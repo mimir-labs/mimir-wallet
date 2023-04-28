@@ -4,7 +4,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const { merge } = require('webpack-merge');
-const { InjectManifest } = require('workbox-webpack-plugin');
 
 const baseConfig = require('./webpack.base.cjs');
 
@@ -17,10 +16,6 @@ module.exports = merge(baseConfig(context), {
       title: 'mimir-wallet',
       inject: true,
       template: path.join(context, 'src/index.html')
-    }),
-    new InjectManifest({
-      swSrc: './src/serviceWorker/index.ts',
-      swDest: 'service-worker.js'
     })
   ]
 });

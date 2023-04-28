@@ -1,5 +1,5 @@
 {
-  "author": "devmimir",
+  "author": "dev.mimir",
   "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
   "homepage": "https://github.com/mimir-labs/mimir-wallet#readme",
   "license": "Apache-2.0",
@@ -11,7 +11,7 @@
   },
   "sideEffects": false,
   "type": "module",
-  "version": "0.7.1",
+  "version": "0.0.0",
   "workspaces": [
     "packages/*"
   ],

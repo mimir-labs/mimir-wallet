@@ -1,5 +1,5 @@
 {
-  "author": "devmimir",
+  "author": "dev.mimir",
   "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
   "contributors": [],
   "description": "mimir-wallet react-hooks",
@@ -16,13 +16,13 @@
   "sideEffects": false,
   "type": "module",
   "version": "0.0.0",
-  "peerDependencies": {
-    "react": "*",
-    "react-dom": "*"
-  },
   "dependencies": {
     "@polkadot/api": "^10.4.1",
     "@polkadot/util": "^12.0.1",
     "@polkadot/util-crypto": "^12.0.1"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-dom": "*"
   }
 }

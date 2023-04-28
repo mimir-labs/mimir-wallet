@@ -1,5 +1,5 @@
 {
-  "author": "devmimir",
+  "author": "dev.mimir",
   "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
   "contributors": [],
   "description": "mimir-wallet react-components",
@@ -16,11 +16,11 @@
   "sideEffects": false,
   "type": "module",
   "version": "0.0.0",
+  "dependencies": {
+    "@mui/material": "^5.12.2"
+  },
   "peerDependencies": {
     "react": "*",
     "react-dom": "*"
-  },
-  "dependencies": {
-    "@mui/material": "^5.12.2"
   }
 }
