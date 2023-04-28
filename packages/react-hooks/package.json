@@ -1,0 +1,28 @@
+{
+  "author": "devmimir",
+  "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
+  "contributors": [],
+  "description": "mimir-wallet react-hooks",
+  "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/react-hooks#readme",
+  "license": "Apache-2.0",
+  "maintainers": [],
+  "name": "@mimirdev/react-hooks",
+  "private": true,
+  "repository": {
+    "directory": "packages/react-hooks",
+    "type": "git",
+    "url": "https://github.com/mimir-labs/mimir-wallet.git"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "version": "0.0.0",
+  "peerDependencies": {
+    "react": "*",
+    "react-dom": "*"
+  },
+  "dependencies": {
+    "@polkadot/api": "^10.4.1",
+    "@polkadot/util": "^12.0.1",
+    "@polkadot/util-crypto": "^12.0.1"
+  }
+}

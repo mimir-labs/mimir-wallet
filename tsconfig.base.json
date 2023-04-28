@@ -1,0 +1,21 @@
+{
+  "extends": "@mimirdev/dev/config/tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "jsx": "react-jsx",
+    "lib": ["WebWorker", "ESNext"],
+    "paths": {
+      "mimir-wallet": ["app/src"],
+      "mimir-wallet/*": ["app/src/*"],
+      "@mimirdev/app-config": ["app-config/src"],
+      "@mimirdev/app-config/*": ["app-config/src/*"],
+      "@mimirdev/react-api": ["react-api/src"],
+      "@mimirdev/react-api/*": ["react-api/src/*"],
+      "@mimirdev/react-components": ["react-components/src"],
+      "@mimirdev/react-components/*": ["react-components/src/*"],
+      "@mimirdev/react-hooks": ["react-hooks/src"],
+      "@mimirdev/react-hooks/*": ["react-hooks/src/*"],
+    },
+    "skipLibCheck": true
+  }
+}

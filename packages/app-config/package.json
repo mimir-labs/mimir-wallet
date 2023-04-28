@@ -1,0 +1,19 @@
+{
+  "author": "devmimir",
+  "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
+  "contributors": [],
+  "description": "mimir-wallet app-config",
+  "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/app-config#readme",
+  "license": "Apache-2.0",
+  "maintainers": [],
+  "name": "@mimirdev/app-config",
+  "private": true,
+  "repository": {
+    "directory": "packages/app-config",
+    "type": "git",
+    "url": "https://github.com/mimir-labs/mimir-wallet.git"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "version": "0.0.0"
+}
