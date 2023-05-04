@@ -8,4 +8,6 @@ export * from './useAddresses';
 export * from './useApi';
 export * from './useCall';
 export * from './useCallMulti';
+export * from './useDeriveAccountInfo';
+export * from './useEndpoint';
 export * from './useIsMountedRef';

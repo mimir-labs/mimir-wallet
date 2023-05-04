@@ -17,7 +17,9 @@
   "type": "module",
   "version": "0.0.0",
   "dependencies": {
-    "@mui/material": "^5.12.2"
+    "@mui/material": "^5.12.2",
+    "@polkadot/react-identicon": "^3.2.2",
+    "lottie-web": "^5.11.0"
   },
   "peerDependencies": {
     "react": "*",

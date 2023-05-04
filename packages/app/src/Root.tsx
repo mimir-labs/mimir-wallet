@@ -5,6 +5,7 @@ import type { KeyringStore } from '@polkadot/ui-keyring/types';
 
 import { StyledEngineProvider } from '@mui/material';
 import { Suspense } from 'react';
+import { HashRouter } from 'react-router-dom';
 
 import { appConfig } from '@mimirdev/app-config';
 import { ApiCtxRoot } from '@mimirdev/react-api';
@@ -24,7 +25,9 @@ function Root({ store }: Props) {
         <ThemeProvider>
           <ApiCtxRoot apiUrl={appConfig.apiUrl} store={store}>
             <KeyringCtxRoot>
-              <App />
+              <HashRouter>
+                <App />
+              </HashRouter>
             </KeyringCtxRoot>
           </ApiCtxRoot>
         </ThemeProvider>
