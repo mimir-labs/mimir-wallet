@@ -3,7 +3,9 @@
 
 export * from './material';
 
-export { default as AddressSmall } from './AddressSmall';
+export { default as AccountMenu } from './AccountMenu';
+export { default as AccountName } from './AccountName';
+export { default as AccountSmall } from './AccountSmall';
 export { default as BalanceFree } from './BalanceFree';
 export { default as FormatBalance } from './FormatBalance';
 export { default as GlobalStyle } from './GlobalStyle';

@@ -18,9 +18,9 @@ interface Props {
   withBalance?: boolean;
 }
 
-function AddressSmall({ balance, value, withBalance }: Props) {
+function AccountSmall({ balance, value, withBalance }: Props) {
   return (
-    <Stack alignItems='center' direction='row' spacing={1}>
+    <Stack alignItems='center' direction='row' spacing={1} sx={{ width: '100%' }}>
       <IdentityIcon size={30} value={value} />
       <Stack
         spacing={0.25}
@@ -45,4 +45,4 @@ function AddressSmall({ balance, value, withBalance }: Props) {
   );
 }
 
-export default React.memo(AddressSmall);
+export default React.memo(AccountSmall);

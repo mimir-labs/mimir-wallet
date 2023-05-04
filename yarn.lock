@@ -2637,6 +2637,9 @@ __metadata:
 "@mimirdev/app-config@workspace:packages/app-config":
   version: 0.0.0-use.local
   resolution: "@mimirdev/app-config@workspace:packages/app-config"
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
   languageName: unknown
   linkType: soft
 
@@ -2751,6 +2754,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mimirdev/page-profile@workspace:packages/page-profile":
+  version: 0.0.0-use.local
+  resolution: "@mimirdev/page-profile@workspace:packages/page-profile"
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
+  languageName: unknown
+  linkType: soft
+
 "@mimirdev/react-api@workspace:packages/react-api":
   version: 0.0.0-use.local
   resolution: "@mimirdev/react-api@workspace:packages/react-api"
@@ -2786,6 +2798,7 @@ __metadata:
   resolution: "@mimirdev/react-hooks@workspace:packages/react-hooks"
   dependencies:
     "@polkadot/api": "npm:^10.5.1"
+    "@polkadot/ui-keyring": "npm:^3.2.2"
     "@polkadot/util": "npm:^12.1.2"
     "@polkadot/util-crypto": "npm:^12.1.2"
   peerDependencies:
@@ -13804,6 +13817,9 @@ __metadata:
     workbox-routing: "npm:^6.5.4"
     workbox-strategies: "npm:^6.5.4"
     workbox-webpack-plugin: "npm:^6.5.4"
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
   languageName: unknown
   linkType: soft
 

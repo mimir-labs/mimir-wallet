@@ -10,4 +10,6 @@ export * from './useCall';
 export * from './useCallMulti';
 export * from './useDeriveAccountInfo';
 export * from './useEndpoint';
+export * from './useGroupAccounts';
 export * from './useIsMountedRef';
+export * from './useSelectedAccount';

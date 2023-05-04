@@ -63,17 +63,17 @@ const createPalette = (mode: PaletteMode): PaletteOptions => ({
   },
   divider: 'rgba(39, 0, 255, 0.05)',
   action: {
-    active: alpha('#151F34', 0.54),
-    hover: alpha('#151F34', 0.04),
-    hoverOpacity: 0.04,
-    selected: alpha('#151F34', 0.08),
-    selectedOpacity: 0.08,
+    active: 'rgba(39, 0, 255, 0.05)',
+    activatedOpacity: 0.05,
+    hover: 'rgba(39, 0, 255, 0.05)',
+    hoverOpacity: 0.05,
+    selected: 'rgba(39, 0, 255, 0.05)',
+    selectedOpacity: 0.05,
     disabled: alpha('#151F34', 0.26),
     disabledBackground: alpha('#151F34', 0.12),
     disabledOpacity: 0.38,
     focus: 'rgba(39, 0, 255, 0.05)',
-    focusOpacity: 0.12,
-    activatedOpacity: 0.12
+    focusOpacity: 0.12
   }
 });
 

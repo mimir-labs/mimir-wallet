@@ -10,18 +10,10 @@ import { findEndpoint } from '@mimirdev/app-config';
 import { createNamedHook } from './createNamedHook';
 import { useApi } from './useApi';
 
-function useEndpointImpl(): EndpointOption {
-  const { apiUrl, isDevelopment, specName, systemName } = useApi();
+function useEndpointImpl(): EndpointOption | undefined {
+  const { specName } = useApi();
 
-  const endpoint = useMemo(
-    () =>
-      findEndpoint(specName) || {
-        provider: apiUrl,
-        text: isDevelopment ? 'Development' : systemName,
-        specName
-      },
-    [apiUrl, isDevelopment, specName, systemName]
-  );
+  const endpoint = useMemo((): EndpointOption | undefined => findEndpoint(specName), [specName]);
 
   return endpoint;
 }

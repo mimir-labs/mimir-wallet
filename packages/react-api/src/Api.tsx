@@ -71,7 +71,7 @@ async function getInjectedAccounts(injectedPromise: Promise<InjectedExtension[]>
       ({ address, meta }, whenCreated): InjectedAccountExt => ({
         address,
         meta: objectSpread({}, meta, {
-          name: `${meta.name || 'unknown'} (${meta.source === 'polkadot-js' ? 'extension' : meta.source})`,
+          name: `${meta.name || 'unknown'}`,
           whenCreated
         })
       })

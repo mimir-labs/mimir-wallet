@@ -2,5 +2,3 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const API_URL_KEY = 'apiUrl';
-
-export const SELECT_ACCOUNT_KEY = 'selected_account';
