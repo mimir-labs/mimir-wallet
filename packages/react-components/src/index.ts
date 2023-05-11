@@ -4,10 +4,12 @@
 export * from './material';
 
 export { default as AccountMenu } from './AccountMenu';
+export { default as AccountMini } from './AccountMini';
 export { default as AccountName } from './AccountName';
 export { default as AccountSmall } from './AccountSmall';
 export { default as BalanceFree } from './BalanceFree';
 export { default as FormatBalance } from './FormatBalance';
 export { default as GlobalStyle } from './GlobalStyle';
 export { default as IdentityIcon } from './IdentityIcon';
+export { default as Input } from './Input';
 export { default as MimirLoading } from './MimirLoading';

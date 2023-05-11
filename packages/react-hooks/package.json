@@ -23,6 +23,7 @@
     "@polkadot/util-crypto": "^12.1.2"
   },
   "peerDependencies": {
+    "@mui/material": "*",
     "react": "*",
     "react-dom": "*"
   }

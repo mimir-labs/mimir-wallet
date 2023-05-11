@@ -8,10 +8,10 @@ import type { SvgIconProps } from '@mui/material';
 import { SvgIcon } from '@mui/material';
 import React from 'react';
 
-import IconDappSvg from '../assets/icon-dapp.svg';
+import IconAddSvg from '../assets/icon-add.svg';
 
-function IconDapp(props: SvgIconProps) {
-  return <SvgIcon component={IconDappSvg} fontSize='inherit' viewBox='0 0 20 20' {...props} />;
+function IconAdd(props: SvgIconProps) {
+  return <SvgIcon component={IconAddSvg} fontSize='inherit' viewBox='0 0 12 12' {...props} />;
 }
 
-export default React.memo(IconDapp);
+export default React.memo(IconAdd);

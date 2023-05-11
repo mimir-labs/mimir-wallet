@@ -14,8 +14,7 @@ const createComponents: Func = () => ({
   MuiButton: {
     styleOverrides: {
       root: {
-        textTransform: 'initial',
-        borderRadius: '10px'
+        textTransform: 'initial'
       },
       startIcon: {
         '>*:nth-of-type(1)': {
@@ -44,11 +43,42 @@ const createComponents: Func = () => ({
     }
   },
 
+  MuiInputLabel: {
+    styleOverrides: {
+      outlined: ({ theme }) => ({
+        position: 'relative',
+        transform: 'none',
+        fontWeight: 700,
+        fontSize: '0.875rem',
+        marginBottom: theme.spacing(0.75),
+        color: theme.palette.text.primary
+      })
+    }
+  },
+
+  MuiOutlinedInput: {
+    styleOverrides: {
+      input: {
+        padding: '8px 10px'
+      },
+      root: ({ theme: { palette } }) => ({
+        '.MuiOutlinedInput-notchedOutline': {
+          borderColor: palette.grey[300]
+        },
+        '&.Mui-disabled': {
+          '.MuiOutlinedInput-notchedOutline': {
+            borderColor: palette.grey[300]
+          }
+        }
+      })
+    }
+  },
+
   MuiPaper: {
     styleOverrides: {
-      outlined: {
-        borderRadius: '10px'
-      }
+      outlined: ({ theme }) => ({
+        borderColor: theme.palette.grey[300]
+      })
     }
   }
 });

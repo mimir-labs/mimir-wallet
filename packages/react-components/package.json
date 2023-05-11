@@ -22,6 +22,7 @@
     "lottie-web": "^5.11.0"
   },
   "peerDependencies": {
+    "@mui/material": "*",
     "react": "*",
     "react-dom": "*"
   }

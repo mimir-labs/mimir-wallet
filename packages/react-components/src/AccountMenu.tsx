@@ -3,6 +3,7 @@
 
 import { Box, Button, IconButton, Menu, MenuItem, MenuList, Typography } from '@mui/material';
 import React, { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { IconAddOutlined, IconDelete } from '@mimirdev/app-config/icons';
 import { useGroupAccounts, useSelectedAccountCallback } from '@mimirdev/react-hooks';
@@ -26,12 +27,12 @@ function AccountCell({ handleClose, value }: { value: string; handleClose?: () =
     <MenuItem
       disableTouchRipple
       onClick={handleClick}
-      sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 1.25, padding: '2px 10px', border: '1px solid', borderColor: 'secondary.main', borderRadius: '10px' }}
+      sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 1.25, padding: '2px 10px', border: '1px solid', borderColor: 'secondary.main' }}
     >
       <Box sx={{ width: 'calc(100% - 30px)' }}>
         <AccountSmall value={value} />
       </Box>
-      <IconButton onClick={(e) => e.stopPropagation()} size='small' sx={{ color: 'grey.300' }}>
+      <IconButton onClick={(e) => e.stopPropagation()} size='small' sx={{ color: 'grey.300', ':hover': { color: 'error.main' } }}>
         <IconDelete />
       </IconButton>
     </MenuItem>
@@ -39,8 +40,11 @@ function AccountCell({ handleClose, value }: { value: string; handleClose?: () =
 }
 
 function CreateMultisig() {
+  const navigate = useNavigate();
+
   return (
     <Button
+      onClick={() => navigate('/create-multisig')}
       startIcon={<IconAddOutlined sx={{ fontSize: '2rem !important' }} />}
       sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginTop: 1.25, padding: '2px 10px' }}
       variant='outlined'

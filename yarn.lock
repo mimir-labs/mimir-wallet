@@ -2638,6 +2638,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@mimirdev/app-config@workspace:packages/app-config"
   peerDependencies:
+    "@mui/material": "*"
     react: "*"
     react-dom: "*"
   languageName: unknown
@@ -2758,6 +2759,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@mimirdev/page-profile@workspace:packages/page-profile"
   peerDependencies:
+    "@mui/material": "*"
     react: "*"
     react-dom: "*"
   languageName: unknown
@@ -2775,6 +2777,7 @@ __metadata:
     fflate: "npm:^0.7.4"
     rxjs: "npm:^7.8.0"
   peerDependencies:
+    "@mui/material": "*"
     react: "*"
     react-dom: "*"
   languageName: unknown
@@ -2788,6 +2791,7 @@ __metadata:
     "@polkadot/react-identicon": "npm:^3.2.2"
     lottie-web: "npm:^5.11.0"
   peerDependencies:
+    "@mui/material": "*"
     react: "*"
     react-dom: "*"
   languageName: unknown
@@ -2802,6 +2806,7 @@ __metadata:
     "@polkadot/util": "npm:^12.1.2"
     "@polkadot/util-crypto": "npm:^12.1.2"
   peerDependencies:
+    "@mui/material": "*"
     react: "*"
     react-dom: "*"
   languageName: unknown
@@ -13818,6 +13823,7 @@ __metadata:
     workbox-strategies: "npm:^6.5.4"
     workbox-webpack-plugin: "npm:^6.5.4"
   peerDependencies:
+    "@mui/material": "*"
     react: "*"
     react-dom: "*"
   languageName: unknown

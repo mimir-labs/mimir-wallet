@@ -5,7 +5,7 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 
 import { Box, Button, Divider, Drawer, IconButton, Paper, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { matchPath, useLocation, useNavigate } from 'react-router-dom';
+import { matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { ArrowDown, IconAddressBook, IconCopy, IconDapp, IconExternal, IconProfile, IconQr, IconTransaction, IconTransfer } from '@mimirdev/app-config/icons';
 import { AccountMenu, AccountSmall } from '@mimirdev/react-components';
@@ -32,7 +32,6 @@ function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<an
         justifyContent: 'flex-start',
         marginTop: 2.5,
         padding: '15px 20px',
-        borderRadius: '10px',
         color: 'grey.300',
         '> p': {
           color: 'text.secondary'
@@ -69,36 +68,50 @@ function SideBar() {
   };
 
   return (
-    <Drawer PaperProps={{ sx: { width: 222, top: 56, paddingX: 2, paddingY: 2.5 } }} anchor='left' variant='permanent'>
-      <Paper sx={{ padding: 1 }} variant='outlined'>
-        <Stack alignItems='center' direction='row' spacing={1}>
-          <Box sx={{ width: 'calc(100% - 30px)' }}>
-            <AccountSmall balance={balances?.freeBalance} value={selected} withBalance />
-          </Box>
-          <IconButton onClick={handleAccountOpen} size='small'>
-            <ArrowDown sx={{ fontSize: '0.75rem' }} />
+    <>
+      <Drawer PaperProps={{ sx: { width: 222, top: 56, paddingX: 2, paddingY: 2.5 } }} anchor='left' variant='permanent'>
+        <Paper sx={{ padding: 1 }} variant='outlined'>
+          <Stack alignItems='center' direction='row' spacing={1}>
+            <Box sx={{ width: 'calc(100% - 30px)' }}>
+              <AccountSmall balance={balances?.freeBalance} value={selected} withBalance />
+            </Box>
+            <IconButton onClick={handleAccountOpen} size='small'>
+              <ArrowDown sx={{ fontSize: '0.75rem' }} />
+            </IconButton>
+          </Stack>
+          <Divider sx={{ marginY: 1.25 }} />
+          <IconButton color='primary' size='small'>
+            <IconQr />
           </IconButton>
-        </Stack>
-        <Divider sx={{ marginY: 1.25 }} />
-        <IconButton color='primary' size='small'>
-          <IconQr />
-        </IconButton>
-        <IconButton color='primary' size='small'>
-          <IconCopy />
-        </IconButton>
-        <IconButton color='primary' size='small'>
-          <IconExternal />
-        </IconButton>
-        <IconButton color='primary' size='small'>
-          <IconTransfer />
-        </IconButton>
-      </Paper>
-      <NavLink Icon={IconProfile} label='Profile' to='/' />
-      <NavLink Icon={IconDapp} label='Dapp' to='/dapp' />
-      <NavLink Icon={IconTransaction} label='Transactions' to='/transactions' />
-      <NavLink Icon={IconAddressBook} label='Address Book' to='/address-book' />
-      <AccountMenu anchorEl={anchorEl} handleClose={handleAccountClose} />
-    </Drawer>
+          <IconButton color='primary' size='small'>
+            <IconCopy />
+          </IconButton>
+          <IconButton color='primary' size='small'>
+            <IconExternal />
+          </IconButton>
+          <IconButton color='primary' size='small'>
+            <IconTransfer />
+          </IconButton>
+        </Paper>
+        <NavLink Icon={IconProfile} label='Profile' to='/' />
+        <NavLink Icon={IconDapp} label='Dapp' to='/dapp' />
+        <NavLink Icon={IconTransaction} label='Transactions' to='/transactions' />
+        <NavLink Icon={IconAddressBook} label='Address Book' to='/address-book' />
+        <AccountMenu anchorEl={anchorEl} handleClose={handleAccountClose} />
+      </Drawer>
+      <Box
+        sx={{
+          paddingTop: 'calc(56px + 20px)',
+          paddingLeft: 'calc(222px + 20px)',
+          paddingRight: '20px',
+          paddingBottom: '20px',
+          height: '100%',
+          background: 'linear-gradient(245.23deg, #F4F2FF 0%, #FBFDFF 100%)'
+        }}
+      >
+        <Outlet />
+      </Box>
+    </>
   );
 }
 

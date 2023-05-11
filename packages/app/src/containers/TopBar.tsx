@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 import { Logo } from '@mimirdev/app-config/images';
 
-import ChainSelect from './ChainSelect';
+import ChainSelect from '../ChainSelect';
 
 function TopBar() {
   return (

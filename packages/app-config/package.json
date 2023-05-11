@@ -17,6 +17,7 @@
   "type": "module",
   "version": "0.0.0",
   "peerDependencies": {
+    "@mui/material": "*",
     "react": "*",
     "react-dom": "*"
   }
