@@ -1,7 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BaseInputProps } from './types';
+import type { InputProps } from './types';
 
 import { Box, FormControl, FormHelperText, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
 import { useCallback } from 'react';
@@ -32,7 +32,7 @@ function Input({
   tabIndex,
   type,
   value
-}: BaseInputProps<string>) {
+}: InputProps) {
   const _onChange = useCallback(
     (e: any) => {
       const _value: string = e.target.value;

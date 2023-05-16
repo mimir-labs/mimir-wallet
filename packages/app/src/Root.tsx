@@ -9,8 +9,8 @@ import { HashRouter } from 'react-router-dom';
 
 import { appConfig } from '@mimirdev/app-config';
 import { ApiCtxRoot } from '@mimirdev/react-api';
-import { ThemeProvider } from '@mimirdev/react-components';
-import { KeyringCtxRoot, SelectAccountCtxRoot } from '@mimirdev/react-hooks';
+import { ThemeProvider, TxModal } from '@mimirdev/react-components';
+import { KeyringCtxRoot, SelectAccountCtxRoot, TxCtxRoot } from '@mimirdev/react-hooks';
 
 import App from './App';
 
@@ -26,9 +26,12 @@ function Root({ store }: Props) {
           <ApiCtxRoot apiUrl={appConfig.apiUrl} store={store}>
             <KeyringCtxRoot>
               <SelectAccountCtxRoot>
-                <HashRouter>
-                  <App />
-                </HashRouter>
+                <TxCtxRoot>
+                  <HashRouter>
+                    <App />
+                    <TxModal />
+                  </HashRouter>
+                </TxCtxRoot>
               </SelectAccountCtxRoot>
             </KeyringCtxRoot>
           </ApiCtxRoot>

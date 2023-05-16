@@ -1,14 +1,14 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Button, IconButton, Menu, MenuItem, MenuList, Typography } from '@mui/material';
+import { Button, IconButton, Menu, MenuItem, MenuList, Typography } from '@mui/material';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { IconAddOutlined, IconDelete } from '@mimirdev/app-config/icons';
 import { useGroupAccounts, useSelectedAccountCallback } from '@mimirdev/react-hooks';
 
-import AccountSmall from './AccountSmall';
+import AddressSmall from './AddressSmall';
 
 interface Props {
   anchorEl: HTMLElement | null;
@@ -27,11 +27,18 @@ function AccountCell({ handleClose, value }: { value: string; handleClose?: () =
     <MenuItem
       disableTouchRipple
       onClick={handleClick}
-      sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 1.25, padding: '2px 10px', border: '1px solid', borderColor: 'secondary.main' }}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 1.25,
+        padding: '2px 10px',
+        border: '1px solid',
+        borderColor: 'secondary.main',
+        '.AddressSmall-Address': { maxWidth: 100 }
+      }}
     >
-      <Box sx={{ width: 'calc(100% - 30px)' }}>
-        <AccountSmall value={value} />
-      </Box>
+      <AddressSmall value={value} />
       <IconButton onClick={(e) => e.stopPropagation()} size='small' sx={{ color: 'grey.300', ':hover': { color: 'error.main' } }}>
         <IconDelete />
       </IconButton>

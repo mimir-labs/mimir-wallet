@@ -8,7 +8,7 @@ import { useMemo, useState } from 'react';
 import { matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { ArrowDown, IconAddressBook, IconCopy, IconDapp, IconExternal, IconProfile, IconQr, IconTransaction, IconTransfer } from '@mimirdev/app-config/icons';
-import { AccountMenu, AccountSmall } from '@mimirdev/react-components';
+import { AccountMenu, AddressSmall } from '@mimirdev/react-components';
 import { useApi, useCall, useSelectedAccount } from '@mimirdev/react-hooks';
 
 function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<any>; label: React.ReactNode }) {
@@ -71,11 +71,9 @@ function SideBar() {
     <>
       <Drawer PaperProps={{ sx: { width: 222, top: 56, paddingX: 2, paddingY: 2.5 } }} anchor='left' variant='permanent'>
         <Paper sx={{ padding: 1 }} variant='outlined'>
-          <Stack alignItems='center' direction='row' spacing={1}>
-            <Box sx={{ width: 'calc(100% - 30px)' }}>
-              <AccountSmall balance={balances?.freeBalance} value={selected} withBalance />
-            </Box>
-            <IconButton onClick={handleAccountOpen} size='small'>
+          <Stack alignItems='center' direction='row' spacing={1} sx={{ '.AddressSmall-Address': { maxWidth: 100 } }}>
+            <AddressSmall balance={balances?.freeBalance} value={selected} withBalance />
+            <IconButton color='inherit' onClick={handleAccountOpen} size='small'>
               <ArrowDown sx={{ fontSize: '0.75rem' }} />
             </IconButton>
           </Stack>

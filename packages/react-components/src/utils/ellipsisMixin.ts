@@ -9,3 +9,11 @@ export const ellipsisMixin = (width?: number | string): CSSObject => ({
   whiteSpace: 'nowrap',
   width
 });
+
+export const ellipsisLinesMixin = (lines: number): CSSObject => ({
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  display: '-webkit-box',
+  WebkitBoxOrient: 'vertical',
+  WebkitLineClamp: lines
+});

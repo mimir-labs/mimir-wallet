@@ -5,6 +5,7 @@ import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Input } from '@mimirdev/react-components';
 import { useApi } from '@mimirdev/react-hooks';
@@ -25,6 +26,7 @@ function PageCreateMultisig() {
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
   const [{ isThresholdValid, threshold }, setThreshold] = useState<{ isThresholdValid: boolean; threshold: number }>({ isThresholdValid: true, threshold: 2 });
   const { chainSS58 } = useApi();
+  const navigate = useNavigate();
 
   const handleAdd = useCallback(() => {
     if (address && isAddressValid) {
@@ -43,13 +45,16 @@ function PageCreateMultisig() {
     if (!name) return;
 
     createMultisig(signatories, threshold, name);
-  }, [name, signatories, threshold]);
+    navigate('/');
+  }, [name, navigate, signatories, threshold]);
 
   return (
     <Box sx={{ width: 480, maxWidth: '100%', margin: '0 auto' }}>
-      <Button variant='outlined'>{'<'} Back</Button>
+      <Button onClick={() => navigate(-1)} variant='outlined'>
+        {'<'} Back
+      </Button>
       <Paper sx={{ padding: 2.5, borderRadius: '20px', marginTop: 1.25 }}>
-        <Stack gap={2}>
+        <Stack spacing={2}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant='h3'>Create Multisig</Typography>
             <Button variant='outlined'>Import</Button>

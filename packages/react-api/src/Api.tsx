@@ -4,6 +4,7 @@
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
 import type { KeyringStore } from '@polkadot/ui-keyring/types';
+import type { ApiProps, ApiState } from './types';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
@@ -14,7 +15,6 @@ import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defau
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { registry } from './typeRegistry';
-import { ApiProps, ApiState } from './types';
 
 interface Props {
   children: React.ReactNode;

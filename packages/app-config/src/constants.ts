@@ -4,3 +4,5 @@
 export const API_URL_KEY = 'apiUrl';
 
 export const SELECT_ACCOUNT_KEY = 'selected_account';
+
+export const MULTISIG_CALLDATA = 'multisig_calldata';

@@ -7,3 +7,11 @@ export interface EndpointOption {
   text: string;
   providers: Record<string, string>;
 }
+
+export interface DappOption {
+  internal: boolean;
+  icon: string;
+  name: string;
+  description: string;
+  url: string;
+}

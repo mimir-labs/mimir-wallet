@@ -3,3 +3,4 @@
 
 export { KeyringCtxRoot } from './Keyring';
 export { SelectAccountCtxRoot } from './SelectedAccount';
+export { TxCtxRoot } from './Tx';

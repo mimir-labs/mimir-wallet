@@ -58,9 +58,6 @@ const createComponents: Func = () => ({
 
   MuiOutlinedInput: {
     styleOverrides: {
-      input: {
-        padding: '8px 10px'
-      },
       root: ({ theme: { palette } }) => ({
         '.MuiOutlinedInput-notchedOutline': {
           borderColor: palette.grey[300]
@@ -78,6 +75,35 @@ const createComponents: Func = () => ({
     styleOverrides: {
       outlined: ({ theme }) => ({
         borderColor: theme.palette.grey[300]
+      })
+    }
+  },
+
+  MuiChip: {
+    styleOverrides: {
+      root: {
+        fontSize: 12,
+        lineHeight: '14px'
+      },
+      sizeSmall: {
+        height: 24
+      },
+      labelSmall: {
+        padding: '0px 5px'
+      },
+      sizeMedium: {
+        height: 24
+      },
+      labelMedium: {
+        padding: '0px 10px'
+      }
+    }
+  },
+
+  MuiAutocomplete: {
+    styleOverrides: {
+      popupIndicator: ({ theme }) => ({
+        color: theme.palette.text.primary
       })
     }
   }

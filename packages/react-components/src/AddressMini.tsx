@@ -7,22 +7,25 @@ import { Stack, Typography } from '@mui/material';
 import React from 'react';
 
 import AccountName from './AccountName';
+import CopyButton from './CopyButton';
 import IdentityIcon from './IdentityIcon';
 import { ellipsisMixin } from './utils';
 
 interface Props {
   value?: AccountId | AccountIndex | Address | string | null;
+  withCopy?: boolean;
 }
 
-function AccountMini({ value }: Props) {
+function AddressMini({ value, withCopy }: Props) {
   return (
     <Stack alignItems='center' direction='row' spacing={0.5} sx={{ width: '100%' }}>
       <IdentityIcon size={20} value={value} />
       <Typography sx={{ ...ellipsisMixin('calc(100% - 4px - 20px)') }}>
         <AccountName value={value} />
+        {withCopy && <CopyButton value={value?.toString()} />}
       </Typography>
     </Stack>
   );
 }
 
-export default React.memo(AccountMini);
+export default React.memo(AddressMini);

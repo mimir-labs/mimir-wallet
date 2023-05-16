@@ -11,6 +11,7 @@ import { encodeAddress } from '@polkadot/util-crypto';
 import React, { useMemo } from 'react';
 
 interface Props {
+  className?: string;
   prefix?: IdentityProps['prefix'];
   size?: number;
   value?: AccountId | AccountIndex | Address | string | Uint8Array | null;
@@ -20,7 +21,7 @@ function isCodec(value?: AccountId | AccountIndex | Address | string | Uint8Arra
   return !!(value && (value as AccountId).toHuman);
 }
 
-function IdentityIcon({ prefix, size = 30, value }: Props) {
+function IdentityIcon({ className, prefix, size = 30, value }: Props) {
   const { address, publicKey } = useMemo(() => {
     try {
       const _value = isCodec(value) ? value.toString() : value;
@@ -33,7 +34,7 @@ function IdentityIcon({ prefix, size = 30, value }: Props) {
   }, [prefix, value]);
 
   return (
-    <Box sx={{ width: size, height: size, bgcolor: 'secondary.main', borderRadius: '50%' }}>
+    <Box className={`${className} IdentityIcon`} sx={{ width: size, height: size, bgcolor: 'secondary.main', borderRadius: '50%' }}>
       <PolkadotIcon address={address} publicKey={publicKey} size={size} />
     </Box>
   );

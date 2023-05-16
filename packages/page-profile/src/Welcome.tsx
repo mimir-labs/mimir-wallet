@@ -12,7 +12,7 @@ function Welcome() {
       <Typography variant='h1'>Welcome</Typography>
       <Stack
         direction='row'
-        gap={2.5}
+        spacing={2.5}
         sx={{
           marginTop: 2.5,
           '>.Welcome-cell': {

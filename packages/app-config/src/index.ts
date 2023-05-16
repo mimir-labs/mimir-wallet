@@ -5,4 +5,5 @@ import { AppConfig } from './AppConfig';
 
 export const appConfig = new AppConfig();
 
+export * from './dapps';
 export * from './endpoints';

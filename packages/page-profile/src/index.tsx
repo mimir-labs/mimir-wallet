@@ -3,12 +3,13 @@
 
 import { useGroupAccounts } from '@mimirdev/react-hooks';
 
+import Profile from './Profile';
 import Welcome from './Welcome';
 
 function PageProfile() {
   const { multisig } = useGroupAccounts();
 
-  return multisig.length > 0 ? <>profile</> : <Welcome />;
+  return multisig.length > 0 ? <Profile /> : <Welcome />;
 }
 
 export default PageProfile;
