@@ -72,7 +72,7 @@ function Extrinsic({ accountId, depositor, method }: { accountId: string; deposi
   const [detailOpen, toggleDetailOpen] = useToggle();
 
   return (
-    <Stack spacing={1.5}>
+    <Stack flex='1' spacing={1.5}>
       <Stack alignItems='center' direction='row' justifyContent='space-between'>
         <Stack alignItems='center' direction='row' spacing={1.25}>
           <Box sx={{ width: 8, height: 8, borderRadius: 1, bgcolor: 'error.main' }} />

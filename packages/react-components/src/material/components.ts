@@ -106,6 +106,43 @@ const createComponents: Func = () => ({
         color: theme.palette.text.primary
       })
     }
+  },
+
+  MuiDialog: {
+    styleOverrides: {
+      paper: () => ({
+        borderRadius: 20
+      })
+    }
+  },
+
+  MuiDialogContent: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        padding: theme.spacing(2)
+      })
+    }
+  },
+
+  MuiDialogActions: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        padding: theme.spacing(2)
+      })
+    }
+  },
+
+  MuiStepLabel: {
+    styleOverrides: {
+      root: {
+        '.MuiStepLabel-label': {
+          fontWeight: '700 !important'
+        },
+        '&.Mui-active .MuiStepLabel-label': {
+          fontWeight: '700 !important'
+        }
+      }
+    }
   }
 });
 

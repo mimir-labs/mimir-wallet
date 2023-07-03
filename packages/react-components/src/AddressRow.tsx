@@ -42,7 +42,7 @@ function AddressRow({ balance, size = 'medium', value, withBalance }: Props) {
       <Stack className='AddressRow-Address' spacing={0.5}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography fontSize={nameFontSize} fontWeight={700}>
-            <AccountName value={value} />
+            <AccountName shorten value={value} />
           </Typography>
           {label && <Chip color='secondary' label={label} size={size === 'small' ? 'small' : 'medium'} variant='filled' />}
         </Box>

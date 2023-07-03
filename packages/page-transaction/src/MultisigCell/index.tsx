@@ -9,6 +9,7 @@ import React, { useMemo } from 'react';
 import { useApi } from '@mimirdev/react-hooks';
 
 import Extrinsic from './Extrinsic';
+import Process from './Process';
 
 function MultisigCell({ multisig }: { multisig: MultisigState }) {
   const { api } = useApi();
@@ -18,8 +19,9 @@ function MultisigCell({ multisig }: { multisig: MultisigState }) {
   }, [api.registry, multisig.calldata]);
 
   return (
-    <Paper sx={{ padding: 2.5 }}>
+    <Paper sx={{ display: 'flex', padding: 2, gap: 2 }}>
       <Extrinsic accountId={multisig.accountId} depositor={multisig.multisig.depositor} method={calldata} />
+      <Process accountId={multisig.accountId} approvals={multisig.multisig.approvals.toArray()} />
     </Paper>
   );
 }

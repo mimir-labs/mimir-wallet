@@ -116,9 +116,9 @@ function ConfirmButton({
     try {
       const [tx, params] = await Promise.all([wrapTx(api, extrinsic, address, signAddress, isMultisig, isMultisigCancel), extractParams(api, signAddress || address)]);
 
-      console.log(await tx.dryRun(signAddress || address, params));
+      await tx.signAndSend(signAddress || address, params);
 
-      if (signAddress) {
+      if (isMultisig) {
         const calldata = localStorage.getItem(MULTISIG_CALLDATA);
 
         localStorage.setItem(

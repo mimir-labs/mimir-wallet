@@ -60,7 +60,8 @@ function createTheme(mode: PaletteMode): Theme {
         lg: 1280,
         xl: 1536
       }
-    }
+    },
+    spacing: 10
   });
 }
 

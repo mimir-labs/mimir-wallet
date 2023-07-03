@@ -15,6 +15,7 @@ import { getAddressName } from './utils';
 interface Props {
   defaultName?: string;
   value: AccountId | AccountIndex | Address | string | Uint8Array | null | undefined;
+  shorten?: boolean;
 }
 
 const displayCache = new Map<string, React.ReactNode>();
@@ -25,7 +26,12 @@ export function getParentAccount(value: string): string | undefined {
   return parentCache.get(value);
 }
 
-function defaultOrAddr(defaultName = '', _address: AccountId | AccountIndex | Address | string | Uint8Array, _accountIndex?: AccountIndex | null): [displayName: React.ReactNode, isAddress: boolean] {
+function defaultOrAddr(
+  defaultName = '',
+  _address: AccountId | AccountIndex | Address | string | Uint8Array,
+  _accountIndex?: AccountIndex | null,
+  shorten = false
+): [displayName: React.ReactNode, isAddress: boolean] {
   const accountId = _address.toString();
 
   if (!accountId) {
@@ -38,26 +44,26 @@ function defaultOrAddr(defaultName = '', _address: AccountId | AccountIndex | Ad
   if (isAddress && accountIndex) {
     indexCache.set(accountId, accountIndex);
 
-    return [accountIndex, true];
+    return [shorten ? `${accountIndex.slice(0, 6)}...${accountIndex.slice(-6)}` : accountIndex, true];
   }
 
-  return [name, isAddress];
+  return [isAddress ? (shorten ? `${name.slice(0, 6)}...${name.slice(-6)}` : name) : name, isAddress];
 }
 
-function defaultOrAddrNode(defaultName = '', address: AccountId | AccountIndex | Address | string | Uint8Array, accountIndex?: AccountIndex | null): React.ReactNode {
-  const [node, isAddress] = defaultOrAddr(defaultName, address, accountIndex);
+function defaultOrAddrNode(defaultName = '', address: AccountId | AccountIndex | Address | string | Uint8Array, accountIndex?: AccountIndex | null, shorten = false): React.ReactNode {
+  const [node, isAddress] = defaultOrAddr(defaultName, address, accountIndex, shorten);
 
   return isAddress ? <Box component='span'>{node}</Box> : node;
 }
 
-function extractName(address: string, accountIndex?: AccountIndex, defaultName?: string): React.ReactNode {
+function extractName(address: string, accountIndex?: AccountIndex, defaultName?: string, shorten = false): React.ReactNode {
   const displayCached = displayCache.get(address);
 
   if (displayCached) {
     return displayCached;
   }
 
-  const [displayName] = defaultOrAddr(defaultName, address, accountIndex);
+  const [displayName] = defaultOrAddr(defaultName, address, accountIndex, shorten);
 
   return <Box component='span'>{displayName}</Box>;
 }
@@ -77,7 +83,7 @@ function extractIdentity(address: string, identity: DeriveAccountRegistration): 
   return elem;
 }
 
-function AccountName({ defaultName, value }: Props): React.ReactElement<Props> {
+function AccountName({ defaultName, shorten = false, value }: Props): React.ReactElement<Props> {
   const { api } = useApi();
   const info = useDeriveAccountInfo(value);
   const [name, setName] = useState<React.ReactNode>(() => extractName((value || '').toString(), undefined, defaultName));
@@ -85,6 +91,7 @@ function AccountName({ defaultName, value }: Props): React.ReactElement<Props> {
   // set the actual nickname, local name, accountIndex, accountId
   useEffect((): void => {
     const { accountId, accountIndex, identity, nickname } = info || {};
+
     const cacheAddr = (accountId || value || '').toString();
 
     if (identity?.parent) {
@@ -92,13 +99,13 @@ function AccountName({ defaultName, value }: Props): React.ReactElement<Props> {
     }
 
     if (api && isFunction(api.query.identity?.identityOf)) {
-      setName(() => (identity?.display ? extractIdentity(cacheAddr, identity) : extractName(cacheAddr, accountIndex)));
+      setName(() => (identity?.display ? extractIdentity(cacheAddr, identity) : extractName(cacheAddr, accountIndex, '', shorten)));
     } else if (nickname) {
       setName(nickname);
     } else {
-      setName(defaultOrAddrNode(defaultName, cacheAddr, accountIndex));
+      setName(defaultOrAddrNode(defaultName, cacheAddr, accountIndex, shorten));
     }
-  }, [api, defaultName, info, value]);
+  }, [api, defaultName, info, shorten, value]);
 
   return <>{name}</>;
 }

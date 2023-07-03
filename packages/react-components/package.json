@@ -19,10 +19,10 @@
   "dependencies": {
     "@mui/lab": "^5.0.0-alpha.129",
     "@mui/material": "^5.12.2",
-    "@polkadot/api": "^10.7.1",
-    "@polkadot/react-identicon": "^3.4.1",
-    "@polkadot/util": "^12.2.1",
-    "@polkadot/util-crypto": "^12.2.1",
+    "@polkadot/api": "^10.9.1",
+    "@polkadot/react-identicon": "^3.5.1",
+    "@polkadot/util": "^12.3.2",
+    "@polkadot/util-crypto": "^12.3.2",
     "lottie-web": "^5.11.0"
   },
   "peerDependencies": {

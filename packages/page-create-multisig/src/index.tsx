@@ -8,7 +8,6 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Input } from '@mimirdev/react-components';
-import { useApi } from '@mimirdev/react-hooks';
 
 import AccountSelect from './AccountSelect';
 import { useSelectMultisig } from './useSelectMultisig';
@@ -25,7 +24,6 @@ function PageCreateMultisig() {
   const [name, setName] = useState<string>();
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
   const [{ isThresholdValid, threshold }, setThreshold] = useState<{ isThresholdValid: boolean; threshold: number }>({ isThresholdValid: true, threshold: 2 });
-  const { chainSS58 } = useApi();
   const navigate = useNavigate();
 
   const handleAdd = useCallback(() => {
@@ -49,7 +47,7 @@ function PageCreateMultisig() {
   }, [name, navigate, signatories, threshold]);
 
   return (
-    <Box sx={{ width: 480, maxWidth: '100%', margin: '0 auto' }}>
+    <Box sx={{ width: 520, maxWidth: '100%', margin: '0 auto' }}>
       <Button onClick={() => navigate(-1)} variant='outlined'>
         {'<'} Back
       </Button>
@@ -69,11 +67,11 @@ function PageCreateMultisig() {
             }
             label='Add Multisig Wallet Owners'
             onChange={(value) => {
-              setAddress({ isAddressValid: isAddress(address, true, chainSS58), address: value });
+              setAddress({ isAddressValid: isAddress(value), address: value });
             }}
             placeholder='input address'
           />
-          <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1.25, display: 'flex', justifyContent: 'space-between', gap: 2.5 }}>
+          <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
             <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
             <AccountSelect accounts={signatories} onClick={unselect} title='Multisig Wallet Owners' type='delete' />
           </Paper>

@@ -16,12 +16,12 @@ interface Props {
 
 function AccountSelect({ accounts, onClick, title, type }: Props) {
   return (
-    <Box display='flex' flex={1} flexDirection='column'>
+    <Box display='flex' flex='1' flexDirection='column'>
       <Typography fontWeight={700}>{title}</Typography>
-      <Paper component={Stack} spacing={1.25} sx={{ marginTop: 0.5, padding: 1.25, flex: 1 }} variant='outlined'>
+      <Paper component={Stack} spacing={1} sx={{ marginTop: 0.5, padding: 1, flex: 1 }} variant='outlined'>
         {accounts.map((account, index) => (
-          <Box key={index} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: '5px', padding: '5px', bgcolor: 'secondary.main' }}>
-            <AddressMini value={account} />
+          <Box key={index} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: 0.5, padding: 0.5, bgcolor: 'secondary.main' }}>
+            <AddressMini shorten value={account} />
             <IconButton color={type === 'add' ? 'primary' : 'error'} onClick={() => onClick(account)}>
               {type === 'add' ? <IconAdd /> : <IconDelete />}
             </IconButton>

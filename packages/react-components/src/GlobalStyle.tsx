@@ -9,9 +9,6 @@ function GlobalStyle() {
       <CssBaseline />
       <GlobalStyles
         styles={{
-          '*': {
-            boxSizing: 'border-box'
-          },
           '#root': {
             width: '100%',
             height: '100%'

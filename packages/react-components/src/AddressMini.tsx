@@ -14,14 +14,15 @@ import { ellipsisMixin } from './utils';
 interface Props {
   value?: AccountId | AccountIndex | Address | string | null;
   withCopy?: boolean;
+  shorten?: boolean;
 }
 
-function AddressMini({ value, withCopy }: Props) {
+function AddressMini({ shorten = false, value, withCopy }: Props) {
   return (
     <Stack alignItems='center' direction='row' spacing={0.5} sx={{ width: '100%' }}>
       <IdentityIcon size={20} value={value} />
       <Typography sx={{ ...ellipsisMixin('calc(100% - 4px - 20px)') }}>
-        <AccountName value={value} />
+        <AccountName shorten={shorten} value={value} />
         {withCopy && <CopyButton value={value?.toString()} />}
       </Typography>
     </Stack>
