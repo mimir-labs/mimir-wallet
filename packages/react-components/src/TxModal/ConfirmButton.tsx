@@ -18,7 +18,7 @@ import React, { useCallback, useState } from 'react';
 
 import { MULTISIG_CALLDATA } from '@mimirdev/app-config/constants';
 import { AccountSigner } from '@mimirdev/react-api';
-import { useApi } from '@mimirdev/react-hooks';
+import { useApi, useServer } from '@mimirdev/react-hooks';
 
 import { getAddressMeta } from '../utils';
 
@@ -110,6 +110,7 @@ function ConfirmButton({
 }) {
   const { api } = useApi();
   const [loading, setLoading] = useState(false);
+  const { createCalldata } = useServer();
   const onConfirm = useCallback(async () => {
     setLoading(true);
 
@@ -119,6 +120,7 @@ function ConfirmButton({
       await tx.signAndSend(signAddress || address, params);
 
       if (isMultisig) {
+        createCalldata(extrinsic.method.toHex());
         const calldata = localStorage.getItem(MULTISIG_CALLDATA);
 
         localStorage.setItem(
@@ -140,7 +142,7 @@ function ConfirmButton({
     }
 
     setLoading(false);
-  }, [address, api, extrinsic, isMultisig, isMultisigCancel, onClick, signAddress]);
+  }, [address, api, createCalldata, extrinsic, isMultisig, isMultisigCancel, onClick, signAddress]);
 
   return (
     <LoadingButton loading={loading} onClick={onConfirm} variant='contained'>

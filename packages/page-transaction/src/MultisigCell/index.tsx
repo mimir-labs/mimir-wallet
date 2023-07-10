@@ -1,27 +1,27 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { MultisigState } from '../types';
-
 import { Paper } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { useApi } from '@mimirdev/react-hooks';
+import { useApi, useCalldata } from '@mimirdev/react-hooks';
+import { MultisigTransaction } from '@mimirdev/react-hooks/types';
 
 import Extrinsic from './Extrinsic';
 import Process from './Process';
 
-function MultisigCell({ multisig }: { multisig: MultisigState }) {
+function MultisigCell({ transaction }: { transaction: MultisigTransaction }) {
   const { api } = useApi();
+  const data = useCalldata(transaction.callhash);
 
   const calldata = useMemo(() => {
-    return api.registry.createType('Call', multisig.calldata);
-  }, [api.registry, multisig.calldata]);
+    return api.registry.createType('Call', data?.data || '0x');
+  }, [api.registry, data?.data]);
 
   return (
     <Paper sx={{ display: 'flex', padding: 2, gap: 2 }}>
-      <Extrinsic accountId={multisig.accountId} depositor={multisig.multisig.depositor} method={calldata} />
-      <Process accountId={multisig.accountId} approvals={multisig.multisig.approvals.toArray()} />
+      <Extrinsic accountId={transaction.multisigAccount} depositor={transaction.depositor} id={transaction.id} method={calldata} status={transaction.status} />
+      <Process accountId={transaction.multisigAccount} approvals={transaction.approvedAccounts} status={transaction.status} />
     </Paper>
   );
 }

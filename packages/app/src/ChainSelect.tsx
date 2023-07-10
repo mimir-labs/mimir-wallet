@@ -23,9 +23,9 @@ function ChainSelect() {
     setAnchorEl(null);
   };
 
-  const handleSelect = (url: string) => {
+  const handleSelect = (url: string, server: string) => {
     handleClose();
-    appConfig.setApiUrl(url);
+    appConfig.setUrl(url, server);
   };
 
   return (
@@ -48,13 +48,13 @@ function ChainSelect() {
           <MenuList key={index}>
             <Typography key={`${index}-title`}>{endpoint.logo ?? endpoint.text}</Typography>
             {Object.entries(endpoint.providers).map(([name, value]) => (
-              <MenuItem key={name} onClick={() => handleSelect(value)}>
+              <MenuItem key={name} onClick={() => handleSelect(value, endpoint.server)}>
                 {name}
               </MenuItem>
             ))}
           </MenuList>
         ))}
-        <MenuItem key='local' onClick={() => handleSelect('ws://127.0.0.1:9944/')}>
+        <MenuItem key='local' onClick={() => handleSelect('ws://127.0.0.1:9944/', 'http://localhost:8080/')}>
           Local
         </MenuItem>
       </Menu>

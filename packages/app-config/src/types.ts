@@ -5,6 +5,7 @@ export interface EndpointOption {
   logo?: React.ReactNode;
   specName?: string;
   text: string;
+  server: string;
   providers: Record<string, string>;
 }
 

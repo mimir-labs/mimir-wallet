@@ -2,14 +2,27 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, Button, Paper, Stack } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+
+import { useTransactions } from '@mimirdev/react-hooks';
+import { MultisigStatus } from '@mimirdev/react-hooks/types';
 
 import MultisigCell from './MultisigCell';
-import { useMultisigs } from './useMultisigs';
 
 function PageTransaction() {
-  const multisigs = useMultisigs();
+  const transactions = useTransactions();
+
   const [type, setType] = useState<'pending' | 'history'>('pending');
+
+  const list = useMemo(() => {
+    return transactions.filter((item) => {
+      if (type === 'pending') {
+        return item.status === MultisigStatus.Created;
+      }
+
+      return true;
+    });
+  }, [transactions, type]);
 
   return (
     <Box>
@@ -22,8 +35,8 @@ function PageTransaction() {
         </Button>
       </Paper>
       <Stack spacing={2.5}>
-        {multisigs?.map((multisig, index) => (
-          <MultisigCell key={index} multisig={multisig} />
+        {list.map((transaction, index) => (
+          <MultisigCell key={index} transaction={transaction} />
         ))}
       </Stack>
     </Box>

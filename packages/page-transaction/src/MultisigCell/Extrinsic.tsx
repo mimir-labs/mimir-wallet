@@ -13,6 +13,7 @@ import React, { useMemo } from 'react';
 
 import { ArrowDown } from '@mimirdev/app-config/icons';
 import { useApi, useToggle } from '@mimirdev/react-hooks';
+import { MultisigStatus } from '@mimirdev/react-hooks/types';
 import Params from '@mimirdev/react-params';
 
 import ApproveButton from './ApproveButton';
@@ -66,7 +67,7 @@ function extractState(api: ApiPromise, value: IMethod): Extracted {
   };
 }
 
-function Extrinsic({ accountId, depositor, method }: { accountId: string; depositor: string | AccountId | AccountIndex | Address; method: IMethod }) {
+function Extrinsic({ accountId, depositor, id, method, status }: { id: number; accountId: string; depositor: string | AccountId | AccountIndex | Address; method: IMethod; status: MultisigStatus }) {
   const { api } = useApi();
   const { callData, callHash, callName, fn, params, values } = useMemo(() => extractState(api, method), [api, method]);
   const [detailOpen, toggleDetailOpen] = useToggle();
@@ -75,9 +76,9 @@ function Extrinsic({ accountId, depositor, method }: { accountId: string; deposi
     <Stack flex='1' spacing={1.5}>
       <Stack alignItems='center' direction='row' justifyContent='space-between'>
         <Stack alignItems='center' direction='row' spacing={1.25}>
-          <Box sx={{ width: 8, height: 8, borderRadius: 1, bgcolor: 'error.main' }} />
+          <Box sx={{ width: 8, height: 8, borderRadius: 1, bgcolor: status === MultisigStatus.Created ? 'warning.main' : status === MultisigStatus.Executed ? 'success.main' : 'error.main' }} />
           <Typography color='primary.main' fontWeight={700} variant='h4'>
-            No 233
+            No {id}
           </Typography>
           <Chip color='secondary' label={callName} variant='filled' />
         </Stack>
@@ -92,8 +93,8 @@ function Extrinsic({ accountId, depositor, method }: { accountId: string; deposi
         </Button>
       )}
       <Box display='flex' gap={1.25}>
-        <ApproveButton accountId={accountId} params={method.args} tx={fn} />
-        <CancelButton accountId={accountId} params={method.args} tx={fn} />
+        {status === MultisigStatus.Created && <ApproveButton accountId={accountId} params={method.args} tx={fn} />}
+        {status === MultisigStatus.Created && <CancelButton accountId={accountId} params={method.args} tx={fn} />}
       </Box>
     </Stack>
   );

@@ -8,6 +8,7 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Input } from '@mimirdev/react-components';
+import { useServer } from '@mimirdev/react-hooks';
 
 import AccountSelect from './AccountSelect';
 import { useSelectMultisig } from './useSelectMultisig';
@@ -24,6 +25,7 @@ function PageCreateMultisig() {
   const [name, setName] = useState<string>();
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
   const [{ isThresholdValid, threshold }, setThreshold] = useState<{ isThresholdValid: boolean; threshold: number }>({ isThresholdValid: true, threshold: 2 });
+  const { createMultisig: createMultisigApi } = useServer();
   const navigate = useNavigate();
 
   const handleAdd = useCallback(() => {
@@ -42,9 +44,11 @@ function PageCreateMultisig() {
   const handleCreate = useCallback(() => {
     if (!name) return;
 
-    createMultisig(signatories, threshold, name);
+    const address = createMultisig(signatories, threshold, name);
+
+    createMultisigApi(address, signatories, threshold);
     navigate('/');
-  }, [name, navigate, signatories, threshold]);
+  }, [createMultisigApi, name, navigate, signatories, threshold]);
 
   return (
     <Box sx={{ width: 520, maxWidth: '100%', margin: '0 auto' }}>

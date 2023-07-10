@@ -19,7 +19,7 @@ function TxButton({ accountId, disabled, isMultisigCancel, params, tx, ...props 
 
     const extrinsic: SubmittableExtrinsic<'promise'> | undefined = tx?.(...(isFunction(params) ? params() : params || []));
 
-    const meta = getAddressMeta(accountId.toString());
+    const meta = getAddressMeta(accountId);
 
     if (extrinsic) {
       setTx({ accountId, extrinsic, isMultisig: !!meta.isMultisig, isMultisigCancel: !!isMultisigCancel });

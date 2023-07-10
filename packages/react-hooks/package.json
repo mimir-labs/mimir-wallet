@@ -21,7 +21,8 @@
     "@polkadot/ui-keyring": "^3.5.1",
     "@polkadot/util": "^12.3.2",
     "@polkadot/util-crypto": "^12.3.2",
-    "copy-to-clipboard": "^3.3.3"
+    "copy-to-clipboard": "^3.3.3",
+    "swr": "^2.2.0"
   },
   "peerDependencies": {
     "@mui/material": "*",

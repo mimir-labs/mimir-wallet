@@ -6,9 +6,10 @@ import type { AccountId } from '@polkadot/types/interfaces';
 import { Box, Divider, Paper, Stack, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { IconAddFill, IconInfoFill, IconWaitingFill } from '@mimirdev/app-config/icons';
+import { IconAddFill, IconFailedFill, IconInfoFill, IconSuccessFill, IconWaitingFill } from '@mimirdev/app-config/icons';
 import { AddressSmall } from '@mimirdev/react-components';
 import { getAddressMeta } from '@mimirdev/react-components/utils';
+import { MultisigStatus } from '@mimirdev/react-hooks/types';
 
 function getAddressInfo(address?: string): [threshold: number, owners: string[]] {
   if (!address) return [0, []];
@@ -30,7 +31,15 @@ function WaitingIcon() {
   return <IconWaitingFill />;
 }
 
-function Process({ accountId, approvals }: { accountId: string; approvals: (string | AccountId)[] }) {
+function SuccessIcon() {
+  return <IconSuccessFill />;
+}
+
+function FailIcon() {
+  return <IconFailedFill />;
+}
+
+function Process({ accountId, approvals, status }: { accountId: string; approvals: (string | AccountId)[]; status: MultisigStatus }) {
   const [threshold, owners] = useMemo(() => getAddressInfo(accountId), [accountId]);
 
   return (
@@ -45,7 +54,7 @@ function Process({ accountId, approvals }: { accountId: string; approvals: (stri
           </Box>
         </Box>
         <Box sx={{ marginTop: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          {Array.from({ length: owners.length }).map((_, index) => (
+          {Array.from({ length: threshold }).map((_, index) => (
             <Box
               key={index}
               sx={{
@@ -81,8 +90,10 @@ function Process({ accountId, approvals }: { accountId: string; approvals: (stri
           </StepContent>
         </Step>
         <Step>
-          <StepLabel StepIconComponent={WaitingIcon} StepIconProps={{ sx: { fontSize: '1.5rem' } }}>
-            Waiting
+          <StepLabel StepIconComponent={status === MultisigStatus.Created ? WaitingIcon : status === MultisigStatus.Executed ? SuccessIcon : FailIcon} StepIconProps={{ sx: { fontSize: '1.5rem' } }}>
+            <Typography color={status === MultisigStatus.Created ? undefined : 'text.primary'} fontWeight={700}>
+              {status === MultisigStatus.Created ? 'Waiting' : status === MultisigStatus.Executed ? 'Executed' : 'Canceled'}
+            </Typography>
           </StepLabel>
         </Step>
       </Stepper>

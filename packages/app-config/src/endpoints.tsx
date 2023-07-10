@@ -18,6 +18,7 @@ export const endpoints: EndpointOption[] = [
       Parity: 'wss://rpc.polkadot.io',
       RadiumBlock: 'wss://polkadot.public.curie.radiumblock.co/ws'
     },
+    server: 'http://localhost:8080/',
     text: 'Polkadot'
   },
   {
@@ -35,6 +36,7 @@ export const endpoints: EndpointOption[] = [
       RadiumBlock: 'wss://kusama.public.curie.radiumblock.co/ws',
       Stakeworld: 'wss://ksm-rpc.stakeworld.io'
     },
+    server: 'http://localhost:8080/',
     text: 'Kusama'
   }
 ];
