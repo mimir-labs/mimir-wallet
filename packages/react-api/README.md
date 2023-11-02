@@ -1,1 +1,0 @@
-# @mimirdev/react-api
