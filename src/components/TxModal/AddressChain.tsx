@@ -12,6 +12,7 @@ import InputAddress from '../InputAddress';
 function AddressChain({
   accounts,
   address,
+  filtered,
   index = 0,
   onChange
 }: {
@@ -19,6 +20,7 @@ function AddressChain({
   accounts: Record<string, string | undefined>;
   onChange: React.Dispatch<React.SetStateAction<Record<string, string | undefined>>>;
   address: string;
+  filtered: Record<string, string[]>;
 }) {
   const { isAccount } = useAccounts();
 
@@ -35,14 +37,14 @@ function AddressChain({
   );
 
   useEffect(() => {
-    const finded = meta.isMultisig ? meta.who?.find((address) => isAccount(address)) : null;
+    const finded = meta.isMultisig ? (filtered[address] || meta.who)?.find((address) => isAccount(address)) : null;
 
     finded &&
       onChange((value) => ({
         ...value,
         [address]: finded
       }));
-  }, [address, isAccount, meta, onChange]);
+  }, [address, filtered, isAccount, meta, onChange]);
 
   if (meta.isMultisig) {
     const value = accounts[address] || '';
@@ -52,9 +54,9 @@ function AddressChain({
     return (
       <>
         <Box sx={{ paddingLeft: index * 2 }}>
-          <InputAddress filtered={meta.who} label={index === 0 ? 'Initiator' : undefined} onChange={_onChange} value={value} />
+          <InputAddress filtered={filtered?.[address] || meta.who} label={index === 0 ? 'Initiator' : undefined} onChange={_onChange} value={value} />
         </Box>
-        {isMultisigValue && <AddressChain accounts={accounts} address={value} index={index + 1} onChange={onChange} />}
+        {isMultisigValue && <AddressChain accounts={accounts} address={value} filtered={filtered} index={index + 1} onChange={onChange} />}
       </>
     );
   }

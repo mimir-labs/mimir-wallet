@@ -330,6 +330,14 @@ const createComponents: Func = () => ({
         boxShadow: theme.shadows[1]
       })
     }
+  },
+
+  MuiListItem: {
+    styleOverrides: {
+      root: {
+        padding: '5px 10px'
+      }
+    }
   }
 });
 

@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { ReactComponent as IconInfo } from '@mimirdev/assets/svg/icon-info-fill.svg';
 import { Address, AddressRow, Input } from '@mimirdev/components';
-import { usePrepareMultisig, useToggle } from '@mimirdev/hooks';
+import { useCacheMultisig, useToggle } from '@mimirdev/hooks';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
@@ -26,7 +26,7 @@ function PageCreateMultisig() {
   const [flexible, setFlexible] = useState(false);
 
   // prepare multisigs
-  const [prepares] = usePrepareMultisig();
+  const [prepares] = useCacheMultisig();
   // flexible
   const [prepare, setPrepare] = useState<PrepareFlexible>();
   const [open, toggleOpen] = useToggle();

@@ -77,7 +77,7 @@ function SideBar() {
     <>
       <Drawer PaperProps={{ sx: { width: 222, top: 56, paddingX: 1.5, paddingY: 2 } }} anchor='left' variant='permanent'>
         <Paper sx={{ padding: 1 }} variant='outlined'>
-          <Stack alignItems='center' direction='row' spacing={1}>
+          <Stack alignItems='center' direction='row' spacing={1} width='100%'>
             <AddressCell size='small' value={selected} />
             <IconButton color='primary' onClick={handleAccountOpen} size='small'>
               <SvgIcon component={ArrowRight} inheritViewBox sx={{ fontSize: '0.75rem' }} />
@@ -108,7 +108,7 @@ function SideBar() {
         <NavLink Icon={IconDapp} label='Dapp' to='/dapp' />
         <NavLink Icon={IconTransaction} label='Transactions' to='/transactions' />
         <NavLink Icon={IconAddressBook} label='Address Book' to='/address-book' />
-        <AccountMenu anchorEl={anchorEl} handleClose={handleAccountClose} />
+        <AccountMenu onClose={handleAccountClose} open={!!anchorEl} />
       </Drawer>
       <Box
         sx={{

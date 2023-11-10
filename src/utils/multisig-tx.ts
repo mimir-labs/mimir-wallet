@@ -34,17 +34,24 @@ async function _asMulti(api: ApiPromise, extrinsic: SubmittableExtrinsic, thresh
   const [info, { weight }] = await Promise.all([api.query.multisig.multisigs<Option<Multisig>>(multiAddress, extrinsic.method.hash), extrinsic.paymentInfo(multiAddress)]);
 
   let timepoint: Timepoint | null = null;
-  let approvals = 0;
 
   if (info.isSome) {
     timepoint = info.unwrap().when;
-    approvals = info.unwrap().approvals.length;
 
-    if (approvals >= threshold - 1) {
+    const approvals = info.unwrap().approvals;
+
+    if (approvals.length >= threshold - 1) {
       unreserve[info.unwrap().depositor.toString()] = info.unwrap().deposit;
+    } else {
+      Object.keys(reserve).forEach((key) => {
+        delete reserve[key];
+      });
     }
   } else {
-    reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(2));
+    Object.keys(reserve).forEach((key) => {
+      delete reserve[key];
+    });
+    reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(threshold)).add(api.consts.balances.existentialDeposit);
   }
 
   return api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method, weight);
@@ -76,7 +83,7 @@ export async function prepareMultisig(
       tx = await _asMulti(api, extrinsic, meta.threshold, meta.who, sender, reserve, unreserve);
     }
 
-    return prepareMultisig(api, tx, accounts, sender, reserve);
+    return prepareMultisig(api, tx, accounts, sender, reserve, unreserve);
   } else {
     return [extrinsic, address, reserve, unreserve];
   }

@@ -77,7 +77,7 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
 
   const [loadingSecond, createMembers] = useToastPromise(
     useCallback(
-      async (pure: string, who: string[], signer: string, threshold: number, name: string, creator?: string) => {
+      async (pure: string, who: string[], signer: string, threshold: number) => {
         const extrinsic = api.tx.utility.batchAll([
           api.tx.balances.transferKeepAlive(pure, api.consts.proxy.proxyDepositFactor.muln(2)),
           api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.addProxy(encodeMultiAddress(who, threshold), 'Any', 0)),
@@ -87,15 +87,6 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
         await signAndSend(extrinsic, signer, { checkProxy: true });
 
         navigate('/');
-        keyring.addExternal(pure, {
-          isMultisig: true,
-          isFlexible: true,
-          name,
-          who,
-          threshold,
-          creator,
-          genesisHash: api.genesisHash.toHex()
-        });
       },
       [api, navigate]
     ),
@@ -127,7 +118,7 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
       setPure(_pure);
 
       if (_pure) {
-        createMembers(_pure, who, signer, threshold, name, extrinsic.signer.toString());
+        createMembers(_pure, who, signer, threshold);
       }
     }, [api, createMembers, name, signer, threshold, who]),
     { pending: 'Creating Pure Account...', success: 'Create Pure success!' }
@@ -198,7 +189,7 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
             loading={loadingSecond}
             onClick={() => {
               if (pure && who && signer) {
-                createMembers(pure, who, signer, threshold, name, creator || undefined);
+                createMembers(pure, who, signer, threshold);
               }
             }}
           >

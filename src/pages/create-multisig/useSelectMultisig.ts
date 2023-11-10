@@ -4,6 +4,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { useAccounts, useAddresses } from '@mimirdev/hooks';
+import { getAddressMeta } from '@mimirdev/utils';
 
 interface UseSelectMultisig {
   unselected: string[];
@@ -15,7 +16,7 @@ interface UseSelectMultisig {
 export function useSelectMultisig(defaultSignatories?: string[]): UseSelectMultisig {
   const { allAccounts } = useAccounts();
   const { allAddresses } = useAddresses();
-  const all = useMemo(() => allAddresses.concat(allAccounts), [allAccounts, allAddresses]);
+  const all = useMemo(() => allAddresses.concat(allAccounts.filter((item) => !getAddressMeta(item).isHidden)), [allAccounts, allAddresses]);
   const [signatories, setSignatories] = useState<string[]>(defaultSignatories || []);
 
   const unselected = useMemo(() => all.filter((account) => !signatories.includes(account)), [all, signatories]);

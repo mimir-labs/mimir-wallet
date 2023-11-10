@@ -4,12 +4,13 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { InputNumberProps } from './types';
 
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useApi } from '@mimirdev/hooks';
 
+import FormatBalance from './FormatBalance';
 import Input from './Input';
 
 function inputToBn(api: ApiPromise, input: string): BN {
@@ -72,11 +73,20 @@ function InputNumber({ defaultValue, maxValue, onChange, value: propsValue, with
         <>
           {props.endAdornment}
           {withMax && (
-            <Button onClick={() => setValues(getValues(api, maxValue || BN_ZERO))} size='small' variant='outlined'>
+            <Button onClick={() => setValues(getValues(api, maxValue || BN_ZERO))} size='small' sx={{ paddingY: 0.2, borderRadius: 0.5 }} variant='outlined'>
               Max
             </Button>
           )}
         </>
+      }
+      label={
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          {props.label}
+          <Box component='span' fontWeight={400}>
+            Balance:
+            <FormatBalance value={maxValue} />
+          </Box>
+        </Box>
       }
       onChange={_onChange}
       value={value}

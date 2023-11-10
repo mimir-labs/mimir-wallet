@@ -7,8 +7,12 @@ import BaseContainer from './containers/BaseContainer';
 import PageWrapper from './containers/PageWrapper';
 import SideBar from './containers/SideBar';
 import PageAccountSetting from './pages/account-setting';
+import PageAddressBook from './pages/address-book';
 import PageCreateMultisig from './pages/create-multisig';
+import PageDapp from './pages/dapp';
 import PageProfile from './pages/profile';
+import PageTransactions from './pages/transactions';
+import PageTransfer from './pages/transfer';
 
 export const routes = createBrowserRouter([
   {
@@ -23,15 +27,15 @@ export const routes = createBrowserRouter([
           },
           {
             path: 'dapp',
-            element: <>dapp</>
+            element: <PageDapp />
           },
           {
             path: 'transactions',
-            element: <>transactions</>
+            element: <PageTransactions />
           },
           {
             path: 'address-book',
-            element: <>address book</>
+            element: <PageAddressBook />
           },
           {
             path: 'account-setting/:address',
@@ -47,8 +51,8 @@ export const routes = createBrowserRouter([
             element: <PageCreateMultisig />
           },
           {
-            path: 'transfer/:sender?',
-            element: <>transfer</>
+            path: 'transfer',
+            element: <PageTransfer />
           }
         ]
       }

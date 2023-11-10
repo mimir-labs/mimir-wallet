@@ -6,7 +6,7 @@ import type { AccountData, MultiAccountData, ProxyAccountData } from './types';
 
 import keyring from '@polkadot/ui-keyring';
 import { u8aEq } from '@polkadot/util';
-import { encodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
+import { encodeAddress } from '@polkadot/util-crypto';
 import { useEffect } from 'react';
 import useSWR from 'swr';
 
@@ -76,23 +76,15 @@ export function useSyncMultisigs() {
 
       const { isValid, name, threshold, who } = account as MultiAccountData;
 
-      if (isValid) {
-        keyring.addMultisig(
-          who.map(({ address }) => encodeAddress(address)),
-          threshold,
-          {
-            isMultisig: true,
-            name: name || undefined
-          }
-        );
-      } else {
-        keyring.forgetAccount(
-          encodeMultiAddress(
-            who.map(({ address }) => encodeAddress(address)),
-            threshold
-          )
-        );
-      }
+      keyring.addMultisig(
+        who.map(({ address }) => encodeAddress(address)),
+        threshold,
+        {
+          isMultisig: true,
+          name: name || undefined,
+          isHidden: !isValid
+        }
+      );
     }
   }, [api, isApiReady, multisigs]);
 }

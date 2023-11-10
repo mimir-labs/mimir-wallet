@@ -5,12 +5,12 @@ import useSWR from 'swr';
 
 import { service } from '@mimirdev/utils';
 
-import { PrepareMultisig } from './types';
+import { CacheMultisig } from './types';
 import { useAccounts } from './useAccounts';
 
-export function usePrepareMultisig(): [data: PrepareMultisig[], isLoading: boolean] {
+export function useCacheMultisig(): [data: CacheMultisig[], isLoading: boolean] {
   const accounts = useAccounts();
-  const { data, isLoading } = useSWR<PrepareMultisig[]>(
+  const { data, isLoading } = useSWR<CacheMultisig[]>(
     service.getServiceUrl(accounts.allAccounts.length > 0 ? `multisig/pending?${accounts.allAccountsHex.map((address) => `addresses=${address}`).join('&')}` : null)
   );
 

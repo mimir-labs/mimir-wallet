@@ -58,7 +58,9 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
             bgcolor: 'primary.main',
             color: 'common.white',
             fontWeight: 700,
-            fontSize: '0.75rem'
+            fontSize: '0.75rem',
+            transformOrigin: 'center',
+            transform: size < 24 ? `scale(${size / 24})` : undefined
           }}
         >
           {threshold}/{who?.length}

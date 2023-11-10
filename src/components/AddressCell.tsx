@@ -32,7 +32,7 @@ function AddressCell({ shorten = true, showType = false, size = 'medium', value,
   const { isFlexible, isMultisig } = useMemo(() => getAddressMeta(address || ''), [address]);
 
   return (
-    <Stack alignItems='center' className='AddressCell' direction='row' spacing={spacing} width={width}>
+    <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
       <IdentityIcon className='AddressCell-Icon' size={iconSize} value={value} />
       <Stack className='AddressCell-Address' spacing={spacingCol}>
         <Typography fontSize={nameFontSize} fontWeight={size === 'large' ? 800 : 700} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

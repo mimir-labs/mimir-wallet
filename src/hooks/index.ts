@@ -14,7 +14,11 @@ export * from './useDeriveAccountInfo';
 export * from './useGroupAccounts';
 export * from './useIsMountedRef';
 export * from './useMultisigs';
-export * from './usePrepareMultisig';
+export * from './useCacheMultisig';
 export * from './useSelectedAccount';
 export * from './useToggle';
+export * from './useTransactions';
 export * from './useTxQueue';
+export * from './useVisibleAccounts';
+
+export * from './utils';

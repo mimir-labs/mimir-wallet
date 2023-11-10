@@ -32,6 +32,7 @@
     "@mui/lab": "^5.0.0-alpha.149",
     "@mui/material": "^5.14.14",
     "@polkadot/api": "^10.10.1",
+    "@polkadot/api-derive": "^10.10.1",
     "@polkadot/extension-dapp": "^0.46.5",
     "@polkadot/extension-inject": "^0.46.5",
     "@polkadot/react-identicon": "^3.6.3",

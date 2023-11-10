@@ -13,8 +13,9 @@ interface Props {
 export interface TxQueue {
   id?: number;
   accountId: AccountId | Address | string;
-  extrinsic: SubmittableExtrinsic<'promise'>;
   beforeSend?: () => Promise<void>;
+  extrinsic: SubmittableExtrinsic<'promise'>;
+  filtered?: Record<string, string[]>;
   onRemove?: () => void;
 }
 
@@ -37,6 +38,7 @@ export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
         ...value,
         id,
         beforeSend: async () => value.beforeSend?.(),
+        filtered: value.filtered || {},
         onRemove: () => {
           value.onRemove?.();
           setQueue((_queue) => _queue.filter((item) => item.id !== id));

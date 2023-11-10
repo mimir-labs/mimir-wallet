@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
+import type { Call } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 
 export type CallParam = any;
@@ -16,29 +17,7 @@ export interface CallOptions<T> {
   withParamsTransform?: boolean;
 }
 
-export enum MultisigStatus {
-  Created,
-  Executed,
-  Cancelled
-}
-
-export interface MultisigTransaction {
-  id: number;
-  blockNumber: string;
-  blockHash: HexString;
-  extrinsicHash: HexString;
-  extrinsicIndex: number;
-  section: string;
-  method: string;
-  multisigAccount: HexString;
-  depositor: HexString;
-  approvedAccounts: HexString[];
-  cancelledAccount?: HexString | null;
-  callhash: HexString;
-  status: MultisigStatus;
-}
-
-export interface PrepareMultisig {
+export interface CacheMultisig {
   extrinsicHash: HexString;
   genesisHash: HexString;
   creator: HexString;
@@ -78,4 +57,44 @@ export interface ProxyAccountData extends AccountData {
   creator: HexString;
   height: number;
   index: number;
+}
+
+export enum CalldataStatus {
+  Initialized = 0,
+  Pending = 1,
+  Success = 2,
+  Failed = 3
+}
+
+export interface Calldata {
+  uuid: string;
+  hash: HexString;
+  metadata: HexString;
+  sender: HexString;
+  isStart: boolean;
+  isEnd: boolean;
+  status: CalldataStatus;
+
+  height?: number;
+  index?: number;
+  isValid: boolean;
+}
+
+export interface Transaction {
+  parent: Transaction | null;
+  children: Transaction[];
+
+  uuid: string;
+  call: Call;
+  sender: string;
+  status: CalldataStatus;
+  isValid: boolean;
+  height?: number;
+  index?: number;
+
+  action: string;
+  section: string;
+  method: string;
+
+  addChild(transaction: Transaction): Transaction;
 }

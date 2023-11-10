@@ -2,25 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LoadingButton } from '@mui/lab';
-import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { BN } from '@polkadot/util';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useApi } from '@mimirdev/hooks';
-import { canSendMultisig, PrepareMultisig, prepareMultisig, signAndSend } from '@mimirdev/utils';
+import { PrepareMultisig, signAndSend } from '@mimirdev/utils';
 
 import { useToastPromise } from '../ToastRoot';
 
-function SendTx({ accounts, address, beforeSend, extrinsic }: { beforeSend: () => Promise<void>; extrinsic: SubmittableExtrinsic; accounts: Record<string, string | undefined>; address: string }) {
+function SendTx({ beforeSend, canSend, onClose, prepare }: { prepare?: PrepareMultisig; canSend: boolean; onClose: () => void; beforeSend: () => Promise<void> }) {
   const { api } = useApi();
-  const [prepare, setPrepare] = useState<PrepareMultisig>();
-  const canSend = useMemo(() => canSendMultisig(accounts, address), [accounts, address]);
-
-  useEffect(() => {
-    if (canSend) {
-      prepareMultisig(api, extrinsic, accounts, address).then(setPrepare);
-    }
-  }, [accounts, address, api, canSend, extrinsic]);
-
+  const [isEnought, setIsEnought] = useState<boolean>(false);
   const [loading, onConfirm] = useToastPromise(
     useCallback(async () => {
       if (!prepare) return;
@@ -29,13 +21,33 @@ function SendTx({ accounts, address, beforeSend, extrinsic }: { beforeSend: () =
 
       return signAndSend(tx, signer, {
         beforeSend
-      });
-    }, [beforeSend, prepare]),
+      }).then(() => onClose());
+    }, [beforeSend, onClose, prepare]),
     { pending: 'Transaction Pending...', success: 'Transaction Success' }
   );
 
+  useEffect(() => {
+    if (prepare) {
+      const addresses = Object.keys(prepare[2]);
+      const values = Object.values(prepare[2]);
+
+      if (addresses.length > 0) {
+        Promise.all(addresses.map((address) => api.derive.balances.all(address))).then((results) => {
+          setIsEnought(
+            results
+              .map((item) => item.freeBalance)
+              .reduce((l, r) => l.add(r), new BN(0))
+              .gte(values.reduce((l, r) => l.add(r)))
+          );
+        });
+      } else {
+        setIsEnought(true);
+      }
+    }
+  }, [api, prepare]);
+
   return (
-    <LoadingButton disabled={!canSend || !prepare} fullWidth loading={loading} onClick={onConfirm} variant='contained'>
+    <LoadingButton disabled={!canSend || !prepare || !isEnought} fullWidth loading={loading} onClick={onConfirm} variant='contained'>
       Confirm
     </LoadingButton>
   );
