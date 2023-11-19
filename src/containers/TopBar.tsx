@@ -1,12 +1,16 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Stack } from '@mui/material';
+import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 import Logo from '@mimirdev/assets/images/logo.png';
+import { ReactComponent as IconSetting } from '@mimirdev/assets/svg/icon-set.svg';
+import { useApi } from '@mimirdev/hooks';
 
 function TopBar() {
+  const { isApiReady } = useApi();
+
   return (
     <Box
       sx={{
@@ -25,7 +29,13 @@ function TopBar() {
         <img src={Logo} style={{ width: 87 }} />
       </Link>
 
-      <Stack>TODO</Stack>
+      {isApiReady && (
+        <Stack direction='row'>
+          <IconButton color='secondary' size='large' sx={{ borderRadius: 1, border: '1px solid' }}>
+            <SvgIcon color='primary' component={IconSetting} inheritViewBox />
+          </IconButton>
+        </Stack>
+      )}
     </Box>
   );
 }

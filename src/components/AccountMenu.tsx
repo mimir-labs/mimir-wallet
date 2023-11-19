@@ -20,10 +20,14 @@ interface Props {
 function AccountCell({ handleClose, value }: { value: string; handleClose?: () => void }) {
   const selectAccount = useSelectedAccountCallback();
 
-  const handleClick = useCallback(() => {
-    selectAccount(value);
-    handleClose?.();
-  }, [handleClose, selectAccount, value]);
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      e.stopPropagation();
+      selectAccount(value);
+      handleClose?.();
+    },
+    [handleClose, selectAccount, value]
+  );
 
   return (
     <ListItem>
@@ -41,7 +45,7 @@ function AccountCell({ handleClose, value }: { value: string; handleClose?: () =
           borderRadius: 1
         }}
       >
-        <AddressCell shorten showType size='small' value={value} />
+        <AddressCell shorten showType size='small' value={value} withCopy />
         <IconButton onClick={(e) => e.stopPropagation()} size='small' sx={{ color: 'grey.300', ':hover': { color: 'error.main' } }}>
           <SvgIcon component={IconDelete} inheritViewBox />
         </IconButton>
@@ -82,7 +86,11 @@ function AccountMenu({ onClose, open }: Props) {
       <List sx={{ width: 280, padding: 1 }}>
         <Typography>Multisig Wallet</Typography>
         {grouped.multisig
-          .filter((item) => !getAddressMeta(item).isHidden)
+          .filter((item) => {
+            const meta = getAddressMeta(item);
+
+            return !meta.isHidden && meta.isValid;
+          })
           .map((account) => (
             <AccountCell handleClose={onClose} key={`multisig-${account}`} value={account} />
           ))}

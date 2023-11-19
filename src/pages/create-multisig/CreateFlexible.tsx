@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { ReactComponent as IconQuestion } from '@mimirdev/assets/svg/icon-question.svg';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem, useToastPromise } from '@mimirdev/components';
 import { useApi } from '@mimirdev/hooks';
-import { service, signAndSend } from '@mimirdev/utils';
+import { getAddressMeta, service, signAndSend } from '@mimirdev/utils';
 
 interface Props {
   prepare: PrepareFlexible;
@@ -176,7 +176,7 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
       </Accordion>
       <Divider sx={{ marginY: 1.5 }} />
       <Typography fontWeight={700}>Transaction Initiator</Typography>
-      <InputAddress filtered={creator ? [creator] : who} onChange={setSigner} value={signer} />
+      <InputAddress filtered={creator ? [creator] : who.filter((address) => !getAddressMeta(address).isMultisig)} onChange={setSigner} value={signer} />
       <LockContainer>
         <LockItem address={signer} value={reservedAmount} />
       </LockContainer>

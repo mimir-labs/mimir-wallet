@@ -13,6 +13,7 @@ import { ReactComponent as IconWaitingFill } from '@mimirdev/assets/svg/icon-wai
 import { useAddressMeta, useToggle } from '@mimirdev/hooks';
 import { CalldataStatus, type Transaction } from '@mimirdev/hooks/types';
 
+import OverviewDialog from '../OverviewDialog';
 import { extraTransaction } from '../util';
 import TxProcess from './TxProcess';
 
@@ -93,12 +94,43 @@ function Process({ transaction }: Props) {
           {txs.map((tx, index) => (
             <TxProcess key={index} tx={tx} />
           ))}
+          <OverviewDialog tx={transaction} />
         </Stack>
       </ProcessItem>
       <ProcessItem
-        Icon={transaction.status === CalldataStatus.Success ? IconSuccessFill : transaction.status === CalldataStatus.Failed ? IconFailedFill : IconWaitingFill}
-        iconColor={transaction.status === CalldataStatus.Success ? 'success.main' : transaction.status === CalldataStatus.Failed ? 'error.main' : 'warning.main'}
-        label={transaction.status === CalldataStatus.Success ? 'Executed' : transaction.status === CalldataStatus.Failed ? 'Failed' : 'Waiting'}
+        Icon={
+          transaction.status === CalldataStatus.Success
+            ? IconSuccessFill
+            : transaction.status === CalldataStatus.Failed
+            ? IconFailedFill
+            : transaction.status === CalldataStatus.Cancelled
+            ? IconFailedFill
+            : transaction.status === CalldataStatus.MemberChanged
+            ? IconFailedFill
+            : IconWaitingFill
+        }
+        iconColor={
+          transaction.status === CalldataStatus.Success
+            ? 'success.main'
+            : transaction.status === CalldataStatus.Failed
+            ? 'error.main'
+            : transaction.status === CalldataStatus.Cancelled
+            ? 'error.main'
+            : transaction.status === CalldataStatus.MemberChanged
+            ? 'error.main'
+            : 'warning.main'
+        }
+        label={
+          transaction.status === CalldataStatus.Success
+            ? 'Executed'
+            : transaction.status === CalldataStatus.Failed
+            ? 'Failed'
+            : transaction.status === CalldataStatus.Cancelled
+            ? 'Cancelled'
+            : transaction.status === CalldataStatus.MemberChanged
+            ? 'MemberChanged'
+            : 'Waiting'
+        }
       />
     </Stack>
   );

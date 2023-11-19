@@ -3,7 +3,7 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { getAddressMeta } from '@mimirdev/utils';
@@ -35,11 +35,13 @@ function AddressCell({ shorten = true, showType = false, size = 'medium', value,
     <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
       <IdentityIcon className='AddressCell-Icon' size={iconSize} value={value} />
       <Stack className='AddressCell-Address' spacing={spacingCol}>
-        <Typography fontSize={nameFontSize} fontWeight={size === 'large' ? 800 : 700} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <AddressName value={value} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Typography component='span' fontSize={nameFontSize} fontWeight={size === 'large' ? 800 : 700} sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <AddressName value={value} />
+          </Typography>
           {showType && <Chip color='secondary' label={isMultisig ? (isFlexible ? 'Flexible' : 'Static') : 'Solo'} size={size === 'large' ? 'medium' : 'small'} />}
-        </Typography>
-        <Typography color='text.secondary' fontSize={addressFontSize} sx={{ display: 'flex', alignItems: 'center' }}>
+        </Box>
+        <Typography color='text.secondary' component='span' fontSize={addressFontSize} sx={{ display: 'flex', alignItems: 'center' }}>
           <AddressComp shorten={shorten} value={address} />
           {withCopy && <CopyButton value={address} />}
         </Typography>

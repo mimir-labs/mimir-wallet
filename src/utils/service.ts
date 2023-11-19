@@ -4,6 +4,7 @@
 import type { HexString } from '@polkadot/util/types';
 
 import { api } from '@mimirdev/api';
+import { AccountData } from '@mimirdev/hooks/types';
 
 import { fetcher } from './fetcher';
 
@@ -23,7 +24,7 @@ export function getServiceUrl<P extends string | null, R = P extends string ? Pr
   const promise =
     CACHE.get(path) ||
     api.isReady.then((api) => {
-      const baseUrl = networkSerice[api.genesisHash.toHex()] || 'http://127.0.0.1:8080/';
+      const baseUrl = networkSerice[api.genesisHash.toHex()] || (process.env.NODE_ENV === 'production' ? 'https://dev-api.mimir.global/' : 'http://127.0.0.1:8080/');
 
       return `${baseUrl}${path}`;
     });
@@ -61,6 +62,15 @@ export function updateAccountName(address: HexString, name: string) {
   return fetcher(getServiceUrl(`multisig/${address}`), {
     method: 'PATCH',
     body: JSON.stringify({ name }),
+    headers: jsonHeader
+  });
+}
+
+export async function getMultisigs(addresses: HexString[]): Promise<Record<HexString, AccountData>> {
+  if (addresses.length === 0) return {};
+
+  return fetcher(getServiceUrl(`multisigs/?${addresses.map((address) => `addresses=${address}`).join('&')}`), {
+    method: 'GET',
     headers: jsonHeader
   });
 }

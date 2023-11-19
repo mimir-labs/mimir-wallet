@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
 
 function PageWrapper() {
   return (
-    <Box sx={{ height: '100%', paddingTop: '56px', background: 'linear-gradient(245.23deg, #F4F2FF 0%, #FBFDFF 100%)' }}>
+    <Box sx={{ height: '100%', paddingTop: '56px' }}>
       <Container
         maxWidth='xl'
         sx={{

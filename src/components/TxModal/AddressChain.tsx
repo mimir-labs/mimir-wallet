@@ -1,6 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Filtered } from '@mimirdev/hooks/ctx/types';
+
 import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
@@ -20,7 +22,7 @@ function AddressChain({
   accounts: Record<string, string | undefined>;
   onChange: React.Dispatch<React.SetStateAction<Record<string, string | undefined>>>;
   address: string;
-  filtered: Record<string, string[]>;
+  filtered?: Filtered;
 }) {
   const { isAccount } = useAccounts();
 
@@ -37,7 +39,7 @@ function AddressChain({
   );
 
   useEffect(() => {
-    const finded = meta.isMultisig ? (filtered[address] || meta.who)?.find((address) => isAccount(address)) : null;
+    const finded = meta.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.find((address) => isAccount(address)) : null;
 
     finded &&
       onChange((value) => ({
@@ -54,9 +56,9 @@ function AddressChain({
     return (
       <>
         <Box sx={{ paddingLeft: index * 2 }}>
-          <InputAddress filtered={filtered?.[address] || meta.who} label={index === 0 ? 'Initiator' : undefined} onChange={_onChange} value={value} />
+          <InputAddress filtered={filtered ? Object.keys(filtered) : meta.who} label={index === 0 ? 'Initiator' : undefined} onChange={_onChange} value={value} />
         </Box>
-        {isMultisigValue && <AddressChain accounts={accounts} address={value} filtered={filtered} index={index + 1} onChange={onChange} />}
+        {isMultisigValue && <AddressChain accounts={accounts} address={value} filtered={filtered?.[value]} index={index + 1} onChange={onChange} />}
       </>
     );
   }

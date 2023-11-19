@@ -116,8 +116,7 @@ function SideBar() {
           paddingLeft: 'calc(222px + 20px)',
           paddingRight: '20px',
           paddingBottom: '20px',
-          height: '100%',
-          background: 'linear-gradient(245.23deg, #F4F2FF 0%, #FBFDFF 100%)'
+          minHeight: '100vh'
         }}
       >
         <Outlet />

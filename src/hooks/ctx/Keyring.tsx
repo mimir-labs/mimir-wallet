@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubjectInfo } from '@polkadot/ui-keyring/observable/types';
+import type { HexString } from '@polkadot/util/types';
 import type { Accounts, Addresses } from './types';
 
 import { keyring } from '@polkadot/ui-keyring';
@@ -62,9 +63,9 @@ function filter(items: string[], others: string[] = []): string[] {
 /**
  * @internal Helper function to convert a list of ss58 addresses into hex
  **/
-function toHex(items: string[]): string[] {
+function toHex(items: string[]): HexString[] {
   return items
-    .map((a): string | null => {
+    .map((a): HexString | null => {
       try {
         return u8aToHex(decodeAddress(a));
       } catch (error) {
@@ -75,37 +76,41 @@ function toHex(items: string[]): string[] {
         return null;
       }
     })
-    .filter((a): a is string => !!a);
+    .filter((a): a is HexString => !!a);
 }
 
-/**
- * @internal Helper to create an is{Account, Address} check
- **/
-function createCheck(items: string[]): Accounts['isAccount'] {
-  return (a?: string | null | { toString: () => string }): boolean => !!a && items.includes(a.toString());
-}
+let allAccounts: string[];
+let allAddresses: string[];
+
+const isAccount: Accounts['isAccount'] = (a): boolean => {
+  return !!a && allAccounts.includes(a.toString());
+};
+
+const isAddress: Addresses['isAddress'] = (a): boolean => {
+  return !!a && allAccounts.includes(a.toString());
+};
 
 function extractAccounts(accounts: SubjectInfo = {}): Accounts {
-  const allAccounts = filter(Object.keys(accounts));
+  allAccounts = filter(Object.keys(accounts));
 
   return {
     allAccounts,
     allAccountsHex: toHex(allAccounts),
     areAccountsLoaded: true,
     hasAccounts: allAccounts.length !== 0,
-    isAccount: createCheck(allAccounts)
+    isAccount
   };
 }
 
 function extractAddresses(addresses: SubjectInfo = {}, accounts: string[]): Addresses {
-  const allAddresses = filter(Object.keys(addresses), accounts);
+  allAddresses = filter(Object.keys(addresses), accounts);
 
   return {
     allAddresses,
     allAddressesHex: toHex(allAddresses),
     areAddressesLoaded: true,
     hasAddresses: allAddresses.length !== 0,
-    isAddress: createCheck(allAddresses)
+    isAddress
   };
 }
 

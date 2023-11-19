@@ -3,7 +3,7 @@
 
 import type { PrepareFlexible } from './types';
 
-import { Alert, AlertTitle, Box, Button, Dialog, DialogContent, Divider, Paper, Stack, SvgIcon, Switch, Typography } from '@mui/material';
+import { Alert, AlertTitle, Box, Button, Dialog, DialogContent, Divider, FormHelperText, Paper, Stack, SvgIcon, Switch, Typography } from '@mui/material';
 import { encodeAddress, isAddress } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -19,11 +19,10 @@ import { useSelectMultisig } from './useSelectMultisig';
 
 function PageCreateMultisig() {
   const navigate = useNavigate();
-  const { select, signatories, unselect, unselected } = useSelectMultisig();
   const [name, setName] = useState<string>('');
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
-  const [{ isThresholdValid, threshold }, setThreshold] = useState<{ isThresholdValid: boolean; threshold: number }>({ isThresholdValid: true, threshold: 2 });
   const [flexible, setFlexible] = useState(false);
+  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig();
 
   // prepare multisigs
   const [prepares] = useCacheMultisig();
@@ -39,9 +38,9 @@ function PageCreateMultisig() {
 
   const _onChangeThreshold = useCallback(
     (value: string) => {
-      setThreshold({ isThresholdValid: Number(value) >= 2 && Number(value) <= signatories.length, threshold: Number(value) });
+      setThreshold(Number(value));
     },
-    [signatories.length]
+    [setThreshold]
   );
 
   const _onFlexibleCancel = () => {
@@ -84,9 +83,12 @@ function PageCreateMultisig() {
                 }}
                 placeholder='input address'
               />
-              <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-                <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
-                <AccountSelect accounts={signatories} onClick={unselect} title='Members' type='delete' />
+              <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                  <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
+                  <AccountSelect accounts={signatories} onClick={unselect} title='Members' type='delete' />
+                </Box>
+                {!hasSoloAccount && <FormHelperText sx={{ color: 'error.main' }}>You need add at least one local account</FormHelperText>}
               </Paper>
               <Input
                 defaultValue={String(threshold)}
@@ -114,7 +116,7 @@ function PageCreateMultisig() {
               </Alert>
               {flexible ? (
                 <Button
-                  disabled={signatories.length < 2 || !name || !isThresholdValid}
+                  disabled={!hasSoloAccount || signatories.length < 2 || !name || !isThresholdValid}
                   fullWidth
                   onClick={() =>
                     setPrepare({
@@ -128,7 +130,7 @@ function PageCreateMultisig() {
                   Create
                 </Button>
               ) : (
-                <CreateStatic isThresholdValid={isThresholdValid} name={name} signatories={signatories} threshold={threshold} />
+                <CreateStatic hasSoloAccount={hasSoloAccount} isThresholdValid={isThresholdValid} name={name} signatories={signatories} threshold={threshold} />
               )}
             </Stack>
           )}

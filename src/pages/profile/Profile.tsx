@@ -2,18 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, Button, Paper, Stack, SvgIcon, Typography } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
-import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { ReactComponent as IconSet } from '@mimirdev/assets/svg/icon-set.svg';
-import { AddressCell } from '@mimirdev/components';
-import { useSelectedAccount } from '@mimirdev/hooks';
-import { getAddressMeta } from '@mimirdev/utils';
+import { AddressCell, AddressOverview } from '@mimirdev/components';
+import { useAddressMeta, useSelectedAccount } from '@mimirdev/hooks';
 
 function Profile() {
   const selected = useSelectedAccount();
-  const { isFlexible, isMultisig, who } = useMemo(() => (selected ? getAddressMeta(selected) : {}), [selected]);
+  const {
+    meta: { isFlexible, isMultisig }
+  } = useAddressMeta(selected);
 
   return (
     <Stack spacing={2}>
@@ -30,20 +29,10 @@ function Profile() {
       </Paper>
       {isMultisig && (
         <Stack spacing={1}>
-          <Typography fontWeight={700}>Owners</Typography>
-          <Box>
-            <Grid columns={{ xs: 12 }} container spacing={2}>
-              {who?.map((address) => {
-                return (
-                  <Grid key={address} lg={4} md={6} xs={12}>
-                    <Paper sx={{ padding: 2, height: '100%' }}>
-                      <AddressCell key={address} showType value={address} withCopy />
-                    </Paper>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Box>
+          <Typography fontWeight={700}>Members</Typography>
+          <Paper sx={{ width: '100%', height: '40vh', borderRadius: 2 }}>
+            <AddressOverview value={selected} />
+          </Paper>
         </Stack>
       )}
     </Stack>

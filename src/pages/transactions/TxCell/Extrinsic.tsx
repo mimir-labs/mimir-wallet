@@ -1,7 +1,9 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Multisig } from '@polkadot/types/interfaces';
 import type { Codec, IMethod, TypeDef } from '@polkadot/types/types';
+import type { Filtered } from '@mimirdev/hooks/ctx/types';
 
 import { alpha, Box, Button, Chip, Divider, Stack, SvgIcon, Typography } from '@mui/material';
 import { ApiPromise } from '@polkadot/api';
@@ -18,6 +20,7 @@ import Item from '@mimirdev/params/Param/Item';
 import { getAddressMeta } from '@mimirdev/utils';
 
 import { useInitTransaction } from '../useInitTransaction';
+import { useMultisigInfo } from '../useMultisigInfo';
 import CallDetail from './CallDetail';
 
 interface Param {
@@ -55,50 +58,62 @@ function extractState(api: ApiPromise, value: IMethod): Extracted {
   };
 }
 
-function extraFiltered(transaction: Transaction): Record<string, string[]> {
-  const queue = [transaction];
-  const filtered: Record<string, string[]> = {};
+function extraFiltered(address: string, filtered: Filtered = {}): Filtered {
+  const meta = getAddressMeta(address);
 
-  while (queue.length > 0) {
-    const node: Transaction = queue.shift() as Transaction;
+  if (meta.isMultisig) {
+    meta.who?.forEach((address) => {
+      filtered[address] = {};
 
-    const meta = getAddressMeta(node.sender);
-
-    if (!meta.isMultisig) continue;
-
-    const list = meta.isFlexible ? node.children.at(0)?.children || [] : node.children;
-
-    // find has not complete transaction (status = 0 | 1)
-    const nocomplete = list.filter((item) => item.status < CalldataStatus.Success && getAddressMeta(item.sender).isMultisig);
-
-    if (nocomplete.length > 0 && list.filter((item) => item.status === CalldataStatus.Success).length === 0) {
-      filtered[node.sender] = [nocomplete[0].sender];
-      queue.push(nocomplete[0]);
-      continue;
-    }
-
-    for (const item of list) {
-      const _meta = getAddressMeta(item.sender);
-
-      if (node.status < CalldataStatus.Success) {
-        if (filtered[node.sender]) {
-          filtered[node.sender] = filtered[node.sender].filter((address) => (item.status === CalldataStatus.Success ? !addressEq(address, item.sender) : true));
-        } else {
-          filtered[node.sender] = (meta.who || []).filter((address) => (item.status === CalldataStatus.Success ? !addressEq(address, item.sender) : true));
-        }
-      } else if (node.status > CalldataStatus.Success) {
-        filtered[node.sender] = meta.who || [];
-      } else {
-        filtered[node.sender] = [];
-      }
-
-      if (_meta.isMultisig) {
-        queue.push(item);
-      }
-    }
+      extraFiltered(address, filtered[address]);
+    });
   }
 
   return filtered;
+}
+
+function removeSuccessFiltered(transaction: Transaction, filtered: Filtered): void {
+  const address = transaction.sender;
+  const meta = getAddressMeta(address);
+
+  (meta.isFlexible ? transaction.children[0] : transaction).children.forEach((tx) => {
+    const _filtered = filtered[tx.sender];
+
+    if (_filtered) {
+      if (tx.status === CalldataStatus.Success) {
+        delete filtered[tx.sender];
+      }
+
+      removeSuccessFiltered(tx, _filtered);
+    }
+  });
+}
+
+function removeMultisigDeepFiltered(transaction: Transaction, filtered: Filtered): void {
+  const address = transaction.sender;
+  const meta = getAddressMeta(address);
+
+  transaction = meta.isFlexible ? transaction.children[0] : transaction;
+
+  if (transaction.status === CalldataStatus.Initialized) {
+    // when transaction status is Initialized, means the transaction is not on chain
+    // remove the account is not multisig from filtered
+    Object.keys(filtered).forEach((_address) => {
+      const _meta = getAddressMeta(_address);
+
+      if (!_meta.isMultisig) {
+        delete filtered[_address];
+      }
+    });
+  }
+
+  transaction.children.forEach((tx) => {
+    const _filtered = filtered[tx.sender];
+
+    if (_filtered) {
+      removeMultisigDeepFiltered(tx, _filtered);
+    }
+  });
 }
 
 function Extrinsic({ transaction }: { transaction: Transaction }) {
@@ -108,14 +123,40 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
   const { addQueue } = useTxQueue();
   const initTx = useInitTransaction(transaction);
   const status = transaction.status;
+  const info = useMultisigInfo(api, transaction);
 
   const handleApprove = useCallback(() => {
+    const filtered = extraFiltered(transaction.sender);
+
+    removeSuccessFiltered(transaction, filtered);
+    removeMultisigDeepFiltered(transaction, filtered);
+
     addQueue({
-      filtered: extraFiltered(transaction),
+      filtered,
       extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
       accountId: transaction.sender
     });
   }, [addQueue, api, transaction]);
+
+  const handleCancel = useCallback(
+    (info: Multisig) => {
+      const filtered = extraFiltered(transaction.sender);
+
+      Object.keys(filtered).forEach((key) => {
+        if (!addressEq(key, info.depositor)) {
+          delete filtered[key];
+        }
+      });
+
+      addQueue({
+        filtered,
+        extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
+        accountId: transaction.sender,
+        isCancelled: true
+      });
+    },
+    [addQueue, api, transaction]
+  );
 
   return (
     <Stack flex='1' spacing={1}>
@@ -147,11 +188,18 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
           Detail
         </Button>
       )}
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        <Button onClick={handleApprove} variant='outlined'>
-          Approve
-        </Button>
-      </Box>
+      {transaction.status < CalldataStatus.Success && (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button onClick={handleApprove} variant='outlined'>
+            Approve
+          </Button>
+          {info && (
+            <Button onClick={() => handleCancel(info)} variant='outlined'>
+              Cancel
+            </Button>
+          )}
+        </Box>
+      )}
     </Stack>
   );
 }

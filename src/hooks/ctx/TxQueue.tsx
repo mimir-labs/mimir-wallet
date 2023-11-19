@@ -1,8 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { AccountId, Address } from '@polkadot/types/interfaces';
+import type { Filtered, TxQueue } from './types';
 
 import React, { useCallback, useState } from 'react';
 
@@ -10,25 +9,16 @@ interface Props {
   children?: React.ReactNode;
 }
 
-export interface TxQueue {
-  id?: number;
-  accountId: AccountId | Address | string;
-  beforeSend?: () => Promise<void>;
-  extrinsic: SubmittableExtrinsic<'promise'>;
-  filtered?: Record<string, string[]>;
-  onRemove?: () => void;
-}
-
 export interface TxState {
-  queue: Required<TxQueue>[];
-  addQueue: (queue: TxQueue) => void;
+  queue: (Required<TxQueue> & { filtered?: Filtered })[];
+  addQueue: (queue: TxQueue & { filtered?: Filtered }) => void;
 }
 
 export const TxQueueCtx = React.createContext<TxState>({} as TxState);
 let queueId = 1;
 
 export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
-  const [queue, setQueue] = useState<Required<TxQueue>[]>([]);
+  const [queue, setQueue] = useState<(Required<TxQueue> & { filtered?: Filtered })[]>([]);
 
   const addQueue = useCallback((value: TxQueue) => {
     setQueue((_queue) => {
@@ -37,8 +27,8 @@ export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
       const newValue = {
         ...value,
         id,
+        isCancelled: value.isCancelled ?? false,
         beforeSend: async () => value.beforeSend?.(),
-        filtered: value.filtered || {},
         onRemove: () => {
           value.onRemove?.();
           setQueue((_queue) => _queue.filter((item) => item.id !== id));

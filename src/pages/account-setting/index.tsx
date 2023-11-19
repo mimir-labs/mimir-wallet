@@ -1,7 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, FormHelperText, Paper, Stack, Typography } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { addressEq, decodeAddress, encodeMultiAddress, isAddress } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
@@ -20,9 +20,8 @@ function AccountSetting() {
   const { meta, name, saveName, setName } = useAddressMeta(addressParam);
   const { api } = useApi();
 
-  const { select, signatories, unselect, unselected } = useSelectMultisig(meta.who);
+  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig(meta.who);
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
-  const [{ isThresholdValid, threshold }, setThreshold] = useState<{ isThresholdValid: boolean; threshold: number }>({ isThresholdValid: true, threshold: 2 });
 
   const { addQueue } = useTxQueue();
 
@@ -56,9 +55,9 @@ function AccountSetting() {
 
   const _onChangeThreshold = useCallback(
     (value: string) => {
-      setThreshold({ isThresholdValid: Number(value) >= 2 && Number(value) <= signatories.length, threshold: Number(value) });
+      setThreshold(Number(value));
     },
-    [signatories.length]
+    [setThreshold]
   );
 
   return (
@@ -86,9 +85,12 @@ function AccountSetting() {
             }}
             placeholder='input address'
           />
-          <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-            <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
-            <AccountSelect accounts={signatories} onClick={unselect} title='Multisig Members' type='delete' />
+          <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+              <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
+              <AccountSelect accounts={signatories} onClick={unselect} title='Multisig Members' type='delete' />
+            </Box>
+            {!hasSoloAccount && <FormHelperText sx={{ color: 'error.main' }}>You need add at least one local account</FormHelperText>}
           </Paper>
           <Input
             defaultValue={String(threshold)}
@@ -98,7 +100,7 @@ function AccountSetting() {
           />
         </Paper>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button fullWidth onClick={_onClick}>
+          <Button disabled={!hasSoloAccount || signatories.length < 2 || !name || !isThresholdValid} fullWidth onClick={_onClick}>
             Save
           </Button>
           <Button fullWidth variant='outlined'>

@@ -49,7 +49,7 @@ function AddressName({ defaultName = 'NONAME', value }: Props): React.ReactEleme
   const { api } = useApi();
   const info = useDeriveAccountInfo(value);
   const [chainName, setChainName] = useState<React.ReactNode>(() => extractName((value || '').toString()));
-  const { name } = useAddressMeta(value?.toString());
+  const { meta } = useAddressMeta(value?.toString());
 
   // set the actual nickname, local name, accountId
   useEffect((): void => {
@@ -68,7 +68,7 @@ function AddressName({ defaultName = 'NONAME', value }: Props): React.ReactEleme
     }
   }, [api, info, value]);
 
-  return <>{chainName || name || defaultName}</>;
+  return <>{chainName || meta.name || defaultName}</>;
 }
 
 export default React.memo(AddressName);

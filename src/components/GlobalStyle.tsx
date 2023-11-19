@@ -1,6 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import 'reactflow/dist/style.css';
+
 import { CssBaseline, GlobalStyles } from '@mui/material';
 
 function GlobalStyle() {
@@ -14,12 +16,10 @@ function GlobalStyle() {
             src: "url('/fonts/SofiaSansSemiCondensed-VariableFont_wght.ttf')"
           },
           'body,html': {
-            lineHeight: 1.25,
-            height: '100%'
+            lineHeight: 1.25
           },
-          '#root': {
-            width: '100%',
-            height: '100%'
+          body: {
+            background: 'linear-gradient(245.23deg, #F4F2FF 0%, #FBFDFF 100%)'
           },
           ul: {
             paddingLeft: 0,

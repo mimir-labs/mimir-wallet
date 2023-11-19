@@ -65,7 +65,7 @@ function CallHash({ label, value }: { label: string; value: HexString }) {
   );
 }
 
-function Call({ method }: { method: IMethod }) {
+function Call({ isCancelled, method }: { isCancelled: boolean; method: IMethod }) {
   const { api } = useApi();
 
   const { callData, callHash, callName, params, values } = useMemo(() => extractState(method), [method]);
@@ -73,7 +73,7 @@ function Call({ method }: { method: IMethod }) {
   return (
     <Stack spacing={2.5}>
       <Typography color='primary.main' fontWeight={700} variant='h6'>
-        Call
+        {isCancelled ? 'Cancel Call' : 'Call'}
       </Typography>
       <Box>
         <Typography fontWeight={700} mb={0.5}>

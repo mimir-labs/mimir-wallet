@@ -7,7 +7,7 @@ import type { Option } from '@polkadot/types';
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces';
 
 import keyring from '@polkadot/ui-keyring';
-import { BN, u8aSorted } from '@polkadot/util';
+import { assert, BN, u8aSorted } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 
 import { getAddressMeta } from './address';
@@ -28,7 +28,16 @@ export function canSendMultisig(accounts: Record<string, string | undefined>, ad
   }
 }
 
-async function _asMulti(api: ApiPromise, extrinsic: SubmittableExtrinsic, threshold: number, who: string[], sender: string, reserve: Record<string, BN>, unreserve: Record<string, BN>) {
+async function _asMulti(
+  api: ApiPromise,
+  extrinsic: SubmittableExtrinsic,
+  threshold: number,
+  who: string[],
+  sender: string,
+  isCancelled: boolean,
+  reserve: Record<string, BN>,
+  unreserve: Record<string, BN>
+) {
   const multiAddress = encodeMultiAddress(who, threshold);
   const others = who.filter((w) => w !== sender);
   const [info, { weight }] = await Promise.all([api.query.multisig.multisigs<Option<Multisig>>(multiAddress, extrinsic.method.hash), extrinsic.paymentInfo(multiAddress)]);
@@ -40,21 +49,35 @@ async function _asMulti(api: ApiPromise, extrinsic: SubmittableExtrinsic, thresh
 
     const approvals = info.unwrap().approvals;
 
-    if (approvals.length >= threshold - 1) {
+    if (isCancelled) {
+      unreserve[info.unwrap().depositor.toString()] = info.unwrap().deposit;
+    } else if (approvals.length >= threshold - 1) {
       unreserve[info.unwrap().depositor.toString()] = info.unwrap().deposit;
     } else {
       Object.keys(reserve).forEach((key) => {
         delete reserve[key];
+      });
+      Object.keys(unreserve).forEach((key) => {
+        delete unreserve[key];
       });
     }
   } else {
     Object.keys(reserve).forEach((key) => {
       delete reserve[key];
     });
+    Object.keys(unreserve).forEach((key) => {
+      delete unreserve[key];
+    });
     reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(threshold)).add(api.consts.balances.existentialDeposit);
   }
 
-  return api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method, weight);
+  if (isCancelled) {
+    assert(timepoint, 'Cancel multisig must has timepoint');
+
+    return api.tx.multisig.cancelAsMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.hash);
+  } else {
+    return api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method, weight);
+  }
 }
 
 export async function prepareMultisig(
@@ -62,6 +85,7 @@ export async function prepareMultisig(
   extrinsic: SubmittableExtrinsic,
   accounts: Record<string, string | undefined>,
   address: string,
+  isCancelled: boolean,
   reserve: Record<string, BN> = {},
   unreserve: Record<string, BN> = {}
 ): Promise<PrepareMultisig> {
@@ -78,12 +102,12 @@ export async function prepareMultisig(
     if (meta.isFlexible) {
       const proxyTx = api.tx.proxy.proxy(address, 'Any', extrinsic.method);
 
-      tx = await _asMulti(api, proxyTx, meta.threshold, meta.who, sender, reserve, unreserve);
+      tx = await _asMulti(api, proxyTx, meta.threshold, meta.who, sender, isCancelled, reserve, unreserve);
     } else {
-      tx = await _asMulti(api, extrinsic, meta.threshold, meta.who, sender, reserve, unreserve);
+      tx = await _asMulti(api, extrinsic, meta.threshold, meta.who, sender, isCancelled, reserve, unreserve);
     }
 
-    return prepareMultisig(api, tx, accounts, sender, reserve, unreserve);
+    return prepareMultisig(api, tx, accounts, sender, false, reserve, unreserve);
   } else {
     return [extrinsic, address, reserve, unreserve];
   }

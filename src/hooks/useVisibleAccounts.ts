@@ -11,7 +11,17 @@ import { useAccounts } from './useAccounts';
 function useVisibleAccountsImpl(others?: string[]): string[] {
   const { allAccounts } = useAccounts();
 
-  return useMemo(() => allAccounts.filter((value) => !getAddressMeta(value).isHidden).concat(others || []), [others, allAccounts]);
+  return useMemo(
+    () =>
+      allAccounts
+        .filter((value) => {
+          const meta = getAddressMeta(value);
+
+          return meta.isMultisig ? !meta.isHidden && meta.isValid : true;
+        })
+        .concat(others || []),
+    [others, allAccounts]
+  );
 }
 
 export const useVisibleAccounts = createNamedHook('useVisibleAccounts', useVisibleAccountsImpl);

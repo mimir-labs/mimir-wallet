@@ -9,6 +9,7 @@ import { keyring } from '@polkadot/ui-keyring';
 import { hexToU8a, isHex } from '@polkadot/util';
 
 export interface AddressMeta extends KeyringJson$Meta {
+  isValid?: boolean;
   isFlexible?: boolean;
   creator?: string;
   height?: number;

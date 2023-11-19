@@ -16,6 +16,7 @@ interface Props {
   name?: string;
   signatories: string[];
   isThresholdValid: boolean;
+  hasSoloAccount: boolean;
   threshold: number;
 }
 
@@ -26,7 +27,7 @@ function createMultisig(signatories: string[], threshold: number, name: string):
   return address;
 }
 
-function CreateStatic({ isThresholdValid, name, signatories, threshold }: Props) {
+function CreateStatic({ hasSoloAccount, isThresholdValid, name, signatories, threshold }: Props) {
   const [open, toggleOpen] = useToggle();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +69,7 @@ function CreateStatic({ isThresholdValid, name, signatories, threshold }: Props)
           </Button>
         </DialogActions>
       </Dialog>
-      <Button disabled={signatories.length < 2 || !name || !isThresholdValid} fullWidth onClick={toggleOpen} variant='contained'>
+      <Button disabled={!hasSoloAccount || signatories.length < 2 || !name || !isThresholdValid} fullWidth onClick={toggleOpen} variant='contained'>
         Create
       </Button>
     </>

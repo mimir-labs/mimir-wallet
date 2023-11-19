@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
+import type { Filtered } from '@mimirdev/hooks/ctx/types';
 
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
@@ -20,12 +21,14 @@ function Contents({
   beforeSend,
   extrinsic,
   filtered,
+  isCancelled,
   onClose
 }: {
   beforeSend: () => Promise<void>;
   address: string;
   extrinsic: SubmittableExtrinsic<'promise'>;
-  filtered: Record<string, string[]>;
+  filtered?: Filtered;
+  isCancelled: boolean;
   onClose: () => void;
 }) {
   const [accounts, setAccounts] = useState<Record<string, string | undefined>>({});
@@ -35,9 +38,9 @@ function Contents({
 
   useEffect(() => {
     if (canSend) {
-      prepareMultisig(api, extrinsic, accounts, address).then(setPrepare);
+      prepareMultisig(api, extrinsic, accounts, address, isCancelled).then(setPrepare);
     }
-  }, [accounts, address, api, canSend, extrinsic]);
+  }, [accounts, address, api, canSend, isCancelled, extrinsic]);
 
   return (
     <>
@@ -52,7 +55,7 @@ function Contents({
             </Paper>
           </Box>
           <Divider />
-          <Call method={extrinsic.method} />
+          <Call isCancelled={isCancelled} method={extrinsic.method} />
           <Divider />
           <AddressChain accounts={accounts} address={address} filtered={filtered} onChange={setAccounts} />
           {prepare && (!!Object.keys(prepare[2]).length || !!Object.keys(prepare[3]).length) && (
@@ -82,10 +85,10 @@ function TxModal() {
   const { queue } = useTxQueue();
 
   return isApiReady ? (
-    queue.map(({ accountId, beforeSend, extrinsic, filtered, id, onRemove }) => (
+    queue.map(({ accountId, beforeSend, extrinsic, filtered, id, isCancelled, onRemove }) => (
       <Dialog fullWidth key={id} maxWidth='sm' onClose={onRemove} open={true}>
         <DialogTitle>Submit Transaction</DialogTitle>
-        {isApiReady && <Contents address={accountId.toString()} beforeSend={beforeSend} extrinsic={extrinsic} filtered={filtered} onClose={onRemove} />}
+        {isApiReady && <Contents address={accountId.toString()} beforeSend={beforeSend} extrinsic={extrinsic} filtered={filtered} isCancelled={isCancelled} onClose={onRemove} />}
       </Dialog>
     ))
   ) : (

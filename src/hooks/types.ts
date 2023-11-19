@@ -63,7 +63,9 @@ export enum CalldataStatus {
   Initialized = 0,
   Pending = 1,
   Success = 2,
-  Failed = 3
+  Failed = 3,
+  MemberChanged = 4,
+  Cancelled = 5
 }
 
 export interface Calldata {

@@ -37,14 +37,25 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
   }, [value]);
 
   useEffect(() => {
-    events.on('account_meta_changed', (address) => {
+    const fn = (address: string) => {
       if (value && addressEq(address, value)) {
-        const meta = getAddressMeta(value);
+        setMeta((meta) => {
+          const newMeta = getAddressMeta(value);
 
-        setMeta(meta);
-        setName(meta.name);
+          if (JSON.stringify(meta) !== JSON.stringify(newMeta)) {
+            return newMeta;
+          } else {
+            return meta;
+          }
+        });
       }
-    });
+    };
+
+    events.on('account_meta_changed', fn);
+
+    return () => {
+      events.off('account_meta_changed', fn);
+    };
   }, [value]);
 
   const saveName = useCallback(() => {

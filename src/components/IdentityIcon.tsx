@@ -40,10 +40,11 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
   }, [value]);
 
   return (
-    <Box className={`${className} IdentityIcon`} sx={{ position: 'relative', width: size, height: size, bgcolor: 'secondary.main', borderRadius: '50%' }}>
+    <Box className={`${className} IdentityIcon`} component='span' sx={{ position: 'relative', width: size, height: size, bgcolor: 'secondary.main', borderRadius: '50%' }}>
       <PolkadotIcon address={address} publicKey={publicKey} size={size} />
       {isMultisig && (
         <Box
+          component='span'
           sx={{
             position: 'absolute',
             left: 0,

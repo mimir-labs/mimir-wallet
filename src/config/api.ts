@@ -5,7 +5,7 @@ import { events } from '@mimirdev/events';
 
 export const API_URL_KEY = 'apiUrl';
 
-export let apiUrl = localStorage.getItem(API_URL_KEY) || 'ws://127.0.0.1:9944/';
+export let apiUrl = process.env.NODE_ENV === 'production' ? 'wss://dev-ws.mimir.global/' : localStorage.getItem(API_URL_KEY) || 'ws://127.0.0.1:9944/';
 
 export function setApiUrl(url: string): void {
   localStorage.setItem(API_URL_KEY, url);
