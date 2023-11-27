@@ -31,5 +31,6 @@ export interface TxQueue {
   beforeSend?: () => Promise<void>;
   extrinsic: SubmittableExtrinsic<'promise'>;
   isCancelled?: boolean;
+  isApprove?: boolean;
   onRemove?: () => void;
 }

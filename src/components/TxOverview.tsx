@@ -1,10 +1,10 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Paper, SvgIcon, useTheme } from '@mui/material';
+import { Button, Paper, SvgIcon, useTheme } from '@mui/material';
 import { addressEq } from '@polkadot/util-crypto';
 import React, { useEffect, useMemo } from 'react';
-import ReactFlow, { Edge, Handle, Node, NodeProps, Position, useEdgesState, useNodesState } from 'reactflow';
+import ReactFlow, { Edge, EdgeLabelRenderer, EdgeProps, Handle, Node, NodeProps, Position, StepEdge, useEdgesState, useNodesState } from 'reactflow';
 
 import { ReactComponent as IconSuccess } from '@mimirdev/assets/svg/icon-success-fill.svg';
 import { CalldataStatus, type Transaction } from '@mimirdev/hooks/types';
@@ -16,7 +16,7 @@ interface Props {
   tx?: Transaction;
 }
 
-type NodeData = { parent: string | null; members: string[]; address: string; txs: Transaction[] };
+type NodeData = { parentId: string | null; members: string[]; address: string; txs: Transaction[] };
 
 const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
   const { palette } = useTheme();
@@ -42,7 +42,7 @@ const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
         <AddressCell showType value={data.address} withCopy />
         {isSuccess && <SvgIcon component={IconSuccess} inheritViewBox sx={{ fontSize: '1rem' }} />}
       </Paper>
-      {data.parent && (
+      {data.parentId && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Right}
@@ -58,51 +58,141 @@ const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
   );
 });
 
+// this is a little helper component to render the actual edge label
+function EdgeLabel({ label, transform }: { transform: string; label: string }) {
+  return (
+    <Button
+      className='nodrag nopan'
+      size='small'
+      sx={{
+        width: 'auto',
+        minWidth: 0,
+        position: 'absolute',
+        padding: 0,
+        paddingX: 0.5,
+        lineHeight: 1,
+        fontSize: 12,
+        transform
+      }}
+    >
+      {label}
+    </Button>
+  );
+}
+
+function CallEdge({ data, id, source, sourcePosition, sourceX, sourceY, target, targetPosition, targetX, targetY }: EdgeProps) {
+  return (
+    <>
+      <StepEdge
+        id={id}
+        pathOptions={{
+          offset: 0
+        }}
+        source={source}
+        sourcePosition={sourcePosition}
+        sourceX={sourceX}
+        sourceY={sourceY}
+        style={{ strokeDasharray: 'none' }}
+        target={target}
+        targetPosition={targetPosition}
+        targetX={targetX}
+        targetY={targetY}
+      />
+      <EdgeLabelRenderer>
+        {data.startLabel && <EdgeLabel label={data.startLabel} transform={`translate(-50%, 0%) translate(${targetX + 10}px,${targetY - 6}px)`} />}
+        {data.endLabel && <EdgeLabel label={data.endLabel} transform={`translate(-50%, -100%) translate(${sourceX}px,${sourceY}px)`} />}
+      </EdgeLabelRenderer>
+    </>
+  );
+}
+
 const nodeTypes = {
   TxNode
 };
+const edgeTypes = {
+  CallEdge
+};
 
-function makeNodes(address: string, parent: string | null, txs: Transaction[], deepX = 0, deepY = 0, nodes: Node<NodeData>[] = [], edges: Edge[] = []) {
+function makeNodes(
+  address: string,
+  parentId: string | null,
+  txs: Transaction[],
+  xPos: number,
+  yPos: number,
+  xOffset: number,
+  yOffset: number,
+  onYChange?: (offset: number) => void,
+  nodes: Node<NodeData>[] = [],
+  edges: Edge[] = []
+): void {
   const meta = getAddressMeta(address);
 
-  const nodeId = `${address}-${deepX}`;
+  const nodeId = `${parentId}-${address}`;
 
-  nodes.push({
+  const node: Node<NodeData> = {
     id: nodeId,
     type: 'TxNode',
-    data: { address, parent, members: meta.who || [], txs },
-    position: { x: deepX * -300, y: deepY * -90 + 50 }
-  });
+    data: { address, parentId, members: meta.who || [], txs },
+    position: { x: xPos, y: yPos }
+  };
 
-  if (parent) {
-    const parentId = `${parent}-${deepX - 1}`;
+  nodes.push(node);
 
+  if (parentId) {
     edges.push({
       id: `${parentId}_to_${nodeId}`,
       source: parentId,
       target: nodeId,
-      type: 'smoothstep',
+      type: 'CallEdge',
       style: { stroke: '#d9d9d9', strokeDasharray: 'none' },
-      animated: true
+      animated: true,
+      data: {}
     });
   }
 
   if (meta.who) {
-    const length = meta.who.length;
+    const nextX = xPos - xOffset;
+    const childCount = meta.who.length;
+
+    const startY = yPos - ((childCount - 1) * yOffset) / 2;
+    let nextY = startY;
 
     meta.who.forEach((_address, index) => {
       const _txs: Transaction[] = [];
 
       for (const item of txs) {
         for (const tx of meta.isFlexible ? item?.children[0]?.children || [] : item?.children || []) {
-          if (addressEq(tx.sender, _address)) {
+          if (addressEq(tx.sender, _address) && tx.status <= CalldataStatus.Success) {
             _txs.push(tx);
           }
         }
       }
 
-      makeNodes(_address, address, _txs, deepX + 1, deepY + index - Math.floor(length / 2) + (length % 2 === 0 ? 0.5 : 0), nodes, edges);
+      makeNodes(
+        _address,
+        nodeId,
+        _txs,
+        nextX,
+        nextY,
+        xOffset,
+        yOffset,
+        (offset: number) => {
+          onYChange?.(offset);
+          nextY += offset;
+        },
+        nodes,
+        edges
+      );
+
+      if (index < childCount - 1) {
+        nextY += yOffset * (getAddressMeta(_address).who?.length || 1);
+      }
     });
+
+    const oldY = node.position.y;
+
+    node.position.y = (nextY + startY) / 2;
+    onYChange?.(node.position.y - oldY);
   }
 }
 
@@ -116,7 +206,7 @@ function TxOverview({ tx }: Props) {
     const nodes: Node<NodeData>[] = [];
     const edges: Edge[] = [];
 
-    makeNodes(tx.sender, null, [tx], 0, 0, nodes, edges);
+    makeNodes(tx.sender, null, [tx], 0, 0, 300, 90, undefined, nodes, edges);
 
     setNodes(nodes);
     setEdges(edges);
@@ -124,16 +214,21 @@ function TxOverview({ tx }: Props) {
 
   return (
     <ReactFlow
+      edgeTypes={edgeTypes}
       edges={edges}
       fitView
       fitViewOptions={{
         maxZoom: 1.5,
+        minZoom: 0.1,
         nodes
       }}
+      maxZoom={1.5}
+      minZoom={0.1}
       nodeTypes={nodeTypes}
       nodes={nodes}
       onEdgesChange={onEdgesChange}
       onNodesChange={onNodesChange}
+      zoomOnScroll
     />
   );
 }

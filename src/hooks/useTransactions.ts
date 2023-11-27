@@ -5,7 +5,7 @@ import type { ApiPromise } from '@polkadot/api';
 import type { Call } from '@polkadot/types/interfaces';
 import type { Calldata, CalldataStatus, Transaction } from './types';
 
-import { encodeAddress } from '@polkadot/util-crypto';
+import { addressEq, encodeAddress } from '@polkadot/util-crypto';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 
@@ -19,6 +19,7 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
   class Instance implements Transaction {
     private api: ApiPromise;
 
+    public top: Transaction | null;
     public parent: Transaction | null;
     public children: Transaction[];
 
@@ -30,8 +31,11 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
     public height?: number;
     public index?: number;
 
+    public initTransaction!: Transaction;
+
     constructor(api: ApiPromise) {
       this.api = api;
+      this.top = null;
       this.parent = null;
       this.children = [];
       this.uuid = calldata.uuid;
@@ -47,6 +51,12 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
       const existValue = this.children.find((item) => item.uuid === transaction.uuid);
 
       if (existValue) return existValue;
+
+      if (this.top) {
+        transaction.top = this.top;
+      } else {
+        transaction.top = this;
+      }
 
       transaction.parent = this;
       this.children.push(transaction);
@@ -83,15 +93,16 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
   return new Instance(api);
 }
 
-function extraTransaction(api: ApiPromise, calldatas: Calldata[][]): Transaction[] {
+function extraTransaction(api: ApiPromise, calldatas: Calldata[][], sender: string): Transaction[] {
   if (calldatas.length === 0) return [];
 
   const transactionMap: Map<string, Transaction> = new Map();
+  const senderTransactionMap: Map<string, Transaction> = new Map();
 
   for (const items of calldatas) {
     if (items.length === 0) continue;
 
-    let transaction: Transaction | undefined = transactionMap.get(items[items.length - 1].uuid);
+    let transaction: Transaction | undefined | null = transactionMap.get(items[items.length - 1].uuid);
 
     if (!transaction) {
       transaction = createTransaction(api, items[items.length - 1]);
@@ -103,9 +114,27 @@ function extraTransaction(api: ApiPromise, calldatas: Calldata[][]): Transaction
 
       transaction = transaction.addChild(createTransaction(api, calldata));
     }
+
+    const initTransaction = transaction;
+
+    while (transaction) {
+      if (addressEq(transaction.sender, sender)) {
+        senderTransactionMap.set(transaction.uuid, transaction);
+      }
+
+      if (!transaction.initTransaction) {
+        transaction.initTransaction = initTransaction;
+      } else {
+        if ((transaction.initTransaction.height || 0) > (initTransaction.height || 0)) {
+          transaction.initTransaction = initTransaction;
+        }
+      }
+
+      transaction = transaction.parent;
+    }
   }
 
-  return Array.from(transactionMap.values());
+  return Array.from(senderTransactionMap.values());
 }
 
 export function useTransactions(address?: string): [transactions: Transaction[], isLoading: boolean] {
@@ -113,7 +142,7 @@ export function useTransactions(address?: string): [transactions: Transaction[],
 
   const { data, isLoading } = useSWR<Calldata[][]>(isApiReady && address ? getServiceUrl(`tx?address=${address}`) : null);
 
-  const transactions = useMemo(() => extraTransaction(api, data || []), [api, data]);
+  const transactions = useMemo(() => (address && data && data.length > 0 ? extraTransaction(api, data, address) : []), [address, api, data]);
 
   return [transactions, isLoading];
 }

@@ -83,6 +83,7 @@ export interface Calldata {
 }
 
 export interface Transaction {
+  top: Transaction | null;
   parent: Transaction | null;
   children: Transaction[];
 
@@ -97,6 +98,8 @@ export interface Transaction {
   action: string;
   section: string;
   method: string;
+
+  initTransaction: Transaction;
 
   addChild(transaction: Transaction): Transaction;
 }

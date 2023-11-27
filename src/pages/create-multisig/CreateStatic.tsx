@@ -9,7 +9,7 @@ import { decodeAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useToggle } from '@mimirdev/hooks';
+import { useSelectedAccountCallback, useToggle } from '@mimirdev/hooks';
 import { service } from '@mimirdev/utils';
 
 interface Props {
@@ -21,7 +21,7 @@ interface Props {
 }
 
 function createMultisig(signatories: string[], threshold: number, name: string): string {
-  const result = keyring.addMultisig(signatories, threshold, { name, genesisHash: '0xe0804a0b86b52b29ff4c536e5d3ea31f2ca3ab2a2b4a9caee5ced16579f42c62' });
+  const result = keyring.addMultisig(signatories, threshold, { name });
   const { address } = result.pair;
 
   return address;
@@ -31,24 +31,28 @@ function CreateStatic({ hasSoloAccount, isThresholdValid, name, signatories, thr
   const [open, toggleOpen] = useToggle();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const selectAccount = useSelectedAccountCallback();
 
   const handleCreate = useCallback(async () => {
     if (!name) return;
 
     try {
       setIsLoading(true);
-      createMultisig(signatories, threshold, name);
 
       await service.createMultisig(
         signatories.map((value) => u8aToHex(decodeAddress(value))),
         threshold,
         name
       );
+
+      const address = createMultisig(signatories, threshold, name);
+
+      selectAccount(address);
       navigate('/');
     } catch {}
 
     setIsLoading(false);
-  }, [name, navigate, signatories, threshold]);
+  }, [name, navigate, selectAccount, signatories, threshold]);
 
   return (
     <>

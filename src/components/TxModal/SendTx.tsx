@@ -10,7 +10,7 @@ import { PrepareMultisig, signAndSend } from '@mimirdev/utils';
 
 import { useToastPromise } from '../ToastRoot';
 
-function SendTx({ beforeSend, canSend, onClose, prepare }: { prepare?: PrepareMultisig; canSend: boolean; onClose: () => void; beforeSend: () => Promise<void> }) {
+function SendTx({ beforeSend, canSend, disabled, onClose, prepare }: { disabled?: boolean; prepare?: PrepareMultisig; canSend: boolean; onClose: () => void; beforeSend: () => Promise<void> }) {
   const { api } = useApi();
   const [isEnought, setIsEnought] = useState<boolean>(false);
   const [loading, onConfirm] = useToastPromise(
@@ -47,7 +47,7 @@ function SendTx({ beforeSend, canSend, onClose, prepare }: { prepare?: PrepareMu
   }, [api, prepare]);
 
   return (
-    <LoadingButton disabled={!canSend || !prepare || !isEnought} fullWidth loading={loading} onClick={onConfirm} variant='contained'>
+    <LoadingButton disabled={disabled || !canSend || !prepare || !isEnought} fullWidth loading={loading} onClick={onConfirm} variant='contained'>
       Confirm
     </LoadingButton>
   );

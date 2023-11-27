@@ -17,13 +17,13 @@ function PageTransaction() {
 
   const list = useMemo(() => {
     return transactions
-      .sort((l, r) => (r.height || 0) - (l.height || 0))
+      .sort((l, r) => (r.initTransaction.height || 0) - (l.initTransaction.height || 0))
       .filter((item) => {
         if (type === 'pending') {
-          return item.status < CalldataStatus.Success;
+          return (item.top || item).status < CalldataStatus.Success;
         }
 
-        return item.status > CalldataStatus.Pending;
+        return (item.top || item).status > CalldataStatus.Pending;
       });
   }, [transactions, type]);
 
@@ -38,8 +38,8 @@ function PageTransaction() {
         </Button>
       </Paper>
       <Stack spacing={2}>
-        {list.map((transaction, index) => (
-          <TxCell key={index} transaction={transaction} />
+        {list.map((transaction) => (
+          <TxCell key={transaction.uuid} transaction={transaction} />
         ))}
       </Stack>
     </Box>

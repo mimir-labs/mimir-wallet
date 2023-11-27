@@ -15,7 +15,7 @@ interface Props {
   value?: AccountId | AccountIndex | Address | string | null;
 }
 
-type NodeData = { parent: string | null; members: string[]; address: string };
+type NodeData = { parentId: string | null; members: string[]; address: string };
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
   const { palette } = useTheme();
@@ -26,7 +26,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
       <Paper sx={{ width: 220, height: 71, padding: 1 }}>
         <AddressCell showType value={data.address} withCopy />
       </Paper>
-      {data.parent && <Handle isConnectable={isConnectable} position={Position.Right} style={{ width: 0, height: 0, background: palette.grey[300] }} type='target' />}
+      {data.parentId && <Handle isConnectable={isConnectable} position={Position.Right} style={{ width: 0, height: 0, background: palette.grey[300] }} type='target' />}
     </>
   );
 });
@@ -35,21 +35,32 @@ const nodeTypes = {
   AddressNode
 };
 
-function makeNodes(address: string, parent: string | null, deepX = 0, deepY = 0, nodes: Node<NodeData>[] = [], edges: Edge[] = []) {
+function makeNodes(
+  address: string,
+  parentId: string | null,
+  xPos: number,
+  yPos: number,
+  xOffset: number,
+  yOffset: number,
+  onYChange?: (offset: number) => void,
+  nodes: Node<NodeData>[] = [],
+  edges: Edge[] = []
+): void {
   const meta = getAddressMeta(address);
 
-  const nodeId = `${address}-${deepX}`;
+  const nodeId = `${parentId}-${address}`;
 
-  nodes.push({
+  const node: Node<NodeData> = {
     id: nodeId,
+    resizing: true,
     type: 'AddressNode',
-    data: { address, parent, members: meta.who || [] },
-    position: { x: deepX * -300, y: deepY * -90 + 50 }
-  });
+    data: { address, parentId, members: meta.who || [] },
+    position: { x: xPos, y: yPos }
+  };
 
-  if (parent) {
-    const parentId = `${parent}-${deepX - 1}`;
+  nodes.push(node);
 
+  if (parentId) {
     edges.push({
       id: `${parentId}_to_${nodeId}`,
       source: parentId,
@@ -61,11 +72,37 @@ function makeNodes(address: string, parent: string | null, deepX = 0, deepY = 0,
   }
 
   if (meta.who) {
-    const length = meta.who.length;
+    const nextX = xPos - xOffset;
+    const childCount = meta.who.length;
+
+    const startY = yPos - ((childCount - 1) * yOffset) / 2;
+    let nextY = startY;
 
     meta.who.forEach((_address, index) => {
-      makeNodes(_address, address, deepX + 1, deepY + index - Math.floor(length / 2) + (length % 2 === 0 ? 0.5 : 0), nodes, edges);
+      makeNodes(
+        _address,
+        nodeId,
+        nextX,
+        nextY,
+        xOffset,
+        yOffset,
+        (offset: number) => {
+          onYChange?.(offset);
+          nextY += offset;
+        },
+        nodes,
+        edges
+      );
+
+      if (index < childCount - 1) {
+        nextY += yOffset * (getAddressMeta(_address).who?.length || 1);
+      }
     });
+
+    const oldY = node.position.y;
+
+    node.position.y = (nextY + startY) / 2;
+    onYChange?.(node.position.y - oldY);
   }
 }
 
@@ -79,7 +116,7 @@ function AddressOverview({ value }: Props) {
     const nodes: Node<NodeData>[] = [];
     const edges: Edge[] = [];
 
-    makeNodes(value.toString(), null, 0, 0, nodes, edges);
+    makeNodes(value.toString(), null, 0, 0, 300, 90, undefined, nodes, edges);
 
     setNodes(nodes);
     setEdges(edges);
@@ -91,12 +128,16 @@ function AddressOverview({ value }: Props) {
       fitView
       fitViewOptions={{
         maxZoom: 1.5,
+        minZoom: 0.1,
         nodes
       }}
+      maxZoom={1.5}
+      minZoom={0.1}
       nodeTypes={nodeTypes}
       nodes={nodes}
       onEdgesChange={onEdgesChange}
       onNodesChange={onNodesChange}
+      zoomOnScroll
     />
   );
 }

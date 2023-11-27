@@ -45,7 +45,7 @@ function extractIdentity(address: string, identity: DeriveAccountRegistration): 
   return elem;
 }
 
-function AddressName({ defaultName = 'NONAME', value }: Props): React.ReactElement<Props> {
+function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
   const { api } = useApi();
   const info = useDeriveAccountInfo(value);
   const [chainName, setChainName] = useState<React.ReactNode>(() => extractName((value || '').toString()));
@@ -68,7 +68,7 @@ function AddressName({ defaultName = 'NONAME', value }: Props): React.ReactEleme
     }
   }, [api, info, value]);
 
-  return <>{chainName || meta.name || defaultName}</>;
+  return <>{chainName || meta.name || defaultName || `${value?.toString().slice(0, 6)}…${value?.toString().slice(-6)}`}</>;
 }
 
 export default React.memo(AddressName);

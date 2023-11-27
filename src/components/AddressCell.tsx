@@ -3,11 +3,14 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Box, Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
+import { ReactComponent as IconAddressBook } from '@mimirdev/assets/svg/icon-address-book.svg';
+import { useAccounts, useAddresses, useToggle } from '@mimirdev/hooks';
 import { getAddressMeta } from '@mimirdev/utils';
 
+import AddAddressDialog from './AddAddressDialog';
 import AddressComp from './Address';
 import AddressName from './AddressName';
 import CopyButton from './CopyButton';
@@ -23,30 +26,41 @@ interface Props {
 }
 
 function AddressCell({ shorten = true, showType = false, size = 'medium', value, width, withCopy = false }: Props) {
+  const { isAccount } = useAccounts();
+  const { isAddress } = useAddresses();
   const [iconSize, nameFontSize, addressFontSize, spacing, spacingCol] = useMemo((): [number, string, string, number, number] => {
     return size === 'small' ? [30, '0.875rem', '0.75rem', 0.5, 0.2] : size === 'medium' ? [40, '1rem', '0.75rem', 0.5, 0.5] : [50, '1.25rem', '0.875rem', 1, 0.5];
   }, [size]);
+  const [open, toggleOpen] = useToggle();
 
   const address = value?.toString();
 
   const { isFlexible, isMultisig } = useMemo(() => getAddressMeta(address || ''), [address]);
 
   return (
-    <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
-      <IdentityIcon className='AddressCell-Icon' size={iconSize} value={value} />
-      <Stack className='AddressCell-Address' spacing={spacingCol}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Typography component='span' fontSize={nameFontSize} fontWeight={size === 'large' ? 800 : 700} sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            <AddressName value={value} />
+    <>
+      <AddAddressDialog onClose={toggleOpen} open={open} />
+      <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
+        <IdentityIcon className='AddressCell-Icon' size={iconSize} value={value} />
+        <Stack className='AddressCell-Address' spacing={spacingCol}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography component='span' fontSize={nameFontSize} fontWeight={size === 'large' ? 800 : 700} sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <AddressName value={value} />
+            </Typography>
+            {showType && <Chip color='secondary' label={isMultisig ? (isFlexible ? 'Flexible' : 'Static') : 'Solo'} size={size === 'large' ? 'medium' : 'small'} />}
+          </Box>
+          <Typography color='text.secondary' component='span' fontSize={addressFontSize} sx={{ display: 'flex', alignItems: 'center' }}>
+            <AddressComp shorten={shorten} value={address} />
+            {withCopy && <CopyButton value={address} />}
+            {!isAccount(value) && !isAddress(value) && (
+              <IconButton color='inherit' onClick={toggleOpen} size='small' sx={{ opacity: 0.7 }}>
+                <SvgIcon component={IconAddressBook} inheritViewBox />
+              </IconButton>
+            )}
           </Typography>
-          {showType && <Chip color='secondary' label={isMultisig ? (isFlexible ? 'Flexible' : 'Static') : 'Solo'} size={size === 'large' ? 'medium' : 'small'} />}
-        </Box>
-        <Typography color='text.secondary' component='span' fontSize={addressFontSize} sx={{ display: 'flex', alignItems: 'center' }}>
-          <AddressComp shorten={shorten} value={address} />
-          {withCopy && <CopyButton value={address} />}
-        </Typography>
+        </Stack>
       </Stack>
-    </Stack>
+    </>
   );
 }
 

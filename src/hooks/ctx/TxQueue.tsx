@@ -28,6 +28,7 @@ export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
         ...value,
         id,
         isCancelled: value.isCancelled ?? false,
+        isApprove: value.isApprove ?? false,
         beforeSend: async () => value.beforeSend?.(),
         onRemove: () => {
           value.onRemove?.();

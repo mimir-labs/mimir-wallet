@@ -4,7 +4,7 @@
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
-import { GlobalStyle, MimirLoading } from '@mimirdev/components';
+import { GlobalStyle, MimirLoading, TxModal } from '@mimirdev/components';
 import { useApi, useSyncMultisigs } from '@mimirdev/hooks';
 
 import TopBar from './TopBar';
@@ -16,6 +16,7 @@ function BaseContainer() {
 
   return (
     <>
+      <TxModal />
       <GlobalStyle />
       <TopBar />
       {isApiReady ? (

@@ -39,7 +39,8 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
           height,
           index,
           genesisHash: api.genesisHash.toHex(),
-          isValid
+          isValid,
+          isPending: false
         });
       } else {
         keyring.addExternal(address, {
@@ -52,7 +53,8 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
           height,
           index,
           genesisHash: api.genesisHash.toHex(),
-          isValid
+          isValid,
+          isPending: false
         });
       }
 
@@ -77,7 +79,8 @@ function mergeMulti(account: MultiAccountData) {
       ...exists?.meta,
       isMultisig: true,
       name: name || undefined,
-      isValid
+      isValid,
+      isPending: false
     }
   );
   events.emit('account_meta_changed', address);
@@ -85,9 +88,9 @@ function mergeMulti(account: MultiAccountData) {
 
 function sync(api: ApiPromise) {
   service.getMultisigs(keyring.getAccounts().map((item) => u8aToHex(item.publicKey))).then((multisigs) => {
-    // remove not exist multisig
+    // remove not exist multisig but not in pending
     keyring.getAccounts().forEach((account) => {
-      if (account.meta.isMultisig && !multisigs[u8aToHex(account.publicKey)]) {
+      if (!account.meta.isPending && account.meta.isMultisig && !multisigs[u8aToHex(account.publicKey)]) {
         keyring.forgetAccount(account.address);
       }
     });

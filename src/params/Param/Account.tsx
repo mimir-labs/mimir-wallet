@@ -10,7 +10,13 @@ import Item from './Item';
 import { ParamProps } from './types';
 
 function Account({ param, type, value }: ParamProps) {
-  return <Item content={<AddressRow size='small' value={value.value.toString()} withCopy />} name={<Typography fontWeight={700}>{param.name}</Typography>} type={type} />;
+  return (
+    <Item
+      content={<AddressRow defaultName={value.value.toString()} shorten={false} size='small' value={value.value.toString()} withAddress={false} withCopy withName />}
+      name={<Typography fontWeight={700}>{param.name}</Typography>}
+      type={type}
+    />
+  );
 }
 
 export default React.memo(Account);

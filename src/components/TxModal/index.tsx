@@ -4,10 +4,12 @@
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Filtered } from '@mimirdev/hooks/ctx/types';
 
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Paper, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import { useApi, useTxQueue } from '@mimirdev/hooks';
+import { useApi, useTransactions, useTxQueue } from '@mimirdev/hooks';
+import { CalldataStatus } from '@mimirdev/hooks/types';
 import { canSendMultisig, PrepareMultisig, prepareMultisig } from '@mimirdev/utils';
 
 import AddressCell from '../AddressCell';
@@ -21,6 +23,7 @@ function Contents({
   beforeSend,
   extrinsic,
   filtered,
+  isApprove,
   isCancelled,
   onClose
 }: {
@@ -28,6 +31,7 @@ function Contents({
   address: string;
   extrinsic: SubmittableExtrinsic<'promise'>;
   filtered?: Filtered;
+  isApprove: boolean;
   isCancelled: boolean;
   onClose: () => void;
 }) {
@@ -35,6 +39,8 @@ function Contents({
   const { api } = useApi();
   const [prepare, setPrepare] = useState<PrepareMultisig>();
   const canSend = useMemo(() => canSendMultisig(accounts, address), [accounts, address]);
+  const [txs] = useTransactions(!isApprove && !isCancelled ? address : undefined);
+  const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success && item.call.hash.toHex() === extrinsic.method.hash.toHex()), [extrinsic.method.hash, txs]);
 
   useEffect(() => {
     if (canSend) {
@@ -70,11 +76,27 @@ function Contents({
           )}
         </Stack>
       </DialogContent>
-      <DialogActions>
-        <SendTx beforeSend={beforeSend} canSend={canSend} onClose={onClose} prepare={prepare} />
-        <Button fullWidth onClick={onClose} variant='outlined'>
-          Cancel
-        </Button>
+      <DialogActions sx={{ flexDirection: 'column', gap: 1, alignItems: 'start' }}>
+        {pendingTxs.length > 0 && (
+          <Alert severity='error' sx={{ width: '100%' }}>
+            This transaction has already been initiated as{' '}
+            <Link
+              to={{
+                pathname: '/transactions',
+                hash: pendingTxs[0].uuid
+              }}
+            >
+              No.{pendingTxs[0].uuid.slice(0, 8).toUpperCase()}
+            </Link>
+            .
+          </Alert>
+        )}
+        <Box sx={{ marginLeft: '0px !important', width: '100%', display: 'flex', gap: 1 }}>
+          <SendTx beforeSend={beforeSend} canSend={canSend} disabled={pendingTxs.length > 0} onClose={onClose} prepare={prepare} />
+          <Button fullWidth onClick={onClose} variant='outlined'>
+            Cancel
+          </Button>
+        </Box>
       </DialogActions>
     </>
   );
@@ -85,10 +107,10 @@ function TxModal() {
   const { queue } = useTxQueue();
 
   return isApiReady ? (
-    queue.map(({ accountId, beforeSend, extrinsic, filtered, id, isCancelled, onRemove }) => (
+    queue.map(({ accountId, beforeSend, extrinsic, filtered, id, isApprove, isCancelled, onRemove }) => (
       <Dialog fullWidth key={id} maxWidth='sm' onClose={onRemove} open={true}>
         <DialogTitle>Submit Transaction</DialogTitle>
-        {isApiReady && <Contents address={accountId.toString()} beforeSend={beforeSend} extrinsic={extrinsic} filtered={filtered} isCancelled={isCancelled} onClose={onRemove} />}
+        {isApiReady && <Contents address={accountId.toString()} beforeSend={beforeSend} extrinsic={extrinsic} filtered={filtered} isApprove={isApprove} isCancelled={isCancelled} onClose={onRemove} />}
       </Dialog>
     ))
   ) : (

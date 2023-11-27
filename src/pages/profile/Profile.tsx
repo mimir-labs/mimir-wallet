@@ -31,7 +31,7 @@ function Profile() {
         <Stack spacing={1}>
           <Typography fontWeight={700}>Members</Typography>
           <Paper sx={{ width: '100%', height: '40vh', borderRadius: 2 }}>
-            <AddressOverview value={selected} />
+            <AddressOverview key={selected} value={selected} />
           </Paper>
         </Stack>
       )}

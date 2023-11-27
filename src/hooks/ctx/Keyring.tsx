@@ -87,7 +87,7 @@ const isAccount: Accounts['isAccount'] = (a): boolean => {
 };
 
 const isAddress: Addresses['isAddress'] = (a): boolean => {
-  return !!a && allAccounts.includes(a.toString());
+  return !!a && allAddresses.includes(a.toString());
 };
 
 function extractAccounts(accounts: SubjectInfo = {}): Accounts {

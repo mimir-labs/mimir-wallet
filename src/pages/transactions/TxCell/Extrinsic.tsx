@@ -19,7 +19,6 @@ import Params from '@mimirdev/params';
 import Item from '@mimirdev/params/Param/Item';
 import { getAddressMeta } from '@mimirdev/utils';
 
-import { useInitTransaction } from '../useInitTransaction';
 import { useMultisigInfo } from '../useMultisigInfo';
 import CallDetail from './CallDetail';
 
@@ -117,11 +116,11 @@ function removeMultisigDeepFiltered(transaction: Transaction, filtered: Filtered
 }
 
 function Extrinsic({ transaction }: { transaction: Transaction }) {
+  const destTx = transaction.top || transaction;
   const { api } = useApi();
-  const { params, values } = useMemo(() => extractState(api, transaction.call), [api, transaction]);
+  const { params, values } = useMemo(() => extractState(api, destTx.call), [api, destTx]);
   const [detailOpen, toggleDetailOpen] = useToggle();
   const { addQueue } = useTxQueue();
-  const initTx = useInitTransaction(transaction);
   const status = transaction.status;
   const info = useMultisigInfo(api, transaction);
 
@@ -134,7 +133,8 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
     addQueue({
       filtered,
       extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
-      accountId: transaction.sender
+      accountId: transaction.sender,
+      isApprove: true
     });
   }, [addQueue, api, transaction]);
 
@@ -164,18 +164,20 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
         <Stack alignItems='center' direction='row' spacing={1.25}>
           <Box sx={{ width: 8, height: 8, borderRadius: 1, bgcolor: status < CalldataStatus.Success ? 'warning.main' : status === CalldataStatus.Success ? 'success.main' : 'error.main' }} />
           <Typography color='primary.main' fontWeight={700} variant='h4'>
-            No {initTx?.height}-{initTx?.index}
+            No {destTx.uuid.slice(0, 8).toUpperCase()}
           </Typography>
-          <Chip color='secondary' label={transaction.action} variant='filled' />
+          <Chip color='secondary' label={destTx.action} variant='filled' />
         </Stack>
       </Stack>
       <Divider />
       <Stack spacing={1} sx={{ lineHeight: 1.5 }}>
-        <Item content={<AddressRow shorten={false} size='small' value={transaction.sender} withAddress withCopy withName={false} />} name='From' type='tx' />
+        {destTx !== transaction && (
+          <Item content={<AddressRow defaultName={destTx.sender} shorten={false} size='small' value={destTx.sender} withAddress={false} withCopy withName />} name='From' type='tx' />
+        )}
         <Params params={params} registry={api.registry} type='tx' values={values} />
       </Stack>
       {detailOpen ? (
-        <CallDetail call={transaction.call} depositor={initTx?.sender} />
+        <CallDetail call={transaction.call} depositor={transaction.initTransaction.sender} />
       ) : (
         <Button
           color='secondary'

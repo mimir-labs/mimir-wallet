@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { ReactComponent as IconQuestion } from '@mimirdev/assets/svg/icon-question.svg';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem, useToastPromise } from '@mimirdev/components';
-import { useApi } from '@mimirdev/hooks';
+import { useApi, useSelectedAccountCallback } from '@mimirdev/hooks';
 import { getAddressMeta, service, signAndSend } from '@mimirdev/utils';
 
 interface Props {
@@ -72,12 +72,13 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
   const [signer, setSigner] = useState(creator || filterDefaultAccount(who));
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
   const navigate = useNavigate();
+  const selectAccount = useSelectedAccountCallback();
 
   const reservedAmount = useMemo(() => api.consts.proxy.proxyDepositFactor.muln(2).iadd(api.consts.proxy.proxyDepositBase), [api]);
 
   const [loadingSecond, createMembers] = useToastPromise(
     useCallback(
-      async (pure: string, who: string[], signer: string, threshold: number) => {
+      async (pure: string, who: string[], signer: string, threshold: number, name: string) => {
         const extrinsic = api.tx.utility.batchAll([
           api.tx.balances.transferKeepAlive(pure, api.consts.proxy.proxyDepositFactor.muln(2)),
           api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.addProxy(encodeMultiAddress(who, threshold), 'Any', 0)),
@@ -86,9 +87,23 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
 
         await signAndSend(extrinsic, signer, { checkProxy: true });
 
+        keyring.addExternal(pure, {
+          isMultisig: true,
+          isFlexible: true,
+          name,
+          who,
+          threshold,
+          creator: signer,
+          genesisHash: api.genesisHash.toHex(),
+          isValid: true,
+          isPending: true
+        });
+
+        selectAccount(pure);
+
         navigate('/');
       },
-      [api, navigate]
+      [api, navigate, selectAccount]
     ),
     { pending: 'Set Members...', success: 'Set Members success!' }
   );
@@ -118,7 +133,7 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
       setPure(_pure);
 
       if (_pure) {
-        createMembers(_pure, who, signer, threshold);
+        createMembers(_pure, who, signer, threshold, name);
       }
     }, [api, createMembers, name, signer, threshold, who]),
     { pending: 'Creating Pure Account...', success: 'Create Pure success!' }
@@ -189,7 +204,7 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
             loading={loadingSecond}
             onClick={() => {
               if (pure && who && signer) {
-                createMembers(pure, who, signer, threshold);
+                createMembers(pure, who, signer, threshold, name);
               }
             }}
           >

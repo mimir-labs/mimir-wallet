@@ -25,6 +25,7 @@ export function getServiceUrl<P extends string | null, R = P extends string ? Pr
     CACHE.get(path) ||
     api.isReady.then((api) => {
       const baseUrl = networkSerice[api.genesisHash.toHex()] || (process.env.NODE_ENV === 'production' ? 'https://dev-api.mimir.global/' : 'http://127.0.0.1:8080/');
+      // const baseUrl = 'https://dev-api.mimir.global/';
 
       return `${baseUrl}${path}`;
     });

@@ -14,6 +14,7 @@ export interface AddressMeta extends KeyringJson$Meta {
   creator?: string;
   height?: number;
   index?: number;
+  isPending?: boolean;
 }
 
 export function getAddressMeta(address: string | Uint8Array | HexString, type: KeyringItemType | null = null): AddressMeta {
