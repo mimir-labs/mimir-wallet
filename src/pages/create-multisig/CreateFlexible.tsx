@@ -191,7 +191,7 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
       </Accordion>
       <Divider sx={{ marginY: 1.5 }} />
       <Typography fontWeight={700}>Transaction Initiator</Typography>
-      <InputAddress filtered={creator ? [creator] : who.filter((address) => !getAddressMeta(address).isMultisig)} onChange={setSigner} value={signer} />
+      <InputAddress filtered={creator ? [creator] : who.filter((address) => !getAddressMeta(address).isMultisig)} isSign onChange={setSigner} value={signer} />
       <LockContainer>
         <LockItem address={signer} value={reservedAmount} />
       </LockContainer>

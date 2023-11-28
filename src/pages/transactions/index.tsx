@@ -19,11 +19,11 @@ function PageTransaction() {
     return transactions
       .sort((l, r) => (r.initTransaction.height || 0) - (l.initTransaction.height || 0))
       .filter((item) => {
-        if (type === 'pending') {
-          return (item.top || item).status < CalldataStatus.Success;
+        if (item.top) {
+          return type === 'pending' ? item.top.status < CalldataStatus.Success && item.status < CalldataStatus.Success : item.top.status > CalldataStatus.Pending;
+        } else {
+          return type === 'pending' ? item.status < CalldataStatus.Success : item.status > CalldataStatus.Pending;
         }
-
-        return (item.top || item).status > CalldataStatus.Pending;
       });
   }, [transactions, type]);
 

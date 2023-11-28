@@ -7,7 +7,7 @@ import type { Option } from '@polkadot/types';
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces';
 
 import keyring from '@polkadot/ui-keyring';
-import { assert, BN, u8aSorted } from '@polkadot/util';
+import { BN, u8aSorted } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 
 import { getAddressMeta } from './address';
@@ -37,7 +37,7 @@ async function _asMulti(
   isCancelled: boolean,
   reserve: Record<string, BN>,
   unreserve: Record<string, BN>
-) {
+): Promise<[tx: SubmittableExtrinsic, cancelled: boolean]> {
   const multiAddress = encodeMultiAddress(who, threshold);
   const others = who.filter((w) => w !== sender);
   const [info, { weight }] = await Promise.all([api.query.multisig.multisigs<Option<Multisig>>(multiAddress, extrinsic.method.hash), extrinsic.paymentInfo(multiAddress)]);
@@ -68,15 +68,20 @@ async function _asMulti(
     Object.keys(unreserve).forEach((key) => {
       delete unreserve[key];
     });
-    reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(threshold)).add(api.consts.balances.existentialDeposit);
+
+    if (!isCancelled) {
+      reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(threshold)).add(api.consts.balances.existentialDeposit);
+    }
   }
 
   if (isCancelled) {
-    assert(timepoint, 'Cancel multisig must has timepoint');
-
-    return api.tx.multisig.cancelAsMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.hash);
+    if (timepoint) {
+      return [api.tx.multisig.cancelAsMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.hash), true];
+    } else {
+      return [api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method, weight), false];
+    }
   } else {
-    return api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method, weight);
+    return [api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method, weight), false];
   }
 }
 
@@ -93,6 +98,7 @@ export async function prepareMultisig(
 
   if (meta.isMultisig && meta.threshold && meta.who) {
     let tx: SubmittableExtrinsic;
+    let cancelled: boolean;
     const sender = accounts[address];
 
     if (!sender) {
@@ -102,12 +108,12 @@ export async function prepareMultisig(
     if (meta.isFlexible) {
       const proxyTx = api.tx.proxy.proxy(address, 'Any', extrinsic.method);
 
-      tx = await _asMulti(api, proxyTx, meta.threshold, meta.who, sender, isCancelled, reserve, unreserve);
+      [tx, cancelled] = await _asMulti(api, proxyTx, meta.threshold, meta.who, sender, isCancelled, reserve, unreserve);
     } else {
-      tx = await _asMulti(api, extrinsic, meta.threshold, meta.who, sender, isCancelled, reserve, unreserve);
+      [tx, cancelled] = await _asMulti(api, extrinsic, meta.threshold, meta.who, sender, isCancelled, reserve, unreserve);
     }
 
-    return prepareMultisig(api, tx, accounts, sender, false, reserve, unreserve);
+    return prepareMultisig(api, tx, accounts, sender, isCancelled && !cancelled, reserve, unreserve);
   } else {
     return [extrinsic, address, reserve, unreserve];
   }

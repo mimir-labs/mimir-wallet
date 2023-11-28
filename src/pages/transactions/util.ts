@@ -1,10 +1,32 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Codec, IMethod, TypeDef } from '@polkadot/types/types';
+import type { Filtered } from '@mimirdev/hooks/ctx/types';
 import type { Transaction } from '@mimirdev/hooks/types';
+import type { AddressMeta } from '@mimirdev/utils';
+
+import { ApiPromise } from '@polkadot/api';
+import { getTypeDef } from '@polkadot/types';
+import keyring from '@polkadot/ui-keyring';
+import { addressEq } from '@polkadot/util-crypto';
 
 import { CalldataStatus } from '@mimirdev/hooks/types';
-import { type AddressMeta, getAddressMeta } from '@mimirdev/utils';
+import { getAddressMeta } from '@mimirdev/utils';
+
+interface Param {
+  name: string;
+  type: TypeDef;
+}
+
+interface Value {
+  isValid: boolean;
+  value: Codec;
+}
+interface Extracted {
+  params: Param[];
+  values: Value[];
+}
 
 export function extraTransaction(meta: AddressMeta, transaction: Transaction): [approvals: number, txs: Transaction[]] {
   let _approvals = 0;
@@ -24,4 +46,102 @@ export function extraTransaction(meta: AddressMeta, transaction: Transaction): [
   });
 
   return [_approvals, _txs];
+}
+
+export function extractState(api: ApiPromise, value: IMethod): Extracted {
+  const params = value.meta.args.map(
+    ({ name, type }): Param => ({
+      name: name.toString(),
+      type: getTypeDef(type.toString())
+    })
+  );
+  const values = value.args.map(
+    (value): Value => ({
+      isValid: true,
+      value
+    })
+  );
+
+  return {
+    params,
+    values
+  };
+}
+
+export function extraFiltered(address: string, filtered: Filtered = {}): Filtered {
+  const meta = getAddressMeta(address);
+
+  if (meta.isMultisig) {
+    meta.who?.forEach((address) => {
+      if (keyring.getAccount(address)) {
+        filtered[address] = {};
+        extraFiltered(address, filtered[address]);
+      }
+    });
+  }
+
+  return filtered;
+}
+
+export function removeSuccessFiltered(transaction: Transaction, filtered: Filtered): void {
+  const address = transaction.sender;
+  const meta = getAddressMeta(address);
+
+  (meta.isFlexible ? transaction.children[0] : transaction).children.forEach((tx) => {
+    const _filtered = filtered[tx.sender];
+
+    if (_filtered) {
+      if (tx.status === CalldataStatus.Success) {
+        delete filtered[tx.sender];
+      }
+
+      removeSuccessFiltered(tx, _filtered);
+    }
+  });
+}
+
+export function removeMultisigDeepFiltered(transaction: Transaction, filtered: Filtered): void {
+  const meta = getAddressMeta(transaction.sender);
+
+  transaction = meta.isFlexible ? transaction.children[0] : transaction;
+
+  if (transaction.status === CalldataStatus.Initialized) {
+    // remove the address not in children
+    Object.keys(filtered).forEach((address) => {
+      if (!transaction.children.find((item) => addressEq(item.sender, address))) {
+        delete filtered[address];
+      }
+    });
+  }
+
+  transaction.children.forEach((tx) => {
+    const _filtered = filtered[tx.sender];
+
+    if (_filtered) {
+      removeMultisigDeepFiltered(tx, _filtered);
+    }
+  });
+}
+
+export function checkFiltered(filtered: Filtered): boolean {
+  const addresses = Object.keys(filtered);
+  let canApprove = false;
+
+  for (const address of addresses) {
+    const meta = getAddressMeta(address);
+
+    if (meta.isMultisig) {
+      const _filtered = filtered[address];
+
+      if (_filtered) {
+        canApprove = checkFiltered(_filtered);
+      } else {
+        canApprove = false;
+      }
+    } else {
+      canApprove = true;
+    }
+  }
+
+  return canApprove;
 }

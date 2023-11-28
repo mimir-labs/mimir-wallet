@@ -10,15 +10,15 @@ interface Props {
 }
 
 export interface TxState {
-  queue: (Required<TxQueue> & { filtered?: Filtered })[];
-  addQueue: (queue: TxQueue & { filtered?: Filtered }) => void;
+  queue: (Omit<Required<TxQueue>, 'filtered'> & { filtered?: Filtered })[];
+  addQueue: (queue: TxQueue) => void;
 }
 
 export const TxQueueCtx = React.createContext<TxState>({} as TxState);
 let queueId = 1;
 
 export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
-  const [queue, setQueue] = useState<(Required<TxQueue> & { filtered?: Filtered })[]>([]);
+  const [queue, setQueue] = useState<(Omit<Required<TxQueue>, 'filtered'> & { filtered?: Filtered })[]>([]);
 
   const addQueue = useCallback((value: TxQueue) => {
     setQueue((_queue) => {
@@ -29,6 +29,8 @@ export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
         id,
         isCancelled: value.isCancelled ?? false,
         isApprove: value.isApprove ?? false,
+        targetSender: value.targetSender || value.accountId,
+        targetCall: value.targetCall || value.extrinsic.method,
         beforeSend: async () => value.beforeSend?.(),
         onRemove: () => {
           value.onRemove?.();

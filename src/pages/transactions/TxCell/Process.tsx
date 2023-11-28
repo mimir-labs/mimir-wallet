@@ -6,6 +6,7 @@ import React, { useMemo } from 'react';
 
 import { ReactComponent as ArrowDown } from '@mimirdev/assets/svg/ArrowDown.svg';
 import { ReactComponent as IconAddFill } from '@mimirdev/assets/svg/icon-add-fill.svg';
+import { ReactComponent as IconBack } from '@mimirdev/assets/svg/icon-back.svg';
 import { ReactComponent as IconFailedFill } from '@mimirdev/assets/svg/icon-failed-fill.svg';
 import { ReactComponent as IconInfoFill } from '@mimirdev/assets/svg/icon-info-fill.svg';
 import { ReactComponent as IconSuccessFill } from '@mimirdev/assets/svg/icon-success-fill.svg';
@@ -104,7 +105,7 @@ function Process({ transaction }: Props) {
             : transaction.status === CalldataStatus.Failed
             ? IconFailedFill
             : transaction.status === CalldataStatus.Cancelled
-            ? IconFailedFill
+            ? IconBack
             : transaction.status === CalldataStatus.MemberChanged
             ? IconFailedFill
             : IconWaitingFill
@@ -115,7 +116,7 @@ function Process({ transaction }: Props) {
             : transaction.status === CalldataStatus.Failed
             ? 'error.main'
             : transaction.status === CalldataStatus.Cancelled
-            ? 'error.main'
+            ? 'warning.main'
             : transaction.status === CalldataStatus.MemberChanged
             ? 'error.main'
             : 'warning.main'

@@ -41,7 +41,7 @@ function PageTransfer() {
       <Paper sx={{ padding: 2.5, borderRadius: '20px', marginTop: 1.25 }}>
         <Stack spacing={2}>
           <Typography variant='h3'>Transfer</Typography>
-          <InputAddress balance={sendingBalances?.freeBalance} filtered={filtered} label='Sending From' onChange={setSending} placeholder='Sender' withBalance />
+          <InputAddress balance={sendingBalances?.freeBalance} filtered={filtered} isSign label='Sending From' onChange={setSending} placeholder='Sender' withBalance />
           <Divider />
           <InputAddress balance={recipientBalances?.freeBalance} filtered={filtered.concat(allAddresses)} label='Recipient' onChange={setRecipient} placeholder='Recipient' withBalance />
           <InputNumber label='Amount' maxValue={sendingBalances?.freeBalance} onChange={setAmount} placeholder='Input amount' withMax />

@@ -4,13 +4,13 @@
 import type { PrepareFlexible } from './types';
 
 import { Alert, AlertTitle, Box, Button, Dialog, DialogContent, Divider, FormHelperText, Paper, Stack, SvgIcon, Switch, Typography } from '@mui/material';
-import { encodeAddress, isAddress } from '@polkadot/util-crypto';
+import { encodeAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ReactComponent as IconInfo } from '@mimirdev/assets/svg/icon-info-fill.svg';
-import { Address, AddressRow, Input } from '@mimirdev/components';
-import { useCacheMultisig, useToggle } from '@mimirdev/hooks';
+import { AddAddressDialog, Address, AddressRow, Input } from '@mimirdev/components';
+import { useAccounts, useAddresses, useCacheMultisig, useToggle } from '@mimirdev/hooks';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
@@ -20,9 +20,12 @@ import { useSelectMultisig } from './useSelectMultisig';
 function PageCreateMultisig() {
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
+  const { isAddress } = useAddresses();
+  const { isAccount } = useAccounts();
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
   const [flexible, setFlexible] = useState(false);
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig();
+  const [addOpen, toggleAdd] = useToggle();
 
   // prepare multisigs
   const [prepares] = useCacheMultisig();
@@ -32,9 +35,13 @@ function PageCreateMultisig() {
 
   const handleAdd = useCallback(() => {
     if (address && isAddressValid) {
-      select(address);
+      if (!isAddress(address) && !isAccount(address)) {
+        toggleAdd();
+      } else {
+        select(address);
+      }
     }
-  }, [address, isAddressValid, select]);
+  }, [address, isAccount, isAddress, isAddressValid, select, toggleAdd]);
 
   const _onChangeThreshold = useCallback(
     (value: string) => {
@@ -49,6 +56,7 @@ function PageCreateMultisig() {
 
   return (
     <>
+      <AddAddressDialog address={address} onAdded={select} onClose={toggleAdd} open={addOpen} />
       <Box sx={{ width: 500, maxWidth: '100%', margin: '0 auto' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Button onClick={prepare ? _onFlexibleCancel : () => navigate(-1)} size='small' variant='outlined'>
@@ -79,7 +87,7 @@ function PageCreateMultisig() {
                 }
                 label='Add Members'
                 onChange={(value) => {
-                  setAddress({ isAddressValid: isAddress(value), address: value });
+                  setAddress({ isAddressValid: isAddressUtil(value), address: value });
                 }}
                 placeholder='input address'
               />

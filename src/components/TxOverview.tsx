@@ -3,10 +3,13 @@
 
 import { Button, Paper, SvgIcon, useTheme } from '@mui/material';
 import { addressEq } from '@polkadot/util-crypto';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import ReactFlow, { Edge, EdgeLabelRenderer, EdgeProps, Handle, Node, NodeProps, Position, StepEdge, useEdgesState, useNodesState } from 'reactflow';
 
+import { ReactComponent as IconBack } from '@mimirdev/assets/svg/icon-back.svg';
+import { ReactComponent as IconFail } from '@mimirdev/assets/svg/icon-failed-fill.svg';
 import { ReactComponent as IconSuccess } from '@mimirdev/assets/svg/icon-success-fill.svg';
+import { ReactComponent as IconWaiting } from '@mimirdev/assets/svg/icon-waiting-fill.svg';
 import { CalldataStatus, type Transaction } from '@mimirdev/hooks/types';
 import { getAddressMeta } from '@mimirdev/utils';
 
@@ -16,12 +19,44 @@ interface Props {
   tx?: Transaction;
 }
 
-type NodeData = { parentId: string | null; members: string[]; address: string; txs: Transaction[] };
+type NodeData = { parentId: string | null; members: string[]; address: string; tx: Transaction | null };
 
 const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
   const { palette } = useTheme();
 
-  const isSuccess = useMemo(() => data.txs.filter((item) => item.status === CalldataStatus.Success).length > 0, [data.txs]);
+  const tx = data.tx;
+  const color = tx
+    ? tx.status === CalldataStatus.Success
+      ? palette.success.main
+      : tx.status === CalldataStatus.Cancelled
+      ? palette.warning.main
+      : tx.status === CalldataStatus.Failed
+      ? palette.error.main
+      : tx.status === CalldataStatus.Pending
+      ? palette.warning.main
+      : tx.status === CalldataStatus.Initialized
+      ? palette.warning.main
+      : palette.grey[300]
+    : palette.grey[300];
+  const icon = tx ? (
+    <SvgIcon
+      component={
+        tx.status === CalldataStatus.Success
+          ? IconSuccess
+          : tx.status === CalldataStatus.Cancelled
+          ? IconBack
+          : tx.status === CalldataStatus.Failed
+          ? IconFail
+          : tx.status === CalldataStatus.Pending
+          ? IconWaiting
+          : tx.status === CalldataStatus.Initialized
+          ? IconWaiting
+          : 'span'
+      }
+      inheritViewBox
+      sx={{ fontSize: '1rem', color }}
+    />
+  ) : null;
 
   return (
     <>
@@ -33,14 +68,14 @@ const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
             width: 10,
             height: 10,
             top: 35,
-            background: isSuccess ? palette.success.main : palette.grey[300]
+            background: color
           }}
           type='source'
         />
       )}
       <Paper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 220, height: 71, padding: 1 }}>
         <AddressCell showType value={data.address} withCopy />
-        {isSuccess && <SvgIcon component={IconSuccess} inheritViewBox sx={{ fontSize: '1rem' }} />}
+        {icon}
       </Paper>
       {data.parentId && (
         <Handle
@@ -49,7 +84,7 @@ const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
           style={{
             width: 10,
             height: 10,
-            background: isSuccess ? palette.success.main : palette.grey[300]
+            background: color
           }}
           type='target'
         />
@@ -116,7 +151,7 @@ const edgeTypes = {
 function makeNodes(
   address: string,
   parentId: string | null,
-  txs: Transaction[],
+  tx: Transaction | null,
   xPos: number,
   yPos: number,
   xOffset: number,
@@ -132,7 +167,7 @@ function makeNodes(
   const node: Node<NodeData> = {
     id: nodeId,
     type: 'TxNode',
-    data: { address, parentId, members: meta.who || [], txs },
+    data: { address, parentId, members: meta.who || [], tx },
     position: { x: xPos, y: yPos }
   };
 
@@ -158,20 +193,10 @@ function makeNodes(
     let nextY = startY;
 
     meta.who.forEach((_address, index) => {
-      const _txs: Transaction[] = [];
-
-      for (const item of txs) {
-        for (const tx of meta.isFlexible ? item?.children[0]?.children || [] : item?.children || []) {
-          if (addressEq(tx.sender, _address) && tx.status <= CalldataStatus.Success) {
-            _txs.push(tx);
-          }
-        }
-      }
-
       makeNodes(
         _address,
         nodeId,
-        _txs,
+        (meta.isFlexible ? tx?.children[0]?.children : tx?.children)?.find((item) => addressEq(item.sender, _address)) || null,
         nextX,
         nextY,
         xOffset,
@@ -206,7 +231,7 @@ function TxOverview({ tx }: Props) {
     const nodes: Node<NodeData>[] = [];
     const edges: Edge[] = [];
 
-    makeNodes(tx.sender, null, [tx], 0, 0, 300, 90, undefined, nodes, edges);
+    makeNodes(tx.sender, null, tx, 0, 0, 300, 90, undefined, nodes, edges);
 
     setNodes(nodes);
     setEdges(edges);

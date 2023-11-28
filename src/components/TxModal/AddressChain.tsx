@@ -56,7 +56,7 @@ function AddressChain({
     return (
       <>
         <Box sx={{ paddingLeft: index * 2 }}>
-          <InputAddress filtered={filtered ? Object.keys(filtered) : meta.who} label={index === 0 ? 'Initiator' : undefined} onChange={_onChange} value={value} />
+          <InputAddress filtered={filtered ? Object.keys(filtered) : meta.who} isSign label={index === 0 ? 'Initiator' : undefined} onChange={_onChange} value={value} />
         </Box>
         {isMultisigValue && <AddressChain accounts={accounts} address={value} filtered={filtered?.[value]} index={index + 1} onChange={onChange} />}
       </>

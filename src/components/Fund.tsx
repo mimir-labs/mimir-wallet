@@ -28,7 +28,7 @@ function Content({ receipt, sending, setSending, setValue, value }: { sending?: 
   return (
     <DialogContent>
       <Stack spacing={2}>
-        <InputAddress filtered={[...injected, ...testing, ...accounts]} label='Sending From' onChange={setSending} value={sending} />
+        <InputAddress filtered={[...injected, ...testing, ...accounts]} isSign label='Sending From' onChange={setSending} value={sending} />
         <Stack spacing={1}>
           <Typography fontWeight={700}>To</Typography>
           <Box bgcolor='secondary.main' borderRadius={1} padding={1}>

@@ -1,119 +1,23 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Multisig } from '@polkadot/types/interfaces';
-import type { Codec, IMethod, TypeDef } from '@polkadot/types/types';
 import type { Filtered } from '@mimirdev/hooks/ctx/types';
 
-import { alpha, Box, Button, Chip, Divider, Stack, SvgIcon, Typography } from '@mui/material';
-import { ApiPromise } from '@polkadot/api';
-import { getTypeDef } from '@polkadot/types';
-import { addressEq } from '@polkadot/util-crypto';
+import { Alert, alpha, Box, Button, Chip, Divider, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
 
 import { ReactComponent as ArrowDown } from '@mimirdev/assets/svg/ArrowDown.svg';
+import { ReactComponent as IconWaitingFill } from '@mimirdev/assets/svg/icon-waiting-fill.svg';
 import { AddressRow } from '@mimirdev/components';
 import { useApi, useToggle, useTxQueue } from '@mimirdev/hooks';
 import { CalldataStatus, Transaction } from '@mimirdev/hooks/types';
 import Params from '@mimirdev/params';
 import Item from '@mimirdev/params/Param/Item';
-import { getAddressMeta } from '@mimirdev/utils';
 
-import { useMultisigInfo } from '../useMultisigInfo';
+import { useApproveFiltered } from '../useApproveFiltered';
+import { useCancelFiltered } from '../useCancelFiltered';
+import { extractState } from '../util';
 import CallDetail from './CallDetail';
-
-interface Param {
-  name: string;
-  type: TypeDef;
-}
-
-interface Value {
-  isValid: boolean;
-  value: Codec;
-}
-
-interface Extracted {
-  params: Param[];
-  values: Value[];
-}
-
-function extractState(api: ApiPromise, value: IMethod): Extracted {
-  const params = value.meta.args.map(
-    ({ name, type }): Param => ({
-      name: name.toString(),
-      type: getTypeDef(type.toString())
-    })
-  );
-  const values = value.args.map(
-    (value): Value => ({
-      isValid: true,
-      value
-    })
-  );
-
-  return {
-    params,
-    values
-  };
-}
-
-function extraFiltered(address: string, filtered: Filtered = {}): Filtered {
-  const meta = getAddressMeta(address);
-
-  if (meta.isMultisig) {
-    meta.who?.forEach((address) => {
-      filtered[address] = {};
-
-      extraFiltered(address, filtered[address]);
-    });
-  }
-
-  return filtered;
-}
-
-function removeSuccessFiltered(transaction: Transaction, filtered: Filtered): void {
-  const address = transaction.sender;
-  const meta = getAddressMeta(address);
-
-  (meta.isFlexible ? transaction.children[0] : transaction).children.forEach((tx) => {
-    const _filtered = filtered[tx.sender];
-
-    if (_filtered) {
-      if (tx.status === CalldataStatus.Success) {
-        delete filtered[tx.sender];
-      }
-
-      removeSuccessFiltered(tx, _filtered);
-    }
-  });
-}
-
-function removeMultisigDeepFiltered(transaction: Transaction, filtered: Filtered): void {
-  const address = transaction.sender;
-  const meta = getAddressMeta(address);
-
-  transaction = meta.isFlexible ? transaction.children[0] : transaction;
-
-  if (transaction.status === CalldataStatus.Initialized) {
-    // when transaction status is Initialized, means the transaction is not on chain
-    // remove the account is not multisig from filtered
-    Object.keys(filtered).forEach((_address) => {
-      const _meta = getAddressMeta(_address);
-
-      if (!_meta.isMultisig) {
-        delete filtered[_address];
-      }
-    });
-  }
-
-  transaction.children.forEach((tx) => {
-    const _filtered = filtered[tx.sender];
-
-    if (_filtered) {
-      removeMultisigDeepFiltered(tx, _filtered);
-    }
-  });
-}
 
 function Extrinsic({ transaction }: { transaction: Transaction }) {
   const destTx = transaction.top || transaction;
@@ -122,35 +26,30 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
   const [detailOpen, toggleDetailOpen] = useToggle();
   const { addQueue } = useTxQueue();
   const status = transaction.status;
-  const info = useMultisigInfo(api, transaction);
+  const [approveFiltered, canApprove] = useApproveFiltered(transaction);
+  const [cancelFiltered, canCancel] = useCancelFiltered(api, transaction);
 
-  const handleApprove = useCallback(() => {
-    const filtered = extraFiltered(transaction.sender);
-
-    removeSuccessFiltered(transaction, filtered);
-    removeMultisigDeepFiltered(transaction, filtered);
-
-    addQueue({
-      filtered,
-      extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
-      accountId: transaction.sender,
-      isApprove: true
-    });
-  }, [addQueue, api, transaction]);
-
-  const handleCancel = useCallback(
-    (info: Multisig) => {
-      const filtered = extraFiltered(transaction.sender);
-
-      Object.keys(filtered).forEach((key) => {
-        if (!addressEq(key, info.depositor)) {
-          delete filtered[key];
-        }
-      });
-
+  const handleApprove = useCallback(
+    (filtered: Filtered) => {
       addQueue({
         filtered,
         extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
+        targetCall: transaction.top?.call,
+        targetSender: transaction.top?.sender,
+        accountId: transaction.sender,
+        isApprove: true
+      });
+    },
+    [addQueue, api, transaction]
+  );
+
+  const handleCancel = useCallback(
+    (filtered: Filtered) => {
+      addQueue({
+        filtered,
+        extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
+        targetCall: transaction.top?.call,
+        targetSender: transaction.top?.sender,
         accountId: transaction.sender,
         isCancelled: true
       });
@@ -190,18 +89,36 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
           Detail
         </Button>
       )}
-      {transaction.status < CalldataStatus.Success && (
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button onClick={handleApprove} variant='outlined'>
-            Approve
-          </Button>
-          {info && (
-            <Button onClick={() => handleCancel(info)} variant='outlined'>
-              Cancel
-            </Button>
-          )}
-        </Box>
-      )}
+      {transaction.status < CalldataStatus.Success &&
+        (transaction.top && transaction.top.status > CalldataStatus.Pending ? (
+          <Box>
+            {cancelFiltered && canCancel && (
+              <Button onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
+                Fund
+              </Button>
+            )}
+          </Box>
+        ) : (
+          <>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {approveFiltered && canApprove && (
+                <Button onClick={() => handleApprove(approveFiltered)} variant='outlined'>
+                  Approve
+                </Button>
+              )}
+              {cancelFiltered && canCancel && (
+                <Button onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
+                  Cancel
+                </Button>
+              )}
+            </Box>
+            {!canApprove && (
+              <Alert icon={<IconWaitingFill />} severity='warning'>
+                Waiting for other {"members's"} approvement
+              </Alert>
+            )}
+          </>
+        ))}
     </Stack>
   );
 }

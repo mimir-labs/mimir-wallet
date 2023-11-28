@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
+import type { Call } from '@polkadot/types/interfaces';
+import type { IMethod } from '@polkadot/types/types';
 import type { Filtered } from '@mimirdev/hooks/ctx/types';
 
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Paper, Stack, Typography } from '@mui/material';
@@ -15,7 +17,7 @@ import { canSendMultisig, PrepareMultisig, prepareMultisig } from '@mimirdev/uti
 import AddressCell from '../AddressCell';
 import LockItem, { LockContainer } from '../LockItem';
 import AddressChain from './AddressChain';
-import Call from './Call';
+import CallComp from './Call';
 import SendTx from './SendTx';
 
 function Contents({
@@ -25,10 +27,14 @@ function Contents({
   filtered,
   isApprove,
   isCancelled,
-  onClose
+  onClose,
+  targetCall,
+  targetSender
 }: {
   beforeSend: () => Promise<void>;
   address: string;
+  targetCall: Call | IMethod;
+  targetSender: string;
   extrinsic: SubmittableExtrinsic<'promise'>;
   filtered?: Filtered;
   isApprove: boolean;
@@ -57,11 +63,11 @@ function Contents({
               Sending From
             </Typography>
             <Paper sx={{ bgcolor: 'secondary.main', padding: 1 }}>
-              <AddressCell shorten={false} size='small' value={address} withCopy />
+              <AddressCell shorten={false} size='small' value={targetSender} withCopy />
             </Paper>
           </Box>
           <Divider />
-          <Call isCancelled={isCancelled} method={extrinsic.method} />
+          <CallComp isCancelled={isCancelled} method={targetCall || extrinsic.method} />
           <Divider />
           <AddressChain accounts={accounts} address={address} filtered={filtered} onChange={setAccounts} />
           {prepare && (!!Object.keys(prepare[2]).length || !!Object.keys(prepare[3]).length) && (
@@ -107,10 +113,22 @@ function TxModal() {
   const { queue } = useTxQueue();
 
   return isApiReady ? (
-    queue.map(({ accountId, beforeSend, extrinsic, filtered, id, isApprove, isCancelled, onRemove }) => (
+    queue.map(({ accountId, beforeSend, extrinsic, filtered, id, isApprove, isCancelled, onRemove, targetCall, targetSender }) => (
       <Dialog fullWidth key={id} maxWidth='sm' onClose={onRemove} open={true}>
         <DialogTitle>Submit Transaction</DialogTitle>
-        {isApiReady && <Contents address={accountId.toString()} beforeSend={beforeSend} extrinsic={extrinsic} filtered={filtered} isApprove={isApprove} isCancelled={isCancelled} onClose={onRemove} />}
+        {isApiReady && (
+          <Contents
+            address={accountId.toString()}
+            beforeSend={beforeSend}
+            extrinsic={extrinsic}
+            filtered={filtered}
+            isApprove={isApprove}
+            isCancelled={isCancelled}
+            onClose={onRemove}
+            targetCall={targetCall}
+            targetSender={targetSender.toString()}
+          />
+        )}
       </Dialog>
     ))
   ) : (
