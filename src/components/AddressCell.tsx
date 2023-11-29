@@ -7,8 +7,7 @@ import { Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material
 import React, { useMemo } from 'react';
 
 import { ReactComponent as IconAddressBook } from '@mimirdev/assets/svg/icon-address-book.svg';
-import { useAccounts, useAddresses, useToggle } from '@mimirdev/hooks';
-import { getAddressMeta } from '@mimirdev/utils';
+import { useAccounts, useAddresses, useAddressMeta, useToggle } from '@mimirdev/hooks';
 
 import AddAddressDialog from './AddAddressDialog';
 import AddressComp from './Address';
@@ -34,8 +33,9 @@ function AddressCell({ shorten = true, showType = false, size = 'medium', value,
   const [open, toggleOpen] = useToggle();
 
   const address = value?.toString();
-
-  const { isFlexible, isMultisig } = useMemo(() => getAddressMeta(address || ''), [address]);
+  const {
+    meta: { isFlexible, isMultisig, isTesting }
+  } = useAddressMeta(address);
 
   return (
     <>
@@ -47,7 +47,12 @@ function AddressCell({ shorten = true, showType = false, size = 'medium', value,
             <Typography component='span' fontSize={nameFontSize} fontWeight={size === 'large' ? 800 : 700} sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               <AddressName value={value} />
             </Typography>
-            {showType && <Chip color='secondary' label={isMultisig ? (isFlexible ? 'Flexible' : 'Static') : 'Solo'} size={size === 'large' ? 'medium' : 'small'} />}
+            {showType &&
+              (isMultisig ? (
+                <Chip color='secondary' label={isFlexible ? 'Flexible' : 'Static'} size={size === 'large' ? 'medium' : 'small'} />
+              ) : isTesting ? (
+                <Chip color='secondary' label='Dev' size={size === 'large' ? 'medium' : 'small'} />
+              ) : null)}
           </Box>
           <Typography color='text.secondary' component='span' fontSize={addressFontSize} sx={{ display: 'flex', alignItems: 'center' }}>
             <AddressComp shorten={shorten} value={address} />

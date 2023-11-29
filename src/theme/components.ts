@@ -164,12 +164,12 @@ const createComponents: Func = () => ({
     styleOverrides: {
       switchBase: ({ theme }) => ({
         top: 0,
-        left: 3,
+        left: 2,
         padding: 0,
         height: '100%',
         color: theme.palette.grey[300],
         '&.Mui-checked': {
-          transform: 'translateX(32px)',
+          transform: 'translateX(20px)',
           color: theme.palette.common.white
         },
         '&.Mui-checked+.MuiSwitch-track': {
@@ -178,16 +178,21 @@ const createComponents: Func = () => ({
           backgroundColor: theme.palette.primary.main
         }
       }),
+      thumb: {
+        width: 16,
+        height: 16
+      },
       track: ({ theme }) => ({
         opacity: 1,
         height: '100%',
         border: '1px solid',
         borderColor: theme.palette.grey[300],
         backgroundColor: 'transparent',
-        borderRadius: 13
+        borderRadius: 10
       }),
       root: () => ({
-        height: 26,
+        width: 40,
+        height: 20,
         padding: 0
       })
     }

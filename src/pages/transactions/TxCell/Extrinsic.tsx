@@ -4,30 +4,30 @@
 import type { Filtered } from '@mimirdev/hooks/ctx/types';
 
 import { Alert, alpha, Box, Button, Chip, Divider, Stack, SvgIcon, Typography } from '@mui/material';
-import React, { useCallback, useMemo } from 'react';
+import moment from 'moment';
+import React, { useCallback } from 'react';
 
 import { ReactComponent as ArrowDown } from '@mimirdev/assets/svg/ArrowDown.svg';
 import { ReactComponent as IconWaitingFill } from '@mimirdev/assets/svg/icon-waiting-fill.svg';
 import { AddressRow } from '@mimirdev/components';
-import { useApi, useToggle, useTxQueue } from '@mimirdev/hooks';
+import { useApi, useBlockTime, useToggle, useTxQueue } from '@mimirdev/hooks';
 import { CalldataStatus, Transaction } from '@mimirdev/hooks/types';
-import Params from '@mimirdev/params';
+import { Call } from '@mimirdev/params';
 import Item from '@mimirdev/params/Param/Item';
 
 import { useApproveFiltered } from '../useApproveFiltered';
 import { useCancelFiltered } from '../useCancelFiltered';
-import { extractState } from '../util';
 import CallDetail from './CallDetail';
 
 function Extrinsic({ transaction }: { transaction: Transaction }) {
   const destTx = transaction.top || transaction;
   const { api } = useApi();
-  const { params, values } = useMemo(() => extractState(api, destTx.call), [api, destTx]);
   const [detailOpen, toggleDetailOpen] = useToggle();
   const { addQueue } = useTxQueue();
   const status = transaction.status;
   const [approveFiltered, canApprove] = useApproveFiltered(transaction);
   const [cancelFiltered, canCancel] = useCancelFiltered(api, transaction);
+  const time = useBlockTime(transaction.initTransaction.height);
 
   const handleApprove = useCallback(
     (filtered: Filtered) => {
@@ -67,13 +67,14 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
           </Typography>
           <Chip color='secondary' label={destTx.action} variant='filled' />
         </Stack>
+        <Typography>{time ? moment(time).format() : null}</Typography>
       </Stack>
       <Divider />
       <Stack spacing={1} sx={{ lineHeight: 1.5 }}>
         {destTx !== transaction && (
           <Item content={<AddressRow defaultName={destTx.sender} shorten={false} size='small' value={destTx.sender} withAddress={false} withCopy withName />} name='From' type='tx' />
         )}
-        <Params params={params} registry={api.registry} type='tx' values={values} />
+        <Call api={api} call={destTx.call} type='tx' />
       </Stack>
       {detailOpen ? (
         <CallDetail call={transaction.call} depositor={transaction.initTransaction.sender} />

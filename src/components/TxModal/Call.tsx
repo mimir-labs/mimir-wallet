@@ -1,56 +1,30 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Codec, IMethod, TypeDef } from '@polkadot/types/types';
+import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material';
-import { getTypeDef } from '@polkadot/types';
 import { useMemo } from 'react';
 
 import { useApi } from '@mimirdev/hooks';
-import Params from '@mimirdev/params';
+import { Call as CallComp } from '@mimirdev/params';
 
 import Hex from '../Hex';
 
-interface Param {
-  name: string;
-  type: TypeDef;
-}
-
-interface Value {
-  isValid: boolean;
-  value: Codec;
-}
 interface Extracted {
   callName: string;
   callHash: HexString;
   callData: HexString;
-  params: Param[];
-  values: Value[];
 }
 
 function extractState(value: IMethod): Extracted {
   const { method, section } = value.registry.findMetaCall(value.callIndex);
-  const params = value.meta.args.map(
-    ({ name, type }): Param => ({
-      name: name.toString(),
-      type: getTypeDef(type.toString())
-    })
-  );
-  const values = value.args.map(
-    (value): Value => ({
-      isValid: true,
-      value
-    })
-  );
 
   return {
     callName: `${section}.${method}`,
     callHash: value.hash.toHex(),
-    callData: value.toHex(),
-    params,
-    values
+    callData: value.toHex()
   };
 }
 
@@ -68,7 +42,7 @@ function CallHash({ label, value }: { label: string; value: HexString }) {
 function Call({ isCancelled, method }: { isCancelled: boolean; method: IMethod }) {
   const { api } = useApi();
 
-  const { callData, callHash, callName, params, values } = useMemo(() => extractState(method), [method]);
+  const { callData, callHash, callName } = useMemo(() => extractState(method), [method]);
 
   return (
     <Stack spacing={2.5}>
@@ -81,7 +55,7 @@ function Call({ isCancelled, method }: { isCancelled: boolean; method: IMethod }
         </Typography>
         <Chip color='secondary' label={callName} variant='filled' />
       </Box>
-      <Params params={params} registry={api.registry} values={values} />
+      <CallComp api={api} call={method} />
       <Paper sx={{ padding: 1.25, bgcolor: 'secondary.main' }}>
         <CallHash label='Call Hash' value={callHash} />
         <CallHash label='Call Data' value={callData} />

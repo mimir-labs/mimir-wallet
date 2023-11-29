@@ -197,7 +197,7 @@ export function ApiCtxRoot({ apiUrl, children, store }: Props): React.ReactEleme
     api.on('disconnected', () => setIsApiConnected(false));
     api.on('error', onError);
     api.on('ready', (): void => {
-      const injectedPromise = web3Enable('polkadot-js/apps');
+      const injectedPromise = web3Enable('mimir-wallet');
 
       injectedPromise.then(setExtensions).catch(console.error);
 

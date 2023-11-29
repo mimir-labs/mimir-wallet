@@ -26,6 +26,7 @@ function PageCreateMultisig() {
   const [flexible, setFlexible] = useState(false);
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig();
   const [addOpen, toggleAdd] = useToggle();
+  const [addressError, setAddressError] = useState<Error | null>(null);
 
   // prepare multisigs
   const [prepares] = useCacheMultisig();
@@ -34,12 +35,14 @@ function PageCreateMultisig() {
   const [open, toggleOpen] = useToggle();
 
   const handleAdd = useCallback(() => {
-    if (address && isAddressValid) {
+    if (isAddressValid) {
       if (!isAddress(address) && !isAccount(address)) {
         toggleAdd();
       } else {
         select(address);
       }
+    } else {
+      setAddressError(new Error('Please input correct address'));
     }
   }, [address, isAccount, isAddress, isAddressValid, select, toggleAdd]);
 
@@ -85,9 +88,16 @@ function PageCreateMultisig() {
                     Add
                   </Button>
                 }
+                error={addressError}
                 label='Add Members'
                 onChange={(value) => {
-                  setAddress({ isAddressValid: isAddressUtil(value), address: value });
+                  const isAddressValid = isAddressUtil(value);
+
+                  if (isAddressValid) {
+                    setAddressError(null);
+                  }
+
+                  setAddress({ isAddressValid, address: value });
                 }}
                 placeholder='input address'
               />
