@@ -85,7 +85,9 @@ export interface Calldata {
 export interface Transaction {
   top: Transaction | null;
   parent: Transaction | null;
+  cancelTx: Transaction | null;
   children: Transaction[];
+  cancelChildren: Transaction[];
 
   uuid: string;
   call: Call;

@@ -5,7 +5,7 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Box, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, IconButton, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
@@ -23,10 +23,11 @@ import Fund from './Fund';
 interface Props {
   isUnLock?: boolean;
   address?: AccountId | AccountIndex | Address | string | null;
-  value?: Compact<any> | BN | string | number | null;
+  value?: Compact<any> | BN | string | number;
+  tip?: React.ReactNode;
 }
 
-function LockItem({ address, isUnLock, value }: Props) {
+function LockItem({ address, isUnLock, tip, value }: Props) {
   const { api } = useApi();
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [address]);
   const [open, toggleOpen] = useToggle();
@@ -43,14 +44,16 @@ function LockItem({ address, isUnLock, value }: Props) {
 
   return (
     <>
-      <Fund defaultValue={value?.toString()} onClose={toggleOpen} open={open} receipt={address?.toString()} />
+      <Fund onClose={toggleOpen} open={open} receipt={address?.toString()} value={value?.toString()} />
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {icon}
           <Typography>
             <AddressName value={address} /> {isUnLock ? 'unlock' : 'lock'}
           </Typography>
-          <SvgIcon color='primary' component={IconQuestion} fontSize='medium' inheritViewBox sx={{ opacity: 0.5 }} />
+          <Tooltip title={tip}>
+            <SvgIcon color='primary' component={IconQuestion} fontSize='medium' inheritViewBox sx={{ opacity: 0.5 }} />
+          </Tooltip>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {!isUnLock && !isEnought && (

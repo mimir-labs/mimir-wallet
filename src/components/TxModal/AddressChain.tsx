@@ -39,13 +39,16 @@ function AddressChain({
   );
 
   useEffect(() => {
-    const finded = meta.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.find((address) => isAccount(address)) : null;
+    const finded = meta.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.filter((address) => isAccount(address)) || [] : [];
 
-    finded &&
+    if (finded.length > 0) {
+      const solo = finded.find((item) => !getAddressMeta(item).isMultisig);
+
       onChange((value) => ({
         ...value,
-        [address]: finded
+        [address]: solo || finded[0]
       }));
+    }
   }, [address, filtered, isAccount, meta, onChange]);
 
   if (meta.isMultisig) {

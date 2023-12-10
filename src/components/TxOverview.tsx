@@ -73,7 +73,7 @@ const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
           type='source'
         />
       )}
-      <Paper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 220, height: 71, padding: 1 }}>
+      <Paper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 280, height: 71, padding: 1 }}>
         <AddressCell showType value={data.address} withCopy />
         {icon}
       </Paper>
@@ -168,7 +168,8 @@ function makeNodes(
     id: nodeId,
     type: 'TxNode',
     data: { address, parentId, members: meta.who || [], tx },
-    position: { x: xPos, y: yPos }
+    position: { x: xPos, y: yPos },
+    connectable: false
   };
 
   nodes.push(node);
@@ -231,7 +232,7 @@ function TxOverview({ tx }: Props) {
     const nodes: Node<NodeData>[] = [];
     const edges: Edge[] = [];
 
-    makeNodes(tx.sender, null, tx, 0, 0, 300, 90, undefined, nodes, edges);
+    makeNodes(tx.sender, null, tx, 0, 0, 360, 90, undefined, nodes, edges);
 
     setNodes(nodes);
     setEdges(edges);

@@ -22,9 +22,10 @@ interface Props {
   showType?: boolean;
   withCopy?: boolean;
   width?: number | string;
+  isMe?: boolean;
 }
 
-function AddressCell({ shorten = true, showType = false, size = 'medium', value, width, withCopy = false }: Props) {
+function AddressCell({ isMe, shorten = true, showType = false, size = 'medium', value, width, withCopy = false }: Props) {
   const { isAccount } = useAccounts();
   const { isAddress } = useAddresses();
   const [iconSize, nameFontSize, addressFontSize, spacing, spacingCol] = useMemo((): [number, string, string, number, number] => {
@@ -41,7 +42,7 @@ function AddressCell({ shorten = true, showType = false, size = 'medium', value,
     <>
       <AddAddressDialog onClose={toggleOpen} open={open} />
       <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
-        <IdentityIcon className='AddressCell-Icon' size={iconSize} value={value} />
+        <IdentityIcon className='AddressCell-Icon' isMe={isMe} size={iconSize} value={value} />
         <Stack className='AddressCell-Address' spacing={spacingCol}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography component='span' fontSize={nameFontSize} fontWeight={size === 'large' ? 800 : 700} sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

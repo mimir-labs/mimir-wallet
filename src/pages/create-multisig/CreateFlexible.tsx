@@ -2,20 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
+import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { PrepareFlexible } from './types';
 
 import { LoadingButton } from '@mui/lab';
-import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
-import { u8aToHex } from '@polkadot/util';
+import { u8aEq, u8aToHex } from '@polkadot/util';
 import { addressEq, decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ReactComponent as IconQuestion } from '@mimirdev/assets/svg/icon-question.svg';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem, useToastPromise } from '@mimirdev/components';
-import { useApi, useSelectedAccountCallback } from '@mimirdev/hooks';
+import { useApi, useCall, useSelectedAccountCallback } from '@mimirdev/hooks';
 import { getAddressMeta, service, signAndSend } from '@mimirdev/utils';
 
 interface Props {
@@ -67,20 +68,33 @@ function ItemStep({ children, disabled = false }: { disabled?: boolean; children
   );
 }
 
-function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount, threshold, who } }: Props) {
+function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creator, extrinsicIndex: _extrinsicIndex, name, pure: pureAccount, threshold, who } }: Props) {
   const { api } = useApi();
   const [signer, setSigner] = useState(creator || filterDefaultAccount(who));
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
+  const [blockNumber, setBlockNumber] = useState<number | null | undefined>(_blockNumber);
+  const [extrinsicIndex, setExtrinsicIndex] = useState<number | null | undefined>(_extrinsicIndex);
   const navigate = useNavigate();
   const selectAccount = useSelectedAccountCallback();
+  const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [signer]);
 
-  const reservedAmount = useMemo(() => api.consts.proxy.proxyDepositFactor.muln(2).iadd(api.consts.proxy.proxyDepositBase), [api]);
+  const reservedAmount = useMemo(() => {
+    const baseReserve = api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2));
+
+    if (allBalances && allBalances.freeBalance.add(allBalances.reservedBalance).gte(api.consts.balances.existentialDeposit)) {
+      baseReserve.iadd(api.consts.balances.existentialDeposit.divn(10)); // for gas
+    } else {
+      baseReserve.iadd(api.consts.balances.existentialDeposit.muln(1.1)); // mul 1.1 for gas
+    }
+
+    return baseReserve;
+  }, [allBalances, api]);
 
   const [loadingSecond, createMembers] = useToastPromise(
     useCallback(
       async (pure: string, who: string[], signer: string, threshold: number, name: string) => {
         const extrinsic = api.tx.utility.batchAll([
-          api.tx.balances.transferKeepAlive(pure, api.consts.proxy.proxyDepositFactor.muln(2)),
+          api.tx.balances.transferKeepAlive(pure, api.consts.proxy.proxyDepositFactor.muln(2).add(api.consts.proxy.proxyDepositBase)),
           api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.addProxy(encodeMultiAddress(who, threshold), 'Any', 0)),
           api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0))
         ]);
@@ -132,11 +146,30 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
 
       setPure(_pure);
 
+      api.rpc.chain.getBlock(result.status.asInBlock).then((block) => {
+        setBlockNumber(block.block.header.number.toNumber());
+        setExtrinsicIndex(block.block.extrinsics.findIndex((item) => u8aEq(item.hash, extrinsic.hash)));
+      });
+
       if (_pure) {
         createMembers(_pure, who, signer, threshold, name);
       }
     }, [api, createMembers, name, signer, threshold, who]),
     { pending: 'Creating Pure Account...', success: 'Create Pure success!' }
+  );
+
+  const [cancelLoading, killPure] = useToastPromise(
+    useCallback(
+      async (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
+        const extrinsic = api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex));
+
+        await signAndSend(extrinsic, signer, { checkProxy: true });
+
+        onCancel();
+      },
+      [api, onCancel]
+    ),
+    { pending: 'Killing Pure Account...', success: 'Kill Pure success!' }
   );
 
   return (
@@ -191,15 +224,19 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
       </Accordion>
       <Divider sx={{ marginY: 1.5 }} />
       <Typography fontWeight={700}>Transaction Initiator</Typography>
-      <InputAddress filtered={creator ? [creator] : who.filter((address) => !getAddressMeta(address).isMultisig)} isSign onChange={setSigner} value={signer} />
+      <InputAddress disabled={!!pure} filtered={creator ? [creator] : who.filter((address) => !getAddressMeta(address).isMultisig)} isSign onChange={setSigner} value={signer} />
       <LockContainer>
-        <LockItem address={signer} value={reservedAmount} />
+        <LockItem
+          address={signer}
+          tip="Flexible Multisig is a Pure Proxy. In ‘set members’ step, you add the multisig account as its proxy and remove the creator's proxy, making the multi-signature its only controller. Then transfer some funds to keep Flexible alive."
+          value={reservedAmount}
+        />
       </LockContainer>
       <Divider sx={{ marginY: 1.5 }} />
       <Box sx={{ display: 'flex', gap: 1 }}>
         {pure ? (
           <LoadingButton
-            disabled={!signer || !pure}
+            disabled={!signer || !pure || cancelLoading}
             fullWidth
             loading={loadingSecond}
             onClick={() => {
@@ -215,9 +252,26 @@ function CreateFlexible({ onCancel, prepare: { creator, name, pure: pureAccount,
             Create
           </LoadingButton>
         )}
-        <LoadingButton fullWidth onClick={onCancel} variant='outlined'>
-          Cancel
-        </LoadingButton>
+        {pure ? (
+          <LoadingButton
+            color='error'
+            disabled={loadingFirst}
+            fullWidth
+            loading={cancelLoading}
+            onClick={() => {
+              if (pure && signer && blockNumber && extrinsicIndex) {
+                killPure(pure, signer, blockNumber, extrinsicIndex);
+              }
+            }}
+            variant='outlined'
+          >
+            Delete Account
+          </LoadingButton>
+        ) : (
+          <Button fullWidth onClick={onCancel} variant='outlined'>
+            Cancel
+          </Button>
+        )}
       </Box>
     </Stack>
   );

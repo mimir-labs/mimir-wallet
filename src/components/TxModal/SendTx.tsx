@@ -1,6 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ISubmittableResult } from '@polkadot/types/types';
+
 import { LoadingButton } from '@mui/lab';
 import { BN } from '@polkadot/util';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -10,7 +12,21 @@ import { PrepareMultisig, signAndSend } from '@mimirdev/utils';
 
 import { useToastPromise } from '../ToastRoot';
 
-function SendTx({ beforeSend, canSend, disabled, onClose, prepare }: { disabled?: boolean; prepare?: PrepareMultisig; canSend: boolean; onClose: () => void; beforeSend: () => Promise<void> }) {
+function SendTx({
+  beforeSend,
+  canSend,
+  disabled,
+  onClose,
+  onResults,
+  prepare
+}: {
+  onResults?: (results: ISubmittableResult) => void;
+  disabled?: boolean;
+  prepare?: PrepareMultisig;
+  canSend: boolean;
+  onClose: () => void;
+  beforeSend: () => Promise<void>;
+}) {
   const { api } = useApi();
   const [isEnought, setIsEnought] = useState<boolean>(false);
   const [loading, onConfirm] = useToastPromise(
@@ -19,10 +35,14 @@ function SendTx({ beforeSend, canSend, disabled, onClose, prepare }: { disabled?
 
       const [tx, signer] = prepare;
 
-      return signAndSend(tx, signer, {
+      const results = await signAndSend(tx, signer, {
         beforeSend
-      }).then(() => onClose());
-    }, [beforeSend, onClose, prepare]),
+      });
+
+      onResults?.(results);
+
+      onClose();
+    }, [beforeSend, onClose, onResults, prepare]),
     { pending: 'Transaction Pending...', success: 'Transaction Success' }
   );
 

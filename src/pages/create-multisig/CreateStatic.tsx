@@ -15,9 +15,8 @@ import { service } from '@mimirdev/utils';
 interface Props {
   name?: string;
   signatories: string[];
-  isThresholdValid: boolean;
-  hasSoloAccount: boolean;
   threshold: number;
+  checkField: () => boolean;
 }
 
 function createMultisig(signatories: string[], threshold: number, name: string): string {
@@ -27,14 +26,14 @@ function createMultisig(signatories: string[], threshold: number, name: string):
   return address;
 }
 
-function CreateStatic({ hasSoloAccount, isThresholdValid, name, signatories, threshold }: Props) {
+function CreateStatic({ checkField, name, signatories, threshold }: Props) {
   const [open, toggleOpen] = useToggle();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const selectAccount = useSelectedAccountCallback();
 
   const handleCreate = useCallback(async () => {
-    if (!name) return;
+    if (!name || !checkField()) return;
 
     try {
       setIsLoading(true);
@@ -52,7 +51,7 @@ function CreateStatic({ hasSoloAccount, isThresholdValid, name, signatories, thr
     } catch {}
 
     setIsLoading(false);
-  }, [name, navigate, selectAccount, signatories, threshold]);
+  }, [checkField, name, navigate, selectAccount, signatories, threshold]);
 
   return (
     <>
@@ -73,7 +72,16 @@ function CreateStatic({ hasSoloAccount, isThresholdValid, name, signatories, thr
           </Button>
         </DialogActions>
       </Dialog>
-      <Button disabled={!hasSoloAccount || signatories.length < 2 || !name || !isThresholdValid} fullWidth onClick={toggleOpen} variant='contained'>
+      <Button
+        disabled={!name}
+        fullWidth
+        onClick={() => {
+          if (!name || !checkField()) return;
+
+          toggleOpen();
+        }}
+        variant='contained'
+      >
         Create
       </Button>
     </>

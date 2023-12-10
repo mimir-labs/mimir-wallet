@@ -3,9 +3,10 @@
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { AccountId, Call } from '@polkadot/types/interfaces';
-import type { IMethod } from '@polkadot/types/types';
+import type { IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { Address } from 'cluster';
+import type { Transaction } from '../types';
 
 export interface Accounts {
   allAccounts: string[];
@@ -32,9 +33,13 @@ export interface TxQueue {
   beforeSend?: () => Promise<void>;
   extrinsic: SubmittableExtrinsic<'promise'>;
   filtered?: Filtered;
-  targetCall?: Call | IMethod;
-  targetSender?: AccountId | Address | string;
+  destCall?: Call | IMethod;
+  destSender?: AccountId | Address | string;
+  transaction?: Transaction;
   isCancelled?: boolean;
   isApprove?: boolean;
   onRemove?: () => void;
+  onResults?: (results: ISubmittableResult) => void;
 }
+
+export type TxQueueState = Omit<Required<TxQueue>, 'filtered' | 'onResults' | 'transaction'> & { transaction?: Transaction; filtered?: Filtered; onResults?: (results: ISubmittableResult) => void };

@@ -11,15 +11,19 @@ import { ReactComponent as IconFailedFill } from '@mimirdev/assets/svg/icon-fail
 import { ReactComponent as IconInfoFill } from '@mimirdev/assets/svg/icon-info-fill.svg';
 import { ReactComponent as IconSuccessFill } from '@mimirdev/assets/svg/icon-success-fill.svg';
 import { ReactComponent as IconWaitingFill } from '@mimirdev/assets/svg/icon-waiting-fill.svg';
-import { useAddressMeta, useToggle } from '@mimirdev/hooks';
+import { useAddressMeta } from '@mimirdev/hooks';
 import { CalldataStatus, type Transaction } from '@mimirdev/hooks/types';
 
 import OverviewDialog from '../OverviewDialog';
 import { extraTransaction } from '../util';
+import Operate from './Operate';
 import TxProcess from './TxProcess';
 
 interface Props {
   transaction: Transaction;
+  cancelTx?: Transaction;
+  processOpen: boolean;
+  toggleProcessOpen: () => void;
 }
 
 function ProcessTitle({ approvals, length, threshold }: { length: number; approvals: number; threshold: number }) {
@@ -54,9 +58,23 @@ function ProcessInfo({ approvals, threshold }: { approvals: number; threshold: n
   );
 }
 
-function ProcessItem({ Icon, children, hasSub, iconColor, label }: { hasSub?: boolean; children?: React.ReactNode; label: string; Icon: React.ComponentType; iconColor: string }) {
-  const [open, toggleOpen] = useToggle();
-
+function ProcessItem({
+  Icon,
+  children,
+  hasSub,
+  iconColor,
+  label,
+  open,
+  toggleOpen
+}: {
+  open?: boolean;
+  toggleOpen?: () => void;
+  hasSub?: boolean;
+  children?: React.ReactNode;
+  label: React.ReactNode;
+  Icon: React.ComponentType;
+  iconColor: string;
+}) {
   return (
     <Box>
       <Box onClick={children ? toggleOpen : undefined} sx={{ cursor: children ? 'pointer' : undefined, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
@@ -80,7 +98,15 @@ function ProcessItem({ Icon, children, hasSub, iconColor, label }: { hasSub?: bo
   );
 }
 
-function Process({ transaction }: Props) {
+function CancellingLabel({ tx }: { tx: Transaction }) {
+  const { meta } = useAddressMeta(tx.sender);
+
+  const approvals = useMemo(() => (meta.isFlexible ? tx.children[0] : tx).children.filter((item) => item.status === CalldataStatus.Success).length, [meta.isFlexible, tx]);
+
+  return `Cancelling(${approvals}/${meta.threshold})`;
+}
+
+function Process({ cancelTx, processOpen, toggleProcessOpen, transaction }: Props) {
   const { meta } = useAddressMeta(transaction.sender);
   const [approvals, txs] = useMemo((): [number, Transaction[]] => extraTransaction(meta, transaction), [meta, transaction]);
 
@@ -90,7 +116,7 @@ function Process({ transaction }: Props) {
       <ProcessInfo approvals={approvals} threshold={meta.threshold || 0} />
       <Divider />
       <ProcessItem Icon={IconAddFill} hasSub iconColor='primary.main' label='Created' />
-      <ProcessItem Icon={IconInfoFill} hasSub iconColor='primary.main' label='Confirmations'>
+      <ProcessItem Icon={IconInfoFill} hasSub iconColor='primary.main' label='Confirmations' open={processOpen} toggleOpen={toggleProcessOpen}>
         <Stack spacing={1}>
           {txs.map((tx, index) => (
             <TxProcess key={index} tx={tx} />
@@ -98,41 +124,46 @@ function Process({ transaction }: Props) {
           <OverviewDialog tx={transaction} />
         </Stack>
       </ProcessItem>
-      <ProcessItem
-        Icon={
-          transaction.status === CalldataStatus.Success
-            ? IconSuccessFill
-            : transaction.status === CalldataStatus.Failed
-            ? IconFailedFill
-            : transaction.status === CalldataStatus.Cancelled
-            ? IconBack
-            : transaction.status === CalldataStatus.MemberChanged
-            ? IconFailedFill
-            : IconWaitingFill
-        }
-        iconColor={
-          transaction.status === CalldataStatus.Success
-            ? 'success.main'
-            : transaction.status === CalldataStatus.Failed
-            ? 'error.main'
-            : transaction.status === CalldataStatus.Cancelled
-            ? 'warning.main'
-            : transaction.status === CalldataStatus.MemberChanged
-            ? 'error.main'
-            : 'warning.main'
-        }
-        label={
-          transaction.status === CalldataStatus.Success
-            ? 'Executed'
-            : transaction.status === CalldataStatus.Failed
-            ? 'Failed'
-            : transaction.status === CalldataStatus.Cancelled
-            ? 'Cancelled'
-            : transaction.status === CalldataStatus.MemberChanged
-            ? 'MemberChanged'
-            : 'Waiting'
-        }
-      />
+      {cancelTx ? (
+        <ProcessItem Icon={IconWaitingFill} iconColor='warning.main' label={<CancellingLabel tx={cancelTx} />} />
+      ) : (
+        <ProcessItem
+          Icon={
+            transaction.status === CalldataStatus.Success
+              ? IconSuccessFill
+              : transaction.status === CalldataStatus.Failed
+              ? IconFailedFill
+              : transaction.status === CalldataStatus.Cancelled
+              ? IconBack
+              : transaction.status === CalldataStatus.MemberChanged
+              ? IconFailedFill
+              : IconWaitingFill
+          }
+          iconColor={
+            transaction.status === CalldataStatus.Success
+              ? 'success.main'
+              : transaction.status === CalldataStatus.Failed
+              ? 'error.main'
+              : transaction.status === CalldataStatus.Cancelled
+              ? 'warning.main'
+              : transaction.status === CalldataStatus.MemberChanged
+              ? 'error.main'
+              : 'warning.main'
+          }
+          label={
+            transaction.status === CalldataStatus.Success
+              ? 'Executed'
+              : transaction.status === CalldataStatus.Failed
+              ? 'Failed'
+              : transaction.status === CalldataStatus.Cancelled
+              ? 'Cancelled'
+              : transaction.status === CalldataStatus.MemberChanged
+              ? 'MemberChanged'
+              : 'Waiting'
+          }
+        />
+      )}
+      <Operate transaction={transaction} />
     </Stack>
   );
 }

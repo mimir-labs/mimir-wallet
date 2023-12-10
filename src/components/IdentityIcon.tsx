@@ -8,7 +8,7 @@ import { Box } from '@mui/material';
 import { Polkadot as PolkadotIcon } from '@polkadot/react-identicon/icons/Polkadot';
 import { isHex, isU8a } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { getAddressMeta } from '@mimirdev/utils';
 
@@ -17,13 +17,15 @@ interface Props {
   prefix?: IdentityProps['prefix'];
   size?: number;
   value?: AccountId | AccountIndex | Address | string | Uint8Array | null;
+  isMe?: boolean;
+  onClick?: (value?: string) => void;
 }
 
 function isCodec(value?: AccountId | AccountIndex | Address | string | Uint8Array | null): value is AccountId | AccountIndex | Address {
   return !!(value && (value as AccountId).toHuman);
 }
 
-function IdentityIcon({ className, prefix, size = 30, value }: Props) {
+function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Props) {
   const { address, publicKey } = useMemo(() => {
     try {
       const _value = isCodec(value) ? value.toString() : value;
@@ -39,8 +41,42 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
     return getAddressMeta(value?.toString() || '');
   }, [value]);
 
+  const _onClick = useCallback(() => {
+    onClick?.(value?.toString());
+  }, [onClick, value]);
+
+  if (isMe) {
+    return (
+      <Box
+        className={`${className} IdentityIcon`}
+        component='span'
+        onClick={_onClick}
+        sx={{
+          cursor: onClick ? 'pointer' : undefined,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: size,
+          height: size,
+          bgcolor: 'primary.main',
+          borderRadius: '50%',
+          color: 'common.white',
+          fontWeight: 800,
+          fontSize: Math.min(16, size / 2)
+        }}
+      >
+        Me
+      </Box>
+    );
+  }
+
   return (
-    <Box className={`${className} IdentityIcon`} component='span' sx={{ position: 'relative', width: size, height: size, bgcolor: 'secondary.main', borderRadius: '50%' }}>
+    <Box
+      className={`${className} IdentityIcon`}
+      component='span'
+      onClick={_onClick}
+      sx={{ cursor: onClick ? 'pointer' : undefined, position: 'relative', width: size, height: size, bgcolor: 'secondary.main', borderRadius: '50%' }}
+    >
       <PolkadotIcon address={address} publicKey={publicKey} size={size} />
       {isMultisig && (
         <Box

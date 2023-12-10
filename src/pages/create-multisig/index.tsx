@@ -17,6 +17,13 @@ import CreateFlexible from './CreateFlexible';
 import CreateStatic from './CreateStatic';
 import { useSelectMultisig } from './useSelectMultisig';
 
+function checkError(signatories: string[], isThresholdValid: boolean, hasSoloAccount: boolean): [Error | null, Error | null] {
+  return [
+    signatories.length < 2 ? new Error('Please select at least two members') : hasSoloAccount ? null : new Error('You need add at least one local account'),
+    isThresholdValid ? null : new Error(`Threshold must great than 2 and less equal than ${signatories.length}`)
+  ];
+}
+
 function PageCreateMultisig() {
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
@@ -27,6 +34,7 @@ function PageCreateMultisig() {
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig();
   const [addOpen, toggleAdd] = useToggle();
   const [addressError, setAddressError] = useState<Error | null>(null);
+  const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
 
   // prepare multisigs
   const [prepares] = useCacheMultisig();
@@ -56,6 +64,14 @@ function PageCreateMultisig() {
   const _onFlexibleCancel = () => {
     setPrepare(undefined);
   };
+
+  const checkField = useCallback((): boolean => {
+    const errors = checkError(signatories, isThresholdValid, hasSoloAccount);
+
+    setErrors(errors);
+
+    return !errors[0] && !errors[1];
+  }, [hasSoloAccount, isThresholdValid, signatories]);
 
   return (
     <>
@@ -106,14 +122,9 @@ function PageCreateMultisig() {
                   <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
                   <AccountSelect accounts={signatories} onClick={unselect} title='Members' type='delete' />
                 </Box>
-                {!hasSoloAccount && <FormHelperText sx={{ color: 'error.main' }}>You need add at least one local account</FormHelperText>}
+                {memberError && <FormHelperText sx={{ color: 'error.main' }}>{memberError.message}</FormHelperText>}
               </Paper>
-              <Input
-                defaultValue={String(threshold)}
-                error={isThresholdValid ? null : new Error(`Threshold must great than 2 and less equal than ${signatories.length}`)}
-                label='Threshold'
-                onChange={_onChangeThreshold}
-              />
+              <Input defaultValue={String(threshold)} error={thresholdError} label='Threshold' onChange={_onChangeThreshold} />
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography fontWeight={700}>Flexible Multisig</Typography>
                 <Switch checked={flexible} onChange={(e) => setFlexible(e.target.checked)} />
@@ -134,21 +145,25 @@ function PageCreateMultisig() {
               </Alert>
               {flexible ? (
                 <Button
-                  disabled={!hasSoloAccount || signatories.length < 2 || !name || !isThresholdValid}
+                  disabled={!name}
                   fullWidth
-                  onClick={() =>
+                  onClick={() => {
+                    if (!checkField()) {
+                      return;
+                    }
+
                     setPrepare({
                       who: signatories,
                       threshold,
                       name
-                    })
-                  }
+                    });
+                  }}
                   variant='contained'
                 >
                   Create
                 </Button>
               ) : (
-                <CreateStatic hasSoloAccount={hasSoloAccount} isThresholdValid={isThresholdValid} name={name} signatories={signatories} threshold={threshold} />
+                <CreateStatic checkField={checkField} name={name} signatories={signatories} threshold={threshold} />
               )}
             </Stack>
           )}
@@ -169,7 +184,9 @@ function PageCreateMultisig() {
                       who: item.who.map((address) => encodeAddress(address)),
                       threshold: item.threshold,
                       name: item.name,
-                      pure: item.pure ? encodeAddress(item.pure) : null
+                      pure: item.pure ? encodeAddress(item.pure) : null,
+                      blockNumber: item.blockNumber,
+                      extrinsicIndex: item.extrinsicIndex
                     });
                     toggleOpen();
                   }

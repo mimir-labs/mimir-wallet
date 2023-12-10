@@ -55,7 +55,8 @@ function makeNodes(
     resizing: true,
     type: 'AddressNode',
     data: { address, parentId, members: meta.who || [] },
-    position: { x: xPos, y: yPos }
+    position: { x: xPos, y: yPos },
+    connectable: false
   };
 
   nodes.push(node);

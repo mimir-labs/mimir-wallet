@@ -9,12 +9,13 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { InputAddress, InputNumber } from '@mimirdev/components';
-import { useAddresses, useApi, useCall, useTxQueue, useVisibleAccounts } from '@mimirdev/hooks';
+import { useAddresses, useApi, useCall, useSelectedAccount, useTxQueue, useVisibleAccounts } from '@mimirdev/hooks';
 
 function PageTransfer() {
   const { api } = useApi();
   const navigate = useNavigate();
-  const [sending, setSending] = useState<string>();
+  const selected = useSelectedAccount();
+  const [sending, setSending] = useState<string | undefined>(selected);
   const [recipient, setRecipient] = useState<string>();
   const [amount, setAmount] = useState<BN>();
   const { addQueue } = useTxQueue();
@@ -41,7 +42,7 @@ function PageTransfer() {
       <Paper sx={{ padding: 2.5, borderRadius: '20px', marginTop: 1.25 }}>
         <Stack spacing={2}>
           <Typography variant='h3'>Transfer</Typography>
-          <InputAddress balance={sendingBalances?.freeBalance} filtered={filtered} isSign label='Sending From' onChange={setSending} placeholder='Sender' withBalance />
+          <InputAddress balance={sendingBalances?.freeBalance} filtered={filtered} isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} withBalance />
           <Divider />
           <InputAddress balance={recipientBalances?.freeBalance} filtered={filtered.concat(allAddresses)} label='Recipient' onChange={setRecipient} placeholder='Recipient' withBalance />
           <InputNumber label='Amount' maxValue={sendingBalances?.freeBalance} onChange={setAmount} placeholder='Input amount' withMax />

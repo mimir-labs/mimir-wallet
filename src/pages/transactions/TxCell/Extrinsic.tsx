@@ -1,61 +1,26 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered } from '@mimirdev/hooks/ctx/types';
-
-import { Alert, alpha, Box, Button, Chip, Divider, Stack, SvgIcon, Typography } from '@mui/material';
+import { alpha, Box, Button, Chip, Divider, Stack, SvgIcon, Typography } from '@mui/material';
 import moment from 'moment';
-import React, { useCallback } from 'react';
+import React from 'react';
 
 import { ReactComponent as ArrowDown } from '@mimirdev/assets/svg/ArrowDown.svg';
-import { ReactComponent as IconWaitingFill } from '@mimirdev/assets/svg/icon-waiting-fill.svg';
 import { AddressRow } from '@mimirdev/components';
-import { useApi, useBlockTime, useToggle, useTxQueue } from '@mimirdev/hooks';
+import { useApi, useBlockTime, useSelectedAccountCallback } from '@mimirdev/hooks';
 import { CalldataStatus, Transaction } from '@mimirdev/hooks/types';
 import { Call } from '@mimirdev/params';
 import Item from '@mimirdev/params/Param/Item';
 
-import { useApproveFiltered } from '../useApproveFiltered';
-import { useCancelFiltered } from '../useCancelFiltered';
 import CallDetail from './CallDetail';
+import Related from './Related';
 
-function Extrinsic({ transaction }: { transaction: Transaction }) {
+function Extrinsic({ detailOpen, relatedTxs, toggleDetailOpen, transaction }: { relatedTxs: Transaction[]; detailOpen: boolean; toggleDetailOpen: () => void; transaction: Transaction }) {
   const destTx = transaction.top || transaction;
   const { api } = useApi();
-  const [detailOpen, toggleDetailOpen] = useToggle();
-  const { addQueue } = useTxQueue();
   const status = transaction.status;
-  const [approveFiltered, canApprove] = useApproveFiltered(transaction);
-  const [cancelFiltered, canCancel] = useCancelFiltered(api, transaction);
   const time = useBlockTime(transaction.initTransaction.height);
-
-  const handleApprove = useCallback(
-    (filtered: Filtered) => {
-      addQueue({
-        filtered,
-        extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
-        targetCall: transaction.top?.call,
-        targetSender: transaction.top?.sender,
-        accountId: transaction.sender,
-        isApprove: true
-      });
-    },
-    [addQueue, api, transaction]
-  );
-
-  const handleCancel = useCallback(
-    (filtered: Filtered) => {
-      addQueue({
-        filtered,
-        extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
-        targetCall: transaction.top?.call,
-        targetSender: transaction.top?.sender,
-        accountId: transaction.sender,
-        isCancelled: true
-      });
-    },
-    [addQueue, api, transaction]
-  );
+  const selectAccount = useSelectedAccountCallback();
 
   return (
     <Stack flex='1' spacing={1}>
@@ -71,13 +36,36 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
       </Stack>
       <Divider />
       <Stack spacing={1} sx={{ lineHeight: 1.5 }}>
-        {destTx !== transaction && (
-          <Item content={<AddressRow defaultName={destTx.sender} shorten={false} size='small' value={destTx.sender} withAddress={false} withCopy withName />} name='From' type='tx' />
-        )}
-        <Call api={api} call={destTx.call} type='tx' />
+        <Item
+          content={
+            <AddressRow
+              defaultName={destTx.sender}
+              isMe={destTx === transaction}
+              onClick={(value) => value && selectAccount(value)}
+              shorten={false}
+              size='small'
+              value={destTx.sender}
+              withAddress={false}
+              withCopy
+              withName
+            />
+          }
+          name='From'
+          type='tx'
+        />
+        <Call
+          api={api}
+          call={destTx.call}
+          selectAccount={destTx.action === 'multisig.cancelAsMulti' ? selectAccount : undefined}
+          tx={destTx.action === 'multisig.cancelAsMulti' ? destTx : undefined}
+          type='tx'
+        />
       </Stack>
       {detailOpen ? (
-        <CallDetail call={transaction.call} depositor={transaction.initTransaction.sender} />
+        <>
+          <CallDetail call={transaction.call} depositor={transaction.initTransaction.sender} />
+          {relatedTxs.length > 0 && <Related relatedTxs={relatedTxs} />}
+        </>
       ) : (
         <Button
           color='secondary'
@@ -90,36 +78,6 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
           Detail
         </Button>
       )}
-      {transaction.status < CalldataStatus.Success &&
-        (transaction.top && transaction.top.status > CalldataStatus.Pending ? (
-          <Box>
-            {cancelFiltered && canCancel && (
-              <Button onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
-                Fund
-              </Button>
-            )}
-          </Box>
-        ) : (
-          <>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              {approveFiltered && canApprove && (
-                <Button onClick={() => handleApprove(approveFiltered)} variant='outlined'>
-                  Approve
-                </Button>
-              )}
-              {cancelFiltered && canCancel && (
-                <Button onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
-                  Cancel
-                </Button>
-              )}
-            </Box>
-            {!canApprove && (
-              <Alert icon={<IconWaitingFill />} severity='warning'>
-                Waiting for other {"members's"} approvement
-              </Alert>
-            )}
-          </>
-        ))}
     </Stack>
   );
 }

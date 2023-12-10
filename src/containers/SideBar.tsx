@@ -77,11 +77,9 @@ function SideBar() {
     <>
       <Drawer PaperProps={{ sx: { width: 222, top: 56, paddingX: 1.5, paddingY: 2 } }} anchor='left' variant='permanent'>
         <Paper sx={{ padding: 1 }} variant='outlined'>
-          <Stack alignItems='center' direction='row' spacing={1} width='100%'>
+          <Stack alignItems='center' direction='row' onClick={handleAccountOpen} spacing={1} sx={{ cursor: 'pointer', width: '100%' }}>
             <AddressCell size='small' value={selected} />
-            <IconButton color='primary' onClick={handleAccountOpen} size='small'>
-              <SvgIcon component={ArrowRight} inheritViewBox sx={{ fontSize: '0.75rem' }} />
-            </IconButton>
+            <SvgIcon color='primary' component={ArrowRight} inheritViewBox sx={{ fontSize: '0.75rem' }} />
           </Stack>
           <Divider sx={{ marginY: 1 }} />
           <Stack alignItems='center' direction='row' spacing={0.5}>

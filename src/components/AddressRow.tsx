@@ -4,7 +4,7 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { Box, Stack } from '@mui/material';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
@@ -16,19 +16,25 @@ interface Props {
   value?: AccountId | AccountIndex | Address | string | null;
   size?: 'small' | 'medium' | 'large';
   shorten?: boolean;
+  isMe?: boolean;
   withAddress?: boolean;
   withCopy?: boolean;
   withName?: boolean;
+  onClick?: (value?: string) => void;
 }
 
-function AddressRow({ defaultName, shorten, size = 'medium', value, withAddress = false, withCopy = false, withName = true }: Props) {
+function AddressRow({ defaultName, isMe, onClick, shorten, size = 'medium', value, withAddress = false, withCopy = false, withName = true }: Props) {
   const [iconSize, spacing] = useMemo((): [number, number] => {
     return size === 'small' ? [20, 0.5] : size === 'medium' ? [30, 0.5] : [40, 0.5];
   }, [size]);
 
+  const _onClick = useCallback(() => {
+    onClick?.(value?.toString());
+  }, [onClick, value]);
+
   return (
-    <Stack alignItems='center' className='AddressRow' direction='row' spacing={spacing}>
-      <IdentityIcon className='AddressRow-Icon' size={iconSize} value={value} />
+    <Stack alignItems='center' className='AddressRow' direction='row' onClick={_onClick} spacing={spacing} sx={{ cursor: onClick ? 'pointer' : undefined }}>
+      <IdentityIcon className='AddressRow-Icon' isMe={isMe} size={iconSize} value={value} />
       {withName && (
         <Box component='span' sx={{ fontWeight: withName && withAddress ? 700 : undefined }}>
           <AddressName defaultName={defaultName} value={value} />

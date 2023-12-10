@@ -7,4 +7,6 @@ export type PrepareFlexible = {
   threshold: number;
   name: string;
   pure?: string | null;
+  blockNumber?: number | null;
+  extrinsicIndex?: number | null;
 };

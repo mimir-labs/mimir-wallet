@@ -24,7 +24,7 @@ function Item({ content, name, type }: Props) {
 
   return (
     <Stack alignItems='center' direction='row'>
-      <Box sx={{ width: '30%', maxWidth: 130, fontWeight: 700 }}>{name}</Box>
+      <Box sx={{ width: '30%', maxWidth: 130, fontWeight: 700, textTransform: 'capitalize' }}>{name}</Box>
       <Box sx={{ width: '70%', flex: '1 0 auto' }}>{content}</Box>
     </Stack>
   );

@@ -121,7 +121,7 @@ export async function signAndSend(extrinsic: SubmittableExtrinsic<'promise'>, si
       const unsubPromise = extrinsic.send((result) => {
         onStatus?.(result);
 
-        if (result.isCompleted) {
+        if (result.isInBlock) {
           try {
             resolve(checkSubmittableResult(result, checkProxy));
             unsubPromise.then((unsub) => unsub());

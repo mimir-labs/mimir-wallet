@@ -6,7 +6,7 @@ import type { InputNumberProps } from './types';
 
 import { Box, Button } from '@mui/material';
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useApi } from '@mimirdev/hooks';
 
@@ -50,20 +50,27 @@ function getValues(api: ApiPromise, value: BN): [string, BN] {
 }
 
 function InputNumber({ defaultValue, maxValue, onChange, value: propsValue, withMax, ...props }: InputNumberProps) {
+  const isControl = useRef(propsValue !== undefined);
   const { api } = useApi();
   const _defaultValue = useMemo(() => defaultValue?.toString(), [defaultValue]);
-  const [[value, valueBn], setValues] = useState<[string, BN]>(getValues(api, new BN(propsValue || _defaultValue || '0')));
-
-  useEffect(() => {
-    onChange?.(valueBn);
-  }, [onChange, valueBn]);
+  const [[value], setValues] = useState<[string, BN]>(getValues(api, new BN(propsValue || _defaultValue || '0')));
 
   const _onChange = useCallback(
     (value: string) => {
-      setValues([value, inputToBn(api, value)]);
+      if (!isControl.current) {
+        setValues([value, inputToBn(api, value)]);
+      }
+
+      onChange?.(inputToBn(api, value));
     },
-    [api]
+    [api, onChange]
   );
+
+  useEffect(() => {
+    if (isControl.current) {
+      propsValue && setValues(getValues(api, propsValue));
+    }
+  }, [api, propsValue]);
 
   return (
     <Input

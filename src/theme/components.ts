@@ -326,6 +326,7 @@ const createComponents: Func = () => ({
     styleOverrides: {
       tooltip: ({ theme }) => ({
         maxWidth: 365,
+        fontSize: '0.875rem',
         borderRadius: theme.shape.borderRadius * 2,
         padding: theme.spacing(2),
         border: '1px solid',

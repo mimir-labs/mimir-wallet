@@ -1,7 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered, TxQueue } from './types';
+import type { TxQueue, TxQueueState } from './types';
 
 import React, { useCallback, useState } from 'react';
 
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export interface TxState {
-  queue: (Omit<Required<TxQueue>, 'filtered'> & { filtered?: Filtered })[];
+  queue: TxQueueState[];
   addQueue: (queue: TxQueue) => void;
 }
 
@@ -18,7 +18,7 @@ export const TxQueueCtx = React.createContext<TxState>({} as TxState);
 let queueId = 1;
 
 export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
-  const [queue, setQueue] = useState<(Omit<Required<TxQueue>, 'filtered'> & { filtered?: Filtered })[]>([]);
+  const [queue, setQueue] = useState<TxQueueState[]>([]);
 
   const addQueue = useCallback((value: TxQueue) => {
     setQueue((_queue) => {
@@ -29,8 +29,9 @@ export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
         id,
         isCancelled: value.isCancelled ?? false,
         isApprove: value.isApprove ?? false,
-        targetSender: value.targetSender || value.accountId,
-        targetCall: value.targetCall || value.extrinsic.method,
+        transaction: value.transaction,
+        destSender: value.destSender || value.accountId,
+        destCall: value.destCall || value.extrinsic.method,
         beforeSend: async () => value.beforeSend?.(),
         onRemove: () => {
           value.onRemove?.();

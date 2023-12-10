@@ -17,7 +17,7 @@ interface UseAddressMeta {
   meta: AddressMeta;
   name?: string;
   setName: React.Dispatch<string>;
-  saveName: () => void;
+  saveName: (cb?: (name: string) => void) => Promise<void>;
 }
 
 function useAddressMetaImpl(value?: string | null): UseAddressMeta {
@@ -58,25 +58,29 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
     };
   }, [value]);
 
-  const saveName = useCallback(() => {
-    if (!value || !name) return;
+  const saveName = useCallback(
+    async (cb?: (name: string) => void) => {
+      if (!value || !name) return;
 
-    if (name === meta.name) return;
+      if (name === meta.name) return;
 
-    try {
-      const pair = keyring.getPair(value);
+      try {
+        const pair = keyring.getPair(value);
 
-      keyring.saveAccountMeta(pair, { name });
+        keyring.saveAccountMeta(pair, { name });
 
-      if (isAccount(value)) {
-        service.updateAccountName(u8aToHex(decodeAddress(value)), name);
+        if (isAccount(value)) {
+          await service.updateAccountName(u8aToHex(decodeAddress(value)), name);
+          cb?.(name);
+        }
+
+        events.emit('account_meta_changed', value);
+      } catch (error) {
+        toastError(error);
       }
-
-      events.emit('account_meta_changed', value);
-    } catch (error) {
-      toastError(error);
-    }
-  }, [isAccount, meta.name, name, value]);
+    },
+    [isAccount, meta.name, name, value]
+  );
 
   return {
     meta,

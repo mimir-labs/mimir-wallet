@@ -4,8 +4,8 @@
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
-import { BN } from '@polkadot/util';
-import React, { useCallback, useState } from 'react';
+import { BN, bnToBn } from '@polkadot/util';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useApi, useCall, useGroupAccounts, useTxQueue } from '@mimirdev/hooks';
 
@@ -16,6 +16,7 @@ import InputNumber from './InputNumber';
 interface Props {
   open: boolean;
   defaultValue?: string | BN;
+  value?: string | BN | number;
   receipt?: string;
   onClose: () => void;
 }
@@ -48,10 +49,11 @@ function Action({ onClose, receipt, sending, value }: { receipt?: string; value?
     if (receipt && sending && value) {
       addQueue({
         extrinsic: api.tx.balances.transferKeepAlive(receipt, value),
-        accountId: sending
+        accountId: sending,
+        onResults: () => onClose()
       });
     }
-  }, [addQueue, api, receipt, sending, value]);
+  }, [addQueue, api.tx.balances, onClose, receipt, sending, value]);
 
   return (
     <DialogActions>
@@ -65,14 +67,31 @@ function Action({ onClose, receipt, sending, value }: { receipt?: string; value?
   );
 }
 
-function Fund({ defaultValue, onClose, open, receipt }: Props) {
+function Fund({ defaultValue, onClose, open, receipt, value: propsValue }: Props) {
+  const isControl = useRef(propsValue !== undefined);
   const [sending, setSending] = useState<string>();
-  const [value, setValue] = useState<BN>(new BN(defaultValue?.toString() || '0'));
+  const [value, setValue] = useState<BN>(bnToBn(propsValue) || bnToBn(defaultValue || '0'));
+
+  useEffect(() => {
+    if (isControl.current) {
+      propsValue && setValue(bnToBn(propsValue));
+    }
+  }, [propsValue]);
 
   return (
     <Dialog fullWidth onClose={onClose} open={open}>
       <DialogTitle>Fund</DialogTitle>
-      <Content receipt={receipt} sending={sending} setSending={setSending} setValue={setValue} value={value} />
+      <Content
+        receipt={receipt}
+        sending={sending}
+        setSending={setSending}
+        setValue={(value) => {
+          if (!isControl.current) {
+            setValue(value);
+          }
+        }}
+        value={value}
+      />
       <Action onClose={onClose} receipt={receipt} sending={sending} value={value} />
     </Dialog>
   );

@@ -14,9 +14,13 @@ interface Props extends IconButtonProps {
 function CopyButton({ value, ...props }: Props) {
   const [copied, copy] = useCopyClipboard();
 
-  const handleClick = useCallback(() => {
-    copy(value?.toString() || '');
-  }, [copy, value]);
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      copy(value?.toString() || '');
+    },
+    [copy, value]
+  );
 
   return (
     <IconButton color='inherit' onClick={handleClick} size='small' sx={{ opacity: 0.7 }} {...props}>

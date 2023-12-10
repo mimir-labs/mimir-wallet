@@ -14,6 +14,7 @@ function TopBar() {
   return (
     <Box
       sx={{
+        zIndex: 1,
         position: 'fixed',
         width: '100%',
         display: 'flex',

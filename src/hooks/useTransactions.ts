@@ -21,7 +21,9 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
 
     public top: Transaction | null;
     public parent: Transaction | null;
+    public cancelTx: Transaction | null;
     public children: Transaction[];
+    public cancelChildren: Transaction[];
 
     public uuid: string;
     public call: Call;
@@ -37,7 +39,9 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
       this.api = api;
       this.top = null;
       this.parent = null;
+      this.cancelTx = null;
       this.children = [];
+      this.cancelChildren = [];
       this.uuid = calldata.uuid;
       this.call = api.registry.createType('Call', calldata.metadata);
       this.sender = encodeAddress(calldata.sender);
@@ -47,7 +51,22 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
       this.index = calldata.index;
     }
 
+    private addCancelChild(transaction: Transaction): Transaction {
+      const existValue = this.cancelChildren.find((item) => item.uuid === transaction.uuid);
+
+      if (existValue) return existValue;
+
+      this.cancelChildren.push(transaction);
+      transaction.cancelTx = this;
+
+      return transaction;
+    }
+
     public addChild(transaction: Transaction): Transaction {
+      if (this.api.tx.multisig.cancelAsMulti.is(transaction.call)) {
+        return this.addCancelChild(transaction);
+      }
+
       const existValue = this.children.find((item) => item.uuid === transaction.uuid);
 
       if (existValue) return existValue;

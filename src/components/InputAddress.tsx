@@ -69,7 +69,10 @@ function InputAddress({
 
   const _onChange = (value: string) => {
     if (isAddress(value)) {
-      setValue(value);
+      if (!isControl.current) {
+        setValue(value);
+      }
+
       onChange?.(value);
     }
   };
@@ -148,6 +151,7 @@ function InputAddress({
               setOpen(false);
             }}
             selected={option === value}
+            sx={{ borderRadius: 1 }}
           >
             <AddressCell shorten={false} size='small' value={option} />
           </MenuItem>

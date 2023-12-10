@@ -7,13 +7,20 @@ import { addressEq, decodeAddress, encodeMultiAddress, isAddress as isAddressUti
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { AddAddressDialog, Input } from '@mimirdev/components';
+import { AddAddressDialog, Input, toastSuccess } from '@mimirdev/components';
 import { useAccounts, useAddresses, useAddressMeta, useApi, useSelectedAccountCallback, useToggle, useTransactions, useTxQueue } from '@mimirdev/hooks';
 import { CalldataStatus } from '@mimirdev/hooks/types';
 import { service } from '@mimirdev/utils';
 
 import AccountSelect from '../create-multisig/AccountSelect';
 import { useSelectMultisig } from '../create-multisig/useSelectMultisig';
+
+function checkError(signatories: string[], isThresholdValid: boolean, hasSoloAccount: boolean): [Error | null, Error | null] {
+  return [
+    signatories.length < 2 ? new Error('Please select at least two members') : hasSoloAccount ? null : new Error('You need add at least one local account'),
+    isThresholdValid ? null : new Error(`Threshold must great than 2 and less equal than ${signatories.length}`)
+  ];
+}
 
 function AccountSetting() {
   const navigate = useNavigate();
@@ -28,11 +35,23 @@ function AccountSetting() {
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig(meta.who);
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
   const [addOpen, toggleAdd] = useToggle();
+  const [addressError, setAddressError] = useState<Error | null>(null);
+  const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
 
   const { addQueue } = useTxQueue();
 
-  const _onClick = useCallback(() => {
-    saveName();
+  const checkField = useCallback((): boolean => {
+    const errors = checkError(signatories, isThresholdValid, hasSoloAccount);
+
+    setErrors(errors);
+
+    return !errors[0] && !errors[1];
+  }, [hasSoloAccount, isThresholdValid, signatories]);
+
+  const _onClick = useCallback(async () => {
+    if (!checkField()) return;
+
+    await saveName((name) => toastSuccess(`Save name to ${name} success`));
 
     if (!meta.who || !meta.threshold || !addressParam) return;
     const oldMultiAddress = encodeMultiAddress(meta.who, meta.threshold);
@@ -48,18 +67,21 @@ function AccountSetting() {
             false
           ),
         extrinsic: api.tx.utility.batchAll([api.tx.proxy.addProxy(newMultiAddress, 0, 0), api.tx.proxy.removeProxy(oldMultiAddress, 0, 0)]),
-        accountId: addressParam
+        accountId: addressParam,
+        onResults: () => toastSuccess('Create change member transaction success')
       });
     }
-  }, [saveName, meta, addressParam, signatories, threshold, addQueue, name, api.tx.utility, api.tx.proxy]);
+  }, [checkField, saveName, meta.who, meta.threshold, addressParam, signatories, threshold, addQueue, api.tx.utility, api.tx.proxy, name]);
 
   const _handleAdd = useCallback(() => {
-    if (address && isAddressValid) {
+    if (isAddressValid) {
       if (!isAddress(address) && !isAccount(address)) {
         toggleAdd();
       } else {
         select(address);
       }
+    } else {
+      setAddressError(new Error('Please input correct address'));
     }
   }, [address, isAccount, isAddress, isAddressValid, select, toggleAdd]);
 
@@ -105,9 +127,16 @@ function AccountSetting() {
                   Add
                 </Button>
               }
+              error={addressError}
               label='Add Members'
               onChange={(value) => {
-                setAddress({ isAddressValid: isAddressUtil(value), address: value });
+                const isAddressValid = isAddressUtil(value);
+
+                if (isAddressValid) {
+                  setAddressError(null);
+                }
+
+                setAddress({ isAddressValid, address: value });
               }}
               placeholder='input address'
             />
@@ -116,18 +145,13 @@ function AccountSetting() {
                 <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
                 <AccountSelect accounts={signatories} onClick={unselect} title='Multisig Members' type='delete' />
               </Box>
-              {!hasSoloAccount && <FormHelperText sx={{ color: 'error.main' }}>You need add at least one local account</FormHelperText>}
+              {memberError && <FormHelperText sx={{ color: 'error.main' }}>{memberError.message}</FormHelperText>}
             </Paper>
-            <Input
-              defaultValue={String(threshold)}
-              error={isThresholdValid ? null : new Error(`Threshold must great than 2 and less equal than ${signatories.length}`)}
-              label='Threshold'
-              onChange={_onChangeThreshold}
-            />
+            <Input defaultValue={String(threshold)} error={thresholdError} label='Threshold' onChange={_onChangeThreshold} />
           </Stack>
         </Paper>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button disabled={!hasSoloAccount || signatories.length < 2 || !name || !isThresholdValid} fullWidth onClick={_onClick}>
+          <Button disabled={!name} fullWidth onClick={_onClick}>
             Save
           </Button>
           <Button fullWidth variant='outlined'>
