@@ -1,1 +1,0 @@
-# @mimirdev/page-create-multisig
