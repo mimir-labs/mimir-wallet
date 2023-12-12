@@ -26,6 +26,7 @@
   },
   "include": [
     "craco.config.ts",
-    "src"
+    "src",
+    "lib"
   ]
 }

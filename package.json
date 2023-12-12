@@ -6,12 +6,15 @@
   "engines": {
     "node": ">=16"
   },
-  "packageManager": "yarn@4.0.0-rc.50",
+  "packageManager": "yarn@4.0.2",
   "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/mimir-labs/mimir-wallet.git"
   },
+  "workspaces": [
+    "lib"
+  ],
   "sideEffects": false,
   "type": "commonjs",
   "name": "mimir-wallet",
