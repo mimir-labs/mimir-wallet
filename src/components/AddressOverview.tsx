@@ -67,7 +67,7 @@ function makeNodes(
       source: parentId,
       target: nodeId,
       type: 'smoothstep',
-      style: { stroke: '#d9d9d9', strokeDasharray: 'none' },
+      style: { stroke: '#d9d9d9' },
       animated: true
     });
   }

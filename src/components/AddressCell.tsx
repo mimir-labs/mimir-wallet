@@ -40,7 +40,7 @@ function AddressCell({ isMe, shorten = true, showType = false, size = 'medium', 
 
   return (
     <>
-      <AddAddressDialog onClose={toggleOpen} open={open} />
+      {address && <AddAddressDialog defaultAddress={address} onClose={toggleOpen} open={open} />}
       <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
         <IdentityIcon className='AddressCell-Icon' isMe={isMe} size={iconSize} value={value} />
         <Stack className='AddressCell-Address' spacing={spacingCol}>
@@ -59,7 +59,15 @@ function AddressCell({ isMe, shorten = true, showType = false, size = 'medium', 
             <AddressComp shorten={shorten} value={address} />
             {withCopy && <CopyButton value={address} />}
             {!isAccount(value) && !isAddress(value) && (
-              <IconButton color='inherit' onClick={toggleOpen} size='small' sx={{ opacity: 0.7 }}>
+              <IconButton
+                color='inherit'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleOpen();
+                }}
+                size='small'
+                sx={{ opacity: 0.7 }}
+              >
                 <SvgIcon component={IconAddressBook} inheritViewBox />
               </IconButton>
             )}

@@ -1,33 +1,26 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Autocomplete, createFilterOptions, FilterOptionsState, FormControl, FormHelperText, InputAdornment, InputLabel, MenuItem, OutlinedInput } from '@mui/material';
+import { Box, Fade, FormHelperText, InputBase, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useToggle } from '@mimirdev/hooks';
 import { getAddressMeta } from '@mimirdev/utils';
 
 import AddressCell from './AddressCell';
 import FormatBalance from './FormatBalance';
-import IdentityIcon from './IdentityIcon';
 import { InputAddressProps } from './types';
 
-const filter = createFilterOptions<string>();
+function filterOptions(options: string[], input: string): string[] {
+  if (!input) return options;
 
-function filterOptions(options: string[], params: FilterOptionsState<string>): string[] {
-  const filtered = filter(options, params);
+  return options.filter((address) => {
+    const meta = getAddressMeta(address);
 
-  const { inputValue } = params;
-  // Suggest the creation of a new value
-  const isExisting = options.some((option) => inputValue === option);
-
-  if (isAddress(inputValue) && !isExisting) {
-    filtered.push(inputValue);
-  }
-
-  return filtered;
+    return address.toLowerCase().includes(input.toLowerCase()) || (meta.name ? meta.name.toLowerCase().includes(input.toLowerCase()) : false);
+  });
 }
 
 function createOptions(isSign: boolean, filtered?: string[]): string[] {
@@ -44,38 +37,43 @@ function createOptions(isSign: boolean, filtered?: string[]): string[] {
   return options;
 }
 
-function InputAddress({
-  balance,
-  defaultValue,
-  disabled,
-  endAdornment,
-  error,
-  filtered,
-  fullWidth,
-  isSign = false,
-  label,
-  onChange,
-  placeholder,
-  size,
-  startAdornment,
-  value: propsValue,
-  withBalance
-}: InputAddressProps) {
+function InputAddress({ balance, defaultValue, disabled, error, filtered, isSign = false, label, onChange, placeholder, value: propsValue, withBalance }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
   const [value, setValue] = useState<string>(isAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : '');
-  const [open, , setOpen] = useToggle();
+  const [inputValue, setInputValue] = useState<string>('');
+  const [focus, , setFocus] = useToggle();
+  const wrapper = useRef<HTMLDivElement | null>(null);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
+  const open = !!anchorEl;
 
-  const options = useMemo((): string[] => createOptions(isSign, filtered), [filtered, isSign]);
+  const options = useMemo((): string[] => filterOptions(createOptions(isSign, filtered), inputValue), [filtered, inputValue, isSign]);
 
-  const _onChange = (value: string) => {
-    if (isAddress(value)) {
-      if (!isControl.current) {
-        setValue(value);
+  const _onChange = useCallback(
+    (value: string) => {
+      if (isAddress(value)) {
+        if (!isControl.current) {
+          setValue(value);
+        }
+
+        onChange?.(value);
       }
+    },
+    [onChange]
+  );
 
-      onChange?.(value);
+  const handleFocus = useCallback(() => {
+    setAnchorEl(wrapper.current);
+    setFocus(true);
+  }, [setFocus]);
+
+  const handleBlur = useCallback(() => {
+    setAnchorEl(null);
+    setFocus(false);
+
+    if (isAddress(inputValue)) {
+      _onChange(inputValue);
     }
-  };
+  }, [_onChange, inputValue, setFocus]);
 
   useEffect(() => {
     if (isControl.current) {
@@ -83,84 +81,66 @@ function InputAddress({
     }
   }, [propsValue]);
 
-  return (
-    <Autocomplete<string, undefined, true, true>
-      disableClearable
-      disableListWrap
-      disabled={disabled}
-      filterOptions={filterOptions}
-      fullWidth={fullWidth}
-      isOptionEqualToValue={(value) => isAddress(value)}
-      onChange={(_, newValue) => {
-        _onChange(newValue);
-      }}
-      open={open}
-      options={options}
-      renderInput={(params) => {
-        const name = params.inputProps.value ? getAddressMeta(params.inputProps.value as string)?.name : null;
+  const width = wrapper.current?.clientWidth;
 
-        return (
-          <FormControl color={error ? 'error' : undefined} error={!!error} fullWidth={params.fullWidth}>
-            {label && (
-              <InputLabel {...params.InputLabelProps} shrink>
-                {label}
-              </InputLabel>
-            )}
-            <OutlinedInput
-              {...params.InputProps}
-              defaultValue={defaultValue}
-              disabled={params.disabled}
-              endAdornment={
-                <InputAdornment position='end'>
-                  {endAdornment}
-                  {params.InputProps.endAdornment}
-                </InputAdornment>
-              }
-              inputProps={{ ...params.inputProps, value: open ? params.inputProps.value : name || params.inputProps.value }}
-              onBlur={(e) => {
-                setOpen(false);
-                _onChange(e.target.value);
-              }}
-              onClick={() => {
-                setOpen(true);
-              }}
-              placeholder={placeholder}
-              startAdornment={
-                <InputAdornment position='start'>
-                  <IdentityIcon size={20} value={value} />
-                  {startAdornment}
-                </InputAdornment>
-              }
-            />
-            {error ? <FormHelperText>{error.message}</FormHelperText> : null}
-            {withBalance ? (
-              <FormHelperText>
-                Balance:
-                <FormatBalance value={balance} />
-              </FormHelperText>
-            ) : null}
-          </FormControl>
-        );
-      }}
-      renderOption={(_, option, { index }) => {
-        return (
-          <MenuItem
-            key={index}
-            onClick={() => {
-              _onChange(option);
-              setOpen(false);
-            }}
-            selected={option === value}
-            sx={{ borderRadius: 1 }}
-          >
-            <AddressCell shorten={false} size='small' value={option} />
-          </MenuItem>
-        );
-      }}
-      selectOnFocus
-      size={size}
-      value={value}
-    />
+  return (
+    <Box>
+      <Typography sx={{ fontWeight: 700, marginBottom: 1, color: focus ? 'primary.main' : 'inherit' }}>{label}</Typography>
+      <Box
+        ref={wrapper}
+        sx={{
+          position: 'relative',
+          padding: 1,
+          borderRadius: 1,
+          border: '1px solid',
+          borderColor: focus ? 'primary.main' : 'grey.300',
+          '.AddressCell-Address': {
+            transition: 'all 0.15s',
+            opacity: focus || !value ? 0 : 1,
+            pointerEvents: focus || !value ? 'none' : undefined
+          }
+        }}
+      >
+        <AddressCell shorten={false} size='small' value={value} />
+        <InputBase
+          disabled={disabled}
+          onBlur={handleBlur}
+          onChange={(e) => setInputValue(e.target.value)}
+          onFocus={handleFocus}
+          placeholder={placeholder}
+          sx={{ opacity: focus ? 1 : 0, paddingLeft: 4.5, position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+          value={inputValue}
+        />
+        <Popper anchorEl={anchorEl} open={open} sx={{ width, zIndex: 1300 }} transition>
+          {({ TransitionProps }) => (
+            <Fade {...TransitionProps} timeout={350}>
+              <Paper sx={{ maxHeight: 280, overflowY: 'scroll' }}>
+                <MenuList>
+                  {options.length > 0 ? (
+                    options.map((item, index) => (
+                      <MenuItem key={index} onClick={() => _onChange(item)}>
+                        <AddressCell shorten={false} size='small' value={item} />
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <Typography color='text.secondary' sx={{ paddingX: 1 }}>
+                      No Address found
+                    </Typography>
+                  )}
+                </MenuList>
+              </Paper>
+            </Fade>
+          )}
+        </Popper>
+      </Box>
+      {withBalance && (
+        <Typography sx={{ marginTop: 0.5, fontSize: '0.75rem', color: 'text.secondary' }}>
+          Balance:
+          <FormatBalance value={balance} />
+        </Typography>
+      )}
+      {error && <FormHelperText sx={{ color: 'error.main' }}>{error.message}</FormHelperText>}
+    </Box>
   );
 }
 

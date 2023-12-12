@@ -5,7 +5,7 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { BN } from '@polkadot/util';
 
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { InputAddress, InputNumber } from '@mimirdev/components';
@@ -21,12 +21,25 @@ function PageTransfer() {
   const { addQueue } = useTxQueue();
   const filtered = useVisibleAccounts();
   const { allAddresses } = useAddresses();
+  const [amountError, setAmountError] = useState<Error | null>(null);
 
   const sendingBalances = useCall<DeriveBalancesAll>(api.derive.balances.all, [sending]);
   const recipientBalances = useCall<DeriveBalancesAll>(api.derive.balances.all, [recipient]);
 
+  useEffect(() => {
+    if (amount && !isNaN(Number(amount))) {
+      setAmountError(null);
+    }
+  }, [amount]);
+
   const handleClick = useCallback(() => {
     if (recipient && sending && amount) {
+      if (isNaN(Number(amount))) {
+        setAmountError(new Error('Please input number value'));
+
+        return;
+      }
+
       addQueue({
         extrinsic: api.tx.balances.transferKeepAlive(recipient, amount),
         accountId: sending
@@ -45,7 +58,7 @@ function PageTransfer() {
           <InputAddress balance={sendingBalances?.freeBalance} filtered={filtered} isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} withBalance />
           <Divider />
           <InputAddress balance={recipientBalances?.freeBalance} filtered={filtered.concat(allAddresses)} label='Recipient' onChange={setRecipient} placeholder='Recipient' withBalance />
-          <InputNumber label='Amount' maxValue={sendingBalances?.freeBalance} onChange={setAmount} placeholder='Input amount' withMax />
+          <InputNumber error={amountError} label='Amount' maxValue={sendingBalances?.freeBalance} onChange={setAmount} placeholder='Input amount' withMax />
           <Button disabled={!amount || !recipient} fullWidth onClick={handleClick}>
             Review
           </Button>

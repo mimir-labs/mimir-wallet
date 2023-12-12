@@ -3,12 +3,10 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { isHex } from '@polkadot/util';
-import { encodeAddress } from '@polkadot/util-crypto';
 import React from 'react';
 
 function Address({ shorten, value }: { shorten?: boolean; value?: AccountId | AccountIndex | Address | string | null }) {
-  const address = isHex(value) ? encodeAddress(value) : value?.toString();
+  const address = value?.toString();
 
   return shorten ? `${address?.slice(0, 6)}…${address?.slice(-6)}` : address;
 }

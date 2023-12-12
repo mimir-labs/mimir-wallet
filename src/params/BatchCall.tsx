@@ -13,6 +13,7 @@ import { AddressRow } from '@mimirdev/components';
 import { useAddressMeta } from '@mimirdev/hooks';
 
 import Item from './Param/Item';
+import FallbackCall from './FallbackCall';
 
 function matchChangeMember(api: ApiPromise, call: IMethod | Call): [string, string] | null {
   if (api.tx.utility.batchAll.is(call)) {
@@ -66,7 +67,7 @@ function BatchCall({ api, call, type = 'base' }: CallProps) {
   const changes = useMemo(() => matchChangeMember(api, call), [api, call]);
 
   if (!changes) {
-    return null;
+    return <FallbackCall call={call} />;
   }
 
   return <ChangeMember api={api} call={call} changes={changes} type={type} />;

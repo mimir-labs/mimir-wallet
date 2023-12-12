@@ -74,6 +74,7 @@ function InputNumber({ defaultValue, maxValue, onChange, value: propsValue, with
 
   return (
     <Input
+      type='number'
       {...props}
       defaultValue={_defaultValue}
       endAdornment={

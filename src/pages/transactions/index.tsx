@@ -17,11 +17,7 @@ function MultisigList({ address }: { address: string }) {
     return transactions
       .sort((l, r) => (r.initTransaction.height || 0) - (l.initTransaction.height || 0))
       .filter((item) => {
-        if (item.top) {
-          return type === 'pending' ? item.top.status < CalldataStatus.Success && item.status < CalldataStatus.Success : item.top.status > CalldataStatus.Pending;
-        } else {
-          return type === 'pending' ? item.status < CalldataStatus.Success : item.status > CalldataStatus.Pending;
-        }
+        return type === 'pending' ? item.status < CalldataStatus.Success : item.status > CalldataStatus.Pending;
       });
   }, [transactions, type]);
 

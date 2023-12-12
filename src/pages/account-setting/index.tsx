@@ -3,7 +3,7 @@
 
 import { Box, Button, FormHelperText, Paper, Stack, Typography } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
-import { addressEq, decodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
+import { addressEq, decodeAddress, encodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -94,7 +94,6 @@ function AccountSetting() {
 
   return (
     <>
-      <AddAddressDialog address={address} onAdded={select} onClose={toggleAdd} open={addOpen} />
       <Stack spacing={2} sx={{ width: 500, maxWidth: '100%', margin: '0 auto' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Button onClick={() => navigate(-1)} size='small' variant='outlined'>
@@ -136,9 +135,10 @@ function AccountSetting() {
                   setAddressError(null);
                 }
 
-                setAddress({ isAddressValid, address: value });
+                setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value) : value });
               }}
               placeholder='input address'
+              value={address}
             />
             <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
@@ -159,6 +159,7 @@ function AccountSetting() {
           </Button>
         </Box>
       </Stack>
+      {address && isAddressValid && <AddAddressDialog defaultAddress={address} onAdded={select} onClose={toggleAdd} open={addOpen} />}
     </>
   );
 }

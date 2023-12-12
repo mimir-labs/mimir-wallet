@@ -44,7 +44,7 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
 
   return (
     <>
-      <Fund onClose={toggleOpen} open={open} receipt={address?.toString()} value={value?.toString()} />
+      {value && address && <Fund defaultValue={value.toString()} onClose={toggleOpen} open={open} receipt={address.toString()} />}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {icon}

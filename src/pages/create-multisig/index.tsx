@@ -75,7 +75,6 @@ function PageCreateMultisig() {
 
   return (
     <>
-      <AddAddressDialog address={address} onAdded={select} onClose={toggleAdd} open={addOpen} />
       <Box sx={{ width: 500, maxWidth: '100%', margin: '0 auto' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Button onClick={prepare ? _onFlexibleCancel : () => navigate(-1)} size='small' variant='outlined'>
@@ -100,9 +99,12 @@ function PageCreateMultisig() {
               <Input label='Name' onChange={setName} placeholder='input multisig account name' value={name} />
               <Input
                 endButton={
-                  <Button onClick={handleAdd} variant='contained'>
-                    Add
-                  </Button>
+                  <>
+                    <Button onClick={handleAdd} variant='contained'>
+                      Add
+                    </Button>
+                    {address && isAddressValid && <AddAddressDialog defaultAddress={address} onAdded={select} onClose={toggleAdd} open={addOpen} />}
+                  </>
                 }
                 error={addressError}
                 label='Add Members'
@@ -113,9 +115,10 @@ function PageCreateMultisig() {
                     setAddressError(null);
                   }
 
-                  setAddress({ isAddressValid, address: value });
+                  setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value) : value });
                 }}
                 placeholder='input address'
+                value={address}
               />
               <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>

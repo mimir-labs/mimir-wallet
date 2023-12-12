@@ -62,7 +62,8 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
           borderRadius: '50%',
           color: 'common.white',
           fontWeight: 800,
-          fontSize: Math.min(16, size / 2)
+          fontSize: Math.min(16, size / 2),
+          lineHeight: 1
         }}
       >
         Me
@@ -75,7 +76,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
       className={`${className} IdentityIcon`}
       component='span'
       onClick={_onClick}
-      sx={{ cursor: onClick ? 'pointer' : undefined, position: 'relative', width: size, height: size, bgcolor: 'secondary.main', borderRadius: '50%' }}
+      sx={{ cursor: onClick ? 'pointer' : undefined, position: 'relative', width: size, height: size + (isMultisig ? 6 + size / 16 : 0), bgcolor: 'secondary.main', borderRadius: '50%' }}
     >
       <PolkadotIcon address={address} publicKey={publicKey} size={size} />
       {isMultisig && (
@@ -85,7 +86,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: -(6 + size / 16),
+            bottom: 0,
             height: 12 + size / 8,
             display: 'flex',
             alignItems: 'center',

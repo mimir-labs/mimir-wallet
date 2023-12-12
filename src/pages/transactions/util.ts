@@ -86,6 +86,22 @@ export function removeMultisigDeepFiltered(transaction: Transaction, filtered: F
   });
 }
 
+export function removeEmptyMultisigFiltered(filtered: Filtered): void {
+  Object.keys(filtered).forEach((address) => {
+    const meta = getAddressMeta(address);
+
+    const _filtered = filtered[address];
+
+    if (!_filtered) return;
+
+    if (meta.isMultisig && Object.keys(_filtered).length === 0) {
+      delete filtered[address];
+    } else {
+      removeEmptyMultisigFiltered(_filtered);
+    }
+  });
+}
+
 export function checkFiltered(filtered: Filtered): boolean {
   const addresses = Object.keys(filtered);
   let canApprove = false;
@@ -101,8 +117,12 @@ export function checkFiltered(filtered: Filtered): boolean {
       }
     } else {
       if (keyring.getAccount(address)) {
-        return true;
+        canApprove = true;
       }
+    }
+
+    if (canApprove) {
+      break;
     }
   }
 

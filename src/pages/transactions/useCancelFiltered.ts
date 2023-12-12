@@ -11,7 +11,7 @@ import { useAddressMeta } from '@mimirdev/hooks';
 import { CalldataStatus, type Transaction } from '@mimirdev/hooks/types';
 import { getAddressMeta } from '@mimirdev/utils';
 
-import { checkFiltered, extraFiltered } from './util';
+import { checkFiltered, extraFiltered, removeEmptyMultisigFiltered } from './util';
 
 async function extraCancelFiltered(api: ApiPromise, transaction: Transaction, filtered: Filtered): Promise<void> {
   const meta = getAddressMeta(transaction.sender);
@@ -59,6 +59,7 @@ export function useCancelFiltered(api: ApiPromise, transaction: Transaction): [f
     const filtered = extraFiltered(transaction.sender);
 
     extraCancelFiltered(api, transaction, filtered).then(() => {
+      removeEmptyMultisigFiltered(filtered);
       setFiltered(filtered);
       setCanCancel(checkFiltered(filtered));
     });

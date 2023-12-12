@@ -3,10 +3,10 @@
 
 import type { Filtered } from '@mimirdev/hooks/ctx/types';
 
-import { Alert, Box, Button } from '@mui/material';
+import { Box, Button, SvgIcon } from '@mui/material';
 import React, { useCallback } from 'react';
 
-import { ReactComponent as IconWaitingFill } from '@mimirdev/assets/svg/icon-waiting-fill.svg';
+import { ReactComponent as IconInfoFill } from '@mimirdev/assets/svg/icon-info-fill.svg';
 import { useApi, useTxQueue } from '@mimirdev/hooks';
 import { CalldataStatus, type Transaction } from '@mimirdev/hooks/types';
 
@@ -56,7 +56,7 @@ function Operate({ transaction }: { transaction: Transaction }) {
       <Box>
         {cancelFiltered && canCancel && (
           <Button onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
-            Fund
+            Unlock
           </Button>
         )}
       </Box>
@@ -75,9 +75,10 @@ function Operate({ transaction }: { transaction: Transaction }) {
           )}
         </Box>
         {!canApprove && (
-          <Alert icon={<IconWaitingFill />} severity='warning'>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <SvgIcon color='warning' component={IconInfoFill} inheritViewBox />
             Waiting for other {"members's"} approvement
-          </Alert>
+          </Box>
         )}
       </>
     ))

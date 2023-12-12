@@ -7,9 +7,9 @@ import React, { useCallback, useState } from 'react';
 
 import Input from './Input';
 
-function AddAddressDialog({ address: propAddress, onAdded, onClose, open }: { address?: string; open: boolean; onAdded?: (address: string) => void; onClose?: () => void }) {
+function AddAddressDialog({ defaultAddress, onAdded, onClose, open }: { defaultAddress?: string; open: boolean; onAdded?: (address: string) => void; onClose?: () => void }) {
   const [name, setName] = useState<string>('');
-  const [address, setAddress] = useState<string>('');
+  const [address, setAddress] = useState<string | undefined>(defaultAddress);
 
   const _onChangeAddress = useCallback((addressInput: string) => {
     let address = '';
@@ -26,17 +26,17 @@ function AddAddressDialog({ address: propAddress, onAdded, onClose, open }: { ad
 
   const _onCommit = useCallback((): void => {
     try {
-      const _address = propAddress || address;
+      if (!address) return;
 
-      keyring.saveAddress(_address, { name: name.trim() });
-      onAdded?.(_address);
+      keyring.saveAddress(address, { name: name.trim() });
+      onAdded?.(address);
     } catch {}
 
     onClose?.();
-  }, [address, name, onAdded, onClose, propAddress]);
+  }, [address, name, onAdded, onClose]);
 
   return (
-    <Dialog fullWidth maxWidth='sm' onClose={onClose} open={open}>
+    <Dialog fullWidth maxWidth='sm' onClick={(e) => e.stopPropagation()} onClose={onClose} open={open}>
       <DialogTitle>
         <Typography textAlign='center' variant='h4'>
           Add New Contact
@@ -46,11 +46,11 @@ function AddAddressDialog({ address: propAddress, onAdded, onClose, open }: { ad
       <DialogContent>
         <Stack spacing={2}>
           <Input label='Name' onChange={setName} placeholder='input name for contact' value={name} />
-          <Input label='Address' onChange={_onChangeAddress} placeholder='input address' value={propAddress || address} />
+          <Input label='Address' onChange={_onChangeAddress} placeholder='input address' value={address} />
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button fullWidth onClick={_onCommit} variant='contained'>
+        <Button disabled={!name || !address} fullWidth onClick={_onCommit} variant='contained'>
           Save
         </Button>
         <Button fullWidth onClick={onClose} variant='outlined'>

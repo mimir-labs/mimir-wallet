@@ -7,6 +7,7 @@ import type { IMethod } from '@polkadot/types/types';
 import type { CallProps } from './types';
 
 import React, { useMemo } from 'react';
+import ReactJson from 'react-json-view';
 
 import BatchCall from './BatchCall';
 import CancelCall from './CancelCall';
@@ -28,7 +29,7 @@ function Call({ api, call, type, ...props }: CallProps) {
   } else if (action.startsWith('balances.')) {
     return <TransferCall api={api} call={call} type={type} {...props} />;
   } else {
-    return null;
+    return <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} />;
   }
 }
 

@@ -19,7 +19,7 @@ function Extrinsic({ detailOpen, relatedTxs, toggleDetailOpen, transaction }: { 
   const destTx = transaction.top || transaction;
   const { api } = useApi();
   const status = transaction.status;
-  const time = useBlockTime(transaction.initTransaction.height);
+  const time = useBlockTime(transaction.status < CalldataStatus.Success ? transaction.initTransaction.height : transaction.height);
   const selectAccount = useSelectedAccountCallback();
 
   return (

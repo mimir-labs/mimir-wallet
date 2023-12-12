@@ -44,10 +44,6 @@ export interface InputAddressProps {
   label?: React.ReactNode;
   error?: Error | null;
   placeholder?: string;
-  fullWidth?: boolean;
-  size?: 'medium' | 'small';
-  endAdornment?: React.ReactNode;
-  startAdornment?: React.ReactNode;
   onChange?: (value: string) => void;
   withBalance?: boolean;
   balance?: BN | string | number | null;
