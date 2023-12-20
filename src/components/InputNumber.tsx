@@ -4,11 +4,10 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { InputNumberProps } from './types';
 
+import { useApi } from '@mimir-wallet/hooks';
 import { Box, Button } from '@mui/material';
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { useApi } from '@mimirdev/hooks';
 
 import FormatBalance from './FormatBalance';
 import Input from './Input';

@@ -1,6 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
+import { service } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
@@ -8,9 +10,6 @@ import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { useSelectedAccountCallback, useToggle } from '@mimirdev/hooks';
-import { service } from '@mimirdev/utils';
 
 interface Props {
   name?: string;

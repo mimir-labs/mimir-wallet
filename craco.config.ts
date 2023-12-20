@@ -10,7 +10,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 export default {
   webpack: {
     alias: {
-      '@mimirdev': resolve(__dirname, 'src')
+      '@mimir-wallet': resolve(__dirname, 'src'),
+      '@mimirdev/inject': '@mimirdev/inject/src'
     },
     configure: (config) => {
       // Configure webpack optimization:

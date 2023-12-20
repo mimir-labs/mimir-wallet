@@ -1,16 +1,15 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AddAddressDialog, Input, toastSuccess } from '@mimir-wallet/components';
+import { useAccounts, useAddresses, useAddressMeta, useApi, useSelectedAccountCallback, useToggle, useTransactions, useTxQueue } from '@mimir-wallet/hooks';
+import { CalldataStatus } from '@mimir-wallet/hooks/types';
+import { service } from '@mimir-wallet/utils';
 import { Box, Button, FormHelperText, Paper, Stack, Typography } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { addressEq, decodeAddress, encodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
-import { AddAddressDialog, Input, toastSuccess } from '@mimirdev/components';
-import { useAccounts, useAddresses, useAddressMeta, useApi, useSelectedAccountCallback, useToggle, useTransactions, useTxQueue } from '@mimirdev/hooks';
-import { CalldataStatus } from '@mimirdev/hooks/types';
-import { service } from '@mimirdev/utils';
 
 import AccountSelect from '../create-multisig/AccountSelect';
 import { useSelectMultisig } from '../create-multisig/useSelectMultisig';
@@ -67,8 +66,7 @@ function AccountSetting() {
             false
           ),
         extrinsic: api.tx.utility.batchAll([api.tx.proxy.addProxy(newMultiAddress, 0, 0), api.tx.proxy.removeProxy(oldMultiAddress, 0, 0)]),
-        accountId: addressParam,
-        onResults: () => toastSuccess('Create change member transaction success')
+        accountId: addressParam
       });
     }
   }, [checkField, saveName, meta.who, meta.threshold, addressParam, signatories, threshold, addQueue, api.tx.utility, api.tx.proxy, name]);
@@ -116,7 +114,7 @@ function AccountSetting() {
               }}
               sx={{ cursor: 'pointer', marginBottom: 2, fontWeight: 700 }}
             >
-              {pendingTxs.length} Pending Transaction
+              Please process {pendingTxs.length} Pending Transaction first
             </Box>
           )}
           <Stack spacing={2} sx={{ opacity: pendingTxs.length > 0 ? 0.5 : undefined, pointerEvents: pendingTxs.length > 0 ? 'none' : undefined }}>
@@ -127,7 +125,7 @@ function AccountSetting() {
                 </Button>
               }
               error={addressError}
-              label='Add Members'
+              label='Change Member'
               onChange={(value) => {
                 const isAddressValid = isAddressUtil(value);
 

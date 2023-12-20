@@ -1,48 +1,61 @@
 {
-  "author": "jarvandev",
+  "author": "dev.mimir",
+  "browserslist": {
+    "production": [
+      "chrome >= 67",
+      "edge >= 79",
+      "firefox >= 68",
+      "opera >= 54",
+      "safari >= 14"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
-  "homepage": "",
-  "license": "Apache-2.0",
   "engines": {
     "node": ">=16"
   },
+  "homepage": "/",
+  "license": "Apache-2.0",
+  "name": "mimir-wallet",
   "packageManager": "yarn@4.0.2",
   "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/mimir-labs/mimir-wallet.git"
   },
-  "workspaces": [
-    "lib"
-  ],
   "sideEffects": false,
   "type": "commonjs",
-  "name": "mimir-wallet",
   "version": "0.0.0",
+  "workspaces": [
+    "inject"
+  ],
   "scripts": {
+    "build": "yarn build:code && yarn bundle:inject && yarn build:wallet",
+    "build:code": "yarn mimir-dev-build-ts",
+    "build:wallet": "craco build",
+    "bundle:inject": "yarn workspace @mimirdev/inject run bundle && cp inject/build/mimir-injectd.min.js public/mimir-injectd.min.js",
+    "lint": "mimir-dev-run-lint",
     "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "lint": "mimir-dev-run-lint"
-  },
-  "resolutions": {
-    "abitype": "0.9.8",
-    "typescript": "5.2.2"
+    "test": "craco test"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/lab": "^5.0.0-alpha.149",
     "@mui/material": "^5.14.14",
-    "@polkadot/api": "^10.10.1",
-    "@polkadot/api-derive": "^10.10.1",
-    "@polkadot/extension-dapp": "^0.46.5",
-    "@polkadot/extension-inject": "^0.46.5",
-    "@polkadot/react-identicon": "^3.6.3",
-    "@polkadot/types": "^10.10.1",
-    "@polkadot/ui-keyring": "^3.6.3",
-    "@polkadot/util": "^12.5.1",
-    "@polkadot/util-crypto": "^12.5.1",
+    "@polkadot/api": "^10.11.1",
+    "@polkadot/api-derive": "^10.11.1",
+    "@polkadot/extension-dapp": "^0.46.6",
+    "@polkadot/extension-inject": "^0.46.6",
+    "@polkadot/react-identicon": "^3.6.4",
+    "@polkadot/types": "^10.11.1",
+    "@polkadot/ui-keyring": "^3.6.4",
+    "@polkadot/util": "^12.6.1",
+    "@polkadot/util-crypto": "^12.6.1",
     "copy-to-clipboard": "^3.3.3",
     "eventemitter3": "^5.0.1",
     "lottie-web": "^5.12.2",
@@ -61,7 +74,7 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@craco/types": "^7.1.0",
-    "@mimirdev/dev": "^0.2.0",
+    "@mimirdev/dev": "^0.3.0",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.5.1",
@@ -72,18 +85,8 @@
     "crypto-browserify": "^3.12.0",
     "react-scripts": "^5.0.1"
   },
-  "browserslist": {
-    "production": [
-      "chrome >= 67",
-      "edge >= 79",
-      "firefox >= 68",
-      "opera >= 54",
-      "safari >= 14"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "resolutions": {
+    "abitype": "0.9.8",
+    "typescript": "5.2.2"
   }
 }

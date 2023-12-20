@@ -3,11 +3,10 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
+import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
+import { useAccounts, useAddresses, useAddressMeta, useToggle } from '@mimir-wallet/hooks';
 import { Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
-
-import { ReactComponent as IconAddressBook } from '@mimirdev/assets/svg/icon-address-book.svg';
-import { useAccounts, useAddresses, useAddressMeta, useToggle } from '@mimirdev/hooks';
 
 import AddAddressDialog from './AddAddressDialog';
 import AddressComp from './Address';

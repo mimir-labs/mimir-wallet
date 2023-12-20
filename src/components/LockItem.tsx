@@ -5,16 +5,16 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
+import { ReactComponent as IconFail } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
+import { ReactComponent as IconLock } from '@mimir-wallet/assets/svg/icon-lock.svg';
+import { ReactComponent as IconQuestion } from '@mimir-wallet/assets/svg/icon-question.svg';
+import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
+import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
+import { ReactComponent as IconUnLock } from '@mimir-wallet/assets/svg/icon-unlock.svg';
+import { useApi, useCall, useToggle } from '@mimir-wallet/hooks';
 import { Box, IconButton, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
-
-import { ReactComponent as IconLock } from '@mimirdev/assets/svg/icon-lock.svg';
-import { ReactComponent as IconQuestion } from '@mimirdev/assets/svg/icon-question.svg';
-import { ReactComponent as IconSuccess } from '@mimirdev/assets/svg/icon-success-fill.svg';
-import { ReactComponent as IconTransfer } from '@mimirdev/assets/svg/icon-transfer.svg';
-import { ReactComponent as IconUnLock } from '@mimirdev/assets/svg/icon-unlock.svg';
-import { useApi, useCall, useToggle } from '@mimirdev/hooks';
 
 import AddressName from './AddressName';
 import FormatBalance from './FormatBalance';
@@ -64,7 +64,7 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
           <Typography>
             <FormatBalance value={value} />
           </Typography>
-          {!isUnLock && isEnought && <SvgIcon color='primary' component={IconSuccess} fontSize='medium' inheritViewBox />}
+          <SvgIcon color='primary' component={!isUnLock && isEnought ? IconSuccess : IconFail} fontSize='medium' inheritViewBox />
         </Box>
       </Box>
     </>

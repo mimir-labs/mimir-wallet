@@ -5,11 +5,10 @@ import type { Compact } from '@polkadot/types';
 import type { Registry } from '@polkadot/types/types';
 import type { BN } from '@polkadot/util';
 
+import { useApi } from '@mimir-wallet/hooks';
 import { Box } from '@mui/material';
 import { formatBalance } from '@polkadot/util';
 import React, { useMemo } from 'react';
-
-import { useApi } from '@mimirdev/hooks';
 
 interface Props {
   format?: [decimals: number, unit: string];

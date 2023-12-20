@@ -16,5 +16,12 @@ export const dapps: DappOption[] = [
     name: 'Transfer',
     description: 'Transfer',
     url: '/transfer'
+  },
+  {
+    internal: false,
+    icon: '/dapp-icons/apps.svg',
+    name: 'Apps',
+    description: 'Polkadot/Substrate Portal, hosted by mimir',
+    url: 'https://apps.mimir.global'
   }
 ];

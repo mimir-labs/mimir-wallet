@@ -1,21 +1,20 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as ArrowRight } from '@mimir-wallet/assets/svg/ArrowRight.svg';
+import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
+import { ReactComponent as IconCopy } from '@mimir-wallet/assets/svg/icon-copy.svg';
+import { ReactComponent as IconDapp } from '@mimir-wallet/assets/svg/icon-dapp.svg';
+import { ReactComponent as IconExternal } from '@mimir-wallet/assets/svg/icon-external.svg';
+import { ReactComponent as IconHome } from '@mimir-wallet/assets/svg/icon-home.svg';
+import { ReactComponent as IconQr } from '@mimir-wallet/assets/svg/icon-qr.svg';
+import { ReactComponent as IconTransaction } from '@mimir-wallet/assets/svg/icon-transaction.svg';
+import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
+import { AccountMenu, AddressCell, BalanceFree, NetworkIcon } from '@mimir-wallet/components';
+import { useApi, useSelectedAccount } from '@mimir-wallet/hooks';
 import { Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
-
-import { ReactComponent as ArrowRight } from '@mimirdev/assets/svg/ArrowRight.svg';
-import { ReactComponent as IconAddressBook } from '@mimirdev/assets/svg/icon-address-book.svg';
-import { ReactComponent as IconCopy } from '@mimirdev/assets/svg/icon-copy.svg';
-import { ReactComponent as IconDapp } from '@mimirdev/assets/svg/icon-dapp.svg';
-import { ReactComponent as IconExternal } from '@mimirdev/assets/svg/icon-external.svg';
-import { ReactComponent as IconProfile } from '@mimirdev/assets/svg/icon-profile.svg';
-import { ReactComponent as IconQr } from '@mimirdev/assets/svg/icon-qr.svg';
-import { ReactComponent as IconTransaction } from '@mimirdev/assets/svg/icon-transaction.svg';
-import { ReactComponent as IconTransfer } from '@mimirdev/assets/svg/icon-transfer.svg';
-import { AccountMenu, AddressCell, BalanceFree, NetworkIcon } from '@mimirdev/components';
-import { useApi, useSelectedAccount } from '@mimirdev/hooks';
 
 function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<any>; label: React.ReactNode }) {
   const navigate = useNavigate();
@@ -102,7 +101,7 @@ function SideBar() {
             <SvgIcon component={IconTransfer} inheritViewBox />
           </IconButton>
         </Paper>
-        <NavLink Icon={IconProfile} label='Profile' to='/' />
+        <NavLink Icon={IconHome} label='Home' to='/' />
         <NavLink Icon={IconDapp} label='Dapp' to='/dapp' />
         <NavLink Icon={IconTransaction} label='Transactions' to='/transactions' />
         <NavLink Icon={IconAddressBook} label='Address Book' to='/address-book' />

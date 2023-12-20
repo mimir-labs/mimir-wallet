@@ -4,11 +4,10 @@
 import type { DeriveAccountRegistration } from '@polkadot/api-derive/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
+import { useAddressMeta, useApi, useDeriveAccountInfo } from '@mimir-wallet/hooks';
 import { Box } from '@mui/material';
 import { isFunction } from '@polkadot/util';
 import React, { useEffect, useState } from 'react';
-
-import { useAddressMeta, useApi, useDeriveAccountInfo } from '@mimirdev/hooks';
 
 interface Props {
   defaultName?: string;
@@ -28,6 +27,8 @@ function extractName(address: string): React.ReactNode {
   if (displayCached) {
     return displayCached;
   }
+
+  return '';
 }
 
 function extractIdentity(address: string, identity: DeriveAccountRegistration): React.ReactNode {

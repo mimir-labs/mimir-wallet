@@ -1,9 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { service } from '@mimir-wallet/utils';
 import useSWR from 'swr';
-
-import { service } from '@mimirdev/utils';
 
 import { CacheMultisig } from './types';
 import { useAccounts } from './useAccounts';

@@ -1,7 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Transaction } from '@mimirdev/hooks/types';
+import type { Transaction } from '@mimir-wallet/hooks/types';
 import type { CallProps } from './types';
 
 import { Typography } from '@mui/material';
@@ -11,9 +11,9 @@ import { Link } from 'react-router-dom';
 import Item from './Param/Item';
 import FallbackCall from './FallbackCall';
 
-function CancelCall({ call, selectAccount, tx, type = 'base' }: CallProps & { tx?: Transaction; selectAccount?: (value: string) => void }) {
+function CancelCall({ call, jsonFallback, selectAccount, tx, type = 'base' }: CallProps & { tx?: Transaction; selectAccount?: (value: string) => void }) {
   if (!tx || !tx.cancelTx) {
-    return <FallbackCall call={call} />;
+    return jsonFallback ? <FallbackCall call={call} /> : null;
   }
 
   const cancelTx = tx.cancelTx.top || tx.cancelTx;

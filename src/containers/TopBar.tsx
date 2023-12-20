@@ -1,12 +1,11 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import Logo from '@mimir-wallet/assets/images/logo.png';
+import { ReactComponent as IconSetting } from '@mimir-wallet/assets/svg/icon-set.svg';
+import { useApi } from '@mimir-wallet/hooks';
 import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
 import { Link } from 'react-router-dom';
-
-import Logo from '@mimirdev/assets/images/logo.png';
-import { ReactComponent as IconSetting } from '@mimirdev/assets/svg/icon-set.svg';
-import { useApi } from '@mimirdev/hooks';
 
 function TopBar() {
   const { isApiReady } = useApi();

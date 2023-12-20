@@ -3,3 +3,4 @@
 
 export * from './api';
 export * from './dapp';
+export * from './tokens';

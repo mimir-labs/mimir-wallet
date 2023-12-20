@@ -6,18 +6,17 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { PrepareFlexible } from './types';
 
+import { ReactComponent as IconQuestion } from '@mimir-wallet/assets/svg/icon-question.svg';
+import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
+import { TxToastCtx, useApi, useCall, useSelectedAccountCallback } from '@mimir-wallet/hooks';
+import { getAddressMeta, service, signAndSend } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
 import { u8aEq, u8aToHex } from '@polkadot/util';
 import { addressEq, decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { ReactComponent as IconQuestion } from '@mimirdev/assets/svg/icon-question.svg';
-import { Address, AddressRow, InputAddress, LockContainer, LockItem, useToastPromise } from '@mimirdev/components';
-import { useApi, useCall, useSelectedAccountCallback } from '@mimirdev/hooks';
-import { getAddressMeta, service, signAndSend } from '@mimirdev/utils';
 
 interface Props {
   prepare: PrepareFlexible;
@@ -77,6 +76,10 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
   const navigate = useNavigate();
   const selectAccount = useSelectedAccountCallback();
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [signer]);
+  const [loadingFirst, setLoadingFirst] = useState(false);
+  const [loadingSecond, setLoadingSecond] = useState(false);
+  const [loadingCancel, setLoadingCancel] = useState(false);
+  const { addToast } = useContext(TxToastCtx);
 
   const reservedAmount = useMemo(() => {
     const baseReserve = api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2));
@@ -90,17 +93,20 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
     return baseReserve;
   }, [allBalances, api]);
 
-  const [loadingSecond, createMembers] = useToastPromise(
-    useCallback(
-      async (pure: string, who: string[], signer: string, threshold: number, name: string) => {
-        const extrinsic = api.tx.utility.batchAll([
-          api.tx.balances.transferKeepAlive(pure, api.consts.proxy.proxyDepositFactor.muln(2).add(api.consts.proxy.proxyDepositBase)),
-          api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.addProxy(encodeMultiAddress(who, threshold), 'Any', 0)),
-          api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0))
-        ]);
+  const createMembers = useCallback(
+    (pure: string, who: string[], signer: string, threshold: number, name: string) => {
+      const extrinsic = api.tx.utility.batchAll([
+        api.tx.balances.transferKeepAlive(pure, api.consts.proxy.proxyDepositFactor.muln(2).add(api.consts.proxy.proxyDepositBase)),
+        api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.addProxy(encodeMultiAddress(who, threshold), 'Any', 0)),
+        api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0))
+      ]);
 
-        await signAndSend(extrinsic, signer, { checkProxy: true });
+      setLoadingSecond(true);
+      const events = signAndSend(extrinsic, signer, { checkProxy: true });
 
+      addToast({ events });
+
+      events.once('inblock', () => {
         keyring.addExternal(pure, {
           isMultisig: true,
           isFlexible: true,
@@ -116,31 +122,35 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
         selectAccount(pure);
 
         navigate('/');
-      },
-      [api, navigate, selectAccount]
-    ),
-    { pending: 'Set Members...', success: 'Set Members success!' }
+      });
+      events.once('error', () => setLoadingSecond(false));
+    },
+    [addToast, api, navigate, selectAccount]
   );
 
-  const [loadingFirst, createPure] = useToastPromise(
-    useCallback(async () => {
-      if (!signer) return;
+  const createPure = useCallback(() => {
+    if (!signer) return;
 
-      const extrinsic = api.tx.proxy.createPure('Any', 0, 0);
+    const extrinsic = api.tx.proxy.createPure('Any', 0, 0);
+    const events = signAndSend(extrinsic, signer, {
+      beforeSend: async (extrinsic) => {
+        if (!name) throw new Error('Please provide account name');
 
-      const result = await signAndSend(extrinsic, signer, {
-        beforeSend: async (extrinsic) => {
-          if (!name) throw new Error('Please provide account name');
+        await service.prepareMultisig(
+          u8aToHex(decodeAddress(extrinsic.signer.toString())),
+          extrinsic.hash.toHex(),
+          name,
+          threshold,
+          who.map((address) => u8aToHex(decodeAddress(address)))
+        );
+      }
+    });
 
-          await service.prepareMultisig(
-            u8aToHex(decodeAddress(extrinsic.signer.toString())),
-            extrinsic.hash.toHex(),
-            name,
-            threshold,
-            who.map((address) => u8aToHex(decodeAddress(address)))
-          );
-        }
-      });
+    addToast({ events });
+
+    setLoadingFirst(true);
+    events.once('inblock', (result) => {
+      setLoadingFirst(false);
 
       const _pure = filterPureAccount(api, result.events);
 
@@ -154,22 +164,28 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
       if (_pure) {
         createMembers(_pure, who, signer, threshold, name);
       }
-    }, [api, createMembers, name, signer, threshold, who]),
-    { pending: 'Creating Pure Account...', success: 'Create Pure success!' }
-  );
+    });
+    events.once('error', () => {
+      setLoadingFirst(false);
+    });
+  }, [api, addToast, createMembers, name, signer, threshold, who]);
 
-  const [cancelLoading, killPure] = useToastPromise(
-    useCallback(
-      async (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
-        const extrinsic = api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex));
+  const killPure = useCallback(
+    (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
+      const extrinsic = api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex));
 
-        await signAndSend(extrinsic, signer, { checkProxy: true });
+      const events = signAndSend(extrinsic, signer, { checkProxy: true });
 
+      addToast({ events });
+
+      setLoadingCancel(true);
+      events.once('inblock', () => {
+        setLoadingCancel(true);
         onCancel();
-      },
-      [api, onCancel]
-    ),
-    { pending: 'Killing Pure Account...', success: 'Kill Pure success!' }
+      });
+      events.once('error', () => setLoadingCancel(false));
+    },
+    [api, addToast, onCancel]
   );
 
   return (
@@ -236,7 +252,7 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
       <Box sx={{ display: 'flex', gap: 1 }}>
         {pure ? (
           <LoadingButton
-            disabled={!signer || !pure || cancelLoading}
+            disabled={!signer || !pure || loadingCancel}
             fullWidth
             loading={loadingSecond}
             onClick={() => {
@@ -255,9 +271,9 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
         {pure ? (
           <LoadingButton
             color='error'
-            disabled={loadingFirst}
+            disabled={loadingFirst || loadingSecond}
             fullWidth
-            loading={cancelLoading}
+            loading={loadingCancel}
             onClick={() => {
               if (pure && signer && blockNumber && extrinsicIndex) {
                 killPure(pure, signer, blockNumber, extrinsicIndex);

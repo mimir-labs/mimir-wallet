@@ -3,10 +3,9 @@
 
 import type { KeyringAddress } from '@polkadot/ui-keyring/types';
 
+import { getAccountCryptoType } from '@mimir-wallet/utils';
 import { keyring } from '@polkadot/ui-keyring';
 import { useMemo } from 'react';
-
-import { getAccountCryptoType } from '@mimirdev/utils';
 
 import { createNamedHook } from './createNamedHook';
 import { useAccounts } from './useAccounts';

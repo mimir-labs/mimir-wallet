@@ -1,13 +1,12 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useToggle } from '@mimir-wallet/hooks';
+import { getAddressMeta } from '@mimir-wallet/utils';
 import { Box, Fade, FormHelperText, InputBase, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { useToggle } from '@mimirdev/hooks';
-import { getAddressMeta } from '@mimirdev/utils';
 
 import AddressCell from './AddressCell';
 import FormatBalance from './FormatBalance';

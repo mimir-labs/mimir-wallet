@@ -1,9 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { getAddressMeta } from '@mimir-wallet/utils';
 import { useMemo } from 'react';
-
-import { getAddressMeta } from '@mimirdev/utils';
 
 import { createNamedHook } from './createNamedHook';
 import { useAccounts } from './useAccounts';

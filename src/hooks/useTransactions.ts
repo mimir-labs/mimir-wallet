@@ -5,11 +5,10 @@ import type { ApiPromise } from '@polkadot/api';
 import type { Call } from '@polkadot/types/interfaces';
 import type { Calldata, CalldataStatus, Transaction } from './types';
 
+import { getServiceUrl } from '@mimir-wallet/utils/service';
 import { addressEq, encodeAddress } from '@polkadot/util-crypto';
 import { useMemo } from 'react';
 import useSWR from 'swr';
-
-import { getServiceUrl } from '@mimirdev/utils/service';
 
 import { useApi } from './useApi';
 
@@ -33,6 +32,8 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
     public height?: number;
     public index?: number;
 
+    public website?: string;
+
     public initTransaction!: Transaction;
 
     constructor(api: ApiPromise) {
@@ -49,6 +50,7 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
       this.isValid = calldata.isValid;
       this.height = calldata.height;
       this.index = calldata.index;
+      this.website = calldata.website;
     }
 
     private addCancelChild(transaction: Transaction): Transaction {

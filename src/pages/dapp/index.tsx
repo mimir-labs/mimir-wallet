@@ -1,9 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { dapps } from '@mimir-wallet/config';
 import Grid from '@mui/material/Unstable_Grid2';
-
-import { dapps } from '@mimirdev/config';
 
 import DappCell from './DappCell';
 

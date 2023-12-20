@@ -14,6 +14,7 @@ export * from './useBlockTime';
 export * from './useCall';
 export * from './useCallMulti';
 export * from './useCopyClipboard';
+export * from './useDapp';
 export * from './useDeriveAccountInfo';
 export * from './useGroupAccounts';
 export * from './useIsMountedRef';

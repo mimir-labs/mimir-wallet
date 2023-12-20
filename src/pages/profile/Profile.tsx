@@ -1,12 +1,11 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as IconSet } from '@mimir-wallet/assets/svg/icon-set.svg';
+import { AddressCell, AddressOverview, Fund } from '@mimir-wallet/components';
+import { useAddressMeta, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
 import { Box, Button, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-
-import { ReactComponent as IconSet } from '@mimirdev/assets/svg/icon-set.svg';
-import { AddressCell, AddressOverview, Fund } from '@mimirdev/components';
-import { useAddressMeta, useSelectedAccount, useToggle } from '@mimirdev/hooks';
 
 function Profile() {
   const selected = useSelectedAccount();

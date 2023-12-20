@@ -1,13 +1,12 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered } from '@mimirdev/hooks/ctx/types';
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
+import { useAccounts } from '@mimir-wallet/hooks';
+import { getAddressMeta } from '@mimir-wallet/utils';
 import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useMemo } from 'react';
-
-import { useAccounts } from '@mimirdev/hooks';
-import { getAddressMeta } from '@mimirdev/utils';
 
 import InputAddress from '../InputAddress';
 

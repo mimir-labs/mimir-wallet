@@ -1,15 +1,14 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered } from '@mimirdev/hooks/ctx/types';
-import type { Transaction } from '@mimirdev/hooks/types';
-import type { AddressMeta } from '@mimirdev/utils';
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
+import type { Transaction } from '@mimir-wallet/hooks/types';
+import type { AddressMeta } from '@mimir-wallet/utils';
 
+import { CalldataStatus } from '@mimir-wallet/hooks/types';
+import { getAddressMeta } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import { addressEq } from '@polkadot/util-crypto';
-
-import { CalldataStatus } from '@mimirdev/hooks/types';
-import { getAddressMeta } from '@mimirdev/utils';
 
 export function extraTransaction(meta: AddressMeta, transaction: Transaction): [approvals: number, txs: Transaction[]] {
   let _approvals = 0;

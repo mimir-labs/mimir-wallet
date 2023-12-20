@@ -1,10 +1,9 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useAccounts, useAddresses, useVisibleAccounts } from '@mimir-wallet/hooks';
+import { getAddressMeta } from '@mimir-wallet/utils';
 import React, { useCallback, useMemo, useState } from 'react';
-
-import { useAccounts, useAddresses, useVisibleAccounts } from '@mimirdev/hooks';
-import { getAddressMeta } from '@mimirdev/utils';
 
 interface UseSelectMultisig {
   unselected: string[];
