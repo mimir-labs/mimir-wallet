@@ -1,14 +1,13 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered } from '@mimirdev/hooks/ctx/types';
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
-import { Box, Button, SvgIcon } from '@mui/material';
+import { ReactComponent as IconInfoFill } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
+import { useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
+import { Box, Button, Divider, SvgIcon } from '@mui/material';
 import React, { useCallback } from 'react';
-
-import { ReactComponent as IconInfoFill } from '@mimirdev/assets/svg/icon-info-fill.svg';
-import { useApi, useTxQueue } from '@mimirdev/hooks';
-import { CalldataStatus, type Transaction } from '@mimirdev/hooks/types';
 
 import { useApproveFiltered } from '../useApproveFiltered';
 import { useCancelFiltered } from '../useCancelFiltered';
@@ -75,10 +74,13 @@ function Operate({ transaction }: { transaction: Transaction }) {
           )}
         </Box>
         {!canApprove && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <SvgIcon color='warning' component={IconInfoFill} inheritViewBox />
-            Waiting for other {"members's"} approvement
-          </Box>
+          <>
+            <Divider />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SvgIcon color='warning' component={IconInfoFill} inheritViewBox />
+              Waiting for other {"members's"} approvement
+            </Box>
+          </>
         )}
       </>
     ))

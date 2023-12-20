@@ -1,12 +1,11 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { Input } from '@mimir-wallet/components';
+import { useToggle } from '@mimir-wallet/hooks';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Stack, Typography } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
 import React, { useCallback, useState } from 'react';
-
-import { Input } from '@mimirdev/components';
-import { useToggle } from '@mimirdev/hooks';
 
 function AddAddress() {
   const [open, toggleOpen] = useToggle();

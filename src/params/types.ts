@@ -28,4 +28,5 @@ export interface CallProps extends Record<string, any> {
   call: Call | IMethod;
   api: ApiPromise;
   type?: ParamType;
+  jsonFallback?: boolean;
 }

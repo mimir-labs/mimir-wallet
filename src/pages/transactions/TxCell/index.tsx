@@ -1,12 +1,11 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Transaction } from '@mimirdev/hooks/types';
+import type { Transaction } from '@mimir-wallet/hooks/types';
 
+import { useToggle } from '@mimir-wallet/hooks';
 import { Paper } from '@mui/material';
 import React from 'react';
-
-import { useToggle } from '@mimirdev/hooks';
 
 import { useRelatedTxs } from '../useRelatedTxs';
 import Extrinsic from './Extrinsic';

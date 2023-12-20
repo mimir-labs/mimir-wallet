@@ -80,6 +80,8 @@ export interface Calldata {
   height?: number;
   index?: number;
   isValid: boolean;
+
+  website?: string;
 }
 
 export interface Transaction {
@@ -100,6 +102,8 @@ export interface Transaction {
   action: string;
   section: string;
   method: string;
+
+  website?: string;
 
   initTransaction: Transaction;
 

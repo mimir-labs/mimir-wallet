@@ -1,9 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { TxDispatchError, TxModuleError } from '@mimir-wallet/utils';
 import React from 'react';
-
-import { TxDispatchError, TxModuleError } from '@mimirdev/utils';
 
 function TxError({ error }: { error: unknown }) {
   if (error instanceof TxModuleError) {

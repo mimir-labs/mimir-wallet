@@ -6,11 +6,10 @@ import type { Call } from '@polkadot/types/interfaces';
 import type { IMethod } from '@polkadot/types/types';
 import type { CallProps } from './types';
 
+import { AddressRow } from '@mimir-wallet/components';
+import { useAddressMeta } from '@mimir-wallet/hooks';
 import { Box, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
-
-import { AddressRow } from '@mimirdev/components';
-import { useAddressMeta } from '@mimirdev/hooks';
 
 import Item from './Param/Item';
 import FallbackCall from './FallbackCall';
@@ -63,11 +62,11 @@ function ChangeMember({ changes, type = 'base' }: CallProps & { changes: [string
   );
 }
 
-function BatchCall({ api, call, type = 'base' }: CallProps) {
+function BatchCall({ api, call, jsonFallback, type = 'base' }: CallProps) {
   const changes = useMemo(() => matchChangeMember(api, call), [api, call]);
 
   if (!changes) {
-    return <FallbackCall call={call} />;
+    return jsonFallback ? <FallbackCall call={call} /> : null;
   }
 
   return <ChangeMember api={api} call={call} changes={changes} type={type} />;

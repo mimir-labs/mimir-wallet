@@ -4,12 +4,11 @@
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
+import { useApi } from '@mimir-wallet/hooks';
+import { Transaction } from '@mimir-wallet/hooks/types';
+import { Call as CallComp } from '@mimir-wallet/params';
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
-
-import { useApi } from '@mimirdev/hooks';
-import { Transaction } from '@mimirdev/hooks/types';
-import { Call as CallComp } from '@mimirdev/params';
 
 import AddressRow from '../AddressRow';
 import Hex from '../Hex';

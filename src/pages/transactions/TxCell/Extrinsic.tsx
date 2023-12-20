@@ -1,16 +1,17 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as ArrowDown } from '@mimir-wallet/assets/svg/ArrowDown.svg';
+import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
+import { AddressRow } from '@mimir-wallet/components';
+import { useApi, useBlockTime, useDapp, useSelectedAccountCallback } from '@mimir-wallet/hooks';
+import { CalldataStatus, Transaction } from '@mimir-wallet/hooks/types';
+import { Call } from '@mimir-wallet/params';
+import Item from '@mimir-wallet/params/Param/Item';
 import { alpha, Box, Button, Chip, Divider, Stack, SvgIcon, Typography } from '@mui/material';
 import moment from 'moment';
 import React from 'react';
-
-import { ReactComponent as ArrowDown } from '@mimirdev/assets/svg/ArrowDown.svg';
-import { AddressRow } from '@mimirdev/components';
-import { useApi, useBlockTime, useSelectedAccountCallback } from '@mimirdev/hooks';
-import { CalldataStatus, Transaction } from '@mimirdev/hooks/types';
-import { Call } from '@mimirdev/params';
-import Item from '@mimirdev/params/Param/Item';
+import { Link } from 'react-router-dom';
 
 import CallDetail from './CallDetail';
 import Related from './Related';
@@ -21,6 +22,7 @@ function Extrinsic({ detailOpen, relatedTxs, toggleDetailOpen, transaction }: { 
   const status = transaction.status;
   const time = useBlockTime(transaction.status < CalldataStatus.Success ? transaction.initTransaction.height : transaction.height);
   const selectAccount = useSelectedAccountCallback();
+  const dapp = useDapp(transaction.initTransaction.website);
 
   return (
     <Stack flex='1' spacing={1}>
@@ -56,10 +58,24 @@ function Extrinsic({ detailOpen, relatedTxs, toggleDetailOpen, transaction }: { 
         <Call
           api={api}
           call={destTx.call}
+          jsonFallback={false}
           selectAccount={destTx.action === 'multisig.cancelAsMulti' ? selectAccount : undefined}
           tx={destTx.action === 'multisig.cancelAsMulti' ? destTx : undefined}
           type='tx'
         />
+        {dapp && (
+          <Item
+            content={
+              <Box component={Link} sx={{ textDecoration: 'none', color: 'text.primary', display: 'flex', alignItems: 'center', gap: 0.5 }} to={`/explorer/${encodeURIComponent(dapp.url)}`}>
+                <Box component='img' src={dapp.icon} width={20} />
+                {dapp.name}
+                <SvgIcon component={IconLink} fontSize='small' inheritViewBox />
+              </Box>
+            }
+            name='App'
+            type='tx'
+          />
+        )}
       </Stack>
       {detailOpen ? (
         <>

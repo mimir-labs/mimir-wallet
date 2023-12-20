@@ -1,15 +1,14 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
+import { AddressRow } from '@mimir-wallet/components';
+import { useSelectedAccountCallback } from '@mimir-wallet/hooks';
+import { Transaction } from '@mimir-wallet/hooks/types';
+import Item from '@mimir-wallet/params/Param/Item';
 import { Box, Chip, Paper, SvgIcon, Typography } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-import { ReactComponent as IconLink } from '@mimirdev/assets/svg/icon-link.svg';
-import { AddressRow } from '@mimirdev/components';
-import { useSelectedAccountCallback } from '@mimirdev/hooks';
-import { Transaction } from '@mimirdev/hooks/types';
-import Item from '@mimirdev/params/Param/Item';
 
 function Related({ relatedTxs }: { relatedTxs: Transaction[] }) {
   const selectAccount = useSelectedAccountCallback();

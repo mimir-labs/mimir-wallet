@@ -1,9 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useAddresses } from '@mimir-wallet/hooks';
 import Grid from '@mui/material/Unstable_Grid2';
-
-import { useAddresses } from '@mimirdev/hooks';
 
 import AddAddress from './AddAddress';
 import AddressCell from './AddressCell';

@@ -1,8 +1,8 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered } from '@mimirdev/hooks/ctx/types';
-import type { Transaction } from '@mimirdev/hooks/types';
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
+import type { Transaction } from '@mimir-wallet/hooks/types';
 
 import { useEffect, useState } from 'react';
 

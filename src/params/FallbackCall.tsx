@@ -8,7 +8,7 @@ import React from 'react';
 import ReactJson from 'react-json-view';
 
 function FallbackCall({ call }: { call: Call | IMethod }) {
-  return <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} />;
+  return <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} theme='summerfruit:inverted' />;
 }
 
 export default React.memo(FallbackCall);

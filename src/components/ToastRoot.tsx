@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Portal } from '@mui/material';
-import { useCallback, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { injectStyle } from 'react-toastify/dist/inject-style';
 
@@ -36,42 +35,6 @@ export function toastError(error: any) {
 
 export function toastWarn(error: any) {
   return toast.warn(getMessage(error));
-}
-
-export function useToastPromise<T extends (...args: any) => Promise<any>, Args extends any[] = Parameters<T>, R extends Promise<any> = ReturnType<T>>(
-  callback: T,
-  { pending, success }: { pending?: string; success?: string } = {}
-): [loading: boolean, fn: (...args: Args) => R] {
-  const [loading, setLoading] = useState(false);
-
-  const fn = useCallback(
-    async (...args: Args): Promise<any> => {
-      setLoading(true);
-
-      try {
-        // eslint-disable-next-line n/no-callback-literal
-        const promise = callback(...args);
-
-        const data = await toast.promise(promise, {
-          pending: pending || 'Pending...',
-          success: success || 'Success!',
-          error: {
-            render: ({ data }) => {
-              return <TxError error={data} />;
-            }
-          }
-        });
-
-        return data;
-      } catch {
-      } finally {
-        setLoading(false);
-      }
-    },
-    [callback, pending, success]
-  );
-
-  return [loading, fn as (...args: Args) => R];
 }
 
 export default ToastRoot;

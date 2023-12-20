@@ -3,11 +3,10 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
+import { getAddressMeta } from '@mimir-wallet/utils';
 import { Paper, useTheme } from '@mui/material';
 import React, { useEffect } from 'react';
 import ReactFlow, { Edge, Handle, Node, NodeProps, Position, useEdgesState, useNodesState } from 'reactflow';
-
-import { getAddressMeta } from '@mimirdev/utils';
 
 import AddressCell from './AddressCell';
 

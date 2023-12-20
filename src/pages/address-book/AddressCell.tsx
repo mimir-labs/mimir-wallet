@@ -1,13 +1,12 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as IconExternal } from '@mimir-wallet/assets/svg/icon-external.svg';
+import { ReactComponent as IconQr } from '@mimir-wallet/assets/svg/icon-qr.svg';
+import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
+import { AddressName, CopyButton, IdentityIcon } from '@mimir-wallet/components';
 import { Box, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import React from 'react';
-
-import { ReactComponent as IconExternal } from '@mimirdev/assets/svg/icon-external.svg';
-import { ReactComponent as IconQr } from '@mimirdev/assets/svg/icon-qr.svg';
-import { ReactComponent as IconTransfer } from '@mimirdev/assets/svg/icon-transfer.svg';
-import { AddressName, CopyButton, IdentityIcon } from '@mimirdev/components';
 
 function AddressCell({ address }: { address: string }) {
   return (

@@ -1,6 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+/* eslint-disable @typescript-eslint/no-empty-function */
 import type { TxQueue, TxQueueState } from './types';
 
 import React, { useCallback, useState } from 'react';
@@ -32,6 +33,9 @@ export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
         transaction: value.transaction,
         destSender: value.destSender || value.accountId,
         destCall: value.destCall || value.extrinsic.method,
+        onlySign: value.onlySign || false,
+        onSignature: value.onSignature || (() => {}),
+        onReject: value.onReject || (() => {}),
         beforeSend: async () => value.beforeSend?.(),
         onRemove: () => {
           value.onRemove?.();

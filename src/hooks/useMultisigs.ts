@@ -5,13 +5,12 @@ import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 import type { AccountData, MultiAccountData, ProxyAccountData } from './types';
 
+import { events } from '@mimir-wallet/events';
+import { service } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import { u8aEq, u8aToHex } from '@polkadot/util';
 import { encodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import { useEffect } from 'react';
-
-import { events } from '@mimirdev/events';
-import { service } from '@mimirdev/utils';
 
 import { useApi } from './useApi';
 

@@ -3,22 +3,21 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { SignerOptions, SubmittableExtrinsic } from '@polkadot/api/types';
-import type { DispatchError } from '@polkadot/types/interfaces';
+import type { DispatchError, ExtrinsicEra, Hash, Header, Index, SignerPayload } from '@polkadot/types/interfaces';
 import type { SpRuntimeDispatchError } from '@polkadot/types/lookup';
-import type { Callback, ISubmittableResult } from '@polkadot/types/types';
+import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
+import { AccountSigner, api } from '@mimir-wallet/api';
 import { web3FromSource } from '@polkadot/extension-dapp';
 import keyring from '@polkadot/ui-keyring';
-import { assert } from '@polkadot/util';
+import { assert, isBn, isNumber, objectSpread } from '@polkadot/util';
 import { addressEq } from '@polkadot/util-crypto';
 
-import { AccountSigner, api } from '@mimirdev/api';
+import { TxEvents } from './tx-events';
 
 type Options = {
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
-  onHash?: (hash: HexString) => void;
-  onStatus?: Callback<ISubmittableResult>;
   checkProxy?: boolean;
 };
 
@@ -99,37 +98,120 @@ export function checkSubmittableResult(result: ISubmittableResult, checkProxy = 
   return result;
 }
 
-export async function signAndSend(extrinsic: SubmittableExtrinsic<'promise'>, signer: string, { beforeSend, checkProxy = false, onHash, onStatus }: Options = {}): Promise<ISubmittableResult> {
-  onHash?.(extrinsic.hash.toHex());
+function makeSignOptions(partialOptions: Partial<SignerOptions>, extras: { blockHash?: Hash; era?: ExtrinsicEra; nonce?: Index }): SignatureOptions {
+  return objectSpread({ blockHash: api.genesisHash, genesisHash: api.genesisHash }, partialOptions, extras, {
+    runtimeVersion: api.runtimeVersion,
+    signedExtensions: api.registry.signedExtensions
+  });
+}
 
-  await extrinsic.signAsync(signer, await extractParams(api, signer));
-
-  const result = await api.call.blockBuilder.applyExtrinsic(extrinsic);
-
-  if (result.isErr) {
-    if (result.asErr.isInvalid) {
-      throw new Error(`Invalid Transaction: ${result.asErr.asInvalid.type}`);
-    } else {
-      throw new Error(`Unknown Error: ${result.asErr.asUnknown.type}`);
+function makeEraOptions(partialOptions: Partial<SignerOptions>, { header, mortalLength, nonce }: { header: Header | null; mortalLength: number; nonce: Index }): SignatureOptions {
+  if (!header) {
+    if (partialOptions.era && !partialOptions.blockHash) {
+      throw new Error('Expected blockHash to be passed alongside non-immortal era options');
     }
-  } else if (result.asOk.isErr) {
-    throw _assetDispatchError(result.asOk.asErr);
-  } else {
-    await beforeSend?.(extrinsic);
 
-    return new Promise((resolve, reject) => {
+    if (isNumber(partialOptions.era)) {
+      // since we have no header, it is immortal, remove any option overrides
+      // so we only supply the genesisHash and no era to the construction
+      delete partialOptions.era;
+      delete partialOptions.blockHash;
+    }
+
+    return makeSignOptions(partialOptions, { nonce });
+  }
+
+  return makeSignOptions(partialOptions, {
+    blockHash: header.hash,
+    era: api.registry.createTypeUnsafe<ExtrinsicEra>('ExtrinsicEra', [
+      {
+        current: header.number,
+        period: partialOptions.era || mortalLength
+      }
+    ]),
+    nonce
+  });
+}
+
+function optionsOrNonce(partialOptions: Partial<SignerOptions> = {}): Partial<SignerOptions> {
+  return isBn(partialOptions) || isNumber(partialOptions) ? { nonce: partialOptions } : partialOptions;
+}
+
+export async function sign(extrinsic: SubmittableExtrinsic<'promise'>, signer: string): Promise<[HexString, SignerPayloadJSON]> {
+  const options = optionsOrNonce();
+  const signingInfo = await api.derive.tx.signingInfo(signer, options.nonce, options.era);
+  const eraOptions = makeEraOptions(options, signingInfo);
+
+  const { signer: accountSigner } = await extractParams(api, signer);
+
+  const payload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
+    objectSpread({}, eraOptions, {
+      address: signer,
+      blockNumber: signingInfo.header ? signingInfo.header.number : 0,
+      method: extrinsic.method,
+      version: extrinsic.version
+    })
+  ]);
+
+  if (!accountSigner?.signPayload) {
+    throw new Error('No signer');
+  }
+
+  const { signature } = await accountSigner.signPayload(payload.toPayload());
+
+  extrinsic.addSignature(signer, signature, payload.toPayload());
+
+  return [signature, payload.toPayload()];
+}
+
+export function signAndSend(extrinsic: SubmittableExtrinsic<'promise'>, signer: string, { beforeSend, checkProxy }: Options = {}): TxEvents {
+  const events = new TxEvents();
+
+  extractParams(api, signer)
+    .then((params) => extrinsic.signAsync(signer, params))
+    .then((extrinsic) => {
+      events.emit('signed', extrinsic.signature);
+
+      return api.call.blockBuilder.applyExtrinsic(extrinsic);
+    })
+    .then(async (result) => {
+      if (result.isErr) {
+        if (result.asErr.isInvalid) {
+          throw new Error(`Invalid Transaction: ${result.asErr.asInvalid.type}`);
+        } else {
+          throw new Error(`Unknown Error: ${result.asErr.asUnknown.type}`);
+        }
+      } else if (result.asOk.isErr) {
+        throw _assetDispatchError(result.asOk.asErr);
+      }
+
+      await beforeSend?.(extrinsic);
+
       const unsubPromise = extrinsic.send((result) => {
-        onStatus?.(result);
+        if (result.isFinalized) {
+          events.emit('finalized', result);
+          unsubPromise.then((unsub) => unsub());
+        }
+
+        if (result.isCompleted) {
+          events.emit('completed', result);
+        }
 
         if (result.isInBlock) {
+          events.emit('inblock', result);
+
           try {
-            resolve(checkSubmittableResult(result, checkProxy));
-            unsubPromise.then((unsub) => unsub());
+            checkSubmittableResult(result, checkProxy);
           } catch (error) {
-            reject(error);
+            events.emit('error', error);
+            unsubPromise.then((unsub) => unsub());
           }
         }
       });
+    })
+    .catch((error) => {
+      events.emit('error', error);
     });
-  }
+
+  return events;
 }

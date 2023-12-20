@@ -1,18 +1,19 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { Call } from '@polkadot/types/interfaces';
-import type { IMethod, ISubmittableResult } from '@polkadot/types/types';
-import type { Filtered } from '@mimirdev/hooks/ctx/types';
+import type { Call, Extrinsic } from '@polkadot/types/interfaces';
+import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
+import type { HexString } from '@polkadot/util/types';
 
+import { useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { SelectAccountCtx } from '@mimir-wallet/hooks/ctx/SelectedAccount';
+import { CalldataStatus, Transaction } from '@mimir-wallet/hooks/types';
+import { canSendMultisig, PrepareMultisig, prepareMultisig } from '@mimir-wallet/utils';
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Paper, Stack, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-import { useApi, useTransactions, useTxQueue } from '@mimirdev/hooks';
-import { CalldataStatus, Transaction } from '@mimirdev/hooks/types';
-import { canSendMultisig, PrepareMultisig, prepareMultisig } from '@mimirdev/utils';
 
 import AddressCell from '../AddressCell';
 import AddressName from '../AddressName';
@@ -32,8 +33,12 @@ function Contents({
   isApprove,
   isCancelled,
   onClose,
+  onReject,
   onResults,
-  transaction
+  onSignature,
+  onlySign,
+  transaction,
+  website
 }: {
   beforeSend: () => Promise<void>;
   address: string;
@@ -44,20 +49,41 @@ function Contents({
   onResults?: (results: ISubmittableResult) => void;
   filtered?: Filtered;
   isApprove: boolean;
+  onlySign: boolean;
+  website?: string;
   isCancelled: boolean;
+  onSignature?: (signer: string, signature: HexString, ex: Extrinsic, payload: ExtrinsicPayloadValue) => void;
   onClose: () => void;
+  onReject: () => void;
 }) {
   const [accounts, setAccounts] = useState<Record<string, string | undefined>>({});
   const { api } = useApi();
   const [prepare, setPrepare] = useState<PrepareMultisig>();
   const canSend = useMemo(() => canSendMultisig(accounts, address), [accounts, address]);
-  const [txs] = useTransactions(!isApprove && !isCancelled ? address : undefined);
+  const { transactions } = useContext(SelectAccountCtx);
+  const txs = useMemo(() => (!isApprove && !isCancelled ? transactions : []), [isApprove, isCancelled, transactions]);
   const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success && item.call.hash.toHex() === extrinsic.method.hash.toHex()), [extrinsic.method.hash, txs]);
 
   useEffect(() => {
+    let unsubPromise: Promise<() => void> | undefined;
+
     if (canSend) {
-      prepareMultisig(api, extrinsic, accounts, address, isCancelled).then(setPrepare);
+      unsubPromise = api.rpc.chain.subscribeFinalizedHeads(() => {
+        prepareMultisig(api, extrinsic, accounts, address, isCancelled).then((value) =>
+          setPrepare((lastValue) => {
+            if (JSON.stringify(value) !== JSON.stringify(lastValue)) {
+              return value;
+            } else {
+              return lastValue;
+            }
+          })
+        );
+      });
     }
+
+    return () => {
+      unsubPromise?.then((unsub) => unsub());
+    };
   }, [accounts, address, api, canSend, isCancelled, extrinsic]);
 
   return (
@@ -72,6 +98,14 @@ function Contents({
               <AddressCell shorten={false} size='small' value={address} withCopy />
             </Paper>
           </Box>
+          {website && (
+            <Box>
+              <Typography fontWeight={700} mb={1}>
+                Website
+              </Typography>
+              <Typography color='primary.main'>{website}</Typography>
+            </Box>
+          )}
           <Divider />
           <CallComp destSender={destSender} isCancelled={isCancelled} method={destCall || extrinsic.method} sender={address} transaction={transaction} />
           <Divider />
@@ -132,8 +166,15 @@ function Contents({
           </Alert>
         )}
         <Box sx={{ marginLeft: '0px !important', width: '100%', display: 'flex', gap: 1 }}>
-          <SendTx beforeSend={beforeSend} canSend={canSend} disabled={pendingTxs.length > 0} onClose={onClose} onResults={onResults} prepare={prepare} />
-          <Button fullWidth onClick={onClose} variant='outlined'>
+          <SendTx beforeSend={beforeSend} canSend={canSend} disabled={pendingTxs.length > 0} onClose={onClose} onResults={onResults} onSignature={onSignature} onlySign={onlySign} prepare={prepare} />
+          <Button
+            fullWidth
+            onClick={() => {
+              onClose();
+              onReject();
+            }}
+            variant='outlined'
+          >
             Cancel
           </Button>
         </Box>
@@ -147,8 +188,17 @@ function TxModal() {
   const { queue } = useTxQueue();
 
   return isApiReady ? (
-    queue.map(({ accountId, beforeSend, destCall, destSender, extrinsic, filtered, id, isApprove, isCancelled, onRemove, onResults, transaction }) => (
-      <Dialog fullWidth key={id} maxWidth='sm' onClose={onRemove} open={true}>
+    queue.map(({ accountId, beforeSend, destCall, destSender, extrinsic, filtered, id, isApprove, isCancelled, onReject, onRemove, onResults, onSignature, onlySign, transaction, website }) => (
+      <Dialog
+        fullWidth
+        key={id}
+        maxWidth='sm'
+        onClose={() => {
+          onRemove();
+          onReject();
+        }}
+        open={true}
+      >
         <DialogTitle>Submit Transaction</DialogTitle>
         {isApiReady && (
           <Contents
@@ -161,8 +211,12 @@ function TxModal() {
             isApprove={isApprove}
             isCancelled={isCancelled}
             onClose={onRemove}
+            onReject={onReject}
             onResults={onResults}
+            onSignature={onSignature}
+            onlySign={onlySign}
             transaction={transaction}
+            website={website}
           />
         )}
       </Dialog>

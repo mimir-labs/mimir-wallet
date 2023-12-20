@@ -1,11 +1,10 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ApiProps } from '@mimirdev/api/types';
+import type { ApiProps } from '@mimir-wallet/api/types';
 
+import { ApiCtx } from '@mimir-wallet/api';
 import { useContext } from 'react';
-
-import { ApiCtx } from '@mimirdev/api';
 
 import { createNamedHook } from './createNamedHook';
 

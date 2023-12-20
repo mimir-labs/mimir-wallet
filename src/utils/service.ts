@@ -3,8 +3,8 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { api } from '@mimirdev/api';
-import { AccountData } from '@mimirdev/hooks/types';
+import { api } from '@mimir-wallet/api';
+import { AccountData } from '@mimir-wallet/hooks/types';
 
 import { fetcher } from './fetcher';
 
@@ -72,6 +72,14 @@ export async function getMultisigs(addresses: HexString[]): Promise<Record<HexSt
 
   return fetcher(getServiceUrl(`multisigs/?${addresses.map((address) => `addresses=${address}`).join('&')}`), {
     method: 'GET',
+    headers: jsonHeader
+  });
+}
+
+export async function uploadWebsite(extrinsicHash: HexString, website: string): Promise<boolean> {
+  return fetcher(getServiceUrl('website'), {
+    method: 'POST',
+    body: JSON.stringify({ extrinsicHash, website }),
     headers: jsonHeader
   });
 }

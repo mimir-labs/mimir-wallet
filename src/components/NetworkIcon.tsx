@@ -3,10 +3,9 @@
 
 import type { HexString } from '@polkadot/util/types';
 
+import Kusuma from '@mimir-wallet/assets/images/Kusuma.png';
+import Polkadot from '@mimir-wallet/assets/images/Polkadot.png';
 import React from 'react';
-
-import Kusuma from '@mimirdev/assets/images/Kusuma.png';
-import Polkadot from '@mimirdev/assets/images/Polkadot.png';
 
 import IdentityIcon from './IdentityIcon';
 

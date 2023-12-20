@@ -9,7 +9,9 @@
 /coverage
 
 # production
-/build
+build/
+build-*/
+tsconfig.*buildinfo
 
 # misc
 .DS_Store

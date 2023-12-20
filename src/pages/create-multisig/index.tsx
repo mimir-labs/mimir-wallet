@@ -3,14 +3,13 @@
 
 import type { PrepareFlexible } from './types';
 
+import { ReactComponent as IconInfo } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
+import { AddAddressDialog, Address, AddressRow, Input } from '@mimir-wallet/components';
+import { useAccounts, useAddresses, useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
 import { Alert, AlertTitle, Box, Button, Dialog, DialogContent, Divider, FormHelperText, Paper, Stack, SvgIcon, Switch, Typography } from '@mui/material';
 import { encodeAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { ReactComponent as IconInfo } from '@mimirdev/assets/svg/icon-info-fill.svg';
-import { AddAddressDialog, Address, AddressRow, Input } from '@mimirdev/components';
-import { useAccounts, useAddresses, useCacheMultisig, useToggle } from '@mimirdev/hooks';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';

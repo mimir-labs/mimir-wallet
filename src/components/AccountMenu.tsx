@@ -1,14 +1,13 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as IconAddOutlined } from '@mimir-wallet/assets/svg/icon-add-outlined.svg';
+import { ReactComponent as IconDelete } from '@mimir-wallet/assets/svg/icon-delete.svg';
+import { useGroupAccounts, useSelectedAccountCallback } from '@mimir-wallet/hooks';
+import { getAddressMeta } from '@mimir-wallet/utils';
 import { Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, SvgIcon, Typography } from '@mui/material';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { ReactComponent as IconAddOutlined } from '@mimirdev/assets/svg/icon-add-outlined.svg';
-import { ReactComponent as IconDelete } from '@mimirdev/assets/svg/icon-delete.svg';
-import { useGroupAccounts, useSelectedAccountCallback } from '@mimirdev/hooks';
-import { getAddressMeta } from '@mimirdev/utils';
 
 import AddressCell from './AddressCell';
 

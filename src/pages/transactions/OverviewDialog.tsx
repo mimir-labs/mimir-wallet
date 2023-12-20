@@ -1,13 +1,12 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Transaction } from '@mimirdev/hooks/types';
+import type { Transaction } from '@mimir-wallet/hooks/types';
 
+import { TxOverview } from '@mimir-wallet/components';
+import { useToggle } from '@mimir-wallet/hooks';
 import { Button, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import React from 'react';
-
-import { TxOverview } from '@mimirdev/components';
-import { useToggle } from '@mimirdev/hooks';
 
 interface Props {
   tx: Transaction;

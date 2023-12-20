@@ -1,18 +1,17 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as ArrowDown } from '@mimir-wallet/assets/svg/ArrowDown.svg';
+import { ReactComponent as IconAddFill } from '@mimir-wallet/assets/svg/icon-add-fill.svg';
+import { ReactComponent as IconBack } from '@mimir-wallet/assets/svg/icon-back.svg';
+import { ReactComponent as IconFailedFill } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
+import { ReactComponent as IconInfoFill } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
+import { ReactComponent as IconSuccessFill } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
+import { ReactComponent as IconWaitingFill } from '@mimir-wallet/assets/svg/icon-waiting-fill.svg';
+import { useAddressMeta } from '@mimir-wallet/hooks';
+import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { Box, Divider, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
-
-import { ReactComponent as ArrowDown } from '@mimirdev/assets/svg/ArrowDown.svg';
-import { ReactComponent as IconAddFill } from '@mimirdev/assets/svg/icon-add-fill.svg';
-import { ReactComponent as IconBack } from '@mimirdev/assets/svg/icon-back.svg';
-import { ReactComponent as IconFailedFill } from '@mimirdev/assets/svg/icon-failed-fill.svg';
-import { ReactComponent as IconInfoFill } from '@mimirdev/assets/svg/icon-info-fill.svg';
-import { ReactComponent as IconSuccessFill } from '@mimirdev/assets/svg/icon-success-fill.svg';
-import { ReactComponent as IconWaitingFill } from '@mimirdev/assets/svg/icon-waiting-fill.svg';
-import { useAddressMeta } from '@mimirdev/hooks';
-import { CalldataStatus, type Transaction } from '@mimirdev/hooks/types';
 
 import OverviewDialog from '../OverviewDialog';
 import { extraTransaction } from '../util';

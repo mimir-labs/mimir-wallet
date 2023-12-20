@@ -11,6 +11,30 @@ type Func = (mode: PaletteMode) => NonNullable<ThemeOptions['components']>;
  * @see https://github.com/mui-org/material-ui/tree/master/packages/mui-material/src
  */
 const createComponents: Func = () => ({
+  MuiCssBaseline: {
+    styleOverrides: `
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+      background: #fff;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2700FF;
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2700FF;
+    }
+    ::-webkit-scrollbar-corner {
+      background: #2700FF;
+    }
+`
+  },
+
   MuiLoadingButton: {
     defaultProps: { variant: 'contained' }
   },

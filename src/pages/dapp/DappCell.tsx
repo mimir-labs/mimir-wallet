@@ -1,13 +1,12 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DappOption } from '@mimirdev/config';
+import type { DappOption } from '@mimir-wallet/config';
 
+import { ellipsisLinesMixin } from '@mimir-wallet/components/utils';
 import { Paper, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { ellipsisLinesMixin } from '@mimirdev/components/utils';
 
 interface Props {
   dapp: DappOption;
@@ -20,7 +19,7 @@ function DappCell({ dapp }: Props) {
     if (dapp.internal) {
       navigate(dapp.url);
     } else {
-      navigate(`/dapp/${encodeURIComponent(dapp.url)}`);
+      navigate(`/explorer/${encodeURIComponent(dapp.url)}`);
     }
   };
 

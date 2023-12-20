@@ -3,11 +3,10 @@
 
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 
+import { useApi, useCall, useGroupAccounts, useTxQueue } from '@mimir-wallet/hooks';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { BN, bnToBn } from '@polkadot/util';
 import React, { useCallback, useState } from 'react';
-
-import { useApi, useCall, useGroupAccounts, useTxQueue } from '@mimirdev/hooks';
 
 import AddressCell from './AddressCell';
 import InputAddress from './InputAddress';

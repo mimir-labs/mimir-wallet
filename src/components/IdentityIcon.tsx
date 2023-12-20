@@ -4,13 +4,12 @@
 import type { IdentityProps } from '@polkadot/react-identicon/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
+import { getAddressMeta } from '@mimir-wallet/utils';
 import { Box } from '@mui/material';
 import { Polkadot as PolkadotIcon } from '@polkadot/react-identicon/icons/Polkadot';
 import { isHex, isU8a } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo } from 'react';
-
-import { getAddressMeta } from '@mimirdev/utils';
 
 interface Props {
   className?: string;

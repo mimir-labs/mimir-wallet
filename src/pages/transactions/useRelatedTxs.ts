@@ -1,13 +1,12 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Transaction } from '@mimirdev/hooks/types';
+import type { Transaction } from '@mimir-wallet/hooks/types';
 
+import { useAddressMeta, useApi } from '@mimir-wallet/hooks';
+import { getAddressMeta } from '@mimir-wallet/utils';
 import { addressEq } from '@polkadot/util-crypto';
 import { useEffect, useState } from 'react';
-
-import { useAddressMeta, useApi } from '@mimirdev/hooks';
-import { getAddressMeta } from '@mimirdev/utils';
 
 function findRelated(transaction: Transaction, values: Transaction[]) {
   const meta = getAddressMeta(transaction.sender);

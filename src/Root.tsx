@@ -9,9 +9,9 @@ import { RouterProvider } from 'react-router-dom';
 import { SWRConfig } from 'swr';
 
 import { ApiCtxRoot } from './api';
-import { GlobalStyle, ToastRoot } from './components';
+import { GlobalStyle, ToastRoot, TxToast } from './components';
 import { apiUrl } from './config';
-import { BlockEventCtxRoot, KeyringCtxRoot, SelectAccountCtxRoot, TxQueueCtxRoot } from './hooks';
+import { BlockEventCtxRoot, KeyringCtxRoot, SelectAccountCtxRoot, TxQueueCtxRoot, TxToastCtxRoot } from './hooks';
 import { routes } from './routes';
 import { ThemeProvider } from './theme';
 import { fetcher } from './utils';
@@ -31,9 +31,12 @@ function Root({ store }: Props) {
                 <SelectAccountCtxRoot>
                   <TxQueueCtxRoot>
                     <BlockEventCtxRoot>
-                      <GlobalStyle />
-                      <ToastRoot />
-                      <RouterProvider router={routes} />
+                      <TxToastCtxRoot>
+                        <GlobalStyle />
+                        <ToastRoot />
+                        <TxToast />
+                        <RouterProvider router={routes} />
+                      </TxToastCtxRoot>
                     </BlockEventCtxRoot>
                   </TxQueueCtxRoot>
                 </SelectAccountCtxRoot>

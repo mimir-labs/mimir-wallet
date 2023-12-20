@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { Call } from '@polkadot/types/interfaces';
+import type { Call as ICall } from '@polkadot/types/interfaces';
 import type { IMethod } from '@polkadot/types/types';
 import type { CallProps } from './types';
 
@@ -13,13 +13,13 @@ import BatchCall from './BatchCall';
 import CancelCall from './CancelCall';
 import TransferCall from './TransferCall';
 
-function findAction(api: ApiPromise, call: IMethod | Call) {
+function findAction(api: ApiPromise, call: IMethod | ICall) {
   const callFunc = api.registry.findMetaCall(call.callIndex);
 
   return `${callFunc.section}.${callFunc.method}`;
 }
 
-function Call({ api, call, type, ...props }: CallProps) {
+function Call({ api, call, jsonFallback, type, ...props }: CallProps) {
   const action = useMemo(() => findAction(api, call), [api, call]);
 
   if (action === 'multisig.cancelAsMulti') {
@@ -29,7 +29,7 @@ function Call({ api, call, type, ...props }: CallProps) {
   } else if (action.startsWith('balances.')) {
     return <TransferCall api={api} call={call} type={type} {...props} />;
   } else {
-    return <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} />;
+    return jsonFallback ? <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} theme='summerfruit:inverted' /> : null;
   }
 }
 

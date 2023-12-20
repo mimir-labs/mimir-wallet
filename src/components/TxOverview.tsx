@@ -1,17 +1,16 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as IconBack } from '@mimir-wallet/assets/svg/icon-back.svg';
+import { ReactComponent as IconFail } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
+import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
+import { ReactComponent as IconWaiting } from '@mimir-wallet/assets/svg/icon-waiting-fill.svg';
+import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
+import { getAddressMeta } from '@mimir-wallet/utils';
 import { Button, Paper, SvgIcon, useTheme } from '@mui/material';
 import { addressEq } from '@polkadot/util-crypto';
 import React, { useEffect } from 'react';
 import ReactFlow, { Edge, EdgeLabelRenderer, EdgeProps, Handle, Node, NodeProps, Position, StepEdge, useEdgesState, useNodesState } from 'reactflow';
-
-import { ReactComponent as IconBack } from '@mimirdev/assets/svg/icon-back.svg';
-import { ReactComponent as IconFail } from '@mimirdev/assets/svg/icon-failed-fill.svg';
-import { ReactComponent as IconSuccess } from '@mimirdev/assets/svg/icon-success-fill.svg';
-import { ReactComponent as IconWaiting } from '@mimirdev/assets/svg/icon-waiting-fill.svg';
-import { CalldataStatus, type Transaction } from '@mimirdev/hooks/types';
-import { getAddressMeta } from '@mimirdev/utils';
 
 import AddressCell from './AddressCell';
 
