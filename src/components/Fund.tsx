@@ -55,11 +55,11 @@ function Action({ onClose, receipt, sending, value }: { receipt?: string; value?
 
   return (
     <DialogActions>
-      <Button disabled={!receipt || !sending || !value} fullWidth onClick={handleClick}>
-        Submit
-      </Button>
       <Button fullWidth onClick={onClose} variant='outlined'>
         Cancel
+      </Button>
+      <Button disabled={!receipt || !sending || !value} fullWidth onClick={handleClick}>
+        Submit
       </Button>
     </DialogActions>
   );

@@ -41,6 +41,7 @@ function PageProfile() {
       setBalances({
         // some chains don't have "active" in the Ledger
         bonded: stakingInfo?.stakingLedger.active?.unwrap() || BN_ZERO,
+        reserved: balancesAll.reservedBalance,
         locked: balancesAll.lockedBalance,
         redeemable: stakingInfo?.redeemable || BN_ZERO,
         total: balancesAll.freeBalance.add(balancesAll.reservedBalance),

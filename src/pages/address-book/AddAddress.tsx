@@ -52,11 +52,11 @@ function AddAddress() {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button fullWidth onClick={_onCommit} variant='contained'>
-            Save
-          </Button>
           <Button fullWidth onClick={toggleOpen} variant='outlined'>
             Cancel
+          </Button>
+          <Button fullWidth onClick={_onCommit} variant='contained'>
+            Save
           </Button>
         </DialogActions>
       </Dialog>

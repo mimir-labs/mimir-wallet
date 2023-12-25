@@ -63,13 +63,13 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
           </ul>
         </DialogContent>
         <DialogActions>
-          <LoadingButton fullWidth loading={isLoading} onClick={handleCreate}>
-            Create
-          </LoadingButton>
           <Button fullWidth onClick={toggleOpen} variant='outlined'>
             Cancel
           </Button>
         </DialogActions>
+        <LoadingButton fullWidth loading={isLoading} onClick={handleCreate}>
+          Create
+        </LoadingButton>
       </Dialog>
       <Button
         disabled={!name}

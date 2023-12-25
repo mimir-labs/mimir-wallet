@@ -50,11 +50,11 @@ function AddAddressDialog({ defaultAddress, onAdded, onClose, open }: { defaultA
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button disabled={!name || !address} fullWidth onClick={_onCommit} variant='contained'>
-          Save
-        </Button>
         <Button fullWidth onClick={onClose} variant='outlined'>
           Cancel
+        </Button>
+        <Button disabled={!name || !address} fullWidth onClick={_onCommit} variant='contained'>
+          Save
         </Button>
       </DialogActions>
     </Dialog>

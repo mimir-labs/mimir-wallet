@@ -5,20 +5,37 @@ import { ReactComponent as IconBack } from '@mimir-wallet/assets/svg/icon-back.s
 import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
 import { ReactComponent as IconSet } from '@mimir-wallet/assets/svg/icon-set.svg';
 import { FormatBalance } from '@mimir-wallet/components';
+import { useTokenInfo } from '@mimir-wallet/hooks';
 import { Box, Button, Divider, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
-import React from 'react';
+import { BN } from '@polkadot/util';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { AccountBalance } from './types';
 
 function Info({ address, balances, toggleFundOpen }: { address?: string; balances?: AccountBalance; toggleFundOpen: () => void }) {
+  const [tokenInfo] = useTokenInfo();
+
+  const [total, transferrable, locked, reserved] = useMemo(() => {
+    const price = tokenInfo?.[Object.keys(tokenInfo)[0]]?.price || '0';
+
+    const priceBN = new BN(Math.ceil(Number(price) * 1e6));
+
+    return [balances?.total.mul(priceBN).divn(1e6), balances?.transferrable.mul(priceBN).divn(1e6), balances?.locked.mul(priceBN).divn(1e6), balances?.reserved.mul(priceBN).divn(1e6)];
+  }, [balances, tokenInfo]);
+
+  const changes = Number(tokenInfo?.[Object.keys(tokenInfo)[0]]?.price_change || '0');
+
   return (
     <Paper sx={{ width: '100%', height: 220, borderRadius: 2, padding: 2 }}>
       <Stack spacing={2}>
         <Box sx={{ display: 'flex' }}>
           <Typography sx={{ flex: '1' }} variant='h1'>
-            $0
+            <FormatBalance label='$' value={transferrable} withCurrency={false} />
+            <Box component='span' sx={{ marginLeft: 0.5, verticalAlign: 'middle', fontSize: '1rem', color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500' }}>
+              {(changes * 100).toFixed(2)}%
+            </Box>
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, '>.MuiButton-root': { borderRadius: 16.5 } }}>
             <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox sx={{ fontSize: '1rem !important' }} />} to='/transfer'>
@@ -39,7 +56,7 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
               <Box>
                 <Typography color='text.secondary'>Total balance</Typography>
                 <Typography variant='h5'>
-                  <FormatBalance value={balances?.total} />
+                  <FormatBalance label='$' value={total} withCurrency={false} />
                 </Typography>
               </Box>
             </Grid>
@@ -47,7 +64,7 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
               <Box>
                 <Typography color='text.secondary'>Transferable balance</Typography>
                 <Typography variant='h5'>
-                  <FormatBalance value={balances?.transferrable} />
+                  <FormatBalance label='$' value={transferrable} withCurrency={false} />
                 </Typography>
               </Box>
             </Grid>
@@ -55,15 +72,15 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
               <Box>
                 <Typography color='text.secondary'>Locked Balance</Typography>
                 <Typography variant='h5'>
-                  <FormatBalance value={balances?.locked} />
+                  <FormatBalance label='$' value={locked} withCurrency={false} />
                 </Typography>
               </Box>
             </Grid>
             <Grid xs={6}>
               <Box>
-                <Typography color='text.secondary'>Redeemable balance</Typography>
+                <Typography color='text.secondary'>Reserved balance</Typography>
                 <Typography variant='h5'>
-                  <FormatBalance value={balances?.redeemable} />
+                  <FormatBalance label='$' value={reserved} withCurrency={false} />
                 </Typography>
               </Box>
             </Grid>

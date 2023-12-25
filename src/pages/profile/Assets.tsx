@@ -52,16 +52,16 @@ function Row({ balances }: { balances: AccountBalance }) {
             </Box>
             <Box>
               <SvgIcon component={IconLock} inheritViewBox />
-              <span>Reserved balance</span>
+              <span>Locked balance</span>
               <Typography color='text.primary' fontWeight={700}>
                 <FormatBalance value={balances.locked} />
               </Typography>
             </Box>
             <Box>
               <SvgIcon component={IconReverse} inheritViewBox />
-              <span>Redeemable balance</span>
+              <span>Reserved balance</span>
               <Typography color='text.primary' fontWeight={700}>
-                <FormatBalance value={balances.redeemable} />
+                <FormatBalance value={balances.reserved} />
               </Typography>
             </Box>
           </Box>

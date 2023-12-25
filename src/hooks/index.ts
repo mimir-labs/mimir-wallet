@@ -22,6 +22,7 @@ export * from './useMultisigs';
 export * from './useCacheMultisig';
 export * from './useSelectedAccount';
 export * from './useToggle';
+export * from './useTokenInfo';
 export * from './useTransactions';
 export * from './useTxQueue';
 export * from './useVisibleAccounts';

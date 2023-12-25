@@ -6,6 +6,7 @@ import type { BN } from '@polkadot/util';
 export interface AccountBalance {
   total: BN;
   locked: BN;
+  reserved: BN;
   transferrable: BN;
   bonded: BN;
   redeemable: BN;

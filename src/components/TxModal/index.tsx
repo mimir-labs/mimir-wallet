@@ -166,7 +166,6 @@ function Contents({
           </Alert>
         )}
         <Box sx={{ marginLeft: '0px !important', width: '100%', display: 'flex', gap: 1 }}>
-          <SendTx beforeSend={beforeSend} canSend={canSend} disabled={pendingTxs.length > 0} onClose={onClose} onResults={onResults} onSignature={onSignature} onlySign={onlySign} prepare={prepare} />
           <Button
             fullWidth
             onClick={() => {
@@ -177,6 +176,7 @@ function Contents({
           >
             Cancel
           </Button>
+          <SendTx beforeSend={beforeSend} canSend={canSend} disabled={pendingTxs.length > 0} onClose={onClose} onResults={onResults} onSignature={onSignature} onlySign={onlySign} prepare={prepare} />
         </Box>
       </DialogActions>
     </>

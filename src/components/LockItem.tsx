@@ -64,7 +64,7 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
           <Typography>
             <FormatBalance value={value} />
           </Typography>
-          <SvgIcon color='primary' component={!isUnLock && isEnought ? IconSuccess : IconFail} fontSize='medium' inheritViewBox />
+          {!isUnLock && <SvgIcon color='primary' component={isEnought ? IconSuccess : IconFail} fontSize='medium' inheritViewBox />}
         </Box>
       </Box>
     </>

@@ -109,3 +109,26 @@ export interface Transaction {
 
   addChild(transaction: Transaction): Transaction;
 }
+
+export interface TokenInfo {
+  asset_type: string;
+  available_balance: string;
+  bonded_locked_balance: string;
+  democracy_locked_balance: string;
+  display_name: string;
+  election_locked_balance: string;
+  free_balance: string;
+  inflation: string;
+  locked_balance: string;
+  nominator_bonded: string;
+  price: string;
+  price_change: string;
+  reserved_balance: string;
+  symbol: string;
+  token_decimals: number;
+  total_issuance: string;
+  unbonded_locked_balance: string;
+  unique_id: string;
+  validator_bonded: string;
+  vesting_balance: string;
+}
