@@ -252,24 +252,6 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
       <Box sx={{ display: 'flex', gap: 1 }}>
         {pure ? (
           <LoadingButton
-            disabled={!signer || !pure || loadingCancel}
-            fullWidth
-            loading={loadingSecond}
-            onClick={() => {
-              if (pure && who && signer) {
-                createMembers(pure, who, signer, threshold, name);
-              }
-            }}
-          >
-            Set Members
-          </LoadingButton>
-        ) : (
-          <LoadingButton disabled={!signer} fullWidth loading={loadingFirst} onClick={createPure}>
-            Create
-          </LoadingButton>
-        )}
-        {pure ? (
-          <LoadingButton
             color='error'
             disabled={loadingFirst || loadingSecond}
             fullWidth
@@ -287,6 +269,24 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
           <Button fullWidth onClick={onCancel} variant='outlined'>
             Cancel
           </Button>
+        )}
+        {pure ? (
+          <LoadingButton
+            disabled={!signer || !pure || loadingCancel}
+            fullWidth
+            loading={loadingSecond}
+            onClick={() => {
+              if (pure && who && signer) {
+                createMembers(pure, who, signer, threshold, name);
+              }
+            }}
+          >
+            Set Members
+          </LoadingButton>
+        ) : (
+          <LoadingButton disabled={!signer} fullWidth loading={loadingFirst} onClick={createPure}>
+            Create
+          </LoadingButton>
         )}
       </Box>
     </Stack>

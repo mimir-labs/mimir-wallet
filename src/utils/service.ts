@@ -4,6 +4,7 @@
 import type { HexString } from '@polkadot/util/types';
 
 import { api } from '@mimir-wallet/api';
+import { serviceUrl } from '@mimir-wallet/config';
 import { AccountData } from '@mimir-wallet/hooks/types';
 
 import { fetcher } from './fetcher';
@@ -21,14 +22,7 @@ export function getServiceUrl<P extends string | null, R = P extends string ? Pr
     return null as R;
   }
 
-  const promise =
-    CACHE.get(path) ||
-    api.isReady.then((api) => {
-      const baseUrl = networkSerice[api.genesisHash.toHex()] || (process.env.NODE_ENV === 'production' ? 'https://dev-api.mimir.global/' : 'http://127.0.0.1:8080/');
-      // const baseUrl = 'https://dev-api.mimir.global/';
-
-      return `${baseUrl}${path}`;
-    });
+  const promise = CACHE.get(path) || serviceUrl(api, path);
 
   CACHE.set(path, promise);
 

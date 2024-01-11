@@ -16,12 +16,13 @@ module.exports = {
     '.yarn/**',
     '/.eslintrc.cjs',
     '/.eslintrc.js',
-    '/.eslintrc.mjs'
+    '/.eslintrc.mjs',
+    '/public/mimir-injectd.min.js'
   ],
   parserOptions: {
     ...base.parserOptions,
     project: [
-      './tsconfig.json'
+      './tsconfig.eslint.json'
     ]
   },
   rules: {

@@ -3,6 +3,7 @@
 
 import Logo from '@mimir-wallet/assets/images/logo.png';
 import { ReactComponent as IconSetting } from '@mimir-wallet/assets/svg/icon-set.svg';
+import { ChainSelect } from '@mimir-wallet/components';
 import { useApi } from '@mimir-wallet/hooks';
 import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -29,13 +30,16 @@ function TopBar() {
         <img src={Logo} style={{ width: 87 }} />
       </Link>
 
-      {isApiReady && (
-        <Stack direction='row'>
-          <IconButton color='secondary' size='large' sx={{ borderRadius: 1, border: '1px solid' }}>
-            <SvgIcon color='primary' component={IconSetting} inheritViewBox />
-          </IconButton>
-        </Stack>
-      )}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <ChainSelect />
+        {isApiReady && (
+          <Stack direction='row'>
+            <IconButton color='secondary' size='large' sx={{ borderRadius: 1, border: '1px solid' }}>
+              <SvgIcon color='primary' component={IconSetting} inheritViewBox />
+            </IconButton>
+          </Stack>
+        )}
+      </Box>
     </Box>
   );
 }
