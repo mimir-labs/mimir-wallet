@@ -13,7 +13,7 @@ import { useApproveFiltered } from '../useApproveFiltered';
 import { useCancelFiltered } from '../useCancelFiltered';
 
 function Operate({ transaction }: { transaction: Transaction }) {
-  const destTx = transaction.top || transaction;
+  const destTx = transaction.top;
   const { api } = useApi();
   const { addQueue } = useTxQueue();
   const [approveFiltered, canApprove] = useApproveFiltered(transaction);
@@ -24,8 +24,8 @@ function Operate({ transaction }: { transaction: Transaction }) {
       addQueue({
         filtered,
         extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
-        destCall: transaction.top?.call,
-        destSender: transaction.top?.sender,
+        destCall: destTx.call,
+        destSender: destTx.sender,
         accountId: transaction.sender,
         isApprove: true,
         transaction: destTx
@@ -39,8 +39,8 @@ function Operate({ transaction }: { transaction: Transaction }) {
       addQueue({
         filtered,
         extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
-        destCall: transaction.top?.call,
-        destSender: transaction.top?.sender,
+        destCall: destTx.call,
+        destSender: destTx.sender,
         accountId: transaction.sender,
         isCancelled: true,
         transaction: destTx
@@ -51,7 +51,7 @@ function Operate({ transaction }: { transaction: Transaction }) {
 
   return (
     transaction.status < CalldataStatus.Success &&
-    (transaction.top && transaction.top.status > CalldataStatus.Pending ? (
+    (transaction.top.status > CalldataStatus.Pending ? (
       <Box>
         {cancelFiltered && canCancel && (
           <Button onClick={() => handleCancel(cancelFiltered)} variant='outlined'>

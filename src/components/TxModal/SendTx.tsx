@@ -71,29 +71,44 @@ function SendTx({
       events.on('error', () => {
         setLoading(false);
       });
+
+      events.on('finalized', () => {
+        setTimeout(() => {
+          // clear all listener after 3s
+          events.removeAllListeners();
+        }, 3000);
+      });
     }
 
     onClose();
   }, [addToast, beforeSend, onClose, onResults, onSignature, onlySign, prepare]);
 
   useEffect(() => {
-    if (prepare) {
-      const addresses = Object.keys(prepare[2]);
-      const values = Object.values(prepare[2]);
+    let unsubPromise: Promise<() => void> | undefined;
 
-      if (addresses.length > 0) {
-        Promise.all(addresses.map((address) => api.derive.balances.all(address))).then((results) => {
-          setIsEnought(
-            results
-              .map((item) => item.freeBalance)
-              .reduce((l, r) => l.add(r), new BN(0))
-              .gte(values.reduce((l, r) => l.add(r)))
-          );
-        });
-      } else {
-        setIsEnought(true);
-      }
+    if (prepare) {
+      unsubPromise = api.rpc.chain.subscribeFinalizedHeads(() => {
+        const addresses = Object.keys(prepare[2]);
+        const values = Object.values(prepare[2]);
+
+        if (addresses.length > 0) {
+          Promise.all(addresses.map((address) => api.derive.balances.all(address))).then((results) => {
+            setIsEnought(
+              results
+                .map((item) => item.freeBalance)
+                .reduce((l, r) => l.add(r), new BN(0))
+                .gte(values.reduce((l, r) => l.add(r)))
+            );
+          });
+        } else {
+          setIsEnought(true);
+        }
+      });
     }
+
+    return () => {
+      unsubPromise?.then((unsub) => unsub());
+    };
   }, [api, prepare]);
 
   return (

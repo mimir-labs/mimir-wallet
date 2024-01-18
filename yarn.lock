@@ -5567,6 +5567,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/store@npm:^2":
+  version: 2.0.5
+  resolution: "@types/store@npm:2.0.5"
+  checksum: 5d5f2ba08a4eed97ac5269f672f1a012bf5f7a3c0458357070aa2d0f893e6090d8eec774fe3f4636f5a94df28d0f42f9fcd8873dc2d3110ed8f57cfdac491439
+  languageName: node
+  linkType: hard
+
 "@types/stylis@npm:^4.0.2":
   version: 4.2.2
   resolution: "@types/stylis@npm:4.2.2"
@@ -5585,6 +5592,13 @@ __metadata:
   version: 2.0.5
   resolution: "@types/trusted-types@npm:2.0.5"
   checksum: 0b1a08862ff296ef1ff6fe11709f1f0f1f0d01b5800f0c0785dd56259da1ce41baa57edcf484bce22c7c09a27c351399006f6aecb0e077fe7a2aae6dc0b97367
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^9":
+  version: 9.0.7
+  resolution: "@types/uuid@npm:9.0.7"
+  checksum: b329ebd4f9d1d8e08d4f2cc211be4922d70d1149f73d5772630e4a3acfb5170c6d37b3d7a39a0412f1a56e86e8a844c7f297c798b082f90380608bf766688787
   languageName: node
   linkType: hard
 
@@ -15353,6 +15367,8 @@ __metadata:
     "@types/node": "npm:^20.8.7"
     "@types/react": "npm:^18.2.33"
     "@types/react-dom": "npm:^18.2.14"
+    "@types/store": "npm:^2"
+    "@types/uuid": "npm:^9"
     copy-to-clipboard: "npm:^3.3.3"
     crypto-browserify: "npm:^3.12.0"
     eventemitter3: "npm:^5.0.1"
@@ -15368,7 +15384,9 @@ __metadata:
     react-toastify: "npm:^9.1.3"
     reactflow: "npm:^11.10.1"
     search-query-parser: "npm:^1.6.0"
+    store: "npm:^2.0.12"
     swr: "npm:^2.2.4"
+    uuid: "npm:^9.0.1"
   languageName: unknown
   linkType: soft
 
@@ -21177,6 +21195,15 @@ __metadata:
   bin:
     uuid: dist/bin/uuid
   checksum: bcbb807a917d374a49f475fae2e87fdca7da5e5530820ef53f65ba1d12131bd81a92ecf259cc7ce317cbe0f289e7d79fdfebcef9bfa3087c8c8a2fa304c9be54
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "uuid@npm:9.0.1"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 1607dd32ac7fc22f2d8f77051e6a64845c9bce5cd3dd8aa0070c074ec73e666a1f63c7b4e0f4bf2bc8b9d59dc85a15e17807446d9d2b17c8485fbc2147b27f9b
   languageName: node
   linkType: hard
 

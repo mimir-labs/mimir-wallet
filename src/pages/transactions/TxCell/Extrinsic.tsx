@@ -17,7 +17,7 @@ import CallDetail from './CallDetail';
 import Related from './Related';
 
 function Extrinsic({ detailOpen, relatedTxs, toggleDetailOpen, transaction }: { relatedTxs: Transaction[]; detailOpen: boolean; toggleDetailOpen: () => void; transaction: Transaction }) {
-  const destTx = transaction.top || transaction;
+  const destTx = transaction.top;
   const { api } = useApi();
   const status = transaction.status;
   const time = useBlockTime(transaction.status < CalldataStatus.Success ? transaction.initTransaction.height : transaction.height);
@@ -29,9 +29,15 @@ function Extrinsic({ detailOpen, relatedTxs, toggleDetailOpen, transaction }: { 
       <Stack alignItems='center' direction='row' justifyContent='space-between'>
         <Stack alignItems='center' direction='row' spacing={1.25}>
           <Box sx={{ width: 8, height: 8, borderRadius: 1, bgcolor: status < CalldataStatus.Success ? 'warning.main' : status === CalldataStatus.Success ? 'success.main' : 'error.main' }} />
-          <Typography color='primary.main' fontWeight={700} variant='h4'>
-            No {destTx.uuid.slice(0, 8).toUpperCase()}
-          </Typography>
+          {destTx.isFinalized ? (
+            <Typography color='primary.main' fontWeight={700} variant='h4'>
+              No {destTx.uuid.slice(0, 8).toUpperCase()}
+            </Typography>
+          ) : (
+            <Typography color='warning.main' fontWeight={700} variant='h4'>
+              Waiting finalized
+            </Typography>
+          )}
           <Chip color='secondary' label={destTx.action} variant='filled' />
         </Stack>
         <Typography>{time ? moment(time).format() : null}</Typography>

@@ -3,12 +3,12 @@
 
 import { API_URL_KEY, findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks';
-import { LoadingButton } from '@mui/lab';
-import { Box, Divider, Menu, MenuItem, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Divider, Menu, MenuItem, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
+import store from 'store';
 
 function ChainSelect() {
-  const { api, isApiReady } = useApi();
+  const { api, isApiConnected, isApiReady } = useApi();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -25,15 +25,14 @@ function ChainSelect() {
 
   return (
     <>
-      <LoadingButton
-        loading={!isApiReady}
+      <Button
         onClick={handleClick}
-        startIcon={<img src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} />}
+        startIcon={isApiConnected ? <img src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} /> : <CircularProgress size={20} />}
         sx={{ borderColor: 'secondary.main' }}
         variant='outlined'
       >
-        {!isApiReady ? 'Connecting...' : endpoint?.name}
-      </LoadingButton>
+        {!isApiConnected ? 'Connecting...' : endpoint?.name}
+      </Button>
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{
@@ -59,10 +58,8 @@ function ChainSelect() {
                   disableRipple
                   key={endpoint.genesisHash || index}
                   onClick={() => {
-                    if (api.genesisHash.toHex() !== endpoint.genesisHash) {
-                      localStorage.setItem(API_URL_KEY, endpoint.wsUrl);
-                      window.location.reload();
-                    }
+                    store.set(API_URL_KEY, endpoint.wsUrl);
+                    window.location.reload();
 
                     handleClose();
                   }}

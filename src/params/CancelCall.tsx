@@ -16,7 +16,7 @@ function CancelCall({ call, jsonFallback, selectAccount, tx, type = 'base' }: Ca
     return jsonFallback ? <FallbackCall call={call} /> : null;
   }
 
-  const cancelTx = tx.cancelTx.top || tx.cancelTx;
+  const cancelTx = tx.cancelTx.top;
 
   return (
     <>

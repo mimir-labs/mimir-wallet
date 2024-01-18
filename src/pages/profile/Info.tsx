@@ -1,9 +1,9 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as IconBack } from '@mimir-wallet/assets/svg/icon-back.svg';
 import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
 import { ReactComponent as IconSet } from '@mimir-wallet/assets/svg/icon-set.svg';
+import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
 import { FormatBalance } from '@mimir-wallet/components';
 import { useTokenInfo } from '@mimir-wallet/hooks';
 import { Box, Button, Divider, Paper, Stack, SvgIcon, Typography } from '@mui/material';
@@ -41,7 +41,7 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
             <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox sx={{ fontSize: '1rem !important' }} />} to='/transfer'>
               Transfer
             </Button>
-            <Button endIcon={<SvgIcon component={IconBack} inheritViewBox sx={{ fontSize: '1rem !important' }} />} onClick={toggleFundOpen} variant='outlined'>
+            <Button endIcon={<SvgIcon component={IconTransfer} inheritViewBox sx={{ fontSize: '1rem !important' }} />} onClick={toggleFundOpen} variant='outlined'>
               Fund
             </Button>
             <Button component={Link} sx={{ minWidth: 0 }} to={`/account-setting/${address}`} variant='outlined'>
