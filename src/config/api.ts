@@ -3,6 +3,8 @@
 
 import type { ApiPromise } from '@polkadot/api';
 
+import store from 'store';
+
 export const API_URL_KEY = 'apiUrl';
 
 type Endpoint = {
@@ -27,7 +29,7 @@ const kusamaEndpoints: Endpoint[] = [
 ];
 
 function _defaultApiUrl() {
-  let wsUrl = localStorage.getItem(API_URL_KEY);
+  let wsUrl = store.get(API_URL_KEY);
 
   if (wsUrl) {
     return wsUrl;
@@ -45,7 +47,7 @@ function _defaultApiUrl() {
     wsUrl = localEndpoint.wsUrl;
   }
 
-  localStorage.setItem(API_URL_KEY, wsUrl);
+  store.set(API_URL_KEY, wsUrl);
 
   return wsUrl;
 }

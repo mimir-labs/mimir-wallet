@@ -9,7 +9,7 @@ import { Outlet } from 'react-router-dom';
 import TopBar from './TopBar';
 
 function BaseContainer() {
-  const { isApiReady } = useApi();
+  const { isApiConnected, isApiReady } = useApi();
 
   useSyncMultisigs();
 
@@ -18,7 +18,7 @@ function BaseContainer() {
       <TxModal />
       <GlobalStyle />
       <TopBar />
-      {isApiReady ? (
+      {isApiReady && isApiConnected ? (
         <Outlet />
       ) : (
         <Box

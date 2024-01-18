@@ -16,12 +16,12 @@ interface UseSelectMultisig {
   unselect: (value: string) => void;
 }
 
-export function useSelectMultisig(defaultSignatories?: string[]): UseSelectMultisig {
+export function useSelectMultisig(defaultSignatories?: string[], defaultThreshold?: number): UseSelectMultisig {
   const { isAccount } = useAccounts();
   const { allAddresses } = useAddresses();
   const all = useVisibleAccounts(allAddresses);
   const [signatories, setSignatories] = useState<string[]>(defaultSignatories || []);
-  const [threshold, setThreshold] = useState<number>(2);
+  const [threshold, setThreshold] = useState<number>(defaultThreshold || 2);
 
   const unselected = useMemo(() => all.filter((account) => !signatories.includes(account)), [all, signatories]);
 

@@ -31,7 +31,7 @@ function AccountSetting() {
   const [txs] = useTransactions(addressParam);
   const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success), [txs]);
   const selectAccount = useSelectedAccountCallback();
-  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig(meta.who);
+  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig(meta.who, meta.threshold);
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
   const [addOpen, toggleAdd] = useToggle();
   const [addressError, setAddressError] = useState<Error | null>(null);
@@ -48,11 +48,10 @@ function AccountSetting() {
   }, [hasSoloAccount, isThresholdValid, signatories]);
 
   const _onClick = useCallback(async () => {
-    if (!checkField()) return;
-
     await saveName((name) => toastSuccess(`Save name to ${name} success`));
 
     if (!meta.who || !meta.threshold || !addressParam) return;
+    if (!checkField()) return;
     const oldMultiAddress = encodeMultiAddress(meta.who, meta.threshold);
     const newMultiAddress = encodeMultiAddress(signatories, threshold);
 
@@ -117,7 +116,18 @@ function AccountSetting() {
               Please process {pendingTxs.length} Pending Transaction first
             </Box>
           )}
-          <Stack spacing={2} sx={{ opacity: pendingTxs.length > 0 ? 0.5 : undefined, pointerEvents: pendingTxs.length > 0 ? 'none' : undefined }}>
+          {meta.isMultisig && !meta.isFlexible && (
+            <Box color='warning.main' sx={{ marginBottom: 2, fontWeight: 700 }}>
+              static multisig account can not change members.
+            </Box>
+          )}
+          <Stack
+            spacing={2}
+            sx={{
+              opacity: !meta.isMultisig || !meta.isFlexible || pendingTxs.length > 0 ? 0.5 : undefined,
+              pointerEvents: !meta.isMultisig || !meta.isFlexible || pendingTxs.length > 0 ? 'none' : undefined
+            }}
+          >
             <Input
               endButton={
                 <Button onClick={_handleAdd} variant='contained'>
@@ -125,7 +135,7 @@ function AccountSetting() {
                 </Button>
               }
               error={addressError}
-              label='Change Member'
+              label='Add Member'
               onChange={(value) => {
                 const isAddressValid = isAddressUtil(value);
 

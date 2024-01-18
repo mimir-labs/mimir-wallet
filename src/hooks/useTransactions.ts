@@ -3,23 +3,24 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { Call } from '@polkadot/types/interfaces';
-import type { Calldata, CalldataStatus, Transaction } from './types';
+import type { BestTx, Calldata, CalldataStatus, Transaction } from './types';
 
 import { getServiceUrl } from '@mimir-wallet/utils/service';
 import { addressEq, encodeAddress } from '@polkadot/util-crypto';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import { useApi } from './useApi';
+import { mergeCalldata } from './utils';
 
-function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
+export function createTransaction(api: ApiPromise, calldata: Calldata, isFinalized: boolean): Transaction {
   let _action: string | undefined;
 
   class Instance implements Transaction {
     private api: ApiPromise;
 
-    public top: Transaction | null;
-    public parent: Transaction | null;
+    public isFinalized = isFinalized;
+    public parent: Transaction;
     public cancelTx: Transaction | null;
     public children: Transaction[];
     public cancelChildren: Transaction[];
@@ -38,8 +39,7 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
 
     constructor(api: ApiPromise) {
       this.api = api;
-      this.top = null;
-      this.parent = null;
+      this.parent = this;
       this.cancelTx = null;
       this.children = [];
       this.cancelChildren = [];
@@ -73,12 +73,6 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
 
       if (existValue) return existValue;
 
-      if (this.top) {
-        transaction.top = this.top;
-      } else {
-        transaction.top = this;
-      }
-
       transaction.parent = this;
       this.children.push(transaction);
 
@@ -109,40 +103,38 @@ function createTransaction(api: ApiPromise, calldata: Calldata): Transaction {
     public get method() {
       return this.call.method;
     }
+
+    public get top(): Transaction {
+      return this.parent === this ? this : this.parent.top;
+    }
   }
 
   return new Instance(api);
 }
 
-function extraTransaction(api: ApiPromise, calldatas: Calldata[][], sender: string): Transaction[] {
-  if (calldatas.length === 0) return [];
-
-  const transactionMap: Map<string, Transaction> = new Map();
-  const senderTransactionMap: Map<string, Transaction> = new Map();
+function extraTransaction(api: ApiPromise, transactionCache: Map<string, Transaction>, calldatas: Calldata[][]): void {
+  if (calldatas.length === 0) return;
 
   for (const items of calldatas) {
     if (items.length === 0) continue;
 
-    let transaction: Transaction | undefined | null = transactionMap.get(items[items.length - 1].uuid);
+    let transaction: Transaction | undefined | null = transactionCache.get(items[items.length - 1].uuid);
 
     if (!transaction) {
-      transaction = createTransaction(api, items[items.length - 1]);
-      transactionMap.set(transaction.uuid, transaction);
+      transaction = createTransaction(api, items[items.length - 1], true);
+      transactionCache.set(transaction.uuid, transaction);
     }
 
     for (let i = items.length - 2; i >= 0; i--) {
       const calldata = items[i];
 
-      transaction = transaction.addChild(createTransaction(api, calldata));
+      transaction = transaction.addChild(createTransaction(api, calldata, true));
+      transactionCache.set(transaction.uuid, transaction);
     }
 
     const initTransaction = transaction;
 
-    while (transaction) {
-      if (addressEq(transaction.sender, sender)) {
-        senderTransactionMap.set(transaction.uuid, transaction);
-      }
-
+    while (true) {
       if (!transaction.initTransaction) {
         transaction.initTransaction = initTransaction;
       } else {
@@ -151,19 +143,50 @@ function extraTransaction(api: ApiPromise, calldatas: Calldata[][], sender: stri
         }
       }
 
+      if (transaction === transaction.parent) {
+        break;
+      }
+
       transaction = transaction.parent;
     }
   }
-
-  return Array.from(senderTransactionMap.values());
 }
 
 export function useTransactions(address?: string): [transactions: Transaction[], isLoading: boolean] {
   const { api, isApiReady } = useApi();
 
-  const { data, isLoading } = useSWR<Calldata[][]>(isApiReady && address ? getServiceUrl(`tx?address=${address}`) : null);
+  const { data, isLoading, mutate } = useSWR<{ bestTx: BestTx[]; tx: Calldata[][] }>(isApiReady && address ? getServiceUrl(`tx?address=${address}`) : null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  const transactions = useMemo(() => (address && data && data.length > 0 ? extraTransaction(api, data, address) : []), [address, api, data]);
+  useEffect(() => {
+    if (address && data && data.tx.length > 0) {
+      const transactionCache: Map<string, Transaction> = new Map();
+
+      extraTransaction(api, transactionCache, data.tx);
+
+      if (data.bestTx.length > 0) {
+        mergeCalldata(api, transactionCache, data.bestTx).then(() => {
+          setTransactions(Array.from(transactionCache.values()).filter((item) => addressEq(address, item.sender)));
+        });
+      } else {
+        setTransactions(Array.from(transactionCache.values()).filter((item) => addressEq(address, item.sender)));
+      }
+    }
+  }, [address, api, data]);
+
+  useEffect(() => {
+    if (!isApiReady) return;
+
+    const unsub = api.rpc.chain.subscribeNewHeads(() => {
+      setTimeout(() => {
+        mutate();
+      }, 1000);
+    });
+
+    return () => {
+      unsub.then((fn) => fn());
+    };
+  }, [api.rpc.chain, isApiReady, mutate]);
 
   return [transactions, isLoading];
 }

@@ -64,12 +64,15 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
       if (name === meta.name) return;
 
       try {
-        const pair = keyring.getPair(value);
-
-        keyring.saveAccountMeta(pair, { name });
-
         if (isAccount(value)) {
+          const pair = keyring.getPair(value);
+
+          keyring.saveAccountMeta(pair, { name });
+
           await service.updateAccountName(u8aToHex(decodeAddress(value)), name);
+          cb?.(name);
+        } else {
+          keyring.saveAddress(value, { name });
           cb?.(name);
         }
 

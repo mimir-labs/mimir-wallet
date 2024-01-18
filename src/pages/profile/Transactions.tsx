@@ -15,7 +15,7 @@ import { extraTransaction } from '../transactions/util';
 function Row({ isStart, transaction }: { transaction: Transaction; isStart: boolean }) {
   const { meta } = useAddressMeta(transaction.sender);
   const [approvals] = useMemo((): [number, Transaction[]] => extraTransaction(meta, transaction), [meta, transaction]);
-  const destTx = transaction.top || transaction;
+  const destTx = transaction.top;
   const dapp = useDapp(transaction.initTransaction.website);
 
   return (

@@ -3,9 +3,11 @@
 
 import type { Transaction } from '../types';
 
+import { SELECT_ACCOUNT_KEY } from '@mimir-wallet/constants';
 import { keyring } from '@polkadot/ui-keyring';
 import { hexToU8a, isHex, u8aToHex } from '@polkadot/util';
 import React, { useCallback, useEffect, useState } from 'react';
+import store from 'store';
 
 import { useAccounts } from '../useAccounts';
 import { useApi } from '../useApi';
@@ -21,7 +23,6 @@ interface State {
   isAccountReady: boolean;
   transactions: Transaction[];
 }
-export const SELECT_ACCOUNT_KEY = 'selected_account';
 
 export const SelectAccountCtx = React.createContext<State>({} as State);
 
@@ -37,7 +38,7 @@ export function SelectAccountCtxRoot({ children }: Props): React.ReactElement<Pr
 
   useEffect(() => {
     if (isApiReady) {
-      const stored = localStorage.getItem(SELECT_ACCOUNT_KEY);
+      const stored = store.get(SELECT_ACCOUNT_KEY);
 
       if (stored) {
         setSelected(getSelected(stored));
@@ -53,7 +54,7 @@ export function SelectAccountCtxRoot({ children }: Props): React.ReactElement<Pr
     if (account) {
       const hex = u8aToHex(account.publicKey);
 
-      localStorage.setItem(SELECT_ACCOUNT_KEY, hex);
+      store.set(SELECT_ACCOUNT_KEY, hex);
       setSelected(getSelected(hex));
     }
   }, []);

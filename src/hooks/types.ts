@@ -85,8 +85,10 @@ export interface Calldata {
 }
 
 export interface Transaction {
-  top: Transaction | null;
-  parent: Transaction | null;
+  isFinalized: boolean;
+
+  top: Transaction;
+  parent: Transaction;
   cancelTx: Transaction | null;
   children: Transaction[];
   cancelChildren: Transaction[];
@@ -131,4 +133,16 @@ export interface TokenInfo {
   unique_id: string;
   validator_bonded: string;
   vesting_balance: string;
+}
+
+export interface BestTx {
+  addresses: HexString[];
+  blockNumber: number;
+  blockHash: HexString;
+  extrinsicHash: HexString;
+  extrinsicIndex: number;
+  genesisHash: HexString;
+  id: number;
+  method: HexString;
+  signer: HexString;
 }
