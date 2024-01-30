@@ -108,6 +108,8 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
 
       events.once('inblock', () => {
         keyring.addExternal(pure, {
+          isMimir: true,
+          isConfirm: true,
           isMultisig: true,
           isFlexible: true,
           name,

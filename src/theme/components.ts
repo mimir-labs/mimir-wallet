@@ -61,12 +61,15 @@ const createComponents: Func = () => ({
         }
       },
       sizeLarge: {
+        borderRadius: '19px',
         padding: '12px 20px'
       },
       sizeMedium: {
+        borderRadius: '17px',
         padding: '8px 15px'
       },
       sizeSmall: {
+        borderRadius: '18.5px',
         padding: '5px 10px'
       }
     }

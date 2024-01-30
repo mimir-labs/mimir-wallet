@@ -159,7 +159,7 @@ export function useTransactions(address?: string): [transactions: Transaction[],
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    if (address && data && data.tx.length > 0) {
+    if (address && data) {
       const transactionCache: Map<string, Transaction> = new Map();
 
       extraTransaction(api, transactionCache, data.tx);

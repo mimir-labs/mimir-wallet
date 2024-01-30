@@ -1,7 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { GlobalStyle, MimirLoading, TxModal } from '@mimir-wallet/components';
+import { DetectedMultisig, GlobalStyle, MimirLoading, TxModal } from '@mimir-wallet/components';
 import { useApi, useSyncMultisigs } from '@mimir-wallet/hooks';
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
@@ -19,7 +19,10 @@ function BaseContainer() {
       <GlobalStyle />
       <TopBar />
       {isApiReady && isApiConnected ? (
-        <Outlet />
+        <>
+          <Outlet />
+          <DetectedMultisig />
+        </>
       ) : (
         <Box
           sx={{

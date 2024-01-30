@@ -3,7 +3,7 @@
 
 import type { KeyringAddress } from '@polkadot/ui-keyring/types';
 
-import { getAccountCryptoType } from '@mimir-wallet/utils';
+import { getAccountCryptoType, getAddressMeta } from '@mimir-wallet/utils';
 import { keyring } from '@polkadot/ui-keyring';
 import { useMemo } from 'react';
 
@@ -29,7 +29,11 @@ function groupAccounts(accounts: KeyringAddress[]): Record<GroupName, string[]> 
     } else if (cryptoType === 'injected') {
       ret.injected.push(account.address);
     } else if (cryptoType === 'multisig') {
-      ret.multisig.push(account.address);
+      const meta = getAddressMeta(account.address);
+
+      if (meta.isConfirm && meta.isValid && !meta.isHidden) {
+        ret.multisig.push(account.address);
+      }
     } else {
       ret.accounts.push(account.address);
     }
@@ -55,3 +59,31 @@ function useGroupAccountsImpl(): Record<GroupName, string[]> {
 }
 
 export const useGroupAccounts = createNamedHook('useGroupAccounts', useGroupAccountsImpl);
+
+export function useAllAccounts(others?: string[]): string[] {
+  const { accounts, injected, multisig, testing } = useGroupAccounts();
+
+  return useMemo(
+    () =>
+      accounts
+        .concat(injected)
+        .concat(multisig)
+        .concat(testing)
+        .concat(others || []),
+    [accounts, injected, multisig, others, testing]
+  );
+}
+
+export function useUnConfirmMultisigs(): string[] {
+  const { allAccounts } = useAccounts();
+
+  return useMemo(
+    () =>
+      allAccounts.filter((address) => {
+        const meta = getAddressMeta(address);
+
+        return meta.isMultisig && meta.isValid && !meta.isHidden && !meta.isConfirm;
+      }),
+    [allAccounts]
+  );
+}

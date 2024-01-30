@@ -45,13 +45,16 @@ export interface TxQueue {
   onSignature?: (signer: string, signature: HexString, ex: Extrinsic, payload: ExtrinsicPayloadValue) => void;
   onReject?: () => void;
   onResults?: (results: ISubmittableResult) => void;
+  onFinalized?: (results: ISubmittableResult) => void;
+  onError?: (error: unknown) => void;
 }
 
-export type TxQueueState = Omit<Required<TxQueue>, 'filtered' | 'onResults' | 'transaction' | 'website'> & {
+export type TxQueueState = Omit<Required<TxQueue>, 'filtered' | 'onResults' | 'onFinalized' | 'transaction' | 'website'> & {
   transaction?: Transaction;
   filtered?: Filtered;
   website?: string;
   onResults?: (results: ISubmittableResult) => void;
+  onFinalized?: (results: ISubmittableResult) => void;
 };
 
 export interface TxToast {

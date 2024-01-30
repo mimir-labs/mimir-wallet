@@ -16,17 +16,21 @@ function SendTx({
   canSend,
   disabled,
   onClose,
+  onError,
+  onFinalized,
   onResults,
   onSignature,
   onlySign,
   prepare
 }: {
   onResults?: (results: ISubmittableResult) => void;
+  onFinalized?: (results: ISubmittableResult) => void;
   disabled?: boolean;
   prepare?: PrepareMultisig;
   canSend: boolean;
   onlySign: boolean;
   onClose: () => void;
+  onError: (error: unknown) => void;
   onSignature?: (signer: string, signature: HexString, tx: Extrinsic, payload: ExtrinsicPayloadValue) => void;
   beforeSend: () => Promise<void>;
 }) {
@@ -52,7 +56,9 @@ function SendTx({
 
         onSignature?.(signer, signature, tx, payload);
         events.emit('success', 'Sign success');
+        onClose();
       } catch (error) {
+        onError(error);
         events.emit('error', error);
       } finally {
         setLoading(false);
@@ -67,21 +73,22 @@ function SendTx({
       events.on('inblock', (result) => {
         setLoading(false);
         onResults?.(result);
+        onClose();
       });
-      events.on('error', () => {
+      events.on('error', (error) => {
+        onError(error);
         setLoading(false);
       });
 
-      events.on('finalized', () => {
+      events.on('finalized', (result) => {
+        onFinalized?.(result);
         setTimeout(() => {
           // clear all listener after 3s
           events.removeAllListeners();
         }, 3000);
       });
     }
-
-    onClose();
-  }, [addToast, beforeSend, onClose, onResults, onSignature, onlySign, prepare]);
+  }, [addToast, beforeSend, onClose, onError, onFinalized, onResults, onSignature, onlySign, prepare]);
 
   useEffect(() => {
     let unsubPromise: Promise<() => void> | undefined;

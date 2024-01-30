@@ -6,8 +6,9 @@ import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 import { ReactComponent as IconInfoFill } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
 import { useApi, useTxQueue } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
-import { Box, Button, Divider, SvgIcon } from '@mui/material';
-import React, { useCallback } from 'react';
+import { LoadingButton } from '@mui/lab';
+import { Box, Divider, SvgIcon } from '@mui/material';
+import React, { useCallback, useState } from 'react';
 
 import { useApproveFiltered } from '../useApproveFiltered';
 import { useCancelFiltered } from '../useCancelFiltered';
@@ -18,9 +19,12 @@ function Operate({ transaction }: { transaction: Transaction }) {
   const { addQueue } = useTxQueue();
   const [approveFiltered, canApprove] = useApproveFiltered(transaction);
   const [cancelFiltered, canCancel] = useCancelFiltered(api, transaction);
+  const [approveLoading, setApproveLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   const handleApprove = useCallback(
     (filtered: Filtered) => {
+      setApproveLoading(true);
       addQueue({
         filtered,
         extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
@@ -28,7 +32,10 @@ function Operate({ transaction }: { transaction: Transaction }) {
         destSender: destTx.sender,
         accountId: transaction.sender,
         isApprove: true,
-        transaction: destTx
+        transaction: destTx,
+        onFinalized: () => setApproveLoading(false),
+        onError: () => setApproveLoading(false),
+        onReject: () => setApproveLoading(false)
       });
     },
     [addQueue, api, transaction, destTx]
@@ -36,6 +43,7 @@ function Operate({ transaction }: { transaction: Transaction }) {
 
   const handleCancel = useCallback(
     (filtered: Filtered) => {
+      setCancelLoading(true);
       addQueue({
         filtered,
         extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
@@ -43,7 +51,10 @@ function Operate({ transaction }: { transaction: Transaction }) {
         destSender: destTx.sender,
         accountId: transaction.sender,
         isCancelled: true,
-        transaction: destTx
+        transaction: destTx,
+        onFinalized: () => setCancelLoading(false),
+        onError: () => setCancelLoading(false),
+        onReject: () => setCancelLoading(false)
       });
     },
     [addQueue, api, destTx, transaction]
@@ -54,23 +65,23 @@ function Operate({ transaction }: { transaction: Transaction }) {
     (transaction.top.status > CalldataStatus.Pending ? (
       <Box>
         {cancelFiltered && canCancel && (
-          <Button onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
+          <LoadingButton loading={cancelLoading} onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
             Unlock
-          </Button>
+          </LoadingButton>
         )}
       </Box>
     ) : (
       <>
         <Box sx={{ display: 'flex', gap: 1 }}>
           {approveFiltered && canApprove && (
-            <Button onClick={() => handleApprove(approveFiltered)} variant='outlined'>
+            <LoadingButton loading={approveLoading} onClick={() => handleApprove(approveFiltered)} variant='outlined'>
               Approve
-            </Button>
+            </LoadingButton>
           )}
           {cancelFiltered && canCancel && (
-            <Button onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
+            <LoadingButton loading={cancelLoading} onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
               Cancel
-            </Button>
+            </LoadingButton>
           )}
         </Box>
         {!canApprove && (

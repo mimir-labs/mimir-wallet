@@ -15,7 +15,7 @@ import { useEffect } from 'react';
 import { useApi } from './useApi';
 
 function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Record<HexString, AccountData>) {
-  const { address: addressHex, creator, delegators, height, index, isValid, name, networks } = account;
+  const { address: addressHex, creator, delegators, height, index, isMimir, isValid, name, networks } = account;
   const address = encodeAddress(addressHex);
 
   if (networks.find((item) => u8aEq(api.genesisHash.toHex(), item))) {
@@ -29,6 +29,7 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
 
       if (exists) {
         keyring.saveAccountMeta(keyring.getPair(address), {
+          isMimir,
           isMultisig: true,
           isFlexible: true,
           name: name || undefined,
@@ -43,6 +44,7 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
         });
       } else {
         keyring.addExternal(address, {
+          isMimir,
           isMultisig: true,
           isFlexible: true,
           name: name || undefined,

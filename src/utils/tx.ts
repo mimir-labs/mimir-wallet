@@ -198,10 +198,9 @@ export function signAndSend(extrinsic: SubmittableExtrinsic<'promise'>, signer: 
         }
 
         if (result.isInBlock) {
-          events.emit('inblock', result);
-
           try {
             checkSubmittableResult(result, checkProxy);
+            events.emit('inblock', result);
           } catch (error) {
             events.emit('error', error);
             unsubPromise.then((unsub) => unsub());
