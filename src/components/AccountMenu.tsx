@@ -15,6 +15,7 @@ import SwitchAccountDialog from './SwitchAccountDialog';
 
 interface Props {
   open: boolean;
+  anchor?: 'left' | 'right';
   onClose?: () => void;
 }
 
@@ -76,7 +77,7 @@ function CreateMultisig() {
   );
 }
 
-function AccountMenu({ onClose, open }: Props) {
+function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   const grouped = useGroupAccounts();
   const [address, setAddress] = useState<string>('');
   const [switchOpen, toggleOpen] = useToggle();
@@ -101,7 +102,7 @@ function AccountMenu({ onClose, open }: Props) {
   return (
     <>
       <SwitchAccountDialog address={address} onClose={toggleOpen} onSelect={onClose} open={switchOpen} />
-      <Drawer onClose={onClose} open={open}>
+      <Drawer anchor={anchor} onClose={onClose} open={open}>
         <List sx={{ width: 280, padding: 1 }}>
           <Typography>Multisig Wallet</Typography>
           {grouped.multisig.map((account) => (

@@ -3,13 +3,14 @@
 
 import Logo from '@mimir-wallet/assets/images/logo.png';
 import { ReactComponent as IconSetting } from '@mimir-wallet/assets/svg/icon-set.svg';
-import { ChainSelect } from '@mimir-wallet/components';
+import { AccountSelect, ChainSelect } from '@mimir-wallet/components';
 import { useApi } from '@mimir-wallet/hooks';
 import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 function TopBar() {
   const { isApiReady } = useApi();
+  const { pathname } = useLocation();
 
   return (
     <Box
@@ -31,13 +32,16 @@ function TopBar() {
       </Link>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        {isApiReady && <>{pathname.startsWith('/explorer') && <AccountSelect />}</>}
         <ChainSelect />
         {isApiReady && (
-          <Stack direction='row' display='none'>
-            <IconButton color='secondary' size='large' sx={{ borderRadius: 1, border: '1px solid' }}>
-              <SvgIcon color='primary' component={IconSetting} inheritViewBox />
-            </IconButton>
-          </Stack>
+          <>
+            <Stack direction='row' display='none'>
+              <IconButton color='secondary' size='large' sx={{ borderRadius: 1, border: '1px solid' }}>
+                <SvgIcon color='primary' component={IconSetting} inheritViewBox />
+              </IconButton>
+            </Stack>
+          </>
         )}
       </Box>
     </Box>
