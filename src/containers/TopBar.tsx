@@ -32,6 +32,7 @@ function TopBar() {
       </Link>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        {isApiReady && <>{pathname.startsWith('/explorer') && <AccountSelect />}</>}
         <ChainSelect />
         {isApiReady && (
           <>
@@ -40,7 +41,6 @@ function TopBar() {
                 <SvgIcon color='primary' component={IconSetting} inheritViewBox />
               </IconButton>
             </Stack>
-            {pathname.startsWith('/explorer') && <AccountSelect />}
           </>
         )}
       </Box>

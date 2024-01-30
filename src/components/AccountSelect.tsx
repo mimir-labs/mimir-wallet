@@ -30,7 +30,7 @@ function AccountSelect() {
         <AddressCell shorten showType size='small' value={selected} />
         <SvgIcon component={ArrowDown} fontSize='small' inheritViewBox />
       </Box>
-      <AccountMenu onClose={handleAccountClose} open={!!anchorEl} />
+      <AccountMenu anchor='right' onClose={handleAccountClose} open={!!anchorEl} />
     </>
   );
 }
