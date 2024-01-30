@@ -5,7 +5,7 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { BN } from '@polkadot/util';
 
 import { InputAddress, InputNumber } from '@mimir-wallet/components';
-import { useAddresses, useApi, useCall, useSelectedAccount, useTxQueue, useVisibleAccounts } from '@mimir-wallet/hooks';
+import { useAddresses, useAllAccounts, useApi, useCall, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +18,7 @@ function PageTransfer() {
   const [recipient, setRecipient] = useState<string>();
   const [amount, setAmount] = useState<BN>();
   const { addQueue } = useTxQueue();
-  const filtered = useVisibleAccounts();
+  const filtered = useAllAccounts();
   const { allAddresses } = useAddresses();
   const [amountError, setAmountError] = useState<Error | null>(null);
 

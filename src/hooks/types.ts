@@ -38,6 +38,7 @@ export interface AccountData {
   address: HexString;
   isValid: boolean;
   networks: HexString[];
+  isMimir?: boolean;
 }
 
 export interface EOAAccountData extends AccountData {

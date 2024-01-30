@@ -37,7 +37,7 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
               {(changes * 100).toFixed(2)}%
             </Box>
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, '>.MuiButton-root': { borderRadius: 16.5 } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox sx={{ fontSize: '1rem !important' }} />} to='/transfer'>
               Transfer
             </Button>

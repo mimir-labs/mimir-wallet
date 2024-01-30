@@ -37,6 +37,7 @@ export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
         onSignature: value.onSignature || (() => {}),
         onReject: value.onReject || (() => {}),
         beforeSend: async () => value.beforeSend?.(),
+        onError: () => {},
         onRemove: () => {
           value.onRemove?.();
           setQueue((_queue) => _queue.filter((item) => item.id !== id));

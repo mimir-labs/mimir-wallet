@@ -26,7 +26,7 @@ export function TxToastCtxRoot({ children }: Props): React.ReactElement<Props> {
     const style = toast.style || 'notification';
 
     const onRemove = () => {
-      setState((state) => state.filter((item) => item.id !== id));
+      setState((state) => state.filter((item) => item.id !== _id));
     };
 
     const onChange =

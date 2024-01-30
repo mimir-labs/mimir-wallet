@@ -25,6 +25,5 @@ export * from './useToggle';
 export * from './useTokenInfo';
 export * from './useTransactions';
 export * from './useTxQueue';
-export * from './useVisibleAccounts';
 
 export * from './utils';

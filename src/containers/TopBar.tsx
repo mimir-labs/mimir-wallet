@@ -33,7 +33,7 @@ function TopBar() {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <ChainSelect />
         {isApiReady && (
-          <Stack direction='row'>
+          <Stack direction='row' display='none'>
             <IconButton color='secondary' size='large' sx={{ borderRadius: 1, border: '1px solid' }}>
               <SvgIcon color='primary' component={IconSetting} inheritViewBox />
             </IconButton>

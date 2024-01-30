@@ -5,7 +5,6 @@ import { ReactComponent as IconAddOutlined } from '@mimir-wallet/assets/svg/icon
 import { ReactComponent as IconDelete } from '@mimir-wallet/assets/svg/icon-delete.svg';
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
 import { useGroupAccounts, useSelectedAccount, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
-import { getAddressMeta } from '@mimir-wallet/utils';
 import { Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, SvgIcon, Typography } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -105,15 +104,9 @@ function AccountMenu({ onClose, open }: Props) {
       <Drawer onClose={onClose} open={open}>
         <List sx={{ width: 280, padding: 1 }}>
           <Typography>Multisig Wallet</Typography>
-          {grouped.multisig
-            .filter((item) => {
-              const meta = getAddressMeta(item);
-
-              return !meta.isHidden && meta.isValid;
-            })
-            .map((account) => (
-              <AccountCell key={`multisig-${account}`} onSelect={onSelect} selected={selected} value={account} />
-            ))}
+          {grouped.multisig.map((account) => (
+            <AccountCell key={`multisig-${account}`} onSelect={onSelect} selected={selected} value={account} />
+          ))}
           <CreateMultisig />
           <Divider sx={{ marginY: 1 }} />
           <Typography>Extension Wallet</Typography>

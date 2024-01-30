@@ -5,6 +5,7 @@ import type { Call } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 
 import { ApiPromise } from '@polkadot/api';
+import { addressEq } from '@polkadot/util-crypto';
 import { v4 as uuidv4 } from 'uuid';
 
 import { reduceCalldata } from './reduce';
@@ -51,7 +52,33 @@ function insertOrUpdate(
   return tx;
 }
 
+function cancelTransaction(transactionCache: Map<string, Transaction>, hash: HexString, sender: string, cancelling: string) {
+  const txs = Array.from(transactionCache.values()).filter((item) => item.status === CalldataStatus.Pending && item.call.hash.toHex() === hash && addressEq(item.sender, sender));
+
+  for (const item of txs) {
+    item.children.forEach((value) => {
+      if (addressEq(value.sender, cancelling)) {
+        value.status = CalldataStatus.Cancelled;
+      }
+    });
+    reduceCancelTransaction(item);
+  }
+}
+
+function reduceCancelTransaction(transaction: Transaction) {
+  if (transaction.status === CalldataStatus.Initialized) {
+    transaction.status = CalldataStatus.Cancelled;
+  }
+
+  if (transaction.parent === transaction) {
+    return;
+  }
+
+  reduceCancelTransaction(transaction.parent);
+}
+
 async function buildTx(api: ApiPromise, transactionCache: Map<string, Transaction>, tx: BestTx) {
+  const call = api.registry.createType('Call', tx.method);
   const apiAt = await api.at(tx.blockHash);
   let childTx: Transaction | null = null;
   let initTransaction: Transaction | null = null;
@@ -63,10 +90,20 @@ async function buildTx(api: ApiPromise, transactionCache: Map<string, Transactio
     })
     .map(({ event }) => event);
 
+  if (api.tx.multisig.cancelAsMulti.is(call)) {
+    for (const event of events) {
+      if (api.events.multisig.MultisigCancelled.is(event)) {
+        cancelTransaction(transactionCache, event.data.callHash.toHex(), event.data.multisig.toString(), event.data.cancelling.toString());
+      }
+    }
+
+    return;
+  }
+
   await reduceCalldata(
     api,
     apiAt,
-    api.registry.createType('Call', tx.method),
+    call,
     tx.extrinsicIndex,
     tx.signer,
     events,
