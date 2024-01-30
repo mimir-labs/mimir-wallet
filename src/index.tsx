@@ -4,6 +4,7 @@
 import moment from 'moment';
 import { createRoot } from 'react-dom/client';
 
+import { initGa } from './initGa';
 import Root from './Root';
 
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
@@ -11,3 +12,7 @@ moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(<Root />);
+
+if (process.env.NODE_ENV === 'production') {
+  initGa();
+}
