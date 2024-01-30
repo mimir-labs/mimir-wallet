@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { default as AccountMenu } from './AccountMenu';
+export { default as AccountSelect } from './AccountSelect';
 export { default as AddAddressDialog } from './AddAddressDialog';
 export { default as Address } from './Address';
 export { default as AddressCell } from './AddressCell';
