@@ -3,7 +3,7 @@
 
 import type { KeyringAddress } from '@polkadot/ui-keyring/types';
 
-import { getAccountCryptoType, getAddressMeta } from '@mimir-wallet/utils';
+import { AddressMeta, getAccountCryptoType, getAddressMeta } from '@mimir-wallet/utils';
 import { keyring } from '@polkadot/ui-keyring';
 import { useMemo } from 'react';
 
@@ -42,7 +42,7 @@ function groupAccounts(accounts: KeyringAddress[]): Record<GroupName, string[]> 
   return ret;
 }
 
-function useGroupAccountsImpl(): Record<GroupName, string[]> {
+function useGroupAccountsImpl(filter?: (address: string, meta: AddressMeta) => boolean): Record<GroupName, string[]> {
   const { allAccounts } = useAccounts();
 
   const allAddress = useMemo(
@@ -51,8 +51,8 @@ function useGroupAccountsImpl(): Record<GroupName, string[]> {
         .map((address): KeyringAddress | undefined => {
           return keyring.getAccount(address);
         })
-        .filter((a): a is KeyringAddress => !!a),
-    [allAccounts]
+        .filter((a): a is KeyringAddress => !!a && (filter ? filter(a.address, a.meta) : true)),
+    [allAccounts, filter]
   );
 
   return useMemo(() => groupAccounts(allAddress), [allAddress]);

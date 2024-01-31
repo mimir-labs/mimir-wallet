@@ -1,7 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as IconBack } from '@mimir-wallet/assets/svg/icon-back.svg';
+import { ReactComponent as IconCancel } from '@mimir-wallet/assets/svg/icon-cancel.svg';
 import { ReactComponent as IconFail } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
 import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
 import { ReactComponent as IconWaiting } from '@mimir-wallet/assets/svg/icon-waiting-fill.svg';
@@ -43,7 +43,7 @@ const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
         tx.status === CalldataStatus.Success
           ? IconSuccess
           : tx.status === CalldataStatus.Cancelled
-          ? IconBack
+          ? IconCancel
           : tx.status === CalldataStatus.Failed
           ? IconFail
           : tx.status === CalldataStatus.Pending

@@ -91,7 +91,7 @@ function Extrinsic({ detailOpen, relatedTxs, toggleDetailOpen, transaction }: { 
       ) : (
         <Button
           color='secondary'
-          endIcon={<SvgIcon component={ArrowDown} inheritViewBox sx={{ fontSize: '0.6rem !important' }} />}
+          endIcon={<SvgIcon component={ArrowDown} inheritViewBox />}
           fullWidth
           onClick={toggleDetailOpen}
           sx={({ palette }) => ({ opacity: 0.9, color: alpha(palette.secondary.contrastText, 0.5) })}

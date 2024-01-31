@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 
 import { AccountBalance } from './types';
 
-function Info({ address, balances, toggleFundOpen }: { address?: string; balances?: AccountBalance; toggleFundOpen: () => void }) {
+function Info({ balances, toggleFundOpen }: { address?: string; balances?: AccountBalance; toggleFundOpen: () => void }) {
   const [tokenInfo] = useTokenInfo();
 
   const [total, transferrable, locked, reserved] = useMemo(() => {
@@ -44,8 +44,8 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
             <Button endIcon={<SvgIcon component={IconTransfer} inheritViewBox sx={{ fontSize: '1rem !important' }} />} onClick={toggleFundOpen} variant='outlined'>
               Fund
             </Button>
-            <Button component={Link} sx={{ minWidth: 0 }} to={`/account-setting/${address}`} variant='outlined'>
-              <SvgIcon component={IconSet} inheritViewBox sx={{ fontSize: '1rem !important' }} />
+            <Button component={Link} sx={{ minWidth: 0 }} to={'/account-setting'} variant='outlined'>
+              <SvgIcon component={IconSet} inheritViewBox />
             </Button>
           </Box>
         </Box>

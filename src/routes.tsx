@@ -40,7 +40,7 @@ export const routes = createBrowserRouter([
             element: <PageAddressBook />
           },
           {
-            path: 'account-setting/:address',
+            path: 'account-setting/:address?',
             element: <PageAccountSetting />
           }
         ]

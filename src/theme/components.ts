@@ -23,14 +23,14 @@ const createComponents: Func = () => ({
       border-radius: 5px;
     }
     ::-webkit-scrollbar-thumb {
-      background: #2700FF;
+      background: #d9d9d9;
       border-radius: 5px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #2700FF;
+      background: #d9d9d9;
     }
     ::-webkit-scrollbar-corner {
-      background: #2700FF;
+      background: #d9d9d9;
     }
 `
   },
@@ -90,9 +90,6 @@ const createComponents: Func = () => ({
   },
 
   MuiSvgIcon: {
-    defaultProps: {
-      fontSize: 'inherit'
-    },
     styleOverrides: {
       fontSizeInherit: {
         fontSize: 'inherit'

@@ -3,7 +3,7 @@
 
 import { ReactComponent as ArrowDown } from '@mimir-wallet/assets/svg/ArrowDown.svg';
 import { ReactComponent as IconAddFill } from '@mimir-wallet/assets/svg/icon-add-fill.svg';
-import { ReactComponent as IconBack } from '@mimir-wallet/assets/svg/icon-back.svg';
+import { ReactComponent as IconCancel } from '@mimir-wallet/assets/svg/icon-cancel.svg';
 import { ReactComponent as IconFailedFill } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
 import { ReactComponent as IconInfoFill } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
 import { ReactComponent as IconSuccessFill } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
@@ -133,7 +133,7 @@ function Process({ cancelTx, processOpen, toggleProcessOpen, transaction }: Prop
               : transaction.status === CalldataStatus.Failed
               ? IconFailedFill
               : transaction.status === CalldataStatus.Cancelled
-              ? IconBack
+              ? IconCancel
               : transaction.status === CalldataStatus.MemberChanged
               ? IconFailedFill
               : IconWaitingFill

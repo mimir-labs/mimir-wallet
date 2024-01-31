@@ -19,7 +19,7 @@ function GlobalStyle() {
             lineHeight: 1.25
           },
           body: {
-            background: 'linear-gradient(245.23deg, #F4F2FF 0%, #FBFDFF 100%)'
+            background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
           },
           'html,body,#root': {
             height: '100%'

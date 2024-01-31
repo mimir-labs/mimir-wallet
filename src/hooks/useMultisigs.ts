@@ -26,40 +26,43 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
       const { threshold, who } = multiAccount as MultiAccountData;
 
       const exists = keyring.getAccount(address);
+      const _meta = {
+        isMimir,
+        isMultisig: true,
+        isFlexible: true,
+        name: name || undefined,
+        who: who.map(({ address }) => encodeAddress(address)),
+        threshold,
+        creator: encodeAddress(creator),
+        height,
+        index,
+        genesisHash: api.genesisHash.toHex(),
+        isValid,
+        isPending: false
+      };
 
       if (exists) {
-        keyring.saveAccountMeta(keyring.getPair(address), {
-          isMimir,
-          isMultisig: true,
-          isFlexible: true,
-          name: name || undefined,
-          who: who.map(({ address }) => encodeAddress(address)),
-          threshold,
-          creator: encodeAddress(creator),
-          height,
-          index,
-          genesisHash: api.genesisHash.toHex(),
-          isValid,
-          isPending: false
-        });
+        if (
+          exists.meta.isMimir !== _meta.isMimir ||
+          exists.meta.isMultisig !== _meta.isMultisig ||
+          exists.meta.isFlexible !== _meta.isFlexible ||
+          exists.meta.name !== _meta.name ||
+          exists.meta.who?.join('') !== _meta.who.join('') ||
+          exists.meta.threshold !== _meta.threshold ||
+          exists.meta.creator !== _meta.creator ||
+          exists.meta.height !== _meta.height ||
+          exists.meta.index !== _meta.index ||
+          exists.meta.genesisHash !== _meta.genesisHash ||
+          exists.meta.isValid !== _meta.isValid ||
+          exists.meta.isPending !== _meta.isPending
+        ) {
+          keyring.saveAccountMeta(keyring.getPair(address), _meta);
+          events.emit('account_meta_changed', address);
+        }
       } else {
-        keyring.addExternal(address, {
-          isMimir,
-          isMultisig: true,
-          isFlexible: true,
-          name: name || undefined,
-          who: who.map(({ address }) => encodeAddress(address)),
-          threshold,
-          creator: encodeAddress(creator),
-          height,
-          index,
-          genesisHash: api.genesisHash.toHex(),
-          isValid,
-          isPending: false
-        });
+        keyring.addExternal(address, _meta);
+        events.emit('account_meta_changed', address);
       }
-
-      events.emit('account_meta_changed', address);
     }
   }
 }
@@ -73,39 +76,62 @@ function mergeMulti(account: MultiAccountData) {
   );
   const exists = keyring.getAccount(address);
 
-  keyring.addMultisig(
-    who.map(({ address }) => encodeAddress(address)),
-    threshold,
-    {
-      ...exists?.meta,
-      isMultisig: true,
-      name: name || undefined,
-      isValid,
-      isPending: false
+  if (!exists) {
+    keyring.addMultisig(
+      who.map(({ address }) => encodeAddress(address)),
+      threshold,
+      {
+        isMultisig: true,
+        name: name || undefined,
+        isValid,
+        isPending: false
+      }
+    );
+    events.emit('account_meta_changed', address);
+  } else {
+    if (!exists.meta.isMultisig || exists.meta.name !== name || exists.meta.isValid !== isValid || exists.meta.isPending) {
+      keyring.addMultisig(
+        who.map(({ address }) => encodeAddress(address)),
+        threshold,
+        {
+          ...exists.meta,
+          isMultisig: true,
+          name: name || undefined,
+          isValid,
+          isPending: false
+        }
+      );
+      events.emit('account_meta_changed', address);
     }
-  );
-  events.emit('account_meta_changed', address);
+  }
 }
 
 function sync(api: ApiPromise) {
-  service.getMultisigs(keyring.getAccounts().map((item) => u8aToHex(item.publicKey))).then((multisigs) => {
-    // remove not exist multisig but not in pending
-    keyring.getAccounts().forEach((account) => {
-      if (!account.meta.isPending && account.meta.isMultisig && !multisigs[u8aToHex(account.publicKey)]) {
-        keyring.forgetAccount(account.address);
-      }
-    });
+  service
+    .getMultisigs(
+      keyring
+        .getAccounts()
+        .filter((item) => !item.meta.isMultisig)
+        .map((item) => u8aToHex(item.publicKey))
+    )
+    .then((multisigs) => {
+      // remove not exist multisig but not in pending
+      keyring.getAccounts().forEach((account) => {
+        if (!account.meta.isPending && account.meta.isMultisig && !multisigs[u8aToHex(account.publicKey)]) {
+          keyring.forgetAccount(account.address);
+        }
+      });
 
-    Object.values(multisigs).forEach((data) => {
-      if (data.type === 'proxy') {
-        mergeProxy(api, data as ProxyAccountData, multisigs);
-      }
+      Object.values(multisigs).forEach((data) => {
+        if (data.type === 'proxy') {
+          mergeProxy(api, data as ProxyAccountData, multisigs);
+        }
 
-      if (data.type === 'multi') {
-        mergeMulti(data as MultiAccountData);
-      }
+        if (data.type === 'multi') {
+          mergeMulti(data as MultiAccountData);
+        }
+      });
     });
-  });
 }
 
 export function useSyncMultisigs() {

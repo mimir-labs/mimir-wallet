@@ -21,7 +21,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
           <Typography fontSize={12}>Transaction is inblock</Typography>
         </Box>
       ),
-      { icon: <SvgIcon component={IconWaiting} fontSize='large' inheritViewBox sx={{ color: '#FFB762' }} />, type: 'warning', autoClose: false }
+      { icon: <SvgIcon component={IconWaiting} fontSize='large' inheritViewBox sx={{ color: '#FF8D07' }} />, type: 'warning', autoClose: false }
     ];
   } else if (events.status === 'finalized') {
     return [
@@ -34,7 +34,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       {
         type: 'success',
         autoClose: 3000,
-        icon: <SvgIcon component={IconSuccess} fontSize='large' inheritViewBox />
+        icon: <SvgIcon color='success' component={IconSuccess} fontSize='large' inheritViewBox />
       }
     ];
   } else if (events.status === 'signed') {
@@ -45,7 +45,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
           <Typography fontSize={12}>Boardcasting transaction</Typography>
         </Box>
       ),
-      { icon: <SvgIcon component={IconWaiting} fontSize='large' inheritViewBox sx={{ color: '#FFB762' }} />, type: 'warning', autoClose: false }
+      { icon: <SvgIcon component={IconWaiting} fontSize='large' inheritViewBox sx={{ color: '#FF8D07' }} />, type: 'warning', autoClose: false }
     ];
   } else if (events.status === 'success') {
     return [
@@ -58,7 +58,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       {
         type: 'success',
         autoClose: 3000,
-        icon: <SvgIcon component={IconSuccess} fontSize='large' inheritViewBox />
+        icon: <SvgIcon color='success' component={IconSuccess} fontSize='large' inheritViewBox />
       }
     ];
   } else if (events.status === 'error') {
@@ -85,7 +85,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
           <Typography fontSize={12}>Waiting for sign</Typography>
         </Box>
       ),
-      { icon: <SvgIcon component={IconWaiting} fontSize='large' inheritViewBox sx={{ color: '#FFB762' }} />, type: 'warning', autoClose: false }
+      { icon: <SvgIcon component={IconWaiting} fontSize='large' inheritViewBox sx={{ color: '#FF8D07' }} />, type: 'warning', autoClose: false }
     ];
   }
 }

@@ -3,16 +3,16 @@
 
 import { ReactComponent as ArrowRight } from '@mimir-wallet/assets/svg/ArrowRight.svg';
 import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
-import { ReactComponent as IconCopy } from '@mimir-wallet/assets/svg/icon-copy.svg';
 import { ReactComponent as IconDapp } from '@mimir-wallet/assets/svg/icon-dapp.svg';
-import { ReactComponent as IconExternal } from '@mimir-wallet/assets/svg/icon-external.svg';
 import { ReactComponent as IconHome } from '@mimir-wallet/assets/svg/icon-home.svg';
+import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
 import { ReactComponent as IconQr } from '@mimir-wallet/assets/svg/icon-qr.svg';
 import { ReactComponent as IconTransaction } from '@mimir-wallet/assets/svg/icon-transaction.svg';
 import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
-import { AccountMenu, AddressCell, BalanceFree, NetworkIcon } from '@mimir-wallet/components';
+import { AccountMenu, AddressCell, BalanceFree, CopyButton } from '@mimir-wallet/components';
+import { findToken } from '@mimir-wallet/config';
 import { useApi, useSelectedAccount } from '@mimir-wallet/hooks';
-import { Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -63,6 +63,7 @@ function SideBar() {
   const { api } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const token = useMemo(() => findToken(api), [api]);
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -78,11 +79,11 @@ function SideBar() {
         <Paper sx={{ padding: 1 }} variant='outlined'>
           <Stack alignItems='center' direction='row' onClick={handleAccountOpen} spacing={1} sx={{ cursor: 'pointer', width: '100%' }}>
             <AddressCell size='small' value={selected} />
-            <SvgIcon color='primary' component={ArrowRight} inheritViewBox sx={{ fontSize: '0.75rem' }} />
+            <SvgIcon color='primary' component={ArrowRight} inheritViewBox />
           </Stack>
           <Divider sx={{ marginY: 1 }} />
           <Stack alignItems='center' direction='row' spacing={0.5}>
-            <NetworkIcon genesisHash={api.genesisHash.toHex()} size={14} />
+            <Avatar alt={api.runtimeChain.toString()} src={token?.Icon} sx={{ width: 14, height: 14 }} />
             <Typography color='text.secondary' fontSize={12}>
               <BalanceFree params={selected} />
             </Typography>
@@ -91,11 +92,9 @@ function SideBar() {
           <IconButton color='primary' size='small'>
             <SvgIcon component={IconQr} inheritViewBox />
           </IconButton>
+          <CopyButton color='primary' value={selected} />
           <IconButton color='primary' size='small'>
-            <SvgIcon component={IconCopy} inheritViewBox />
-          </IconButton>
-          <IconButton color='primary' size='small'>
-            <SvgIcon component={IconExternal} inheritViewBox />
+            <SvgIcon component={IconLink} inheritViewBox />
           </IconButton>
           <IconButton color='primary' size='small'>
             <SvgIcon component={IconTransfer} inheritViewBox />
