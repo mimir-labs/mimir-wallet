@@ -63,7 +63,7 @@ function SideBar() {
   const { api } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const token = useMemo(() => findToken(api), [api]);
+  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -83,7 +83,7 @@ function SideBar() {
           </Stack>
           <Divider sx={{ marginY: 1 }} />
           <Stack alignItems='center' direction='row' spacing={0.5}>
-            <Avatar alt={api.runtimeChain.toString()} src={token?.Icon} sx={{ width: 14, height: 14 }} />
+            <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
             <Typography color='text.secondary' fontSize={12}>
               <BalanceFree params={selected} />
             </Typography>

@@ -1,13 +1,22 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DappOption } from '@mimir-wallet/config';
+
 import { DappCell } from '@mimir-wallet/components';
-import { useDapps } from '@mimir-wallet/hooks';
 import Grid from '@mui/material/Unstable_Grid2';
 
-function PageDapp() {
-  const { addFavorite, dapps, isFavorite, removeFavorite } = useDapps();
-
+function FavoriteDapps({
+  addFavorite,
+  dapps,
+  isFavorite,
+  removeFavorite
+}: {
+  dapps: DappOption[];
+  isFavorite: (id: number) => boolean;
+  addFavorite: (id: number) => void;
+  removeFavorite: (id: number) => void;
+}) {
   return (
     <Grid columns={{ xs: 12 }} container spacing={2.5}>
       {dapps.map((dapp, index) => {
@@ -21,4 +30,4 @@ function PageDapp() {
   );
 }
 
-export default PageDapp;
+export default FavoriteDapps;

@@ -43,7 +43,7 @@ const createComponents: Func = () => ({
     defaultProps: { variant: 'contained' },
     styleOverrides: {
       root: () => ({
-        fontWeight: 600,
+        fontWeight: 700,
         lineHeight: 1.25,
         textTransform: 'initial'
       }),
@@ -61,16 +61,22 @@ const createComponents: Func = () => ({
         }
       },
       sizeLarge: {
+        fontSize: '1rem',
         borderRadius: '19px',
-        padding: '12px 20px'
+        padding: '12px 20px',
+        lineHeight: '19px'
       },
       sizeMedium: {
+        fontSize: '0.875rem',
         borderRadius: '17px',
-        padding: '8px 15px'
+        padding: '8px 15px',
+        lineHeight: '17px'
       },
       sizeSmall: {
+        fontSize: '0.75rem',
         borderRadius: '18.5px',
-        padding: '5px 10px'
+        padding: '5px 10px',
+        lineHeight: '15px'
       }
     }
   },
@@ -78,13 +84,16 @@ const createComponents: Func = () => ({
   MuiIconButton: {
     styleOverrides: {
       sizeSmall: {
-        fontSize: '0.75rem'
+        fontSize: '0.75rem',
+        lineHeight: '15px'
       },
       sizeMedium: {
-        fontSize: '0.875rem'
+        fontSize: '0.875rem',
+        lineHeight: '17px'
       },
       sizeLarge: {
-        fontSize: '1rem'
+        fontSize: '1rem',
+        lineHeight: '19px'
       }
     }
   },
@@ -263,6 +272,14 @@ const createComponents: Func = () => ({
         marginTop: theme.spacing(1.5),
         padding: 0,
         paddingTop: theme.spacing(1.5)
+      })
+    }
+  },
+
+  MuiDivider: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        borderColor: theme.palette.divider
       })
     }
   },

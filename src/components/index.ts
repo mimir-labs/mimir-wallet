@@ -13,6 +13,7 @@ export { default as AppIframe } from './AppIframe';
 export { default as BalanceFree } from './BalanceFree';
 export { default as ChainSelect } from './ChainSelect';
 export { default as CopyButton } from './CopyButton';
+export { default as DappCell } from './DappCell';
 export { default as DetectedMultisig } from './DetectedMultisig';
 export { default as EditAddressDialog } from './EditAddressDialog';
 export { default as Empty } from './Empty';

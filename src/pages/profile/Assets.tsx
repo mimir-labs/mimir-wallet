@@ -18,13 +18,13 @@ import { AccountBalance } from './types';
 function Row({ balances }: { balances: AccountBalance }) {
   const { api, systemChain } = useApi();
 
-  const token = useMemo(() => findToken(api), [api]);
+  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [open, toggleOpen] = useToggle(true);
 
   return (
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-        <Avatar alt='Token' src={token?.Icon} sx={{ width: 32, height: 32 }} />
+        <Avatar alt='Token' src={token.Icon} sx={{ width: 32, height: 32 }} />
         <Typography fontSize='1rem' width='20%'>
           {systemChain}
         </Typography>
