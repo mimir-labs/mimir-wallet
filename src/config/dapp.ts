@@ -4,7 +4,9 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 
+import { FAVORITE_DAPP_KEY } from '@mimir-wallet/constants';
 import { isArray } from '@polkadot/util';
+import store from 'store';
 
 export interface DappOption {
   // (1 - 999) is internal app
@@ -66,4 +68,10 @@ export const dapps: DappOption[] = [
 
 export function findSupportedDapps(api: ApiPromise): DappOption[] {
   return dapps.filter((item) => (isArray(item.supportedChains) ? item.supportedChains.includes(api.genesisHash.toHex()) : true));
+}
+
+export function initializeFavoriteDapps() {
+  if (!store.get(FAVORITE_DAPP_KEY)) {
+    store.set(FAVORITE_DAPP_KEY, [1, 1000]);
+  }
 }

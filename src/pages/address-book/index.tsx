@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAddresses } from '@mimir-wallet/hooks';
-import Grid from '@mui/material/Unstable_Grid2';
+import { Stack } from '@mui/material';
 
 import AddAddress from './AddAddress';
-import AddressCell from './AddressCell';
+import AddressItem from './AddressItem';
 
 function PageAddressBook() {
   const { allAddresses } = useAddresses();
@@ -13,15 +13,11 @@ function PageAddressBook() {
   return (
     <>
       <AddAddress />
-      <Grid columns={{ xs: 12 }} container marginTop={2.5} spacing={2.5}>
-        {allAddresses.map((address, index) => {
-          return (
-            <Grid key={index} lg={6} md={12} xs={12}>
-              <AddressCell address={address} />
-            </Grid>
-          );
+      <Stack marginTop={2} spacing={2}>
+        {allAddresses.map((address) => {
+          return <AddressItem address={address} key={address} />;
         })}
-      </Grid>
+      </Stack>
     </>
   );
 }

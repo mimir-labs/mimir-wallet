@@ -21,7 +21,7 @@ function SupportedChains({ supported }: { supported: string[] | true }) {
   return (
     <Box sx={{ position: 'absolute', right: 0, top: 0, display: 'flex', alignItems: 'center' }}>
       <Typography marginRight={1}>Supported on</Typography>
-      {isArray(supported) ? supported.map((genesisHash) => <Avatar key={genesisHash} src={findToken(genesisHash).Icon} sx={{ width: 16, height: 16, marginLeft: '-4px' }} />) : 'All'}
+      {isArray(supported) ? supported.map((genesisHash) => <Avatar key={genesisHash} src={findToken(genesisHash).Icon} sx={{ width: 16, height: 16, marginLeft: '-4px' }} />) : 'All Chains'}
     </Box>
   );
 }
