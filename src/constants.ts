@@ -6,3 +6,5 @@ export const SWITCH_ACCOUNT_REMIND_KEY = 'switch_account_remind';
 export const SELECT_ACCOUNT_KEY = 'selected_account';
 
 export const FAVORITE_DAPP_KEY = 'favorite_dapp';
+
+export const ONE_DAY = 86400;

@@ -33,15 +33,15 @@ function Info({ balances, toggleFundOpen }: { address?: string; balances?: Accou
         <Box sx={{ display: 'flex' }}>
           <Typography sx={{ flex: '1' }} variant='h1'>
             <FormatBalance label='$' value={transferrable} withCurrency={false} />
-            <Box component='span' sx={{ marginLeft: 0.5, verticalAlign: 'middle', fontSize: '1rem', color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500' }}>
+            <Box component='span' sx={{ marginLeft: 0.5, verticalAlign: 'middle', color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500' }}>
               {(changes * 100).toFixed(2)}%
             </Box>
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox sx={{ fontSize: '1rem !important' }} />} to='/transfer'>
+            <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox />} to='/transfer'>
               Transfer
             </Button>
-            <Button endIcon={<SvgIcon component={IconTransfer} inheritViewBox sx={{ fontSize: '1rem !important' }} />} onClick={toggleFundOpen} variant='outlined'>
+            <Button endIcon={<SvgIcon component={IconTransfer} inheritViewBox />} onClick={toggleFundOpen} variant='outlined'>
               Fund
             </Button>
             <Button component={Link} sx={{ minWidth: 0 }} to={'/account-setting'} variant='outlined'>

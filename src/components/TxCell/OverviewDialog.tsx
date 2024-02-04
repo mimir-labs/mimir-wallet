@@ -29,7 +29,7 @@ function OverviewDialog({ tx }: Props) {
           {open && <TxOverview tx={tx} />}
         </DialogContent>
       </Dialog>
-      <Button onClick={toggle} size='small' sx={{ alignSelf: 'start' }} variant='outlined'>
+      <Button onClick={toggle} size='small' sx={{ alignSelf: 'start' }} variant='text'>
         Overview
       </Button>
     </>

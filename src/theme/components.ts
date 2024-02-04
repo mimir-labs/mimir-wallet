@@ -45,63 +45,74 @@ const createComponents: Func = () => ({
       root: () => ({
         fontWeight: 700,
         lineHeight: 1.25,
-        textTransform: 'initial'
+        textTransform: 'initial',
+        '>.MuiSvgIcon-root': {
+          fontSize: '1.2em'
+        }
       }),
       outlined: ({ ownerState, theme }) => ({
         borderColor: ownerState.color !== 'inherit' ? theme.palette[ownerState.color || 'primary'].main : undefined
       }),
       startIcon: {
         '>*:nth-of-type(1)': {
-          fontSize: '1em'
+          fontSize: '1.2em'
         }
       },
       endIcon: {
         '>*:nth-of-type(1)': {
-          fontSize: '1em'
+          fontSize: '1.2em'
         }
       },
       sizeLarge: {
         fontSize: '1rem',
-        borderRadius: '19px',
-        padding: '12px 20px',
-        lineHeight: '19px'
+        borderRadius: '20px',
+        padding: '8px 20px',
+        lineHeight: 1.2
       },
       sizeMedium: {
         fontSize: '0.875rem',
-        borderRadius: '17px',
+        borderRadius: '19px',
         padding: '8px 15px',
-        lineHeight: '17px'
+        lineHeight: 1.2
       },
       sizeSmall: {
-        fontSize: '0.75rem',
-        borderRadius: '18.5px',
+        fontSize: '0.875rem',
+        borderRadius: '15px',
         padding: '5px 10px',
-        lineHeight: '15px'
+        lineHeight: 1.2
       }
     }
   },
 
   MuiIconButton: {
     styleOverrides: {
-      sizeSmall: {
-        fontSize: '0.75rem',
-        lineHeight: '15px'
-      },
-      sizeMedium: {
-        fontSize: '0.875rem',
-        lineHeight: '17px'
+      root: {
+        '>.MuiSvgIcon-root': {
+          fontSize: '1.2em'
+        }
       },
       sizeLarge: {
         fontSize: '1rem',
-        lineHeight: '19px'
+        lineHeight: 1.2
+      },
+      sizeMedium: {
+        fontSize: '0.875rem',
+        lineHeight: 1.2
+      },
+      sizeSmall: {
+        fontSize: '0.875rem',
+        lineHeight: 1.2
       }
     }
   },
 
   MuiSvgIcon: {
+    defaultProps: {
+      fontSize: 'inherit'
+    },
     styleOverrides: {
       fontSizeInherit: {
-        fontSize: 'inherit'
+        fontSize: '1.2em'
       },
       fontSizeSmall: {
         fontSize: '0.75rem'

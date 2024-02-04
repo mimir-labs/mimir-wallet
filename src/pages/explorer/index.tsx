@@ -7,6 +7,7 @@ import { CircularProgress, Stack } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import PendingTx from './PendingTx';
 import { useCommunicator } from './useCommunicator';
 
 function PageExplorer() {
@@ -23,9 +24,10 @@ function PageExplorer() {
   useCommunicator(iframeRef, appUrl);
 
   return (
-    <Stack key={selected} sx={{ height: '100%', position: 'relative' }}>
+    <Stack key={selected} sx={{ height: '100%', position: 'relative', paddingBottom: '60px' }}>
       {loading && <CircularProgress sx={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, margin: 'auto' }} />}
       {url && <AppIframe appUrl={appUrl} iframeRef={iframeRef} key={url} onLoad={() => setLoading(false)} />}
+      {url && <PendingTx url={url} />}
     </Stack>
   );
 }

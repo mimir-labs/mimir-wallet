@@ -16,11 +16,11 @@ type Endpoint = {
   serviceUrl?: string;
 };
 
-export const localEndpoint: Endpoint = { icon: '/chain-icons/Mimir.png', tokenIcon: '/token-icons/Mimir.png', name: 'Development', wsUrl: 'ws://127.0.0.1:9944/' };
+export const localEndpoint: Endpoint = { icon: '/chain-icons/Mimir.svg', tokenIcon: '/token-icons/Mimir.svg', name: 'Development', wsUrl: 'ws://127.0.0.1:9944/' };
 export const devEndpoints: Endpoint[] = [
   {
-    icon: '/chain-icons/Mimir.png',
-    tokenIcon: '/token-icons/Mimir.png',
+    icon: '/chain-icons/Mimir.svg',
+    tokenIcon: '/token-icons/Mimir.svg',
     name: 'Mimir',
     wsUrl: 'wss://dev-ws.mimir.global/',
     genesisHash: '0xc47e0ed91f4362642787756a15618b5cb558a3952187c6dfb3fb8e9db5128678',

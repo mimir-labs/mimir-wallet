@@ -1,14 +1,12 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Empty } from '@mimir-wallet/components';
+import { Empty, TxCell } from '@mimir-wallet/components';
 import { useAddressMeta, useSelectedAccount } from '@mimir-wallet/hooks';
 import { SelectAccountCtx } from '@mimir-wallet/hooks/ctx/SelectedAccount';
 import { CalldataStatus } from '@mimir-wallet/hooks/types';
 import { Box, Button, Paper, Stack } from '@mui/material';
 import { useContext, useMemo, useState } from 'react';
-
-import TxCell from './TxCell';
 
 function MultisigList() {
   const { transactions } = useContext(SelectAccountCtx);

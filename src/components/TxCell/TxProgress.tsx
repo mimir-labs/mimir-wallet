@@ -8,13 +8,13 @@ import { useAddressMeta, useCopyClipboard } from '@mimir-wallet/hooks';
 import { alpha, Box, Paper } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
 
-import { extraTransaction } from '../util';
+import { extraTransaction } from './hooks/util';
 
-function TxProcess({ tx }: { tx: Transaction }) {
+function TxProgress({ tx }: { tx: Transaction }) {
   const { meta } = useAddressMeta(tx.sender);
   const [, copy] = useCopyClipboard();
 
-  const process = useMemo(() => extraTransaction(meta, tx)[0] / (meta.threshold || 1), [meta, tx]);
+  const progress = useMemo(() => extraTransaction(meta, tx)[0] / (meta.threshold || 1), [meta, tx]);
 
   const handleClick = useCallback(() => {
     copy(tx.sender);
@@ -26,11 +26,11 @@ function TxProcess({ tx }: { tx: Transaction }) {
       <AddressCell shorten size='small' value={tx.sender} />
       {meta.isMultisig && (
         <Box sx={({ palette }) => ({ overflow: 'hidden', borderRadius: '1px', position: 'relative', marginX: 3.5, height: '2px', bgcolor: alpha(palette.primary.main, 0.1) })}>
-          <Box sx={{ borderRadius: '1px', position: 'absolute', left: 0, top: 0, bottom: 0, bgcolor: 'primary.main', width: `${process * 100}%` }} />
+          <Box sx={{ borderRadius: '1px', position: 'absolute', left: 0, top: 0, bottom: 0, bgcolor: 'primary.main', width: `${progress * 100}%` }} />
         </Box>
       )}
     </Paper>
   );
 }
 
-export default React.memo(TxProcess);
+export default React.memo(TxProgress);

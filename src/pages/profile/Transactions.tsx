@@ -10,7 +10,7 @@ import { Box, Chip, Paper, SvgIcon, Typography } from '@mui/material';
 import React, { useContext, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { extraTransaction } from '../transactions/util';
+import { extraTransaction } from '../../components/TxCell/hooks/util';
 
 function Row({ isStart, transaction }: { transaction: Transaction; isStart: boolean }) {
   const { meta } = useAddressMeta(transaction.sender);

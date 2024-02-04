@@ -40,7 +40,7 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
     return true;
   }, [allBalances, value]);
 
-  const icon = <SvgIcon color='primary' component={isUnLock ? IconUnLock : IconLock} fontSize='medium' inheritViewBox sx={{ opacity: 0.5 }} />;
+  const icon = <SvgIcon color='primary' component={isUnLock ? IconUnLock : IconLock} inheritViewBox sx={{ opacity: 0.5 }} />;
 
   return (
     <>
@@ -52,7 +52,7 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
             <AddressName value={address} /> {isUnLock ? 'unlock' : 'lock'}
           </Typography>
           <Tooltip title={tip}>
-            <SvgIcon color='primary' component={IconQuestion} fontSize='medium' inheritViewBox sx={{ opacity: 0.5 }} />
+            <SvgIcon color='primary' component={IconQuestion} inheritViewBox sx={{ opacity: 0.5 }} />
           </Tooltip>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -64,7 +64,7 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
           <Typography>
             <FormatBalance value={value} />
           </Typography>
-          {!isUnLock && <SvgIcon color={isEnought ? 'success' : 'error'} component={isEnought ? IconSuccess : IconFail} fontSize='medium' inheritViewBox />}
+          {!isUnLock && <SvgIcon color={isEnought ? 'success' : 'error'} component={isEnought ? IconSuccess : IconFail} inheritViewBox />}
         </Box>
       </Box>
     </>
