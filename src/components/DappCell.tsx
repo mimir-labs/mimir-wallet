@@ -54,7 +54,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
             <Box sx={{ flex: '1' }}>
               <Box component='img' src={dapp.icon} sx={{ width: 32, height: 32 }} />
             </Box>
-            <Button component={Link} onClick={(e) => e.stopPropagation()} to={`/explorer/${encodeURIComponent(dapp.url)}`} variant='outlined'>
+            <Button component={Link} onClick={(e) => e.stopPropagation()} to={dapp.internal ? dapp.url : `/explorer/${encodeURIComponent(dapp.url)}`} variant='outlined'>
               Enter
             </Button>
             <IconButton onClick={toggleFavorite} sx={({ palette }) => ({ bgcolor: alpha(palette.primary.main, 0.1) })}>

@@ -30,6 +30,10 @@ function GlobalStyle() {
           },
           ':root': {
             '--toastify-text-color-light': palette.text.primary
+          },
+          '.Toastify__toast-icon': {
+            width: 'auto',
+            minWidth: 'auto'
           }
         })}
       />
