@@ -29,7 +29,11 @@ function GlobalStyle() {
             margin: 0
           },
           ':root': {
-            '--toastify-text-color-light': palette.text.primary
+            '--toastify-text-color-light': palette.text.primary,
+            '--toastify-color-info': palette.info.main,
+            '--toastify-color-success': palette.success.main,
+            '--toastify-color-warning': palette.warning.main,
+            '--toastify-color-error': palette.error.main
           },
           '.Toastify__toast-icon': {
             width: 'auto',
