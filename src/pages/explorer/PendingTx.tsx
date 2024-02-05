@@ -5,7 +5,7 @@ import { ReactComponent as ExpandArrow } from '@mimir-wallet/assets/svg/expand-a
 import { Empty } from '@mimir-wallet/components';
 import { useToggle } from '@mimir-wallet/hooks';
 import { TxCell } from '@mimir-wallet/transactions';
-import { Box, Button, Drawer, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Drawer, IconButton, lighten, Stack, SvgIcon, Typography } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -25,18 +25,19 @@ function PendingTx({ url }: Props) {
         keepMounted: true
       }}
       PaperProps={{
-        sx: {
+        sx: ({ palette }) => ({
           height: 340,
+          bgcolor: lighten(palette.primary.main, 0.95),
           overflow: 'visible',
           pointerEvents: 'all !important'
-        }
+        })
       }}
       anchor='bottom'
       onClose={toggleExpand}
       open={expand}
     >
       <Box
-        sx={{
+        sx={({ palette }) => ({
           position: 'absolute',
           top: -60,
           left: 0,
@@ -44,11 +45,11 @@ function PendingTx({ url }: Props) {
           visibility: 'visible',
           height: 60,
           paddingX: 2.4,
+          bgcolor: lighten(palette.primary.main, 0.95),
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          bgcolor: 'common.white'
-        }}
+          justifyContent: 'space-between'
+        })}
       >
         <Typography color='primary.main' variant='h6'>
           {txs.length} Pending Transactions

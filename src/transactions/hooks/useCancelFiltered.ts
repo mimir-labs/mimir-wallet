@@ -55,6 +55,13 @@ export function useCancelFiltered(api: ApiPromise, transaction: Transaction): [f
   const [canCancel, setCanCancel] = useState<boolean>(false);
 
   useEffect(() => {
+    if (transaction.status > CalldataStatus.Pending) {
+      setFiltered(undefined);
+      setCanCancel(false);
+
+      return;
+    }
+
     const filtered = extraFiltered(transaction.sender);
 
     extraCancelFiltered(api, transaction, filtered).then(() => {

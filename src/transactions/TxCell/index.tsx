@@ -1,16 +1,13 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAddressMeta, useApi, useBlockTime, useToggle } from '@mimir-wallet/hooks';
+import { useAddressMeta, useBlockTime } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
 import moment from 'moment';
 import React, { useMemo } from 'react';
 
-import { useApproveFiltered } from '../hooks/useApproveFiltered';
-import { useCancelFiltered } from '../hooks/useCancelFiltered';
 import { extraTransaction } from '../util';
-import OverviewDialog from './OverviewDialog';
 import TxItems from './TxItems';
 
 interface Props {
@@ -21,13 +18,9 @@ interface Props {
 function TxCell({ defaultOpen, transaction }: Props) {
   const destTx = transaction.top;
   const status = transaction.status;
-  const { api } = useApi();
   const time = useBlockTime(transaction.status < CalldataStatus.Success ? transaction.initTransaction.height : transaction.height);
   const { meta: destSenderMeta } = useAddressMeta(destTx.sender);
   const [approvals] = useMemo((): [number, Transaction[]] => extraTransaction(destSenderMeta, transaction), [destSenderMeta, transaction]);
-  const [approveFiltered, canApprove] = useApproveFiltered(transaction);
-  const [cancelFiltered, canCancel] = useCancelFiltered(api, transaction);
-  const [overviewOpen, toggleOverviewOpen] = useToggle();
 
   return (
     <Paper component={Stack} spacing={1.2} sx={{ padding: 2, borderRadius: 2 }}>
@@ -47,19 +40,7 @@ function TxCell({ defaultOpen, transaction }: Props) {
         <Typography>{time ? moment(time).format() : null}</Typography>
       </Box>
       <Divider orientation='horizontal' />
-      <TxItems
-        approvals={approvals}
-        approveFiltered={approveFiltered}
-        canApprove={canApprove}
-        canCancel={canCancel}
-        cancelFiltered={cancelFiltered}
-        defaultOpen={defaultOpen}
-        openOverview={toggleOverviewOpen}
-        threshold={destSenderMeta.threshold || 0}
-        time={time}
-        transaction={transaction}
-      />
-      <OverviewDialog approveFiltered={approveFiltered} cancelFiltered={cancelFiltered} onClose={toggleOverviewOpen} open={overviewOpen} tx={transaction} />
+      <TxItems approvals={approvals} defaultOpen={defaultOpen} threshold={destSenderMeta.threshold || 0} time={time} transaction={transaction} />
     </Paper>
   );
 }

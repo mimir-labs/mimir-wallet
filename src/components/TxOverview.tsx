@@ -47,6 +47,10 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
   const destTx = sourceTx.top;
 
   const [accounts, canApprove, cancelAccounts, canCancel] = useMemo(() => {
+    if (isMultisig) {
+      return [{}, false, {}, false];
+    }
+
     const _accounts: Record<string, string | undefined> = {};
     const _cancelAccounts: Record<string, string | undefined> = {};
 
@@ -82,7 +86,7 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
     });
 
     return [_accounts, canApprove, _cancelAccounts, canCancel];
-  }, [approveFiltered, cancelFiltered, id]);
+  }, [approveFiltered, cancelFiltered, id, isMultisig]);
 
   const handleApprove = useCallback(
     (filtered: Filtered) => {
@@ -179,7 +183,7 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
           {icon}
         </Box>
         <Box sx={{ display: 'flex' }}>
-          {!isMultisig && canCancel && cancelFiltered && (
+          {canCancel && cancelFiltered && (
             <LoadingButton
               color='error'
               fullWidth
@@ -192,7 +196,7 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
               Cancel
             </LoadingButton>
           )}
-          {!isMultisig && canApprove && approveFiltered && (
+          {canApprove && approveFiltered && (
             <LoadingButton
               color='success'
               fullWidth

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
-import type { Transaction } from '@mimir-wallet/hooks/types';
 
 import { TxOverview } from '@mimir-wallet/components';
+import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import React from 'react';
 
@@ -27,7 +27,9 @@ function OverviewDialog({ approveFiltered, cancelFiltered, onClose, open, tx }: 
           borderRadius: 1
         }}
       >
-        {open && <TxOverview approveFiltered={approveFiltered} cancelFiltered={cancelFiltered} tx={tx} />}
+        {open && (
+          <TxOverview approveFiltered={tx.status < CalldataStatus.Success ? approveFiltered : undefined} cancelFiltered={tx.status < CalldataStatus.Success ? cancelFiltered : undefined} tx={tx} />
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -16,28 +16,24 @@ import { useAddressMeta, useApi, useBlockTime, useDapp, useToggle } from '@mimir
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { formatAgo } from '@mimir-wallet/utils';
 import { alpha, Box, Button, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 
+import { useApproveFiltered } from '../hooks/useApproveFiltered';
+import { useCancelFiltered } from '../hooks/useCancelFiltered';
 import { useRelatedTxs } from '../hooks/useRelatedTxs';
 import { ActionText } from '../TxDisplay';
 import ActionDisplay from '../TxDisplay/ActionDisplay';
 import { extraTransaction } from '../util';
 import Extrinsic from './Extrinsic';
 import Operate from './Operate';
+import OverviewDialog from './OverviewDialog';
 import Progress from './Progress';
 
-function AppCell({ onWidth, website }: { website?: string; onWidth: (width: number) => void }) {
+function AppCell({ website }: { website?: string }) {
   const dapp = useDapp(website);
-  const ref = useRef<HTMLElement>();
-
-  useEffect(() => {
-    if (ref.current) {
-      onWidth(ref.current.clientWidth);
-    }
-  }, [onWidth]);
 
   return (
-    <Box ref={ref} sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+    <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
       {dapp ? (
         <Box component='img' src={dapp.icon} sx={{ width: 20, height: 20 }} />
       ) : (
@@ -128,57 +124,19 @@ function ActionsCell({
   );
 }
 
-function RelatedItem({
-  approveFiltered,
-  canApprove,
-  canCancel,
-  cancelFiltered,
-  offset,
-  openOverview,
-  tx
-}: {
-  tx: Transaction;
-  offset: number;
-  approveFiltered?: Filtered;
-  canApprove: boolean;
-  cancelFiltered?: Filtered;
-  canCancel: boolean;
-  openOverview: () => void;
-}) {
+function RelatedItem({ tx }: { tx: Transaction }) {
   const destTx = tx.top;
   const { meta: destSenderMeta } = useAddressMeta(destTx.sender);
   const [approvals] = useMemo((): [number, Transaction[]] => extraTransaction(destSenderMeta, tx), [destSenderMeta, tx]);
   const time = useBlockTime(tx.status < CalldataStatus.Success ? tx.initTransaction.height : tx.height);
 
-  return (
-    <TxItems
-      approvals={approvals}
-      approveFiltered={approveFiltered}
-      canApprove={canApprove}
-      canCancel={canCancel}
-      cancelFiltered={cancelFiltered}
-      defaultOpen={false}
-      isSub
-      offset={offset}
-      openOverview={openOverview}
-      threshold={destSenderMeta.threshold || 0}
-      time={time}
-      transaction={tx}
-      withApp={false}
-    />
-  );
+  return <TxItems approvals={approvals} defaultOpen={false} isSub threshold={destSenderMeta.threshold || 0} time={time} transaction={tx} withApp={false} />;
 }
 
 function TxItems({
   approvals,
-  approveFiltered,
-  canApprove,
-  canCancel,
-  cancelFiltered,
   defaultOpen,
   isSub = false,
-  offset,
-  openOverview,
   threshold,
   time,
   transaction,
@@ -188,22 +146,18 @@ function TxItems({
   approvals: number;
   threshold: number;
   transaction: Transaction;
-  offset?: number;
   time?: number;
   withApp?: boolean;
   isSub?: boolean;
-  approveFiltered?: Filtered;
-  canApprove: boolean;
-  cancelFiltered?: Filtered;
-  canCancel: boolean;
-  openOverview: () => void;
 }) {
+  const { api } = useApi();
   const [detailOpen, toggleDetailOpen] = useToggle(defaultOpen);
+  const [overviewOpen, toggleOverviewOpen] = useToggle();
   const [relatedTxs] = useRelatedTxs(transaction);
+  const [approveFiltered, canApprove] = useApproveFiltered(transaction);
+  const [cancelFiltered, canCancel] = useCancelFiltered(api, transaction);
 
   const destTx = transaction.top;
-  const { api } = useApi();
-  const [appCellWidth, setAppCellWidth] = useState(0);
 
   return (
     <>
@@ -213,17 +167,17 @@ function TxItems({
           borderRadius: 1,
           overflow: 'hidden',
           border: '1px solid',
-          marginLeft: `${offset ? offset + 20 : 0}px !important`,
+          marginLeft: `${isSub ? 'calc((100% - 135px - 40px) / 5 - 30px)' : 0} !important`,
           borderColor: detailOpen ? palette.secondary.main : alpha(palette.primary.main, 0),
           boxShadow: detailOpen ? shadows[1] : shadows[0]
         })}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', paddingX: 2, paddingY: 1, gap: 2, bgcolor: 'secondary.main', fontWeight: 600 }}>
-          {withApp && <AppCell onWidth={setAppCellWidth} website={destTx.initTransaction.website} />}
+        <Box sx={{ display: 'flex', alignItems: 'center', paddingX: 2, paddingY: 1, paddingLeft: isSub ? 5 : 2, gap: 2, bgcolor: 'secondary.main', fontWeight: 600 }}>
+          {withApp && <AppCell website={destTx.initTransaction.website} />}
           <ActionTextCell action={destTx.action} />
           <ActionDisplayCell api={api} call={destTx.call} isSub={isSub} tx={destTx} />
           <TimeCell time={time} />
-          <ProgressCell approvals={approvals} onClick={openOverview} threshold={threshold} />
+          <ProgressCell approvals={approvals} onClick={toggleOverviewOpen} threshold={threshold} />
           <ActionsCell
             approveFiltered={approveFiltered}
             canApprove={canApprove}
@@ -237,23 +191,12 @@ function TxItems({
         {detailOpen && (
           <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
             <Extrinsic transaction={transaction} />
-            <Progress approveFiltered={approveFiltered} canApprove={canApprove} canCancel={canCancel} cancelFiltered={cancelFiltered} openOverview={openOverview} transaction={transaction} />
+            <Progress approveFiltered={approveFiltered} canApprove={canApprove} canCancel={canCancel} cancelFiltered={cancelFiltered} openOverview={toggleOverviewOpen} transaction={transaction} />
           </Box>
         )}
       </Stack>
-      {relatedTxs.length > 0 &&
-        relatedTxs.map((tx) => (
-          <RelatedItem
-            approveFiltered={approveFiltered}
-            canApprove={canApprove}
-            canCancel={canCancel}
-            cancelFiltered={cancelFiltered}
-            key={tx.uuid}
-            offset={appCellWidth}
-            openOverview={openOverview}
-            tx={tx}
-          />
-        ))}
+      {relatedTxs.length > 0 && relatedTxs.map((tx) => <RelatedItem key={tx.uuid} tx={tx} />)}
+      <OverviewDialog approveFiltered={approveFiltered} cancelFiltered={cancelFiltered} onClose={toggleOverviewOpen} open={overviewOpen} tx={transaction} />
     </>
   );
 }

@@ -5,7 +5,7 @@ import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
 import { useAccounts } from '@mimir-wallet/hooks';
 import { getAddressMeta } from '@mimir-wallet/utils';
-import { Box, Divider } from '@mui/material';
+import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
 import InputAddress from '../InputAddress';
@@ -59,11 +59,10 @@ function AddressChain({
 
     return (
       <>
-        <Box sx={{ paddingLeft: index * 2 }}>
+        <Box sx={{ paddingLeft: index * 1.5 }}>
           <InputAddress filtered={filtered ? Object.keys(filtered) : meta.who} isSign label={index === 0 ? 'Initiator' : undefined} onChange={_onChange} value={value} />
         </Box>
         {isMultisigValue && <AddressChain accounts={accounts} address={value} filtered={filtered?.[value]} index={index + 1} onChange={onChange} />}
-        <Divider />
       </>
     );
   }
