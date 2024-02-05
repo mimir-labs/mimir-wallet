@@ -28,6 +28,7 @@ export { default as InputAddress } from './InputAddress';
 export { default as InputNumber } from './InputNumber';
 export { default as LockItem, LockContainer } from './LockItem';
 export { default as MimirLoading } from './MimirLoading';
+export { default as QrcodeAddress } from './QrcodeAddress';
 export { default as SwitchAccountDialog } from './SwitchAccountDialog';
 export { default as ToastRoot, toastError, toastSuccess, toastWarn } from './ToastRoot';
 export { default as TxError } from './TxError';

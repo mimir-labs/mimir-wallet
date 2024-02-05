@@ -14,8 +14,9 @@ function PageTransfer() {
   const { api } = useApi();
   const navigate = useNavigate();
   const selected = useSelectedAccount();
+  const [fromParam] = useQueryParam<string>('from');
   const [toParam] = useQueryParam<string>('to');
-  const [sending, setSending] = useState<string | undefined>(selected || '');
+  const [sending, setSending] = useState<string | undefined>(fromParam || selected || '');
   const [recipient, setRecipient] = useState<string>(toParam || '');
   const [amount, setAmount] = useState<BN>();
   const { addQueue } = useTxQueue();
