@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
-import type { KeyringItemType, KeyringJson$Meta } from '@polkadot/ui-keyring/types';
+import type { KeyringJson$Meta } from '@polkadot/ui-keyring/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { keyring } from '@polkadot/ui-keyring';
@@ -19,11 +19,11 @@ export interface AddressMeta extends KeyringJson$Meta {
   isPending?: boolean;
 }
 
-export function getAddressMeta(address: string | Uint8Array | HexString, type: KeyringItemType | null = null): AddressMeta {
+export function getAddressMeta(address: string | Uint8Array | HexString): AddressMeta {
   let meta: AddressMeta | undefined;
 
   try {
-    const pair = keyring.getAddress(isHex(address) ? hexToU8a(address) : address, type);
+    const pair = keyring.getAddress(isHex(address) ? hexToU8a(address) : address, 'account') || keyring.getAddress(isHex(address) ? hexToU8a(address) : address, 'address');
 
     meta = pair && pair.meta;
   } catch {

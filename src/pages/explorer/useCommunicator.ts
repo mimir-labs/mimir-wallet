@@ -6,7 +6,6 @@ import type { SignerPayloadJSON } from '@polkadot/types/types';
 
 import { IframeCommunicator } from '@mimir-wallet/communicator';
 import { useApi, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
-import { service } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
@@ -29,7 +28,6 @@ export function useCommunicator(iframeRef: MutableRefObject<HTMLIFrameElement | 
           onlySign: true,
           website: website.origin,
           onSignature: (signer, signature, tx, payload) => {
-            service.uploadWebsite(tx.hash.toHex(), website.origin);
             resolve({ id, signature, signer, payload } as any);
           },
           onReject: () => reject(new Error('User reject'))

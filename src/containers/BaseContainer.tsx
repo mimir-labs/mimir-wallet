@@ -19,14 +19,14 @@ function BaseContainer() {
       <GlobalStyle />
       <TopBar />
       {isApiReady && isApiConnected ? (
-        <>
+        <Box sx={{ height: '100%' }}>
           <Outlet />
           <DetectedMultisig />
-        </>
+        </Box>
       ) : (
         <Box
           sx={{
-            background: 'linear-gradient(245.23deg, #F4F2FF 0%, #FBFDFF 100%)',
+            background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)',
             position: 'absolute',
             left: 0,
             right: 0,

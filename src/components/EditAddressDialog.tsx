@@ -23,7 +23,15 @@ function Content({ address, onClose }: { address: string; onClose?: () => void }
         <Button fullWidth onClick={onClose} variant='outlined'>
           Cancel
         </Button>
-        <Button disabled={!name || !address} fullWidth onClick={() => saveName((name) => toastSuccess(`Save name to ${name} success`))} variant='contained'>
+        <Button
+          disabled={!name || !address}
+          fullWidth
+          onClick={() => {
+            onClose?.();
+            saveName((name) => toastSuccess(`Save name to ${name} success`));
+          }}
+          variant='contained'
+        >
           Save
         </Button>
       </DialogActions>

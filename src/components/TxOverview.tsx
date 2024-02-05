@@ -1,27 +1,132 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as IconBack } from '@mimir-wallet/assets/svg/icon-back.svg';
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
+
+import { ReactComponent as IconCancel } from '@mimir-wallet/assets/svg/icon-cancel.svg';
 import { ReactComponent as IconFail } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
+import { ReactComponent as IconFailOutlined } from '@mimir-wallet/assets/svg/icon-failed-outlined.svg';
 import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
+import { ReactComponent as IconSuccessOutlined } from '@mimir-wallet/assets/svg/icon-success-outlined.svg';
 import { ReactComponent as IconWaiting } from '@mimir-wallet/assets/svg/icon-waiting-fill.svg';
+import { useApi, useTxQueue } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { getAddressMeta } from '@mimir-wallet/utils';
-import { Button, Paper, SvgIcon, useTheme } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { alpha, Box, Button, Paper, SvgIcon, useTheme } from '@mui/material';
 import { addressEq } from '@polkadot/util-crypto';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactFlow, { Edge, EdgeLabelRenderer, EdgeProps, Handle, Node, NodeProps, Position, StepEdge, useEdgesState, useNodesState } from 'reactflow';
 
 import AddressCell from './AddressCell';
 
 interface Props {
   tx?: Transaction;
+  approveFiltered?: Filtered;
+  cancelFiltered?: Filtered;
 }
 
-type NodeData = { parentId: string | null; members: string[]; address: string; tx: Transaction | null };
+type NodeData = {
+  parentId: string | null;
+  members: string[];
+  address: string;
+  sourceTx: Transaction;
+  tx: Transaction | null;
+  isMultisig?: boolean;
+  approveFiltered?: Filtered;
+  cancelFiltered?: Filtered;
+};
 
-const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
+const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => {
+  const { address, approveFiltered, cancelFiltered, isMultisig, members, parentId, sourceTx } = data;
+  const { api } = useApi();
   const { palette } = useTheme();
+  const { addQueue } = useTxQueue();
+  const [approveLoading, setApproveLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const destTx = sourceTx.top;
+
+  const [accounts, canApprove, cancelAccounts, canCancel] = useMemo(() => {
+    if (isMultisig) {
+      return [{}, false, {}, false];
+    }
+
+    const _accounts: Record<string, string | undefined> = {};
+    const _cancelAccounts: Record<string, string | undefined> = {};
+
+    let lastAddress: string;
+    let canApprove = true;
+    let canCancel = true;
+
+    let _approveFiltered = approveFiltered;
+    let _cancelFiltered = cancelFiltered;
+
+    id.split('-').forEach((address) => {
+      if (address === 'null') {
+        return;
+      }
+
+      if (lastAddress) {
+        if (!_approveFiltered?.[address]) {
+          canApprove = false;
+        }
+
+        if (!_cancelFiltered?.[address]) {
+          canCancel = false;
+        }
+
+        _approveFiltered = _approveFiltered?.[address];
+        _cancelFiltered = _cancelFiltered?.[address];
+
+        _accounts[lastAddress] = address;
+        _cancelAccounts[lastAddress] = address;
+      }
+
+      lastAddress = address;
+    });
+
+    return [_accounts, canApprove, _cancelAccounts, canCancel];
+  }, [approveFiltered, cancelFiltered, id, isMultisig]);
+
+  const handleApprove = useCallback(
+    (filtered: Filtered) => {
+      setApproveLoading(true);
+      addQueue({
+        filtered,
+        accounts,
+        extrinsic: api.tx[sourceTx.call.section][sourceTx.call.method](...sourceTx.call.args),
+        destCall: destTx.call,
+        destSender: destTx.sender,
+        accountId: sourceTx.sender,
+        isApprove: true,
+        transaction: destTx,
+        onFinalized: () => setApproveLoading(false),
+        onError: () => setApproveLoading(false),
+        onReject: () => setApproveLoading(false)
+      });
+    },
+    [addQueue, api.tx, accounts, destTx, sourceTx]
+  );
+
+  const handleCancel = useCallback(
+    (filtered: Filtered) => {
+      setCancelLoading(true);
+      addQueue({
+        filtered,
+        accounts: cancelAccounts,
+        extrinsic: api.tx[sourceTx.call.section][sourceTx.call.method](...sourceTx.call.args),
+        destCall: destTx.call,
+        destSender: destTx.sender,
+        accountId: sourceTx.sender,
+        isCancelled: true,
+        transaction: destTx,
+        onFinalized: () => setCancelLoading(false),
+        onError: () => setCancelLoading(false),
+        onReject: () => setCancelLoading(false)
+      });
+    },
+    [addQueue, api.tx, cancelAccounts, destTx, sourceTx]
+  );
 
   const tx = data.tx;
   const color = tx
@@ -43,7 +148,7 @@ const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
         tx.status === CalldataStatus.Success
           ? IconSuccess
           : tx.status === CalldataStatus.Cancelled
-          ? IconBack
+          ? IconCancel
           : tx.status === CalldataStatus.Failed
           ? IconFail
           : tx.status === CalldataStatus.Pending
@@ -59,30 +164,61 @@ const TxNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
 
   return (
     <>
-      {data.members.length > 0 && (
+      {members.length > 0 && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
           style={{
             width: 10,
             height: 10,
-            top: 35,
+            top: 30,
             background: color
           }}
           type='source'
         />
       )}
-      <Paper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 280, height: 71, padding: 1 }}>
-        <AddressCell showType value={data.address} withCopy />
-        {icon}
+      <Paper sx={{ width: 280, overflow: 'hidden' }}>
+        <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingX: 1, paddingY: 0.3 }}>
+          <AddressCell showType size='small' value={address} withCopy />
+          {icon}
+        </Box>
+        <Box sx={{ display: 'flex' }}>
+          {canCancel && cancelFiltered && (
+            <LoadingButton
+              color='error'
+              fullWidth
+              loading={cancelLoading}
+              onClick={() => handleCancel(cancelFiltered)}
+              startIcon={<SvgIcon component={IconFailOutlined} inheritViewBox />}
+              sx={({ palette }) => ({ borderRadius: 0, bgcolor: alpha(palette.error.main, 0.1) })}
+              variant='text'
+            >
+              Cancel
+            </LoadingButton>
+          )}
+          {canApprove && approveFiltered && (
+            <LoadingButton
+              color='success'
+              fullWidth
+              loading={approveLoading}
+              onClick={() => handleApprove(approveFiltered)}
+              startIcon={<SvgIcon component={IconSuccessOutlined} inheritViewBox />}
+              sx={({ palette }) => ({ borderRadius: 0, bgcolor: alpha(palette.success.main, 0.1) })}
+              variant='text'
+            >
+              Approve
+            </LoadingButton>
+          )}
+        </Box>
       </Paper>
-      {data.parentId && (
+      {parentId && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Right}
           style={{
             width: 10,
             height: 10,
+            top: 30,
             background: color
           }}
           type='target'
@@ -150,11 +286,14 @@ const edgeTypes = {
 function makeNodes(
   address: string,
   parentId: string | null,
+  sourceTx: Transaction,
   tx: Transaction | null,
   xPos: number,
   yPos: number,
   xOffset: number,
   yOffset: number,
+  approveFiltered?: Filtered,
+  cancelFiltered?: Filtered,
   onYChange?: (offset: number) => void,
   nodes: Node<NodeData>[] = [],
   edges: Edge[] = []
@@ -166,7 +305,7 @@ function makeNodes(
   const node: Node<NodeData> = {
     id: nodeId,
     type: 'TxNode',
-    data: { address, parentId, members: meta.who || [], tx },
+    data: { approveFiltered, cancelFiltered, address, parentId, members: meta.who || [], sourceTx, tx, isMultisig: meta.isMultisig },
     position: { x: xPos, y: yPos },
     connectable: false
   };
@@ -196,11 +335,14 @@ function makeNodes(
       makeNodes(
         _address,
         nodeId,
+        sourceTx,
         (meta.isFlexible ? tx?.children[0]?.children : tx?.children)?.find((item) => addressEq(item.sender, _address)) || null,
         nextX,
         nextY,
         xOffset,
         yOffset,
+        approveFiltered,
+        cancelFiltered,
         (offset: number) => {
           onYChange?.(offset);
           nextY += offset;
@@ -221,7 +363,7 @@ function makeNodes(
   }
 }
 
-function TxOverview({ tx }: Props) {
+function TxOverview({ approveFiltered, cancelFiltered, tx }: Props) {
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -231,11 +373,11 @@ function TxOverview({ tx }: Props) {
     const nodes: Node<NodeData>[] = [];
     const edges: Edge[] = [];
 
-    makeNodes(tx.sender, null, tx, 0, 0, 360, 90, undefined, nodes, edges);
+    makeNodes(tx.sender, null, tx, tx, 0, 0, 360, 110, approveFiltered, cancelFiltered, undefined, nodes, edges);
 
     setNodes(nodes);
     setEdges(edges);
-  }, [tx, setEdges, setNodes]);
+  }, [tx, setEdges, setNodes, approveFiltered, cancelFiltered]);
 
   return (
     <ReactFlow

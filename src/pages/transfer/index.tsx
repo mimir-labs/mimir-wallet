@@ -5,7 +5,7 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { BN } from '@polkadot/util';
 
 import { InputAddress, InputNumber } from '@mimir-wallet/components';
-import { useAddresses, useAllAccounts, useApi, useCall, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
+import { useAddresses, useAllAccounts, useApi, useCall, useQueryParam, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,8 +14,10 @@ function PageTransfer() {
   const { api } = useApi();
   const navigate = useNavigate();
   const selected = useSelectedAccount();
-  const [sending, setSending] = useState<string | undefined>(selected);
-  const [recipient, setRecipient] = useState<string>();
+  const [fromParam] = useQueryParam<string>('from');
+  const [toParam] = useQueryParam<string>('to');
+  const [sending, setSending] = useState<string | undefined>(fromParam || selected || '');
+  const [recipient, setRecipient] = useState<string>(toParam || '');
   const [amount, setAmount] = useState<BN>();
   const { addQueue } = useTxQueue();
   const filtered = useAllAccounts();
@@ -56,7 +58,15 @@ function PageTransfer() {
           <Typography variant='h3'>Transfer</Typography>
           <InputAddress balance={sendingBalances?.freeBalance} filtered={filtered} isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} withBalance />
           <Divider />
-          <InputAddress balance={recipientBalances?.freeBalance} filtered={filtered.concat(allAddresses)} label='Recipient' onChange={setRecipient} placeholder='Recipient' withBalance />
+          <InputAddress
+            balance={recipientBalances?.freeBalance}
+            filtered={filtered.concat(allAddresses)}
+            label='Recipient'
+            onChange={setRecipient}
+            placeholder='Recipient'
+            value={recipient}
+            withBalance
+          />
           <InputNumber error={amountError} label='Amount' maxValue={sendingBalances?.freeBalance} onChange={setAmount} placeholder='Input amount' withMax />
           <Button disabled={!amount || !recipient} fullWidth onClick={handleClick}>
             Review

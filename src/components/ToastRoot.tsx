@@ -5,6 +5,7 @@ import { Portal } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import { injectStyle } from 'react-toastify/dist/inject-style';
 
+import { FailedAnimation, NoticeAnimation, SuccessAnimation, WaitingAnimation } from './animation';
 import TxError from './TxError';
 
 injectStyle();
@@ -20,7 +21,31 @@ function getMessage(value: unknown): React.ReactNode {
 function ToastRoot() {
   return (
     <Portal>
-      <ToastContainer autoClose={5000} closeOnClick draggable hideProgressBar={false} newestOnTop={false} pauseOnFocusLoss pauseOnHover position='top-right' rtl={false} theme='light' />
+      <ToastContainer
+        autoClose={5000}
+        closeOnClick
+        draggable
+        hideProgressBar={false}
+        icon={(props) => {
+          if (props.type === 'info') {
+            return <NoticeAnimation />;
+          } else if (props.type === 'default') {
+            return <NoticeAnimation />;
+          } else if (props.type === 'success') {
+            return <SuccessAnimation />;
+          } else if (props.type === 'error') {
+            return <FailedAnimation />;
+          } else {
+            return <WaitingAnimation />;
+          }
+        }}
+        newestOnTop={false}
+        pauseOnFocusLoss
+        pauseOnHover
+        position='top-right'
+        rtl={false}
+        theme='light'
+      />
     </Portal>
   );
 }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AddAddressDialog, Input, toastSuccess } from '@mimir-wallet/components';
-import { useAccounts, useAddresses, useAddressMeta, useApi, useSelectedAccountCallback, useToggle, useTransactions, useTxQueue } from '@mimir-wallet/hooks';
+import { useAccounts, useAddresses, useAddressMeta, useApi, useSelectedAccount, useSelectedAccountCallback, useToggle, useTransactions, useTxQueue } from '@mimir-wallet/hooks';
 import { CalldataStatus } from '@mimir-wallet/hooks/types';
 import { service } from '@mimir-wallet/utils';
 import { Box, Button, FormHelperText, Paper, Stack, Typography } from '@mui/material';
@@ -24,11 +24,13 @@ function checkError(signatories: string[], isThresholdValid: boolean, hasSoloAcc
 function AccountSetting() {
   const navigate = useNavigate();
   const { address: addressParam } = useParams<'address'>();
-  const { meta, name, saveName, setName } = useAddressMeta(addressParam);
+  const selected = useSelectedAccount();
+  const account = addressParam || selected;
+  const { meta, name, saveName, setName } = useAddressMeta(account);
   const { isAddress } = useAddresses();
   const { isAccount } = useAccounts();
   const { api } = useApi();
-  const [txs] = useTransactions(addressParam);
+  const [txs] = useTransactions(account);
   const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success), [txs]);
   const selectAccount = useSelectedAccountCallback();
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig(meta.who, meta.threshold);
@@ -50,7 +52,7 @@ function AccountSetting() {
   const _onClick = useCallback(async () => {
     await saveName((name) => toastSuccess(`Save name to ${name} success`));
 
-    if (!meta.who || !meta.threshold || !addressParam) return;
+    if (!meta.who || !meta.threshold || !account) return;
     if (!checkField()) return;
     const oldMultiAddress = encodeMultiAddress(meta.who, meta.threshold);
     const newMultiAddress = encodeMultiAddress(signatories, threshold);
@@ -65,10 +67,10 @@ function AccountSetting() {
             false
           ),
         extrinsic: api.tx.utility.batchAll([api.tx.proxy.addProxy(newMultiAddress, 0, 0), api.tx.proxy.removeProxy(oldMultiAddress, 0, 0)]),
-        accountId: addressParam
+        accountId: account
       });
     }
-  }, [checkField, saveName, meta.who, meta.threshold, addressParam, signatories, threshold, addQueue, api.tx.utility, api.tx.proxy, name]);
+  }, [checkField, saveName, meta.who, meta.threshold, account, signatories, threshold, addQueue, api.tx.utility, api.tx.proxy, name]);
 
   const _handleAdd = useCallback(() => {
     if (isAddressValid) {
@@ -106,9 +108,9 @@ function AccountSetting() {
             <Box
               color='primary.main'
               onClick={() => {
-                if (!addressParam) return;
+                if (!account) return;
 
-                selectAccount(addressParam);
+                selectAccount(account);
                 navigate('/transactions');
               }}
               sx={{ cursor: 'pointer', marginBottom: 2, fontWeight: 700 }}

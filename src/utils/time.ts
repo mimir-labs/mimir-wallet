@@ -52,3 +52,11 @@ export function formatCountdown(value: number | string, format: string) {
 
   return formatTimeStr(diff, format);
 }
+
+export function formatAgo(value: number | string, format: string) {
+  const target = new Date(value).getTime();
+  const current = Date.now();
+  const diff = Math.max(current - target, 0);
+
+  return formatTimeStr(diff, format);
+}

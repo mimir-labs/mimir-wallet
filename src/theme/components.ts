@@ -23,14 +23,14 @@ const createComponents: Func = () => ({
       border-radius: 5px;
     }
     ::-webkit-scrollbar-thumb {
-      background: #2700FF;
+      background: #d9d9d9;
       border-radius: 5px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #2700FF;
+      background: #d9d9d9;
     }
     ::-webkit-scrollbar-corner {
-      background: #2700FF;
+      background: #d9d9d9;
     }
 `
   },
@@ -43,48 +43,65 @@ const createComponents: Func = () => ({
     defaultProps: { variant: 'contained' },
     styleOverrides: {
       root: () => ({
-        fontWeight: 600,
+        fontWeight: 700,
         lineHeight: 1.25,
-        textTransform: 'initial'
+        textTransform: 'initial',
+        '>.MuiSvgIcon-root': {
+          fontSize: '1.2em'
+        }
       }),
       outlined: ({ ownerState, theme }) => ({
         borderColor: ownerState.color !== 'inherit' ? theme.palette[ownerState.color || 'primary'].main : undefined
       }),
       startIcon: {
         '>*:nth-of-type(1)': {
-          fontSize: '1em'
+          fontSize: '1.2em'
         }
       },
       endIcon: {
         '>*:nth-of-type(1)': {
-          fontSize: '1em'
+          fontSize: '1.2em'
         }
       },
       sizeLarge: {
-        borderRadius: '19px',
-        padding: '12px 20px'
+        fontSize: '1rem',
+        borderRadius: '20px',
+        padding: '8px 20px',
+        lineHeight: 1.2
       },
       sizeMedium: {
-        borderRadius: '17px',
-        padding: '8px 15px'
+        fontSize: '0.875rem',
+        borderRadius: '19px',
+        padding: '8px 15px',
+        lineHeight: 1.2
       },
       sizeSmall: {
-        borderRadius: '18.5px',
-        padding: '5px 10px'
+        fontSize: '0.875rem',
+        borderRadius: '15px',
+        padding: '5px 10px',
+        lineHeight: 1.2
       }
     }
   },
 
   MuiIconButton: {
     styleOverrides: {
-      sizeSmall: {
-        fontSize: '0.75rem'
-      },
-      sizeMedium: {
-        fontSize: '0.875rem'
+      root: {
+        '>.MuiSvgIcon-root': {
+          fontSize: '1.2em'
+        }
       },
       sizeLarge: {
-        fontSize: '1rem'
+        fontSize: '1rem',
+        lineHeight: 1.2
+      },
+      sizeMedium: {
+        fontSize: '0.875rem',
+        lineHeight: 1.2
+      },
+      sizeSmall: {
+        fontSize: '0.875rem',
+        lineHeight: 1.2
       }
     }
   },
@@ -95,7 +112,7 @@ const createComponents: Func = () => ({
     },
     styleOverrides: {
       fontSizeInherit: {
-        fontSize: 'inherit'
+        fontSize: '1.2em'
       },
       fontSizeSmall: {
         fontSize: '0.75rem'
@@ -266,6 +283,14 @@ const createComponents: Func = () => ({
         marginTop: theme.spacing(1.5),
         padding: 0,
         paddingTop: theme.spacing(1.5)
+      })
+    }
+  },
+
+  MuiDivider: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        borderColor: theme.palette.divider
       })
     }
   },

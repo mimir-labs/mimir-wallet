@@ -14,6 +14,7 @@ function TxModal() {
     queue.map(
       ({
         accountId,
+        accounts,
         beforeSend,
         destCall,
         destSender,
@@ -45,6 +46,7 @@ function TxModal() {
           <DialogTitle>{onlySign ? 'Sign Transaction' : 'Submit Transaction'}</DialogTitle>
           {isApiReady && (
             <Contents
+              accounts={accounts}
               address={accountId.toString()}
               beforeSend={beforeSend}
               destCall={destCall}

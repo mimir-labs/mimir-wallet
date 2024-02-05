@@ -24,6 +24,7 @@ import CallComp from './Call';
 import SendTx from './SendTx';
 
 function Contents({
+  accounts: propsAccounts = {},
   address,
   beforeSend,
   destCall,
@@ -54,13 +55,14 @@ function Contents({
   isApprove: boolean;
   onlySign: boolean;
   website?: string;
+  accounts?: Record<string, string | undefined>;
   isCancelled: boolean;
   onSignature?: (signer: string, signature: HexString, ex: Extrinsic, payload: ExtrinsicPayloadValue) => void;
   onError: (error: unknown) => void;
   onClose: () => void;
   onReject: () => void;
 }) {
-  const [accounts, setAccounts] = useState<Record<string, string | undefined>>({});
+  const [accounts, setAccounts] = useState<Record<string, string | undefined>>(propsAccounts);
   const { api } = useApi();
   const [prepare, setPrepare] = useState<PrepareMultisig>();
   const canSend = useMemo(() => canSendMultisig(accounts, address), [accounts, address]);
@@ -112,43 +114,49 @@ function Contents({
           )}
           <Divider />
           <CallComp destSender={destSender} isCancelled={isCancelled} method={destCall || extrinsic.method} sender={address} transaction={transaction} />
-          <AddressChain accounts={accounts} address={address} filtered={filtered} onChange={setAccounts} />
+          <Stack spacing={1}>
+            <Divider />
+            <AddressChain accounts={accounts} address={address} filtered={filtered} onChange={setAccounts} />
+          </Stack>
           {prepare && (!!Object.keys(prepare[2]).length || !!Object.keys(prepare[3]).length) && (
-            <LockContainer>
-              {Object.entries(prepare[2]).map(([address, value], index) => (
-                <LockItem
-                  address={address}
-                  key={index}
-                  tip={
-                    <>
-                      <FormatBalance value={value} /> in{' '}
-                      <b>
-                        <AddressName value={address} />
-                      </b>{' '}
-                      will be reserved for initiate transaction.
-                    </>
-                  }
-                  value={value}
-                />
-              ))}
-              {Object.entries(prepare[3]).map(([address, value], index) => (
-                <LockItem
-                  address={address}
-                  isUnLock
-                  key={index}
-                  tip={
-                    <>
-                      <FormatBalance value={value} /> in{' '}
-                      <b>
-                        <AddressName value={address} />
-                      </b>{' '}
-                      will be unreserved for execute transaction.
-                    </>
-                  }
-                  value={value}
-                />
-              ))}
-            </LockContainer>
+            <>
+              <Divider />
+              <LockContainer>
+                {Object.entries(prepare[2]).map(([address, value], index) => (
+                  <LockItem
+                    address={address}
+                    key={index}
+                    tip={
+                      <>
+                        <FormatBalance value={value} /> in{' '}
+                        <b>
+                          <AddressName value={address} />
+                        </b>{' '}
+                        will be reserved for initiate transaction.
+                      </>
+                    }
+                    value={value}
+                  />
+                ))}
+                {Object.entries(prepare[3]).map(([address, value], index) => (
+                  <LockItem
+                    address={address}
+                    isUnLock
+                    key={index}
+                    tip={
+                      <>
+                        <FormatBalance value={value} /> in{' '}
+                        <b>
+                          <AddressName value={address} />
+                        </b>{' '}
+                        will be unreserved for execute transaction.
+                      </>
+                    }
+                    value={value}
+                  />
+                ))}
+              </LockContainer>
+            </>
           )}
         </Stack>
       </DialogContent>
@@ -190,6 +198,7 @@ function Contents({
             onSignature={onSignature}
             onlySign={onlySign}
             prepare={prepare}
+            website={website}
           />
         </Box>
       </DialogActions>

@@ -7,10 +7,11 @@ interface Props {
   info: React.ReactNode;
   transaction?: React.ReactNode;
   assets?: React.ReactNode;
+  dapps?: React.ReactNode | null;
   member?: React.ReactNode;
 }
 
-function ProfileWrapper({ assets, info, member, transaction }: Props) {
+function ProfileWrapper({ assets, dapps, info, member, transaction }: Props) {
   return (
     <Stack spacing={2}>
       <Box sx={{ display: 'flex', gap: 2 }}>
@@ -33,6 +34,14 @@ function ProfileWrapper({ assets, info, member, transaction }: Props) {
         </Typography>
         {assets}
       </Box>
+      {dapps && (
+        <Box>
+          <Typography marginBottom={0.5} variant='h6'>
+            Favorite DApps
+          </Typography>
+          {dapps}
+        </Box>
+      )}
       <Box>
         {member && (
           <Typography marginBottom={0.5} variant='h6'>

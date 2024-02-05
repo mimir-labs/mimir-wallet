@@ -5,7 +5,7 @@ import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
 import { useAccounts } from '@mimir-wallet/hooks';
 import { getAddressMeta } from '@mimir-wallet/utils';
-import { Box, Divider } from '@mui/material';
+import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
 import InputAddress from '../InputAddress';
@@ -38,17 +38,19 @@ function AddressChain({
   );
 
   useEffect(() => {
-    const finded = meta.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.filter((address) => isAccount(address)) || [] : [];
+    if (!accounts[address]) {
+      const finded = meta.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.filter((address) => isAccount(address)) || [] : [];
 
-    if (finded.length > 0) {
-      const solo = finded.find((item) => !getAddressMeta(item).isMultisig);
+      if (finded.length > 0) {
+        const solo = finded.find((item) => !getAddressMeta(item).isMultisig);
 
-      onChange((value) => ({
-        ...value,
-        [address]: solo || finded[0]
-      }));
+        onChange((value) => ({
+          ...value,
+          [address]: solo || finded[0]
+        }));
+      }
     }
-  }, [address, filtered, isAccount, meta, onChange]);
+  }, [accounts, address, filtered, isAccount, meta, onChange]);
 
   if (meta.isMultisig) {
     const value = accounts[address] || '';
@@ -57,11 +59,10 @@ function AddressChain({
 
     return (
       <>
-        <Box sx={{ paddingLeft: index * 2 }}>
+        <Box sx={{ paddingLeft: index * 1.5 }}>
           <InputAddress filtered={filtered ? Object.keys(filtered) : meta.who} isSign label={index === 0 ? 'Initiator' : undefined} onChange={_onChange} value={value} />
         </Box>
         {isMultisigValue && <AddressChain accounts={accounts} address={value} filtered={filtered?.[value]} index={index + 1} onChange={onChange} />}
-        <Divider />
       </>
     );
   }

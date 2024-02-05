@@ -3,6 +3,7 @@
 
 export * from './address';
 export * from './common';
+export * as chainExplorer from './chain-explorer';
 export * from './fetcher';
 export * from './multisig-tx';
 export * as service from './service';

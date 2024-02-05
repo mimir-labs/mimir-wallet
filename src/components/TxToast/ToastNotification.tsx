@@ -3,13 +3,11 @@
 
 import type { TxEvents } from '@mimir-wallet/utils';
 
-import { ReactComponent as IconFailed } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
-import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
-import { ReactComponent as IconWaiting } from '@mimir-wallet/assets/svg/icon-waiting-fill.svg';
-import { Box, SvgIcon, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 import { toast, ToastOptions } from 'react-toastify';
 
+import { FailedAnimation, SuccessAnimation, WaitingAnimation } from '../animation';
 import TxError from '../TxError';
 
 function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions] {
@@ -21,7 +19,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
           <Typography fontSize={12}>Transaction is inblock</Typography>
         </Box>
       ),
-      { icon: <SvgIcon component={IconWaiting} fontSize='large' inheritViewBox sx={{ color: '#FFB762' }} />, type: 'warning', autoClose: false }
+      { icon: <WaitingAnimation />, autoClose: false }
     ];
   } else if (events.status === 'finalized') {
     return [
@@ -34,7 +32,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       {
         type: 'success',
         autoClose: 3000,
-        icon: <SvgIcon component={IconSuccess} fontSize='large' inheritViewBox />
+        icon: <SuccessAnimation />
       }
     ];
   } else if (events.status === 'signed') {
@@ -45,7 +43,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
           <Typography fontSize={12}>Boardcasting transaction</Typography>
         </Box>
       ),
-      { icon: <SvgIcon component={IconWaiting} fontSize='large' inheritViewBox sx={{ color: '#FFB762' }} />, type: 'warning', autoClose: false }
+      { icon: <WaitingAnimation />, autoClose: false }
     ];
   } else if (events.status === 'success') {
     return [
@@ -58,7 +56,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       {
         type: 'success',
         autoClose: 3000,
-        icon: <SvgIcon component={IconSuccess} fontSize='large' inheritViewBox />
+        icon: <SuccessAnimation />
       }
     ];
   } else if (events.status === 'error') {
@@ -74,7 +72,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       {
         type: 'error',
         autoClose: 3000,
-        icon: <SvgIcon component={IconFailed} fontSize='large' inheritViewBox />
+        icon: <FailedAnimation />
       }
     ];
   } else {
@@ -85,7 +83,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
           <Typography fontSize={12}>Waiting for sign</Typography>
         </Box>
       ),
-      { icon: <SvgIcon component={IconWaiting} fontSize='large' inheritViewBox sx={{ color: '#FFB762' }} />, type: 'warning', autoClose: false }
+      { icon: <WaitingAnimation />, autoClose: false }
     ];
   }
 }

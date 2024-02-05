@@ -6,11 +6,10 @@ import { Empty } from '@mimir-wallet/components';
 import { useAddressMeta, useDapp } from '@mimir-wallet/hooks';
 import { SelectAccountCtx } from '@mimir-wallet/hooks/ctx/SelectedAccount';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
+import { extraTransaction } from '@mimir-wallet/transactions';
 import { Box, Chip, Paper, SvgIcon, Typography } from '@mui/material';
 import React, { useContext, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-
-import { extraTransaction } from '../transactions/util';
 
 function Row({ isStart, transaction }: { transaction: Transaction; isStart: boolean }) {
   const { meta } = useAddressMeta(transaction.sender);

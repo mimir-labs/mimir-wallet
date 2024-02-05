@@ -18,13 +18,13 @@ import { AccountBalance } from './types';
 function Row({ balances }: { balances: AccountBalance }) {
   const { api, systemChain } = useApi();
 
-  const token = useMemo(() => findToken(api), [api]);
+  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [open, toggleOpen] = useToggle(true);
 
   return (
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-        <Avatar alt='Token' src={token?.Icon} sx={{ width: 32, height: 32 }} />
+        <Avatar alt='Token' src={token.Icon} sx={{ width: 32, height: 32 }} />
         <Typography fontSize='1rem' width='20%'>
           {systemChain}
         </Typography>
@@ -33,7 +33,7 @@ function Row({ balances }: { balances: AccountBalance }) {
             <FormatBalance value={balances.total} />
           </Typography>
         </Box>
-        <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox sx={{ fontSize: '1rem !important' }} />} to='/transfer'>
+        <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox />} to='/transfer'>
           Transfer
         </Button>
         <IconButton onClick={toggleOpen} sx={{ transformOrigin: 'center', transform: `rotateZ(${open ? '0deg' : '180deg'})`, transition: 'all 150ms' }}>

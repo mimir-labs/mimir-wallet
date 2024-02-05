@@ -3,18 +3,19 @@
 
 import { ReactComponent as ArrowRight } from '@mimir-wallet/assets/svg/ArrowRight.svg';
 import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
-import { ReactComponent as IconCopy } from '@mimir-wallet/assets/svg/icon-copy.svg';
 import { ReactComponent as IconDapp } from '@mimir-wallet/assets/svg/icon-dapp.svg';
-import { ReactComponent as IconExternal } from '@mimir-wallet/assets/svg/icon-external.svg';
 import { ReactComponent as IconHome } from '@mimir-wallet/assets/svg/icon-home.svg';
+import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
 import { ReactComponent as IconQr } from '@mimir-wallet/assets/svg/icon-qr.svg';
 import { ReactComponent as IconTransaction } from '@mimir-wallet/assets/svg/icon-transaction.svg';
 import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
-import { AccountMenu, AddressCell, BalanceFree, NetworkIcon } from '@mimir-wallet/components';
-import { useApi, useSelectedAccount } from '@mimir-wallet/hooks';
-import { Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import { AccountMenu, AddressCell, BalanceFree, CopyButton, QrcodeAddress } from '@mimir-wallet/components';
+import { findToken } from '@mimir-wallet/config';
+import { useApi, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
+import { chainExplorer } from '@mimir-wallet/utils';
+import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<any>; label: React.ReactNode }) {
   const navigate = useNavigate();
@@ -63,6 +64,8 @@ function SideBar() {
   const { api } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
+  const [qrOpen, toggleQrOpen] = useToggle();
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -74,30 +77,29 @@ function SideBar() {
 
   return (
     <>
+      <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
       <Drawer PaperProps={{ sx: { width: 222, top: 56, paddingX: 1.5, paddingY: 2 } }} anchor='left' variant='permanent'>
         <Paper sx={{ padding: 1 }} variant='outlined'>
           <Stack alignItems='center' direction='row' onClick={handleAccountOpen} spacing={1} sx={{ cursor: 'pointer', width: '100%' }}>
             <AddressCell size='small' value={selected} />
-            <SvgIcon color='primary' component={ArrowRight} inheritViewBox sx={{ fontSize: '0.75rem' }} />
+            <SvgIcon color='primary' component={ArrowRight} inheritViewBox />
           </Stack>
           <Divider sx={{ marginY: 1 }} />
           <Stack alignItems='center' direction='row' spacing={0.5}>
-            <NetworkIcon genesisHash={api.genesisHash.toHex()} size={14} />
+            <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
             <Typography color='text.secondary' fontSize={12}>
               <BalanceFree params={selected} />
             </Typography>
           </Stack>
           <Divider sx={{ marginY: 1 }} />
-          <IconButton color='primary' size='small'>
+          <IconButton color='primary' onClick={toggleQrOpen} size='small'>
             <SvgIcon component={IconQr} inheritViewBox />
           </IconButton>
-          <IconButton color='primary' size='small'>
-            <SvgIcon component={IconCopy} inheritViewBox />
+          <CopyButton color='primary' value={selected} />
+          <IconButton color='primary' component='a' href={chainExplorer.accountHref(selected)} size='small' target='_blank'>
+            <SvgIcon component={IconLink} inheritViewBox />
           </IconButton>
-          <IconButton color='primary' size='small'>
-            <SvgIcon component={IconExternal} inheritViewBox />
-          </IconButton>
-          <IconButton color='primary' size='small'>
+          <IconButton color='primary' component={Link} size='small' to={`/transfer?from=${selected}`}>
             <SvgIcon component={IconTransfer} inheritViewBox />
           </IconButton>
         </Paper>

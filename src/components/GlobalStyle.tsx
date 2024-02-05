@@ -19,7 +19,7 @@ function GlobalStyle() {
             lineHeight: 1.25
           },
           body: {
-            background: 'linear-gradient(245.23deg, #F4F2FF 0%, #FBFDFF 100%)'
+            background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
           },
           'html,body,#root': {
             height: '100%'
@@ -29,7 +29,15 @@ function GlobalStyle() {
             margin: 0
           },
           ':root': {
-            '--toastify-text-color-light': palette.text.primary
+            '--toastify-text-color-light': palette.text.primary,
+            '--toastify-color-info': palette.info.main,
+            '--toastify-color-success': palette.success.main,
+            '--toastify-color-warning': palette.warning.main,
+            '--toastify-color-error': palette.error.main
+          },
+          '.Toastify__toast-icon': {
+            width: 'auto',
+            minWidth: 'auto'
           }
         })}
       />

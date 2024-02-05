@@ -6,7 +6,7 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { PrepareFlexible } from './types';
 
-import { ReactComponent as IconQuestion } from '@mimir-wallet/assets/svg/icon-question.svg';
+import { ReactComponent as IconQuestion } from '@mimir-wallet/assets/svg/icon-question-fill.svg';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
 import { TxToastCtx, useApi, useCall, useSelectedAccountCallback } from '@mimir-wallet/hooks';
 import { getAddressMeta, service, signAndSend } from '@mimir-wallet/utils';

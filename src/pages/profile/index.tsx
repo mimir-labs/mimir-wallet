@@ -4,11 +4,12 @@
 import type { DeriveBalancesAll, DeriveStakingAccount } from '@polkadot/api-derive/types';
 
 import { Fund } from '@mimir-wallet/components';
-import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
+import { useApi, useCall, useDapps, useGroupAccounts, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useEffect, useMemo, useState } from 'react';
 
 import Assets from './Assets';
+import FavoriteDapps from './FavoriteDapp';
 import Info from './Info';
 import Members from './Members';
 import Transactions from './Transactions';
@@ -35,6 +36,7 @@ function PageProfile() {
   const stakingInfo = useCall<DeriveStakingAccount>(api.derive.staking?.account, [selected]);
   const [balances, setBalances] = useState<AccountBalance>();
   const [fundOpen, toggleFundOpen] = useToggle();
+  const { addFavorite, favorites, isFavorite, removeFavorite } = useDapps();
 
   useEffect(() => {
     if (balancesAll) {
@@ -58,6 +60,7 @@ function PageProfile() {
       {multisig.length > 0 ? (
         <ProfileWrapper
           assets={<Assets address={selected} assets={assets} />}
+          dapps={favorites.length > 0 ? <FavoriteDapps addFavorite={addFavorite} dapps={favorites} isFavorite={isFavorite} removeFavorite={removeFavorite} /> : null}
           info={<Info address={selected} balances={balances} toggleFundOpen={toggleFundOpen} />}
           member={<Members address={selected} />}
           transaction={<Transactions />}

@@ -6,7 +6,7 @@ import type { ExtrinsicPayloadValue, ISubmittableResult } from '@polkadot/types/
 import type { HexString } from '@polkadot/util/types';
 
 import { TxToastCtx, useApi } from '@mimir-wallet/hooks';
-import { PrepareMultisig, sign, signAndSend, TxEvents } from '@mimir-wallet/utils';
+import { PrepareMultisig, service, sign, signAndSend, TxEvents } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
 import { BN } from '@polkadot/util';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
@@ -21,12 +21,14 @@ function SendTx({
   onResults,
   onSignature,
   onlySign,
-  prepare
+  prepare,
+  website
 }: {
   onResults?: (results: ISubmittableResult) => void;
   onFinalized?: (results: ISubmittableResult) => void;
   disabled?: boolean;
   prepare?: PrepareMultisig;
+  website?: string;
   canSend: boolean;
   onlySign: boolean;
   onClose: () => void;
@@ -88,7 +90,9 @@ function SendTx({
         }, 3000);
       });
     }
-  }, [addToast, beforeSend, onClose, onError, onFinalized, onResults, onSignature, onlySign, prepare]);
+
+    website && service.uploadWebsite(tx.hash.toHex(), website);
+  }, [addToast, beforeSend, onClose, onError, onFinalized, onResults, onSignature, onlySign, prepare, website]);
 
   useEffect(() => {
     let unsubPromise: Promise<() => void> | undefined;

@@ -40,7 +40,7 @@ export const routes = createBrowserRouter([
             element: <PageAddressBook />
           },
           {
-            path: 'account-setting/:address',
+            path: 'account-setting/:address?',
             element: <PageAccountSetting />
           }
         ]
@@ -60,7 +60,7 @@ export const routes = createBrowserRouter([
       },
       {
         element: (
-          <Box sx={{ paddingY: 3, height: 'calc(100% - 56px)', minHeight: '100vh', paddingTop: '56px' }}>
+          <Box sx={{ height: 'calc(100% - 56px)', minHeight: '100vh', paddingTop: '56px' }}>
             <Outlet />
           </Box>
         ),

@@ -1,6 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+export * from './animation';
 export { default as AccountMenu } from './AccountMenu';
 export { default as AccountSelect } from './AccountSelect';
 export { default as AddAddressDialog } from './AddAddressDialog';
@@ -13,6 +14,7 @@ export { default as AppIframe } from './AppIframe';
 export { default as BalanceFree } from './BalanceFree';
 export { default as ChainSelect } from './ChainSelect';
 export { default as CopyButton } from './CopyButton';
+export { default as DappCell } from './DappCell';
 export { default as DetectedMultisig } from './DetectedMultisig';
 export { default as EditAddressDialog } from './EditAddressDialog';
 export { default as Empty } from './Empty';
@@ -26,7 +28,7 @@ export { default as InputAddress } from './InputAddress';
 export { default as InputNumber } from './InputNumber';
 export { default as LockItem, LockContainer } from './LockItem';
 export { default as MimirLoading } from './MimirLoading';
-export { default as NetworkIcon } from './NetworkIcon';
+export { default as QrcodeAddress } from './QrcodeAddress';
 export { default as SwitchAccountDialog } from './SwitchAccountDialog';
 export { default as ToastRoot, toastError, toastSuccess, toastWarn } from './ToastRoot';
 export { default as TxError } from './TxError';

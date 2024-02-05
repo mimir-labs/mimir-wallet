@@ -1,7 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as Logo } from '@mimir-wallet/assets/svg/logo.svg';
+import { ReactComponent as Logo } from '@mimir-wallet/assets/svg/logo-circle.svg';
 import { useUnConfirmMultisigs } from '@mimir-wallet/hooks';
 import { getAddressMeta } from '@mimir-wallet/utils';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
