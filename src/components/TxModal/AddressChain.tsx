@@ -38,17 +38,19 @@ function AddressChain({
   );
 
   useEffect(() => {
-    const finded = meta.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.filter((address) => isAccount(address)) || [] : [];
+    if (!accounts[address]) {
+      const finded = meta.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.filter((address) => isAccount(address)) || [] : [];
 
-    if (finded.length > 0) {
-      const solo = finded.find((item) => !getAddressMeta(item).isMultisig);
+      if (finded.length > 0) {
+        const solo = finded.find((item) => !getAddressMeta(item).isMultisig);
 
-      onChange((value) => ({
-        ...value,
-        [address]: solo || finded[0]
-      }));
+        onChange((value) => ({
+          ...value,
+          [address]: solo || finded[0]
+        }));
+      }
     }
-  }, [address, filtered, isAccount, meta, onChange]);
+  }, [accounts, address, filtered, isAccount, meta, onChange]);
 
   if (meta.isMultisig) {
     const value = accounts[address] || '';

@@ -13,15 +13,24 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Divider, IconButton, SvgIcon } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 
-import { useApproveFiltered } from './hooks/useApproveFiltered';
-import { useCancelFiltered } from './hooks/useCancelFiltered';
-
-function Operate({ transaction, type = 'normal' }: { transaction: Transaction; type?: 'icon' | 'normal' }) {
+function Operate({
+  approveFiltered,
+  canApprove,
+  canCancel,
+  cancelFiltered,
+  transaction,
+  type = 'normal'
+}: {
+  approveFiltered?: Filtered;
+  canApprove: boolean;
+  cancelFiltered?: Filtered;
+  canCancel: boolean;
+  transaction: Transaction;
+  type?: 'icon' | 'normal';
+}) {
   const destTx = transaction.top;
   const { api } = useApi();
   const { addQueue } = useTxQueue();
-  const [approveFiltered, canApprove] = useApproveFiltered(transaction);
-  const [cancelFiltered, canCancel] = useCancelFiltered(api, transaction);
   const [approveLoading, setApproveLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
 

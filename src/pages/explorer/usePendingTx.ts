@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SelectAccountCtx } from '@mimir-wallet/hooks/ctx/SelectedAccount';
+import { CalldataStatus } from '@mimir-wallet/hooks/types';
 import { useContext, useMemo } from 'react';
 
 export function usePendingTx(url: string) {
@@ -10,6 +11,10 @@ export function usePendingTx(url: string) {
   return useMemo(
     () =>
       transactions.filter((item) => {
+        if (item.status > CalldataStatus.Pending) {
+          return false;
+        }
+
         if (!item.initTransaction.website) {
           return false;
         }

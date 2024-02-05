@@ -1,6 +1,7 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 import type { ApiPromise } from '@polkadot/api';
 import type { IMethod } from '@polkadot/types/types';
 
@@ -9,20 +10,18 @@ import { ReactComponent as IconCancel } from '@mimir-wallet/assets/svg/icon-canc
 import { ReactComponent as IconExternalApp } from '@mimir-wallet/assets/svg/icon-external-app.svg';
 import { ReactComponent as IconFailed } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
 import { ReactComponent as IconMember } from '@mimir-wallet/assets/svg/icon-member-fill.svg';
-import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
 import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
-import { findToken } from '@mimir-wallet/config';
 import { ONE_DAY } from '@mimir-wallet/constants';
-import { useAddressMeta, useApi, useBlockTime, useDapp, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
+import { useAddressMeta, useApi, useBlockTime, useDapp, useToggle } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { formatAgo } from '@mimir-wallet/utils';
 import { alpha, Box, Button, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 
-import FormatBalance from '../FormatBalance';
-import { useRelatedTxs } from './hooks/useRelatedTxs';
-import { extraTransaction } from './hooks/util';
+import { useRelatedTxs } from '../hooks/useRelatedTxs';
+import { ActionText } from '../TxDisplay';
+import ActionDisplay from '../TxDisplay/ActionDisplay';
+import { extraTransaction } from '../util';
 import Extrinsic from './Extrinsic';
 import Operate from './Operate';
 import Progress from './Progress';
@@ -52,59 +51,19 @@ function AppCell({ onWidth, website }: { website?: string; onWidth: (width: numb
 }
 
 function ActionTextCell({ action }: { action: string }) {
-  let comp: React.ReactNode;
-
-  if (['balances.transfer', 'balances.transferKeepAlive', 'balances.transferAllowDeath'].includes(action)) {
-    comp = (
-      <>
-        <SvgIcon color='primary' component={IconSend} inheritViewBox />
-        Transfer
-      </>
-    );
-  } else if (['multisig.cancelAsMulti'].includes(action)) {
-    comp = (
-      <>
-        <SvgIcon color='error' component={IconCancel} inheritViewBox />
-        Cancel
-      </>
-    );
-  } else {
-    comp = action;
-  }
-
-  return <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>{comp}</Box>;
+  return (
+    <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <ActionText action={action} />
+    </Box>
+  );
 }
 
 function ActionDisplayCell({ api, call, isSub, tx }: { isSub?: boolean; api: ApiPromise; call: IMethod; tx: Transaction }) {
-  let comp: React.ReactNode;
-  const selectAccount = useSelectedAccountCallback();
-
-  if (api.tx.balances.transfer?.is(call) || api.tx.balances.transferKeepAlive?.is(call) || api.tx.balances.transferAllowDeath?.is(call)) {
-    const token = findToken(api.genesisHash.toHex());
-
-    comp = (
-      <>
-        <Box component='img' src={token.Icon} sx={{ width: 20, height: 20 }} />
-        <Typography>
-          -<FormatBalance value={call.args[1]} />
-        </Typography>
-      </>
-    );
-  } else if (api.tx.multisig.cancelAsMulti.is(call)) {
-    comp = isSub ? (
-      <Typography color='primary.main' component={Link} onClick={() => tx && selectAccount(tx.sender)} to='/transactions'>
-        No. {tx.uuid.slice(0, 8).toUpperCase()}
-      </Typography>
-    ) : (
-      <Typography color='primary.main' component={Link} onClick={() => tx.cancelTx?.top && selectAccount(tx.cancelTx?.top.sender)} to='/transactions'>
-        No. {tx.cancelTx?.top?.uuid.slice(0, 8).toUpperCase()}
-      </Typography>
-    );
-  } else {
-    comp = '--';
-  }
-
-  return <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>{comp}</Box>;
+  return (
+    <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <ActionDisplay api={api} call={call} isSub={isSub} tx={tx} />
+    </Box>
+  );
 }
 
 function TimeCell({ time }: { time?: number }) {
@@ -115,23 +74,39 @@ function TimeCell({ time }: { time?: number }) {
   return <Box sx={{ flex: '1' }}>{now - time > 0 ? (now - time < ONE_DAY * 1000 ? `${formatAgo(time, 'H')} hours ago` : `${formatAgo(time, 'D')} days ago`) : 'Now'}</Box>;
 }
 
-function ProgressCell({ approvals, threshold }: { approvals: number; threshold: number }) {
+function ProgressCell({ approvals, onClick, threshold }: { approvals: number; threshold: number; onClick: () => void }) {
   return (
     <Box sx={{ flex: '1' }}>
-      <Button size='small' startIcon={<SvgIcon component={IconMember} inheritViewBox />} variant='outlined'>
+      <Button onClick={onClick} size='small' startIcon={<SvgIcon component={IconMember} inheritViewBox />} variant='outlined'>
         {approvals}/{threshold}
       </Button>
     </Box>
   );
 }
 
-function ActionsCell({ detailOpen, toggleDetailOpen, transaction }: { detailOpen: boolean; transaction: Transaction; toggleDetailOpen: () => void }) {
+function ActionsCell({
+  approveFiltered,
+  canApprove,
+  canCancel,
+  cancelFiltered,
+  detailOpen,
+  toggleDetailOpen,
+  transaction
+}: {
+  detailOpen: boolean;
+  transaction: Transaction;
+  approveFiltered?: Filtered;
+  canApprove: boolean;
+  cancelFiltered?: Filtered;
+  canCancel: boolean;
+  toggleDetailOpen: () => void;
+}) {
   const status = transaction.status;
 
   return (
-    <Box sx={{ flex: '0 0 auto', display: 'flex', justifyContent: 'flex-end' }}>
+    <Box sx={{ flex: '0 0 135px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       {status > CalldataStatus.Pending ? (
-        <Box sx={{ width: 80, wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Box sx={{ wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <SvgIcon
             color={status === CalldataStatus.Success ? 'success' : status === CalldataStatus.Failed ? 'error' : status === CalldataStatus.Cancelled ? 'warning' : 'error'}
             component={status === CalldataStatus.Success ? IconSuccess : status === CalldataStatus.Failed ? IconFailed : status === CalldataStatus.Cancelled ? IconCancel : IconFailed}
@@ -140,9 +115,9 @@ function ActionsCell({ detailOpen, toggleDetailOpen, transaction }: { detailOpen
           {status === CalldataStatus.Success ? 'Excuted' : status === CalldataStatus.Failed ? 'Failed' : status === CalldataStatus.Cancelled ? 'Cancelled' : 'Member Changed'}
         </Box>
       ) : (
-        <Operate transaction={transaction} type='icon' />
+        <Operate approveFiltered={approveFiltered} canApprove={canApprove} canCancel={canCancel} cancelFiltered={cancelFiltered} transaction={transaction} type='icon' />
       )}
-      <IconButton color='primary' onClick={toggleDetailOpen} sx={{ marginLeft: 2 }}>
+      <IconButton color='primary' onClick={toggleDetailOpen}>
         <SvgIcon
           component={ArrowDown}
           inheritViewBox
@@ -153,20 +128,57 @@ function ActionsCell({ detailOpen, toggleDetailOpen, transaction }: { detailOpen
   );
 }
 
-function RelatedItem({ offset, tx }: { tx: Transaction; offset: number }) {
+function RelatedItem({
+  approveFiltered,
+  canApprove,
+  canCancel,
+  cancelFiltered,
+  offset,
+  openOverview,
+  tx
+}: {
+  tx: Transaction;
+  offset: number;
+  approveFiltered?: Filtered;
+  canApprove: boolean;
+  cancelFiltered?: Filtered;
+  canCancel: boolean;
+  openOverview: () => void;
+}) {
   const destTx = tx.top;
   const { meta: destSenderMeta } = useAddressMeta(destTx.sender);
   const [approvals] = useMemo((): [number, Transaction[]] => extraTransaction(destSenderMeta, tx), [destSenderMeta, tx]);
   const time = useBlockTime(tx.status < CalldataStatus.Success ? tx.initTransaction.height : tx.height);
 
-  return <TxItems approvals={approvals} defaultOpen={false} isSub offset={offset} threshold={destSenderMeta.threshold || 0} time={time} transaction={tx} withApp={false} />;
+  return (
+    <TxItems
+      approvals={approvals}
+      approveFiltered={approveFiltered}
+      canApprove={canApprove}
+      canCancel={canCancel}
+      cancelFiltered={cancelFiltered}
+      defaultOpen={false}
+      isSub
+      offset={offset}
+      openOverview={openOverview}
+      threshold={destSenderMeta.threshold || 0}
+      time={time}
+      transaction={tx}
+      withApp={false}
+    />
+  );
 }
 
 function TxItems({
   approvals,
+  approveFiltered,
+  canApprove,
+  canCancel,
+  cancelFiltered,
   defaultOpen,
   isSub = false,
   offset,
+  openOverview,
   threshold,
   time,
   transaction,
@@ -180,6 +192,11 @@ function TxItems({
   time?: number;
   withApp?: boolean;
   isSub?: boolean;
+  approveFiltered?: Filtered;
+  canApprove: boolean;
+  cancelFiltered?: Filtered;
+  canCancel: boolean;
+  openOverview: () => void;
 }) {
   const [detailOpen, toggleDetailOpen] = useToggle(defaultOpen);
   const [relatedTxs] = useRelatedTxs(transaction);
@@ -196,7 +213,7 @@ function TxItems({
           borderRadius: 1,
           overflow: 'hidden',
           border: '1px solid',
-          marginLeft: `${offset || 0}px !important`,
+          marginLeft: `${offset ? offset + 20 : 0}px !important`,
           borderColor: detailOpen ? palette.secondary.main : alpha(palette.primary.main, 0),
           boxShadow: detailOpen ? shadows[1] : shadows[0]
         })}
@@ -206,17 +223,37 @@ function TxItems({
           <ActionTextCell action={destTx.action} />
           <ActionDisplayCell api={api} call={destTx.call} isSub={isSub} tx={destTx} />
           <TimeCell time={time} />
-          <ProgressCell approvals={approvals} threshold={threshold} />
-          <ActionsCell detailOpen={detailOpen} toggleDetailOpen={toggleDetailOpen} transaction={transaction} />
+          <ProgressCell approvals={approvals} onClick={openOverview} threshold={threshold} />
+          <ActionsCell
+            approveFiltered={approveFiltered}
+            canApprove={canApprove}
+            canCancel={canCancel}
+            cancelFiltered={cancelFiltered}
+            detailOpen={detailOpen}
+            toggleDetailOpen={toggleDetailOpen}
+            transaction={transaction}
+          />
         </Box>
         {detailOpen && (
           <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
             <Extrinsic transaction={transaction} />
-            <Progress transaction={transaction} />
+            <Progress approveFiltered={approveFiltered} canApprove={canApprove} canCancel={canCancel} cancelFiltered={cancelFiltered} openOverview={openOverview} transaction={transaction} />
           </Box>
         )}
       </Stack>
-      {relatedTxs.length > 0 && relatedTxs.map((tx) => <RelatedItem key={tx.uuid} offset={appCellWidth} tx={tx} />)}
+      {relatedTxs.length > 0 &&
+        relatedTxs.map((tx) => (
+          <RelatedItem
+            approveFiltered={approveFiltered}
+            canApprove={canApprove}
+            canCancel={canCancel}
+            cancelFiltered={cancelFiltered}
+            key={tx.uuid}
+            offset={appCellWidth}
+            openOverview={openOverview}
+            tx={tx}
+          />
+        ))}
     </>
   );
 }

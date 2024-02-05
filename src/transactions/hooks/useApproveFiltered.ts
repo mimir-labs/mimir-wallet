@@ -6,7 +6,7 @@ import type { Transaction } from '@mimir-wallet/hooks/types';
 
 import { useEffect, useState } from 'react';
 
-import { checkFiltered, extraFiltered, removeEmptyMultisigFiltered, removeMultisigDeepFiltered, removeSuccessFiltered } from './util';
+import { checkFiltered, extraFiltered, removeEmptyMultisigFiltered, removeMultisigDeepFiltered, removeSuccessFiltered } from '../util';
 
 export function useApproveFiltered(transaction: Transaction): [filtered: Filtered | undefined, canApprove: boolean] {
   const [filtered, setFiltered] = useState<Filtered>();

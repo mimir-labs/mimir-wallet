@@ -1,18 +1,24 @@
 // Copyright 2023-2023 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
+
 import { useAddressMeta } from '@mimir-wallet/hooks';
 import { type Transaction } from '@mimir-wallet/hooks/types';
-import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { extraTransaction } from './hooks/util';
+import { extraTransaction } from '../util';
 import Operate from './Operate';
-import OverviewDialog from './OverviewDialog';
 import TxProgress from './TxProgress';
 
 interface Props {
   transaction: Transaction;
+  approveFiltered?: Filtered;
+  canApprove: boolean;
+  cancelFiltered?: Filtered;
+  canCancel: boolean;
+  openOverview: () => void;
 }
 
 function ProgressTitle() {
@@ -44,7 +50,7 @@ function ProgressInfo({ approvals, threshold }: { approvals: number; threshold: 
   );
 }
 
-function Progress({ transaction }: Props) {
+function Progress({ approveFiltered, canApprove, canCancel, cancelFiltered, openOverview, transaction }: Props) {
   const { meta } = useAddressMeta(transaction.sender);
   const [approvals, txs] = useMemo((): [number, Transaction[]] => extraTransaction(meta, transaction), [meta, transaction]);
 
@@ -61,7 +67,9 @@ function Progress({ transaction }: Props) {
               ({approvals}/{meta.threshold})
             </span>
           </Typography>
-          <OverviewDialog tx={transaction} />
+          <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
+            Overview
+          </Button>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'stretch', marginTop: 1, minHeight: 20 }}>
           <Box sx={{ flex: '1', paddingY: 0.5 }}>
@@ -73,7 +81,7 @@ function Progress({ transaction }: Props) {
           </Box>
         </Box>
       </Box>
-      <Operate transaction={transaction} />
+      <Operate approveFiltered={approveFiltered} canApprove={canApprove} canCancel={canCancel} cancelFiltered={cancelFiltered} transaction={transaction} />
     </Stack>
   );
 }

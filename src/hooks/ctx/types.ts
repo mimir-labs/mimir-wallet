@@ -31,6 +31,7 @@ export interface Filtered {
 export interface TxQueue {
   id?: number;
   accountId: AccountId | Address | string;
+  accounts?: Record<string, string | undefined>;
   beforeSend?: () => Promise<void>;
   extrinsic: SubmittableExtrinsic<'promise'>;
   filtered?: Filtered;

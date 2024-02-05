@@ -29,7 +29,6 @@ export { default as LockItem, LockContainer } from './LockItem';
 export { default as MimirLoading } from './MimirLoading';
 export { default as SwitchAccountDialog } from './SwitchAccountDialog';
 export { default as ToastRoot, toastError, toastSuccess, toastWarn } from './ToastRoot';
-export { default as TxCell } from './TxCell';
 export { default as TxError } from './TxError';
 export { default as TxOverview } from './TxOverview';
 export { default as TxModal } from './TxModal';

@@ -17,7 +17,7 @@ module.exports = {
     '/.eslintrc.cjs',
     '/.eslintrc.js',
     '/.eslintrc.mjs',
-    '/public/mimir-injectd.min.js'
+    '/public/mimir-injected.min.js'
   ],
   parserOptions: {
     ...base.parserOptions,

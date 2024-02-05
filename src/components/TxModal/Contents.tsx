@@ -24,6 +24,7 @@ import CallComp from './Call';
 import SendTx from './SendTx';
 
 function Contents({
+  accounts: propsAccounts = {},
   address,
   beforeSend,
   destCall,
@@ -54,13 +55,14 @@ function Contents({
   isApprove: boolean;
   onlySign: boolean;
   website?: string;
+  accounts?: Record<string, string | undefined>;
   isCancelled: boolean;
   onSignature?: (signer: string, signature: HexString, ex: Extrinsic, payload: ExtrinsicPayloadValue) => void;
   onError: (error: unknown) => void;
   onClose: () => void;
   onReject: () => void;
 }) {
-  const [accounts, setAccounts] = useState<Record<string, string | undefined>>({});
+  const [accounts, setAccounts] = useState<Record<string, string | undefined>>(propsAccounts);
   const { api } = useApi();
   const [prepare, setPrepare] = useState<PrepareMultisig>();
   const canSend = useMemo(() => canSendMultisig(accounts, address), [accounts, address]);

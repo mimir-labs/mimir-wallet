@@ -8,7 +8,7 @@ import { ReactComponent as IconMore } from '@mimir-wallet/assets/svg/icon-more.s
 import { ReactComponent as IconSearch } from '@mimir-wallet/assets/svg/icon-search.svg';
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
 import { useGroupAccounts, useSelectedAccount, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
-import { Box, Button, Divider, Drawer, IconButton, List, ListItem, ListItemButton, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Divider, Drawer, IconButton, List, ListItem, ListItemButton, Menu, MenuItem, SvgIcon, Typography } from '@mui/material';
 import { addressEq } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -30,7 +30,19 @@ function filterAddress(keywords: string, selected?: string) {
     (selected ? !addressEq(address, selected) : true);
 }
 
-function AccountCell({ onSelect, selected, value }: { selected?: boolean; value?: string; onSelect?: (address: string) => void }) {
+function AccountCell({ onClose, onSelect, selected, value }: { onClose?: () => void; selected?: boolean; value?: string; onSelect?: (address: string) => void }) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleMore = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.stopPropagation();
@@ -40,28 +52,47 @@ function AccountCell({ onSelect, selected, value }: { selected?: boolean; value?
   );
 
   return (
-    <ListItem>
-      <ListItemButton
-        disableTouchRipple
-        onClick={handleClick}
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingX: 1,
-          paddingY: 0.5,
-          border: '1px solid',
-          borderColor: 'secondary.main',
-          borderRadius: 1,
-          bgcolor: selected ? 'secondary.main' : undefined
+    <>
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
+        onClose={handleClose}
+        open={open}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
         }}
       >
-        <AddressCell shorten showType size='small' value={value} withCopy />
-        <IconButton color='inherit' onClick={(e) => e.stopPropagation()} size='small'>
-          <SvgIcon component={IconMore} inheritViewBox />
-        </IconButton>
-      </ListItemButton>
-    </ListItem>
+        <MenuItem component={Link} disableRipple onClick={onClose} to={`/account-setting/${value}`}>
+          Setting
+        </MenuItem>
+      </Menu>
+      <ListItem>
+        <ListItemButton
+          disableTouchRipple
+          onClick={handleClick}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingX: 1,
+            paddingY: 0.5,
+            border: '1px solid',
+            borderColor: 'secondary.main',
+            borderRadius: 1,
+            bgcolor: selected ? 'secondary.main' : undefined
+          }}
+        >
+          <AddressCell shorten showType size='small' value={value} withCopy />
+          <IconButton color='inherit' onClick={handleMore} size='small'>
+            <SvgIcon component={IconMore} inheritViewBox />
+          </IconButton>
+        </ListItemButton>
+      </ListItem>
+    </>
   );
 }
 
@@ -129,23 +160,23 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
         <Box sx={{ height: '100%', padding: 1, paddingY: 6, overflowY: 'auto' }}>
           <List sx={{ width: 280 }}>
             <Typography>Current Wallet</Typography>
-            <AccountCell key={`current-account-${selected}`} selected value={selected} />
+            <AccountCell key={`current-account-${selected}`} onClose={onClose} selected value={selected} />
             <Divider sx={{ marginY: 1 }} />
             <Typography>Multisig Wallet</Typography>
             {grouped.multisig.map((account) => (
-              <AccountCell key={`multisig-${account}`} onSelect={onSelect} value={account} />
+              <AccountCell key={`multisig-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
             ))}
             <Divider sx={{ marginY: 1 }} />
             <Typography>Extension Wallet</Typography>
             {grouped.injected.map((account) => (
-              <AccountCell key={`extension-${account}`} onSelect={onSelect} value={account} />
+              <AccountCell key={`extension-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
             ))}
             {grouped.accounts.length > 0 && (
               <>
                 <Divider sx={{ marginY: 1 }} />
                 <Typography>Local Wallet</Typography>
                 {grouped.accounts.map((account) => (
-                  <AccountCell key={`local-${account}`} onSelect={onSelect} value={account} />
+                  <AccountCell key={`local-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
                 ))}
               </>
             )}
@@ -154,7 +185,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
                 <Divider sx={{ marginY: 1 }} />
                 <Typography>Testing Wallet</Typography>
                 {grouped.testing.map((account) => (
-                  <AccountCell key={`testing-${account}`} onSelect={onSelect} value={account} />
+                  <AccountCell key={`testing-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
                 ))}
               </>
             )}

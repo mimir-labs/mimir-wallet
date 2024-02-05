@@ -8,7 +8,7 @@ import { useAddressMeta, useCopyClipboard } from '@mimir-wallet/hooks';
 import { alpha, Box, Paper } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
 
-import { extraTransaction } from './hooks/util';
+import { extraTransaction } from '../util';
 
 function TxProgress({ tx }: { tx: Transaction }) {
   const { meta } = useAddressMeta(tx.sender);

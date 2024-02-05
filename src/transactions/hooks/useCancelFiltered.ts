@@ -10,7 +10,7 @@ import { getAddressMeta } from '@mimir-wallet/utils';
 import { addressEq } from '@polkadot/util-crypto';
 import { useEffect, useState } from 'react';
 
-import { checkFiltered, extraFiltered, removeEmptyMultisigFiltered } from './util';
+import { checkFiltered, extraFiltered, removeEmptyMultisigFiltered } from '../util';
 
 async function extraCancelFiltered(api: ApiPromise, transaction: Transaction, filtered: Filtered): Promise<void> {
   const meta = getAddressMeta(transaction.sender);
