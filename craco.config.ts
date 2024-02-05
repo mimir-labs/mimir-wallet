@@ -4,6 +4,7 @@
 import { CracoConfig } from '@craco/types';
 import { resolve } from 'path';
 import * as webpack from 'webpack';
+import { InjectManifest } from 'workbox-webpack-plugin';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -50,7 +51,16 @@ export default {
         new webpack.ProvidePlugin({
           Buffer: ['buffer', 'Buffer']
         }) as any
-      ]
+      ].concat(
+        isProduction
+          ? [
+              new InjectManifest({
+                swSrc: './src/serviceWorker/index.ts',
+                swDest: 'service-worker.js'
+              })
+            ]
+          : []
+      )
     }
   }
 } as CracoConfig;
