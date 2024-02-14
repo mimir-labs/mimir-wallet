@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { ReactComponent as ArrowDown } from '@mimir-wallet/assets/svg/ArrowDown.svg';
@@ -25,7 +25,18 @@ function AccountSelect() {
     <>
       <Box
         onClick={handleAccountOpen}
-        sx={{ cursor: 'pointer', borderRadius: 1, paddingX: 1, bgcolor: 'secondary.main', border: '1px solid', borderColor: 'secondary.main', gap: 2, display: 'flex', alignItems: 'center' }}
+        sx={{
+          cursor: 'pointer',
+          borderRadius: 1,
+          paddingX: 1,
+          paddingY: 0.3,
+          bgcolor: 'secondary.main',
+          border: '1px solid',
+          borderColor: 'secondary.main',
+          gap: 2,
+          display: 'flex',
+          alignItems: 'center'
+        }}
       >
         <AddressCell shorten showType size='small' value={selected} />
         <SvgIcon component={ArrowDown} fontSize='small' inheritViewBox />

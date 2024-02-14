@@ -1,8 +1,9 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
 import type { Call } from '@polkadot/types/interfaces';
+import type { HexString } from '@polkadot/util/types';
 import type { BestTx, Calldata, CalldataStatus, Transaction } from './types';
 
 import { getServiceUrl } from '@mimir-wallet/utils/service';
@@ -26,7 +27,8 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
     public cancelChildren: Transaction[];
 
     public uuid: string;
-    public call: Call;
+    public hash: HexString;
+    public call: Call | null;
     public sender: string;
     public status: CalldataStatus;
     public isValid: boolean;
@@ -44,7 +46,8 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
       this.children = [];
       this.cancelChildren = [];
       this.uuid = calldata.uuid;
-      this.call = api.registry.createType('Call', calldata.metadata);
+      this.hash = calldata.hash;
+      this.call = calldata.metadata ? api.registry.createType('Call', calldata.metadata) : null;
       this.sender = encodeAddress(calldata.sender);
       this.status = calldata.status;
       this.isValid = calldata.isValid;
@@ -65,7 +68,7 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
     }
 
     public addChild(transaction: Transaction): Transaction {
-      if (this.api.tx.multisig.cancelAsMulti.is(transaction.call)) {
+      if (transaction.call && this.api.tx.multisig.cancelAsMulti.is(transaction.call)) {
         return this.addCancelChild(transaction);
       }
 
@@ -82,6 +85,8 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
     public get action(): string {
       if (_action) return _action;
 
+      if (!this.call) return 'unknown';
+
       if (
         this.api.tx.utility.batchAll.is(this.call) &&
         this.call.args[0].length === 2 &&
@@ -97,11 +102,11 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
     }
 
     public get section() {
-      return this.call.section;
+      return this.call ? this.call.section : 'unknown';
     }
 
     public get method() {
-      return this.call.method;
+      return this.call ? this.call.method : 'unknown';
     }
 
     public get top(): Transaction {

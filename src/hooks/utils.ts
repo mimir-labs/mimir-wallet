@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Call } from '@polkadot/types/interfaces';
@@ -23,7 +23,7 @@ function insertOrUpdate(
 ): Transaction {
   const hash = call.hash.toHex();
 
-  let tx = Array.from(transactionCache.values()).find((item) => item.status < CalldataStatus.Success && item.call.hash.toHex() === hash);
+  let tx = Array.from(transactionCache.values()).find((item) => item.status < CalldataStatus.Success && item.hash === hash);
 
   if (tx) {
     tx.status = status;
@@ -53,7 +53,7 @@ function insertOrUpdate(
 }
 
 function cancelTransaction(transactionCache: Map<string, Transaction>, hash: HexString, sender: string, cancelling: string) {
-  const txs = Array.from(transactionCache.values()).filter((item) => item.status === CalldataStatus.Pending && item.call.hash.toHex() === hash && addressEq(item.sender, sender));
+  const txs = Array.from(transactionCache.values()).filter((item) => item.status === CalldataStatus.Pending && item.hash === hash && addressEq(item.sender, sender));
 
   for (const item of txs) {
     item.children.forEach((value) => {
@@ -109,9 +109,9 @@ async function buildTx(api: ApiPromise, transactionCache: Map<string, Transactio
     events,
     tx.blockNumber,
     (hash) => {
-      const item = Array.from(transactionCache.values()).find((item) => item.call.hash.toHex() === hash);
+      const item = Array.from(transactionCache.values()).find((item) => item.hash === hash);
 
-      if (item) {
+      if (item?.call) {
         return item.call.toHex();
       } else {
         return null;

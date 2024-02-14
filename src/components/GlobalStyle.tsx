@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import 'reactflow/dist/style.css';
@@ -16,7 +16,7 @@ function GlobalStyle() {
             src: "url('/fonts/SofiaSansSemiCondensed-VariableFont_wght.ttf')"
           },
           'body,html': {
-            lineHeight: 1.25
+            lineHeight: 1.2
           },
           body: {
             background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'

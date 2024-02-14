@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
@@ -37,7 +37,7 @@ async function extraCancelFiltered(api: ApiPromise, transaction: Transaction, fi
       }
     }
   } else if (tx.status === CalldataStatus.Pending) {
-    const info = await api.query.multisig.multisigs(tx.sender, tx.call.hash);
+    const info = await api.query.multisig.multisigs(tx.sender, tx.hash);
 
     Object.keys(filtered).forEach((address) => {
       if (info.isSome) {

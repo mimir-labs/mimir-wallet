@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
@@ -31,10 +31,10 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
     <>
       <Dialog onClose={toggleOpen} open={open}>
         <DialogTitle>Call Detail</DialogTitle>
-        <DialogContent>{open && <FallbackCall call={destTx.call} />}</DialogContent>
+        <DialogContent>{open && destTx.call && <FallbackCall call={destTx.call} />}</DialogContent>
       </Dialog>
       <Stack flex='1' spacing={1}>
-        <Stack spacing={1} sx={{ lineHeight: 1.5 }}>
+        <Stack spacing={1}>
           <Item
             content={
               <AddressRow
@@ -51,14 +51,16 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
             }
             name='From'
           />
-          <Call
-            api={api}
-            call={destTx.call}
-            jsonFallback={false}
-            selectAccount={destTx.action === 'multisig.cancelAsMulti' ? selectAccount : undefined}
-            tx={destTx.action === 'multisig.cancelAsMulti' ? destTx : undefined}
-            type='tx'
-          />
+          {destTx.call && (
+            <Call
+              api={api}
+              call={destTx.call}
+              jsonFallback={false}
+              selectAccount={destTx.action === 'multisig.cancelAsMulti' ? selectAccount : undefined}
+              tx={destTx.action === 'multisig.cancelAsMulti' ? destTx : undefined}
+              type='tx'
+            />
+          )}
           <Divider />
           {dapp && (
             <Item
@@ -73,8 +75,8 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
             />
           )}
           <Item content={<AddressRow shorten size='small' value={transaction.initTransaction.sender} withAddress withCopy withName />} name='Initiator' />
-          <Item content={<Hex value={destTx.call.hash.toHex()} withCopy />} name='Call Hash' />
-          <Item content={<Hex value={destTx.call.hash.toHex()} withCopy />} name='Call Data' />
+          <Item content={<Hex value={destTx.hash} withCopy />} name='Call Hash' />
+          <Item content={<Hex value={destTx.hash} withCopy />} name='Call Data' />
           <Box onClick={toggleOpen} sx={{ fontWeight: 600, color: 'primary.main', cursor: 'pointer', textDecoration: 'none' }}>
             View Parameters
           </Box>

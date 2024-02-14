@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
@@ -54,7 +54,7 @@ function ActionTextCell({ action }: { action: string }) {
   );
 }
 
-function ActionDisplayCell({ api, call, isSub, tx }: { isSub?: boolean; api: ApiPromise; call: IMethod; tx: Transaction }) {
+function ActionDisplayCell({ api, call, isSub, tx }: { isSub?: boolean; api: ApiPromise; call: IMethod | null; tx: Transaction }) {
   return (
     <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
       <ActionDisplay api={api} call={call} isSub={isSub} tx={tx} />

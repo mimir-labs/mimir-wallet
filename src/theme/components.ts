@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { PaletteMode } from '@mui/material';
@@ -44,7 +44,7 @@ const createComponents: Func = () => ({
     styleOverrides: {
       root: () => ({
         fontWeight: 700,
-        lineHeight: 1.25,
+        lineHeight: 1.2,
         textTransform: 'initial',
         '>.MuiSvgIcon-root': {
           fontSize: '1.2em'
@@ -182,7 +182,7 @@ const createComponents: Func = () => ({
     styleOverrides: {
       root: {
         height: 'auto',
-        padding: '5px 0',
+        padding: '3px 0',
         fontWeight: 600,
         lineHeight: 1
       },
@@ -394,6 +394,14 @@ const createComponents: Func = () => ({
     styleOverrides: {
       root: {
         padding: '5px 10px'
+      }
+    }
+  },
+
+  MuiTypography: {
+    styleOverrides: {
+      root: {
+        lineHeight: 1.2
       }
     }
   }

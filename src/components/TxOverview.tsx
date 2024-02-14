@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
@@ -8,12 +8,13 @@ import { ReactComponent as IconFail } from '@mimir-wallet/assets/svg/icon-failed
 import { ReactComponent as IconFailOutlined } from '@mimir-wallet/assets/svg/icon-failed-outlined.svg';
 import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
 import { ReactComponent as IconSuccessOutlined } from '@mimir-wallet/assets/svg/icon-success-outlined.svg';
+import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
 import { ReactComponent as IconWaiting } from '@mimir-wallet/assets/svg/icon-waiting-fill.svg';
-import { useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { useApi, useSelectedAccountCallback, useTxQueue } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { getAddressMeta } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
-import { alpha, Box, Button, Paper, SvgIcon, useTheme } from '@mui/material';
+import { alpha, Box, Button, IconButton, Paper, SvgIcon, useTheme } from '@mui/material';
 import { addressEq } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactFlow, { Edge, EdgeLabelRenderer, EdgeProps, Handle, Node, NodeProps, Position, StepEdge, useEdgesState, useNodesState } from 'reactflow';
@@ -44,6 +45,7 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
   const { addQueue } = useTxQueue();
   const [approveLoading, setApproveLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
+  const selectAccount = useSelectedAccountCallback();
   const destTx = sourceTx.top;
 
   const [accounts, canApprove, cancelAccounts, canCancel] = useMemo(() => {
@@ -90,12 +92,14 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
 
   const handleApprove = useCallback(
     (filtered: Filtered) => {
+      if (!sourceTx.call) return;
+
       setApproveLoading(true);
       addQueue({
         filtered,
         accounts,
         extrinsic: api.tx[sourceTx.call.section][sourceTx.call.method](...sourceTx.call.args),
-        destCall: destTx.call,
+        destCall: destTx.call || undefined,
         destSender: destTx.sender,
         accountId: sourceTx.sender,
         isApprove: true,
@@ -110,12 +114,14 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
 
   const handleCancel = useCallback(
     (filtered: Filtered) => {
+      if (!sourceTx.call) return;
+
       setCancelLoading(true);
       addQueue({
         filtered,
         accounts: cancelAccounts,
         extrinsic: api.tx[sourceTx.call.section][sourceTx.call.method](...sourceTx.call.args),
-        destCall: destTx.call,
+        destCall: destTx.call || undefined,
         destSender: destTx.sender,
         accountId: sourceTx.sender,
         isCancelled: true,
@@ -177,9 +183,21 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
           type='source'
         />
       )}
-      <Paper sx={{ width: 280, overflow: 'hidden' }}>
+      <Paper sx={{ width: 260, overflow: 'hidden' }}>
         <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingX: 1, paddingY: 0.3 }}>
-          <AddressCell showType size='small' value={address} withCopy />
+          <AddressCell
+            namePost={
+              isMultisig ? (
+                <IconButton color='primary' onClick={() => selectAccount(address)} size='small'>
+                  <SvgIcon component={IconTransfer} inheritViewBox />
+                </IconButton>
+              ) : null
+            }
+            showType
+            size='small'
+            value={address}
+            withCopy
+          />
           {icon}
         </Box>
         <Box sx={{ display: 'flex' }}>
@@ -373,7 +391,7 @@ function TxOverview({ approveFiltered, cancelFiltered, tx }: Props) {
     const nodes: Node<NodeData>[] = [];
     const edges: Edge[] = [];
 
-    makeNodes(tx.sender, null, tx, tx, 0, 0, 360, 110, approveFiltered, cancelFiltered, undefined, nodes, edges);
+    makeNodes(tx.sender, null, tx, tx, 0, 0, 340, 110, approveFiltered, cancelFiltered, undefined, nodes, edges);
 
     setNodes(nodes);
     setEdges(edges);

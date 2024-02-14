@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
@@ -72,7 +72,7 @@ export enum CalldataStatus {
 export interface Calldata {
   uuid: string;
   hash: HexString;
-  metadata: HexString;
+  metadata?: HexString | null;
   sender: HexString;
   isStart: boolean;
   isEnd: boolean;
@@ -95,7 +95,8 @@ export interface Transaction {
   cancelChildren: Transaction[];
 
   uuid: string;
-  call: Call;
+  hash: HexString;
+  call: Call | null;
   sender: string;
   status: CalldataStatus;
   isValid: boolean;

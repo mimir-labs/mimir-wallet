@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { type ThemeOptions } from '@mui/material/styles';
@@ -28,7 +28,7 @@ const createTypography: Func = () => ({
   h1: {
     fontSize: '2rem',
     fontWeight: 700,
-    lineHeight: 1.25,
+    lineHeight: 1.2,
     '@media (max-width:600px)': {
       fontSize: '1.875rem'
     }
@@ -36,7 +36,7 @@ const createTypography: Func = () => ({
   h2: {
     fontSize: '1.75rem',
     fontWeight: 700,
-    lineHeight: 1.25,
+    lineHeight: 1.2,
     '@media (max-width:600px)': {
       fontSize: '1.625rem'
     }
@@ -44,7 +44,7 @@ const createTypography: Func = () => ({
   h3: {
     fontSize: '1.5rem',
     fontWeight: 700,
-    lineHeight: 1.25,
+    lineHeight: 1.2,
     '@media (max-width:600px)': {
       fontSize: '1.375rem'
     }
@@ -52,22 +52,22 @@ const createTypography: Func = () => ({
   h4: {
     fontSize: '1.25rem',
     fontWeight: 700,
-    lineHeight: 1.25
+    lineHeight: 1.2
   },
   h5: {
     fontSize: '1.125rem',
     fontWeight: 700,
-    lineHeight: 1.25
+    lineHeight: 1.2
   },
   h6: {
     fontSize: '1rem',
     fontWeight: 700,
-    lineHeight: 1.25
+    lineHeight: 1.2
   },
   inherit: {
     fontSize: '0.875rem',
     fontWeight: 400,
-    lineHeight: 1.25
+    lineHeight: 1.2
   },
   body1: {
     fontSize: '0.875rem'

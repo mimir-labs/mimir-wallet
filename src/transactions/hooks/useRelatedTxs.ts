@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@mimir-wallet/hooks/types';
@@ -35,13 +35,11 @@ export function useRelatedTxs(transaction: Transaction): [relatedTxs: Transactio
   useEffect(() => {
     if (!meta.isMultisig || relatedTxs.length === 0) return;
 
-    api.query.multisig
-      .multisigs(meta.isFlexible ? transaction.children[0].sender : transaction.sender, meta.isFlexible ? transaction.children[0].call.hash.toHex() : transaction.call.hash.toHex())
-      .then((multisigs) => {
-        if (multisigs.isSome) {
-          setCancelTx(relatedTxs.find((item) => addressEq(item.sender, multisigs.unwrap().depositor.toString())));
-        }
-      });
+    api.query.multisig.multisigs(meta.isFlexible ? transaction.children[0].sender : transaction.sender, meta.isFlexible ? transaction.children[0].hash : transaction.hash).then((multisigs) => {
+      if (multisigs.isSome) {
+        setCancelTx(relatedTxs.find((item) => addressEq(item.sender, multisigs.unwrap().depositor.toString())));
+      }
+    });
   }, [api, meta, relatedTxs, transaction]);
 
   return [relatedTxs, cancelTx];

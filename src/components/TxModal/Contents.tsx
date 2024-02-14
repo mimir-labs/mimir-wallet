@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
@@ -68,7 +68,7 @@ function Contents({
   const canSend = useMemo(() => canSendMultisig(accounts, address), [accounts, address]);
   const { transactions } = useContext(SelectAccountCtx);
   const txs = useMemo(() => (!isApprove && !isCancelled ? transactions : []), [isApprove, isCancelled, transactions]);
-  const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success && item.call.hash.toHex() === extrinsic.method.hash.toHex()), [extrinsic.method.hash, txs]);
+  const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success && item.hash === extrinsic.method.hash.toHex()), [extrinsic.method.hash, txs]);
 
   useEffect(() => {
     let unsubPromise: Promise<() => void> | undefined;
