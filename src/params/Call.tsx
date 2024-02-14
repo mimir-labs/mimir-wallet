@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
@@ -20,7 +20,7 @@ function findAction(api: ApiPromise, call: IMethod | ICall) {
 }
 
 function Call({ api, call, jsonFallback, type, ...props }: CallProps) {
-  const action = useMemo(() => findAction(api, call), [api, call]);
+  const action = useMemo(() => (call ? findAction(api, call) : 'unknown'), [api, call]);
 
   if (action === 'multisig.cancelAsMulti') {
     return <CancelCall api={api} call={call} type={type} {...props} />;

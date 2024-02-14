@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@mimir-wallet/hooks/types';
@@ -12,9 +12,13 @@ import { Box, Typography } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function ActionDisplay({ api, call, isSub, tx }: { isSub?: boolean; api: ApiPromise; call: IMethod; tx: Transaction }) {
+function ActionDisplay({ api, call, isSub, tx }: { isSub?: boolean; api: ApiPromise; call: IMethod | null; tx: Transaction }) {
   let comp: React.ReactNode;
   const selectAccount = useSelectedAccountCallback();
+
+  if (!call) {
+    return 'unknown';
+  }
 
   if (api.tx.balances.transfer?.is(call) || api.tx.balances.transferKeepAlive?.is(call) || api.tx.balances.transferAllowDeath?.is(call)) {
     const token = findToken(api.genesisHash.toHex());
@@ -23,7 +27,7 @@ function ActionDisplay({ api, call, isSub, tx }: { isSub?: boolean; api: ApiProm
       <>
         <Box component='img' src={token.Icon} sx={{ width: 20, height: 20 }} />
         <Typography>
-          -<FormatBalance value={call.args[1]} />
+          -<FormatBalance value={call.args[1].toString()} />
         </Typography>
       </>
     );

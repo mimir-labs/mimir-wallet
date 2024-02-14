@@ -1,10 +1,10 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DeriveBalancesAll, DeriveStakingAccount } from '@polkadot/api-derive/types';
 
 import { Fund } from '@mimir-wallet/components';
-import { useApi, useCall, useDapps, useGroupAccounts, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
+import { useApi, useCall, useDapps, useGroupAccounts, useProposal, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -12,6 +12,7 @@ import Assets from './Assets';
 import FavoriteDapps from './FavoriteDapp';
 import Info from './Info';
 import Members from './Members';
+import Proposals from './Proposals';
 import Transactions from './Transactions';
 import { AccountBalance } from './types';
 import Welcome from './Welcome';
@@ -37,6 +38,7 @@ function PageProfile() {
   const [balances, setBalances] = useState<AccountBalance>();
   const [fundOpen, toggleFundOpen] = useToggle();
   const { addFavorite, favorites, isFavorite, removeFavorite } = useDapps();
+  const proposals = useProposal();
 
   useEffect(() => {
     if (balancesAll) {
@@ -63,6 +65,7 @@ function PageProfile() {
           dapps={favorites.length > 0 ? <FavoriteDapps addFavorite={addFavorite} dapps={favorites} isFavorite={isFavorite} removeFavorite={removeFavorite} /> : null}
           info={<Info address={selected} balances={balances} toggleFundOpen={toggleFundOpen} />}
           member={<Members address={selected} />}
+          proposals={proposals.length > 0 ? <Proposals data={proposals} /> : null}
           transaction={<Transactions />}
         />
       ) : (

@@ -1,12 +1,11 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
 
-import { api } from '@mimir-wallet/api';
-import { serviceUrl } from '@mimir-wallet/config';
 import { AccountData } from '@mimir-wallet/hooks/types';
 
+import { serviceUrl } from './chain-links';
 import { fetcher } from './fetcher';
 
 const CACHE: Map<string, Promise<string>> = new Map();
@@ -22,7 +21,7 @@ export function getServiceUrl<P extends string | null, R = P extends string ? Pr
     return null as R;
   }
 
-  const promise = CACHE.get(path) || serviceUrl(api, path);
+  const promise = CACHE.get(path) || serviceUrl(path);
 
   CACHE.set(path, promise);
 

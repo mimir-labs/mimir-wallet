@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_URL_KEY, findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
@@ -27,11 +27,11 @@ function ChainSelect() {
     <>
       <Button
         onClick={handleClick}
-        startIcon={isApiConnected ? <img src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} /> : <CircularProgress size={20} />}
+        startIcon={isApiConnected && isApiReady ? <img src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} /> : <CircularProgress size={20} />}
         sx={{ borderColor: 'secondary.main' }}
         variant='outlined'
       >
-        {!isApiConnected ? 'Connecting...' : endpoint?.name}
+        {!isApiConnected || !isApiReady ? 'Connecting...' : endpoint?.name}
       </Button>
       <Menu
         anchorEl={anchorEl}

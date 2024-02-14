@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
@@ -244,11 +244,7 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
       <Typography fontWeight={700}>Transaction Initiator</Typography>
       <InputAddress disabled={!!pure} filtered={creator ? [creator] : who.filter((address) => !getAddressMeta(address).isMultisig)} isSign onChange={setSigner} value={signer} />
       <LockContainer>
-        <LockItem
-          address={signer}
-          tip="Flexible Multisig is a Pure Proxy. In ‘set members’ step, you add the multisig account as its proxy and remove the creator's proxy, making the multi-signature its only controller. Then transfer some funds to keep Flexible alive."
-          value={reservedAmount}
-        />
+        <LockItem address={signer} tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.' value={reservedAmount} />
       </LockContainer>
       <Divider sx={{ marginY: 1.5 }} />
       <Box sx={{ display: 'flex', gap: 1 }}>

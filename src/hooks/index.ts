@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 export * from './ctx';
@@ -19,6 +19,7 @@ export * from './useDeriveAccountInfo';
 export * from './useGroupAccounts';
 export * from './useIsMountedRef';
 export * from './useMultisigs';
+export * from './useProposals';
 export * from './useQueryParams';
 export * from './useCacheMultisig';
 export * from './useSelectedAccount';

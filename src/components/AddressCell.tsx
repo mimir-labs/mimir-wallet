@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
@@ -22,9 +22,10 @@ interface Props {
   withCopy?: boolean;
   width?: number | string;
   isMe?: boolean;
+  namePost?: React.ReactNode | null;
 }
 
-function AddressCell({ isMe, shorten = true, showType = false, size = 'medium', value, width, withCopy = false }: Props) {
+function AddressCell({ isMe, namePost, shorten = true, showType = false, size = 'medium', value, width, withCopy = false }: Props) {
   const { isAccount } = useAccounts();
   const { isAddress } = useAddresses();
   const [iconSize, nameFontSize, addressFontSize, spacing, spacingCol] = useMemo((): [number, string, string, number, number] => {
@@ -47,6 +48,7 @@ function AddressCell({ isMe, shorten = true, showType = false, size = 'medium', 
             <Typography component='span' fontSize={nameFontSize} fontWeight={size === 'large' ? 800 : 700} sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               <AddressName value={value} />
             </Typography>
+            {namePost}
             {showType &&
               (isMultisig ? (
                 <Chip color='secondary' label={isFlexible ? 'Flexible' : 'Static'} size={size === 'large' ? 'medium' : 'small'} />

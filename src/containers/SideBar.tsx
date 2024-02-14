@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { ReactComponent as ArrowRight } from '@mimir-wallet/assets/svg/ArrowRight.svg';
@@ -12,7 +12,7 @@ import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-tr
 import { AccountMenu, AddressCell, BalanceFree, CopyButton, QrcodeAddress } from '@mimir-wallet/components';
 import { findToken } from '@mimir-wallet/config';
 import { useApi, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
-import { chainExplorer } from '@mimir-wallet/utils';
+import { chainLinks } from '@mimir-wallet/utils';
 import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { Link, matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -96,7 +96,7 @@ function SideBar() {
             <SvgIcon component={IconQr} inheritViewBox />
           </IconButton>
           <CopyButton color='primary' value={selected} />
-          <IconButton color='primary' component='a' href={chainExplorer.accountHref(selected)} size='small' target='_blank'>
+          <IconButton color='primary' component='a' href={chainLinks.accountExplorerLink(selected)} size='small' target='_blank'>
             <SvgIcon component={IconLink} inheritViewBox />
           </IconButton>
           <IconButton color='primary' component={Link} size='small' to={`/transfer?from=${selected}`}>

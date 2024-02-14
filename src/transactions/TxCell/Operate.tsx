@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
@@ -36,11 +36,13 @@ function Operate({
 
   const handleApprove = useCallback(
     (filtered: Filtered) => {
+      if (!transaction.call) return;
+
       setApproveLoading(true);
       addQueue({
         filtered,
         extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
-        destCall: destTx.call,
+        destCall: destTx.call || undefined,
         destSender: destTx.sender,
         accountId: transaction.sender,
         isApprove: true,
@@ -55,11 +57,13 @@ function Operate({
 
   const handleCancel = useCallback(
     (filtered: Filtered) => {
+      if (!transaction.call) return;
+
       setCancelLoading(true);
       addQueue({
         filtered,
         extrinsic: api.tx[transaction.call.section][transaction.call.method](...transaction.call.args),
-        destCall: destTx.call,
+        destCall: destTx.call || undefined,
         destSender: destTx.sender,
         accountId: transaction.sender,
         isCancelled: true,

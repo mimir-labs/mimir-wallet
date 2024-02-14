@@ -1,7 +1,5 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import type { ApiPromise } from '@polkadot/api';
 
 import store from 'store';
 
@@ -15,6 +13,8 @@ type Endpoint = {
   genesisHash?: string;
   serviceUrl?: string;
   explorerUrl?: string;
+  proposalApi?: string;
+  subsquareUrl?: string;
 };
 
 export const localEndpoint: Endpoint = { icon: '/chain-icons/Mimir.svg', tokenIcon: '/token-icons/Mimir.svg', name: 'Development', wsUrl: 'ws://127.0.0.1:9944/' };
@@ -25,7 +25,9 @@ export const devEndpoints: Endpoint[] = [
     name: 'Mimir',
     wsUrl: 'wss://dev-ws.mimir.global/',
     genesisHash: '0xc47e0ed91f4362642787756a15618b5cb558a3952187c6dfb3fb8e9db5128678',
-    serviceUrl: 'https://dev-api.mimir.global/'
+    serviceUrl: 'https://dev-api.mimir.global/',
+    proposalApi: 'https://rococo.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://rococo.subsquare.io/'
   }
 ];
 export const testnetEndpoints: Endpoint[] = [
@@ -36,7 +38,9 @@ export const testnetEndpoints: Endpoint[] = [
     wsUrl: 'wss://rococo-rpc.polkadot.io/',
     genesisHash: '0x6408de7737c59c238890533af25896a2c20608d8b380bb01029acb392781063e',
     serviceUrl: 'https://rococo-api.mimir.global/',
-    explorerUrl: 'https://rococo.subscan.io/'
+    explorerUrl: 'https://rococo.subscan.io/',
+    proposalApi: 'https://rococo.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://rococo.subsquare.io/'
   }
 ];
 export const polkadotEndpoints: Endpoint[] = [
@@ -47,7 +51,9 @@ export const polkadotEndpoints: Endpoint[] = [
     wsUrl: 'wss://polkadot.api.onfinality.io/public-ws/',
     genesisHash: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
     serviceUrl: 'https://polkadot-api.mimir.global/',
-    explorerUrl: 'https://polkadot.subscan.io/'
+    explorerUrl: 'https://polkadot.subscan.io/',
+    proposalApi: 'https://polkadot.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://polkadot.subsquare.io/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
@@ -58,7 +64,9 @@ export const kusamaEndpoints: Endpoint[] = [
     wsUrl: 'wss://kusama.api.onfinality.io/public-ws/',
     genesisHash: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
     serviceUrl: 'https://kusama-api.mimir.global/',
-    explorerUrl: 'https://kusama.subscan.io/'
+    explorerUrl: 'https://kusama.subscan.io/',
+    proposalApi: 'https://kusama.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://kusama.subsquare.io/'
   }
 ];
 
@@ -111,20 +119,6 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
       local: [localEndpoint]
     };
   }
-}
-
-export async function serviceUrl(api: ApiPromise, path: string): Promise<string> {
-  let url: string;
-
-  if (process.env.NODE_ENV === 'production') {
-    await api.isReady;
-
-    url = allEndpoints.find((item) => item.genesisHash === api.genesisHash.toHex())?.serviceUrl || 'http://127.0.0.1:8080/';
-  } else {
-    url = 'http://127.0.0.1:8080/';
-  }
-
-  return `${url}${path}`;
 }
 
 export function findEndpoint(genesisHash: string): Endpoint {

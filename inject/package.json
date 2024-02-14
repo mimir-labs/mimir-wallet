@@ -19,7 +19,7 @@
     "bundle": "yarn mimir-exec-webpack --config webpack.config.cjs --mode production"
   },
   "devDependencies": {
-    "@mimirdev/dev": "^0.3.0",
+    "@mimirdev/dev": "^0.4.0",
     "@polkadot/extension-base": "^0.46.6",
     "@polkadot/extension-inject": "^0.46.6",
     "@types/path-browserify": "^1",

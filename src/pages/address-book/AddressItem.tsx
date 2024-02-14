@@ -1,4 +1,4 @@
-// Copyright 2023-2023 dev.mimir authors & contributors
+// Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
@@ -6,7 +6,7 @@ import { ReactComponent as IconQr } from '@mimir-wallet/assets/svg/icon-qr.svg';
 import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
 import { AddressRow, CopyButton, EditAddressDialog } from '@mimir-wallet/components';
 import { useAddressMeta, useToggle } from '@mimir-wallet/hooks';
-import { chainExplorer } from '@mimir-wallet/utils';
+import { chainLinks } from '@mimir-wallet/utils';
 import { Box, Button, IconButton, Paper, SvgIcon, Typography } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -26,7 +26,7 @@ function AddressItem({ address }: { address: string }) {
         <IconButton color='primary' size='small'>
           <SvgIcon component={IconQr} inheritViewBox />
         </IconButton>
-        <IconButton color='primary' component='a' href={chainExplorer.accountHref(address)} size='small' target='_blank'>
+        <IconButton color='primary' component='a' href={chainLinks.accountExplorerLink(address)} size='small' target='_blank'>
           <SvgIcon component={IconLink} inheritViewBox />
         </IconButton>
       </Box>
