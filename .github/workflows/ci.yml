@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      YARN_ENABLE_SCRIPTS: false
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install deps
+        run: |
+          yarn install --immutable | grep -v 'YN0013'
+      - name: Lint
+        run: |
+          yarn lint
+      - name: Test
+        run: |
+          yarn test
+      - name: Build
+        run: |
+          yarn build

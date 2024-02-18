@@ -40,7 +40,7 @@
     "bundle:inject": "yarn workspace @mimirdev/inject run bundle && cp inject/build/mimir-injectd.min.js public/mimir-injected.min.js",
     "lint": "mimir-dev-run-lint",
     "start": "craco start",
-    "test": "craco test"
+    "test": "craco test --passWithNoTests"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
