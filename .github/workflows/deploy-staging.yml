@@ -35,6 +35,7 @@ jobs:
           host: ${{ secrets.HOST }}
           port: ${{ secrets.PORT }}
           key: ${{ secrets.KEY }}
-          source: ${{ github.workspace }}/build
+          source: build
           target: ${{ secrets.TARGET }}
+          strip_components: 5
           rm: true
