@@ -27,13 +27,12 @@ jobs:
           yarn build
 
       - name: Deploy to server
-        uses: appleboy/scp-action@v0.1.7
+        uses: burnett01/rsync-deployments@6.0.0
         with:
-          username: ${{ secrets.USERNAME }}
-          host: ${{ secrets.HOST }}
-          port: ${{ secrets.PORT }}
-          key: ${{ secrets.KEY }}
-          source: ${{ github.workspace }}/build
-          target: ${{ secrets.TARGET }}
-          strip_components: 5
-          rm: true
+          switches: -avzr --delete --exclude '*.map'
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_port: ${{ secrets.PORT }}
+          remote_key: ${{ secrets.KEY }}
+          remote_path: ${{ secrets.TARGET }}
+          path: build/
