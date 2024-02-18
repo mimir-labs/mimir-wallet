@@ -37,5 +37,4 @@ jobs:
           key: ${{ secrets.KEY }}
           source: build/*
           target: ${{ secrets.TARGET }}
-          strip_components: 5
           rm: true
