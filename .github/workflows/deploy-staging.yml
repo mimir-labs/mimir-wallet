@@ -1,7 +1,9 @@
 name: Deploy staging
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - fix-deploy
 
 jobs:
   deploy-staging:
@@ -35,5 +37,4 @@ jobs:
           key: ${{ secrets.KEY }}
           source: ${{ github.workspace }}/build
           target: ${{ secrets.TARGET }}
-          strip_components: 5
           rm: true
