@@ -1,0 +1,26 @@
+name: PR
+on: [pull_request]
+
+jobs:
+  pr:
+    strategy:
+      matrix:
+        step: ['lint', 'test', 'build']
+    name: ${{ matrix.step }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: "yarn"
+
+    - name: Install deps
+      run: |
+        yarn install --immutable | grep -v 'YN0013'
+
+    - name: ${{ matrix.step }}
+      run: |
+        yarn ${{ matrix.step }}

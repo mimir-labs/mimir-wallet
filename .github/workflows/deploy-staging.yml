@@ -1,0 +1,39 @@
+name: Deploy staging
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      YARN_ENABLE_SCRIPTS: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install deps and build
+        run: |
+          yarn install --immutable | grep -v 'YN0013'
+          yarn build
+
+      - name: Deploy to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          username: ${{ secrets.USERNAME }}
+          host: ${{ secrets.HOST }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.KEY }}
+          source: ${{ github.workspace }}/build
+          target: ${{ secrets.TARGET }}
+          strip_components: 5
+          rm: true
