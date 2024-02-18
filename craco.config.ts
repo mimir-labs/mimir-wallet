@@ -21,11 +21,11 @@ export default {
         isProduction
           ? {
               splitChunks: {
-                // Cap the chunk size to 5MB.
+                // Cap the chunk size to 2MB.
                 // react-scripts suggests a chunk size under 1MB after gzip, but we can only measure maxSize before gzip.
                 // react-scripts also caps cacheable chunks at 5MB, which gzips to below 1MB, so we cap chunk size there.
                 // See https://github.com/facebook/create-react-app/blob/d960b9e/packages/react-scripts/config/webpack.config.js#L713-L716.
-                maxSize: 5 * 1024 * 1024,
+                maxSize: 2 * 1024 * 1024,
                 // Optimize over all chunks, instead of async chunks (the default), so that initial chunks are also optimized.
                 chunks: 'all'
               }
@@ -56,7 +56,8 @@ export default {
           ? [
               new InjectManifest({
                 swSrc: './src/serviceWorker/index.ts',
-                swDest: 'service-worker.js'
+                swDest: 'service-worker.js',
+                maximumFileSizeToCacheInBytes: 2 * 1024 * 1024
               })
             ]
           : []
