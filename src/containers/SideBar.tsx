@@ -104,7 +104,7 @@ function SideBar() {
           </IconButton>
         </Paper>
         <NavLink Icon={IconHome} label='Home' to='/' />
-        <NavLink Icon={IconDapp} label='Dapp' to='/dapp' />
+        <NavLink Icon={IconDapp} label='Apps' to='/dapp' />
         <NavLink Icon={IconTransaction} label='Transactions' to='/transactions' />
         <NavLink Icon={IconAddressBook} label='Address Book' to='/address-book' />
         <AccountMenu onClose={handleAccountClose} open={!!anchorEl} />

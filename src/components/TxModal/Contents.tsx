@@ -2,17 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
+import type { Transaction } from '@mimir-wallet/hooks/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Call, Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { useApi } from '@mimir-wallet/hooks';
-import { SelectAccountCtx } from '@mimir-wallet/hooks/ctx/SelectedAccount';
-import { CalldataStatus, Transaction } from '@mimir-wallet/hooks/types';
+import { useApi, usePendingTransactions } from '@mimir-wallet/hooks';
 import { canSendMultisig, PrepareMultisig, prepareMultisig } from '@mimir-wallet/utils';
 import { Alert, Box, Button, DialogActions, DialogContent, Divider, Paper, Stack, Typography } from '@mui/material';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import AddressCell from '../AddressCell';
@@ -66,9 +65,8 @@ function Contents({
   const { api } = useApi();
   const [prepare, setPrepare] = useState<PrepareMultisig>();
   const canSend = useMemo(() => canSendMultisig(accounts, address), [accounts, address]);
-  const { transactions } = useContext(SelectAccountCtx);
-  const txs = useMemo(() => (!isApprove && !isCancelled ? transactions : []), [isApprove, isCancelled, transactions]);
-  const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success && item.hash === extrinsic.method.hash.toHex()), [extrinsic.method.hash, txs]);
+  const [_pendingTxs] = usePendingTransactions(isApprove || isCancelled ? null : address);
+  const pendingTxs = _pendingTxs.filter((item) => item.hash === extrinsic.method.hash.toHex());
 
   useEffect(() => {
     let unsubPromise: Promise<() => void> | undefined;

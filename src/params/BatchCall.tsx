@@ -39,9 +39,9 @@ function ChangeMember({ changes, type = 'base' }: CallProps & { changes: [string
       <Item
         content={
           <Typography>
-            {oldMeta.threshold}
+            {oldMeta?.threshold}
             {'->'}
-            {newMeta.threshold}
+            {newMeta?.threshold}
           </Typography>
         }
         name='Threshold'
@@ -50,7 +50,7 @@ function ChangeMember({ changes, type = 'base' }: CallProps & { changes: [string
       <Item
         content={
           <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-            {newMeta.who?.map((address) => (
+            {newMeta?.who?.map((address) => (
               <AddressRow key={address} size='small' value={address} withAddress={false} withCopy withName />
             ))}
           </Box>

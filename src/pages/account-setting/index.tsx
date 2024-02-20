@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AddAddressDialog, Input, toastSuccess } from '@mimir-wallet/components';
-import { useAccounts, useAddresses, useAddressMeta, useApi, useSelectedAccount, useSelectedAccountCallback, useToggle, useTransactions, useTxQueue } from '@mimir-wallet/hooks';
+import { useAccounts, useAddresses, useAddressMeta, useApi, usePendingTransactions, useSelectedAccount, useSelectedAccountCallback, useToggle, useTxQueue } from '@mimir-wallet/hooks';
 import { CalldataStatus } from '@mimir-wallet/hooks/types';
 import { service } from '@mimir-wallet/utils';
 import { Box, Button, FormHelperText, Paper, Stack, Typography } from '@mui/material';
@@ -30,10 +30,10 @@ function AccountSetting() {
   const { isAddress } = useAddresses();
   const { isAccount } = useAccounts();
   const { api } = useApi();
-  const [txs] = useTransactions(account);
+  const [txs] = usePendingTransactions(account);
   const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success), [txs]);
   const selectAccount = useSelectedAccountCallback();
-  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig(meta.who, meta.threshold);
+  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig(meta?.who, meta?.threshold);
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
   const [addOpen, toggleAdd] = useToggle();
   const [addressError, setAddressError] = useState<Error | null>(null);
@@ -52,7 +52,7 @@ function AccountSetting() {
   const _onClick = useCallback(async () => {
     await saveName((name) => toastSuccess(`Save name to ${name} success`));
 
-    if (!meta.who || !meta.threshold || !account) return;
+    if (!meta?.who || !meta?.threshold || !account) return;
     if (!checkField()) return;
     const oldMultiAddress = encodeMultiAddress(meta.who, meta.threshold);
     const newMultiAddress = encodeMultiAddress(signatories, threshold);
@@ -70,7 +70,7 @@ function AccountSetting() {
         accountId: account
       });
     }
-  }, [checkField, saveName, meta.who, meta.threshold, account, signatories, threshold, addQueue, api.tx.utility, api.tx.proxy, name]);
+  }, [checkField, saveName, meta?.who, meta?.threshold, account, signatories, threshold, addQueue, api.tx.utility, api.tx.proxy, name]);
 
   const _handleAdd = useCallback(() => {
     if (isAddressValid) {
@@ -118,7 +118,7 @@ function AccountSetting() {
               Please process {pendingTxs.length} Pending Transaction first
             </Box>
           )}
-          {meta.isMultisig && !meta.isFlexible && (
+          {meta?.isMultisig && !meta.isFlexible && (
             <Box color='warning.main' sx={{ marginBottom: 2, fontWeight: 700 }}>
               static multisig account can not change members.
             </Box>
@@ -126,8 +126,8 @@ function AccountSetting() {
           <Stack
             spacing={2}
             sx={{
-              opacity: !meta.isMultisig || !meta.isFlexible || pendingTxs.length > 0 ? 0.5 : undefined,
-              pointerEvents: !meta.isMultisig || !meta.isFlexible || pendingTxs.length > 0 ? 'none' : undefined
+              opacity: !meta?.isMultisig || !meta?.isFlexible || pendingTxs.length > 0 ? 0.5 : undefined,
+              pointerEvents: !meta?.isMultisig || !meta?.isFlexible || pendingTxs.length > 0 ? 'none' : undefined
             }}
           >
             <Input

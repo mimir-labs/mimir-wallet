@@ -1,12 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SelectAccountCtx } from '@mimir-wallet/hooks/ctx/SelectedAccount';
+import { usePendingTransactions } from '@mimir-wallet/hooks';
 import { CalldataStatus } from '@mimir-wallet/hooks/types';
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 
-export function usePendingTx(url: string) {
-  const { transactions } = useContext(SelectAccountCtx);
+export function usePendingTx(address: string, url: string) {
+  const [transactions] = usePendingTransactions(address);
 
   return useMemo(
     () =>

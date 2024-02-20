@@ -66,7 +66,7 @@ function PageProfile() {
           info={<Info address={selected} balances={balances} toggleFundOpen={toggleFundOpen} />}
           member={<Members address={selected} />}
           proposals={proposals.length > 0 ? <Proposals data={proposals} /> : null}
-          transaction={<Transactions />}
+          transaction={<Transactions address={selected} />}
         />
       ) : (
         <Welcome />

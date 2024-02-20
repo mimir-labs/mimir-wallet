@@ -17,6 +17,11 @@ export function useCommunicator(iframeRef: MutableRefObject<HTMLIFrameElement | 
 
   const state: State = {
     extrinsicSign: (payload: SignerPayloadJSON, id: string) => {
+      console.log(payload);
+      // if (payload.genesisHash !== api.genesisHash.toHex()) {
+      //   throw new Error(`Extrinsic genesisHash error, only supported ${api.runtimeChain.toString()}`);
+      // }
+
       const call = api.registry.createType('Call', payload.method);
 
       const website = new URL(url);
@@ -28,6 +33,7 @@ export function useCommunicator(iframeRef: MutableRefObject<HTMLIFrameElement | 
           onlySign: true,
           website: website.origin,
           onSignature: (signer, signature, tx, payload) => {
+            console.log(payload);
             resolve({ id, signature, signer, payload } as any);
           },
           onReject: () => reject(new Error('User reject'))

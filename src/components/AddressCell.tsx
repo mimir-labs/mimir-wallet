@@ -34,9 +34,7 @@ function AddressCell({ isMe, namePost, shorten = true, showType = false, size = 
   const [open, toggleOpen] = useToggle();
 
   const address = value?.toString();
-  const {
-    meta: { isFlexible, isMultisig, isTesting }
-  } = useAddressMeta(address);
+  const { meta: { isFlexible, isMultisig, isTesting } = {} } = useAddressMeta(address);
 
   return (
     <>

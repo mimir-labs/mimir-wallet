@@ -1,81 +1,76 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Empty } from '@mimir-wallet/components';
-import { useAddressMeta, useSelectedAccount } from '@mimir-wallet/hooks';
-import { SelectAccountCtx } from '@mimir-wallet/hooks/ctx/SelectedAccount';
-import { CalldataStatus } from '@mimir-wallet/hooks/types';
-import { TxCell } from '@mimir-wallet/transactions';
-import { Box, Button, Paper, Stack } from '@mui/material';
-import { useContext, useMemo, useState } from 'react';
+import { useAddressMeta, useQueryParam, useSelectedAccount } from '@mimir-wallet/hooks';
+import { Box, Button, Paper } from '@mui/material';
+import keyring from '@polkadot/ui-keyring';
+import { useEffect } from 'react';
 
-function MultisigList() {
-  const { transactions } = useContext(SelectAccountCtx);
-  const [type, setType] = useState<'pending' | 'history'>('pending');
+import HistoryTransactions from './HistoryTransactions';
+import PendingTransactions from './PendingTransactions';
 
-  const list = useMemo(() => {
-    return transactions
-      .sort((l, r) => (r.initTransaction.height || 0) - (l.initTransaction.height || 0))
-      .filter((item) => {
-        return type === 'pending' ? item.status < CalldataStatus.Success : item.status > CalldataStatus.Pending;
-      });
-  }, [transactions, type]);
+function MultisigList({ address, limit, page, setLimit, setPage }: { address: string; page?: number; limit?: number; setPage: (value: string) => void; setLimit: (value: string) => void }) {
+  const [type, setType] = useQueryParam<'pending' | 'history'>('status', 'pending');
+
+  const _setPage = (value: number) => setPage(value.toString());
+  const _setLimit = (value: number) => setLimit(value.toString());
 
   return (
     <Box>
       <Paper sx={{ borderRadius: '20px', padding: 1, display: 'inline-flex', marginBottom: 2, gap: 1 }}>
-        <Button onClick={() => setType('pending')} sx={{ paddingX: 3 }} variant={type === 'pending' ? 'contained' : 'text'}>
+        <Button onClick={() => setType('pending')} sx={{ borderRadius: 1, paddingX: 3 }} variant={type === 'pending' ? 'contained' : 'text'}>
           Pending
         </Button>
-        <Button color='primary' onClick={() => setType('history')} sx={{ paddingX: 3 }} variant={type === 'history' ? 'contained' : 'text'}>
+        <Button color='primary' onClick={() => setType('history')} sx={{ borderRadius: 1, paddingX: 3 }} variant={type === 'history' ? 'contained' : 'text'}>
           History
         </Button>
       </Paper>
-      {list.length > 0 ? (
-        <Stack spacing={2}>
-          {list.map((transaction, index) => (
-            <TxCell defaultOpen={index === 0} key={transaction.uuid} transaction={transaction} />
-          ))}
-        </Stack>
-      ) : (
-        <Empty height='calc(100vh - 200px)' label={type === 'pending' ? 'No Pending Transactions' : 'No Transactions'} />
-      )}
+      {type === 'history' ? <HistoryTransactions address={address} limit={limit} page={page} setLimit={_setLimit} setPage={_setPage} /> : <PendingTransactions address={address} />}
     </Box>
   );
 }
 
-function AccountList() {
-  const { transactions } = useContext(SelectAccountCtx);
-
-  if (transactions.length === 0) {
-    return <Empty height='calc(100vh - 100px)' label='No Transactions' />;
-  }
+function AccountList({ address, limit, page, setLimit, setPage }: { address: string; page?: number; limit?: number; setPage: (value: string) => void; setLimit: (value: string) => void }) {
+  const _setPage = (value: number) => setPage(value.toString());
+  const _setLimit = (value: number) => setLimit(value.toString());
 
   return (
     <Box>
       <Paper sx={{ borderRadius: '20px', padding: 1, display: 'inline-flex', marginBottom: 2, gap: 1 }}>
-        <Button color='primary' sx={{ paddingX: 3 }} variant='contained'>
+        <Button color='primary' sx={{ borderRadius: 1, paddingX: 3 }} variant='contained'>
           History
         </Button>
       </Paper>
-      <Stack spacing={2}>
-        {transactions.map((transaction, index) => (
-          <TxCell defaultOpen={index === 0} key={transaction.uuid} transaction={transaction} />
-        ))}
-      </Stack>
+      <HistoryTransactions address={address} limit={limit} page={page} setLimit={_setLimit} setPage={_setPage} />
     </Box>
   );
+}
+
+function Content({ address }: { address: string }) {
+  const { meta } = useAddressMeta(address);
+  const [page, setPage] = useQueryParam<string>('page', '1');
+  const [limit, setLimit] = useQueryParam<string>('limit', '10');
+
+  if (!meta || meta.isMultisig) return <MultisigList address={address} limit={Number(limit) || 10} page={Number(page) || 1} setLimit={setLimit} setPage={setPage} />;
+
+  return <AccountList address={address} limit={Number(limit) || 10} page={Number(page) || 1} setLimit={setLimit} setPage={setPage} />;
 }
 
 function PageTransaction() {
-  const current = useSelectedAccount();
-  const { meta } = useAddressMeta(current);
+  const [address, setAddress] = useQueryParam<string>('address');
+  const selected = useSelectedAccount();
 
-  if (!current) return null;
+  useEffect(() => {
+    if (!address) {
+      selected && setAddress(selected, { replace: true });
+    } else {
+      keyring.getAccount(address) && selected && setAddress(selected);
+    }
+  }, [address, selected, setAddress]);
 
-  if (meta.isMultisig) return <MultisigList />;
+  if (!address) return null;
 
-  return <AccountList />;
+  return <Content address={address} />;
 }
 
 export default PageTransaction;

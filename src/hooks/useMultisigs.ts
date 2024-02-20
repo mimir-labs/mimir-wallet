@@ -16,7 +16,7 @@ import { useApi } from './useApi';
 
 function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Record<HexString, AccountData>) {
   const { address: addressHex, creator, delegators, height, index, isMimir, isValid, name, networks } = account;
-  const address = encodeAddress(addressHex);
+  const address = encodeAddress(addressHex, api.registry.chainSS58);
 
   if (networks.find((item) => u8aEq(api.genesisHash.toHex(), item))) {
     const multiAddress = delegators.at(0)?.address;
@@ -67,13 +67,15 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
   }
 }
 
-function mergeMulti(account: MultiAccountData) {
+function mergeMulti(api: ApiPromise, account: MultiAccountData) {
   const { isValid, name, threshold, who } = account;
 
   const address = encodeMultiAddress(
     who.map(({ address }) => address),
-    threshold
+    threshold,
+    api.registry.chainSS58
   );
+
   const exists = keyring.getAccount(address);
 
   if (!exists) {
@@ -128,7 +130,7 @@ function sync(api: ApiPromise) {
         }
 
         if (data.type === 'multi') {
-          mergeMulti(data as MultiAccountData);
+          mergeMulti(api, data as MultiAccountData);
         }
       });
     });

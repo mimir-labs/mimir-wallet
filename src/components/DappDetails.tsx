@@ -75,7 +75,7 @@ function DappDetails({ dapp, onClose, open }: Props) {
       <Contents dapp={dapp} />
       <DialogActions sx={{ justifyContent: 'center' }}>
         <Button component={Link} size='large' sx={{ width: 195 }} to={dapp.internal ? dapp.url : `/explorer/${encodeURIComponent(dapp.url)}`}>
-          Open DApp
+          Open
         </Button>
       </DialogActions>
     </Dialog>

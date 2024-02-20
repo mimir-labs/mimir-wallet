@@ -52,19 +52,19 @@ function ProgressInfo({ approvals, threshold }: { approvals: number; threshold: 
 
 function Progress({ approveFiltered, canApprove, canCancel, cancelFiltered, openOverview, transaction }: Props) {
   const { meta } = useAddressMeta(transaction.sender);
-  const [approvals, txs] = useMemo((): [number, Transaction[]] => extraTransaction(meta, transaction), [meta, transaction]);
+  const [approvals, txs] = useMemo((): [number, Transaction[]] => (meta ? extraTransaction(meta, transaction) : [0, []]), [meta, transaction]);
 
   return (
     <Stack bgcolor='secondary.main' component={Paper} minWidth={280} padding={2} spacing={1} variant='elevation'>
       <ProgressTitle />
-      <ProgressInfo approvals={approvals} threshold={meta.threshold || 0} />
+      <ProgressInfo approvals={approvals} threshold={meta?.threshold || 0} />
       <Divider />
       <Box>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
           <Typography sx={{ fontWeight: 700, flex: '1' }}>
             Confirmations{' '}
             <span style={{ opacity: 0.5 }}>
-              ({approvals}/{meta.threshold})
+              ({approvals}/{meta?.threshold})
             </span>
           </Typography>
           <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>

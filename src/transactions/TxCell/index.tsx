@@ -20,7 +20,7 @@ function TxCell({ defaultOpen, transaction }: Props) {
   const status = transaction.status;
   const time = useBlockTime(transaction.status < CalldataStatus.Success ? transaction.initTransaction.height : transaction.height);
   const { meta: destSenderMeta } = useAddressMeta(destTx.sender);
-  const [approvals] = useMemo((): [number, Transaction[]] => extraTransaction(destSenderMeta, transaction), [destSenderMeta, transaction]);
+  const [approvals] = useMemo((): [number, Transaction[]] => (destSenderMeta ? extraTransaction(destSenderMeta, transaction) : [0, []]), [destSenderMeta, transaction]);
 
   return (
     <Paper component={Stack} spacing={1.2} sx={{ padding: 2, borderRadius: 2 }}>
@@ -40,7 +40,7 @@ function TxCell({ defaultOpen, transaction }: Props) {
         <Typography>{time ? moment(time).format() : null}</Typography>
       </Box>
       <Divider orientation='horizontal' />
-      <TxItems approvals={approvals} defaultOpen={defaultOpen} threshold={destSenderMeta.threshold || 0} time={time} transaction={transaction} />
+      <TxItems approvals={approvals} defaultOpen={defaultOpen} threshold={destSenderMeta?.threshold || 0} time={time} transaction={transaction} />
     </Paper>
   );
 }

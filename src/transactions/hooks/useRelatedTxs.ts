@@ -33,7 +33,7 @@ export function useRelatedTxs(transaction: Transaction): [relatedTxs: Transactio
   }, [transaction]);
 
   useEffect(() => {
-    if (!meta.isMultisig || relatedTxs.length === 0) return;
+    if (!meta?.isMultisig || relatedTxs.length === 0) return;
 
     api.query.multisig.multisigs(meta.isFlexible ? transaction.children[0].sender : transaction.sender, meta.isFlexible ? transaction.children[0].hash : transaction.hash).then((multisigs) => {
       if (multisigs.isSome) {

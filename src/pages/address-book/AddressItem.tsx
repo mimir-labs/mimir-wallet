@@ -18,7 +18,7 @@ function AddressItem({ address }: { address: string }) {
   return (
     <Paper sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 4, borderRadius: '20px', padding: 2.5, boxShadow: '0px 0px 10px rgba(21, 31, 52, 0.06)' }}>
       <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Typography variant='h6'>{meta.name}</Typography>
+        <Typography variant='h6'>{meta?.name}</Typography>
       </Box>
       <Box sx={{ flex: '3', display: 'flex', alignItems: 'center', gap: 0.5, '>.MuiIconButton-root': { padding: 0 } }}>
         <AddressRow shorten={false} value={address} withAddress withName={false} />
