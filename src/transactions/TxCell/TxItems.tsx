@@ -127,10 +127,10 @@ function ActionsCell({
 function RelatedItem({ tx }: { tx: Transaction }) {
   const destTx = tx.top;
   const { meta: destSenderMeta } = useAddressMeta(destTx.sender);
-  const [approvals] = useMemo((): [number, Transaction[]] => extraTransaction(destSenderMeta, tx), [destSenderMeta, tx]);
+  const [approvals] = useMemo((): [number, Transaction[]] => (destSenderMeta ? extraTransaction(destSenderMeta, tx) : [0, []]), [destSenderMeta, tx]);
   const time = useBlockTime(tx.status < CalldataStatus.Success ? tx.initTransaction.height : tx.height);
 
-  return <TxItems approvals={approvals} defaultOpen={false} isSub threshold={destSenderMeta.threshold || 0} time={time} transaction={tx} withApp={false} />;
+  return <TxItems approvals={approvals} defaultOpen={false} isSub threshold={destSenderMeta?.threshold || 0} time={time} transaction={tx} withApp={false} />;
 }
 
 function TxItems({

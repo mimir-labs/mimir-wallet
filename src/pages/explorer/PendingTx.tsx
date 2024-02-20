@@ -12,11 +12,12 @@ import { Link } from 'react-router-dom';
 import { usePendingTx } from './usePendingTx';
 
 interface Props {
+  address: string;
   url: string;
 }
 
-function PendingTx({ url }: Props) {
-  const txs = usePendingTx(url);
+function PendingTx({ address, url }: Props) {
+  const txs = usePendingTx(address, url);
   const [expand, toggleExpand] = useToggle();
 
   return (
@@ -56,11 +57,7 @@ function PendingTx({ url }: Props) {
         <Typography color='primary.main' variant='h6'>
           {txs.length} Pending Transactions
         </Typography>
-        <IconButton
-          color='primary'
-          onClick={toggleExpand}
-          sx={{ transition: 'all 150ms', marginLeft: 1, bgcolor: 'secondary.main', transformOrigin: 'center', transform: `rotateZ(${expand ? '180deg' : '0deg'})` }}
-        >
+        <IconButton color='primary' sx={{ transition: 'all 150ms', marginLeft: 1, bgcolor: 'secondary.main', transformOrigin: 'center', transform: `rotateZ(${expand ? '180deg' : '0deg'})` }}>
           <SvgIcon component={ExpandArrow} inheritViewBox />
         </IconButton>
       </Box>

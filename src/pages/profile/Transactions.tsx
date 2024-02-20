@@ -1,19 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Transaction } from '@mimir-wallet/hooks/types';
+
 import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
 import { Empty } from '@mimir-wallet/components';
-import { useAddressMeta, useDapp } from '@mimir-wallet/hooks';
-import { SelectAccountCtx } from '@mimir-wallet/hooks/ctx/SelectedAccount';
-import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
+import { useAddressMeta, useDapp, usePendingTransactions } from '@mimir-wallet/hooks';
 import { extraTransaction } from '@mimir-wallet/transactions';
 import { Box, Chip, Paper, SvgIcon, Typography } from '@mui/material';
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 function Row({ isStart, transaction }: { transaction: Transaction; isStart: boolean }) {
   const { meta } = useAddressMeta(transaction.sender);
-  const [approvals] = useMemo((): [number, Transaction[]] => extraTransaction(meta, transaction), [meta, transaction]);
+  const [approvals] = useMemo((): [number, Transaction[]] => (meta ? extraTransaction(meta, transaction) : [0, []]), [meta, transaction]);
   const destTx = transaction.top;
   const dapp = useDapp(transaction.initTransaction.website);
 
@@ -37,20 +37,13 @@ function Row({ isStart, transaction }: { transaction: Transaction; isStart: bool
       {dapp ? <Box component='img' src={dapp.icon} width={16} /> : <SvgIcon color='primary' component={IconSend} inheritViewBox />}
       <Typography sx={{ width: 120 }}>No.{destTx.uuid.slice(0, 8).toUpperCase()}</Typography>
       <Typography sx={{ flex: '1' }}>{destTx.action}</Typography>
-      <Chip color='primary' label={`${approvals}/${meta.threshold}`} size='small' />
+      <Chip color='primary' label={`${approvals}/${meta?.threshold}`} size='small' />
     </Box>
   );
 }
 
-function Transactions() {
-  const { transactions } = useContext(SelectAccountCtx);
-  const pendingTransactions = useMemo(() => {
-    return transactions
-      .sort((l, r) => (r.initTransaction.height || 0) - (l.initTransaction.height || 0))
-      .filter((item) => {
-        return item.status < CalldataStatus.Success;
-      });
-  }, [transactions]);
+function Transactions({ address }: { address?: string }) {
+  const [pendingTransactions] = usePendingTransactions(address);
 
   return (
     <Paper

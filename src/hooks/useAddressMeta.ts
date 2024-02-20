@@ -13,15 +13,15 @@ import { KeyringCtx } from './ctx/Keyring';
 import { createNamedHook } from './createNamedHook';
 
 interface UseAddressMeta {
-  meta: AddressMeta;
+  meta: AddressMeta | undefined;
   name?: string;
   setName: React.Dispatch<string>;
   saveName: (cb?: (name: string) => void) => Promise<void>;
 }
 
 function useAddressMetaImpl(value?: string | null): UseAddressMeta {
-  const [meta, setMeta] = useState<AddressMeta>(value ? getAddressMeta(value) : {});
-  const [name, setName] = useState<string | undefined>(meta.name);
+  const [meta, setMeta] = useState<AddressMeta | undefined>(value ? getAddressMeta(value) : undefined);
+  const [name, setName] = useState<string | undefined>(meta?.name);
   const {
     accounts: { isAccount }
   } = useContext(KeyringCtx);
@@ -61,7 +61,7 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
     async (cb?: (name: string) => void) => {
       if (!value || !name) return;
 
-      if (name === meta.name) return;
+      if (name === meta?.name) return;
 
       try {
         if (isAccount(value)) {
@@ -81,7 +81,7 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
         toastError(error);
       }
     },
-    [isAccount, meta.name, name, value]
+    [isAccount, meta?.name, name, value]
   );
 
   return {

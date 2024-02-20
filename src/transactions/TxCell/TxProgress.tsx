@@ -14,7 +14,7 @@ function TxProgress({ tx }: { tx: Transaction }) {
   const { meta } = useAddressMeta(tx.sender);
   const [, copy] = useCopyClipboard();
 
-  const progress = useMemo(() => extraTransaction(meta, tx)[0] / (meta.threshold || 1), [meta, tx]);
+  const progress = useMemo(() => (meta ? extraTransaction(meta, tx)[0] : 0) / (meta?.threshold || 1), [meta, tx]);
 
   const handleClick = useCallback(() => {
     copy(tx.sender);
@@ -24,7 +24,7 @@ function TxProgress({ tx }: { tx: Transaction }) {
   return (
     <Paper onClick={handleClick} sx={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 0.5, padding: 0.5, width: '100%', bgcolor: 'secondary.main' }} variant='elevation'>
       <AddressCell shorten size='small' value={tx.sender} />
-      {meta.isMultisig && (
+      {meta?.isMultisig && (
         <Box sx={({ palette }) => ({ overflow: 'hidden', borderRadius: '1px', position: 'relative', marginX: 3.5, height: '2px', bgcolor: alpha(palette.primary.main, 0.1) })}>
           <Box sx={{ borderRadius: '1px', position: 'absolute', left: 0, top: 0, bottom: 0, bgcolor: 'primary.main', width: `${progress * 100}%` }} />
         </Box>

@@ -32,7 +32,7 @@ function Info({ balances, toggleFundOpen }: { address?: string; balances?: Accou
       <Stack spacing={2}>
         <Box sx={{ display: 'flex' }}>
           <Typography sx={{ flex: '1' }} variant='h1'>
-            <FormatBalance label='$' value={transferrable} withCurrency={false} />
+            <FormatBalance label='$' value={total} withCurrency={false} />
             <Box component='span' sx={{ marginLeft: 0.5, verticalAlign: 'middle', color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500' }}>
               {(changes * 100).toFixed(2)}%
             </Box>

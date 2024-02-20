@@ -82,8 +82,8 @@ function _defaultApiUrl() {
   if (process.env.NODE_ENV === 'production') {
     if (window.location.hostname === 'dev.mimir.global') {
       wsUrl = devEndpoints[0].wsUrl;
-    } else if (window.location.hostname === 'app.mimir.global') {
-      wsUrl = testnetEndpoints[0].wsUrl;
+    } else if (window.location.hostname === 'app.mimir.global' || window.location.hostname === 'staging-app.mimir.global') {
+      wsUrl = polkadotEndpoints[0].wsUrl;
     } else {
       wsUrl = localEndpoint.wsUrl;
     }
@@ -105,10 +105,10 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
         mimir: devEndpoints,
         local: [localEndpoint]
       };
-    } else if (window.location.hostname === 'app.mimir.global') {
+    } else if (window.location.hostname === 'app.mimir.global' || window.location.hostname === 'staging-app.mimir.global') {
       return {
-        // polkadot: polkadotEndpoints,
-        // kusama: kusamaEndpoints,
+        polkadot: polkadotEndpoints,
+        kusama: kusamaEndpoints,
         rococo: testnetEndpoints
       };
     } else {

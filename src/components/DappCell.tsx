@@ -22,13 +22,18 @@ interface Props {
 function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
   const [detailsOpen, toggleOpen] = useToggle();
   const _isFavorite = useMemo(() => isFavorite(dapp.id), [dapp.id, isFavorite]);
-  const toggleFavorite = useCallback(() => {
-    if (_isFavorite) {
-      removeFavorite(dapp.id);
-    } else {
-      addFavorite(dapp.id);
-    }
-  }, [_isFavorite, addFavorite, dapp.id, removeFavorite]);
+  const toggleFavorite = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      if (_isFavorite) {
+        removeFavorite(dapp.id);
+      } else {
+        addFavorite(dapp.id);
+      }
+    },
+    [_isFavorite, addFavorite, dapp.id, removeFavorite]
+  );
 
   return (
     <>

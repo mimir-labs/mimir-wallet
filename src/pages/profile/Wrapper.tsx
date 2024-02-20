@@ -15,6 +15,8 @@ interface Props {
 }
 
 function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }: Props) {
+  const url = chainLinks.subsquareUrl();
+
   return (
     <Stack spacing={2}>
       <Box sx={{ display: 'flex', gap: 2 }}>
@@ -41,9 +43,11 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
         <Box>
           <Typography marginBottom={0.5} variant='h6'>
             Latest proposals
-            <MuiLink href={chainLinks.subsquareUrl()} sx={{ float: 'right' }} target='_blank' underline='none'>
-              View More
-            </MuiLink>
+            {url && (
+              <MuiLink color='primary.main' component={Link} style={{ float: 'right' }} to={`/explorer/${encodeURIComponent(url)}`} underline='none'>
+                View More
+              </MuiLink>
+            )}
           </Typography>
           {proposals}
         </Box>

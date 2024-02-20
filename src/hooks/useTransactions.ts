@@ -8,7 +8,7 @@ import type { BestTx, Calldata, CalldataStatus, Transaction } from './types';
 
 import { getServiceUrl } from '@mimir-wallet/utils/service';
 import { addressEq, encodeAddress } from '@polkadot/util-crypto';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import { useApi } from './useApi';
@@ -157,10 +157,10 @@ function extraTransaction(api: ApiPromise, transactionCache: Map<string, Transac
   }
 }
 
-export function useTransactions(address?: string): [transactions: Transaction[], isLoading: boolean] {
+export function usePendingTransactions(address?: string | null): [transactions: Transaction[], isLoading: boolean] {
   const { api, isApiReady } = useApi();
 
-  const { data, isLoading, mutate } = useSWR<{ bestTx: BestTx[]; tx: Calldata[][] }>(isApiReady && address ? getServiceUrl(`tx?address=${address}`) : null);
+  const { data, isLoading, mutate } = useSWR<{ bestTx: BestTx[]; tx: Calldata[][] }>(isApiReady && address ? getServiceUrl(`tx/pending?address=${address}`) : null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
@@ -181,9 +181,11 @@ export function useTransactions(address?: string): [transactions: Transaction[],
 
   useEffect(() => {
     if (!isApiReady) return;
+    let timeout: any;
 
     const unsub = api.rpc.chain.subscribeNewHeads(() => {
-      setTimeout(() => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
         mutate();
       }, 1000);
     });
@@ -194,4 +196,30 @@ export function useTransactions(address?: string): [transactions: Transaction[],
   }, [api.rpc.chain, isApiReady, mutate]);
 
   return [transactions, isLoading];
+}
+
+export function useHistoryTransactions(address?: string | null, page = 1, limit = 10): [transactions: Transaction[], page: number, limit: number, total: number, isLoading: boolean] {
+  const { api, isApiReady } = useApi();
+  const totalRef = useRef<number>(0);
+
+  const { data, isLoading } = useSWR<{ tx: Calldata[][]; page: number; limit: number; total: number }>(
+    isApiReady && address ? getServiceUrl(`tx/history?address=${address}&page=${page}&limit=${limit}`) : null
+  );
+
+  if (data) {
+    totalRef.current = data.total;
+  }
+
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    if (address && data) {
+      const transactionCache: Map<string, Transaction> = new Map();
+
+      extraTransaction(api, transactionCache, data.tx);
+      setTransactions(Array.from(transactionCache.values()).filter((item) => addressEq(address, item.sender)));
+    }
+  }, [address, api, data]);
+
+  return [transactions, data?.page || page, data?.limit || limit, totalRef.current, isLoading];
 }
