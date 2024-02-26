@@ -13,6 +13,7 @@ export { default as AddressRow } from './AddressRow';
 export { default as AppIframe } from './AppIframe';
 export { default as BalanceFree } from './BalanceFree';
 export { default as ChainSelect } from './ChainSelect';
+export { default as ConnectWalletModal } from './ConnectWalletModal';
 export { default as CopyButton } from './CopyButton';
 export { default as DappCell } from './DappCell';
 export { default as DetectedMultisig } from './DetectedMultisig';

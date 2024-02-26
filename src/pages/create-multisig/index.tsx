@@ -7,7 +7,8 @@ import { ReactComponent as IconInfo } from '@mimir-wallet/assets/svg/icon-info-f
 import { AddAddressDialog, Address, AddressRow, Input } from '@mimir-wallet/components';
 import { useAccounts, useAddresses, useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
 import { Alert, AlertTitle, Box, Button, Dialog, DialogContent, Divider, FormHelperText, Paper, Stack, SvgIcon, Switch, Typography } from '@mui/material';
-import { encodeAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
+import keyring from '@polkadot/ui-keyring';
+import { isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -114,7 +115,7 @@ function PageCreateMultisig() {
                     setAddressError(null);
                   }
 
-                  setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value) : value });
+                  setAddress({ isAddressValid, address: isAddressValid ? keyring.encodeAddress(value) : value });
                 }}
                 placeholder='input address'
                 value={address}
@@ -183,10 +184,10 @@ function PageCreateMultisig() {
                   if (item.pure) {
                     setPrepare({
                       creator: item.creator,
-                      who: item.who.map((address) => encodeAddress(address)),
+                      who: item.who.map((address) => keyring.encodeAddress(address)),
                       threshold: item.threshold,
                       name: item.name,
-                      pure: item.pure ? encodeAddress(item.pure) : null,
+                      pure: item.pure ? keyring.encodeAddress(item.pure) : null,
                       blockNumber: item.blockNumber,
                       extrinsicIndex: item.extrinsicIndex
                     });

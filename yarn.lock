@@ -3799,7 +3799,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/extension-dapp@npm:0.46.6, @polkadot/extension-dapp@npm:^0.46.6":
+"@polkadot/extension-dapp@npm:0.46.6":
   version: 0.46.6
   resolution: "@polkadot/extension-dapp@npm:0.46.6"
   dependencies:
@@ -15369,7 +15369,6 @@ __metadata:
     "@mui/material": "npm:^5.15.10"
     "@polkadot/api": "npm:^10.11.2"
     "@polkadot/api-derive": "npm:^10.11.2"
-    "@polkadot/extension-dapp": "npm:^0.46.6"
     "@polkadot/extension-inject": "npm:^0.46.6"
     "@polkadot/react-identicon": "npm:^3.6.4"
     "@polkadot/types": "npm:^10.11.2"

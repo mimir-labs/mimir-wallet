@@ -38,7 +38,7 @@ async function _asMulti(
   reserve: Record<string, BN>,
   unreserve: Record<string, BN>
 ): Promise<[tx: SubmittableExtrinsic, cancelled: boolean]> {
-  const multiAddress = encodeMultiAddress(who, threshold);
+  const multiAddress = encodeMultiAddress(who, threshold, api.registry.chainSS58);
   const others = who.filter((w) => w !== sender);
   const [info, { weight }] = await Promise.all([api.query.multisig.multisigs<Option<Multisig>>(multiAddress, extrinsic.method.hash), extrinsic.paymentInfo(multiAddress)]);
 

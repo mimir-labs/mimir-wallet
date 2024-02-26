@@ -1,10 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as IconExternal } from '@mimir-wallet/assets/svg/icon-external-app.svg';
 import { ReactComponent as Logo } from '@mimir-wallet/assets/svg/logo-circle.svg';
 import { useUnConfirmMultisigs } from '@mimir-wallet/hooks';
 import { getAddressMeta } from '@mimir-wallet/utils';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, SvgIcon, Typography } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
 import { useMemo } from 'react';
 
@@ -51,14 +52,21 @@ function DetectedDialog({ multisigs }: { multisigs: string[] }) {
       <DialogTitle>New Multisig Account Detected</DialogTitle>
       <DialogContent>
         <Stack spacing={1.5}>
-          <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
-            <Logo />
-            Mimir
-          </Typography>
+          {mimirs.length > 0 && (
+            <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
+              <Logo />
+              Mimir
+            </Typography>
+          )}
           {mimirs.map((item) => (
             <Item address={item} key={item} withEdit={false} />
           ))}
-          <Typography>External</Typography>
+          {externals.length > 0 && (
+            <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
+              <SvgIcon color='primary' component={IconExternal} inheritViewBox />
+              External
+            </Typography>
+          )}
           {externals.map((item) => (
             <Item address={item} key={item} withEdit />
           ))}

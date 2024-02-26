@@ -4,3 +4,4 @@
 export * from './api';
 export * from './dapp';
 export * from './tokens';
+export * from './wallet';

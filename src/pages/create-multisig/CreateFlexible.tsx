@@ -97,7 +97,7 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
     (pure: string, who: string[], signer: string, threshold: number, name: string) => {
       const extrinsic = api.tx.utility.batchAll([
         api.tx.balances.transferKeepAlive(pure, api.consts.proxy.proxyDepositFactor.muln(2).add(api.consts.proxy.proxyDepositBase)),
-        api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.addProxy(encodeMultiAddress(who, threshold), 'Any', 0)),
+        api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, api.registry.chainSS58), 'Any', 0)),
         api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0))
       ]);
 

@@ -10,3 +10,4 @@ export * as service from './service';
 export * from './time';
 export * from './tx-events';
 export * from './tx';
+export * from './wallet';

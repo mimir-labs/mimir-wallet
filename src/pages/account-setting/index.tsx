@@ -6,8 +6,9 @@ import { useAccounts, useAddresses, useAddressMeta, useApi, usePendingTransactio
 import { CalldataStatus } from '@mimir-wallet/hooks/types';
 import { service } from '@mimir-wallet/utils';
 import { Box, Button, FormHelperText, Paper, Stack, Typography } from '@mui/material';
+import keyring from '@polkadot/ui-keyring';
 import { u8aToHex } from '@polkadot/util';
-import { addressEq, decodeAddress, encodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
+import { addressEq, decodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -145,7 +146,7 @@ function AccountSetting() {
                   setAddressError(null);
                 }
 
-                setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value) : value });
+                setAddress({ isAddressValid, address: isAddressValid ? keyring.encodeAddress(value) : value });
               }}
               placeholder='input address'
               value={address}

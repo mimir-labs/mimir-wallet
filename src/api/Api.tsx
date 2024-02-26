@@ -1,14 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
 import type { KeyringStore } from '@polkadot/ui-keyring/types';
 import type { ApiProps, ApiState } from './types';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
-import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import { keyring } from '@polkadot/ui-keyring';
 import { formatBalance, isTestChain, objectSpread, stringify } from '@polkadot/util';
 import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
@@ -22,17 +20,7 @@ interface Props {
   store: KeyringStore | undefined;
 }
 
-interface InjectedAccountExt {
-  address: string;
-  meta: {
-    name: string;
-    source: string;
-    whenCreated: number;
-  };
-}
-
 interface ChainData {
-  injectedAccounts: InjectedAccountExt[];
   properties: ChainProperties;
   systemChain: string;
   systemChainType: ChainType;
@@ -46,7 +34,6 @@ export const DEFAULT_AUX = ['Aux1', 'Aux2', 'Aux3', 'Aux4', 'Aux5', 'Aux6', 'Aux
 
 export const ApiCtx = React.createContext<ApiProps>({} as unknown as ApiProps);
 
-const DISALLOW_EXTENSIONS: string[] = [];
 const EMPTY_STATE = { hasInjectedAccounts: false, isApiReady: false } as unknown as ApiState;
 
 let api: ApiPromise;
@@ -61,39 +48,15 @@ function isKeyringLoaded() {
   }
 }
 
-async function getInjectedAccounts(injectedPromise: Promise<InjectedExtension[]>): Promise<InjectedAccountExt[]> {
-  try {
-    await injectedPromise;
-
-    const accounts = await web3Accounts();
-
-    return accounts.map(
-      ({ address, meta }, whenCreated): InjectedAccountExt => ({
-        address,
-        meta: objectSpread({}, meta, {
-          name: `${meta.name || 'unknown'}`,
-          whenCreated
-        })
-      })
-    );
-  } catch (error) {
-    console.error('web3Accounts', error);
-
-    return [];
-  }
-}
-
-async function retrieve(api: ApiPromise, injectedPromise: Promise<InjectedExtension[]>): Promise<ChainData> {
-  const [systemChain, systemChainType, systemName, systemVersion, injectedAccounts] = await Promise.all([
+async function retrieve(api: ApiPromise): Promise<ChainData> {
+  const [systemChain, systemChainType, systemName, systemVersion] = await Promise.all([
     api.rpc.system.chain(),
     api.rpc.system.chainType ? api.rpc.system.chainType() : Promise.resolve(registry.createType('ChainType', 'Live')),
     api.rpc.system.name(),
-    api.rpc.system.version(),
-    getInjectedAccounts(injectedPromise)
+    api.rpc.system.version()
   ]);
 
   return {
-    injectedAccounts: injectedAccounts.filter(({ meta: { source } }) => !DISALLOW_EXTENSIONS.includes(source)),
     properties: registry.createType('ChainProperties', {
       ss58Format: api.registry.chainSS58,
       tokenDecimals: api.registry.chainDecimals,
@@ -106,8 +69,8 @@ async function retrieve(api: ApiPromise, injectedPromise: Promise<InjectedExtens
   };
 }
 
-async function loadOnReady(api: ApiPromise, injectedPromise: Promise<InjectedExtension[]>, store: KeyringStore | undefined): Promise<ApiState> {
-  const { injectedAccounts, properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api, injectedPromise);
+async function loadOnReady(api: ApiPromise, store: KeyringStore | undefined): Promise<ApiState> {
+  const { properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api);
   const chainSS58 = properties.ss58Format.unwrapOr(DEFAULT_SS58).toNumber();
   const ss58Format = chainSS58;
   const tokenSymbol = properties.tokenSymbol.unwrapOr([formatBalance.getDefaults().unit, ...DEFAULT_AUX]);
@@ -134,22 +97,18 @@ async function loadOnReady(api: ApiPromise, injectedPromise: Promise<InjectedExt
 
   // finally load the keyring
   isKeyringLoaded() ||
-    keyring.loadAll(
-      {
-        genesisHash: api.genesisHash,
-        isDevelopment,
-        ss58Format,
-        store,
-        type: 'ed25519'
-      },
-      injectedAccounts
-    );
+    keyring.loadAll({
+      genesisHash: api.genesisHash,
+      isDevelopment,
+      ss58Format,
+      store,
+      type: 'ed25519'
+    });
 
   return {
     apiDefaultTx,
     apiDefaultTxSudo,
     chainSS58,
-    hasInjectedAccounts: injectedAccounts.length !== 0,
     isApiReady: true,
     isDevelopment,
     specName: api.runtimeVersion.specName.toString(),
@@ -178,11 +137,7 @@ export function ApiCtxRoot({ apiUrl, children, store }: Props): React.ReactEleme
   const [isApiConnected, setIsApiConnected] = useState(false);
   const [isApiInitialized, setIsApiInitialized] = useState(false);
   const [apiError, setApiError] = useState<null | string>(null);
-  const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>();
-  const value = useMemo<ApiProps>(
-    () => objectSpread({}, state, { api, apiError, apiUrl, extensions, isApiConnected, isApiInitialized, isWaitingInjected: !extensions }),
-    [apiError, extensions, isApiConnected, isApiInitialized, state, apiUrl]
-  );
+  const value = useMemo<ApiProps>(() => objectSpread({}, state, { api, apiError, apiUrl, isApiConnected, isApiInitialized }), [apiError, isApiConnected, isApiInitialized, state, apiUrl]);
 
   // initial initialization
   useEffect((): void => {
@@ -197,11 +152,7 @@ export function ApiCtxRoot({ apiUrl, children, store }: Props): React.ReactEleme
     api.on('disconnected', () => setIsApiConnected(false));
     api.on('error', onError);
     api.on('ready', (): void => {
-      const injectedPromise = web3Enable('mimir-wallet');
-
-      injectedPromise.then(setExtensions).catch(console.error);
-
-      loadOnReady(api, injectedPromise, store).then(setState).catch(onError);
+      loadOnReady(api, store).then(setState).catch(onError);
     });
 
     setIsApiInitialized(true);

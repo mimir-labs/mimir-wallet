@@ -7,8 +7,8 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 import { getAddressMeta } from '@mimir-wallet/utils';
 import { Box } from '@mui/material';
 import { Polkadot as PolkadotIcon } from '@polkadot/react-identicon/icons/Polkadot';
+import keyring from '@polkadot/ui-keyring';
 import { isHex, isU8a } from '@polkadot/util';
-import { encodeAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo } from 'react';
 
 interface Props {
@@ -28,7 +28,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
   const { address, publicKey } = useMemo(() => {
     try {
       const _value = isCodec(value) ? value.toString() : value;
-      const address = isU8a(_value) || isHex(_value) ? encodeAddress(_value, prefix) : _value || '';
+      const address = isU8a(_value) || isHex(_value) ? keyring.encodeAddress(_value, prefix) : _value || '';
 
       return { address, publicKey: '0x' };
     } catch {

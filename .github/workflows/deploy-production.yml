@@ -1,12 +1,12 @@
-name: Deploy staging
+name: Deploy production
 
 on:
   workflow_dispatch:
 
 jobs:
-  deploy-staging:
+  deploy-production:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: production
     env:
       YARN_ENABLE_SCRIPTS: false
 

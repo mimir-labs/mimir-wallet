@@ -4,11 +4,12 @@
 import { SELECT_ACCOUNT_KEY } from '@mimir-wallet/constants';
 import { keyring } from '@polkadot/ui-keyring';
 import { hexToU8a, isHex, u8aToHex } from '@polkadot/util';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import store from 'store';
 
 import { useAccounts } from '../useAccounts';
 import { useApi } from '../useApi';
+import { WalletCtx } from './Wallet';
 
 interface Props {
   children?: React.ReactNode;
@@ -22,27 +23,39 @@ interface State {
 
 export const SelectAccountCtx = React.createContext<State>({} as State);
 
-function getSelected(hex: string): string | undefined {
-  return keyring.getAccount(hexToU8a(hex))?.address;
+function getSelected(hex?: string): string | undefined {
+  if (hex) {
+    return keyring.getAccount(hexToU8a(hex))?.address;
+  } else {
+    return keyring.getAccounts().find((item) => item.meta.isValid && item.meta.isMultisig)?.address || keyring.getAccounts()[0].address;
+  }
 }
 
 export function SelectAccountCtxRoot({ children }: Props): React.ReactElement<Props> {
   const { isApiReady } = useApi();
-  const { allAccounts } = useAccounts();
   const [selected, setSelected] = useState<string | undefined>();
   const [isAccountReady] = useState(false);
+  const { isWalletReady } = useContext(WalletCtx);
+  const { allAccounts } = useAccounts();
 
   useEffect(() => {
-    if (isApiReady) {
-      const stored = store.get(SELECT_ACCOUNT_KEY);
+    if (selected && !allAccounts.includes(selected)) {
+      const address = getSelected();
 
-      if (stored) {
-        setSelected(getSelected(stored));
-      } else {
-        setSelected(allAccounts[0]);
+      if (address) {
+        setSelected(address);
+        store.set(SELECT_ACCOUNT_KEY, u8aToHex(keyring.decodeAddress(address)));
       }
     }
-  }, [allAccounts, isApiReady]);
+  }, [allAccounts, selected]);
+
+  useEffect(() => {
+    if (isApiReady && isWalletReady) {
+      const stored = store.get(SELECT_ACCOUNT_KEY);
+
+      setSelected(getSelected(stored));
+    }
+  }, [isApiReady, isWalletReady]);
 
   const selectAccount = useCallback((address: string) => {
     const account = keyring.getAccount(isHex(address) ? hexToU8a(address) : address);

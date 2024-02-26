@@ -27,5 +27,6 @@ export * from './useToggle';
 export * from './useTokenInfo';
 export * from './useTransactions';
 export * from './useTxQueue';
+export * from './useEagerConnect';
 
 export * from './utils';

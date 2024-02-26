@@ -6,3 +6,4 @@ export { KeyringCtxRoot } from './Keyring';
 export { SelectAccountCtxRoot } from './SelectedAccount';
 export { TxQueueCtxRoot, TxQueueCtx } from './TxQueue';
 export { TxToastCtxRoot, TxToastCtx } from './TxToast';
+export { WalletCtxRoot, WalletCtx } from './Wallet';

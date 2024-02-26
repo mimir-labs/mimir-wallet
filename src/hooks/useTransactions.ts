@@ -7,7 +7,8 @@ import type { HexString } from '@polkadot/util/types';
 import type { BestTx, Calldata, CalldataStatus, Transaction } from './types';
 
 import { getServiceUrl } from '@mimir-wallet/utils/service';
-import { addressEq, encodeAddress } from '@polkadot/util-crypto';
+import keyring from '@polkadot/ui-keyring';
+import { addressEq } from '@polkadot/util-crypto';
 import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 
@@ -48,7 +49,7 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
       this.uuid = calldata.uuid;
       this.hash = calldata.hash;
       this.call = calldata.metadata ? api.registry.createType('Call', calldata.metadata) : null;
-      this.sender = encodeAddress(calldata.sender);
+      this.sender = keyring.encodeAddress(calldata.sender);
       this.status = calldata.status;
       this.isValid = calldata.isValid;
       this.height = calldata.height;
