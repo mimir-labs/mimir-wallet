@@ -9,11 +9,11 @@ import { events } from '@mimir-wallet/events';
 import { service } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import { u8aEq, u8aToHex } from '@polkadot/util';
-import { encodeMultiAddress } from '@polkadot/util-crypto';
-import { useContext, useEffect } from 'react';
+import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
+import { useEffect, useMemo, useState } from 'react';
 
-import { WalletCtx } from './ctx';
 import { useApi } from './useApi';
+import { useGroupAccounts } from './useGroupAccounts';
 
 function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Record<HexString, AccountData>) {
   const { address: addressHex, creator, delegators, height, index, isMimir, isValid, name, networks } = account;
@@ -109,53 +109,57 @@ function mergeMulti(api: ApiPromise, account: MultiAccountData) {
   }
 }
 
-function sync(api: ApiPromise) {
-  service
-    .getMultisigs(
-      keyring
-        .getAccounts()
-        .filter((item) => !item.meta.isMultisig)
-        .map((item) => u8aToHex(item.publicKey))
-    )
-    .then((multisigs) => {
-      // remove not exist multisig but not in pending
-      keyring.getAccounts().forEach((account) => {
-        if (!account.meta.isPending && account.meta.isMultisig && !multisigs[u8aToHex(account.publicKey)]) {
-          keyring.forgetAccount(account.address);
-        }
-      });
+async function sync(api: ApiPromise, key: string): Promise<void> {
+  const addresses = key.split(',');
 
-      Object.values(multisigs).forEach((data) => {
-        if (data.type === 'proxy') {
-          mergeProxy(api, data as ProxyAccountData, multisigs);
-        }
+  const multisigs = await service.getMultisigs(addresses);
 
-        if (data.type === 'multi') {
-          mergeMulti(api, data as MultiAccountData);
-        }
-      });
-    });
+  // remove not exist multisig but not in pending
+  keyring.getAccounts().forEach((account) => {
+    if (!account.meta.isPending && account.meta.isMultisig && !multisigs[u8aToHex(account.publicKey)]) {
+      keyring.forgetAccount(account.address);
+    }
+  });
+
+  Object.values(multisigs).forEach((data) => {
+    if (data.type === 'proxy') {
+      mergeProxy(api, data as ProxyAccountData, multisigs);
+    }
+
+    if (data.type === 'multi') {
+      mergeMulti(api, data as MultiAccountData);
+    }
+  });
 }
 
-export function useSyncMultisigs() {
+export function useSyncMultisigs(isWalletReady: boolean): boolean {
   const { api, isApiReady } = useApi();
-  const { isWalletReady } = useContext(WalletCtx);
+  const { accounts, injected, testing } = useGroupAccounts();
+  const [syned, setSyned] = useState(false);
+  const queryKey = useMemo(
+    () =>
+      accounts
+        .concat(injected)
+        .concat(testing)
+        .map((item) => u8aToHex(decodeAddress(item)))
+        .sort((l, r) => (l > r ? 1 : -1))
+        .join(','),
+    [accounts, injected, testing]
+  );
 
   useEffect(() => {
-    let unsub: (() => void) | undefined;
+    let unsubPromise: Promise<() => void> | undefined;
 
     if (isWalletReady && isApiReady) {
-      api.rpc.chain
-        .subscribeFinalizedHeads(() => {
-          sync(api);
-        })
-        .then((_unsub) => {
-          unsub = _unsub;
-        });
+      unsubPromise = api.rpc.chain.subscribeFinalizedHeads(() => {
+        sync(api, queryKey).then(() => setSyned(true));
+      });
     }
 
     return () => {
-      unsub?.();
+      unsubPromise?.then((unsub) => unsub());
     };
-  }, [api, isApiReady, isWalletReady]);
+  }, [api, queryKey, isApiReady, isWalletReady]);
+
+  return syned;
 }

@@ -4,7 +4,8 @@
 import type { IdentityProps } from '@polkadot/react-identicon/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { getAddressMeta } from '@mimir-wallet/utils';
+import { walletConfig } from '@mimir-wallet/config';
+import { useAddressMeta } from '@mimir-wallet/hooks';
 import { Box } from '@mui/material';
 import { Polkadot as PolkadotIcon } from '@polkadot/react-identicon/icons/Polkadot';
 import keyring from '@polkadot/ui-keyring';
@@ -35,10 +36,11 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
       return { address: '', publicKey: '0x' };
     }
   }, [prefix, value]);
+  const { meta } = useAddressMeta(value?.toString());
 
-  const { isMultisig, threshold, who } = useMemo(() => {
-    return getAddressMeta(value?.toString() || '');
-  }, [value]);
+  const { isInjected, isMultisig, source, threshold, who } = meta || {};
+
+  const extensionIcon = isInjected ? walletConfig[source || '']?.icon : undefined;
 
   const _onClick = useCallback(() => {
     onClick?.(value?.toString());
@@ -78,6 +80,19 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
       sx={{ cursor: onClick ? 'pointer' : undefined, position: 'relative', width: size, height: size + (isMultisig ? 6 + size / 16 : 0), bgcolor: 'secondary.main', borderRadius: '50%' }}
     >
       <PolkadotIcon address={address} publicKey={publicKey} size={size} />
+      {extensionIcon ? (
+        <Box
+          component='img'
+          src={extensionIcon}
+          sx={{
+            position: 'absolute',
+            right: -2,
+            bottom: -2,
+            width: size / 2.5,
+            height: size / 2.5
+          }}
+        />
+      ) : null}
       {isMultisig && (
         <Box
           component='span'

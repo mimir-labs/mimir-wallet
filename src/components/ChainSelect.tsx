@@ -41,6 +41,11 @@ function ChainSelect() {
         }}
         onClose={handleClose}
         open={open}
+        slotProps={{
+          paper: {
+            sx: { width: 200 }
+          }
+        }}
         transformOrigin={{
           vertical: 'top',
           horizontal: 'right'

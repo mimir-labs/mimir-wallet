@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AddAddressDialog, Input, toastSuccess } from '@mimir-wallet/components';
-import { useAccounts, useAddresses, useAddressMeta, useApi, usePendingTransactions, useSelectedAccount, useSelectedAccountCallback, useToggle, useTxQueue } from '@mimir-wallet/hooks';
+import { useAddressMeta, useApi, usePendingTransactions, useSelectedAccount, useSelectedAccountCallback, useToggle, useTxQueue } from '@mimir-wallet/hooks';
 import { CalldataStatus } from '@mimir-wallet/hooks/types';
-import { service } from '@mimir-wallet/utils';
+import { isLocalAccount, isLocalAddress, service } from '@mimir-wallet/utils';
 import { Box, Button, FormHelperText, Paper, Stack, Typography } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
 import { u8aToHex } from '@polkadot/util';
@@ -28,8 +28,6 @@ function AccountSetting() {
   const selected = useSelectedAccount();
   const account = addressParam || selected;
   const { meta, name, saveName, setName } = useAddressMeta(account);
-  const { isAddress } = useAddresses();
-  const { isAccount } = useAccounts();
   const { api } = useApi();
   const [txs] = usePendingTransactions(account);
   const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success), [txs]);
@@ -75,7 +73,7 @@ function AccountSetting() {
 
   const _handleAdd = useCallback(() => {
     if (isAddressValid) {
-      if (!isAddress(address) && !isAccount(address)) {
+      if (!isLocalAddress(address) && !isLocalAccount(address)) {
         toggleAdd();
       } else {
         select(address);
@@ -83,7 +81,7 @@ function AccountSetting() {
     } else {
       setAddressError(new Error('Please input correct address'));
     }
-  }, [address, isAccount, isAddress, isAddressValid, select, toggleAdd]);
+  }, [address, isAddressValid, select, toggleAdd]);
 
   const _onChangeThreshold = useCallback(
     (value: string) => {

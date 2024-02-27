@@ -5,6 +5,7 @@ import type { ProposalData } from '@mimir-wallet/hooks';
 
 import { chainLinks } from '@mimir-wallet/utils';
 import { Box, Chip, Link as MuiLink, Paper, Stack, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 function Proposals({ data }: { data: Array<ProposalData> }) {
   return (
@@ -16,6 +17,7 @@ function Proposals({ data }: { data: Array<ProposalData> }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: 2,
             paddingX: 2,
             paddingY: 1,
             borderRadius: 1,
@@ -24,13 +26,16 @@ function Proposals({ data }: { data: Array<ProposalData> }) {
             ':hover': { bgcolor: 'secondary.main' }
           }}
         >
-          <Typography variant='h6'>
+          <Typography sx={{ flex: '1 0 auto' }} variant='h6'>
             <span style={{ opacity: 0.5 }}>#{item.referendumIndex}</span>
             &nbsp;·&nbsp;
-            <MuiLink color='inherit' href={chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`)} target='_blank' underline='hover'>
+            <MuiLink color='inherit' component={Link} to={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`) || '')}`} underline='hover'>
               {item.title || `[${item.onchainData.trackInfo?.name}] Referendum #${item.referendumIndex}`}
             </MuiLink>
           </Typography>
+          <Box sx={{ width: '20%' }}>
+            <Box component='img' src='/dapp-icons/subsquare.svg' sx={{ width: 30, height: 30 }} />
+          </Box>
           <Chip color='secondary' label={item.state.name} />
         </Box>
       ))}

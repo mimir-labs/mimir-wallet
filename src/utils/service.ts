@@ -60,7 +60,7 @@ export function updateAccountName(address: HexString, name: string) {
   });
 }
 
-export async function getMultisigs(addresses: HexString[]): Promise<Record<HexString, AccountData>> {
+export async function getMultisigs(addresses: string[]): Promise<Record<HexString, AccountData>> {
   if (addresses.length === 0) return {};
 
   return fetcher(getServiceUrl(`multisigs/?${addresses.map((address) => `addresses=${address}`).join('&')}`), {

@@ -55,7 +55,7 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
       {dapps && (
         <Box>
           <Typography marginBottom={0.5} sx={{ display: 'flex', justifyContent: 'space-between' }} variant='h6'>
-            Favorite DApps
+            Favorite Apps
             <MuiLink component={Link} to='/dapp' underline='none'>
               View More
             </MuiLink>

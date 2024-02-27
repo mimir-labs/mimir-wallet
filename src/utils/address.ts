@@ -56,3 +56,11 @@ export function getAccountCryptoType(accountId: AccountId | AccountIndex | Addre
 
   return 'unknown';
 }
+
+export function isLocalAccount(address?: string | null | { toString: () => string }): boolean {
+  return !!address && !!keyring.getAccount(address.toString());
+}
+
+export function isLocalAddress(address?: string | null | { toString: () => string }): boolean {
+  return !!address && !!keyring.getAddress(address.toString(), 'address');
+}

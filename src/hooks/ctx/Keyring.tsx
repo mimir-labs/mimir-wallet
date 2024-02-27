@@ -22,11 +22,9 @@ interface State {
   addresses: Addresses;
 }
 
-const EMPTY_IS = () => false;
-
 const EMPTY: State = {
-  accounts: { allAccounts: [], allAccountsHex: [], areAccountsLoaded: false, hasAccounts: false, isAccount: EMPTY_IS },
-  addresses: { allAddresses: [], allAddressesHex: [], areAddressesLoaded: false, hasAddresses: false, isAddress: EMPTY_IS }
+  accounts: { allAccounts: [], allAccountsHex: [], areAccountsLoaded: false, hasAccounts: false },
+  addresses: { allAddresses: [], allAddressesHex: [], areAddressesLoaded: false, hasAddresses: false }
 };
 
 export const KeyringCtx = React.createContext<State>(EMPTY);
@@ -79,38 +77,25 @@ function toHex(items: string[]): HexString[] {
     .filter((a): a is HexString => !!a);
 }
 
-let allAccounts: string[];
-let allAddresses: string[];
-
-const isAccount: Accounts['isAccount'] = (a): boolean => {
-  return !!a && allAccounts.includes(a.toString());
-};
-
-const isAddress: Addresses['isAddress'] = (a): boolean => {
-  return !!a && allAddresses.includes(a.toString());
-};
-
 function extractAccounts(accounts: SubjectInfo = {}): Accounts {
-  allAccounts = filter(Object.keys(accounts));
+  const allAccounts = filter(Object.keys(accounts));
 
   return {
     allAccounts,
     allAccountsHex: toHex(allAccounts),
     areAccountsLoaded: true,
-    hasAccounts: allAccounts.length !== 0,
-    isAccount
+    hasAccounts: allAccounts.length !== 0
   };
 }
 
 function extractAddresses(addresses: SubjectInfo = {}, accounts: string[]): Addresses {
-  allAddresses = filter(Object.keys(addresses), accounts);
+  const allAddresses = filter(Object.keys(addresses), accounts);
 
   return {
     allAddresses,
     allAddressesHex: toHex(allAddresses),
     areAddressesLoaded: true,
-    hasAddresses: allAddresses.length !== 0,
-    isAddress
+    hasAddresses: allAddresses.length !== 0
   };
 }
 

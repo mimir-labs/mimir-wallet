@@ -4,7 +4,6 @@
 import { ReactComponent as ExpandArrow } from '@mimir-wallet/assets/svg/expand-arrow.svg';
 import { ReactComponent as IconLock } from '@mimir-wallet/assets/svg/icon-lock.svg';
 import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
-import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
 import { ReactComponent as IconReverse } from '@mimir-wallet/assets/svg/icon-waiting-fill.svg';
 import { FormatBalance } from '@mimir-wallet/components';
 import { findToken } from '@mimir-wallet/config';
@@ -44,7 +43,7 @@ function Row({ balances }: { balances: AccountBalance }) {
         <Paper sx={{ width: '100%', marginTop: 2, bgcolor: 'secondary.main', borderRadius: 2, padding: 2 }}>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'space-between', '>div': { display: 'flex', gap: 0.5, alignItems: 'center', color: 'text.secondary' } }}>
             <Box>
-              <SvgIcon component={IconTransfer} inheritViewBox />
+              <SvgIcon component={IconSend} inheritViewBox />
               <span>Transferable</span>
               <b>
                 <FormatBalance value={balances.transferrable} />
