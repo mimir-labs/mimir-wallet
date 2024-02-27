@@ -102,6 +102,9 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
   if (process.env.NODE_ENV === 'production') {
     if (window.location.hostname === 'dev.mimir.global') {
       return {
+        polkadot: polkadotEndpoints,
+        kusama: kusamaEndpoints,
+        rococo: testnetEndpoints,
         mimir: devEndpoints,
         local: [localEndpoint]
       };
@@ -116,6 +119,9 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
     }
   } else {
     return {
+      polkadot: polkadotEndpoints,
+      kusama: kusamaEndpoints,
+      rococo: testnetEndpoints,
       local: [localEndpoint]
     };
   }

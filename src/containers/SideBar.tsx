@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
+
 import { ReactComponent as ArrowRight } from '@mimir-wallet/assets/svg/ArrowRight.svg';
 import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
 import { ReactComponent as IconDapp } from '@mimir-wallet/assets/svg/icon-dapp.svg';
@@ -9,9 +11,9 @@ import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.s
 import { ReactComponent as IconQr } from '@mimir-wallet/assets/svg/icon-qr.svg';
 import { ReactComponent as IconTransaction } from '@mimir-wallet/assets/svg/icon-transaction.svg';
 import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
-import { AccountMenu, AddressCell, BalanceFree, CopyButton, QrcodeAddress } from '@mimir-wallet/components';
+import { AccountMenu, AddressCell, CopyButton, FormatBalance, QrcodeAddress } from '@mimir-wallet/components';
 import { findToken, walletConfig } from '@mimir-wallet/config';
-import { useApi, useGroupAccounts, useSelectedAccount, useToggle, WalletCtx } from '@mimir-wallet/hooks';
+import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, WalletCtx } from '@mimir-wallet/hooks';
 import { chainLinks } from '@mimir-wallet/utils';
 import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { useContext, useMemo, useState } from 'react';
@@ -68,6 +70,7 @@ function SideBar() {
   const [qrOpen, toggleQrOpen] = useToggle();
   const { injected } = useGroupAccounts();
   const { connectedWallets, openWallet } = useContext(WalletCtx);
+  const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [selected]);
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -91,7 +94,7 @@ function SideBar() {
             <Stack alignItems='center' direction='row' spacing={0.5}>
               <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
               <Typography color='text.secondary' fontSize={12}>
-                <BalanceFree params={selected} />
+                <FormatBalance value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
               </Typography>
             </Stack>
             <Divider sx={{ marginY: 1 }} />

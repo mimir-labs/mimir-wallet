@@ -80,32 +80,25 @@ function mergeMulti(api: ApiPromise, account: MultiAccountData) {
   const exists = keyring.getAccount(address);
 
   if (!exists) {
-    keyring.addMultisig(
-      who.map(({ address }) => keyring.encodeAddress(address)),
+    keyring.addExternal(address, {
+      isMultisig: true,
       threshold,
-      {
-        isMultisig: true,
-        name: name || undefined,
-        isValid,
-        isPending: false
-      }
-    );
+      who: who.map(({ address }) => keyring.encodeAddress(address)),
+      name: name || undefined,
+      isValid,
+      isPending: false
+    });
     events.emit('account_meta_changed', address);
   } else {
-    if (!exists.meta.isMultisig || exists.meta.name !== name || exists.meta.isValid !== isValid || exists.meta.isPending) {
-      keyring.addMultisig(
-        who.map(({ address }) => keyring.encodeAddress(address)),
-        threshold,
-        {
-          ...exists.meta,
-          isMultisig: true,
-          name: name || undefined,
-          isValid,
-          isPending: false
-        }
-      );
-      events.emit('account_meta_changed', address);
-    }
+    keyring.saveAccountMeta(keyring.getPair(address), {
+      isMultisig: true,
+      threshold,
+      who: who.map(({ address }) => keyring.encodeAddress(address)),
+      name: name || undefined,
+      isValid,
+      isPending: false
+    });
+    events.emit('account_meta_changed', address);
   }
 }
 

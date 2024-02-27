@@ -34,7 +34,7 @@ function Content({ receipt, sending, setSending, setValue, value }: { sending?: 
             <AddressCell shorten={false} showType value={receipt} withCopy />
           </Box>
         </Stack>
-        <InputNumber label='Amount' maxValue={balances?.freeBalance} onChange={setValue} value={value} withMax />
+        <InputNumber label='Amount' maxValue={balances?.availableBalance} onChange={setValue} value={value} withMax />
       </Stack>
     </DialogContent>
   );

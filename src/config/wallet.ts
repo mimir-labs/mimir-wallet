@@ -16,16 +16,10 @@ export type WalletConfig = {
 };
 
 export const walletConfig: Record<string, WalletConfig> = {
-  'polkadot-js': {
-    icon: PolkadotJs,
-    disabledIcon: PolkadotJsDisabled,
-    name: 'Polkadot.js',
-    downloadUrl: 'https://polkadot.js.org/extension/'
-  },
   'subwallet-js': {
     icon: Subwallet,
     disabledIcon: SubwalletDisabled,
-    name: 'Subwallet',
+    name: 'SubWallet',
     downloadUrl: 'https://www.subwallet.app/zh/'
   },
   talisman: {
@@ -33,5 +27,11 @@ export const walletConfig: Record<string, WalletConfig> = {
     disabledIcon: TalismanDisabled,
     name: 'Talisman',
     downloadUrl: 'https://www.talisman.xyz/'
+  },
+  'polkadot-js': {
+    icon: PolkadotJs,
+    disabledIcon: PolkadotJsDisabled,
+    name: 'Polkadot.js',
+    downloadUrl: 'https://polkadot.js.org/extension/'
   }
 };

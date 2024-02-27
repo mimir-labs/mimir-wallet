@@ -24,27 +24,26 @@ export function useEagerConnect(): boolean {
           promises.push(loadWallet(window.injectedWeb3[wallet], 'mimir-wallet', wallet));
         } else {
           promises.push(
-            documentReadyPromise().then(
-              () =>
-                new Promise<void>((resolve) => {
-                  setTimeout(() => {
-                    if (window.injectedWeb3?.[wallet]) {
-                      loadWallet(window.injectedWeb3[wallet], 'mimir-wallet', wallet).finally(() => {
-                        resolve();
-                      });
-                    } else {
-                      resolve();
-                    }
-                  }, 1000);
-                })
-            )
+            new Promise<void>((resolve) => {
+              setTimeout(() => {
+                if (window.injectedWeb3?.[wallet]) {
+                  loadWallet(window.injectedWeb3[wallet], 'mimir-wallet', wallet).finally(() => {
+                    resolve();
+                  });
+                } else {
+                  resolve();
+                }
+              }, 1000);
+            })
           );
         }
       }
 
-      Promise.all(promises).then(() => {
-        setIsDone(true);
-      });
+      documentReadyPromise()
+        .then(() => Promise.all(promises))
+        .then(() => {
+          setIsDone(true);
+        });
     }
   }, [isApiReady]);
 

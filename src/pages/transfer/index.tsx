@@ -56,10 +56,10 @@ function PageTransfer() {
       <Paper sx={{ padding: 2.5, borderRadius: '20px', marginTop: 1.25 }}>
         <Stack spacing={2}>
           <Typography variant='h3'>Transfer</Typography>
-          <InputAddress balance={sendingBalances?.freeBalance} filtered={filtered} isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} withBalance />
+          <InputAddress balance={sendingBalances?.availableBalance} filtered={filtered} isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} withBalance />
           <Divider />
           <InputAddress
-            balance={recipientBalances?.freeBalance}
+            balance={recipientBalances?.availableBalance}
             filtered={filtered.concat(allAddresses)}
             label='Recipient'
             onChange={setRecipient}
@@ -67,7 +67,7 @@ function PageTransfer() {
             value={recipient}
             withBalance
           />
-          <InputNumber error={amountError} label='Amount' maxValue={sendingBalances?.freeBalance} onChange={setAmount} placeholder='Input amount' withMax />
+          <InputNumber error={amountError} label='Amount' maxValue={sendingBalances?.availableBalance} onChange={setAmount} placeholder='Input amount' withMax />
           <Button disabled={!amount || !recipient} fullWidth onClick={handleClick}>
             Review
           </Button>
