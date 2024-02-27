@@ -4,7 +4,8 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
-import { useAccounts, useAddresses, useAddressMeta, useToggle } from '@mimir-wallet/hooks';
+import { useAddressMeta, useToggle } from '@mimir-wallet/hooks';
+import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
 import { Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
@@ -26,8 +27,6 @@ interface Props {
 }
 
 function AddressCell({ isMe, namePost, shorten = true, showType = false, size = 'medium', value, width, withCopy = false }: Props) {
-  const { isAccount } = useAccounts();
-  const { isAddress } = useAddresses();
   const [iconSize, nameFontSize, addressFontSize, spacing, spacingCol] = useMemo((): [number, string, string, number, number] => {
     return size === 'small' ? [30, '0.875rem', '0.75rem', 0.5, 0.2] : size === 'medium' ? [40, '1rem', '0.75rem', 0.5, 0.5] : [50, '1.25rem', '0.875rem', 1, 0.5];
   }, [size]);
@@ -54,10 +53,10 @@ function AddressCell({ isMe, namePost, shorten = true, showType = false, size = 
                 <Chip color='secondary' label='Dev' size={size === 'large' ? 'medium' : 'small'} />
               ) : null)}
           </Box>
-          <Typography color='text.secondary' component='span' fontSize={addressFontSize} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography color='text.secondary' component='span' fontSize={addressFontSize} sx={{ height: 18, display: 'flex', alignItems: 'center' }}>
             <AddressComp shorten={shorten} value={address} />
             {withCopy && <CopyButton value={address} />}
-            {!isAccount(value) && !isAddress(value) && (
+            {!isLocalAccount(value) && !isLocalAddress(value) && (
               <IconButton
                 color='inherit'
                 onClick={(e) => {

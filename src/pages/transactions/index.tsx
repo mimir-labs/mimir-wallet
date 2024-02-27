@@ -36,11 +36,6 @@ function AccountList({ address, limit, page, setLimit, setPage }: { address: str
 
   return (
     <Box>
-      <Paper sx={{ borderRadius: '20px', padding: 1, display: 'inline-flex', marginBottom: 2, gap: 1 }}>
-        <Button color='primary' sx={{ borderRadius: 1, paddingX: 3 }} variant='contained'>
-          History
-        </Button>
-      </Paper>
       <HistoryTransactions address={address} limit={limit} page={page} setLimit={_setLimit} setPage={_setPage} />
     </Box>
   );

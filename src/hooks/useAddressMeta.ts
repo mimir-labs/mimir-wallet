@@ -3,13 +3,12 @@
 
 import { toastError } from '@mimir-wallet/components';
 import { events } from '@mimir-wallet/events';
-import { AddressMeta, getAddressMeta, service } from '@mimir-wallet/utils';
+import { AddressMeta, getAddressMeta, isLocalAccount, service } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import { u8aToHex } from '@polkadot/util';
 import { addressEq, decodeAddress } from '@polkadot/util-crypto';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { KeyringCtx } from './ctx/Keyring';
 import { createNamedHook } from './createNamedHook';
 
 interface UseAddressMeta {
@@ -22,9 +21,6 @@ interface UseAddressMeta {
 function useAddressMetaImpl(value?: string | null): UseAddressMeta {
   const [meta, setMeta] = useState<AddressMeta | undefined>(value ? getAddressMeta(value) : undefined);
   const [name, setName] = useState<string | undefined>(meta?.name);
-  const {
-    accounts: { isAccount }
-  } = useContext(KeyringCtx);
 
   useEffect(() => {
     if (value) {
@@ -64,7 +60,7 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
       if (name === meta?.name) return;
 
       try {
-        if (isAccount(value)) {
+        if (isLocalAccount(value)) {
           const pair = keyring.getPair(value);
 
           keyring.saveAccountMeta(pair, { name });
@@ -81,7 +77,7 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
         toastError(error);
       }
     },
-    [isAccount, meta?.name, name, value]
+    [meta?.name, name, value]
   );
 
   return {

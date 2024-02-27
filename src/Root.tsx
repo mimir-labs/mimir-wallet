@@ -27,8 +27,8 @@ function Root({ store }: Props) {
         <ThemeProvider>
           <SWRConfig value={{ fetcher }}>
             <ApiCtxRoot apiUrl={apiUrl} store={store}>
-              <WalletCtxRoot>
-                <KeyringCtxRoot>
+              <KeyringCtxRoot>
+                <WalletCtxRoot>
                   <SelectAccountCtxRoot>
                     <TxQueueCtxRoot>
                       <BlockEventCtxRoot>
@@ -41,8 +41,8 @@ function Root({ store }: Props) {
                       </BlockEventCtxRoot>
                     </TxQueueCtxRoot>
                   </SelectAccountCtxRoot>
-                </KeyringCtxRoot>
-              </WalletCtxRoot>
+                </WalletCtxRoot>
+              </KeyringCtxRoot>
             </ApiCtxRoot>
           </SWRConfig>
         </ThemeProvider>

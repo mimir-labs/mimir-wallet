@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DetectedMultisig, GlobalStyle, MimirLoading, TxModal } from '@mimir-wallet/components';
-import { useApi, useSyncMultisigs } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks';
+import { useWallet } from '@mimir-wallet/hooks/useWallet';
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
@@ -10,15 +11,14 @@ import TopBar from './TopBar';
 
 function BaseContainer() {
   const { isApiConnected, isApiReady } = useApi();
-
-  useSyncMultisigs();
+  const { isMultisigSyned, isWalletReady } = useWallet();
 
   return (
     <>
       <TxModal />
       <GlobalStyle />
       <TopBar />
-      {isApiReady && isApiConnected ? (
+      {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (
         <Box sx={{ height: '100%' }}>
           <Outlet />
           <DetectedMultisig />

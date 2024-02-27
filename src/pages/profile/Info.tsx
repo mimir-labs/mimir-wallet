@@ -1,11 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactComponent as IconFund } from '@mimir-wallet/assets/svg/icon-fund-fill.svg';
 import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
 import { ReactComponent as IconSet } from '@mimir-wallet/assets/svg/icon-set.svg';
-import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
 import { FormatBalance } from '@mimir-wallet/components';
-import { useTokenInfo } from '@mimir-wallet/hooks';
+import { useAddressMeta, useTokenInfo } from '@mimir-wallet/hooks';
 import { Box, Button, Divider, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { BN } from '@polkadot/util';
@@ -14,7 +14,8 @@ import { Link } from 'react-router-dom';
 
 import { AccountBalance } from './types';
 
-function Info({ balances, toggleFundOpen }: { address?: string; balances?: AccountBalance; toggleFundOpen: () => void }) {
+function Info({ address, balances, toggleFundOpen }: { address?: string; balances?: AccountBalance; toggleFundOpen: () => void }) {
+  const { meta } = useAddressMeta(address);
   const [tokenInfo] = useTokenInfo();
 
   const [total, transferrable, locked, reserved] = useMemo(() => {
@@ -41,12 +42,14 @@ function Info({ balances, toggleFundOpen }: { address?: string; balances?: Accou
             <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox />} to='/transfer'>
               Transfer
             </Button>
-            <Button endIcon={<SvgIcon component={IconTransfer} inheritViewBox />} onClick={toggleFundOpen} variant='outlined'>
+            <Button endIcon={<SvgIcon component={IconFund} inheritViewBox />} onClick={toggleFundOpen} variant='outlined'>
               Fund
             </Button>
-            <Button component={Link} sx={{ minWidth: 0 }} to={'/account-setting'} variant='outlined'>
-              <SvgIcon component={IconSet} inheritViewBox />
-            </Button>
+            {meta?.isMultisig && (
+              <Button component={Link} sx={{ minWidth: 0 }} to={'/account-setting'} variant='outlined'>
+                <SvgIcon component={IconSet} inheritViewBox />
+              </Button>
+            )}
           </Box>
         </Box>
         <Divider />

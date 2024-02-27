@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Injected } from '@polkadot/extension-inject/types';
+import type { InjectedWindowProvider, WalletState } from './types';
 
 import { ConnectWalletModal } from '@mimir-wallet/components';
 import { CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
@@ -11,26 +11,11 @@ import React, { useEffect, useState } from 'react';
 import store from 'store';
 
 import { useEagerConnect } from '../useEagerConnect';
+import { useSyncMultisigs } from '../useMultisigs';
 import { useToggle } from '../useToggle';
 
 interface Props {
   children?: React.ReactNode;
-}
-
-interface InjectedWindowProvider {
-  enable: (origin: string) => Promise<Injected>;
-  version: string;
-}
-
-interface State {
-  isWalletReady: boolean;
-  walletOpen: boolean;
-  wallets: Record<string, InjectedWindowProvider>;
-  connectedWallets: string[];
-  openWallet: () => void;
-  closeWallet: () => void;
-  connect: (name: string) => Promise<void>;
-  disconnect: (name: string) => void;
 }
 
 export function documentReadyPromise(): Promise<void> {
@@ -43,13 +28,14 @@ export function documentReadyPromise(): Promise<void> {
   });
 }
 
-export const WalletCtx = React.createContext<State>({} as State);
+export const WalletCtx = React.createContext<WalletState>({} as WalletState);
 
 export function WalletCtxRoot({ children }: Props): React.ReactElement<Props> {
   const [walletOpen, , setOpen] = useToggle();
   const [wallets, setWallets] = useState<Record<string, InjectedWindowProvider>>({});
   const [connectedWallets, setConnectedWallets] = useState<string[]>(store.get(CONNECTED_WALLETS_KEY) || []);
   const isWalletReady = useEagerConnect();
+  const isMultisigSyned = useSyncMultisigs(isWalletReady);
 
   useEffect(() => {
     documentReadyPromise().then(() => {
@@ -98,7 +84,7 @@ export function WalletCtxRoot({ children }: Props): React.ReactElement<Props> {
   };
 
   return (
-    <WalletCtx.Provider value={{ isWalletReady, openWallet, connect, disconnect, wallets, connectedWallets, walletOpen, closeWallet }}>
+    <WalletCtx.Provider value={{ isWalletReady, isMultisigSyned, openWallet, connect, disconnect, wallets, connectedWallets, walletOpen, closeWallet }}>
       {children}
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
     </WalletCtx.Provider>

@@ -4,12 +4,12 @@
 import { SELECT_ACCOUNT_KEY } from '@mimir-wallet/constants';
 import { keyring } from '@polkadot/ui-keyring';
 import { hexToU8a, isHex, u8aToHex } from '@polkadot/util';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import store from 'store';
 
 import { useAccounts } from '../useAccounts';
 import { useApi } from '../useApi';
-import { WalletCtx } from './Wallet';
+import { useWallet } from '../useWallet';
 
 interface Props {
   children?: React.ReactNode;
@@ -27,7 +27,7 @@ function getSelected(hex?: string): string | undefined {
   if (hex) {
     return keyring.getAccount(hexToU8a(hex))?.address;
   } else {
-    return keyring.getAccounts().find((item) => item.meta.isValid && item.meta.isMultisig)?.address || keyring.getAccounts()[0].address;
+    return keyring.getAccounts().find((item) => item.meta.isValid && item.meta.isMultisig)?.address || keyring.getAccounts()[0]?.address;
   }
 }
 
@@ -35,27 +35,31 @@ export function SelectAccountCtxRoot({ children }: Props): React.ReactElement<Pr
   const { isApiReady } = useApi();
   const [selected, setSelected] = useState<string | undefined>();
   const [isAccountReady] = useState(false);
-  const { isWalletReady } = useContext(WalletCtx);
+  const { isWalletReady } = useWallet();
   const { allAccounts } = useAccounts();
-
-  useEffect(() => {
-    if (selected && !allAccounts.includes(selected)) {
-      const address = getSelected();
-
-      if (address) {
-        setSelected(address);
-        store.set(SELECT_ACCOUNT_KEY, u8aToHex(keyring.decodeAddress(address)));
-      }
-    }
-  }, [allAccounts, selected]);
 
   useEffect(() => {
     if (isApiReady && isWalletReady) {
       const stored = store.get(SELECT_ACCOUNT_KEY);
 
-      setSelected(getSelected(stored));
+      const address = getSelected(stored);
+
+      if (address) {
+        setSelected(address);
+        store.set(SELECT_ACCOUNT_KEY, u8aToHex(keyring.decodeAddress(address)));
+      } else {
+        const address = getSelected();
+
+        if (address) {
+          setSelected(address);
+          store.set(SELECT_ACCOUNT_KEY, u8aToHex(keyring.decodeAddress(address)));
+        } else {
+          setSelected(undefined);
+          store.remove(SELECT_ACCOUNT_KEY);
+        }
+      }
     }
-  }, [isApiReady, isWalletReady]);
+  }, [allAccounts, isApiReady, isWalletReady]);
 
   const selectAccount = useCallback((address: string) => {
     const account = keyring.getAccount(isHex(address) ? hexToU8a(address) : address);

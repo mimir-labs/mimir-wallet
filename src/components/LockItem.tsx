@@ -6,10 +6,10 @@ import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { ReactComponent as IconFail } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
+import { ReactComponent as IconFund } from '@mimir-wallet/assets/svg/icon-fund-fill.svg';
 import { ReactComponent as IconLock } from '@mimir-wallet/assets/svg/icon-lock.svg';
 import { ReactComponent as IconQuestion } from '@mimir-wallet/assets/svg/icon-question-fill.svg';
 import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
-import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
 import { ReactComponent as IconUnLock } from '@mimir-wallet/assets/svg/icon-unlock.svg';
 import { useApi, useCall, useToggle } from '@mimir-wallet/hooks';
 import { Box, IconButton, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
@@ -58,7 +58,7 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {!isUnLock && !isEnought && (
             <IconButton color='primary' onClick={toggleOpen} size='small'>
-              <SvgIcon component={IconTransfer} inheritViewBox />
+              <SvgIcon component={IconFund} inheritViewBox />
             </IconButton>
           )}
           <Typography>

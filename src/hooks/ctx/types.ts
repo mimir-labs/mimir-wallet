@@ -3,6 +3,7 @@
 
 import type { TxEvents } from '@mimir-wallet/utils';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
+import type { Injected } from '@polkadot/extension-inject/types';
 import type { AccountId, Call, Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
@@ -14,7 +15,6 @@ export interface Accounts {
   allAccountsHex: HexString[];
   areAccountsLoaded: boolean;
   hasAccounts: boolean;
-  isAccount: (address?: string | null | { toString: () => string }) => boolean;
 }
 
 export interface Addresses {
@@ -22,7 +22,6 @@ export interface Addresses {
   allAddressesHex: HexString[];
   areAddressesLoaded: boolean;
   hasAddresses: boolean;
-  isAddress: (address?: string | null | { toString: () => string }) => boolean;
 }
 
 export interface Filtered {
@@ -67,3 +66,19 @@ export interface TxToast {
 }
 
 export type TxToastState = Omit<Required<TxToast>, 'onChange'> & { onChange?: () => void };
+
+export interface InjectedWindowProvider {
+  enable: (origin: string) => Promise<Injected>;
+  version: string;
+}
+export interface WalletState {
+  isWalletReady: boolean;
+  isMultisigSyned: boolean;
+  walletOpen: boolean;
+  wallets: Record<string, InjectedWindowProvider>;
+  connectedWallets: string[];
+  openWallet: () => void;
+  closeWallet: () => void;
+  connect: (name: string) => Promise<void>;
+  disconnect: (name: string) => void;
+}

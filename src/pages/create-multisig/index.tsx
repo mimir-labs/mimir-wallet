@@ -5,7 +5,8 @@ import type { PrepareFlexible } from './types';
 
 import { ReactComponent as IconInfo } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
 import { AddAddressDialog, Address, AddressRow, Input } from '@mimir-wallet/components';
-import { useAccounts, useAddresses, useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
+import { useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
+import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
 import { Alert, AlertTitle, Box, Button, Dialog, DialogContent, Divider, FormHelperText, Paper, Stack, SvgIcon, Switch, Typography } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
 import { isAddress as isAddressUtil } from '@polkadot/util-crypto';
@@ -27,8 +28,6 @@ function checkError(signatories: string[], isThresholdValid: boolean, hasSoloAcc
 function PageCreateMultisig() {
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
-  const { isAddress } = useAddresses();
-  const { isAccount } = useAccounts();
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
   const [flexible, setFlexible] = useState(false);
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig();
@@ -44,7 +43,7 @@ function PageCreateMultisig() {
 
   const handleAdd = useCallback(() => {
     if (isAddressValid) {
-      if (!isAddress(address) && !isAccount(address)) {
+      if (!isLocalAddress(address) && !isLocalAccount(address)) {
         toggleAdd();
       } else {
         select(address);
@@ -52,7 +51,7 @@ function PageCreateMultisig() {
     } else {
       setAddressError(new Error('Please input correct address'));
     }
-  }, [address, isAccount, isAddress, isAddressValid, select, toggleAdd]);
+  }, [address, isAddressValid, select, toggleAdd]);
 
   const _onChangeThreshold = useCallback(
     (value: string) => {

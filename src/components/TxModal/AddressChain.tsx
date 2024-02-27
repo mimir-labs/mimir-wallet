@@ -3,8 +3,7 @@
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
-import { useAccounts } from '@mimir-wallet/hooks';
-import { getAddressMeta } from '@mimir-wallet/utils';
+import { getAddressMeta, isLocalAccount } from '@mimir-wallet/utils';
 import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
@@ -23,8 +22,6 @@ function AddressChain({
   address: string;
   filtered?: Filtered;
 }) {
-  const { isAccount } = useAccounts();
-
   const meta = useMemo(() => getAddressMeta(address), [address]);
 
   const _onChange = useCallback(
@@ -39,7 +36,7 @@ function AddressChain({
 
   useEffect(() => {
     if (!accounts[address]) {
-      const finded = meta.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.filter((address) => isAccount(address)) || [] : [];
+      const finded = meta.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.filter((address) => isLocalAccount(address)) || [] : [];
 
       if (finded.length > 0) {
         const solo = finded.find((item) => !getAddressMeta(item).isMultisig);
@@ -50,7 +47,7 @@ function AddressChain({
         }));
       }
     }
-  }, [accounts, address, filtered, isAccount, meta, onChange]);
+  }, [accounts, address, filtered, meta, onChange]);
 
   if (meta.isMultisig) {
     const value = accounts[address] || '';

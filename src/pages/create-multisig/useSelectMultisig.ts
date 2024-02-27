@@ -1,8 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAccounts, useAddresses, useAllAccounts } from '@mimir-wallet/hooks';
-import { getAddressMeta } from '@mimir-wallet/utils';
+import { useAddresses, useAllAccounts } from '@mimir-wallet/hooks';
+import { getAddressMeta, isLocalAccount } from '@mimir-wallet/utils';
 import React, { useCallback, useMemo, useState } from 'react';
 
 interface UseSelectMultisig {
@@ -17,7 +17,6 @@ interface UseSelectMultisig {
 }
 
 export function useSelectMultisig(defaultSignatories?: string[], defaultThreshold?: number): UseSelectMultisig {
-  const { isAccount } = useAccounts();
   const { allAddresses } = useAddresses();
   const all = useAllAccounts(allAddresses);
   const [signatories, setSignatories] = useState<string[]>(defaultSignatories || []);
@@ -25,7 +24,7 @@ export function useSelectMultisig(defaultSignatories?: string[], defaultThreshol
 
   const unselected = useMemo(() => all.filter((account) => !signatories.includes(account)), [all, signatories]);
 
-  const hasSoloAccount = useMemo(() => !!signatories.find((address) => isAccount(address) && !getAddressMeta(address).isMultisig), [isAccount, signatories]);
+  const hasSoloAccount = useMemo(() => !!signatories.find((address) => isLocalAccount(address) && !getAddressMeta(address).isMultisig), [signatories]);
   const isThresholdValid = Number(threshold) >= 2 && Number(threshold) <= signatories.length;
 
   const select = useCallback((value: string) => {

@@ -9,7 +9,6 @@ import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@p
 import type { HexString } from '@polkadot/util/types';
 
 import { AccountSigner, api } from '@mimir-wallet/api';
-import { web3FromSource } from '@polkadot/extension-dapp';
 import keyring from '@polkadot/ui-keyring';
 import { assert, isBn, isNumber, objectSpread } from '@polkadot/util';
 import { addressEq } from '@polkadot/util-crypto';
@@ -62,11 +61,11 @@ async function extractParams(api: ApiPromise, address: string): Promise<Partial<
   } = pair;
 
   if (isInjected) {
-    const injected = await web3FromSource(source as string);
+    const signer = (await window.injectedWeb3?.[source || ''].enable('mimir-wallet'))?.signer;
 
-    assert(injected, `Unable to find a signer for ${address}`);
+    assert(signer, `Unable to find a signer for ${address}`);
 
-    return { signer: injected.signer };
+    return { signer };
   }
 
   assert(addressEq(address, pair.address), `Unable to retrieve keypair for ${address}`);
