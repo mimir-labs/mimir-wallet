@@ -34,7 +34,7 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
 
   const isEnought = useMemo(() => {
     if (value && allBalances) {
-      return allBalances.freeBalance.gte(new BN(value.toString()));
+      return allBalances.availableBalance.gte(new BN(value.toString()));
     }
 
     return true;

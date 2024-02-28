@@ -18,9 +18,10 @@ export function useCommunicator(iframeRef: MutableRefObject<HTMLIFrameElement | 
   const state: State = {
     extrinsicSign: (payload: SignerPayloadJSON, id: string) => {
       console.log(payload);
-      // if (payload.genesisHash !== api.genesisHash.toHex()) {
-      //   throw new Error(`Extrinsic genesisHash error, only supported ${api.runtimeChain.toString()}`);
-      // }
+
+      if (payload.genesisHash && payload.genesisHash !== api.genesisHash.toHex()) {
+        throw new Error(`Extrinsic genesisHash error, only supported ${api.runtimeChain.toString()}`);
+      }
 
       const call = api.registry.createType('Call', payload.method);
 
@@ -45,18 +46,14 @@ export function useCommunicator(iframeRef: MutableRefObject<HTMLIFrameElement | 
 
       const meta = keyring.getAccount(selected)?.meta;
 
-      if (meta?.isMultisig) {
-        return [
-          {
-            address: selected,
-            genesisHash: meta.genesisHash,
-            name: meta.name,
-            type: meta.type
-          }
-        ];
-      } else {
-        return [];
-      }
+      return [
+        {
+          address: selected,
+          genesisHash: meta?.genesisHash,
+          name: meta?.name,
+          type: meta?.type
+        }
+      ];
     }
   };
   const stateRef = useRef<State>(state);

@@ -34,15 +34,9 @@ export function proposalApi(): string | undefined {
 }
 
 export async function serviceUrl(path: string): Promise<string> {
-  let url: string;
+  await api.isReady;
 
-  if (process.env.NODE_ENV === 'production') {
-    await api.isReady;
-
-    url = allEndpoints.find((item) => item.genesisHash === api.genesisHash.toHex())?.serviceUrl || 'http://127.0.0.1:8080/';
-  } else {
-    url = 'http://127.0.0.1:8080/';
-  }
+  const url: string = allEndpoints.find((item) => item.genesisHash === api.genesisHash.toHex())?.serviceUrl || 'http://127.0.0.1:8080/';
 
   return `${url}${path}`;
 }

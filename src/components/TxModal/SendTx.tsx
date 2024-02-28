@@ -106,7 +106,7 @@ function SendTx({
           Promise.all(addresses.map((address) => api.derive.balances.all(address))).then((results) => {
             setIsEnought(
               results
-                .map((item) => item.freeBalance)
+                .map((item) => item.availableBalance)
                 .reduce((l, r) => l.add(r), new BN(0))
                 .gte(values.reduce((l, r) => l.add(r)))
             );

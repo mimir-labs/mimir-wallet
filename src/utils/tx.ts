@@ -9,6 +9,7 @@ import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@p
 import type { HexString } from '@polkadot/util/types';
 
 import { AccountSigner, api } from '@mimir-wallet/api';
+import { CONNECT_ORIGIN } from '@mimir-wallet/constants';
 import keyring from '@polkadot/ui-keyring';
 import { assert, isBn, isNumber, objectSpread } from '@polkadot/util';
 import { addressEq } from '@polkadot/util-crypto';
@@ -61,7 +62,7 @@ async function extractParams(api: ApiPromise, address: string): Promise<Partial<
   } = pair;
 
   if (isInjected) {
-    const signer = (await window.injectedWeb3?.[source || ''].enable('mimir-wallet'))?.signer;
+    const signer = (await window.injectedWeb3?.[source || ''].enable(CONNECT_ORIGIN))?.signer;
 
     assert(signer, `Unable to find a signer for ${address}`);
 
@@ -159,6 +160,18 @@ export async function sign(extrinsic: SubmittableExtrinsic<'promise'>, signer: s
   const { signature } = await accountSigner.signPayload(payload.toPayload());
 
   extrinsic.addSignature(signer, signature, payload.toPayload());
+
+  const result = await api.call.blockBuilder.applyExtrinsic(extrinsic);
+
+  if (result.isErr) {
+    if (result.asErr.isInvalid) {
+      throw new Error(`Invalid Transaction: ${result.asErr.asInvalid.type}`);
+    } else {
+      throw new Error(`Unknown Error: ${result.asErr.asUnknown.type}`);
+    }
+  } else if (result.asOk.isErr) {
+    throw _assetDispatchError(result.asOk.asErr);
+  }
 
   return [signature, payload.toPayload()];
 }

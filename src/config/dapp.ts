@@ -89,6 +89,18 @@ export const dapps: DappOption[] = [
     website: 'https://www.subsquare.io/',
     twitter: 'https://twitter.com/OpensquareN',
     github: 'https://github.com/opensquare-network'
+  },
+  {
+    id: 1004,
+    internal: false,
+    icon: '/dapp-icons/staking.png',
+    name: 'Staking',
+    description: 'Staking',
+    url: 'https://staking.mimir.global/',
+    supportedChains: ['0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3', '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'],
+    tags: ['Governance'],
+    website: 'https://staking.polkadot.network/',
+    github: 'https://github.com/paritytech/polkadot-staking-dashboard'
   }
 ];
 
