@@ -5,8 +5,19 @@ import { store } from '@mimir-wallet/instance';
 import { Injected } from '@polkadot/extension-inject/types';
 import keyring from '@polkadot/ui-keyring';
 
+export function documentReadyPromise(): Promise<void> {
+  return new Promise((resolve): void => {
+    if (document.readyState === 'complete') {
+      resolve();
+    } else {
+      window.addEventListener('load', () => resolve());
+    }
+  });
+}
+
 export async function loadWallet({ enable }: { enable: (origin: string) => Promise<Injected> }, origin: string, source: string) {
   try {
+    await documentReadyPromise();
     const injected = await enable(origin);
     const accounts = await injected.accounts.get(true);
 

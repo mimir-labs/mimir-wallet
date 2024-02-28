@@ -4,8 +4,8 @@
 import type { InjectedWindowProvider, WalletState } from './types';
 
 import { ConnectWalletModal } from '@mimir-wallet/components';
-import { CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
-import { loadWallet } from '@mimir-wallet/utils';
+import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
+import { documentReadyPromise, loadWallet } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import React, { useEffect, useState } from 'react';
 import store from 'store';
@@ -16,16 +16,6 @@ import { useToggle } from '../useToggle';
 
 interface Props {
   children?: React.ReactNode;
-}
-
-export function documentReadyPromise(): Promise<void> {
-  return new Promise((resolve): void => {
-    if (document.readyState === 'complete') {
-      resolve();
-    } else {
-      window.addEventListener('load', () => resolve());
-    }
-  });
 }
 
 export const WalletCtx = React.createContext<WalletState>({} as WalletState);
@@ -57,7 +47,7 @@ export function WalletCtxRoot({ children }: Props): React.ReactElement<Props> {
     const provider = window.injectedWeb3?.[name];
 
     if (provider) {
-      await loadWallet(provider, 'mimir-wallet', name);
+      await loadWallet(provider, CONNECT_ORIGIN, name);
       setConnectedWallets((values) => {
         const newValue = [...values, name];
 

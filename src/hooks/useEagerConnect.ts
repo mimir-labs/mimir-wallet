@@ -1,12 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
+import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
 import { loadWallet } from '@mimir-wallet/utils';
 import { useEffect, useState } from 'react';
 import store from 'store';
 
-import { documentReadyPromise } from './ctx/Wallet';
 import { useApi } from './useApi';
 
 export function useEagerConnect(): boolean {
@@ -21,13 +20,13 @@ export function useEagerConnect(): boolean {
 
       for (const wallet of connectWallets) {
         if (window.injectedWeb3?.[wallet]) {
-          promises.push(loadWallet(window.injectedWeb3[wallet], 'mimir-wallet', wallet));
+          promises.push(loadWallet(window.injectedWeb3[wallet], CONNECT_ORIGIN, wallet));
         } else {
           promises.push(
             new Promise<void>((resolve) => {
               setTimeout(() => {
                 if (window.injectedWeb3?.[wallet]) {
-                  loadWallet(window.injectedWeb3[wallet], 'mimir-wallet', wallet).finally(() => {
+                  loadWallet(window.injectedWeb3[wallet], CONNECT_ORIGIN, wallet).finally(() => {
                     resolve();
                   });
                 } else {
@@ -39,11 +38,9 @@ export function useEagerConnect(): boolean {
         }
       }
 
-      documentReadyPromise()
-        .then(() => Promise.all(promises))
-        .then(() => {
-          setIsDone(true);
-        });
+      Promise.all(promises).then(() => {
+        setIsDone(true);
+      });
     }
   }, [isApiReady]);
 
