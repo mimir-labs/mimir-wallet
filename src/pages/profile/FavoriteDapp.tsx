@@ -21,7 +21,7 @@ function FavoriteDapps({
     <Grid columns={{ xs: 12 }} container spacing={2.5}>
       {dapps.map((dapp, index) => {
         return (
-          <Grid key={index} lg={4} md={6} xs={12}>
+          <Grid key={index} lg={4} sm={6} xs={12}>
             <DappCell addFavorite={addFavorite} dapp={dapp} isFavorite={isFavorite} removeFavorite={removeFavorite} />
           </Grid>
         );

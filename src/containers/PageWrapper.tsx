@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
 
 function PageWrapper() {
   return (
-    <Box sx={{ height: '100%', minHeight: '100vh', paddingTop: '86px' }}>
+    <Box sx={{ height: '100%', minHeight: '100vh', paddingTop: '86px', paddingX: { md: 2, xs: 1.5 } }}>
       <Outlet />
     </Box>
   );

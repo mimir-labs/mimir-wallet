@@ -45,8 +45,8 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
   return (
     <>
       {value && address && <Fund defaultValue={value.toString()} onClose={toggleOpen} open={open} receipt={address.toString()} />}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: { xs: 0.5, sm: 1 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
           {icon}
           <Typography>
             <AddressName value={address} /> {isUnLock ? 'unlock' : 'lock'}
@@ -55,7 +55,7 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
             <SvgIcon color='primary' component={IconQuestion} inheritViewBox sx={{ opacity: 0.5 }} />
           </Tooltip>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
           {!isUnLock && !isEnought && (
             <IconButton color='primary' onClick={toggleOpen} size='small'>
               <SvgIcon component={IconFund} inheritViewBox />

@@ -148,12 +148,12 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
       <SwitchAccountDialog address={address} onClose={toggleOpen} onSelect={onClose} open={switchOpen} />
       <Drawer
         PaperProps={{
-          sx: { top: '56px', boxShadow: 'none', height: 'calc(100vh - 56px)' }
+          sx: { top: { md: '56px', xs: 0 }, boxShadow: 'none', height: { md: 'calc(100vh - 56px)', xs: '100vh' } }
         }}
         anchor={anchor}
         onClose={onClose}
         open={open}
-        slotProps={{ backdrop: { sx: { top: '56px' } } }}
+        slotProps={{ backdrop: { sx: { top: { md: '56px', xs: 0 } } } }}
         variant='temporary'
       >
         <Search onChange={setKeywords} value={keywords} />

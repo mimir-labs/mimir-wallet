@@ -3,8 +3,10 @@
 
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 
+import Logo from '@mimir-wallet/assets/images/logo.png';
 import { ReactComponent as ArrowRight } from '@mimir-wallet/assets/svg/ArrowRight.svg';
 import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
+import { ReactComponent as IconClose } from '@mimir-wallet/assets/svg/icon-close.svg';
 import { ReactComponent as IconDapp } from '@mimir-wallet/assets/svg/icon-dapp.svg';
 import { ReactComponent as IconHome } from '@mimir-wallet/assets/svg/icon-home.svg';
 import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
@@ -15,9 +17,11 @@ import { AccountMenu, AddressCell, CopyButton, FormatBalance, QrcodeAddress } fr
 import { findToken, walletConfig } from '@mimir-wallet/config';
 import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, WalletCtx } from '@mimir-wallet/hooks';
 import { chainLinks } from '@mimir-wallet/utils';
-import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useMemo, useState } from 'react';
 import { Link, matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
+
+import { BaseContainerCtx } from './BaseContainer';
 
 function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<any>; label: React.ReactNode }) {
   const navigate = useNavigate();
@@ -71,6 +75,9 @@ function SideBar() {
   const { injected } = useGroupAccounts();
   const { connectedWallets, openWallet } = useContext(WalletCtx);
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [selected]);
+  const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const { breakpoints } = useTheme();
+  const downMd = useMediaQuery(breakpoints.down('md'));
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -83,7 +90,21 @@ function SideBar() {
   return (
     <>
       <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
-      <Drawer PaperProps={{ sx: { width: 222, top: 56, paddingX: 1.5, paddingY: 2 } }} anchor='left' variant='permanent'>
+      <Drawer
+        PaperProps={{ sx: { width: 222, top: downMd ? 0 : 56, paddingX: 1.5, paddingY: 2, borderTopLeftRadius: { md: 0, xs: 20 }, borderBottomLeftRadius: { md: 0, xs: 20 } } }}
+        anchor={downMd ? 'right' : 'left'}
+        onClose={closeSidebar}
+        open={sidebarOpen}
+        variant={downMd ? 'temporary' : 'permanent'}
+      >
+        <Box sx={{ display: { md: 'none', xs: 'flex' }, justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+          <Link to='/'>
+            <img src={Logo} style={{ width: 87 }} />
+          </Link>
+          <IconButton color='inherit' onClick={closeSidebar}>
+            <SvgIcon component={IconClose} inheritViewBox />
+          </IconButton>
+        </Box>
         {injected.length > 0 ? (
           <Paper sx={{ padding: 1 }} variant='outlined'>
             <Stack alignItems='center' direction='row' onClick={handleAccountOpen} spacing={1} sx={{ cursor: 'pointer', width: '100%' }}>
@@ -119,7 +140,7 @@ function SideBar() {
         <NavLink Icon={IconTransaction} label='Transactions' to='/transactions' />
         <NavLink Icon={IconAddressBook} label='Address Book' to='/address-book' />
         <AccountMenu onClose={handleAccountClose} open={!!anchorEl} />
-        <Box onClick={openWallet} sx={{ cursor: 'pointer', position: 'absolute', left: 0, bottom: 60, display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}>
+        <Box onClick={openWallet} sx={{ cursor: 'pointer', position: 'absolute', left: 0, bottom: { md: 60, xs: 0 }, display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}>
           {Object.entries(walletConfig).map(([wallet, config]) => (
             <Box component='img' key={wallet} src={connectedWallets.includes(wallet) ? config.icon : config.disabledIcon} sx={{ width: 20, height: 20 }} />
           ))}
@@ -128,9 +149,9 @@ function SideBar() {
       <Box
         sx={{
           paddingTop: 'calc(56px + 20px)',
-          paddingLeft: 'calc(222px + 20px)',
-          paddingRight: '20px',
-          paddingBottom: '20px',
+          paddingLeft: { md: 'calc(222px + 20px)', xs: 1.5 },
+          paddingRight: { md: '20px', xs: 1.5 },
+          paddingBottom: { md: '20px', xs: 1.5 },
           minHeight: '100vh'
         }}
       >

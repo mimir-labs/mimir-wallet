@@ -2,15 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Logo from '@mimir-wallet/assets/images/logo.png';
+import { ReactComponent as IconMenu } from '@mimir-wallet/assets/svg/icon-menu.svg';
 import { ReactComponent as IconSetting } from '@mimir-wallet/assets/svg/icon-set.svg';
 import { AccountSelect, ChainSelect } from '@mimir-wallet/components';
 import { useApi } from '@mimir-wallet/hooks';
 import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
+import { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
+import { BaseContainerCtx } from './BaseContainer';
 
 function TopBar() {
   const { isApiReady } = useApi();
   const { pathname } = useLocation();
+  const { closeSidebar, openSidebar, sidebarOpen } = useContext(BaseContainerCtx);
 
   return (
     <Box
@@ -43,6 +48,10 @@ function TopBar() {
             </Stack>
           </>
         )}
+
+        <IconButton color='inherit' onClick={sidebarOpen ? closeSidebar : openSidebar} sx={{ display: { md: 'none' } }}>
+          <SvgIcon component={IconMenu} inheritViewBox />
+        </IconButton>
       </Box>
     </Box>
   );

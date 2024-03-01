@@ -20,52 +20,67 @@ function Row({ balances }: { balances: AccountBalance }) {
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [open, toggleOpen] = useToggle(true);
 
-  return (
-    <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-        <Avatar alt='Token' src={token.Icon} sx={{ width: 32, height: 32 }} />
-        <Typography fontSize='1rem' width='20%'>
+  const RowMain = () => (
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+      <Box sx={{ flex: '1', display: 'flex', alignItems: { sm: 'center', xs: 'flex-start' }, gap: { sm: 5, xs: 1 }, flexDirection: { sm: 'row', xs: 'column' } }}>
+        <Typography fontSize='1rem' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Avatar alt='Token' src={token.Icon} sx={{ width: 32, height: 32 }} />
           {systemChain}
         </Typography>
-        <Box sx={{ flex: '1' }}>
-          <Typography variant='h6'>
-            <FormatBalance value={balances.total} />
+        <Typography variant='h6'>
+          <FormatBalance value={balances.total} />
+        </Typography>
+      </Box>
+      <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox />} to='/transfer'>
+        <Box sx={{ display: { sm: 'inline', xs: 'none' } }}>Transfer</Box>
+      </Button>
+      <IconButton onClick={toggleOpen} sx={{ transformOrigin: 'center', transform: `rotateZ(${open ? '0deg' : '180deg'})`, transition: 'all 150ms' }}>
+        <SvgIcon color='primary' component={ExpandArrow} inheritViewBox />
+      </IconButton>
+    </Box>
+  );
+
+  const RowSub = () => (
+    <Paper sx={{ width: '100%', marginTop: 2, bgcolor: 'secondary.main', borderRadius: 2, padding: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: { md: 'nowrap', xs: 'wrap' },
+          gap: 2,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          '>div': { display: 'flex', gap: 0.5, alignItems: 'center', color: 'text.secondary' }
+        }}
+      >
+        <Box>
+          <SvgIcon component={IconSend} inheritViewBox />
+          <span>Transferable</span>
+          <b>
+            <FormatBalance value={balances.transferrable} />
+          </b>
+        </Box>
+        <Box>
+          <SvgIcon component={IconLock} inheritViewBox />
+          <span>Locked balance</span>
+          <Typography color='text.primary' fontWeight={700}>
+            <FormatBalance value={balances.locked} />
           </Typography>
         </Box>
-        <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox />} to='/transfer'>
-          Transfer
-        </Button>
-        <IconButton onClick={toggleOpen} sx={{ transformOrigin: 'center', transform: `rotateZ(${open ? '0deg' : '180deg'})`, transition: 'all 150ms' }}>
-          <SvgIcon color='primary' component={ExpandArrow} inheritViewBox />
-        </IconButton>
+        <Box>
+          <SvgIcon component={IconReverse} inheritViewBox />
+          <span>Reserved balance</span>
+          <Typography color='text.primary' fontWeight={700}>
+            <FormatBalance value={balances.reserved} />
+          </Typography>
+        </Box>
       </Box>
-      {open && (
-        <Paper sx={{ width: '100%', marginTop: 2, bgcolor: 'secondary.main', borderRadius: 2, padding: 2 }}>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'space-between', '>div': { display: 'flex', gap: 0.5, alignItems: 'center', color: 'text.secondary' } }}>
-            <Box>
-              <SvgIcon component={IconSend} inheritViewBox />
-              <span>Transferable</span>
-              <b>
-                <FormatBalance value={balances.transferrable} />
-              </b>
-            </Box>
-            <Box>
-              <SvgIcon component={IconLock} inheritViewBox />
-              <span>Locked balance</span>
-              <Typography color='text.primary' fontWeight={700}>
-                <FormatBalance value={balances.locked} />
-              </Typography>
-            </Box>
-            <Box>
-              <SvgIcon component={IconReverse} inheritViewBox />
-              <span>Reserved balance</span>
-              <Typography color='text.primary' fontWeight={700}>
-                <FormatBalance value={balances.reserved} />
-              </Typography>
-            </Box>
-          </Box>
-        </Paper>
-      )}
+    </Paper>
+  );
+
+  return (
+    <Box>
+      <RowMain />
+      {open && <RowSub />}
     </Box>
   );
 }
