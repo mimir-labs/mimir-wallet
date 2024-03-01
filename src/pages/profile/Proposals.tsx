@@ -5,12 +5,15 @@ import type { ProposalData } from '@mimir-wallet/hooks';
 
 import { ellipsisMixin } from '@mimir-wallet/components/utils';
 import { chainLinks } from '@mimir-wallet/utils';
-import { Box, Chip, Link as MuiLink, Paper, Stack, Typography } from '@mui/material';
+import { Box, Chip, Link as MuiLink, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 function Proposals({ data }: { data: Array<ProposalData> }) {
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
+
   return (
-    <Stack component={Paper} padding={2} spacing={1} sx={{ bgcolor: 'common.white' }}>
+    <Stack component={Paper} padding={{ sm: 2, xs: 1 }} spacing={1} sx={{ bgcolor: 'common.white' }}>
       {data.slice(0, 3).map((item, index) => (
         <Box
           key={index}
@@ -18,8 +21,8 @@ function Proposals({ data }: { data: Array<ProposalData> }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: 2,
-            paddingX: 2,
+            gap: { sm: 2, xs: 1 },
+            paddingX: { sm: 2, xs: 1 },
             paddingY: 1,
             borderRadius: 1,
             border: '1px solid',
@@ -27,7 +30,7 @@ function Proposals({ data }: { data: Array<ProposalData> }) {
             ':hover': { bgcolor: 'secondary.main' }
           }}
         >
-          <Typography sx={{ flex: '1 0 auto', maxWidth: '60%', ...ellipsisMixin() }} variant='h6'>
+          <Typography sx={{ flex: '1 0 auto', maxWidth: '60%', fontSize: { sm: '1rem', xs: '0.875rem' }, ...ellipsisMixin() }} variant='h6'>
             <span style={{ opacity: 0.5 }}>#{item.referendumIndex}</span>
             &nbsp;·&nbsp;
             <MuiLink color='inherit' component={Link} to={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`) || '')}`} underline='hover'>
@@ -37,7 +40,7 @@ function Proposals({ data }: { data: Array<ProposalData> }) {
           <Box sx={{ width: '20%' }}>
             <Box component='img' src='/dapp-icons/subsquare.svg' sx={{ width: 30, height: 30 }} />
           </Box>
-          <Chip color='secondary' label={item.state.name} />
+          <Chip color='secondary' label={item.state.name} size={downSm ? 'small' : 'medium'} />
         </Box>
       ))}
     </Stack>
