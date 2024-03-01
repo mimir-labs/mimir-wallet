@@ -6,6 +6,8 @@ import { WalletCtx } from '@mimir-wallet/hooks';
 import { Box, Button, Dialog, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import React, { useContext } from 'react';
 
+import { toastError } from './ToastRoot';
+
 function WalletCell({ disabledIcon, downloadUrl, icon, name, wallet }: { name: string; wallet: string; icon: string; disabledIcon: string; downloadUrl: string }) {
   const { connect, connectedWallets, disconnect, wallets } = useContext(WalletCtx);
 
@@ -19,7 +21,7 @@ function WalletCell({ disabledIcon, downloadUrl, icon, name, wallet }: { name: s
             Disconnect
           </Button>
         ) : (
-          <Button onClick={() => connect(wallet)} variant='outlined'>
+          <Button onClick={() => connect(wallet).catch(toastError)} variant='outlined'>
             Connect
           </Button>
         )
