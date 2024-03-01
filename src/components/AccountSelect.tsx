@@ -21,6 +21,8 @@ function AccountSelect() {
     setAnchorEl(null);
   };
 
+  if (!selected) return null;
+
   return (
     <>
       <Box

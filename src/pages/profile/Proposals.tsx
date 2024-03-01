@@ -3,6 +3,7 @@
 
 import type { ProposalData } from '@mimir-wallet/hooks';
 
+import { ellipsisMixin } from '@mimir-wallet/components/utils';
 import { chainLinks } from '@mimir-wallet/utils';
 import { Box, Chip, Link as MuiLink, Paper, Stack, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -26,7 +27,7 @@ function Proposals({ data }: { data: Array<ProposalData> }) {
             ':hover': { bgcolor: 'secondary.main' }
           }}
         >
-          <Typography sx={{ flex: '1 0 auto' }} variant='h6'>
+          <Typography sx={{ flex: '1 0 auto', maxWidth: '60%', ...ellipsisMixin() }} variant='h6'>
             <span style={{ opacity: 0.5 }}>#{item.referendumIndex}</span>
             &nbsp;·&nbsp;
             <MuiLink color='inherit' component={Link} to={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`) || '')}`} underline='hover'>

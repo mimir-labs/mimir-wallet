@@ -23,13 +23,13 @@ function PageExplorer() {
 
   useCommunicator(iframeRef, appUrl);
 
-  return selected ? (
-    <Stack key={selected} sx={{ height: '100%', position: 'relative', paddingBottom: '60px' }}>
+  return (
+    <Stack key={selected || 'none'} sx={{ height: '100%', position: 'relative', paddingBottom: '60px' }}>
       {loading && <CircularProgress sx={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, margin: 'auto' }} />}
       {url && <AppIframe appUrl={appUrl} iframeRef={iframeRef} key={url} onLoad={() => setLoading(false)} />}
-      {url && <PendingTx address={selected} url={url} />}
+      {url && selected && <PendingTx address={selected} url={url} />}
     </Stack>
-  ) : null;
+  );
 }
 
 export default PageExplorer;

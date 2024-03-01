@@ -25,6 +25,7 @@ function Root({ store }: Props) {
     <Suspense fallback='...'>
       <StyledEngineProvider injectFirst>
         <ThemeProvider>
+          <ToastRoot />
           <SWRConfig value={{ fetcher }}>
             <ApiCtxRoot apiUrl={apiUrl} store={store}>
               <KeyringCtxRoot>
@@ -34,7 +35,6 @@ function Root({ store }: Props) {
                       <BlockEventCtxRoot>
                         <TxToastCtxRoot>
                           <GlobalStyle />
-                          <ToastRoot />
                           <TxToast />
                           <RouterProvider router={routes} />
                         </TxToastCtxRoot>
