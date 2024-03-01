@@ -8,31 +8,33 @@ import { ReactComponent as IconReverse } from '@mimir-wallet/assets/svg/icon-wai
 import { FormatBalance } from '@mimir-wallet/components';
 import { findToken } from '@mimir-wallet/config';
 import { useApi, useToggle } from '@mimir-wallet/hooks';
-import { Avatar, Box, Button, IconButton, Paper, SvgIcon, Typography } from '@mui/material';
+import { Avatar, Box, Button, IconButton, Paper, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { AccountBalance } from './types';
 
 function Row({ balances }: { balances: AccountBalance }) {
-  const { api, systemChain } = useApi();
+  const { api, tokenSymbol } = useApi();
 
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [open, toggleOpen] = useToggle(true);
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   const RowMain = () => (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
       <Box sx={{ flex: '1', display: 'flex', alignItems: { sm: 'center', xs: 'flex-start' }, gap: { sm: 5, xs: 1 }, flexDirection: { sm: 'row', xs: 'column' } }}>
         <Typography fontSize='1rem' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Avatar alt='Token' src={token.Icon} sx={{ width: 32, height: 32 }} />
-          {systemChain}
+          {tokenSymbol}
         </Typography>
         <Typography variant='h6'>
           <FormatBalance value={balances.total} />
         </Typography>
       </Box>
-      <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox />} to='/transfer'>
-        <Box sx={{ display: { sm: 'inline', xs: 'none' } }}>Transfer</Box>
+      <Button component={Link} endIcon={downSm ? undefined : <SvgIcon component={IconSend} inheritViewBox />} sx={{ minWidth: downSm ? 0 : undefined }} to='/transfer'>
+        {downSm ? <SvgIcon component={IconSend} inheritViewBox /> : 'Transfer'}
       </Button>
       <IconButton onClick={toggleOpen} sx={{ transformOrigin: 'center', transform: `rotateZ(${open ? '0deg' : '180deg'})`, transition: 'all 150ms' }}>
         <SvgIcon color='primary' component={ExpandArrow} inheritViewBox />

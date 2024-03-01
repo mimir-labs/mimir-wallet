@@ -3,20 +3,23 @@
 
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
 import { useSelectedAccountCallback } from '@mimir-wallet/hooks';
-import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Paper, Typography } from '@mui/material';
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Paper, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import store from 'store';
 
 import AddressCell from './AddressCell';
 
 function Content({ address }: { address: string }) {
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
+
   return (
     <DialogContent>
       <Typography fontSize='1rem' marginBottom={1.5}>
         You are about to switch to this account
       </Typography>
       <Paper sx={{ padding: 1, bgcolor: 'secondary.main' }} variant='elevation'>
-        <AddressCell shorten={false} value={address} withCopy />
+        <AddressCell shorten={downSm} value={address} withCopy />
       </Paper>
     </DialogContent>
   );

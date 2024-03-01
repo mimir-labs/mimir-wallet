@@ -3,7 +3,6 @@
 
 import { useAddressMeta, useQueryParam, useSelectedAccount } from '@mimir-wallet/hooks';
 import { Box, Button, Paper } from '@mui/material';
-import keyring from '@polkadot/ui-keyring';
 import { useEffect } from 'react';
 
 import HistoryTransactions from './HistoryTransactions';
@@ -59,7 +58,7 @@ function PageTransaction() {
     if (!address) {
       selected && setAddress(selected, { replace: true });
     } else {
-      keyring.getAccount(address) && selected && setAddress(selected);
+      selected && setAddress(selected);
     }
   }, [address, selected, setAddress]);
 

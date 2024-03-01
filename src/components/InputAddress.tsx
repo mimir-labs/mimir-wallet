@@ -83,7 +83,7 @@ function InputAddress({ balance, defaultValue, disabled, error, filtered, isSign
   const width = wrapper.current?.clientWidth;
 
   return (
-    <Box>
+    <Box sx={{ overflow: 'hidden' }}>
       {label && <Typography sx={{ fontWeight: 700, marginBottom: 1, color: focus ? 'primary.main' : 'inherit' }}>{label}</Typography>}
       <Box
         ref={wrapper}

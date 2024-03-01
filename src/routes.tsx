@@ -5,8 +5,7 @@ import { Box } from '@mui/material';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 
 import BaseContainer from './containers/BaseContainer';
-import PageWrapper from './containers/PageWrapper';
-import SideBar from './containers/SideBar';
+import PageWrapper, { PageWrapperMain } from './containers/PageWrapper';
 import PageAccountSetting from './pages/account-setting';
 import PageAddressBook from './pages/address-book';
 import PageCreateMultisig from './pages/create-multisig';
@@ -18,10 +17,10 @@ import PageTransfer from './pages/transfer';
 
 export const routes = createBrowserRouter([
   {
-    element: <BaseContainer />,
+    element: <BaseContainer fixedSidebar />,
     children: [
       {
-        element: <SideBar />,
+        element: <PageWrapperMain />,
         children: [
           {
             index: true,
@@ -44,7 +43,12 @@ export const routes = createBrowserRouter([
             element: <PageAccountSetting />
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    element: <BaseContainer fixedSidebar={false} />,
+    children: [
       {
         element: <PageWrapper />,
         children: [
@@ -60,7 +64,7 @@ export const routes = createBrowserRouter([
       },
       {
         element: (
-          <Box sx={{ height: 'calc(100% - 56px)', minHeight: '100vh', paddingTop: '56px' }}>
+          <Box sx={{ height: '100vh', paddingTop: '56px' }}>
             <Outlet />
           </Box>
         ),

@@ -7,7 +7,7 @@ import type { HexString } from '@polkadot/util/types';
 import { useApi } from '@mimir-wallet/hooks';
 import { Transaction } from '@mimir-wallet/hooks/types';
 import { Call as CallComp } from '@mimir-wallet/params';
-import { Box, Chip, Paper, Stack, Typography } from '@mui/material';
+import { Box, Chip, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useMemo } from 'react';
 
 import AddressRow from '../AddressRow';
@@ -31,7 +31,7 @@ function extractState(value: IMethod): Extracted {
 
 function CallHash({ label, value }: { label: string; value: HexString }) {
   return (
-    <Stack direction='row' spacing={3}>
+    <Stack alignItems='center' direction='row' spacing={3}>
       <Typography fontSize='0.75rem' fontWeight={700}>
         {label}
       </Typography>
@@ -44,6 +44,8 @@ function Call({ destSender, isCancelled, method, sender, transaction }: { transa
   const { api } = useApi();
 
   const { callData, callHash, callName } = useMemo(() => extractState(method), [method]);
+  const { breakpoints } = useTheme();
+  const upSm = useMediaQuery(breakpoints.up('sm'));
 
   return (
     <Stack spacing={2.5}>
@@ -54,7 +56,7 @@ function Call({ destSender, isCancelled, method, sender, transaction }: { transa
         <Typography fontWeight={700} mb={0.5}>
           From
         </Typography>
-        <AddressRow isMe={destSender === sender} shorten size='small' value={destSender} withAddress withCopy />
+        <AddressRow isMe={destSender === sender} shorten size='small' value={destSender} withAddress={upSm} withCopy />
       </Box>
       <Box>
         <Typography fontWeight={700} mb={0.5}>

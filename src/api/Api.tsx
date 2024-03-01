@@ -115,7 +115,8 @@ async function loadOnReady(api: ApiPromise, store: KeyringStore | undefined): Pr
     specVersion: api.runtimeVersion.specVersion.toString(),
     systemChain,
     systemName,
-    systemVersion
+    systemVersion,
+    tokenSymbol: tokenSymbol[0].toString()
   };
 }
 

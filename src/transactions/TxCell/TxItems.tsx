@@ -180,7 +180,18 @@ function TxItems({
           boxShadow: detailOpen ? shadows[1] : shadows[0]
         })}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', paddingX: 2, paddingY: 1, paddingLeft: isSub ? 5 : 2, gap: 2, bgcolor: 'secondary.main', fontWeight: 600 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            paddingX: { xs: 1, sm: 1.5, md: 2 },
+            paddingY: 1,
+            paddingLeft: isSub ? { xs: 2.5, sm: 3.5, md: 5 } : { xs: 1.5, md: 2 },
+            gap: { sm: 2, xs: 1 },
+            bgcolor: 'secondary.main',
+            fontWeight: 600
+          }}
+        >
           {min600 && withApp && <AppCell website={destTx.initTransaction.website} />}
           <ActionTextCell action={destTx.action} />
           {min700 && <ActionDisplayCell api={api} call={destTx.call} isSub={isSub} tx={destTx} />}

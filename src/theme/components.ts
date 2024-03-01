@@ -253,7 +253,8 @@ const createComponents: Func = () => ({
           },
           [theme.breakpoints.down('sm')]: {
             width: 'calc(100% - 30px)',
-            margin: '15px'
+            margin: '15px',
+            padding: '15px'
           }
         }
       })

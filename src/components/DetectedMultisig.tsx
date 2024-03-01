@@ -5,7 +5,7 @@ import { ReactComponent as IconExternal } from '@mimir-wallet/assets/svg/icon-ex
 import { ReactComponent as Logo } from '@mimir-wallet/assets/svg/logo-circle.svg';
 import { useUnConfirmMultisigs } from '@mimir-wallet/hooks';
 import { getAddressMeta } from '@mimir-wallet/utils';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
 import { useMemo } from 'react';
 
@@ -14,14 +14,19 @@ import AddressRow from './AddressRow';
 import BalanceFree from './BalanceFree';
 
 function Item({ address, withEdit }: { address: string; withEdit: boolean }) {
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
+
   return (
     <Box sx={{ padding: 1, display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'space-between', borderRadius: 1, border: '1px solid', borderColor: 'grey.300' }}>
       <Box sx={{ flex: '1.3', display: 'flex', alignItems: 'center' }}>
-        <AddressRow size='small' value={address} withEdit={withEdit} withName />
+        <AddressRow shorten size='small' value={address} withEdit={withEdit} withName />
       </Box>
-      <Typography sx={{ flex: '1.2' }}>
-        <Address shorten value={address} />
-      </Typography>
+      {!downSm && (
+        <Typography sx={{ flex: '1.2' }}>
+          <Address shorten value={address} />
+        </Typography>
+      )}
       <Box sx={{ flex: '1', textAlign: 'right' }}>
         <BalanceFree params={address} />
       </Box>

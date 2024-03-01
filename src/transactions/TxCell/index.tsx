@@ -23,7 +23,7 @@ function TxCell({ defaultOpen, transaction }: Props) {
   const [approvals] = useMemo((): [number, Transaction[]] => (destSenderMeta ? extraTransaction(destSenderMeta, transaction) : [0, []]), [destSenderMeta, transaction]);
 
   return (
-    <Paper component={Stack} spacing={1.2} sx={{ padding: 2, borderRadius: 2 }}>
+    <Paper component={Stack} spacing={1.2} sx={{ padding: { sm: 2, xs: 1.5 }, borderRadius: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Stack alignItems='center' direction='row' spacing={1.25}>
           <Box sx={{ width: 8, height: 8, borderRadius: 1, bgcolor: status < CalldataStatus.Success ? 'warning.main' : status === CalldataStatus.Success ? 'success.main' : 'error.main' }} />

@@ -3,30 +3,32 @@
 
 import { walletConfig } from '@mimir-wallet/config';
 import { WalletCtx } from '@mimir-wallet/hooks';
-import { Box, Button, Dialog, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, DialogTitle, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useContext } from 'react';
 
 import { toastError } from './ToastRoot';
 
 function WalletCell({ disabledIcon, downloadUrl, icon, name, wallet }: { name: string; wallet: string; icon: string; disabledIcon: string; downloadUrl: string }) {
   const { connect, connectedWallets, disconnect, wallets } = useContext(WalletCtx);
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   return (
     <Stack alignItems='center' justifyContent='center' spacing={1}>
-      <Box component='img' src={wallets[wallet] ? icon : disabledIcon} sx={{ width: 64, height: 64 }} />
+      <Box component='img' src={wallets[wallet] ? icon : disabledIcon} sx={{ width: { sm: 64, xs: 40 }, height: { sm: 64, xs: 40 } }} />
       <Typography>{name}</Typography>
       {wallets[wallet] ? (
         connectedWallets.includes(wallet) ? (
-          <Button color='error' onClick={() => disconnect(wallet)} variant='outlined'>
+          <Button color='error' onClick={() => disconnect(wallet)} size={downSm ? 'small' : 'medium'} variant='outlined'>
             Disconnect
           </Button>
         ) : (
-          <Button onClick={() => connect(wallet).catch(toastError)} variant='outlined'>
+          <Button onClick={() => connect(wallet).catch(toastError)} size={downSm ? 'small' : 'medium'} variant='outlined'>
             Connect
           </Button>
         )
       ) : (
-        <Button component='a' href={downloadUrl} target='_blank' variant='outlined'>
+        <Button component='a' href={downloadUrl} size={downSm ? 'small' : 'medium'} target='_blank' variant='outlined'>
           Download
         </Button>
       )}
@@ -39,7 +41,7 @@ function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => v
     <Dialog maxWidth='sm' onClose={onClose} open={open}>
       <DialogTitle textAlign='center'>Connect Wallet</DialogTitle>
       <DialogContent>
-        <Box sx={{ display: 'flex', gap: 4 }}>
+        <Box sx={{ display: 'flex', gap: { sm: 4, xs: 2 } }}>
           {Object.entries(walletConfig).map(([wallet, config]) => (
             <WalletCell disabledIcon={config.disabledIcon} downloadUrl={config.downloadUrl} icon={config.icon} key={wallet} name={config.name} wallet={wallet} />
           ))}

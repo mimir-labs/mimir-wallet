@@ -3,10 +3,8 @@
 
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 
-import Logo from '@mimir-wallet/assets/images/logo.png';
 import { ReactComponent as ArrowRight } from '@mimir-wallet/assets/svg/ArrowRight.svg';
 import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
-import { ReactComponent as IconClose } from '@mimir-wallet/assets/svg/icon-close.svg';
 import { ReactComponent as IconDapp } from '@mimir-wallet/assets/svg/icon-dapp.svg';
 import { ReactComponent as IconHome } from '@mimir-wallet/assets/svg/icon-home.svg';
 import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
@@ -19,25 +17,21 @@ import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, Walle
 import { chainLinks } from '@mimir-wallet/utils';
 import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useMemo, useState } from 'react';
-import { Link, matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, matchPath, useLocation } from 'react-router-dom';
 
 import { BaseContainerCtx } from './BaseContainer';
 
-function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<any>; label: React.ReactNode }) {
-  const navigate = useNavigate();
+function NavLink({ Icon, label, onClick, to }: { to: string; Icon: React.ComponentType<any>; label: React.ReactNode; onClick: () => void }) {
   const location = useLocation();
 
   const matched = useMemo(() => matchPath(to, location.pathname), [location.pathname, to]);
 
-  const handleClick = () => {
-    navigate(to);
-  };
-
   return (
     <Button
       className={matched ? 'Mui-active' : undefined}
+      component={Link}
       fullWidth
-      onClick={handleClick}
+      onClick={onClick}
       size='large'
       startIcon={<SvgIcon component={Icon} inheritViewBox sx={{ fontSize: '1.25rem !important', color: 'inherit' }} />}
       sx={{
@@ -57,6 +51,7 @@ function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<an
           }
         }
       }}
+      to={to}
       variant='text'
     >
       <Typography fontSize='1rem' fontWeight={700}>
@@ -66,7 +61,7 @@ function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<an
   );
 }
 
-function SideBar() {
+function SideBar({ fixed }: { fixed: boolean }) {
   const { api } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -91,19 +86,14 @@ function SideBar() {
     <>
       <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
       <Drawer
-        PaperProps={{ sx: { width: 222, top: downMd ? 0 : 56, paddingX: 1.5, paddingY: 2, borderTopLeftRadius: { md: 0, xs: 20 }, borderBottomLeftRadius: { md: 0, xs: 20 } } }}
-        anchor={downMd ? 'right' : 'left'}
+        PaperProps={{ sx: { width: downMd ? 280 : 222, top: downMd ? 0 : 56, paddingX: 1.5, paddingY: 2, borderTopRightRadius: { md: 0, xs: 20 }, borderBottomRightRadius: { md: 0, xs: 20 } } }}
+        anchor='left'
         onClose={closeSidebar}
         open={sidebarOpen}
-        variant={downMd ? 'temporary' : 'permanent'}
+        variant={downMd ? 'temporary' : fixed ? 'permanent' : 'temporary'}
       >
         <Box sx={{ display: { md: 'none', xs: 'flex' }, justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-          <Link to='/'>
-            <img src={Logo} style={{ width: 87 }} />
-          </Link>
-          <IconButton color='inherit' onClick={closeSidebar}>
-            <SvgIcon component={IconClose} inheritViewBox />
-          </IconButton>
+          <Typography variant='h3'>Menu</Typography>
         </Box>
         {injected.length > 0 ? (
           <Paper sx={{ padding: 1 }} variant='outlined'>
@@ -131,32 +121,34 @@ function SideBar() {
             </IconButton>
           </Paper>
         ) : (
-          <Button onClick={openWallet} size='large' sx={{ borderRadius: 1 }}>
+          <Button
+            onClick={() => {
+              openWallet();
+              closeSidebar();
+            }}
+            size='large'
+            sx={{ borderRadius: 1 }}
+          >
             Connect Wallet
           </Button>
         )}
-        <NavLink Icon={IconHome} label='Home' to='/' />
-        <NavLink Icon={IconDapp} label='Apps' to='/dapp' />
-        <NavLink Icon={IconTransaction} label='Transactions' to='/transactions' />
-        <NavLink Icon={IconAddressBook} label='Address Book' to='/address-book' />
+        <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
+        <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
+        <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
+        <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
         <AccountMenu onClose={handleAccountClose} open={!!anchorEl} />
-        <Box onClick={openWallet} sx={{ cursor: 'pointer', position: 'absolute', left: 0, bottom: { md: 60, xs: 0 }, display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}>
+        <Box
+          onClick={() => {
+            openWallet();
+            closeSidebar();
+          }}
+          sx={{ cursor: 'pointer', position: 'absolute', left: 0, bottom: { md: 60, xs: 0 }, display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}
+        >
           {Object.entries(walletConfig).map(([wallet, config]) => (
             <Box component='img' key={wallet} src={connectedWallets.includes(wallet) ? config.icon : config.disabledIcon} sx={{ width: 20, height: 20 }} />
           ))}
         </Box>
       </Drawer>
-      <Box
-        sx={{
-          paddingTop: 'calc(56px + 20px)',
-          paddingLeft: { md: 'calc(222px + 20px)', xs: 1.5 },
-          paddingRight: { md: '20px', xs: 1.5 },
-          paddingBottom: { md: '20px', xs: 1.5 },
-          minHeight: '100vh'
-        }}
-      >
-        <Outlet />
-      </Box>
     </>
   );
 }
