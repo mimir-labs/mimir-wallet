@@ -24,9 +24,10 @@ interface Props {
   width?: number | string;
   isMe?: boolean;
   namePost?: React.ReactNode | null;
+  icons?: React.ReactNode;
 }
 
-function AddressCell({ isMe, namePost, shorten = true, showType = false, size = 'medium', value, width, withCopy = false }: Props) {
+function AddressCell({ icons, isMe, namePost, shorten = true, showType = false, size = 'medium', value, width, withCopy = false }: Props) {
   const [iconSize, nameFontSize, addressFontSize, spacing, spacingCol] = useMemo((): [number, string, string, number, number] => {
     return size === 'small' ? [30, '0.875rem', '0.75rem', 0.5, 0.2] : size === 'medium' ? [40, '1rem', '0.75rem', 0.5, 0.5] : [50, '1.25rem', '0.875rem', 1, 0.5];
   }, [size]);
@@ -56,6 +57,7 @@ function AddressCell({ isMe, namePost, shorten = true, showType = false, size = 
           <Typography color='text.secondary' component='span' fontSize={addressFontSize} sx={{ height: 18, display: 'flex', alignItems: 'center' }}>
             <AddressComp shorten={shorten} value={address} />
             {withCopy && <CopyButton value={address} />}
+            {icons}
             {!isLocalAccount(value) && !isLocalAddress(value) && (
               <IconButton
                 color='inherit'

@@ -48,7 +48,7 @@ function Transactions({ address }: { address?: string }) {
   return (
     <Paper
       sx={{
-        height: '220px',
+        height: pendingTransactions.length > 0 ? { lg: '220px', xs: 'auto' } : 210,
         width: '100%',
         borderRadius: 2,
         paddingX: 1,

@@ -1,25 +1,43 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { DetectedMultisig, GlobalStyle, MimirLoading, TxModal } from '@mimir-wallet/components';
-import { useApi } from '@mimir-wallet/hooks';
+import { DetectedMultisig, MimirLoading, TxModal } from '@mimir-wallet/components';
+import { useApi, useToggle } from '@mimir-wallet/hooks';
 import { useWallet } from '@mimir-wallet/hooks/useWallet';
 import { Box } from '@mui/material';
+import { createContext } from 'react';
 import { Outlet } from 'react-router-dom';
 
+import SideBar from './SideBar';
 import TopBar from './TopBar';
 
-function BaseContainer() {
+interface State {
+  sidebarOpen: boolean;
+  openSidebar: () => void;
+  closeSidebar: () => void;
+}
+
+export const BaseContainerCtx = createContext<State>({} as State);
+
+function BaseContainer({ fixedSidebar }: { fixedSidebar: boolean }) {
   const { isApiConnected, isApiReady } = useApi();
   const { isMultisigSyned, isWalletReady } = useWallet();
+  const [sidebarOpen, , setSidebarOpen] = useToggle(false);
+
+  const openSidebar = () => setSidebarOpen(true);
+  const closeSidebar = () => setSidebarOpen(false);
 
   return (
-    <>
+    <BaseContainerCtx.Provider value={{ sidebarOpen, openSidebar, closeSidebar }}>
       <TxModal />
-      <GlobalStyle />
       <TopBar />
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (
-        <Box sx={{ height: '100%' }}>
+        <Box
+          sx={{
+            minHeight: '100%'
+          }}
+        >
+          <SideBar fixed={fixedSidebar} />
           <Outlet />
           <DetectedMultisig />
         </Box>
@@ -40,7 +58,7 @@ function BaseContainer() {
           <MimirLoading />
         </Box>
       )}
-    </>
+    </BaseContainerCtx.Provider>
   );
 }
 

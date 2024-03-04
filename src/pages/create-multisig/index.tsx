@@ -120,7 +120,7 @@ function PageCreateMultisig() {
                 value={address}
               />
               <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexDirection: { sm: 'row', xs: 'column' } }}>
                   <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
                   <AccountSelect accounts={signatories} onClick={unselect} title='Members' type='delete' />
                 </Box>

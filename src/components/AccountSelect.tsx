@@ -32,12 +32,13 @@ function AccountSelect() {
           borderRadius: 1,
           paddingX: 1,
           paddingY: 0.3,
-          bgcolor: 'secondary.main',
+          bgcolor: 'common.white',
           border: '1px solid',
           borderColor: 'secondary.main',
           gap: 2,
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
+          maxWidth: 192
         }}
       >
         <AddressCell shorten showType size='small' value={selected} />

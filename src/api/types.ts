@@ -23,6 +23,7 @@ export interface ApiState {
   systemChain: string;
   systemName: string;
   systemVersion: string;
+  tokenSymbol: string;
 }
 
 export interface ApiProps extends ApiState {

@@ -19,14 +19,14 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
 
   return (
     <Stack spacing={2}>
-      <Box sx={{ display: 'flex', gap: 2 }}>
-        <Box sx={{ width: '59%' }}>
+      <Box sx={{ display: 'flex', flexDirection: { lg: 'row', xs: 'column' }, gap: 2 }}>
+        <Box sx={{ width: { lg: '59%', xs: '100%' } }}>
           <Typography marginBottom={0.5} variant='h6'>
             Info
           </Typography>
           {info}
         </Box>
-        <Box sx={{ width: '41%' }}>
+        <Box sx={{ width: { lg: '41%', xs: '100%' } }}>
           <Typography marginBottom={0.5} variant='h6'>
             Pending Transactions
           </Typography>

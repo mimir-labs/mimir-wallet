@@ -22,7 +22,7 @@ function HistoryTransactions({
   const [transactions, page, limit, total] = useHistoryTransactions(address, propsPage, propsLimit);
 
   if (transactions.length === 0) {
-    return <Empty height='calc(100vh - 100px)' label='No Transactions' />;
+    return <Empty height='80vh' label='No Transactions' />;
   }
 
   return (

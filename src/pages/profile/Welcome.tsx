@@ -15,14 +15,15 @@ function Welcome() {
     <>
       <Typography variant='h1'>Welcome</Typography>
       <Stack
-        direction='row'
+        alignItems='center'
+        direction={{ sm: 'row', xs: 'column' }}
         spacing={2.5}
         sx={{
           marginTop: 2.5,
           '>.Welcome-cell': {
             cursor: 'pointer',
-            width: 280,
-            height: 280,
+            width: { sm: 280, xs: '85vw' },
+            height: { sm: 280, xs: '85vw' },
             borderRadius: '20px',
             display: 'flex',
             flexDirection: 'column',

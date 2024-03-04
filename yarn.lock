@@ -5311,6 +5311,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/json2mq@npm:^0":
+  version: 0.2.2
+  resolution: "@types/json2mq@npm:0.2.2"
+  checksum: 10c0/5f7ddd4752741d9ed309a4815f356d80ef98e298c039d70b52e3e2703a21bb02781b7a9721fedc3095b7439b25ffbbaa2962de12920748f12ca734caa9d867a8
+  languageName: node
+  linkType: hard
+
 "@types/json5@npm:^0.0.29":
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
@@ -14532,6 +14539,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json2mq@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "json2mq@npm:0.2.0"
+  dependencies:
+    string-convert: "npm:^0.2.0"
+  checksum: 10c0/fc9e2f2306572522d3e61d246afdf70b56ca9ea32f4ad5924c30949867851ab59c926bd0ffc821ebb54d32f3e82e95225f3906eacdb3e54c1ad49acdadf7e0c7
+  languageName: node
+  linkType: hard
+
 "json5@npm:^1.0.2":
   version: 1.0.2
   resolution: "json5@npm:1.0.2"
@@ -15381,6 +15397,7 @@ __metadata:
     "@testing-library/react": "npm:^14.2.1"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/jest": "npm:^29.5.12"
+    "@types/json2mq": "npm:^0"
     "@types/node": "npm:^20.11.17"
     "@types/react": "npm:^18.2.55"
     "@types/react-dom": "npm:^18.2.19"
@@ -15389,6 +15406,7 @@ __metadata:
     copy-to-clipboard: "npm:^3.3.3"
     crypto-browserify: "npm:^3.12.0"
     eventemitter3: "npm:^5.0.1"
+    json2mq: "npm:^0.2.0"
     lottie-web: "npm:^5.12.2"
     moment: "npm:^2.30.1"
     qrcode-generator: "npm:^1.4.4"
@@ -19893,6 +19911,13 @@ __metadata:
   dependencies:
     mixme: "npm:^0.5.1"
   checksum: 10c0/8a4b40e1ee952869358c12bbb3da3aa9ca30c8964f8f8eef2058a3b6b2202d7a856657ef458a5f2402a464310d177f92d2e4a119667854fce4b17c05e3c180bd
+  languageName: node
+  linkType: hard
+
+"string-convert@npm:^0.2.0":
+  version: 0.2.1
+  resolution: "string-convert@npm:0.2.1"
+  checksum: 10c0/00673ed8a3106137395436537ace7d3672c91a3290da73466055daa0134331dc84bc58c54ba2d2ea40711adc5744426d3c8239dbfc30290438fa3e9ff65db528
   languageName: node
   linkType: hard
 

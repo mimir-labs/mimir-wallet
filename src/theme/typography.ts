@@ -30,7 +30,7 @@ const createTypography: Func = () => ({
     fontWeight: 700,
     lineHeight: 1.2,
     '@media (max-width:600px)': {
-      fontSize: '1.875rem'
+      fontSize: '1.8rem'
     }
   },
   h2: {
@@ -38,7 +38,7 @@ const createTypography: Func = () => ({
     fontWeight: 700,
     lineHeight: 1.2,
     '@media (max-width:600px)': {
-      fontSize: '1.625rem'
+      fontSize: '1.6rem'
     }
   },
   h3: {

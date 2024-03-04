@@ -7,7 +7,7 @@ import { Box, Button, CircularProgress, Divider, Menu, MenuItem, Typography } fr
 import { useMemo, useState } from 'react';
 import store from 'store';
 
-function ChainSelect() {
+function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
   const { api, isApiConnected, isApiReady } = useApi();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -25,14 +25,20 @@ function ChainSelect() {
 
   return (
     <>
-      <Button
-        onClick={handleClick}
-        startIcon={isApiConnected && isApiReady ? <img src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} /> : <CircularProgress size={20} />}
-        sx={{ borderColor: 'secondary.main' }}
-        variant='outlined'
-      >
-        {!isApiConnected || !isApiReady ? 'Connecting...' : endpoint?.name}
-      </Button>
+      {onlyLogo ? (
+        <Button onClick={handleClick} sx={{ borderColor: 'secondary.main' }} variant='outlined'>
+          {isApiConnected && isApiReady ? <img src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} /> : <CircularProgress size={20} />}
+        </Button>
+      ) : (
+        <Button
+          onClick={handleClick}
+          startIcon={isApiConnected && isApiReady ? <img src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} /> : <CircularProgress size={20} />}
+          sx={{ borderColor: 'secondary.main' }}
+          variant='outlined'
+        >
+          {!isApiConnected || !isApiReady ? 'Connecting...' : endpoint?.name}
+        </Button>
+      )}
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{

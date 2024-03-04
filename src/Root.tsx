@@ -34,8 +34,8 @@ function Root({ store }: Props) {
                     <TxQueueCtxRoot>
                       <BlockEventCtxRoot>
                         <TxToastCtxRoot>
-                          <GlobalStyle />
                           <TxToast />
+                          <GlobalStyle />
                           <RouterProvider router={routes} />
                         </TxToastCtxRoot>
                       </BlockEventCtxRoot>

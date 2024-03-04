@@ -15,7 +15,8 @@ import { ONE_DAY } from '@mimir-wallet/constants';
 import { useAddressMeta, useApi, useBlockTime, useDapp, useToggle } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { formatAgo } from '@mimir-wallet/utils';
-import { alpha, Box, Button, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
+import { alpha, Box, Button, IconButton, Stack, SvgIcon, Typography, useMediaQuery } from '@mui/material';
+import json2mq from 'json2mq';
 import React, { useMemo } from 'react';
 
 import { useApproveFiltered } from '../hooks/useApproveFiltered';
@@ -82,6 +83,7 @@ function ProgressCell({ approvals, onClick, threshold }: { approvals: number; th
 
 function ActionsCell({
   approveFiltered,
+  autoWidth,
   canApprove,
   canCancel,
   cancelFiltered,
@@ -95,12 +97,13 @@ function ActionsCell({
   canApprove: boolean;
   cancelFiltered?: Filtered;
   canCancel: boolean;
+  autoWidth: boolean;
   toggleDetailOpen: () => void;
 }) {
   const status = transaction.status;
 
   return (
-    <Box sx={{ flex: '0 0 135px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Box sx={{ flex: autoWidth ? '0 0 auto' : '0 0 135px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       {status > CalldataStatus.Pending ? (
         <Box sx={{ wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <SvgIcon
@@ -157,6 +160,11 @@ function TxItems({
   const [approveFiltered, canApprove] = useApproveFiltered(transaction);
   const [cancelFiltered, canCancel] = useCancelFiltered(api, transaction);
 
+  const min800 = useMediaQuery(json2mq({ minWidth: 800 }));
+  const min700 = useMediaQuery(json2mq({ minWidth: 700 }));
+  const min600 = useMediaQuery(json2mq({ minWidth: 600 }));
+  const min500 = useMediaQuery(json2mq({ minWidth: 500 }));
+
   const destTx = transaction.top;
 
   return (
@@ -172,14 +180,26 @@ function TxItems({
           boxShadow: detailOpen ? shadows[1] : shadows[0]
         })}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', paddingX: 2, paddingY: 1, paddingLeft: isSub ? 5 : 2, gap: 2, bgcolor: 'secondary.main', fontWeight: 600 }}>
-          {withApp && <AppCell website={destTx.initTransaction.website} />}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            paddingX: { xs: 1, sm: 1.5, md: 2 },
+            paddingY: 1,
+            paddingLeft: isSub ? { xs: 2.5, sm: 3.5, md: 5 } : { xs: 1.5, md: 2 },
+            gap: { sm: 2, xs: 1 },
+            bgcolor: 'secondary.main',
+            fontWeight: 600
+          }}
+        >
+          {min600 && withApp && <AppCell website={destTx.initTransaction.website} />}
           <ActionTextCell action={destTx.action} />
-          <ActionDisplayCell api={api} call={destTx.call} isSub={isSub} tx={destTx} />
-          <TimeCell time={time} />
-          <ProgressCell approvals={approvals} onClick={toggleOverviewOpen} threshold={threshold} />
+          {min700 && <ActionDisplayCell api={api} call={destTx.call} isSub={isSub} tx={destTx} />}
+          {min800 && <TimeCell time={time} />}
+          {min500 && <ProgressCell approvals={approvals} onClick={toggleOverviewOpen} threshold={threshold} />}
           <ActionsCell
             approveFiltered={approveFiltered}
+            autoWidth={!min600}
             canApprove={canApprove}
             canCancel={canCancel}
             cancelFiltered={cancelFiltered}
@@ -189,7 +209,7 @@ function TxItems({
           />
         </Box>
         {detailOpen && (
-          <Box sx={{ display: 'flex', gap: 2, padding: 2 }}>
+          <Box sx={{ display: 'flex', gap: { md: 2, xs: 1.5 }, padding: { md: 2, xs: 1.5 }, flexDirection: min700 ? 'row' : 'column' }}>
             <Extrinsic transaction={transaction} />
             <Progress approveFiltered={approveFiltered} canApprove={canApprove} canCancel={canCancel} cancelFiltered={cancelFiltered} openOverview={toggleOverviewOpen} transaction={transaction} />
           </Box>

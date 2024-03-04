@@ -150,7 +150,7 @@ function AccountSetting() {
               value={address}
             />
             <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
                 <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
                 <AccountSelect accounts={signatories} onClick={unselect} title='Multisig Members' type='delete' />
               </Box>
@@ -160,11 +160,11 @@ function AccountSetting() {
           </Stack>
         </Paper>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button disabled={!name} fullWidth onClick={_onClick}>
-            Save
-          </Button>
           <Button fullWidth variant='outlined'>
             Cancel
+          </Button>
+          <Button disabled={!name} fullWidth onClick={_onClick}>
+            Save
           </Button>
         </Box>
       </Stack>

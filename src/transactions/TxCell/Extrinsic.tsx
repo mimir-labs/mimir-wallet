@@ -7,7 +7,7 @@ import { useApi, useDapp, useSelectedAccountCallback, useToggle } from '@mimir-w
 import { Transaction } from '@mimir-wallet/hooks/types';
 import { Call } from '@mimir-wallet/params';
 import FallbackCall from '@mimir-wallet/params/FallbackCall';
-import { Box, Dialog, DialogContent, DialogTitle, Divider, Stack, SvgIcon } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, Divider, Stack, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -26,6 +26,8 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
   const selectAccount = useSelectedAccountCallback();
   const dapp = useDapp(transaction.initTransaction.website);
   const [open, toggleOpen] = useToggle();
+  const { breakpoints } = useTheme();
+  const upSm = useMediaQuery(breakpoints.up('sm'));
 
   return (
     <>
@@ -74,7 +76,7 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
               name='App'
             />
           )}
-          <Item content={<AddressRow shorten size='small' value={transaction.initTransaction.sender} withAddress withCopy withName />} name='Initiator' />
+          <Item content={<AddressRow shorten size='small' value={transaction.initTransaction.sender} withAddress={upSm} withCopy withName />} name='Initiator' />
           <Item content={<Hex value={destTx.hash} withCopy />} name='Call Hash' />
           <Item content={<Hex value={destTx.hash} withCopy />} name='Call Data' />
           <Box onClick={toggleOpen} sx={{ fontWeight: 600, color: 'primary.main', cursor: 'pointer', textDecoration: 'none' }}>

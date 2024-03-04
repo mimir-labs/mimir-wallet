@@ -10,7 +10,7 @@ import type { HexString } from '@polkadot/util/types';
 
 import { useApi, usePendingTransactions } from '@mimir-wallet/hooks';
 import { canSendMultisig, PrepareMultisig, prepareMultisig } from '@mimir-wallet/utils';
-import { Alert, Box, Button, DialogActions, DialogContent, Divider, Paper, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, DialogActions, DialogContent, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -67,6 +67,8 @@ function Contents({
   const canSend = useMemo(() => canSendMultisig(accounts, address), [accounts, address]);
   const [_pendingTxs] = usePendingTransactions(isApprove || isCancelled ? null : address);
   const pendingTxs = _pendingTxs.filter((item) => item.hash === extrinsic.method.hash.toHex());
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   useEffect(() => {
     let unsubPromise: Promise<() => void> | undefined;
@@ -99,7 +101,7 @@ function Contents({
               Sending From
             </Typography>
             <Paper sx={{ bgcolor: 'secondary.main', padding: 1 }}>
-              <AddressCell shorten={false} size='small' value={address} withCopy />
+              <AddressCell shorten={downSm} size='small' value={address} withCopy />
             </Paper>
           </Box>
           {website && (

@@ -4,9 +4,17 @@
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
+export function PageWrapperMain() {
+  return (
+    <Box sx={{ paddingTop: 'calc(56px + 20px)', paddingLeft: { md: 'calc(222px + 20px)', xs: 1.5 }, paddingRight: { md: '20px', xs: 1.5 }, paddingBottom: 4 }}>
+      <Outlet />
+    </Box>
+  );
+}
+
 function PageWrapper() {
   return (
-    <Box sx={{ height: '100%', minHeight: '100vh', paddingTop: '86px' }}>
+    <Box sx={{ paddingTop: 'calc(56px + 20px)', paddingX: { md: 2, xs: 1.5 }, paddingBottom: 4 }}>
       <Outlet />
     </Box>
   );

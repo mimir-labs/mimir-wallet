@@ -29,16 +29,16 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
   const changes = Number(tokenInfo?.[Object.keys(tokenInfo)[0]]?.price_change || '0');
 
   return (
-    <Paper sx={{ width: '100%', height: 220, borderRadius: 2, padding: 2 }}>
+    <Paper sx={{ width: '100%', height: 'auto', borderRadius: 2, padding: 2 }}>
       <Stack spacing={2}>
-        <Box sx={{ display: 'flex' }}>
-          <Typography sx={{ flex: '1' }} variant='h1'>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: { lg: 'nowrap', xs: 'wrap' } }}>
+          <Typography sx={{ flex: '1', whiteSpace: 'nowrap' }} variant='h1'>
             <FormatBalance label='$' value={total} withCurrency={false} />
             <Box component='span' sx={{ marginLeft: 0.5, verticalAlign: 'middle', color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500' }}>
               {(changes * 100).toFixed(2)}%
             </Box>
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox />} to='/transfer'>
               Transfer
             </Button>

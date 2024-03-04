@@ -15,25 +15,23 @@ import { AccountMenu, AddressCell, CopyButton, FormatBalance, QrcodeAddress } fr
 import { findToken, walletConfig } from '@mimir-wallet/config';
 import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, WalletCtx } from '@mimir-wallet/hooks';
 import { chainLinks } from '@mimir-wallet/utils';
-import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useMemo, useState } from 'react';
-import { Link, matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, matchPath, useLocation } from 'react-router-dom';
 
-function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<any>; label: React.ReactNode }) {
-  const navigate = useNavigate();
+import { BaseContainerCtx } from './BaseContainer';
+
+function NavLink({ Icon, label, onClick, to }: { to: string; Icon: React.ComponentType<any>; label: React.ReactNode; onClick: () => void }) {
   const location = useLocation();
 
   const matched = useMemo(() => matchPath(to, location.pathname), [location.pathname, to]);
 
-  const handleClick = () => {
-    navigate(to);
-  };
-
   return (
     <Button
       className={matched ? 'Mui-active' : undefined}
+      component={Link}
       fullWidth
-      onClick={handleClick}
+      onClick={onClick}
       size='large'
       startIcon={<SvgIcon component={Icon} inheritViewBox sx={{ fontSize: '1.25rem !important', color: 'inherit' }} />}
       sx={{
@@ -53,6 +51,7 @@ function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<an
           }
         }
       }}
+      to={to}
       variant='text'
     >
       <Typography fontSize='1rem' fontWeight={700}>
@@ -62,7 +61,7 @@ function NavLink({ Icon, label, to }: { to: string; Icon: React.ComponentType<an
   );
 }
 
-function SideBar() {
+function SideBar({ fixed }: { fixed: boolean }) {
   const { api } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -71,6 +70,9 @@ function SideBar() {
   const { injected } = useGroupAccounts();
   const { connectedWallets, openWallet } = useContext(WalletCtx);
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [selected]);
+  const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const { breakpoints } = useTheme();
+  const downMd = useMediaQuery(breakpoints.down('md'));
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -83,7 +85,16 @@ function SideBar() {
   return (
     <>
       <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
-      <Drawer PaperProps={{ sx: { width: 222, top: 56, paddingX: 1.5, paddingY: 2 } }} anchor='left' variant='permanent'>
+      <Drawer
+        PaperProps={{ sx: { width: downMd ? 280 : 222, top: downMd ? 0 : 56, paddingX: 1.5, paddingY: 2, borderTopRightRadius: { md: 0, xs: 20 }, borderBottomRightRadius: { md: 0, xs: 20 } } }}
+        anchor='left'
+        onClose={closeSidebar}
+        open={sidebarOpen}
+        variant={downMd ? 'temporary' : fixed ? 'permanent' : 'temporary'}
+      >
+        <Box sx={{ display: { md: 'none', xs: 'flex' }, justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+          <Typography variant='h3'>Menu</Typography>
+        </Box>
         {injected.length > 0 ? (
           <Paper sx={{ padding: 1 }} variant='outlined'>
             <Stack alignItems='center' direction='row' onClick={handleAccountOpen} spacing={1} sx={{ cursor: 'pointer', width: '100%' }}>
@@ -110,32 +121,34 @@ function SideBar() {
             </IconButton>
           </Paper>
         ) : (
-          <Button onClick={openWallet} size='large' sx={{ borderRadius: 1 }}>
+          <Button
+            onClick={() => {
+              openWallet();
+              closeSidebar();
+            }}
+            size='large'
+            sx={{ borderRadius: 1 }}
+          >
             Connect Wallet
           </Button>
         )}
-        <NavLink Icon={IconHome} label='Home' to='/' />
-        <NavLink Icon={IconDapp} label='Apps' to='/dapp' />
-        <NavLink Icon={IconTransaction} label='Transactions' to='/transactions' />
-        <NavLink Icon={IconAddressBook} label='Address Book' to='/address-book' />
+        <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
+        <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
+        <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
+        <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
         <AccountMenu onClose={handleAccountClose} open={!!anchorEl} />
-        <Box onClick={openWallet} sx={{ cursor: 'pointer', position: 'absolute', left: 0, bottom: 60, display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}>
+        <Box
+          onClick={() => {
+            openWallet();
+            closeSidebar();
+          }}
+          sx={{ cursor: 'pointer', position: 'absolute', left: 0, bottom: { md: 60, xs: 0 }, display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}
+        >
           {Object.entries(walletConfig).map(([wallet, config]) => (
             <Box component='img' key={wallet} src={connectedWallets.includes(wallet) ? config.icon : config.disabledIcon} sx={{ width: 20, height: 20 }} />
           ))}
         </Box>
       </Drawer>
-      <Box
-        sx={{
-          paddingTop: 'calc(56px + 20px)',
-          paddingLeft: 'calc(222px + 20px)',
-          paddingRight: '20px',
-          paddingBottom: '20px',
-          minHeight: '100vh'
-        }}
-      >
-        <Outlet />
-      </Box>
     </>
   );
 }

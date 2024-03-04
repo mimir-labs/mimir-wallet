@@ -246,7 +246,16 @@ const createComponents: Func = () => ({
     styleOverrides: {
       root: ({ theme }) => ({
         '.MuiDialog-paper': {
-          padding: theme.spacing(2)
+          padding: theme.spacing(2),
+          [theme.breakpoints.down('md')]: {
+            width: 'calc(100% - 40px)',
+            margin: '20px'
+          },
+          [theme.breakpoints.down('sm')]: {
+            width: 'calc(100% - 30px)',
+            margin: '15px',
+            padding: '15px'
+          }
         }
       })
     }
