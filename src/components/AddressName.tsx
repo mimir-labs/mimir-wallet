@@ -69,7 +69,7 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
     }
   }, [api, info, value]);
 
-  return <>{chainName || meta?.name || defaultName || `${value?.toString().slice(0, 6)}…${value?.toString().slice(-6)}`}</>;
+  return <>{chainName || meta?.name || defaultName || `${value?.toString().slice(0, 8).toUpperCase()}`}</>;
 }
 
 export default React.memo(AddressName);
