@@ -6,6 +6,7 @@ import type { Injected } from '@polkadot/extension-inject/types';
 
 declare global {
   interface Window {
+    walletExtension?: { isNovaWallet?: boolean };
     injectedWeb3?: Record<
       string,
       {

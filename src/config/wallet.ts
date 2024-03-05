@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import Fearless from '@mimir-wallet/assets/images/fearless.png';
+import FearlessDisabled from '@mimir-wallet/assets/images/fearless-disabled.png';
 import PolkadotJs from '@mimir-wallet/assets/images/polkadotjs.svg';
 import PolkadotJsDisabled from '@mimir-wallet/assets/images/polkadotjs-disabled.svg';
 import Subwallet from '@mimir-wallet/assets/images/subwallet.png';
@@ -27,6 +29,12 @@ export const walletConfig: Record<string, WalletConfig> = {
     disabledIcon: TalismanDisabled,
     name: 'Talisman',
     downloadUrl: 'https://www.talisman.xyz/'
+  },
+  'fearless-wallet': {
+    icon: Fearless,
+    disabledIcon: FearlessDisabled,
+    name: 'Fearless',
+    downloadUrl: 'https://fearlesswallet.io/'
   },
   'polkadot-js': {
     icon: PolkadotJs,

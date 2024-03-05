@@ -11,7 +11,7 @@ import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.s
 import { ReactComponent as IconQr } from '@mimir-wallet/assets/svg/icon-qr.svg';
 import { ReactComponent as IconTransaction } from '@mimir-wallet/assets/svg/icon-transaction.svg';
 import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
-import { AccountMenu, AddressCell, CopyButton, FormatBalance, QrcodeAddress } from '@mimir-wallet/components';
+import { AccountMenu, AddressCell, CopyButton, FormatBalance, QrcodeAddress, WalletIcon } from '@mimir-wallet/components';
 import { findToken, walletConfig } from '@mimir-wallet/config';
 import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, WalletCtx } from '@mimir-wallet/hooks';
 import { chainLinks } from '@mimir-wallet/utils';
@@ -144,8 +144,8 @@ function SideBar({ fixed }: { fixed: boolean }) {
           }}
           sx={{ cursor: 'pointer', position: 'absolute', left: 0, bottom: { md: 60, xs: 0 }, display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}
         >
-          {Object.entries(walletConfig).map(([wallet, config]) => (
-            <Box component='img' key={wallet} src={connectedWallets.includes(wallet) ? config.icon : config.disabledIcon} sx={{ width: 20, height: 20 }} />
+          {Object.entries(walletConfig).map(([id]) => (
+            <WalletIcon disabled={!connectedWallets.includes(id)} id={id} key={id} sx={{ width: 20, height: 20 }} />
           ))}
         </Box>
       </Drawer>

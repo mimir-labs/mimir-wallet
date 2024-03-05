@@ -54,6 +54,15 @@ export const polkadotEndpoints: Endpoint[] = [
     explorerUrl: 'https://polkadot.subscan.io/',
     proposalApi: 'https://polkadot.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://polkadot.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/assethub.svg',
+    tokenIcon: '/token-icons/Polkadot.png',
+    name: 'AssetHub',
+    wsUrl: 'wss://polkadot-asset-hub-rpc.polkadot.io/',
+    genesisHash: '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f',
+    serviceUrl: 'https://assethub-polkadot-api.mimir.global/',
+    explorerUrl: 'https://assethub-polkadot.subscan.io/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
@@ -69,8 +78,18 @@ export const kusamaEndpoints: Endpoint[] = [
     subsquareUrl: 'https://kusama.subsquare.io/'
   }
 ];
+export const paseoEndpoints: Endpoint[] = [
+  {
+    icon: '/chain-icons/Paseo.png',
+    tokenIcon: '/token-icons/Paseo.png',
+    name: 'Paseo',
+    wsUrl: 'wss://paseo.rpc.amforc.com/',
+    genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
+    serviceUrl: 'https://paseo-api.mimir.global/'
+  }
+];
 
-export const allEndpoints = devEndpoints.concat(testnetEndpoints).concat(polkadotEndpoints).concat(kusamaEndpoints);
+export const allEndpoints = devEndpoints.concat(testnetEndpoints).concat(polkadotEndpoints).concat(kusamaEndpoints).concat(paseoEndpoints);
 
 function _defaultApiUrl() {
   let wsUrl = store.get(API_URL_KEY);
@@ -105,6 +124,7 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
         polkadot: polkadotEndpoints,
         kusama: kusamaEndpoints,
         rococo: testnetEndpoints,
+        paseo: paseoEndpoints,
         mimir: devEndpoints,
         local: [localEndpoint]
       };
@@ -112,7 +132,8 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
       return {
         polkadot: polkadotEndpoints,
         kusama: kusamaEndpoints,
-        rococo: testnetEndpoints
+        rococo: testnetEndpoints,
+        paseo: paseoEndpoints
       };
     } else {
       return {};
@@ -122,6 +143,8 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
       polkadot: polkadotEndpoints,
       kusama: kusamaEndpoints,
       rococo: testnetEndpoints,
+      paseo: paseoEndpoints,
+      mimir: devEndpoints,
       local: [localEndpoint]
     };
   }

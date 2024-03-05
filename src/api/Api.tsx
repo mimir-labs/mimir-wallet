@@ -95,6 +95,8 @@ async function loadOnReady(api: ApiPromise, store: KeyringStore | undefined): Pr
 
   setDeriveCache(api.genesisHash.toHex(), deriveMapCache);
 
+  console.log(api.genesisHash.toHex());
+
   // finally load the keyring
   isKeyringLoaded() ||
     keyring.loadAll({
