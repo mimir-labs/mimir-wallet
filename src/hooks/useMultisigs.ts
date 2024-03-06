@@ -32,7 +32,7 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
         isMultisig: true,
         isFlexible: true,
         name: name || undefined,
-        who: who.map(({ address }) => keyring.encodeAddress(address)),
+        who: who.map(({ address }) => keyring.encodeAddress(address)).sort((l, r) => (l > r ? 1 : -1)),
         threshold,
         creator: keyring.encodeAddress(creator),
         height,
@@ -48,7 +48,7 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
           exists.meta.isMultisig !== _meta.isMultisig ||
           exists.meta.isFlexible !== _meta.isFlexible ||
           exists.meta.name !== _meta.name ||
-          exists.meta.who?.join('') !== _meta.who.join('') ||
+          exists.meta.who?.sort((l, r) => (l > r ? 1 : -1)).join('') !== _meta.who.join('') ||
           exists.meta.threshold !== _meta.threshold ||
           exists.meta.creator !== _meta.creator ||
           exists.meta.height !== _meta.height ||
@@ -83,7 +83,7 @@ function mergeMulti(api: ApiPromise, account: MultiAccountData) {
     keyring.addExternal(address, {
       isMultisig: true,
       threshold,
-      who: who.map(({ address }) => keyring.encodeAddress(address)),
+      who: who.map(({ address }) => keyring.encodeAddress(address)).sort((l, r) => (l > r ? 1 : -1)),
       name: name || undefined,
       isValid,
       isPending: false
@@ -93,7 +93,7 @@ function mergeMulti(api: ApiPromise, account: MultiAccountData) {
     keyring.saveAccountMeta(keyring.getPair(address), {
       isMultisig: true,
       threshold,
-      who: who.map(({ address }) => keyring.encodeAddress(address)),
+      who: who.map(({ address }) => keyring.encodeAddress(address)).sort((l, r) => (l > r ? 1 : -1)),
       name: name || undefined,
       isValid,
       isPending: false

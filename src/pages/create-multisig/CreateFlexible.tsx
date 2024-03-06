@@ -26,7 +26,7 @@ interface Props {
 function filterDefaultAccount(who: string[]): string | undefined {
   for (const account of keyring.getAccounts()) {
     for (const address of who) {
-      if (addressEq(address, account.address)) {
+      if (!account.meta.isMultisig && addressEq(address, account.address)) {
         return address;
       }
     }

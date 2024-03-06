@@ -114,10 +114,7 @@ function Contents({
           )}
           <Divider />
           <CallComp destSender={destSender} isCancelled={isCancelled} method={destCall || extrinsic.method} sender={address} transaction={transaction} />
-          <Stack spacing={1}>
-            <Divider />
-            <AddressChain accounts={accounts} address={address} filtered={filtered} onChange={setAccounts} />
-          </Stack>
+          <AddressChain accounts={accounts} address={address} filtered={filtered} onChange={setAccounts} />
           {prepare && (!!Object.keys(prepare[2]).length || !!Object.keys(prepare[3]).length) && (
             <>
               <Divider />

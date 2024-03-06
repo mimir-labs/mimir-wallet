@@ -79,7 +79,7 @@ function Operate({
   if (type === 'normal') {
     return (
       transaction.status < CalldataStatus.Success &&
-      (transaction.top.status > CalldataStatus.Pending ? (
+      (transaction.top.status > CalldataStatus.Pending || (transaction.action === 'multisig.cancelAsMulti' && transaction.cancelTx?.status && transaction.cancelTx.status > CalldataStatus.Pending) ? (
         <Box>
           {cancelFiltered && canCancel && (
             <LoadingButton loading={cancelLoading} onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
@@ -117,7 +117,7 @@ function Operate({
 
   return (
     transaction.status < CalldataStatus.Success &&
-    (transaction.top.status > CalldataStatus.Pending ? (
+    (transaction.top.status > CalldataStatus.Pending || (transaction.action === 'multisig.cancelAsMulti' && transaction.cancelTx?.status && transaction.cancelTx.status > CalldataStatus.Pending) ? (
       <Box>
         {cancelFiltered && canCancel && (
           <IconButton color='warning' disabled={cancelLoading} onClick={() => handleCancel(cancelFiltered)}>

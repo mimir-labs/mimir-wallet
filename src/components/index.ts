@@ -36,3 +36,4 @@ export { default as TxError } from './TxError';
 export { default as TxOverview } from './TxOverview';
 export { default as TxModal } from './TxModal';
 export { default as TxToast } from './TxToast';
+export { default as WalletIcon } from './WalletIcon';
