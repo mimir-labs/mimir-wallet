@@ -151,11 +151,5 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
 }
 
 export function findEndpoint(genesisHash: string): Endpoint {
-  return (
-    testnetEndpoints.find((item) => item.genesisHash === genesisHash) ||
-    polkadotEndpoints.find((item) => item.genesisHash === genesisHash) ||
-    kusamaEndpoints.find((item) => item.genesisHash === genesisHash) ||
-    devEndpoints.find((item) => item.genesisHash === genesisHash) ||
-    localEndpoint
-  );
+  return allEndpoints.find((item) => item.genesisHash === genesisHash) || localEndpoint;
 }

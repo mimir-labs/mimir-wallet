@@ -3,7 +3,8 @@
 
 import { walletConfig } from '@mimir-wallet/config';
 import { WalletCtx } from '@mimir-wallet/hooks';
-import { Box, Button, Dialog, DialogContent, DialogTitle, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2';
 import React, { useContext } from 'react';
 
 import { toastError } from './ToastRoot';
@@ -17,7 +18,7 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
   const name = id === 'polkadot-js' && window?.walletExtension?.isNovaWallet ? 'Nova' : propsName;
 
   return (
-    <Stack alignItems='center' justifyContent='center' spacing={1}>
+    <Stack alignItems='center' justifyContent='center' spacing={1} sx={{ '>.MuiButton-root': { width: '100%' }, width: '100%' }}>
       <WalletIcon disabled={!wallets[id]} id={id} sx={{ width: { sm: 64, xs: 40 }, height: { sm: 64, xs: 40 } }} />
       <Typography>{name}</Typography>
       {wallets[id] ? (
@@ -41,14 +42,16 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
 
 function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => void }) {
   return (
-    <Dialog maxWidth='sm' onClose={onClose} open={open}>
+    <Dialog maxWidth='md' onClose={onClose} open={open}>
       <DialogTitle textAlign='center'>Connect Wallet</DialogTitle>
-      <DialogContent>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { sm: 4, xs: 2 } }}>
+      <DialogContent sx={{ overflow: 'hidden' }}>
+        <Grid columns={{ xs: 12 }} container spacing={{ sm: 4, xs: 2 }}>
           {Object.entries(walletConfig).map(([id, config]) => (
-            <WalletCell disabledIcon={config.disabledIcon} downloadUrl={config.downloadUrl} icon={config.icon} id={id} key={id} name={config.name} />
+            <Grid key={id} sm={3} xs={4}>
+              <WalletCell disabledIcon={config.disabledIcon} downloadUrl={config.downloadUrl} icon={config.icon} id={id} name={config.name} />
+            </Grid>
           ))}
-        </Box>
+        </Grid>
       </DialogContent>
     </Dialog>
   );

@@ -248,13 +248,24 @@ const createComponents: Func = () => ({
         '.MuiDialog-paper': {
           padding: theme.spacing(2),
           [theme.breakpoints.down('md')]: {
-            width: 'calc(100% - 40px)',
-            margin: '20px'
+            maxWidth: 'calc(100% - 40px)',
+            maxHeight: 'calc(100% - 40px)',
+            margin: '20px',
+            padding: '20px'
           },
           [theme.breakpoints.down('sm')]: {
-            width: 'calc(100% - 30px)',
+            maxWidth: 'calc(100% - 30px)',
+            maxHeight: 'calc(100% - 30px)',
             margin: '15px',
             padding: '15px'
+          }
+        },
+        '.MuiDialog-paperFullWidth': {
+          [theme.breakpoints.down('md')]: {
+            width: 'calc(100% - 40px)'
+          },
+          [theme.breakpoints.down('sm')]: {
+            width: 'calc(100% - 30px)'
           }
         }
       })
