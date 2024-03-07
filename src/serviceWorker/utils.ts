@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { PrecacheEntry } from 'workbox-precaching/_types';
+import type { RouteMatchCallbackOptions } from 'workbox-core';
 
 export function isDevelopment() {
   return Boolean(
@@ -13,36 +13,24 @@ export function isDevelopment() {
   );
 }
 
-export function isAppMimir({ hostname }: { hostname: string }): boolean {
-  return hostname === 'app.mimir.global';
+export function isMimir(hostname: string) {
+  return hostname === 'dev.mimir.global' || hostname === 'app.mimir.global';
 }
 
-export function isDevMimir({ hostname }: { hostname: string }): boolean {
-  return hostname === 'dev.mimir.global';
+export function matchStatic({ request, url }: RouteMatchCallbackOptions) {
+  return !isDevelopment() && ['dev.mimir.global', 'app.mimir.global'].includes(url.hostname) && ['font', 'image'].includes(request.destination);
 }
 
-type GroupedEntries = { onDemandEntries: (string | PrecacheEntry)[]; precacheEntries: PrecacheEntry[] };
+export function matchJs({ request }: RouteMatchCallbackOptions) {
+  return !isDevelopment() && request.destination === 'script';
+}
 
-/**
- * Splits entries into on-demand and precachable entries.
- * Effectively, splits out index.html as the only precachable entry.
- */
-export function groupEntries(entries: (string | PrecacheEntry)[]): GroupedEntries {
-  return entries.reduce<GroupedEntries>(
-    ({ onDemandEntries, precacheEntries }, entry) => {
-      console.log(entry);
+export function matchCss({ request }: RouteMatchCallbackOptions) {
+  return !isDevelopment() && request.destination === 'style';
+}
 
-      if (typeof entry === 'string' || entry.url.includes('/media/')) {
-        return { precacheEntries, onDemandEntries: [...onDemandEntries, entry] };
-      } else if (entry.revision) {
-        // index.html should be the only non-media entry with a revision, as code chunks have a hashed URL.
-        return { precacheEntries: [...precacheEntries, entry], onDemandEntries };
-      } else {
-        return { precacheEntries, onDemandEntries: [...onDemandEntries, entry] };
-      }
-    },
-    { onDemandEntries: [], precacheEntries: [] }
-  );
+export async function clearCache(cacheName: string) {
+  return caches.delete(cacheName);
 }
 
 export async function deleteUnusedCaches(caches: CacheStorage, { usedCaches }: { usedCaches: string[] }) {

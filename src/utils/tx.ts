@@ -137,7 +137,7 @@ function optionsOrNonce(partialOptions: Partial<SignerOptions> = {}): Partial<Si
   return isBn(partialOptions) || isNumber(partialOptions) ? { nonce: partialOptions } : partialOptions;
 }
 
-export async function sign(extrinsic: SubmittableExtrinsic<'promise'>, signer: string): Promise<[HexString, SignerPayloadJSON]> {
+export async function sign(extrinsic: SubmittableExtrinsic<'promise'>, signer: string): Promise<[HexString, SignerPayloadJSON, Hash]> {
   const options = optionsOrNonce();
   const signingInfo = await api.derive.tx.signingInfo(signer, options.nonce, options.era);
   const eraOptions = makeEraOptions(options, signingInfo);
@@ -173,7 +173,7 @@ export async function sign(extrinsic: SubmittableExtrinsic<'promise'>, signer: s
     throw _assetDispatchError(result.asOk.asErr);
   }
 
-  return [signature, payload.toPayload()];
+  return [signature, payload.toPayload(), extrinsic.hash];
 }
 
 export function signAndSend(extrinsic: SubmittableExtrinsic<'promise'>, signer: string, { beforeSend, checkProxy }: Options = {}): TxEvents {
