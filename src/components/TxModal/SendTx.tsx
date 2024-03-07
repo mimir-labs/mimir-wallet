@@ -54,7 +54,9 @@ function SendTx({
       addToast({ events });
 
       try {
-        const [signature, payload] = await sign(tx, signer);
+        const [signature, payload, extrinsicHash] = await sign(tx, signer);
+
+        service.uploadWebsite(extrinsicHash.toHex(), website);
 
         onSignature?.(signer, signature, tx, payload);
         events.emit('success', 'Sign success');
@@ -73,6 +75,7 @@ function SendTx({
       addToast({ events });
 
       events.on('inblock', (result) => {
+        service.uploadWebsite(result.txHash.toHex(), website);
         setLoading(false);
         onResults?.(result);
         onClose();
@@ -90,8 +93,6 @@ function SendTx({
         }, 3000);
       });
     }
-
-    website && service.uploadWebsite(tx.hash.toHex(), website);
   }, [addToast, beforeSend, onClose, onError, onFinalized, onResults, onSignature, onlySign, prepare, website]);
 
   useEffect(() => {

@@ -69,7 +69,7 @@ export async function getMultisigs(addresses: string[]): Promise<Record<HexStrin
   });
 }
 
-export async function uploadWebsite(extrinsicHash: HexString, website: string): Promise<boolean> {
+export async function uploadWebsite(extrinsicHash: HexString, website?: string): Promise<boolean> {
   return fetcher(getServiceUrl('website'), {
     method: 'POST',
     body: JSON.stringify({ extrinsicHash, website }),
