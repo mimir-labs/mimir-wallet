@@ -12,6 +12,7 @@ import { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { BaseContainerCtx } from './BaseContainer';
+import Notification from './Notification';
 
 function TopBar() {
   const { isApiReady } = useApi();
@@ -43,6 +44,7 @@ function TopBar() {
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: { sm: 2, xs: 1 } }}>
         {isApiReady && <>{isInAppPage && <AccountSelect />}</>}
+        <Notification />
         <ChainSelect onlyLogo={isInAppPage && downSm} />
         {isApiReady && (
           <>

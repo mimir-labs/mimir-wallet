@@ -148,3 +148,53 @@ export interface BestTx {
   method: HexString;
   signer: HexString;
 }
+
+export type NewTxMessage = {
+  uuid: string;
+  action: string;
+  initiator: HexString;
+  blockTime: string;
+  blockHeight: number;
+  extrinsicIndex: number;
+};
+
+export type ApproveTxMessage = {
+  uuid: string;
+  action: string;
+  approver: HexString;
+  blockTime: string;
+  blockHeight: number;
+  extrinsicIndex: number;
+};
+
+export type ExecuteTxMessage = {
+  uuid: string;
+  action: string;
+  executer: HexString;
+  status: CalldataStatus;
+  blockTime: string;
+  blockHeight: number;
+  extrinsicIndex: number;
+};
+
+export type CancelTxMessage = {
+  uuid: string;
+  action: string;
+  canceller: HexString;
+  blockTime: string;
+  blockHeight: number;
+  extrinsicIndex: number;
+};
+
+export interface PushMessageData {
+  id: number;
+  address: HexString;
+  sender: HexString;
+  type: 'initial' | 'approve' | 'execute' | 'cancel';
+  blockHeight: number;
+  extrinsicIndex: number;
+  blockTime: string;
+  raw: NewTxMessage | ApproveTxMessage | ExecuteTxMessage | CancelTxMessage;
+  createdAt: string;
+  updatedAt: string;
+}

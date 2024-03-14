@@ -70,7 +70,7 @@ async function _asMulti(
     });
 
     if (!isCancelled) {
-      reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(threshold)).add(api.consts.balances.existentialDeposit);
+      reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(threshold));
     }
   }
 

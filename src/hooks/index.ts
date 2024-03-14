@@ -18,6 +18,7 @@ export * from './useDapp';
 export * from './useDeriveAccountInfo';
 export * from './useGroupAccounts';
 export * from './useIsMountedRef';
+export * from './useMessages';
 export * from './useMultisigs';
 export * from './useProposals';
 export * from './useQueryParams';
