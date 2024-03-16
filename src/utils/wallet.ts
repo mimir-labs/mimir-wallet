@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { store } from '@mimir-wallet/instance';
+import { keyringStore } from '@mimir-wallet/instance';
 import { Injected } from '@polkadot/extension-inject/types';
 import keyring from '@polkadot/ui-keyring';
 
@@ -34,7 +34,7 @@ export async function loadWallet({ enable }: { enable: (origin: string) => Promi
       };
       const pair = keyring.keyring.addFromAddress(address, json.meta, null, type);
 
-      keyring.accounts.add(store, pair.address, json, pair.type);
+      keyring.accounts.add(keyringStore, pair.address, json, pair.type);
     });
   } catch (error) {
     console.error(error);

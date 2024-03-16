@@ -5,7 +5,7 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 import type { HexString } from '@polkadot/util/types';
 
 import { api } from '@mimir-wallet/api';
-import { allEndpoints } from '@mimir-wallet/config';
+import { findEndpoint } from '@mimir-wallet/config';
 import keyring from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
 
@@ -13,7 +13,7 @@ export function accountExplorerLink(value?: AccountId | AccountIndex | Address |
   const _value = value?.toString();
 
   if (_value && _value.length > 47 && isAddress(_value)) {
-    const explorerUrl = allEndpoints.find((item) => item.genesisHash === api.genesisHash.toHex())?.explorerUrl;
+    const explorerUrl = findEndpoint(api.genesisHash.toHex())?.explorerUrl;
 
     if (explorerUrl) {
       return `${explorerUrl}account/${keyring.encodeAddress(_value, api.registry.chainSS58)}`;
@@ -24,19 +24,25 @@ export function accountExplorerLink(value?: AccountId | AccountIndex | Address |
 }
 
 export function subsquareUrl(path?: string): string | undefined {
-  const baseUrl = allEndpoints.find((item) => item.genesisHash === api.genesisHash.toHex())?.subsquareUrl;
+  const baseUrl = findEndpoint(api.genesisHash.toHex())?.subsquareUrl;
 
   return baseUrl ? `${baseUrl}${path || ''}` : undefined;
 }
 
 export function proposalApi(): string | undefined {
-  return allEndpoints.find((item) => item.genesisHash === api.genesisHash.toHex())?.proposalApi;
+  return findEndpoint(api.genesisHash.toHex())?.proposalApi;
 }
 
 export async function serviceUrl(path: string): Promise<string> {
   await api.isReady;
 
-  const url: string = allEndpoints.find((item) => item.genesisHash === api.genesisHash.toHex())?.serviceUrl || 'http://127.0.0.1:8080/';
+  const url: string = findEndpoint(api.genesisHash.toHex())?.serviceUrl || 'http://127.0.0.1:8080/';
 
   return `${url}${path}`;
+}
+
+export async function socketUrl(): Promise<string> {
+  await api.isReady;
+
+  return findEndpoint(api.genesisHash.toHex()).socketUrl || 'ws://127.0.0.1:8080/ws';
 }

@@ -68,6 +68,7 @@
     "react-toastify": "^10.0.4",
     "reactflow": "^11.10.3",
     "search-query-parser": "^1.6.0",
+    "socket.io-client": "^4.7.4",
     "store": "^2.0.12",
     "swr": "^2.2.4",
     "uuid": "^9.0.1"

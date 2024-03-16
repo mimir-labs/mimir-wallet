@@ -7,7 +7,7 @@ import { ONE_DAY } from '@mimir-wallet/constants';
 import { useMessages, useSelectedAccount } from '@mimir-wallet/hooks';
 import { CalldataStatus, ExecuteTxMessage, PushMessageData } from '@mimir-wallet/hooks/types';
 import { formatAgo, getAddressMeta } from '@mimir-wallet/utils';
-import { Button, IconButton, Link as MuiLink, Popover, Stack, SvgIcon, Typography } from '@mui/material';
+import { Badge, Button, IconButton, Link as MuiLink, Popover, Stack, SvgIcon, Typography } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import React, { useMemo, useState } from 'react';
@@ -40,11 +40,12 @@ function Notification() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const addresses = useMemo(() => (selected ? getEoaAddresses(selected).map((item) => u8aToHex(decodeAddress(item))) : []), [selected]);
-  const messages = useMessages(addresses);
+  const [messages, isRead, read] = useMessages(addresses);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
+    read();
   };
 
   const handleClose = () => {
@@ -102,9 +103,11 @@ function Notification() {
 
   return (
     <>
-      <IconButton color='primary' onClick={handleClick} sx={{ borderRadius: 1, border: '1px solid', borderColor: 'secondary.main' }}>
-        <SvgIcon component={IconNotification} inheritViewBox />
-      </IconButton>
+      <Badge color='error' invisible={isRead} variant='dot'>
+        <IconButton color='primary' onClick={handleClick} sx={{ borderRadius: 1, border: '1px solid', borderColor: 'secondary.main' }}>
+          <SvgIcon component={IconNotification} inheritViewBox />
+        </IconButton>
+      </Badge>
       <Popover
         anchorEl={anchorEl}
         anchorOrigin={{

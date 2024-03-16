@@ -13,6 +13,7 @@ import { GlobalStyle, ToastRoot, TxToast } from './components';
 import { apiUrl } from './config';
 import { BlockEventCtxRoot, KeyringCtxRoot, SelectAccountCtxRoot, TxQueueCtxRoot, TxToastCtxRoot, WalletCtxRoot } from './hooks';
 import { routes } from './routes';
+import { SocketCtxRoot } from './socket';
 import { ThemeProvider } from './theme';
 import { fetcher } from './utils';
 
@@ -28,21 +29,23 @@ function Root({ store }: Props) {
           <ToastRoot />
           <SWRConfig value={{ fetcher }}>
             <ApiCtxRoot apiUrl={apiUrl} store={store}>
-              <KeyringCtxRoot>
-                <WalletCtxRoot>
-                  <SelectAccountCtxRoot>
-                    <TxQueueCtxRoot>
-                      <BlockEventCtxRoot>
-                        <TxToastCtxRoot>
-                          <TxToast />
-                          <GlobalStyle />
-                          <RouterProvider router={routes} />
-                        </TxToastCtxRoot>
-                      </BlockEventCtxRoot>
-                    </TxQueueCtxRoot>
-                  </SelectAccountCtxRoot>
-                </WalletCtxRoot>
-              </KeyringCtxRoot>
+              <SocketCtxRoot>
+                <KeyringCtxRoot>
+                  <WalletCtxRoot>
+                    <SelectAccountCtxRoot>
+                      <TxQueueCtxRoot>
+                        <BlockEventCtxRoot>
+                          <TxToastCtxRoot>
+                            <TxToast />
+                            <GlobalStyle />
+                            <RouterProvider router={routes} />
+                          </TxToastCtxRoot>
+                        </BlockEventCtxRoot>
+                      </TxQueueCtxRoot>
+                    </SelectAccountCtxRoot>
+                  </WalletCtxRoot>
+                </KeyringCtxRoot>
+              </SocketCtxRoot>
             </ApiCtxRoot>
           </SWRConfig>
         </ThemeProvider>
