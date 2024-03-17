@@ -5,4 +5,4 @@ import type { KeyringStore } from '@polkadot/ui-keyring/types';
 
 import { BrowserStore } from '@polkadot/ui-keyring/stores/Browser';
 
-export const store: KeyringStore = new BrowserStore();
+export const keyringStore: KeyringStore = new BrowserStore();
