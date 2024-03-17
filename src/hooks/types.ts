@@ -83,6 +83,7 @@ export interface Calldata {
   isValid: boolean;
 
   website?: string;
+  note?: string;
 }
 
 export interface Transaction {
@@ -108,6 +109,7 @@ export interface Transaction {
   method: string;
 
   website?: string;
+  note?: string;
 
   initTransaction: Transaction;
 

@@ -37,6 +37,7 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
     public index?: number;
 
     public website?: string;
+    public note?: string;
 
     public initTransaction!: Transaction;
 
@@ -55,6 +56,7 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
       this.height = calldata.height;
       this.index = calldata.index;
       this.website = calldata.website;
+      this.note = calldata.note;
     }
 
     private addCancelChild(transaction: Transaction): Transaction {
