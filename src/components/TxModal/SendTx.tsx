@@ -15,6 +15,7 @@ function SendTx({
   beforeSend,
   canSend,
   disabled,
+  note,
   onClose,
   onError,
   onFinalized,
@@ -29,6 +30,7 @@ function SendTx({
   disabled?: boolean;
   prepare?: PrepareMultisig;
   website?: string;
+  note?: string;
   canSend: boolean;
   onlySign: boolean;
   onClose: () => void;
@@ -56,7 +58,7 @@ function SendTx({
       try {
         const [signature, payload, extrinsicHash] = await sign(tx, signer);
 
-        service.uploadWebsite(extrinsicHash.toHex(), website);
+        service.uploadWebsite(extrinsicHash.toHex(), website, note);
 
         onSignature?.(signer, signature, tx, payload);
         events.emit('success', 'Sign success');
@@ -75,7 +77,7 @@ function SendTx({
       addToast({ events });
 
       events.on('inblock', (result) => {
-        service.uploadWebsite(result.txHash.toHex(), website);
+        service.uploadWebsite(result.txHash.toHex(), website, note);
         setLoading(false);
         onResults?.(result);
         onClose();
@@ -93,7 +95,7 @@ function SendTx({
         }, 3000);
       });
     }
-  }, [addToast, beforeSend, onClose, onError, onFinalized, onResults, onSignature, onlySign, prepare, website]);
+  }, [addToast, beforeSend, onClose, onError, note, onFinalized, onResults, onSignature, onlySign, prepare, website]);
 
   useEffect(() => {
     let unsubPromise: Promise<() => void> | undefined;

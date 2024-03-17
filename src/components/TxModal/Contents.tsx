@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom';
 import AddressCell from '../AddressCell';
 import AddressName from '../AddressName';
 import FormatBalance from '../FormatBalance';
+import Input from '../Input';
 import LockItem, { LockContainer } from '../LockItem';
 import AddressChain from './AddressChain';
 import CallComp from './Call';
@@ -68,6 +69,7 @@ function Contents({
   const [_pendingTxs] = usePendingTransactions(isApprove || isCancelled ? null : address);
   const pendingTxs = _pendingTxs.filter((item) => item.hash === extrinsic.method.hash.toHex());
   const { breakpoints } = useTheme();
+  const [note, setNote] = useState<string>();
   const downSm = useMediaQuery(breakpoints.down('sm'));
 
   useEffect(() => {
@@ -155,6 +157,12 @@ function Contents({
               </LockContainer>
             </>
           )}
+          {!isApprove && (
+            <>
+              <Divider />
+              <Input label='Note' onChange={setNote} placeholder='Please note' />
+            </>
+          )}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ flexDirection: 'column', gap: 1, alignItems: 'start' }}>
@@ -188,6 +196,7 @@ function Contents({
             beforeSend={beforeSend}
             canSend={canSend}
             disabled={pendingTxs.length > 0}
+            note={note}
             onClose={onClose}
             onError={onError}
             onFinalized={onFinalized}
