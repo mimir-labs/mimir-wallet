@@ -1,18 +1,21 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { DetectedMultisig, MimirLoading, TxModal } from '@mimir-wallet/components';
+import { MimirLoading, TxModal } from '@mimir-wallet/components';
 import { useApi, useToggle } from '@mimir-wallet/hooks';
 import { useWallet } from '@mimir-wallet/hooks/useWallet';
 import { Box } from '@mui/material';
-import { createContext } from 'react';
+import React, { createContext, useCallback, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
+import DetectedMultisig from './DetectedMultisig';
 import SideBar from './SideBar';
+import ToggleAlert from './ToggleAlert';
 import TopBar from './TopBar';
 
 interface State {
   sidebarOpen: boolean;
+  alertOpen: boolean;
   openSidebar: () => void;
   closeSidebar: () => void;
 }
@@ -23,12 +26,13 @@ function BaseContainer({ fixedSidebar }: { fixedSidebar: boolean }) {
   const { isApiConnected, isApiReady } = useApi();
   const { isMultisigSyned, isWalletReady } = useWallet();
   const [sidebarOpen, , setSidebarOpen] = useToggle(false);
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
 
-  const openSidebar = () => setSidebarOpen(true);
-  const closeSidebar = () => setSidebarOpen(false);
+  const openSidebar = useCallback(() => setSidebarOpen(true), [setSidebarOpen]);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
 
   return (
-    <BaseContainerCtx.Provider value={{ sidebarOpen, openSidebar, closeSidebar }}>
+    <BaseContainerCtx.Provider value={{ alertOpen, sidebarOpen, openSidebar, closeSidebar }}>
       <TxModal />
       <TopBar />
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (
@@ -37,6 +41,7 @@ function BaseContainer({ fixedSidebar }: { fixedSidebar: boolean }) {
             minHeight: '100%'
           }}
         >
+          <ToggleAlert setAlertOpen={setAlertOpen} />
           <SideBar fixed={fixedSidebar} />
           <Outlet />
           <DetectedMultisig />

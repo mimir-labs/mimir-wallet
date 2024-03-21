@@ -4,7 +4,6 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { Call } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
-import type { BestTx, Calldata, CalldataStatus, Transaction } from './types';
 
 import { getServiceUrl } from '@mimir-wallet/utils/service';
 import keyring from '@polkadot/ui-keyring';
@@ -12,6 +11,7 @@ import { addressEq } from '@polkadot/util-crypto';
 import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 
+import { BestTx, Calldata, CalldataStatus, Transaction } from './types';
 import { useApi } from './useApi';
 import { mergeCalldata } from './utils';
 
@@ -35,6 +35,7 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
     public isValid: boolean;
     public height?: number;
     public index?: number;
+    public blockTime: number;
 
     public website?: string;
     public note?: string;
@@ -55,6 +56,7 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
       this.isValid = calldata.isValid;
       this.height = calldata.height;
       this.index = calldata.index;
+      this.blockTime = Number(calldata.blockTime || 0);
       this.website = calldata.website;
       this.note = calldata.note;
     }
@@ -81,6 +83,7 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
 
       transaction.parent = this;
       this.children.push(transaction);
+      this.children.sort((l, r) => (r.height || 0) - (l.height || 0));
 
       return transaction;
     }

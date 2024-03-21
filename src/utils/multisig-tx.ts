@@ -14,15 +14,21 @@ import { getAddressMeta } from './address';
 
 export type PrepareMultisig = [extrinsic: SubmittableExtrinsic, signer: string, reserve: Record<string, BN>, unreserve: Record<string, BN>];
 
-export function canSendMultisig(accounts: Record<string, string | undefined>, address: string): boolean {
+export function canSendMultisig(accounts: string[]): boolean {
+  const address = accounts.at(0);
+
+  if (!address) {
+    return false;
+  }
+
   const meta = getAddressMeta(address);
 
   if (meta.isMultisig) {
-    const sender = accounts[address];
+    const sender = accounts.at(1);
 
     if (!sender) return false;
 
-    return canSendMultisig(accounts, sender);
+    return canSendMultisig(accounts.slice(1));
   } else {
     return !!keyring.getAccount(address);
   }
@@ -70,7 +76,7 @@ async function _asMulti(
     });
 
     if (!isCancelled) {
-      reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(threshold));
+      reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(threshold)).add(api.consts.balances.existentialDeposit);
     }
   }
 
@@ -88,18 +94,23 @@ async function _asMulti(
 export async function prepareMultisig(
   api: ApiPromise,
   extrinsic: SubmittableExtrinsic,
-  accounts: Record<string, string | undefined>,
-  address: string,
+  addressChain: string[],
   isCancelled: boolean,
   reserve: Record<string, BN> = {},
   unreserve: Record<string, BN> = {}
 ): Promise<PrepareMultisig> {
+  const address = addressChain.at(0);
+
+  if (!address) {
+    throw new Error('Can not find address to prepare multisig');
+  }
+
   const meta = getAddressMeta(address);
 
   if (meta.isMultisig && meta.threshold && meta.who) {
     let tx: SubmittableExtrinsic;
     let cancelled: boolean;
-    const sender = accounts[address];
+    const sender = addressChain.at(1);
 
     if (!sender) {
       throw new Error('Can not find sender for multisig');
@@ -113,7 +124,7 @@ export async function prepareMultisig(
       [tx, cancelled] = await _asMulti(api, extrinsic, meta.threshold, meta.who, sender, isCancelled, reserve, unreserve);
     }
 
-    return prepareMultisig(api, tx, accounts, sender, isCancelled && !cancelled, reserve, unreserve);
+    return prepareMultisig(api, tx, addressChain.slice(1), isCancelled && !cancelled, reserve, unreserve);
   } else {
     return [extrinsic, address, reserve, unreserve];
   }

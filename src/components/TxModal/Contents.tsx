@@ -8,7 +8,7 @@ import type { Call, Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { useApi, usePendingTransactions } from '@mimir-wallet/hooks';
+import { useAddressMeta, useApi, usePendingTransactions } from '@mimir-wallet/hooks';
 import { canSendMultisig, PrepareMultisig, prepareMultisig } from '@mimir-wallet/utils';
 import { Alert, Box, Button, DialogActions, DialogContent, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -24,7 +24,7 @@ import CallComp from './Call';
 import SendTx from './SendTx';
 
 function Contents({
-  accounts: propsAccounts = {},
+  accounts: propsAccounts,
   address,
   beforeSend,
   destCall,
@@ -55,21 +55,22 @@ function Contents({
   isApprove: boolean;
   onlySign: boolean;
   website?: string;
-  accounts?: Record<string, string | undefined>;
+  accounts?: [string, ...string[]];
   isCancelled: boolean;
   onSignature?: (signer: string, signature: HexString, ex: Extrinsic, payload: ExtrinsicPayloadValue) => void;
   onError: (error: unknown) => void;
   onClose: () => void;
   onReject: () => void;
 }) {
-  const [accounts, setAccounts] = useState<Record<string, string | undefined>>(propsAccounts);
+  const [accounts, setAccounts] = useState<[string, ...string[]]>(propsAccounts || [address]);
   const { api } = useApi();
   const [prepare, setPrepare] = useState<PrepareMultisig>();
-  const canSend = useMemo(() => canSendMultisig(accounts, address), [accounts, address]);
+  const canSend = useMemo(() => canSendMultisig(accounts), [accounts]);
   const [_pendingTxs] = usePendingTransactions(isApprove || isCancelled ? null : address);
   const pendingTxs = _pendingTxs.filter((item) => item.hash === extrinsic.method.hash.toHex());
   const { breakpoints } = useTheme();
   const [note, setNote] = useState<string>();
+  const { meta } = useAddressMeta();
   const downSm = useMediaQuery(breakpoints.down('sm'));
 
   useEffect(() => {
@@ -77,7 +78,7 @@ function Contents({
 
     if (canSend) {
       unsubPromise = api.rpc.chain.subscribeFinalizedHeads(() => {
-        prepareMultisig(api, extrinsic, accounts, address, isCancelled).then((value) =>
+        prepareMultisig(api, extrinsic, accounts, isCancelled).then((value) =>
           setPrepare((lastValue) => {
             if (JSON.stringify(value) !== JSON.stringify(lastValue)) {
               return value;
@@ -92,7 +93,7 @@ function Contents({
     return () => {
       unsubPromise?.then((unsub) => unsub());
     };
-  }, [accounts, address, api, canSend, isCancelled, extrinsic]);
+  }, [accounts, api, canSend, isCancelled, extrinsic]);
 
   return (
     <>
@@ -116,7 +117,7 @@ function Contents({
           )}
           <Divider />
           <CallComp destSender={destSender} isCancelled={isCancelled} method={destCall || extrinsic.method} sender={address} transaction={transaction} />
-          <AddressChain accounts={accounts} address={address} filtered={filtered} onChange={setAccounts} />
+          <AddressChain accounts={accounts} filtered={filtered} onChange={setAccounts} />
           {prepare && (!!Object.keys(prepare[2]).length || !!Object.keys(prepare[3]).length) && (
             <>
               <Divider />
@@ -157,7 +158,7 @@ function Contents({
               </LockContainer>
             </>
           )}
-          {!isApprove && (
+          {meta?.isMultisig && !isApprove && (
             <>
               <Divider />
               <Input label='Note' onChange={setNote} placeholder='Please note' />

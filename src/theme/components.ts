@@ -317,15 +317,9 @@ const createComponents: Func = () => ({
 
   MuiAlert: {
     styleOverrides: {
-      message: ({ theme }) => ({
+      message: () => ({
         overflow: 'visible',
-        fontSize: '0.75rem',
-        color: theme.palette.text.secondary
-      }),
-      standard: ({ theme }) => ({
-        '.MuiAlertTitle-root': {
-          color: theme.palette.text.primary
-        }
+        fontSize: '0.75rem'
       })
     }
   },

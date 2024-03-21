@@ -28,7 +28,7 @@ export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
       const newValue = {
         ...value,
         id,
-        accounts: value.accounts || {},
+        accounts: value.accounts || [value.accountId.toString()],
         isCancelled: value.isCancelled ?? false,
         isApprove: value.isApprove ?? false,
         transaction: value.transaction,

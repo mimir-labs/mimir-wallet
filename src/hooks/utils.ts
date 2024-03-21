@@ -42,6 +42,7 @@ function insertOrUpdate(
         status,
         height: blockHeight || undefined,
         index: extrinsicIndex || undefined,
+        blockTime: Date.now().toString(),
         isValid: true
       },
       false

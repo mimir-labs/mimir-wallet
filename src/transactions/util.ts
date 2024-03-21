@@ -49,17 +49,19 @@ export function removeSuccessFiltered(transaction: Transaction, filtered: Filter
   const address = transaction.sender;
   const meta = getAddressMeta(address);
 
-  (meta.isFlexible ? transaction.children[0] : transaction).children.forEach((tx) => {
-    const _filtered = filtered[tx.sender];
+  if (transaction.status !== CalldataStatus.Failed) {
+    (meta.isFlexible ? transaction.children[0] : transaction).children.forEach((tx) => {
+      const _filtered = filtered[tx.sender];
 
-    if (_filtered) {
-      if (tx.status === CalldataStatus.Success) {
-        delete filtered[tx.sender];
+      if (_filtered) {
+        if (tx.status === CalldataStatus.Success) {
+          delete filtered[tx.sender];
+        }
+
+        removeSuccessFiltered(tx, _filtered);
       }
-
-      removeSuccessFiltered(tx, _filtered);
-    }
-  });
+    });
+  }
 }
 
 export function removeMultisigDeepFiltered(transaction: Transaction, filtered: Filtered): void {
