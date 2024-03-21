@@ -55,7 +55,7 @@ const createPalette = (mode: PaletteMode): PaletteOptions => ({
   },
   common: { black: '#151F34', white: '#fff' },
   secondary: { main: 'rgba(39, 0, 255, 0.05)', light: 'rgba(39, 0, 255, 0.05)', dark: 'rgba(39, 0, 255, 0.05)', contrastText: '#2700FF' },
-  info: { main: '#0288d1', light: '#03a9f4', dark: '#01579b', contrastText: '#fff' },
+  info: { main: '#2700FF', light: '#2700FF', dark: '#2700FF', contrastText: '#fff' },
   text: {
     primary: '#151F34',
     secondary: alpha('#151F34', 0.5),

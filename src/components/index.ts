@@ -16,7 +16,6 @@ export { default as ChainSelect } from './ChainSelect';
 export { default as ConnectWalletModal } from './ConnectWalletModal';
 export { default as CopyButton } from './CopyButton';
 export { default as DappCell } from './DappCell';
-export { default as DetectedMultisig } from './DetectedMultisig';
 export { default as EditAddressDialog } from './EditAddressDialog';
 export { default as Empty } from './Empty';
 export { default as FormatBalance } from './FormatBalance';

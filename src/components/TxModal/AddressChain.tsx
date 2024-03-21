@@ -10,58 +10,55 @@ import React, { useCallback, useEffect } from 'react';
 
 import InputAddress from '../InputAddress';
 
-function AddressChain({
-  accounts,
-  address,
-  filtered,
-  index = 0,
-  onChange
-}: {
-  index?: number;
-  accounts: Record<string, string | undefined>;
-  onChange: React.Dispatch<React.SetStateAction<Record<string, string | undefined>>>;
-  address: string;
-  filtered?: Filtered;
-}) {
+function AddressChain({ accounts, filtered, index = 0, onChange }: { index?: number; accounts: [string, ...string[]]; onChange: (values: [string, ...string[]]) => void; filtered?: Filtered }) {
+  const address = accounts[0];
   const { meta } = useAddressMeta(address);
 
-  const _onChange = useCallback(
+  const _onChangeValue = useCallback(
     (selected: string) => {
-      onChange((value) => ({
-        ...value,
-        [address]: selected
-      }));
+      onChange([address, selected]);
+    },
+    [address, onChange]
+  );
+
+  const _onChangeChain = useCallback(
+    (value: [string, ...string[]]) => {
+      onChange([address, ...value]);
     },
     [address, onChange]
   );
 
   useEffect(() => {
-    if (!accounts[address]) {
+    const address = accounts[0];
+    const sender = accounts.at(1);
+
+    if (!sender) {
       const finded = meta?.isMultisig ? (filtered ? Object.keys(filtered) : meta.who)?.filter((address) => isLocalAccount(address)) || [] : [];
 
       if (finded.length > 0) {
         const solo = finded.find((item) => !getAddressMeta(item).isMultisig);
 
-        onChange((value) => ({
-          ...value,
-          [address]: solo || finded[0]
-        }));
+        onChange([address, solo || finded[0]]);
       }
     }
-  }, [accounts, address, filtered, meta, onChange]);
+  }, [accounts, filtered, meta, onChange]);
 
   if (meta?.isMultisig) {
-    const value = accounts[address] || '';
+    const sender = accounts.at(1) || '';
 
-    const isMultisigValue: boolean = !!value && !!getAddressMeta(value).isMultisig;
+    let comp: React.ReactNode | null = null;
+
+    if (sender && getAddressMeta(sender).isMultisig) {
+      comp = <AddressChain accounts={accounts.slice(1) as [string, ...string[]]} filtered={filtered?.[sender]} index={index + 1} onChange={_onChangeChain} />;
+    }
 
     return (
       <Stack spacing={1}>
         <Divider />
         <Box sx={{ paddingLeft: index * 1.5 }}>
-          <InputAddress filtered={filtered ? Object.keys(filtered) : meta.who} isSign label={index === 0 ? 'Initiator' : undefined} onChange={_onChange} value={value} />
+          <InputAddress filtered={filtered ? Object.keys(filtered) : meta.who} isSign label={index === 0 ? 'Initiator' : undefined} onChange={_onChangeValue} value={sender} />
         </Box>
-        {isMultisigValue && <AddressChain accounts={accounts} address={value} filtered={filtered?.[value]} index={index + 1} onChange={onChange} />}
+        {comp}
       </Stack>
     );
   }

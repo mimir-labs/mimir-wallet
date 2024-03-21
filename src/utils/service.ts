@@ -1,9 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AccountData, CalldataStatus } from '@mimir-wallet/hooks/types';
 import type { HexString } from '@polkadot/util/types';
-
-import { AccountData } from '@mimir-wallet/hooks/types';
 
 import { serviceUrl } from './chain-links';
 import { fetcher } from './fetcher';
@@ -73,6 +72,13 @@ export async function uploadWebsite(extrinsicHash: HexString, website?: string, 
   return fetcher(getServiceUrl('website'), {
     method: 'POST',
     body: JSON.stringify({ extrinsicHash, website, note }),
+    headers: jsonHeader
+  });
+}
+
+export async function getStatus(uuid: string): Promise<{ status: CalldataStatus }> {
+  return fetcher(getServiceUrl(`tx/${uuid}/status`), {
+    method: 'GET',
     headers: jsonHeader
   });
 }

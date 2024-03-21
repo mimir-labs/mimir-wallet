@@ -70,7 +70,7 @@ function SideBar({ fixed }: { fixed: boolean }) {
   const { injected } = useGroupAccounts();
   const { connectedWallets, openWallet } = useContext(WalletCtx);
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [selected]);
-  const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const { alertOpen, closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
 
@@ -86,7 +86,9 @@ function SideBar({ fixed }: { fixed: boolean }) {
     <>
       <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
       <Drawer
-        PaperProps={{ sx: { width: downMd ? 280 : 222, top: downMd ? 0 : 56, paddingX: 1.5, paddingY: 2, borderTopRightRadius: { md: 0, xs: 20 }, borderBottomRightRadius: { md: 0, xs: 20 } } }}
+        PaperProps={{
+          sx: { width: downMd ? 280 : 222, top: downMd ? 0 : alertOpen ? 80 : 56, paddingX: 1.5, paddingY: 2, borderTopRightRadius: { md: 0, xs: 20 }, borderBottomRightRadius: { md: 0, xs: 20 } }
+        }}
         anchor='left'
         onClose={closeSidebar}
         open={sidebarOpen}

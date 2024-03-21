@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAddressMeta, useBlockTime } from '@mimir-wallet/hooks';
+import { useAddressMeta } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
 import moment from 'moment';
@@ -18,7 +18,6 @@ interface Props {
 function TxCell({ defaultOpen, transaction }: Props) {
   const destTx = transaction.top;
   const status = transaction.status;
-  const time = useBlockTime(transaction.status < CalldataStatus.Success ? transaction.initTransaction.height : transaction.height);
   const { meta: destSenderMeta } = useAddressMeta(destTx.sender);
   const [approvals] = useMemo((): [number, Transaction[]] => (destSenderMeta ? extraTransaction(destSenderMeta, transaction) : [0, []]), [destSenderMeta, transaction]);
 
@@ -37,10 +36,10 @@ function TxCell({ defaultOpen, transaction }: Props) {
             </Typography>
           )}
         </Stack>
-        <Typography>{time ? moment(time).format() : null}</Typography>
+        <Typography>{moment(destTx.blockTime).format()}</Typography>
       </Box>
       <Divider orientation='horizontal' />
-      <TxItems approvals={approvals} defaultOpen={defaultOpen} threshold={destSenderMeta?.threshold || 0} time={time} transaction={transaction} />
+      <TxItems approvals={approvals} defaultOpen={defaultOpen} threshold={destSenderMeta?.threshold || 0} time={destTx.blockTime} transaction={transaction} />
     </Paper>
   );
 }

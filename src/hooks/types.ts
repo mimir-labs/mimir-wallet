@@ -80,6 +80,7 @@ export interface Calldata {
 
   height?: number;
   index?: number;
+  blockTime?: string;
   isValid: boolean;
 
   website?: string;
@@ -103,6 +104,7 @@ export interface Transaction {
   isValid: boolean;
   height?: number;
   index?: number;
+  blockTime: number;
 
   action: string;
   section: string;

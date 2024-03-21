@@ -48,24 +48,24 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
   const selectAccount = useSelectedAccountCallback();
   const destTx = sourceTx.top;
 
-  const [accounts, canApprove, cancelAccounts, canCancel] = useMemo(() => {
+  const [accounts, canApprove, canCancel] = useMemo(() => {
     if (isMultisig) {
-      return [{}, false, {}, false];
+      return [undefined, false, false];
     }
 
-    const _accounts: Record<string, string | undefined> = {};
-    const _cancelAccounts: Record<string, string | undefined> = {};
+    const _accounts: [string, ...string[]] = [sourceTx.sender];
 
-    let lastAddress: string;
     let canApprove = true;
     let canCancel = true;
 
     let _approveFiltered = approveFiltered;
     let _cancelFiltered = cancelFiltered;
 
-    id.split('-').forEach((address) => {
+    let lastAddress = '';
+
+    for (const address of id.split('-')) {
       if (address === 'null') {
-        return;
+        continue;
       }
 
       if (lastAddress) {
@@ -79,16 +79,14 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
 
         _approveFiltered = _approveFiltered?.[address];
         _cancelFiltered = _cancelFiltered?.[address];
-
-        _accounts[lastAddress] = address;
-        _cancelAccounts[lastAddress] = address;
+        _accounts.push(address);
       }
 
       lastAddress = address;
-    });
+    }
 
-    return [_accounts, canApprove, _cancelAccounts, canCancel];
-  }, [approveFiltered, cancelFiltered, id, isMultisig]);
+    return [_accounts, canApprove, canCancel];
+  }, [approveFiltered, cancelFiltered, id, isMultisig, sourceTx.sender]);
 
   const handleApprove = useCallback(
     (filtered: Filtered) => {
@@ -119,7 +117,7 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
       setCancelLoading(true);
       addQueue({
         filtered,
-        accounts: cancelAccounts,
+        accounts,
         extrinsic: api.tx[sourceTx.call.section][sourceTx.call.method](...sourceTx.call.args),
         destCall: destTx.call || undefined,
         destSender: destTx.sender,
@@ -131,7 +129,7 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
         onReject: () => setCancelLoading(false)
       });
     },
-    [addQueue, api.tx, cancelAccounts, destTx, sourceTx]
+    [addQueue, api.tx, accounts, destTx, sourceTx]
   );
 
   const tx = data.tx;

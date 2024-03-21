@@ -3,15 +3,12 @@
 
 import { ReactComponent as IconExternal } from '@mimir-wallet/assets/svg/icon-external-app.svg';
 import { ReactComponent as Logo } from '@mimir-wallet/assets/svg/logo-circle.svg';
+import { Address, AddressRow, BalanceFree } from '@mimir-wallet/components';
 import { useUnConfirmMultisigs } from '@mimir-wallet/hooks';
 import { getAddressMeta } from '@mimir-wallet/utils';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
 import { useMemo } from 'react';
-
-import Address from './Address';
-import AddressRow from './AddressRow';
-import BalanceFree from './BalanceFree';
 
 function Item({ address, withEdit }: { address: string; withEdit: boolean }) {
   const { breakpoints } = useTheme();

@@ -6,12 +6,12 @@ import { AddressName } from '@mimir-wallet/components';
 import { ONE_DAY } from '@mimir-wallet/constants';
 import { useMessages, useSelectedAccount } from '@mimir-wallet/hooks';
 import { CalldataStatus, ExecuteTxMessage, PushMessageData } from '@mimir-wallet/hooks/types';
-import { formatAgo, getAddressMeta } from '@mimir-wallet/utils';
+import { formatAgo, getAddressMeta, service } from '@mimir-wallet/utils';
 import { Badge, Button, IconButton, Link as MuiLink, Popover, Stack, SvgIcon, Typography } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import React, { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function traverseAccount(address: string, callback: (address: string) => void) {
   const meta = getAddressMeta(address);
@@ -41,6 +41,7 @@ function Notification() {
   const open = Boolean(anchorEl);
   const addresses = useMemo(() => (selected ? getEoaAddresses(selected).map((item) => u8aToHex(decodeAddress(item))) : []), [selected]);
   const [messages, isRead, read] = useMessages(addresses);
+  const navigate = useNavigate();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -54,14 +55,29 @@ function Notification() {
 
   const now = Date.now();
 
-  const TxLink = ({ uuid }: { uuid: string }) => (
-    <MuiLink component={Link} to='/transactions'>
-      No.{uuid.slice(0, 8).toUpperCase()}
-    </MuiLink>
-  );
+  const TxLink = ({ uuid }: { uuid: string }) => <MuiLink>No.{uuid.slice(0, 8).toUpperCase()}</MuiLink>;
 
   const Item = ({ message: { blockTime, raw, type } }: { message: PushMessageData }) => (
-    <Stack component={Link} spacing={0.5} sx={{ textDecoration: 'none', color: 'inherit', bgcolor: 'secondary.main', borderRadius: 1, padding: 1 }} to='/transactions'>
+    <Stack
+      component={Link}
+      onClick={(e) => {
+        e.preventDefault();
+        service
+          .getStatus(raw.uuid)
+          .then(({ status }) => {
+            navigate({
+              pathname: '/transactions',
+              search: status >= CalldataStatus.Success ? 'status=history' : ''
+            });
+          })
+          .catch(() => {
+            navigate('/transactions');
+          });
+      }}
+      spacing={0.5}
+      sx={{ textDecoration: 'none', color: 'inherit', bgcolor: 'secondary.main', borderRadius: 1, padding: 1 }}
+      to='/transactions'
+    >
       <Typography color='text.secondary'>
         {now - Number(blockTime) > 0 ? (now - Number(blockTime) < ONE_DAY * 1000 ? `${formatAgo(Number(blockTime), 'H')} hours ago` : `${formatAgo(Number(blockTime), 'D')} days ago`) : 'Now'}
       </Typography>
