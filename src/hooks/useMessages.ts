@@ -32,7 +32,8 @@ export function useMessages(addresses: HexString[]): [messages: PushMessageData[
     });
 
     return () => unsubs.forEach((unsub) => unsub());
-  }, [addresses, subscribe]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addresses.join(''), subscribe]);
 
   useEffect(() => {
     store.set(LAST_READ_MESSAGE_KEY, readId);

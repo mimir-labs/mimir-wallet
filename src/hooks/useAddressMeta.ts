@@ -3,10 +3,9 @@
 
 import { toastError } from '@mimir-wallet/components';
 import { events } from '@mimir-wallet/events';
-import { AddressMeta, getAddressMeta, isLocalAccount, service } from '@mimir-wallet/utils';
+import { AddressMeta, addressToHex, getAddressMeta, isLocalAccount, service } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
-import { u8aToHex } from '@polkadot/util';
-import { addressEq, decodeAddress } from '@polkadot/util-crypto';
+import { addressEq } from '@polkadot/util-crypto';
 import { useCallback, useEffect, useState } from 'react';
 
 import { createNamedHook } from './createNamedHook';
@@ -65,7 +64,7 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
 
           keyring.saveAccountMeta(pair, { name });
 
-          await service.updateAccountName(u8aToHex(decodeAddress(value)), name);
+          await service.updateAccountName(addressToHex(value), name);
           cb?.(name);
         } else {
           keyring.saveAddress(value, { name });

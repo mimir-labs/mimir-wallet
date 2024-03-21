@@ -1,13 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { referrer } from '@mimir-wallet/config';
 import { useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
-import { service } from '@mimir-wallet/utils';
+import { addressToHex, service } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
-import { u8aToHex } from '@polkadot/util';
-import { decodeAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -42,13 +41,15 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
     try {
       setIsLoading(true);
 
+      const address = createMultisig(signatories, threshold, name);
+
+      referrer && (await service.setReferrer(addressToHex(address), referrer));
+
       await service.createMultisig(
-        signatories.map((value) => u8aToHex(decodeAddress(value))),
+        signatories.map((value) => addressToHex(value)),
         threshold,
         name
       );
-
-      const address = createMultisig(signatories, threshold, name);
 
       selectAccount(address);
       navigate('/');

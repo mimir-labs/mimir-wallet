@@ -8,13 +8,14 @@ import type { PrepareFlexible } from './types';
 
 import { ReactComponent as IconQuestion } from '@mimir-wallet/assets/svg/icon-question-fill.svg';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
+import { referrer } from '@mimir-wallet/config';
 import { TxToastCtx, useApi, useCall, useSelectedAccountCallback } from '@mimir-wallet/hooks';
-import { getAddressMeta, service, signAndSend } from '@mimir-wallet/utils';
+import { addressToHex, getAddressMeta, service, signAndSend } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
-import { u8aEq, u8aToHex } from '@polkadot/util';
-import { addressEq, decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
+import { u8aEq } from '@polkadot/util';
+import { addressEq, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -139,11 +140,11 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
         if (!name) throw new Error('Please provide account name');
 
         await service.prepareMultisig(
-          u8aToHex(decodeAddress(extrinsic.signer.toString())),
+          addressToHex(extrinsic.signer.toString()),
           extrinsic.hash.toHex(),
           name,
           threshold,
-          who.map((address) => u8aToHex(decodeAddress(address)))
+          who.map((address) => addressToHex(address))
         );
       }
     });
@@ -165,6 +166,8 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
 
       if (_pure) {
         createMembers(_pure, who, signer, threshold, name);
+
+        referrer && service.setReferrer(addressToHex(_pure), referrer);
       }
     });
     events.once('error', () => {

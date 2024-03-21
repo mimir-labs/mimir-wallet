@@ -119,7 +119,7 @@ function AccountSetting() {
           )}
           {meta?.isMultisig && !meta.isFlexible && (
             <Box color='warning.main' sx={{ marginBottom: 2, fontWeight: 700 }}>
-              static multisig account can not change members.
+              Static multisig account can not change members.
             </Box>
           )}
           <Stack

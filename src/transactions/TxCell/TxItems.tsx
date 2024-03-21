@@ -11,7 +11,7 @@ import { ReactComponent as IconExternalApp } from '@mimir-wallet/assets/svg/icon
 import { ReactComponent as IconFailed } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
 import { ReactComponent as IconMember } from '@mimir-wallet/assets/svg/icon-member-fill.svg';
 import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
-import { ONE_DAY } from '@mimir-wallet/constants';
+import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@mimir-wallet/constants';
 import { useAddressMeta, useApi, useBlockTime, useDapp, useToggle } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { formatAgo } from '@mimir-wallet/utils';
@@ -68,7 +68,17 @@ function TimeCell({ time }: { time?: number }) {
 
   time = time || now;
 
-  return <Box sx={{ flex: '1' }}>{now - time > 0 ? (now - time < ONE_DAY * 1000 ? `${formatAgo(time, 'H')} hours ago` : `${formatAgo(time, 'D')} days ago`) : 'Now'}</Box>;
+  return (
+    <Box sx={{ flex: '1' }}>
+      {now - Number(time) < ONE_MINUTE
+        ? 'Now'
+        : now - Number(time) < ONE_HOUR * 1000
+        ? `${formatAgo(Number(time), 'm')} mins ago`
+        : now - Number(time) < ONE_DAY * 1000
+        ? `${formatAgo(Number(time), 'H')} hours ago`
+        : `${formatAgo(Number(time), 'D')} days ago`}
+    </Box>
+  );
 }
 
 function ProgressCell({ approvals, onClick, threshold }: { approvals: number; threshold: number; onClick: () => void }) {

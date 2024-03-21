@@ -29,5 +29,6 @@ export * from './useTokenInfo';
 export * from './useTransactions';
 export * from './useTxQueue';
 export * from './useEagerConnect';
+export * from './useWallet';
 
 export * from './utils';
