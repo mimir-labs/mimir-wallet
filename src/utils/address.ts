@@ -6,7 +6,8 @@ import type { KeyringJson$Meta } from '@polkadot/ui-keyring/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { keyring } from '@polkadot/ui-keyring';
-import { hexToU8a, isHex } from '@polkadot/util';
+import { hexToU8a, isHex, u8aToHex } from '@polkadot/util';
+import { decodeAddress } from '@polkadot/util-crypto';
 
 export interface AddressMeta extends KeyringJson$Meta {
   isMimir?: boolean;
@@ -63,4 +64,8 @@ export function isLocalAccount(address?: string | null | { toString: () => strin
 
 export function isLocalAddress(address?: string | null | { toString: () => string }): boolean {
   return !!address && !!keyring.getAddress(address.toString(), 'address');
+}
+
+export function addressToHex(address: string): HexString {
+  return u8aToHex(decodeAddress(address));
 }

@@ -82,3 +82,11 @@ export async function getStatus(uuid: string): Promise<{ status: CalldataStatus 
     headers: jsonHeader
   });
 }
+
+export async function setReferrer(address: HexString, referrer: string): Promise<void> {
+  await fetcher(getServiceUrl(`referrer/${address}`), {
+    method: 'POST',
+    body: JSON.stringify({ referrer }),
+    headers: jsonHeader
+  });
+}

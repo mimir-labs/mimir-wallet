@@ -6,10 +6,10 @@ import type { HexString } from '@polkadot/util/types';
 import type { AccountData, MultiAccountData, ProxyAccountData } from './types';
 
 import { events } from '@mimir-wallet/events';
-import { service } from '@mimir-wallet/utils';
+import { addressToHex, service } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import { u8aEq, u8aToHex } from '@polkadot/util';
-import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
+import { encodeMultiAddress } from '@polkadot/util-crypto';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useApi } from './useApi';
@@ -134,7 +134,7 @@ export function useSyncMultisigs(isWalletReady: boolean): boolean {
       accounts
         .concat(injected)
         .concat(testing)
-        .map((item) => u8aToHex(decodeAddress(item)))
+        .map((item) => addressToHex(item))
         .sort((l, r) => (l > r ? 1 : -1))
         .join(','),
     [accounts, injected, testing]

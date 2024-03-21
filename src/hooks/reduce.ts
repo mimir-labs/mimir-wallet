@@ -9,8 +9,9 @@ import type { PalletMultisigTimepoint, SpRuntimeDispatchError } from '@polkadot/
 import type { IEvent } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
+import { addressToHex } from '@mimir-wallet/utils';
 import { u8aEq, u8aToHex } from '@polkadot/util';
-import { createKeyMulti, decodeAddress } from '@polkadot/util-crypto';
+import { createKeyMulti } from '@polkadot/util-crypto';
 
 import { CalldataStatus } from './types';
 
@@ -165,7 +166,7 @@ export async function reduceCalldata(
 
       callStatus.set(callHash, await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash));
     } else if (api.tx.proxy.proxy.is(call)) {
-      _sender = u8aToHex(decodeAddress(call.args[0].toString()));
+      _sender = addressToHex(call.args[0].toString());
       _call = call.args[2];
 
       const callHash = call.args[2].hash.toHex();

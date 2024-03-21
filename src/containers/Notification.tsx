@@ -2,44 +2,26 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ReactComponent as IconNotification } from '@mimir-wallet/assets/svg/icon-notification.svg';
-import { AddressName } from '@mimir-wallet/components';
-import { ONE_DAY } from '@mimir-wallet/constants';
-import { useMessages, useSelectedAccount } from '@mimir-wallet/hooks';
+import { AddressName, Empty } from '@mimir-wallet/components';
+import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@mimir-wallet/constants';
+import { useGroupAccounts, useMessages, useSelectedAccountCallback, useWallet } from '@mimir-wallet/hooks';
 import { CalldataStatus, ExecuteTxMessage, PushMessageData } from '@mimir-wallet/hooks/types';
-import { formatAgo, getAddressMeta, service } from '@mimir-wallet/utils';
+import { addressToHex, formatAgo, service } from '@mimir-wallet/utils';
 import { Badge, Button, IconButton, Link as MuiLink, Popover, Stack, SvgIcon, Typography } from '@mui/material';
-import { u8aToHex } from '@polkadot/util';
-import { decodeAddress } from '@polkadot/util-crypto';
 import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-function traverseAccount(address: string, callback: (address: string) => void) {
-  const meta = getAddressMeta(address);
-
-  if (!meta.isMultisig) {
-    callback(address);
-  }
-
-  for (const child of meta.who || []) {
-    traverseAccount(child, callback);
-  }
-}
-
-function getEoaAddresses(address: string) {
-  const addresses = new Set<string>();
-
-  traverseAccount(address, (address) => {
-    addresses.add(address);
-  });
-
-  return Array.from(addresses);
+function sortAddress(addresses: string[]) {
+  return addresses.map((item) => addressToHex(item)).sort((l, r) => (l > r ? 1 : -1));
 }
 
 function Notification() {
-  const selected = useSelectedAccount();
+  const selectAccount = useSelectedAccountCallback();
+  const { isWalletReady } = useWallet();
+  const { injected, testing } = useGroupAccounts();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const addresses = useMemo(() => (selected ? getEoaAddresses(selected).map((item) => u8aToHex(decodeAddress(item))) : []), [selected]);
+  const addresses = useMemo(() => (isWalletReady ? sortAddress(injected.concat(testing)) : []), [injected, isWalletReady, testing]);
   const [messages, isRead, read] = useMessages(addresses);
   const navigate = useNavigate();
 
@@ -57,29 +39,32 @@ function Notification() {
 
   const TxLink = ({ uuid }: { uuid: string }) => <MuiLink>No.{uuid.slice(0, 8).toUpperCase()}</MuiLink>;
 
-  const Item = ({ message: { blockTime, raw, type } }: { message: PushMessageData }) => (
+  const Item = ({ message: { blockTime, raw, sender, type } }: { message: PushMessageData }) => (
     <Stack
       component={Link}
       onClick={(e) => {
         e.preventDefault();
-        service
-          .getStatus(raw.uuid)
-          .then(({ status }) => {
-            navigate({
-              pathname: '/transactions',
-              search: status >= CalldataStatus.Success ? 'status=history' : ''
-            });
-          })
-          .catch(() => {
-            navigate('/transactions');
+        handleClose();
+        service.getStatus(raw.uuid).then(({ status }) => {
+          selectAccount(sender);
+          navigate({
+            pathname: '/transactions',
+            search: status >= CalldataStatus.Success ? 'status=history' : ''
           });
+        });
       }}
       spacing={0.5}
       sx={{ textDecoration: 'none', color: 'inherit', bgcolor: 'secondary.main', borderRadius: 1, padding: 1 }}
       to='/transactions'
     >
       <Typography color='text.secondary'>
-        {now - Number(blockTime) > 0 ? (now - Number(blockTime) < ONE_DAY * 1000 ? `${formatAgo(Number(blockTime), 'H')} hours ago` : `${formatAgo(Number(blockTime), 'D')} days ago`) : 'Now'}
+        {now - Number(blockTime) < ONE_MINUTE
+          ? 'Now'
+          : now - Number(blockTime) < ONE_HOUR * 1000
+          ? `${formatAgo(Number(blockTime), 'm')} mins ago`
+          : now - Number(blockTime) < ONE_DAY * 1000
+          ? `${formatAgo(Number(blockTime), 'H')} hours ago`
+          : `${formatAgo(Number(blockTime), 'D')} days ago`}
       </Typography>
       <Typography>
         {type === 'initial' ? (
@@ -139,9 +124,7 @@ function Notification() {
         }}
       >
         <Stack spacing={1}>
-          {messages.map((message) => (
-            <Item key={message.id} message={message} />
-          ))}
+          {messages.length ? messages.map((message) => <Item key={message.id} message={message} />) : <Empty height={240} label='No messages here.' />}
           <Button component={Link} fullWidth to='/transactions' variant='outlined'>
             View All Transactions
           </Button>
