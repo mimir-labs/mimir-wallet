@@ -7,6 +7,8 @@ export * from './useAccounts';
 export * from './useAddresses';
 export * from './useAddressMeta';
 export * from './useApi';
+export * from './useAssets';
+export * from './useBalances';
 export * from './useBestNumber';
 export * from './useBlockInterval';
 export * from './useBlocksPerDays';

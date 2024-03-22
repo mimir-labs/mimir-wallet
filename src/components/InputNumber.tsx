@@ -12,9 +12,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import FormatBalance from './FormatBalance';
 import Input from './Input';
 
-function inputToBn(api: ApiPromise, input: string): BN {
+function inputToBn(api: ApiPromise, input: string, decimals = api.registry.chainDecimals[0]): BN {
   const isDecimalValue = input.match(/^(\d+)\.(\d+)$/);
-  const decimals = api.registry.chainDecimals[0];
 
   let result;
 
@@ -31,9 +30,7 @@ function inputToBn(api: ApiPromise, input: string): BN {
   return result;
 }
 
-function bnToInput(api: ApiPromise, bn: BN): string {
-  const decimals = api.registry.chainDecimals[0];
-
+function bnToInput(api: ApiPromise, bn: BN, decimals = api.registry.chainDecimals[0]): string {
   const mod = bn.toString().slice(-decimals);
   const div = bn.toString().slice(0, -decimals);
 
@@ -44,32 +41,32 @@ function bnToInput(api: ApiPromise, bn: BN): string {
   }
 }
 
-function getValues(api: ApiPromise, value: BN): [string, BN] {
-  return [bnToInput(api, value), value];
+function getValues(api: ApiPromise, value: BN, decimals = api.registry.chainDecimals[0]): [string, BN] {
+  return [bnToInput(api, value, decimals), value];
 }
 
-function InputNumber({ defaultValue, maxValue, onChange, value: propsValue, withMax, ...props }: InputNumberProps) {
+function InputNumber({ defaultValue, format, maxValue, onChange, value: propsValue, withMax, ...props }: InputNumberProps) {
   const isControl = useRef(propsValue !== undefined);
   const { api } = useApi();
   const _defaultValue = useMemo(() => defaultValue?.toString(), [defaultValue]);
-  const [[value], setValues] = useState<[string, BN]>(getValues(api, new BN(propsValue || _defaultValue || '0')));
+  const [[value], setValues] = useState<[string, BN]>(getValues(api, new BN(propsValue || _defaultValue || '0'), format?.[0]));
 
   const _onChange = useCallback(
     (value: string) => {
       if (!isControl.current) {
-        setValues([value, inputToBn(api, value)]);
+        setValues([value, inputToBn(api, value, format?.[0])]);
       }
 
-      onChange?.(inputToBn(api, value));
+      onChange?.(inputToBn(api, value, format?.[0]));
     },
-    [api, onChange]
+    [api, format, onChange]
   );
 
   useEffect(() => {
     if (isControl.current) {
-      propsValue && setValues(getValues(api, propsValue));
+      propsValue && setValues(getValues(api, propsValue, format?.[0]));
     }
-  }, [api, propsValue]);
+  }, [api, format, propsValue]);
 
   return (
     <Input
@@ -80,7 +77,7 @@ function InputNumber({ defaultValue, maxValue, onChange, value: propsValue, with
         <>
           {props.endAdornment}
           {withMax && (
-            <Button onClick={() => setValues(getValues(api, maxValue || BN_ZERO))} size='small' sx={{ paddingY: 0.2, borderRadius: 0.5 }} variant='outlined'>
+            <Button onClick={() => setValues(getValues(api, maxValue || BN_ZERO, format?.[0]))} size='small' sx={{ paddingY: 0.2, borderRadius: 0.5 }} variant='outlined'>
               Max
             </Button>
           )}
@@ -91,7 +88,7 @@ function InputNumber({ defaultValue, maxValue, onChange, value: propsValue, with
           {props.label}
           <Box component='span' fontWeight={400}>
             Balance:
-            <FormatBalance value={maxValue} />
+            <FormatBalance format={format} value={maxValue} />
           </Box>
         </Box>
       }

@@ -1,39 +1,61 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AccountBalance } from '@mimir-wallet/hooks/types';
+
 import { ReactComponent as ExpandArrow } from '@mimir-wallet/assets/svg/expand-arrow.svg';
 import { ReactComponent as IconLock } from '@mimir-wallet/assets/svg/icon-lock.svg';
 import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
 import { ReactComponent as IconReverse } from '@mimir-wallet/assets/svg/icon-waiting-fill.svg';
 import { FormatBalance } from '@mimir-wallet/components';
 import { findToken } from '@mimir-wallet/config';
-import { useApi, useToggle } from '@mimir-wallet/hooks';
-import { Avatar, Box, Button, IconButton, Paper, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useApi, useAssetBalances, useToggle } from '@mimir-wallet/hooks';
+import { Avatar, Box, Button, IconButton, Paper, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { type BN, BN_ZERO } from '@polkadot/util';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { AccountBalance } from './types';
-
-function Row({ balances }: { balances: AccountBalance }) {
+function Row({
+  assetId,
+  decimals,
+  defaultOpen,
+  icon: propsIcon,
+  locked,
+  reserved,
+  symbol,
+  total,
+  transferrable
+}: {
+  defaultOpen?: boolean;
+  symbol?: string;
+  icon?: string;
+  decimals?: number;
+  transferrable: BN;
+  assetId: string;
+  locked: BN;
+  reserved: BN;
+  total: BN;
+}) {
   const { api, tokenSymbol } = useApi();
 
-  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
-  const [open, toggleOpen] = useToggle(true);
+  const icon = useMemo(() => propsIcon || findToken(api.genesisHash.toHex()).Icon, [api, propsIcon]);
+  const [open, toggleOpen] = useToggle(defaultOpen);
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
+  const format = useMemo((): [decimals: number, unit: string] => [decimals || api.registry.chainDecimals[0], symbol || tokenSymbol], [api, decimals, symbol, tokenSymbol]);
 
   const RowMain = () => (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
       <Box sx={{ flex: '1', display: 'flex', alignItems: { sm: 'center', xs: 'flex-start' }, gap: { sm: 5, xs: 1 }, flexDirection: { sm: 'row', xs: 'column' } }}>
         <Typography fontSize='1rem' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Avatar alt='Token' src={token.Icon} sx={{ width: 32, height: 32 }} />
-          {tokenSymbol}
+          <Avatar alt='Token' src={icon} sx={{ width: 32, height: 32 }} />
+          {symbol || tokenSymbol}
         </Typography>
         <Typography variant='h6'>
-          <FormatBalance value={balances.total} />
+          <FormatBalance format={format} value={total} />
         </Typography>
       </Box>
-      <Button component={Link} endIcon={downSm ? undefined : <SvgIcon component={IconSend} inheritViewBox />} sx={{ minWidth: downSm ? 0 : undefined }} to='/transfer'>
+      <Button component={Link} endIcon={downSm ? undefined : <SvgIcon component={IconSend} inheritViewBox />} sx={{ minWidth: downSm ? 0 : undefined }} to={`/transfer?assetId=${assetId}`}>
         {downSm ? <SvgIcon component={IconSend} inheritViewBox /> : 'Transfer'}
       </Button>
       <IconButton onClick={toggleOpen} sx={{ transformOrigin: 'center', transform: `rotateZ(${open ? '0deg' : '180deg'})`, transition: 'all 150ms' }}>
@@ -43,7 +65,7 @@ function Row({ balances }: { balances: AccountBalance }) {
   );
 
   const RowSub = () => (
-    <Paper sx={{ width: '100%', marginTop: 2, bgcolor: 'secondary.main', borderRadius: 2, padding: 2 }}>
+    <Paper sx={{ width: '100%', marginTop: { sm: 2, xs: 1.5 }, bgcolor: 'secondary.main', borderRadius: 2, padding: 2 }}>
       <Box
         sx={{
           display: 'flex',
@@ -58,21 +80,21 @@ function Row({ balances }: { balances: AccountBalance }) {
           <SvgIcon component={IconSend} inheritViewBox />
           <span>Transferable</span>
           <b>
-            <FormatBalance value={balances.transferrable} />
+            <FormatBalance format={format} value={transferrable} />
           </b>
         </Box>
         <Box>
           <SvgIcon component={IconLock} inheritViewBox />
           <span>Locked balance</span>
           <Typography color='text.primary' fontWeight={700}>
-            <FormatBalance value={balances.locked} />
+            <FormatBalance format={format} value={locked} />
           </Typography>
         </Box>
         <Box>
           <SvgIcon component={IconReverse} inheritViewBox />
           <span>Reserved balance</span>
           <Typography color='text.primary' fontWeight={700}>
-            <FormatBalance value={balances.reserved} />
+            <FormatBalance format={format} value={reserved} />
           </Typography>
         </Box>
       </Box>
@@ -87,11 +109,34 @@ function Row({ balances }: { balances: AccountBalance }) {
   );
 }
 
-function Assets({ assets }: { address?: string; assets?: AccountBalance[] }) {
+function Assets({ address, nativeBalance }: { address?: string; nativeBalance?: AccountBalance }) {
+  const assets = useAssetBalances(address);
+
   return (
-    <Paper sx={{ width: '100%', borderRadius: 2, padding: 2 }}>
-      {assets?.map((item, index) => (
-        <Row balances={item} key={index} />
+    <Paper component={Stack} spacing={{ xs: 1.5, sm: 2 }} sx={{ width: '100%', borderRadius: 2, padding: 2 }}>
+      {nativeBalance && (
+        <Row
+          assetId='native'
+          defaultOpen
+          key={'native-balance'}
+          locked={nativeBalance.locked}
+          reserved={nativeBalance.reserved}
+          total={nativeBalance.total}
+          transferrable={nativeBalance.transferrable}
+        />
+      )}
+      {assets.map((item) => (
+        <Row
+          assetId={item.assetId}
+          decimals={item.decimals}
+          icon={item.Icon}
+          key={`asset-balance-${item.assetId}`}
+          locked={BN_ZERO}
+          reserved={BN_ZERO}
+          symbol={item.symbol}
+          total={item.balance}
+          transferrable={item.balance}
+        />
       ))}
     </Paper>
   );

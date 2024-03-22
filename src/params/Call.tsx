@@ -9,6 +9,7 @@ import type { CallProps } from './types';
 import React, { useMemo } from 'react';
 import ReactJson from 'react-json-view';
 
+import AssetsTransferCall from './AssetsTransferCall';
 import BatchCall from './BatchCall';
 import CancelCall from './CancelCall';
 import TransferCall from './TransferCall';
@@ -28,6 +29,8 @@ function Call({ api, call, jsonFallback, type, ...props }: CallProps) {
     return <BatchCall api={api} call={call} type={type} {...props} />;
   } else if (action.startsWith('balances.')) {
     return <TransferCall api={api} call={call} type={type} {...props} />;
+  } else if (action.startsWith('assets.')) {
+    return <AssetsTransferCall api={api} call={call} type={type} {...props} />;
   } else {
     return jsonFallback ? <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} theme='summerfruit:inverted' /> : null;
   }

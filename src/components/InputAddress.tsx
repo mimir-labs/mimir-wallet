@@ -36,7 +36,7 @@ function createOptions(isSign: boolean, filtered?: string[]): string[] {
   return options;
 }
 
-function InputAddress({ balance, defaultValue, disabled, error, filtered, isSign = false, label, onChange, placeholder, value: propsValue, withBalance }: InputAddressProps) {
+function InputAddress({ balance, defaultValue, disabled, error, filtered, format, isSign = false, label, onChange, placeholder, value: propsValue, withBalance }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
   const [value, setValue] = useState<string>(isAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : '');
   const [inputValue, setInputValue] = useState<string>('');
@@ -135,7 +135,7 @@ function InputAddress({ balance, defaultValue, disabled, error, filtered, isSign
       {withBalance && (
         <Typography sx={{ marginTop: 0.5, fontSize: '0.75rem', color: 'text.secondary' }}>
           Balance:
-          <FormatBalance value={balance} />
+          <FormatBalance format={format} value={balance} />
         </Typography>
       )}
       {error && <FormHelperText sx={{ color: 'error.main' }}>{error.message}</FormHelperText>}
