@@ -1,14 +1,16 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
-import type { BN } from '@polkadot/util';
-
 import { InputAddress, InputNumber } from '@mimir-wallet/components';
-import { useAddresses, useAllAccounts, useApi, useCall, useQueryParam, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
+import { useAddresses, useAllAccounts, useApi, useQueryParam, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
+import { type BN, BN_ZERO } from '@polkadot/util';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import SelectToken from './SelectToken';
+import { TransferToken } from './types';
+import { useTransferBalance } from './useTransferBalances';
 
 function PageTransfer() {
   const { api } = useApi();
@@ -16,37 +18,51 @@ function PageTransfer() {
   const selected = useSelectedAccount();
   const [fromParam] = useQueryParam<string>('from');
   const [toParam] = useQueryParam<string>('to');
+  const [assetId, setAssetId] = useQueryParam<string>('assetId', 'native', { replace: true });
   const [sending, setSending] = useState<string | undefined>(fromParam || selected || '');
   const [recipient, setRecipient] = useState<string>(toParam || '');
-  const [amount, setAmount] = useState<BN>();
+  const [amount, setAmount] = useState<BN>(BN_ZERO);
   const { addQueue } = useTxQueue();
   const filtered = useAllAccounts();
   const { allAddresses } = useAddresses();
   const [amountError, setAmountError] = useState<Error | null>(null);
-
-  const sendingBalances = useCall<DeriveBalancesAll>(api.derive.balances.all, [sending]);
-  const recipientBalances = useCall<DeriveBalancesAll>(api.derive.balances.all, [recipient]);
+  const [token, setToken] = useState<TransferToken>();
+  const [format, sendingBalances, recipientBalances] = useTransferBalance(token, sending, recipient);
 
   useEffect(() => {
-    if (amount && !isNaN(Number(amount))) {
+    setAmount(BN_ZERO);
+  }, [assetId]);
+
+  useEffect(() => {
+    if (amount && amount.gt(BN_ZERO)) {
       setAmountError(null);
     }
   }, [amount]);
 
   const handleClick = useCallback(() => {
-    if (recipient && sending && amount) {
+    if (recipient && sending && amount && token) {
       if (isNaN(Number(amount))) {
         setAmountError(new Error('Please input number value'));
 
         return;
       }
 
-      addQueue({
-        extrinsic: api.tx.balances.transferKeepAlive(recipient, amount),
-        accountId: sending
-      });
+      if (token.isNative) {
+        addQueue({
+          extrinsic: api.tx.balances.transferKeepAlive(recipient, amount),
+          accountId: sending
+        });
+      } else {
+        if (!api.tx.assets) return;
+
+        addQueue({
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          extrinsic: api.tx.assets.transferKeepAlive(token.assetId, recipient, amount),
+          accountId: sending
+        });
+      }
     }
-  }, [addQueue, amount, api.tx.balances, recipient, sending]);
+  }, [addQueue, amount, api, recipient, sending, token]);
 
   return (
     <Box sx={{ width: 500, maxWidth: '100%', margin: '0 auto' }}>
@@ -56,19 +72,21 @@ function PageTransfer() {
       <Paper sx={{ padding: 2.5, borderRadius: '20px', marginTop: 1.25 }}>
         <Stack spacing={2}>
           <Typography variant='h3'>Transfer</Typography>
-          <InputAddress balance={sendingBalances?.availableBalance} filtered={filtered} isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} withBalance />
+          <InputAddress balance={sendingBalances} filtered={filtered} format={format} isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} withBalance />
           <Divider />
           <InputAddress
-            balance={recipientBalances?.availableBalance}
+            balance={recipientBalances}
             filtered={filtered.concat(allAddresses)}
+            format={format}
             label='Recipient'
             onChange={setRecipient}
             placeholder='Recipient'
             value={recipient}
             withBalance
           />
-          <InputNumber error={amountError} label='Amount' maxValue={sendingBalances?.availableBalance} onChange={setAmount} placeholder='Input amount' withMax />
-          <Button disabled={!amount || !recipient} fullWidth onClick={handleClick}>
+          <InputNumber error={amountError} format={format} label='Amount' maxValue={sendingBalances} onChange={setAmount} placeholder='Input amount' value={amount} withMax />
+          <SelectToken assetId={assetId} onChange={setToken} setAssetId={setAssetId} />
+          <Button disabled={!amount || !recipient || amount.eq(BN_ZERO)} fullWidth onClick={handleClick}>
             Review
           </Button>
         </Stack>

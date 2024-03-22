@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AccountBalance } from '@mimir-wallet/hooks/types';
+
 import { ReactComponent as IconFund } from '@mimir-wallet/assets/svg/icon-fund-fill.svg';
 import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
 import { ReactComponent as IconSet } from '@mimir-wallet/assets/svg/icon-set.svg';
@@ -11,8 +13,6 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-
-import { AccountBalance } from './types';
 
 function Info({ address, balances, toggleFundOpen }: { address?: string; balances?: AccountBalance; toggleFundOpen: () => void }) {
   const { meta } = useAddressMeta(address);

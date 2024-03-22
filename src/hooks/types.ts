@@ -1,8 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Asset } from '@mimir-wallet/config';
 import type { ApiPromise } from '@polkadot/api';
 import type { Call } from '@polkadot/types/interfaces';
+import type { PalletAssetsAssetStatus } from '@polkadot/types/lookup';
+import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
 
 export type CallParam = any;
@@ -201,4 +204,45 @@ export interface PushMessageData {
   raw: NewTxMessage | ApproveTxMessage | ExecuteTxMessage | CancelTxMessage;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface AssetInfoBase {
+  readonly isNative: boolean;
+  // metadata
+  readonly name: string;
+  readonly symbol: string;
+  readonly decimals: number;
+}
+
+export interface AssetInfo extends Asset, AssetInfoBase {
+  // for assets
+  readonly assetsInfo?: {
+    readonly owner: string;
+    readonly issuer: string;
+    readonly admin: string;
+    readonly freezer: string;
+    readonly supply: BN;
+    readonly deposit: BN;
+    readonly minBalance: BN;
+    readonly isSufficient: boolean;
+    readonly accounts: number;
+    readonly sufficients: number;
+    readonly approvals: number;
+    readonly status: PalletAssetsAssetStatus;
+  };
+}
+
+export interface AccountBalance {
+  total: BN;
+  locked: BN;
+  reserved: BN;
+  transferrable: BN;
+  bonded: BN;
+  redeemable: BN;
+  unbonding: BN;
+}
+
+export interface AccountAssetInfo extends AssetInfo {
+  balance: BN;
+  account: string;
 }

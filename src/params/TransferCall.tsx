@@ -10,7 +10,7 @@ import Item from './Param/Item';
 import FallbackCall from './FallbackCall';
 
 function TransferCall({ api, call, jsonFallback, type = 'base' }: CallProps) {
-  const args = useMemo(() => (api.tx.balances.transferKeepAlive.is(call) ? ([call.args[0], call.args[1]] as const) : null), [api, call]);
+  const args = useMemo(() => (api.tx.balances.transferKeepAlive?.is(call) ? ([call.args[0], call.args[1]] as const) : null), [api, call]);
 
   if (!args) {
     return jsonFallback ? <FallbackCall call={call} /> : null;

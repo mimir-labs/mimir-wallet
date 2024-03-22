@@ -6,7 +6,7 @@ import type { ApiPromise } from '@polkadot/api';
 import type { IMethod } from '@polkadot/types/types';
 
 import { FormatBalance } from '@mimir-wallet/components';
-import { findToken } from '@mimir-wallet/config';
+import { findAssets, findToken } from '@mimir-wallet/config';
 import { useSelectedAccountCallback } from '@mimir-wallet/hooks';
 import { Box, Typography } from '@mui/material';
 import React from 'react';
@@ -40,6 +40,17 @@ function ActionDisplay({ api, call, isSub, tx }: { isSub?: boolean; api: ApiProm
       <Typography color='primary.main' component={Link} onClick={() => tx.cancelTx?.top && selectAccount(tx.cancelTx?.top.sender)} to='/transactions'>
         No. {tx.cancelTx?.top?.uuid.slice(0, 8).toUpperCase()}
       </Typography>
+    );
+  } else if (api.tx.assets && (api.tx.assets.transfer?.is(call) || api.tx.assets.transferKeepAlive?.is(call))) {
+    const asset = findAssets(api.genesisHash.toHex()).find((asset) => asset.assetId === call.args[0].toString());
+
+    comp = (
+      <>
+        <Box component='img' src={asset?.Icon} sx={{ width: 20, height: 20 }} />
+        <Typography>
+          -<FormatBalance value={call.args[2].toString()} />
+        </Typography>
+      </>
     );
   } else {
     comp = '--';

@@ -38,6 +38,7 @@ export interface InputProps {
 }
 
 export interface InputAddressProps {
+  format?: [decimals: number, unit: string];
   defaultValue?: string;
   value?: string;
   disabled?: boolean;
@@ -52,6 +53,7 @@ export interface InputAddressProps {
 }
 
 export interface InputNumberProps extends Omit<InputProps, 'defaultValue' | 'value' | 'onChange'> {
+  format?: [decimals: number, unit: string];
   defaultValue?: string | BN;
   value?: BN;
   onChange?: (value: BN) => void;

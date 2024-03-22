@@ -45,13 +45,21 @@ function Notification() {
       onClick={(e) => {
         e.preventDefault();
         handleClose();
-        service.getStatus(raw.uuid).then(({ status }) => {
-          selectAccount(sender);
-          navigate({
-            pathname: '/transactions',
-            search: status >= CalldataStatus.Success ? 'status=history' : ''
+        service
+          .getStatus(raw.uuid)
+          .then(({ status }) => {
+            selectAccount(sender);
+            navigate({
+              pathname: '/transactions',
+              search: status >= CalldataStatus.Success ? 'status=history' : ''
+            });
+          })
+          .catch(() => {
+            selectAccount(sender);
+            navigate({
+              pathname: '/transactions'
+            });
           });
-        });
       }}
       spacing={0.5}
       sx={{ textDecoration: 'none', color: 'inherit', bgcolor: 'secondary.main', borderRadius: 1, padding: 1 }}
