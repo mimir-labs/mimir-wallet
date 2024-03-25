@@ -8,7 +8,7 @@ import type { PrepareFlexible } from './types';
 
 import { ReactComponent as IconQuestion } from '@mimir-wallet/assets/svg/icon-question-fill.svg';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
-import { referrer } from '@mimir-wallet/config';
+import { utm } from '@mimir-wallet/config';
 import { TxToastCtx, useApi, useCall, useSelectedAccountCallback } from '@mimir-wallet/hooks';
 import { addressToHex, getAddressMeta, service, signAndSend } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
@@ -167,7 +167,7 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
       if (_pure) {
         createMembers(_pure, who, signer, threshold, name);
 
-        referrer && service.setReferrer(addressToHex(_pure), referrer);
+        utm && service.utm(addressToHex(_pure), utm);
       }
     });
     events.once('error', () => {

@@ -17,4 +17,6 @@ export const CONNECTED_WALLETS_KEY = 'connected_wallets';
 
 export const CONNECT_ORIGIN = 'mimir-wallet';
 
-export const REFERRER_KEY = 'referrer';
+export const UTM_KEY = 'utm_source';
+
+export const NOT_CREATE_MULTISIG_NOW_KEY = 'not_create_multisig_now';
