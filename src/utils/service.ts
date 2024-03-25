@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { UTM } from '@mimir-wallet/config';
 import type { AccountData, CalldataStatus } from '@mimir-wallet/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
@@ -83,10 +84,10 @@ export async function getStatus(uuid: string): Promise<{ status: CalldataStatus 
   });
 }
 
-export async function setReferrer(address: HexString, referrer: string): Promise<void> {
-  await fetcher(getServiceUrl(`referrer/${address}`), {
+export async function utm(address: HexString, utm: UTM): Promise<void> {
+  await fetcher(getServiceUrl(`utm/${address}`), {
     method: 'POST',
-    body: JSON.stringify({ referrer }),
+    body: JSON.stringify(utm),
     headers: jsonHeader
   });
 }

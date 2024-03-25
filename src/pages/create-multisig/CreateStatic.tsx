@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { referrer } from '@mimir-wallet/config';
+import { utm } from '@mimir-wallet/config';
 import { useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
 import { addressToHex, service } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
@@ -43,7 +43,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
 
       const address = createMultisig(signatories, threshold, name);
 
-      referrer && (await service.setReferrer(addressToHex(address), referrer));
+      utm && (await service.utm(addressToHex(address), utm));
 
       await service.createMultisig(
         signatories.map((value) => addressToHex(value)),

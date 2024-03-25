@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Fund } from '@mimir-wallet/components';
+import { NOT_CREATE_MULTISIG_NOW_KEY } from '@mimir-wallet/constants';
 import { useDapps, useGroupAccounts, useNativeBalances, useProposal, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
+import { useState } from 'react';
+import store from 'store';
 
 import Assets from './Assets';
 import FavoriteDapps from './FavoriteDapp';
@@ -20,10 +23,11 @@ function PageProfile() {
   const { addFavorite, favorites, isFavorite, removeFavorite } = useDapps();
   const proposals = useProposal();
   const balances = useNativeBalances(selected);
+  const [notNow, setNotNow] = useState(!!store.get(NOT_CREATE_MULTISIG_NOW_KEY));
 
   return (
     <>
-      {multisig.length > 0 ? (
+      {multisig.length > 0 || (notNow && selected) ? (
         <ProfileWrapper
           assets={<Assets address={selected} nativeBalance={balances} />}
           dapps={favorites.length > 0 ? <FavoriteDapps addFavorite={addFavorite} dapps={favorites} isFavorite={isFavorite} removeFavorite={removeFavorite} /> : null}
@@ -33,7 +37,7 @@ function PageProfile() {
           transaction={<Transactions address={selected} />}
         />
       ) : (
-        <Welcome />
+        <Welcome handleNotNow={() => setNotNow(true)} />
       )}
       <Fund onClose={toggleFundOpen} open={fundOpen} receipt={selected} />
     </>
