@@ -106,6 +106,18 @@ export const paseoEndpoints: Endpoint[] = [
 export const allEndpoints = devEndpoints.concat(testnetEndpoints).concat(polkadotEndpoints).concat(kusamaEndpoints).concat(paseoEndpoints);
 
 function _defaultApiUrl() {
+  const url = new URL(window.location.href);
+
+  const rpc = url.searchParams.get('rpc');
+
+  if (rpc) {
+    try {
+      const url = new URL(decodeURIComponent(rpc));
+
+      url.protocol === 'wss:' && store.set(API_URL_KEY, decodeURIComponent(rpc));
+    } catch {}
+  }
+
   let wsUrl = store.get(API_URL_KEY);
 
   if (wsUrl) {
