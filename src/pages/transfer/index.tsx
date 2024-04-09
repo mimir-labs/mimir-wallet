@@ -84,7 +84,7 @@ function PageTransfer() {
             value={recipient}
             withBalance
           />
-          <InputNumber error={amountError} format={format} label='Amount' maxValue={sendingBalances} onChange={setAmount} placeholder='Input amount' value={amount} withMax />
+          <InputNumber error={amountError} format={format} key={assetId} label='Amount' maxValue={sendingBalances} onChange={setAmount} placeholder='Input amount' withMax />
           <SelectToken assetId={assetId} onChange={setToken} setAssetId={setAssetId} />
           <Button disabled={!amount || !recipient || amount.eq(BN_ZERO)} fullWidth onClick={handleClick}>
             Review

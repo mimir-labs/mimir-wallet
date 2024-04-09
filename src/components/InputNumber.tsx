@@ -7,7 +7,7 @@ import type { InputNumberProps } from './types';
 import { useApi } from '@mimir-wallet/hooks';
 import { Box, Button } from '@mui/material';
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import FormatBalance from './FormatBalance';
 import Input from './Input';
@@ -37,7 +37,7 @@ function bnToInput(api: ApiPromise, bn: BN, decimals = api.registry.chainDecimal
   if (new BN(mod).eq(BN_ZERO)) {
     return div;
   } else {
-    return `${div}.${mod}`;
+    return `${div || 0}.${mod}`;
   }
 }
 
@@ -46,27 +46,17 @@ function getValues(api: ApiPromise, value: BN, decimals = api.registry.chainDeci
 }
 
 function InputNumber({ defaultValue, format, maxValue, onChange, value: propsValue, withMax, ...props }: InputNumberProps) {
-  const isControl = useRef(propsValue !== undefined);
   const { api } = useApi();
   const _defaultValue = useMemo(() => defaultValue?.toString(), [defaultValue]);
   const [[value], setValues] = useState<[string, BN]>(getValues(api, new BN(propsValue || _defaultValue || '0'), format?.[0]));
 
   const _onChange = useCallback(
     (value: string) => {
-      if (!isControl.current) {
-        setValues([value, inputToBn(api, value, format?.[0])]);
-      }
-
+      setValues([value, inputToBn(api, value, format?.[0])]);
       onChange?.(inputToBn(api, value, format?.[0]));
     },
     [api, format, onChange]
   );
-
-  useEffect(() => {
-    if (isControl.current) {
-      propsValue && setValues(getValues(api, propsValue, format?.[0]));
-    }
-  }, [api, format, propsValue]);
 
   return (
     <Input
