@@ -102,8 +102,22 @@ export const paseoEndpoints: Endpoint[] = [
     socketUrl: 'wss://paseo-api.mimir.global/'
   }
 ];
+export const solochainEndpoints: Endpoint[] = [
+  {
+    icon: '/chain-icons/vara.png',
+    tokenIcon: '/token-icons/vara.png',
+    name: 'Vara',
+    wsUrl: 'wss://rpc.vara.network',
+    genesisHash: '0xfe1b4c55fd4d668101126434206571a7838a8b6b93a6d1b95d607e78e6c53763',
+    serviceUrl: 'https://vara-api.mimir.global/',
+    socketUrl: 'wss://vara-api.mimir.global/',
+    explorerUrl: 'https://vara.subscan.io/',
+    proposalApi: 'https://vara.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://vara.subsquare.io/'
+  }
+];
 
-export const allEndpoints = devEndpoints.concat(testnetEndpoints).concat(polkadotEndpoints).concat(kusamaEndpoints).concat(paseoEndpoints);
+export const allEndpoints = devEndpoints.concat(testnetEndpoints).concat(polkadotEndpoints).concat(kusamaEndpoints).concat(paseoEndpoints).concat(solochainEndpoints);
 
 function _defaultApiUrl() {
   const url = new URL(window.location.href);
@@ -149,6 +163,7 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
       return {
         polkadot: polkadotEndpoints,
         kusama: kusamaEndpoints,
+        solochain: solochainEndpoints,
         rococo: testnetEndpoints,
         paseo: paseoEndpoints,
         mimir: devEndpoints,
@@ -158,6 +173,7 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
       return {
         polkadot: polkadotEndpoints,
         kusama: kusamaEndpoints,
+        solochain: solochainEndpoints,
         rococo: testnetEndpoints,
         paseo: paseoEndpoints
       };
@@ -168,6 +184,7 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
     return {
       polkadot: polkadotEndpoints,
       kusama: kusamaEndpoints,
+      soloChain: solochainEndpoints,
       rococo: testnetEndpoints,
       paseo: paseoEndpoints,
       mimir: devEndpoints,
