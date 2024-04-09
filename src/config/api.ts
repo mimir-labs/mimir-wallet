@@ -112,6 +112,7 @@ export const solochainEndpoints: Endpoint[] = [
     serviceUrl: 'https://vara-api.mimir.global/',
     socketUrl: 'wss://vara-api.mimir.global/',
     explorerUrl: 'https://vara.subscan.io/',
+    proposalApi: 'https://vara.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://vara.subsquare.io/'
   }
 ];
