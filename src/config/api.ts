@@ -172,6 +172,7 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
       return {
         polkadot: polkadotEndpoints,
         kusama: kusamaEndpoints,
+        solochain: solochainEndpoints,
         rococo: testnetEndpoints,
         paseo: paseoEndpoints
       };
