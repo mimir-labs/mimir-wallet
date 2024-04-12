@@ -75,6 +75,18 @@ export const polkadotEndpoints: Endpoint[] = [
     serviceUrl: 'https://assethub-polkadot-api.mimir.global/',
     socketUrl: 'wss://assethub-polkadot-api.mimir.global/',
     explorerUrl: 'https://assethub-polkadot.subscan.io/'
+  },
+  {
+    icon: '/chain-icons/bifrost-polkadot.png',
+    tokenIcon: '/token-icons/bnc.png',
+    name: 'Bifrost',
+    wsUrl: 'wss://hk.p.bifrost-rpc.liebi.com/ws',
+    genesisHash: '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
+    serviceUrl: 'https://bifrost-polkadot-api.mimir.global/',
+    socketUrl: 'wss://bifrost-polkadot-api.mimir.global/',
+    explorerUrl: 'https://bifrost.subscan.io/',
+    proposalApi: 'https://bifrost.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://bifrost.subsquare.io/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
@@ -89,6 +101,18 @@ export const kusamaEndpoints: Endpoint[] = [
     explorerUrl: 'https://kusama.subscan.io/',
     proposalApi: 'https://kusama.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://kusama.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/bifrost-kusama.png',
+    tokenIcon: '/token-icons/bnc.png',
+    name: 'Bifrost Kusama',
+    wsUrl: 'wss://bifrost-rpc.liebi.com/ws',
+    genesisHash: '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed',
+    serviceUrl: 'https://bifrost-kusama-api.mimir.global/',
+    socketUrl: 'wss://bifrost-kusama-api.mimir.global/',
+    explorerUrl: 'https://bifrost.subscan.io/',
+    proposalApi: 'https://bifrost.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://bifrost.subsquare.io/'
   }
 ];
 export const paseoEndpoints: Endpoint[] = [
