@@ -3,6 +3,7 @@
 
 import Fearless from '@mimir-wallet/assets/images/fearless.png';
 import FearlessDisabled from '@mimir-wallet/assets/images/fearless-disabled.png';
+import PlutoWallet from '@mimir-wallet/assets/images/plutowalleticon.png';
 import PolkadotJs from '@mimir-wallet/assets/images/polkadotjs.svg';
 import PolkadotJsDisabled from '@mimir-wallet/assets/images/polkadotjs-disabled.svg';
 import Subwallet from '@mimir-wallet/assets/images/subwallet.png';
@@ -40,6 +41,12 @@ export const walletConfig: Record<string, WalletConfig> = {
     icon: PolkadotJs,
     disabledIcon: PolkadotJsDisabled,
     name: 'Polkadot.js',
+    downloadUrl: 'https://polkadot.js.org/extension/'
+  },
+  'pluto-wallet': {
+    icon: PlutoWallet,
+    disabledIcon: PlutoWallet, // PlutoWallet is always enabled
+    name: 'PlutoWallet',
     downloadUrl: 'https://polkadot.js.org/extension/'
   }
 };
