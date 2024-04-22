@@ -43,10 +43,10 @@ export const walletConfig: Record<string, WalletConfig> = {
     name: 'Polkadot.js',
     downloadUrl: 'https://polkadot.js.org/extension/'
   },
-  'pluto-wallet': {
+  plutonication: {
     icon: PlutoWallet,
     disabledIcon: PlutoWallet, // PlutoWallet is always enabled
-    name: 'PlutoWallet',
-    downloadUrl: 'https://polkadot.js.org/extension/'
+    name: 'Plutonication',
+    downloadUrl: 'https://plutonication.com'
   }
 };

@@ -32,7 +32,7 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
             Connect
           </Button>
         )
-      ) : name === 'PlutoWallet' ? (
+      ) : id === 'plutonication' ? (
         <Button
           onClick={async () => {
             const accessCredentials = new AccessCredentials('wss://plutonication-acnha.ondigitalocean.app/', 'Mimir', 'https://rostislavlitovkin.pythonanywhere.com/plutowalleticonwhite');
