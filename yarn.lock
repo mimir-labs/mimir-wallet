@@ -4673,9 +4673,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@plutonication/plutonication@npm:^1.0.94":
-  version: 1.0.94
-  resolution: "@plutonication/plutonication@npm:1.0.94"
+"@plutonication/plutonication@npm:^1.0.97":
+  version: 1.0.97
+  resolution: "@plutonication/plutonication@npm:1.0.97"
   dependencies:
     "@babel/core": "npm:^7.23.7"
     "@babel/plugin-proposal-export-default-from": "npm:^7.23.3"
@@ -4694,7 +4694,7 @@ __metadata:
     socket.io-client: "npm:^4.7.2"
     tsify: "npm:^5.0.4"
     webpack: "npm:^5.89.0"
-  checksum: 10c0/41795d36ad3f2f42d933a6ddd5f79abfaaa612e13615378f52d66837dadbbf9f666bd339aee83b749addcc1132bba11378ef8f8094177ad0a5dec06dcb00bb92
+  checksum: 10c0/817074ed1e161e6d1ab8de4467f2924de55b391a9af7533de9b1465d2619db84c2a639c281d093b1897a3dbf3f031c57762e0b111f8e41eb97e33645e9634ea8
   languageName: node
   linkType: hard
 
@@ -17053,7 +17053,7 @@ __metadata:
     "@mimirdev/dev": "npm:^0.4.0"
     "@mui/lab": "npm:^5.0.0-alpha.165"
     "@mui/material": "npm:^5.15.10"
-    "@plutonication/plutonication": "npm:^1.0.94"
+    "@plutonication/plutonication": "npm:^1.0.97"
     "@polkadot/api": "npm:^10.11.2"
     "@polkadot/api-derive": "npm:^10.11.2"
     "@polkadot/extension-inject": "npm:^0.46.6"

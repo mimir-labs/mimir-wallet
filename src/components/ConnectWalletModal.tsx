@@ -34,22 +34,15 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
         )
       ) : name === 'PlutoWallet' ? (
         <Button
-          onClick={() => {
-            window.injectedWeb3 = {
-              'pluto-wallet': {
-                version: '0.1.0',
-                enable: async (originName: string) => {
-                  const accessCredentials = new AccessCredentials('wss://plutonication-acnha.ondigitalocean.app/', originName, 'https://rostislavlitovkin.pythonanywhere.com/plutowalleticonwhite');
+          onClick={async () => {
+            const accessCredentials = new AccessCredentials('wss://plutonication-acnha.ondigitalocean.app/', 'Mimir', 'https://rostislavlitovkin.pythonanywhere.com/plutowalleticonwhite');
 
-                  return await initializePlutonicationDAppClientWithModal(accessCredentials, (receivedPubkey: string) => {
-                    /* */
-                    console.log(receivedPubkey);
-                  });
-                }
-              }
-            };
+            await initializePlutonicationDAppClientWithModal(accessCredentials, (receivedPubkey: string) => {
+              /* */
+              console.log(receivedPubkey);
+            });
 
-            connect('pluto-wallet').catch(toastError);
+            connect('plutonication').catch(toastError);
           }}
           size={downSm ? 'small' : 'medium'}
           variant='outlined'
