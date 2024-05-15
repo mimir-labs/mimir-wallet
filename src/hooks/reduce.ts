@@ -3,13 +3,14 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { ApiDecoration, ApiTypes } from '@polkadot/api/types';
-import type { GenericCall, Null, Option, Result, U8aFixed } from '@polkadot/types';
+import type { Null, Option, Result, U8aFixed } from '@polkadot/types';
 import type { AccountId32, Event, Multisig } from '@polkadot/types/interfaces';
 import type { PalletMultisigTimepoint, SpRuntimeDispatchError } from '@polkadot/types/lookup';
 import type { IEvent } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { addressToHex } from '@mimir-wallet/utils';
+import { GenericCall } from '@polkadot/types';
 import { u8aEq, u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 
@@ -149,9 +150,23 @@ export async function reduceCalldata(
       _sender = u8aToHex(createKeyMulti([sender, ...call.args[1]], call.args[0]));
       _call = call.args[3];
 
-      const callHash = call.args[3].hash.toHex();
+      if (call.args[3] instanceof GenericCall) {
+        _call = call.args[3];
 
-      callStatus.set(callHash, await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash));
+        const callHash = _call.hash.toHex();
+
+        callStatus.set(callHash, await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash));
+      } else {
+        try {
+          _call = api.registry.createType('Call', (call.args[3] as any).toU8a(true));
+
+          const callHash = _call.hash.toHex();
+
+          callStatus.set(callHash, await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash));
+        } catch (error) {
+          _call = undefined;
+        }
+      }
     } else if (api.tx.multisig.approveAsMulti.is(call)) {
       _sender = u8aToHex(createKeyMulti([sender, ...call.args[1]], call.args[0]));
 
