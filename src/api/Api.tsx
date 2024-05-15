@@ -7,6 +7,7 @@ import type { ApiProps, ApiState } from './types';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
+import { typesBundle } from '@polkadot/apps-config/api';
 import { keyring } from '@polkadot/ui-keyring';
 import { formatBalance, isTestChain, objectSpread, stringify } from '@polkadot/util';
 import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
@@ -129,7 +130,16 @@ function createApi(apiUrl: string, onError: (error: unknown) => void): void {
   try {
     const provider = new WsProvider(apiUrl);
 
-    api = new ApiPromise({ provider, registry });
+    api = new ApiPromise({
+      provider,
+      registry,
+      typesBundle,
+      typesChain: {
+        Crust: {
+          DispatchErrorModule: 'DispatchErrorModuleU8'
+        }
+      }
+    });
   } catch (error) {
     onError(error);
   }

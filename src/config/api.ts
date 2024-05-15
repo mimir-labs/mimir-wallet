@@ -87,6 +87,16 @@ export const polkadotEndpoints: Endpoint[] = [
     explorerUrl: 'https://bifrost.subscan.io/',
     proposalApi: 'https://bifrost.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://bifrost.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/crust-polkadot.svg',
+    tokenIcon: '/token-icons/cru.svg',
+    name: 'Crust',
+    wsUrl: 'wss://crust-parachain.crustapps.net/',
+    genesisHash: '0x4319cc49ee79495b57a1fec4d2bd43f59052dcc690276de566c2691d6df4f7b8',
+    serviceUrl: 'https://crust-polkadot-api.mimir.global/',
+    socketUrl: 'wss://crust-polkadot-api.mimir.global/',
+    explorerUrl: 'https://crust-parachain.subscan.io/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
@@ -138,6 +148,18 @@ export const solochainEndpoints: Endpoint[] = [
     explorerUrl: 'https://vara.subscan.io/',
     proposalApi: 'https://vara.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://vara.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/crust.svg',
+    tokenIcon: '/token-icons/cru.svg',
+    name: 'Crust',
+    wsUrl: 'wss://rpc.crust.network/',
+    genesisHash: '0x8b404e7ed8789d813982b9cb4c8b664c05b3fbf433309f603af014ec9ce56a8c',
+    serviceUrl: 'https://crust-api.mimir.global/',
+    socketUrl: 'wss://crust-api.mimir.global/',
+    explorerUrl: 'https://crust.subscan.io/',
+    proposalApi: 'https://crust.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://crust.subsquare.io/'
   }
 ];
 

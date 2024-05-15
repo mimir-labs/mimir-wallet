@@ -20,8 +20,8 @@
   },
   "devDependencies": {
     "@mimirdev/dev": "^0.4.0",
-    "@polkadot/extension-base": "^0.47.3",
-    "@polkadot/extension-inject": "^0.47.3",
+    "@polkadot/extension-base": "^0.47.4",
+    "@polkadot/extension-inject": "^0.47.4",
     "@types/path-browserify": "^1",
     "path-browserify": "^1.0.1",
     "stream-browserify": "^3.0.0",

@@ -246,3 +246,9 @@ export interface AccountAssetInfo extends AssetInfo {
   balance: BN;
   account: string;
 }
+
+export interface SafetyLevel {
+  severity: 'none' | 'warning' | 'error';
+  title: string;
+  message: string;
+}

@@ -50,7 +50,13 @@ export function createTransaction(api: ApiPromise, calldata: Calldata, isFinaliz
       this.cancelChildren = [];
       this.uuid = calldata.uuid;
       this.hash = calldata.hash;
-      this.call = calldata.metadata ? api.registry.createType('Call', calldata.metadata) : null;
+
+      try {
+        this.call = calldata.metadata ? api.registry.createType('Call', calldata.metadata) : null;
+      } catch {
+        this.call = null;
+      }
+
       this.sender = keyring.encodeAddress(calldata.sender);
       this.status = calldata.status;
       this.isValid = calldata.isValid;
