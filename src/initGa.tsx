@@ -4,5 +4,5 @@
 import ReactGA from 'react-ga4';
 
 export function initGa() {
-  ReactGA.initialize('G-N1N38RJE6Q');
+  ReactGA.initialize('G-2MD2S3XXRG');
 }
