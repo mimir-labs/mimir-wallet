@@ -97,6 +97,16 @@ export const polkadotEndpoints: Endpoint[] = [
     serviceUrl: 'https://crust-polkadot-api.mimir.global/',
     socketUrl: 'wss://crust-polkadot-api.mimir.global/',
     explorerUrl: 'https://crust-parachain.subscan.io/'
+  },
+  {
+    icon: '/chain-icons/pendulum.svg',
+    tokenIcon: '/token-icons/pen.png',
+    name: 'Pendulum',
+    wsUrl: 'wss://rpc-pendulum.prd.pendulumchain.tech/',
+    genesisHash: '0x5d3c298622d5634ed019bf61ea4b71655030015bde9beb0d6a24743714462c86',
+    serviceUrl: 'https://pendulum-api.mimir.global/',
+    socketUrl: 'wss://pendulum-api.mimir.global/',
+    explorerUrl: 'https://pendulum.subscan.io/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
@@ -123,6 +133,15 @@ export const kusamaEndpoints: Endpoint[] = [
     explorerUrl: 'https://bifrost.subscan.io/',
     proposalApi: 'https://bifrost.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://bifrost.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/amplitude.svg',
+    tokenIcon: '/token-icons/ampe.svg',
+    name: 'Amplitude',
+    wsUrl: 'wss://rpc-amplitude.pendulumchain.tech',
+    genesisHash: '0xcceae7f3b9947cdb67369c026ef78efa5f34a08fe5808d373c04421ecf4f1aaf',
+    serviceUrl: 'https://amplitude-api.mimir.global/',
+    socketUrl: 'wss://amplitude-api.mimir.global/'
   }
 ];
 export const paseoEndpoints: Endpoint[] = [
