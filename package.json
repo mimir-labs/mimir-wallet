@@ -47,11 +47,11 @@
     "@emotion/styled": "^11.11.0",
     "@mui/lab": "^5.0.0-alpha.165",
     "@mui/material": "^5.15.10",
-    "@polkadot/api": "^11.0.3",
-    "@polkadot/api-derive": "^11.0.3",
-    "@polkadot/apps-config": "^0.137.1",
+    "@polkadot/api": "^11.2.1",
+    "@polkadot/api-derive": "^11.2.1",
+    "@polkadot/apps-config": "^0.138.1",
     "@polkadot/react-identicon": "^3.6.6",
-    "@polkadot/types": "^11.0.3",
+    "@polkadot/types": "^11.2.1",
     "@polkadot/ui-keyring": "^3.6.6",
     "@polkadot/util": "^12.6.2",
     "@polkadot/util-crypto": "^12.6.2",
@@ -78,7 +78,7 @@
     "@craco/craco": "^7.1.0",
     "@craco/types": "^7.1.0",
     "@mimirdev/dev": "^0.4.0",
-    "@polkadot/extension-inject": "^0.47.4",
+    "@polkadot/extension-inject": "^0.47.5",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.2",
@@ -99,12 +99,12 @@
     "workbox-webpack-plugin": "^7.0.0"
   },
   "resolutions": {
-    "@polkadot/api": "^11.0.3",
-    "@polkadot/api-augment": "^11.0.3",
-    "@polkadot/api-base": "^11.0.3",
-    "@polkadot/rpc-core": "^11.0.3",
-    "@polkadot/types": "^11.0.3",
-    "@polkadot/types-codec": "^11.0.3",
+    "@polkadot/api": "^11.2.1",
+    "@polkadot/api-augment": "^11.2.1",
+    "@polkadot/api-base": "^11.2.1",
+    "@polkadot/rpc-core": "^11.2.1",
+    "@polkadot/types": "^11.2.1",
+    "@polkadot/types-codec": "^11.2.1",
     "typescript": "5.2.2"
   }
 }
