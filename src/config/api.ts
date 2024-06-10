@@ -107,6 +107,18 @@ export const polkadotEndpoints: Endpoint[] = [
     serviceUrl: 'https://pendulum-api.mimir.global/',
     socketUrl: 'wss://pendulum-api.mimir.global/',
     explorerUrl: 'https://pendulum.subscan.io/'
+  },
+  {
+    icon: '/chain-icons/Acala.svg',
+    tokenIcon: '/token-icons/ACA.png',
+    name: 'Acala',
+    wsUrl: 'wss://acala-rpc-0.aca-api.network/',
+    genesisHash: '0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c',
+    serviceUrl: 'https://acala-api.mimir.global/',
+    socketUrl: 'wss://acala-api.mimir.global/',
+    explorerUrl: 'https://acala.subscan.io/',
+    proposalApi: 'https://acala.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://acala.subsquare.io/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
@@ -142,6 +154,18 @@ export const kusamaEndpoints: Endpoint[] = [
     genesisHash: '0xcceae7f3b9947cdb67369c026ef78efa5f34a08fe5808d373c04421ecf4f1aaf',
     serviceUrl: 'https://amplitude-api.mimir.global/',
     socketUrl: 'wss://amplitude-api.mimir.global/'
+  },
+  {
+    icon: '/chain-icons/Karura.svg',
+    tokenIcon: '/token-icons/KAR.png',
+    name: 'Karura',
+    wsUrl: 'wss://karura-rpc-0.aca-api.network/',
+    genesisHash: '0xbaf5aabe40646d11f0ee8abbdc64f4a4b7674925cba08e4a05ff9ebed6e2126b',
+    serviceUrl: 'https://karura-api.mimir.global/',
+    socketUrl: 'wss://karura-api.mimir.global/',
+    explorerUrl: 'https://karura.subscan.io/',
+    proposalApi: 'https://karura.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://karura.subsquare.io/'
   }
 ];
 export const paseoEndpoints: Endpoint[] = [
