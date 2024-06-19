@@ -110,7 +110,7 @@ export const polkadotEndpoints: Endpoint[] = [
   },
   {
     icon: '/chain-icons/Acala.svg',
-    tokenIcon: '/token-icons/ACA.png',
+    tokenIcon: '/token-icons/ACA.svg',
     name: 'Acala',
     wsUrl: 'wss://acala-rpc-0.aca-api.network/',
     genesisHash: '0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c',
