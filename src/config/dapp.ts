@@ -101,6 +101,40 @@ export const dapps: DappOption[] = [
     tags: ['Staking'],
     website: 'https://staking.polkadot.network/',
     github: 'https://github.com/paritytech/polkadot-staking-dashboard'
+  },
+  {
+    id: 1005,
+    internal: false,
+    icon: '/dapp-icons/bifrost.png',
+    name: 'Bifrost App',
+    description:
+      'The Bifrost App integrates operations such as cross-chain transfers, swaps, and Yield Farming, providing vital liquidity and asset management services for the Polkadot ecosystem. This makes Bifrost an indispensable part of the Polkadot ecosystem.',
+    url: 'https://bifrost.app/',
+    supportedChains: [
+      '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+      '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
+      '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
+      '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed',
+      '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f'
+    ],
+    tags: ['Defi'],
+    website: 'https://bifrost.finance/',
+    github: 'https://github.com/bifrost-finance'
+  },
+  {
+    id: 1006,
+    internal: false,
+    icon: '/dapp-icons/crust.webp',
+    name: 'Crust Files',
+    description:
+      "Crust Files is the world's first Web 3.0 personal file storage application, launched by Crust Network. The Crust Files application enables safe storage of your personal files on IPFS, secured by the Crust Network public blockchain.",
+    url: 'https://crustfiles.io/',
+    supportedChains: ['0x8b404e7ed8789d813982b9cb4c8b664c05b3fbf433309f603af014ec9ce56a8c'],
+    tags: ['Defi'],
+    website: 'https://crust.network/',
+    twitter: 'https://x.com/CrustNetwork',
+    discord: 'https://discord.gg/prkGRTeMGN',
+    github: 'https://github.com/crustio'
   }
 ];
 

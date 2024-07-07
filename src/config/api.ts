@@ -87,6 +87,38 @@ export const polkadotEndpoints: Endpoint[] = [
     explorerUrl: 'https://bifrost.subscan.io/',
     proposalApi: 'https://bifrost.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://bifrost.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/crust-polkadot.svg',
+    tokenIcon: '/token-icons/cru.svg',
+    name: 'Crust',
+    wsUrl: 'wss://crust-parachain.crustapps.net/',
+    genesisHash: '0x4319cc49ee79495b57a1fec4d2bd43f59052dcc690276de566c2691d6df4f7b8',
+    serviceUrl: 'https://crust-polkadot-api.mimir.global/',
+    socketUrl: 'wss://crust-polkadot-api.mimir.global/',
+    explorerUrl: 'https://crust-parachain.subscan.io/'
+  },
+  {
+    icon: '/chain-icons/pendulum.svg',
+    tokenIcon: '/token-icons/pen.png',
+    name: 'Pendulum',
+    wsUrl: 'wss://rpc-pendulum.prd.pendulumchain.tech/',
+    genesisHash: '0x5d3c298622d5634ed019bf61ea4b71655030015bde9beb0d6a24743714462c86',
+    serviceUrl: 'https://pendulum-api.mimir.global/',
+    socketUrl: 'wss://pendulum-api.mimir.global/',
+    explorerUrl: 'https://pendulum.subscan.io/'
+  },
+  {
+    icon: '/chain-icons/Acala.svg',
+    tokenIcon: '/token-icons/ACA.svg',
+    name: 'Acala',
+    wsUrl: 'wss://acala-rpc-0.aca-api.network/',
+    genesisHash: '0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c',
+    serviceUrl: 'https://acala-api.mimir.global/',
+    socketUrl: 'wss://acala-api.mimir.global/',
+    explorerUrl: 'https://acala.subscan.io/',
+    proposalApi: 'https://acala.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://acala.subsquare.io/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
@@ -113,6 +145,27 @@ export const kusamaEndpoints: Endpoint[] = [
     explorerUrl: 'https://bifrost.subscan.io/',
     proposalApi: 'https://bifrost.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://bifrost.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/amplitude.svg',
+    tokenIcon: '/token-icons/ampe.svg',
+    name: 'Amplitude',
+    wsUrl: 'wss://rpc-amplitude.pendulumchain.tech',
+    genesisHash: '0xcceae7f3b9947cdb67369c026ef78efa5f34a08fe5808d373c04421ecf4f1aaf',
+    serviceUrl: 'https://amplitude-api.mimir.global/',
+    socketUrl: 'wss://amplitude-api.mimir.global/'
+  },
+  {
+    icon: '/chain-icons/Karura.svg',
+    tokenIcon: '/token-icons/KAR.png',
+    name: 'Karura',
+    wsUrl: 'wss://karura-rpc-0.aca-api.network/',
+    genesisHash: '0xbaf5aabe40646d11f0ee8abbdc64f4a4b7674925cba08e4a05ff9ebed6e2126b',
+    serviceUrl: 'https://karura-api.mimir.global/',
+    socketUrl: 'wss://karura-api.mimir.global/',
+    explorerUrl: 'https://karura.subscan.io/',
+    proposalApi: 'https://karura.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://karura.subsquare.io/'
   }
 ];
 export const paseoEndpoints: Endpoint[] = [
@@ -138,6 +191,18 @@ export const solochainEndpoints: Endpoint[] = [
     explorerUrl: 'https://vara.subscan.io/',
     proposalApi: 'https://vara.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://vara.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/crust.svg',
+    tokenIcon: '/token-icons/cru.svg',
+    name: 'Crust',
+    wsUrl: 'wss://rpc.crust.network/',
+    genesisHash: '0x8b404e7ed8789d813982b9cb4c8b664c05b3fbf433309f603af014ec9ce56a8c',
+    serviceUrl: 'https://crust-api.mimir.global/',
+    socketUrl: 'wss://crust-api.mimir.global/',
+    explorerUrl: 'https://crust.subscan.io/',
+    proposalApi: 'https://crust.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://crust.subsquare.io/'
   }
 ];
 

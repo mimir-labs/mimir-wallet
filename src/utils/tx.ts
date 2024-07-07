@@ -161,18 +161,6 @@ export async function sign(extrinsic: SubmittableExtrinsic<'promise'>, signer: s
 
   extrinsic.addSignature(signer, signature, payload.toPayload());
 
-  const result = await api.call.blockBuilder.applyExtrinsic(extrinsic);
-
-  if (result.isErr) {
-    if (result.asErr.isInvalid) {
-      throw new Error(`Invalid Transaction: ${result.asErr.asInvalid.type}`);
-    } else {
-      throw new Error(`Unknown Error: ${result.asErr.asUnknown.type}`);
-    }
-  } else if (result.asOk.isErr) {
-    throw _assetDispatchError(result.asOk.asErr);
-  }
-
   return [signature, payload.toPayload(), extrinsic.hash];
 }
 

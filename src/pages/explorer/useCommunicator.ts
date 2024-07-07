@@ -30,7 +30,7 @@ export function useCommunicator(iframeRef: MutableRefObject<HTMLIFrameElement | 
       return new Promise((resolve, reject) => {
         addQueue({
           extrinsic: api.tx[call.section][call.method](...call.args),
-          accountId: payload.address,
+          accountId: keyring.encodeAddress(payload.address),
           onlySign: true,
           website: website.origin,
           onSignature: (signer, signature, tx, payload) => {

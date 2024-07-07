@@ -84,10 +84,20 @@ async function _asMulti(
     if (timepoint) {
       return [api.tx.multisig.cancelAsMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.hash), true];
     } else {
-      return [api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method, weight), false];
+      return [
+        api.tx.multisig.asMulti.meta.args.length === 6
+          ? (api.tx.multisig.asMulti as any)(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.toHex(), false, weight)
+          : api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.toHex(), weight),
+        false
+      ];
     }
   } else {
-    return [api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method, weight), false];
+    return [
+      api.tx.multisig.asMulti.meta.args.length === 6
+        ? (api.tx.multisig.asMulti as any)(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.toHex(), false, weight)
+        : api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.toHex(), weight),
+      false
+    ];
   }
 }
 
