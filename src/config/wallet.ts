@@ -3,7 +3,7 @@
 
 import Fearless from '@mimir-wallet/assets/images/fearless.png';
 import FearlessDisabled from '@mimir-wallet/assets/images/fearless-disabled.png';
-import PlutoWallet from '@mimir-wallet/assets/images/plutowalleticon.png';
+import Plutonication from '@mimir-wallet/assets/images/plutonication-icon.png';
 import PolkadotJs from '@mimir-wallet/assets/images/polkadotjs.svg';
 import PolkadotJsDisabled from '@mimir-wallet/assets/images/polkadotjs-disabled.svg';
 import Subwallet from '@mimir-wallet/assets/images/subwallet.png';
@@ -44,8 +44,8 @@ export const walletConfig: Record<string, WalletConfig> = {
     downloadUrl: 'https://polkadot.js.org/extension/'
   },
   plutonication: {
-    icon: PlutoWallet,
-    disabledIcon: PlutoWallet, // PlutoWallet is always enabled
+    icon: Plutonication,
+    disabledIcon: Plutonication, // PlutoWallet is always enabled
     name: 'Plutonication',
     downloadUrl: 'https://plutonication.com'
   }
