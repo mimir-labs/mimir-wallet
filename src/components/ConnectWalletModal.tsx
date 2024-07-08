@@ -35,7 +35,7 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
       ) : id === 'plutonication' ? (
         <Button
           onClick={async () => {
-            const accessCredentials = new AccessCredentials('wss://plutonication-acnha.ondigitalocean.app/', 'Mimir', 'https://rostislavlitovkin.pythonanywhere.com/plutowalleticonwhite');
+            const accessCredentials = new AccessCredentials('wss://plutonication.com/', 'Mimir', 'https://plutonication.com/dapp/mimir-icon', 'Mimir');
 
             await initializePlutonicationDAppClientWithModal(accessCredentials, (receivedPubkey: string) => {
               /* */
