@@ -47,6 +47,7 @@
     "@emotion/styled": "^11.11.0",
     "@mui/lab": "^5.0.0-alpha.165",
     "@mui/material": "^5.15.10",
+    "@plutonication/plutonication": "^1.1.0",
     "@polkadot/api": "^11.2.1",
     "@polkadot/api-derive": "^11.2.1",
     "@polkadot/apps-config": "^0.138.1",

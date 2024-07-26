@@ -5,6 +5,7 @@ import { walletConfig } from '@mimir-wallet/config';
 import { WalletCtx } from '@mimir-wallet/hooks';
 import { Button, Dialog, DialogContent, DialogTitle, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
+import { AccessCredentials, initializePlutonicationDAppClientWithModal } from '@plutonication/plutonication';
 import React, { useContext } from 'react';
 
 import { toastError } from './ToastRoot';
@@ -31,6 +32,23 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
             Connect
           </Button>
         )
+      ) : id === 'plutonication' ? (
+        <Button
+          onClick={async () => {
+            const accessCredentials = new AccessCredentials('wss://plutonication.com/', 'Mimir', 'https://plutonication.com/dapp/mimir-icon', 'Mimir');
+
+            await initializePlutonicationDAppClientWithModal(accessCredentials, (receivedPubkey: string) => {
+              /* */
+              console.log(receivedPubkey);
+            });
+
+            connect('plutonication').catch(toastError);
+          }}
+          size={downSm ? 'small' : 'medium'}
+          variant='outlined'
+        >
+          Connect
+        </Button>
       ) : (
         <Button component='a' href={downloadUrl} size={downSm ? 'small' : 'medium'} target='_blank' variant='outlined'>
           Download
@@ -42,18 +60,21 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
 
 function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => void }) {
   return (
-    <Dialog maxWidth='md' onClose={onClose} open={open}>
-      <DialogTitle textAlign='center'>Connect Wallet</DialogTitle>
-      <DialogContent sx={{ overflow: 'hidden' }}>
-        <Grid columns={{ xs: 12 }} container spacing={{ sm: 4, xs: 2 }}>
-          {Object.entries(walletConfig).map(([id, config]) => (
-            <Grid key={id} sm={3} xs={4}>
-              <WalletCell disabledIcon={config.disabledIcon} downloadUrl={config.downloadUrl} icon={config.icon} id={id} name={config.name} />
-            </Grid>
-          ))}
-        </Grid>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog maxWidth='md' onClose={onClose} open={open}>
+        <DialogTitle textAlign='center'>Connect Wallet</DialogTitle>
+        <DialogContent sx={{ overflow: 'hidden' }}>
+          <Grid columns={{ xs: 12 }} container spacing={{ sm: 4, xs: 2 }}>
+            {Object.entries(walletConfig).map(([id, config]) => (
+              <Grid key={id} sm={3} xs={4}>
+                <WalletCell disabledIcon={config.disabledIcon} downloadUrl={config.downloadUrl} icon={config.icon} id={id} name={config.name} />
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+      </Dialog>
+      <plutonication-modal />
+    </>
   );
 }
 
