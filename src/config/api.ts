@@ -203,6 +203,16 @@ export const solochainEndpoints: Endpoint[] = [
     explorerUrl: 'https://crust.subscan.io/',
     proposalApi: 'https://crust.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://crust.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/avail.png',
+    tokenIcon: '/token-icons/avail.png',
+    name: 'Avail Turing',
+    wsUrl: 'wss://turing-rpc.avail.so/ws',
+    genesisHash: '0xd3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70',
+    serviceUrl: 'https://avail-turing-api.mimir.global/',
+    socketUrl: 'wss://avail-turing-api.mimir.global/',
+    explorerUrl: 'https://avail-turing.subscan.io/'
   }
 ];
 
