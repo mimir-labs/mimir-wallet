@@ -8,11 +8,12 @@ import type { SpRuntimeDispatchError } from '@polkadot/types/lookup';
 import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { AccountSigner, api } from '@mimir-wallet/api';
+import { AccountSigner, api, DEFAULT_DECIMALS, DEFAULT_SS58 } from '@mimir-wallet/api';
 import { CONNECT_ORIGIN } from '@mimir-wallet/constants';
+import { getSpecTypes } from '@polkadot/types-known';
 import keyring from '@polkadot/ui-keyring';
-import { assert, isBn, isNumber, objectSpread } from '@polkadot/util';
-import { addressEq } from '@polkadot/util-crypto';
+import { assert, formatBalance, isBn, isNumber, objectSpread } from '@polkadot/util';
+import { addressEq, base64Encode } from '@polkadot/util-crypto';
 
 import { TxEvents } from './tx-events';
 
@@ -62,7 +63,31 @@ async function extractParams(api: ApiPromise, address: string): Promise<Partial<
   } = pair;
 
   if (isInjected) {
-    const signer = (await window.injectedWeb3?.[source || ''].enable(CONNECT_ORIGIN))?.signer;
+    const injected = await window.injectedWeb3?.[source || ''].enable(CONNECT_ORIGIN);
+    const signer = injected?.signer;
+    const metadata = injected?.metadata;
+
+    if (metadata) {
+      const knowns = await metadata.get();
+
+      if (!knowns.find((item) => item.genesisHash === api.genesisHash.toHex() && item.specVersion === api.runtimeVersion.specVersion.toNumber())) {
+        const [systemChain] = await Promise.all([api.rpc.system.chain()]);
+        const chainInfo = {
+          chain: systemChain.toString(),
+          chainType: 'substrate' as const,
+          genesisHash: api.genesisHash.toHex(),
+          icon: 'substrate',
+          metaCalls: base64Encode(api.runtimeMetadata.asCallsOnly.toU8a()),
+          specVersion: api.runtimeVersion.specVersion.toNumber(),
+          ss58Format: isNumber(api.registry.chainSS58) ? api.registry.chainSS58 : DEFAULT_SS58.toNumber(),
+          tokenDecimals: (api.registry.chainDecimals || [DEFAULT_DECIMALS.toNumber()])[0],
+          tokenSymbol: (api.registry.chainTokens || formatBalance.getDefaults().unit)[0],
+          types: getSpecTypes(api.registry, systemChain, api.runtimeVersion.specName, api.runtimeVersion.specVersion) as unknown as Record<string, string>
+        };
+
+        await metadata.provide(chainInfo);
+      }
+    }
 
     assert(signer, `Unable to find a signer for ${address}`);
 

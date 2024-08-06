@@ -81,7 +81,7 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
           {note && <Item content={<Typography sx={{ ...ellipsisLinesMixin(1) }}>{note}</Typography>} name='Note' />}
           <Item content={<AddressRow shorten size='small' value={transaction.initTransaction.sender} withAddress={upSm} withCopy withName />} name='Initiator' />
           <Item content={<Hex value={destTx.hash} withCopy />} name='Call Hash' />
-          <Item content={<Hex value={destTx.hash} withCopy />} name='Call Data' />
+          <Item content={<Hex value={destTx.call?.toHex()} withCopy />} name='Call Data' />
           <Box onClick={toggleOpen} sx={{ fontWeight: 600, color: 'primary.main', cursor: 'pointer', textDecoration: 'none' }}>
             View Parameters
           </Box>
