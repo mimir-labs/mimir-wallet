@@ -92,7 +92,7 @@ function PageCreateMultisig() {
             <Stack spacing={1.5}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant='h3'>Create Multisig</Typography>
-                <Button variant='outlined'>Import</Button>
+                {/* <Button variant='outlined'>Import</Button> */}
               </Box>
               <Divider />
               <Input label='Name' onChange={setName} placeholder='input multisig account name' value={name} />

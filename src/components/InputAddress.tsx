@@ -49,7 +49,7 @@ function InputAddress({ balance, defaultValue, disabled, error, filtered, format
 
   const _onChange = useCallback(
     (value: string) => {
-      if (isAddress(value)) {
+      if (isAddress(value) && !inputValue.startsWith('0x')) {
         if (!isControl.current) {
           setValue(value);
         }
@@ -57,7 +57,7 @@ function InputAddress({ balance, defaultValue, disabled, error, filtered, format
         onChange?.(value);
       }
     },
-    [onChange]
+    [inputValue, onChange]
   );
 
   const handleFocus = useCallback(() => {
@@ -69,7 +69,7 @@ function InputAddress({ balance, defaultValue, disabled, error, filtered, format
     setAnchorEl(null);
     setFocus(false);
 
-    if (isAddress(inputValue)) {
+    if (isAddress(inputValue) && !inputValue.startsWith('0x')) {
       _onChange(inputValue);
     }
   }, [_onChange, inputValue, setFocus]);
