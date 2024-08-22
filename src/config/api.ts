@@ -76,6 +76,38 @@ export const polkadotEndpoints: Endpoint[] = [
     socketUrl: 'wss://assethub-polkadot-api.mimir.global/',
     explorerUrl: 'https://assethub-polkadot.subscan.io/'
   },
+  // {
+  //   icon: '/chain-icons/bridgehub.svg',
+  //   tokenIcon: '/token-icons/Polkadot.png',
+  //   name: 'BridgeHub',
+  //   wsUrl: 'wss://polkadot-bridge-hub-rpc.polkadot.io/',
+  //   genesisHash: '0xdcf691b5a3fbe24adc99ddc959c0561b973e329b1aef4c4b22e7bb2ddecb4464',
+  //   serviceUrl: 'https://bridgehub-polkadot-api.mimir.global/',
+  //   socketUrl: 'wss://bridgehub-polkadot-api.mimir.global/',
+  //   explorerUrl: 'https://bridgehub-polkadot.subscan.io/'
+  // },
+  {
+    icon: '/chain-icons/collectives.svg',
+    tokenIcon: '/token-icons/Polkadot.png',
+    name: 'Collectives',
+    wsUrl: 'wss://polkadot-collectives-rpc.polkadot.io/',
+    genesisHash: '0x46ee89aa2eedd13e988962630ec9fb7565964cf5023bb351f2b6b25c1b68b0b2',
+    serviceUrl: 'https://collectives-polkadot-api.mimir.global/',
+    socketUrl: 'wss://collectives-polkadot-api.mimir.global/',
+    explorerUrl: 'https://collectives-polkadot.subscan.io/',
+    proposalApi: 'https://collectives.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://collectives.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/people.svg',
+    tokenIcon: '/token-icons/Polkadot.png',
+    name: 'People',
+    wsUrl: 'wss://polkadot-people-rpc.polkadot.io/',
+    genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
+    serviceUrl: 'https://collectives-polkadot-api.mimir.global/',
+    socketUrl: 'wss://people-polkadot-api.mimir.global/',
+    explorerUrl: 'https://people-polkadot.subscan.io/'
+  },
   {
     icon: '/chain-icons/bifrost-polkadot.png',
     tokenIcon: '/token-icons/bnc.png',
@@ -119,6 +151,30 @@ export const polkadotEndpoints: Endpoint[] = [
     explorerUrl: 'https://acala.subscan.io/',
     proposalApi: 'https://acala.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://acala.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/phala.svg',
+    tokenIcon: '/token-icons/PHA.svg',
+    name: 'Phala',
+    wsUrl: 'wss://phala.api.onfinality.io/public-ws',
+    genesisHash: '0x1bb969d85965e4bb5a651abbedf21a54b6b31a21f66b5401cc3f1e286268d736',
+    serviceUrl: 'https://phala-api.mimir.global/',
+    socketUrl: 'wss://phala-api.mimir.global/',
+    explorerUrl: 'https://phala.subscan.io/',
+    proposalApi: 'https://phala.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://phala.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/hydration.svg',
+    tokenIcon: '/token-icons/HDX.svg',
+    name: 'Hydration',
+    wsUrl: 'wss://rpc.hydradx.cloud/',
+    genesisHash: '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d',
+    serviceUrl: 'https://hydration-api.mimir.global/',
+    socketUrl: 'wss://hydration-api.mimir.global/',
+    explorerUrl: 'https://hydration.subscan.io/',
+    proposalApi: 'https://hydration.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://hydration.subsquare.io/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
@@ -133,6 +189,46 @@ export const kusamaEndpoints: Endpoint[] = [
     explorerUrl: 'https://kusama.subscan.io/',
     proposalApi: 'https://kusama.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://kusama.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/assethub-kusama.svg',
+    tokenIcon: '/token-icons/Kusama.png',
+    name: 'AssetHub Kusama',
+    wsUrl: 'wss://kusama-asset-hub-rpc.polkadot.io/',
+    genesisHash: '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a',
+    serviceUrl: 'https://assethub-kusama-api.mimir.global/',
+    socketUrl: 'wss://assethub-kusama-api.mimir.global/',
+    explorerUrl: 'https://assethub-kusama.subscan.io/'
+  },
+  // {
+  //   icon: '/chain-icons/bridgehub-kusama.svg',
+  //   tokenIcon: '/token-icons/Kusama.png',
+  //   name: 'BridgeHub Kusama',
+  //   wsUrl: 'wss://kusama-bridge-hub-rpc.polkadot.io/',
+  //   genesisHash: '0x00dcb981df86429de8bbacf9803401f09485366c44efbf53af9ecfab03adc7e5',
+  //   serviceUrl: 'https://bridgehub-kusama-api.mimir.global/',
+  //   socketUrl: 'wss://bridgehub-kusama-api.mimir.global/',
+  //   explorerUrl: 'https://bridgehub-kusama.subscan.io/'
+  // },
+  {
+    icon: '/chain-icons/coretime-kusama.svg',
+    tokenIcon: '/token-icons/Kusama.png',
+    name: 'Coretime Kusama',
+    wsUrl: 'wss://kusama-coretime-rpc.polkadot.io/',
+    genesisHash: '0x638cd2b9af4b3bb54b8c1f0d22711fc89924ca93300f0caf25a580432b29d050',
+    serviceUrl: 'https://coretime-kusama-api.mimir.global/',
+    socketUrl: 'wss://coretime-kusama-api.mimir.global/',
+    explorerUrl: 'https://coretime-kusama.subscan.io/'
+  },
+  {
+    icon: '/chain-icons/people-kusama.svg',
+    tokenIcon: '/token-icons/Kusama.png',
+    name: 'People Kusama',
+    wsUrl: 'wss://kusama-people-rpc.polkadot.io/',
+    genesisHash: '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f',
+    serviceUrl: 'https://people-kusama-api.mimir.global/',
+    socketUrl: 'wss://people-kusama-api.mimir.global/',
+    explorerUrl: 'https://people-kusama.subscan.io/'
   },
   {
     icon: '/chain-icons/bifrost-kusama.png',
@@ -166,6 +262,18 @@ export const kusamaEndpoints: Endpoint[] = [
     explorerUrl: 'https://karura.subscan.io/',
     proposalApi: 'https://karura.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://karura.subsquare.io/'
+  },
+  {
+    icon: '/chain-icons/khala.svg',
+    tokenIcon: '/token-icons/PHA.svg',
+    name: 'Khala',
+    wsUrl: 'wss://khala.api.onfinality.io/public-ws',
+    genesisHash: '0xd43540ba6d3eb4897c28a77d48cb5b729fea37603cbbfc7a86a73b72adb3be8d',
+    serviceUrl: 'https://khala-api.mimir.global/',
+    socketUrl: 'wss://khala-api.mimir.global/',
+    explorerUrl: 'https://khala.subscan.io/',
+    proposalApi: 'https://khala.subsquare.io/api/gov2/referendums?simple=true',
+    subsquareUrl: 'https://khala.subsquare.io/'
   }
 ];
 export const paseoEndpoints: Endpoint[] = [
