@@ -30,10 +30,10 @@ jobs:
       - name: Deploy to server
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr --delete --exclude '*.map'
+          switches: -avzr
           remote_host: ${{ secrets.HOST }}
           remote_user: ${{ secrets.USERNAME }}
           remote_port: ${{ secrets.PORT }}
           remote_key: ${{ secrets.KEY }}
           remote_path: ${{ secrets.TARGET }}
-          path: build/
+          path: dist/
