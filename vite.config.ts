@@ -32,32 +32,38 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          if (id.includes('@polkadot/')) {
-            return 'polkadot';
-          }
-
-          if (id.includes('@mui')) {
-            return 'mui';
-          }
-
-          if (id.includes('reactflow')) {
-            return 'reactflow';
-          }
-
-          if (
-            id.includes('react-ga4') ||
-            id.includes('react-json-view') ||
-            id.includes('react-toastify') ||
-            id.includes('socket.io-client') ||
-            id.includes('moment')
-          ) {
-            return 'common';
-          }
-
-          if (id.includes('react')) {
-            return 'react';
-          }
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          polkadot: [
+            '@polkadot/api',
+            '@polkadot/api-augment',
+            '@polkadot/api-base',
+            '@polkadot/api-derive',
+            '@polkadot/apps-config',
+            '@polkadot/keyring',
+            '@polkadot/react-identicon',
+            '@polkadot/types',
+            '@polkadot/types-codec',
+            '@polkadot/types-known',
+            '@polkadot/ui-keyring',
+            '@polkadot/util',
+            '@polkadot/util-crypto'
+          ],
+          mui: ['@mui/lab', '@mui/material', '@mui/system'],
+          reactflow: ['reactflow'],
+          lottie: ['lottie-web'],
+          common: [
+            'copy-to-clipboard',
+            'json2mq',
+            'moment',
+            'qrcode-generator',
+            'react-ga4',
+            'react-json-view',
+            'react-toastify',
+            'socket.io-client',
+            'swr',
+            'uuid'
+          ]
         }
       }
     }
