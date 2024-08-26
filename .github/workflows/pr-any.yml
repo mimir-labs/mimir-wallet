@@ -22,7 +22,7 @@ jobs:
 
     - name: Install deps
       run: |
-        pnpm install --immutable | grep -v 'YN0013'
+        pnpm install
 
     - name: ${{ matrix.step }}
       run: |
