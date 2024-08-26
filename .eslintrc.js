@@ -18,7 +18,6 @@ module.exports = {
     '**/node_modules/*',
     '.github/**',
     '.vscode/**',
-    '.yarn/**',
     '/.eslintrc.cjs',
     '/.eslintrc.js',
     '/.eslintrc.mjs',

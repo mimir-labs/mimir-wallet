@@ -7,8 +7,6 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     environment: production
-    env:
-      YARN_ENABLE_SCRIPTS: false
 
     steps:
       - uses: actions/checkout@v4
@@ -19,12 +17,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "yarn"
+          cache: "pnpm"
 
       - name: Install deps and build
         run: |
-          yarn install --immutable | grep -v 'YN0013'
-          yarn build
+          pnpm install --immutable | grep -v 'YN0013'
+          pnpm build
 
       - name: Deploy to server
         uses: burnett01/rsync-deployments@6.0.0
