@@ -21,6 +21,18 @@ export class IframeCommunicator extends Communicator {
     window.addEventListener('message', this.handleMessage);
   }
 
+  public sendMessage(id: string, response?: unknown, subscription?: unknown): void {
+    this.iframeRef.current?.contentWindow?.postMessage(
+      {
+        id,
+        origin: MESSAGE_ORIGIN_WALLET,
+        response,
+        subscription
+      } as TransportResponseMessage<MessageTypes>,
+      '*'
+    );
+  }
+
   private handleMessage = (message: Message): void => {
     if (this.iframeRef.current?.contentWindow !== message.source) {
       return;

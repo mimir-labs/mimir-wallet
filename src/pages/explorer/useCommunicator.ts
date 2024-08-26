@@ -51,7 +51,7 @@ export function useCommunicator(iframeRef: MutableRefObject<HTMLIFrameElement | 
           address: selected,
           genesisHash: meta?.genesisHash,
           name: meta?.name,
-          type: meta?.type
+          type: meta?.type || 'ed25519' // for polkadot-api
         }
       ];
     }

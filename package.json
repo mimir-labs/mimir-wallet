@@ -21,7 +21,7 @@
   "homepage": "/",
   "license": "Apache-2.0",
   "name": "mimir-wallet",
-  "packageManager": "yarn@4.1.0",
+  "packageManager": "yarn@4.4.1",
   "private": true,
   "repository": {
     "type": "git",

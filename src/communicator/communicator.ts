@@ -6,12 +6,14 @@ import type { SignerPayloadJSON } from '@polkadot/types/types';
 import type { MutableRefObject } from 'react';
 import type { State } from './types';
 
-export class Communicator {
+export abstract class Communicator {
   #state: MutableRefObject<State>;
 
   constructor(state: MutableRefObject<State>) {
     this.#state = state;
   }
+
+  public abstract sendMessage(id: string, response?: unknown, subscription?: unknown): void;
 
   public async handle<TMessageType extends MessageTypes>({ id, message: type, request }: TransportRequestMessage<TMessageType>): Promise<ResponseTypes[keyof ResponseTypes]> {
     // if (type === 'pub(phishing.redirectIfDenied)') {
@@ -26,17 +28,21 @@ export class Communicator {
       case 'pub(authorize.tab)':
         return {
           result: true,
-          authorizedAccounts: []
-        } as unknown as ResponseTypes['pub(authorize.tab)'];
+          authorizedAccounts: this.#state.current.getAccounts().map((item) => item.address)
+        };
 
       case 'pub(accounts.list)':
         return this.#state.current.getAccounts();
 
       case 'pub(accounts.subscribe)':
-        throw new Error('not implements');
+        setTimeout(() => {
+          this.sendMessage(id, undefined, this.#state.current.getAccounts());
+        }, 100);
+
+        return id;
 
       case 'pub(accounts.unsubscribe)':
-        throw new Error('not implements');
+        return true;
 
       case 'pub(bytes.sign)':
         throw new Error('not support for sign');
