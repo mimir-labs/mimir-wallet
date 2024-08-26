@@ -3,16 +3,30 @@
 
 import type { AddressMeta } from '@mimir-wallet/utils';
 
-import { ReactComponent as IconAddFill } from '@mimir-wallet/assets/svg/icon-add-fill.svg';
-import { ReactComponent as IconMore } from '@mimir-wallet/assets/svg/icon-more.svg';
-import { ReactComponent as IconSearch } from '@mimir-wallet/assets/svg/icon-search.svg';
-import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
-import { useGroupAccounts, useSelectedAccount, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
-import { Box, Button, Divider, Drawer, IconButton, List, ListItem, ListItemButton, Menu, MenuItem, SvgIcon, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  Menu,
+  MenuItem,
+  SvgIcon,
+  Typography
+} from '@mui/material';
 import { addressEq } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import store from 'store';
+
+import IconAddFill from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
+import IconMore from '@mimir-wallet/assets/svg/icon-more.svg?react';
+import IconSearch from '@mimir-wallet/assets/svg/icon-search.svg?react';
+import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
+import { useGroupAccounts, useSelectedAccount, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
 
 import AddressCell from './AddressCell';
 import Input from './Input';
@@ -26,11 +40,23 @@ interface Props {
 
 function filterAddress(keywords: string, selected?: string) {
   return (address: string, meta: AddressMeta): boolean =>
-    (keywords ? address.toLowerCase().includes(keywords.toLowerCase()) || (meta.name ? meta.name.toLowerCase().includes(keywords.toLowerCase()) : false) : true) &&
-    (selected ? !addressEq(address, selected) : true);
+    (keywords
+      ? address.toLowerCase().includes(keywords.toLowerCase()) ||
+        (meta.name ? meta.name.toLowerCase().includes(keywords.toLowerCase()) : false)
+      : true) && (selected ? !addressEq(address, selected) : true);
 }
 
-function AccountCell({ onClose, onSelect, selected, value }: { onClose?: () => void; selected?: boolean; value?: string; onSelect?: (address: string) => void }) {
+function AccountCell({
+  onClose,
+  onSelect,
+  selected,
+  value
+}: {
+  onClose?: () => void;
+  selected?: boolean;
+  value?: string;
+  onSelect?: (address: string) => void;
+}) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -98,15 +124,41 @@ function AccountCell({ onClose, onSelect, selected, value }: { onClose?: () => v
 
 function Search({ onChange, value }: { value: string; onChange: (value: string) => void }) {
   return (
-    <Box sx={{ zIndex: 1, position: 'absolute', top: 0, left: 0, right: 0, bottom: 'auto', padding: 1, bgcolor: 'background.default' }}>
-      <Input endAdornment={<SvgIcon component={IconSearch} inheritViewBox sx={{ color: 'text.disabled' }} />} onChange={onChange} placeholder='Search' value={value} />
+    <Box
+      sx={{
+        zIndex: 1,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 'auto',
+        padding: 1,
+        bgcolor: 'background.default'
+      }}
+    >
+      <Input
+        endAdornment={<SvgIcon component={IconSearch} inheritViewBox sx={{ color: 'text.disabled' }} />}
+        onChange={onChange}
+        placeholder='Search'
+        value={value}
+      />
     </Box>
   );
 }
 
 function CreateMultisig() {
   return (
-    <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 'auto', padding: 1, bgcolor: 'background.default' }}>
+    <Box
+      sx={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        top: 'auto',
+        padding: 1,
+        bgcolor: 'background.default'
+      }}
+    >
       <Button
         component={Link}
         fullWidth

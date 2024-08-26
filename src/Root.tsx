@@ -11,7 +11,14 @@ import { SWRConfig } from 'swr';
 import { ApiCtxRoot } from './api';
 import { GlobalStyle, ToastRoot, TxToast } from './components';
 import { apiUrl } from './config';
-import { BlockEventCtxRoot, KeyringCtxRoot, SelectAccountCtxRoot, TxQueueCtxRoot, TxToastCtxRoot, WalletCtxRoot } from './hooks';
+import {
+  BlockEventCtxRoot,
+  KeyringCtxRoot,
+  SelectAccountCtxRoot,
+  TxQueueCtxRoot,
+  TxToastCtxRoot,
+  WalletCtxRoot
+} from './hooks';
 import { routes } from './routes';
 import { SocketCtxRoot } from './socket';
 import { ThemeProvider } from './theme';

@@ -25,15 +25,23 @@ function Call({ api, call, jsonFallback, type, ...props }: CallProps) {
 
   if (action === 'multisig.cancelAsMulti') {
     return <CancelCall api={api} call={call} type={type} {...props} />;
-  } else if (action === 'utility.batchAll') {
-    return <BatchCall api={api} call={call} type={type} {...props} />;
-  } else if (action.startsWith('balances.')) {
-    return <TransferCall api={api} call={call} type={type} {...props} />;
-  } else if (action.startsWith('assets.')) {
-    return <AssetsTransferCall api={api} call={call} type={type} {...props} />;
-  } else {
-    return jsonFallback ? <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} theme='summerfruit:inverted' /> : null;
   }
+
+  if (action === 'utility.batchAll') {
+    return <BatchCall api={api} call={call} type={type} {...props} />;
+  }
+
+  if (action.startsWith('balances.')) {
+    return <TransferCall api={api} call={call} type={type} {...props} />;
+  }
+
+  if (action.startsWith('assets.')) {
+    return <AssetsTransferCall api={api} call={call} type={type} {...props} />;
+  }
+
+  return jsonFallback ? (
+    <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} theme='summerfruit:inverted' />
+  ) : null;
 }
 
 export default React.memo(Call);

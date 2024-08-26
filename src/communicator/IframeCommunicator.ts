@@ -1,12 +1,16 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { State } from '@mimir-wallet/communicator/types';
-import type { MessageTypes, TransportRequestMessage, TransportResponseMessage } from '@polkadot/extension-base/background/types';
+import type {
+  MessageTypes,
+  TransportRequestMessage,
+  TransportResponseMessage
+} from '@polkadot/extension-base/background/types';
 import type { Message } from '@polkadot/extension-base/types';
 import type { MutableRefObject } from 'react';
+import type { State } from '@mimir-wallet/communicator/types';
 
-import { MESSAGE_ORIGIN_WALLET } from '@mimirdev/inject/defaults';
+import { MESSAGE_ORIGIN_WALLET } from '@mimir-wallet/constants';
 
 import { Communicator } from './communicator';
 

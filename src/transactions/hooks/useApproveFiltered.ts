@@ -3,10 +3,17 @@
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
-import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { useEffect, useState } from 'react';
 
-import { checkFiltered, extraFiltered, removeEmptyMultisigFiltered, removeMultisigDeepFiltered, removeSuccessFiltered } from '../util';
+import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
+
+import {
+  checkFiltered,
+  extraFiltered,
+  removeEmptyMultisigFiltered,
+  removeMultisigDeepFiltered,
+  removeSuccessFiltered
+} from '../util';
 
 export function useApproveFiltered(transaction: Transaction): [filtered: Filtered | undefined, canApprove: boolean] {
   const [filtered, setFiltered] = useState<Filtered>();

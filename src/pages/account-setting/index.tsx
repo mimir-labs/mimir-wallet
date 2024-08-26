@@ -1,10 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddAddressDialog, Input, toastSuccess } from '@mimir-wallet/components';
-import { useAddressMeta, useApi, usePendingTransactions, useSelectedAccount, useSelectedAccountCallback, useToggle, useTxQueue } from '@mimir-wallet/hooks';
-import { CalldataStatus } from '@mimir-wallet/hooks/types';
-import { isLocalAccount, isLocalAddress, service } from '@mimir-wallet/utils';
 import { Box, Button, FormHelperText, Paper, Stack, Typography } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
 import { u8aToHex } from '@polkadot/util';
@@ -12,12 +8,33 @@ import { addressEq, decodeAddress, encodeMultiAddress, isAddress as isAddressUti
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { AddAddressDialog, Input, toastSuccess } from '@mimir-wallet/components';
+import {
+  useAddressMeta,
+  useApi,
+  usePendingTransactions,
+  useSelectedAccount,
+  useSelectedAccountCallback,
+  useToggle,
+  useTxQueue
+} from '@mimir-wallet/hooks';
+import { CalldataStatus } from '@mimir-wallet/hooks/types';
+import { isLocalAccount, isLocalAddress, service } from '@mimir-wallet/utils';
+
 import AccountSelect from '../create-multisig/AccountSelect';
 import { useSelectMultisig } from '../create-multisig/useSelectMultisig';
 
-function checkError(signatories: string[], isThresholdValid: boolean, hasSoloAccount: boolean): [Error | null, Error | null] {
+function checkError(
+  signatories: string[],
+  isThresholdValid: boolean,
+  hasSoloAccount: boolean
+): [Error | null, Error | null] {
   return [
-    signatories.length < 2 ? new Error('Please select at least two members') : hasSoloAccount ? null : new Error('You need add at least one local account'),
+    signatories.length < 2
+      ? new Error('Please select at least two members')
+      : hasSoloAccount
+        ? null
+        : new Error('You need add at least one local account'),
     isThresholdValid ? null : new Error(`Threshold must great than 2 and less equal than ${signatories.length}`)
   ];
 }
@@ -32,8 +49,12 @@ function AccountSetting() {
   const [txs] = usePendingTransactions(account);
   const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success), [txs]);
   const selectAccount = useSelectedAccountCallback();
-  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig(meta?.who, meta?.threshold);
-  const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
+  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
+    useSelectMultisig(meta?.who, meta?.threshold);
+  const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({
+    address: '',
+    isAddressValid: false
+  });
   const [addOpen, toggleAdd] = useToggle();
   const [addressError, setAddressError] = useState<Error | null>(null);
   const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
@@ -65,11 +86,26 @@ function AccountSetting() {
             name,
             false
           ),
-        extrinsic: api.tx.utility.batchAll([api.tx.proxy.addProxy(newMultiAddress, 0, 0), api.tx.proxy.removeProxy(oldMultiAddress, 0, 0)]),
+        extrinsic: api.tx.utility.batchAll([
+          api.tx.proxy.addProxy(newMultiAddress, 0, 0),
+          api.tx.proxy.removeProxy(oldMultiAddress, 0, 0)
+        ]),
         accountId: account
       });
     }
-  }, [checkField, saveName, meta?.who, meta?.threshold, account, signatories, threshold, addQueue, api.tx.utility, api.tx.proxy, name]);
+  }, [
+    checkField,
+    saveName,
+    meta?.who,
+    meta?.threshold,
+    account,
+    signatories,
+    threshold,
+    addQueue,
+    api.tx.utility,
+    api.tx.proxy,
+    name
+  ]);
 
   const _handleAdd = useCallback(() => {
     if (isAddressValid) {
@@ -100,7 +136,13 @@ function AccountSetting() {
         </Box>
         <Typography variant='h3'>Wallet Setting</Typography>
         <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
-          <Input helper='All members will see this name' label='Name' onChange={(value) => setName(value)} placeholder='Please input account name' value={name} />
+          <Input
+            helper='All members will see this name'
+            label='Name'
+            onChange={(value) => setName(value)}
+            placeholder='Please input account name'
+            value={name}
+          />
         </Paper>
         <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
           {pendingTxs.length > 0 && (
@@ -150,13 +192,25 @@ function AccountSetting() {
               value={address}
             />
             <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                  flexDirection: { xs: 'column', sm: 'row' }
+                }}
+              >
                 <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
                 <AccountSelect accounts={signatories} onClick={unselect} title='Multisig Members' type='delete' />
               </Box>
               {memberError && <FormHelperText sx={{ color: 'error.main' }}>{memberError.message}</FormHelperText>}
             </Paper>
-            <Input defaultValue={String(threshold)} error={thresholdError} label='Threshold' onChange={_onChangeThreshold} />
+            <Input
+              defaultValue={String(threshold)}
+              error={thresholdError}
+              label='Threshold'
+              onChange={_onChangeThreshold}
+            />
           </Stack>
         </Paper>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -168,7 +222,9 @@ function AccountSetting() {
           </Button>
         </Box>
       </Stack>
-      {address && isAddressValid && <AddAddressDialog defaultAddress={address} onAdded={select} onClose={toggleAdd} open={addOpen} />}
+      {address && isAddressValid && (
+        <AddAddressDialog defaultAddress={address} onAdded={select} onClose={toggleAdd} open={addOpen} />
+      )}
     </>
   );
 }

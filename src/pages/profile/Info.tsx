@@ -3,18 +3,27 @@
 
 import type { AccountBalance } from '@mimir-wallet/hooks/types';
 
-import { ReactComponent as IconFund } from '@mimir-wallet/assets/svg/icon-fund-fill.svg';
-import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
-import { ReactComponent as IconSet } from '@mimir-wallet/assets/svg/icon-set.svg';
-import { FormatBalance } from '@mimir-wallet/components';
-import { useAddressMeta, useApi, useTokenInfo } from '@mimir-wallet/hooks';
 import { Box, Button, Divider, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-function Info({ address, balances, toggleFundOpen }: { address?: string; balances?: AccountBalance; toggleFundOpen: () => void }) {
+import IconFund from '@mimir-wallet/assets/svg/icon-fund-fill.svg?react';
+import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
+import IconSet from '@mimir-wallet/assets/svg/icon-set.svg?react';
+import { FormatBalance } from '@mimir-wallet/components';
+import { useAddressMeta, useApi, useTokenInfo } from '@mimir-wallet/hooks';
+
+function Info({
+  address,
+  balances,
+  toggleFundOpen
+}: {
+  address?: string;
+  balances?: AccountBalance;
+  toggleFundOpen: () => void;
+}) {
   const { meta } = useAddressMeta(address);
   const [tokenInfo] = useTokenInfo();
   const { tokenSymbol } = useApi();
@@ -24,7 +33,12 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
 
     const priceBN = new BN(Math.ceil(Number(price) * 1e6));
 
-    return [balances?.total.mul(priceBN).divn(1e6), balances?.transferrable.mul(priceBN).divn(1e6), balances?.locked.mul(priceBN).divn(1e6), balances?.reserved.mul(priceBN).divn(1e6)];
+    return [
+      balances?.total.mul(priceBN).divn(1e6),
+      balances?.transferrable.mul(priceBN).divn(1e6),
+      balances?.locked.mul(priceBN).divn(1e6),
+      balances?.reserved.mul(priceBN).divn(1e6)
+    ];
   }, [balances, tokenInfo, tokenSymbol]);
 
   const changes = Number(tokenInfo?.[tokenSymbol]?.price_change || '0');
@@ -35,7 +49,14 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: { lg: 'nowrap', xs: 'wrap' } }}>
           <Typography sx={{ flex: '1', whiteSpace: 'nowrap' }} variant='h1'>
             <FormatBalance label='$' value={total} withCurrency={false} />
-            <Box component='span' sx={{ marginLeft: 0.5, verticalAlign: 'middle', color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500' }}>
+            <Box
+              component='span'
+              sx={{
+                marginLeft: 0.5,
+                verticalAlign: 'middle',
+                color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500'
+              }}
+            >
               {(changes * 100).toFixed(2)}%
             </Box>
           </Typography>
@@ -43,11 +64,15 @@ function Info({ address, balances, toggleFundOpen }: { address?: string; balance
             <Button component={Link} endIcon={<SvgIcon component={IconSend} inheritViewBox />} to='/transfer'>
               Transfer
             </Button>
-            <Button endIcon={<SvgIcon component={IconFund} inheritViewBox />} onClick={toggleFundOpen} variant='outlined'>
+            <Button
+              endIcon={<SvgIcon component={IconFund} inheritViewBox />}
+              onClick={toggleFundOpen}
+              variant='outlined'
+            >
               Fund
             </Button>
             {meta?.isMultisig && (
-              <Button component={Link} sx={{ minWidth: 0 }} to={'/account-setting'} variant='outlined'>
+              <Button component={Link} sx={{ minWidth: 0 }} to='/account-setting' variant='outlined'>
                 <SvgIcon component={IconSet} inheritViewBox />
               </Button>
             )}

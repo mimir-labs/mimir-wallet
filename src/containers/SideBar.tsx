@@ -3,25 +3,56 @@
 
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 
-import { ReactComponent as ArrowRight } from '@mimir-wallet/assets/svg/ArrowRight.svg';
-import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
-import { ReactComponent as IconDapp } from '@mimir-wallet/assets/svg/icon-dapp.svg';
-import { ReactComponent as IconHome } from '@mimir-wallet/assets/svg/icon-home.svg';
-import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
-import { ReactComponent as IconQr } from '@mimir-wallet/assets/svg/icon-qr.svg';
-import { ReactComponent as IconTransaction } from '@mimir-wallet/assets/svg/icon-transaction.svg';
-import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
-import { AccountMenu, AddressCell, CopyButton, FormatBalance, QrcodeAddress, WalletIcon } from '@mimir-wallet/components';
-import { findToken, walletConfig } from '@mimir-wallet/config';
-import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, WalletCtx } from '@mimir-wallet/hooks';
-import { chainLinks } from '@mimir-wallet/utils';
-import { Avatar, Box, Button, Divider, Drawer, IconButton, Paper, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  Drawer,
+  IconButton,
+  Paper,
+  Stack,
+  SvgIcon,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import { useContext, useMemo, useState } from 'react';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 
+import ArrowRight from '@mimir-wallet/assets/svg/ArrowRight.svg?react';
+import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
+import IconDapp from '@mimir-wallet/assets/svg/icon-dapp.svg?react';
+import IconHome from '@mimir-wallet/assets/svg/icon-home.svg?react';
+import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
+import IconQr from '@mimir-wallet/assets/svg/icon-qr.svg?react';
+import IconTransaction from '@mimir-wallet/assets/svg/icon-transaction.svg?react';
+import IconTransfer from '@mimir-wallet/assets/svg/icon-transfer.svg?react';
+import {
+  AccountMenu,
+  AddressCell,
+  CopyButton,
+  FormatBalance,
+  QrcodeAddress,
+  WalletIcon
+} from '@mimir-wallet/components';
+import { findToken, walletConfig } from '@mimir-wallet/config';
+import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, WalletCtx } from '@mimir-wallet/hooks';
+import { chainLinks } from '@mimir-wallet/utils';
+
 import { BaseContainerCtx } from './BaseContainer';
 
-function NavLink({ Icon, label, onClick, to }: { to: string; Icon: React.ComponentType<any>; label: React.ReactNode; onClick: () => void }) {
+function NavLink({
+  Icon,
+  label,
+  onClick,
+  to
+}: {
+  to: string;
+  Icon: React.ComponentType<any>;
+  label: React.ReactNode;
+  onClick: () => void;
+}) {
   const location = useLocation();
 
   const matched = useMemo(() => matchPath(to, location.pathname), [location.pathname, to]);
@@ -87,19 +118,39 @@ function SideBar({ fixed }: { fixed: boolean }) {
       <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
       <Drawer
         PaperProps={{
-          sx: { width: downMd ? 280 : 222, top: downMd ? 0 : alertOpen ? 80 : 56, paddingX: 1.5, paddingY: 2, borderTopRightRadius: { md: 0, xs: 20 }, borderBottomRightRadius: { md: 0, xs: 20 } }
+          sx: {
+            width: downMd ? 280 : 222,
+            top: downMd ? 0 : alertOpen ? 80 : 56,
+            paddingX: 1.5,
+            paddingY: 2,
+            borderTopRightRadius: { md: 0, xs: 20 },
+            borderBottomRightRadius: { md: 0, xs: 20 }
+          }
         }}
         anchor='left'
         onClose={closeSidebar}
         open={sidebarOpen}
         variant={downMd ? 'temporary' : fixed ? 'permanent' : 'temporary'}
       >
-        <Box sx={{ display: { md: 'none', xs: 'flex' }, justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+        <Box
+          sx={{
+            display: { md: 'none', xs: 'flex' },
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 2
+          }}
+        >
           <Typography variant='h3'>Menu</Typography>
         </Box>
         {injected.length > 0 ? (
           <Paper sx={{ padding: 1 }} variant='outlined'>
-            <Stack alignItems='center' direction='row' onClick={handleAccountOpen} spacing={1} sx={{ cursor: 'pointer', width: '100%' }}>
+            <Stack
+              alignItems='center'
+              direction='row'
+              onClick={handleAccountOpen}
+              spacing={1}
+              sx={{ cursor: 'pointer', width: '100%' }}
+            >
               <AddressCell size='small' value={selected} />
               <SvgIcon color='primary' component={ArrowRight} inheritViewBox />
             </Stack>
@@ -115,7 +166,13 @@ function SideBar({ fixed }: { fixed: boolean }) {
               <SvgIcon component={IconQr} inheritViewBox />
             </IconButton>
             <CopyButton color='primary' value={selected} />
-            <IconButton color='primary' component='a' href={chainLinks.accountExplorerLink(selected)} size='small' target='_blank'>
+            <IconButton
+              color='primary'
+              component='a'
+              href={chainLinks.accountExplorerLink(selected)}
+              size='small'
+              target='_blank'
+            >
               <SvgIcon component={IconLink} inheritViewBox />
             </IconButton>
             <IconButton color='primary' component={Link} size='small' to={`/transfer?from=${selected}`}>
@@ -144,7 +201,16 @@ function SideBar({ fixed }: { fixed: boolean }) {
             openWallet();
             closeSidebar();
           }}
-          sx={{ cursor: 'pointer', position: 'absolute', left: 0, bottom: { md: 60, xs: 0 }, display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}
+          sx={{
+            cursor: 'pointer',
+            position: 'absolute',
+            left: 0,
+            bottom: { md: 60, xs: 0 },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            padding: 2
+          }}
         >
           {Object.entries(walletConfig).map(([id]) => (
             <WalletIcon disabled={!connectedWallets.includes(id)} id={id} key={id} sx={{ width: 20, height: 20 }} />

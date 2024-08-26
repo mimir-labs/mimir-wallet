@@ -1,12 +1,23 @@
 {
-  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "composite": false
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "src",
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext",
+    "types": ["vite/client", "vitest/globals", "vite-plugin-pwa/client", "vite-plugin-pwa/react", "vite-plugin-svgr/client", "@polkadot/api-augment"],
+    "paths": {
+      "@mimir-wallet/*": ["./*"]
+    }
   },
-  "include": [
-    "craco.config.ts",
-    "src",
-    "inject"
-  ],
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

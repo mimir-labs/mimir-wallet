@@ -1,12 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Asset } from '@mimir-wallet/config';
 import type { ApiPromise } from '@polkadot/api';
 import type { Call } from '@polkadot/types/interfaces';
 import type { PalletAssetsAssetStatus } from '@polkadot/types/lookup';
 import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
+import type { Asset } from '@mimir-wallet/config';
 
 export type CallParam = any;
 

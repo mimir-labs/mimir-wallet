@@ -5,14 +5,29 @@ import { useCallback, useMemo } from 'react';
 import { NavigateOptions, useSearchParams } from 'react-router-dom';
 import * as searchQuery from 'search-query-parser';
 
-export function useQueryParam<T>(key: string, defaultValue?: undefined, options?: NavigateOptions): [T | undefined, (newQuery: T | undefined, options?: NavigateOptions) => void];
-export function useQueryParam<T>(key: string, defaultValue: T, options?: NavigateOptions): [T, (newQuery: T | undefined, options?: NavigateOptions) => void];
+export function useQueryParam<T>(
+  key: string,
+  defaultValue?: undefined,
+  options?: NavigateOptions
+): [T | undefined, (newQuery: T | undefined, options?: NavigateOptions) => void];
+export function useQueryParam<T>(
+  key: string,
+  defaultValue: T,
+  options?: NavigateOptions
+): [T, (newQuery: T | undefined, options?: NavigateOptions) => void];
 
-export function useQueryParam<T>(key: string, defaultValue?: T, options?: NavigateOptions): [T | undefined, (newQuery: T | undefined, options?: NavigateOptions) => void] {
+export function useQueryParam<T>(
+  key: string,
+  defaultValue?: T,
+  options?: NavigateOptions
+): [T | undefined, (newQuery: T | undefined, options?: NavigateOptions) => void] {
   const [searchParams, setSearchParams] = useSearchParams();
   const paramValue = searchParams.get(key);
 
-  const value = useMemo(() => (paramValue ? (searchQuery.parse(paramValue) as unknown as T) : defaultValue), [defaultValue, paramValue]);
+  const value = useMemo(
+    () => (paramValue ? (searchQuery.parse(paramValue) as unknown as T) : defaultValue),
+    [defaultValue, paramValue]
+  );
 
   const setValue = useCallback(
     (newValue: T | undefined, _options?: NavigateOptions) => {

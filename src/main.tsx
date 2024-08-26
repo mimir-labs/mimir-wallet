@@ -3,13 +3,12 @@
 
 import moment from 'moment';
 import { createRoot } from 'react-dom/client';
+import { registerSW } from 'virtual:pwa-register';
 
 import { initializeFavoriteDapps } from './config';
-import { events } from './events';
 import { initGa } from './initGa';
 import { keyringStore } from './instance';
 import Root from './Root';
-import { register } from './serviceWorkerRegistration';
 
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
 
@@ -19,9 +18,6 @@ initializeFavoriteDapps();
 root.render(<Root store={keyringStore} />);
 
 if (process.env.NODE_ENV === 'production') {
+  registerSW();
   initGa();
-  register({
-    onSuccess: () => events.emit('app_installed'),
-    onUpdate: () => events.emit('app_updated')
-  });
 }

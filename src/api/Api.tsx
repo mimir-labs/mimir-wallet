@@ -5,13 +5,14 @@ import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
 import type { KeyringStore } from '@polkadot/ui-keyring/types';
 import type { ApiProps, ApiState } from './types';
 
-import { typesBundle } from '@mimir-wallet/config';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { keyring } from '@polkadot/ui-keyring';
 import { formatBalance, isTestChain, objectSpread, stringify } from '@polkadot/util';
 import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
 import React, { useEffect, useMemo, useState } from 'react';
+
+import { typesBundle } from '@mimir-wallet/config';
 
 import { registry } from './typeRegistry';
 
@@ -150,7 +151,10 @@ export function ApiCtxRoot({ apiUrl, children, store }: Props): React.ReactEleme
   const [isApiConnected, setIsApiConnected] = useState(false);
   const [isApiInitialized, setIsApiInitialized] = useState(false);
   const [apiError, setApiError] = useState<null | string>(null);
-  const value = useMemo<ApiProps>(() => objectSpread({}, state, { api, apiError, apiUrl, isApiConnected, isApiInitialized }), [apiError, isApiConnected, isApiInitialized, state, apiUrl]);
+  const value = useMemo<ApiProps>(
+    () => objectSpread({}, state, { api, apiError, apiUrl, isApiConnected, isApiInitialized }),
+    [apiError, isApiConnected, isApiInitialized, state, apiUrl]
+  );
 
   // initial initialization
   useEffect((): void => {

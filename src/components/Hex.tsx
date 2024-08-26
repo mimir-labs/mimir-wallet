@@ -17,7 +17,13 @@ interface Props extends TypographyProps {
 
 function Hex({ length = 10, value, withCopy, ...props }: Props) {
   const displayValue = useMemo(() => {
-    return isU8a(value) ? u8aToHex() : isHex(value) ? value : isString(value) ? stringToHex(value.toString()) : value?.toHex();
+    return isU8a(value)
+      ? u8aToHex()
+      : isHex(value)
+        ? value
+        : isString(value)
+          ? stringToHex(value.toString())
+          : value?.toHex();
   }, [value]);
 
   return (

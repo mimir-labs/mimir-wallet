@@ -324,7 +324,12 @@ export const solochainEndpoints: Endpoint[] = [
   }
 ];
 
-export const allEndpoints = devEndpoints.concat(testnetEndpoints).concat(polkadotEndpoints).concat(kusamaEndpoints).concat(paseoEndpoints).concat(solochainEndpoints);
+export const allEndpoints = devEndpoints
+  .concat(testnetEndpoints)
+  .concat(polkadotEndpoints)
+  .concat(kusamaEndpoints)
+  .concat(paseoEndpoints)
+  .concat(solochainEndpoints);
 
 function _defaultApiUrl() {
   const url = new URL(window.location.href);
@@ -336,7 +341,9 @@ function _defaultApiUrl() {
       const url = new URL(decodeURIComponent(rpc));
 
       url.protocol === 'wss:' && store.set(API_URL_KEY, decodeURIComponent(rpc));
-    } catch {}
+    } catch {
+      /* empty */
+    }
   }
 
   let wsUrl = store.get(API_URL_KEY);
@@ -348,7 +355,10 @@ function _defaultApiUrl() {
   if (process.env.NODE_ENV === 'production') {
     if (window.location.hostname === 'dev.mimir.global') {
       wsUrl = devEndpoints[0].wsUrl;
-    } else if (window.location.hostname === 'app.mimir.global' || window.location.hostname === 'staging-app.mimir.global') {
+    } else if (
+      window.location.hostname === 'app.mimir.global' ||
+      window.location.hostname === 'staging-app.mimir.global'
+    ) {
       wsUrl = polkadotEndpoints[0].wsUrl;
     } else {
       wsUrl = localEndpoint.wsUrl;
@@ -376,7 +386,9 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
         mimir: devEndpoints,
         local: [localEndpoint]
       };
-    } else if (window.location.hostname === 'app.mimir.global' || window.location.hostname === 'staging-app.mimir.global') {
+    }
+
+    if (window.location.hostname === 'app.mimir.global' || window.location.hostname === 'staging-app.mimir.global') {
       return {
         polkadot: polkadotEndpoints,
         kusama: kusamaEndpoints,
@@ -384,20 +396,20 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
         rococo: testnetEndpoints,
         paseo: paseoEndpoints
       };
-    } else {
-      return {};
     }
-  } else {
-    return {
-      polkadot: polkadotEndpoints,
-      kusama: kusamaEndpoints,
-      soloChain: solochainEndpoints,
-      rococo: testnetEndpoints,
-      paseo: paseoEndpoints,
-      mimir: devEndpoints,
-      local: [localEndpoint]
-    };
+
+    return {};
   }
+
+  return {
+    polkadot: polkadotEndpoints,
+    kusama: kusamaEndpoints,
+    soloChain: solochainEndpoints,
+    rococo: testnetEndpoints,
+    paseo: paseoEndpoints,
+    mimir: devEndpoints,
+    local: [localEndpoint]
+  };
 }
 
 export function findEndpoint(genesisHash: string): Endpoint {

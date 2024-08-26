@@ -4,9 +4,10 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 
-import { FAVORITE_DAPP_KEY } from '@mimir-wallet/constants';
 import { isArray } from '@polkadot/util';
 import store from 'store';
+
+import { FAVORITE_DAPP_KEY } from '@mimir-wallet/constants';
 
 export interface DappOption {
   // (1 - 999) is internal app
@@ -44,7 +45,8 @@ export const dapps: DappOption[] = [
     internal: false,
     icon: '/dapp-icons/apps.svg',
     name: 'Apps',
-    description: 'Using the Mimir-modified version of the Polkadot.js App, users can quickly perform all operations related to Substrate.',
+    description:
+      'Using the Mimir-modified version of the Polkadot.js App, users can quickly perform all operations related to Substrate.',
     url: 'https://apps.mimir.global/',
     supportedChains: true,
     tags: ['Wallet', 'Tool'],
@@ -95,9 +97,13 @@ export const dapps: DappOption[] = [
     internal: false,
     icon: '/dapp-icons/staking.png',
     name: 'Staking',
-    description: 'Staking DOT natively provides the function of securing the network and allows you to collect DOT tokens for your help.',
+    description:
+      'Staking DOT natively provides the function of securing the network and allows you to collect DOT tokens for your help.',
     url: 'https://staking.mimir.global/',
-    supportedChains: ['0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3', '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'],
+    supportedChains: [
+      '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+      '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'
+    ],
     tags: ['Staking'],
     website: 'https://staking.polkadot.network/',
     github: 'https://github.com/paritytech/polkadot-staking-dashboard'
@@ -139,7 +145,9 @@ export const dapps: DappOption[] = [
 ];
 
 export function findSupportedDapps(api: ApiPromise): DappOption[] {
-  return dapps.filter((item) => (isArray(item.supportedChains) ? item.supportedChains.includes(api.genesisHash.toHex()) : true));
+  return dapps.filter((item) =>
+    isArray(item.supportedChains) ? item.supportedChains.includes(api.genesisHash.toHex()) : true
+  );
 }
 
 export function initializeFavoriteDapps() {

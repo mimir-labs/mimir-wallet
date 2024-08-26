@@ -24,7 +24,9 @@ export function getAddressMeta(address: string | Uint8Array | HexString): Addres
   let meta: AddressMeta | undefined;
 
   try {
-    const pair = keyring.getAddress(isHex(address) ? hexToU8a(address) : address, 'account') || keyring.getAddress(isHex(address) ? hexToU8a(address) : address, 'address');
+    const pair =
+      keyring.getAddress(isHex(address) ? hexToU8a(address) : address, 'account') ||
+      keyring.getAddress(isHex(address) ? hexToU8a(address) : address, 'address');
 
     meta = pair && pair.meta;
   } catch {
@@ -34,7 +36,9 @@ export function getAddressMeta(address: string | Uint8Array | HexString): Addres
   return meta || {};
 }
 
-export function getAccountCryptoType(accountId: AccountId | AccountIndex | Address | string | Uint8Array | null): string {
+export function getAccountCryptoType(
+  accountId: AccountId | AccountIndex | Address | string | Uint8Array | null
+): string {
   try {
     const current = accountId ? keyring.getPair(accountId.toString()) : null;
 
@@ -42,14 +46,14 @@ export function getAccountCryptoType(accountId: AccountId | AccountIndex | Addre
       return current.meta.isInjected
         ? 'injected'
         : current.meta.isHardware
-        ? (current.meta.hardwareType as string) || 'hardware'
-        : current.meta.isExternal
-        ? current.meta.isMultisig
-          ? 'multisig'
-          : current.meta.isProxied
-          ? 'proxied'
-          : 'qr'
-        : current.type;
+          ? (current.meta.hardwareType as string) || 'hardware'
+          : current.meta.isExternal
+            ? current.meta.isMultisig
+              ? 'multisig'
+              : current.meta.isProxied
+                ? 'proxied'
+                : 'qr'
+            : current.type;
     }
   } catch {
     // cannot determine, keep unknown

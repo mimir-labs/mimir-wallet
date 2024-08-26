@@ -1,23 +1,24 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 import type { ApiPromise } from '@polkadot/api';
 import type { IMethod } from '@polkadot/types/types';
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
-import { ReactComponent as ArrowDown } from '@mimir-wallet/assets/svg/ArrowDown.svg';
-import { ReactComponent as IconCancel } from '@mimir-wallet/assets/svg/icon-cancel.svg';
-import { ReactComponent as IconExternalApp } from '@mimir-wallet/assets/svg/icon-external-app.svg';
-import { ReactComponent as IconFailed } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
-import { ReactComponent as IconMember } from '@mimir-wallet/assets/svg/icon-member-fill.svg';
-import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
+import { alpha, Box, Button, IconButton, Stack, SvgIcon, Typography, useMediaQuery } from '@mui/material';
+import json2mq from 'json2mq';
+import React, { useMemo } from 'react';
+
+import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
+import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
+import IconExternalApp from '@mimir-wallet/assets/svg/icon-external-app.svg?react';
+import IconFailed from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
+import IconMember from '@mimir-wallet/assets/svg/icon-member-fill.svg?react';
+import IconSuccess from '@mimir-wallet/assets/svg/icon-success-fill.svg?react';
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@mimir-wallet/constants';
 import { useAddressMeta, useApi, useBlockTime, useDapp, useToggle } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { formatAgo } from '@mimir-wallet/utils';
-import { alpha, Box, Button, IconButton, Stack, SvgIcon, Typography, useMediaQuery } from '@mui/material';
-import json2mq from 'json2mq';
-import React, { useMemo } from 'react';
 
 import { useApproveFiltered } from '../hooks/useApproveFiltered';
 import { useCancelFiltered } from '../hooks/useCancelFiltered';
@@ -38,7 +39,17 @@ function AppCell({ website }: { website?: string }) {
       {dapp ? (
         <Box component='img' src={dapp.icon} sx={{ width: 20, height: 20 }} />
       ) : (
-        <Box sx={({ palette }) => ({ width: 20, height: 20, borderRadius: 1, bgcolor: alpha(palette.primary.main, 0.5), display: 'flex', alignItems: 'center', justifyContent: 'center' })}>
+        <Box
+          sx={({ palette }) => ({
+            width: 20,
+            height: 20,
+            borderRadius: 1,
+            bgcolor: alpha(palette.primary.main, 0.5),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          })}
+        >
           <SvgIcon component={IconExternalApp} fontSize='small' inheritViewBox sx={{ color: 'common.white' }} />
         </Box>
       )}
@@ -55,7 +66,17 @@ function ActionTextCell({ action }: { action: string }) {
   );
 }
 
-function ActionDisplayCell({ api, call, isSub, tx }: { isSub?: boolean; api: ApiPromise; call: IMethod | null; tx: Transaction }) {
+function ActionDisplayCell({
+  api,
+  call,
+  isSub,
+  tx
+}: {
+  isSub?: boolean;
+  api: ApiPromise;
+  call: IMethod | null;
+  tx: Transaction;
+}) {
   return (
     <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
       <ActionDisplay api={api} call={call} isSub={isSub} tx={tx} />
@@ -66,25 +87,38 @@ function ActionDisplayCell({ api, call, isSub, tx }: { isSub?: boolean; api: Api
 function TimeCell({ time }: { time?: number }) {
   const now = Date.now();
 
-  time = time || now;
+  time ||= now;
 
   return (
     <Box sx={{ flex: '1' }}>
       {now - Number(time) < ONE_MINUTE
         ? 'Now'
         : now - Number(time) < ONE_HOUR * 1000
-        ? `${formatAgo(Number(time), 'm')} mins ago`
-        : now - Number(time) < ONE_DAY * 1000
-        ? `${formatAgo(Number(time), 'H')} hours ago`
-        : `${formatAgo(Number(time), 'D')} days ago`}
+          ? `${formatAgo(Number(time), 'm')} mins ago`
+          : now - Number(time) < ONE_DAY * 1000
+            ? `${formatAgo(Number(time), 'H')} hours ago`
+            : `${formatAgo(Number(time), 'D')} days ago`}
     </Box>
   );
 }
 
-function ProgressCell({ approvals, onClick, threshold }: { approvals: number; threshold: number; onClick: () => void }) {
+function ProgressCell({
+  approvals,
+  onClick,
+  threshold
+}: {
+  approvals: number;
+  threshold: number;
+  onClick: () => void;
+}) {
   return (
     <Box sx={{ flex: '1' }}>
-      <Button onClick={onClick} size='small' startIcon={<SvgIcon component={IconMember} inheritViewBox />} variant='outlined'>
+      <Button
+        onClick={onClick}
+        size='small'
+        startIcon={<SvgIcon component={IconMember} inheritViewBox />}
+        variant='outlined'
+      >
         {approvals}/{threshold}
       </Button>
     </Box>
@@ -110,27 +144,69 @@ function ActionsCell({
   autoWidth: boolean;
   toggleDetailOpen: () => void;
 }) {
-  const status = transaction.status;
+  const { status } = transaction;
 
   return (
-    <Box sx={{ flex: autoWidth ? '0 0 auto' : '0 0 135px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Box
+      sx={{
+        flex: autoWidth ? '0 0 auto' : '0 0 135px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}
+    >
       {status > CalldataStatus.Pending ? (
         <Box sx={{ wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <SvgIcon
-            color={status === CalldataStatus.Success ? 'success' : status === CalldataStatus.Failed ? 'error' : status === CalldataStatus.Cancelled ? 'warning' : 'error'}
-            component={status === CalldataStatus.Success ? IconSuccess : status === CalldataStatus.Failed ? IconFailed : status === CalldataStatus.Cancelled ? IconCancel : IconFailed}
+            color={
+              status === CalldataStatus.Success
+                ? 'success'
+                : status === CalldataStatus.Failed
+                  ? 'error'
+                  : status === CalldataStatus.Cancelled
+                    ? 'warning'
+                    : 'error'
+            }
+            component={
+              status === CalldataStatus.Success
+                ? IconSuccess
+                : status === CalldataStatus.Failed
+                  ? IconFailed
+                  : status === CalldataStatus.Cancelled
+                    ? IconCancel
+                    : IconFailed
+            }
             inheritViewBox
           />
-          {status === CalldataStatus.Success ? 'Excuted' : status === CalldataStatus.Failed ? 'Failed' : status === CalldataStatus.Cancelled ? 'Cancelled' : 'Member Changed'}
+          {status === CalldataStatus.Success
+            ? 'Excuted'
+            : status === CalldataStatus.Failed
+              ? 'Failed'
+              : status === CalldataStatus.Cancelled
+                ? 'Cancelled'
+                : 'Member Changed'}
         </Box>
       ) : (
-        <Operate approveFiltered={approveFiltered} canApprove={canApprove} canCancel={canCancel} cancelFiltered={cancelFiltered} transaction={transaction} type='icon' />
+        <Operate
+          approveFiltered={approveFiltered}
+          canApprove={canApprove}
+          canCancel={canCancel}
+          cancelFiltered={cancelFiltered}
+          transaction={transaction}
+          type='icon'
+        />
       )}
       <IconButton color='primary' onClick={toggleDetailOpen}>
         <SvgIcon
           component={ArrowDown}
           inheritViewBox
-          sx={{ transition: 'transform 0.2s', transformOrigin: 'center', transform: detailOpen ? 'rotateZ(180deg)' : 'rotateZ(0deg)', fontSize: '0.6rem', color: 'primary.main' }}
+          sx={{
+            transition: 'transform 0.2s',
+            transformOrigin: 'center',
+            transform: detailOpen ? 'rotateZ(180deg)' : 'rotateZ(0deg)',
+            fontSize: '0.6rem',
+            color: 'primary.main'
+          }}
         />
       </IconButton>
     </Box>
@@ -140,10 +216,23 @@ function ActionsCell({
 function RelatedItem({ tx }: { tx: Transaction }) {
   const destTx = tx.top;
   const { meta: destSenderMeta } = useAddressMeta(destTx.sender);
-  const [approvals] = useMemo((): [number, Transaction[]] => (destSenderMeta ? extraTransaction(destSenderMeta, tx) : [0, []]), [destSenderMeta, tx]);
+  const [approvals] = useMemo(
+    (): [number, Transaction[]] => (destSenderMeta ? extraTransaction(destSenderMeta, tx) : [0, []]),
+    [destSenderMeta, tx]
+  );
   const time = useBlockTime(tx.status < CalldataStatus.Success ? tx.initTransaction.height : tx.height);
 
-  return <TxItems approvals={approvals} defaultOpen={false} isSub threshold={destSenderMeta?.threshold || 0} time={time} transaction={tx} withApp={false} />;
+  return (
+    <TxItems
+      approvals={approvals}
+      defaultOpen={false}
+      isSub
+      threshold={destSenderMeta?.threshold || 0}
+      time={time}
+      transaction={tx}
+      withApp={false}
+    />
+  );
 }
 
 function TxItems({
@@ -219,14 +308,34 @@ function TxItems({
           />
         </Box>
         {detailOpen && (
-          <Box sx={{ display: 'flex', gap: { md: 2, xs: 1.5 }, padding: { md: 2, xs: 1.5 }, flexDirection: min700 ? 'row' : 'column' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: { md: 2, xs: 1.5 },
+              padding: { md: 2, xs: 1.5 },
+              flexDirection: min700 ? 'row' : 'column'
+            }}
+          >
             <Extrinsic transaction={transaction} />
-            <Progress approveFiltered={approveFiltered} canApprove={canApprove} canCancel={canCancel} cancelFiltered={cancelFiltered} openOverview={toggleOverviewOpen} transaction={transaction} />
+            <Progress
+              approveFiltered={approveFiltered}
+              canApprove={canApprove}
+              canCancel={canCancel}
+              cancelFiltered={cancelFiltered}
+              openOverview={toggleOverviewOpen}
+              transaction={transaction}
+            />
           </Box>
         )}
       </Stack>
       {relatedTxs.length > 0 && relatedTxs.map((tx) => <RelatedItem key={tx.uuid} tx={tx} />)}
-      <OverviewDialog approveFiltered={approveFiltered} cancelFiltered={cancelFiltered} onClose={toggleOverviewOpen} open={overviewOpen} tx={transaction} />
+      <OverviewDialog
+        approveFiltered={approveFiltered}
+        cancelFiltered={cancelFiltered}
+        onClose={toggleOverviewOpen}
+        open={overviewOpen}
+        tx={transaction}
+      />
     </>
   );
 }

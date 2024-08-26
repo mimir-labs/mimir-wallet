@@ -16,7 +16,16 @@ interface TypeToComponent {
   t: string[];
 }
 
-const SPECIAL_TYPES = ['AccountId', 'AccountId20', 'AccountId32', 'AccountIndex', 'Address', 'Balance', 'BalanceOf', 'Vec<KeyValue>'];
+const SPECIAL_TYPES = [
+  'AccountId',
+  'AccountId20',
+  'AccountId32',
+  'AccountIndex',
+  'Address',
+  'Balance',
+  'BalanceOf',
+  'Vec<KeyValue>'
+];
 
 const DISPATCH_ERROR = ['DispatchError', 'SpRuntimeDispatchError'];
 
@@ -27,18 +36,23 @@ const componentDef: TypeToComponent[] = [
   { c: Unknown, t: ['Unknown'] }
 ];
 
-const components: ComponentMap = componentDef.reduce((components, { c, t }): ComponentMap => {
-  t.forEach((type): void => {
-    components[type] = c;
-  });
+const components: ComponentMap = componentDef.reduce(
+  (components, { c, t }): ComponentMap => {
+    t.forEach((type): void => {
+      components[type] = c;
+    });
 
-  return components;
-}, {} as unknown as ComponentMap);
+    return components;
+  },
+  {} as unknown as ComponentMap
+);
 
 function fromDef({ displayName, info, lookupName, sub, type }: TypeDef): string {
   if (displayName && SPECIAL_TYPES.includes(displayName)) {
     return displayName;
-  } else if (type.endsWith('RuntimeSessionKeys')) {
+  }
+
+  if (type.endsWith('RuntimeSessionKeys')) {
     return 'RuntimeSessionKeys';
   }
 
@@ -80,7 +94,11 @@ function fromDef({ displayName, info, lookupName, sub, type }: TypeDef): string 
   }
 }
 
-export default function findComponent(registry: Registry, def: TypeDef, overrides: ComponentMap = {}): React.ComponentType<ParamProps> {
+export default function findComponent(
+  registry: Registry,
+  def: TypeDef,
+  overrides: ComponentMap = {}
+): React.ComponentType<ParamProps> {
   // Explicit/special handling for Account20/32 types where they don't match
   // the actual chain we are connected to
   if (['AccountId20', 'AccountId32'].includes(def.type)) {
@@ -89,13 +107,14 @@ export default function findComponent(registry: Registry, def: TypeDef, override
     if (def.type !== defType) {
       if (def.type === 'AccountId20') {
         return Account;
-      } else {
-        return Account;
       }
+
+      return Account;
     }
   }
 
-  const findOne = (type?: string): React.ComponentType<ParamProps> | null => (type ? overrides[type] || components[type] : null);
+  const findOne = (type?: string): React.ComponentType<ParamProps> | null =>
+    type ? overrides[type] || components[type] : null;
 
   const type = fromDef(def);
   const Component = findOne(def.lookupName) || findOne(def.type) || findOne(type);

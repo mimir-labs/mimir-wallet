@@ -1,21 +1,45 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as IconExternal } from '@mimir-wallet/assets/svg/icon-external-app.svg';
-import { ReactComponent as Logo } from '@mimir-wallet/assets/svg/logo-circle.svg';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  SvgIcon,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import keyring from '@polkadot/ui-keyring';
+import { useMemo } from 'react';
+
+import IconExternal from '@mimir-wallet/assets/svg/icon-external-app.svg?react';
+import Logo from '@mimir-wallet/assets/svg/logo-circle.svg?react';
 import { Address, AddressRow, BalanceFree } from '@mimir-wallet/components';
 import { useUnConfirmMultisigs } from '@mimir-wallet/hooks';
 import { getAddressMeta } from '@mimir-wallet/utils';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
-import keyring from '@polkadot/ui-keyring';
-import { useMemo } from 'react';
 
 function Item({ address, withEdit }: { address: string; withEdit: boolean }) {
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
 
   return (
-    <Box sx={{ padding: 1, display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'space-between', borderRadius: 1, border: '1px solid', borderColor: 'grey.300' }}>
+    <Box
+      sx={{
+        padding: 1,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        justifyContent: 'space-between',
+        borderRadius: 1,
+        border: '1px solid',
+        borderColor: 'grey.300'
+      }}
+    >
       <Box sx={{ flex: '1.3', display: 'flex', alignItems: 'center' }}>
         <AddressRow shorten size='small' value={address} withEdit={withEdit} withName />
       </Box>
@@ -84,7 +108,9 @@ function DetectedDialog({ multisigs }: { multisigs: string[] }) {
 
                 keyring.saveAccountMeta(pair, { isConfirm: true });
               }
-            } catch {}
+            } catch {
+              /* empty */
+            }
           }}
         >
           Confirm

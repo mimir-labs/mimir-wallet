@@ -3,10 +3,11 @@
 
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 
-import { useApi, useCall, useGroupAccounts, useTxQueue } from '@mimir-wallet/hooks';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { BN, bnToBn } from '@polkadot/util';
 import React, { useCallback, useState } from 'react';
+
+import { useApi, useCall, useGroupAccounts, useTxQueue } from '@mimir-wallet/hooks';
 
 import AddressCell from './AddressCell';
 import InputAddress from './InputAddress';
@@ -19,7 +20,19 @@ interface Props {
   onClose: () => void;
 }
 
-function Content({ receipt, sending, setSending, setValue, value }: { sending?: string; setSending: React.Dispatch<string>; value?: BN; setValue: React.Dispatch<BN>; receipt?: string }) {
+function Content({
+  receipt,
+  sending,
+  setSending,
+  setValue,
+  value
+}: {
+  sending?: string;
+  setSending: React.Dispatch<string>;
+  value?: BN;
+  setValue: React.Dispatch<BN>;
+  receipt?: string;
+}) {
   const { api } = useApi();
   const balances = useCall<DeriveBalancesAll>(api.derive.balances.all, [sending]);
   const { accounts, injected, testing } = useGroupAccounts();
@@ -27,7 +40,13 @@ function Content({ receipt, sending, setSending, setValue, value }: { sending?: 
   return (
     <DialogContent>
       <Stack spacing={2}>
-        <InputAddress filtered={[...injected, ...testing, ...accounts]} isSign label='Sending From' onChange={setSending} value={sending} />
+        <InputAddress
+          filtered={[...injected, ...testing, ...accounts]}
+          isSign
+          label='Sending From'
+          onChange={setSending}
+          value={sending}
+        />
         <Stack spacing={1}>
           <Typography fontWeight={700}>To</Typography>
           <Box bgcolor='secondary.main' borderRadius={1} padding={1}>
@@ -40,7 +59,17 @@ function Content({ receipt, sending, setSending, setValue, value }: { sending?: 
   );
 }
 
-function Action({ onClose, receipt, sending, value }: { receipt?: string; value?: BN; sending?: string; onClose: () => void }) {
+function Action({
+  onClose,
+  receipt,
+  sending,
+  value
+}: {
+  receipt?: string;
+  value?: BN;
+  sending?: string;
+  onClose: () => void;
+}) {
   const { api } = useApi();
   const { addQueue } = useTxQueue();
   const handleClick = useCallback(() => {

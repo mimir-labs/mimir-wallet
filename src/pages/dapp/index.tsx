@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import Grid from '@mui/material/Unstable_Grid2';
+
 import { DappCell } from '@mimir-wallet/components';
 import { useDapps } from '@mimir-wallet/hooks';
-import Grid from '@mui/material/Unstable_Grid2';
 
 function PageDapp() {
   const { addFavorite, dapps, isFavorite, removeFavorite } = useDapps();

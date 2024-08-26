@@ -1,17 +1,18 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { walletConfig } from '@mimir-wallet/config';
-import { WalletCtx } from '@mimir-wallet/hooks';
 import { Button, Dialog, DialogContent, DialogTitle, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { AccessCredentials, initializePlutonicationDAppClientWithModal } from '@plutonication/plutonication';
 import React, { useContext } from 'react';
 
+import { walletConfig } from '@mimir-wallet/config';
+import { WalletCtx } from '@mimir-wallet/hooks';
+
 import { toastError } from './ToastRoot';
 import WalletIcon from './WalletIcon';
 
-function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: string; icon: string; disabledIcon: string; downloadUrl: string }) {
+function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: string; downloadUrl: string }) {
   const { connect, connectedWallets, disconnect, wallets } = useContext(WalletCtx);
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
@@ -19,7 +20,12 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
   const name = id === 'polkadot-js' && window?.walletExtension?.isNovaWallet ? 'Nova' : propsName;
 
   return (
-    <Stack alignItems='center' justifyContent='center' spacing={1} sx={{ '>.MuiButton-root': { width: '100%' }, width: '100%' }}>
+    <Stack
+      alignItems='center'
+      justifyContent='center'
+      spacing={1}
+      sx={{ '>.MuiButton-root': { width: '100%' }, width: '100%' }}
+    >
       <WalletIcon disabled={!wallets[id]} id={id} sx={{ width: { sm: 64, xs: 40 }, height: { sm: 64, xs: 40 } }} />
       <Typography>{name}</Typography>
       {wallets[id] ? (
@@ -35,7 +41,12 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
       ) : id === 'plutonication' ? (
         <Button
           onClick={async () => {
-            const accessCredentials = new AccessCredentials('wss://plutonication.com/', 'Mimir', 'https://plutonication.com/dapp/mimir-icon', 'Mimir');
+            const accessCredentials = new AccessCredentials(
+              'wss://plutonication.com/',
+              'Mimir',
+              'https://plutonication.com/dapp/mimir-icon',
+              'Mimir'
+            );
 
             await initializePlutonicationDAppClientWithModal(accessCredentials, (receivedPubkey: string) => {
               /* */
@@ -67,7 +78,7 @@ function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => v
           <Grid columns={{ xs: 12 }} container spacing={{ sm: 4, xs: 2 }}>
             {Object.entries(walletConfig).map(([id, config]) => (
               <Grid key={id} sm={3} xs={4}>
-                <WalletCell disabledIcon={config.disabledIcon} downloadUrl={config.downloadUrl} icon={config.icon} id={id} name={config.name} />
+                <WalletCell downloadUrl={config.downloadUrl} id={id} name={config.name} />
               </Grid>
             ))}
           </Grid>

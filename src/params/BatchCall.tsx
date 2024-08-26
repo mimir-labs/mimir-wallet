@@ -6,10 +6,11 @@ import type { Call } from '@polkadot/types/interfaces';
 import type { IMethod } from '@polkadot/types/types';
 import type { CallProps } from './types';
 
-import { AddressRow } from '@mimir-wallet/components';
-import { useAddressMeta } from '@mimir-wallet/hooks';
 import { Box, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { AddressRow } from '@mimir-wallet/components';
+import { useAddressMeta } from '@mimir-wallet/hooks';
 
 import Item from './Param/Item';
 import FallbackCall from './FallbackCall';

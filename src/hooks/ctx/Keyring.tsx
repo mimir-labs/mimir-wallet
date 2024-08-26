@@ -37,7 +37,7 @@ export const KeyringCtx = React.createContext<State>(EMPTY);
  *
  * The first check ensures that we never have dupes in the original. The second
  * ensures that e.g. an address is not also available as an account
- **/
+ * */
 function filter(items: string[], others: string[] = []): string[] {
   const allowedLength = 32;
 
@@ -60,7 +60,7 @@ function filter(items: string[], others: string[] = []): string[] {
 
 /**
  * @internal Helper function to convert a list of ss58 addresses into hex
- **/
+ * */
 function toHex(items: string[]): HexString[] {
   return items
     .map((a): HexString | null => {
@@ -88,7 +88,7 @@ function extractAccounts(accounts: SubjectInfo = {}): Accounts {
   };
 }
 
-function extractAddresses(addresses: SubjectInfo = {}, accounts: string[]): Addresses {
+function extractAddresses(addresses: SubjectInfo = {}, accounts: string[] = []): Addresses {
   const allAddresses = filter(Object.keys(addresses), accounts);
 
   return {
@@ -109,7 +109,10 @@ export function KeyringCtxRoot({ children }: Props): React.ReactElement<Props> {
     // Defer keyring injection until the API is ready - we need to have the chain
     // info to determine which type of addresses we can use (before subscribing)
     if (isApiReady) {
-      sub = combineLatest([keyring.accounts.subject.pipe(map((accInfo) => extractAccounts(accInfo))), keyring.addresses.subject])
+      sub = combineLatest([
+        keyring.accounts.subject.pipe(map((accInfo) => extractAccounts(accInfo))),
+        keyring.addresses.subject
+      ])
         .pipe(
           map(
             ([accounts, addrInfo]): State => ({

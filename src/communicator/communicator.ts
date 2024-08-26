@@ -15,7 +15,11 @@ export abstract class Communicator {
 
   public abstract sendMessage(id: string, response?: unknown, subscription?: unknown): void;
 
-  public async handle<TMessageType extends MessageTypes>({ id, message: type, request }: TransportRequestMessage<TMessageType>): Promise<ResponseTypes[keyof ResponseTypes]> {
+  public async handle<TMessageType extends MessageTypes>({
+    id,
+    message: type,
+    request
+  }: TransportRequestMessage<TMessageType>): Promise<ResponseTypes[keyof ResponseTypes]> {
     // if (type === 'pub(phishing.redirectIfDenied)') {
     //   return this.redirectIfPhishing(url);
     // }

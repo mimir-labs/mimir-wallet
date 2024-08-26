@@ -21,7 +21,9 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       ),
       { icon: <WaitingAnimation />, autoClose: false }
     ];
-  } else if (events.status === 'finalized') {
+  }
+
+  if (events.status === 'finalized') {
     return [
       () => (
         <Box marginLeft={1.5}>
@@ -35,7 +37,9 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
         icon: <SuccessAnimation />
       }
     ];
-  } else if (events.status === 'signed') {
+  }
+
+  if (events.status === 'signed') {
     return [
       () => (
         <Box marginLeft={1.5}>
@@ -45,7 +49,9 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       ),
       { icon: <WaitingAnimation />, autoClose: false }
     ];
-  } else if (events.status === 'success') {
+  }
+
+  if (events.status === 'success') {
     return [
       () => (
         <Box marginLeft={1.5}>
@@ -59,7 +65,9 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
         icon: <SuccessAnimation />
       }
     ];
-  } else if (events.status === 'error') {
+  }
+
+  if (events.status === 'error') {
     return [
       () => (
         <Box marginLeft={1.5}>
@@ -75,17 +83,17 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
         icon: <FailedAnimation />
       }
     ];
-  } else {
-    return [
-      () => (
-        <Box marginLeft={1.5}>
-          <Typography fontWeight={700}>Waiting</Typography>
-          <Typography fontSize={12}>Waiting for sign</Typography>
-        </Box>
-      ),
-      { icon: <WaitingAnimation />, autoClose: false }
-    ];
   }
+
+  return [
+    () => (
+      <Box marginLeft={1.5}>
+        <Typography fontWeight={700}>Waiting</Typography>
+        <Typography fontSize={12}>Waiting for sign</Typography>
+      </Box>
+    ),
+    { icon: <WaitingAnimation />, autoClose: false }
+  ];
 }
 
 function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: () => void }) {
@@ -99,7 +107,8 @@ function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: (
     } else {
       const [content, options] = getToastContent(events);
 
-      id = idRef.current = toast.warn(content, options);
+      idRef.current = toast.warn(content, options);
+      id = idRef.current;
     }
 
     const onInblock = () => {
@@ -147,7 +156,12 @@ function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: (
       });
     };
 
-    events.on('signed', onSign).on('inblock', onInblock).on('finalized', onFinalized).on('error', onError).on('success', onSuccess);
+    events
+      .on('signed', onSign)
+      .on('inblock', onInblock)
+      .on('finalized', onFinalized)
+      .on('error', onError)
+      .on('success', onSuccess);
 
     toast.onChange((item) => {
       if (id === item.id && item.status === 'removed') {

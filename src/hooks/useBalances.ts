@@ -17,7 +17,9 @@ function calcUnbonding(stakingInfo?: DeriveStakingAccount) {
     return BN_ZERO;
   }
 
-  const filtered = stakingInfo.unlocking.filter(({ remainingEras, value }) => value.gt(BN_ZERO) && remainingEras.gt(BN_ZERO)).map((unlock) => unlock.value);
+  const filtered = stakingInfo.unlocking
+    .filter(({ remainingEras, value }) => value.gt(BN_ZERO) && remainingEras.gt(BN_ZERO))
+    .map((unlock) => unlock.value);
   const total = filtered.reduce((total, value) => total.iadd(value), BN_ZERO);
 
   return total;

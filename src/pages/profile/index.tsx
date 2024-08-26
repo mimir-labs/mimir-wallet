@@ -1,11 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Fund } from '@mimir-wallet/components';
-import { NOT_CREATE_MULTISIG_NOW_KEY } from '@mimir-wallet/constants';
-import { useDapps, useGroupAccounts, useNativeBalances, useProposal, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
 import { useState } from 'react';
 import store from 'store';
+
+import { Fund } from '@mimir-wallet/components';
+import { NOT_CREATE_MULTISIG_NOW_KEY } from '@mimir-wallet/constants';
+import {
+  useDapps,
+  useGroupAccounts,
+  useNativeBalances,
+  useProposal,
+  useSelectedAccount,
+  useToggle
+} from '@mimir-wallet/hooks';
 
 import Assets from './Assets';
 import FavoriteDapps from './FavoriteDapp';
@@ -30,7 +38,16 @@ function PageProfile() {
       {multisig.length > 0 || (notNow && selected) ? (
         <ProfileWrapper
           assets={<Assets address={selected} nativeBalance={balances} />}
-          dapps={favorites.length > 0 ? <FavoriteDapps addFavorite={addFavorite} dapps={favorites} isFavorite={isFavorite} removeFavorite={removeFavorite} /> : null}
+          dapps={
+            favorites.length > 0 ? (
+              <FavoriteDapps
+                addFavorite={addFavorite}
+                dapps={favorites}
+                isFavorite={isFavorite}
+                removeFavorite={removeFavorite}
+              />
+            ) : null
+          }
           info={<Info address={selected} balances={balances} toggleFundOpen={toggleFundOpen} />}
           member={<Members address={selected} />}
           proposals={proposals.length > 0 ? <Proposals data={proposals} /> : null}

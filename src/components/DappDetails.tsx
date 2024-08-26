@@ -1,15 +1,28 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as IconDiscord } from '@mimir-wallet/assets/svg/icon-discord.svg';
-import { ReactComponent as IconGithub } from '@mimir-wallet/assets/svg/icon-github.svg';
-import { ReactComponent as IconWebsite } from '@mimir-wallet/assets/svg/icon-website.svg';
-import { ReactComponent as IconX } from '@mimir-wallet/assets/svg/icon-x.svg';
-import { type DappOption, findToken } from '@mimir-wallet/config';
-import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, Divider, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Divider,
+  IconButton,
+  Stack,
+  SvgIcon,
+  Typography
+} from '@mui/material';
 import { isArray } from '@polkadot/util';
 import React from 'react';
 import { Link } from 'react-router-dom';
+
+import IconDiscord from '@mimir-wallet/assets/svg/icon-discord.svg?react';
+import IconGithub from '@mimir-wallet/assets/svg/icon-github.svg?react';
+import IconWebsite from '@mimir-wallet/assets/svg/icon-website.svg?react';
+import IconX from '@mimir-wallet/assets/svg/icon-x.svg?react';
+import { type DappOption, findToken } from '@mimir-wallet/config';
 
 interface Props {
   open: boolean;
@@ -21,7 +34,15 @@ function SupportedChains({ supported }: { supported: string[] | true }) {
   return (
     <Box sx={{ position: 'absolute', right: 0, top: 0, display: 'flex', alignItems: 'center' }}>
       <Typography marginRight={1}>Supported on</Typography>
-      {isArray(supported) ? supported.map((genesisHash) => <Avatar key={genesisHash} src={findToken(genesisHash).Icon} sx={{ width: 16, height: 16, marginLeft: '-4px' }} />) : 'All Chains'}
+      {isArray(supported)
+        ? supported.map((genesisHash) => (
+            <Avatar
+              key={genesisHash}
+              src={findToken(genesisHash).Icon}
+              sx={{ width: 16, height: 16, marginLeft: '-4px' }}
+            />
+          ))
+        : 'All Chains'}
     </Box>
   );
 }
@@ -33,7 +54,9 @@ function Contents({ dapp }: { dapp: DappOption }) {
         <SupportedChains supported={dapp.supportedChains} />
         <Box component='img' src={dapp.icon} sx={{ width: 64, height: 64 }} />
         <Typography variant='h3'>{dapp.name}</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, '>.MuiIconButton-root': { bgcolor: 'secondary.main' } }}>
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, '>.MuiIconButton-root': { bgcolor: 'secondary.main' } }}
+        >
           {dapp.tags.map((tag, index) => (
             <Button color='secondary' key={index} size='small' sx={{ fontWeight: 500 }}>
               {tag}
@@ -74,7 +97,12 @@ function DappDetails({ dapp, onClose, open }: Props) {
     <Dialog fullWidth maxWidth='sm' onClose={onClose} open={open}>
       <Contents dapp={dapp} />
       <DialogActions sx={{ justifyContent: 'center' }}>
-        <Button component={Link} size='large' sx={{ width: 195 }} to={dapp.internal ? dapp.url : `/explorer/${encodeURIComponent(dapp.url)}`}>
+        <Button
+          component={Link}
+          size='large'
+          sx={{ width: 195 }}
+          to={dapp.internal ? dapp.url : `/explorer/${encodeURIComponent(dapp.url)}`}
+        >
           Open
         </Button>
       </DialogActions>

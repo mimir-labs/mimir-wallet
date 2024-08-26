@@ -8,12 +8,13 @@ import type { SpRuntimeDispatchError } from '@polkadot/types/lookup';
 import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { AccountSigner, api, DEFAULT_DECIMALS, DEFAULT_SS58 } from '@mimir-wallet/api';
-import { CONNECT_ORIGIN } from '@mimir-wallet/constants';
 import { getSpecTypes } from '@polkadot/types-known';
 import keyring from '@polkadot/ui-keyring';
 import { assert, formatBalance, isBn, isNumber, objectSpread } from '@polkadot/util';
 import { addressEq, base64Encode } from '@polkadot/util-crypto';
+
+import { AccountSigner, api, DEFAULT_DECIMALS, DEFAULT_SS58 } from '@mimir-wallet/api';
+import { CONNECT_ORIGIN } from '@mimir-wallet/constants';
 
 import { TxEvents } from './tx-events';
 
@@ -25,7 +26,9 @@ type Options = {
 export class TxDispatchError extends Error {}
 export class TxModuleError extends Error {
   public section: string;
+
   public method: string;
+
   public docs: string[];
 
   constructor(message: string, section: string, method: string, docs: string[]) {
@@ -44,16 +47,27 @@ function _assetDispatchError(dispatch: DispatchError | SpRuntimeDispatchError): 
   if (dispatch.isModule) {
     const error = api.registry.findMetaError(dispatch.asModule);
 
-    return new TxModuleError(`Cause by ${error.section}.${error.method}: ${error.docs.join('\n')}`, error.section, error.method, error.docs);
-  } else if (dispatch.isToken) {
-    return new TxDispatchError(`Token Error: ${dispatch.asToken.type}`);
-  } else if (dispatch.isArithmetic) {
-    return new TxDispatchError(`Arithmetic Error: ${dispatch.asArithmetic.type}`);
-  } else if (dispatch.isTransactional) {
-    return new TxDispatchError(`Transactional Error: ${dispatch.asTransactional.type}`);
-  } else {
-    return new TxDispatchError(`Dispatch Error: ${dispatch.type}`);
+    return new TxModuleError(
+      `Cause by ${error.section}.${error.method}: ${error.docs.join('\n')}`,
+      error.section,
+      error.method,
+      error.docs
+    );
   }
+
+  if (dispatch.isToken) {
+    return new TxDispatchError(`Token Error: ${dispatch.asToken.type}`);
+  }
+
+  if (dispatch.isArithmetic) {
+    return new TxDispatchError(`Arithmetic Error: ${dispatch.asArithmetic.type}`);
+  }
+
+  if (dispatch.isTransactional) {
+    return new TxDispatchError(`Transactional Error: ${dispatch.asTransactional.type}`);
+  }
+
+  return new TxDispatchError(`Dispatch Error: ${dispatch.type}`);
 }
 
 async function extractParams(api: ApiPromise, address: string): Promise<Partial<SignerOptions>> {
@@ -70,7 +84,13 @@ async function extractParams(api: ApiPromise, address: string): Promise<Partial<
     if (metadata) {
       const knowns = await metadata.get();
 
-      if (!knowns.find((item) => item.genesisHash === api.genesisHash.toHex() && item.specVersion === api.runtimeVersion.specVersion.toNumber())) {
+      if (
+        !knowns.find(
+          (item) =>
+            item.genesisHash === api.genesisHash.toHex() &&
+            item.specVersion === api.runtimeVersion.specVersion.toNumber()
+        )
+      ) {
         const [systemChain] = await Promise.all([api.rpc.system.chain()]);
         const chainInfo = {
           chain: systemChain.toString(),
@@ -82,7 +102,12 @@ async function extractParams(api: ApiPromise, address: string): Promise<Partial<
           ss58Format: isNumber(api.registry.chainSS58) ? api.registry.chainSS58 : DEFAULT_SS58.toNumber(),
           tokenDecimals: (api.registry.chainDecimals || [DEFAULT_DECIMALS.toNumber()])[0],
           tokenSymbol: (api.registry.chainTokens || formatBalance.getDefaults().unit)[0],
-          types: getSpecTypes(api.registry, systemChain, api.runtimeVersion.specName, api.runtimeVersion.specVersion) as unknown as Record<string, string>
+          types: getSpecTypes(
+            api.registry,
+            systemChain,
+            api.runtimeVersion.specName,
+            api.runtimeVersion.specVersion
+          ) as unknown as Record<string, string>
         };
 
         await metadata.provide(chainInfo);
@@ -123,14 +148,20 @@ export function checkSubmittableResult(result: ISubmittableResult, checkProxy = 
   return result;
 }
 
-function makeSignOptions(partialOptions: Partial<SignerOptions>, extras: { blockHash?: Hash; era?: ExtrinsicEra; nonce?: Index }): SignatureOptions {
+function makeSignOptions(
+  partialOptions: Partial<SignerOptions>,
+  extras: { blockHash?: Hash; era?: ExtrinsicEra; nonce?: Index }
+): SignatureOptions {
   return objectSpread({ blockHash: api.genesisHash, genesisHash: api.genesisHash }, partialOptions, extras, {
     runtimeVersion: api.runtimeVersion,
     signedExtensions: api.registry.signedExtensions
   });
 }
 
-function makeEraOptions(partialOptions: Partial<SignerOptions>, { header, mortalLength, nonce }: { header: Header | null; mortalLength: number; nonce: Index }): SignatureOptions {
+function makeEraOptions(
+  partialOptions: Partial<SignerOptions>,
+  { header, mortalLength, nonce }: { header: Header | null; mortalLength: number; nonce: Index }
+): SignatureOptions {
   if (!header) {
     if (partialOptions.era && !partialOptions.blockHash) {
       throw new Error('Expected blockHash to be passed alongside non-immortal era options');
@@ -162,7 +193,10 @@ function optionsOrNonce(partialOptions: Partial<SignerOptions> = {}): Partial<Si
   return isBn(partialOptions) || isNumber(partialOptions) ? { nonce: partialOptions } : partialOptions;
 }
 
-export async function sign(extrinsic: SubmittableExtrinsic<'promise'>, signer: string): Promise<[HexString, SignerPayloadJSON, Hash]> {
+export async function sign(
+  extrinsic: SubmittableExtrinsic<'promise'>,
+  signer: string
+): Promise<[HexString, SignerPayloadJSON, Hash]> {
   const options = optionsOrNonce();
   const signingInfo = await api.derive.tx.signingInfo(signer, options.nonce, options.era);
   const eraOptions = makeEraOptions(options, signingInfo);
@@ -189,7 +223,11 @@ export async function sign(extrinsic: SubmittableExtrinsic<'promise'>, signer: s
   return [signature, payload.toPayload(), extrinsic.hash];
 }
 
-export function signAndSend(extrinsic: SubmittableExtrinsic<'promise'>, signer: string, { beforeSend, checkProxy }: Options = {}): TxEvents {
+export function signAndSend(
+  extrinsic: SubmittableExtrinsic<'promise'>,
+  signer: string,
+  { beforeSend, checkProxy }: Options = {}
+): TxEvents {
   const events = new TxEvents();
 
   extractParams(api, signer)

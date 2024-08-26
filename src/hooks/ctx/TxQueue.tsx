@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import type { TxQueue, TxQueueState } from './types';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 interface Props {
   children?: React.ReactNode;
@@ -49,5 +49,7 @@ export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {
     });
   }, []);
 
-  return <TxQueueCtx.Provider value={{ queue, addQueue }}>{children}</TxQueueCtx.Provider>;
+  const value = useMemo(() => ({ queue, addQueue }), [addQueue, queue]);
+
+  return <TxQueueCtx.Provider value={value}>{children}</TxQueueCtx.Provider>;
 }

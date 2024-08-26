@@ -1,10 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as IconCancel } from '@mimir-wallet/assets/svg/icon-cancel.svg';
-import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
 import { SvgIcon } from '@mui/material';
 import React from 'react';
+
+import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
+import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 
 function ActionText({ action }: { action: string }) {
   let comp: React.ReactNode;

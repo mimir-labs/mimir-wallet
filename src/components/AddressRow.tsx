@@ -3,10 +3,11 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { ReactComponent as IconEdit } from '@mimir-wallet/assets/svg/icon-edit.svg';
-import { useAddressMeta } from '@mimir-wallet/hooks';
 import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
 import React, { useCallback, useMemo, useState } from 'react';
+
+import IconEdit from '@mimir-wallet/assets/svg/icon-edit.svg?react';
+import { useAddressMeta } from '@mimir-wallet/hooks';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
@@ -26,7 +27,13 @@ interface Props {
   onClick?: (value?: string) => void;
 }
 
-function EditName({ address, onDone }: { onDone: () => void; address?: AccountId | AccountIndex | Address | string | null }) {
+function EditName({
+  address,
+  onDone
+}: {
+  onDone: () => void;
+  address?: AccountId | AccountIndex | Address | string | null;
+}) {
   const { name, saveName, setName } = useAddressMeta(address?.toString());
 
   return (
@@ -44,7 +51,18 @@ function EditName({ address, onDone }: { onDone: () => void; address?: AccountId
   );
 }
 
-function AddressRow({ defaultName, isMe, onClick, shorten, size = 'medium', value, withAddress = false, withCopy = false, withEdit, withName = true }: Props) {
+function AddressRow({
+  defaultName,
+  isMe,
+  onClick,
+  shorten,
+  size = 'medium',
+  value,
+  withAddress = false,
+  withCopy = false,
+  withEdit,
+  withName = true
+}: Props) {
   const [editing, setEditing] = useState(false);
 
   const [iconSize, spacing] = useMemo((): [number, number] => {
@@ -56,11 +74,22 @@ function AddressRow({ defaultName, isMe, onClick, shorten, size = 'medium', valu
   }, [onClick, value]);
 
   return (
-    <Stack alignItems='center' className='AddressRow' direction='row' onClick={_onClick} spacing={spacing} sx={{ cursor: onClick ? 'pointer' : undefined }}>
+    <Stack
+      alignItems='center'
+      className='AddressRow'
+      direction='row'
+      onClick={_onClick}
+      spacing={spacing}
+      sx={{ cursor: onClick ? 'pointer' : undefined }}
+    >
       <IdentityIcon className='AddressRow-Icon' isMe={isMe} size={iconSize} value={value} />
       {withName && (
         <Box component='span' sx={{ fontWeight: withName && withAddress ? 700 : undefined }}>
-          {editing ? <EditName address={value} onDone={() => setEditing(false)} /> : <AddressName defaultName={defaultName} value={value} />}
+          {editing ? (
+            <EditName address={value} onDone={() => setEditing(false)} />
+          ) : (
+            <AddressName defaultName={defaultName} value={value} />
+          )}
         </Box>
       )}
       {withAddress && (

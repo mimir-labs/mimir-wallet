@@ -4,19 +4,24 @@
 import type { HexString } from '@polkadot/util/types';
 import type { PushMessageData } from './types';
 
-import { LAST_READ_MESSAGE_KEY } from '@mimir-wallet/constants';
-import { SocketCtx } from '@mimir-wallet/socket';
-import { getServiceUrl } from '@mimir-wallet/utils/service';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import store from 'store';
 import useSWR from 'swr/immutable';
+
+import { LAST_READ_MESSAGE_KEY } from '@mimir-wallet/constants';
+import { SocketCtx } from '@mimir-wallet/socket';
+import { getServiceUrl } from '@mimir-wallet/utils/service';
 
 import { useApi } from './useApi';
 
 export function useMessages(addresses: HexString[]): [messages: PushMessageData[], isRead: boolean, read: () => void] {
   const { isApiReady } = useApi();
   const { subscribe } = useContext(SocketCtx);
-  const { data } = useSWR<PushMessageData[]>(isApiReady && addresses.length > 0 ? getServiceUrl(`messages?${addresses.map((address) => `addresses=${address}`).join('&')}`) : null);
+  const { data } = useSWR<PushMessageData[]>(
+    isApiReady && addresses.length > 0
+      ? getServiceUrl(`messages?${addresses.map((address) => `addresses=${address}`).join('&')}`)
+      : null
+  );
   const [pushed, setPushed] = useState<PushMessageData[]>([]);
   const [readId, setReadId] = useState<number | undefined | null>(store.get(LAST_READ_MESSAGE_KEY));
 

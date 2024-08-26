@@ -1,24 +1,40 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
-import type { SafetyLevel, Transaction } from '@mimir-wallet/hooks/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Call, Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
+import type { SafetyLevel, Transaction } from '@mimir-wallet/hooks/types';
 
-import Logo from '@mimir-wallet/assets/images/logo.png';
-import { ReactComponent as IconFailed } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
-import { ReactComponent as IconInfo } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
-import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success.svg';
-import { useAddressMeta, useApi, usePendingTransactions, useToggle } from '@mimir-wallet/hooks';
-import { canSendMultisig, PrepareMultisig, prepareMultisig, service } from '@mimir-wallet/utils';
-import { Alert, Box, Button, Checkbox, DialogActions, DialogContent, Divider, FormControlLabel, Paper, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  DialogActions,
+  DialogContent,
+  Divider,
+  FormControlLabel,
+  Paper,
+  Stack,
+  SvgIcon,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+
+import Logo from '@mimir-wallet/assets/images/logo.png';
+import IconFailed from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
+import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
+import IconSuccess from '@mimir-wallet/assets/svg/icon-success.svg?react';
+import { useAddressMeta, useApi, usePendingTransactions, useToggle } from '@mimir-wallet/hooks';
+import { canSendMultisig, type PrepareMultisig, prepareMultisig, service } from '@mimir-wallet/utils';
 
 import AddressCell from '../AddressCell';
 import AddressName from '../AddressName';
@@ -100,9 +116,9 @@ function Contents({
           setPrepare((lastValue) => {
             if (JSON.stringify(value) !== JSON.stringify(lastValue)) {
               return value;
-            } else {
-              return lastValue;
             }
+
+            return lastValue;
           })
         );
       });
@@ -134,10 +150,25 @@ function Contents({
             </Box>
           )}
           <Divider />
-          <CallComp destSender={destSender} isCancelled={isCancelled} method={destCall || extrinsic.method} sender={address} transaction={transaction} />
+          <CallComp
+            destSender={destSender}
+            isCancelled={isCancelled}
+            method={destCall || extrinsic.method}
+            sender={address}
+            transaction={transaction}
+          />
 
           {safetyCheck && (
-            <Paper sx={{ padding: 1.25, bgcolor: 'secondary.main', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+            <Paper
+              sx={{
+                padding: 1.25,
+                bgcolor: 'secondary.main',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 2
+              }}
+            >
               <Box>
                 <Typography sx={{ mb: 1, fontSize: '0.875rem' }} variant='h6'>
                   {safetyCheck.title}
@@ -147,7 +178,19 @@ function Contents({
                   <Box component='img' src={Logo} sx={{ height: 12 }} />
                 </Box>
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: safetyCheck.severity === 'none' ? 'primary.main' : safetyCheck.severity === 'error' ? 'error.main' : 'warning.main' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  color:
+                    safetyCheck.severity === 'none'
+                      ? 'primary.main'
+                      : safetyCheck.severity === 'error'
+                        ? 'error.main'
+                        : 'warning.main'
+                }}
+              >
                 {safetyCheck.severity === 'none' && <SvgIcon component={IconSuccess} inheritViewBox />}
                 {safetyCheck.severity === 'error' && <SvgIcon component={IconFailed} inheritViewBox />}
                 {safetyCheck.severity === 'warning' && <SvgIcon component={IconInfo} inheritViewBox />}
@@ -223,7 +266,10 @@ function Contents({
         )}
         <Box sx={{ marginLeft: '0px !important', width: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
           {safetyCheck && safetyCheck.severity === 'warning' && (
-            <FormControlLabel control={<Checkbox checked={isConfirm} onChange={(e) => setConfirm(e.target.checked)} />} label='I confirm recipient address exsits on the destination chain.' />
+            <FormControlLabel
+              control={<Checkbox checked={isConfirm} onChange={(e) => setConfirm(e.target.checked)} />}
+              label='I confirm recipient address exsits on the destination chain.'
+            />
           )}
 
           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -240,7 +286,16 @@ function Contents({
             <SendTx
               beforeSend={beforeSend}
               canSend={canSend}
-              disabled={pendingTxs.length > 0 || (safetyCheck ? (safetyCheck.severity === 'none' ? false : safetyCheck.severity === 'error' ? true : !isConfirm) : true)}
+              disabled={
+                pendingTxs.length > 0 ||
+                (safetyCheck
+                  ? safetyCheck.severity === 'none'
+                    ? false
+                    : safetyCheck.severity === 'error'
+                      ? true
+                      : !isConfirm
+                  : true)
+              }
               note={note}
               onClose={onClose}
               onError={onError}

@@ -5,12 +5,13 @@ import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 import type { AccountData, MultiAccountData, ProxyAccountData } from './types';
 
-import { events } from '@mimir-wallet/events';
-import { addressToHex, service } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import { u8aEq, u8aToHex } from '@polkadot/util';
 import { encodeMultiAddress } from '@polkadot/util-crypto';
 import { useEffect, useMemo, useState } from 'react';
+
+import { events } from '@mimir-wallet/events';
+import { addressToHex, service } from '@mimir-wallet/utils';
 
 import { useApi } from './useApi';
 import { useGroupAccounts } from './useGroupAccounts';
@@ -21,48 +22,51 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
 
   if (networks.find((item) => u8aEq(api.genesisHash.toHex(), item))) {
     const multiAddress = delegators.at(0)?.address;
-    let multiAccount: AccountData;
 
-    if (multiAddress && (multiAccount = multisigs[multiAddress]) && multiAccount.type === 'multi') {
-      const { threshold, who } = multiAccount as MultiAccountData;
+    if (multiAddress) {
+      const multiAccount: AccountData = multisigs[multiAddress];
 
-      const exists = keyring.getAccount(address);
-      const _meta = {
-        isMimir,
-        isMultisig: true,
-        isFlexible: true,
-        name: name || undefined,
-        who: who.map(({ address }) => keyring.encodeAddress(address)).sort((l, r) => (l > r ? 1 : -1)),
-        threshold,
-        creator: keyring.encodeAddress(creator),
-        height,
-        index,
-        genesisHash: api.genesisHash.toHex(),
-        isValid,
-        isPending: false
-      };
+      if (multiAccount && multiAccount.type === 'multi') {
+        const { threshold, who } = multiAccount as MultiAccountData;
 
-      if (exists) {
-        if (
-          exists.meta.isMimir !== _meta.isMimir ||
-          exists.meta.isMultisig !== _meta.isMultisig ||
-          exists.meta.isFlexible !== _meta.isFlexible ||
-          exists.meta.name !== _meta.name ||
-          exists.meta.who?.sort((l, r) => (l > r ? 1 : -1)).join('') !== _meta.who.join('') ||
-          exists.meta.threshold !== _meta.threshold ||
-          exists.meta.creator !== _meta.creator ||
-          exists.meta.height !== _meta.height ||
-          exists.meta.index !== _meta.index ||
-          exists.meta.genesisHash !== _meta.genesisHash ||
-          exists.meta.isValid !== _meta.isValid ||
-          exists.meta.isPending !== _meta.isPending
-        ) {
-          keyring.saveAccountMeta(keyring.getPair(address), _meta);
+        const exists = keyring.getAccount(address);
+        const _meta = {
+          isMimir,
+          isMultisig: true,
+          isFlexible: true,
+          name: name || undefined,
+          who: who.map(({ address }) => keyring.encodeAddress(address)).sort((l, r) => (l > r ? 1 : -1)),
+          threshold,
+          creator: keyring.encodeAddress(creator),
+          height,
+          index,
+          genesisHash: api.genesisHash.toHex(),
+          isValid,
+          isPending: false
+        };
+
+        if (exists) {
+          if (
+            exists.meta.isMimir !== _meta.isMimir ||
+            exists.meta.isMultisig !== _meta.isMultisig ||
+            exists.meta.isFlexible !== _meta.isFlexible ||
+            exists.meta.name !== _meta.name ||
+            exists.meta.who?.sort((l, r) => (l > r ? 1 : -1)).join('') !== _meta.who.join('') ||
+            exists.meta.threshold !== _meta.threshold ||
+            exists.meta.creator !== _meta.creator ||
+            exists.meta.height !== _meta.height ||
+            exists.meta.index !== _meta.index ||
+            exists.meta.genesisHash !== _meta.genesisHash ||
+            exists.meta.isValid !== _meta.isValid ||
+            exists.meta.isPending !== _meta.isPending
+          ) {
+            keyring.saveAccountMeta(keyring.getPair(address), _meta);
+            events.emit('account_meta_changed', address);
+          }
+        } else {
+          keyring.addExternal(address, _meta);
           events.emit('account_meta_changed', address);
         }
-      } else {
-        keyring.addExternal(address, _meta);
-        events.emit('account_meta_changed', address);
       }
     }
   }

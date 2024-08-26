@@ -32,7 +32,17 @@ function Content({ value }: { value: string }) {
 
   return (
     <Box>
-      <Box ref={container} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', width: 300, height: 300 }}></Box>
+      <Box
+        ref={container}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto',
+          width: 300,
+          height: 300
+        }}
+      />
       <Typography marginTop={1}>
         {value}
         <CopyButton value={value} />

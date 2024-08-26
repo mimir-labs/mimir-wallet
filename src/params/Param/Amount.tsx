@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { FormatBalance } from '@mimir-wallet/components';
 import { Typography } from '@mui/material';
 import React from 'react';
+
+import { FormatBalance } from '@mimir-wallet/components';
 
 import Item from './Item';
 import { ParamProps } from './types';

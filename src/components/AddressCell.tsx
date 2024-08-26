@@ -3,11 +3,12 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { ReactComponent as IconAddressBook } from '@mimir-wallet/assets/svg/icon-address-book.svg';
-import { useAddressMeta, useToggle } from '@mimir-wallet/hooks';
-import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
 import { Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
+import { useAddressMeta, useToggle } from '@mimir-wallet/hooks';
+import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
 
 import AddAddressDialog from './AddAddressDialog';
 import AddressComp from './Address';
@@ -27,9 +28,29 @@ interface Props {
   icons?: React.ReactNode;
 }
 
-function AddressCell({ icons, isMe, namePost, shorten = true, showType = false, size = 'medium', value, width, withCopy = false }: Props) {
-  const [iconSize, nameFontSize, addressFontSize, spacing, spacingCol] = useMemo((): [number, string, string, number, number] => {
-    return size === 'small' ? [30, '0.875rem', '0.75rem', 0.5, 0.2] : size === 'medium' ? [40, '1rem', '0.75rem', 0.5, 0.5] : [50, '1.25rem', '0.875rem', 1, 0.5];
+function AddressCell({
+  icons,
+  isMe,
+  namePost,
+  shorten = true,
+  showType = false,
+  size = 'medium',
+  value,
+  width,
+  withCopy = false
+}: Props) {
+  const [iconSize, nameFontSize, addressFontSize, spacing, spacingCol] = useMemo((): [
+    number,
+    string,
+    string,
+    number,
+    number
+  ] => {
+    return size === 'small'
+      ? [30, '0.875rem', '0.75rem', 0.5, 0.2]
+      : size === 'medium'
+        ? [40, '1rem', '0.75rem', 0.5, 0.5]
+        : [50, '1.25rem', '0.875rem', 1, 0.5];
   }, [size]);
   const [open, toggleOpen] = useToggle();
 
@@ -43,18 +64,32 @@ function AddressCell({ icons, isMe, namePost, shorten = true, showType = false, 
         <IdentityIcon className='AddressCell-Icon' isMe={isMe} size={iconSize} value={value} />
         <Stack className='AddressCell-Address' spacing={spacingCol}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography component='span' fontSize={nameFontSize} fontWeight={size === 'large' ? 800 : 700} sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Typography
+              component='span'
+              fontSize={nameFontSize}
+              fontWeight={size === 'large' ? 800 : 700}
+              sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
               <AddressName value={value} />
             </Typography>
             {namePost}
             {showType &&
               (isMultisig ? (
-                <Chip color='secondary' label={isFlexible ? 'Flexible' : 'Static'} size={size === 'large' ? 'medium' : 'small'} />
+                <Chip
+                  color='secondary'
+                  label={isFlexible ? 'Flexible' : 'Static'}
+                  size={size === 'large' ? 'medium' : 'small'}
+                />
               ) : isTesting ? (
                 <Chip color='secondary' label='Dev' size={size === 'large' ? 'medium' : 'small'} />
               ) : null)}
           </Box>
-          <Typography color='text.secondary' component='span' fontSize={addressFontSize} sx={{ height: 18, display: 'flex', alignItems: 'center' }}>
+          <Typography
+            color='text.secondary'
+            component='span'
+            fontSize={addressFontSize}
+            sx={{ height: 18, display: 'flex', alignItems: 'center' }}
+          >
             <AddressComp shorten={shorten} value={address} />
             {withCopy && <CopyButton value={address} />}
             {icons}

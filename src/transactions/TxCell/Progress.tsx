@@ -3,10 +3,11 @@
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
-import { useAddressMeta } from '@mimir-wallet/hooks';
-import { type Transaction } from '@mimir-wallet/hooks/types';
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { useAddressMeta } from '@mimir-wallet/hooks';
+import { type Transaction } from '@mimir-wallet/hooks/types';
 
 import { extraTransaction } from '../util';
 import Operate from './Operate';
@@ -52,7 +53,10 @@ function ProgressInfo({ approvals, threshold }: { approvals: number; threshold: 
 
 function Progress({ approveFiltered, canApprove, canCancel, cancelFiltered, openOverview, transaction }: Props) {
   const { meta } = useAddressMeta(transaction.sender);
-  const [approvals, txs] = useMemo((): [number, Transaction[]] => (meta ? extraTransaction(meta, transaction) : [0, []]), [meta, transaction]);
+  const [approvals, txs] = useMemo(
+    (): [number, Transaction[]] => (meta ? extraTransaction(meta, transaction) : [0, []]),
+    [meta, transaction]
+  );
 
   return (
     <Stack bgcolor='secondary.main' component={Paper} minWidth={280} padding={2} spacing={1} variant='elevation'>
@@ -81,7 +85,13 @@ function Progress({ approveFiltered, canApprove, canCancel, cancelFiltered, open
           </Box>
         </Box>
       </Box>
-      <Operate approveFiltered={approveFiltered} canApprove={canApprove} canCancel={canCancel} cancelFiltered={cancelFiltered} transaction={transaction} />
+      <Operate
+        approveFiltered={approveFiltered}
+        canApprove={canApprove}
+        canCancel={canCancel}
+        cancelFiltered={cancelFiltered}
+        transaction={transaction}
+      />
     </Stack>
   );
 }

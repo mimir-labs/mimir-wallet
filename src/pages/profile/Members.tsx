@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddressOverview } from '@mimir-wallet/components';
 import { Paper } from '@mui/material';
 import React from 'react';
+
+import { AddressOverview } from '@mimir-wallet/components';
 
 function Members({ address }: { address?: string }) {
   return (

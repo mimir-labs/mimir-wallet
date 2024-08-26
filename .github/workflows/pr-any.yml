@@ -11,16 +11,19 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+
     - name: Setup Node
       uses: actions/setup-node@v4
       with:
         node-version: "20"
-        cache: "yarn"
+        cache: "pnpm"
 
     - name: Install deps
       run: |
-        yarn install --immutable | grep -v 'YN0013'
+        pnpm install
 
     - name: ${{ matrix.step }}
       run: |
-        yarn ${{ matrix.step }}
+        pnpm ${{ matrix.step }}

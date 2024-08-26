@@ -1,7 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { type PaletteMode, type Theme } from '@mui/material';
+import type { PaletteMode, Theme } from '@mui/material';
+
 import { createTheme as createMuiTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import * as React from 'react';
 
@@ -68,7 +69,7 @@ function createTheme(mode: PaletteMode): Theme {
 /* eslint-disable-next-line @typescript-eslint/no-empty-function */
 const ToggleThemeContext = React.createContext(() => {});
 
-function ThemeProvider(props: ThemeProviderProps): JSX.Element {
+function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
   const [theme, setTheme] = React.useState(() => createTheme('light'));
 
   const toggleTheme = React.useCallback(() => {
@@ -77,7 +78,7 @@ function ThemeProvider(props: ThemeProviderProps): JSX.Element {
 
   return (
     <MuiThemeProvider theme={theme}>
-      <ToggleThemeContext.Provider value={toggleTheme}>{props.children}</ToggleThemeContext.Provider>
+      <ToggleThemeContext.Provider value={toggleTheme}>{children}</ToggleThemeContext.Provider>
     </MuiThemeProvider>
   );
 }

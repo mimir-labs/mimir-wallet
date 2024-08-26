@@ -11,7 +11,13 @@ import { Link } from 'react-router-dom';
 import Item from './Param/Item';
 import FallbackCall from './FallbackCall';
 
-function CancelCall({ call, jsonFallback, selectAccount, tx, type = 'base' }: CallProps & { tx?: Transaction; selectAccount?: (value: string) => void }) {
+function CancelCall({
+  call,
+  jsonFallback,
+  selectAccount,
+  tx,
+  type = 'base'
+}: CallProps & { tx?: Transaction; selectAccount?: (value: string) => void }) {
   if (!tx || !tx.cancelTx) {
     return jsonFallback ? <FallbackCall call={call} /> : null;
   }
@@ -22,7 +28,12 @@ function CancelCall({ call, jsonFallback, selectAccount, tx, type = 'base' }: Ca
     <>
       <Item
         content={
-          <Typography color='primary.main' component={Link} onClick={() => selectAccount?.(cancelTx.sender)} to='/transactions'>
+          <Typography
+            color='primary.main'
+            component={Link}
+            onClick={() => selectAccount?.(cancelTx.sender)}
+            to='/transactions'
+          >
             No. {cancelTx.uuid.slice(0, 8).toUpperCase()}
           </Typography>
         }

@@ -3,7 +3,7 @@
 
 import type { TxToast, TxToastState } from './types';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 interface Props {
   children?: React.ReactNode;
@@ -59,5 +59,7 @@ export function TxToastCtxRoot({ children }: Props): React.ReactElement<Props> {
     return onRemove;
   }, []);
 
-  return <TxToastCtx.Provider value={{ state, addToast }}>{children}</TxToastCtx.Provider>;
+  const value = useMemo(() => ({ state, addToast }), [addToast, state]);
+
+  return <TxToastCtx.Provider value={value}>{children}</TxToastCtx.Provider>;
 }

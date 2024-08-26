@@ -1,12 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { Box } from '@mui/material';
+import { createContext, useCallback, useMemo, useState } from 'react';
+import { Outlet } from 'react-router-dom';
+
 import { MimirLoading, TxModal } from '@mimir-wallet/components';
 import { useApi, useToggle } from '@mimir-wallet/hooks';
 import { useWallet } from '@mimir-wallet/hooks/useWallet';
-import { Box } from '@mui/material';
-import React, { createContext, useCallback, useState } from 'react';
-import { Outlet } from 'react-router-dom';
 
 import DetectedMultisig from './DetectedMultisig';
 import SideBar from './SideBar';
@@ -31,8 +32,13 @@ function BaseContainer({ fixedSidebar }: { fixedSidebar: boolean }) {
   const openSidebar = useCallback(() => setSidebarOpen(true), [setSidebarOpen]);
   const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
 
+  const value = useMemo(
+    () => ({ alertOpen, sidebarOpen, openSidebar, closeSidebar }),
+    [alertOpen, closeSidebar, openSidebar, sidebarOpen]
+  );
+
   return (
-    <BaseContainerCtx.Provider value={{ alertOpen, sidebarOpen, openSidebar, closeSidebar }}>
+    <BaseContainerCtx.Provider value={value}>
       <TxModal />
       <TopBar />
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (

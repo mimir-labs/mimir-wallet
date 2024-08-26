@@ -4,13 +4,14 @@
 import type { IdentityProps } from '@polkadot/react-identicon/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { walletConfig } from '@mimir-wallet/config';
-import { useAddressMeta } from '@mimir-wallet/hooks';
 import { Box } from '@mui/material';
 import { Polkadot as PolkadotIcon } from '@polkadot/react-identicon/icons/Polkadot';
 import keyring from '@polkadot/ui-keyring';
 import { isHex, isU8a } from '@polkadot/util';
 import React, { useCallback, useMemo } from 'react';
+
+import { walletConfig } from '@mimir-wallet/config';
+import { useAddressMeta } from '@mimir-wallet/hooks';
 
 interface Props {
   className?: string;
@@ -21,7 +22,9 @@ interface Props {
   onClick?: (value?: string) => void;
 }
 
-function isCodec(value?: AccountId | AccountIndex | Address | string | Uint8Array | null): value is AccountId | AccountIndex | Address {
+function isCodec(
+  value?: AccountId | AccountIndex | Address | string | Uint8Array | null
+): value is AccountId | AccountIndex | Address {
   return !!(value && (value as AccountId).toHuman);
 }
 
@@ -77,7 +80,14 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
       className={`${className} IdentityIcon`}
       component='span'
       onClick={_onClick}
-      sx={{ cursor: onClick ? 'pointer' : undefined, position: 'relative', width: size, height: size + (isMultisig ? 6 + size / 16 : 0), bgcolor: 'secondary.main', borderRadius: '50%' }}
+      sx={{
+        cursor: onClick ? 'pointer' : undefined,
+        position: 'relative',
+        width: size,
+        height: size + (isMultisig ? 6 + size / 16 : 0),
+        bgcolor: 'secondary.main',
+        borderRadius: '50%'
+      }}
     >
       <PolkadotIcon address={address} publicKey={publicKey} size={size} />
       {extensionIcon ? (

@@ -4,12 +4,15 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 
-import { api } from '@mimir-wallet/api';
-import { findEndpoint } from '@mimir-wallet/config';
 import keyring from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
 
-export function accountExplorerLink(value?: AccountId | AccountIndex | Address | HexString | string | null): string | undefined {
+import { api } from '@mimir-wallet/api';
+import { findEndpoint } from '@mimir-wallet/config';
+
+export function accountExplorerLink(
+  value?: AccountId | AccountIndex | Address | HexString | string | null
+): string | undefined {
   const _value = value?.toString();
 
   if (_value && _value.length > 47 && isAddress(_value)) {

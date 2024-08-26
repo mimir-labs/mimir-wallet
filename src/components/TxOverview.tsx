@@ -3,21 +3,33 @@
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
-import { ReactComponent as IconCancel } from '@mimir-wallet/assets/svg/icon-cancel.svg';
-import { ReactComponent as IconFail } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
-import { ReactComponent as IconFailOutlined } from '@mimir-wallet/assets/svg/icon-failed-outlined.svg';
-import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
-import { ReactComponent as IconSuccessOutlined } from '@mimir-wallet/assets/svg/icon-success-outlined.svg';
-import { ReactComponent as IconTransfer } from '@mimir-wallet/assets/svg/icon-transfer.svg';
-import { ReactComponent as IconWaiting } from '@mimir-wallet/assets/svg/icon-waiting-fill.svg';
-import { useApi, useSelectedAccountCallback, useTxQueue } from '@mimir-wallet/hooks';
-import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
-import { getAddressMeta } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
 import { alpha, Box, Button, IconButton, Paper, SvgIcon, useTheme } from '@mui/material';
 import { addressEq } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import ReactFlow, { Edge, EdgeLabelRenderer, EdgeProps, Handle, Node, NodeProps, Position, StepEdge, useEdgesState, useNodesState } from 'reactflow';
+import ReactFlow, {
+  type Edge,
+  EdgeLabelRenderer,
+  type EdgeProps,
+  Handle,
+  type Node,
+  type NodeProps,
+  Position,
+  StepEdge,
+  useEdgesState,
+  useNodesState
+} from 'reactflow';
+
+import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
+import IconFail from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
+import IconFailOutlined from '@mimir-wallet/assets/svg/icon-failed-outlined.svg?react';
+import IconSuccess from '@mimir-wallet/assets/svg/icon-success-fill.svg?react';
+import IconSuccessOutlined from '@mimir-wallet/assets/svg/icon-success-outlined.svg?react';
+import IconTransfer from '@mimir-wallet/assets/svg/icon-transfer.svg?react';
+import IconWaiting from '@mimir-wallet/assets/svg/icon-waiting-fill.svg?react';
+import { useApi, useSelectedAccountCallback, useTxQueue } from '@mimir-wallet/hooks';
+import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
+import { getAddressMeta } from '@mimir-wallet/utils';
 
 import AddressCell from './AddressCell';
 
@@ -132,19 +144,19 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
     [addQueue, api.tx, accounts, destTx, sourceTx]
   );
 
-  const tx = data.tx;
+  const { tx } = data;
   const color = tx
     ? tx.status === CalldataStatus.Success
       ? palette.success.main
       : tx.status === CalldataStatus.Cancelled
-      ? palette.warning.main
-      : tx.status === CalldataStatus.Failed
-      ? palette.error.main
-      : tx.status === CalldataStatus.Pending
-      ? palette.warning.main
-      : tx.status === CalldataStatus.Initialized
-      ? palette.warning.main
-      : palette.grey[300]
+        ? palette.warning.main
+        : tx.status === CalldataStatus.Failed
+          ? palette.error.main
+          : tx.status === CalldataStatus.Pending
+            ? palette.warning.main
+            : tx.status === CalldataStatus.Initialized
+              ? palette.warning.main
+              : palette.grey[300]
     : palette.grey[300];
   const icon = tx ? (
     <SvgIcon
@@ -152,14 +164,14 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
         tx.status === CalldataStatus.Success
           ? IconSuccess
           : tx.status === CalldataStatus.Cancelled
-          ? IconCancel
-          : tx.status === CalldataStatus.Failed
-          ? IconFail
-          : tx.status === CalldataStatus.Pending
-          ? IconWaiting
-          : tx.status === CalldataStatus.Initialized
-          ? IconWaiting
-          : 'span'
+            ? IconCancel
+            : tx.status === CalldataStatus.Failed
+              ? IconFail
+              : tx.status === CalldataStatus.Pending
+                ? IconWaiting
+                : tx.status === CalldataStatus.Initialized
+                  ? IconWaiting
+                  : 'span'
       }
       inheritViewBox
       sx={{ fontSize: '1rem', color }}
@@ -182,7 +194,16 @@ const TxNode = React.memo(({ data, id, isConnectable }: NodeProps<NodeData>) => 
         />
       )}
       <Paper sx={{ width: 260, overflow: 'hidden' }}>
-        <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingX: 1, paddingY: 0.3 }}>
+        <Box
+          sx={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingX: 1,
+            paddingY: 0.3
+          }}
+        >
           <AddressCell
             namePost={
               isMultisig ? (
@@ -266,7 +287,18 @@ function EdgeLabel({ label, transform }: { transform: string; label: string }) {
   );
 }
 
-function CallEdge({ data, id, source, sourcePosition, sourceX, sourceY, target, targetPosition, targetX, targetY }: EdgeProps) {
+function CallEdge({
+  data,
+  id,
+  source,
+  sourcePosition,
+  sourceX,
+  sourceY,
+  target,
+  targetPosition,
+  targetX,
+  targetY
+}: EdgeProps) {
   return (
     <>
       <StepEdge
@@ -285,8 +317,15 @@ function CallEdge({ data, id, source, sourcePosition, sourceX, sourceY, target, 
         targetY={targetY}
       />
       <EdgeLabelRenderer>
-        {data.startLabel && <EdgeLabel label={data.startLabel} transform={`translate(-50%, 0%) translate(${targetX + 10}px,${targetY - 6}px)`} />}
-        {data.endLabel && <EdgeLabel label={data.endLabel} transform={`translate(-50%, -100%) translate(${sourceX}px,${sourceY}px)`} />}
+        {data.startLabel && (
+          <EdgeLabel
+            label={data.startLabel}
+            transform={`translate(-50%, 0%) translate(${targetX + 10}px,${targetY - 6}px)`}
+          />
+        )}
+        {data.endLabel && (
+          <EdgeLabel label={data.endLabel} transform={`translate(-50%, -100%) translate(${sourceX}px,${sourceY}px)`} />
+        )}
       </EdgeLabelRenderer>
     </>
   );
@@ -321,7 +360,16 @@ function makeNodes(
   const node: Node<NodeData> = {
     id: nodeId,
     type: 'TxNode',
-    data: { approveFiltered, cancelFiltered, address, parentId, members: meta.who || [], sourceTx, tx, isMultisig: meta.isMultisig },
+    data: {
+      approveFiltered,
+      cancelFiltered,
+      address,
+      parentId,
+      members: meta.who || [],
+      sourceTx,
+      tx,
+      isMultisig: meta.isMultisig
+    },
     position: { x: xPos, y: yPos },
     connectable: false
   };
@@ -352,7 +400,9 @@ function makeNodes(
         _address,
         nodeId,
         sourceTx,
-        (meta.isFlexible ? tx?.children[0]?.children : tx?.children)?.find((item) => addressEq(item.sender, _address)) || null,
+        (meta.isFlexible ? tx?.children[0]?.children : tx?.children)?.find((item) =>
+          addressEq(item.sender, _address)
+        ) || null,
         nextX,
         nextY,
         xOffset,
