@@ -1,14 +1,23 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { findToken } from '@mimir-wallet/config';
-import { useApi, useAssets } from '@mimir-wallet/hooks';
 import { Avatar, FormControl, MenuItem, Select, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
+import { findToken } from '@mimir-wallet/config';
+import { useApi, useAssets } from '@mimir-wallet/hooks';
+
 import { TransferToken } from './types';
 
-function SelectToken({ assetId, onChange, setAssetId }: { assetId: string; setAssetId: (assetId: string) => void; onChange: (value: TransferToken) => void }) {
+function SelectToken({
+  assetId,
+  onChange,
+  setAssetId
+}: {
+  assetId: string;
+  setAssetId: (assetId: string) => void;
+  onChange: (value: TransferToken) => void;
+}) {
   const { api } = useApi();
   const assets = useAssets();
   const [tokens, setTokens] = useState<TransferToken[]>([]);
@@ -58,7 +67,11 @@ function SelectToken({ assetId, onChange, setAssetId }: { assetId: string; setAs
         value={assetId}
       >
         {tokens.map((item) => (
-          <MenuItem key={item.isNative ? item.name : item.assetId} sx={{ display: 'flex', alignItems: 'center', gap: 1 }} value={item.assetId}>
+          <MenuItem
+            key={item.isNative ? item.name : item.assetId}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+            value={item.assetId}
+          >
             <Avatar alt={item.name} src={item.icon} sx={{ width: 32, height: 32 }} />
             <Typography>
               {item.name}{' '}

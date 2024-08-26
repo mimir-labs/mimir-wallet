@@ -3,17 +3,21 @@
 
 import type { Transaction } from '@mimir-wallet/hooks/types';
 
-import { ReactComponent as IconSend } from '@mimir-wallet/assets/svg/icon-send-fill.svg';
-import { Empty } from '@mimir-wallet/components';
-import { useAddressMeta, useDapp, usePendingTransactions } from '@mimir-wallet/hooks';
-import { extraTransaction } from '@mimir-wallet/transactions';
 import { Box, Chip, Paper, SvgIcon, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
+import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
+import { Empty } from '@mimir-wallet/components';
+import { useAddressMeta, useDapp, usePendingTransactions } from '@mimir-wallet/hooks';
+import { extraTransaction } from '@mimir-wallet/transactions';
+
 function Row({ isStart, transaction }: { transaction: Transaction; isStart: boolean }) {
   const { meta } = useAddressMeta(transaction.sender);
-  const [approvals] = useMemo((): [number, Transaction[]] => (meta ? extraTransaction(meta, transaction) : [0, []]), [meta, transaction]);
+  const [approvals] = useMemo(
+    (): [number, Transaction[]] => (meta ? extraTransaction(meta, transaction) : [0, []]),
+    [meta, transaction]
+  );
   const destTx = transaction.top;
   const dapp = useDapp(transaction.initTransaction.website);
 
@@ -34,7 +38,11 @@ function Row({ isStart, transaction }: { transaction: Transaction; isStart: bool
       }}
       to='/transactions'
     >
-      {dapp ? <Box component='img' src={dapp.icon} width={16} /> : <SvgIcon color='primary' component={IconSend} inheritViewBox />}
+      {dapp ? (
+        <Box component='img' src={dapp.icon} width={16} />
+      ) : (
+        <SvgIcon color='primary' component={IconSend} inheritViewBox />
+      )}
       <Typography sx={{ width: 120 }}>No.{destTx.uuid.slice(0, 8).toUpperCase()}</Typography>
       <Typography sx={{ flex: '1' }}>{destTx.action}</Typography>
       <Chip color='primary' label={`${approvals}/${meta?.threshold}`} size='small' />

@@ -1,11 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { Pagination, Stack } from '@mui/material';
+import React from 'react';
+
 import { Empty } from '@mimir-wallet/components';
 import { useHistoryTransactions } from '@mimir-wallet/hooks';
 import { TxCell } from '@mimir-wallet/transactions';
-import { Pagination, Stack } from '@mui/material';
-import React from 'react';
 
 function HistoryTransactions({
   address,
@@ -17,7 +18,6 @@ function HistoryTransactions({
   page?: number;
   limit?: number;
   setPage: (value: number) => void;
-  setLimit: (value: number) => void;
 }) {
   const [transactions, page, limit, total] = useHistoryTransactions(address, propsPage, propsLimit);
 

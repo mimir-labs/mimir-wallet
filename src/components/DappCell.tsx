@@ -3,12 +3,13 @@
 
 import type { DappOption } from '@mimir-wallet/config';
 
-import { ReactComponent as IconStar } from '@mimir-wallet/assets/svg/icon-star.svg';
-import { ellipsisLinesMixin } from '@mimir-wallet/components/utils';
-import { useToggle } from '@mimir-wallet/hooks';
 import { alpha, Box, Button, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+
+import IconStar from '@mimir-wallet/assets/svg/icon-star.svg?react';
+import { ellipsisLinesMixin } from '@mimir-wallet/components/utils';
+import { useToggle } from '@mimir-wallet/hooks';
 
 import DappDetails from './DappDetails';
 
@@ -59,7 +60,12 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
             <Box sx={{ flex: '1' }}>
               <Box component='img' src={dapp.icon} sx={{ width: 32, height: 32 }} />
             </Box>
-            <Button component={Link} onClick={(e) => e.stopPropagation()} to={dapp.internal ? dapp.url : `/explorer/${encodeURIComponent(dapp.url)}`} variant='outlined'>
+            <Button
+              component={Link}
+              onClick={(e) => e.stopPropagation()}
+              to={dapp.internal ? dapp.url : `/explorer/${encodeURIComponent(dapp.url)}`}
+              variant='outlined'
+            >
               Enter
             </Button>
             <IconButton onClick={toggleFavorite} sx={({ palette }) => ({ bgcolor: alpha(palette.primary.main, 0.1) })}>

@@ -1,12 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as IconClose } from '@mimir-wallet/assets/svg/icon-close.svg';
-import { ReactComponent as IconInfo } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
+import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
+import { useContext, useEffect } from 'react';
+
+import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
+import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { FormatBalance, Fund } from '@mimir-wallet/components';
 import { useApi, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
-import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
-import React, { useContext, useEffect } from 'react';
 
 import { BaseContainerCtx } from './BaseContainer';
 
@@ -57,7 +58,8 @@ function ToggleAlert({ setAlertOpen }: { setAlertOpen: (state: boolean) => void 
       >
         <SvgIcon component={IconInfo} inheritViewBox />
         <Typography sx={{ flex: '1' }}>
-          To prevent this account from being purged, please transfer <FormatBalance value={api.consts.balances.existentialDeposit} /> to keep the account alive.
+          To prevent this account from being purged, please transfer{' '}
+          <FormatBalance value={api.consts.balances.existentialDeposit} /> to keep the account alive.
         </Typography>
         <IconButton color='inherit' onClick={() => setAlertOpen(false)}>
           <SvgIcon component={IconClose} inheritViewBox />

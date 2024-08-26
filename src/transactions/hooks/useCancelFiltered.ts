@@ -1,14 +1,15 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 import type { ApiPromise } from '@polkadot/api';
+import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
+
+import { addressEq } from '@polkadot/util-crypto';
+import { useEffect, useState } from 'react';
 
 import { useAddressMeta } from '@mimir-wallet/hooks';
 import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { getAddressMeta } from '@mimir-wallet/utils';
-import { addressEq } from '@polkadot/util-crypto';
-import { useEffect, useState } from 'react';
 
 import { checkFiltered, extraFiltered, removeEmptyMultisigFiltered } from '../util';
 
@@ -49,7 +50,10 @@ async function extraCancelFiltered(api: ApiPromise, transaction: Transaction, fi
   }
 }
 
-export function useCancelFiltered(api: ApiPromise, transaction: Transaction): [filtered: Filtered | undefined, canCancel: boolean] {
+export function useCancelFiltered(
+  api: ApiPromise,
+  transaction: Transaction
+): [filtered: Filtered | undefined, canCancel: boolean] {
   const { meta } = useAddressMeta(transaction.sender);
   const [filtered, setFiltered] = useState<Filtered>();
   const [canCancel, setCanCancel] = useState<boolean>(false);

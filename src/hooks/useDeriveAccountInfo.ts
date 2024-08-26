@@ -8,7 +8,9 @@ import { createNamedHook } from './createNamedHook';
 import { useApi } from './useApi';
 import { useCall } from './useCall';
 
-function useDeriveAccountInfoImpl(value?: AccountId | AccountIndex | Address | Uint8Array | string | null): DeriveAccountInfo | undefined {
+function useDeriveAccountInfoImpl(
+  value?: AccountId | AccountIndex | Address | Uint8Array | string | null
+): DeriveAccountInfo | undefined {
   const { api } = useApi();
 
   return useCall<DeriveAccountInfo>(api && api.derive.accounts.info, [value]);

@@ -9,10 +9,11 @@ import type { PalletMultisigTimepoint, SpRuntimeDispatchError } from '@polkadot/
 import type { IEvent } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { addressToHex } from '@mimir-wallet/utils';
 import { GenericCall } from '@polkadot/types';
 import { u8aEq, u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
+
+import { addressToHex } from '@mimir-wallet/utils';
 
 import { CalldataStatus } from './types';
 
@@ -53,7 +54,16 @@ type MultisigNewEvent = Event &
       callHash: U8aFixed;
     }
   >;
-type ReduceArgs = [call: GenericCall, sender: HexString, isStart: boolean, isEnd: boolean, status: CalldataStatus, blockHeight: number | null, extrinsicIndex: number | null, index: number];
+type ReduceArgs = [
+  call: GenericCall,
+  sender: HexString,
+  isStart: boolean,
+  isEnd: boolean,
+  status: CalldataStatus,
+  blockHeight: number | null,
+  extrinsicIndex: number | null,
+  index: number
+];
 
 // @internal
 async function _asMultiStatus(
@@ -65,9 +75,18 @@ async function _asMultiStatus(
   sender: HexString,
   callHash: HexString
 ): Promise<[status: CalldataStatus, blockHeight: number | null, extrinsicIndex: number | null]> {
-  const eventExcuted = events.find((event): event is MultiExecutedEvent => api.events.multisig.MultisigExecuted.is(event) && u8aEq(event.data.callHash, callHash));
-  const eventApproval = events.find((event): event is MultisigApprovalEvent => api.events.multisig.MultisigApproval.is(event) && u8aEq(event.data.callHash, callHash));
-  const eventNew = events.find((event): event is MultisigNewEvent => api.events.multisig.NewMultisig.is(event) && u8aEq(event.data.callHash, callHash));
+  const eventExcuted = events.find(
+    (event): event is MultiExecutedEvent =>
+      api.events.multisig.MultisigExecuted.is(event) && u8aEq(event.data.callHash, callHash)
+  );
+  const eventApproval = events.find(
+    (event): event is MultisigApprovalEvent =>
+      api.events.multisig.MultisigApproval.is(event) && u8aEq(event.data.callHash, callHash)
+  );
+  const eventNew = events.find(
+    (event): event is MultisigNewEvent =>
+      api.events.multisig.NewMultisig.is(event) && u8aEq(event.data.callHash, callHash)
+  );
 
   let status: CalldataStatus = CalldataStatus.Initialized;
 
@@ -97,7 +116,11 @@ async function _asMultiStatus(
 }
 
 // @internal
-function _proxyStatus(events: ProxyExecutedEvent[], extrinsicIndex: number | null, blockHeight: number): [status: CalldataStatus, blockHeight: number | null, extrinsicIndex: number | null] {
+function _proxyStatus(
+  events: ProxyExecutedEvent[],
+  extrinsicIndex: number | null,
+  blockHeight: number
+): [status: CalldataStatus, blockHeight: number | null, extrinsicIndex: number | null] {
   const event = events.pop(); // get the last ProxyExecutedEvent
 
   let status: CalldataStatus = CalldataStatus.Initialized;
@@ -133,9 +156,14 @@ export async function reduceCalldata(
   const extrinsicSuccess = events.findIndex((event) => api.events.system.ExtrinsicSuccess.is(event)) > -1;
 
   // save the callHash => status
-  const callStatus: Map<HexString, [status: CalldataStatus, blockHeight: number | null, extrinsicIndex: number | null]> = new Map();
+  const callStatus: Map<
+    HexString,
+    [status: CalldataStatus, blockHeight: number | null, extrinsicIndex: number | null]
+  > = new Map();
 
-  const proxyExecutedEvents = events.filter((event): event is ProxyExecutedEvent => api.events.proxy.ProxyExecuted.is(event));
+  const proxyExecutedEvents = events.filter((event): event is ProxyExecutedEvent =>
+    api.events.proxy.ProxyExecuted.is(event)
+  );
 
   const results: ReduceArgs[] = [];
 
@@ -155,14 +183,20 @@ export async function reduceCalldata(
 
         const callHash = _call.hash.toHex();
 
-        callStatus.set(callHash, await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash));
+        callStatus.set(
+          callHash,
+          await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash)
+        );
       } else {
         try {
           _call = api.registry.createType('Call', (call.args[3] as any).toU8a(true));
 
           const callHash = _call.hash.toHex();
 
-          callStatus.set(callHash, await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash));
+          callStatus.set(
+            callHash,
+            await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash)
+          );
         } catch (error) {
           _call = undefined;
         }
@@ -179,7 +213,10 @@ export async function reduceCalldata(
         _call = undefined;
       }
 
-      callStatus.set(callHash, await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash));
+      callStatus.set(
+        callHash,
+        await _asMultiStatus(api, apiAt, events, extrinsicIndex, blockHeight, _sender, callHash)
+      );
     } else if (api.tx.proxy.proxy.is(call)) {
       _sender = addressToHex(call.args[0].toString());
       _call = call.args[2];
@@ -198,9 +235,13 @@ export async function reduceCalldata(
       sender,
       isStart,
       isEnd,
-      index === 0 ? (extrinsicSuccess ? CalldataStatus.Success : CalldataStatus.Failed) : callStatus.get(call.hash.toHex())?.[0] ?? CalldataStatus.Pending,
-      index === 0 ? blockHeight : callStatus.get(call.hash.toHex())?.[1] ?? null,
-      index === 0 ? extrinsicIndex : callStatus.get(call.hash.toHex())?.[2] ?? null,
+      index === 0
+        ? extrinsicSuccess
+          ? CalldataStatus.Success
+          : CalldataStatus.Failed
+        : (callStatus.get(call.hash.toHex())?.[0] ?? CalldataStatus.Pending),
+      index === 0 ? blockHeight : (callStatus.get(call.hash.toHex())?.[1] ?? null),
+      index === 0 ? extrinsicIndex : (callStatus.get(call.hash.toHex())?.[2] ?? null),
       index
     ];
 

@@ -3,8 +3,9 @@
 
 import type { DappOption } from '@mimir-wallet/config';
 
-import { DappCell } from '@mimir-wallet/components';
 import Grid from '@mui/material/Unstable_Grid2';
+
+import { DappCell } from '@mimir-wallet/components';
 
 function FavoriteDapps({
   addFavorite,

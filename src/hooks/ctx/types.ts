@@ -1,13 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TxEvents } from '@mimir-wallet/utils';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Injected } from '@polkadot/extension-inject/types';
 import type { AccountId, Call, Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { Address } from 'cluster';
+import type { TxEvents } from '@mimir-wallet/utils';
 import type { Transaction } from '../types';
 
 export interface Accounts {
@@ -49,7 +49,10 @@ export interface TxQueue {
   onError?: (error: unknown) => void;
 }
 
-export type TxQueueState = Omit<Required<TxQueue>, 'filtered' | 'onResults' | 'onFinalized' | 'transaction' | 'website'> & {
+export type TxQueueState = Omit<
+  Required<TxQueue>,
+  'filtered' | 'onResults' | 'onFinalized' | 'transaction' | 'website'
+> & {
   transaction?: Transaction;
   filtered?: Filtered;
   website?: string;

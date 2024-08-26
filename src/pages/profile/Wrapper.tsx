@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { chainLinks } from '@mimir-wallet/utils';
 import { Box, Link as MuiLink, Stack, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
+
+import { chainLinks } from '@mimir-wallet/utils';
 
 interface Props {
   info: React.ReactNode;
@@ -44,7 +45,13 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
           <Typography marginBottom={0.5} variant='h6'>
             Latest proposals
             {url && (
-              <MuiLink color='primary.main' component={Link} style={{ float: 'right' }} to={`/explorer/${encodeURIComponent(url)}`} underline='none'>
+              <MuiLink
+                color='primary.main'
+                component={Link}
+                style={{ float: 'right' }}
+                to={`/explorer/${encodeURIComponent(url)}`}
+                underline='none'
+              >
                 View More
               </MuiLink>
             )}

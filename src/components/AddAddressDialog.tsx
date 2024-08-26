@@ -1,16 +1,27 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { events } from '@mimir-wallet/events';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { events } from '@mimir-wallet/events';
+
 import Input from './Input';
 import { toastError } from './ToastRoot';
 
-function Content({ defaultAddress, defaultName, onAdded, onClose }: { defaultAddress?: string; defaultName?: string; onAdded?: (address: string) => void; onClose?: () => void }) {
+function Content({
+  defaultAddress,
+  defaultName,
+  onAdded,
+  onClose
+}: {
+  defaultAddress?: string;
+  defaultName?: string;
+  onAdded?: (address: string) => void;
+  onClose?: () => void;
+}) {
   const [name, setName] = useState<string>(defaultName || '');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
 
@@ -51,7 +62,13 @@ function Content({ defaultAddress, defaultName, onAdded, onClose }: { defaultAdd
       <DialogContent>
         <Stack spacing={2}>
           <Input label='Name' onChange={setName} placeholder='input name for contact' value={name} />
-          <Input error={exists ? new Error('Already in related account') : null} label='Address' onChange={_onChangeAddress} placeholder='input address' value={address} />
+          <Input
+            error={exists ? new Error('Already in related account') : null}
+            label='Address'
+            onChange={_onChangeAddress}
+            placeholder='input address'
+            value={address}
+          />
         </Stack>
       </DialogContent>
       <DialogActions>

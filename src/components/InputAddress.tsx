@@ -1,12 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useToggle } from '@mimir-wallet/hooks';
-import { getAddressMeta } from '@mimir-wallet/utils';
 import { Box, Fade, FormHelperText, InputBase, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { useToggle } from '@mimir-wallet/hooks';
+import { getAddressMeta } from '@mimir-wallet/utils';
 
 import AddressCell from './AddressCell';
 import FormatBalance from './FormatBalance';
@@ -18,7 +19,10 @@ function filterOptions(options: string[], input: string): string[] {
   return options.filter((address) => {
     const meta = getAddressMeta(address);
 
-    return address.toLowerCase().includes(input.toLowerCase()) || (meta.name ? meta.name.toLowerCase().includes(input.toLowerCase()) : false);
+    return (
+      address.toLowerCase().includes(input.toLowerCase()) ||
+      (meta.name ? meta.name.toLowerCase().includes(input.toLowerCase()) : false)
+    );
   });
 }
 
@@ -36,16 +40,34 @@ function createOptions(isSign: boolean, filtered?: string[]): string[] {
   return options;
 }
 
-function InputAddress({ balance, defaultValue, disabled, error, filtered, format, isSign = false, label, onChange, placeholder, value: propsValue, withBalance }: InputAddressProps) {
+function InputAddress({
+  balance,
+  defaultValue,
+  disabled,
+  error,
+  filtered,
+  format,
+  isSign = false,
+  label,
+  onChange,
+  placeholder,
+  value: propsValue,
+  withBalance
+}: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
-  const [value, setValue] = useState<string>(isAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : '');
+  const [value, setValue] = useState<string>(
+    isAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : ''
+  );
   const [inputValue, setInputValue] = useState<string>('');
   const [focus, , setFocus] = useToggle();
   const wrapper = useRef<HTMLDivElement | null>(null);
   const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
   const open = !!anchorEl;
 
-  const options = useMemo((): string[] => filterOptions(createOptions(isSign, filtered), inputValue), [filtered, inputValue, isSign]);
+  const options = useMemo(
+    (): string[] => filterOptions(createOptions(isSign, filtered), inputValue),
+    [filtered, inputValue, isSign]
+  );
 
   const _onChange = useCallback(
     (value: string) => {
@@ -84,7 +106,11 @@ function InputAddress({ balance, defaultValue, disabled, error, filtered, format
 
   return (
     <Box sx={{ overflow: 'hidden' }}>
-      {label && <Typography sx={{ fontWeight: 700, marginBottom: 1, color: focus ? 'primary.main' : 'inherit' }}>{label}</Typography>}
+      {label && (
+        <Typography sx={{ fontWeight: 700, marginBottom: 1, color: focus ? 'primary.main' : 'inherit' }}>
+          {label}
+        </Typography>
+      )}
       <Box
         ref={wrapper}
         sx={{

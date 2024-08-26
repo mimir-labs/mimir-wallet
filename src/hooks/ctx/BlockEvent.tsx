@@ -26,5 +26,6 @@ export function BlockEventCtxRoot({ children }: Props): React.ReactElement<Props
     }
   });
 
+  // eslint-disable-next-line react/jsx-no-constructed-context-values
   return <BlockEventCtx.Provider value={{}}>{children}</BlockEventCtx.Provider>;
 }

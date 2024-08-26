@@ -6,12 +6,17 @@ import type { PalletAssetsAssetDetails, PalletAssetsAssetMetadata } from '@polka
 import type { BN } from '@polkadot/util';
 import type { AssetInfo, AssetInfoBase } from './types';
 
-import { Asset, findAssets } from '@mimir-wallet/config';
 import { useEffect, useState } from 'react';
+
+import { Asset, findAssets } from '@mimir-wallet/config';
 
 import { useApi } from './useApi';
 
-function _transform(assets: Asset[], assetValues: Option<PalletAssetsAssetDetails>[], metadataValues: PalletAssetsAssetMetadata[]): AssetInfo[] {
+function _transform(
+  assets: Asset[],
+  assetValues: Option<PalletAssetsAssetDetails>[],
+  metadataValues: PalletAssetsAssetMetadata[]
+): AssetInfo[] {
   const assetInfo: AssetInfo[] = [];
 
   for (let i = 0; i < assets.length; i++) {
@@ -57,9 +62,11 @@ export function useAssets(): AssetInfo[] {
       const assets = findAssets(api.genesisHash.toHex());
       const ids = assets.map((item) => item.assetId);
 
-      Promise.all([api.query.assets.asset.multi(ids), api.query.assets.metadata.multi(ids)]).then(([assetsResults, metadatas]) => {
-        setAllAssets(_transform(assets, assetsResults, metadatas));
-      });
+      Promise.all([api.query.assets.asset.multi(ids), api.query.assets.metadata.multi(ids)]).then(
+        ([assetsResults, metadatas]) => {
+          setAllAssets(_transform(assets, assetsResults, metadatas));
+        }
+      );
     }
   }, [isApiReady, api]);
 

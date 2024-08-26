@@ -3,10 +3,11 @@
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
-import { TxOverview } from '@mimir-wallet/components';
-import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import React from 'react';
+
+import { TxOverview } from '@mimir-wallet/components';
+import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 
 interface Props {
   tx: Transaction;
@@ -28,7 +29,11 @@ function OverviewDialog({ approveFiltered, cancelFiltered, onClose, open, tx }: 
         }}
       >
         {open && (
-          <TxOverview approveFiltered={tx.status < CalldataStatus.Success ? approveFiltered : undefined} cancelFiltered={tx.status < CalldataStatus.Success ? cancelFiltered : undefined} tx={tx} />
+          <TxOverview
+            approveFiltered={tx.status < CalldataStatus.Success ? approveFiltered : undefined}
+            cancelFiltered={tx.status < CalldataStatus.Success ? cancelFiltered : undefined}
+            tx={tx}
+          />
         )}
       </DialogContent>
     </Dialog>

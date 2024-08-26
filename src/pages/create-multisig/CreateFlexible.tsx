@@ -6,18 +6,30 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { PrepareFlexible } from './types';
 
-import { ReactComponent as IconQuestion } from '@mimir-wallet/assets/svg/icon-question-fill.svg';
-import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
-import { utm } from '@mimir-wallet/config';
-import { TxToastCtx, useApi, useCall, useSelectedAccountCallback } from '@mimir-wallet/hooks';
-import { addressToHex, getAddressMeta, service, signAndSend } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Divider,
+  Stack,
+  SvgIcon,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
 import { u8aEq } from '@polkadot/util';
 import { addressEq, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
+import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
+import { utm } from '@mimir-wallet/config';
+import { TxToastCtx, useApi, useCall, useSelectedAccountCallback } from '@mimir-wallet/hooks';
+import { addressToHex, getAddressMeta, service, signAndSend } from '@mimir-wallet/utils';
 
 interface Props {
   prepare: PrepareFlexible;
@@ -68,7 +80,18 @@ function ItemStep({ children, disabled = false }: { disabled?: boolean; children
   );
 }
 
-function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creator, extrinsicIndex: _extrinsicIndex, name, pure: pureAccount, threshold, who } }: Props) {
+function CreateFlexible({
+  onCancel,
+  prepare: {
+    blockNumber: _blockNumber,
+    creator,
+    extrinsicIndex: _extrinsicIndex,
+    name,
+    pure: pureAccount,
+    threshold,
+    who
+  }
+}: Props) {
   const { api } = useApi();
   const [signer, setSigner] = useState(creator || filterDefaultAccount(who));
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
@@ -85,7 +108,10 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
   const reservedAmount = useMemo(() => {
     const baseReserve = api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2));
 
-    if (allBalances && allBalances.freeBalance.add(allBalances.reservedBalance).gte(api.consts.balances.existentialDeposit)) {
+    if (
+      allBalances &&
+      allBalances.freeBalance.add(allBalances.reservedBalance).gte(api.consts.balances.existentialDeposit)
+    ) {
       baseReserve.iadd(api.consts.balances.existentialDeposit.divn(10)); // for gas
     } else {
       baseReserve.iadd(api.consts.balances.existentialDeposit.muln(1.1)); // mul 1.1 for gas
@@ -97,8 +123,15 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
   const createMembers = useCallback(
     (pure: string, who: string[], signer: string, threshold: number, name: string) => {
       const extrinsic = api.tx.utility.batchAll([
-        api.tx.balances.transferKeepAlive(pure, api.consts.proxy.proxyDepositFactor.muln(2).add(api.consts.proxy.proxyDepositBase)),
-        api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, api.registry.chainSS58), 'Any', 0)),
+        api.tx.balances.transferKeepAlive(
+          pure,
+          api.consts.proxy.proxyDepositFactor.muln(2).add(api.consts.proxy.proxyDepositBase)
+        ),
+        api.tx.proxy.proxy(
+          pure,
+          'Any',
+          api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, api.registry.chainSS58), 'Any', 0)
+        ),
         api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0))
       ]);
 
@@ -177,7 +210,11 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
 
   const killPure = useCallback(
     (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
-      const extrinsic = api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex));
+      const extrinsic = api.tx.proxy.proxy(
+        pure,
+        'Any',
+        api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex)
+      );
 
       const events = signAndSend(extrinsic, signer, { checkProxy: true });
 
@@ -213,19 +250,24 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
           )}
         </AccordionSummary>
       </Accordion>
-      <Accordion expanded={true}>
+      <Accordion expanded>
         <AccordionSummary>
           <ItemStep disabled={!pure}>2</ItemStep>
           Set Members ({threshold}/{who.length})
           <Tooltip
             title={
               <>
-                Flexible Multisig is a Pure Proxy. In <b>‘set members’</b> step, you add the multisig account as its proxy and remove the {"creator's"} proxy, making the multi-signature its only
-                controller. Then transfer some funds to keep Flexible alive.
+                Flexible Multisig is a Pure Proxy. In <b>‘set members’</b> step, you add the multisig account as its
+                proxy and remove the creator's proxy, making the multi-signature its only controller. Then transfer some
+                funds to keep Flexible alive.
               </>
             }
           >
-            <SvgIcon component={IconQuestion} inheritViewBox sx={{ marginLeft: 1, color: 'primary.main', opacity: 0.5 }} />
+            <SvgIcon
+              component={IconQuestion}
+              inheritViewBox
+              sx={{ marginLeft: 1, color: 'primary.main', opacity: 0.5 }}
+            />
           </Tooltip>
         </AccordionSummary>
         <AccordionDetails>
@@ -245,9 +287,19 @@ function CreateFlexible({ onCancel, prepare: { blockNumber: _blockNumber, creato
       </Accordion>
       <Divider sx={{ marginY: 1.5 }} />
       <Typography fontWeight={700}>Transaction Initiator</Typography>
-      <InputAddress disabled={!!pure} filtered={creator ? [creator] : who.filter((address) => !getAddressMeta(address).isMultisig)} isSign onChange={setSigner} value={signer} />
+      <InputAddress
+        disabled={!!pure}
+        filtered={creator ? [creator] : who.filter((address) => !getAddressMeta(address).isMultisig)}
+        isSign
+        onChange={setSigner}
+        value={signer}
+      />
       <LockContainer>
-        <LockItem address={signer} tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.' value={reservedAmount} />
+        <LockItem
+          address={signer}
+          tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.'
+          value={reservedAmount}
+        />
       </LockContainer>
       <Divider sx={{ marginY: 1.5 }} />
       <Box sx={{ display: 'flex', gap: 1 }}>

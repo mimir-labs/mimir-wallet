@@ -3,10 +3,11 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { getAddressMeta } from '@mimir-wallet/utils';
 import { Paper, useTheme } from '@mui/material';
 import React, { useEffect } from 'react';
 import ReactFlow, { Edge, Handle, Node, NodeProps, Position, useEdgesState, useNodesState } from 'reactflow';
+
+import { getAddressMeta } from '@mimir-wallet/utils';
 
 import AddressCell from './AddressCell';
 
@@ -21,11 +22,25 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
 
   return (
     <>
-      {data.members.length > 0 && <Handle isConnectable={isConnectable} position={Position.Left} style={{ width: 0, height: 0, top: 35, background: palette.grey[300] }} type='source' />}
+      {data.members.length > 0 && (
+        <Handle
+          isConnectable={isConnectable}
+          position={Position.Left}
+          style={{ width: 0, height: 0, top: 35, background: palette.grey[300] }}
+          type='source'
+        />
+      )}
       <Paper sx={{ width: 220, height: 71, padding: 1 }}>
         <AddressCell showType value={data.address} withCopy />
       </Paper>
-      {data.parentId && <Handle isConnectable={isConnectable} position={Position.Right} style={{ width: 0, height: 0, background: palette.grey[300] }} type='target' />}
+      {data.parentId && (
+        <Handle
+          isConnectable={isConnectable}
+          position={Position.Right}
+          style={{ width: 0, height: 0, background: palette.grey[300] }}
+          type='target'
+        />
+      )}
     </>
   );
 });

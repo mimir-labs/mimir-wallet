@@ -1,11 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AppIframe } from '@mimir-wallet/components';
-import { useApi, useSelectedAccount } from '@mimir-wallet/hooks';
 import { CircularProgress, Stack } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+
+import { AppIframe } from '@mimir-wallet/components';
+import { useApi, useSelectedAccount } from '@mimir-wallet/hooks';
 
 import PendingTx from './PendingTx';
 import { useCommunicator } from './useCommunicator';
@@ -25,7 +26,9 @@ function PageExplorer() {
 
   return (
     <Stack key={selected || 'none'} sx={{ height: '100%', position: 'relative', paddingBottom: '60px' }}>
-      {loading && <CircularProgress sx={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, margin: 'auto' }} />}
+      {loading && (
+        <CircularProgress sx={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, margin: 'auto' }} />
+      )}
       {url && <AppIframe appUrl={appUrl} iframeRef={iframeRef} key={url} onLoad={() => setLoading(false)} />}
       {url && selected && <PendingTx address={selected} url={url} />}
     </Stack>

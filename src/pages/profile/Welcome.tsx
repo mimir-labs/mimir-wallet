@@ -1,12 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NOT_CREATE_MULTISIG_NOW_KEY } from '@mimir-wallet/constants';
-import { useGroupAccounts } from '@mimir-wallet/hooks';
-import { useWallet } from '@mimir-wallet/hooks/useWallet';
 import { Button, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import store from 'store';
+
+import { NOT_CREATE_MULTISIG_NOW_KEY } from '@mimir-wallet/constants';
+import { useGroupAccounts } from '@mimir-wallet/hooks';
+import { useWallet } from '@mimir-wallet/hooks/useWallet';
 
 function Welcome({ handleNotNow }: { handleNotNow: () => void }) {
   const navigate = useNavigate();
@@ -39,8 +40,12 @@ function Welcome({ handleNotNow }: { handleNotNow: () => void }) {
           }
         }}
       >
-        <Button className='Welcome-cell' color='primary' onClick={() => (injected.length > 0 ? navigate('/create-multisig') : openWallet())}>
-          <img src='images/create-multisig.png' width={93} />
+        <Button
+          className='Welcome-cell'
+          color='primary'
+          onClick={() => (injected.length > 0 ? navigate('/create-multisig') : openWallet())}
+        >
+          <img alt='create' src='images/create-multisig.png' width={93} />
           <Typography color='white' variant='h6'>
             Create/Import Multisig
           </Typography>
@@ -55,7 +60,7 @@ function Welcome({ handleNotNow }: { handleNotNow: () => void }) {
           sx={{ bgcolor: 'common.white', color: 'inherit', ':hover': { bgcolor: 'common.white' } }}
           variant='text'
         >
-          <img src='images/start.png' width={98} />
+          <img alt='start' src='images/start.png' width={98} />
           <Typography variant='h6'>
             Not Now,
             <br />

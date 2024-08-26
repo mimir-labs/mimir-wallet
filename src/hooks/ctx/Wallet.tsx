@@ -3,12 +3,13 @@
 
 import type { InjectedWindowProvider, WalletState } from './types';
 
+import keyring from '@polkadot/ui-keyring';
+import React, { useEffect, useMemo, useState } from 'react';
+import store from 'store';
+
 import { ConnectWalletModal } from '@mimir-wallet/components';
 import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
 import { documentReadyPromise, loadWallet } from '@mimir-wallet/utils';
-import keyring from '@polkadot/ui-keyring';
-import React, { useEffect, useState } from 'react';
-import store from 'store';
 
 import { useEagerConnect } from '../useEagerConnect';
 import { useSyncMultisigs } from '../useMultisigs';
@@ -40,8 +41,6 @@ export function WalletCtxRoot({ children }: Props): React.ReactElement<Props> {
       }, 1000);
     });
   }, []);
-  const openWallet = () => setOpen(true);
-  const closeWallet = () => setOpen(false);
 
   const connect = async (name: string) => {
     const provider = window.injectedWeb3?.[name];
@@ -73,10 +72,25 @@ export function WalletCtxRoot({ children }: Props): React.ReactElement<Props> {
     });
   };
 
+  const state = useMemo(
+    () => ({
+      isWalletReady,
+      isMultisigSyned,
+      openWallet: () => setOpen(true),
+      connect,
+      disconnect,
+      wallets,
+      connectedWallets,
+      walletOpen,
+      closeWallet: () => setOpen(false)
+    }),
+    [connectedWallets, isMultisigSyned, isWalletReady, setOpen, walletOpen, wallets]
+  );
+
   return (
-    <WalletCtx.Provider value={{ isWalletReady, isMultisigSyned, openWallet, connect, disconnect, wallets, connectedWallets, walletOpen, closeWallet }}>
+    <WalletCtx.Provider value={state}>
       {children}
-      <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
+      <ConnectWalletModal onClose={() => setOpen(false)} open={walletOpen} />
     </WalletCtx.Provider>
   );
 }

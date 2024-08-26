@@ -18,10 +18,15 @@ type EventTypes = {
 
 export class TxEvents extends EventEmitter<EventTypes> {
   public uuid: string = uuidv4();
+
   public status: keyof EventTypes | 'pending' = 'pending';
+
   public signature?: U8aLike;
+
   public result?: ISubmittableResult;
+
   public error?: unknown;
+
   public message?: string;
 
   constructor() {

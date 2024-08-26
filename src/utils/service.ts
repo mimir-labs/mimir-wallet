@@ -1,9 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { HexString } from '@polkadot/util/types';
 import type { UTM } from '@mimir-wallet/config';
 import type { AccountData, CalldataStatus, SafetyLevel } from '@mimir-wallet/hooks/types';
-import type { HexString } from '@polkadot/util/types';
 
 import { serviceUrl } from './chain-links';
 import { fetcher } from './fetcher';
@@ -36,7 +36,13 @@ export function createMultisig(who: HexString[], threshold: number, name?: strin
   });
 }
 
-export function prepareMultisig(creator: HexString, extrinsicHash: HexString, name: string, threshold: number, who: HexString[]) {
+export function prepareMultisig(
+  creator: HexString,
+  extrinsicHash: HexString,
+  name: string,
+  threshold: number,
+  who: HexString[]
+) {
   return fetcher(getServiceUrl('multisig/prepare'), {
     method: 'POST',
     body: JSON.stringify({ creator, extrinsicHash, who, threshold, name }),

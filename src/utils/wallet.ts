@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { keyringStore } from '@mimir-wallet/instance';
 import { Injected } from '@polkadot/extension-inject/types';
 import keyring from '@polkadot/ui-keyring';
+
+import { keyringStore } from '@mimir-wallet/instance';
 
 import { sleep } from './common';
 
@@ -17,7 +18,12 @@ export function documentReadyPromise(): Promise<void> {
   });
 }
 
-export async function loadWallet({ enable }: { enable: (origin: string) => Promise<Injected> }, origin: string, source: string, delay = 0) {
+export async function loadWallet(
+  { enable }: { enable: (origin: string) => Promise<Injected> },
+  origin: string,
+  source: string,
+  delay = 0
+) {
   if (delay) {
     await sleep(delay);
   }

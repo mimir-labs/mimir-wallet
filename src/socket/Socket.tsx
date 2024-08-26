@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import React, { useEffect, useMemo, useState } from 'react';
+import { io, type Socket } from 'socket.io-client';
+
 import { chainLinks } from '@mimir-wallet/utils';
-import React, { useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
 
 interface SocketProps {
   isConnected: boolean;
@@ -76,5 +77,7 @@ export function SocketCtxRoot({ children }: { children: React.ReactNode }) {
       });
   }, []);
 
-  return <SocketCtx.Provider value={{ isConnected, socket, subscribe, unsubscribe }}>{children}</SocketCtx.Provider>;
+  const state = useMemo(() => ({ isConnected, socket, subscribe, unsubscribe }), [isConnected]);
+
+  return <SocketCtx.Provider value={state}>{children}</SocketCtx.Provider>;
 }

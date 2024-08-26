@@ -1,11 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { API_URL_KEY, findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
-import { useApi } from '@mimir-wallet/hooks';
 import { Box, Button, CircularProgress, Divider, Menu, MenuItem, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import store from 'store';
+
+import { API_URL_KEY, findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
+import { useApi } from '@mimir-wallet/hooks';
 
 function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
   const { api, isApiConnected, isApiReady } = useApi();
@@ -27,12 +28,22 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
     <>
       {onlyLogo ? (
         <Button onClick={handleClick} sx={{ borderColor: 'secondary.main' }} variant='outlined'>
-          {isApiConnected && isApiReady ? <img src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} /> : <CircularProgress size={20} />}
+          {isApiConnected && isApiReady ? (
+            <img alt='' src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} />
+          ) : (
+            <CircularProgress size={20} />
+          )}
         </Button>
       ) : (
         <Button
           onClick={handleClick}
-          startIcon={isApiConnected && isApiReady ? <img src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} /> : <CircularProgress size={20} />}
+          startIcon={
+            isApiConnected && isApiReady ? (
+              <img alt='' src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} />
+            ) : (
+              <CircularProgress size={20} />
+            )
+          }
           sx={{ borderColor: 'secondary.main' }}
           variant='outlined'
         >

@@ -4,10 +4,11 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { InputNumberProps } from './types';
 
-import { useApi } from '@mimir-wallet/hooks';
 import { Box, Button } from '@mui/material';
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
+
+import { useApi } from '@mimir-wallet/hooks';
 
 import FormatBalance from './FormatBalance';
 import Input from './Input';
@@ -36,19 +37,29 @@ function bnToInput(api: ApiPromise, bn: BN, decimals = api.registry.chainDecimal
 
   if (new BN(mod).eq(BN_ZERO)) {
     return div;
-  } else {
-    return `${div || 0}.${mod}`;
   }
+
+  return `${div || 0}.${mod}`;
 }
 
 function getValues(api: ApiPromise, value: BN, decimals = api.registry.chainDecimals[0]): [string, BN] {
   return [bnToInput(api, value, decimals), value];
 }
 
-function InputNumber({ defaultValue, format, maxValue, onChange, value: propsValue, withMax, ...props }: InputNumberProps) {
+function InputNumber({
+  defaultValue,
+  format,
+  maxValue,
+  onChange,
+  value: propsValue,
+  withMax,
+  ...props
+}: InputNumberProps) {
   const { api } = useApi();
   const _defaultValue = useMemo(() => defaultValue?.toString(), [defaultValue]);
-  const [[value], setValues] = useState<[string, BN]>(getValues(api, new BN(propsValue || _defaultValue || '0'), format?.[0]));
+  const [[value], setValues] = useState<[string, BN]>(
+    getValues(api, new BN(propsValue || _defaultValue || '0'), format?.[0])
+  );
 
   const _onChange = useCallback(
     (value: string) => {
@@ -67,7 +78,12 @@ function InputNumber({ defaultValue, format, maxValue, onChange, value: propsVal
         <>
           {props.endAdornment}
           {withMax && (
-            <Button onClick={() => setValues(getValues(api, maxValue || BN_ZERO, format?.[0]))} size='small' sx={{ paddingY: 0.2, borderRadius: 0.5 }} variant='outlined'>
+            <Button
+              onClick={() => setValues(getValues(api, maxValue || BN_ZERO, format?.[0]))}
+              size='small'
+              sx={{ paddingY: 0.2, borderRadius: 0.5 }}
+              variant='outlined'
+            >
               Max
             </Button>
           )}

@@ -5,11 +5,12 @@ import type { Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { TxToastCtx, useApi } from '@mimir-wallet/hooks';
-import { PrepareMultisig, service, sign, signAndSend, TxEvents } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
 import { BN } from '@polkadot/util';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+
+import { TxToastCtx, useApi } from '@mimir-wallet/hooks';
+import { PrepareMultisig, service, sign, signAndSend, TxEvents } from '@mimir-wallet/utils';
 
 function SendTx({
   beforeSend,
@@ -126,7 +127,13 @@ function SendTx({
   }, [api, prepare]);
 
   return (
-    <LoadingButton disabled={disabled || !canSend || !prepare || !isEnought} fullWidth loading={loading} onClick={onConfirm} variant='contained'>
+    <LoadingButton
+      disabled={disabled || !canSend || !prepare || !isEnought}
+      fullWidth
+      loading={loading}
+      onClick={onConfirm}
+      variant='contained'
+    >
       Confirm
     </LoadingButton>
   );

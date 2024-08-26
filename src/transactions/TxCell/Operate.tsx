@@ -3,15 +3,16 @@
 
 import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 
-import { ReactComponent as IconRefund } from '@mimir-wallet/assets/svg/icon-cancel.svg';
-import { ReactComponent as IconFailed } from '@mimir-wallet/assets/svg/icon-failed-outlined.svg';
-import { ReactComponent as IconInfoFill } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
-import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-outlined.svg';
-import { useApi, useTxQueue } from '@mimir-wallet/hooks';
-import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 import { LoadingButton } from '@mui/lab';
 import { Box, Divider, IconButton, SvgIcon } from '@mui/material';
 import React, { useCallback, useState } from 'react';
+
+import IconRefund from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
+import IconFailed from '@mimir-wallet/assets/svg/icon-failed-outlined.svg?react';
+import IconInfoFill from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
+import IconSuccess from '@mimir-wallet/assets/svg/icon-success-outlined.svg?react';
+import { useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
 
 function Operate({
   approveFiltered,
@@ -79,7 +80,10 @@ function Operate({
   if (type === 'normal') {
     return (
       transaction.status < CalldataStatus.Success &&
-      (transaction.top.status > CalldataStatus.Pending || (transaction.action === 'multisig.cancelAsMulti' && transaction.cancelTx?.status && transaction.cancelTx.status > CalldataStatus.Pending) ? (
+      (transaction.top.status > CalldataStatus.Pending ||
+      (transaction.action === 'multisig.cancelAsMulti' &&
+        transaction.cancelTx?.status &&
+        transaction.cancelTx.status > CalldataStatus.Pending) ? (
         <Box>
           {cancelFiltered && canCancel && (
             <LoadingButton loading={cancelLoading} onClick={() => handleCancel(cancelFiltered)} variant='outlined'>
@@ -94,7 +98,7 @@ function Operate({
               <Divider />
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <SvgIcon color='warning' component={IconInfoFill} inheritViewBox />
-                Waiting for other {"members's"} approvement
+                Waiting for other {`members's`} approvement
               </Box>
             </>
           )}
@@ -117,7 +121,10 @@ function Operate({
 
   return (
     transaction.status < CalldataStatus.Success &&
-    (transaction.top.status > CalldataStatus.Pending || (transaction.action === 'multisig.cancelAsMulti' && transaction.cancelTx?.status && transaction.cancelTx.status > CalldataStatus.Pending) ? (
+    (transaction.top.status > CalldataStatus.Pending ||
+    (transaction.action === 'multisig.cancelAsMulti' &&
+      transaction.cancelTx?.status &&
+      transaction.cancelTx.status > CalldataStatus.Pending) ? (
       <Box>
         {cancelFiltered && canCancel && (
           <IconButton color='warning' disabled={cancelLoading} onClick={() => handleCancel(cancelFiltered)}>
@@ -126,20 +133,18 @@ function Operate({
         )}
       </Box>
     ) : (
-      <>
-        <Box sx={{ display: 'flex' }}>
-          {approveFiltered && canApprove && (
-            <IconButton color='success' disabled={approveLoading} onClick={() => handleApprove(approveFiltered)}>
-              <SvgIcon component={IconSuccess} inheritViewBox />
-            </IconButton>
-          )}
-          {cancelFiltered && canCancel && (
-            <IconButton color='error' disabled={cancelLoading} onClick={() => handleCancel(cancelFiltered)}>
-              <SvgIcon component={IconFailed} inheritViewBox />
-            </IconButton>
-          )}
-        </Box>
-      </>
+      <Box sx={{ display: 'flex' }}>
+        {approveFiltered && canApprove && (
+          <IconButton color='success' disabled={approveLoading} onClick={() => handleApprove(approveFiltered)}>
+            <SvgIcon component={IconSuccess} inheritViewBox />
+          </IconButton>
+        )}
+        {cancelFiltered && canCancel && (
+          <IconButton color='error' disabled={cancelLoading} onClick={() => handleCancel(cancelFiltered)}>
+            <SvgIcon component={IconFailed} inheritViewBox />
+          </IconButton>
+        )}
+      </Box>
     ))
   );
 }

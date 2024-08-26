@@ -11,6 +11,7 @@ let id = 0;
 
 export class AccountSigner implements Signer {
   readonly #keyringPair: KeyringPair;
+
   readonly #registry: Registry;
 
   constructor(registry: Registry, keyringPair: KeyringPair) {
@@ -20,7 +21,9 @@ export class AccountSigner implements Signer {
 
   public async signPayload(payload: SignerPayloadJSON): Promise<SignerResult> {
     return new Promise((resolve): void => {
-      const signed = this.#registry.createType('ExtrinsicPayload', payload, { version: payload.version }).sign(this.#keyringPair);
+      const signed = this.#registry
+        .createType('ExtrinsicPayload', payload, { version: payload.version })
+        .sign(this.#keyringPair);
 
       resolve(objectSpread({ id: ++id }, signed));
     });

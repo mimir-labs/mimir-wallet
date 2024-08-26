@@ -12,7 +12,12 @@ import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 
 import { getAddressMeta } from './address';
 
-export type PrepareMultisig = [extrinsic: SubmittableExtrinsic, signer: string, reserve: Record<string, BN>, unreserve: Record<string, BN>];
+export type PrepareMultisig = [
+  extrinsic: SubmittableExtrinsic,
+  signer: string,
+  reserve: Record<string, BN>,
+  unreserve: Record<string, BN>
+];
 
 export function canSendMultisig(accounts: string[]): boolean {
   const address = accounts.at(0);
@@ -29,9 +34,9 @@ export function canSendMultisig(accounts: string[]): boolean {
     if (!sender) return false;
 
     return canSendMultisig(accounts.slice(1));
-  } else {
-    return !!keyring.getAccount(address);
   }
+
+  return !!keyring.getAccount(address);
 }
 
 async function _asMulti(
@@ -46,14 +51,17 @@ async function _asMulti(
 ): Promise<[tx: SubmittableExtrinsic, cancelled: boolean]> {
   const multiAddress = encodeMultiAddress(who, threshold, api.registry.chainSS58);
   const others = who.filter((w) => w !== sender);
-  const [info, { weight }] = await Promise.all([api.query.multisig.multisigs<Option<Multisig>>(multiAddress, extrinsic.method.hash), extrinsic.paymentInfo(multiAddress)]);
+  const [info, { weight }] = await Promise.all([
+    api.query.multisig.multisigs<Option<Multisig>>(multiAddress, extrinsic.method.hash),
+    extrinsic.paymentInfo(multiAddress)
+  ]);
 
   let timepoint: Timepoint | null = null;
 
   if (info.isSome) {
     timepoint = info.unwrap().when;
 
-    const approvals = info.unwrap().approvals;
+    const { approvals } = info.unwrap();
 
     if (isCancelled) {
       unreserve[info.unwrap().depositor.toString()] = info.unwrap().deposit;
@@ -76,29 +84,65 @@ async function _asMulti(
     });
 
     if (!isCancelled) {
-      reserve[sender] = api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.muln(threshold)).add(api.consts.balances.existentialDeposit);
+      reserve[sender] = api.consts.multisig.depositBase
+        .add(api.consts.multisig.depositFactor.muln(threshold))
+        .add(api.consts.balances.existentialDeposit);
     }
   }
 
   if (isCancelled) {
     if (timepoint) {
-      return [api.tx.multisig.cancelAsMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.hash), true];
-    } else {
       return [
-        api.tx.multisig.asMulti.meta.args.length === 6
-          ? (api.tx.multisig.asMulti as any)(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.toHex(), false, weight)
-          : api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.toHex(), weight),
-        false
+        api.tx.multisig.cancelAsMulti(
+          threshold,
+          u8aSorted(others.map((address) => decodeAddress(address))),
+          timepoint,
+          extrinsic.method.hash
+        ),
+        true
       ];
     }
-  } else {
+
     return [
       api.tx.multisig.asMulti.meta.args.length === 6
-        ? (api.tx.multisig.asMulti as any)(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.toHex(), false, weight)
-        : api.tx.multisig.asMulti(threshold, u8aSorted(others.map((address) => decodeAddress(address))), timepoint, extrinsic.method.toHex(), weight),
+        ? (api.tx.multisig.asMulti as any)(
+            threshold,
+            u8aSorted(others.map((address) => decodeAddress(address))),
+            timepoint,
+            extrinsic.method.toHex(),
+            false,
+            weight
+          )
+        : api.tx.multisig.asMulti(
+            threshold,
+            u8aSorted(others.map((address) => decodeAddress(address))),
+            timepoint,
+            extrinsic.method.toHex(),
+            weight
+          ),
       false
     ];
   }
+
+  return [
+    api.tx.multisig.asMulti.meta.args.length === 6
+      ? (api.tx.multisig.asMulti as any)(
+          threshold,
+          u8aSorted(others.map((address) => decodeAddress(address))),
+          timepoint,
+          extrinsic.method.toHex(),
+          false,
+          weight
+        )
+      : api.tx.multisig.asMulti(
+          threshold,
+          u8aSorted(others.map((address) => decodeAddress(address))),
+          timepoint,
+          extrinsic.method.toHex(),
+          weight
+        ),
+    false
+  ];
 }
 
 export async function prepareMultisig(
@@ -131,11 +175,20 @@ export async function prepareMultisig(
 
       [tx, cancelled] = await _asMulti(api, proxyTx, meta.threshold, meta.who, sender, isCancelled, reserve, unreserve);
     } else {
-      [tx, cancelled] = await _asMulti(api, extrinsic, meta.threshold, meta.who, sender, isCancelled, reserve, unreserve);
+      [tx, cancelled] = await _asMulti(
+        api,
+        extrinsic,
+        meta.threshold,
+        meta.who,
+        sender,
+        isCancelled,
+        reserve,
+        unreserve
+      );
     }
 
     return prepareMultisig(api, tx, addressChain.slice(1), isCancelled && !cancelled, reserve, unreserve);
-  } else {
-    return [extrinsic, address, reserve, unreserve];
   }
+
+  return [extrinsic, address, reserve, unreserve];
 }

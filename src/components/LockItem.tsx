@@ -5,16 +5,17 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { ReactComponent as IconFail } from '@mimir-wallet/assets/svg/icon-failed-fill.svg';
-import { ReactComponent as IconFund } from '@mimir-wallet/assets/svg/icon-fund-fill.svg';
-import { ReactComponent as IconLock } from '@mimir-wallet/assets/svg/icon-lock.svg';
-import { ReactComponent as IconQuestion } from '@mimir-wallet/assets/svg/icon-question-fill.svg';
-import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success-fill.svg';
-import { ReactComponent as IconUnLock } from '@mimir-wallet/assets/svg/icon-unlock.svg';
-import { useApi, useCall, useToggle } from '@mimir-wallet/hooks';
 import { Box, IconButton, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
+
+import IconFail from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
+import IconFund from '@mimir-wallet/assets/svg/icon-fund-fill.svg?react';
+import IconLock from '@mimir-wallet/assets/svg/icon-lock.svg?react';
+import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
+import IconSuccess from '@mimir-wallet/assets/svg/icon-success-fill.svg?react';
+import IconUnLock from '@mimir-wallet/assets/svg/icon-unlock.svg?react';
+import { useApi, useCall, useToggle } from '@mimir-wallet/hooks';
 
 import AddressName from './AddressName';
 import FormatBalance from './FormatBalance';
@@ -40,11 +41,15 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
     return true;
   }, [allBalances, value]);
 
-  const icon = <SvgIcon color='primary' component={isUnLock ? IconUnLock : IconLock} inheritViewBox sx={{ opacity: 0.5 }} />;
+  const icon = (
+    <SvgIcon color='primary' component={isUnLock ? IconUnLock : IconLock} inheritViewBox sx={{ opacity: 0.5 }} />
+  );
 
   return (
     <>
-      {value && address && <Fund defaultValue={value.toString()} onClose={toggleOpen} open={open} receipt={address.toString()} />}
+      {value && address && (
+        <Fund defaultValue={value.toString()} onClose={toggleOpen} open={open} receipt={address.toString()} />
+      )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: { xs: 0.5, sm: 1 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
           {icon}
@@ -64,14 +69,20 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
           <Typography>
             <FormatBalance value={value} />
           </Typography>
-          {!isUnLock && <SvgIcon color={isEnought ? 'success' : 'error'} component={isEnought ? IconSuccess : IconFail} inheritViewBox />}
+          {!isUnLock && (
+            <SvgIcon
+              color={isEnought ? 'success' : 'error'}
+              component={isEnought ? IconSuccess : IconFail}
+              inheritViewBox
+            />
+          )}
         </Box>
       </Box>
     </>
   );
 }
 
-export const LockContainer = React.memo(function ({ children }: { children: React.ReactNode }) {
+export const LockContainer = React.memo(({ children }: { children: React.ReactNode }) => {
   return (
     <Stack bgcolor='secondary.main' borderRadius={1} padding={1} spacing={1}>
       {children}

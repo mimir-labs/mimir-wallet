@@ -4,10 +4,11 @@
 import type { Compact } from '@polkadot/types';
 import type { Registry } from '@polkadot/types/types';
 
-import { useApi } from '@mimir-wallet/hooks';
 import { Box } from '@mui/material';
 import { BN, formatBalance, isString } from '@polkadot/util';
 import React, { useMemo } from 'react';
+
+import { useApi } from '@mimir-wallet/hooks';
 
 interface Props {
   children?: React.ReactNode;
@@ -32,10 +33,19 @@ function getFormat(registry: Registry, formatIndex = 0): [number, string] {
   const decimals = registry.chainDecimals;
   const tokens = registry.chainTokens;
 
-  return [formatIndex < decimals.length ? decimals[formatIndex] : decimals[0], formatIndex < tokens.length ? tokens[formatIndex] : tokens[1]];
+  return [
+    formatIndex < decimals.length ? decimals[formatIndex] : decimals[0],
+    formatIndex < tokens.length ? tokens[formatIndex] : tokens[1]
+  ];
 }
 
-function createElement(prefix: string, postfix: string, unit: string, label: LabelPost = '', isShort = false): React.ReactNode {
+function createElement(
+  prefix: string,
+  postfix: string,
+  unit: string,
+  label: LabelPost = '',
+  isShort = false
+): React.ReactNode {
   return (
     <>
       {`${prefix}`}
@@ -88,7 +98,18 @@ function applyFormat(
   return createElement(prefix, postfix, unitPost, labelPost, isShort);
 }
 
-function FormatBalance({ children, className = '', format, formatIndex, isShort, label, labelPost, value, withCurrency, withSi }: Props): React.ReactElement<Props> {
+function FormatBalance({
+  children,
+  className = '',
+  format,
+  formatIndex,
+  isShort,
+  label,
+  labelPost,
+  value,
+  withCurrency,
+  withSi
+}: Props): React.ReactElement<Props> {
   const { api } = useApi();
 
   const formatInfo = useMemo(() => format || getFormat(api.registry, formatIndex), [api, format, formatIndex]);
@@ -101,7 +122,7 @@ function FormatBalance({ children, className = '', format, formatIndex, isShort,
         {value ? (
           value === 'all' ? (
             <>
-              {'everything'}
+              everything
               {labelPost || ''}
             </>
           ) : (

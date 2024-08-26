@@ -1,11 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import store from 'store';
+
 import { DappOption, dapps, findSupportedDapps } from '@mimir-wallet/config';
 import { FAVORITE_DAPP_KEY } from '@mimir-wallet/constants';
 import { events } from '@mimir-wallet/events';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import store from 'store';
 
 import { useApi } from './useApi';
 

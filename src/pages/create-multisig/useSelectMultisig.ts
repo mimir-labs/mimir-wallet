@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import React, { useCallback, useMemo, useState } from 'react';
+
 import { useAddresses, useAllAccounts } from '@mimir-wallet/hooks';
 import { getAddressMeta, isLocalAccount } from '@mimir-wallet/utils';
-import React, { useCallback, useMemo, useState } from 'react';
 
 interface UseSelectMultisig {
   unselected: string[];
@@ -24,7 +25,10 @@ export function useSelectMultisig(defaultSignatories?: string[], defaultThreshol
 
   const unselected = useMemo(() => all.filter((account) => !signatories.includes(account)), [all, signatories]);
 
-  const hasSoloAccount = useMemo(() => !!signatories.find((address) => isLocalAccount(address) && !getAddressMeta(address).isMultisig), [signatories]);
+  const hasSoloAccount = useMemo(
+    () => !!signatories.find((address) => isLocalAccount(address) && !getAddressMeta(address).isMultisig),
+    [signatories]
+  );
   const isThresholdValid = Number(threshold) >= 2 && Number(threshold) <= signatories.length;
 
   const select = useCallback((value: string) => {

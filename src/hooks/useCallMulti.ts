@@ -69,11 +69,23 @@ function subscribe<T>(
 
 // very much copied from useCall
 // FIXME This is generic, we cannot really use createNamedHook
-export function useCallMulti<T>(calls?: QueryableStorageMultiArg<'promise'>[] | null | false, options?: CallOptions<T>): T {
+export function useCallMulti<T>(
+  calls?: QueryableStorageMultiArg<'promise'>[] | null | false,
+  options?: CallOptions<T>
+): T {
   const { api } = useApi();
   const mountedRef = useIsMountedRef();
-  const tracker = useRef<Tracker>({ error: null, fn: null, isActive: false, serialized: null, subscriber: null, type: 'useCallMulti' });
-  const [value, setValue] = useState<T>(() => (isUndefined((options || {}).defaultValue) ? [] : (options || {}).defaultValue) as unknown as T);
+  const tracker = useRef<Tracker>({
+    error: null,
+    fn: null,
+    isActive: false,
+    serialized: null,
+    subscriber: null,
+    type: 'useCallMulti'
+  });
+  const [value, setValue] = useState<T>(
+    () => (isUndefined((options || {}).defaultValue) ? [] : (options || {}).defaultValue) as unknown as T
+  );
 
   // initial effect, we need an un-subscription
   useEffect((): (() => void) => {

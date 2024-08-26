@@ -1,14 +1,15 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { utm } from '@mimir-wallet/config';
-import { useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
-import { addressToHex, service } from '@mimir-wallet/utils';
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { utm } from '@mimir-wallet/config';
+import { useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
+import { addressToHex, service } from '@mimir-wallet/utils';
 
 interface Props {
   name?: string;
@@ -53,7 +54,9 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
 
       selectAccount(address);
       navigate('/');
-    } catch {}
+    } catch {
+      /* empty */
+    }
 
     setIsLoading(false);
   }, [checkField, name, navigate, selectAccount, signatories, threshold]);
@@ -64,8 +67,8 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
         <DialogTitle>Create Static Multisig</DialogTitle>
         <DialogContent>
           <ul>
-            <li>{"You're creating a non-Flexible multisig, members can't be modified."}</li>
-            <li>{"You need to submit signature to confirm your identity; this isn't a transaction."}</li>
+            <li>You're creating a non-Flexible multisig, members can't be modified.</li>
+            <li>You need to submit signature to confirm your identity; this isn't a transaction.</li>
           </ul>
         </DialogContent>
         <DialogActions>

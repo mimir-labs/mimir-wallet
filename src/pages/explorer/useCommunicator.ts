@@ -1,15 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { State } from '@mimir-wallet/communicator/types';
 import type { SignerPayloadJSON } from '@polkadot/types/types';
+import type { State } from '@mimir-wallet/communicator/types';
 
-import { IframeCommunicator } from '@mimir-wallet/communicator';
-import { useApi, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
 import keyring from '@polkadot/ui-keyring';
 import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
-export function useCommunicator(iframeRef: MutableRefObject<HTMLIFrameElement | null>, url: string): IframeCommunicator | null {
+import { IframeCommunicator } from '@mimir-wallet/communicator';
+import { useApi, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
+
+export function useCommunicator(
+  iframeRef: MutableRefObject<HTMLIFrameElement | null>,
+  url: string
+): IframeCommunicator | null {
   const [communicator, setCommunicator] = useState<IframeCommunicator | null>(null);
   const { api } = useApi();
   const { addQueue } = useTxQueue();

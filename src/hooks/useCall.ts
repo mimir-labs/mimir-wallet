@@ -35,7 +35,11 @@ interface QueryMapFn extends QueryTrackFn {
   };
 }
 
-type QueryFn = QueryableStorageEntry<'promise', []> | QueryableStorageEntry<'promise', []>['entries'] | QueryableStorageEntry<'promise', []>['keys'] | QueryableStorageEntry<'promise', []>['multi'];
+type QueryFn =
+  | QueryableStorageEntry<'promise', []>
+  | QueryableStorageEntry<'promise', []>['entries']
+  | QueryableStorageEntry<'promise', []>['keys']
+  | QueryableStorageEntry<'promise', []>['multi'];
 
 type CallFn = (...params: unknown[]) => Promise<VoidFn>;
 
@@ -68,13 +72,22 @@ function isQuery(fn: unknown): fn is QueryableStorageEntry<'promise', []> {
 }
 
 // extract the serialized and mapped params, all ready for use in our call
-function extractParams<T>(fn: unknown, params: unknown[], { paramMap = transformIdentity }: CallOptions<T> = {}): [string, CallParams | null] {
-  return [JSON.stringify({ f: (fn as { name: string })?.name, p: params }), params.length === 0 || !params.some((param) => isNull(param) || isUndefined(param)) ? paramMap(params) : null];
+function extractParams<T>(
+  fn: unknown,
+  params: unknown[],
+  { paramMap = transformIdentity }: CallOptions<T> = {}
+): [string, CallParams | null] {
+  return [
+    JSON.stringify({ f: (fn as { name: string })?.name, p: params }),
+    params.length === 0 || !params.some((param) => isNull(param) || isUndefined(param)) ? paramMap(params) : null
+  ];
 }
 
 export function handleError(error: Error, tracker: TrackerRef, fn?: unknown): void {
   console.error(
-    (tracker.current.error = new Error(`${tracker.current.type}(${isQuery(fn) ? `${fn.creator.section}.${fn.creator.method}` : '...'}):: ${error.message}:: ${error.stack || '<unknown>'}`))
+    (tracker.current.error = new Error(
+      `${tracker.current.type}(${isQuery(fn) ? `${fn.creator.section}.${fn.creator.method}` : '...'}):: ${error.message}:: ${error.stack || '<unknown>'}`
+    ))
   );
 }
 
@@ -83,7 +96,9 @@ export function unsubscribe(tracker: TrackerRef): void {
   tracker.current.isActive = false;
 
   if (tracker.current.subscriber) {
-    tracker.current.subscriber.then((u) => isFunction(u) && (u as VoidFn)()).catch((e) => handleError(e as Error, tracker));
+    tracker.current.subscriber
+      .then((u) => isFunction(u) && (u as VoidFn)())
+      .catch((e) => handleError(e as Error, tracker));
     tracker.current.subscriber = null;
   }
 }
@@ -113,7 +128,13 @@ function subscribe<T>(
           // we use the isActive flag here since .subscriber may not be set on immediate callback)
           if (mountedRef.current && tracker.current.isActive) {
             try {
-              setValue(withParams ? [params, transform(value, api)] : withParamsTransform ? transform([params, value], api) : transform(value, api));
+              setValue(
+                withParams
+                  ? [params, transform(value, api)]
+                  : withParamsTransform
+                    ? transform([params, value], api)
+                    : transform(value, api)
+              );
             } catch (error) {
               handleError(error as Error, tracker, fn);
             }
@@ -128,7 +149,7 @@ function subscribe<T>(
 
 export function throwOnError(tracker: Tracker): void {
   if (tracker.error) {
-    const error = tracker.error;
+    const { error } = tracker;
 
     tracker.error = null;
 
@@ -141,10 +162,21 @@ export function throwOnError(tracker: Tracker): void {
 //  - has a callback to set the value
 // FIXME The typings here need some serious TLC
 // FIXME This is generic, we cannot really use createNamedHook
-export function useCall<T>(fn: TrackFn | undefined | null | false, params?: CallParams | null, options?: CallOptions<T>): T | undefined {
+export function useCall<T>(
+  fn: TrackFn | undefined | null | false,
+  params?: CallParams | null,
+  options?: CallOptions<T>
+): T | undefined {
   const { api } = useApi();
   const mountedRef = useIsMountedRef();
-  const tracker = useRef<Tracker>({ error: null, fn: null, isActive: false, serialized: null, subscriber: null, type: 'useCall' });
+  const tracker = useRef<Tracker>({
+    error: null,
+    fn: null,
+    isActive: false,
+    serialized: null,
+    subscriber: null,
+    type: 'useCall'
+  });
   const [value, setValue] = useState<T | undefined>(options?.defaultValue);
 
   // initial effect, we need an un-subscription

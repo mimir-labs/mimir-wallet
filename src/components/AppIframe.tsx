@@ -15,7 +15,8 @@ type AppIframeProps = {
 };
 
 // see sandbox mdn docs for more details https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
-const IFRAME_SANDBOX_ALLOWED_FEATURES = 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-downloads allow-orientation-lock';
+const IFRAME_SANDBOX_ALLOWED_FEATURES =
+  'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-downloads allow-orientation-lock';
 
 function AppIframe({ allowedFeaturesList = 'camera', appUrl, iframeRef, onLoad, title }: AppIframeProps) {
   return (

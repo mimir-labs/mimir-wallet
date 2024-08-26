@@ -4,8 +4,9 @@
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { useApi, useCall } from '@mimir-wallet/hooks';
 import React from 'react';
+
+import { useApi, useCall } from '@mimir-wallet/hooks';
 
 import FormatBalance from './FormatBalance';
 

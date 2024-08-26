@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Portal } from '@mui/material';
-import { toast, ToastContainer } from 'react-toastify';
+import { IconProps, toast, ToastContainer } from 'react-toastify';
 import { injectStyle } from 'react-toastify/dist/inject-style';
 
 import { FailedAnimation, NoticeAnimation, SuccessAnimation, WaitingAnimation } from './animation';
@@ -13,10 +13,30 @@ injectStyle();
 function getMessage(value: unknown): React.ReactNode {
   if (typeof value === 'string') {
     return value.toString();
-  } else {
-    return <TxError error={value} />;
   }
+
+  return <TxError error={value} />;
 }
+
+const icon = (props: IconProps) => {
+  if (props.type === 'info') {
+    return <NoticeAnimation />;
+  }
+
+  if (props.type === 'default') {
+    return <NoticeAnimation />;
+  }
+
+  if (props.type === 'success') {
+    return <SuccessAnimation />;
+  }
+
+  if (props.type === 'error') {
+    return <FailedAnimation />;
+  }
+
+  return <WaitingAnimation />;
+};
 
 function ToastRoot() {
   return (
@@ -26,19 +46,7 @@ function ToastRoot() {
         closeOnClick
         draggable
         hideProgressBar={false}
-        icon={(props) => {
-          if (props.type === 'info') {
-            return <NoticeAnimation />;
-          } else if (props.type === 'default') {
-            return <NoticeAnimation />;
-          } else if (props.type === 'success') {
-            return <SuccessAnimation />;
-          } else if (props.type === 'error') {
-            return <FailedAnimation />;
-          } else {
-            return <WaitingAnimation />;
-          }
-        }}
+        icon={icon}
         newestOnTop={false}
         pauseOnFocusLoss
         pauseOnHover

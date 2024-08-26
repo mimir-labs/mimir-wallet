@@ -1,16 +1,29 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as IconLink } from '@mimir-wallet/assets/svg/icon-link.svg';
+import type { Transaction } from '@mimir-wallet/hooks/types';
+
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Stack,
+  SvgIcon,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
 import { AddressRow, Hex } from '@mimir-wallet/components';
 import { ellipsisLinesMixin } from '@mimir-wallet/components/utils';
 import { useApi, useDapp, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
-import { Transaction } from '@mimir-wallet/hooks/types';
 import { Call } from '@mimir-wallet/params';
 import FallbackCall from '@mimir-wallet/params/FallbackCall';
-import { Box, Dialog, DialogContent, DialogTitle, Divider, Stack, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
-import React from 'react';
-import { Link } from 'react-router-dom';
 
 function Item({ content, name }: { name: React.ReactNode; content: React.ReactNode }) {
   return (
@@ -29,7 +42,7 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
   const [open, toggleOpen] = useToggle();
   const { breakpoints } = useTheme();
   const upSm = useMediaQuery(breakpoints.up('sm'));
-  const note = destTx.note;
+  const { note } = destTx;
 
   return (
     <>
@@ -69,7 +82,17 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
           {dapp && (
             <Item
               content={
-                <Box component={Link} sx={{ textDecoration: 'none', color: 'text.primary', display: 'flex', alignItems: 'center', gap: 0.5 }} to={`/explorer/${encodeURIComponent(dapp.url)}`}>
+                <Box
+                  component={Link}
+                  sx={{
+                    textDecoration: 'none',
+                    color: 'text.primary',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5
+                  }}
+                  to={`/explorer/${encodeURIComponent(dapp.url)}`}
+                >
                   <Box component='img' src={dapp.icon} width={20} />
                   {dapp.name}
                   <SvgIcon component={IconLink} fontSize='small' inheritViewBox />
@@ -79,10 +102,25 @@ function Extrinsic({ transaction }: { transaction: Transaction }) {
             />
           )}
           {note && <Item content={<Typography sx={{ ...ellipsisLinesMixin(1) }}>{note}</Typography>} name='Note' />}
-          <Item content={<AddressRow shorten size='small' value={transaction.initTransaction.sender} withAddress={upSm} withCopy withName />} name='Initiator' />
+          <Item
+            content={
+              <AddressRow
+                shorten
+                size='small'
+                value={transaction.initTransaction.sender}
+                withAddress={upSm}
+                withCopy
+                withName
+              />
+            }
+            name='Initiator'
+          />
           <Item content={<Hex value={destTx.hash} withCopy />} name='Call Hash' />
           <Item content={<Hex value={destTx.call?.toHex()} withCopy />} name='Call Data' />
-          <Box onClick={toggleOpen} sx={{ fontWeight: 600, color: 'primary.main', cursor: 'pointer', textDecoration: 'none' }}>
+          <Box
+            onClick={toggleOpen}
+            sx={{ fontWeight: 600, color: 'primary.main', cursor: 'pointer', textDecoration: 'none' }}
+          >
             View Parameters
           </Box>
         </Stack>

@@ -1,11 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useEffect, useState } from 'react';
+import store from 'store';
+
 import { toastError } from '@mimir-wallet/components';
 import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
 import { loadWallet } from '@mimir-wallet/utils';
-import { useEffect, useState } from 'react';
-import store from 'store';
 
 import { useApi } from './useApi';
 

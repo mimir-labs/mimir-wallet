@@ -7,7 +7,10 @@ import { createNamedHook } from './createNamedHook';
 import { useIsMountedRef } from './useIsMountedRef';
 
 // Simple wrapper for a true/false toggle
-function useToggleImpl(defaultValue = false, onToggle?: (isActive: boolean) => void): [boolean, () => void, (value: boolean) => void] {
+function useToggleImpl(
+  defaultValue = false,
+  onToggle?: (isActive: boolean) => void
+): [boolean, () => void, (value: boolean) => void] {
   const mountedRef = useIsMountedRef();
   const [isActive, setActive] = useState(defaultValue);
 

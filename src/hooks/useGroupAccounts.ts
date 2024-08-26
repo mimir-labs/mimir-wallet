@@ -3,9 +3,10 @@
 
 import type { KeyringAddress } from '@polkadot/ui-keyring/types';
 
-import { AddressMeta, getAccountCryptoType, getAddressMeta } from '@mimir-wallet/utils';
 import { keyring } from '@polkadot/ui-keyring';
 import { useMemo } from 'react';
+
+import { AddressMeta, getAccountCryptoType, getAddressMeta } from '@mimir-wallet/utils';
 
 import { createNamedHook } from './createNamedHook';
 import { useAccounts } from './useAccounts';

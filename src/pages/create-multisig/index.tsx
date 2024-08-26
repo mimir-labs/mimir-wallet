@@ -3,24 +3,47 @@
 
 import type { PrepareFlexible } from './types';
 
-import { ReactComponent as IconInfo } from '@mimir-wallet/assets/svg/icon-info-fill.svg';
-import { AddAddressDialog, Address, AddressRow, Input } from '@mimir-wallet/components';
-import { useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
-import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
-import { Alert, AlertTitle, Box, Button, Dialog, DialogContent, Divider, FormHelperText, Paper, Stack, SvgIcon, Switch, Typography } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  Divider,
+  FormHelperText,
+  Paper,
+  Stack,
+  SvgIcon,
+  Switch,
+  Typography
+} from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
 import { isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
+import { AddAddressDialog, Address, AddressRow, Input } from '@mimir-wallet/components';
+import { useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
+import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
 import CreateStatic from './CreateStatic';
 import { useSelectMultisig } from './useSelectMultisig';
 
-function checkError(signatories: string[], isThresholdValid: boolean, hasSoloAccount: boolean): [Error | null, Error | null] {
+function checkError(
+  signatories: string[],
+  isThresholdValid: boolean,
+  hasSoloAccount: boolean
+): [Error | null, Error | null] {
   return [
-    signatories.length < 2 ? new Error('Please select at least two members') : hasSoloAccount ? null : new Error('You need add at least one local account'),
+    signatories.length < 2
+      ? new Error('Please select at least two members')
+      : hasSoloAccount
+        ? null
+        : new Error('You need add at least one local account'),
     isThresholdValid ? null : new Error(`Threshold must great than 2 and less equal than ${signatories.length}`)
   ];
 }
@@ -28,9 +51,13 @@ function checkError(signatories: string[], isThresholdValid: boolean, hasSoloAcc
 function PageCreateMultisig() {
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
-  const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({ address: '', isAddressValid: false });
+  const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({
+    address: '',
+    isAddressValid: false
+  });
   const [flexible, setFlexible] = useState(false);
-  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } = useSelectMultisig();
+  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
+    useSelectMultisig();
   const [addOpen, toggleAdd] = useToggle();
   const [addressError, setAddressError] = useState<Error | null>(null);
   const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
@@ -80,7 +107,13 @@ function PageCreateMultisig() {
             {'<'} Back
           </Button>
           {prepares.length > 0 && (
-            <Button color='primary' onClick={toggleOpen} size='small' startIcon={<SvgIcon component={IconInfo} inheritViewBox />} variant='text'>
+            <Button
+              color='primary'
+              onClick={toggleOpen}
+              size='small'
+              startIcon={<SvgIcon component={IconInfo} inheritViewBox />}
+              variant='text'
+            >
               {prepares.length} unfinished creation
             </Button>
           )}
@@ -102,7 +135,9 @@ function PageCreateMultisig() {
                     <Button onClick={handleAdd} variant='contained'>
                       Add
                     </Button>
-                    {address && isAddressValid && <AddAddressDialog defaultAddress={address} onAdded={select} onClose={toggleAdd} open={addOpen} />}
+                    {address && isAddressValid && (
+                      <AddAddressDialog defaultAddress={address} onAdded={select} onClose={toggleAdd} open={addOpen} />
+                    )}
                   </>
                 }
                 error={addressError}
@@ -120,13 +155,25 @@ function PageCreateMultisig() {
                 value={address}
               />
               <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexDirection: { sm: 'row', xs: 'column' } }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    flexDirection: { sm: 'row', xs: 'column' }
+                  }}
+                >
                   <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
                   <AccountSelect accounts={signatories} onClick={unselect} title='Members' type='delete' />
                 </Box>
                 {memberError && <FormHelperText sx={{ color: 'error.main' }}>{memberError.message}</FormHelperText>}
               </Paper>
-              <Input defaultValue={String(threshold)} error={thresholdError} label='Threshold' onChange={_onChangeThreshold} />
+              <Input
+                defaultValue={String(threshold)}
+                error={thresholdError}
+                label='Threshold'
+                onChange={_onChangeThreshold}
+              />
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography fontWeight={700}>Flexible Multisig</Typography>
                 <Switch checked={flexible} onChange={(e) => setFlexible(e.target.checked)} />
@@ -135,13 +182,13 @@ function PageCreateMultisig() {
                 <AlertTitle>Notice</AlertTitle>
                 {flexible ? (
                   <ul>
-                    <li>{'You are trying to create a flexible multisig on Polkadot.'}</li>
-                    <li>{'Initiating a transaction is required.'}</li>
+                    <li>You are trying to create a flexible multisig on Polkadot.</li>
+                    <li>Initiating a transaction is required.</li>
                   </ul>
                 ) : (
                   <ul>
-                    <li>{'This multisig could be used on Polkadot, Kusama and all their parachains.'}</li>
-                    <li>{'Once created, the multisig members and threshold cannot be modified.'}</li>
+                    <li>This multisig could be used on Polkadot, Kusama and all their parachains.</li>
+                    <li>Once created, the multisig members and threshold cannot be modified.</li>
                   </ul>
                 )}
               </Alert>

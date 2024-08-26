@@ -1,15 +1,16 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TxEvents } from '@mimir-wallet/utils';
 import type { ISubmittableResult } from '@polkadot/types/types';
+import type { TxEvents } from '@mimir-wallet/utils';
+
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { HexString } from '@polkadot/util/types';
+import React, { useEffect, useState } from 'react';
 
 import ImgTxFailed from '@mimir-wallet/assets/images/tx-failed.png';
 import ImgTxPending from '@mimir-wallet/assets/images/tx-pending.png';
 import ImgTxSuccess from '@mimir-wallet/assets/images/tx-success.png';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
-import { HexString } from '@polkadot/util/types';
-import React, { useEffect, useState } from 'react';
 
 import TxError from '../TxError';
 
@@ -54,7 +55,12 @@ function ToastDialog({ events, onChange, onRemove }: { onRemove: () => void; eve
       setStatus('error');
     };
 
-    events.on('signed', onSign).on('inblock', onInblock).on('finalized', onFinalized).on('error', onError).on('success', onSuccess);
+    events
+      .on('signed', onSign)
+      .on('inblock', onInblock)
+      .on('finalized', onFinalized)
+      .on('error', onError)
+      .on('success', onSuccess);
 
     return () => {
       events.off('signed', onSign);

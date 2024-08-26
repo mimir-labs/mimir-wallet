@@ -1,12 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { toastError } from '@mimir-wallet/components';
-import { events } from '@mimir-wallet/events';
-import { AddressMeta, addressToHex, getAddressMeta, isLocalAccount, service } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import { addressEq } from '@polkadot/util-crypto';
 import { useCallback, useEffect, useState } from 'react';
+
+import { toastError } from '@mimir-wallet/components';
+import { events } from '@mimir-wallet/events';
+import { AddressMeta, addressToHex, getAddressMeta, isLocalAccount, service } from '@mimir-wallet/utils';
 
 import { createNamedHook } from './createNamedHook';
 
@@ -38,9 +39,9 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
 
           if (JSON.stringify(meta) !== JSON.stringify(newMeta)) {
             return newMeta;
-          } else {
-            return meta;
           }
+
+          return meta;
         });
       }
     };

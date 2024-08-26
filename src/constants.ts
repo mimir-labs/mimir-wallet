@@ -20,3 +20,6 @@ export const CONNECT_ORIGIN = 'mimir-wallet';
 export const UTM_KEY = 'utm_source';
 
 export const NOT_CREATE_MULTISIG_NOW_KEY = 'not_create_multisig_now';
+
+export const EXTENSION_PREFIX = 'mimir-wallet';
+export const MESSAGE_ORIGIN_WALLET = `${EXTENSION_PREFIX}wallet`;

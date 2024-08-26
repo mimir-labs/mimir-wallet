@@ -3,10 +3,11 @@
 
 import type { ProposalData } from '@mimir-wallet/hooks';
 
-import { ellipsisMixin } from '@mimir-wallet/components/utils';
-import { chainLinks } from '@mimir-wallet/utils';
 import { Box, Chip, Link as MuiLink, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
+
+import { ellipsisMixin } from '@mimir-wallet/components/utils';
+import { chainLinks } from '@mimir-wallet/utils';
 
 function Proposals({ data }: { data: Array<ProposalData> }) {
   const { breakpoints } = useTheme();
@@ -30,10 +31,18 @@ function Proposals({ data }: { data: Array<ProposalData> }) {
             ':hover': { bgcolor: 'secondary.main' }
           }}
         >
-          <Typography sx={{ flex: '1 0 auto', maxWidth: '60%', fontSize: { sm: '1rem', xs: '0.875rem' }, ...ellipsisMixin() }} variant='h6'>
+          <Typography
+            sx={{ flex: '1 0 auto', maxWidth: '60%', fontSize: { sm: '1rem', xs: '0.875rem' }, ...ellipsisMixin() }}
+            variant='h6'
+          >
             <span style={{ opacity: 0.5 }}>#{item.referendumIndex}</span>
             &nbsp;·&nbsp;
-            <MuiLink color='inherit' component={Link} to={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`) || '')}`} underline='hover'>
+            <MuiLink
+              color='inherit'
+              component={Link}
+              to={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`) || '')}`}
+              underline='hover'
+            >
               {item.title || `[${item.onchainData.trackInfo?.name}] Referendum #${item.referendumIndex}`}
             </MuiLink>
           </Typography>

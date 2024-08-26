@@ -1,11 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as IconCopy } from '@mimir-wallet/assets/svg/icon-copy.svg';
-import { ReactComponent as IconSuccess } from '@mimir-wallet/assets/svg/icon-success.svg';
-import { useCopyClipboard } from '@mimir-wallet/hooks';
-import { IconButton, IconButtonProps, SvgIcon } from '@mui/material';
+import { IconButton, type IconButtonProps, SvgIcon } from '@mui/material';
 import React, { useCallback } from 'react';
+
+import IconCopy from '@mimir-wallet/assets/svg/icon-copy.svg?react';
+import IconSuccess from '@mimir-wallet/assets/svg/icon-success.svg?react';
+import { useCopyClipboard } from '@mimir-wallet/hooks';
 
 interface Props extends IconButtonProps {
   value?: string;

@@ -5,7 +5,7 @@ import { Box } from '@mui/material';
 import lottie, { AnimationItem } from 'lottie-web';
 import { useEffect, useRef } from 'react';
 
-import DataJson from './waiting.json';
+import DataJson from './waiting-data.json';
 
 function Waiting({ size = 28 }: { size?: number }) {
   const container = useRef<HTMLDivElement>();

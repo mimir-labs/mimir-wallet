@@ -3,8 +3,9 @@
 
 import type { ApiProps } from '@mimir-wallet/api/types';
 
-import { ApiCtx } from '@mimir-wallet/api';
 import { useContext } from 'react';
+
+import { ApiCtx } from '@mimir-wallet/api';
 
 import { createNamedHook } from './createNamedHook';
 

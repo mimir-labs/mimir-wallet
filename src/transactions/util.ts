@@ -5,10 +5,11 @@ import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
 import type { Transaction } from '@mimir-wallet/hooks/types';
 import type { AddressMeta } from '@mimir-wallet/utils';
 
-import { CalldataStatus } from '@mimir-wallet/hooks/types';
-import { getAddressMeta } from '@mimir-wallet/utils';
 import keyring from '@polkadot/ui-keyring';
 import { addressEq } from '@polkadot/util-crypto';
+
+import { CalldataStatus } from '@mimir-wallet/hooks/types';
+import { getAddressMeta } from '@mimir-wallet/utils';
 
 export function extraTransaction(meta: AddressMeta, transaction: Transaction): [approvals: number, txs: Transaction[]] {
   let _approvals = 0;
@@ -116,10 +117,8 @@ export function checkFiltered(filtered: Filtered): boolean {
       if (_filtered) {
         canApprove = checkFiltered(_filtered);
       }
-    } else {
-      if (keyring.getAccount(address)) {
-        canApprove = true;
-      }
+    } else if (keyring.getAccount(address)) {
+      canApprove = true;
     }
 
     if (canApprove) {

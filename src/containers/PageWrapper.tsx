@@ -11,7 +11,14 @@ export function PageWrapperMain() {
   const { alertOpen } = useContext(BaseContainerCtx);
 
   return (
-    <Box sx={{ paddingTop: `calc(56px + 20px + ${alertOpen ? 24 : 0}px)`, paddingLeft: { md: 'calc(222px + 20px)', xs: 1.5 }, paddingRight: { md: '20px', xs: 1.5 }, paddingBottom: 4 }}>
+    <Box
+      sx={{
+        paddingTop: `calc(56px + 20px + ${alertOpen ? 24 : 0}px)`,
+        paddingLeft: { md: 'calc(222px + 20px)', xs: 1.5 },
+        paddingRight: { md: '20px', xs: 1.5 },
+        paddingBottom: 4
+      }}
+    >
       <Outlet />
     </Box>
   );
@@ -21,7 +28,9 @@ function PageWrapper() {
   const { alertOpen } = useContext(BaseContainerCtx);
 
   return (
-    <Box sx={{ paddingTop: `calc(56px + 20px + ${alertOpen ? 24 : 0}px)`, paddingX: { md: 2, xs: 1.5 }, paddingBottom: 4 }}>
+    <Box
+      sx={{ paddingTop: `calc(56px + 20px + ${alertOpen ? 24 : 0}px)`, paddingX: { md: 2, xs: 1.5 }, paddingBottom: 4 }}
+    >
       <Outlet />
     </Box>
   );

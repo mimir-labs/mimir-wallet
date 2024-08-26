@@ -1,10 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactComponent as ArrowDown } from '@mimir-wallet/assets/svg/ArrowDown.svg';
-import { useSelectedAccount } from '@mimir-wallet/hooks';
 import { Box, SvgIcon } from '@mui/material';
 import React, { useState } from 'react';
+
+import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
+import { useSelectedAccount } from '@mimir-wallet/hooks';
 
 import AccountMenu from './AccountMenu';
 import AddressCell from './AddressCell';

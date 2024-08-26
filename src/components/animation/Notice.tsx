@@ -5,7 +5,7 @@ import { Box } from '@mui/material';
 import lottie, { AnimationItem } from 'lottie-web';
 import { useEffect, useRef } from 'react';
 
-import DataJson from './notice.json';
+import DataJson from './notice-data.json';
 
 function Notice({ size = 28 }: { size?: number }) {
   const container = useRef<HTMLDivElement>();

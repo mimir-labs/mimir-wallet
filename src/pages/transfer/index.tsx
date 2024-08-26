@@ -1,12 +1,20 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { InputAddress, InputNumber } from '@mimir-wallet/components';
-import { useAddresses, useAllAccounts, useApi, useQueryParam, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import { type BN, BN_ZERO } from '@polkadot/util';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { InputAddress, InputNumber } from '@mimir-wallet/components';
+import {
+  useAddresses,
+  useAllAccounts,
+  useApi,
+  useQueryParam,
+  useSelectedAccount,
+  useTxQueue
+} from '@mimir-wallet/hooks';
 
 import SelectToken from './SelectToken';
 import { TransferToken } from './types';
@@ -41,7 +49,7 @@ function PageTransfer() {
 
   const handleClick = useCallback(() => {
     if (recipient && sending && amount && token) {
-      if (isNaN(Number(amount))) {
+      if (Number.isNaN(Number(amount))) {
         setAmountError(new Error('Please input number value'));
 
         return;
@@ -72,7 +80,17 @@ function PageTransfer() {
       <Paper sx={{ padding: 2.5, borderRadius: '20px', marginTop: 1.25 }}>
         <Stack spacing={2}>
           <Typography variant='h3'>Transfer</Typography>
-          <InputAddress balance={sendingBalances} filtered={filtered} format={format} isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} withBalance />
+          <InputAddress
+            balance={sendingBalances}
+            filtered={filtered}
+            format={format}
+            isSign
+            label='Sending From'
+            onChange={setSending}
+            placeholder='Sender'
+            value={sending}
+            withBalance
+          />
           <Divider />
           <InputAddress
             balance={recipientBalances}
@@ -84,7 +102,16 @@ function PageTransfer() {
             value={recipient}
             withBalance
           />
-          <InputNumber error={amountError} format={format} key={assetId} label='Amount' maxValue={sendingBalances} onChange={setAmount} placeholder='Input amount' withMax />
+          <InputNumber
+            error={amountError}
+            format={format}
+            key={assetId}
+            label='Amount'
+            maxValue={sendingBalances}
+            onChange={setAmount}
+            placeholder='Input amount'
+            withMax
+          />
           <SelectToken assetId={assetId} onChange={setToken} setAssetId={setAssetId} />
           <Button disabled={!amount || !recipient || amount.eq(BN_ZERO)} fullWidth onClick={handleClick}>
             Review
