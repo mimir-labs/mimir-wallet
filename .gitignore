@@ -11,6 +11,7 @@
 # production
 build/
 build-*/
+dist/
 tsconfig.*buildinfo
 
 # misc
