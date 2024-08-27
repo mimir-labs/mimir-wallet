@@ -20,7 +20,7 @@
     "build": "vite build",
     "commit": "cz",
     "dev": "vite --open",
-    "prepare": "husky install",
+    "prepare": "husky",
     "preview": "vite preview",
     "preview:test": "start-server-and-test preview http://localhost:4173",
     "test": "vitest --passWithNoTests",

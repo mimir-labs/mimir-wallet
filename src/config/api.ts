@@ -104,7 +104,7 @@ export const polkadotEndpoints: Endpoint[] = [
     name: 'People',
     wsUrl: 'wss://polkadot-people-rpc.polkadot.io/',
     genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
-    serviceUrl: 'https://collectives-polkadot-api.mimir.global/',
+    serviceUrl: 'https://people-polkadot-api.mimir.global/',
     socketUrl: 'wss://people-polkadot-api.mimir.global/',
     explorerUrl: 'https://people-polkadot.subscan.io/'
   },
