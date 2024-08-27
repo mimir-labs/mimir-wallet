@@ -1,18 +1,15 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
-build/
-build-*/
-dist/
-tsconfig.*buildinfo
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+.eslintcache
+coverage
+.nyc_output
+.stylelintcache
+cypress/videos
 
 # misc
 .DS_Store
@@ -22,3 +19,9 @@ tsconfig.*buildinfo
 .env.production.local
 
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks

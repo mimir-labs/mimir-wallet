@@ -16,24 +16,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "pnpm"
+          cache: "yarn"
 
       - name: Install deps
         run: |
-          pnpm install
+          yarn install
       - name: Lint
         run: |
-          pnpm lint
+          yarn lint
       - name: Test
         run: |
-          pnpm test:ci
+          yarn test:ci
       - name: Build
         run: |
-          pnpm build
+          yarn build
