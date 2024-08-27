@@ -13,19 +13,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "pnpm"
+          cache: "yarn"
 
       - name: Install deps and build
         run: |
-          pnpm install
-          pnpm build
+          yarn install
+          yarn build
 
       - name: Deploy to server
         uses: burnett01/rsync-deployments@6.0.0
