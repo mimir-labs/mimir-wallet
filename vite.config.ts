@@ -71,7 +71,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     tsconfigPaths(),
     react(),
-    svgr(),
+    svgr({ svgrOptions: { ref: true } }),
     ...(mode === 'test'
       ? []
       : [
