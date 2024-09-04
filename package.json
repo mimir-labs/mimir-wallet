@@ -43,7 +43,7 @@
     "@plutonication/plutonication": "^1.1.0",
     "@polkadot/api": "^12.4.2",
     "@polkadot/api-derive": "^12.4.2",
-    "@polkadot/apps-config": "^0.142.1",
+    "@polkadot/apps-config": "^0.143.2",
     "@polkadot/keyring": "^13.0.2",
     "@polkadot/react-identicon": "^3.9.1",
     "@polkadot/types": "^12.4.2",

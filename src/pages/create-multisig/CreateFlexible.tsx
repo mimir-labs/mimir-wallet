@@ -20,16 +20,20 @@ import {
   Typography
 } from '@mui/material';
 import keyring from '@polkadot/ui-keyring';
-import { u8aEq } from '@polkadot/util';
-import { addressEq, encodeMultiAddress } from '@polkadot/util-crypto';
+import { u8aEq, u8aToHex } from '@polkadot/util';
+import { addressEq, decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import store from 'store';
 
 import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
 import { utm } from '@mimir-wallet/config';
+import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
 import { TxToastCtx, useApi, useCall, useSelectedAccountCallback } from '@mimir-wallet/hooks';
 import { addressToHex, getAddressMeta, service, signAndSend } from '@mimir-wallet/utils';
+
+import { createMultisig } from './CreateStatic';
 
 interface Props {
   prepare: PrepareFlexible;
@@ -141,6 +145,7 @@ function CreateFlexible({
       addToast({ events });
 
       events.once('inblock', () => {
+        createMultisig(who, threshold, name);
         keyring.addExternal(pure, {
           isMimir: true,
           isMultisig: true,
@@ -152,6 +157,11 @@ function CreateFlexible({
           genesisHash: api.genesisHash.toHex(),
           isPending: true
         });
+
+        store.set(
+          DETECTED_ACCOUNT_KEY,
+          Array.from([...(store.get(DETECTED_ACCOUNT_KEY) || []), u8aToHex(decodeAddress(pure))])
+        );
 
         selectAccount(pure);
 
