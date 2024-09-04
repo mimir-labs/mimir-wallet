@@ -29,10 +29,7 @@ function getSelected(hex?: string): string | undefined {
     return keyring.getAccount(hexToU8a(hex))?.address;
   }
 
-  return (
-    keyring.getAccounts().find((item) => item.meta.isValid && item.meta.isMultisig)?.address ||
-    keyring.getAccounts()[0]?.address
-  );
+  return keyring.getAccounts().find((item) => item.meta.isMultisig)?.address || keyring.getAccounts()[0]?.address;
 }
 
 export function SelectAccountCtxRoot({ children }: Props): React.ReactElement<Props> {

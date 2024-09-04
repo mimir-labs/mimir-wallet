@@ -2,10 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { KeyringAddress } from '@polkadot/ui-keyring/types';
+import type { HexString } from '@polkadot/util/types';
 
 import { keyring } from '@polkadot/ui-keyring';
-import { useMemo } from 'react';
+import { u8aToHex } from '@polkadot/util';
+import { decodeAddress } from '@polkadot/util-crypto';
+import { useMemo, useState } from 'react';
+import store from 'store';
 
+import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
 import { AddressMeta, getAccountCryptoType, getAddressMeta } from '@mimir-wallet/utils';
 
 import { createNamedHook } from './createNamedHook';
@@ -32,7 +37,7 @@ function groupAccounts(accounts: KeyringAddress[]): Record<GroupName, string[]> 
     } else if (cryptoType === 'multisig') {
       const meta = getAddressMeta(account.address);
 
-      if (meta.isConfirm && meta.isValid && !meta.isHidden) {
+      if (!meta.isHidden) {
         ret.multisig.push(account.address);
       }
     } else {
@@ -75,16 +80,26 @@ export function useAllAccounts(others?: string[]): string[] {
   );
 }
 
-export function useUnConfirmMultisigs(): string[] {
+export function useUnConfirmMultisigs(): [string[], confirm: (addresses: string[]) => void] {
+  const [detected, setDetected] = useState<HexString[]>(store.get(DETECTED_ACCOUNT_KEY) || []);
   const { allAccounts } = useAccounts();
 
   return useMemo(
-    () =>
+    () => [
       allAccounts.filter((address) => {
         const meta = getAddressMeta(address);
 
-        return meta.isMultisig && meta.isValid && !meta.isHidden && !meta.isConfirm;
+        return meta.isMultisig && !meta.isHidden && !detected.includes(u8aToHex(decodeAddress(address)));
       }),
-    [allAccounts]
+      (addresses) => {
+        const newValue = Array.from(
+          new Set([...detected, ...addresses.map((address) => u8aToHex(decodeAddress(address)))])
+        );
+
+        setDetected(newValue);
+        store.set(DETECTED_ACCOUNT_KEY, newValue);
+      }
+    ],
+    [allAccounts, detected]
   );
 }
