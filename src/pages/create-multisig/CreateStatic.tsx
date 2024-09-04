@@ -4,10 +4,13 @@
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { keyring } from '@polkadot/ui-keyring';
+import { u8aToHex } from '@polkadot/util';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import store from 'store';
 
 import { utm } from '@mimir-wallet/config';
+import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
 import { useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
 import { addressToHex, service } from '@mimir-wallet/utils';
 
@@ -18,11 +21,16 @@ interface Props {
   checkField: () => boolean;
 }
 
-function createMultisig(signatories: string[], threshold: number, name: string): string {
+export function createMultisig(signatories: string[], threshold: number, name: string): string {
   const result = keyring.addMultisig(signatories, threshold, {
     name,
     isMimir: true
   });
+
+  store.set(
+    DETECTED_ACCOUNT_KEY,
+    Array.from([...(store.get(DETECTED_ACCOUNT_KEY) || []), u8aToHex(result.pair.addressRaw)])
+  );
   const { address } = result.pair;
 
   return address;

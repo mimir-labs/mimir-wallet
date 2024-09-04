@@ -32,8 +32,14 @@ function inputToBn(api: ApiPromise, input: string, decimals = api.registry.chain
 }
 
 function bnToInput(api: ApiPromise, bn: BN, decimals = api.registry.chainDecimals[0]): string {
-  const mod = bn.toString().slice(-decimals);
+  let mod = bn.toString().slice(-decimals);
   const div = bn.toString().slice(0, -decimals);
+
+  if (mod.length < decimals) {
+    mod = `${Array.from({ length: decimals - mod.length })
+      .map(() => 0)
+      .join('')}${mod}`;
+  }
 
   if (new BN(mod).eq(BN_ZERO)) {
     return div;

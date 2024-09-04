@@ -86,7 +86,39 @@ function makeNodes(
     });
   }
 
-  if (meta.who) {
+  if (meta.delegators) {
+    const nextX = xPos - xOffset;
+    const childCount = meta.delegators.length;
+
+    const startY = yPos - ((childCount - 1) * yOffset) / 2;
+    let nextY = startY;
+
+    meta.delegators.forEach((_address, index) => {
+      makeNodes(
+        _address,
+        nodeId,
+        nextX,
+        nextY,
+        xOffset,
+        yOffset,
+        (offset: number) => {
+          onYChange?.(offset);
+          nextY += offset;
+        },
+        nodes,
+        edges
+      );
+
+      if (index < childCount - 1) {
+        nextY += yOffset * (getAddressMeta(_address).who?.length || 1);
+      }
+    });
+
+    const oldY = node.position.y;
+
+    node.position.y = (nextY + startY) / 2;
+    onYChange?.(node.position.y - oldY);
+  } else if (meta.who) {
     const nextX = xPos - xOffset;
     const childCount = meta.who.length;
 

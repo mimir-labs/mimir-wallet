@@ -2737,7 +2737,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/api-derive@npm:12.4.2, @polkadot/api-derive@npm:^12.2.1, @polkadot/api-derive@npm:^12.4.2":
+"@polkadot/api-derive@npm:12.4.2, @polkadot/api-derive@npm:^12.4.2":
   version: 12.4.2
   resolution: "@polkadot/api-derive@npm:12.4.2"
   dependencies:
@@ -2780,9 +2780,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/apps-config@npm:^0.142.1":
-  version: 0.142.1
-  resolution: "@polkadot/apps-config@npm:0.142.1"
+"@polkadot/apps-config@npm:^0.143.2":
+  version: 0.143.2
+  resolution: "@polkadot/apps-config@npm:0.143.2"
   dependencies:
     "@acala-network/type-definitions": "npm:5.1.2"
     "@bifrost-finance/type-definitions": "npm:1.11.3"
@@ -2805,12 +2805,12 @@ __metadata:
     "@peaqnetwork/type-definitions": "npm:0.0.4"
     "@pendulum-chain/type-definitions": "npm:0.3.8"
     "@phala/typedefs": "npm:0.2.33"
-    "@polkadot/api": "npm:^12.2.1"
-    "@polkadot/api-derive": "npm:^12.2.1"
+    "@polkadot/api": "npm:^12.4.2"
+    "@polkadot/api-derive": "npm:^12.4.2"
     "@polkadot/networks": "npm:^13.0.2"
-    "@polkadot/react-identicon": "npm:^3.7.1"
-    "@polkadot/types": "npm:^12.2.1"
-    "@polkadot/types-codec": "npm:^12.2.1"
+    "@polkadot/react-identicon": "npm:^3.9.1"
+    "@polkadot/types": "npm:^12.4.2"
+    "@polkadot/types-codec": "npm:^12.4.2"
     "@polkadot/util": "npm:^13.0.2"
     "@polkadot/util-crypto": "npm:^13.0.2"
     "@polkadot/wasm-util": "npm:^7.3.2"
@@ -2830,7 +2830,7 @@ __metadata:
     pontem-types-bundle: "npm:1.0.15"
     rxjs: "npm:^7.8.1"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/985a9fc6bab08d5ef1ff690c375683707b1c95410e82fc6d533093bcb822731f2279fa76974833ba4766e9fff279676b069081d4b0141c801cb5da347edaee12
+  checksum: 10c0/303b1018a403a43fbfc4e06ed8ba8856b01e4eca8b9975731464cbbdbc1ef7c1b213a54a7c39fbd78217a28c7104d80ab338c85ea2f5f6e24e4fd31c012dc1ef
   languageName: node
   linkType: hard
 
@@ -3084,7 +3084,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/react-identicon@npm:^3.7.1, @polkadot/react-identicon@npm:^3.9.1":
+"@polkadot/react-identicon@npm:^3.9.1":
   version: 3.9.1
   resolution: "@polkadot/react-identicon@npm:3.9.1"
   dependencies:
@@ -11367,7 +11367,7 @@ __metadata:
     "@plutonication/plutonication": "npm:^1.1.0"
     "@polkadot/api": "npm:^12.4.2"
     "@polkadot/api-derive": "npm:^12.4.2"
-    "@polkadot/apps-config": "npm:^0.142.1"
+    "@polkadot/apps-config": "npm:^0.143.2"
     "@polkadot/extension-base": "npm:^0.52.3"
     "@polkadot/extension-inject": "npm:^0.52.3"
     "@polkadot/keyring": "npm:^13.0.2"

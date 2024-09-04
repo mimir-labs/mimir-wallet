@@ -40,6 +40,7 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
           creator: keyring.encodeAddress(creator),
           height,
           index,
+          delegators: delegators.map((item) => keyring.encodeAddress(item.address)),
           genesisHash: api.genesisHash.toHex(),
           isPending: false
         };
@@ -51,6 +52,8 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
             exists.meta.isFlexible !== _meta.isFlexible ||
             exists.meta.name !== _meta.name ||
             exists.meta.who?.sort((l, r) => (l > r ? 1 : -1)).join('') !== _meta.who.join('') ||
+            (exists.meta.delegators as string[] | undefined)?.sort((l, r) => (l > r ? 1 : -1)).join('') !==
+              _meta.delegators.join('') ||
             exists.meta.threshold !== _meta.threshold ||
             exists.meta.creator !== _meta.creator ||
             exists.meta.height !== _meta.height ||
