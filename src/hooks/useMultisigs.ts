@@ -17,7 +17,7 @@ import { useApi } from './useApi';
 import { useGroupAccounts } from './useGroupAccounts';
 
 function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Record<HexString, AccountData>) {
-  const { address: addressHex, creator, delegators, height, index, isMimir, isValid, name, networks } = account;
+  const { address: addressHex, creator, delegators, height, index, isMimir, name, networks } = account;
   const address = keyring.encodeAddress(addressHex, api.registry.chainSS58);
 
   if (networks.find((item) => u8aEq(api.genesisHash.toHex(), item))) {
@@ -41,7 +41,6 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
           height,
           index,
           genesisHash: api.genesisHash.toHex(),
-          isValid,
           isPending: false
         };
 
@@ -57,7 +56,6 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
             exists.meta.height !== _meta.height ||
             exists.meta.index !== _meta.index ||
             exists.meta.genesisHash !== _meta.genesisHash ||
-            exists.meta.isValid !== _meta.isValid ||
             exists.meta.isPending !== _meta.isPending
           ) {
             keyring.saveAccountMeta(keyring.getPair(address), _meta);
@@ -73,7 +71,7 @@ function mergeProxy(api: ApiPromise, account: ProxyAccountData, multisigs: Recor
 }
 
 function mergeMulti(api: ApiPromise, account: MultiAccountData) {
-  const { isValid, name, threshold, who } = account;
+  const { name, threshold, who } = account;
 
   const address = encodeMultiAddress(
     who.map(({ address }) => address),
@@ -89,7 +87,6 @@ function mergeMulti(api: ApiPromise, account: MultiAccountData) {
       threshold,
       who: who.map(({ address }) => keyring.encodeAddress(address)).sort((l, r) => (l > r ? 1 : -1)),
       name: name || undefined,
-      isValid,
       isPending: false
     });
     events.emit('account_meta_changed', address);
@@ -99,7 +96,6 @@ function mergeMulti(api: ApiPromise, account: MultiAccountData) {
       threshold,
       who: who.map(({ address }) => keyring.encodeAddress(address)).sort((l, r) => (l > r ? 1 : -1)),
       name: name || undefined,
-      isValid,
       isPending: false
     });
     events.emit('account_meta_changed', address);

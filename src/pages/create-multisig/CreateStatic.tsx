@@ -21,9 +21,7 @@ interface Props {
 function createMultisig(signatories: string[], threshold: number, name: string): string {
   const result = keyring.addMultisig(signatories, threshold, {
     name,
-    isMimir: true,
-    isConfirm: true,
-    isValid: true
+    isMimir: true
   });
   const { address } = result.pair;
 

@@ -14,7 +14,6 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import keyring from '@polkadot/ui-keyring';
 import { useMemo } from 'react';
 
 import IconExternal from '@mimir-wallet/assets/svg/icon-external-app.svg?react';
@@ -55,7 +54,7 @@ function Item({ address, withEdit }: { address: string; withEdit: boolean }) {
   );
 }
 
-function DetectedDialog({ multisigs }: { multisigs: string[] }) {
+function DetectedDialog({ multisigs, confirm }: { multisigs: string[]; confirm: (addresses: string[]) => void }) {
   const [mimirs, externals] = useMemo((): [string[], string[]] => {
     const mimirs: string[] = [];
     const externals: string[] = [];
@@ -102,15 +101,7 @@ function DetectedDialog({ multisigs }: { multisigs: string[] }) {
         <Button
           fullWidth
           onClick={() => {
-            try {
-              for (const address of mimirs.concat(externals)) {
-                const pair = keyring.getPair(address);
-
-                keyring.saveAccountMeta(pair, { isConfirm: true });
-              }
-            } catch {
-              /* empty */
-            }
+            confirm(multisigs);
           }}
         >
           Confirm
@@ -121,13 +112,13 @@ function DetectedDialog({ multisigs }: { multisigs: string[] }) {
 }
 
 function DetectedMultisig() {
-  const multisigs = useUnConfirmMultisigs();
+  const [multisigs, confirm] = useUnConfirmMultisigs();
 
   if (multisigs.length === 0) {
     return null;
   }
 
-  return <DetectedDialog multisigs={multisigs} />;
+  return <DetectedDialog multisigs={multisigs} confirm={confirm} />;
 }
 
 export default DetectedMultisig;

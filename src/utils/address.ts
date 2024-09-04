@@ -11,8 +11,6 @@ import { decodeAddress } from '@polkadot/util-crypto';
 
 export interface AddressMeta extends KeyringJson$Meta {
   isMimir?: boolean;
-  isConfirm?: boolean;
-  isValid?: boolean;
   isFlexible?: boolean;
   creator?: string;
   height?: number;

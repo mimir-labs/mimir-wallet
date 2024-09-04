@@ -143,7 +143,6 @@ function CreateFlexible({
       events.once('inblock', () => {
         keyring.addExternal(pure, {
           isMimir: true,
-          isConfirm: true,
           isMultisig: true,
           isFlexible: true,
           name,
@@ -151,7 +150,6 @@ function CreateFlexible({
           threshold,
           creator: signer,
           genesisHash: api.genesisHash.toHex(),
-          isValid: true,
           isPending: true
         });
 
