@@ -315,6 +315,16 @@ export const solochainEndpoints: Endpoint[] = [
   {
     icon: '/chain-icons/avail.png',
     tokenIcon: '/token-icons/avail.png',
+    name: 'Avail',
+    wsUrl: 'wss://mainnet-rpc.avail.so/ws',
+    genesisHash: '0xb91746b45e0346cc2f815a520b9c6cb4d5c0902af848db0a80f85932d2e8276a',
+    serviceUrl: 'https://avail-api.mimir.global/',
+    socketUrl: 'wss://avail-api.mimir.global/',
+    explorerUrl: 'https://avail.subscan.io/'
+  },
+  {
+    icon: '/chain-icons/avail.png',
+    tokenIcon: '/token-icons/avail.png',
     name: 'Avail Turing',
     wsUrl: 'wss://turing-rpc.avail.so/ws',
     genesisHash: '0xd3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70',
