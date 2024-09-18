@@ -10,6 +10,7 @@ type Endpoint = {
   wsUrl: string;
   icon: string;
   tokenIcon: string;
+  ss58Format?: number;
   genesisHash?: string;
   socketUrl: string;
   serviceUrl: string;
@@ -114,6 +115,7 @@ export const polkadotEndpoints: Endpoint[] = [
     name: 'Bifrost',
     wsUrl: 'wss://hk.p.bifrost-rpc.liebi.com/ws',
     genesisHash: '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
+    ss58Format: 0,
     serviceUrl: 'https://bifrost-polkadot-api.mimir.global/',
     socketUrl: 'wss://bifrost-polkadot-api.mimir.global/',
     explorerUrl: 'https://bifrost.subscan.io/',
@@ -236,6 +238,7 @@ export const kusamaEndpoints: Endpoint[] = [
     name: 'Bifrost Kusama',
     wsUrl: 'wss://bifrost-rpc.liebi.com/ws',
     genesisHash: '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed',
+    ss58Format: 2,
     serviceUrl: 'https://bifrost-kusama-api.mimir.global/',
     socketUrl: 'wss://bifrost-kusama-api.mimir.global/',
     explorerUrl: 'https://bifrost.subscan.io/',

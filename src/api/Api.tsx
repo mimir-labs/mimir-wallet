@@ -12,7 +12,7 @@ import { formatBalance, isTestChain, objectSpread, stringify } from '@polkadot/u
 import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { typesBundle } from '@mimir-wallet/config';
+import { allEndpoints, typesBundle } from '@mimir-wallet/config';
 
 import { registry } from './typeRegistry';
 
@@ -74,7 +74,8 @@ async function retrieve(api: ApiPromise): Promise<ChainData> {
 async function loadOnReady(api: ApiPromise, store: KeyringStore | undefined): Promise<ApiState> {
   const { properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api);
   const chainSS58 = properties.ss58Format.unwrapOr(DEFAULT_SS58).toNumber();
-  const ss58Format = chainSS58;
+  const chain = allEndpoints.find((item) => item.genesisHash === api.genesisHash.toHex());
+  const ss58Format = chain?.ss58Format !== undefined ? chain.ss58Format : chainSS58;
   const tokenSymbol = properties.tokenSymbol.unwrapOr([formatBalance.getDefaults().unit, ...DEFAULT_AUX]);
   const tokenDecimals = properties.tokenDecimals.unwrapOr([DEFAULT_DECIMALS]);
   const isDevelopment = systemChainType.isDevelopment || systemChainType.isLocal || isTestChain(systemChain);
