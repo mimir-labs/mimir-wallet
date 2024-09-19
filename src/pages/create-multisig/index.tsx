@@ -25,7 +25,7 @@ import { useNavigate } from 'react-router-dom';
 
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { AddAddressDialog, Address, AddressRow, Input } from '@mimir-wallet/components';
-import { useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
+import { useApi, useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
 import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
 
 import AccountSelect from './AccountSelect';
@@ -50,6 +50,7 @@ function checkError(
 
 function PageCreateMultisig() {
   const navigate = useNavigate();
+  const { systemChain } = useApi();
   const [name, setName] = useState<string>('');
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({
     address: '',
@@ -182,12 +183,12 @@ function PageCreateMultisig() {
                 <AlertTitle>Notice</AlertTitle>
                 {flexible ? (
                   <ul>
-                    <li>You are trying to create a flexible multisig on Polkadot.</li>
+                    <li>You are trying to create a flexible multisig on {systemChain}.</li>
                     <li>Initiating a transaction is required.</li>
                   </ul>
                 ) : (
                   <ul>
-                    <li>This multisig could be used on Polkadot, Kusama and all their parachains.</li>
+                    <li>This multisig could be used on {systemChain}, Kusama and all their parachains.</li>
                     <li>Once created, the multisig members and threshold cannot be modified.</li>
                   </ul>
                 )}
