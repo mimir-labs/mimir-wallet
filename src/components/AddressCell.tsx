@@ -3,12 +3,11 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
+import { alpha, Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
-import { useAddressMeta, useToggle } from '@mimir-wallet/hooks';
-import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
+import { useAccount, useAddressMeta, useToggle } from '@mimir-wallet/hooks';
 
 import AddAddressDialog from './AddAddressDialog';
 import AddressComp from './Address';
@@ -55,7 +54,8 @@ function AddressCell({
   const [open, toggleOpen] = useToggle();
 
   const address = value?.toString();
-  const { meta: { isFlexible, isMultisig, isTesting } = {} } = useAddressMeta(address);
+  const { meta: { isMultisig, isProxied } = {} } = useAddressMeta(address);
+  const { isLocalAccount, isLocalAddress } = useAccount();
 
   return (
     <>
@@ -73,16 +73,19 @@ function AddressCell({
               <AddressName value={value} />
             </Typography>
             {namePost}
-            {showType &&
-              (isMultisig ? (
-                <Chip
-                  color='secondary'
-                  label={isFlexible ? 'Flexible' : 'Static'}
-                  size={size === 'large' ? 'medium' : 'small'}
-                />
-              ) : isTesting ? (
-                <Chip color='secondary' label='Dev' size={size === 'large' ? 'medium' : 'small'} />
-              ) : null)}
+            {showType && (
+              <>
+                {isMultisig && <Chip color='secondary' label='Multisig' size={size === 'large' ? 'medium' : 'small'} />}
+                {isProxied && (
+                  <Chip
+                    color='default'
+                    sx={{ bgcolor: alpha('#B700FF', 0.05), color: '#B700FF' }}
+                    label='Proxied'
+                    size={size === 'large' ? 'medium' : 'small'}
+                  />
+                )}
+              </>
+            )}
           </Box>
           <Typography
             color='text.secondary'
@@ -91,9 +94,9 @@ function AddressCell({
             sx={{ height: 18, display: 'flex', alignItems: 'center' }}
           >
             <AddressComp shorten={shorten} value={address} />
-            {withCopy && <CopyButton value={address} />}
+            {withCopy && <CopyButton size='small' sx={{ fontSize: 'inherit' }} value={address} />}
             {icons}
-            {!isLocalAccount(value) && !isLocalAddress(value) && (
+            {address && !isLocalAccount(address) && !isLocalAddress(address) && (
               <IconButton
                 color='inherit'
                 onClick={(e) => {

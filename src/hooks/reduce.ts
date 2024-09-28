@@ -15,7 +15,7 @@ import { createKeyMulti } from '@polkadot/util-crypto';
 
 import { addressToHex } from '@mimir-wallet/utils';
 
-import { CalldataStatus } from './types';
+import { TransactionStatus } from './types';
 
 type ProxyExecutedEvent = Event &
   IEvent<
@@ -59,7 +59,7 @@ type ReduceArgs = [
   sender: HexString,
   isStart: boolean,
   isEnd: boolean,
-  status: CalldataStatus,
+  status: TransactionStatus,
   blockHeight: number | null,
   extrinsicIndex: number | null,
   index: number
@@ -74,7 +74,7 @@ async function _asMultiStatus(
   blockHeight: number,
   sender: HexString,
   callHash: HexString
-): Promise<[status: CalldataStatus, blockHeight: number | null, extrinsicIndex: number | null]> {
+): Promise<[status: TransactionStatus, blockHeight: number | null, extrinsicIndex: number | null]> {
   const eventExcuted = events.find(
     (event): event is MultiExecutedEvent =>
       api.events.multisig.MultisigExecuted.is(event) && u8aEq(event.data.callHash, callHash)
@@ -88,25 +88,25 @@ async function _asMultiStatus(
       api.events.multisig.NewMultisig.is(event) && u8aEq(event.data.callHash, callHash)
   );
 
-  let status: CalldataStatus = CalldataStatus.Initialized;
+  let status: TransactionStatus = TransactionStatus.Initialized;
 
   if (eventExcuted) {
-    status = eventExcuted.data.result.isOk ? CalldataStatus.Success : CalldataStatus.Failed;
+    status = eventExcuted.data.result.isOk ? TransactionStatus.Success : TransactionStatus.Failed;
     blockHeight = eventExcuted.data.timepoint.height.toNumber();
     extrinsicIndex = eventExcuted.data.timepoint.index.toNumber();
   } else if (eventApproval) {
-    status = CalldataStatus.Pending;
+    status = TransactionStatus.Pending;
     blockHeight = eventApproval.data.timepoint.height.toNumber();
     extrinsicIndex = eventApproval.data.timepoint.index.toNumber();
   } else if (eventNew) {
-    status = CalldataStatus.Pending;
+    status = TransactionStatus.Pending;
   }
 
-  if (status === CalldataStatus.Initialized) {
+  if (status === TransactionStatus.Initialized) {
     const info = (await apiAt.query.multisig.multisigs(sender, callHash)) as Option<Multisig>;
 
     if (info.isSome) {
-      status = CalldataStatus.Pending;
+      status = TransactionStatus.Pending;
       blockHeight = info.unwrap().when.height.toNumber();
       extrinsicIndex = info.unwrap().when.index.toNumber();
     }
@@ -120,13 +120,13 @@ function _proxyStatus(
   events: ProxyExecutedEvent[],
   extrinsicIndex: number | null,
   blockHeight: number
-): [status: CalldataStatus, blockHeight: number | null, extrinsicIndex: number | null] {
+): [status: TransactionStatus, blockHeight: number | null, extrinsicIndex: number | null] {
   const event = events.pop(); // get the last ProxyExecutedEvent
 
-  let status: CalldataStatus = CalldataStatus.Initialized;
+  let status: TransactionStatus = TransactionStatus.Initialized;
 
   if (event) {
-    status = event.data.result.isOk ? CalldataStatus.Success : CalldataStatus.Failed;
+    status = event.data.result.isOk ? TransactionStatus.Success : TransactionStatus.Failed;
   }
 
   return [status, blockHeight, extrinsicIndex];
@@ -158,7 +158,7 @@ export async function reduceCalldata(
   // save the callHash => status
   const callStatus: Map<
     HexString,
-    [status: CalldataStatus, blockHeight: number | null, extrinsicIndex: number | null]
+    [status: TransactionStatus, blockHeight: number | null, extrinsicIndex: number | null]
   > = new Map();
 
   const proxyExecutedEvents = events.filter((event): event is ProxyExecutedEvent =>
@@ -237,9 +237,9 @@ export async function reduceCalldata(
       isEnd,
       index === 0
         ? extrinsicSuccess
-          ? CalldataStatus.Success
-          : CalldataStatus.Failed
-        : (callStatus.get(call.hash.toHex())?.[0] ?? CalldataStatus.Pending),
+          ? TransactionStatus.Success
+          : TransactionStatus.Failed
+        : (callStatus.get(call.hash.toHex())?.[0] ?? TransactionStatus.Pending),
       index === 0 ? blockHeight : (callStatus.get(call.hash.toHex())?.[1] ?? null),
       index === 0 ? extrinsicIndex : (callStatus.get(call.hash.toHex())?.[2] ?? null),
       index

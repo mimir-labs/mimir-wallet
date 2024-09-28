@@ -5,8 +5,6 @@ import type { ApiPromise } from '@polkadot/api';
 import type { Call } from '@polkadot/types/interfaces';
 import type { Codec, IMethod, Registry, TypeDef } from '@polkadot/types/types';
 
-export type ParamType = 'base' | 'tx';
-
 export interface ParamDef {
   name: string;
   type: TypeDef;
@@ -21,12 +19,11 @@ export interface ParamsProps {
   params: ParamDef[];
   values: RawParam[];
   registry: Registry;
-  type?: ParamType;
 }
 
-export interface CallProps extends Record<string, any> {
+export interface CallProps {
+  from: string;
   call: Call | IMethod;
   api: ApiPromise;
-  type?: ParamType;
   jsonFallback?: boolean;
 }

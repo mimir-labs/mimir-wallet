@@ -2,24 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
-import type { KeyringStore } from '@polkadot/ui-keyring/types';
 import type { ApiProps, ApiState } from './types';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
-import { keyring } from '@polkadot/ui-keyring';
 import { formatBalance, isTestChain, objectSpread, stringify } from '@polkadot/util';
+import { decodeAddress as decodeAddressBase, encodeAddress as encodeAddressBase } from '@polkadot/util-crypto';
 import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { allEndpoints, typesBundle } from '@mimir-wallet/config';
+import { currentChain, Endpoint, typesBundle } from '@mimir-wallet/config';
+import { service } from '@mimir-wallet/utils';
 
 import { registry } from './typeRegistry';
 
 interface Props {
   children: React.ReactNode;
-  apiUrl: string;
-  store: KeyringStore | undefined;
+  chain: Endpoint;
 }
 
 interface ChainData {
@@ -34,6 +33,14 @@ export const DEFAULT_DECIMALS = registry.createType('u32', 12);
 export const DEFAULT_SS58 = registry.createType('u32', addressDefaults.prefix);
 export const DEFAULT_AUX = ['Aux1', 'Aux2', 'Aux3', 'Aux4', 'Aux5', 'Aux6', 'Aux7', 'Aux8', 'Aux9'];
 
+export function encodeAddress(key: string | Uint8Array, ss58Format = currentChain.ss58Format) {
+  return encodeAddressBase(key, ss58Format);
+}
+
+export function decodeAddress(address: string) {
+  return decodeAddressBase(address);
+}
+
 export const ApiCtx = React.createContext<ApiProps>({} as unknown as ApiProps);
 
 const EMPTY_STATE = { hasInjectedAccounts: false, isApiReady: false } as unknown as ApiState;
@@ -41,14 +48,6 @@ const EMPTY_STATE = { hasInjectedAccounts: false, isApiReady: false } as unknown
 let api: ApiPromise;
 
 export { api, registry };
-
-function isKeyringLoaded() {
-  try {
-    return !!keyring.keyring;
-  } catch {
-    return false;
-  }
-}
 
 async function retrieve(api: ApiPromise): Promise<ChainData> {
   const [systemChain, systemChainType, systemName, systemVersion] = await Promise.all([
@@ -71,11 +70,9 @@ async function retrieve(api: ApiPromise): Promise<ChainData> {
   };
 }
 
-async function loadOnReady(api: ApiPromise, store: KeyringStore | undefined): Promise<ApiState> {
+async function loadOnReady(api: ApiPromise, chain: Endpoint): Promise<ApiState> {
   const { properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api);
-  const chainSS58 = properties.ss58Format.unwrapOr(DEFAULT_SS58).toNumber();
-  const chain = allEndpoints.find((item) => item.genesisHash === api.genesisHash.toHex());
-  const ss58Format = chain?.ss58Format !== undefined ? chain.ss58Format : chainSS58;
+  const ss58Format = chain.ss58Format;
   const tokenSymbol = properties.tokenSymbol.unwrapOr([formatBalance.getDefaults().unit, ...DEFAULT_AUX]);
   const tokenDecimals = properties.tokenDecimals.unwrapOr([DEFAULT_DECIMALS]);
   const isDevelopment = systemChainType.isDevelopment || systemChainType.isLocal || isTestChain(systemChain);
@@ -100,20 +97,10 @@ async function loadOnReady(api: ApiPromise, store: KeyringStore | undefined): Pr
 
   console.log(api.genesisHash.toHex());
 
-  // finally load the keyring
-  isKeyringLoaded() ||
-    keyring.loadAll({
-      genesisHash: api.genesisHash,
-      isDevelopment,
-      ss58Format,
-      store,
-      type: 'ed25519'
-    });
-
   return {
     apiDefaultTx,
     apiDefaultTxSudo,
-    chainSS58,
+    chainSS58: ss58Format,
     isApiReady: true,
     isDevelopment,
     specName: api.runtimeVersion.specName.toString(),
@@ -121,14 +108,17 @@ async function loadOnReady(api: ApiPromise, store: KeyringStore | undefined): Pr
     systemChain,
     systemName,
     systemVersion,
-    tokenSymbol: tokenSymbol[0].toString()
+    tokenSymbol: tokenSymbol[0].toString(),
+    genesisHash: api.genesisHash.toHex()
   };
 }
 
 /**
  * @internal
  */
-function createApi(apiUrl: string, onError: (error: unknown) => void): void {
+async function createApi(apiUrl: string, onError: (error: unknown) => void): Promise<void> {
+  const metadata = await service.getMetadata();
+
   try {
     const provider = new WsProvider(apiUrl);
 
@@ -140,21 +130,32 @@ function createApi(apiUrl: string, onError: (error: unknown) => void): void {
         Crust: {
           DispatchErrorModule: 'DispatchErrorModuleU8'
         }
-      }
+      },
+      metadata
     });
   } catch (error) {
     onError(error);
   }
 }
 
-export function ApiCtxRoot({ apiUrl, children, store }: Props): React.ReactElement<Props> | null {
+export function ApiCtxRoot({ chain, children }: Props): React.ReactElement<Props> | null {
   const [state, setState] = useState<ApiState>(EMPTY_STATE);
   const [isApiConnected, setIsApiConnected] = useState(false);
-  const [isApiInitialized, setIsApiInitialized] = useState(false);
+  const [isApiInitialized, setIsApiInitialized] = useState<boolean>();
   const [apiError, setApiError] = useState<null | string>(null);
   const value = useMemo<ApiProps>(
-    () => objectSpread({}, state, { api, apiError, apiUrl, isApiConnected, isApiInitialized }),
-    [apiError, isApiConnected, isApiInitialized, state, apiUrl]
+    () =>
+      objectSpread({}, state, {
+        api,
+        apiError,
+        wsUrl: chain.wsUrl,
+        isApiConnected,
+        isApiInitialized: !!isApiInitialized,
+        network: chain.key,
+        genesisHash: chain.genesisHash,
+        chain
+      }),
+    [state, apiError, chain, isApiConnected, isApiInitialized]
   );
 
   // initial initialization
@@ -165,16 +166,18 @@ export function ApiCtxRoot({ apiUrl, children, store }: Props): React.ReactEleme
       setApiError((error as Error).message);
     };
 
-    createApi(apiUrl, onError);
-    api.on('connected', () => setIsApiConnected(true));
-    api.on('disconnected', () => setIsApiConnected(false));
-    api.on('error', onError);
-    api.on('ready', (): void => {
-      loadOnReady(api, store).then(setState).catch(onError);
+    createApi(chain.wsUrl, onError).then(() => {
+      api.on('connected', () => setIsApiConnected(true));
+      api.on('disconnected', () => setIsApiConnected(false));
+      api.on('error', onError);
+      api.on('ready', (): void => {
+        loadOnReady(api, chain).then(setState).catch(onError);
+      });
+      setIsApiInitialized(true);
     });
 
-    setIsApiInitialized(true);
-  }, [apiUrl, store]);
+    setIsApiInitialized(false);
+  }, [chain]);
 
   if (!value.isApiInitialized) {
     return null;

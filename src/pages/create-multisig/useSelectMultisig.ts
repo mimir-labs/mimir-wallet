@@ -3,8 +3,7 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { useAddresses, useAllAccounts } from '@mimir-wallet/hooks';
-import { getAddressMeta, isLocalAccount } from '@mimir-wallet/utils';
+import { useAccount, useAllAccounts, useWallet } from '@mimir-wallet/hooks';
 
 interface UseSelectMultisig {
   unselected: string[];
@@ -18,16 +17,20 @@ interface UseSelectMultisig {
 }
 
 export function useSelectMultisig(defaultSignatories?: string[], defaultThreshold?: number): UseSelectMultisig {
-  const { allAddresses } = useAddresses();
-  const all = useAllAccounts(allAddresses);
+  const { accountSource } = useWallet();
+  const { addresses: allAddresses } = useAccount();
+  const all = useAllAccounts(allAddresses.map((item) => item.address));
   const [signatories, setSignatories] = useState<string[]>(defaultSignatories || []);
   const [threshold, setThreshold] = useState<number>(defaultThreshold || 2);
 
-  const unselected = useMemo(() => all.filter((account) => !signatories.includes(account)), [all, signatories]);
+  const unselected = useMemo(
+    () => Array.from(new Set(all.filter((account) => !signatories.includes(account)))),
+    [all, signatories]
+  );
 
   const hasSoloAccount = useMemo(
-    () => !!signatories.find((address) => isLocalAccount(address) && !getAddressMeta(address).isMultisig),
-    [signatories]
+    () => !!signatories.find((address) => !!accountSource(address)),
+    [accountSource, signatories]
   );
   const isThresholdValid = Number(threshold) >= 2 && Number(threshold) <= signatories.length;
 

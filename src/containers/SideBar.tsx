@@ -37,7 +37,7 @@ import {
   WalletIcon
 } from '@mimir-wallet/components';
 import { findToken, walletConfig } from '@mimir-wallet/config';
-import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, WalletCtx } from '@mimir-wallet/hooks';
+import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, useWallet } from '@mimir-wallet/hooks';
 import { chainLinks } from '@mimir-wallet/utils';
 
 import { BaseContainerCtx } from './BaseContainer';
@@ -92,16 +92,16 @@ function NavLink({
   );
 }
 
-function SideBar({ fixed }: { fixed: boolean }) {
+function SideBar({ offsetTop = 0 }: { offsetTop?: number }) {
   const { api } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [qrOpen, toggleQrOpen] = useToggle();
   const { injected } = useGroupAccounts();
-  const { connectedWallets, openWallet } = useContext(WalletCtx);
+  const { connectedWallets, openWallet } = useWallet();
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [selected]);
-  const { alertOpen, closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
 
@@ -113,110 +113,134 @@ function SideBar({ fixed }: { fixed: boolean }) {
     setAnchorEl(null);
   };
 
-  return (
+  const element = (
     <>
-      <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
-      <Drawer
-        PaperProps={{
-          sx: {
-            width: downMd ? 280 : 222,
-            top: downMd ? 0 : alertOpen ? 80 : 56,
-            paddingX: 1.5,
-            paddingY: 2,
-            borderTopRightRadius: { md: 0, xs: 20 },
-            borderBottomRightRadius: { md: 0, xs: 20 }
-          }
+      <Box
+        sx={{
+          display: { md: 'none', xs: 'flex' },
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 2
         }}
-        anchor='left'
-        onClose={closeSidebar}
-        open={sidebarOpen}
-        variant={downMd ? 'temporary' : fixed ? 'permanent' : 'temporary'}
       >
-        <Box
-          sx={{
-            display: { md: 'none', xs: 'flex' },
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 2
-          }}
-        >
-          <Typography variant='h3'>Menu</Typography>
-        </Box>
-        {injected.length > 0 ? (
-          <Paper sx={{ padding: 1 }} variant='outlined'>
-            <Stack
-              alignItems='center'
-              direction='row'
-              onClick={handleAccountOpen}
-              spacing={1}
-              sx={{ cursor: 'pointer', width: '100%' }}
-            >
-              <AddressCell size='small' value={selected} />
-              <SvgIcon color='primary' component={ArrowRight} inheritViewBox />
-            </Stack>
-            <Divider sx={{ marginY: 1 }} />
-            <Stack alignItems='center' direction='row' spacing={0.5}>
-              <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
-              <Typography color='text.secondary' fontSize={12}>
-                <FormatBalance value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
-              </Typography>
-            </Stack>
-            <Divider sx={{ marginY: 1 }} />
-            <IconButton color='primary' onClick={toggleQrOpen} size='small'>
-              <SvgIcon component={IconQr} inheritViewBox />
-            </IconButton>
-            <CopyButton color='primary' value={selected} />
-            <IconButton
-              color='primary'
-              component='a'
-              href={chainLinks.accountExplorerLink(selected)}
-              size='small'
-              target='_blank'
-            >
-              <SvgIcon component={IconLink} inheritViewBox />
-            </IconButton>
-            <IconButton color='primary' component={Link} size='small' to={`/transfer?from=${selected}`}>
-              <SvgIcon component={IconTransfer} inheritViewBox />
-            </IconButton>
-          </Paper>
-        ) : (
-          <Button
-            onClick={() => {
-              openWallet();
-              closeSidebar();
-            }}
-            size='large'
-            sx={{ borderRadius: 1 }}
+        <Typography variant='h3'>Menu</Typography>
+      </Box>
+      {injected.length > 0 ? (
+        <Paper sx={{ padding: 1 }} variant='outlined'>
+          <Stack
+            alignItems='center'
+            direction='row'
+            onClick={handleAccountOpen}
+            spacing={1}
+            sx={{ cursor: 'pointer', width: '100%' }}
           >
-            Connect Wallet
-          </Button>
-        )}
-        <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
-        <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
-        <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
-        <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
-        <AccountMenu onClose={handleAccountClose} open={!!anchorEl} />
-        <Box
+            <AddressCell size='small' value={selected} />
+            <SvgIcon color='primary' component={ArrowRight} inheritViewBox />
+          </Stack>
+          <Divider sx={{ marginY: 1 }} />
+          <Stack alignItems='center' direction='row' spacing={0.5}>
+            <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
+            <Typography color='text.secondary' fontSize={12}>
+              <FormatBalance value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
+            </Typography>
+          </Stack>
+          <Divider sx={{ marginY: 1 }} />
+          <IconButton color='primary' onClick={toggleQrOpen} size='small'>
+            <SvgIcon component={IconQr} inheritViewBox />
+          </IconButton>
+          <CopyButton color='primary' value={selected} />
+          <IconButton
+            color='primary'
+            component='a'
+            href={chainLinks.accountExplorerLink(selected)}
+            size='small'
+            target='_blank'
+          >
+            <SvgIcon component={IconLink} inheritViewBox />
+          </IconButton>
+          <IconButton color='primary' component={Link} size='small' to={`/transfer?from=${selected}`}>
+            <SvgIcon component={IconTransfer} inheritViewBox />
+          </IconButton>
+        </Paper>
+      ) : (
+        <Button
           onClick={() => {
             openWallet();
             closeSidebar();
           }}
+          size='large'
+          sx={{ borderRadius: 1 }}
+        >
+          Connect Wallet
+        </Button>
+      )}
+      <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
+      <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
+      <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
+      <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
+      <AccountMenu onClose={handleAccountClose} open={!!anchorEl} />
+      <Box
+        onClick={() => {
+          openWallet();
+          closeSidebar();
+        }}
+        sx={{
+          cursor: 'pointer',
+          position: 'absolute',
+          left: 0,
+          bottom: { md: 0, xs: 0 },
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          padding: 2
+        }}
+      >
+        {Object.entries(walletConfig).map(([id]) => (
+          <WalletIcon disabled={!connectedWallets.includes(id)} id={id} key={id} sx={{ width: 20, height: 20 }} />
+        ))}
+      </Box>
+    </>
+  );
+
+  return (
+    <>
+      <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
+      {downMd ? (
+        <Drawer
+          PaperProps={{
+            sx: {
+              width: 280,
+              paddingX: 1.5,
+              paddingY: 2,
+              borderTopRightRadius: { md: 0, xs: 20 },
+              borderBottomRightRadius: { md: 0, xs: 20 }
+            }
+          }}
+          anchor='left'
+          onClose={closeSidebar}
+          open={sidebarOpen}
+          variant='temporary'
+        >
+          {element}
+        </Drawer>
+      ) : (
+        <Box
           sx={{
-            cursor: 'pointer',
-            position: 'absolute',
-            left: 0,
-            bottom: { md: 60, xs: 0 },
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            padding: 2
+            position: 'sticky',
+            top: offsetTop + 56,
+            flex: 'none',
+            width: 222,
+            height: `calc(100dvh - ${offsetTop}px - 1px - 56px)`,
+            paddingX: 1.5,
+            paddingY: 2,
+            borderTopRightRadius: { md: 0, xs: 20 },
+            borderBottomRightRadius: { md: 0, xs: 20 },
+            bgcolor: 'background.paper'
           }}
         >
-          {Object.entries(walletConfig).map(([id]) => (
-            <WalletIcon disabled={!connectedWallets.includes(id)} id={id} key={id} sx={{ width: 20, height: 20 }} />
-          ))}
+          {element}
         </Box>
-      </Drawer>
+      )}
     </>
   );
 }

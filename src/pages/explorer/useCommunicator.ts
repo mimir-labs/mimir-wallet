@@ -4,11 +4,12 @@
 import type { SignerPayloadJSON } from '@polkadot/types/types';
 import type { State } from '@mimir-wallet/communicator/types';
 
-import keyring from '@polkadot/ui-keyring';
 import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import { IframeCommunicator } from '@mimir-wallet/communicator';
 import { useApi, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
+import { getAddressMeta } from '@mimir-wallet/providers';
 
 export function useCommunicator(
   iframeRef: MutableRefObject<HTMLIFrameElement | null>,
@@ -33,8 +34,8 @@ export function useCommunicator(
 
       return new Promise((resolve, reject) => {
         addQueue({
-          extrinsic: api.tx[call.section][call.method](...call.args),
-          accountId: keyring.encodeAddress(payload.address),
+          call: api.tx[call.section][call.method](...call.args),
+          accountId: encodeAddress(payload.address),
           onlySign: true,
           website: website.origin,
           onSignature: (signer, signature, tx, payload) => {
@@ -48,14 +49,13 @@ export function useCommunicator(
     getAccounts: () => {
       if (!selected) return [];
 
-      const meta = keyring.getAccount(selected)?.meta;
+      const meta = getAddressMeta(selected);
 
       return [
         {
           address: selected,
-          genesisHash: meta?.genesisHash,
           name: meta?.name,
-          type: meta?.type || 'ed25519' // for polkadot-api
+          type: (meta?.cryptoType || 'ed25519') as 'ed25519' // for polkadot-api
         }
       ];
     }

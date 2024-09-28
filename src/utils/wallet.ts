@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Injected } from '@polkadot/extension-inject/types';
-import keyring from '@polkadot/ui-keyring';
 
-import { keyringStore } from '@mimir-wallet/instance';
+import { encodeAddress } from '@mimir-wallet/api';
 
 import { sleep } from './common';
 
@@ -33,14 +32,8 @@ export async function loadWallet(
     const injected = await enable(origin);
     const accounts = await injected.accounts.get(true);
 
-    accounts.forEach(({ address, name, type }, whenCreated) => {
-      const json = {
-        address,
-        meta: { isInjected: true, name, whenCreated, source }
-      };
-      const pair = keyring.keyring.addFromAddress(address, json.meta, null, type);
-
-      keyring.accounts.add(keyringStore, pair.address, json, pair.type);
+    return accounts.map(({ address, name, type }) => {
+      return { address: encodeAddress(address), name, type, source };
     });
   } catch (error) {
     console.error(error);

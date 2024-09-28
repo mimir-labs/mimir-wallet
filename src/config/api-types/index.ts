@@ -3,7 +3,7 @@
 
 import type { OverrideBundleType, RegistryTypes } from '@polkadot/types/types';
 
-import { typesBundle as typesBundleJs } from '@polkadot/apps-config/api';
+import { typesBundle as typesBundleJs } from '@polkadot/apps-config/api/typesBundle';
 
 import avail from './avail.json';
 

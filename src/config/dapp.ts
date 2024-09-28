@@ -5,9 +5,9 @@ import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 
 import { isArray } from '@polkadot/util';
-import store from 'store';
 
 import { FAVORITE_DAPP_KEY } from '@mimir-wallet/constants';
+import { store } from '@mimir-wallet/utils';
 
 export interface DappOption {
   // (1 - 999) is internal app
@@ -149,7 +149,7 @@ export const dapps: DappOption[] = [
     name: 'Avail Staking',
     description:
       'Avail Staking Dashboard is the easiest way to stake AVAIL, check validator stats, manage your nominations and join nomination pools. Stake on Avail (AVAIL).',
-    url: 'https://crustfiles.io/',
+    url: 'https://staking.avail.tools/#/overview',
     supportedChains: [
       '0xb91746b45e0346cc2f815a520b9c6cb4d5c0902af848db0a80f85932d2e8276a',
       '0xd3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70'

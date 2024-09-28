@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AccountData } from '@mimir-wallet/hooks/types';
+
 import {
   Box,
   Button,
@@ -20,7 +22,6 @@ import IconExternal from '@mimir-wallet/assets/svg/icon-external-app.svg?react';
 import Logo from '@mimir-wallet/assets/svg/logo-circle.svg?react';
 import { Address, AddressRow, BalanceFree } from '@mimir-wallet/components';
 import { useUnConfirmMultisigs } from '@mimir-wallet/hooks';
-import { getAddressMeta } from '@mimir-wallet/utils';
 
 function Item({ address, withEdit }: { address: string; withEdit: boolean }) {
   const { breakpoints } = useTheme();
@@ -54,18 +55,16 @@ function Item({ address, withEdit }: { address: string; withEdit: boolean }) {
   );
 }
 
-function DetectedDialog({ multisigs, confirm }: { multisigs: string[]; confirm: (addresses: string[]) => void }) {
+function DetectedDialog({ multisigs, confirm }: { multisigs: AccountData[]; confirm: (addresses: string[]) => void }) {
   const [mimirs, externals] = useMemo((): [string[], string[]] => {
     const mimirs: string[] = [];
     const externals: string[] = [];
 
-    multisigs.forEach((address) => {
-      const meta = getAddressMeta(address);
-
-      if (meta.isMimir) {
-        mimirs.push(address);
+    multisigs.forEach((account) => {
+      if (account.isMimir) {
+        mimirs.push(account.address);
       } else {
-        externals.push(address);
+        externals.push(account.address);
       }
     });
 
@@ -101,7 +100,7 @@ function DetectedDialog({ multisigs, confirm }: { multisigs: string[]; confirm: 
         <Button
           fullWidth
           onClick={() => {
-            confirm(multisigs);
+            confirm(multisigs.map((item) => item.address));
           }}
         >
           Confirm

@@ -3,29 +3,15 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { IMethod } from '@polkadot/types/types';
-import type { Transaction } from '@mimir-wallet/hooks/types';
 
 import { Box, Typography } from '@mui/material';
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { FormatBalance } from '@mimir-wallet/components';
 import { findAssets, findToken } from '@mimir-wallet/config';
-import { useSelectedAccountCallback } from '@mimir-wallet/hooks';
 
-function ActionDisplay({
-  api,
-  call,
-  isSub,
-  tx
-}: {
-  isSub?: boolean;
-  api: ApiPromise;
-  call: IMethod | null;
-  tx: Transaction;
-}) {
+function ActionDisplay({ api, call }: { api: ApiPromise; call?: IMethod | null }) {
   let comp: React.ReactNode;
-  const selectAccount = useSelectedAccountCallback();
 
   if (!call) {
     return 'unknown';
@@ -46,26 +32,6 @@ function ActionDisplay({
         </Typography>
       </>
     );
-  } else if (api.tx.multisig.cancelAsMulti.is(call)) {
-    comp = isSub ? (
-      <Typography
-        color='primary.main'
-        component={Link}
-        onClick={() => tx && selectAccount(tx.sender)}
-        to='/transactions'
-      >
-        No. {tx.uuid.slice(0, 8).toUpperCase()}
-      </Typography>
-    ) : (
-      <Typography
-        color='primary.main'
-        component={Link}
-        onClick={() => tx.cancelTx?.top && selectAccount(tx.cancelTx?.top.sender)}
-        to='/transactions'
-      >
-        No. {tx.cancelTx?.top?.uuid.slice(0, 8).toUpperCase()}
-      </Typography>
-    );
   } else if (api.tx.assets && (api.tx.assets.transfer?.is(call) || api.tx.assets.transferKeepAlive?.is(call))) {
     const asset = findAssets(api.genesisHash.toHex()).find((asset) => asset.assetId === call.args[0].toString());
 
@@ -84,4 +50,4 @@ function ActionDisplay({
   return comp;
 }
 
-export default React.memo(ActionDisplay);
+export default React.memo<typeof ActionDisplay>(ActionDisplay);

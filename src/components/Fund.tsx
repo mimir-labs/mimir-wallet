@@ -35,18 +35,12 @@ function Content({
 }) {
   const { api } = useApi();
   const balances = useCall<DeriveBalancesAll>(api.derive.balances.all, [sending]);
-  const { accounts, injected, testing } = useGroupAccounts();
+  const { injected } = useGroupAccounts();
 
   return (
     <DialogContent>
       <Stack spacing={2}>
-        <InputAddress
-          filtered={[...injected, ...testing, ...accounts]}
-          isSign
-          label='Sending From'
-          onChange={setSending}
-          value={sending}
-        />
+        <InputAddress filtered={injected} isSign label='Sending From' onChange={setSending} value={sending} />
         <Stack spacing={1}>
           <Typography fontWeight={700}>To</Typography>
           <Box bgcolor='secondary.main' borderRadius={1} padding={1}>
@@ -75,10 +69,11 @@ function Action({
   const handleClick = useCallback(() => {
     if (receipt && sending && value) {
       addQueue({
-        extrinsic: api.tx.balances.transferKeepAlive(receipt, value),
+        call: api.tx.balances.transferKeepAlive(receipt, value),
         accountId: sending,
         onResults: () => onClose()
       });
+      onClose();
     }
   }, [addQueue, api.tx.balances, onClose, receipt, sending, value]);
 

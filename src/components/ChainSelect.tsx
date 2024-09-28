@@ -3,13 +3,13 @@
 
 import { Box, Button, CircularProgress, Divider, Menu, MenuItem, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
-import store from 'store';
 
 import { API_URL_KEY, findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks';
+import { store } from '@mimir-wallet/utils';
 
 function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
-  const { api, isApiConnected, isApiReady } = useApi();
+  const { genesisHash, isApiConnected, isApiReady } = useApi();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -21,7 +21,7 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
     setAnchorEl(null);
   };
 
-  const endpoint = useMemo(() => (isApiReady ? findEndpoint(api.genesisHash.toHex()) : undefined), [api, isApiReady]);
+  const endpoint = useMemo(() => findEndpoint(genesisHash), [genesisHash]);
   const groupEndpoints = useMemo(() => groupedEndpoints(), []);
 
   return (

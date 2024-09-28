@@ -43,10 +43,9 @@ function ToggleAlert({ setAlertOpen }: { setAlertOpen: (state: boolean) => void 
         onClick={toggleOpen}
         sx={{
           cursor: 'pointer',
-          position: 'fixed',
+          position: 'sticky',
           top: 56,
           width: '100%',
-          zIndex: 1201,
           paddingX: 2,
           display: 'flex',
           alignItems: 'center',

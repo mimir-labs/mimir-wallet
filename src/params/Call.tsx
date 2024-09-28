@@ -1,47 +1,32 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ApiPromise } from '@polkadot/api';
-import type { Call as ICall } from '@polkadot/types/interfaces';
-import type { IMethod } from '@polkadot/types/types';
 import type { CallProps } from './types';
 
 import React, { useMemo } from 'react';
-import ReactJson from 'react-json-view';
 
 import AssetsTransferCall from './AssetsTransferCall';
 import BatchCall from './BatchCall';
-import CancelCall from './CancelCall';
+import FunctionArgs from './FunctionArgs';
 import TransferCall from './TransferCall';
+import { findAction } from './utils';
 
-function findAction(api: ApiPromise, call: IMethod | ICall) {
-  const callFunc = api.registry.findMetaCall(call.callIndex);
+function Call({ api, call, ...props }: CallProps) {
+  const action = useMemo(() => (call ? findAction(api, call).join('.') : 'unknown.unknown'), [api, call]);
 
-  return `${callFunc.section}.${callFunc.method}`;
-}
-
-function Call({ api, call, jsonFallback, type, ...props }: CallProps) {
-  const action = useMemo(() => (call ? findAction(api, call) : 'unknown'), [api, call]);
-
-  if (action === 'multisig.cancelAsMulti') {
-    return <CancelCall api={api} call={call} type={type} {...props} />;
-  }
-
-  if (action === 'utility.batchAll') {
-    return <BatchCall api={api} call={call} type={type} {...props} />;
+  if (action === 'utility.batchAll' || action === 'utility.batch' || action === 'utility.forceBatch') {
+    return <BatchCall api={api} call={call} {...props} />;
   }
 
   if (action.startsWith('balances.')) {
-    return <TransferCall api={api} call={call} type={type} {...props} />;
+    return <TransferCall api={api} call={call} {...props} />;
   }
 
   if (action.startsWith('assets.')) {
-    return <AssetsTransferCall api={api} call={call} type={type} {...props} />;
+    return <AssetsTransferCall api={api} call={call} {...props} />;
   }
 
-  return jsonFallback ? (
-    <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} theme='summerfruit:inverted' />
-  ) : null;
+  return <FunctionArgs api={api} call={call} {...props} />;
 }
 
 export default React.memo(Call);

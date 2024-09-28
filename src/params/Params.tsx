@@ -6,11 +6,11 @@ import React from 'react';
 import Param from './Param';
 import { ParamsProps } from './types';
 
-function Params({ params, registry, type = 'base', values }: ParamsProps) {
+function Params({ params, registry, values }: ParamsProps) {
   return (
     <>
       {params.map((param, index) => (
-        <Param key={index} param={param} registry={registry} type={type} value={values[index]} />
+        <Param key={index} param={param} registry={registry} value={values[index]} />
       ))}
     </>
   );

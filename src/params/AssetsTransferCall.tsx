@@ -11,7 +11,7 @@ import { useAssetInfo } from '@mimir-wallet/hooks';
 import Item from './Param/Item';
 import FallbackCall from './FallbackCall';
 
-function AssetsTransferCall({ api, call, jsonFallback, type = 'base' }: CallProps) {
+function AssetsTransferCall({ api, call, jsonFallback }: CallProps) {
   const args = useMemo(
     () =>
       api.tx.assets && (api.tx.assets.transferKeepAlive.is(call) || api.tx.assets.transfer?.is(call))
@@ -41,12 +41,10 @@ function AssetsTransferCall({ api, call, jsonFallback, type = 'base' }: CallProp
           />
         }
         name='Recipient'
-        type={type}
       />
       <Item
         content={<FormatBalance format={info ? [info.decimals, info.symbol] : undefined} value={args[2]} />}
         name='Amount'
-        type={type}
       />
     </>
   );

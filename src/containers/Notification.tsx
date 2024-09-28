@@ -9,7 +9,7 @@ import IconNotification from '@mimir-wallet/assets/svg/icon-notification.svg?rea
 import { AddressName, Empty } from '@mimir-wallet/components';
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@mimir-wallet/constants';
 import { useGroupAccounts, useMessages, useSelectedAccountCallback, useWallet } from '@mimir-wallet/hooks';
-import { CalldataStatus, type ExecuteTxMessage, type PushMessageData } from '@mimir-wallet/hooks/types';
+import { type ExecuteTxMessage, type PushMessageData, TransactionStatus } from '@mimir-wallet/hooks/types';
 import { addressToHex, formatAgo, service } from '@mimir-wallet/utils';
 
 function sortAddress(addresses: string[]) {
@@ -19,13 +19,10 @@ function sortAddress(addresses: string[]) {
 function Notification() {
   const selectAccount = useSelectedAccountCallback();
   const { isWalletReady } = useWallet();
-  const { injected, testing } = useGroupAccounts();
+  const { injected } = useGroupAccounts();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const addresses = useMemo(
-    () => (isWalletReady ? sortAddress(injected.concat(testing)) : []),
-    [injected, isWalletReady, testing]
-  );
+  const addresses = useMemo(() => (isWalletReady ? sortAddress(injected) : []), [injected, isWalletReady]);
   const [messages, isRead, read] = useMessages(addresses);
   const navigate = useNavigate();
 
@@ -60,7 +57,7 @@ function Notification() {
               selectAccount(sender);
               navigate({
                 pathname: '/transactions',
-                search: status >= CalldataStatus.Success ? 'status=history' : ''
+                search: status >= TransactionStatus.Success ? 'status=history' : ''
               });
             })
             .catch(() => {
@@ -96,7 +93,7 @@ function Notification() {
               has approved your transaction <TxLink uuid={raw.uuid} />.
             </>
           ) : type === 'execute' ? (
-            (raw as ExecuteTxMessage).status === CalldataStatus.Failed ? (
+            (raw as ExecuteTxMessage).status === TransactionStatus.Failed ? (
               <>
                 Transaction <TxLink uuid={raw.uuid} /> failed to be executed.
               </>

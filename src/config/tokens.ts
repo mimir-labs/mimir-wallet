@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { allEndpoints, localEndpoint } from './api';
+import { allEndpoints } from './api';
 
 export type Token = {
   Icon: string;
@@ -15,10 +15,10 @@ export type Asset = {
 };
 
 export function findToken(genesisHash: string): Token {
-  const endpoint = allEndpoints.find((item) => item.genesisHash === genesisHash) || localEndpoint;
+  const endpoint = allEndpoints.find((item) => item.genesisHash === genesisHash);
 
   return {
-    Icon: endpoint.tokenIcon,
+    Icon: endpoint?.tokenIcon || '/token-icons/Polkadot.png',
     genesisHash
   };
 }

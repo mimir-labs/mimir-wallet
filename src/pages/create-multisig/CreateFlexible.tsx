@@ -4,6 +4,7 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { EventRecord } from '@polkadot/types/interfaces';
+import type { AccountData } from '@mimir-wallet/hooks/types';
 import type { PrepareFlexible } from './types';
 
 import { LoadingButton } from '@mui/lab';
@@ -19,19 +20,19 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import keyring from '@polkadot/ui-keyring';
 import { u8aEq, u8aToHex } from '@polkadot/util';
-import { addressEq, decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
+import { HexString } from '@polkadot/util/types';
+import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import store from 'store';
 
 import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
 import { utm } from '@mimir-wallet/config';
 import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
-import { TxToastCtx, useApi, useCall, useSelectedAccountCallback } from '@mimir-wallet/hooks';
-import { addressToHex, getAddressMeta, service, signAndSend } from '@mimir-wallet/utils';
+import { useAccount, useApi, useCall, useSelectedAccountCallback, useWallet } from '@mimir-wallet/hooks';
+import { getAddressMeta, TxToastCtx } from '@mimir-wallet/providers';
+import { addressEq, addressToHex, service, signAndSend, sleep, store } from '@mimir-wallet/utils';
 
 import { createMultisig } from './CreateStatic';
 
@@ -40,10 +41,10 @@ interface Props {
   onCancel: () => void;
 }
 
-function filterDefaultAccount(who: string[]): string | undefined {
-  for (const account of keyring.getAccounts()) {
+function filterDefaultAccount(accounts: AccountData[], who: string[]): string | undefined {
+  for (const account of accounts) {
     for (const address of who) {
-      if (!account.meta.isMultisig && addressEq(address, account.address)) {
+      if (account.type !== 'multisig' && addressEq(address, account.address)) {
         return address;
       }
     }
@@ -97,7 +98,9 @@ function CreateFlexible({
   }
 }: Props) {
   const { api } = useApi();
-  const [signer, setSigner] = useState(creator || filterDefaultAccount(who));
+  const { accountSource } = useWallet();
+  const { accounts } = useAccount();
+  const [signer, setSigner] = useState(creator || filterDefaultAccount(accounts, who));
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
   const [blockNumber, setBlockNumber] = useState<number | null | undefined>(_blockNumber);
   const [extrinsicIndex, setExtrinsicIndex] = useState<number | null | undefined>(_extrinsicIndex);
@@ -108,6 +111,7 @@ function CreateFlexible({
   const [loadingSecond, setLoadingSecond] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
   const { addToast } = useContext(TxToastCtx);
+  const source = useMemo(() => (signer ? accountSource(signer) : undefined), [accountSource, signer]);
 
   const reservedAmount = useMemo(() => {
     const baseReserve = api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2));
@@ -125,7 +129,7 @@ function CreateFlexible({
   }, [allBalances, api]);
 
   const createMembers = useCallback(
-    (pure: string, who: string[], signer: string, threshold: number, name: string) => {
+    (pure: string, who: string[], signer: string, source: string, threshold: number) => {
       const extrinsic = api.tx.utility.batchAll([
         api.tx.balances.transferKeepAlive(
           pure,
@@ -140,28 +144,24 @@ function CreateFlexible({
       ]);
 
       setLoadingSecond(true);
-      const events = signAndSend(extrinsic, signer, { checkProxy: true });
+      const events = signAndSend(extrinsic, signer, source, { checkProxy: true });
 
       addToast({ events });
 
-      events.once('inblock', () => {
-        createMultisig(who, threshold, name);
-        keyring.addExternal(pure, {
-          isMimir: true,
-          isMultisig: true,
-          isFlexible: true,
-          name,
-          who,
-          threshold,
-          creator: signer,
-          genesisHash: api.genesisHash.toHex(),
-          isPending: true
-        });
+      events.once('finalized', async () => {
+        while (true) {
+          try {
+            const data = await service.getFullAccount(pure);
 
-        store.set(
-          DETECTED_ACCOUNT_KEY,
-          Array.from([...(store.get(DETECTED_ACCOUNT_KEY) || []), u8aToHex(decodeAddress(pure))])
-        );
+            if (data) {
+              break;
+            }
+          } catch {
+            /* empty */
+          }
+
+          await sleep(3_000);
+        }
 
         selectAccount(pure);
 
@@ -174,12 +174,16 @@ function CreateFlexible({
 
   const createPure = useCallback(() => {
     if (!signer) return;
+    const source = accountSource(signer);
+
+    if (!source) return;
 
     const extrinsic = api.tx.proxy.createPure('Any', 0, 0);
-    const events = signAndSend(extrinsic, signer, {
+    const events = signAndSend(extrinsic, signer, source, {
       beforeSend: async (extrinsic) => {
         if (!name) throw new Error('Please provide account name');
 
+        await createMultisig(who, threshold, name);
         await service.prepareMultisig(
           addressToHex(extrinsic.signer.toString()),
           extrinsic.hash.toHex(),
@@ -206,7 +210,14 @@ function CreateFlexible({
       });
 
       if (_pure) {
-        createMembers(_pure, who, signer, threshold, name);
+        createMembers(_pure, who, signer, source, threshold);
+
+        store.set(
+          DETECTED_ACCOUNT_KEY,
+          Array.from(
+            new Set([...((store.get(DETECTED_ACCOUNT_KEY) as HexString[]) || []), u8aToHex(decodeAddress(_pure))])
+          )
+        );
 
         utm && service.utm(addressToHex(_pure), utm);
       }
@@ -214,17 +225,21 @@ function CreateFlexible({
     events.once('error', () => {
       setLoadingFirst(false);
     });
-  }, [api, addToast, createMembers, name, signer, threshold, who]);
+  }, [signer, accountSource, api, addToast, name, threshold, who, createMembers]);
 
   const killPure = useCallback(
     (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
+      const source = accountSource(signer);
+
+      if (!source) return;
+
       const extrinsic = api.tx.proxy.proxy(
         pure,
         'Any',
         api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex)
       );
 
-      const events = signAndSend(extrinsic, signer, { checkProxy: true });
+      const events = signAndSend(extrinsic, signer, source, { checkProxy: true });
 
       addToast({ events });
 
@@ -235,7 +250,7 @@ function CreateFlexible({
       });
       events.once('error', () => setLoadingCancel(false));
     },
-    [api, addToast, onCancel]
+    [accountSource, api.tx.proxy, addToast, onCancel]
   );
 
   return (
@@ -333,12 +348,12 @@ function CreateFlexible({
         )}
         {pure ? (
           <LoadingButton
-            disabled={!signer || !pure || loadingCancel}
+            disabled={!signer || !pure || loadingCancel || !source}
             fullWidth
             loading={loadingSecond}
             onClick={() => {
-              if (pure && who && signer) {
-                createMembers(pure, who, signer, threshold, name);
+              if (pure && who && signer && source) {
+                createMembers(pure, who, signer, source, threshold);
               }
             }}
           >

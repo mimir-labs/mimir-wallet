@@ -315,26 +315,6 @@ const createComponents: Func = () => ({
     }
   },
 
-  MuiAlert: {
-    styleOverrides: {
-      message: () => ({
-        overflow: 'visible',
-        fontSize: '0.75rem'
-      })
-    }
-  },
-
-  MuiAlertTitle: {
-    styleOverrides: {
-      root: ({ theme }) => ({
-        fontWeight: 700,
-        fontSize: '0.875rem',
-        marginTop: 0,
-        marginBottom: theme.spacing(1)
-      })
-    }
-  },
-
   MuiAccordion: {
     styleOverrides: {
       root: ({ theme }) => ({
@@ -416,6 +396,15 @@ const createComponents: Func = () => ({
     styleOverrides: {
       root: {
         lineHeight: 1.2
+      }
+    }
+  },
+
+  MuiSelect: {
+    styleOverrides: {
+      select: {
+        minHeight: '1.375rem',
+        lineHeight: '1.375rem'
       }
     }
   }

@@ -16,10 +16,10 @@ import {
   useTheme
 } from '@mui/material';
 import React, { useState } from 'react';
-import store from 'store';
 
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
 import { useSelectedAccountCallback } from '@mimir-wallet/hooks';
+import { store } from '@mimir-wallet/utils';
 
 import AddressCell from './AddressCell';
 

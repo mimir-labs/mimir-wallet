@@ -5,8 +5,8 @@ import { Box } from '@mui/material';
 import { createContext, useCallback, useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import { MimirLoading, TxModal } from '@mimir-wallet/components';
-import { useApi, useToggle } from '@mimir-wallet/hooks';
+import { ConnectWalletModal, MimirLoading, TxSubmit } from '@mimir-wallet/components';
+import { useAccount, useApi, useFollowAccounts, useToggle, useTxQueue } from '@mimir-wallet/hooks';
 import { useWallet } from '@mimir-wallet/hooks/useWallet';
 
 import DetectedMultisig from './DetectedMultisig';
@@ -23,9 +23,11 @@ interface State {
 
 export const BaseContainerCtx = createContext<State>({} as State);
 
-function BaseContainer({ fixedSidebar }: { fixedSidebar: boolean }) {
+function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; withPadding: boolean }) {
   const { isApiConnected, isApiReady } = useApi();
-  const { isMultisigSyned, isWalletReady } = useWallet();
+  const { isWalletReady, closeWallet, walletOpen } = useWallet();
+  const { isMultisigSyned } = useAccount();
+  const { queue } = useTxQueue();
   const [sidebarOpen, , setSidebarOpen] = useToggle(false);
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
 
@@ -37,19 +39,30 @@ function BaseContainer({ fixedSidebar }: { fixedSidebar: boolean }) {
     [alertOpen, closeSidebar, openSidebar, sidebarOpen]
   );
 
+  useFollowAccounts();
+
   return (
     <BaseContainerCtx.Provider value={value}>
-      <TxModal />
       <TopBar />
+
+      <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
+
+      {isApiReady && isApiConnected && isWalletReady && isMultisigSyned && <ToggleAlert setAlertOpen={setAlertOpen} />}
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (
         <Box
           sx={{
-            minHeight: '100%'
+            display: 'flex',
+            minHeight: `calc(100dvh - ${alertOpen ? 37 : 0}px - 1px - 56px)`
           }}
         >
-          <ToggleAlert setAlertOpen={setAlertOpen} />
-          <SideBar fixed={fixedSidebar} />
-          <Outlet />
+          {withSideBar && <SideBar offsetTop={alertOpen ? 36 : 0} />}
+          <Box sx={{ flex: '1', padding: withPadding ? { sm: 1.5, md: 2 } : 0 }}>
+            {queue.length > 0 ? <TxSubmit {...queue[0]} /> : null}
+
+            <span style={{ display: queue.length > 0 ? 'none' : undefined }}>
+              <Outlet />
+            </span>
+          </Box>
           <DetectedMultisig />
         </Box>
       ) : (

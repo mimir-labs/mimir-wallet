@@ -3,23 +3,15 @@
 
 import type { Transaction } from '@mimir-wallet/hooks/types';
 
-import { Box, Chip, Paper, SvgIcon, Typography } from '@mui/material';
-import React, { useMemo } from 'react';
+import { Box, Chip, Paper, Typography } from '@mui/material';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
-import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
-import { Empty } from '@mimir-wallet/components';
-import { useAddressMeta, useDapp, usePendingTransactions } from '@mimir-wallet/hooks';
-import { extraTransaction } from '@mimir-wallet/transactions';
+import { AppName, Empty } from '@mimir-wallet/components';
+import { useAddressMeta, usePendingTransactions } from '@mimir-wallet/hooks';
 
 function Row({ isStart, transaction }: { transaction: Transaction; isStart: boolean }) {
-  const { meta } = useAddressMeta(transaction.sender);
-  const [approvals] = useMemo(
-    (): [number, Transaction[]] => (meta ? extraTransaction(meta, transaction) : [0, []]),
-    [meta, transaction]
-  );
-  const destTx = transaction.top;
-  const dapp = useDapp(transaction.initTransaction.website);
+  const { meta } = useAddressMeta(transaction.address);
 
   return (
     <Box
@@ -38,14 +30,17 @@ function Row({ isStart, transaction }: { transaction: Transaction; isStart: bool
       }}
       to='/transactions'
     >
-      {dapp ? (
-        <Box component='img' src={dapp.icon} width={16} />
-      ) : (
-        <SvgIcon color='primary' component={IconSend} inheritViewBox />
-      )}
-      <Typography sx={{ width: 120 }}>No.{destTx.uuid.slice(0, 8).toUpperCase()}</Typography>
-      <Typography sx={{ flex: '1' }}>{destTx.action}</Typography>
-      <Chip color='primary' label={`${approvals}/${meta?.threshold}`} size='small' />
+      <AppName
+        iconSize={16}
+        website={transaction.website}
+        appName={transaction.appName}
+        iconUrl={transaction.iconUrl}
+      />
+      <Typography sx={{ width: 120 }}>No.{transaction.id}</Typography>
+      <Typography sx={{ flex: '1' }}>
+        {transaction.section}.{transaction.method}
+      </Typography>
+      <Chip color='primary' label={`${1}/${meta?.threshold}`} size='small' />
     </Box>
   );
 }
@@ -72,7 +67,7 @@ function Transactions({ address }: { address?: string }) {
           }}
         >
           {pendingTransactions.map((item, index) => (
-            <Row isStart={index === 0} key={item.uuid} transaction={item} />
+            <Row isStart={index === 0} key={item.id} transaction={item} />
           ))}
         </Box>
       ) : (

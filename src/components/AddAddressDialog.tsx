@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
-import { keyring } from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { events } from '@mimir-wallet/events';
+import { decodeAddress, encodeAddress } from '@mimir-wallet/api';
+import { useAccount } from '@mimir-wallet/hooks';
+import { addressEq } from '@mimir-wallet/utils';
 
 import Input from './Input';
 import { toastError } from './ToastRoot';
@@ -22,6 +23,7 @@ function Content({
   onAdded?: (address: string) => void;
   onClose?: () => void;
 }) {
+  const { setAddressName, addresses } = useAccount();
   const [name, setName] = useState<string>(defaultName || '');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
 
@@ -29,16 +31,19 @@ function Content({
     let address = '';
 
     try {
-      const publicKey = keyring.decodeAddress(addressInput);
+      const publicKey = decodeAddress(addressInput);
 
-      address = keyring.encodeAddress(publicKey);
+      address = encodeAddress(publicKey);
       setAddress(address);
     } catch {
       setAddress(addressInput);
     }
   }, []);
 
-  const exists = useMemo(() => address && isAddress(address) && keyring.getAddress(address), [address]);
+  const exists = useMemo(
+    () => address && isAddress(address) && addresses.findIndex((item) => addressEq(item.address, address)) > -1,
+    [address, addresses]
+  );
 
   const _onCommit = useCallback((): void => {
     try {
@@ -48,14 +53,13 @@ function Content({
         throw new Error('not a valid address');
       }
 
-      keyring.saveAddress(address, { name: name.trim() });
+      setAddressName(address, name.trim());
       onAdded?.(address);
-      events.emit('account_meta_changed', address);
       onClose?.();
     } catch (error) {
       toastError(error);
     }
-  }, [address, name, onAdded, onClose]);
+  }, [address, name, onAdded, onClose, setAddressName]);
 
   return (
     <>

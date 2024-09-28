@@ -12,10 +12,11 @@ import CopyButton from './CopyButton';
 interface Props extends TypographyProps {
   value?: string | Uint8Array | HexString | { toHex: () => string };
   length?: number;
+  showFull?: boolean;
   withCopy?: boolean;
 }
 
-function Hex({ length = 10, value, withCopy, ...props }: Props) {
+function Hex({ length = 10, value, showFull, withCopy, ...props }: Props) {
   const displayValue = useMemo(() => {
     return isU8a(value)
       ? u8aToHex()
@@ -27,9 +28,13 @@ function Hex({ length = 10, value, withCopy, ...props }: Props) {
   }, [value]);
 
   return (
-    <Typography {...props}>
-      {displayValue ? `${displayValue.slice(0, length + 2)}…${displayValue.slice(-10)}` : '0x'}
-      {withCopy && <CopyButton value={displayValue} />}
+    <Typography fontSize='inherit' fontWeight='inherit' {...props}>
+      {displayValue
+        ? showFull
+          ? displayValue
+          : `${displayValue.slice(0, length + 2)}…${displayValue.slice(-10)}`
+        : '0x'}
+      {withCopy && <CopyButton size='small' sx={{ fontSize: 'inherit' }} value={displayValue} />}
     </Typography>
   );
 }

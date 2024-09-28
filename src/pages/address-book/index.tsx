@@ -3,20 +3,20 @@
 
 import { Stack } from '@mui/material';
 
-import { useAddresses } from '@mimir-wallet/hooks';
+import { useAccount } from '@mimir-wallet/hooks';
 
 import AddAddress from './AddAddress';
 import AddressItem from './AddressItem';
 
 function PageAddressBook() {
-  const { allAddresses } = useAddresses();
+  const { addresses } = useAccount();
 
   return (
     <>
       <AddAddress />
       <Stack marginTop={2} spacing={2}>
-        {allAddresses.map((address) => {
-          return <AddressItem address={address} key={address} />;
+        {addresses.map((address) => {
+          return <AddressItem address={address.address} key={address.address} />;
         })}
       </Stack>
     </>

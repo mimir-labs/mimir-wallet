@@ -9,11 +9,10 @@ import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@p
 import type { HexString } from '@polkadot/util/types';
 
 import { getSpecTypes } from '@polkadot/types-known';
-import keyring from '@polkadot/ui-keyring';
 import { assert, formatBalance, isBn, isNumber, objectSpread } from '@polkadot/util';
-import { addressEq, base64Encode } from '@polkadot/util-crypto';
+import { base64Encode } from '@polkadot/util-crypto';
 
-import { AccountSigner, api, DEFAULT_DECIMALS, DEFAULT_SS58 } from '@mimir-wallet/api';
+import { api } from '@mimir-wallet/api';
 import { CONNECT_ORIGIN } from '@mimir-wallet/constants';
 
 import { TxEvents } from './tx-events';
@@ -70,58 +69,46 @@ function _assetDispatchError(dispatch: DispatchError | SpRuntimeDispatchError): 
   return new TxDispatchError(`Dispatch Error: ${dispatch.type}`);
 }
 
-async function extractParams(api: ApiPromise, address: string): Promise<Partial<SignerOptions>> {
-  const pair = keyring.getPair(address);
-  const {
-    meta: { isInjected, source }
-  } = pair;
+async function extractParams(api: ApiPromise, address: string, source: string): Promise<Partial<SignerOptions>> {
+  const injected = await window.injectedWeb3?.[source || ''].enable(CONNECT_ORIGIN);
+  const signer = injected?.signer;
+  const metadata = injected?.metadata;
 
-  if (isInjected) {
-    const injected = await window.injectedWeb3?.[source || ''].enable(CONNECT_ORIGIN);
-    const signer = injected?.signer;
-    const metadata = injected?.metadata;
+  if (metadata) {
+    const knowns = await metadata.get();
 
-    if (metadata) {
-      const knowns = await metadata.get();
+    if (
+      !knowns.find(
+        (item) =>
+          item.genesisHash === api.genesisHash.toHex() && item.specVersion === api.runtimeVersion.specVersion.toNumber()
+      )
+    ) {
+      const [systemChain] = await Promise.all([api.rpc.system.chain()]);
+      const chainInfo = {
+        chain: systemChain.toString(),
+        chainType: 'substrate' as const,
+        genesisHash: api.genesisHash.toHex(),
+        icon: 'substrate',
+        metaCalls: base64Encode(api.runtimeMetadata.asCallsOnly.toU8a()),
+        specVersion: api.runtimeVersion.specVersion.toNumber(),
+        ss58Format: api.registry.chainSS58!,
+        tokenDecimals: api.registry.chainDecimals[0],
+        tokenSymbol: (api.registry.chainTokens || formatBalance.getDefaults().unit)[0],
+        types: getSpecTypes(
+          api.registry,
+          systemChain,
+          api.runtimeVersion.specName,
+          api.runtimeVersion.specVersion
+        ) as unknown as Record<string, string>
+      };
 
-      if (
-        !knowns.find(
-          (item) =>
-            item.genesisHash === api.genesisHash.toHex() &&
-            item.specVersion === api.runtimeVersion.specVersion.toNumber()
-        )
-      ) {
-        const [systemChain] = await Promise.all([api.rpc.system.chain()]);
-        const chainInfo = {
-          chain: systemChain.toString(),
-          chainType: 'substrate' as const,
-          genesisHash: api.genesisHash.toHex(),
-          icon: 'substrate',
-          metaCalls: base64Encode(api.runtimeMetadata.asCallsOnly.toU8a()),
-          specVersion: api.runtimeVersion.specVersion.toNumber(),
-          ss58Format: isNumber(api.registry.chainSS58) ? api.registry.chainSS58 : DEFAULT_SS58.toNumber(),
-          tokenDecimals: (api.registry.chainDecimals || [DEFAULT_DECIMALS.toNumber()])[0],
-          tokenSymbol: (api.registry.chainTokens || formatBalance.getDefaults().unit)[0],
-          types: getSpecTypes(
-            api.registry,
-            systemChain,
-            api.runtimeVersion.specName,
-            api.runtimeVersion.specVersion
-          ) as unknown as Record<string, string>
-        };
-
-        await metadata.provide(chainInfo);
-      }
+      await metadata.provide(chainInfo);
     }
-
-    assert(signer, `Unable to find a signer for ${address}`);
-
-    return { signer };
   }
 
-  assert(addressEq(address, pair.address), `Unable to retrieve keypair for ${address}`);
+  assert(signer, `Unable to find a signer for ${address}`);
 
-  return { signer: new AccountSigner(api.registry, pair) };
+  return { signer };
 }
 
 export function checkSubmittableResult(result: ISubmittableResult, checkProxy = false) {
@@ -195,13 +182,14 @@ function optionsOrNonce(partialOptions: Partial<SignerOptions> = {}): Partial<Si
 
 export async function sign(
   extrinsic: SubmittableExtrinsic<'promise'>,
-  signer: string
+  signer: string,
+  source: string
 ): Promise<[HexString, SignerPayloadJSON, Hash]> {
   const options = optionsOrNonce();
   const signingInfo = await api.derive.tx.signingInfo(signer, options.nonce, options.era);
   const eraOptions = makeEraOptions(options, signingInfo);
 
-  const { signer: accountSigner } = await extractParams(api, signer);
+  const { signer: accountSigner } = await extractParams(api, signer, source);
 
   const payload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
     objectSpread({}, eraOptions, {
@@ -226,11 +214,12 @@ export async function sign(
 export function signAndSend(
   extrinsic: SubmittableExtrinsic<'promise'>,
   signer: string,
+  source: string,
   { beforeSend, checkProxy }: Options = {}
 ): TxEvents {
   const events = new TxEvents();
 
-  extractParams(api, signer)
+  extractParams(api, signer, source)
     .then((params) => extrinsic.signAsync(signer, params))
     .then((extrinsic) => {
       events.emit('signed', extrinsic.signature);

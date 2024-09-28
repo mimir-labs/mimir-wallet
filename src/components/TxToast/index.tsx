@@ -3,7 +3,7 @@
 
 import { useContext } from 'react';
 
-import { TxToastCtx } from '@mimir-wallet/hooks';
+import { TxToastCtx } from '@mimir-wallet/providers';
 
 import ToastDialog from './ToastDialog';
 import ToastNotification from './ToastNotification';

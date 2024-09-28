@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AddressMeta } from '@mimir-wallet/utils';
+import type { AccountData } from '@mimir-wallet/hooks/types';
 
 import {
+  Avatar,
   Box,
   Button,
   Divider,
@@ -17,18 +18,29 @@ import {
   SvgIcon,
   Typography
 } from '@mui/material';
-import { addressEq } from '@polkadot/util-crypto';
+import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import store from 'store';
+import { Link, useNavigate } from 'react-router-dom';
 
 import IconAddFill from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
+import IconExtension from '@mimir-wallet/assets/svg/icon-extension.svg?react';
 import IconMore from '@mimir-wallet/assets/svg/icon-more.svg?react';
 import IconSearch from '@mimir-wallet/assets/svg/icon-search.svg?react';
+import IconUnion from '@mimir-wallet/assets/svg/icon-union.svg?react';
+import { findToken } from '@mimir-wallet/config';
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
-import { useGroupAccounts, useSelectedAccount, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
+import {
+  useApi,
+  useGroupAccounts,
+  useNativeBalances,
+  useSelectedAccount,
+  useSelectedAccountCallback,
+  useToggle
+} from '@mimir-wallet/hooks';
+import { store } from '@mimir-wallet/utils';
 
 import AddressCell from './AddressCell';
+import FormatBalance from './FormatBalance';
 import Input from './Input';
 import SwitchAccountDialog from './SwitchAccountDialog';
 
@@ -38,12 +50,12 @@ interface Props {
   onClose?: () => void;
 }
 
-function filterAddress(keywords: string, selected?: string) {
-  return (address: string, meta: AddressMeta): boolean =>
-    (keywords
-      ? address.toLowerCase().includes(keywords.toLowerCase()) ||
-        (meta.name ? meta.name.toLowerCase().includes(keywords.toLowerCase()) : false)
-      : true) && (selected ? !addressEq(address, selected) : true);
+function filterAddress(keywords: string) {
+  return (account: AccountData): boolean =>
+    keywords
+      ? account.address.toLowerCase().includes(keywords.toLowerCase()) ||
+        (account.name ? account.name.toLowerCase().includes(keywords.toLowerCase()) : false)
+      : true;
 }
 
 function AccountCell({
@@ -57,8 +69,11 @@ function AccountCell({
   value?: string;
   onSelect?: (address: string) => void;
 }) {
+  const { genesisHash } = useApi();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const balances = useNativeBalances(value);
+  const icon = useMemo(() => findToken(genesisHash).Icon, [genesisHash]);
 
   const handleMore = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -113,6 +128,11 @@ function AccountCell({
           }}
         >
           <AddressCell shorten showType size='small' value={value} withCopy />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 700 }}>
+            <FormatBalance value={balances?.total} />
+
+            <Avatar alt='Token' src={icon} sx={{ width: 16, height: 16 }} />
+          </Box>
           <IconButton color='inherit' onClick={handleMore} size='small'>
             <SvgIcon component={IconMore} inheritViewBox />
           </IconButton>
@@ -146,7 +166,9 @@ function Search({ onChange, value }: { value: string; onChange: (value: string) 
   );
 }
 
-function CreateMultisig() {
+function CreateMultisig({ selected }: { selected: string }) {
+  const navigate = useNavigate();
+
   return (
     <Box
       sx={{
@@ -159,15 +181,62 @@ function CreateMultisig() {
         bgcolor: 'background.default'
       }}
     >
-      <Button
-        component={Link}
-        fullWidth
-        startIcon={<SvgIcon component={IconAddFill} inheritViewBox sx={{ fontSize: '2rem !important' }} />}
-        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', borderRadius: 1 }}
-        to='/create-multisig'
-      >
-        Create/Recover Multisig
-      </Button>
+      <PopupState variant='popover'>
+        {(popupState) => (
+          <>
+            <Button
+              fullWidth
+              startIcon={<SvgIcon component={IconAddFill} inheritViewBox sx={{ fontSize: '2rem !important' }} />}
+              sx={{ borderRadius: 1 }}
+              {...bindTrigger(popupState)}
+            >
+              Create New
+            </Button>
+            <Menu
+              {...bindMenu(popupState)}
+              anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+              slotProps={{
+                paper: {
+                  sx: {
+                    width: popupState.anchorEl?.clientWidth,
+                    transform: 'translateY(-10px) translateX(-6px) !important',
+                    '.MuiMenuItem-root': {
+                      display: 'flex',
+                      justifyContent: 'center'
+                    }
+                  }
+                }
+              }}
+            >
+              <MenuItem
+                onClick={() => {
+                  navigate('/create-multisig');
+                  popupState.close();
+                }}
+              >
+                Create Multisig
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  navigate(`/add-proxy/${selected}`);
+                  popupState.close();
+                }}
+              >
+                Add Proxy
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  navigate('/create-multisig');
+                  popupState.close();
+                }}
+              >
+                Create Pure Proxy
+              </MenuItem>
+            </Menu>
+          </>
+        )}
+      </PopupState>
     </Box>
   );
 }
@@ -178,7 +247,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   const [switchOpen, toggleOpen] = useToggle();
   const selected = useSelectedAccount();
   const selectAccount = useSelectedAccountCallback();
-  const grouped = useGroupAccounts(useMemo(() => filterAddress(keywords, selected), [keywords, selected]));
+  const grouped = useGroupAccounts(useMemo(() => filterAddress(keywords), [keywords]));
 
   const onSelect = useCallback(
     (address: string) => {
@@ -210,40 +279,33 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
       >
         <Search onChange={setKeywords} value={keywords} />
         <Box sx={{ height: '100%', padding: 1, paddingY: 6, overflowY: 'auto' }}>
-          <List sx={{ width: 280 }}>
-            <Typography>Current Wallet</Typography>
-            <AccountCell key={`current-account-${selected}`} onClose={onClose} selected value={selected} />
-            <Divider sx={{ marginY: 1 }} />
-            <Typography>Multisig Wallet</Typography>
-            {grouped.multisig.map((account) => (
-              <AccountCell key={`multisig-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
+          <List sx={{ width: 370, maxWidth: '90vw' }}>
+            <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
+              <SvgIcon inheritViewBox component={IconUnion} fontSize='small' />
+              Mimir Wallet
+            </Typography>
+            {grouped.mimir.map((account) => (
+              <AccountCell
+                key={`multisig-${account}`}
+                onClose={onClose}
+                onSelect={onSelect}
+                value={account}
+                selected={account === selected}
+              />
             ))}
-            <Divider sx={{ marginY: 1 }} />
-            <Typography>Extension Wallet</Typography>
+            <Divider sx={{ marginY: 0.5 }} />
+
+            <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
+              <SvgIcon inheritViewBox component={IconExtension} fontSize='small' />
+              Extension Wallet
+            </Typography>
             {grouped.injected.map((account) => (
               <AccountCell key={`extension-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
             ))}
-            {grouped.accounts.length > 0 && (
-              <>
-                <Divider sx={{ marginY: 1 }} />
-                <Typography>Local Wallet</Typography>
-                {grouped.accounts.map((account) => (
-                  <AccountCell key={`local-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
-                ))}
-              </>
-            )}
-            {grouped.testing.length > 0 && (
-              <>
-                <Divider sx={{ marginY: 1 }} />
-                <Typography>Testing Wallet</Typography>
-                {grouped.testing.map((account) => (
-                  <AccountCell key={`testing-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
-                ))}
-              </>
-            )}
           </List>
         </Box>
-        <CreateMultisig />
+
+        {selected && <CreateMultisig selected={selected} />}
       </Drawer>
     </>
   );

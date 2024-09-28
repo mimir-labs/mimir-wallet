@@ -21,12 +21,13 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
   return (
     <Stack spacing={2}>
       <Box sx={{ display: 'flex', flexDirection: { lg: 'row', xs: 'column' }, gap: 2 }}>
-        <Box sx={{ width: { lg: '59%', xs: '100%' } }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', width: { lg: '59%', xs: '100%' } }}>
           <Typography marginBottom={0.5} variant='h6'>
             Info
           </Typography>
           {info}
         </Box>
+
         <Box sx={{ width: { lg: '41%', xs: '100%' } }}>
           <Typography marginBottom={0.5} variant='h6'>
             Pending Transactions
@@ -34,12 +35,14 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
           {transaction}
         </Box>
       </Box>
+
       <Box>
         <Typography marginBottom={0.5} variant='h6'>
           Assets
         </Typography>
         {assets}
       </Box>
+
       {proposals && (
         <Box>
           <Typography marginBottom={0.5} variant='h6'>
@@ -59,6 +62,7 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
           {proposals}
         </Box>
       )}
+
       {dapps && (
         <Box>
           <Typography marginBottom={0.5} sx={{ display: 'flex', justifyContent: 'space-between' }} variant='h6'>
@@ -70,6 +74,7 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
           {dapps}
         </Box>
       )}
+
       <Box>
         {member && (
           <Typography marginBottom={0.5} variant='h6'>

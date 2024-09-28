@@ -3,4 +3,4 @@
 
 export { default as TxCell } from './TxCell';
 
-export * from './util';
+export * from './utils';

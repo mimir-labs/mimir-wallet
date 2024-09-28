@@ -3,11 +3,11 @@
 
 import { Button, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import store from 'store';
 
 import { NOT_CREATE_MULTISIG_NOW_KEY } from '@mimir-wallet/constants';
 import { useGroupAccounts } from '@mimir-wallet/hooks';
 import { useWallet } from '@mimir-wallet/hooks/useWallet';
+import { store } from '@mimir-wallet/utils';
 
 function Welcome({ handleNotNow }: { handleNotNow: () => void }) {
   const navigate = useNavigate();

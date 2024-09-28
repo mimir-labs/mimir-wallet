@@ -3,7 +3,9 @@
 
 import type { AccountId, AccountIndex, Address as AddressType } from '@polkadot/types/interfaces';
 
-import React from 'react';
+import React, { useMemo } from 'react';
+
+import { encodeAddress } from '@mimir-wallet/api';
 
 function Address({
   shorten,
@@ -14,7 +16,9 @@ function Address({
 }) {
   const address = value?.toString();
 
-  return shorten ? `${address?.slice(0, 6)}…${address?.slice(-6)}` : address;
+  const format = useMemo(() => (address ? encodeAddress(address) : undefined), [address]);
+
+  return shorten ? `${format?.slice(0, 6)}…${format?.slice(-6)}` : format;
 }
 
 export default React.memo(Address);

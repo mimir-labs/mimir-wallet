@@ -18,15 +18,14 @@ import {
   Switch,
   Typography
 } from '@mui/material';
-import keyring from '@polkadot/ui-keyring';
 import { isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { AddAddressDialog, Address, AddressRow, Input } from '@mimir-wallet/components';
-import { useApi, useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
-import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
+import { useAccount, useApi, useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
@@ -51,6 +50,7 @@ function checkError(
 function PageCreateMultisig() {
   const navigate = useNavigate();
   const { systemChain } = useApi();
+  const { isLocalAccount, isLocalAddress } = useAccount();
   const [name, setName] = useState<string>('');
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({
     address: '',
@@ -79,7 +79,7 @@ function PageCreateMultisig() {
     } else {
       setAddressError(new Error('Please input correct address'));
     }
-  }, [address, isAddressValid, select, toggleAdd]);
+  }, [address, isAddressValid, isLocalAccount, isLocalAddress, select, toggleAdd]);
 
   const _onChangeThreshold = useCallback(
     (value: string) => {
@@ -150,7 +150,7 @@ function PageCreateMultisig() {
                     setAddressError(null);
                   }
 
-                  setAddress({ isAddressValid, address: isAddressValid ? keyring.encodeAddress(value) : value });
+                  setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value) : value });
                 }}
                 placeholder='input address'
                 value={address}
@@ -231,10 +231,10 @@ function PageCreateMultisig() {
                   if (item.pure) {
                     setPrepare({
                       creator: item.creator,
-                      who: item.who.map((address) => keyring.encodeAddress(address)),
+                      who: item.who.map((address) => encodeAddress(address)),
                       threshold: item.threshold,
                       name: item.name,
-                      pure: item.pure ? keyring.encodeAddress(item.pure) : null,
+                      pure: item.pure ? encodeAddress(item.pure) : null,
                       blockNumber: item.blockNumber,
                       extrinsicIndex: item.extrinsicIndex
                     });

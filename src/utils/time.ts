@@ -45,9 +45,8 @@ export function formatTimeStr(duration: number, format: string) {
   });
 }
 
-export function formatCountdown(value: number | string, format: string) {
+export function formatCountdown(value: number | string, format: string, current = Date.now()) {
   const target = new Date(value).getTime();
-  const current = Date.now();
   const diff = Math.max(target - current, 0);
 
   return formatTimeStr(diff, format);

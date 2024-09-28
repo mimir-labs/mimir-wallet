@@ -1,129 +1,76 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { IMethod } from '@polkadot/types/types';
 import type { Transaction } from '@mimir-wallet/hooks/types';
 
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Stack,
-  SvgIcon,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
+import { Alert, AlertTitle, Box, Divider, Grid2 as Grid, Stack } from '@mui/material';
+import moment from 'moment';
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
-import { AddressRow, Hex } from '@mimir-wallet/components';
-import { ellipsisLinesMixin } from '@mimir-wallet/components/utils';
-import { useApi, useDapp, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
-import { Call } from '@mimir-wallet/params';
-import FallbackCall from '@mimir-wallet/params/FallbackCall';
+import { AppName, Hex } from '@mimir-wallet/components';
+import { useApi, useToggle } from '@mimir-wallet/hooks';
+import { Call as CallComp } from '@mimir-wallet/params';
 
-function Item({ content, name }: { name: React.ReactNode; content: React.ReactNode }) {
+function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
-    <Stack alignItems='center' direction='row'>
-      <Box sx={{ width: '30%', maxWidth: 130, fontWeight: 700, textTransform: 'capitalize' }}>{name}</Box>
-      <Box sx={{ width: '70%', flex: '1 0 auto', color: 'text.secondary' }}>{content}</Box>
-    </Stack>
+    <Grid container spacing={1} columns={10} sx={{ fontSize: '0.875rem' }}>
+      <Grid sx={{ display: 'flex', alignItems: 'center', fontWeight: 700 }} size={2}>
+        {title}
+      </Grid>
+      <Grid sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }} size={8}>
+        {content}
+      </Grid>
+    </Grid>
   );
 }
 
-function Extrinsic({ transaction }: { transaction: Transaction }) {
-  const destTx = transaction.top;
+function Extrinsic({ transaction, call }: { transaction: Transaction; call?: IMethod | null }) {
   const { api } = useApi();
-  const selectAccount = useSelectedAccountCallback();
-  const dapp = useDapp(transaction.initTransaction.website);
-  const [open, toggleOpen] = useToggle();
-  const { breakpoints } = useTheme();
-  const upSm = useMediaQuery(breakpoints.up('sm'));
-  const { note } = destTx;
+  const [isOpen, toggleOpen] = useToggle();
 
   return (
     <>
-      <Dialog onClose={toggleOpen} open={open}>
-        <DialogTitle>Call Detail</DialogTitle>
-        <DialogContent>{open && destTx.call && <FallbackCall call={destTx.call} />}</DialogContent>
-      </Dialog>
       <Stack flex='1' spacing={1}>
-        <Stack spacing={1}>
-          <Item
-            content={
-              <AddressRow
-                defaultName={destTx.sender}
-                isMe={destTx === transaction}
-                onClick={(value) => value && selectAccount(value)}
-                shorten={false}
-                size='small'
-                value={destTx.sender}
-                withAddress={false}
-                withCopy
-                withName
-              />
-            }
-            name='From'
-          />
-          {destTx.call && (
-            <Call
-              api={api}
-              call={destTx.call}
-              jsonFallback={false}
-              selectAccount={destTx.action === 'multisig.cancelAsMulti' ? selectAccount : undefined}
-              tx={destTx.action === 'multisig.cancelAsMulti' ? destTx : undefined}
-              type='tx'
-            />
-          )}
-          <Divider />
-          {dapp && (
+        {call ? (
+          <CallComp from={transaction.address} api={api} call={call} jsonFallback />
+        ) : (
+          <Alert severity='warning'>
+            <AlertTitle>Warning</AlertTitle>
+            This transaction wasn’t initiated from Mimir. Please confirm the security of this transaction.
+          </Alert>
+        )}
+
+        <Divider />
+
+        <Item
+          title='App'
+          content={
+            <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />
+          }
+        />
+        <Item title='Hash' content={<Hex showFull value={transaction.callHash} withCopy />} />
+
+        <Box
+          sx={{ fontWeight: 700, color: 'primary.main', cursor: 'pointer', textDecoration: 'none' }}
+          onClick={toggleOpen}
+        >
+          {isOpen ? 'Hide' : 'View'} Details
+        </Box>
+
+        {isOpen && (
+          <>
+            {transaction.call && <Item title='Call Data' content={<Hex value={transaction.call} withCopy />} />}
+            {transaction.note && <Item title='Call Data' content={transaction.note} />}
+            <Item title='Created Block' content={transaction.createdBlock} />
             <Item
-              content={
-                <Box
-                  component={Link}
-                  sx={{
-                    textDecoration: 'none',
-                    color: 'text.primary',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5
-                  }}
-                  to={`/explorer/${encodeURIComponent(dapp.url)}`}
-                >
-                  <Box component='img' src={dapp.icon} width={20} />
-                  {dapp.name}
-                  <SvgIcon component={IconLink} fontSize='small' inheritViewBox />
-                </Box>
-              }
-              name='App'
+              title='Created Extrinsic'
+              content={<Hex showFull value={transaction.createdExtrinsicHash} withCopy />}
             />
-          )}
-          {note && <Item content={<Typography sx={{ ...ellipsisLinesMixin(1) }}>{note}</Typography>} name='Note' />}
-          <Item
-            content={
-              <AddressRow
-                shorten
-                size='small'
-                value={transaction.initTransaction.sender}
-                withAddress={upSm}
-                withCopy
-                withName
-              />
-            }
-            name='Initiator'
-          />
-          <Item content={<Hex value={destTx.hash} withCopy />} name='Call Hash' />
-          <Item content={<Hex value={destTx.call?.toHex()} withCopy />} name='Call Data' />
-          <Box
-            onClick={toggleOpen}
-            sx={{ fontWeight: 600, color: 'primary.main', cursor: 'pointer', textDecoration: 'none' }}
-          >
-            View Parameters
-          </Box>
-        </Stack>
+            <Item title='Created Time' content={moment(transaction.createdAt).format()} />
+            <Item title='Updated Time' content={moment(transaction.updatedAt).format()} />
+          </>
+        )}
       </Stack>
     </>
   );

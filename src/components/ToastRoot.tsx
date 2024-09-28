@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Portal } from '@mui/material';
-import { IconProps, toast, ToastContainer } from 'react-toastify';
+import { IconProps, Icons, toast, ToastContainer } from 'react-toastify';
 import { injectStyle } from 'react-toastify/dist/inject-style';
 
-import { FailedAnimation, NoticeAnimation, SuccessAnimation, WaitingAnimation } from './animation';
+import { FailedAnimation, NoticeAnimation, SuccessAnimation } from './animation';
 import TxError from './TxError';
 
 injectStyle();
@@ -35,7 +35,9 @@ const icon = (props: IconProps) => {
     return <FailedAnimation />;
   }
 
-  return <WaitingAnimation />;
+  const Icon = Icons.warning;
+
+  return <Icon {...props} />;
 };
 
 function ToastRoot() {

@@ -7,14 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { InputAddress, InputNumber } from '@mimir-wallet/components';
-import {
-  useAddresses,
-  useAllAccounts,
-  useApi,
-  useQueryParam,
-  useSelectedAccount,
-  useTxQueue
-} from '@mimir-wallet/hooks';
+import { useAccount, useAllAccounts, useApi, useQueryParam, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
 
 import SelectToken from './SelectToken';
 import { TransferToken } from './types';
@@ -32,7 +25,7 @@ function PageTransfer() {
   const [amount, setAmount] = useState<BN>(BN_ZERO);
   const { addQueue } = useTxQueue();
   const filtered = useAllAccounts();
-  const { allAddresses } = useAddresses();
+  const { addresses } = useAccount();
   const [amountError, setAmountError] = useState<Error | null>(null);
   const [token, setToken] = useState<TransferToken>();
   const [format, sendingBalances, recipientBalances] = useTransferBalance(token, sending, recipient);
@@ -57,15 +50,14 @@ function PageTransfer() {
 
       if (token.isNative) {
         addQueue({
-          extrinsic: api.tx.balances.transferKeepAlive(recipient, amount),
+          call: api.tx.balances.transferKeepAlive(recipient, amount).method,
           accountId: sending
         });
       } else {
         if (!api.tx.assets) return;
 
         addQueue({
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          extrinsic: api.tx.assets.transferKeepAlive(token.assetId, recipient, amount),
+          call: api.tx.assets.transferKeepAlive(token.assetId, recipient, amount).method,
           accountId: sending
         });
       }
@@ -94,7 +86,7 @@ function PageTransfer() {
           <Divider />
           <InputAddress
             balance={recipientBalances}
-            filtered={filtered.concat(allAddresses)}
+            filtered={filtered.concat(addresses.map((item) => item.address))}
             format={format}
             label='Recipient'
             onChange={setRecipient}

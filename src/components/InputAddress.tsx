@@ -1,43 +1,67 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Fade, FormHelperText, InputBase, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material';
-import { keyring } from '@polkadot/ui-keyring';
+import type { AccountData } from '@mimir-wallet/hooks/types';
+
+import {
+  Box,
+  Fade,
+  FormHelperText,
+  InputBase,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
+  SvgIcon,
+  Typography
+} from '@mui/material';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useToggle } from '@mimir-wallet/hooks';
-import { getAddressMeta } from '@mimir-wallet/utils';
+import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
+import { useAccount, useToggle } from '@mimir-wallet/hooks';
 
 import AddressCell from './AddressCell';
 import FormatBalance from './FormatBalance';
 import { InputAddressProps } from './types';
 
-function filterOptions(options: string[], input: string): string[] {
-  if (!input) return options;
+function createOptions(
+  accounts: AccountData[],
+  addresses: { address: string; name: string }[],
+  isSign: boolean,
+  input?: string,
+  filtered?: string[]
+): string[] {
+  const all = accounts.reduce<Record<string, string | null | undefined>>((result, item) => {
+    result[item.address] = item.name;
 
-  return options.filter((address) => {
-    const meta = getAddressMeta(address);
-
-    return (
-      address.toLowerCase().includes(input.toLowerCase()) ||
-      (meta.name ? meta.name.toLowerCase().includes(input.toLowerCase()) : false)
-    );
-  });
-}
-
-function createOptions(isSign: boolean, filtered?: string[]): string[] {
-  const options: string[] = keyring.getAccounts().map((account) => account.address);
+    return result;
+  }, {});
 
   if (!isSign) {
-    options.push(...keyring.getAddresses().map((address) => address.address));
+    addresses.reduce<Record<string, string | null | undefined>>((result, item) => {
+      result[item.address] = item.name;
+
+      return result;
+    }, all);
   }
+
+  let options = Object.entries(all);
 
   if (filtered) {
-    return options.filter((option) => filtered.includes(option));
+    options = options.filter((option) => filtered.includes(option[0]));
   }
 
-  return options;
+  if (!input) return options.map((item) => item[0]);
+
+  return options
+    .filter(([address, name]) => {
+      return (
+        address.toLowerCase().includes(input.toLowerCase()) ||
+        (name ? name.toLowerCase().includes(input.toLowerCase()) : false)
+      );
+    })
+    .map((item) => item[0]);
 }
 
 function InputAddress({
@@ -54,6 +78,7 @@ function InputAddress({
   value: propsValue,
   withBalance
 }: InputAddressProps) {
+  const { accounts, addresses } = useAccount();
   const isControl = useRef(propsValue !== undefined);
   const [value, setValue] = useState<string>(
     isAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : ''
@@ -65,8 +90,8 @@ function InputAddress({
   const open = !!anchorEl;
 
   const options = useMemo(
-    (): string[] => filterOptions(createOptions(isSign, filtered), inputValue),
-    [filtered, inputValue, isSign]
+    (): string[] => createOptions(accounts, addresses, isSign, inputValue, filtered),
+    [accounts, addresses, filtered, inputValue, isSign]
   );
 
   const _onChange = useCallback(
@@ -105,7 +130,7 @@ function InputAddress({
   const width = wrapper.current?.clientWidth;
 
   return (
-    <Box sx={{ overflow: 'hidden' }}>
+    <Box sx={{ overflow: 'hidden', width: '100%' }}>
       {label && (
         <Typography sx={{ fontWeight: 700, marginBottom: 1, color: focus ? 'primary.main' : 'inherit' }}>
           {label}
@@ -118,7 +143,8 @@ function InputAddress({
           padding: 1,
           borderRadius: 1,
           border: '1px solid',
-          borderColor: focus ? 'primary.main' : 'grey.300',
+          borderColor: disabled ? 'transparent' : focus ? 'primary.main' : 'grey.300',
+          bgcolor: disabled ? 'secondary.main' : undefined,
           '.AddressCell-Address': {
             transition: 'all 0.15s',
             opacity: focus || !value ? 0 : 1,
@@ -132,11 +158,18 @@ function InputAddress({
           onBlur={handleBlur}
           onChange={(e) => setInputValue(e.target.value)}
           onFocus={handleFocus}
-          placeholder={placeholder}
-          sx={{ opacity: focus ? 1 : 0, paddingLeft: 4.5, position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+          placeholder={value ? '' : placeholder}
+          sx={{ opacity: 1, paddingLeft: 4.5, position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
           value={inputValue}
+          endAdornment={<SvgIcon component={ArrowDown} inheritViewBox color='primary' />}
         />
-        <Popper anchorEl={anchorEl} open={open} sx={{ width, zIndex: 1300 }} transition>
+        <Popper
+          anchorEl={anchorEl}
+          placement='bottom-start'
+          open={open}
+          sx={{ width, minWidth: 400, maxWidth: '95vw', zIndex: 1300 }}
+          transition
+        >
           {({ TransitionProps }) => (
             <Fade {...TransitionProps} timeout={350}>
               <Paper sx={{ maxHeight: 280, overflowY: 'scroll' }}>

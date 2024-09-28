@@ -66,7 +66,7 @@ function Input({
           placeholder={placeholder}
           rows={rows}
           startAdornment={startAdornment && <InputAdornment position='start'>{startAdornment}</InputAdornment>}
-          sx={{ flex: 1, ...inputSx }}
+          sx={{ flex: 1, ...inputSx, '& textarea': { padding: 0 } }}
           tabIndex={tabIndex}
           type={type}
           value={value}

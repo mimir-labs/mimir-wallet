@@ -1,0 +1,40 @@
+// Copyright 2023-2024 dev.mimir authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import { Navigate, Route, Routes } from 'react-router-dom';
+
+import BaseContainer from './containers/BaseContainer';
+import PageAccountSetting from './pages/account-setting';
+import PageAddProxy from './pages/add-proxy';
+import PageAddressBook from './pages/address-book';
+import PageCreateMultisig from './pages/create-multisig';
+import PageDapp from './pages/dapp';
+import PageExplorer from './pages/explorer';
+import PageProfile from './pages/profile';
+import PageTransactions from './pages/transactions';
+import PageTransfer from './pages/transfer';
+
+function App() {
+  return (
+    <Routes>
+      <Route element={<BaseContainer withSideBar withPadding />}>
+        <Route index element={<PageProfile />} />
+        <Route path='/dapp' element={<PageDapp />} />
+        <Route path='/transactions' element={<PageTransactions />} />
+        <Route path='/address-book' element={<PageAddressBook />} />
+        <Route path='/account-setting/:address' element={<PageAccountSetting />} />
+      </Route>
+      <Route element={<BaseContainer withSideBar={false} withPadding />}>
+        <Route path='/create-multisig' element={<PageCreateMultisig />} />
+        <Route path='/add-proxy/:address' element={<PageAddProxy />} />
+        <Route path='/transfer' element={<PageTransfer />} />
+      </Route>
+      <Route element={<BaseContainer withSideBar={false} withPadding={false} />}>
+        <Route path='/explorer/:url' element={<PageExplorer />} />
+      </Route>
+      <Route path='*' element={<Navigate replace to='/' />} />
+    </Routes>
+  );
+}
+
+export default App;
