@@ -1,14 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box } from '@mui/material';
 import lottie, { AnimationItem } from 'lottie-web';
 import { useEffect, useRef } from 'react';
 
-import DataJson from './mimir-loading.json';
+import DataJson from './lottie-congrats.json';
 
-function MimirLoading() {
-  const container = useRef<HTMLDivElement>();
+function Congrats() {
+  const container = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let animation: AnimationItem | null = null;
@@ -28,7 +27,7 @@ function MimirLoading() {
     };
   }, []);
 
-  return <Box ref={container} sx={{ width: 160, height: 100 }} />;
+  return <div ref={container} style={{ width: 280, height: 280 }} />;
 }
 
-export default MimirLoading;
+export default Congrats;

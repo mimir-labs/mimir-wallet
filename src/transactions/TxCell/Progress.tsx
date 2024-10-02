@@ -44,7 +44,7 @@ function ProgressItem({ account, transaction }: { account?: AccountData; transac
       }}
       variant='elevation'
     >
-      <AddressCell showType withCopy shorten size='small' value={transaction.address} />
+      <AddressCell showType withCopy shorten value={transaction.address} />
       <Box
         sx={({ palette }) => ({
           overflow: 'hidden',
@@ -122,6 +122,17 @@ function ProxyContent({
   transaction: Transaction;
   button?: React.ReactNode;
 }) {
+  if (account.type === 'pure' && account.delegatees.length === 1 && account.delegatees[0].type === 'multisig') {
+    const multisigAccount = account.delegatees[0];
+    const multisigTransaction = transaction.children.find(
+      (item) => item.type === TransactionType.Multisig && addressEq(item.address, multisigAccount.address)
+    );
+
+    if (multisigTransaction) {
+      return <MultisigContent account={multisigAccount} transaction={multisigTransaction} button={button} />;
+    }
+  }
+
   return (
     <Stack spacing={1}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -156,7 +167,7 @@ function AnnounceContent({
 
   const leftTime = currentBlock >= endBlock ? 0 : ((endBlock - currentBlock) * blockInterval) / 1000;
 
-  const leftTImeFormat =
+  const leftTimeFormat =
     leftTime > ONE_DAY
       ? `${formatTimeStr(leftTime * 1000, 'D')} days`
       : leftTime > ONE_HOUR
@@ -197,7 +208,7 @@ function AnnounceContent({
 
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography sx={{ flex: '1' }}>{currentBlock >= endBlock ? 'Review finished' : 'Under Reviewing'}</Typography>
-        {leftTImeFormat}
+        {leftTimeFormat ? `${leftTimeFormat} left` : ''}
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

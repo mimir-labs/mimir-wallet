@@ -7,7 +7,6 @@ import type { HexString } from '@polkadot/util/types';
 import { isAddress } from '@polkadot/util-crypto';
 
 import { encodeAddress } from '@mimir-wallet/api';
-import { currentChain } from '@mimir-wallet/config';
 
 export function accountExplorerLink(
   value?: AccountId | AccountIndex | Address | HexString | string | null
@@ -15,7 +14,7 @@ export function accountExplorerLink(
   const _value = value?.toString();
 
   if (_value && _value.length > 47 && isAddress(_value)) {
-    const explorerUrl = currentChain.explorerUrl;
+    const explorerUrl = window.currentChain.explorerUrl;
 
     if (explorerUrl) {
       return `${explorerUrl}account/${encodeAddress(_value)}`;
@@ -26,21 +25,21 @@ export function accountExplorerLink(
 }
 
 export function subsquareUrl(path?: string): string | undefined {
-  const baseUrl = currentChain.subsquareUrl;
+  const baseUrl = window.currentChain.subsquareUrl;
 
   return baseUrl ? `${baseUrl}${path || ''}` : undefined;
 }
 
 export function proposalApi(): string | undefined {
-  return currentChain.proposalApi;
+  return window.currentChain.proposalApi;
 }
 
 export function serviceUrl(path: string): string {
-  const url: string = currentChain.serviceUrl || 'http://127.0.0.1:8080/';
+  const url: string = window.currentChain.serviceUrl || 'http://127.0.0.1:8080/';
 
   return `${url}${path}`;
 }
 
 export async function socketUrl(): Promise<string> {
-  return currentChain.socketUrl || 'ws://127.0.0.1:8080/ws';
+  return window.currentChain.socketUrl || 'ws://127.0.0.1:8080/ws';
 }

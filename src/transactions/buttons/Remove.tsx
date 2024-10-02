@@ -36,7 +36,8 @@ function Remove({ transaction }: { transaction: Transaction }) {
       onClick={() => {
         addQueue({
           accountId: delegate,
-          call: api.tx.proxy.removeAnnouncement(transaction.address, transaction.callHash)
+          call: api.tx.proxy.removeAnnouncement(transaction.address, transaction.callHash),
+          website: 'mimir://internal/remove-announcement'
         });
       }}
     >

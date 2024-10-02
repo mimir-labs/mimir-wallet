@@ -48,16 +48,17 @@ function extractIdentity(address: string, identity: DeriveAccountRegistration): 
 }
 
 function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
+  const address = value?.toString() || '';
   const { api } = useApi();
-  const info = useDeriveAccountInfo(value);
-  const [chainName, setChainName] = useState<React.ReactNode>(() => extractName((value || '').toString()));
-  const { meta } = useAddressMeta(value?.toString());
+  const info = useDeriveAccountInfo(address);
+  const [chainName, setChainName] = useState<React.ReactNode>(() => extractName(address.toString()));
+  const { meta } = useAddressMeta(address);
 
   // set the actual nickname, local name, accountId
   useEffect((): void => {
     const { accountId, identity, nickname } = info || {};
 
-    const cacheAddr = (accountId || value || '').toString();
+    const cacheAddr = (accountId || address).toString();
 
     if (identity?.parent) {
       parentCache.set(cacheAddr, identity.parent.toString());
@@ -68,9 +69,9 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
     } else if (nickname) {
       setChainName(nickname);
     }
-  }, [api, info, value]);
+  }, [api, info, address]);
 
-  return <>{chainName || meta?.name || defaultName}</>;
+  return <>{chainName || meta?.name || defaultName || address.slice(0, 8).toUpperCase()}</>;
 }
 
 export default React.memo(AddressName);

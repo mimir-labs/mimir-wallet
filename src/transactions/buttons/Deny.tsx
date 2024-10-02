@@ -36,7 +36,8 @@ function Deny({ transaction }: { transaction: Transaction }) {
       onClick={() => {
         addQueue({
           accountId: transaction.address,
-          call: api.tx.proxy.rejectAnnouncement(delegate, transaction.callHash)
+          call: api.tx.proxy.rejectAnnouncement(delegate, transaction.callHash),
+          website: 'mimir://internal/deny-announcement'
         });
       }}
     >

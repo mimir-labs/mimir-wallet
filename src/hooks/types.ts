@@ -97,7 +97,7 @@ export enum TransactionType {
 
 type BaseTransaction = {
   id: number;
-  address: HexString;
+  address: string;
   callHash: HexString;
   section?: string;
   method?: string;
@@ -123,6 +123,9 @@ type BaseTransaction = {
   appName?: string | null;
   iconUrl?: string | null;
   note?: string | null;
+  threshold?: number;
+  members?: string[];
+  delegate?: string;
   children: Transaction[];
 };
 
@@ -264,14 +267,14 @@ export interface SafetyLevel {
 }
 
 export interface AddressMeta {
-  name: string;
+  name?: string;
   cryptoType?: string;
-  isMimir: boolean;
-  isPure: boolean;
-  isProxied: boolean;
-  isProxy: boolean;
-  isInjected: boolean;
-  isMultisig: boolean;
+  isMimir?: boolean;
+  isPure?: boolean;
+  isProxied?: boolean;
+  isProxy?: boolean;
+  isInjected?: boolean;
+  isMultisig?: boolean;
   source?: string;
   threshold?: number;
   who?: string[];

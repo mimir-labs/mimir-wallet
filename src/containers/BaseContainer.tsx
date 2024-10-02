@@ -9,7 +9,6 @@ import { ConnectWalletModal, MimirLoading, TxSubmit } from '@mimir-wallet/compon
 import { useAccount, useApi, useFollowAccounts, useToggle, useTxQueue } from '@mimir-wallet/hooks';
 import { useWallet } from '@mimir-wallet/hooks/useWallet';
 
-import DetectedMultisig from './DetectedMultisig';
 import SideBar from './SideBar';
 import ToggleAlert from './ToggleAlert';
 import TopBar from './TopBar';
@@ -63,7 +62,6 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
               <Outlet />
             </span>
           </Box>
-          <DetectedMultisig />
         </Box>
       ) : (
         <Box

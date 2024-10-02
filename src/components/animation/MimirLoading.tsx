@@ -4,10 +4,10 @@
 import lottie, { AnimationItem } from 'lottie-web';
 import { useEffect, useRef } from 'react';
 
-import DataJson from './lottie-waiting.json';
+import DataJson from './lottie-loading.json';
 
-function Waiting({ size = 28, loop = false }: { size?: number; loop?: boolean }) {
-  const container = useRef(null);
+function MimirLoading() {
+  const container = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let animation: AnimationItem | null = null;
@@ -16,7 +16,7 @@ function Waiting({ size = 28, loop = false }: { size?: number; loop?: boolean })
       animation = lottie.loadAnimation({
         container: container.current,
         renderer: 'svg',
-        loop,
+        loop: true,
         autoplay: true,
         animationData: DataJson
       });
@@ -25,9 +25,9 @@ function Waiting({ size = 28, loop = false }: { size?: number; loop?: boolean })
     return () => {
       animation?.destroy();
     };
-  }, [loop]);
+  }, []);
 
-  return <div ref={container} style={{ width: size, height: size }} />;
+  return <div ref={container} style={{ width: 160, height: 100 }} />;
 }
 
-export default Waiting;
+export default MimirLoading;

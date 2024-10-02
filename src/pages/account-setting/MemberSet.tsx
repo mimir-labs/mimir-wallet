@@ -79,6 +79,7 @@ function MemberSet({
           api.tx.proxy.addProxy(newMultiAddress, 0, 0),
           api.tx.proxy.removeProxy(oldMultiAddress, 0, 0)
         ]),
+        website: 'mimir://internal/setup',
         beforeSend: () =>
           service.createMultisig(
             signatories.map((address) => u8aToHex(decodeAddress(address))),

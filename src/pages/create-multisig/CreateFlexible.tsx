@@ -4,7 +4,6 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { EventRecord } from '@polkadot/types/interfaces';
-import type { AccountData } from '@mimir-wallet/hooks/types';
 import type { PrepareFlexible } from './types';
 
 import { LoadingButton } from '@mui/lab';
@@ -30,27 +29,15 @@ import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react'
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
 import { utm } from '@mimir-wallet/config';
 import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
-import { useAccount, useApi, useCall, useSelectedAccountCallback, useWallet } from '@mimir-wallet/hooks';
-import { getAddressMeta, TxToastCtx } from '@mimir-wallet/providers';
-import { addressEq, addressToHex, service, signAndSend, sleep, store } from '@mimir-wallet/utils';
+import { useApi, useCall, useSelectedAccountCallback, useWallet } from '@mimir-wallet/hooks';
+import { TxToastCtx } from '@mimir-wallet/providers';
+import { addressToHex, service, signAndSend, sleep, store } from '@mimir-wallet/utils';
 
 import { createMultisig } from './CreateStatic';
 
 interface Props {
   prepare: PrepareFlexible;
   onCancel: () => void;
-}
-
-function filterDefaultAccount(accounts: AccountData[], who: string[]): string | undefined {
-  for (const account of accounts) {
-    for (const address of who) {
-      if (account.type !== 'multisig' && addressEq(address, account.address)) {
-        return address;
-      }
-    }
-  }
-
-  return undefined;
 }
 
 function filterPureAccount(api: ApiPromise, events: EventRecord[]): string | undefined {
@@ -98,9 +85,8 @@ function CreateFlexible({
   }
 }: Props) {
   const { api } = useApi();
-  const { accountSource } = useWallet();
-  const { accounts } = useAccount();
-  const [signer, setSigner] = useState(creator || filterDefaultAccount(accounts, who));
+  const { accountSource, walletAccounts } = useWallet();
+  const [signer, setSigner] = useState<string | undefined>(creator || walletAccounts[0].address);
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
   const [blockNumber, setBlockNumber] = useState<number | null | undefined>(_blockNumber);
   const [extrinsicIndex, setExtrinsicIndex] = useState<number | null | undefined>(_extrinsicIndex);
@@ -312,7 +298,7 @@ function CreateFlexible({
       <Typography fontWeight={700}>Transaction Initiator</Typography>
       <InputAddress
         disabled={!!pure}
-        filtered={creator ? [creator] : who.filter((address) => !getAddressMeta(address).isMultisig)}
+        filtered={creator ? [creator] : who.filter((address) => !!accountSource(address))}
         isSign
         onChange={setSigner}
         value={signer}

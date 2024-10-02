@@ -19,16 +19,24 @@ interface UseDapps {
 
 export function useDapp(website?: string | null): DappOption | undefined {
   return useMemo(() => {
-    if (!website) return undefined;
+    if (website) {
+      if (website.startsWith('mimir://')) {
+        const app = dapps.find((item) => website.startsWith(item.url));
 
-    return dapps.find((item) => {
-      if (item.internal) return false;
+        return app;
+      }
 
-      const urlIn = new URL(website);
-      const urlThis = new URL(item.url);
+      const websiteURL = new URL(website);
+      const app = dapps.find((item) => {
+        const appURL = new URL(item.url);
 
-      return urlIn.origin === urlThis.origin;
-    });
+        return websiteURL.hostname === appURL.hostname;
+      });
+
+      return app;
+    }
+
+    return undefined;
   }, [website]);
 }
 
@@ -36,7 +44,10 @@ export function useDapps(): UseDapps {
   const { api } = useApi();
   const [favoriteIds, setFavoriteIds] = useLocalStore<number[]>(FAVORITE_DAPP_KEY, []);
 
-  const dapps = useMemo(() => findSupportedDapps(api), [api]);
+  const dapps = useMemo(
+    () => findSupportedDapps(api).filter((item) => !item.url.startsWith('mimir://internal')),
+    [api]
+  );
   const favorites = useMemo(() => dapps.filter((item) => favoriteIds.includes(item.id)), [dapps, favoriteIds]);
 
   const addFavorite = useCallback(

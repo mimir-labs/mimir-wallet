@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Endpoint } from '@mimir-wallet/config';
+import type { AddressMeta } from '@mimir-wallet/hooks/types';
 import type { AddressState } from './types';
 
 import { isAddress } from '@polkadot/util-crypto';
@@ -9,15 +11,17 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 
 import { ApiCtx, encodeAddress } from '@mimir-wallet/api';
 import { CURRENT_ADDRESS_PREFIX } from '@mimir-wallet/constants';
-import { addressEq, service, store } from '@mimir-wallet/utils';
+import { useLocalStore } from '@mimir-wallet/hooks';
+import { addressEq, service } from '@mimir-wallet/utils';
 
 import { extraAccounts, sync } from './sync';
 import { _useAddresses } from './useAddresses';
-import { _setAllAccounts, _setAllAddresses } from './utils';
+import { deriveAddressMeta } from './utils';
 import { WalletCtx } from './Wallet';
 
 interface Props {
   address?: string;
+  chain: Endpoint;
   children?: React.ReactNode;
 }
 const EMPTY_STATE = {
@@ -28,22 +32,37 @@ const EMPTY_STATE = {
 
 export const AddressCtx = React.createContext<AddressState>({} as AddressState);
 
-export function AddressCtxRoot({ children, address }: Props): React.ReactElement<Props> {
+export function AddressCtxRoot({ children, chain, address }: Props): React.ReactElement<Props> {
   const [state, setState] = useState<AddressState>({
-    ...EMPTY_STATE,
-    current: address ? encodeAddress(address) : undefined
+    ...EMPTY_STATE
   });
-  const { genesisHash, network } = useContext(ApiCtx);
+  const [current, setCurrent] = useLocalStore<string | undefined>(
+    `${CURRENT_ADDRESS_PREFIX}${chain.key}`,
+    address ? encodeAddress(address) : undefined
+  );
+  const { genesisHash } = useContext(ApiCtx);
   const { isWalletReady, walletAccounts } = useContext(WalletCtx);
   const [addresses, setAddressName] = _useAddresses();
-
-  _setAllAccounts(state.accounts);
-  _setAllAddresses(addresses);
+  const [metas, setMetas] = useState<Record<string, AddressMeta>>({});
 
   useEffect(() => {
+    setMetas(deriveAddressMeta(state.accounts, state.addresses));
+  }, [state.accounts, state.addresses]);
+
+  useEffect(() => {
+    let interval: any;
+
     if (isWalletReady) {
       sync(genesisHash, walletAccounts, setState);
+
+      interval = setInterval(() => {
+        sync(genesisHash, walletAccounts, setState);
+      }, 6000);
     }
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [genesisHash, isWalletReady, walletAccounts]);
 
   const resync = useCallback(async () => {
@@ -67,18 +86,33 @@ export function AddressCtxRoot({ children, address }: Props): React.ReactElement
   const _setCurrent = useCallback(
     (address: string) => {
       if (address && isAddress(address)) {
-        store.set(`${CURRENT_ADDRESS_PREFIX}${network}`, address);
-        setState((state) => ({ ...state, current: encodeAddress(address) }));
+        setCurrent(encodeAddress(address));
       }
     },
-    [network]
+    [setCurrent]
   );
+
+  const appendMeta = useCallback((meta: Record<string, AddressMeta>) => {
+    setMetas((metas) => {
+      return Object.entries(meta).reduce(
+        (result, item) => {
+          result[item[0]] = { ...result[item[0]], ...item[1] };
+
+          return result;
+        },
+        { ...metas }
+      );
+    });
+  }, []);
 
   const value = useMemo(
     () => ({
       ...state,
+      current,
+      metas,
       addresses,
       resync,
+      appendMeta,
       setCurrent: _setCurrent,
       setAccountName: (address: string, name: string) =>
         setState((state) => {
@@ -91,7 +125,7 @@ export function AddressCtxRoot({ children, address }: Props): React.ReactElement
       isLocalAccount,
       isLocalAddress
     }),
-    [state, addresses, resync, _setCurrent, setAddressName, isLocalAccount, isLocalAddress]
+    [state, current, metas, addresses, resync, appendMeta, _setCurrent, setAddressName, isLocalAccount, isLocalAddress]
   );
 
   return <AddressCtx.Provider value={value}>{children}</AddressCtx.Provider>;

@@ -6,7 +6,7 @@ import type { AccountId, Address, Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { TxEvents } from '@mimir-wallet/utils';
-import type { AccountData, AccountDataExtra, FilterPath, Transaction } from '../hooks/types';
+import type { AccountData, AccountDataExtra, AddressMeta, FilterPath, Transaction } from '../hooks/types';
 
 export interface Filtered {
   [key: string]: Filtered | undefined;
@@ -64,7 +64,9 @@ export interface AddressState {
   addresses: { address: string; name: string }[];
   current?: string;
   isMultisigSyned: boolean;
+  metas: Record<string, AddressMeta>;
   resync: () => void;
+  appendMeta: (meta: Record<string, AddressMeta>) => void;
   setCurrent: (address: string) => void;
   setAccountName: (address: string, name: string) => void;
   setAddressName: (address: string, name: string) => void;

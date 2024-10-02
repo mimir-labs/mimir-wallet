@@ -109,7 +109,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
       <Box>
         <Paper
           sx={{
-            width: 200,
+            width: 220,
             padding: 1,
             display: 'flex',
             alignItems: 'center',
@@ -120,7 +120,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
             borderBottomRightRadius: !data.successForThisPath && call && source ? 0 : undefined
           }}
         >
-          <AddressCell size='small' value={data.account.address} withCopy />
+          <AddressCell showType value={data.account.address} withCopy />
           {icon}
         </Paper>
         {!data.successForThisPath && call && source && (
@@ -377,7 +377,7 @@ function TxOverview({ account, call, transaction, ...props }: Props) {
     const initialEdges: Edge[] = [];
 
     makeNodes(account, call, transaction, initialNodes, initialEdges);
-    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges);
+    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 270, 70);
 
     setNodes(nodes);
     setEdges(edges);

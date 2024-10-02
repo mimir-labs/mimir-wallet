@@ -4,7 +4,7 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { alpha, Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
 import { useAccount, useAddressMeta, useToggle } from '@mimir-wallet/hooks';
@@ -16,8 +16,9 @@ import CopyButton from './CopyButton';
 import IdentityIcon from './IdentityIcon';
 
 interface Props {
+  defaultName?: string;
   value?: AccountId | AccountIndex | Address | string | null;
-  size?: 'small' | 'medium' | 'large';
+  iconSize?: number;
   shorten?: boolean;
   showType?: boolean;
   withCopy?: boolean;
@@ -28,29 +29,18 @@ interface Props {
 }
 
 function AddressCell({
+  defaultName,
   icons,
   isMe,
   namePost,
   shorten = true,
   showType = false,
-  size = 'medium',
   value,
   width,
+  iconSize = 30,
   withCopy = false
 }: Props) {
-  const [iconSize, nameFontSize, addressFontSize, spacing, spacingCol] = useMemo((): [
-    number,
-    string,
-    string,
-    number,
-    number
-  ] => {
-    return size === 'small'
-      ? [30, '0.875rem', '0.75rem', 0.5, 0.2]
-      : size === 'medium'
-        ? [40, '1rem', '0.75rem', 0.5, 0.5]
-        : [50, '1.25rem', '0.875rem', 1, 0.5];
-  }, [size]);
+  const [nameFontSize, addressFontSize, spacing, spacingCol] = ['0.875rem', '0.75rem', 0.5, 0.2];
   const [open, toggleOpen] = useToggle();
 
   const address = value?.toString();
@@ -67,21 +57,21 @@ function AddressCell({
             <Typography
               component='span'
               fontSize={nameFontSize}
-              fontWeight={size === 'large' ? 800 : 700}
+              fontWeight={700}
               sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
             >
-              <AddressName value={value} />
+              <AddressName defaultName={defaultName} value={value} />
             </Typography>
             {namePost}
             {showType && (
               <>
-                {isMultisig && <Chip color='secondary' label='Multisig' size={size === 'large' ? 'medium' : 'small'} />}
+                {isMultisig && <Chip color='secondary' label='Multisig' size='small' />}
                 {isProxied && (
                   <Chip
                     color='default'
                     sx={{ bgcolor: alpha('#B700FF', 0.05), color: '#B700FF' }}
                     label='Proxied'
-                    size={size === 'large' ? 'medium' : 'small'}
+                    size='small'
                   />
                 )}
               </>
@@ -104,7 +94,7 @@ function AddressCell({
                   toggleOpen();
                 }}
                 size='small'
-                sx={{ opacity: 0.7 }}
+                sx={{ opacity: 0.7, fontSize: '0.8em' }}
               >
                 <SvgIcon component={IconAddressBook} inheritViewBox />
               </IconButton>

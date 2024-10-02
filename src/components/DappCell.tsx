@@ -63,7 +63,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
             <Button
               component={Link}
               onClick={(e) => e.stopPropagation()}
-              to={dapp.internal ? dapp.url : `/explorer/${encodeURIComponent(dapp.url)}`}
+              to={`/explorer/${encodeURIComponent(dapp.url)}`}
               variant='outlined'
             >
               Enter

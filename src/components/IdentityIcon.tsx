@@ -103,7 +103,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
           }}
         />
       ) : null}
-      {isMultisig && (
+      {who && who.length > 0 && (
         <Box
           component='span'
           sx={{
@@ -111,18 +111,18 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
             left: 0,
             right: 0,
             bottom: 0,
-            height: 12 + size / 8,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             width: '100%',
+            height: 12,
+            paddingX: 0.5,
             borderRadius: `${6 + size / 16}px`,
             bgcolor: 'primary.main',
             color: 'common.white',
             fontWeight: 700,
-            fontSize: '0.75rem',
-            transformOrigin: 'center',
-            transform: size < 24 ? `scale(${size / 24})` : undefined
+            fontSize: 10,
+            lineHeight: '12px'
           }}
         >
           {threshold}/{who?.length}

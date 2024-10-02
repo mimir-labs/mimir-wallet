@@ -3,14 +3,14 @@
 
 import type { AddressMeta } from './types';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { toastError } from '@mimir-wallet/components';
-import { deriveAddressMeta } from '@mimir-wallet/providers';
-import { addressEq, addressToHex, service } from '@mimir-wallet/utils';
+import { addressToHex, service } from '@mimir-wallet/utils';
 
 import { createNamedHook } from './createNamedHook';
 import { useAccount } from './useAccounts';
+import { useWallet } from './useWallet';
 
 interface UseAddressMeta {
   meta: AddressMeta;
@@ -20,21 +20,19 @@ interface UseAddressMeta {
 }
 
 function useAddressMetaImpl(value?: string | null): UseAddressMeta {
-  const { addresses, setAddressName, setAccountName, accounts } = useAccount();
-  const account = useMemo(() => accounts.find((item) => addressEq(item.address, value)), [accounts, value]);
-  const address = useMemo(() => addresses.find((item) => addressEq(item.address, value)), [addresses, value]);
+  const { metas, setAddressName, setAccountName, isLocalAccount } = useAccount();
+  const { accountSource } = useWallet();
+  const _meta = metas[value || ''];
 
-  const [meta, setMeta] = useState<AddressMeta>(() => deriveAddressMeta(account, address, value));
-  const [name, setName] = useState<string>(meta.name);
+  const [meta, setMeta] = useState<AddressMeta>(_meta || {});
+  const [name, setName] = useState<string>(meta.name || '');
 
   useEffect(() => {
-    if (value) {
-      const meta = deriveAddressMeta(account, address, value);
-
-      setMeta(meta);
-      setName(meta.name);
+    if (_meta) {
+      setMeta(_meta);
+      setName(_meta.name || '');
     }
-  }, [account, address, value]);
+  }, [_meta]);
 
   const saveName = useCallback(
     async (cb?: (name: string) => void) => {
@@ -43,7 +41,7 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
       if (name === meta.name) return;
 
       try {
-        if (account && !account.source) {
+        if (isLocalAccount(value) && !accountSource(value)) {
           await service.updateAccountName(addressToHex(value), name);
           setAccountName(value, name);
           cb?.(name);
@@ -55,7 +53,7 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
         toastError(error);
       }
     },
-    [account, meta.name, name, setAccountName, setAddressName, value]
+    [accountSource, isLocalAccount, meta.name, name, setAccountName, setAddressName, value]
   );
 
   return {

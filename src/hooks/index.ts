@@ -26,6 +26,7 @@ export * from './useQueryAccount';
 export * from './useQueryParams';
 export * from './useCacheMultisig';
 export * from './useSelectedAccount';
+export * from './useStore';
 export * from './useToggle';
 export * from './useTokenInfo';
 export * from './useTransactions';

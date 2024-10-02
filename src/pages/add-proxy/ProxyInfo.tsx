@@ -17,7 +17,7 @@ function ProxyInfo({
 }: {
   delay: number;
   proxyType: string;
-  proxied: string;
+  proxied?: string;
   delegate: string;
   onDelete?: () => void;
 }) {
@@ -58,9 +58,9 @@ function ProxyInfo({
           '&>.AddressCell': { bgcolor: 'background.paper', paddingY: 0.5, paddingX: 1, borderRadius: 1 }
         }}
       >
-        <AddressCell withCopy size='small' value={proxied} />
+        <AddressCell withCopy value={proxied} />
         <SvgIcon component={IconArrow} fontSize='small' inheritViewBox color='primary' />
-        <AddressCell withCopy size='small' value={delegate} />
+        <AddressCell withCopy value={delegate} />
       </Box>
     </Box>
   );

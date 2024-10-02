@@ -152,7 +152,7 @@ function InputAddress({
           }
         }}
       >
-        <AddressCell shorten={false} size='small' value={value} />
+        <AddressCell shorten={false} value={value} />
         <InputBase
           disabled={disabled}
           onBlur={handleBlur}
@@ -177,7 +177,7 @@ function InputAddress({
                   {options.length > 0 ? (
                     options.map((item, index) => (
                       <MenuItem key={index} onClick={() => _onChange(item)}>
-                        <AddressCell shorten={false} size='small' value={item} />
+                        <AddressCell shorten={false} value={item} />
                       </MenuItem>
                     ))
                   ) : (

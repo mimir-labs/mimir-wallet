@@ -127,13 +127,13 @@ function AccountCell({
             bgcolor: selected ? 'secondary.main' : undefined
           }}
         >
-          <AddressCell shorten showType size='small' value={value} withCopy />
+          <AddressCell shorten showType value={value} withCopy />
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 700 }}>
             <FormatBalance value={balances?.total} />
 
             <Avatar alt='Token' src={icon} sx={{ width: 16, height: 16 }} />
           </Box>
-          <IconButton color='inherit' onClick={handleMore} size='small'>
+          <IconButton color='inherit' onClick={handleMore}>
             <SvgIcon component={IconMore} inheritViewBox />
           </IconButton>
         </ListItemButton>
@@ -166,7 +166,7 @@ function Search({ onChange, value }: { value: string; onChange: (value: string) 
   );
 }
 
-function CreateMultisig({ selected }: { selected: string }) {
+function CreateMultisig() {
   const navigate = useNavigate();
 
   return (
@@ -219,7 +219,7 @@ function CreateMultisig({ selected }: { selected: string }) {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  navigate(`/add-proxy/${selected}`);
+                  navigate(`/add-proxy`);
                   popupState.close();
                 }}
               >
@@ -227,7 +227,7 @@ function CreateMultisig({ selected }: { selected: string }) {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  navigate('/create-multisig');
+                  navigate('/create-pure');
                   popupState.close();
                 }}
               >
@@ -305,7 +305,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
           </List>
         </Box>
 
-        {selected && <CreateMultisig selected={selected} />}
+        <CreateMultisig />
       </Drawer>
     </>
   );

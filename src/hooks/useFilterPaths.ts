@@ -96,7 +96,7 @@ function findFilterPaths(
       return;
     }
 
-    if (!transaction || (transaction.status !== TransactionStatus.Success && accountSource(node.value.address))) {
+    if ((!transaction || transaction.status !== TransactionStatus.Success) && accountSource(node.value.address)) {
       paths.push(path.slice());
     }
 

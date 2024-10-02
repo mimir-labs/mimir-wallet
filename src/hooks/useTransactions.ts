@@ -2,22 +2,56 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { isEqual } from 'lodash-es';
+import { useEffect, useState } from 'react';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import { fetcher } from '@mimir-wallet/utils';
 import { serviceUrl } from '@mimir-wallet/utils/chain-links';
 
 import { Transaction } from './types';
 
+function transformTransaction(transaction: Transaction): Transaction {
+  const tx = { ...transaction };
+
+  tx.address = encodeAddress(tx.address);
+
+  if (tx.delegate) {
+    tx.delegate = encodeAddress(tx.delegate);
+  }
+
+  if (tx.members) {
+    tx.members = tx.members.map((item) => encodeAddress(item));
+  }
+
+  return {
+    ...tx,
+    children: tx.children.map((item) => transformTransaction(item))
+  };
+}
+
 export function usePendingTransactions(
   address?: string | null
 ): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
+  const [txs, setTxs] = useState<Transaction[]>([]);
+
   const { data, isFetched, isFetching } = useQuery<Transaction[]>({
     initialData: [],
     queryHash: serviceUrl(`tx/pending?address=${address}`),
     queryKey: [address ? serviceUrl(`tx/pending?address=${address}`) : null]
   });
 
-  return [data, isFetched, isFetching];
+  useEffect(() => {
+    if (data) {
+      setTxs((value) => {
+        const newData = data.map((item) => transformTransaction(item));
+
+        return isEqual(newData, value) ? value : newData;
+      });
+    }
+  }, [data]);
+
+  return [txs, isFetched, isFetching];
 }
 
 export function useHistoryTransactions(
@@ -31,6 +65,8 @@ export function useHistoryTransactions(
   isFetchingNextPage: boolean,
   fetchNextPage: () => void
 ] {
+  const [txs, setTxs] = useState<Transaction[]>([]);
+
   const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
     initialPageParam: null,
     queryKey: [address ? serviceUrl(`tx/history?address=${address}&limit=${limit}`) : null],
@@ -56,5 +92,15 @@ export function useHistoryTransactions(
     refetchInterval: 0
   });
 
-  return [data?.pages.flat() || [], isFetched, isFetching, hasNextPage, isFetchingNextPage, fetchNextPage];
+  useEffect(() => {
+    if (data) {
+      setTxs((value) => {
+        const newData = data.pages.flat().map((item) => transformTransaction(item));
+
+        return isEqual(newData, value) ? value : newData;
+      });
+    }
+  }, [data]);
+
+  return [txs, isFetched, isFetching, hasNextPage, isFetchingNextPage, fetchNextPage];
 }

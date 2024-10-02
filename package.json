@@ -86,7 +86,6 @@
     "@types/css-mediaquery": "^0.1.4",
     "@types/dagre": "^0",
     "@types/json2mq": "^0.2.2",
-    "@types/lodash": "^4.17.7",
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",

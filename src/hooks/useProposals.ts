@@ -22,9 +22,10 @@ export interface ProposalData {
 }
 
 export function useProposal(): ProposalData[] {
+  const proposalApi = chainLinks.proposalApi();
   const { data } = useQuery<{ items: ProposalData[] }>({
-    queryHash: `${chainLinks.proposalApi()}`,
-    queryKey: [chainLinks.proposalApi() ? chainLinks.proposalApi() : null]
+    queryHash: `${proposalApi}`,
+    queryKey: [proposalApi || null]
   });
 
   return useMemo(() => data?.items || [], [data]);

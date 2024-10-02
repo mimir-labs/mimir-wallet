@@ -49,7 +49,8 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
                     onClick={() => {
                       addQueue({
                         accountId: address,
-                        call: api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType, proxy.delay)
+                        call: api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType, proxy.delay),
+                        website: 'mimir://internal/setup'
                       });
                     }}
                   >

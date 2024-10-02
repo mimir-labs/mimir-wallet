@@ -99,8 +99,7 @@ export async function sync(
       setState((state) => ({
         ...state,
         isMultisigSyned: true,
-        accounts: isEqual(state.accounts, accounts) ? state.accounts : accounts,
-        current: state.current || accounts[0]?.address
+        accounts: isEqual(state.accounts, accounts) ? state.accounts : accounts
       }));
 
       break;

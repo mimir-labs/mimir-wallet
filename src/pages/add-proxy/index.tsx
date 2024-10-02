@@ -4,6 +4,7 @@
 import type { u128, Vec } from '@polkadot/types';
 import type { PalletProxyProxyDefinition } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
+import type { ProxyArgs } from './types';
 
 import { LoadingButton } from '@mui/lab';
 import {
@@ -21,7 +22,7 @@ import {
   Typography
 } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAsyncFn } from 'react-use';
 
 import IconArrow from '@mimir-wallet/assets/svg/icon-arrow.svg?react';
@@ -38,39 +39,35 @@ import {
 } from '@mimir-wallet/hooks';
 
 import ProxyInfo from './ProxyInfo';
+import PureCell from './PureCell';
 
-type ProxyArgs = {
-  delegate: string;
-  proxyType: string;
-  delay: number;
-};
-
-function PageAddProxy() {
+function PageAddProxy({ pure }: { pure?: boolean }) {
   const { api } = useApi();
   const navigate = useNavigate();
   const { addQueue } = useTxQueue();
-  const { address } = useParams() as { address: string };
-  const { accounts } = useAccount();
+  const { accounts, current } = useAccount();
   const proxyTypes = useProxyTypes();
   const [proxyType, setProxyType] = useState<string>(proxyTypes.defKeys[0]);
-  const [proxied, setProxied] = useState<string | undefined>(address);
-  const [proxy, setProxy] = useState<string | undefined>(accounts[0]?.address);
+  const [proxied, setProxied] = useState<string | undefined>(current);
+  const [proxy, setProxy] = useState<string | undefined>(pure ? current : accounts[0]?.address);
   const [advanced, toggleAdvanced] = useToggle();
   const [reviewWindow, setReviewWindow] = useState<number>(0);
   const [custom, setCustom] = useState<string>('');
   const blockInterval = useBlockInterval().toNumber();
   const [proxyArgs, setProxyArgs] = useState<ProxyArgs[]>([]);
-  const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(api.query.proxy.proxies, [address]);
+  const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(pure ? undefined : api.query.proxy.proxies, [
+    proxied
+  ]);
 
   const existsProxies = useMemo(
     () =>
       proxies?.[0].map((proxy) => ({
-        proxied: address,
+        proxied,
         delegate: proxy.delegate.toString(),
         delay: proxy.delay.toNumber(),
         proxyType: proxy.proxyType.toString()
       })) || [],
-    [address, proxies]
+    [proxied, proxies]
   );
 
   const estimateCustom =
@@ -98,16 +95,18 @@ function PageAddProxy() {
       return;
     }
 
-    const result = await api.query.proxy.proxies(proxied);
+    if (!pure) {
+      const result = await api.query.proxy.proxies(proxied);
 
-    if (result[0].find((item) => item.delegate.toString() === proxy)) {
-      toastWarn('Already added');
+      if (result[0].find((item) => item.delegate.toString() === proxy)) {
+        toastWarn('Already added');
 
-      return;
+        return;
+      }
     }
 
     setProxyArgs([...proxyArgs, { delegate: proxy, proxyType, delay }]);
-  }, [api.query.proxy, custom, proxied, proxy, proxyArgs, proxyType, reviewWindow]);
+  }, [api.query.proxy, custom, proxied, proxy, proxyArgs, proxyType, pure, reviewWindow]);
 
   return (
     <>
@@ -124,13 +123,17 @@ function PageAddProxy() {
             </Box>
             <Divider />
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <InputAddress
-                disabled={!!proxyArgs.length}
-                value={proxied}
-                onChange={setProxied}
-                label='Proxied Account'
-                isSign
-              />
+              {pure ? (
+                <PureCell />
+              ) : (
+                <InputAddress
+                  disabled={!!proxyArgs.length}
+                  value={proxied}
+                  onChange={setProxied}
+                  label='Proxied Account'
+                  isSign={!!pure}
+                />
+              )}
               <SvgIcon
                 component={IconArrow}
                 fontSize='small'
@@ -185,45 +188,65 @@ function PageAddProxy() {
               </>
             )}
 
-            <LoadingButton
-              disabled={!proxied || !proxy}
-              fullWidth
-              variant='outlined'
-              onClick={onAdd}
-              loading={state.loading}
-            >
-              Add
-            </LoadingButton>
+            {!pure && (
+              <LoadingButton
+                disabled={!proxied || !proxy}
+                fullWidth
+                variant='outlined'
+                onClick={onAdd}
+                loading={state.loading}
+              >
+                Add
+              </LoadingButton>
+            )}
 
             {!!(proxyArgs.length + (existsProxies.length || 0)) && <Divider />}
 
-            {existsProxies.map((proxy, index) => (
-              <ProxyInfo
-                key={`proxy_${index}`}
-                proxied={address}
-                delegate={proxy.delegate}
-                delay={proxy.delay}
-                proxyType={proxy.proxyType}
-              />
-            ))}
+            {!pure &&
+              existsProxies.map((proxy, index) => (
+                <ProxyInfo
+                  key={`proxy_${index}`}
+                  proxied={proxy.proxied}
+                  delegate={proxy.delegate}
+                  delay={proxy.delay}
+                  proxyType={proxy.proxyType}
+                />
+              ))}
 
-            {proxyArgs.map((arg, index) => (
-              <ProxyInfo
-                key={index}
-                proxied={address}
-                delegate={arg.delegate}
-                delay={arg.delay}
-                proxyType={arg.proxyType}
-                onDelete={() => {
-                  setProxyArgs((args) => args.filter((_, i) => index !== i));
-                }}
-              />
-            ))}
+            {!pure &&
+              proxyArgs.map((arg, index) => (
+                <ProxyInfo
+                  key={index}
+                  proxied={proxied}
+                  delegate={arg.delegate}
+                  delay={arg.delay}
+                  proxyType={arg.proxyType}
+                  onDelete={() => {
+                    setProxyArgs((args) => args.filter((_, i) => index !== i));
+                  }}
+                />
+              ))}
 
             <Button
               fullWidth
-              disabled={!proxyArgs.length || !proxied}
+              disabled={pure ? !proxy : !proxyArgs.length || !proxied}
               onClick={() => {
+                if (pure) {
+                  if (!proxy) {
+                    return;
+                  }
+
+                  const delay = reviewWindow === -1 ? Number(custom) : reviewWindow;
+
+                  addQueue({
+                    call: api.tx.proxy.createPure(proxyType as any, delay, 0).method,
+                    accountId: proxy,
+                    website: 'mimir://internal/create-pure'
+                  });
+
+                  return;
+                }
+
                 if (!proxyArgs.length || !proxied) {
                   return;
                 }
@@ -233,7 +256,8 @@ function PageAddProxy() {
                     call: api.tx.utility.batchAll(
                       proxyArgs.map((item) => api.tx.proxy.addProxy(item.delegate, item.proxyType as any, item.delay))
                     ).method,
-                    accountId: proxied
+                    accountId: proxied,
+                    website: 'mimir://internal/setup'
                   });
                 } else
                   addQueue({
@@ -242,7 +266,8 @@ function PageAddProxy() {
                       proxyArgs[0].proxyType as any,
                       proxyArgs[0].delay
                     ).method,
-                    accountId: proxied
+                    accountId: proxied,
+                    website: 'mimir://internal/setup'
                   });
               }}
             >

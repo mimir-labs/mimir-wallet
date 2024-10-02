@@ -73,7 +73,7 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
           {addresses.map((item, index) => (
             <MenuItem value={item.id} key={index}>
               <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <AddressCell size='small' value={item.address} withCopy showType />
+                <AddressCell value={item.address} withCopy showType />
                 <Chip
                   color={item.type === 'multisig' ? 'secondary' : item.type === 'proxy' ? 'default' : 'primary'}
                   label={item.type === 'multisig' ? 'AsMulti' : item.type === 'proxy' ? 'Proxy' : 'Origin'}

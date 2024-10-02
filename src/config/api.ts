@@ -272,7 +272,7 @@ export const paseoEndpoints: Endpoint[] = [
     wsUrl: 'wss://paseo.rpc.amforc.com',
     genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
     serviceUrl:
-      process.env.NODE_ENV === 'production' ? 'https://paseo-api.mimir.global/' : 'https://dev-api.mimir.global/',
+      process.env.NODE_ENV === 'production' ? 'https://dev-api.mimir.global/' : 'https://dev-api.mimir.global/',
     socketUrl: 'wss://paseo-api.mimir.global/',
     explorerUrl: 'https://paseo.subscan.io/'
   }
@@ -330,8 +330,6 @@ export const allEndpoints = testnetEndpoints
   .concat(paseoEndpoints)
   .concat(solochainEndpoints);
 
-export let currentChain: Endpoint;
-
 export function initMimir() {
   const search = new URLSearchParams(window.location.search);
 
@@ -366,7 +364,13 @@ export function initMimir() {
     address = localAddress;
   }
 
-  currentChain = chain;
+  if (address) {
+    store.set(`${CURRENT_ADDRESS_PREFIX}${chain.key}`, address);
+  } else {
+    store.remove(`${CURRENT_ADDRESS_PREFIX}${chain.key}`);
+  }
+
+  window.currentChain = chain;
 
   return {
     address,

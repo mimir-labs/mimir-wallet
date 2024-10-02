@@ -57,7 +57,7 @@ function Contents({ dapp }: { dapp: DappOption }) {
         <Box
           sx={{ display: 'flex', alignItems: 'center', gap: 1, '>.MuiIconButton-root': { bgcolor: 'secondary.main' } }}
         >
-          {dapp.tags.map((tag, index) => (
+          {dapp.tags?.map((tag, index) => (
             <Button color='secondary' key={index} size='small' sx={{ fontWeight: 500 }}>
               {tag}
             </Button>
@@ -97,12 +97,7 @@ function DappDetails({ dapp, onClose, open }: Props) {
     <Dialog fullWidth maxWidth='sm' onClose={onClose} open={open}>
       <Contents dapp={dapp} />
       <DialogActions sx={{ justifyContent: 'center' }}>
-        <Button
-          component={Link}
-          size='large'
-          sx={{ width: 195 }}
-          to={dapp.internal ? dapp.url : `/explorer/${encodeURIComponent(dapp.url)}`}
-        >
+        <Button component={Link} size='large' sx={{ width: 195 }} to={`/explorer/${encodeURIComponent(dapp.url)}`}>
           Open
         </Button>
       </DialogActions>

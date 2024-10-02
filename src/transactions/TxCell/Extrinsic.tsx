@@ -4,21 +4,22 @@
 import type { IMethod } from '@polkadot/types/types';
 import type { Transaction } from '@mimir-wallet/hooks/types';
 
-import { Alert, AlertTitle, Box, Divider, Grid2 as Grid, Stack } from '@mui/material';
+import { Box, Divider, Grid2 as Grid, Stack } from '@mui/material';
 import moment from 'moment';
 import React from 'react';
 
 import { AppName, Hex } from '@mimir-wallet/components';
-import { useApi, useToggle } from '@mimir-wallet/hooks';
-import { Call as CallComp } from '@mimir-wallet/params';
+import { useToggle } from '@mimir-wallet/hooks';
 
-function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
+import Target from './Target';
+
+export function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
     <Grid container spacing={1} columns={10} sx={{ fontSize: '0.875rem' }}>
-      <Grid sx={{ display: 'flex', alignItems: 'center', fontWeight: 700 }} size={2}>
+      <Grid sx={{ display: 'flex', alignItems: 'center', fontWeight: 700, fontSize: '0.75rem' }} size={2}>
         {title}
       </Grid>
-      <Grid sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }} size={8}>
+      <Grid sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary', fontSize: '0.75rem' }} size={8}>
         {content}
       </Grid>
     </Grid>
@@ -26,20 +27,12 @@ function Item({ content, title }: { title?: React.ReactNode; content?: React.Rea
 }
 
 function Extrinsic({ transaction, call }: { transaction: Transaction; call?: IMethod | null }) {
-  const { api } = useApi();
   const [isOpen, toggleOpen] = useToggle();
 
   return (
     <>
       <Stack flex='1' spacing={1}>
-        {call ? (
-          <CallComp from={transaction.address} api={api} call={call} jsonFallback />
-        ) : (
-          <Alert severity='warning'>
-            <AlertTitle>Warning</AlertTitle>
-            This transaction wasn’t initiated from Mimir. Please confirm the security of this transaction.
-          </Alert>
-        )}
+        <Target address={transaction.address} call={call} />
 
         <Divider />
 

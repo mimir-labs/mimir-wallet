@@ -26,12 +26,13 @@ function App() {
       </Route>
       <Route element={<BaseContainer withSideBar={false} withPadding />}>
         <Route path='/create-multisig' element={<PageCreateMultisig />} />
-        <Route path='/add-proxy/:address' element={<PageAddProxy />} />
-        <Route path='/transfer' element={<PageTransfer />} />
+        <Route path='/add-proxy' element={<PageAddProxy />} />
+        <Route path='/create-pure' element={<PageAddProxy pure />} />
       </Route>
       <Route element={<BaseContainer withSideBar={false} withPadding={false} />}>
         <Route path='/explorer/:url' element={<PageExplorer />} />
       </Route>
+      <Route path='/transfer' element={<PageTransfer />} />
       <Route path='*' element={<Navigate replace to='/' />} />
     </Routes>
   );

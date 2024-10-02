@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
+import type { HexString } from '@polkadot/util/types';
 import type { ApiProps, ApiState } from './types';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
@@ -11,7 +12,7 @@ import { decodeAddress as decodeAddressBase, encodeAddress as encodeAddressBase 
 import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { currentChain, Endpoint, typesBundle } from '@mimir-wallet/config';
+import { Endpoint, typesBundle } from '@mimir-wallet/config';
 import { service } from '@mimir-wallet/utils';
 
 import { registry } from './typeRegistry';
@@ -33,7 +34,7 @@ export const DEFAULT_DECIMALS = registry.createType('u32', 12);
 export const DEFAULT_SS58 = registry.createType('u32', addressDefaults.prefix);
 export const DEFAULT_AUX = ['Aux1', 'Aux2', 'Aux3', 'Aux4', 'Aux5', 'Aux6', 'Aux7', 'Aux8', 'Aux9'];
 
-export function encodeAddress(key: string | Uint8Array, ss58Format = currentChain.ss58Format) {
+export function encodeAddress(key: string | Uint8Array, ss58Format = window?.currentChain?.ss58Format) {
   return encodeAddressBase(key, ss58Format);
 }
 
@@ -117,7 +118,13 @@ async function loadOnReady(api: ApiPromise, chain: Endpoint): Promise<ApiState> 
  * @internal
  */
 async function createApi(apiUrl: string, onError: (error: unknown) => void): Promise<void> {
-  const metadata = await service.getMetadata();
+  let metadata: Record<string, HexString> = {};
+
+  try {
+    metadata = await service.getMetadata();
+  } catch {
+    /* empty */
+  }
 
   try {
     const provider = new WsProvider(apiUrl);

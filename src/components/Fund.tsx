@@ -71,6 +71,7 @@ function Action({
       addQueue({
         call: api.tx.balances.transferKeepAlive(receipt, value),
         accountId: sending,
+        website: 'mimir://internal/fund',
         onResults: () => onClose()
       });
       onClose();

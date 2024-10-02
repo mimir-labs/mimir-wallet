@@ -60,7 +60,8 @@ function Cancel({ account, transaction }: { account: AccountData; transaction: T
             multisigTx.members.filter((item) => !addressEq(item, depositor)),
             multisigInfo?.unwrap().when,
             multisigTx.callHash
-          )
+          ),
+          website: 'mimir://internal/cancel'
         });
       }}
     >

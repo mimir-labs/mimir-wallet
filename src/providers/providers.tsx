@@ -26,7 +26,7 @@ function Providers({ chain, address, children }: { chain: Endpoint; address?: st
       defaultOptions: {
         queries: {
           refetchInterval: 6_000,
-          queryFn: ({ queryKey }) => (queryKey[0] ? fetcher(queryKey[0] as string) : undefined)
+          queryFn: ({ queryKey }) => (queryKey[0] ? fetcher(queryKey[0] as string) : null)
         }
       }
     })
@@ -37,10 +37,10 @@ function Providers({ chain, address, children }: { chain: Endpoint; address?: st
       <ThemeProvider>
         <ToastRoot />
         <QueryClientProvider client={queryClient.current}>
-          <WalletCtxRoot>
-            <ApiCtxRoot chain={chain}>
+          <ApiCtxRoot chain={chain}>
+            <WalletCtxRoot>
               <SocketCtxRoot>
-                <AddressCtxRoot address={address}>
+                <AddressCtxRoot chain={chain} address={address}>
                   <TxQueueCtxRoot>
                     <BlockEventCtxRoot>
                       <TxToastCtxRoot>
@@ -52,8 +52,8 @@ function Providers({ chain, address, children }: { chain: Endpoint; address?: st
                   </TxQueueCtxRoot>
                 </AddressCtxRoot>
               </SocketCtxRoot>
-            </ApiCtxRoot>
-          </WalletCtxRoot>
+            </WalletCtxRoot>
+          </ApiCtxRoot>
         </QueryClientProvider>
       </ThemeProvider>
     </StyledEngineProvider>

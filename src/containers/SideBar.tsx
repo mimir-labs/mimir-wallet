@@ -37,7 +37,7 @@ import {
   WalletIcon
 } from '@mimir-wallet/components';
 import { findToken, walletConfig } from '@mimir-wallet/config';
-import { useApi, useCall, useGroupAccounts, useSelectedAccount, useToggle, useWallet } from '@mimir-wallet/hooks';
+import { useApi, useCall, useSelectedAccount, useToggle, useWallet } from '@mimir-wallet/hooks';
 import { chainLinks } from '@mimir-wallet/utils';
 
 import { BaseContainerCtx } from './BaseContainer';
@@ -98,12 +98,12 @@ function SideBar({ offsetTop = 0 }: { offsetTop?: number }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [qrOpen, toggleQrOpen] = useToggle();
-  const { injected } = useGroupAccounts();
   const { connectedWallets, openWallet } = useWallet();
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [selected]);
   const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
+  const isConnected = Object.keys(connectedWallets).length > 0;
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -125,43 +125,49 @@ function SideBar({ offsetTop = 0 }: { offsetTop?: number }) {
       >
         <Typography variant='h3'>Menu</Typography>
       </Box>
-      {injected.length > 0 ? (
-        <Paper sx={{ padding: 1 }} variant='outlined'>
-          <Stack
-            alignItems='center'
-            direction='row'
-            onClick={handleAccountOpen}
-            spacing={1}
-            sx={{ cursor: 'pointer', width: '100%' }}
-          >
-            <AddressCell size='small' value={selected} />
-            <SvgIcon color='primary' component={ArrowRight} inheritViewBox />
-          </Stack>
-          <Divider sx={{ marginY: 1 }} />
-          <Stack alignItems='center' direction='row' spacing={0.5}>
-            <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
-            <Typography color='text.secondary' fontSize={12}>
-              <FormatBalance value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
-            </Typography>
-          </Stack>
-          <Divider sx={{ marginY: 1 }} />
-          <IconButton color='primary' onClick={toggleQrOpen} size='small'>
-            <SvgIcon component={IconQr} inheritViewBox />
-          </IconButton>
-          <CopyButton color='primary' value={selected} />
-          <IconButton
-            color='primary'
-            component='a'
-            href={chainLinks.accountExplorerLink(selected)}
-            size='small'
-            target='_blank'
-          >
-            <SvgIcon component={IconLink} inheritViewBox />
-          </IconButton>
-          <IconButton color='primary' component={Link} size='small' to={`/transfer?from=${selected}`}>
-            <SvgIcon component={IconTransfer} inheritViewBox />
-          </IconButton>
-        </Paper>
+      {isConnected ? (
+        selected ? (
+          <Paper sx={{ padding: 1 }} variant='outlined'>
+            <Stack
+              alignItems='center'
+              direction='row'
+              onClick={handleAccountOpen}
+              spacing={1}
+              sx={{ cursor: 'pointer', width: '100%' }}
+            >
+              <AddressCell value={selected} />
+              <SvgIcon color='primary' component={ArrowRight} inheritViewBox />
+            </Stack>
+            <Divider sx={{ marginY: 1 }} />
+            <Stack alignItems='center' direction='row' spacing={0.5}>
+              <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
+              <Typography color='text.secondary' fontSize={12}>
+                <FormatBalance value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
+              </Typography>
+            </Stack>
+            <Divider sx={{ marginY: 1 }} />
+            <IconButton color='primary' onClick={toggleQrOpen} size='small'>
+              <SvgIcon component={IconQr} inheritViewBox />
+            </IconButton>
+            <CopyButton color='primary' value={selected} />
+            <IconButton
+              color='primary'
+              component='a'
+              href={chainLinks.accountExplorerLink(selected)}
+              size='small'
+              target='_blank'
+            >
+              <SvgIcon component={IconLink} inheritViewBox />
+            </IconButton>
+            <IconButton color='primary' component={Link} size='small' to={`/transfer?from=${selected}`}>
+              <SvgIcon component={IconTransfer} inheritViewBox />
+            </IconButton>
+          </Paper>
+        ) : (
+          <Button component={Link} to='/create-multisig' size='large' fullWidth sx={{ borderRadius: 1, height: 48 }}>
+            Create Multisig
+          </Button>
+        )
       ) : (
         <Button
           onClick={() => {
@@ -169,7 +175,8 @@ function SideBar({ offsetTop = 0 }: { offsetTop?: number }) {
             closeSidebar();
           }}
           size='large'
-          sx={{ borderRadius: 1 }}
+          fullWidth
+          sx={{ borderRadius: 1, height: 48 }}
         >
           Connect Wallet
         </Button>

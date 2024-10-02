@@ -42,7 +42,7 @@ function AccountSelect() {
           maxWidth: 192
         }}
       >
-        <AddressCell shorten showType size='small' value={selected} />
+        <AddressCell shorten showType value={selected} />
         <SvgIcon component={ArrowDown} fontSize='small' inheritViewBox />
       </Box>
       <AccountMenu anchor='right' onClose={handleAccountClose} open={!!anchorEl} />
