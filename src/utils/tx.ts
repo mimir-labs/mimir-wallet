@@ -116,7 +116,7 @@ async function extractParams(api: ApiPromise, address: string): Promise<Partial<
 
     assert(signer, `Unable to find a signer for ${address}`);
 
-    return { signer };
+    return { signer, withSignedTransaction: true };
   }
 
   assert(addressEq(address, pair.address), `Unable to retrieve keypair for ${address}`);
@@ -152,10 +152,15 @@ function makeSignOptions(
   partialOptions: Partial<SignerOptions>,
   extras: { blockHash?: Hash; era?: ExtrinsicEra; nonce?: Index }
 ): SignatureOptions {
-  return objectSpread({ blockHash: api.genesisHash, genesisHash: api.genesisHash }, partialOptions, extras, {
-    runtimeVersion: api.runtimeVersion,
-    signedExtensions: api.registry.signedExtensions
-  });
+  return objectSpread(
+    { blockHash: api.genesisHash, genesisHash: api.genesisHash, withSignedTransaction: true },
+    partialOptions,
+    extras,
+    {
+      runtimeVersion: api.runtimeVersion,
+      signedExtensions: api.registry.signedExtensions
+    }
+  );
 }
 
 function makeEraOptions(
