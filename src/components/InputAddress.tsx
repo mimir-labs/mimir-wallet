@@ -30,7 +30,8 @@ function createOptions(
   addresses: { address: string; name: string }[],
   isSign: boolean,
   input?: string,
-  filtered?: string[]
+  filtered?: string[],
+  excluded?: string[]
 ): string[] {
   const all = accounts.reduce<Record<string, string | null | undefined>>((result, item) => {
     result[item.address] = item.name;
@@ -52,6 +53,10 @@ function createOptions(
     options = options.filter((option) => filtered.includes(option[0]));
   }
 
+  if (excluded) {
+    options = options.filter((option) => !excluded.includes(option[0]));
+  }
+
   if (!input) return options.map((item) => item[0]);
 
   return options
@@ -70,11 +75,13 @@ function InputAddress({
   disabled,
   error,
   filtered,
+  excluded,
   format,
   isSign = false,
   label,
   onChange,
   placeholder,
+  shorten,
   value: propsValue,
   withBalance
 }: InputAddressProps) {
@@ -90,8 +97,8 @@ function InputAddress({
   const open = !!anchorEl;
 
   const options = useMemo(
-    (): string[] => createOptions(accounts, addresses, isSign, inputValue, filtered),
-    [accounts, addresses, filtered, inputValue, isSign]
+    (): string[] => createOptions(accounts, addresses, isSign, inputValue, filtered, excluded),
+    [accounts, addresses, excluded, filtered, inputValue, isSign]
   );
 
   const _onChange = useCallback(
@@ -123,7 +130,7 @@ function InputAddress({
 
   useEffect(() => {
     if (isControl.current) {
-      propsValue && setValue(propsValue);
+      setValue(propsValue || '');
     }
   }, [propsValue]);
 
@@ -152,14 +159,14 @@ function InputAddress({
           }
         }}
       >
-        <AddressCell shorten={false} value={value} />
+        <AddressCell shorten={shorten} value={value} showType />
         <InputBase
           disabled={disabled}
           onBlur={handleBlur}
           onChange={(e) => setInputValue(e.target.value)}
           onFocus={handleFocus}
           placeholder={value ? '' : placeholder}
-          sx={{ opacity: 1, paddingLeft: 4.5, position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+          sx={{ opacity: focus ? 1 : 0, paddingLeft: 4.5, position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
           value={inputValue}
           endAdornment={<SvgIcon component={ArrowDown} inheritViewBox color='primary' />}
         />
@@ -177,7 +184,7 @@ function InputAddress({
                   {options.length > 0 ? (
                     options.map((item, index) => (
                       <MenuItem key={index} onClick={() => _onChange(item)}>
-                        <AddressCell shorten={false} value={item} />
+                        <AddressCell shorten={false} showType value={item} />
                       </MenuItem>
                     ))
                   ) : (

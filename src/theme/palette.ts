@@ -25,9 +25,9 @@ const createPalette = (mode: PaletteMode): PaletteOptions => ({
     contrastText: '#fff'
   },
   error: {
-    main: '#E82F5E',
-    light: '#E82F5E',
-    dark: '#E82F5E',
+    main: '#FF5310',
+    light: '#FF5310',
+    dark: '#FF5310',
     contrastText: '#fff'
   },
   warning: {

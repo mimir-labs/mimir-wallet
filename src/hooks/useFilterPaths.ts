@@ -40,16 +40,19 @@ function findFilterPaths(
         from: 'delegate';
         parent: AccountData;
         value: AccountData & DelegateeProp;
+        approvalForThisPath: boolean;
       }
     | {
         from: 'member';
         parent: MultisigAccountData;
         value: AccountData;
+        approvalForThisPath: boolean;
       }
     | {
         from: 'origin';
         parent: null;
         value: AccountData;
+        approvalForThisPath: boolean;
       };
 
   function dfs(deep: number, node: NodeInfo, path: FilterPath[], transaction?: Transaction | null) {
@@ -90,13 +93,24 @@ function findFilterPaths(
       path.push({ id: filterPathId(deep, p), ...p });
     }
 
+    const approvalForThisPath: boolean =
+      node.approvalForThisPath &&
+      (!transaction ||
+        (transaction.type === TransactionType.Proxy
+          ? transaction.status !== TransactionStatus.Success
+          : transaction.status === TransactionStatus.Pending));
+
     if (transaction && transaction.status === TransactionStatus.Success) {
       path.pop();
 
       return;
     }
 
-    if ((!transaction || transaction.status !== TransactionStatus.Success) && accountSource(node.value.address)) {
+    if (
+      (!transaction || transaction.status !== TransactionStatus.Success) &&
+      approvalForThisPath &&
+      accountSource(node.value.address)
+    ) {
       paths.push(path.slice());
     }
 
@@ -107,7 +121,7 @@ function findFilterPaths(
           if (addressEq(transaction.delegate, child.address)) {
             dfs(
               deep + 1,
-              { from: 'delegate', parent: node.value, value: child },
+              { from: 'delegate', parent: node.value, value: child, approvalForThisPath },
               path,
               transaction.children.find(
                 (item) =>
@@ -120,17 +134,19 @@ function findFilterPaths(
         }
 
         if (transaction.type === TransactionType.Proxy) {
-          dfs(
-            deep + 1,
-            { from: 'delegate', parent: node.value, value: child },
-            path,
-            transaction.children.find(
-              (item) => item.section === 'proxy' && item.method === 'proxy' && addressEq(item.address, child.address)
-            )
-          );
+          if (addressEq(transaction.delegate, child.address)) {
+            dfs(
+              deep + 1,
+              { from: 'delegate', parent: node.value, value: child, approvalForThisPath },
+              path,
+              transaction.children.find(
+                (item) => item.section === 'proxy' && item.method === 'proxy' && addressEq(item.address, child.address)
+              )
+            );
+          }
         }
       } else {
-        dfs(deep + 1, { from: 'delegate', parent: node.value, value: child }, path, null);
+        dfs(deep + 1, { from: 'delegate', parent: node.value, value: child, approvalForThisPath }, path, null);
       }
     }
 
@@ -142,7 +158,8 @@ function findFilterPaths(
           {
             from: 'member',
             parent: node.value,
-            value: child
+            value: child,
+            approvalForThisPath
           },
           path,
           transaction?.children.find(
@@ -158,7 +175,21 @@ function findFilterPaths(
     path.pop();
   }
 
-  dfs(0, { from: 'origin', parent: null, value: topAccount }, [], topTransaction);
+  dfs(
+    0,
+    {
+      from: 'origin',
+      parent: null,
+      value: topAccount,
+      approvalForThisPath:
+        !topTransaction ||
+        (topTransaction.type === TransactionType.Proxy
+          ? topTransaction.status !== TransactionStatus.Success
+          : topTransaction.status === TransactionStatus.Pending)
+    },
+    [],
+    topTransaction
+  );
 
   return paths;
 }

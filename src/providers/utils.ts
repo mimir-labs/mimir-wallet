@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AccountDataExtra, AddressMeta } from '../hooks/types';
+import type { AccountData, AccountDataExtra, AddressMeta, DelegateeProp, MultisigAccountData } from '../hooks/types';
 
 export function deriveAddressMeta(
   accounts: (AccountDataExtra & AccountData)[],
@@ -32,21 +32,23 @@ export function deriveAddressMeta(
   // make pure account multisig meta
   accounts.forEach((item) => {
     if (item.type === 'pure') {
-      if (
-        item.delegatees.length === 1 &&
-        item.delegatees[0].type === 'multisig' &&
-        item.delegatees[0].proxyType.toLowerCase() === 'any' &&
-        item.delegatees[0].proxyDelay === 0
-      ) {
-        const account = accounts.find((account) => account.address === item.delegatees[0].address);
+      const multisigAccounts = item.delegatees.filter(
+        (item): item is MultisigAccountData & DelegateeProp =>
+          item.proxyType === 'Any' && item.proxyDelay === 0 && item.type === 'multisig'
+      );
 
-        if (account?.type === 'multisig') {
-          const who = account.members.map((item) => item.address);
-          const threshold = account.threshold;
+      if (multisigAccounts.length > 0) {
+        if (multisigAccounts.length === 1) {
+          const account = accounts.find(
+            (account): account is MultisigAccountData =>
+              account.type === 'multisig' && account.address === multisigAccounts[0].address
+          );
+          const threshold = account?.threshold;
+          const who = account?.members?.map(({ address }) => address);
 
-          if (meta[item.address]) {
-            meta[item.address] = { ...meta[item.address], threshold, who };
-          }
+          meta[item.address] = { ...meta[item.address], threshold, who };
+        } else {
+          meta[item.address] = { ...meta[item.address], multipleMultisig: true };
         }
       }
     }

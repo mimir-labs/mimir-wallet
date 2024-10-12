@@ -8,7 +8,7 @@ import { Box, Divider, Grid2 as Grid, Stack } from '@mui/material';
 import moment from 'moment';
 import React from 'react';
 
-import { AppName, Hex } from '@mimir-wallet/components';
+import { AppName, Bytes, Hash } from '@mimir-wallet/components';
 import { useToggle } from '@mimir-wallet/hooks';
 
 import Target from './Target';
@@ -42,7 +42,16 @@ function Extrinsic({ transaction, call }: { transaction: Transaction; call?: IMe
             <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />
           }
         />
-        <Item title='Hash' content={<Hex showFull value={transaction.callHash} withCopy />} />
+        <Item
+          title='Created Extrinsic'
+          content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
+        />
+        {transaction.executedExtrinsicHash && (
+          <Item
+            title='Executed Extrinsic'
+            content={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
+          />
+        )}
 
         <Box
           sx={{ fontWeight: 700, color: 'primary.main', cursor: 'pointer', textDecoration: 'none' }}
@@ -53,15 +62,19 @@ function Extrinsic({ transaction, call }: { transaction: Transaction; call?: IMe
 
         {isOpen && (
           <>
-            {transaction.call && <Item title='Call Data' content={<Hex value={transaction.call} withCopy />} />}
-            {transaction.note && <Item title='Call Data' content={transaction.note} />}
+            <Item title='Call Hash' content={<Hash value={transaction.callHash} withCopy />} />
+            {transaction.call && <Item title='Call Data' content={<Bytes value={transaction.call} />} />}
+            {transaction.note && <Item title='Note' content={transaction.note} />}
             <Item title='Created Block' content={transaction.createdBlock} />
-            <Item
-              title='Created Extrinsic'
-              content={<Hex showFull value={transaction.createdExtrinsicHash} withCopy />}
-            />
             <Item title='Created Time' content={moment(transaction.createdAt).format()} />
-            <Item title='Updated Time' content={moment(transaction.updatedAt).format()} />
+            {transaction.executedBlock && <Item title='Executed Block' content={transaction.executedBlock} />}
+            {transaction.cancelBlock && <Item title='Cancel Block' content={transaction.cancelBlock} />}
+            {transaction.cancelExtrinsicHash && (
+              <Item
+                title='Cancel Extrinsic'
+                content={<Hash value={transaction.cancelExtrinsicHash} withCopy withExplorer />}
+              />
+            )}
           </>
         )}
       </Stack>

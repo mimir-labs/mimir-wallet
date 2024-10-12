@@ -53,7 +53,8 @@ function Info({
               sx={{
                 marginLeft: 0.5,
                 verticalAlign: 'middle',
-                color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500'
+                color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500',
+                fontSize: '0.875rem'
               }}
             >
               {(changes * 100).toFixed(2)}%

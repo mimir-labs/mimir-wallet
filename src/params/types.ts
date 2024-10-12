@@ -22,7 +22,7 @@ export interface ParamsProps {
 }
 
 export interface CallProps {
-  from: string;
+  from?: string;
   call: Call | IMethod;
   api: ApiPromise;
   jsonFallback?: boolean;

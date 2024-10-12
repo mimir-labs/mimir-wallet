@@ -84,6 +84,22 @@ export const dapps: DappOption[] = [
     supportedChains: true
   },
   {
+    id: 506,
+    icon: LogoCircle,
+    name: 'Execute Announcement',
+    description: 'Execute Announcement',
+    url: 'mimir://internal/execute-announcement',
+    supportedChains: true
+  },
+  {
+    id: 507,
+    icon: LogoCircle,
+    name: 'Remove All Proxies',
+    description: 'Remove All Proxies',
+    url: 'mimir://internal/remove-proxies',
+    supportedChains: true
+  },
+  {
     id: 1000,
     icon: '/dapp-icons/apps.svg',
     name: 'Apps',

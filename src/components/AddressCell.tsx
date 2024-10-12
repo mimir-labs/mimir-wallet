@@ -22,6 +22,7 @@ interface Props {
   shorten?: boolean;
   showType?: boolean;
   withCopy?: boolean;
+  withAddressBook?: boolean;
   width?: number | string;
   isMe?: boolean;
   namePost?: React.ReactNode | null;
@@ -38,13 +39,14 @@ function AddressCell({
   value,
   width,
   iconSize = 30,
-  withCopy = false
+  withCopy = false,
+  withAddressBook = false
 }: Props) {
   const [nameFontSize, addressFontSize, spacing, spacingCol] = ['0.875rem', '0.75rem', 0.5, 0.2];
   const [open, toggleOpen] = useToggle();
 
   const address = value?.toString();
-  const { meta: { isMultisig, isProxied } = {} } = useAddressMeta(address);
+  const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
   const { isLocalAccount, isLocalAddress } = useAccount();
 
   return (
@@ -65,12 +67,12 @@ function AddressCell({
             {namePost}
             {showType && (
               <>
-                {isMultisig && <Chip color='secondary' label='Multisig' size='small' />}
-                {isProxied && (
+                {isMultisig && <Chip color='secondary' label='Multisig' size='small' sx={{ fontSize: 12 }} />}
+                {(isPure || isProxied) && (
                   <Chip
                     color='default'
-                    sx={{ bgcolor: alpha('#B700FF', 0.05), color: '#B700FF' }}
-                    label='Proxied'
+                    sx={{ bgcolor: alpha('#B700FF', 0.05), color: '#B700FF', fontSize: 12 }}
+                    label={isPure ? 'Pure' : 'Proxied'}
                     size='small'
                   />
                 )}
@@ -86,7 +88,7 @@ function AddressCell({
             <AddressComp shorten={shorten} value={address} />
             {withCopy && <CopyButton size='small' sx={{ fontSize: 'inherit' }} value={address} />}
             {icons}
-            {address && !isLocalAccount(address) && !isLocalAddress(address) && (
+            {withAddressBook && address && !isLocalAccount(address) && !isLocalAddress(address) && (
               <IconButton
                 color='inherit'
                 onClick={(e) => {

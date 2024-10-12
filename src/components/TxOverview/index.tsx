@@ -16,17 +16,7 @@ import { LoadingButton } from '@mui/lab';
 import { Paper, SvgIcon, useTheme } from '@mui/material';
 import { alpha, Box } from '@mui/system';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
-import ReactFlow, {
-  Controls,
-  Edge,
-  Handle,
-  MiniMap,
-  Node,
-  NodeProps,
-  Position,
-  useEdgesState,
-  useNodesState
-} from 'reactflow';
+import ReactFlow, { Controls, Edge, Handle, Node, NodeProps, Position, useEdgesState, useNodesState } from 'reactflow';
 
 import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
 import IconFail from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
@@ -38,7 +28,7 @@ import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
 import { addressEq } from '@mimir-wallet/utils';
 
 import AddressCell from '../AddressCell';
-import { getLayoutedElements } from '../AddressOverview';
+import { AddressEdge, getLayoutedElements } from '../AddressOverview';
 
 interface State {
   onApprove?: (call: IMethod | HexString, path: FilterPath[]) => void;
@@ -58,7 +48,7 @@ type NodeData = {
   transaction?: Transaction | null;
   call?: IMethod | HexString | null;
   path: FilterPath[];
-  successForThisPath: boolean;
+  approvalForThisPath: boolean;
 };
 
 const context = createContext<State>({} as State);
@@ -102,7 +92,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
-          style={{ width: 0, height: 0, top: 35, background: palette.grey[300] }}
+          style={{ width: 0, height: 0, background: palette.grey[300] }}
           type='source'
         />
       )}
@@ -116,14 +106,14 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
             justifyContent: 'space-between',
             paddingX: 1,
             paddingY: 0.3,
-            borderBottomLeftRadius: !data.successForThisPath && call && source ? 0 : undefined,
-            borderBottomRightRadius: !data.successForThisPath && call && source ? 0 : undefined
+            borderBottomLeftRadius: data.approvalForThisPath && call && source ? 0 : undefined,
+            borderBottomRightRadius: data.approvalForThisPath && call && source ? 0 : undefined
           }}
         >
-          <AddressCell showType value={data.account.address} withCopy />
+          <AddressCell value={data.account.address} withCopy />
           {icon}
         </Paper>
-        {!data.successForThisPath && call && source && (
+        {data.approvalForThisPath && call && source && (
           <Box sx={{ display: 'flex' }}>
             <LoadingButton
               color='success'
@@ -154,6 +144,10 @@ const nodeTypes = {
   AddressNode
 };
 
+const edgeTypes = {
+  AddressEdge
+};
+
 function makeNodes(
   topAccount: AccountData,
   call?: IMethod | HexString | null,
@@ -166,7 +160,7 @@ function makeNodes(
     account: AccountData,
     isTop: boolean,
     path: FilterPath[],
-    successForThisPath: boolean,
+    approvalForThisPath: boolean,
     transaction?: Transaction | null
   ): Node<NodeData> {
     return {
@@ -180,7 +174,7 @@ function makeNodes(
         isLeaf: account.type !== 'multisig' && account.delegatees.length === 0,
         call,
         path,
-        successForThisPath,
+        approvalForThisPath,
         transaction
       },
       position: { x: 0, y: 0 },
@@ -188,14 +182,20 @@ function makeNodes(
     };
   }
 
-  function makeEdge(parentId: string, nodeId: string, label: string): Edge {
+  function makeEdge(
+    parentId: string,
+    nodeId: string,
+    label: string = '',
+    delay?: number,
+    color: string = '#d9d9d9',
+    labelBgColor: string = '#fff'
+  ): Edge {
     return {
       id: `${parentId}->${nodeId}`,
       source: parentId,
       target: nodeId,
-      type: 'smoothstep',
-      style: { stroke: '#d9d9d9' },
-      label
+      type: 'AddressEdge',
+      data: { label, delay, color, labelBgColor }
     };
   }
 
@@ -205,21 +205,21 @@ function makeNodes(
         parent: AccountData;
         value: AccountData & DelegateeProp;
         parentId: string;
-        successForThisPath: boolean;
+        approvalForThisPath: boolean;
       }
     | {
         from: 'member';
         parent: MultisigAccountData;
         value: AccountData;
         parentId: string;
-        successForThisPath: boolean;
+        approvalForThisPath: boolean;
       }
     | {
         from: 'origin';
         parent: null;
         value: AccountData;
         parentId: string | null;
-        successForThisPath: boolean;
+        approvalForThisPath: boolean;
       };
 
   function dfs(deep: number, node: NodeInfo, path: FilterPath[], transaction?: Transaction | null) {
@@ -257,16 +257,29 @@ function makeNodes(
       path.push({ id: filterPathId(deep, p), ...p });
     }
 
-    const successForThisPath: boolean =
-      node.successForThisPath || (!!transaction && transaction.status === TransactionStatus.Success);
+    const approvalForThisPath: boolean =
+      node.approvalForThisPath &&
+      (!transaction ||
+        (transaction.type === TransactionType.Proxy
+          ? transaction.status !== TransactionStatus.Success
+          : transaction.status === TransactionStatus.Pending));
 
     const nodeId = node.parentId ? `${node.parentId}_${JSON.stringify(node.value)}` : JSON.stringify(node.value);
 
     if (!node.parent) {
-      nodes.push(createNode(nodeId, node.value, true, path.slice(), successForThisPath, transaction));
+      nodes.push(createNode(nodeId, node.value, true, path.slice(), approvalForThisPath, transaction));
     } else {
-      nodes.push(createNode(nodeId, node.value, false, path.slice(), successForThisPath, transaction));
-      edges.push(makeEdge(node.parentId, nodeId, node.from === 'delegate' ? 'Proxy' : 'Member'));
+      nodes.push(createNode(nodeId, node.value, false, path.slice(), approvalForThisPath, transaction));
+      edges.push(
+        makeEdge(
+          node.parentId,
+          nodeId,
+          node.from === 'delegate' ? node.value.proxyType : '',
+          node.from === 'delegate' ? node.value.proxyDelay : undefined,
+          node.from === 'delegate' ? '#B700FF' : '#AEAEAE',
+          node.from === 'delegate' ? '#B700FF' : '#AEAEAE'
+        )
+      );
     }
 
     // traverse the members or delegatees of the current account
@@ -281,7 +294,7 @@ function makeNodes(
                 parent: node.value,
                 value: child,
                 parentId: nodeId,
-                successForThisPath
+                approvalForThisPath
               },
               path,
               transaction.children.find(
@@ -295,20 +308,22 @@ function makeNodes(
         }
 
         if (transaction.type === TransactionType.Proxy) {
-          dfs(
-            deep + 1,
-            {
-              from: 'delegate',
-              parent: node.value,
-              value: child,
-              parentId: nodeId,
-              successForThisPath
-            },
-            path,
-            transaction.children.find(
-              (item) => item.section === 'proxy' && item.method === 'proxy' && addressEq(item.address, child.address)
-            )
-          );
+          if (addressEq(transaction.delegate, child.address)) {
+            dfs(
+              deep + 1,
+              {
+                from: 'delegate',
+                parent: node.value,
+                value: child,
+                parentId: nodeId,
+                approvalForThisPath
+              },
+              path,
+              transaction.children.find(
+                (item) => item.section === 'proxy' && item.method === 'proxy' && addressEq(item.address, child.address)
+              )
+            );
+          }
         }
       } else {
         dfs(
@@ -318,7 +333,7 @@ function makeNodes(
             parent: node.value,
             value: child,
             parentId: nodeId,
-            successForThisPath
+            approvalForThisPath
           },
           path,
           null
@@ -336,7 +351,7 @@ function makeNodes(
             parent: node.value,
             value: child,
             parentId: nodeId,
-            successForThisPath
+            approvalForThisPath
           },
           path,
           transaction?.children.find(
@@ -359,7 +374,11 @@ function makeNodes(
       parent: null,
       value: topAccount,
       parentId: null,
-      successForThisPath: topTransaction?.status === TransactionStatus.Success
+      approvalForThisPath:
+        !topTransaction ||
+        (topTransaction.type === TransactionType.Proxy
+          ? topTransaction.status !== TransactionStatus.Success
+          : topTransaction.status === TransactionStatus.Pending)
     },
     [],
     topTransaction
@@ -396,12 +415,12 @@ function TxOverview({ account, call, transaction, ...props }: Props) {
         maxZoom={1.5}
         minZoom={0.1}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         nodes={nodes}
         onEdgesChange={onEdgesChange}
         onNodesChange={onNodesChange}
         zoomOnScroll
       >
-        <MiniMap pannable zoomable />
         <Controls />
       </ReactFlow>
     </context.Provider>

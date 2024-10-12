@@ -12,12 +12,14 @@ function AppName({
   website,
   iconSize = 20,
   iconUrl,
-  appName
+  appName,
+  hiddenName
 }: {
   website?: string | null;
   iconSize?: number;
   iconUrl?: string | null;
   appName?: string | null;
+  hiddenName?: boolean;
 }) {
   const app = useDapp(website);
 
@@ -62,9 +64,14 @@ function AppName({
   return (
     <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, maxWidth: '100%' }}>
       <Box sx={{ display: 'flex', flexShrink: '0' }}>{icon}</Box>
-      <Box component='span' sx={{ flexGrow: '1', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-        {name}
-      </Box>
+      {!hiddenName && (
+        <Box
+          component='span'
+          sx={{ flexGrow: '1', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
+        >
+          {name}
+        </Box>
+      )}
     </Box>
   );
 }

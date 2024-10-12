@@ -28,7 +28,7 @@ export function useAnnouncementProgress(
 
   const result = useCall<ITuple<[Vec<PalletProxyAnnouncement>, u128]>>(
     api.query.proxy.announcements,
-    status === TransactionStatus.Pending && type === TransactionType.Announce ? [delegate?.address] : []
+    status === TransactionStatus.Pending && type === TransactionType.Announce ? [transaction.delegate] : []
   );
   const bestNumber = useCall<BlockNumber>(api.derive.chain.bestNumber);
   const announcements = result?.[0];

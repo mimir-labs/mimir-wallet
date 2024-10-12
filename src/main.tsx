@@ -15,12 +15,12 @@ moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
-const { address, chain } = initMimir();
+const { chain } = initMimir();
 
 initializeFavoriteDapps();
 root.render(
   <BrowserRouter>
-    <Providers chain={chain} address={address}>
+    <Providers chain={chain}>
       <App />
     </Providers>
   </BrowserRouter>

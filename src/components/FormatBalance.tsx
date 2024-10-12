@@ -8,29 +8,13 @@ import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
 import { registry } from '@mimir-wallet/api';
+import { formatUnits } from '@mimir-wallet/utils';
 
 interface Props extends BoxProps {
   format?: [decimals: number, unit: string];
   label?: React.ReactNode;
   value?: Compact<any> | BN | string | number | null;
   withCurrency?: boolean;
-}
-
-export function formatUnits(value: bigint, decimals: number) {
-  let display = value.toString();
-
-  const negative = display.startsWith('-');
-
-  if (negative) display = display.slice(1);
-
-  display = display.padStart(decimals, '0');
-
-  const results = [display.slice(0, display.length - decimals), display.slice(display.length - decimals)];
-
-  const integer = results[0];
-  const fraction = results[1].replace(/(0+)$/, '');
-
-  return `${negative ? '-' : ''}${integer || '0'}${fraction ? `.${fraction}` : ''}`;
 }
 
 const formatDisplay = (value: string, sufLen = 4): [string, string] => {
@@ -56,11 +40,7 @@ function FormatBalance({ format, label, value, withCurrency, ...props }: Props):
       {label}
       <Box component='span'>
         {major}
-        {rest ? (
-          <Box component='span' style={{ opacity: 0.7 }}>
-            .{rest}
-          </Box>
-        ) : null}
+        {rest ? <Box component='span'>.{rest}</Box> : null}
       </Box>
       <Box component='span'>{withCurrency ? ` ${format?.[1] || registry.chainTokens[0] || ''}` : ''}</Box>
     </Box>

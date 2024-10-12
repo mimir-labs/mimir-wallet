@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Link as MuiLink, Stack, Typography } from '@mui/material';
+import { Box, Button, Link as MuiLink, Stack, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 import { chainLinks } from '@mimir-wallet/utils';
@@ -29,8 +29,15 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
         </Box>
 
         <Box sx={{ width: { lg: '41%', xs: '100%' } }}>
-          <Typography marginBottom={0.5} variant='h6'>
+          <Typography
+            marginBottom={0.5}
+            variant='h6'
+            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+          >
             Pending Transactions
+            <Button component={Link} to='/transactions' size='small' variant='text'>
+              View More
+            </Button>
           </Typography>
           {transaction}
         </Box>
@@ -78,7 +85,7 @@ function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }:
       <Box>
         {member && (
           <Typography marginBottom={0.5} variant='h6'>
-            Members
+            Relation
           </Typography>
         )}
         {member}

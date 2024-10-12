@@ -1,17 +1,20 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Transaction } from '@mimir-wallet/hooks/types';
-
 import { Box, Chip, Paper, Typography } from '@mui/material';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { AppName, Empty } from '@mimir-wallet/components';
-import { useAddressMeta, usePendingTransactions } from '@mimir-wallet/hooks';
+import { usePendingTransactions } from '@mimir-wallet/hooks';
+import { Transaction, TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { formatTransactionId } from '@mimir-wallet/transactions';
 
 function Row({ isStart, transaction }: { transaction: Transaction; isStart: boolean }) {
-  const { meta } = useAddressMeta(transaction.address);
+  const counts = useMemo(
+    () => transaction.children.filter((item) => item.status === TransactionStatus.Success).length,
+    [transaction]
+  );
 
   return (
     <Box
@@ -31,16 +34,19 @@ function Row({ isStart, transaction }: { transaction: Transaction; isStart: bool
       to='/transactions'
     >
       <AppName
+        hiddenName
         iconSize={16}
         website={transaction.website}
         appName={transaction.appName}
         iconUrl={transaction.iconUrl}
       />
-      <Typography sx={{ width: 120 }}>No.{transaction.id}</Typography>
+      <Typography sx={{ width: 120 }}>No.{formatTransactionId(transaction.id)}</Typography>
       <Typography sx={{ flex: '1' }}>
         {transaction.section}.{transaction.method}
       </Typography>
-      <Chip color='primary' label={`${1}/${meta?.threshold}`} size='small' />
+      {transaction.type === TransactionType.Multisig && (
+        <Chip color='primary' label={`${counts}/${transaction.threshold}`} size='small' />
+      )}
     </Box>
   );
 }

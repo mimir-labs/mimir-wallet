@@ -8,7 +8,7 @@ import type { AddressState } from './types';
 import { isEqual } from 'lodash-es';
 
 import { encodeAddress } from '@mimir-wallet/api';
-import { service, sleep } from '@mimir-wallet/utils';
+import { service } from '@mimir-wallet/utils';
 
 export function extraAccounts(
   genesisHash: HexString,
@@ -91,21 +91,12 @@ export async function sync(
   walletAccounts: { address: string; name?: string; type?: string; source: string }[],
   setState: React.Dispatch<React.SetStateAction<AddressState>>
 ): Promise<void> {
-  while (true) {
-    try {
-      const data = await service.getMultisigs(walletAccounts.map((item) => item.address));
-      const accounts = extraAccounts(genesisHash, walletAccounts, data);
+  const data = await service.getMultisigs(walletAccounts.map((item) => item.address));
+  const accounts = extraAccounts(genesisHash, walletAccounts, data);
 
-      setState((state) => ({
-        ...state,
-        isMultisigSyned: true,
-        accounts: isEqual(state.accounts, accounts) ? state.accounts : accounts
-      }));
-
-      break;
-    } catch {
-      await sleep(6000);
-      /* empty */
-    }
-  }
+  setState((state) => ({
+    ...state,
+    isMultisigSyned: true,
+    accounts: isEqual(state.accounts, accounts) ? state.accounts : accounts
+  }));
 }

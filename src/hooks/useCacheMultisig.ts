@@ -20,5 +20,5 @@ export function useCacheMultisig(): [data: CacheMultisig[], isLoading: boolean] 
     ]
   });
 
-  return [data || [], isLoading];
+  return [data?.filter((item) => item.who && item.threshold) || [], isLoading];
 }

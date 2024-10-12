@@ -38,3 +38,13 @@ export function approvalCounts(account: AccountData, transaction: Transaction): 
 
   return [approveCount, account.threshold];
 }
+
+export function formatTransactionId(id: number): string {
+  const idStr = String(id);
+
+  if (idStr.length < 8) {
+    return `${Array.from({ length: 8 - idStr.length }).reduce((result) => `${result}0`, '')}${idStr}`;
+  }
+
+  return idStr;
+}

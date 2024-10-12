@@ -5,7 +5,7 @@ import { Box } from '@mui/material';
 import { createContext, useCallback, useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import { ConnectWalletModal, MimirLoading, TxSubmit } from '@mimir-wallet/components';
+import { ConnectWalletModal, MimirLoading, SwitchAccountDialog, TxSubmit } from '@mimir-wallet/components';
 import { useAccount, useApi, useFollowAccounts, useToggle, useTxQueue } from '@mimir-wallet/hooks';
 import { useWallet } from '@mimir-wallet/hooks/useWallet';
 
@@ -42,9 +42,11 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
 
   return (
     <BaseContainerCtx.Provider value={value}>
-      <TopBar />
-
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
+
+      <SwitchAccountDialog />
+
+      <TopBar />
 
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned && <ToggleAlert setAlertOpen={setAlertOpen} />}
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (
@@ -54,7 +56,7 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
             minHeight: `calc(100dvh - ${alertOpen ? 37 : 0}px - 1px - 56px)`
           }}
         >
-          {withSideBar && <SideBar offsetTop={alertOpen ? 36 : 0} />}
+          <SideBar offsetTop={alertOpen ? 36 : 0} withSideBar={withSideBar} />
           <Box sx={{ flex: '1', padding: withPadding ? { sm: 1.5, md: 2 } : 0 }}>
             {queue.length > 0 ? <TxSubmit {...queue[0]} /> : null}
 

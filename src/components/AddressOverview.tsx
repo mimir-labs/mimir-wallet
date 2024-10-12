@@ -4,11 +4,15 @@
 import type { AccountData, DelegateeProp, MultisigAccountData } from '@mimir-wallet/hooks/types';
 
 import dagre from '@dagrejs/dagre';
-import { alpha, Chip, Paper, useTheme } from '@mui/material';
+import { Box, Paper, SvgIcon, useTheme } from '@mui/material';
 import React, { useEffect } from 'react';
 import ReactFlow, {
+  BaseEdge,
   Controls,
   Edge,
+  EdgeLabelRenderer,
+  EdgeProps,
+  getSmoothStepPath,
   Handle,
   MiniMap,
   Node,
@@ -17,6 +21,8 @@ import ReactFlow, {
   useEdgesState,
   useNodesState
 } from 'reactflow';
+
+import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 
 import AddressCell from './AddressCell';
 
@@ -86,25 +92,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
         />
       )}
       <Paper sx={{ display: 'flex', alignItems: 'center', width: 270, padding: 1 }}>
-        <AddressCell
-          namePost={
-            data.type !== 'unknown' ? (
-              <>
-                <Chip
-                  color={data.type === 'multisig' ? 'secondary' : data.type === 'proxy' ? 'default' : 'primary'}
-                  label={data.type === 'multisig' ? 'Multisig' : data.type === 'proxy' ? 'Proxy' : 'Origin'}
-                  size='small'
-                  sx={data.type === 'proxy' ? { bgcolor: alpha('#B700FF', 0.05), color: '#B700FF' } : {}}
-                />
-                {data.type === 'proxy' && data.proxyType && (
-                  <Chip color='secondary' label={`${data.proxyType}:${data.delay || 0}`} size='small' />
-                )}
-              </>
-            ) : null
-          }
-          value={data.account.address}
-          withCopy
-        />
+        <AddressCell value={data.account.address} withCopy withAddressBook />
       </Paper>
       {!data.isTop && (
         <Handle
@@ -118,8 +106,67 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
   );
 });
 
+export const AddressEdge = React.memo(
+  ({
+    id,
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+    data
+  }: EdgeProps<{ label?: string; color?: string; labelBgColor?: string; delay?: number }>) => {
+    const [edgePath, labelX, labelY] = getSmoothStepPath({
+      sourceX,
+      sourceY,
+      sourcePosition,
+      targetX,
+      targetY,
+      targetPosition,
+      borderRadius: 10
+    });
+
+    return (
+      <>
+        <BaseEdge id={id} path={edgePath} style={{ stroke: data?.color }} />
+
+        {data && (
+          <EdgeLabelRenderer>
+            <Box
+              sx={{
+                display: data.label ? 'flex' : 'none',
+                alignItems: 'center',
+                position: 'absolute',
+                transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+                background: '#ffcc00',
+                minWidth: 40,
+                height: 16,
+                padding: '2px',
+                borderRadius: '8px',
+                fontSize: 10,
+                fontWeight: 700,
+                bgcolor: data.labelBgColor,
+                color: 'white',
+                gap: '2px'
+              }}
+            >
+              {!!data.delay && <SvgIcon component={IconClock} inheritViewBox sx={{ fontSize: '0.75rem' }} />}
+              <Box sx={{ flex: '1', textAlign: 'center' }}>{data.label}</Box>
+            </Box>
+          </EdgeLabelRenderer>
+        )}
+      </>
+    );
+  }
+);
+
 const nodeTypes = {
   AddressNode
+};
+
+const edgeTypes = {
+  AddressEdge
 };
 
 function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges: Edge[] = []) {
@@ -148,14 +195,20 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
     };
   }
 
-  function makeEdge(parentId: string, nodeId: string, label: string): Edge {
+  function makeEdge(
+    parentId: string,
+    nodeId: string,
+    label: string = '',
+    delay?: number,
+    color: string = '#d9d9d9',
+    labelBgColor: string = '#fff'
+  ): Edge {
     return {
       id: `${parentId}->${nodeId}`,
       source: parentId,
       target: nodeId,
-      type: 'smoothstep',
-      style: { stroke: '#d9d9d9' },
-      label
+      type: 'AddressEdge',
+      data: { label, delay, color, labelBgColor }
     };
   }
 
@@ -204,7 +257,16 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
           node.from === 'delegate' ? node.value.proxyDelay : undefined
         )
       );
-      edges.push(makeEdge(node.parentId, nodeId, node.from === 'delegate' ? 'Proxy' : 'Member'));
+      edges.push(
+        makeEdge(
+          node.parentId,
+          nodeId,
+          node.from === 'delegate' ? node.value.proxyType : '',
+          node.from === 'delegate' ? node.value.proxyDelay : undefined,
+          node.from === 'delegate' ? '#B700FF' : '#AEAEAE',
+          node.from === 'delegate' ? '#B700FF' : '#AEAEAE'
+        )
+      );
     }
 
     // traverse the members or delegatees of the current account
@@ -267,6 +329,7 @@ function AddressOverview({ account }: Props) {
       maxZoom={1.5}
       minZoom={0.1}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       nodes={nodes}
       onEdgesChange={onEdgesChange}
       onNodesChange={onNodesChange}

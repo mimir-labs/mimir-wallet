@@ -179,7 +179,11 @@ function PageCreateMultisig() {
                 <Typography fontWeight={700}>Flexible Multisig</Typography>
                 <Switch checked={flexible} onChange={(e) => setFlexible(e.target.checked)} />
               </Box>
-              <Alert severity='warning'>
+              <Alert
+                icon={<SvgIcon inheritViewBox component={IconInfo} sx={{ fontSize: '0.875rem' }} />}
+                severity='warning'
+                sx={{ '.MuiAlert-message': { overflow: 'visible' } }}
+              >
                 <AlertTitle>Notice</AlertTitle>
                 {flexible ? (
                   <ul>

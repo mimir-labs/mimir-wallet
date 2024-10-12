@@ -33,8 +33,6 @@ import { useApi, useCall, useSelectedAccountCallback, useWallet } from '@mimir-w
 import { TxToastCtx } from '@mimir-wallet/providers';
 import { addressToHex, service, signAndSend, sleep, store } from '@mimir-wallet/utils';
 
-import { createMultisig } from './CreateStatic';
-
 interface Props {
   prepare: PrepareFlexible;
   onCancel: () => void;
@@ -169,7 +167,6 @@ function CreateFlexible({
       beforeSend: async (extrinsic) => {
         if (!name) throw new Error('Please provide account name');
 
-        await createMultisig(who, threshold, name);
         await service.prepareMultisig(
           addressToHex(extrinsic.signer.toString()),
           extrinsic.hash.toHex(),

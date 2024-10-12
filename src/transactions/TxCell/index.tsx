@@ -9,6 +9,7 @@ import React from 'react';
 
 import { TransactionStatus } from '@mimir-wallet/hooks/types';
 
+import { formatTransactionId } from '../utils';
 import TxItems from './TxItems';
 
 interface Props {
@@ -38,10 +39,14 @@ function TxCell({ defaultOpen, account, transaction }: Props) {
             }}
           />
           <Typography color='primary.main' fontWeight={700} variant='h4'>
-            No {transaction.id}
+            No {formatTransactionId(transaction.id)}
           </Typography>
         </Stack>
-        <Typography>{moment(transaction.createdAt).format()}</Typography>
+        <Typography>
+          {transaction.status < TransactionStatus.Success
+            ? moment(transaction.createdAt).format()
+            : moment(transaction.updatedAt).format()}
+        </Typography>
       </Box>
       <Divider orientation='horizontal' />
       <TxItems defaultOpen={defaultOpen} account={account} transaction={transaction} />

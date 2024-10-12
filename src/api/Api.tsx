@@ -160,7 +160,8 @@ export function ApiCtxRoot({ chain, children }: Props): React.ReactElement<Props
         isApiInitialized: !!isApiInitialized,
         network: chain.key,
         genesisHash: chain.genesisHash,
-        chain
+        chain,
+        apiUrl: chain.wsUrl
       }),
     [state, apiError, chain, isApiConnected, isApiInitialized]
   );

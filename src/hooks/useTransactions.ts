@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { HistoryTransaction, Transaction } from './types';
+
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { isEqual } from 'lodash-es';
 import { useEffect, useState } from 'react';
@@ -8,8 +10,6 @@ import { useEffect, useState } from 'react';
 import { encodeAddress } from '@mimir-wallet/api';
 import { fetcher } from '@mimir-wallet/utils';
 import { serviceUrl } from '@mimir-wallet/utils/chain-links';
-
-import { Transaction } from './types';
 
 function transformTransaction(transaction: Transaction): Transaction {
   const tx = { ...transaction };
@@ -33,39 +33,32 @@ function transformTransaction(transaction: Transaction): Transaction {
 export function usePendingTransactions(
   address?: string | null
 ): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
-  const [txs, setTxs] = useState<Transaction[]>([]);
-
   const { data, isFetched, isFetching } = useQuery<Transaction[]>({
     initialData: [],
     queryHash: serviceUrl(`tx/pending?address=${address}`),
-    queryKey: [address ? serviceUrl(`tx/pending?address=${address}`) : null]
+    queryKey: [address ? serviceUrl(`tx/pending?address=${address}`) : null],
+    structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
+      const nextData = (next as Transaction[]).map((item) => transformTransaction(item));
+
+      return isEqual(prev, nextData) ? (prev as Transaction[]) || [] : nextData;
+    }
   });
 
-  useEffect(() => {
-    if (data) {
-      setTxs((value) => {
-        const newData = data.map((item) => transformTransaction(item));
-
-        return isEqual(newData, value) ? value : newData;
-      });
-    }
-  }, [data]);
-
-  return [txs, isFetched, isFetching];
+  return [data, isFetched, isFetching];
 }
 
 export function useHistoryTransactions(
   address?: string | null,
   limit = 20
 ): [
-  transactions: Transaction[],
+  transactions: HistoryTransaction[],
   isFetched: boolean,
   isFetching: boolean,
   hasNextPage: boolean,
   isFetchingNextPage: boolean,
   fetchNextPage: () => void
 ] {
-  const [txs, setTxs] = useState<Transaction[]>([]);
+  const [txs, setTxs] = useState<HistoryTransaction[]>([]);
 
   const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
     initialPageParam: null,
@@ -83,7 +76,7 @@ export function useHistoryTransactions(
       }
 
       if (data.length) {
-        return data.length === limit ? data[data.length - 1].id : null;
+        return data.length === limit ? data[data.length - 1].uuid : null;
       }
 
       return null;
@@ -95,7 +88,7 @@ export function useHistoryTransactions(
   useEffect(() => {
     if (data) {
       setTxs((value) => {
-        const newData = data.pages.flat().map((item) => transformTransaction(item));
+        const newData = data.pages.flat().map((item) => transformTransaction(item) as HistoryTransaction);
 
         return isEqual(newData, value) ? value : newData;
       });

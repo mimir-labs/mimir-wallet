@@ -9,7 +9,6 @@ import React, { useMemo } from 'react';
 
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
 import { AppName } from '@mimir-wallet/components';
-import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@mimir-wallet/constants';
 import { useApi, useToggle } from '@mimir-wallet/hooks';
 import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
 import { formatAgo } from '@mimir-wallet/utils';
@@ -50,20 +49,10 @@ function TimeCell({ time }: { time?: number }) {
 
   time ||= now;
 
-  return (
-    <Box sx={{ flex: '1' }}>
-      {now - Number(time) < ONE_MINUTE
-        ? 'Now'
-        : now - Number(time) < ONE_HOUR * 1000
-          ? `${formatAgo(Number(time), 'm')} mins ago`
-          : now - Number(time) < ONE_DAY * 1000
-            ? `${formatAgo(Number(time), 'H')} hours ago`
-            : `${formatAgo(Number(time), 'D')} days ago`}
-    </Box>
-  );
+  return <Box sx={{ flex: '1' }}>{now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`}</Box>;
 }
 
-function ActionsCell({ detailOpen, toggleDetailOpen }: { detailOpen: boolean; toggleDetailOpen: () => void }) {
+function ActionsCell({ detailOpen }: { detailOpen: boolean }) {
   return (
     <Box
       sx={{
@@ -74,7 +63,7 @@ function ActionsCell({ detailOpen, toggleDetailOpen }: { detailOpen: boolean; to
       }}
     >
       <div />
-      <IconButton color='primary' onClick={toggleDetailOpen}>
+      <IconButton color='primary'>
         <SvgIcon
           component={ArrowDown}
           inheritViewBox
@@ -126,6 +115,7 @@ function TxItems({
         <Grid
           container
           sx={{
+            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             paddingX: { xs: 1, sm: 1.5, md: 2 },
@@ -139,6 +129,7 @@ function TxItems({
             }
           }}
           columns={12}
+          onClick={toggleDetailOpen}
         >
           <Grid size={2}>
             <AppCell transaction={transaction} />
@@ -166,7 +157,7 @@ function TxItems({
             )}
           </Grid>
           <Grid size='grow'>
-            <ActionsCell detailOpen={detailOpen} toggleDetailOpen={toggleDetailOpen} />
+            <ActionsCell detailOpen={detailOpen} />
           </Grid>
         </Grid>
         {detailOpen && (

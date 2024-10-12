@@ -41,11 +41,11 @@ function Detected({ accounts }: { accounts: AccountData[] }) {
       <Divider />
 
       <Button component={Link} to='/create-multisig' color='primary' variant='outlined' fullWidth>
-        Create Account
+        Create Multisig Account
       </Button>
-      {/* <Button component={Link} to='/create-multisig' color='primary' variant='outlined' fullWidth>
-        Create Multisig
-      </Button> */}
+      <Button component={Link} to='/create-pure' color='primary' variant='outlined' fullWidth>
+        Create Pure Proxy
+      </Button>
       <Button onClick={handleClick} variant='text' color='primary'>
         {'Skip>'}
       </Button>
@@ -86,17 +86,17 @@ function Welcome() {
                 sx={{ width: 210 }}
                 color='primary'
               >
-                Create Multisig
+                Create Multisig Account
               </Button>
-              {/* <Button
+              <Button
                 component={Link}
-                to='/import-multisig'
-                startIcon={<SvgIcon inheritViewBox component={IconSend} sx={{ color: 'white' }} />}
-                sx={{ width: 210, display: 'none' }}
+                to='/create-pure'
+                startIcon={<SvgIcon inheritViewBox component={IconAdd} sx={{ color: 'white' }} />}
+                sx={{ width: 210 }}
                 color='primary'
               >
-                Import Multisig
-              </Button> */}
+                Create Pure Proxy
+              </Button>
             </>
           ) : (
             <>

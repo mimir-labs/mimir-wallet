@@ -16,6 +16,15 @@ export function getProxyTypeInstance(registry: Registry, index = 0): Kitchensink
   return registry.createType<KitchensinkRuntimeProxyType>(proxyNames.length ? proxyNames[0] : 'ProxyType', index);
 }
 
+export function getProxyOptions(registry: Registry): { text: string; value: number }[] {
+  return (
+    getProxyTypeInstance(registry)
+      .defKeys.map((text, value) => ({ text, value }))
+      // Filter the empty entries added in v14
+      .filter(({ text }) => !text.startsWith('__Unused'))
+  );
+}
+
 export function useProxyTypes() {
-  return useMemo(() => getProxyTypeInstance(registry), []);
+  return useMemo(() => getProxyOptions(registry), []);
 }

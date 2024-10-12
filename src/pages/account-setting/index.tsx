@@ -30,6 +30,7 @@ function AccountSetting() {
   const { address } = useParams() as { address: string };
   const { setName, name, saveName } = useAddressMeta(address);
   const account = useQueryAccount(address);
+  const [error, setError] = useState<Error>();
   const [txs] = usePendingTransactions(address);
   const [tab, setTab] = useState('0');
   const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(api.query.proxy.proxies, [address]);
@@ -57,21 +58,34 @@ function AccountSetting() {
             <Input
               helper='All members will see this name'
               label='Name'
-              onChange={(value) => setName(value)}
+              onChange={(value) => {
+                if (value) {
+                  setError(undefined);
+                }
+
+                setName(value);
+              }}
               placeholder='Please input account name'
               value={name}
+              error={error}
             />
             <Button
               disabled={!address || !isLocalAccount(address)}
               fullWidth
-              onClick={() => saveName((name) => toastSuccess(`Save name to ${name} success`))}
+              onClick={() => {
+                if (!name) {
+                  setError(new Error('Please input wallet name'));
+                } else {
+                  saveName((name) => toastSuccess(`Save name to ${name} success`));
+                }
+              }}
             >
               Save
             </Button>
           </Paper>
         </Box>
 
-        {(account?.type === 'multisig' || account?.type === 'pure') && (
+        {(account?.type === 'multisig' || (account?.type === 'pure' && multisigDelegates.length > 0)) && (
           <Box>
             <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
               Multisig Information
@@ -93,7 +107,6 @@ function AccountSetting() {
 
               {account &&
                 account.type === 'pure' &&
-                multisigDelegates.length &&
                 (multisigDelegates.length > 1 ? (
                   <>
                     <TabContext value={tab}>

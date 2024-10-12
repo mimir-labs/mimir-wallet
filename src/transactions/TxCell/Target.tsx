@@ -57,15 +57,14 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
 
   return (
     <>
-      {targetCall ? (
-        <CallComp from={from} api={api} call={targetCall} jsonFallback />
-      ) : (
+      {targetCall ? <CallComp from={from} api={api} call={targetCall} jsonFallback /> : null}
+      {!call && (
         <Alert severity='warning'>
           <AlertTitle>Warning</AlertTitle>
           This transaction wasn’t initiated from Mimir. Please confirm the security of this transaction.
         </Alert>
       )}
-      <Item title='From' content={<AddressRow size='small' value={from} />} />
+      <Item title='From' content={<AddressRow size='small' withCopy value={from} />} />
     </>
   );
 }

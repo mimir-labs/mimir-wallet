@@ -48,8 +48,8 @@ export function prepareMultisig(
   creator: HexString,
   extrinsicHash: HexString,
   name: string,
-  threshold: number,
-  who: HexString[]
+  threshold?: number | null,
+  who?: HexString[] | null
 ) {
   return fetcher(serviceUrl('multisig/prepare'), {
     method: 'POST',
@@ -83,10 +83,10 @@ export async function getMultisigs(addresses: string[]) {
 
 export async function uploadWebsite(
   extrinsicHash: HexString,
-  website?: string,
-  appName?: string,
-  iconUrl?: string,
-  note?: string
+  website?: string | null,
+  appName?: string | null,
+  iconUrl?: string | null,
+  note?: string | null
 ): Promise<boolean> {
   return fetcher(serviceUrl('website'), {
     method: 'POST',
@@ -110,10 +110,10 @@ export async function utm(address: HexString, utm: UTM): Promise<void> {
   });
 }
 
-export async function safetyCheck(from: string, method: HexString): Promise<SafetyLevel> {
+export async function safetyCheck(method: HexString): Promise<SafetyLevel> {
   return fetcher(serviceUrl('safety-check'), {
     method: 'POST',
-    body: JSON.stringify({ from, method }),
+    body: JSON.stringify({ method }),
     headers: jsonHeader
   });
 }

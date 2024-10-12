@@ -1,8 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { PaletteMode } from '@mui/material';
 import type { ThemeOptions } from '@mui/material/styles';
+
+import { type PaletteMode, SvgIcon } from '@mui/material';
+
+import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 
 type Func = (mode: PaletteMode) => NonNullable<ThemeOptions['components']>;
 /**
@@ -405,6 +408,14 @@ const createComponents: Func = () => ({
       select: {
         minHeight: '1.375rem',
         lineHeight: '1.375rem'
+      }
+    }
+  },
+
+  MuiAlert: {
+    defaultProps: {
+      iconMapping: {
+        warning: <SvgIcon inheritViewBox component={IconInfo} sx={{ fontSize: '0.875rem' }} />
       }
     }
   }

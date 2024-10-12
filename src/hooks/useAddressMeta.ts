@@ -31,6 +31,9 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
     if (_meta) {
       setMeta(_meta);
       setName(_meta.name || '');
+    } else {
+      setMeta({});
+      setName('');
     }
   }, [_meta]);
 

@@ -7,7 +7,6 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import IconNotification from '@mimir-wallet/assets/svg/icon-notification.svg?react';
 import { AddressName, Empty } from '@mimir-wallet/components';
-import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@mimir-wallet/constants';
 import { useGroupAccounts, useMessages, useSelectedAccountCallback, useWallet } from '@mimir-wallet/hooks';
 import { type ExecuteTxMessage, type PushMessageData, TransactionStatus } from '@mimir-wallet/hooks/types';
 import { addressToHex, formatAgo, service } from '@mimir-wallet/utils';
@@ -72,13 +71,7 @@ function Notification() {
         to='/transactions'
       >
         <Typography color='text.secondary'>
-          {now - Number(blockTime) < ONE_MINUTE
-            ? 'Now'
-            : now - Number(blockTime) < ONE_HOUR * 1000
-              ? `${formatAgo(Number(blockTime), 'm')} mins ago`
-              : now - Number(blockTime) < ONE_DAY * 1000
-                ? `${formatAgo(Number(blockTime), 'H')} hours ago`
-                : `${formatAgo(Number(blockTime), 'D')} days ago`}
+          {now - Number(blockTime) < 1000 ? 'Now' : `${formatAgo(blockTime)} ago`}
         </Typography>
         <Typography>
           {type === 'initial' ? (

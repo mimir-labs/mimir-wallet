@@ -8,7 +8,7 @@ function useSelectedAccountImpl(): string | undefined {
   return useAccount().current;
 }
 
-function useSelectedAccountCallbackImpl(): (address: string) => void {
+function useSelectedAccountCallbackImpl(): (address: string, confirm?: boolean) => void {
   return useAccount().setCurrent;
 }
 

@@ -39,7 +39,11 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
   return (
     <>
       <DappDetails dapp={dapp} onClose={toggleOpen} open={detailsOpen} />
-      <Paper onClick={toggleOpen} sx={{ cursor: 'pointer', display: 'block', padding: 2, textDecoration: 'none' }}>
+      <Paper
+        component={Link}
+        to={`/explorer/${encodeURIComponent(dapp.url)}`}
+        sx={{ cursor: 'pointer', display: 'block', padding: 2, textDecoration: 'none' }}
+      >
         <Stack spacing={2}>
           <Box>
             <Typography variant='h4'>{dapp.name}</Typography>
@@ -61,12 +65,13 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
               <Box component='img' src={dapp.icon} sx={{ width: 32, height: 32 }} />
             </Box>
             <Button
-              component={Link}
-              onClick={(e) => e.stopPropagation()}
-              to={`/explorer/${encodeURIComponent(dapp.url)}`}
+              onClick={(e) => {
+                e.preventDefault();
+                toggleOpen();
+              }}
               variant='outlined'
             >
-              Enter
+              Details
             </Button>
             <IconButton onClick={toggleFavorite} sx={({ palette }) => ({ bgcolor: alpha(palette.primary.main, 0.1) })}>
               <SvgIcon color='primary' component={IconStar} inheritViewBox sx={{ opacity: _isFavorite ? 1 : 0.2 }} />

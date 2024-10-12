@@ -15,6 +15,10 @@ function AppInfo({
   iconUrl?: string | null;
   appName?: string | null;
 }) {
+  if (website && website.startsWith('mimir://internal')) {
+    return null;
+  }
+
   return (
     <Box>
       <Typography fontWeight={700}>App</Typography>

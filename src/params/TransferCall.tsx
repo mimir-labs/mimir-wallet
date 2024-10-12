@@ -6,21 +6,14 @@ import type { CallProps } from './types';
 import { alpha, Box, lighten, Skeleton } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { AddressName, CopyButton, FormatBalance, IdentityIcon } from '@mimir-wallet/components';
+import { Address, AddressName, CopyButton, FormatBalance, IdentityIcon } from '@mimir-wallet/components';
+import { ellipsisMixin } from '@mimir-wallet/components/utils';
 import { useAssetInfo } from '@mimir-wallet/hooks';
 
 import FunctionArgs from './FunctionArgs';
 import { findAction } from './utils';
 
-function AddressDisplay({
-  reverse,
-  address,
-  children
-}: {
-  reverse: boolean;
-  address: string;
-  children: React.ReactNode;
-}) {
+function AddressDisplay({ reverse, address }: { reverse: boolean; address?: string }) {
   return (
     <Box
       data-reverse={reverse}
@@ -52,10 +45,14 @@ function AddressDisplay({
             gap: 0.4
           }}
         >
-          <AddressName value={address} />
+          <Box component='span' sx={{ ...ellipsisMixin(150) }}>
+            <AddressName value={address} />
+          </Box>
           <CopyButton size='small' value={address} color='default' sx={{ color: 'text.secondary' }} />
         </Box>
-        <Box sx={{ fontSize: '10px', color: 'text.secondary', lineHeight: '12px' }}>{children}</Box>
+        <Box sx={{ fontSize: '10px', color: 'text.secondary', lineHeight: '12px' }}>
+          <Address shorten value={address} />
+        </Box>
       </Box>
     </Box>
   );
@@ -66,7 +63,7 @@ function TransferCall({ from: propFrom, api, call, jsonFallback }: CallProps) {
 
   const results = useMemo(() => {
     let assetId: string | null = null;
-    let from: string = propFrom;
+    let from: string | undefined = propFrom;
     let to: string;
     let value: string;
     let isAll: boolean = false;
@@ -113,9 +110,7 @@ function TransferCall({ from: propFrom, api, call, jsonFallback }: CallProps) {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3 }}>
-      <AddressDisplay reverse={false} address={from}>
-        Sender
-      </AddressDisplay>
+      <AddressDisplay reverse={false} address={from} />
       <Box
         sx={({ palette }) => ({
           position: 'relative',
@@ -176,9 +171,7 @@ function TransferCall({ from: propFrom, api, call, jsonFallback }: CallProps) {
           )}
         </Box>
       </Box>
-      <AddressDisplay reverse address={to}>
-        Recipient
-      </AddressDisplay>
+      <AddressDisplay reverse address={to} />
     </Box>
   );
 }

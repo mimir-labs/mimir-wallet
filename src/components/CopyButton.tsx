@@ -18,6 +18,7 @@ function CopyButton({ value, ...props }: Props) {
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
+      e.preventDefault();
       copy(value?.toString() || '');
     },
     [copy, value]

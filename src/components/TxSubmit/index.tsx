@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { AccountId, Address, Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
@@ -10,19 +11,23 @@ import { Box, Checkbox, Divider, FormControlLabel, IconButton, Paper, Stack, Svg
 import { useState } from 'react';
 
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
-import { useFilterPaths, useQueryAccount } from '@mimir-wallet/hooks';
+import { useFilterPaths, useQueryAccount, useWallet } from '@mimir-wallet/hooks';
 
 import Input from '../Input';
+import InputAddress from '../InputAddress';
+import { useBuildTx } from './hooks/useBuildTx';
+import { useCloseWhenPathChange } from './hooks/useCloseWhenPathChange';
+import { useHighlightTab } from './hooks/useHighlightTab';
+import { useSafetyCheck } from './hooks/useSafetyCheck';
 import AddressChain from './AddressChain';
 import AppInfo from './AppInfo';
 import Call from './Call';
 import SafetyCheck from './SafetyCheck';
 import Sender from './Sender';
 import SendTx from './SendTx';
-import { useSafetyCheck } from './useSafetyCheck';
 
 interface Props {
-  accountId: AccountId | Address | string;
+  accountId?: AccountId | Address | string;
   call: IMethod;
   transaction?: Transaction | null;
   filterPaths?: FilterPath[];
@@ -36,7 +41,7 @@ interface Props {
   onResults?: (results: ISubmittableResult) => void;
   onFinalized?: (results: ISubmittableResult) => void;
   onSignature?: (signer: string, signature: HexString, tx: Extrinsic, payload: ExtrinsicPayloadValue) => void;
-  beforeSend?: () => Promise<void>;
+  beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }
 
 function TxSubmit({
@@ -56,15 +61,20 @@ function TxSubmit({
   onSignature,
   beforeSend
 }: Props) {
-  const account = accountId.toString();
-  const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(account, call);
-  const [note, setNote] = useState<string>();
+  const { walletAccounts } = useWallet();
+  const [account, setAccount] = useState<string | undefined>(accountId?.toString() || walletAccounts?.[0].address);
+  const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
+  const [note, setNote] = useState<string>(transaction?.note || '');
   const accountData = useQueryAccount(account);
   const filterPaths = useFilterPaths(accountData, transaction);
   const [addressChain, setAddressChain] = useState<FilterPath[]>(propsFilterPaths || []);
+  const { isLoading: isTxBundleLoading, txBundle } = useBuildTx(call, addressChain);
+
+  useHighlightTab();
+  useCloseWhenPathChange(onClose);
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', padding: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
         <Typography variant='h4'>Submit Transaction</Typography>
         <IconButton
@@ -89,17 +99,17 @@ function TxSubmit({
         }}
       >
         <Stack width='60%' spacing={2}>
-          <Sender address={account} />
+          {account && <Sender address={account} />}
 
           <AppInfo
-            website={website || transaction?.website}
-            iconUrl={iconUrl || transaction?.iconUrl}
-            appName={appName || transaction?.appName}
+            website={transaction?.website || website}
+            iconUrl={transaction?.iconUrl || iconUrl}
+            appName={transaction?.appName || appName}
           />
 
-          <Call account={account} method={call} />
+          <Call account={account} method={call} transaction={transaction} />
 
-          <SafetyCheck safetyCheck={safetyCheck} />
+          <SafetyCheck isTxBundleLoading={isTxBundleLoading} txBundle={txBundle} safetyCheck={safetyCheck} />
         </Stack>
 
         <Stack
@@ -115,14 +125,25 @@ function TxSubmit({
           })}
           spacing={2}
         >
-          <AddressChain
-            deep={0}
-            filterPaths={filterPaths}
-            addressChain={addressChain}
-            setAddressChain={setAddressChain}
-          />
+          {accountId ? (
+            <AddressChain
+              deep={0}
+              filterPaths={filterPaths}
+              addressChain={addressChain}
+              setAddressChain={setAddressChain}
+            />
+          ) : (
+            <InputAddress
+              label='Select Signer'
+              placeholder='Please select signer'
+              value={account}
+              onChange={setAccount}
+              isSign
+              filtered={walletAccounts.map((item) => item.address)}
+            />
+          )}
 
-          <Input multiline rows={6} label='Note' onChange={setNote} placeholder='Please note' />
+          <Input label='Note(Optional)' onChange={setNote} value={note} placeholder='Please note' />
 
           <Divider />
 
@@ -136,12 +157,13 @@ function TxSubmit({
           <SendTx
             account={account}
             call={call}
+            disabled={!txBundle.canProxyExecute}
             filterPath={addressChain}
             note={note}
             onlySign={onlySign}
-            website={website}
-            iconUrl={iconUrl}
-            appName={appName}
+            website={transaction?.website || website}
+            iconUrl={transaction?.iconUrl || iconUrl}
+            appName={transaction?.appName || appName}
             onError={onError}
             onFinalized={onFinalized}
             onResults={(...args) => {

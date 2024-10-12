@@ -18,6 +18,8 @@ export * from './useDeriveAccountInfo';
 export * from './useFilterPaths';
 export * from './useFollowAccounts';
 export * from './useGroupAccounts';
+export * from './useInput';
+export * from './useInputNumber';
 export * from './useIsMountedRef';
 export * from './useMessages';
 export * from './useProposals';

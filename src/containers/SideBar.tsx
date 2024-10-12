@@ -41,6 +41,7 @@ import { useApi, useCall, useSelectedAccount, useToggle, useWallet } from '@mimi
 import { chainLinks } from '@mimir-wallet/utils';
 
 import { BaseContainerCtx } from './BaseContainer';
+import ToggleSidebar from './ToggleSidebar';
 
 function NavLink({
   Icon,
@@ -92,7 +93,7 @@ function NavLink({
   );
 }
 
-function SideBar({ offsetTop = 0 }: { offsetTop?: number }) {
+function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideBar: boolean }) {
   const { api } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -212,7 +213,7 @@ function SideBar({ offsetTop = 0 }: { offsetTop?: number }) {
   return (
     <>
       <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
-      {downMd ? (
+      {downMd || !withSideBar ? (
         <Drawer
           PaperProps={{
             sx: {
@@ -248,6 +249,8 @@ function SideBar({ offsetTop = 0 }: { offsetTop?: number }) {
           {element}
         </Box>
       )}
+
+      {!withSideBar && !downMd && !sidebarOpen && <ToggleSidebar />}
     </>
   );
 }

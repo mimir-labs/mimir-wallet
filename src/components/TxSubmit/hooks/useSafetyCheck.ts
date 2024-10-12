@@ -9,20 +9,20 @@ import { useApi, useToggle } from '@mimir-wallet/hooks';
 import { SafetyLevel } from '@mimir-wallet/hooks/types';
 import { service } from '@mimir-wallet/utils';
 
-export function useSafetyCheck(sender: string, call: IMethod) {
+export function useSafetyCheck(call: IMethod) {
   const { api } = useApi();
   const [safetyCheck, setSafetyCheck] = useState<SafetyLevel>();
   const [isConfirm, , setConfirm] = useToggle(false);
 
   useEffect(() => {
-    service.safetyCheck(sender, call.toHex()).then((level) => {
+    service.safetyCheck(call.toHex()).then((level) => {
       if (level.severity === 'none') {
         setConfirm(true);
       }
 
       setSafetyCheck(level);
     });
-  }, [api, call, sender, setConfirm]);
+  }, [api, call, setConfirm]);
 
   return [safetyCheck, isConfirm, setConfirm] as const;
 }

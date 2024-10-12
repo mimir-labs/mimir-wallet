@@ -10,7 +10,7 @@ import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
 import { useApi, useCall } from '@mimir-wallet/hooks';
-import { AccountData, ProxyTransaction, TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { AccountData, Transaction, TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
 import { addressEq } from '@mimir-wallet/utils';
 
 export type AnnouncementStatus =
@@ -20,10 +20,11 @@ export type AnnouncementStatus =
   | 'success'
   | 'failed'
   | 'rejected'
-  | 'removed';
+  | 'removed'
+  | 'proxy_removed';
 
 export function useAnnouncementStatus(
-  transaction: ProxyTransaction,
+  transaction: Transaction,
   account: AccountData
 ): [status: AnnouncementStatus, isFetching: boolean] {
   const { api } = useApi();
@@ -37,7 +38,7 @@ export function useAnnouncementStatus(
 
   const result = useCall<ITuple<[Vec<PalletProxyAnnouncement>, u128]>>(
     api.query.proxy.announcements,
-    status === TransactionStatus.Pending && type === TransactionType.Announce ? [delegate?.address] : []
+    status === TransactionStatus.Pending && type === TransactionType.Announce ? [transaction.delegate] : []
   );
   const bestNumber = useCall<BlockNumber>(api.derive.chain.bestNumber);
 
@@ -54,14 +55,16 @@ export function useAnnouncementStatus(
 
   if (status < TransactionStatus.Success) {
     return [
-      announcements
-        ? announcement
-          ? announcement.height.add(new BN(delegate?.proxyDelay || 0)).lte(bestNumber || new BN(0))
-            ? 'executable'
-            : 'reviewing'
-          : 'indexing'
-        : 'reviewing',
-      !bestNumber || !result
+      !delegate && result
+        ? 'proxy_removed'
+        : announcements
+          ? announcement
+            ? announcement.height.add(new BN(delegate?.proxyDelay || 0)).lte(bestNumber || new BN(0))
+              ? 'executable'
+              : 'reviewing'
+            : 'indexing'
+          : 'reviewing',
+      status === TransactionStatus.Pending ? !bestNumber || !result : !bestNumber
     ];
   }
 

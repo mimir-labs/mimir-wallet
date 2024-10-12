@@ -7,16 +7,16 @@ import { alpha, Box, Button, Divider, Paper, Stack, Typography } from '@mui/mate
 import React, { useMemo } from 'react';
 
 import { AddressCell } from '@mimir-wallet/components';
-import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@mimir-wallet/constants';
 import { useBlockInterval, useFilterPaths } from '@mimir-wallet/hooks';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
-import { addressEq, formatTimeStr } from '@mimir-wallet/utils';
+import { addressEq, autoFormatTimeStr } from '@mimir-wallet/utils';
 
 import Approve from '../buttons/Approve';
 import Cancel from '../buttons/Cancel';
 import Deny from '../buttons/Deny';
 import ExecuteAnnounce from '../buttons/ExecuteAnnounce';
 import Remove from '../buttons/Remove';
+import ViewPending from '../buttons/ViewPending';
 import { useAnnouncementProgress } from '../hooks/useAnnouncementProgress';
 import { approvalCounts } from '../utils';
 
@@ -26,9 +26,17 @@ interface Props {
   openOverview: () => void;
 }
 
-function ProgressItem({ account, transaction }: { account?: AccountData; transaction: Transaction }) {
+function ProgressItem({
+  account,
+  transaction,
+  address
+}: {
+  account?: AccountData;
+  transaction?: Transaction;
+  address: string;
+}) {
   const [counts, threshold] = useMemo(
-    () => (account ? approvalCounts(account, transaction) : [0, 1]),
+    () => (account && transaction ? approvalCounts(account, transaction) : [0, 1]),
     [account, transaction]
   );
 
@@ -44,7 +52,7 @@ function ProgressItem({ account, transaction }: { account?: AccountData; transac
       }}
       variant='elevation'
     >
-      <AddressCell showType withCopy shorten value={transaction.address} />
+      <AddressCell showType withCopy withAddressBook shorten value={address} />
       <Box
         sx={({ palette }) => ({
           overflow: 'hidden',
@@ -91,11 +99,12 @@ function MultisigContent({
   button?: React.ReactNode;
 }) {
   return (
-    <Stack spacing={1}>
+    <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography sx={{ fontWeight: 700, flex: '1' }}>Confirmations</Typography>
         {button}
       </Box>
+
       <Content>
         {transaction.children.map((tx, index) => (
           <ProgressItem
@@ -106,10 +115,11 @@ function MultisigContent({
                 : undefined
             }
             transaction={tx}
+            address={tx.address}
           />
         ))}
       </Content>
-    </Stack>
+    </>
   );
 }
 
@@ -134,22 +144,27 @@ function ProxyContent({
   }
 
   return (
-    <Stack spacing={1}>
+    <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 700, flex: '1' }}>Delegate</Typography>
+        <Typography sx={{ fontWeight: 700, flex: '1' }}>Proxy</Typography>
         {button}
       </Box>
 
       <Content>
-        {transaction.children.map((tx, index) => (
-          <ProgressItem
-            key={index}
-            account={account.delegatees.find((item) => addressEq(item.address, tx.address))}
-            transaction={tx}
-          />
-        ))}
+        {transaction.children.length > 0 ? (
+          transaction.children.map((tx, index) => (
+            <ProgressItem
+              key={index}
+              account={account.delegatees.find((item) => addressEq(item.address, tx.address))}
+              transaction={tx}
+              address={tx.address}
+            />
+          ))
+        ) : transaction.delegate ? (
+          <ProgressItem address={transaction.delegate} />
+        ) : null}
       </Content>
-    </Stack>
+    </>
   );
 }
 
@@ -167,65 +182,73 @@ function AnnounceContent({
 
   const leftTime = currentBlock >= endBlock ? 0 : ((endBlock - currentBlock) * blockInterval) / 1000;
 
-  const leftTimeFormat =
-    leftTime > ONE_DAY
-      ? `${formatTimeStr(leftTime * 1000, 'D')} days`
-      : leftTime > ONE_HOUR
-        ? `${formatTimeStr(leftTime * 1000, 'H')} hours`
-        : leftTime > ONE_MINUTE
-          ? `${formatTimeStr(leftTime * 1000, 'm')} minutes`
-          : leftTime === 0
-            ? ''
-            : `${formatTimeStr(leftTime * 1000, 's')} seconds`;
+  const leftTimeFormat = useMemo(() => autoFormatTimeStr(leftTime * 1000), [leftTime]);
 
-  return (
-    <Stack spacing={1}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 700, flex: '1' }}>Review Time</Typography>
-      </Box>
-      <Box
-        sx={({ palette }) => ({
-          overflow: 'hidden',
-          borderRadius: '2px',
-          position: 'relative',
-          marginX: 3.5,
-          height: '4px',
-          bgcolor: alpha(palette.primary.main, 0.1)
-        })}
-      >
+  const element =
+    transaction.status === TransactionStatus.Pending ? (
+      <Stack spacing={1}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography sx={{ fontWeight: 700, flex: '1' }}>Review Time</Typography>
+        </Box>
         <Box
-          sx={{
+          sx={({ palette }) => ({
+            overflow: 'hidden',
             borderRadius: '2px',
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            bgcolor: 'primary.main',
-            width: `${(currentBlock > endBlock ? 1 : (currentBlock - startBlock) / (endBlock - startBlock)) * 100}%`
-          }}
-        />
-      </Box>
+            position: 'relative',
+            marginX: 3.5,
+            height: '4px',
+            bgcolor: alpha(palette.primary.main, 0.1)
+          })}
+        >
+          <Box
+            sx={{
+              borderRadius: '2px',
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              bottom: 0,
+              bgcolor: 'primary.main',
+              width: `${(currentBlock > endBlock ? 1 : (currentBlock - startBlock) / (endBlock - startBlock)) * 100}%`
+            }}
+          />
+        </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ flex: '1' }}>{currentBlock >= endBlock ? 'Review finished' : 'Under Reviewing'}</Typography>
-        {leftTimeFormat ? `${leftTimeFormat} left` : ''}
-      </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography sx={{ flex: '1' }}>{currentBlock >= endBlock ? 'Review finished' : 'Under Reviewing'}</Typography>
+          {leftTimeFormat ? `${leftTimeFormat} left` : ''}
+        </Box>
 
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography sx={{ fontWeight: 700, flex: '1' }}>Proxy</Typography>
+          {button}
+        </Box>
+      </Stack>
+    ) : (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 700, flex: '1' }}>Delegate</Typography>
+        <Typography sx={{ fontWeight: 700, flex: '1' }}>Proxy</Typography>
         {button}
       </Box>
+    );
+
+  return (
+    <>
+      {element}
 
       <Content>
-        {transaction.children.map((tx, index) => (
-          <ProgressItem
-            key={index}
-            account={account.delegatees.find((item) => addressEq(item.address, tx.address))}
-            transaction={tx}
-          />
-        ))}
+        {transaction.children.length > 0 ? (
+          transaction.children.map((tx, index) => (
+            <ProgressItem
+              key={index}
+              account={account.delegatees.find((item) => addressEq(item.address, tx.address))}
+              transaction={tx}
+              address={tx.address}
+            />
+          ))
+        ) : transaction.delegate ? (
+          <ProgressItem address={transaction.delegate} />
+        ) : null}
       </Content>
-    </Stack>
+    </>
   );
 }
 
@@ -270,17 +293,17 @@ function Progress({ account, transaction, openOverview }: Props) {
           }
         />
       ) : null}
+
       <Divider />
 
       {transaction.status < TransactionStatus.Success && (
         <Stack spacing={1}>
+          <ViewPending transaction={transaction} />
           <Approve account={account} transaction={transaction} filterPaths={filterPaths} />
           <Cancel account={account} transaction={transaction} />
           <Remove transaction={transaction} />
           <Deny transaction={transaction} />
-          {transaction.type === TransactionType.Announce && (
-            <ExecuteAnnounce account={account} transaction={transaction} />
-          )}
+          <ExecuteAnnounce account={account} transaction={transaction} />
         </Stack>
       )}
     </Stack>

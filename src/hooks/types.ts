@@ -83,6 +83,7 @@ export enum TransactionStatus {
   Pending = 1,
   Success = 2,
   Failed = 3,
+  MemberChanged = 4,
   Cancelled = 5,
   AnnounceRemoved = 6,
   AnnounceReject = 7
@@ -108,6 +109,10 @@ type BaseTransaction = {
   createdBlockHash: HexString;
   createdExtrinsicIndex: number;
   createdExtrinsicHash: HexString;
+  executedBlock?: string;
+  executedBlockHash?: HexString;
+  executedExtrinsicIndex?: number;
+  executedExtrinsicHash?: HexString;
   cancelBlock?: string;
   cancelBlockHash?: HexString;
   cancelExtrinsicIndex?: number;
@@ -145,6 +150,8 @@ export type ProxyTransaction = BaseTransaction & {
 };
 
 export type Transaction = UnknownTransaction | MultisigTransaction | ProxyTransaction;
+
+export type HistoryTransaction = Transaction & { uuid: string };
 
 export interface TokenInfo {
   asset_type: string;
@@ -275,6 +282,7 @@ export interface AddressMeta {
   isProxy?: boolean;
   isInjected?: boolean;
   isMultisig?: boolean;
+  multipleMultisig?: boolean;
   source?: string;
   threshold?: number;
   who?: string[];

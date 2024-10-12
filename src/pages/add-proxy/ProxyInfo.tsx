@@ -58,9 +58,9 @@ function ProxyInfo({
           '&>.AddressCell': { bgcolor: 'background.paper', paddingY: 0.5, paddingX: 1, borderRadius: 1 }
         }}
       >
-        <AddressCell withCopy value={proxied} />
+        <AddressCell withCopy value={proxied} withAddressBook />
         <SvgIcon component={IconArrow} fontSize='small' inheritViewBox color='primary' />
-        <AddressCell withCopy value={delegate} />
+        <AddressCell withCopy value={delegate} withAddressBook />
       </Box>
     </Box>
   );

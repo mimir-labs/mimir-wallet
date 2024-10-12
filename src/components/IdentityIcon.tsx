@@ -41,7 +41,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
   }, [prefix, value]);
   const { meta } = useAddressMeta(value?.toString());
 
-  const { isInjected, isMultisig, source, threshold, who } = meta || {};
+  const { isInjected, isMultisig, source, threshold, who, multipleMultisig } = meta || {};
 
   const extensionIcon = isInjected ? walletConfig[source || '']?.icon : undefined;
 
@@ -103,7 +103,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
           }}
         />
       ) : null}
-      {who && who.length > 0 && (
+      {((who && who.length > 0) || multipleMultisig) && (
         <Box
           component='span'
           sx={{
@@ -116,7 +116,6 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
             justifyContent: 'center',
             width: '100%',
             height: 12,
-            paddingX: 0.5,
             borderRadius: `${6 + size / 16}px`,
             bgcolor: 'primary.main',
             color: 'common.white',
@@ -125,7 +124,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
             lineHeight: '12px'
           }}
         >
-          {threshold}/{who?.length}
+          {who && who.length > 0 ? `${threshold}/${who.length}` : 'Multi'}
         </Box>
       )}
     </Box>

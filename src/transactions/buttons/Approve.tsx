@@ -1,12 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, FilterPath, Transaction } from '@mimir-wallet/hooks/types';
-
 import { LoadingButton } from '@mui/lab';
 import React from 'react';
 
 import { useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { type AccountData, type FilterPath, type Transaction, TransactionType } from '@mimir-wallet/hooks/types';
 
 function Approve({
   account,
@@ -20,7 +19,10 @@ function Approve({
   const { api } = useApi();
   const { addQueue } = useTxQueue();
 
-  if (!filterPaths.length) {
+  if (
+    (transaction.type !== TransactionType.Multisig && transaction.type !== TransactionType.Proxy) ||
+    !filterPaths.length
+  ) {
     return null;
   }
 

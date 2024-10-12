@@ -1,27 +1,41 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { isAddress } from '@polkadot/util-crypto';
 import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
+import { encodeAddress } from '@mimir-wallet/api';
+import { CURRENT_ADDRESS_PREFIX, CURRENT_NETWORK_KEY } from '@mimir-wallet/constants';
+import { store } from '@mimir-wallet/utils';
 
 import { useAccount } from './useAccounts';
 import { useApi } from './useApi';
-import { useQueryParam } from './useQueryParams';
 
 export function useFollowAccounts() {
   const { network } = useApi();
   const { current } = useAccount();
-
-  const [urlAddress, setQueryAddress] = useQueryParam('address');
-  const [urlNetwork, setQueryNetwork] = useQueryParam('network');
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    if (urlNetwork !== network.toString()) setQueryNetwork(network.toString(), { replace: true });
-  }, [network, setQueryNetwork, urlNetwork]);
-  useEffect(() => {
-    if (current) {
-      if (current !== urlAddress) setQueryAddress(current, { replace: true });
-    } else {
-      setQueryAddress(undefined, { replace: true });
+    const newSearchParams = new URLSearchParams(searchParams);
+
+    if (network) {
+      newSearchParams.set('network', network);
+      store.set(CURRENT_NETWORK_KEY, network);
     }
-  }, [setQueryAddress, urlAddress, current]);
+
+    if (current) {
+      newSearchParams.set('address', encodeAddress(current));
+      store.set(`${CURRENT_ADDRESS_PREFIX}${network}`, current);
+    } else {
+      const stored = store.get(`${CURRENT_ADDRESS_PREFIX}${network}`) as string;
+
+      if (stored && isAddress(stored)) {
+        newSearchParams.set('address', encodeAddress(stored));
+      }
+    }
+
+    setSearchParams(newSearchParams, { replace: true });
+  }, [current, network, searchParams, setSearchParams]);
 }

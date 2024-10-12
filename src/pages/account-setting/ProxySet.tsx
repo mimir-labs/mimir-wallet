@@ -4,20 +4,37 @@
 import type { Vec } from '@polkadot/types';
 import type { PalletProxyProxyDefinition } from '@polkadot/types/lookup';
 
-import { Alert, AlertTitle, Box, Button, Chip, Divider, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  IconButton,
+  Stack,
+  SvgIcon,
+  Tooltip,
+  Typography
+} from '@mui/material';
+import { BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
+import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 import IconDelete from '@mimir-wallet/assets/svg/icon-delete.svg?react';
+import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { AddressRow } from '@mimir-wallet/components';
-import { useApi, useTxQueue, useWallet } from '@mimir-wallet/hooks';
+import { useAccount, useApi, useTxQueue } from '@mimir-wallet/hooks';
+
+import DeleteAllProxy from './DeleteAllProxy';
 
 function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletProxyProxyDefinition> }) {
   const { api } = useApi();
-  const { accountSource } = useWallet();
+  const { isLocalAccount } = useAccount();
   const { addQueue } = useTxQueue();
 
-  const isInjected = useMemo(() => !!accountSource(address), [address, accountSource]);
+  const isReadOnly = useMemo(() => !isLocalAccount(address), [address, isLocalAccount]);
 
   return (
     <>
@@ -40,8 +57,17 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
                 <Box sx={{ flex: '1' }}>
                   <AddressRow size='small' withAddress withName shorten value={proxy.delegate.toString()} />
                 </Box>
+                {proxy.delay.gt(BN_ZERO) ? (
+                  <Tooltip title={`Delay Blocks: ${[proxy.delay]}`}>
+                    <SvgIcon
+                      component={IconClock}
+                      inheritViewBox
+                      sx={{ fontSize: '0.875rem', color: 'primary.main', opacity: 0.7 }}
+                    />
+                  </Tooltip>
+                ) : null}
                 <Chip color='secondary' label={proxy.proxyType.toString()} />
-                {isInjected && (
+                {!isReadOnly && (
                   <IconButton
                     color='error'
                     size='small'
@@ -64,7 +90,11 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
 
         <Divider />
 
-        <Alert severity='warning'>
+        <Alert
+          icon={<SvgIcon inheritViewBox component={IconInfo} sx={{ fontSize: '0.875rem' }} />}
+          severity='warning'
+          sx={{ '.MuiAlert-message': { overflow: 'visible' } }}
+        >
           <AlertTitle>Notice</AlertTitle>
           <ul>
             <li>Only All authority can delete proxy.</li>
@@ -72,9 +102,11 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
           </ul>
         </Alert>
 
-        <Button component={Link} variant='contained' fullWidth to={`/add-proxy/${address}`}>
+        <Button component={Link} variant='contained' fullWidth to='/add-proxy'>
           Add New Proxy
         </Button>
+
+        <DeleteAllProxy address={address} />
       </Stack>
     </>
   );

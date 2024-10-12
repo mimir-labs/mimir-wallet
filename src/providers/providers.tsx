@@ -9,18 +9,12 @@ import { useRef } from 'react';
 
 import { ApiCtxRoot } from '@mimir-wallet/api';
 import { GlobalStyle, ToastRoot, TxToast } from '@mimir-wallet/components';
-import {
-  AddressCtxRoot,
-  BlockEventCtxRoot,
-  TxQueueCtxRoot,
-  TxToastCtxRoot,
-  WalletCtxRoot
-} from '@mimir-wallet/providers';
+import { AddressCtxRoot, TxQueueCtxRoot, TxToastCtxRoot, WalletCtxRoot } from '@mimir-wallet/providers';
 import { SocketCtxRoot } from '@mimir-wallet/socket';
 import { ThemeProvider } from '@mimir-wallet/theme';
 import { fetcher } from '@mimir-wallet/utils';
 
-function Providers({ chain, address, children }: { chain: Endpoint; address?: string; children: React.ReactNode }) {
+function Providers({ chain, children }: { chain: Endpoint; children: React.ReactNode }) {
   const queryClient = useRef(
     new QueryClient({
       defaultOptions: {
@@ -40,15 +34,13 @@ function Providers({ chain, address, children }: { chain: Endpoint; address?: st
           <ApiCtxRoot chain={chain}>
             <WalletCtxRoot>
               <SocketCtxRoot>
-                <AddressCtxRoot chain={chain} address={address}>
+                <AddressCtxRoot>
                   <TxQueueCtxRoot>
-                    <BlockEventCtxRoot>
-                      <TxToastCtxRoot>
-                        <TxToast />
-                        <GlobalStyle />
-                        {children}
-                      </TxToastCtxRoot>
-                    </BlockEventCtxRoot>
+                    <TxToastCtxRoot>
+                      <TxToast />
+                      <GlobalStyle />
+                      {children}
+                    </TxToastCtxRoot>
                   </TxQueueCtxRoot>
                 </AddressCtxRoot>
               </SocketCtxRoot>

@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Injected } from '@polkadot/extension-inject/types';
 import type { AccountId, Address, Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
@@ -13,7 +14,7 @@ export interface Filtered {
 }
 export interface TxQueue {
   id?: number;
-  accountId: AccountId | Address | string;
+  accountId?: AccountId | Address | string;
   call: IMethod;
   filterPaths?: FilterPath[];
   transaction?: Transaction;
@@ -27,7 +28,7 @@ export interface TxQueue {
   onResults?: (results: ISubmittableResult) => void;
   onFinalized?: (results: ISubmittableResult) => void;
   onSignature?: (signer: string, signature: HexString, tx: Extrinsic, payload: ExtrinsicPayloadValue) => void;
-  beforeSend?: () => Promise<void>;
+  beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }
 
 export interface TxToast {
@@ -64,10 +65,11 @@ export interface AddressState {
   addresses: { address: string; name: string }[];
   current?: string;
   isMultisigSyned: boolean;
+  switchAddress?: string;
   metas: Record<string, AddressMeta>;
   resync: () => void;
   appendMeta: (meta: Record<string, AddressMeta>) => void;
-  setCurrent: (address: string) => void;
+  setCurrent: (address: string, confirm?: boolean) => void;
   setAccountName: (address: string, name: string) => void;
   setAddressName: (address: string, name: string) => void;
   isLocalAccount: (address: string) => boolean;

@@ -8,17 +8,7 @@ import type { FilterPath, Transaction } from '@mimir-wallet/hooks/types';
 import { Paper, SvgIcon, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { createContext, useEffect } from 'react';
-import ReactFlow, {
-  Controls,
-  Edge,
-  Handle,
-  MiniMap,
-  Node,
-  NodeProps,
-  Position,
-  useEdgesState,
-  useNodesState
-} from 'reactflow';
+import ReactFlow, { Controls, Edge, Handle, Node, NodeProps, Position, useEdgesState, useNodesState } from 'reactflow';
 
 import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
 import IconFail from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
@@ -27,7 +17,7 @@ import IconWaiting from '@mimir-wallet/assets/svg/icon-waiting-fill.svg?react';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
 
 import AddressCell from '../AddressCell';
-import { getLayoutedElements } from '../AddressOverview';
+import { AddressEdge, getLayoutedElements } from '../AddressOverview';
 
 interface State {
   onApprove?: (call: IMethod | HexString, path: FilterPath[]) => void;
@@ -80,7 +70,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
-          style={{ width: 0, height: 0, top: 35, background: palette.grey[300] }}
+          style={{ width: 0, height: 0, background: palette.grey[300] }}
           type='source'
         />
       )}
@@ -96,7 +86,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
             paddingY: 0.3
           }}
         >
-          <AddressCell value={data.transaction.address} withCopy />
+          <AddressCell value={data.transaction.address} withCopy withAddressBook />
           {icon}
         </Paper>
       </Box>
@@ -116,6 +106,10 @@ const nodeTypes = {
   AddressNode
 };
 
+const edgeTypes = {
+  AddressEdge
+};
+
 function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], edges: Edge[] = []) {
   function createNode(id: string, transaction: Transaction, isTop: boolean): Node<NodeData> {
     return {
@@ -132,14 +126,20 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
     };
   }
 
-  function makeEdge(parentId: string, nodeId: string, label: string): Edge {
+  function makeEdge(
+    parentId: string,
+    nodeId: string,
+    label: string = '',
+    delay?: number,
+    color: string = '#d9d9d9',
+    labelBgColor: string = '#fff'
+  ): Edge {
     return {
       id: `${parentId}->${nodeId}`,
       source: parentId,
       target: nodeId,
-      type: 'smoothstep',
-      style: { stroke: '#d9d9d9' },
-      label
+      type: 'AddressEdge',
+      data: { label, delay, color, labelBgColor }
     };
   }
 
@@ -163,9 +163,18 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
             ? 'Proxy'
             : node.parent.type === TransactionType.Announce
               ? 'Announce'
-              : node.parent.type === TransactionType.Multisig
-                ? 'AsMulti'
-                : ''
+              : '',
+          undefined,
+          node.parent.type === TransactionType.Proxy
+            ? '#B700FF'
+            : node.parent.type === TransactionType.Announce
+              ? '#B700FF'
+              : '',
+          node.parent.type === TransactionType.Proxy
+            ? '#B700FF'
+            : node.parent.type === TransactionType.Announce
+              ? '#B700FF'
+              : ''
         )
       );
     }
@@ -206,12 +215,12 @@ function TxOverview({ transaction, ...props }: Props) {
         maxZoom={1.5}
         minZoom={0.1}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         nodes={nodes}
         onEdgesChange={onEdgesChange}
         onNodesChange={onNodesChange}
         zoomOnScroll
       >
-        <MiniMap pannable zoomable />
         <Controls />
       </ReactFlow>
     </context.Provider>

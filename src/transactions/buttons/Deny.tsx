@@ -6,15 +6,15 @@ import type { Transaction } from '@mimir-wallet/hooks/types';
 import { LoadingButton } from '@mui/lab';
 import React from 'react';
 
-import { useApi, useTxQueue, useWallet } from '@mimir-wallet/hooks';
-import { TransactionType } from '@mimir-wallet/hooks/types';
+import { useAccount, useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
 
 function Deny({ transaction }: { transaction: Transaction }) {
   const { api } = useApi();
   const { addQueue } = useTxQueue();
-  const { accountSource } = useWallet();
+  const { isLocalAccount } = useAccount();
 
-  if (transaction.type !== TransactionType.Announce) {
+  if (transaction.type !== TransactionType.Announce || transaction.status !== TransactionStatus.Pending) {
     return null;
   }
 
@@ -24,7 +24,7 @@ function Deny({ transaction }: { transaction: Transaction }) {
     return null;
   }
 
-  if (!accountSource(transaction.address)) {
+  if (!isLocalAccount(transaction.address)) {
     return null;
   }
 

@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-export { BlockEventCtx, BlockEventCtxRoot } from './BlockEvent';
 export { AddressCtx, AddressCtxRoot } from './Address';
 export { TxQueueCtxRoot, TxQueueCtx } from './TxQueue';
 export { TxToastCtxRoot, TxToastCtx } from './TxToast';

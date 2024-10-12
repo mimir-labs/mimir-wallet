@@ -61,7 +61,9 @@ export function AnnouncementStatus({ account, transaction }: { account: AccountD
                 ? 'Failed'
                 : status === 'rejected'
                   ? 'Rejected'
-                  : 'Removed'}
+                  : status === 'removed'
+                    ? 'Removed'
+                    : 'Proxy Removed'}
     </Box>
   );
 }
@@ -125,11 +127,13 @@ export function Status({ transaction }: { transaction: Transaction }) {
           ? 'Success'
           : status === TransactionStatus.Failed
             ? 'Failed'
-            : status === TransactionStatus.Cancelled
-              ? 'Cancelled'
-              : status === TransactionStatus.AnnounceReject
-                ? 'AnnounceReject'
-                : 'AnnounceRemoved'}
+            : status === TransactionStatus.MemberChanged
+              ? 'MemberChanged'
+              : status === TransactionStatus.Cancelled
+                ? 'Cancelled'
+                : status === TransactionStatus.AnnounceReject
+                  ? 'AnnounceReject'
+                  : 'AnnounceRemoved'}
     </Box>
   );
 }

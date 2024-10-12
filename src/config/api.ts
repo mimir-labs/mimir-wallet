@@ -3,6 +3,7 @@
 
 import { isAddress } from '@polkadot/util-crypto';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import { CURRENT_ADDRESS_PREFIX, CURRENT_NETWORK_KEY } from '@mimir-wallet/constants';
 import { store } from '@mimir-wallet/utils';
 
@@ -352,6 +353,8 @@ export function initMimir() {
     }
   }
 
+  window.currentChain = chain;
+
   store.set(CURRENT_NETWORK_KEY, chain.key);
 
   let address: string | undefined;
@@ -359,9 +362,9 @@ export function initMimir() {
   const localAddress = store.get(`${CURRENT_ADDRESS_PREFIX}${chain.key}`) as string;
 
   if (urlAddress && isAddress(urlAddress)) {
-    address = urlAddress;
+    address = encodeAddress(urlAddress);
   } else if (localAddress && isAddress(localAddress)) {
-    address = localAddress;
+    address = encodeAddress(localAddress);
   }
 
   if (address) {
@@ -369,8 +372,6 @@ export function initMimir() {
   } else {
     store.remove(`${CURRENT_ADDRESS_PREFIX}${chain.key}`);
   }
-
-  window.currentChain = chain;
 
   return {
     address,

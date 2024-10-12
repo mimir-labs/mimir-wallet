@@ -1,27 +1,23 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Endpoint } from '@mimir-wallet/config';
 import type { AddressMeta } from '@mimir-wallet/hooks/types';
 import type { AddressState } from './types';
 
 import { isAddress } from '@polkadot/util-crypto';
-import { isEqual } from 'lodash-es';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ApiCtx, encodeAddress } from '@mimir-wallet/api';
-import { CURRENT_ADDRESS_PREFIX } from '@mimir-wallet/constants';
-import { useLocalStore } from '@mimir-wallet/hooks';
-import { addressEq, service } from '@mimir-wallet/utils';
+import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
+import { useQueryParam } from '@mimir-wallet/hooks';
+import { addressEq, store } from '@mimir-wallet/utils';
 
-import { extraAccounts, sync } from './sync';
+import { sync } from './sync';
 import { _useAddresses } from './useAddresses';
 import { deriveAddressMeta } from './utils';
 import { WalletCtx } from './Wallet';
 
 interface Props {
-  address?: string;
-  chain: Endpoint;
   children?: React.ReactNode;
 }
 const EMPTY_STATE = {
@@ -32,22 +28,25 @@ const EMPTY_STATE = {
 
 export const AddressCtx = React.createContext<AddressState>({} as AddressState);
 
-export function AddressCtxRoot({ children, chain, address }: Props): React.ReactElement<Props> {
+export function AddressCtxRoot({ children }: Props): React.ReactElement<Props> {
   const [state, setState] = useState<AddressState>({
     ...EMPTY_STATE
   });
-  const [current, setCurrent] = useLocalStore<string | undefined>(
-    `${CURRENT_ADDRESS_PREFIX}${chain.key}`,
-    address ? encodeAddress(address) : undefined
-  );
+  const [current, setCurrent] = useQueryParam<string | undefined>('address');
+  const currentRef = useRef(current);
+  const [switchAddress, setSwitchAddress] = useState<string>();
   const { genesisHash } = useContext(ApiCtx);
   const { isWalletReady, walletAccounts } = useContext(WalletCtx);
   const [addresses, setAddressName] = _useAddresses();
   const [metas, setMetas] = useState<Record<string, AddressMeta>>({});
 
+  if (current) {
+    currentRef.current = current;
+  }
+
   useEffect(() => {
-    setMetas(deriveAddressMeta(state.accounts, state.addresses));
-  }, [state.accounts, state.addresses]);
+    setMetas(deriveAddressMeta(state.accounts, addresses));
+  }, [state.accounts, addresses]);
 
   useEffect(() => {
     let interval: any;
@@ -66,13 +65,7 @@ export function AddressCtxRoot({ children, chain, address }: Props): React.React
   }, [genesisHash, isWalletReady, walletAccounts]);
 
   const resync = useCallback(async () => {
-    const data = await service.getMultisigs(walletAccounts.map((item) => item.address));
-    const accounts = extraAccounts(genesisHash, walletAccounts, data);
-
-    setState((state) => ({
-      ...state,
-      accounts: isEqual(state.accounts, accounts) ? state.accounts : accounts
-    }));
+    await sync(genesisHash, walletAccounts, setState);
   }, [genesisHash, walletAccounts]);
 
   const isLocalAccount = useCallback(
@@ -84,9 +77,18 @@ export function AddressCtxRoot({ children, chain, address }: Props): React.React
     [addresses]
   );
   const _setCurrent = useCallback(
-    (address: string) => {
+    (address: string, confirm?: boolean) => {
       if (address && isAddress(address)) {
-        setCurrent(encodeAddress(address));
+        if (confirm && !store.get(SWITCH_ACCOUNT_REMIND_KEY)) {
+          setSwitchAddress(address);
+
+          return;
+        }
+
+        const value = encodeAddress(address);
+
+        setSwitchAddress(undefined);
+        setCurrent(value);
       }
     },
     [setCurrent]
@@ -108,9 +110,10 @@ export function AddressCtxRoot({ children, chain, address }: Props): React.React
   const value = useMemo(
     () => ({
       ...state,
-      current,
+      current: currentRef.current,
       metas,
       addresses,
+      switchAddress,
       resync,
       appendMeta,
       setCurrent: _setCurrent,
@@ -125,7 +128,18 @@ export function AddressCtxRoot({ children, chain, address }: Props): React.React
       isLocalAccount,
       isLocalAddress
     }),
-    [state, current, metas, addresses, resync, appendMeta, _setCurrent, setAddressName, isLocalAccount, isLocalAddress]
+    [
+      state,
+      metas,
+      addresses,
+      switchAddress,
+      resync,
+      appendMeta,
+      _setCurrent,
+      setAddressName,
+      isLocalAccount,
+      isLocalAddress
+    ]
   );
 
   return <AddressCtx.Provider value={value}>{children}</AddressCtx.Provider>;

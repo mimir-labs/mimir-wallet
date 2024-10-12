@@ -2,12 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
-import { type BN, BN_ZERO } from '@polkadot/util';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { InputAddress, InputNumber } from '@mimir-wallet/components';
-import { useAccount, useAllAccounts, useApi, useQueryParam, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
+import { Input, InputAddress } from '@mimir-wallet/components';
+import {
+  useAccount,
+  useAllAccounts,
+  useApi,
+  useInputNumber,
+  useQueryParam,
+  useSelectedAccount,
+  useTxQueue
+} from '@mimir-wallet/hooks';
+import { formatUnits, isValidNumber, parseUnits } from '@mimir-wallet/utils';
 
 import SelectToken from './SelectToken';
 import { TransferToken } from './types';
@@ -22,35 +30,26 @@ function PageTransfer() {
   const [assetId, setAssetId] = useQueryParam<string>('assetId', 'native', { replace: true });
   const [sending, setSending] = useState<string | undefined>(fromParam || selected || '');
   const [recipient, setRecipient] = useState<string>(toParam || '');
-  const [amount, setAmount] = useState<BN>(BN_ZERO);
+  const [[amount, isAmountValid], setAmount] = useInputNumber('0', false, 0);
   const { addQueue } = useTxQueue();
   const filtered = useAllAccounts();
   const { addresses } = useAccount();
-  const [amountError, setAmountError] = useState<Error | null>(null);
   const [token, setToken] = useState<TransferToken>();
   const [format, sendingBalances, recipientBalances] = useTransferBalance(token, sending, recipient);
 
   useEffect(() => {
-    setAmount(BN_ZERO);
-  }, [assetId]);
-
-  useEffect(() => {
-    if (amount && amount.gt(BN_ZERO)) {
-      setAmountError(null);
-    }
-  }, [amount]);
+    setAmount('0');
+  }, [assetId, setAmount]);
 
   const handleClick = useCallback(() => {
     if (recipient && sending && amount && token) {
-      if (Number.isNaN(Number(amount))) {
-        setAmountError(new Error('Please input number value'));
-
+      if (!isAmountValid) {
         return;
       }
 
       if (token.isNative) {
         addQueue({
-          call: api.tx.balances.transferKeepAlive(recipient, amount).method,
+          call: api.tx.balances.transferKeepAlive(recipient, parseUnits(amount, format[0])).method,
           accountId: sending,
           website: 'mimir://app/transfer'
         });
@@ -58,13 +57,13 @@ function PageTransfer() {
         if (!api.tx.assets) return;
 
         addQueue({
-          call: api.tx.assets.transferKeepAlive(token.assetId, recipient, amount).method,
+          call: api.tx.assets.transferKeepAlive(token.assetId, recipient, parseUnits(amount, format[0])).method,
           accountId: sending,
           website: 'mimir://app/transfer'
         });
       }
     }
-  }, [addQueue, amount, api, recipient, sending, token]);
+  }, [addQueue, amount, api, format, isAmountValid, recipient, sending, token]);
 
   return (
     <Box sx={{ width: 500, maxWidth: '100%', margin: '10px auto' }}>
@@ -96,18 +95,28 @@ function PageTransfer() {
             value={recipient}
             withBalance
           />
-          <InputNumber
-            error={amountError}
-            format={format}
+          <Input
+            error={isAmountValid ? null : new Error('Invalid number')}
             key={assetId}
             label='Amount'
-            maxValue={sendingBalances}
+            value={amount}
             onChange={setAmount}
             placeholder='Input amount'
-            withMax
+            endAdornment={
+              <Button
+                size='small'
+                variant='outlined'
+                sx={{ borderRadius: 0.5, padding: 0.5, paddingY: 0.1, minWidth: 0 }}
+                onClick={() => {
+                  setAmount(formatUnits(sendingBalances, format[0]));
+                }}
+              >
+                Max
+              </Button>
+            }
           />
           <SelectToken assetId={assetId} onChange={setToken} setAssetId={setAssetId} />
-          <Button disabled={!amount || !recipient || amount.eq(BN_ZERO)} fullWidth onClick={handleClick}>
+          <Button disabled={!amount || !recipient || !isValidNumber} fullWidth onClick={handleClick}>
             Review
           </Button>
         </Stack>

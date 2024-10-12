@@ -24,6 +24,18 @@ export function accountExplorerLink(
   return undefined;
 }
 
+export function extrinsicExplorerLink(value?: string | { toString: () => string }): string | undefined {
+  const _value = value?.toString();
+
+  const explorerUrl = window.currentChain.explorerUrl;
+
+  if (explorerUrl) {
+    return `${explorerUrl}extrinsic/${_value}`;
+  }
+
+  return undefined;
+}
+
 export function subsquareUrl(path?: string): string | undefined {
   const baseUrl = window.currentChain.subsquareUrl;
 

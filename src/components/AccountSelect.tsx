@@ -38,8 +38,7 @@ function AccountSelect() {
           borderColor: 'secondary.main',
           gap: 2,
           display: 'flex',
-          alignItems: 'center',
-          maxWidth: 192
+          alignItems: 'center'
         }}
       >
         <AddressCell shorten showType value={selected} />

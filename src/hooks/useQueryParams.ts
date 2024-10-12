@@ -24,12 +24,13 @@ export function useQueryParam<T>(
   const [searchParams, setSearchParams] = useSearchParams();
   const paramValue = searchParams.get(key);
   const optionsRef = useRef(options);
+  const defaultValueRef = useRef(defaultValue);
 
   optionsRef.current = options;
 
   const value = useMemo(
-    () => (paramValue ? (searchQuery.parse(paramValue) as unknown as T) : defaultValue),
-    [defaultValue, paramValue]
+    () => (paramValue ? (searchQuery.parse(paramValue) as unknown as T) : defaultValueRef.current),
+    [paramValue]
   );
 
   const setValue = useCallback(

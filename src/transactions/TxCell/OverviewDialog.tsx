@@ -25,7 +25,8 @@ function OverviewDialog({ account, transaction, onClose, open }: Props) {
     addQueue({
       accountId: transaction.address,
       call: api.createType('Call', call),
-      filterPaths
+      filterPaths,
+      transaction
     });
     onClose();
   };

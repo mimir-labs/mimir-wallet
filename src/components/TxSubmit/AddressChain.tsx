@@ -3,9 +3,10 @@
 
 import type { FilterPath } from '@mimir-wallet/hooks/types';
 
-import { alpha, Box, Chip, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { alpha, Box, Chip, FormControl, InputLabel, MenuItem, Select, SvgIcon } from '@mui/material';
 import React, { useLayoutEffect, useMemo } from 'react';
 
+import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 import { AddressCell } from '@mimir-wallet/components';
 import { useWallet } from '@mimir-wallet/hooks';
 
@@ -74,14 +75,29 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
             <MenuItem value={item.id} key={index}>
               <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <AddressCell value={item.address} withCopy showType />
-                <Chip
-                  color={item.type === 'multisig' ? 'secondary' : item.type === 'proxy' ? 'default' : 'primary'}
-                  label={item.type === 'multisig' ? 'AsMulti' : item.type === 'proxy' ? 'Proxy' : 'Origin'}
-                  size='medium'
-                  sx={item.type === 'proxy' ? { bgcolor: alpha('#B700FF', 0.05), color: '#B700FF' } : {}}
-                />
+                {item.type !== 'origin' && (
+                  <Chip
+                    color={item.type === 'multisig' ? 'secondary' : item.type === 'proxy' ? 'default' : 'primary'}
+                    label={item.type === 'multisig' ? 'AsMulti' : item.type === 'proxy' ? 'Proxy' : ''}
+                    size='medium'
+                    sx={{
+                      fontSize: '0.75rem',
+                      ...(item.type === 'proxy' ? { bgcolor: alpha('#B700FF', 0.05), color: '#B700FF' } : {})
+                    }}
+                  />
+                )}
                 {item.type === 'proxy' && (
-                  <Chip color='secondary' label={`${item.proxyType}:${item.delay || 0}`} size='medium' />
+                  <Chip
+                    color='secondary'
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        {!!item.delay && <SvgIcon component={IconClock} inheritViewBox sx={{ fontSize: '0.75rem' }} />}
+                        {item.proxyType}
+                      </Box>
+                    }
+                    size='medium'
+                    sx={{ fontSize: '0.75rem' }}
+                  />
                 )}
               </Box>
             </MenuItem>

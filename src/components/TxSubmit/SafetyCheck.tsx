@@ -11,34 +11,56 @@ import IconFailed from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import IconSuccess from '@mimir-wallet/assets/svg/icon-success.svg?react';
 
-function SafetyCheck({ safetyCheck }: { safetyCheck?: SafetyLevel }) {
+import { TxBundle } from './utils';
+
+function Cell({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 1,
+        bgcolor: 'secondary.main',
+        borderRadius: 1,
+        padding: 1,
+        marginTop: 0.8
+      }}
+    >
+      <Box sx={{ flex: '1' }}>
+        <Box sx={{ fontWeight: 700 }}>{title}</Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box component='span' sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+            Power by
+          </Box>
+          <img src={Logo} alt='mimir' height={14} />
+        </Box>
+      </Box>
+      {children}
+    </Box>
+  );
+}
+
+function SafetyCheck({
+  safetyCheck,
+  isTxBundleLoading,
+  txBundle
+}: {
+  safetyCheck?: SafetyLevel;
+  isTxBundleLoading: boolean;
+  txBundle: TxBundle;
+}) {
   return (
     <Box>
-      <Typography fontWeight={700}>Cross-chain Check</Typography>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 1,
-          bgcolor: 'secondary.main',
-          borderRadius: 1,
-          padding: 1,
-          marginTop: 0.8
-        }}
-      >
-        <Box sx={{ flex: '1' }}>
-          <Box sx={{ fontWeight: 700 }}>Simulation</Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box component='span' sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-              Power by
-            </Box>
-            <img src={Logo} alt='mimir' height={14} />
-          </Box>
-        </Box>
+      <Typography fontWeight={700}>Transaction Check</Typography>
+      <Cell title='Cross-chain Check'>
         {!safetyCheck && <CircularProgress size={20} />}
         {safetyCheck && (
           <>
+            {safetyCheck.severity === 'none' && <SvgIcon color='success' component={IconSuccess} inheritViewBox />}
+            {safetyCheck.severity === 'error' && <SvgIcon color='error' component={IconFailed} inheritViewBox />}
+            {safetyCheck.severity === 'warning' && <SvgIcon color='warning' component={IconInfo} inheritViewBox />}
+
             <Typography
               sx={{
                 fontWeight: 700,
@@ -52,12 +74,30 @@ function SafetyCheck({ safetyCheck }: { safetyCheck?: SafetyLevel }) {
             >
               {safetyCheck?.message}
             </Typography>
-            {safetyCheck.severity === 'none' && <SvgIcon color='success' component={IconSuccess} inheritViewBox />}
-            {safetyCheck.severity === 'error' && <SvgIcon color='error' component={IconFailed} inheritViewBox />}
-            {safetyCheck.severity === 'warning' && <SvgIcon color='warning' component={IconInfo} inheritViewBox />}
           </>
         )}
-      </Box>
+      </Cell>
+      <Cell title='Authority Check'>
+        {isTxBundleLoading && <CircularProgress size={20} />}
+        {!isTxBundleLoading && (
+          <>
+            {txBundle.canProxyExecute ? (
+              <SvgIcon color='success' component={IconSuccess} inheritViewBox />
+            ) : (
+              <SvgIcon color='error' component={IconFailed} inheritViewBox />
+            )}
+
+            <Typography
+              sx={{
+                fontWeight: 700,
+                color: txBundle.canProxyExecute ? 'success.main' : 'error.main'
+              }}
+            >
+              {txBundle.canProxyExecute ? 'Permission Granted' : 'Perimission Denied'}
+            </Typography>
+          </>
+        )}
+      </Cell>
     </Box>
   );
 }

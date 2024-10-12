@@ -28,21 +28,11 @@ import IconMore from '@mimir-wallet/assets/svg/icon-more.svg?react';
 import IconSearch from '@mimir-wallet/assets/svg/icon-search.svg?react';
 import IconUnion from '@mimir-wallet/assets/svg/icon-union.svg?react';
 import { findToken } from '@mimir-wallet/config';
-import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
-import {
-  useApi,
-  useGroupAccounts,
-  useNativeBalances,
-  useSelectedAccount,
-  useSelectedAccountCallback,
-  useToggle
-} from '@mimir-wallet/hooks';
-import { store } from '@mimir-wallet/utils';
+import { useAccount, useApi, useGroupAccounts, useNativeBalances } from '@mimir-wallet/hooks';
 
 import AddressCell from './AddressCell';
 import FormatBalance from './FormatBalance';
 import Input from './Input';
-import SwitchAccountDialog from './SwitchAccountDialog';
 
 interface Props {
   open: boolean;
@@ -127,7 +117,7 @@ function AccountCell({
             bgcolor: selected ? 'secondary.main' : undefined
           }}
         >
-          <AddressCell shorten showType value={value} withCopy />
+          <AddressCell shorten showType value={value} withCopy withAddressBook />
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 700 }}>
             <FormatBalance value={balances?.total} />
 
@@ -243,71 +233,75 @@ function CreateMultisig() {
 
 function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   const [keywords, setKeywords] = useState('');
-  const [address, setAddress] = useState<string>('');
-  const [switchOpen, toggleOpen] = useToggle();
-  const selected = useSelectedAccount();
-  const selectAccount = useSelectedAccountCallback();
+  const { current, setCurrent } = useAccount();
   const grouped = useGroupAccounts(useMemo(() => filterAddress(keywords), [keywords]));
 
   const onSelect = useCallback(
     (address: string) => {
-      if (selected === address) return;
+      if (current === address) return;
 
-      if (store.get(SWITCH_ACCOUNT_REMIND_KEY)) {
-        selectAccount(address);
-        onClose?.();
-      } else {
-        setAddress(address);
-        toggleOpen();
-      }
+      setCurrent(address);
+
+      onClose?.();
     },
-    [onClose, selectAccount, selected, toggleOpen]
+    [onClose, current, setCurrent]
   );
 
   return (
-    <>
-      <SwitchAccountDialog address={address} onClose={toggleOpen} onSelect={onClose} open={switchOpen} />
-      <Drawer
-        PaperProps={{
-          sx: { top: { md: '56px', xs: 0 }, boxShadow: 'none', height: { md: 'calc(100vh - 56px)', xs: '100vh' } }
-        }}
-        anchor={anchor}
-        onClose={onClose}
-        open={open}
-        slotProps={{ backdrop: { sx: { top: { md: '56px', xs: 0 } } } }}
-        variant='temporary'
-      >
-        <Search onChange={setKeywords} value={keywords} />
-        <Box sx={{ height: '100%', padding: 1, paddingY: 6, overflowY: 'auto' }}>
-          <List sx={{ width: 370, maxWidth: '90vw' }}>
+    <Drawer
+      PaperProps={{
+        sx: { top: { md: '56px', xs: 0 }, boxShadow: 'none', height: { md: 'calc(100vh - 56px)', xs: '100vh' } }
+      }}
+      anchor={anchor}
+      onClose={onClose}
+      open={open}
+      slotProps={{ backdrop: { sx: { top: { md: '56px', xs: 0 } } } }}
+      variant='temporary'
+    >
+      <Search onChange={setKeywords} value={keywords} />
+      <Box sx={{ height: '100%', padding: 1, paddingY: 6, overflowY: 'auto' }}>
+        <List sx={{ width: 370, maxWidth: '90vw' }}>
+          {current && (
+            <>
+              <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
+                Current Account
+              </Typography>
+
+              <AccountCell key={`current-${current}`} value={current} selected />
+            </>
+          )}
+
+          {grouped.mimir.length > 0 && (
             <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
               <SvgIcon inheritViewBox component={IconUnion} fontSize='small' />
               Mimir Wallet
             </Typography>
-            {grouped.mimir.map((account) => (
-              <AccountCell
-                key={`multisig-${account}`}
-                onClose={onClose}
-                onSelect={onSelect}
-                value={account}
-                selected={account === selected}
-              />
-            ))}
-            <Divider sx={{ marginY: 0.5 }} />
+          )}
+          {grouped.mimir.map((account) => (
+            <AccountCell
+              key={`multisig-${account}`}
+              onClose={onClose}
+              onSelect={onSelect}
+              value={account}
+              selected={account === current}
+            />
+          ))}
+          <Divider sx={{ marginY: 0.5 }} />
 
+          {grouped.injected.length > 0 && (
             <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
               <SvgIcon inheritViewBox component={IconExtension} fontSize='small' />
               Extension Wallet
             </Typography>
-            {grouped.injected.map((account) => (
-              <AccountCell key={`extension-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
-            ))}
-          </List>
-        </Box>
+          )}
+          {grouped.injected.map((account) => (
+            <AccountCell key={`extension-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
+          ))}
+        </List>
+      </Box>
 
-        <CreateMultisig />
-      </Drawer>
-    </>
+      <CreateMultisig />
+    </Drawer>
   );
 }
 

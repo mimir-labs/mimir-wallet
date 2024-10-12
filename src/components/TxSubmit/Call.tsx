@@ -3,6 +3,7 @@
 
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
+import type { Transaction } from '@mimir-wallet/hooks/types';
 
 import {
   Accordion,
@@ -15,13 +16,15 @@ import {
   SvgIcon,
   Typography
 } from '@mui/material';
+import moment from 'moment';
 import { useMemo } from 'react';
 
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
 import { useApi, useToggle } from '@mimir-wallet/hooks';
 import { Call as CallComp } from '@mimir-wallet/params';
 
-import Hex from '../Hex';
+import Bytes from '../Bytes';
+import Hash from '../Hash';
 
 interface Extracted {
   callName: string;
@@ -52,7 +55,15 @@ function Item({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function Call({ account, method }: { account: string; method: IMethod }) {
+function Call({
+  account,
+  method,
+  transaction
+}: {
+  account?: string;
+  method: IMethod;
+  transaction?: Transaction | null;
+}) {
   const { api } = useApi();
 
   const { callData, callHash, callName } = useMemo(() => extractState(method), [method]);
@@ -64,8 +75,29 @@ function Call({ account, method }: { account: string; method: IMethod }) {
       sx={{ bgcolor: 'secondary.main', borderRadius: 1, padding: 1 }}
       className='bg-secondary rounded-small p-2.5 space-y-1'
     >
-      <Item label='Call Hash' value={<Hex value={callHash} withCopy />} />
-      <Item label='Call Data' value={<Hex value={callData} withCopy />} />
+      <Item label='Call Hash' value={<Hash value={callHash} withCopy />} />
+      <Item label='Call Data' value={<Bytes value={callData} />} />
+
+      {transaction?.note && <Item label='Call Data' value={transaction.note} />}
+      {transaction?.createdBlock && <Item label='Created Block' value={transaction.createdBlock} />}
+      {transaction?.createdExtrinsicHash && (
+        <Item
+          label='Created Extrinsic'
+          value={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
+        />
+      )}
+      {transaction?.createdAt && <Item label='Created Time' value={moment(transaction.createdAt).format()} />}
+      {transaction?.executedBlock && <Item label='Executed Block' value={transaction.executedBlock} />}
+      {transaction?.executedExtrinsicHash && (
+        <Item
+          label='Executed Extrinsic'
+          value={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
+        />
+      )}
+      {transaction?.cancelBlock && <Item label='Cancel Block' value={transaction.cancelBlock} />}
+      {transaction?.cancelExtrinsicHash && (
+        <Item label='Cancel Extrinsic' value={<Hash value={transaction.cancelExtrinsicHash} withCopy withExplorer />} />
+      )}
     </Stack>
   );
 
