@@ -214,23 +214,24 @@ export interface AssetInfoBase {
   readonly decimals: number;
 }
 
-export interface AssetInfo extends Asset, AssetInfoBase {
-  // for assets
-  readonly assetsInfo?: {
-    readonly owner: string;
-    readonly issuer: string;
-    readonly admin: string;
-    readonly freezer: string;
-    readonly supply: BN;
-    readonly deposit: BN;
-    readonly minBalance: BN;
-    readonly isSufficient: boolean;
-    readonly accounts: number;
-    readonly sufficients: number;
-    readonly approvals: number;
-    readonly status: PalletAssetsAssetStatus;
+export type AssetInfo = Asset &
+  AssetInfoBase & {
+    // for assets
+    readonly assetsInfo?: {
+      readonly owner: string;
+      readonly issuer: string;
+      readonly admin: string;
+      readonly freezer: string;
+      readonly supply: BN;
+      readonly deposit: BN;
+      readonly minBalance: BN;
+      readonly isSufficient: boolean;
+      readonly accounts: number;
+      readonly sufficients: number;
+      readonly approvals: number;
+      readonly status: PalletAssetsAssetStatus;
+    };
   };
-}
 
 export interface AccountBalance {
   total: BN;
@@ -242,10 +243,10 @@ export interface AccountBalance {
   unbonding: BN;
 }
 
-export interface AccountAssetInfo extends AssetInfo {
+export type AccountAssetInfo = AssetInfo & {
   balance: BN;
   account: string;
-}
+};
 
 export interface SafetyLevel {
   severity: 'none' | 'warning' | 'error';

@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DeriveBalancesAll, DeriveStakingAccount } from '@polkadot/api-derive/types';
+import type { Option } from '@polkadot/types';
 import type { AccountId, AccountId32 } from '@polkadot/types/interfaces';
+import type { PalletAssetsAssetAccount } from '@polkadot/types/lookup';
 import type { AccountAssetInfo, AccountBalance } from './types';
 
-import { BN_ZERO } from '@polkadot/util';
+import { BN_ZERO, isHex } from '@polkadot/util';
 import { useEffect, useState } from 'react';
 
 import { useApi } from './useApi';
@@ -57,9 +59,16 @@ export function useAssetBalances(address?: AccountId | AccountId32 | string | nu
   useEffect(() => {
     let unsubPromise: Promise<() => void> | null = null;
 
-    if (address && allAssets.length > 0 && api.query.assets.account) {
-      unsubPromise = api.query.assets.account.multi(
-        allAssets.map((item) => [item.assetId, address.toString()]),
+    if (address && allAssets.length > 0 && api.query.assets) {
+      unsubPromise = api.queryMulti?.<Option<PalletAssetsAssetAccount>[]>(
+        allAssets.map((item) => {
+          return isHex(item.assetId)
+            ? [
+                api.query.foreignAssets.account,
+                [api.createType('StagingXcmV3MultiLocation', item.assetId), address.toString()]
+              ]
+            : [api.query.assets.account, [item.assetId, address.toString()]];
+        }),
         (results) => {
           setBalances(
             results.map((result, index) => ({

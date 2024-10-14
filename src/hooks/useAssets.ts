@@ -3,9 +3,9 @@
 
 import type { Option } from '@polkadot/types';
 import type { PalletAssetsAssetDetails, PalletAssetsAssetMetadata } from '@polkadot/types/lookup';
-import type { BN } from '@polkadot/util';
 import type { AssetInfo, AssetInfoBase } from './types';
 
+import { type BN, isHex } from '@polkadot/util';
 import { useEffect, useState } from 'react';
 
 import { Asset, findAssets } from '@mimir-wallet/config';
@@ -60,13 +60,25 @@ export function useAssets(): AssetInfo[] {
   useEffect(() => {
     if (isApiReady && api.query.assets) {
       const assets = findAssets(api.genesisHash.toHex());
-      const ids = assets.map((item) => item.assetId);
 
-      Promise.all([api.query.assets.asset.multi(ids), api.query.assets.metadata.multi(ids)]).then(
-        ([assetsResults, metadatas]) => {
-          setAllAssets(_transform(assets, assetsResults, metadatas));
-        }
-      );
+      Promise.all([
+        api.queryMulti<Option<PalletAssetsAssetDetails>[]>(
+          assets.map((item) => {
+            return isHex(item.assetId)
+              ? [api.query.foreignAssets.asset, api.createType('StagingXcmV3MultiLocation', item.assetId)]
+              : [api.query.assets.asset, item.assetId];
+          })
+        ),
+        api.queryMulti<PalletAssetsAssetMetadata[]>(
+          assets.map((item) => {
+            return isHex(item.assetId)
+              ? [api.query.foreignAssets.metadata, api.createType('StagingXcmV3MultiLocation', item.assetId)]
+              : [api.query.assets.metadata, item.assetId];
+          })
+        )
+      ]).then(([assetsResults, metadatas]) => {
+        setAllAssets(_transform(assets, assetsResults, metadatas));
+      });
     }
   }, [isApiReady, api]);
 
