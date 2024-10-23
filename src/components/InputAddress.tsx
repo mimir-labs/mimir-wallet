@@ -19,6 +19,7 @@ import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
+import IconWarning from '@mimir-wallet/assets/svg/icon-warning-fill.svg?react';
 import { useAccount, useToggle } from '@mimir-wallet/hooks';
 
 import AddressCell from './AddressCell';
@@ -85,7 +86,7 @@ function InputAddress({
   value: propsValue,
   withBalance
 }: InputAddressProps) {
-  const { accounts, addresses } = useAccount();
+  const { accounts, addresses, isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const isControl = useRef(propsValue !== undefined);
   const [value, setValue] = useState<string>(
     isAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : ''
@@ -198,6 +199,21 @@ function InputAddress({
           )}
         </Popper>
       </Box>
+      {value && !isLocalAccount(value) && !isLocalAddress(value) && (
+        <Box component='span' sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.875rem' }}>
+          <SvgIcon component={IconWarning} inheritViewBox color='warning' />
+          This is an unknown address. You can&nbsp;
+          <Box
+            component='span'
+            sx={{ cursor: 'pointer', color: 'primary.main' }}
+            onClick={() => {
+              addAddressBook(value);
+            }}
+          >
+            add it to your address book
+          </Box>
+        </Box>
+      )}
       {withBalance && (
         <Typography sx={{ marginTop: 0.5, fontSize: '0.75rem', color: 'text.secondary' }}>
           Balance:

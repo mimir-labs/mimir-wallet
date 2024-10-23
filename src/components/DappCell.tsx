@@ -3,9 +3,9 @@
 
 import type { DappOption } from '@mimir-wallet/config';
 
-import { alpha, Box, Button, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
-import React, { useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { alpha, Box, Button, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import React, { createElement, useCallback, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import IconStar from '@mimir-wallet/assets/svg/icon-star.svg?react';
 import { ellipsisLinesMixin } from '@mimir-wallet/components/utils';
@@ -21,7 +21,10 @@ interface Props {
 }
 
 function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
-  const [detailsOpen, toggleOpen] = useToggle();
+  const navigate = useNavigate();
+  const [detailsOpen, toggleOpen, setDetailsOpen] = useToggle();
+  const [isDrawerOpen, toggleDrawerOpen, setDrawerOpen] = useToggle();
+  const [element, setElement] = useState<JSX.Element>();
   const _isFavorite = useMemo(() => isFavorite(dapp.id), [dapp.id, isFavorite]);
   const toggleFavorite = useCallback(
     (e: React.MouseEvent) => {
@@ -36,14 +39,34 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
     [_isFavorite, addFavorite, dapp.id, removeFavorite]
   );
 
+  const openApp = useCallback(() => {
+    setDetailsOpen(false);
+
+    if (!dapp.isDrawer) {
+      navigate(`/explorer/${encodeURIComponent(dapp.url)}`);
+    } else {
+      dapp.Component?.().then((C) => {
+        setDrawerOpen(true);
+        setElement(
+          createElement(C, {
+            onClose: () => setDrawerOpen(false)
+          } as Record<string, unknown>)
+        );
+      });
+    }
+  }, [dapp, navigate, setDetailsOpen, setDrawerOpen]);
+
   return (
     <>
-      <DappDetails dapp={dapp} onClose={toggleOpen} open={detailsOpen} />
-      <Paper
-        component={Link}
-        to={`/explorer/${encodeURIComponent(dapp.url)}`}
-        sx={{ cursor: 'pointer', display: 'block', padding: 2, textDecoration: 'none' }}
-      >
+      <DappDetails dapp={dapp} onClose={toggleOpen} open={detailsOpen} onOpen={openApp} />
+
+      {dapp.isDrawer && (
+        <Drawer anchor='right' open={isDrawerOpen} onClose={toggleDrawerOpen}>
+          {element}
+        </Drawer>
+      )}
+
+      <Paper sx={{ cursor: 'pointer', display: 'block', padding: 2, textDecoration: 'none' }} onClick={openApp}>
         <Stack spacing={2}>
           <Box>
             <Typography variant='h4'>{dapp.name}</Typography>
@@ -67,6 +90,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
             <Button
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 toggleOpen();
               }}
               variant='outlined'

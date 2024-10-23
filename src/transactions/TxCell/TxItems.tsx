@@ -11,10 +11,9 @@ import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
 import { AppName } from '@mimir-wallet/components';
 import { useApi, useToggle } from '@mimir-wallet/hooks';
 import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { CallDisplayDetail, CallDisplaySection } from '@mimir-wallet/params';
 import { formatAgo } from '@mimir-wallet/utils';
 
-import { ActionText } from '../TxDisplay';
-import ActionDisplay from '../TxDisplay/ActionDisplay';
 import Extrinsic from './Extrinsic';
 import OverviewDialog from './OverviewDialog';
 import Progress from './Progress';
@@ -28,10 +27,10 @@ function AppCell({ transaction }: { transaction: Transaction }) {
   );
 }
 
-function ActionTextCell({ action }: { action: string }) {
+function ActionTextCell({ section, method }: { section?: string; method?: string }) {
   return (
     <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-      <ActionText action={action} />
+      <CallDisplaySection section={section} method={method} />
     </Box>
   );
 }
@@ -39,7 +38,7 @@ function ActionTextCell({ action }: { action: string }) {
 function ActionDisplayCell({ api, call }: { api: ApiPromise; call?: IMethod | null }) {
   return (
     <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-      <ActionDisplay api={api} call={call} />
+      <CallDisplayDetail api={api} call={call} />
     </Box>
   );
 }
@@ -135,13 +134,15 @@ function TxItems({
             <AppCell transaction={transaction} />
           </Grid>
           <Grid size={2}>
-            <ActionTextCell action={`${transaction.section}.${transaction.method}`} />
+            <ActionTextCell section={transaction.section} method={transaction.method} />
           </Grid>
           <Grid size={2}>
             <ActionDisplayCell api={api} call={call} />
           </Grid>
           <Grid size={2}>
-            <TimeCell time={transaction.createdAt} />
+            <TimeCell
+              time={transaction.status < TransactionStatus.Success ? transaction.createdAt : transaction.updatedAt}
+            />
           </Grid>
           <Grid size={2}>
             {transaction.status < TransactionStatus.Success ? (

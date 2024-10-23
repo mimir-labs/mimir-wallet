@@ -10,14 +10,9 @@ export interface ParamDef {
   type: TypeDef;
 }
 
-export interface RawParam {
-  isValid: boolean;
-  value: Codec;
-}
-
 export interface ParamsProps {
-  params: ParamDef[];
-  values: RawParam[];
+  type: TypeDef;
+  values: Codec[];
   registry: Registry;
 }
 

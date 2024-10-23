@@ -6,7 +6,7 @@ import type { Registry } from '@polkadot/types/types';
 
 import { useMemo } from 'react';
 
-import { registry } from '@mimir-wallet/api';
+import { useApi } from './useApi';
 
 export function getProxyTypeInstance(registry: Registry, index = 0): KitchensinkRuntimeProxyType {
   // This is not perfect, but should work for `{Kusama, Node, Polkadot}RuntimeProxyType`
@@ -26,5 +26,7 @@ export function getProxyOptions(registry: Registry): { text: string; value: numb
 }
 
 export function useProxyTypes() {
-  return useMemo(() => getProxyOptions(registry), []);
+  const { api } = useApi();
+
+  return useMemo(() => getProxyOptions(api.registry), [api.registry]);
 }

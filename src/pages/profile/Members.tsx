@@ -8,7 +8,7 @@ import { AddressOverview } from '@mimir-wallet/components';
 import { useQueryAccount } from '@mimir-wallet/hooks';
 
 function Members({ address }: { address?: string }) {
-  const account = useQueryAccount(address);
+  const [account] = useQueryAccount(address);
 
   return (
     <Paper sx={{ width: '100%', height: '40vh', borderRadius: 2 }}>

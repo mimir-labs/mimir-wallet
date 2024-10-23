@@ -1,12 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Transaction } from '@mimir-wallet/hooks/types';
+import type { FilterPath, Transaction } from '@mimir-wallet/hooks/types';
 
 import { Button } from '@mui/material';
 import React from 'react';
 
-import { AddressName } from '@mimir-wallet/components';
 import { useAccount } from '@mimir-wallet/hooks';
 import { TransactionStatus } from '@mimir-wallet/hooks/types';
 
@@ -24,10 +23,14 @@ function findSubPendingTx(transaction: Transaction): Transaction | null {
   return null;
 }
 
-function ViewPending({ transaction }: { transaction: Transaction }) {
+function ViewPending({ transaction, filterPaths }: { transaction: Transaction; filterPaths: Array<FilterPath[]> }) {
   const { setCurrent } = useAccount();
 
   if (transaction.status !== TransactionStatus.Initialized) {
+    return null;
+  }
+
+  if (filterPaths.length) {
     return null;
   }
 
@@ -44,8 +47,9 @@ function ViewPending({ transaction }: { transaction: Transaction }) {
       onClick={() => {
         setCurrent(subPendingTx.address);
       }}
+      variant='outlined'
     >
-      View Pending Transaction In <AddressName value={subPendingTx.address} />
+      View Pending Transaction
     </Button>
   );
 }

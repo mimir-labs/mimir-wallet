@@ -3,12 +3,10 @@
 
 import React from 'react';
 
-import { FormatBalance } from '@mimir-wallet/components';
-
 import { ParamProps } from './types';
 
 function Amount({ value }: ParamProps) {
-  return <FormatBalance value={value.value.toString()} />;
+  return value.toString();
 }
 
 export default React.memo(Amount);

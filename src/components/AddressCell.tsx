@@ -4,12 +4,13 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { alpha, Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
+import { hexToU8a } from '@polkadot/util';
 import React from 'react';
 
 import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
-import { useAccount, useAddressMeta, useToggle } from '@mimir-wallet/hooks';
+import { useAccount, useAddressMeta } from '@mimir-wallet/hooks';
+import { addressEq } from '@mimir-wallet/utils';
 
-import AddAddressDialog from './AddAddressDialog';
 import AddressComp from './Address';
 import AddressName from './AddressName';
 import CopyButton from './CopyButton';
@@ -43,57 +44,58 @@ function AddressCell({
   withAddressBook = false
 }: Props) {
   const [nameFontSize, addressFontSize, spacing, spacingCol] = ['0.875rem', '0.75rem', 0.5, 0.2];
-  const [open, toggleOpen] = useToggle();
 
   const address = value?.toString();
   const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
-  const { isLocalAccount, isLocalAddress } = useAccount();
+  const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
 
   return (
-    <>
-      {address && <AddAddressDialog defaultAddress={address} onClose={toggleOpen} open={open} />}
-      <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
-        <IdentityIcon className='AddressCell-Icon' isMe={isMe} size={iconSize} value={value} />
-        <Stack className='AddressCell-Address' spacing={spacingCol}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography
-              component='span'
-              fontSize={nameFontSize}
-              fontWeight={700}
-              sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-            >
-              <AddressName defaultName={defaultName} value={value} />
-            </Typography>
-            {namePost}
-            {showType && (
-              <>
-                {isMultisig && <Chip color='secondary' label='Multisig' size='small' sx={{ fontSize: 12 }} />}
-                {(isPure || isProxied) && (
-                  <Chip
-                    color='default'
-                    sx={{ bgcolor: alpha('#B700FF', 0.05), color: '#B700FF', fontSize: 12 }}
-                    label={isPure ? 'Pure' : 'Proxied'}
-                    size='small'
-                  />
-                )}
-              </>
-            )}
-          </Box>
+    <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
+      <IdentityIcon className='AddressCell-Icon' isMe={isMe} size={iconSize} value={value} />
+      <Stack className='AddressCell-Address' spacing={spacingCol}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Typography
-            color='text.secondary'
             component='span'
-            fontSize={addressFontSize}
-            sx={{ height: 18, display: 'flex', alignItems: 'center' }}
+            fontSize={nameFontSize}
+            fontWeight={700}
+            sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
           >
-            <AddressComp shorten={shorten} value={address} />
-            {withCopy && <CopyButton size='small' sx={{ fontSize: 'inherit' }} value={address} />}
-            {icons}
-            {withAddressBook && address && !isLocalAccount(address) && !isLocalAddress(address) && (
+            <AddressName defaultName={defaultName} value={value} />
+          </Typography>
+          {namePost}
+          {showType && (
+            <>
+              {isMultisig && <Chip color='secondary' label='Multisig' size='small' sx={{ fontSize: 12 }} />}
+              {(isPure || isProxied) && (
+                <Chip
+                  color='default'
+                  sx={{ bgcolor: alpha('#B700FF', 0.05), color: '#B700FF', fontSize: 12 }}
+                  label={isPure ? 'Pure' : 'Proxied'}
+                  size='small'
+                />
+              )}
+            </>
+          )}
+        </Box>
+        <Typography
+          color='text.secondary'
+          component='span'
+          fontSize={addressFontSize}
+          sx={{ height: 18, display: 'flex', alignItems: 'center' }}
+        >
+          <AddressComp shorten={shorten} value={address} />
+          {withCopy && <CopyButton size='small' sx={{ fontSize: 'inherit' }} value={address} />}
+          {icons}
+          {withAddressBook &&
+            address &&
+            !isLocalAccount(address) &&
+            !isLocalAddress(address) &&
+            !addressEq(hexToU8a('0x0', 256), address) && (
               <IconButton
                 color='inherit'
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleOpen();
+                  addAddressBook(address);
                 }}
                 size='small'
                 sx={{ opacity: 0.7, fontSize: '0.8em' }}
@@ -101,10 +103,9 @@ function AddressCell({
                 <SvgIcon component={IconAddressBook} inheritViewBox />
               </IconButton>
             )}
-          </Typography>
-        </Stack>
+        </Typography>
       </Stack>
-    </>
+    </Stack>
   );
 }
 

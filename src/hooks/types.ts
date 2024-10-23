@@ -319,3 +319,11 @@ export type FilterPathWithoutId =
   | Omit<MultisigFilterPath, 'id'>
   | Omit<ProxyFilterPath, 'id'>
   | Omit<OriginFilterPath, 'id'>;
+
+export interface BatchTxItem {
+  id: number;
+  calldata: HexString;
+  website?: string;
+  iconUrl?: string;
+  appName?: string;
+}

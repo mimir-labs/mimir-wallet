@@ -13,6 +13,7 @@ import { AccountSelect, ChainSelect } from '@mimir-wallet/components';
 import { useApi } from '@mimir-wallet/hooks';
 
 import { BaseContainerCtx } from './BaseContainer';
+import BatchButton from './BatchButton';
 
 function TopBar() {
   const { isApiReady } = useApi();
@@ -50,6 +51,7 @@ function TopBar() {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: { sm: 2, xs: 1 } }}>
         {isApiReady && isInAppPage && <AccountSelect />}
         {/* <Notification /> */}
+        {isApiReady && <BatchButton />}
         <ChainSelect onlyLogo={isInAppPage && downSm} />
         {isApiReady && (
           <Stack direction='row' display='none'>

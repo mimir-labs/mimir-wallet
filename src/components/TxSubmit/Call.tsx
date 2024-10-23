@@ -70,11 +70,7 @@ function Call({
   const [isOpen, toggleOpen] = useToggle();
 
   const details = (
-    <Stack
-      spacing={0.4}
-      sx={{ bgcolor: 'secondary.main', borderRadius: 1, padding: 1 }}
-      className='bg-secondary rounded-small p-2.5 space-y-1'
-    >
+    <Stack spacing={0.4} sx={{ bgcolor: 'secondary.main', borderRadius: 1, padding: 1 }}>
       <Item label='Call Hash' value={<Hash value={callHash} withCopy />} />
       <Item label='Call Data' value={<Bytes value={callData} />} />
 

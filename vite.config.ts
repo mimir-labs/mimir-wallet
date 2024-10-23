@@ -61,7 +61,8 @@ export default defineConfig(({ mode }) => ({
             'react-toastify',
             'socket.io-client',
             '@tanstack/react-query',
-            'uuid'
+            'uuid',
+            'react-draggable-list'
           ]
         }
       }

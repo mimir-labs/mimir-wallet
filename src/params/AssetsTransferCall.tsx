@@ -33,7 +33,6 @@ function AssetsTransferCall({ api, call, jsonFallback }: CallProps) {
           <AddressRow
             defaultName={args[0].toString()}
             shorten={false}
-            size='small'
             value={args[1]}
             withAddress={false}
             withCopy

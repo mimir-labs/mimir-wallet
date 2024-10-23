@@ -11,9 +11,9 @@ import React, { useMemo, useState } from 'react';
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
 
 import CallComp from './Call';
+import { CallDisplayDetail, CallDisplayDetailMinor, CallDisplaySection } from './CallDisplay';
 import FunctionArgs from './FunctionArgs';
-import Param from './Param';
-import { extractParams, findAction } from './utils';
+import { findAction } from './utils';
 
 function Item({
   from,
@@ -28,12 +28,7 @@ function Item({
   isOpen: boolean;
   toggleOpen: () => void;
 } & CallProps) {
-  const action = useMemo(
-    () => (call ? findAction(api, call) || ['unknown', 'unknown'] : ['unknown', 'unknown']),
-    [api, call]
-  );
-
-  const { params, values } = useMemo(() => extractParams(call), [call]);
+  const action = useMemo(() => (call ? findAction(api, call) : null), [api, call]);
 
   const Top = (
     <Grid
@@ -46,13 +41,14 @@ function Item({
         {index}
       </Grid>
       <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
-        {action.join('.')}
+        <CallDisplaySection section={action?.[0]} method={action?.[1]} />
       </Grid>
-      {Array.from({ length: 2 }).map((_, index) => (
-        <Grid key={index} size={3} sx={{ display: 'flex', alignItems: 'center' }}>
-          {params[index] ? <Param registry={api.registry} param={params[index]} value={values[index]} /> : <div />}
-        </Grid>
-      ))}
+      <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+        <CallDisplayDetail api={api} call={call} />
+      </Grid>
+      <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+        <CallDisplayDetailMinor api={api} call={call} />
+      </Grid>
 
       <Grid size={1} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
         <IconButton
@@ -97,7 +93,7 @@ function BatchCall({ from, api, call, jsonFallback, ...props }: CallProps) {
   }
 
   return (
-    <Stack spacing={1}>
+    <Stack spacing={1} width='100%'>
       <Box
         sx={{
           display: 'flex',

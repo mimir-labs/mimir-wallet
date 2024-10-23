@@ -7,7 +7,7 @@ import { Box, BoxProps } from '@mui/material';
 import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { registry } from '@mimir-wallet/api';
+import { useApi } from '@mimir-wallet/hooks';
 import { formatUnits } from '@mimir-wallet/utils';
 
 interface Props extends BoxProps {
@@ -28,11 +28,12 @@ const formatDisplay = (value: string, sufLen = 4): [string, string] => {
 };
 
 function FormatBalance({ format, label, value, withCurrency, ...props }: Props): React.ReactElement<Props> {
+  const { api } = useApi();
   const [major, rest] = useMemo(() => {
-    const _value = formatUnits(BigInt(value?.toString() || 0), format?.[0] || registry.chainDecimals[0]);
+    const _value = formatUnits(BigInt(value?.toString() || 0), format?.[0] || api.registry.chainDecimals[0]);
 
     return formatDisplay(_value);
-  }, [format, value]);
+  }, [format, value, api.registry]);
 
   // labelPost here looks messy, however we ensure we have one less text node
   return (
@@ -42,7 +43,7 @@ function FormatBalance({ format, label, value, withCurrency, ...props }: Props):
         {major}
         {rest ? <Box component='span'>.{rest}</Box> : null}
       </Box>
-      <Box component='span'>{withCurrency ? ` ${format?.[1] || registry.chainTokens[0] || ''}` : ''}</Box>
+      <Box component='span'>{withCurrency ? ` ${format?.[1] || api.registry.chainTokens[0] || ''}` : ''}</Box>
     </Box>
   );
 }

@@ -20,7 +20,7 @@ interface Props {
 function PendingTx({ address, url }: Props) {
   const txs = usePendingTx(address, url);
   const [expand, toggleExpand] = useToggle();
-  const account = useQueryAccount();
+  const [account] = useQueryAccount();
 
   return (
     <Drawer
@@ -35,6 +35,7 @@ function PendingTx({ address, url }: Props) {
           pointerEvents: 'all !important'
         })
       }}
+      sx={{ zIndex: 1100 }}
       anchor='bottom'
       onClose={toggleExpand}
       open={expand}

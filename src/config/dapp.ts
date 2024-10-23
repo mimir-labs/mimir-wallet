@@ -6,6 +6,7 @@ import type { HexString } from '@polkadot/util/types';
 
 import { isArray } from '@polkadot/util';
 
+import BatchIcon from '@mimir-wallet/assets/images/batch.svg';
 import Failed from '@mimir-wallet/assets/images/failed.svg';
 import LogoCircle from '@mimir-wallet/assets/svg/logo-circle.svg';
 import { FAVORITE_DAPP_KEY } from '@mimir-wallet/constants';
@@ -26,6 +27,7 @@ export interface DappOption {
   twitter?: string;
   discord?: string;
   github?: string;
+  isDrawer?: boolean;
   Component?: () => Promise<React.ComponentType>; // only for mimir://dapp/*
 }
 
@@ -42,6 +44,20 @@ export const dapps: DappOption[] = [
     twitter: 'https://twitter.com/Mimir_global',
     github: 'https://github.com/mimir-labs',
     Component: () => import('@mimir-wallet/apps/transfer').then((res) => res.default)
+  },
+  {
+    id: 2,
+    name: 'Cache',
+    description: 'Build cache transaction',
+    url: 'mimir://app/batch',
+    icon: BatchIcon,
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Batch', 'Cache'],
+    Component: () => import('@mimir-wallet/apps/batch').then((res) => res.default),
+    isDrawer: true
   },
   {
     id: 500,

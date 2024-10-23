@@ -12,7 +12,11 @@ import TransferCall from './TransferCall';
 import { findAction } from './utils';
 
 function Call({ api, call, ...props }: CallProps) {
-  const action = useMemo(() => (call ? findAction(api, call).join('.') : 'unknown.unknown'), [api, call]);
+  const action = useMemo(() => (call ? findAction(api, call)?.join('.') : null), [api, call]);
+
+  if (!action) {
+    return null;
+  }
 
   if (action === 'utility.batchAll' || action === 'utility.batch' || action === 'utility.forceBatch') {
     return <BatchCall api={api} call={call} {...props} />;

@@ -8,11 +8,12 @@ import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
+import IconAdd from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
 import IconFund from '@mimir-wallet/assets/svg/icon-fund-fill.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@mimir-wallet/assets/svg/icon-set.svg?react';
 import { FormatBalance } from '@mimir-wallet/components';
-import { useAddressMeta, useApi, useTokenInfo } from '@mimir-wallet/hooks';
+import { useApi, useTokenInfo } from '@mimir-wallet/hooks';
 
 function Info({
   address,
@@ -23,7 +24,6 @@ function Info({
   balances?: AccountBalance;
   toggleFundOpen: () => void;
 }) {
-  const { meta } = useAddressMeta(address);
   const [tokenInfo] = useTokenInfo();
   const { tokenSymbol } = useApi();
 
@@ -71,7 +71,15 @@ function Info({
             >
               Fund
             </Button>
-            {address && (meta?.isMultisig || meta.isProxied) && (
+            <Button
+              component={Link}
+              endIcon={<SvgIcon component={IconAdd} inheritViewBox />}
+              to='/add-proxy'
+              variant='outlined'
+            >
+              Proxy
+            </Button>
+            {address && (
               <Button component={Link} sx={{ minWidth: 0 }} to={`/account-setting/${address}`} variant='outlined'>
                 <SvgIcon component={IconSet} inheritViewBox />
               </Button>

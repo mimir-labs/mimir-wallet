@@ -22,7 +22,7 @@ interface Props {
   checkField: () => boolean;
 }
 
-export async function createMultisig(signatories: string[], threshold: number, name: string): Promise<string> {
+async function createMultisig(signatories: string[], threshold: number, name: string): Promise<string> {
   const address = encodeAddress(createKeyMulti(signatories, threshold));
 
   await service.createMultisig(
@@ -44,7 +44,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const selectAccount = useSelectedAccountCallback();
-  const { setAddressName, resync } = useAccount();
+  const { addAddress, resync } = useAccount();
 
   const handleCreate = useCallback(async () => {
     if (!name || !checkField()) return;
@@ -59,7 +59,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
       utm && (await service.utm(addressToHex(address), utm));
 
       selectAccount(address);
-      setAddressName(address, name);
+      addAddress(address, name);
 
       navigate('/');
     } catch {
@@ -67,7 +67,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
     }
 
     setIsLoading(false);
-  }, [checkField, name, navigate, resync, selectAccount, setAddressName, signatories, threshold]);
+  }, [name, checkField, signatories, threshold, resync, selectAccount, addAddress, navigate]);
 
   return (
     <>

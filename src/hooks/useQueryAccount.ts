@@ -5,7 +5,8 @@ import type { HexString } from '@polkadot/util/types';
 import type { AccountData, AddressMeta, DelegateeProp } from './types';
 
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { isEqual } from 'lodash-es';
+import { useEffect } from 'react';
 
 import { encodeAddress } from '@mimir-wallet/api';
 import { serviceUrl } from '@mimir-wallet/utils/chain-links';
@@ -63,27 +64,36 @@ function deriveMeta(account: AccountData, meta: Record<string, AddressMeta> = {}
   }
 }
 
-function useQueryAccountImpl(address?: string | null): AccountData | undefined {
+function useQueryAccountImpl(
+  address?: string | null
+): [AccountData | null | undefined, isFetched: boolean, isFetching: boolean] {
   const { genesisHash } = useApi();
   const { appendMeta } = useAccount();
-  const [account, setAccount] = useState<AccountData>();
-  const { data } = useQuery<AccountData | null>({
+  const { data, isFetched, isFetching } = useQuery<AccountData | null>({
+    initialData: null,
     queryHash: serviceUrl(`accounts/full/${address}`),
-    queryKey: [address ? serviceUrl(`accounts/full/${address}`) : null]
+    queryKey: [address ? serviceUrl(`accounts/full/${address}`) : null],
+    structuralSharing: (prev, next): AccountData | null => {
+      if (!next) {
+        return null;
+      }
+
+      const nextData = transformAccount(genesisHash, next as AccountData);
+
+      return isEqual(prev, nextData) ? (prev as AccountData) : nextData;
+    }
   });
 
   useEffect(() => {
     if (data) {
-      const account = transformAccount(genesisHash, data);
       const meta: Record<string, AddressMeta> = {};
 
-      deriveMeta(account, meta);
+      deriveMeta(data, meta);
       appendMeta(meta);
-      setAccount(account);
     }
   }, [appendMeta, data, genesisHash]);
 
-  return account;
+  return [data, isFetched, isFetching];
 }
 
 export const useQueryAccount = createNamedHook('useQueryAccount', useQueryAccountImpl);

@@ -14,17 +14,17 @@ import { toastError } from './ToastRoot';
 
 function Content({
   defaultAddress,
-  defaultName,
+  watchlist,
   onAdded,
   onClose
 }: {
   defaultAddress?: string;
-  defaultName?: string;
+  watchlist?: boolean;
   onAdded?: (address: string) => void;
   onClose?: () => void;
 }) {
-  const { setAddressName, addresses } = useAccount();
-  const [name, setName] = useState<string>(defaultName || '');
+  const { addAddress, addresses } = useAccount();
+  const [name, setName] = useState<string>('');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
 
   const _onChangeAddress = useCallback((addressInput: string) => {
@@ -41,8 +41,11 @@ function Content({
   }, []);
 
   const exists = useMemo(
-    () => address && isAddress(address) && addresses.findIndex((item) => addressEq(item.address, address)) > -1,
-    [address, addresses]
+    () =>
+      address &&
+      isAddress(address) &&
+      addresses.findIndex((item) => item.watchlist === watchlist && addressEq(item.address, address)) > -1,
+    [address, addresses, watchlist]
   );
 
   const _onCommit = useCallback((): void => {
@@ -53,13 +56,13 @@ function Content({
         throw new Error('not a valid address');
       }
 
-      setAddressName(address, name.trim());
+      addAddress(address, name.trim(), watchlist);
       onAdded?.(address);
       onClose?.();
     } catch (error) {
       toastError(error);
     }
-  }, [address, name, onAdded, onClose, setAddressName]);
+  }, [address, name, onAdded, onClose, addAddress, watchlist]);
 
   return (
     <>
@@ -89,13 +92,13 @@ function Content({
 
 function AddAddressDialog({
   defaultAddress,
-  defaultName,
+  watchlist,
   onAdded,
   onClose,
   open
 }: {
   defaultAddress?: string;
-  defaultName?: string;
+  watchlist?: boolean;
   open: boolean;
   onAdded?: (address: string) => void;
   onClose?: () => void;
@@ -104,10 +107,10 @@ function AddAddressDialog({
     <Dialog fullWidth maxWidth='sm' onClick={(e) => e.stopPropagation()} onClose={onClose} open={open}>
       <DialogTitle>
         <Typography textAlign='center' variant='h4'>
-          Add New Contact
+          {watchlist ? 'Add Watchlist' : 'Add New Contact'}
         </Typography>
       </DialogTitle>
-      <Content defaultAddress={defaultAddress} defaultName={defaultName} onAdded={onAdded} onClose={onClose} />
+      <Content defaultAddress={defaultAddress} watchlist={watchlist} onAdded={onAdded} onClose={onClose} />
     </Dialog>
   );
 }

@@ -25,13 +25,14 @@ import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { signAndSend } from '@mimir-wallet/api';
 import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
 import { utm } from '@mimir-wallet/config';
 import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
 import { useApi, useCall, useSelectedAccountCallback, useWallet } from '@mimir-wallet/hooks';
 import { TxToastCtx } from '@mimir-wallet/providers';
-import { addressToHex, service, signAndSend, sleep, store } from '@mimir-wallet/utils';
+import { addressToHex, service, sleep, store } from '@mimir-wallet/utils';
 
 interface Props {
   prepare: PrepareFlexible;
@@ -279,9 +280,9 @@ function CreateFlexible({
         <AccordionDetails>
           <Stack spacing={1}>
             {who.map((address) => (
-              <Box key={address} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box key={address} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography fontSize='0.75rem' fontWeight={700}>
-                  <AddressRow size='small' value={address} />
+                  <AddressRow value={address} />
                 </Typography>
                 <Typography color='text.secondary' fontSize='0.75rem'>
                   <Address shorten value={address} />

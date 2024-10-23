@@ -3,18 +3,18 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { Call as ICall } from '@polkadot/types/interfaces';
-import type { IMethod } from '@polkadot/types/types';
-import type { ParamDef, RawParam } from './types';
+import type { Codec, IMethod } from '@polkadot/types/types';
+import type { ParamDef } from './types';
 
 import { getTypeDef } from '@polkadot/types';
 
-export function findAction(api: ApiPromise, call: IMethod | ICall): [string, string] {
+export function findAction(api: ApiPromise, call: IMethod | ICall): [string, string] | null {
   try {
     const callFunc = api.registry.findMetaCall(call.callIndex);
 
     return [callFunc.section, callFunc.method];
   } catch {
-    return ['unknown', 'unknown'];
+    return null;
   }
 }
 
@@ -25,12 +25,7 @@ export function extractParams(value: IMethod) {
       type: getTypeDef(type.toString())
     })
   );
-  const values = value.args.map(
-    (value): RawParam => ({
-      isValid: true,
-      value
-    })
-  );
+  const values: Codec[] = value.args;
 
   return { params, values };
 }

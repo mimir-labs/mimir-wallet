@@ -150,7 +150,8 @@ const createComponents: Func = () => ({
         },
         '&.Mui-disabled': {
           '.MuiOutlinedInput-notchedOutline': {
-            borderColor: palette.grey[300]
+            borderColor: palette.grey[300],
+            backgroundColor: palette.secondary.main
           }
         }
       }),
@@ -280,7 +281,6 @@ const createComponents: Func = () => ({
       root: ({ theme }) => ({
         fontSize: '1.25rem',
         fontWeight: 800,
-        color: theme.palette.primary.main,
         padding: 0,
         paddingBottom: theme.spacing(1.5),
         '+.MuiDialogContent-root': {
@@ -377,7 +377,7 @@ const createComponents: Func = () => ({
         maxWidth: 365,
         fontSize: '0.875rem',
         borderRadius: theme.shape.borderRadius * 2,
-        padding: theme.spacing(2),
+        padding: theme.spacing(1),
         border: '1px solid',
         borderColor: theme.palette.secondary.main,
         backgroundColor: theme.palette.common.white,
@@ -415,7 +415,16 @@ const createComponents: Func = () => ({
   MuiAlert: {
     defaultProps: {
       iconMapping: {
+        error: <SvgIcon inheritViewBox component={IconInfo} sx={{ fontSize: '0.875rem' }} />,
         warning: <SvgIcon inheritViewBox component={IconInfo} sx={{ fontSize: '0.875rem' }} />
+      }
+    }
+  },
+
+  MuiAlertTitle: {
+    styleOverrides: {
+      root: {
+        marginBottom: 0
       }
     }
   }

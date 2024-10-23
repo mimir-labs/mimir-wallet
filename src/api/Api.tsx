@@ -9,13 +9,10 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance, isTestChain, objectSpread, stringify } from '@polkadot/util';
 import { decodeAddress as decodeAddressBase, encodeAddress as encodeAddressBase } from '@polkadot/util-crypto';
-import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { Endpoint, typesBundle } from '@mimir-wallet/config';
 import { service } from '@mimir-wallet/utils';
-
-import { registry } from './typeRegistry';
 
 interface Props {
   children: React.ReactNode;
@@ -30,8 +27,6 @@ interface ChainData {
   systemVersion: string;
 }
 
-export const DEFAULT_DECIMALS = registry.createType('u32', 12);
-export const DEFAULT_SS58 = registry.createType('u32', addressDefaults.prefix);
 export const DEFAULT_AUX = ['Aux1', 'Aux2', 'Aux3', 'Aux4', 'Aux5', 'Aux6', 'Aux7', 'Aux8', 'Aux9'];
 
 export function encodeAddress(key: string | Uint8Array, ss58Format = window?.currentChain?.ss58Format) {
@@ -48,18 +43,20 @@ const EMPTY_STATE = { hasInjectedAccounts: false, isApiReady: false } as unknown
 
 let api: ApiPromise;
 
-export { api, registry };
+export { api };
 
 async function retrieve(api: ApiPromise): Promise<ChainData> {
   const [systemChain, systemChainType, systemName, systemVersion] = await Promise.all([
     api.rpc.system.chain(),
-    api.rpc.system.chainType ? api.rpc.system.chainType() : Promise.resolve(registry.createType('ChainType', 'Live')),
+    api.rpc.system.chainType
+      ? api.rpc.system.chainType()
+      : Promise.resolve(api.registry.createType('ChainType', 'Live')),
     api.rpc.system.name(),
     api.rpc.system.version()
   ]);
 
   return {
-    properties: registry.createType('ChainProperties', {
+    properties: api.registry.createType('ChainProperties', {
       ss58Format: api.registry.chainSS58,
       tokenDecimals: api.registry.chainDecimals,
       tokenSymbol: api.registry.chainTokens
@@ -75,13 +72,15 @@ async function loadOnReady(api: ApiPromise, chain: Endpoint): Promise<ApiState> 
   const { properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api);
   const ss58Format = chain.ss58Format;
   const tokenSymbol = properties.tokenSymbol.unwrapOr([formatBalance.getDefaults().unit, ...DEFAULT_AUX]);
-  const tokenDecimals = properties.tokenDecimals.unwrapOr([DEFAULT_DECIMALS]);
+  const tokenDecimals = properties.tokenDecimals.unwrapOr([api.registry.createType('u32', 12)]);
   const isDevelopment = systemChainType.isDevelopment || systemChainType.isLocal || isTestChain(systemChain);
 
   console.log(`chain: ${systemChain} (${systemChainType.toString()}), ${stringify(properties)}`);
 
   // explicitly override the ss58Format as specified
-  registry.setChainProperties(registry.createType('ChainProperties', { ss58Format, tokenDecimals, tokenSymbol }));
+  api.registry.setChainProperties(
+    api.registry.createType('ChainProperties', { ss58Format, tokenDecimals, tokenSymbol })
+  );
 
   // first setup the UI helpers
   formatBalance.setDefaults({
@@ -131,7 +130,6 @@ async function createApi(apiUrl: string, onError: (error: unknown) => void): Pro
 
     api = new ApiPromise({
       provider,
-      registry,
       typesBundle,
       typesChain: {
         Crust: {
@@ -186,10 +184,6 @@ export function ApiCtxRoot({ chain, children }: Props): React.ReactElement<Props
 
     setIsApiInitialized(false);
   }, [chain]);
-
-  if (!value.isApiInitialized) {
-    return null;
-  }
 
   return <ApiCtx.Provider value={value}>{children}</ApiCtx.Provider>;
 }

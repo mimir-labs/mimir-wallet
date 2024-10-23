@@ -64,7 +64,7 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
           This transaction wasn’t initiated from Mimir. Please confirm the security of this transaction.
         </Alert>
       )}
-      <Item title='From' content={<AddressRow size='small' withCopy value={from} />} />
+      <Item title='From' content={<AddressRow iconSize={20} withCopy value={from} />} />
     </>
   );
 }

@@ -6,7 +6,6 @@ import type { PalletProxyProxyDefinition } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
 import type { ProxyArgs } from './types';
 
-import { LoadingButton } from '@mui/lab';
 import {
   Alert,
   AlertTitle,
@@ -23,34 +22,24 @@ import {
   Switch,
   Typography
 } from '@mui/material';
-import { u8aToHex } from '@polkadot/util';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAsyncFn } from 'react-use';
 
-import { decodeAddress } from '@mimir-wallet/api';
 import IconArrow from '@mimir-wallet/assets/svg/icon-arrow.svg?react';
-import { Input, InputAddress, toastWarn } from '@mimir-wallet/components';
+import { Input, InputAddress } from '@mimir-wallet/components';
 import { ONE_DAY, ONE_HOUR } from '@mimir-wallet/constants';
-import {
-  useAccount,
-  useApi,
-  useBlockInterval,
-  useCall,
-  useInput,
-  useProxyTypes,
-  useToggle,
-  useTxQueue
-} from '@mimir-wallet/hooks';
-import { addressEq, service } from '@mimir-wallet/utils';
+import { useAccount, useApi, useBlockInterval, useCall, useInput, useProxyTypes, useToggle } from '@mimir-wallet/hooks';
+import { addressEq } from '@mimir-wallet/utils';
 
+import AddProxy from './AddProxy';
 import ProxyInfo from './ProxyInfo';
 import PureCell from './PureCell';
+import SubmitProxy from './SubmitProxy';
+import SubmitPure from './SubmitPure';
 
 function PageAddProxy({ pure }: { pure?: boolean }) {
   const { api } = useApi();
   const navigate = useNavigate();
-  const { addQueue } = useTxQueue();
   const { accounts, current } = useAccount();
   const proxyTypes = useProxyTypes();
   const [proxyType, setProxyType] = useState<string>(proxyTypes?.[0]?.text || 'Any');
@@ -94,38 +83,6 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
     [(ONE_DAY * 7 * 1000) / blockInterval]: '1 Week',
     [-1]: 'Custom'
   };
-
-  const [state, onAdd] = useAsyncFn(async () => {
-    if (!proxy || !proxied) {
-      return;
-    }
-
-    const delay = reviewWindow === -1 ? Number(custom) : reviewWindow;
-
-    if (addressEq(proxied, proxy)) {
-      toastWarn('Can not add self');
-
-      return;
-    }
-
-    if (proxyArgs.find((item) => item.delegate === proxy && item.proxyType === proxyType)) {
-      toastWarn('Already added');
-
-      return;
-    }
-
-    if (!pure) {
-      const result = await api.query.proxy.proxies(proxied);
-
-      if (result[0].find((item) => item.delegate.toString() === proxy && item.proxyType.type === proxyType)) {
-        toastWarn('Already added');
-
-        return;
-      }
-    }
-
-    setProxyArgs([...proxyArgs, { delegate: proxy, proxyType, delay }]);
-  }, [api.query.proxy, custom, proxied, proxy, proxyArgs, proxyType, pure, reviewWindow]);
 
   return (
     <>
@@ -227,18 +184,16 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
             )}
 
             {!pure && (
-              <LoadingButton
-                disabled={!proxied || !proxy}
-                fullWidth
-                variant='outlined'
-                onClick={onAdd}
-                loading={state.loading}
-              >
-                Add
-              </LoadingButton>
+              <AddProxy
+                proxied={proxied}
+                proxy={proxy}
+                proxyArgs={proxyArgs}
+                reviewWindow={reviewWindow}
+                custom={custom}
+                proxyType={proxyType}
+                setProxyArgs={setProxyArgs}
+              />
             )}
-
-            {!!(proxyArgs.length + (existsProxies.length || 0)) && <Divider />}
 
             {!pure &&
               proxyArgs.map((arg, index) => (
@@ -254,61 +209,22 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
                 />
               ))}
 
-            <Button
-              fullWidth
-              disabled={pure ? !proxy || !name : !proxyArgs.length || !proxied}
-              onClick={() => {
-                if (pure) {
-                  if (!proxy) {
-                    return;
-                  }
+            {!!(proxyArgs.length + (existsProxies.length || 0)) && <Divider />}
 
-                  const delay = reviewWindow === -1 ? Number(custom) : reviewWindow;
+            <Alert severity='warning' sx={{ '.MuiAlert-message': { overflow: 'visible' } }}>
+              <AlertTitle>Notice</AlertTitle>
+              <ul>
+                <li>Proxy account can have selected authority of proxied account.</li>
+                <li>A deposit is necessary for proxy creation.</li>
+                <li>Only All authority can delete proxy.</li>
+              </ul>
+            </Alert>
 
-                  addQueue({
-                    call: api.tx.proxy.createPure(proxyType as any, delay, 0).method,
-                    accountId: proxy,
-                    website: 'mimir://internal/create-pure',
-                    beforeSend: async (extrinsic) => {
-                      await service.prepareMultisig(u8aToHex(decodeAddress(proxy)), extrinsic.hash.toHex(), name);
-                    }
-                  });
-
-                  return;
-                }
-
-                if (!proxyArgs.length || !proxied) {
-                  return;
-                }
-
-                if (proxyArgs.length > 1) {
-                  addQueue({
-                    call: api.tx.utility.batchAll(
-                      proxyArgs.map((item) => api.tx.proxy.addProxy(item.delegate, item.proxyType as any, item.delay))
-                    ).method,
-                    accountId: proxied,
-                    website: 'mimir://internal/setup',
-                    onResults: () => {
-                      setProxyArgs([]);
-                    }
-                  });
-                } else
-                  addQueue({
-                    call: api.tx.proxy.addProxy(
-                      proxyArgs[0].delegate,
-                      proxyArgs[0].proxyType as any,
-                      proxyArgs[0].delay
-                    ).method,
-                    accountId: proxied,
-                    website: 'mimir://internal/setup',
-                    onResults: () => {
-                      setProxyArgs([]);
-                    }
-                  });
-              }}
-            >
-              Submit
-            </Button>
+            {pure ? (
+              <SubmitPure proxy={proxy} name={name} reviewWindow={reviewWindow} custom={custom} proxyType={proxyType} />
+            ) : (
+              <SubmitProxy proxied={proxied} proxyArgs={proxyArgs} setProxyArgs={setProxyArgs} />
+            )}
 
             {!pure && (
               <Box sx={{ filter: 'grayscale(30%)' }}>

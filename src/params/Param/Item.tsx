@@ -11,7 +11,7 @@ interface Props {
 
 function Item({ content, name }: Props) {
   return (
-    <Grid container spacing={1} columns={10} sx={{ fontSize: '0.75rem' }}>
+    <Grid container spacing={1} columns={10} sx={{ width: '100%', fontSize: '0.75rem' }}>
       <Grid sx={{ display: 'flex', alignItems: 'center', fontWeight: 700 }} size={2}>
         {name}
       </Grid>

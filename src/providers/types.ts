@@ -6,7 +6,7 @@ import type { Injected } from '@polkadot/extension-inject/types';
 import type { AccountId, Address, Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
-import type { TxEvents } from '@mimir-wallet/utils';
+import type { TxEvents } from '@mimir-wallet/api';
 import type { AccountData, AccountDataExtra, AddressMeta, FilterPath, Transaction } from '../hooks/types';
 
 export interface Filtered {
@@ -62,7 +62,7 @@ export interface WalletState {
 
 export interface AddressState {
   accounts: (AccountDataExtra & AccountData)[];
-  addresses: { address: string; name: string }[];
+  addresses: { address: string; name: string; watchlist?: boolean }[];
   current?: string;
   isMultisigSyned: boolean;
   switchAddress?: string;
@@ -71,7 +71,14 @@ export interface AddressState {
   appendMeta: (meta: Record<string, AddressMeta>) => void;
   setCurrent: (address: string, confirm?: boolean) => void;
   setAccountName: (address: string, name: string) => void;
-  setAddressName: (address: string, name: string) => void;
+  addAddress: (address: string, name: string, watchlist?: boolean, genesisHash?: HexString) => void;
+  addAddressBook: (
+    address?: string,
+    watchlist?: boolean,
+    onAdded?: (address: string) => void,
+    onClose?: () => void
+  ) => void;
+  deleteAddress: (address: string) => void;
   isLocalAccount: (address: string) => boolean;
   isLocalAddress: (address: string) => boolean;
 }

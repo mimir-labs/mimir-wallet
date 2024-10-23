@@ -20,7 +20,7 @@ interface UseAddressMeta {
 }
 
 function useAddressMetaImpl(value?: string | null): UseAddressMeta {
-  const { metas, setAddressName, setAccountName, isLocalAccount } = useAccount();
+  const { metas, addAddress, setAccountName, isLocalAccount } = useAccount();
   const { accountSource } = useWallet();
   const _meta = metas[value || ''];
 
@@ -49,14 +49,14 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
           setAccountName(value, name);
           cb?.(name);
         } else {
-          setAddressName(value, name);
+          addAddress(value, name);
           cb?.(name);
         }
       } catch (error) {
         toastError(error);
       }
     },
-    [accountSource, isLocalAccount, meta.name, name, setAccountName, setAddressName, value]
+    [accountSource, isLocalAccount, meta.name, name, setAccountName, addAddress, value]
   );
 
   return {

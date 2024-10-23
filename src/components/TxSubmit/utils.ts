@@ -10,11 +10,9 @@ import type { FilterPath } from '@mimir-wallet/hooks/types';
 
 import { u8aSorted } from '@polkadot/util';
 
-import { decodeAddress } from '@mimir-wallet/api';
+import { callFilter, decodeAddress } from '@mimir-wallet/api';
 
-export type TxBundle =
-  | { canProxyExecute: false; tx: null }
-  | { canProxyExecute: true; tx: SubmittableExtrinsic<'promise'> };
+export type TxBundle = { tx: SubmittableExtrinsic<'promise'>; signer?: string };
 
 async function asMulti(
   api: ApiPromise,
@@ -32,6 +30,13 @@ async function asMulti(
 
   if (info.isSome) {
     timepoint = info.unwrap().when;
+  }
+
+  if (threshold === 1 && api.tx.multisig.asMultiThreshold1) {
+    return api.tx.multisig.asMultiThreshold1(
+      u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
+      tx.method
+    );
   }
 
   return api.tx.multisig.asMulti.meta.args.length === 6
@@ -52,53 +57,26 @@ async function asMulti(
       );
 }
 
-function canProxyExecuteCall(api: ApiPromise, proxyType: string, method: IMethod): true | false | 'unknown' {
-  const callFunction = api.registry.findMetaCall(method.callIndex);
-
-  const allowedCalls: Record<string, boolean> = {
-    Any: true,
-    NonTransfer: callFunction.section !== 'balances',
-    Staking: callFunction.section === 'staking',
-    Governance: callFunction.section === 'democracy' || callFunction.section === 'council',
-    CancelProxy:
-      callFunction.section === 'proxy' &&
-      (callFunction.method === 'removeProxy' || callFunction.method === 'rejectAnnouncement'),
-    Auction: callFunction.section === 'auctions',
-    NominationPools: callFunction.section === 'nominationPools'
-  };
-
-  const allowed = allowedCalls[proxyType];
-
-  if (allowed) {
-    return true;
-  }
-
-  if (allowed === false) {
-    return false;
-  }
-
-  return 'unknown';
-}
-
 export async function buildTx(
   api: ApiPromise,
   call: IMethod,
   path: FilterPath[],
+  account?: string,
   calls: Set<HexString> = new Set()
 ): Promise<TxBundle> {
   const functionMeta = api.registry.findMetaCall(call.callIndex);
 
   let tx = api.tx[functionMeta.section][functionMeta.method](...call.args);
 
+  if (path.length === 0) {
+    return { tx, signer: account };
+  }
+
   for (const item of path) {
     if (item.type === 'multisig') {
       tx = await asMulti(api, tx, item.multisig, item.threshold, item.otherSignatures);
     } else if (item.type === 'proxy') {
-      const canExecute = canProxyExecuteCall(api, item.proxyType, tx.method);
-
-      if (!canExecute) {
-        return { canProxyExecute: false, tx: null };
-      }
+      callFilter(api, item.proxyType, item.address, tx.method);
 
       if (item.delay) {
         calls.add(tx.method.toHex());
@@ -109,5 +87,5 @@ export async function buildTx(
     }
   }
 
-  return { canProxyExecute: true, tx };
+  return { tx, signer: path[path.length - 1].address };
 }

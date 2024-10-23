@@ -14,7 +14,7 @@ import { SocketCtxRoot } from '@mimir-wallet/socket';
 import { ThemeProvider } from '@mimir-wallet/theme';
 import { fetcher } from '@mimir-wallet/utils';
 
-function Providers({ chain, children }: { chain: Endpoint; children: React.ReactNode }) {
+function Providers({ address, chain, children }: { address?: string; chain: Endpoint; children: React.ReactNode }) {
   const queryClient = useRef(
     new QueryClient({
       defaultOptions: {
@@ -34,7 +34,7 @@ function Providers({ chain, children }: { chain: Endpoint; children: React.React
           <ApiCtxRoot chain={chain}>
             <WalletCtxRoot>
               <SocketCtxRoot>
-                <AddressCtxRoot>
+                <AddressCtxRoot address={address}>
                   <TxQueueCtxRoot>
                     <TxToastCtxRoot>
                       <TxToast />

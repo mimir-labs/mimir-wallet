@@ -5,7 +5,7 @@ import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Input, InputAddress } from '@mimir-wallet/components';
+import { FormatBalance, Input, InputAddress } from '@mimir-wallet/components';
 import {
   useAccount,
   useAllAccounts,
@@ -35,7 +35,7 @@ function PageTransfer() {
   const filtered = useAllAccounts();
   const { addresses } = useAccount();
   const [token, setToken] = useState<TransferToken>();
-  const [format, sendingBalances, recipientBalances] = useTransferBalance(token, sending, recipient);
+  const [format, sendingBalances] = useTransferBalance(token, sending);
 
   useEffect(() => {
     setAmount('0');
@@ -74,7 +74,6 @@ function PageTransfer() {
         <Stack spacing={2}>
           <Typography variant='h3'>Transfer</Typography>
           <InputAddress
-            balance={sendingBalances}
             filtered={filtered}
             format={format}
             isSign
@@ -82,23 +81,27 @@ function PageTransfer() {
             onChange={setSending}
             placeholder='Sender'
             value={sending}
-            withBalance
           />
           <Divider />
           <InputAddress
-            balance={recipientBalances}
             filtered={filtered.concat(addresses.map((item) => item.address))}
             format={format}
             label='Recipient'
             onChange={setRecipient}
             placeholder='Recipient'
             value={recipient}
-            withBalance
           />
           <Input
             error={isAmountValid ? null : new Error('Invalid number')}
             key={assetId}
-            label='Amount'
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                Amount
+                <span style={{ opacity: 0.5 }}>
+                  Balance: <FormatBalance format={format} value={sendingBalances} />
+                </span>
+              </Box>
+            }
             value={amount}
             onChange={setAmount}
             placeholder='Input amount'

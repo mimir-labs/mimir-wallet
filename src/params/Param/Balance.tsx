@@ -8,7 +8,7 @@ import { FormatBalance } from '@mimir-wallet/components';
 import { ParamProps } from './types';
 
 function Balance({ value }: ParamProps) {
-  return <FormatBalance value={value.value.toString()} />;
+  return <FormatBalance value={value.toString()} />;
 }
 
 export default React.memo(Balance);

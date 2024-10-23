@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box } from '@mui/material';
+import { Box, lighten } from '@mui/material';
 import { createContext, useCallback, useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
   const { isMultisigSyned } = useAccount();
   const { queue } = useTxQueue();
   const [sidebarOpen, , setSidebarOpen] = useToggle(false);
-  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [alertOpen, setAlertOpen] = useState<boolean>(true);
 
   const openSidebar = useCallback(() => setSidebarOpen(true), [setSidebarOpen]);
   const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
@@ -49,6 +49,7 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
       <TopBar />
 
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned && <ToggleAlert setAlertOpen={setAlertOpen} />}
+
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (
         <Box
           sx={{
@@ -57,13 +58,29 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
           }}
         >
           <SideBar offsetTop={alertOpen ? 36 : 0} withSideBar={withSideBar} />
-          <Box sx={{ flex: '1', padding: withPadding ? { sm: 1.5, md: 2 } : 0 }}>
-            {queue.length > 0 ? <TxSubmit {...queue[0]} /> : null}
 
-            <span style={{ display: queue.length > 0 ? 'none' : undefined }}>
-              <Outlet />
-            </span>
+          <Box
+            sx={{
+              display: queue.length > 0 ? 'none' : 'block',
+              flex: '1',
+              padding: withPadding ? { sm: 1.5, md: 2 } : 0
+            }}
+          >
+            <Outlet />
           </Box>
+
+          {queue.length > 0 ? (
+            <Box
+              sx={({ palette }) => ({
+                zIndex: 1200,
+                flex: '1',
+                position: 'relative',
+                bgcolor: lighten(palette.primary.main, 0.95)
+              })}
+            >
+              <TxSubmit {...queue[0]} />
+            </Box>
+          ) : null}
         </Box>
       ) : (
         <Box

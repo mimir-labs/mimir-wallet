@@ -9,8 +9,8 @@ import { addressEq, decodeAddress, encodeMultiAddress, isAddress as isAddressUti
 import { useCallback, useState } from 'react';
 
 import { encodeAddress } from '@mimir-wallet/api';
-import { AddAddressDialog, Input } from '@mimir-wallet/components';
-import { useAccount, useApi, useToggle, useTxQueue } from '@mimir-wallet/hooks';
+import { Input } from '@mimir-wallet/components';
+import { useAccount, useApi, useTxQueue } from '@mimir-wallet/hooks';
 import { service } from '@mimir-wallet/utils';
 
 import AccountSelect from '../create-multisig/AccountSelect';
@@ -40,7 +40,7 @@ function MemberSet({
   pureAccount?: PureAccountData;
   disabled?: boolean;
 }) {
-  const { isLocalAccount, isLocalAddress } = useAccount();
+  const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const { api } = useApi();
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
     useSelectMultisig(
@@ -51,7 +51,6 @@ function MemberSet({
     address: '',
     isAddressValid: false
   });
-  const [addOpen, toggleAdd] = useToggle();
   const [addressError, setAddressError] = useState<Error | null>(null);
   const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
 
@@ -94,14 +93,16 @@ function MemberSet({
   const _handleAdd = useCallback(() => {
     if (isAddressValid) {
       if (!isLocalAddress(address) && !isLocalAccount(address)) {
-        toggleAdd();
+        addAddressBook(address, false, (address) => {
+          select(address);
+        });
       } else {
         select(address);
       }
     } else {
       setAddressError(new Error('Please input correct address'));
     }
-  }, [address, isAddressValid, isLocalAccount, isLocalAddress, select, toggleAdd]);
+  }, [addAddressBook, address, isAddressValid, isLocalAccount, isLocalAddress, select]);
 
   const _onChangeThreshold = useCallback(
     (value: string) => {
@@ -111,7 +112,12 @@ function MemberSet({
   );
 
   return (
-    <>
+    <Stack spacing={2}>
+      {!pureAccount && (
+        <Box color='warning.main' sx={{ fontWeight: 700 }}>
+          Static multisig account can not change members.
+        </Box>
+      )}
       <Stack
         spacing={2}
         sx={{
@@ -119,11 +125,6 @@ function MemberSet({
           pointerEvents: !pureAccount || disabled ? 'none' : undefined
         }}
       >
-        {!pureAccount && (
-          <Box color='warning.main' sx={{ fontWeight: 700 }}>
-            Static multisig account can not change members.
-          </Box>
-        )}
         <Input
           endButton={
             <Button onClick={_handleAdd} variant='contained'>
@@ -174,11 +175,7 @@ function MemberSet({
           Confirm
         </Button>
       </Stack>
-
-      {address && isAddressValid && (
-        <AddAddressDialog defaultAddress={address} onAdded={select} onClose={toggleAdd} open={addOpen} />
-      )}
-    </>
+    </Stack>
   );
 }
 

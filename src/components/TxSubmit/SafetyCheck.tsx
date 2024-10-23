@@ -11,8 +11,6 @@ import IconFailed from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import IconSuccess from '@mimir-wallet/assets/svg/icon-success.svg?react';
 
-import { TxBundle } from './utils';
-
 function Cell({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
   return (
     <Box
@@ -42,46 +40,48 @@ function Cell({ title, children }: { title: React.ReactNode; children: React.Rea
 }
 
 function SafetyCheck({
-  safetyCheck,
   isTxBundleLoading,
-  txBundle
+  txError,
+  safetyCheck
 }: {
-  safetyCheck?: SafetyLevel;
   isTxBundleLoading: boolean;
-  txBundle: TxBundle;
+  txError?: Error | null;
+  safetyCheck?: SafetyLevel;
 }) {
   return (
     <Box>
       <Typography fontWeight={700}>Transaction Check</Typography>
-      <Cell title='Cross-chain Check'>
-        {!safetyCheck && <CircularProgress size={20} />}
-        {safetyCheck && (
-          <>
-            {safetyCheck.severity === 'none' && <SvgIcon color='success' component={IconSuccess} inheritViewBox />}
-            {safetyCheck.severity === 'error' && <SvgIcon color='error' component={IconFailed} inheritViewBox />}
-            {safetyCheck.severity === 'warning' && <SvgIcon color='warning' component={IconInfo} inheritViewBox />}
+      {safetyCheck && safetyCheck.severity === 'none' ? null : (
+        <Cell title='Cross-chain Check'>
+          {!safetyCheck && <CircularProgress size={20} />}
+          {safetyCheck && (
+            <>
+              {safetyCheck.severity === 'none' && <SvgIcon color='success' component={IconSuccess} inheritViewBox />}
+              {safetyCheck.severity === 'error' && <SvgIcon color='error' component={IconFailed} inheritViewBox />}
+              {safetyCheck.severity === 'warning' && <SvgIcon color='warning' component={IconInfo} inheritViewBox />}
 
-            <Typography
-              sx={{
-                fontWeight: 700,
-                color:
-                  safetyCheck.severity === 'none'
-                    ? 'success.main'
-                    : safetyCheck.severity === 'error'
-                      ? 'error.main'
-                      : 'warning.main'
-              }}
-            >
-              {safetyCheck?.message}
-            </Typography>
-          </>
-        )}
-      </Cell>
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  color:
+                    safetyCheck.severity === 'none'
+                      ? 'success.main'
+                      : safetyCheck.severity === 'error'
+                        ? 'error.main'
+                        : 'warning.main'
+                }}
+              >
+                {safetyCheck?.message}
+              </Typography>
+            </>
+          )}
+        </Cell>
+      )}
       <Cell title='Authority Check'>
         {isTxBundleLoading && <CircularProgress size={20} />}
         {!isTxBundleLoading && (
           <>
-            {txBundle.canProxyExecute ? (
+            {!txError ? (
               <SvgIcon color='success' component={IconSuccess} inheritViewBox />
             ) : (
               <SvgIcon color='error' component={IconFailed} inheritViewBox />
@@ -90,10 +90,10 @@ function SafetyCheck({
             <Typography
               sx={{
                 fontWeight: 700,
-                color: txBundle.canProxyExecute ? 'success.main' : 'error.main'
+                color: !txError ? 'success.main' : 'error.main'
               }}
             >
-              {txBundle.canProxyExecute ? 'Permission Granted' : 'Perimission Denied'}
+              {!txError ? 'Permission Granted' : 'Perimission Denied'}
             </Typography>
           </>
         )}

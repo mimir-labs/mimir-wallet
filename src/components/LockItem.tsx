@@ -16,6 +16,7 @@ import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react'
 import IconSuccess from '@mimir-wallet/assets/svg/icon-success-fill.svg?react';
 import IconUnLock from '@mimir-wallet/assets/svg/icon-unlock.svg?react';
 import { useApi, useCall, useToggle } from '@mimir-wallet/hooks';
+import { formatUnits } from '@mimir-wallet/utils';
 
 import AddressName from './AddressName';
 import FormatBalance from './FormatBalance';
@@ -48,7 +49,12 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
   return (
     <>
       {value && address && (
-        <Fund defaultValue={value.toString()} onClose={toggleOpen} open={open} receipt={address.toString()} />
+        <Fund
+          defaultValue={formatUnits(value, api.registry.chainDecimals[0])}
+          onClose={toggleOpen}
+          open={open}
+          receipt={address.toString()}
+        />
       )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: { xs: 0.5, sm: 1 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>

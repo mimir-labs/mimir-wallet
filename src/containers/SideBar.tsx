@@ -32,6 +32,7 @@ import {
   AccountMenu,
   AddressCell,
   CopyButton,
+  CreateMultisigDialog,
   FormatBalance,
   QrcodeAddress,
   WalletIcon
@@ -99,6 +100,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [qrOpen, toggleQrOpen] = useToggle();
+  const [createMultisigOpen, toggleCreateMultisigOpen] = useToggle();
   const { connectedWallets, openWallet } = useWallet();
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [selected]);
   const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
@@ -112,12 +114,14 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
 
   const handleAccountClose = () => {
     setAnchorEl(null);
+    closeSidebar();
   };
 
   const element = (
     <>
       <Box
         sx={{
+          zIndex: 10,
           display: { md: 'none', xs: 'flex' },
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -165,7 +169,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
             </IconButton>
           </Paper>
         ) : (
-          <Button component={Link} to='/create-multisig' size='large' fullWidth sx={{ borderRadius: 1, height: 48 }}>
+          <Button size='large' fullWidth sx={{ borderRadius: 1, height: 48 }} onClick={toggleCreateMultisigOpen}>
             Create Multisig
           </Button>
         )
@@ -251,6 +255,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
       )}
 
       {!withSideBar && !downMd && !sidebarOpen && <ToggleSidebar />}
+      <CreateMultisigDialog open={createMultisigOpen} onClose={toggleCreateMultisigOpen} />
     </>
   );
 }

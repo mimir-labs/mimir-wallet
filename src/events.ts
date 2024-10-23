@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { BatchTxItem } from './hooks/types';
+
 import Events from 'eventemitter3';
 
 type EventTypes = {
@@ -10,6 +12,7 @@ type EventTypes = {
   favorite_dapp_removed: (id: number) => void;
   app_installed: () => void;
   app_updated: () => void;
+  batch_tx_added: (value: BatchTxItem[], alert: boolean) => void;
 };
 
 export const events = new Events<EventTypes>();

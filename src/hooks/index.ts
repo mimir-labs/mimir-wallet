@@ -6,6 +6,7 @@ export * from './useAddressMeta';
 export * from './useApi';
 export * from './useAssets';
 export * from './useBalances';
+export * from './useBatchTxs';
 export * from './useBestNumber';
 export * from './useBlockInterval';
 export * from './useBlocksPerDays';

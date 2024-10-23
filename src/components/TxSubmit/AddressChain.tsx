@@ -48,6 +48,7 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
         {deep === 0 && <InputLabel>Select Signer</InputLabel>}
 
         <Select<string>
+          sx={{ display: deep === 0 ? 'none' : undefined }}
           fullWidth
           variant='outlined'
           displayEmpty
@@ -106,7 +107,7 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
       </FormControl>
 
       {selected && !accountSource(selected.address) && (
-        <Box sx={{ paddingTop: 1, paddingLeft: 1 }}>
+        <Box sx={{ paddingTop: deep === 0 ? 0 : 1, paddingLeft: deep === 0 ? 0 : 1 }}>
           <AddressChain
             addressChain={addressChain}
             deep={deep + 1}

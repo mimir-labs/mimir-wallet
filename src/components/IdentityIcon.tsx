@@ -6,12 +6,13 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 
 import { Box } from '@mui/material';
 import { Polkadot as PolkadotIcon } from '@polkadot/react-identicon/icons/Polkadot';
-import { isHex, isU8a } from '@polkadot/util';
+import { hexToU8a, isHex, isU8a } from '@polkadot/util';
 import React, { useCallback, useMemo } from 'react';
 
 import { encodeAddress } from '@mimir-wallet/api';
 import { walletConfig } from '@mimir-wallet/config';
 import { useAddressMeta } from '@mimir-wallet/hooks';
+import { addressEq } from '@mimir-wallet/utils';
 
 interface Props {
   className?: string;
@@ -49,7 +50,9 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
     onClick?.(value?.toString());
   }, [onClick, value]);
 
-  if (isMe) {
+  const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
+
+  if (isMe || isZeroAddress) {
     return (
       <Box
         className={`${className} IdentityIcon`}
@@ -70,7 +73,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
           lineHeight: 1
         }}
       >
-        Me
+        {isMe ? 'Me' : '0'}
       </Box>
     );
   }

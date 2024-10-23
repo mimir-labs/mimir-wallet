@@ -5,11 +5,12 @@ import type { AddressMeta } from '@mimir-wallet/hooks/types';
 import type { AddressState } from './types';
 
 import { isAddress } from '@polkadot/util-crypto';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { ApiCtx, encodeAddress } from '@mimir-wallet/api';
+import { AddAddressDialog } from '@mimir-wallet/components';
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
-import { useQueryParam } from '@mimir-wallet/hooks';
 import { addressEq, store } from '@mimir-wallet/utils';
 
 import { sync } from './sync';
@@ -18,6 +19,7 @@ import { deriveAddressMeta } from './utils';
 import { WalletCtx } from './Wallet';
 
 interface Props {
+  address?: string;
   children?: React.ReactNode;
 }
 const EMPTY_STATE = {
@@ -28,21 +30,29 @@ const EMPTY_STATE = {
 
 export const AddressCtx = React.createContext<AddressState>({} as AddressState);
 
-export function AddressCtxRoot({ children }: Props): React.ReactElement<Props> {
+export function AddressCtxRoot({ address, children }: Props): React.ReactElement<Props> {
   const [state, setState] = useState<AddressState>({
     ...EMPTY_STATE
   });
-  const [current, setCurrent] = useQueryParam<string | undefined>('address');
-  const currentRef = useRef(current);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [switchAddress, setSwitchAddress] = useState<string>();
   const { genesisHash } = useContext(ApiCtx);
   const { isWalletReady, walletAccounts } = useContext(WalletCtx);
-  const [addresses, setAddressName] = _useAddresses();
+  const [addresses, addAddress, deleteAddress] = _useAddresses();
   const [metas, setMetas] = useState<Record<string, AddressMeta>>({});
+  const [addAddressDialog, setAddAddressDialog] = useState<{
+    defaultAddress?: string;
+    watchlist?: boolean;
+    open: boolean;
+    onAdded?: (address: string) => void;
+    onClose?: () => void;
+  }>({ open: false });
 
-  if (current) {
-    currentRef.current = current;
-  }
+  const currentRef = useRef<string | undefined>(address ? encodeAddress(address) : undefined);
+
+  const urlAddress = searchParams.get('address');
+
+  currentRef.current = urlAddress && isAddress(urlAddress) ? encodeAddress(urlAddress) : currentRef.current;
 
   useEffect(() => {
     setMetas(deriveAddressMeta(state.accounts, addresses));
@@ -88,10 +98,11 @@ export function AddressCtxRoot({ children }: Props): React.ReactElement<Props> {
         const value = encodeAddress(address);
 
         setSwitchAddress(undefined);
-        setCurrent(value);
+        currentRef.current = value;
+        setSearchParams(new URLSearchParams({ address: value }));
       }
     },
-    [setCurrent]
+    [setSearchParams]
   );
 
   const appendMeta = useCallback((meta: Record<string, AddressMeta>) => {
@@ -107,40 +118,56 @@ export function AddressCtxRoot({ children }: Props): React.ReactElement<Props> {
     });
   }, []);
 
-  const value = useMemo(
-    () => ({
-      ...state,
-      current: currentRef.current,
-      metas,
-      addresses,
-      switchAddress,
-      resync,
-      appendMeta,
-      setCurrent: _setCurrent,
-      setAccountName: (address: string, name: string) =>
-        setState((state) => {
-          return {
-            ...state,
-            accounts: state.accounts.map((item) => (addressEq(item.address, address) ? { ...item, name } : item))
-          };
-        }),
-      setAddressName,
-      isLocalAccount,
-      isLocalAddress
-    }),
-    [
-      state,
-      metas,
-      addresses,
-      switchAddress,
-      resync,
-      appendMeta,
-      _setCurrent,
-      setAddressName,
-      isLocalAccount,
-      isLocalAddress
-    ]
+  const addAddressBook = useCallback(
+    (address?: string, watchlist?: boolean, onAdded?: (address: string) => void, onClose?: () => void) => {
+      setAddAddressDialog({
+        defaultAddress: address,
+        watchlist,
+        open: true,
+        onAdded,
+        onClose
+      });
+    },
+    []
   );
 
-  return <AddressCtx.Provider value={value}>{children}</AddressCtx.Provider>;
+  // eslint-disable-next-line react/jsx-no-constructed-context-values
+  const value = {
+    ...state,
+    current: currentRef.current,
+    metas,
+    addresses,
+    switchAddress,
+    resync,
+    appendMeta,
+    setCurrent: _setCurrent,
+    setAccountName: (address: string, name: string) =>
+      setState((state) => {
+        return {
+          ...state,
+          accounts: state.accounts.map((item) => (addressEq(item.address, address) ? { ...item, name } : item))
+        };
+      }),
+    addAddress,
+    addAddressBook,
+    deleteAddress,
+    isLocalAccount,
+    isLocalAddress
+  };
+
+  return (
+    <AddressCtx.Provider value={value}>
+      {children}
+      <AddAddressDialog
+        defaultAddress={addAddressDialog.defaultAddress}
+        open={addAddressDialog.open}
+        onClose={() => {
+          addAddressDialog?.onClose?.();
+          setAddAddressDialog((state) => ({ ...state, open: false }));
+        }}
+        watchlist={addAddressDialog.watchlist}
+        onAdded={addAddressDialog.onAdded}
+      />
+    </AddressCtx.Provider>
+  );
 }

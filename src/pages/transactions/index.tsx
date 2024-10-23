@@ -9,7 +9,7 @@ import HistoryTransactions from './HistoryTransactions';
 import PendingTransactions from './PendingTransactions';
 
 function MultisigList({ address }: { address: string }) {
-  const account = useQueryAccount(address);
+  const [account] = useQueryAccount(address);
 
   const [type, setType] = useQueryParam<'pending' | 'history'>('status', 'pending');
 

@@ -29,7 +29,7 @@ function AccountSetting() {
   const { isLocalAccount } = useAccount();
   const { address } = useParams() as { address: string };
   const { setName, name, saveName } = useAddressMeta(address);
-  const account = useQueryAccount(address);
+  const [account] = useQueryAccount(address);
   const [error, setError] = useState<Error>();
   const [txs] = usePendingTransactions(address);
   const [tab, setTab] = useState('0');
@@ -56,7 +56,6 @@ function AccountSetting() {
           </Typography>
           <Paper component={Stack} sx={{ padding: 2, borderRadius: 2 }} spacing={1}>
             <Input
-              helper='All members will see this name'
               label='Name'
               onChange={(value) => {
                 if (value) {
@@ -69,6 +68,9 @@ function AccountSetting() {
               value={name}
               error={error}
             />
+            <Typography fontSize='0.75rem' color='textSecondary' marginTop={1}>
+              All members will see this name
+            </Typography>
             <Button
               disabled={!address || !isLocalAccount(address)}
               fullWidth

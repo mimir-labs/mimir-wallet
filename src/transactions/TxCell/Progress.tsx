@@ -298,12 +298,12 @@ function Progress({ account, transaction, openOverview }: Props) {
 
       {transaction.status < TransactionStatus.Success && (
         <Stack spacing={1}>
-          <ViewPending transaction={transaction} />
           <Approve account={account} transaction={transaction} filterPaths={filterPaths} />
+          <ExecuteAnnounce account={account} transaction={transaction} />
+          <ViewPending transaction={transaction} filterPaths={filterPaths} />
           <Cancel account={account} transaction={transaction} />
           <Remove transaction={transaction} />
           <Deny transaction={transaction} />
-          <ExecuteAnnounce account={account} transaction={transaction} />
         </Stack>
       )}
     </Stack>

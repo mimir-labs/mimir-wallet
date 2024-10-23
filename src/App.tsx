@@ -26,6 +26,7 @@ function App() {
       </Route>
       <Route element={<BaseContainer withSideBar={false} withPadding />}>
         <Route path='/create-multisig' element={<PageCreateMultisig />} />
+        <Route path='/create-multisig-one' element={<PageCreateMultisig threshold1 />} />
         <Route path='/add-proxy' element={<PageAddProxy />} />
         <Route path='/create-pure' element={<PageAddProxy pure />} />
       </Route>

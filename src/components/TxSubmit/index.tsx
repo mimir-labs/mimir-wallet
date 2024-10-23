@@ -7,11 +7,23 @@ import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkad
 import type { HexString } from '@polkadot/util/types';
 import type { FilterPath, Transaction } from '@mimir-wallet/hooks/types';
 
-import { Box, Checkbox, Divider, FormControlLabel, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
-import { useState } from 'react';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  IconButton,
+  Paper,
+  Stack,
+  SvgIcon,
+  Typography
+} from '@mui/material';
+import { useCallback, useState } from 'react';
 
+import IconBatch from '@mimir-wallet/assets/svg/icon-batch.svg?react';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
-import { useFilterPaths, useQueryAccount, useWallet } from '@mimir-wallet/hooks';
+import { useBatchTxs, useFilterPaths, useQueryAccount, useWallet } from '@mimir-wallet/hooks';
 
 import Input from '../Input';
 import InputAddress from '../InputAddress';
@@ -61,14 +73,27 @@ function TxSubmit({
   onSignature,
   beforeSend
 }: Props) {
-  const { walletAccounts } = useWallet();
+  const { walletAccounts, accountSource } = useWallet();
   const [account, setAccount] = useState<string | undefined>(accountId?.toString() || walletAccounts?.[0].address);
   const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
   const [note, setNote] = useState<string>(transaction?.note || '');
-  const accountData = useQueryAccount(account);
+  const [accountData, isFetched] = useQueryAccount(account);
   const filterPaths = useFilterPaths(accountData, transaction);
   const [addressChain, setAddressChain] = useState<FilterPath[]>(propsFilterPaths || []);
-  const { isLoading: isTxBundleLoading, txBundle } = useBuildTx(call, addressChain);
+  const [, addTx] = useBatchTxs(account);
+  const buildTx = useBuildTx(call, addressChain, account);
+
+  const handleAddBatch = useCallback(() => {
+    addTx([
+      {
+        calldata: call.toHex(),
+        website,
+        iconUrl,
+        appName
+      }
+    ]);
+    onClose?.();
+  }, [addTx, appName, call, iconUrl, onClose, website]);
 
   useHighlightTab();
   useCloseWhenPathChange(onClose);
@@ -109,7 +134,7 @@ function TxSubmit({
 
           <Call account={account} method={call} transaction={transaction} />
 
-          <SafetyCheck isTxBundleLoading={isTxBundleLoading} txBundle={txBundle} safetyCheck={safetyCheck} />
+          <SafetyCheck isTxBundleLoading={buildTx.isLoading} txError={buildTx.error} safetyCheck={safetyCheck} />
         </Stack>
 
         <Stack
@@ -125,21 +150,21 @@ function TxSubmit({
           })}
           spacing={2}
         >
-          {accountId ? (
-            <AddressChain
-              deep={0}
-              filterPaths={filterPaths}
-              addressChain={addressChain}
-              setAddressChain={setAddressChain}
-            />
-          ) : (
+          {!accountId || !!accountSource(accountId.toString()) ? (
             <InputAddress
               label='Select Signer'
               placeholder='Please select signer'
               value={account}
               onChange={setAccount}
               isSign
-              filtered={walletAccounts.map((item) => item.address)}
+              filtered={accountId ? [accountId.toString()] : walletAccounts.map((item) => item.address)}
+            />
+          ) : (
+            <AddressChain
+              deep={0}
+              filterPaths={filterPaths}
+              addressChain={addressChain}
+              setAddressChain={setAddressChain}
             />
           )}
 
@@ -154,28 +179,39 @@ function TxSubmit({
             />
           )}
 
-          <SendTx
-            account={account}
-            call={call}
-            disabled={!txBundle.canProxyExecute}
-            filterPath={addressChain}
-            note={note}
-            onlySign={onlySign}
-            website={transaction?.website || website}
-            iconUrl={transaction?.iconUrl || iconUrl}
-            appName={transaction?.appName || appName}
-            onError={onError}
-            onFinalized={onFinalized}
-            onResults={(...args) => {
-              onClose?.();
-              onResults?.(...args);
-            }}
-            onSignature={(...args) => {
-              onClose?.();
-              onSignature?.(...args);
-            }}
-            beforeSend={beforeSend}
-          />
+          {isFetched && (
+            <SendTx
+              buildTx={buildTx}
+              note={note}
+              onlySign={onlySign}
+              website={transaction?.website || website}
+              iconUrl={transaction?.iconUrl || iconUrl}
+              appName={transaction?.appName || appName}
+              onError={onError}
+              onFinalized={onFinalized}
+              onResults={(...args) => {
+                onClose?.();
+                onResults?.(...args);
+              }}
+              onSignature={(...args) => {
+                onClose?.();
+                onSignature?.(...args);
+              }}
+              beforeSend={beforeSend}
+            />
+          )}
+
+          {!transaction && (
+            <Button
+              fullWidth
+              onClick={handleAddBatch}
+              color='primary'
+              variant='outlined'
+              startIcon={<SvgIcon component={IconBatch} inheritViewBox />}
+            >
+              Add To Cache
+            </Button>
+          )}
         </Stack>
       </Paper>
     </Box>

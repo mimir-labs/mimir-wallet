@@ -55,7 +55,7 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
                 }}
               >
                 <Box sx={{ flex: '1' }}>
-                  <AddressRow size='small' withAddress withName shorten value={proxy.delegate.toString()} />
+                  <AddressRow withAddress withName shorten value={proxy.delegate.toString()} />
                 </Box>
                 {proxy.delay.gt(BN_ZERO) ? (
                   <Tooltip title={`Delay Blocks: ${[proxy.delay]}`}>

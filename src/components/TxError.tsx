@@ -3,7 +3,7 @@
 
 import React from 'react';
 
-import { TxDispatchError, TxModuleError } from '@mimir-wallet/utils';
+import { TxDispatchError, TxModuleError } from '@mimir-wallet/api';
 
 function TxError({ error }: { error: unknown }) {
   if (error instanceof TxModuleError) {

@@ -59,7 +59,7 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
 }
 
 function TransferCall({ from: propFrom, api, call, jsonFallback }: CallProps) {
-  const [section, method] = useMemo(() => findAction(api, call), [api, call]);
+  const action = useMemo(() => findAction(api, call), [api, call]);
 
   const results = useMemo(() => {
     let assetId: string | null = null;
@@ -67,6 +67,12 @@ function TransferCall({ from: propFrom, api, call, jsonFallback }: CallProps) {
     let to: string;
     let value: string;
     let isAll: boolean = false;
+
+    if (!action) {
+      return null;
+    }
+
+    const [section, method] = action;
 
     if (section !== 'balances' && section !== 'assets') {
       return null;
@@ -101,7 +107,7 @@ function TransferCall({ from: propFrom, api, call, jsonFallback }: CallProps) {
     }
 
     return [assetId, from, to, value, isAll] as const;
-  }, [call.args, method, propFrom, section]);
+  }, [action, call.args, propFrom]);
   const assetInfo = useAssetInfo(results?.[0]);
 
   if (!results) return <FunctionArgs from={propFrom} api={api} call={call} jsonFallback={jsonFallback} />;
@@ -109,7 +115,7 @@ function TransferCall({ from: propFrom, api, call, jsonFallback }: CallProps) {
   const [assetId, from, to, value, isAll] = results;
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3 }}>
+    <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3 }}>
       <AddressDisplay reverse={false} address={from} />
       <Box
         sx={({ palette }) => ({

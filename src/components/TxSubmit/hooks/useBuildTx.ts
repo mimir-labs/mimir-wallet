@@ -12,18 +12,35 @@ import { useApi } from '@mimir-wallet/hooks';
 
 import { buildTx } from '../utils';
 
-export function useBuildTx(method: IMethod | HexString, filterPath: FilterPath[]) {
+const EMPTY_STATE = {
+  isLoading: true,
+  txBundle: null,
+  error: null,
+  hashSet: new Set<HexString>()
+};
+
+export type BuildTx = {
+  isLoading: boolean;
+  txBundle: TxBundle | null;
+  error: Error | null;
+  hashSet: Set<HexString>;
+};
+
+export function useBuildTx(method: IMethod | HexString, filterPath: FilterPath[], account?: string) {
   const { api } = useApi();
-  const [state, setState] = useState<{ isLoading: boolean; txBundle: TxBundle }>({
-    isLoading: true,
-    txBundle: { canProxyExecute: false, tx: null }
-  });
+  const [state, setState] = useState<BuildTx>(EMPTY_STATE);
 
   useEffect(() => {
-    buildTx(api, api.createType('Call', method), filterPath).then((bundle) =>
-      setState({ isLoading: false, txBundle: bundle })
-    );
-  }, [api, filterPath, method]);
+    setState(EMPTY_STATE);
+
+    const hashSet = new Set<HexString>();
+
+    buildTx(api, api.createType('Call', method), filterPath, account, hashSet)
+      .then(async (bundle) => {
+        setState({ isLoading: false, txBundle: bundle, error: null, hashSet });
+      })
+      .catch((error) => setState((state) => ({ ...state, isLoading: false, txBundle: null, error })));
+  }, [account, api, filterPath, method]);
 
   return state;
 }

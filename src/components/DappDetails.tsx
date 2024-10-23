@@ -16,7 +16,6 @@ import {
 } from '@mui/material';
 import { isArray } from '@polkadot/util';
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import IconDiscord from '@mimir-wallet/assets/svg/icon-discord.svg?react';
 import IconGithub from '@mimir-wallet/assets/svg/icon-github.svg?react';
@@ -28,6 +27,7 @@ interface Props {
   open: boolean;
   dapp: DappOption;
   onClose: () => void;
+  onOpen: () => void;
 }
 
 function SupportedChains({ supported }: { supported: string[] | true }) {
@@ -92,12 +92,12 @@ function Contents({ dapp }: { dapp: DappOption }) {
   );
 }
 
-function DappDetails({ dapp, onClose, open }: Props) {
+function DappDetails({ dapp, onClose, onOpen, open }: Props) {
   return (
     <Dialog fullWidth maxWidth='sm' onClose={onClose} open={open}>
       <Contents dapp={dapp} />
       <DialogActions sx={{ justifyContent: 'center' }}>
-        <Button component={Link} size='large' sx={{ width: 195 }} to={`/explorer/${encodeURIComponent(dapp.url)}`}>
+        <Button size='large' sx={{ width: 195 }} onClick={onOpen}>
           Open
         </Button>
       </DialogActions>
