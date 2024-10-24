@@ -3,7 +3,18 @@
 
 import type { AccountData } from '@mimir-wallet/hooks/types';
 
-import { Box, Button, Divider, MenuItem, Select, Stack, SvgIcon, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Divider,
+  MenuItem,
+  Select,
+  Stack,
+  SvgIcon,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -24,7 +35,7 @@ function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onC
   };
 
   return (
-    <Stack spacing={1} sx={{ width: 400 }}>
+    <Stack spacing={1} sx={{ width: { xs: '100%', sm: 400 } }}>
       <Select fullWidth variant='outlined' value={selected} onChange={(e) => setSelected(e.target.value)}>
         {accounts.map((item) => (
           <MenuItem value={item.address} key={item.address}>
@@ -57,6 +68,8 @@ function Welcome() {
   const { connectedWallets, openWallet } = useWallet();
   const { accounts } = useAccount();
   const [createMultisigOpen, toggleCreateMultisigOpen] = useToggle();
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   const isConnected = Object.keys(connectedWallets).length > 0;
 
@@ -68,18 +81,19 @@ function Welcome() {
           flexDirection: { xs: 'column', sm: 'column' },
           justifyContent: 'center',
           alignItems: 'center',
-          gap: 8,
+          gap: { xs: 2, sm: 4, md: 6, lg: 8 },
           height: '100%'
         }}
       >
-        <Box sx={{ width: 309, overflow: 'hidden', borderRadius: 3 }}>
+        <Box sx={{ width: { xs: 185, sm: 309 }, overflow: 'hidden', borderRadius: { xs: 1.8, sm: 3 } }}>
           <video muted playsInline autoPlay loop src='/ux.mp4' controls={false} width='100%' />
         </Box>
-        <Stack spacing={2}>
-          <Typography variant='h1' sx={{ fontWeight: 700, fontSize: '40px', lineHeight: 1.25 }}>
-            Start your ultimate
-            <br />
-            multisig journey
+        <Stack spacing={2} width='100%'>
+          <Typography
+            variant='h1'
+            sx={{ fontWeight: 700, fontSize: { xs: '20px', sm: '30px', md: '40px' }, lineHeight: 1.1 }}
+          >
+            Start your ultimate{downSm ? '' : <br />} multisig journey
           </Typography>
           <Typography sx={{ fontSize: '1rem', lineHeight: '19px', letterSpacing: '0.16px' }}>
             · More security fund
@@ -92,7 +106,7 @@ function Welcome() {
               <>
                 <Button
                   startIcon={<SvgIcon inheritViewBox component={IconAdd} sx={{ color: 'white' }} />}
-                  sx={{ width: 210 }}
+                  sx={{ width: { xs: 'auto', sm: 210 } }}
                   color='primary'
                   onClick={toggleCreateMultisigOpen}
                 >
@@ -102,7 +116,7 @@ function Welcome() {
                   component={Link}
                   to='/create-pure'
                   startIcon={<SvgIcon inheritViewBox component={IconAdd} sx={{ color: 'white' }} />}
-                  sx={{ width: 210 }}
+                  sx={{ width: { xs: 'auto', sm: 210 } }}
                   color='primary'
                 >
                   Create Pure Proxy
@@ -110,14 +124,14 @@ function Welcome() {
               </>
             ) : (
               <>
-                <Typography fontWeight={800} fontSize='1.25rem'>
+                <Typography fontWeight={800} fontSize={{ xs: '1rem', sm: '1.25rem' }}>
                   Detected Multisig
                 </Typography>
                 <Detected accounts={accounts} onCreateMultisig={toggleCreateMultisigOpen} />
               </>
             )
           ) : (
-            <Button sx={{ width: 210 }} color='primary' onClick={openWallet}>
+            <Button sx={{ width: { xs: 'auto', sm: 210 } }} color='primary' onClick={openWallet}>
               Connect Wallet
             </Button>
           )}

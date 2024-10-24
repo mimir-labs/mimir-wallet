@@ -13,7 +13,9 @@ import {
   Paper,
   Popper,
   SvgIcon,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -96,6 +98,8 @@ function InputAddress({
   const wrapper = useRef<HTMLDivElement | null>(null);
   const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
   const open = !!anchorEl;
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   const options = useMemo(
     (): string[] => createOptions(accounts, addresses, isSign, inputValue, filtered, excluded),
@@ -153,14 +157,14 @@ function InputAddress({
           border: '1px solid',
           borderColor: disabled ? 'transparent' : focus ? 'primary.main' : 'grey.300',
           bgcolor: disabled ? 'secondary.main' : undefined,
-          '.AddressCell-Address': {
+          '.AddressCell-Content': {
             transition: 'all 0.15s',
             opacity: focus || !value ? 0 : 1,
             pointerEvents: focus || !value ? 'none' : undefined
           }
         }}
       >
-        <AddressCell shorten={shorten} value={value} showType />
+        <AddressCell shorten={downSm ? true : shorten} value={value} showType />
         <InputBase
           disabled={disabled}
           onBlur={handleBlur}
@@ -175,7 +179,7 @@ function InputAddress({
           anchorEl={anchorEl}
           placement='bottom-start'
           open={open}
-          sx={{ width, minWidth: 400, maxWidth: '95vw', zIndex: 1300 }}
+          sx={{ width, minWidth: 300, maxWidth: '95vw', zIndex: 1300 }}
           transition
         >
           {({ TransitionProps }) => (
@@ -185,7 +189,7 @@ function InputAddress({
                   {options.length > 0 ? (
                     options.map((item, index) => (
                       <MenuItem key={index} onClick={() => _onChange(item)}>
-                        <AddressCell shorten={false} showType value={item} />
+                        <AddressCell shorten={!!downSm} showType value={item} />
                       </MenuItem>
                     ))
                   ) : (

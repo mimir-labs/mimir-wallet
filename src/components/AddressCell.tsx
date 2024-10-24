@@ -43,7 +43,7 @@ function AddressCell({
   withCopy = false,
   withAddressBook = false
 }: Props) {
-  const [nameFontSize, addressFontSize, spacing, spacingCol] = ['0.875rem', '0.75rem', 0.5, 0.2];
+  const [spacing, spacingCol] = [0.5, 0.2];
 
   const address = value?.toString();
   const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
@@ -52,11 +52,12 @@ function AddressCell({
   return (
     <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
       <IdentityIcon className='AddressCell-Icon' isMe={isMe} size={iconSize} value={value} />
-      <Stack className='AddressCell-Address' spacing={spacingCol}>
+      <Stack className='AddressCell-Content' spacing={spacingCol}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Typography
+            className='AddressCell-Name'
             component='span'
-            fontSize={nameFontSize}
+            fontSize='inherit'
             fontWeight={700}
             sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
           >
@@ -78,10 +79,11 @@ function AddressCell({
           )}
         </Box>
         <Typography
+          className='AddressCell-Address'
           color='text.secondary'
           component='span'
-          fontSize={addressFontSize}
-          sx={{ height: 18, display: 'flex', alignItems: 'center' }}
+          fontSize='inherit'
+          sx={{ height: 18, display: 'flex', alignItems: 'center', fontSize: '0.875em' }}
         >
           <AddressComp shorten={shorten} value={address} />
           {withCopy && <CopyButton size='small' sx={{ fontSize: 'inherit' }} value={address} />}

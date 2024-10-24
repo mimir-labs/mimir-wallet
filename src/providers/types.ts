@@ -80,5 +80,5 @@ export interface AddressState {
   ) => void;
   deleteAddress: (address: string) => void;
   isLocalAccount: (address: string) => boolean;
-  isLocalAddress: (address: string) => boolean;
+  isLocalAddress: (address: string, watchlist?: boolean) => boolean;
 }

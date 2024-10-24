@@ -118,13 +118,12 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
             alignItems: 'center',
             justifyContent: 'center',
             width: '100%',
-            height: 12,
-            borderRadius: `${6 + size / 16}px`,
+            height: Math.max(12, size / 2.5),
+            borderRadius: `${Math.max(12, size / 2.5) / 2}px`,
             bgcolor: 'primary.main',
             color: 'common.white',
             fontWeight: 700,
-            fontSize: 10,
-            lineHeight: '12px'
+            fontSize: 10
           }}
         >
           {who && who.length > 0 ? `${threshold}/${who.length}` : 'Multi'}

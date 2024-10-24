@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ApiPromise } from '@polkadot/api';
 import type { Call } from '@polkadot/types/interfaces';
 import type { Codec, IMethod, Registry, TypeDef } from '@polkadot/types/types';
 
@@ -17,8 +16,9 @@ export interface ParamsProps {
 }
 
 export interface CallProps {
+  displayType?: 'horizontal' | 'vertical';
   from?: string;
   call: Call | IMethod;
-  api: ApiPromise;
+  registry: Registry;
   jsonFallback?: boolean;
 }

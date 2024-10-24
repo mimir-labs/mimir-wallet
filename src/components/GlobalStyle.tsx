@@ -16,7 +16,7 @@ function GlobalStyle() {
             src: "url('/fonts/SofiaSansSemiCondensed-VariableFont_wght.ttf')"
           },
           'body,html': {
-            lineHeight: 1.2
+            lineHeight: 1.1
           },
           body: {
             background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'

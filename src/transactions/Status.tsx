@@ -14,7 +14,7 @@ import IconWaiting from '@mimir-wallet/assets/svg/icon-waiting-fill.svg?react';
 import { useAddressMeta } from '@mimir-wallet/hooks';
 import { TransactionStatus } from '@mimir-wallet/hooks/types';
 
-import { useAnnouncementStatus } from '../hooks/useAnnouncementStatus';
+import { useAnnouncementStatus } from './hooks/useAnnouncementStatus';
 
 export function AnnouncementStatus({ account, transaction }: { account: AccountData; transaction: ProxyTransaction }) {
   const [status, isFetching] = useAnnouncementStatus(transaction, account);

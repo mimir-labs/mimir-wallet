@@ -47,7 +47,7 @@ const createComponents: Func = () => ({
     styleOverrides: {
       root: () => ({
         fontWeight: 700,
-        lineHeight: 1.2,
+        lineHeight: 1.1,
         textTransform: 'initial',
         '>.MuiSvgIcon-root': {
           fontSize: '1.2em'
@@ -70,19 +70,19 @@ const createComponents: Func = () => ({
         fontSize: '1rem',
         borderRadius: '20px',
         padding: '8px 20px',
-        lineHeight: 1.2
+        lineHeight: 1.1
       },
       sizeMedium: {
         fontSize: '0.875rem',
         borderRadius: '19px',
         padding: '8px 15px',
-        lineHeight: 1.2
+        lineHeight: 1.1
       },
       sizeSmall: {
         fontSize: '0.875rem',
         borderRadius: '15px',
         padding: '5px 10px',
-        lineHeight: 1.2
+        lineHeight: 1.1
       }
     }
   },
@@ -96,15 +96,15 @@ const createComponents: Func = () => ({
       },
       sizeLarge: {
         fontSize: '1rem',
-        lineHeight: 1.2
+        lineHeight: 1.1
       },
       sizeMedium: {
         fontSize: '0.875rem',
-        lineHeight: 1.2
+        lineHeight: 1.1
       },
       sizeSmall: {
         fontSize: '0.875rem',
-        lineHeight: 1.2
+        lineHeight: 1.1
       }
     }
   },
@@ -398,7 +398,7 @@ const createComponents: Func = () => ({
   MuiTypography: {
     styleOverrides: {
       root: {
-        lineHeight: 1.2
+        lineHeight: 1.1
       }
     }
   },

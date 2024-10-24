@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { CallProps } from './types';
+import type { CallProps } from '../types';
 
 import { alpha, Box, lighten, Skeleton } from '@mui/material';
 import React, { useMemo } from 'react';
@@ -10,8 +10,8 @@ import { Address, AddressName, CopyButton, FormatBalance, IdentityIcon } from '@
 import { ellipsisMixin } from '@mimir-wallet/components/utils';
 import { useAssetInfo } from '@mimir-wallet/hooks';
 
+import { findAction } from '../utils';
 import FunctionArgs from './FunctionArgs';
-import { findAction } from './utils';
 
 function AddressDisplay({ reverse, address }: { reverse: boolean; address?: string }) {
   return (
@@ -20,7 +20,7 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
       sx={{
         display: 'inline-flex',
         alignItems: 'center',
-        columnGap: 1,
+        columnGap: { sm: 1, xs: 0.5 },
         flexGrow: 0,
         flexDirection: reverse ? 'row-reverse' : 'row',
         textAlign: reverse ? 'right' : 'left'
@@ -58,8 +58,8 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
   );
 }
 
-function TransferCall({ from: propFrom, api, call, jsonFallback }: CallProps) {
-  const action = useMemo(() => findAction(api, call), [api, call]);
+function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProps) {
+  const action = useMemo(() => findAction(registry, call), [registry, call]);
 
   const results = useMemo(() => {
     let assetId: string | null = null;
@@ -110,12 +110,20 @@ function TransferCall({ from: propFrom, api, call, jsonFallback }: CallProps) {
   }, [action, call.args, propFrom]);
   const assetInfo = useAssetInfo(results?.[0]);
 
-  if (!results) return <FunctionArgs from={propFrom} api={api} call={call} jsonFallback={jsonFallback} />;
+  if (!results) return <FunctionArgs from={propFrom} registry={registry} call={call} jsonFallback={jsonFallback} />;
 
   const [assetId, from, to, value, isAll] = results;
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3 }}>
+    <Box
+      sx={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: { md: 3, sm: 2, xs: 1 }
+      }}
+    >
       <AddressDisplay reverse={false} address={from} />
       <Box
         sx={({ palette }) => ({

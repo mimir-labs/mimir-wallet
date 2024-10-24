@@ -8,7 +8,7 @@ import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/hooks';
-import { formatUnits } from '@mimir-wallet/utils';
+import { formatDisplay, formatUnits } from '@mimir-wallet/utils';
 
 interface Props extends BoxProps {
   format?: [decimals: number, unit: string];
@@ -16,16 +16,6 @@ interface Props extends BoxProps {
   value?: Compact<any> | BN | string | number | null;
   withCurrency?: boolean;
 }
-
-const formatDisplay = (value: string, sufLen = 4): [string, string] => {
-  if (value.includes('.')) {
-    const [pre, suf] = value.split('.');
-
-    return sufLen === 0 ? [pre, ''] : [pre, suf.slice(0, sufLen)];
-  }
-
-  return [value, ''];
-};
 
 function FormatBalance({ format, label, value, withCurrency, ...props }: Props): React.ReactElement<Props> {
   const { api } = useApi();

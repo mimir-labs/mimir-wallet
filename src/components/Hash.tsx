@@ -3,7 +3,7 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { Box, IconButton, SvgIcon } from '@mui/material';
+import { Box, IconButton, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 
 import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
@@ -19,6 +19,8 @@ interface Props {
 
 function Hash({ value, withCopy, withExplorer }: Props) {
   const stringValue = value?.toString();
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   return (
     <Box
@@ -34,7 +36,7 @@ function Hash({ value, withCopy, withExplorer }: Props) {
       href={withExplorer ? chainLinks.extrinsicExplorerLink(stringValue) : undefined}
       target='_blank'
     >
-      {stringValue}
+      {downSm ? `${stringValue?.slice(0, 8)}...${stringValue?.slice(-8)}` : stringValue}
       {withCopy && <CopyButton sx={{ padding: 0 }} size='small' value={stringValue} />}
       {withExplorer && (
         <IconButton color='inherit' size='small' sx={{ padding: 0 }}>

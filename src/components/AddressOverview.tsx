@@ -27,6 +27,8 @@ import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 import AddressCell from './AddressCell';
 
 interface Props {
+  showControls?: boolean;
+  showMiniMap?: boolean;
   account?: AccountData | null;
 }
 
@@ -300,7 +302,7 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
   });
 }
 
-function AddressOverview({ account }: Props) {
+function AddressOverview({ account, showControls, showMiniMap }: Props) {
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -335,8 +337,8 @@ function AddressOverview({ account }: Props) {
       onNodesChange={onNodesChange}
       zoomOnScroll
     >
-      <MiniMap pannable zoomable />
-      <Controls />
+      {showMiniMap && <MiniMap pannable zoomable />}
+      {showControls && <Controls />}
     </ReactFlow>
   );
 }

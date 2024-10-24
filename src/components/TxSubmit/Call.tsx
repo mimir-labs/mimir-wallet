@@ -123,7 +123,7 @@ function Call({
             borderRadius: 1
           }}
         >
-          <CallComp from={account} api={api} call={method} jsonFallback />
+          <CallComp from={account} registry={api.registry} call={method} jsonFallback />
           <Divider />
 
           <Box

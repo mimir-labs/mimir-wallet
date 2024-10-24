@@ -2,22 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TypeDef } from '@polkadot/types/types';
-import type { CallProps } from './types';
+import type { CallProps } from '../types';
 
 import { getTypeDef } from '@polkadot/types';
 import React, { useEffect, useState } from 'react';
 import ReactJson from 'react-json-view';
 
-import Item from './Param/Item';
-import Param from './Param';
+import Param from '../Param';
+import Item from '../Param/Item';
 
-function FunctionArgs({ api, call, jsonFallback }: CallProps) {
+function FunctionArgs({ registry, call, jsonFallback, displayType }: CallProps) {
   const [args, setArgs] = useState<[string, TypeDef][]>();
   const [done, setDone] = useState(false);
 
   useEffect(() => {
     try {
-      const callFunction = api.registry.findMetaCall(call.callIndex);
+      const callFunction = registry.findMetaCall(call.callIndex);
 
       setArgs(callFunction.meta.args.map((item) => [item.name.toString(), getTypeDef(item.type.toString())]));
     } catch {
@@ -25,15 +25,18 @@ function FunctionArgs({ api, call, jsonFallback }: CallProps) {
     }
 
     setDone(true);
-  }, [api.registry, call]);
+  }, [registry, call]);
 
   return done ? (
     <>
       {args ? (
         args.map(([name, type], index) => (
           <Item
+            type={displayType}
             key={index}
-            content={<Param name={name} registry={api.registry} type={type} value={call.args[index]} />}
+            content={
+              <Param displayType={displayType} name={name} registry={registry} type={type} value={call.args[index]} />
+            }
             name={name}
           />
         ))

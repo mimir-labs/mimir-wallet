@@ -11,6 +11,7 @@ import PageCreateMultisig from './pages/create-multisig';
 import PageDapp from './pages/dapp';
 import PageExplorer from './pages/explorer';
 import PageProfile from './pages/profile';
+import PageTransactionDetails from './pages/transaction-details';
 import PageTransactions from './pages/transactions';
 import PageTransfer from './pages/transfer';
 
@@ -21,6 +22,7 @@ function App() {
         <Route index element={<PageProfile />} />
         <Route path='/dapp' element={<PageDapp />} />
         <Route path='/transactions' element={<PageTransactions />} />
+        <Route path='/transactions/:id' element={<PageTransactionDetails />} />
         <Route path='/address-book' element={<PageAddressBook />} />
         <Route path='/account-setting/:address' element={<PageAccountSetting />} />
       </Route>

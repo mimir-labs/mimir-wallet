@@ -25,6 +25,7 @@ import { useToggle } from 'react-use';
 
 import IconAdd from '@mimir-wallet/assets/svg/icon-add.svg?react';
 import IconAddFill from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
+import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
 import IconExtension from '@mimir-wallet/assets/svg/icon-extension.svg?react';
 import IconMore from '@mimir-wallet/assets/svg/icon-more.svg?react';
 import IconSearch from '@mimir-wallet/assets/svg/icon-search.svg?react';
@@ -116,7 +117,7 @@ function AccountCell({
           </MenuItem>
         )}
       </Menu>
-      <ListItem>
+      <ListItem sx={{ paddingX: { sm: 1, xs: 0.5 } }}>
         <ListItemButton
           disableTouchRipple
           onClick={handleClick}
@@ -124,7 +125,7 @@ function AccountCell({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            paddingX: 1,
+            paddingX: { sm: 1, xs: 0.5 },
             paddingY: 0.5,
             border: '1px solid',
             borderColor: 'secondary.main',
@@ -138,7 +139,7 @@ function AccountCell({
             <Avatar alt='Token' src={icon} sx={{ width: 16, height: 16 }} />
           </Box>
           {value && (
-            <IconButton color='inherit' onClick={handleMore}>
+            <IconButton color='inherit' onClick={handleMore} sx={{ padding: { sm: 1, xs: 0.4 } }}>
               <SvgIcon component={IconMore} inheritViewBox />
             </IconButton>
           )}
@@ -150,18 +151,7 @@ function AccountCell({
 
 function Search({ onChange, value }: { value: string; onChange: (value: string) => void }) {
   return (
-    <Box
-      sx={{
-        zIndex: 1,
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 'auto',
-        padding: 1,
-        bgcolor: 'background.default'
-      }}
-    >
+    <Box>
       <Input
         endAdornment={<SvgIcon component={IconSearch} inheritViewBox sx={{ color: 'text.disabled' }} />}
         onChange={onChange}
@@ -281,7 +271,17 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   return (
     <Drawer
       PaperProps={{
-        sx: { top: { md: '56px', xs: 0 }, boxShadow: 'none', height: { md: 'calc(100vh - 56px)', xs: '100vh' } }
+        sx: {
+          top: { md: '56px', xs: 0 },
+          boxShadow: 'none',
+          height: {
+            md: 'calc(100vh - 56px)',
+            xs: '100vh'
+          },
+          ...(anchor === 'left'
+            ? { borderTopRightRadius: { md: 0, xs: 20 }, borderBottomRightRadius: { md: 0, xs: 20 } }
+            : { borderTopLeftRadius: { md: 0, xs: 20 }, borderBottomLeftRadius: { md: 0, xs: 20 } })
+        }
       }}
       anchor={anchor}
       onClose={onClose}
@@ -289,9 +289,46 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
       slotProps={{ backdrop: { sx: { top: { md: '56px', xs: 0 } } } }}
       variant='temporary'
     >
-      <Search onChange={setKeywords} value={keywords} />
-      <Box sx={{ height: '100%', padding: 1, paddingY: 6, overflowY: 'auto' }}>
-        <List sx={{ width: 370, maxWidth: '90vw' }}>
+      <Box
+        sx={{
+          zIndex: 10,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 'auto',
+          paddingTop: 2,
+          paddingBottom: 1,
+          paddingX: { sm: 2, xs: 1 },
+          bgcolor: 'background.default'
+        }}
+      >
+        <Box
+          sx={{
+            display: { sm: 'none', xs: 'flex' },
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 1
+          }}
+        >
+          <Typography variant='h3'>Menu</Typography>
+          <IconButton onClick={onClose} color='inherit'>
+            <SvgIcon component={IconClose} inheritViewBox fontSize='large' />
+          </IconButton>
+        </Box>
+        <Search onChange={setKeywords} value={keywords} />
+      </Box>
+
+      <Box
+        sx={{
+          height: '100%',
+          padding: { sm: 1, xs: 0.5 },
+          paddingBottom: 6,
+          paddingTop: { sm: 7, xs: 11 },
+          overflowY: 'auto'
+        }}
+      >
+        <List sx={{ width: { sm: 370, xs: 330 }, maxWidth: '80vw', fontSize: { sm: '0.875rem', xs: '0.75rem' } }}>
           {current && (
             <>
               <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>

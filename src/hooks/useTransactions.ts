@@ -97,3 +97,20 @@ export function useHistoryTransactions(
 
   return [txs, isFetched, isFetching, hasNextPage, isFetchingNextPage, fetchNextPage];
 }
+
+export function useTransactionDetail(
+  id?: string
+): [transactions: Transaction | null, isFetched: boolean, isFetching: boolean] {
+  const { data, isFetched, isFetching } = useQuery<Transaction | null>({
+    initialData: null,
+    queryHash: serviceUrl(`tx-details/${id}`),
+    queryKey: [id ? serviceUrl(`tx-details/${id}`) : null],
+    structuralSharing: (prev: unknown | undefined, next: unknown): Transaction | null => {
+      const nextData = next ? transformTransaction(next as Transaction) : null;
+
+      return isEqual(prev, nextData) ? (prev as Transaction) || null : nextData;
+    }
+  });
+
+  return [data, isFetched, isFetching];
+}

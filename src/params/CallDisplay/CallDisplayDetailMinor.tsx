@@ -1,31 +1,35 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ApiPromise } from '@polkadot/api';
-import type { IMethod } from '@polkadot/types/types';
+import type { Option } from '@polkadot/types';
+import type { KitchensinkRuntimeProxyType } from '@polkadot/types/lookup';
+import type { IMethod, Registry } from '@polkadot/types/types';
 
 import { Box, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { AddressRow, FormatBalance } from '@mimir-wallet/components';
 import { findAssets } from '@mimir-wallet/config';
+import { useApi } from '@mimir-wallet/hooks';
 
 import Param from '../Param';
 import { extractParams } from '../utils';
 
-function CallDisplayDetailMinor({ api, call }: { api: ApiPromise; call?: IMethod | null }) {
+function CallDisplayDetailMinor({ registry, call }: { registry: Registry; call?: IMethod | null }) {
+  const { genesisHash } = useApi();
   let comp: React.ReactNode;
 
   const params = useMemo(() => (call ? extractParams(call) : null), [call]);
+  const calllFunction = useMemo(() => (call ? registry.findMetaCall(call?.callIndex) : null), [call, registry]);
 
-  if (!call) {
+  if (!call || !calllFunction) {
     return null;
   }
 
   if (
-    api.tx.balances.transfer?.is(call) ||
-    api.tx.balances.transferKeepAlive?.is(call) ||
-    api.tx.balances.transferAllowDeath?.is(call)
+    ['balances.transfer', 'balances.transferKeepAlive', 'balances.transferAllowDeath'].includes(
+      `${calllFunction.section}.${calllFunction.method}`
+    )
   ) {
     comp = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -40,8 +44,10 @@ function CallDisplayDetailMinor({ api, call }: { api: ApiPromise; call?: IMethod
         />
       </Box>
     );
-  } else if (api.tx.assets?.transfer?.is(call) || api.tx.assets?.transferKeepAlive?.is(call)) {
-    const asset = findAssets(api.genesisHash.toHex()).find((asset) => asset.assetId === call.args[0].toString());
+  } else if (
+    ['assets.transfer', 'assets.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
+  ) {
+    const asset = findAssets(genesisHash).find((asset) => asset.assetId === call.args[0].toString());
 
     comp = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -51,12 +57,24 @@ function CallDisplayDetailMinor({ api, call }: { api: ApiPromise; call?: IMethod
         </Typography>
       </Box>
     );
-  } else if (api.tx.proxy?.proxy?.is(call)) {
-    comp = <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>{call.args[1].unwrapOrDefault().type}</Box>;
-  } else if (api.tx.proxy?.proxyAnnounced?.is(call)) {
-    comp = <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>{call.args[2].unwrapOrDefault().type}</Box>;
-  } else if (api.tx.proxy?.addProxy?.is(call) || api.tx.proxy?.removeProxy?.is(call)) {
-    comp = <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>{call.args[1].type}</Box>;
+  } else if (['proxy.proxy'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
+    comp = (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        {(call.args[1] as Option<KitchensinkRuntimeProxyType>)?.unwrapOrDefault?.()?.type}
+      </Box>
+    );
+  } else if (['proxy.proxyAnnounced'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
+    comp = (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        {(call.args[2] as Option<KitchensinkRuntimeProxyType>)?.unwrapOrDefault?.()?.type}
+      </Box>
+    );
+  } else if (['proxy.addProxy', 'proxy.removeProxy'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
+    comp = (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        {(call.args[1] as KitchensinkRuntimeProxyType)?.type}
+      </Box>
+    );
   } else {
     if (!params) {
       return null;
@@ -65,7 +83,7 @@ function CallDisplayDetailMinor({ api, call }: { api: ApiPromise; call?: IMethod
     comp = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         {params.params.length > 1 ? (
-          <Param registry={api.registry} type={params.params[1].type} value={params.values[1]} />
+          <Param registry={registry} type={params.params[1].type} value={params.values[1]} />
         ) : null}
       </Box>
     );

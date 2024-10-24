@@ -15,6 +15,7 @@ function CreateMultisigDialog({ open, onClose }: { open: boolean; onClose: () =>
       <DialogContent
         sx={{
           display: 'flex',
+          flexDirection: { sm: 'row', xs: 'column' },
           gap: 2,
           '&>a': {
             width: '100%',

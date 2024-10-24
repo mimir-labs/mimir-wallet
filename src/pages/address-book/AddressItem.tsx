@@ -47,13 +47,30 @@ function AddressItem({ address }: { address: string }) {
       <EditAddressDialog address={address} onClose={toggleOpen} open={open} />
 
       {downSm && (
-        <Paper sx={{ borderRadius: '20px', padding: 1.5, boxShadow: '0px 0px 10px rgba(21, 31, 52, 0.06)' }}>
-          <AddressCell icons={<Icons address={address} />} shorten value={address} withCopy={false} />
+        <Paper
+          sx={{
+            borderRadius: '20px',
+            padding: 1.5,
+            boxShadow: '0px 0px 10px rgba(21, 31, 52, 0.06)',
+            '.AddressCell-Content': {
+              marginLeft: 1
+            },
+            '.AddressCell-Name': {
+              fontSize: '1.125rem'
+            },
+            '.AddressCell-Address': {
+              marginTop: 1,
+              fontSize: '0.875rem'
+            }
+          }}
+        >
+          <AddressCell iconSize={50} icons={<Icons address={address} />} shorten value={address} withCopy={false} />
           <Box sx={{ display: 'flex', gap: 1, marginTop: 2 }}>
-            <Button onClick={toggleOpen} variant='outlined'>
+            <Button size='small' onClick={toggleOpen} variant='outlined' sx={{ marginLeft: 6 }}>
               Edit
             </Button>
             <Button
+              size='small'
               component={Link}
               endIcon={<SvgIcon component={IconSend} inheritViewBox />}
               to={`/transfer?to=${address}`}

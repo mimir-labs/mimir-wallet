@@ -22,6 +22,7 @@ import { Link, matchPath, useLocation } from 'react-router-dom';
 
 import ArrowRight from '@mimir-wallet/assets/svg/ArrowRight.svg?react';
 import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
+import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
 import IconDapp from '@mimir-wallet/assets/svg/icon-dapp.svg?react';
 import IconHome from '@mimir-wallet/assets/svg/icon-home.svg?react';
 import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
@@ -129,7 +130,11 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
         }}
       >
         <Typography variant='h3'>Menu</Typography>
+        <IconButton onClick={closeSidebar} color='inherit'>
+          <SvgIcon component={IconClose} inheritViewBox fontSize='large' />
+        </IconButton>
       </Box>
+
       {isConnected ? (
         selected ? (
           <Paper sx={{ padding: 1 }} variant='outlined'>
@@ -190,7 +195,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
       <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
       <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
       <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
-      <AccountMenu onClose={handleAccountClose} open={!!anchorEl} />
+      <AccountMenu anchor={downMd ? 'right' : 'left'} onClose={handleAccountClose} open={!!anchorEl} />
       <Box
         onClick={() => {
           openWallet();
@@ -224,11 +229,13 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
               width: 280,
               paddingX: 1.5,
               paddingY: 2,
-              borderTopRightRadius: { md: 0, xs: 20 },
-              borderBottomRightRadius: { md: 0, xs: 20 }
+              borderTopRightRadius: { md: 20, xs: 0 },
+              borderBottomRightRadius: { md: 20, xs: 0 },
+              borderTopLeftRadius: { md: 0, xs: 20 },
+              borderBottomLeftRadius: { md: 0, xs: 20 }
             }
           }}
-          anchor='left'
+          anchor={downMd ? 'right' : 'left'}
           onClose={closeSidebar}
           open={sidebarOpen}
           variant='temporary'
@@ -245,8 +252,6 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
             height: `calc(100dvh - ${offsetTop}px - 1px - 56px)`,
             paddingX: 1.5,
             paddingY: 2,
-            borderTopRightRadius: { md: 0, xs: 20 },
-            borderBottomRightRadius: { md: 0, xs: 20 },
             bgcolor: 'background.paper'
           }}
         >

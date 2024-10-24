@@ -3,7 +3,7 @@
 
 import type { AccountData, ProxyTransaction, Transaction } from '@mimir-wallet/hooks/types';
 
-import { alpha, Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
+import { alpha, Box, Button, Divider, Paper, Stack, type StackProps, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { AddressCell } from '@mimir-wallet/components';
@@ -11,19 +11,19 @@ import { useBlockInterval, useFilterPaths } from '@mimir-wallet/hooks';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
 import { addressEq, autoFormatTimeStr } from '@mimir-wallet/utils';
 
-import Approve from '../buttons/Approve';
-import Cancel from '../buttons/Cancel';
-import Deny from '../buttons/Deny';
-import ExecuteAnnounce from '../buttons/ExecuteAnnounce';
-import Remove from '../buttons/Remove';
-import ViewPending from '../buttons/ViewPending';
-import { useAnnouncementProgress } from '../hooks/useAnnouncementProgress';
-import { approvalCounts } from '../utils';
+import Approve from './buttons/Approve';
+import Cancel from './buttons/Cancel';
+import Deny from './buttons/Deny';
+import ExecuteAnnounce from './buttons/ExecuteAnnounce';
+import Remove from './buttons/Remove';
+import ViewPending from './buttons/ViewPending';
+import { useAnnouncementProgress } from './hooks/useAnnouncementProgress';
+import { approvalCounts } from './utils';
 
-interface Props {
+interface Props extends StackProps {
   account: AccountData;
   transaction: Transaction;
-  openOverview: () => void;
+  openOverview?: () => void;
 }
 
 function ProgressItem({
@@ -252,11 +252,19 @@ function AnnounceContent({
   );
 }
 
-function Progress({ account, transaction, openOverview }: Props) {
+function Progress({ account, transaction, openOverview, ...props }: Props) {
   const filterPaths = useFilterPaths(account, transaction);
 
   return (
-    <Stack bgcolor='secondary.main' component={Paper} minWidth={280} padding={2} spacing={1} variant='elevation'>
+    <Stack
+      bgcolor='secondary.main'
+      component={Paper}
+      minWidth={280}
+      padding={2}
+      spacing={1}
+      variant='elevation'
+      {...props}
+    >
       <Typography sx={{ fontWeight: 700, color: 'primary.main' }} variant='h6'>
         Progress
       </Typography>
@@ -267,9 +275,11 @@ function Progress({ account, transaction, openOverview }: Props) {
           account={account}
           transaction={transaction}
           button={
-            <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
-              Overview
-            </Button>
+            openOverview ? (
+              <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
+                Overview
+              </Button>
+            ) : null
           }
         />
       ) : transaction.type === TransactionType.Proxy ? (
@@ -277,9 +287,11 @@ function Progress({ account, transaction, openOverview }: Props) {
           account={account}
           transaction={transaction}
           button={
-            <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
-              Overview
-            </Button>
+            openOverview ? (
+              <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
+                Overview
+              </Button>
+            ) : null
           }
         />
       ) : transaction.type === TransactionType.Announce ? (
@@ -287,9 +299,11 @@ function Progress({ account, transaction, openOverview }: Props) {
           account={account}
           transaction={transaction}
           button={
-            <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
-              Overview
-            </Button>
+            openOverview ? (
+              <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
+                Overview
+              </Button>
+            ) : null
           }
         />
       ) : null}

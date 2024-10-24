@@ -4,8 +4,9 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { IMethod } from '@polkadot/types/types';
 
-import { Box, Grid2 as Grid, IconButton, Stack, SvgIcon } from '@mui/material';
+import { Box, Button, Grid2 as Grid, IconButton, Stack, SvgIcon } from '@mui/material';
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
 import { AppName } from '@mimir-wallet/components';
@@ -14,33 +15,21 @@ import { type AccountData, type Transaction, TransactionStatus, TransactionType 
 import { CallDisplayDetail, CallDisplaySection } from '@mimir-wallet/params';
 import { formatAgo } from '@mimir-wallet/utils';
 
+import Progress from '../Progress';
+import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
 import Extrinsic from './Extrinsic';
 import OverviewDialog from './OverviewDialog';
-import Progress from './Progress';
-import { AnnouncementStatus, MultisigStatus, Status } from './Status';
 
 function AppCell({ transaction }: { transaction: Transaction }) {
-  return (
-    <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-      <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />
-    </Box>
-  );
+  return <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />;
 }
 
 function ActionTextCell({ section, method }: { section?: string; method?: string }) {
-  return (
-    <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-      <CallDisplaySection section={section} method={method} />
-    </Box>
-  );
+  return <CallDisplaySection section={section} method={method} />;
 }
 
 function ActionDisplayCell({ api, call }: { api: ApiPromise; call?: IMethod | null }) {
-  return (
-    <Box sx={{ flex: '1', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-      <CallDisplayDetail api={api} call={call} />
-    </Box>
-  );
+  return <CallDisplayDetail registry={api.registry} call={call} />;
 }
 
 function TimeCell({ time }: { time?: number }) {
@@ -48,10 +37,10 @@ function TimeCell({ time }: { time?: number }) {
 
   time ||= now;
 
-  return <Box sx={{ flex: '1' }}>{now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`}</Box>;
+  return now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`;
 }
 
-function ActionsCell({ detailOpen }: { detailOpen: boolean }) {
+function ActionsCell({ withDetails, detailOpen }: { withDetails?: boolean; detailOpen: boolean }) {
   return (
     <Box
       sx={{
@@ -62,28 +51,36 @@ function ActionsCell({ detailOpen }: { detailOpen: boolean }) {
       }}
     >
       <div />
-      <IconButton color='primary'>
-        <SvgIcon
-          component={ArrowDown}
-          inheritViewBox
-          sx={{
-            transition: 'transform 0.2s',
-            transformOrigin: 'center',
-            transform: detailOpen ? 'rotateZ(180deg)' : 'rotateZ(0deg)',
-            fontSize: '0.6rem',
-            color: 'primary.main'
-          }}
-        />
-      </IconButton>
+      {withDetails ? (
+        <IconButton color='primary'>
+          <SvgIcon
+            component={ArrowDown}
+            inheritViewBox
+            sx={{
+              transition: 'transform 0.2s',
+              transformOrigin: 'center',
+              transform: detailOpen ? 'rotateZ(180deg)' : 'rotateZ(0deg)',
+              fontSize: '0.6rem',
+              color: 'primary.main'
+            }}
+          />
+        </IconButton>
+      ) : (
+        <Button component={Link} to='/transactions' variant='text'>
+          View More
+        </Button>
+      )}
     </Box>
   );
 }
 
 function TxItems({
+  withDetails = true,
   defaultOpen,
   account,
   transaction
 }: {
+  withDetails?: boolean;
   defaultOpen?: boolean;
   account: AccountData;
   transaction: Transaction;
@@ -118,8 +115,6 @@ function TxItems({
             display: 'flex',
             alignItems: 'center',
             paddingX: { xs: 1, sm: 1.5, md: 2 },
-            paddingLeft: { xs: 1.5, md: 2 },
-            gap: { sm: 2, xs: 1 },
             fontWeight: 600,
             '.MuiGrid2-root': {
               display: 'flex',
@@ -128,6 +123,7 @@ function TxItems({
             }
           }}
           columns={12}
+          spacing={{ sm: 2, xs: 1 }}
           onClick={toggleDetailOpen}
         >
           <Grid size={2}>
@@ -158,10 +154,10 @@ function TxItems({
             )}
           </Grid>
           <Grid size='grow'>
-            <ActionsCell detailOpen={detailOpen} />
+            <ActionsCell withDetails={withDetails} detailOpen={detailOpen} />
           </Grid>
         </Grid>
-        {detailOpen && (
+        {withDetails && detailOpen && (
           <Box
             sx={{
               display: 'flex',

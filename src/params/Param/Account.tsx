@@ -3,11 +3,15 @@
 
 import React from 'react';
 
-import { AddressRow } from '@mimir-wallet/components';
+import { AddressCell, AddressRow } from '@mimir-wallet/components';
 
 import { ParamProps } from './types';
 
-function Account({ value }: ParamProps) {
+function Account({ value, displayType }: ParamProps) {
+  if (displayType === 'horizontal') {
+    return <AddressCell iconSize={40} value={value.toString()} withCopy />;
+  }
+
   return <AddressRow iconSize={20} shorten={false} value={value.toString()} withAddress={false} withCopy withName />;
 }
 

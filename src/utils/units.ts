@@ -56,3 +56,13 @@ export function formatUnits(value: bigint | { toString: () => string }, decimals
 
   return `${negative ? '-' : ''}${integer || '0'}${fraction ? `.${fraction}` : ''}`;
 }
+
+export const formatDisplay = (value: string, sufLen = 4): [string, string] => {
+  if (value.includes('.')) {
+    const [pre, suf] = value.split('.');
+
+    return sufLen === 0 ? [pre, ''] : [pre, suf.slice(0, sufLen)];
+  }
+
+  return [value, ''];
+};

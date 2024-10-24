@@ -65,7 +65,7 @@ function BatchItem({
           <AppName website={website} iconUrl={iconUrl} appName={appName} />
         </Grid>
         <Grid size={2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <CallDisplayDetail api={api} call={call} />
+          <CallDisplayDetail registry={api.registry} call={call} />
         </Grid>
         <Grid size={1} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
@@ -101,7 +101,7 @@ function BatchItem({
             overflowY: 'hidden'
           }}
         >
-          <Call jsonFallback from={from} call={call} api={api} />
+          <Call jsonFallback from={from} call={call} registry={api.registry} />
         </Box>
       ) : null}
     </Box>

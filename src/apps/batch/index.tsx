@@ -1,13 +1,24 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Button, Checkbox, Divider, FormControlLabel, Stack, SvgIcon, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  IconButton,
+  Stack,
+  SvgIcon,
+  Typography
+} from '@mui/material';
 import { useRef, useState } from 'react';
 import DraggableList from 'react-draggable-list';
 import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import IconAdd from '@mimir-wallet/assets/svg/icon-add.svg?react';
+import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
 import { useAccount, useApi, useBatchTxs, useTxQueue } from '@mimir-wallet/hooks';
 
 // import AddNewCache from './AddNewCache';
@@ -38,6 +49,14 @@ function Batch({ onClose }: { onClose?: () => void }) {
               {/* <Button color='primary' variant='outlined' onClick={toggleOpen}>
                 Add New
               </Button> */}
+              <IconButton
+                color='inherit'
+                onClick={() => {
+                  onClose?.();
+                }}
+              >
+                <SvgIcon component={IconClose} inheritViewBox />
+              </IconButton>
             </Typography>
             <Divider />
 

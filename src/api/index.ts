@@ -4,6 +4,7 @@
 export { api, ApiCtx, ApiCtxRoot, encodeAddress, decodeAddress } from './Api';
 
 export * from './callFilter';
+export * from './call';
 
 export * from './tx-events';
 export * from './tx-reserve';

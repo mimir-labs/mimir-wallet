@@ -3,7 +3,7 @@
 
 import type { AccountData, Transaction } from '@mimir-wallet/hooks/types';
 
-import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
+import { Box, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import moment from 'moment';
 import React from 'react';
 
@@ -11,15 +11,19 @@ import { TransactionStatus } from '@mimir-wallet/hooks/types';
 
 import { formatTransactionId } from '../utils';
 import TxItems from './TxItems';
+import TxItemsSmall from './TxItemsSmall';
 
 interface Props {
+  withDetails?: boolean;
   defaultOpen?: boolean;
   account: AccountData;
   transaction: Transaction;
 }
 
-function TxCell({ defaultOpen, account, transaction }: Props) {
+function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
   const { status } = transaction;
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   return (
     <Paper component={Stack} spacing={1.2} sx={{ padding: { sm: 1.5, xs: 1.2 }, borderRadius: 2 }}>
@@ -49,7 +53,11 @@ function TxCell({ defaultOpen, account, transaction }: Props) {
         </Typography>
       </Box>
       <Divider orientation='horizontal' />
-      <TxItems defaultOpen={defaultOpen} account={account} transaction={transaction} />
+      {downSm ? (
+        <TxItemsSmall transaction={transaction} />
+      ) : (
+        <TxItems withDetails={withDetails} defaultOpen={defaultOpen} account={account} transaction={transaction} />
+      )}
     </Paper>
   );
 }

@@ -49,6 +49,7 @@ export type AccountDataExtra = {
 };
 
 export type AccountDataType = {
+  createdAt: number;
   address: string;
   name?: string | null;
   isMimir?: boolean;

@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, lighten } from '@mui/material';
+import { Box } from '@mui/material';
 import { createContext, useCallback, useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
@@ -61,9 +61,10 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
 
           <Box
             sx={{
+              width: '100%',
               display: queue.length > 0 ? 'none' : 'block',
               flex: '1',
-              padding: withPadding ? { sm: 1.5, md: 2 } : 0
+              padding: withPadding ? { xs: 1.5, md: 2 } : { xs: 1.5, sm: 0 }
             }}
           >
             <Outlet />
@@ -71,11 +72,11 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
 
           {queue.length > 0 ? (
             <Box
-              sx={({ palette }) => ({
+              sx={() => ({
                 zIndex: 1200,
                 flex: '1',
                 position: 'relative',
-                bgcolor: lighten(palette.primary.main, 0.95)
+                background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
               })}
             >
               <TxSubmit {...queue[0]} />

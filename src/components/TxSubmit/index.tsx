@@ -19,7 +19,7 @@ import {
   SvgIcon,
   Typography
 } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import IconBatch from '@mimir-wallet/assets/svg/icon-batch.svg?react';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
@@ -95,12 +95,23 @@ function TxSubmit({
     onClose?.();
   }, [addTx, appName, call, iconUrl, onClose, website]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
   useHighlightTab();
   useCloseWhenPathChange(onClose);
 
   return (
-    <Box sx={{ width: '100%', padding: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
+    <Box sx={{ width: '100%', padding: { sm: 2, xs: 1.5 } }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 2
+        }}
+      >
         <Typography variant='h4'>Submit Transaction</Typography>
         <IconButton
           color='inherit'
@@ -114,16 +125,28 @@ function TxSubmit({
       </Box>
 
       <Paper
-        sx={{
+        sx={({ shadows }) => ({
           width: '100%',
-          height: 'calc(100dvh - 160px)',
+          height: { md: 'calc(100dvh - 160px)', xs: 'auto' },
           display: 'flex',
-          padding: 2,
+          flexDirection: { md: 'row', xs: 'column' },
+          padding: { md: 2, xs: 0 },
           gap: 2,
-          overflowY: 'auto'
-        }}
+          overflowY: 'auto',
+          bgcolor: { md: 'background.paper', xs: 'transparent' },
+          boxShadow: { md: shadows[1], xs: shadows[0] }
+        })}
       >
-        <Stack width='60%' spacing={2}>
+        <Stack
+          width={{ md: '60%', xs: '100%' }}
+          spacing={2}
+          sx={({ shadows }) => ({
+            padding: { md: 0, xs: 1.5 },
+            boxShadow: { md: shadows[0], xs: shadows[1] },
+            bgcolor: { md: 'transparent', xs: 'background.paper' },
+            borderRadius: 2
+          })}
+        >
           {account && <Sender address={account} />}
 
           <AppInfo
@@ -142,11 +165,12 @@ function TxSubmit({
             position: 'sticky',
             top: 0,
             alignSelf: 'start',
-            width: '40%',
+            width: { md: '40%', xs: '100%' },
             height: 'auto',
-            padding: 2,
+            padding: { sm: 2, xs: 1.5 },
             borderRadius: 2,
-            boxShadow: shadows[1]
+            boxShadow: shadows[1],
+            bgcolor: { md: 'transparent', xs: 'background.paper' }
           })}
           spacing={2}
         >

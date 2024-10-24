@@ -18,6 +18,7 @@ import { useApi } from './useApi';
 function transformAccount(genesisHash: HexString, account: AccountData): AccountData {
   if (account.type === 'pure' && account.network !== genesisHash) {
     return {
+      createdAt: Date.now(),
       type: 'account',
       address: encodeAddress(account.address),
       name: account.name,
@@ -38,6 +39,13 @@ function transformAccount(genesisHash: HexString, account: AccountData): Account
 }
 
 function deriveMeta(account: AccountData, meta: Record<string, AddressMeta> = {}) {
+  meta[account.address] = {
+    ...meta[account.address],
+    isMimir: !!account.isMimir,
+    isPure: account.type === 'pure',
+    isMultisig: account.type === 'multisig'
+  };
+
   if (account.delegatees.length > 0) {
     meta[account.address] = {
       ...meta[account.address],
@@ -55,6 +63,10 @@ function deriveMeta(account: AccountData, meta: Record<string, AddressMeta> = {}
 
   account.delegatees.forEach((item) => {
     deriveMeta(item, meta);
+    meta[item.address] = {
+      ...meta[item.address],
+      isProxy: true
+    };
   });
 
   if (account.type === 'multisig') {
