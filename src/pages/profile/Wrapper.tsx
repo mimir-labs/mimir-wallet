@@ -4,6 +4,7 @@
 import { Box, Link as MuiLink, Stack, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 
+import { useApi } from '@mimir-wallet/hooks';
 import { chainLinks } from '@mimir-wallet/utils';
 
 interface Props {
@@ -16,10 +17,20 @@ interface Props {
 }
 
 function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }: Props) {
+  const { api } = useApi();
+  const genesisHash = api.genesisHash.toHex();
   const url = chainLinks.subsquareUrl();
 
   return (
     <Stack spacing={2}>
+      {[
+        '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
+        '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed'
+      ].includes(genesisHash) && (
+        <Box component='a' href='https://wave.bifrost.io' target='_blank' rel='noreferrer'>
+          <Box component='img' src='/images/bifrost.webp' sx={{ width: '100%', borderRadius: 2 }} />
+        </Box>
+      )}
       <Box sx={{ display: 'flex', flexDirection: { lg: 'row', xs: 'column' }, gap: 2 }}>
         <Box sx={{ width: { lg: '59%', xs: '100%' } }}>
           <Typography marginBottom={0.5} variant='h6'>
