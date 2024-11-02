@@ -38,6 +38,7 @@ export interface ApiProps extends ApiState {
   network: string;
   chain: Endpoint;
   metadata: Record<string, HexString>;
+  identityApi: ApiPromise | null;
 }
 
 export interface OnChangeCbObs {

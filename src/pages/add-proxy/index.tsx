@@ -22,13 +22,14 @@ import {
   Switch,
   Typography
 } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToggle } from 'react-use';
 
 import IconArrow from '@mimir-wallet/assets/svg/icon-arrow.svg?react';
 import { Input, InputAddress } from '@mimir-wallet/components';
 import { ONE_DAY, ONE_HOUR } from '@mimir-wallet/constants';
-import { useAccount, useApi, useBlockInterval, useCall, useInput, useProxyTypes, useToggle } from '@mimir-wallet/hooks';
+import { useAccount, useApi, useBlockInterval, useCall, useInput, useProxyTypes } from '@mimir-wallet/hooks';
 import { addressEq } from '@mimir-wallet/utils';
 
 import AddProxy from './AddProxy';
@@ -46,7 +47,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
   const [proxied, setProxied] = useState<string | undefined>(current);
   const [proxy, setProxy] = useState<string | undefined>(pure ? current : accounts[0]?.address);
   const [name, setName] = useInput('');
-  const [advanced, toggleAdvanced] = useToggle();
+  const [advanced, toggleAdvanced] = useToggle(false);
   const [reviewWindow, setReviewWindow] = useState<number>(0);
   const [custom, setCustom] = useState<string>('');
   const blockInterval = useBlockInterval().toNumber();
@@ -54,6 +55,11 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
   const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(pure ? undefined : api.query.proxy.proxies, [
     proxied
   ]);
+
+  const swap = useCallback(() => {
+    setProxied(proxy);
+    setProxy(proxied);
+  }, [proxied, proxy]);
 
   const existsProxies = useMemo(
     () =>
@@ -92,13 +98,20 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
             {'<'} Back
           </Button>
         </Box>
-        <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
+        <Paper sx={{ padding: { sm: 2, xs: 1.5 }, borderRadius: 2, marginTop: 1 }}>
           <Stack spacing={2}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography variant='h3'>{pure ? 'Create New Pure Proxy' : 'Add Proxy'}</Typography>
             </Box>
             <Divider />
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { sm: 'row', xs: 'column' },
+                gap: 1,
+                alignItems: 'center'
+              }}
+            >
               {pure ? (
                 <PureCell />
               ) : (
@@ -116,7 +129,8 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
                 fontSize='small'
                 inheritViewBox
                 color='primary'
-                sx={{ transform: 'translateY(14px)' }}
+                sx={{ cursor: 'pointer', transform: { sm: 'translateY(14px)', xs: 'rotate(90deg)' } }}
+                onClick={pure ? undefined : swap}
               />
               <InputAddress
                 excluded={!pure && proxied ? [proxied] : []}
@@ -142,7 +156,13 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
 
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Typography fontWeight={700}>Advanced Setting</Typography>
-              <Switch checked={advanced} onChange={toggleAdvanced} />
+              <Switch
+                checked={advanced}
+                onChange={(e) => {
+                  toggleAdvanced(e.target.checked);
+                  setReviewWindow(0);
+                }}
+              />
             </Box>
 
             {advanced && (

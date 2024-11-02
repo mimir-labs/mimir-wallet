@@ -11,7 +11,8 @@ import { formatBalance, isTestChain, objectSpread, stringify } from '@polkadot/u
 import { decodeAddress as decodeAddressBase, encodeAddress as encodeAddressBase } from '@polkadot/util-crypto';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { Endpoint, typesBundle } from '@mimir-wallet/config';
+import { allEndpoints, Endpoint, typesBundle } from '@mimir-wallet/config';
+import { useApiUrl } from '@mimir-wallet/hooks';
 import { service } from '@mimir-wallet/utils';
 
 interface Props {
@@ -148,6 +149,12 @@ export function ApiCtxRoot({ chain, children }: Props): React.ReactElement<Props
   const [isApiConnected, setIsApiConnected] = useState(false);
   const [isApiInitialized, setIsApiInitialized] = useState<boolean>();
   const [apiError, setApiError] = useState<null | string>(null);
+  const peopleEndpoint = useMemo(
+    () => (chain.identityNetwork ? allEndpoints.find((item) => item.key === chain.identityNetwork) : undefined),
+    [chain.identityNetwork]
+  );
+  const apiSystemPeople = useApiUrl(peopleEndpoint?.wsUrl);
+
   const value = useMemo<ApiProps>(
     () =>
       objectSpread({}, state, {
@@ -159,9 +166,10 @@ export function ApiCtxRoot({ chain, children }: Props): React.ReactElement<Props
         network: chain.key,
         genesisHash: chain.genesisHash,
         chain,
-        apiUrl: chain.wsUrl
+        apiUrl: chain.wsUrl,
+        identityApi: (chain.identityNetwork && apiSystemPeople) || api
       }),
-    [state, apiError, chain, isApiConnected, isApiInitialized]
+    [state, apiError, chain, isApiConnected, isApiInitialized, apiSystemPeople]
   );
 
   // initial initialization

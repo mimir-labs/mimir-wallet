@@ -10,7 +10,6 @@ import { useRef } from 'react';
 import { ApiCtxRoot } from '@mimir-wallet/api';
 import { GlobalStyle, ToastRoot, TxToast } from '@mimir-wallet/components';
 import { AddressCtxRoot, TxQueueCtxRoot, TxToastCtxRoot, WalletCtxRoot } from '@mimir-wallet/providers';
-import { SocketCtxRoot } from '@mimir-wallet/socket';
 import { ThemeProvider } from '@mimir-wallet/theme';
 import { fetcher } from '@mimir-wallet/utils';
 
@@ -33,17 +32,15 @@ function Providers({ address, chain, children }: { address?: string; chain: Endp
         <QueryClientProvider client={queryClient.current}>
           <ApiCtxRoot chain={chain}>
             <WalletCtxRoot>
-              <SocketCtxRoot>
-                <AddressCtxRoot address={address}>
-                  <TxQueueCtxRoot>
-                    <TxToastCtxRoot>
-                      <TxToast />
-                      <GlobalStyle />
-                      {children}
-                    </TxToastCtxRoot>
-                  </TxQueueCtxRoot>
-                </AddressCtxRoot>
-              </SocketCtxRoot>
+              <AddressCtxRoot chain={chain} address={address}>
+                <TxQueueCtxRoot>
+                  <TxToastCtxRoot>
+                    <TxToast />
+                    <GlobalStyle />
+                    {children}
+                  </TxToastCtxRoot>
+                </TxQueueCtxRoot>
+              </AddressCtxRoot>
             </WalletCtxRoot>
           </ApiCtxRoot>
         </QueryClientProvider>

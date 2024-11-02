@@ -10,6 +10,10 @@ import {
   Box,
   Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   IconButton,
   Stack,
@@ -20,21 +24,31 @@ import {
 import { BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useToggle } from 'react-use';
 
 import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 import IconDelete from '@mimir-wallet/assets/svg/icon-delete.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { AddressRow } from '@mimir-wallet/components';
-import { useAccount, useApi, useTxQueue } from '@mimir-wallet/hooks';
-
-import DeleteAllProxy from './DeleteAllProxy';
+import { useAccount, useAddressMeta, useApi, useTxQueue } from '@mimir-wallet/hooks';
 
 function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletProxyProxyDefinition> }) {
   const { api } = useApi();
   const { isLocalAccount } = useAccount();
   const { addQueue } = useTxQueue();
+  const { meta } = useAddressMeta(address);
+  const [isOpen, toggleOpen] = useToggle(false);
 
   const isReadOnly = useMemo(() => !isLocalAccount(address), [address, isLocalAccount]);
+
+  const handleDelete = () => {
+    addQueue({
+      accountId: address,
+      call: api.tx.proxy.removeProxies(),
+      website: 'mimir://internal/remove-proxies'
+    });
+    toggleOpen(false);
+  };
 
   return (
     <>
@@ -72,13 +86,20 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
                     color='error'
                     size='small'
                     sx={{ fontSize: 'inherit' }}
-                    onClick={() => {
-                      addQueue({
-                        accountId: address,
-                        call: api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType, proxy.delay),
-                        website: 'mimir://internal/setup'
-                      });
-                    }}
+                    onClick={
+                      proxies.length === 1 && meta.isPure
+                        ? toggleOpen
+                        : () => {
+                            addQueue({
+                              accountId: address,
+                              call:
+                                proxies.length === 1
+                                  ? api.tx.proxy.removeProxies()
+                                  : api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType, proxy.delay),
+                              website: 'mimir://internal/setup'
+                            });
+                          }
+                    }
                   >
                     <SvgIcon component={IconDelete} inheritViewBox />
                   </IconButton>
@@ -106,8 +127,35 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
           Add New Proxy
         </Button>
 
-        <DeleteAllProxy address={address} />
+        <Button variant='contained' fullWidth color='error' onClick={meta.isPure ? toggleOpen : handleDelete}>
+          Delete All
+        </Button>
       </Stack>
+
+      <Dialog maxWidth='sm' fullWidth open={isOpen} onClose={toggleOpen}>
+        <DialogTitle>Attention</DialogTitle>
+
+        <DialogContent>
+          <Typography>
+            If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control this
+            account. Please make sure to carefully confirm the following:
+          </Typography>
+
+          <br />
+
+          <Typography>1. The assets of this account have been successfully transferred.</Typography>
+          <Typography>2. The account is not bound to any other application functions.</Typography>
+          <br />
+
+          <Typography>Please note that thisaction is irreversible.</Typography>
+        </DialogContent>
+
+        <DialogActions>
+          <Button variant='contained' fullWidth color='error' onClick={handleDelete}>
+            Continue
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

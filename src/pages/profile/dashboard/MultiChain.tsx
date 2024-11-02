@@ -10,7 +10,7 @@ import { useApi } from '@mimir-wallet/hooks';
 
 function MultiChain({ address }: { address: string }) {
   const { genesisHash } = useApi();
-  const endpoints = useMemo(() => allEndpoints.filter((item) => item.genesisHash === genesisHash), [genesisHash]);
+  const endpoints = useMemo(() => allEndpoints.filter((item) => item.genesisHash !== genesisHash), [genesisHash]);
 
   return (
     <Paper component={Stack} spacing={2} sx={{ borderRadius: 2, padding: 2 }}>

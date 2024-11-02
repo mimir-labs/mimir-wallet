@@ -20,7 +20,7 @@ interface Props {
 function PendingTx({ address, url }: Props) {
   const txs = usePendingTx(address, url);
   const [expand, toggleExpand] = useToggle();
-  const [account] = useQueryAccount();
+  const [account] = useQueryAccount(address);
 
   return (
     <Drawer
@@ -50,7 +50,7 @@ function PendingTx({ address, url }: Props) {
           right: 0,
           visibility: 'visible',
           height: 60,
-          paddingX: 2.4,
+          paddingX: { sm: 2.4, xs: 1.5 },
           bgcolor: lighten(palette.primary.main, 0.95),
           display: 'flex',
           alignItems: 'center',
@@ -73,7 +73,16 @@ function PendingTx({ address, url }: Props) {
           <SvgIcon component={ExpandArrow} inheritViewBox />
         </IconButton>
       </Box>
-      <Stack spacing={1} sx={{ paddingX: 2.4, paddingY: 2, height: 340, marginTop: 1, overflowY: 'auto' }}>
+      <Stack
+        spacing={1}
+        sx={{
+          paddingX: { sm: 2.4, xs: 1.5 },
+          paddingY: { sm: 2, xs: 1.5 },
+          height: 340,
+          marginTop: 1,
+          overflowY: 'auto'
+        }}
+      >
         {account && txs.length > 0 ? (
           txs.map((item) => <TxCell account={account} defaultOpen={false} key={item.id} transaction={item} />)
         ) : (

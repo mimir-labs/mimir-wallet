@@ -19,7 +19,7 @@ interface Props extends BoxProps {
 
 function FormatBalance({ format, label, value, withCurrency, ...props }: Props): React.ReactElement<Props> {
   const { api } = useApi();
-  const [major, rest] = useMemo(() => {
+  const [major, rest, unit] = useMemo(() => {
     const _value = formatUnits(BigInt(value?.toString() || 0), format?.[0] || api.registry.chainDecimals[0]);
 
     return formatDisplay(_value);
@@ -31,7 +31,12 @@ function FormatBalance({ format, label, value, withCurrency, ...props }: Props):
       {label}
       <Box component='span'>
         {major}
-        {rest ? <Box component='span'>.{rest}</Box> : null}
+        {rest ? (
+          <Box component='span'>
+            .{rest}
+            {unit || ''}
+          </Box>
+        ) : null}
       </Box>
       <Box component='span'>{withCurrency ? ` ${format?.[1] || api.registry.chainTokens[0] || ''}` : ''}</Box>
     </Box>

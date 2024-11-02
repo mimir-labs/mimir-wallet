@@ -11,9 +11,9 @@ import { useCall } from './useCall';
 function useDeriveAccountInfoImpl(
   value?: AccountId | AccountIndex | Address | Uint8Array | string | null
 ): DeriveAccountInfo | undefined {
-  const { api } = useApi();
+  const { identityApi } = useApi();
 
-  return useCall<DeriveAccountInfo>(api && api.derive.accounts.info, [value]);
+  return useCall<DeriveAccountInfo>(identityApi && identityApi.derive.accounts.info, [value]);
 }
 
 export const useDeriveAccountInfo = createNamedHook('useDeriveAccountInfo', useDeriveAccountInfoImpl);

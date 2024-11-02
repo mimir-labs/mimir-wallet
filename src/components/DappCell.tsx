@@ -3,7 +3,7 @@
 
 import type { DappOption } from '@mimir-wallet/config';
 
-import { alpha, Box, Button, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import { alpha, Box, Button, IconButton, Paper, Stack, SvgIcon, SwipeableDrawer, Typography } from '@mui/material';
 import React, { createElement, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -61,9 +61,17 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
       <DappDetails dapp={dapp} onClose={toggleOpen} open={detailsOpen} onOpen={openApp} />
 
       {dapp.isDrawer && (
-        <Drawer anchor='right' open={isDrawerOpen} onClose={toggleDrawerOpen}>
+        <SwipeableDrawer
+          ModalProps={{
+            keepMounted: false
+          }}
+          anchor='right'
+          open={isDrawerOpen}
+          onOpen={toggleDrawerOpen}
+          onClose={toggleDrawerOpen}
+        >
           {element}
-        </Drawer>
+        </SwipeableDrawer>
       )}
 
       <Paper sx={{ cursor: 'pointer', display: 'block', padding: 2, textDecoration: 'none' }} onClick={openApp}>

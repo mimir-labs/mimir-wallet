@@ -35,11 +35,10 @@ import { useSelectMultisig } from './useSelectMultisig';
 function checkError(
   signatories: string[],
   isThresholdValid: boolean,
-  hasSoloAccount: boolean,
-  threshold1?: boolean
+  hasSoloAccount: boolean
 ): [Error | null, Error | null] {
   return [
-    signatories.length < (threshold1 ? 1 : 2)
+    signatories.length < 2
       ? new Error('Please select at least two members')
       : hasSoloAccount
         ? null
@@ -93,12 +92,12 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
   };
 
   const checkField = useCallback((): boolean => {
-    const errors = checkError(signatories, isThresholdValid, hasSoloAccount, threshold1);
+    const errors = checkError(signatories, isThresholdValid, hasSoloAccount);
 
     setErrors(errors);
 
     return !errors[0] && !errors[1];
-  }, [hasSoloAccount, isThresholdValid, signatories, threshold1]);
+  }, [hasSoloAccount, isThresholdValid, signatories]);
 
   return (
     <>

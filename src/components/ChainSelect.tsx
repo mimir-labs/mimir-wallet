@@ -4,9 +4,8 @@
 import { Box, Button, CircularProgress, Divider, Menu, MenuItem, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 
-import { API_URL_KEY, findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
+import { findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks';
-import { store } from '@mimir-wallet/utils';
 
 function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
   const { genesisHash, isApiConnected, isApiReady } = useApi();
@@ -80,8 +79,7 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
                   disableRipple
                   key={endpoint.genesisHash || index}
                   onClick={() => {
-                    store.set(API_URL_KEY, endpoint.wsUrl);
-                    window.location.reload();
+                    window.location.href = `${window.location.origin}?network=${endpoint.key}`;
 
                     handleClose();
                   }}

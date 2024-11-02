@@ -8,11 +8,11 @@ import {
   Box,
   Button,
   Divider,
-  Drawer,
   IconButton,
   Paper,
   Stack,
   SvgIcon,
+  SwipeableDrawer,
   Typography,
   useMediaQuery,
   useTheme
@@ -70,7 +70,6 @@ function NavLink({
       startIcon={<SvgIcon component={Icon} inheritViewBox sx={{ fontSize: '1.25rem !important', color: 'inherit' }} />}
       sx={{
         justifyContent: 'flex-start',
-        marginTop: 2.5,
         padding: '15px 20px',
         color: 'grey.300',
         '> p': {
@@ -95,19 +94,19 @@ function NavLink({
   );
 }
 
-function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideBar: boolean }) {
+function TopContent() {
   const { api } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [qrOpen, toggleQrOpen] = useToggle();
   const [createMultisigOpen, toggleCreateMultisigOpen] = useToggle();
   const { connectedWallets, openWallet } = useWallet();
+  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [selected]);
-  const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const { closeSidebar } = useContext(BaseContainerCtx);
+  const isConnected = Object.keys(connectedWallets).length > 0;
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
-  const isConnected = Object.keys(connectedWallets).length > 0;
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -118,23 +117,8 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
     closeSidebar();
   };
 
-  const element = (
+  return (
     <>
-      <Box
-        sx={{
-          zIndex: 10,
-          display: { md: 'none', xs: 'flex' },
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 2
-        }}
-      >
-        <Typography variant='h3'>Menu</Typography>
-        <IconButton onClick={closeSidebar} color='inherit'>
-          <SvgIcon component={IconClose} inheritViewBox fontSize='large' />
-        </IconButton>
-      </Box>
-
       {isConnected ? (
         selected ? (
           <Paper sx={{ padding: 1 }} variant='outlined'>
@@ -191,11 +175,44 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
           Connect Wallet
         </Button>
       )}
+
+      <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
+      <AccountMenu anchor={downMd ? 'right' : 'left'} onClose={handleAccountClose} open={!!anchorEl} />
+      <CreateMultisigDialog open={createMultisigOpen} onClose={toggleCreateMultisigOpen} />
+    </>
+  );
+}
+
+function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideBar: boolean }) {
+  const { connectedWallets, openWallet } = useWallet();
+  const { closeSidebar, openSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const { breakpoints } = useTheme();
+  const downMd = useMediaQuery(breakpoints.down('md'));
+  const { pathname } = useLocation();
+
+  const element = (
+    <Stack gap={2.5}>
+      <Box
+        sx={{
+          zIndex: 10,
+          display: { md: 'none', xs: 'flex' },
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 2
+        }}
+      >
+        <Typography variant='h3'>Menu</Typography>
+        <IconButton onClick={closeSidebar} color='inherit'>
+          <SvgIcon component={IconClose} inheritViewBox fontSize='large' />
+        </IconButton>
+      </Box>
+
+      {pathname !== '/welcome' && <TopContent />}
+
       <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
       <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
       <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
       <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
-      <AccountMenu anchor={downMd ? 'right' : 'left'} onClose={handleAccountClose} open={!!anchorEl} />
       <Box
         onClick={() => {
           openWallet();
@@ -216,14 +233,13 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
           <WalletIcon disabled={!connectedWallets.includes(id)} id={id} key={id} sx={{ width: 20, height: 20 }} />
         ))}
       </Box>
-    </>
+    </Stack>
   );
 
   return (
     <>
-      <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
       {downMd || !withSideBar ? (
-        <Drawer
+        <SwipeableDrawer
           PaperProps={{
             sx: {
               width: 280,
@@ -237,11 +253,12 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
           }}
           anchor={downMd ? 'right' : 'left'}
           onClose={closeSidebar}
+          onOpen={openSidebar}
           open={sidebarOpen}
           variant='temporary'
         >
           {element}
-        </Drawer>
+        </SwipeableDrawer>
       ) : (
         <Box
           sx={{
@@ -260,7 +277,6 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
       )}
 
       {!withSideBar && !downMd && !sidebarOpen && <ToggleSidebar />}
-      <CreateMultisigDialog open={createMultisigOpen} onClose={toggleCreateMultisigOpen} />
     </>
   );
 }

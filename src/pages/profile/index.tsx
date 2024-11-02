@@ -4,12 +4,11 @@
 import { useSelectedAccount } from '@mimir-wallet/hooks';
 
 import Dashboard from './dashboard';
-import Welcome from './Welcome';
 
 function PageProfile() {
   const selected = useSelectedAccount();
 
-  return selected ? <Dashboard address={selected} /> : <Welcome />;
+  return selected ? <Dashboard address={selected} /> : null;
 }
 
 export default PageProfile;

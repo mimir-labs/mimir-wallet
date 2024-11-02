@@ -3,7 +3,16 @@
 
 import type { BatchTxItem } from '@mimir-wallet/hooks/types';
 
-import { Box, Checkbox, FormControlLabel, Grid2 as Grid, IconButton, SvgIcon } from '@mui/material';
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Grid2 as Grid,
+  IconButton,
+  SvgIcon,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
@@ -36,6 +45,8 @@ function BatchItem({
 }: Props) {
   const { api } = useApi();
   const [isOpen, toggleOpen] = useToggle(false);
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   const call = useMemo(() => {
     return api.createType('Call', calldata);
@@ -45,7 +56,7 @@ function BatchItem({
     <Box data-open={isOpen} sx={{ bgcolor: 'secondary.main', borderRadius: 1, overflow: 'hidden' }}>
       <Grid
         container
-        sx={{ cursor: 'pointer', height: 44, paddingX: 1.2, fontSize: '0.875rem' }}
+        sx={{ cursor: 'pointer', height: 44, paddingX: { sm: 1.2, xs: 0.8 }, fontSize: '0.875rem' }}
         columns={6}
         onClick={toggleOpen}
       >
@@ -57,7 +68,14 @@ function BatchItem({
             {...dragHandleProps}
           />
           <FormControlLabel
-            control={<Checkbox checked={selected.includes(id)} onChange={(e) => onSelected(e.target.checked)} />}
+            control={
+              <Checkbox
+                sx={{ padding: { sm: 1, xs: 0.5 } }}
+                size={downSm ? 'small' : 'medium'}
+                checked={selected.includes(id)}
+                onChange={(e) => onSelected(e.target.checked)}
+              />
+            }
             label={index + 1}
           />
         </Grid>
@@ -91,11 +109,11 @@ function BatchItem({
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            gap: 1.2,
-            padding: 1.2,
-            marginLeft: 1.2,
-            marginBottom: 1.2,
-            marginRight: 1.2,
+            gap: { sm: 1.2, xs: 0.8 },
+            padding: { sm: 1.2, xs: 0.8 },
+            marginLeft: { sm: 1.2, xs: 0.8 },
+            marginBottom: { sm: 1.2, xs: 0.8 },
+            marginRight: { sm: 1.2, xs: 0.8 },
             bgcolor: 'white',
             borderRadius: 1,
             overflowY: 'hidden'

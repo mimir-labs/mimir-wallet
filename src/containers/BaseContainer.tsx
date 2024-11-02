@@ -3,7 +3,7 @@
 
 import { Box } from '@mui/material';
 import { createContext, useCallback, useMemo, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 
 import { ConnectWalletModal, MimirLoading, SwitchAccountDialog, TxSubmit } from '@mimir-wallet/components';
 import { useAccount, useApi, useFollowAccounts, useToggle, useTxQueue } from '@mimir-wallet/hooks';
@@ -22,10 +22,18 @@ interface State {
 
 export const BaseContainerCtx = createContext<State>({} as State);
 
-function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; withPadding: boolean }) {
+function BaseContainer({
+  auth,
+  withSideBar,
+  withPadding
+}: {
+  auth: boolean;
+  withSideBar: boolean;
+  withPadding: boolean;
+}) {
   const { isApiConnected, isApiReady } = useApi();
   const { isWalletReady, closeWallet, walletOpen } = useWallet();
-  const { isMultisigSyned } = useAccount();
+  const { current, isMultisigSyned } = useAccount();
   const { queue } = useTxQueue();
   const [sidebarOpen, , setSidebarOpen] = useToggle(false);
   const [alertOpen, setAlertOpen] = useState<boolean>(true);
@@ -40,6 +48,10 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
 
   useFollowAccounts();
 
+  if (!current && auth) {
+    return <Navigate to='/welcome' replace />;
+  }
+
   return (
     <BaseContainerCtx.Provider value={value}>
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
@@ -48,7 +60,9 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
 
       <TopBar />
 
-      {isApiReady && isApiConnected && isWalletReady && isMultisigSyned && <ToggleAlert setAlertOpen={setAlertOpen} />}
+      {isApiReady && isApiConnected && isWalletReady && isMultisigSyned && current && (
+        <ToggleAlert address={current} setAlertOpen={setAlertOpen} />
+      )}
 
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (
         <Box
@@ -64,7 +78,7 @@ function BaseContainer({ withSideBar, withPadding }: { withSideBar: boolean; wit
               width: '100%',
               display: queue.length > 0 ? 'none' : 'block',
               flex: '1',
-              padding: withPadding ? { xs: 1.5, md: 2 } : { xs: 1.5, sm: 0 }
+              padding: withPadding ? { xs: 1.5, md: 2 } : 0
             }}
           >
             <Outlet />

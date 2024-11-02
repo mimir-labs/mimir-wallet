@@ -12,7 +12,7 @@ import Assets from './Assets';
 import Hero from './Hero';
 import MultiChain from './MultiChain';
 import PendingTx from './PendingTx';
-import Relation from './Relation';
+import Structure from './Structure';
 
 function Dashboard({ address }: { address: string }) {
   const [tokenInfo] = useTokenInfo();
@@ -21,7 +21,7 @@ function Dashboard({ address }: { address: string }) {
   const [tab, setTab] = useQueryParam('tab', 'asset', { replace: true });
   const tabsRef = useRef([
     { tab: 'asset', label: 'Asset' },
-    { tab: 'relation', label: 'Relation' },
+    { tab: 'structure', label: 'Structure' },
     { tab: 'transaction', label: 'Transaction' },
     { tab: 'multichain', label: 'Multi-Chain' }
   ]);
@@ -67,7 +67,7 @@ function Dashboard({ address }: { address: string }) {
       </Paper>
 
       {tab === 'asset' && <Assets address={address} nativeBalance={balances} />}
-      {tab === 'relation' && <Relation address={address} />}
+      {tab === 'structure' && <Structure address={address} />}
       {tab === 'transaction' && <PendingTx address={address} />}
       {account?.type !== 'pure' && tab === 'multichain' && <MultiChain address={address} />}
     </Stack>

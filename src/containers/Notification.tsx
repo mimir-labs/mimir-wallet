@@ -129,7 +129,7 @@ function Notification() {
         }}
         onClose={handleClose}
         open={open}
-        slotProps={{ paper: { sx: { padding: 1.5, width: 320, maxHeight: '50vh', overflowY: 'auto' } } }}
+        slotProps={{ paper: { sx: { padding: 1.5, width: 340, maxHeight: '50vh', overflowY: 'auto' } } }}
         transformOrigin={{
           vertical: 'top',
           horizontal: 'right'

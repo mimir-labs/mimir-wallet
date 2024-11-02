@@ -39,7 +39,7 @@ function Batch({ onClose }: { onClose?: () => void }) {
 
   return (
     <>
-      <Box sx={{ width: '50vw', maxWidth: 560, minWidth: 320, height: '100%', padding: 2 }}>
+      <Box sx={{ width: '50vw', maxWidth: 560, minWidth: 340, height: '100%', padding: { sm: 2, xs: 1.5 } }}>
         {txs.length === 0 ? (
           <EmptyBatch onAdd={toggleOpen} onClose={onClose} />
         ) : (

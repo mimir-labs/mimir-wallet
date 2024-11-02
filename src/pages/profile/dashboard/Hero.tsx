@@ -24,6 +24,7 @@ import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
 import IconProxy from '@mimir-wallet/assets/svg/icon-proxy-fill.svg?react';
 import IconQrcode from '@mimir-wallet/assets/svg/icon-qr.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
+import IconSet from '@mimir-wallet/assets/svg/icon-set.svg?react';
 import { Address, AddressName, Fund, IdentityIcon, QrcodeAddress } from '@mimir-wallet/components';
 import { ONE_DAY } from '@mimir-wallet/constants';
 import { useAccount, useQueryAccount } from '@mimir-wallet/hooks';
@@ -106,7 +107,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
       <Paper
         sx={{
           width: '100%',
-          padding: 2,
+          padding: { sm: 2, xs: 1.5 },
           display: 'flex',
           flexDirection: { sm: 'row', xs: 'column' },
           alignItems: { sx: 'end', xs: 'start' },
@@ -119,8 +120,25 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
           <IdentityIcon value={address} size={downSm ? 50 : 80} />
 
           <Stack spacing={{ sm: 1, xs: 0.5 }}>
-            <Typography sx={{ fontWeight: 800, fontSize: { sm: '30px', xs: '26px' }, lineHeight: 1.1 }}>
+            <Typography
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                fontWeight: 800,
+                fontSize: { sm: '30px', xs: '26px' },
+                lineHeight: 1.1
+              }}
+            >
               <AddressName value={address} />
+              <IconButton
+                component={Link}
+                to={`/account-setting/${address}`}
+                color='primary'
+                sx={{ bgcolor: 'secondary.main', fontSize: '1.2rem' }}
+              >
+                <SvgIcon component={IconSet} inheritViewBox />
+              </IconButton>
             </Typography>
 
             <Box
@@ -164,6 +182,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
           <Typography variant='h1' sx={{ fontWeight: 700, fontSize: '40px', lineHeight: 1 }}>
             $ {formatUsd[0]}
             {formatUsd[1] ? `.${formatUsd[1]}` : ''}
+            {formatUsd[2] || ''}
           </Typography>
           <Typography
             sx={{

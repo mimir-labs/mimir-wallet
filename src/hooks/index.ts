@@ -4,6 +4,7 @@
 export * from './useAccounts';
 export * from './useAddressMeta';
 export * from './useApi';
+export * from './useApiUrl';
 export * from './useAssets';
 export * from './useBalances';
 export * from './useBatchTxs';

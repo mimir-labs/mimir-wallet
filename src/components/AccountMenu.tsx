@@ -16,7 +16,9 @@ import {
   Menu,
   MenuItem,
   SvgIcon,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -138,7 +140,7 @@ function AccountCell({
             <FormatBalance value={balances?.total} />
             <Avatar alt='Token' src={icon} sx={{ width: 16, height: 16 }} />
           </Box>
-          {value && (
+          {value && (isLocalAccount(value) || watchlist) && (
             <IconButton color='inherit' onClick={handleMore} sx={{ padding: { sm: 1, xs: 0.4 } }}>
               <SvgIcon component={IconMore} inheritViewBox />
             </IconButton>
@@ -165,6 +167,8 @@ function Search({ onChange, value }: { value: string; onChange: (value: string) 
 function CreateMultisig({ onClose }: { onClose?: () => void }) {
   const navigate = useNavigate();
   const [open, toggleOpen] = useToggle(false);
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   return (
     <>
@@ -192,13 +196,15 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
               </Button>
               <Menu
                 {...bindMenu(popupState)}
-                anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                anchorOrigin={{ vertical: 'top', horizontal: downSm ? 'right' : 'left' }}
                 transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                 slotProps={{
                   paper: {
                     sx: {
                       width: popupState.anchorEl?.clientWidth,
-                      transform: 'translateY(-10px) translateX(-6px) !important',
+                      transform: downSm
+                        ? 'translateY(-10px) translateX(6px) !important'
+                        : 'translateY(-10px) translateX(-6px) !important',
                       '.MuiMenuItem-root': {
                         display: 'flex',
                         justifyContent: 'center'
@@ -322,7 +328,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
       <Box
         sx={{
           height: '100%',
-          padding: { sm: 1, xs: 0.5 },
+          paddingX: { sm: 1, xs: 0.5 },
           paddingBottom: 6,
           paddingTop: { sm: 7, xs: 11 },
           overflowY: 'auto'

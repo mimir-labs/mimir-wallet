@@ -41,6 +41,14 @@ function EmptyBatch({ onAdd, onClose }: { onAdd?: () => void; onClose?: () => vo
       >
         Add New Transfer
       </Button>
+      <Button
+        component={Link}
+        onClick={onClose}
+        to={`/explorer/${encodeURIComponent(`https://apps.mimir.global`)}`}
+        color='primary'
+      >
+        Go to PolkadotJS
+      </Button>
     </Box>
   );
 }

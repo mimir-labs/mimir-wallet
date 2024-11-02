@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Badge, Box, Drawer, IconButton, Popover, SvgIcon } from '@mui/material';
+import { Badge, Box, IconButton, Popover, SvgIcon, SwipeableDrawer } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 import { useToggle } from 'react-use';
 
@@ -87,9 +87,14 @@ function BatchButton() {
         </Box>
       </Popover>
 
-      <Drawer anchor='right' open={isDrawerOpen} onClose={() => toggleDrawerOpen(false)}>
+      <SwipeableDrawer
+        onOpen={toggleDrawerOpen}
+        anchor='right'
+        open={isDrawerOpen}
+        onClose={() => toggleDrawerOpen(false)}
+      >
         <Batch onClose={() => toggleDrawerOpen(false)} />
-      </Drawer>
+      </SwipeableDrawer>
     </>
   );
 }

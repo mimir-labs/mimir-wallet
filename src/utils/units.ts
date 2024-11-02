@@ -57,12 +57,38 @@ export function formatUnits(value: bigint | { toString: () => string }, decimals
   return `${negative ? '-' : ''}${integer || '0'}${fraction ? `.${fraction}` : ''}`;
 }
 
-export const formatDisplay = (value: string, sufLen = 4): [string, string] => {
-  if (value.includes('.')) {
-    const [pre, suf] = value.split('.');
+export const formatDisplay = (value: string): [string, string, string] => {
+  let [pre, suf] = ['', ''];
 
-    return sufLen === 0 ? [pre, ''] : [pre, suf.slice(0, sufLen)];
+  if (value.includes('.')) {
+    [pre, suf] = value.split('.');
+  } else {
+    pre = value;
   }
 
-  return [value, ''];
+  const preLen = pre.length;
+
+  let display;
+
+  if (preLen > 18) {
+    display = `${(Number(BigInt(pre) / BigInt(1e15)) / 1000).toFixed(3)} Qi`;
+  } else if (preLen > 15) {
+    display = `${(Number(BigInt(pre) / BigInt(1e12)) / 1000).toFixed(3)} Q`;
+  } else if (preLen > 12) {
+    display = `${(Number(BigInt(pre) / BigInt(1e9)) / 1000).toFixed(3)} T`;
+  } else if (preLen > 9) {
+    display = `${(Number(BigInt(pre) / BigInt(1e6)) / 1000).toFixed(3)} B`;
+  } else if (preLen > 6) {
+    display = `${(Number(BigInt(pre) / BigInt(1e3)) / 1000).toFixed(3)} M`;
+  } else if (preLen > 3) {
+    display = `${(Number(BigInt(pre) / BigInt(1e1)) / 1000).toFixed(3)} K`;
+  } else {
+    display = `${pre}.${suf}`;
+  }
+
+  const [amount, unit] = display.split(' ');
+
+  [pre, suf] = amount.split('.');
+
+  return [pre, suf.replace(/0+$/, '').slice(0, 3), unit];
 };

@@ -71,7 +71,7 @@ export function useHistoryTransactions(
       return fetcher(pageParam ? `${queryKey[0]}&next_cursor=${pageParam}` : `${queryKey[0]}`);
     },
     getNextPageParam: (data, allPages) => {
-      if (allPages.length === 20) {
+      if (allPages.length === 100) {
         return null;
       }
 
@@ -81,7 +81,7 @@ export function useHistoryTransactions(
 
       return null;
     },
-    maxPages: 20,
+    maxPages: 100,
     refetchInterval: 0
   });
 

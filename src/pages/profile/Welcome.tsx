@@ -16,7 +16,7 @@ import {
   useTheme
 } from '@mui/material';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import IconAdd from '@mimir-wallet/assets/svg/icon-add.svg?react';
 // import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
@@ -28,10 +28,12 @@ function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onC
   const selectAccount = useSelectedAccountCallback();
   const [selected, setSelected] = useState<string>(accounts[0].address);
   const [, confirm] = useUnConfirmMultisigs();
+  const navigate = useNavigate();
 
   const handleClick = () => {
     confirm(accounts.map((item) => item.address));
     selectAccount(selected);
+    navigate('/', { replace: true });
   };
 
   return (
@@ -78,7 +80,7 @@ function Welcome() {
       <Box
         sx={{
           display: 'flex',
-          flexDirection: { xs: 'column', sm: 'column' },
+          flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'center',
           alignItems: 'center',
           gap: { xs: 2, sm: 4, md: 6, lg: 8 },
@@ -88,18 +90,18 @@ function Welcome() {
         <Box sx={{ width: { xs: 185, sm: 309 }, overflow: 'hidden', borderRadius: { xs: 1.8, sm: 3 } }}>
           <video muted playsInline autoPlay loop src='/ux.mp4' controls={false} width='100%' />
         </Box>
-        <Stack spacing={2} width='100%'>
+        <Stack spacing={2} width={{ xs: '100%', sm: 'auto' }}>
           <Typography
             variant='h1'
             sx={{ fontWeight: 700, fontSize: { xs: '20px', sm: '30px', md: '40px' }, lineHeight: 1.1 }}
           >
-            Start your ultimate{downSm ? '' : <br />} multisig journey
+            Manage your assets{downSm ? '' : <br />} like a pro
           </Typography>
           <Typography sx={{ fontSize: '1rem', lineHeight: '19px', letterSpacing: '0.16px' }}>
-            · More security fund
-            <br />
-            · Policy Rules
-            <br />· Enterprise-Level Operation
+            · Multisig Accounts
+            <br />· Proxy Accounts
+            <br />· Batch Transactions
+            <br />· Account Structure Overview
           </Typography>
           {isConnected ? (
             accounts.length === 0 ? (
@@ -125,7 +127,7 @@ function Welcome() {
             ) : (
               <>
                 <Typography fontWeight={800} fontSize={{ xs: '1rem', sm: '1.25rem' }}>
-                  Detected Multisig
+                  Detected Account
                 </Typography>
                 <Detected accounts={accounts} onCreateMultisig={toggleCreateMultisigOpen} />
               </>

@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Endpoint } from '@mimir-wallet/config';
 import type { AddressMeta } from '@mimir-wallet/hooks/types';
 import type { AddressState } from './types';
 
@@ -10,7 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { ApiCtx, encodeAddress } from '@mimir-wallet/api';
 import { AddAddressDialog } from '@mimir-wallet/components';
-import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
+import { CURRENT_ADDRESS_PREFIX, SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
 import { addressEq, store } from '@mimir-wallet/utils';
 
 import { sync } from './sync';
@@ -20,6 +21,7 @@ import { WalletCtx } from './Wallet';
 
 interface Props {
   address?: string;
+  chain: Endpoint;
   children?: React.ReactNode;
 }
 const EMPTY_STATE = {
@@ -30,7 +32,7 @@ const EMPTY_STATE = {
 
 export const AddressCtx = React.createContext<AddressState>({} as AddressState);
 
-export function AddressCtxRoot({ address, children }: Props): React.ReactElement<Props> {
+export function AddressCtxRoot({ address, chain, children }: Props): React.ReactElement<Props> {
   const [state, setState] = useState<AddressState>({
     ...EMPTY_STATE
   });
@@ -101,9 +103,10 @@ export function AddressCtxRoot({ address, children }: Props): React.ReactElement
         setSwitchAddress(undefined);
         currentRef.current = value;
         setSearchParams(new URLSearchParams({ address: value }));
+        store.set(`${CURRENT_ADDRESS_PREFIX}${chain.key}`, value);
       }
     },
-    [setSearchParams]
+    [chain.key, setSearchParams]
   );
 
   const appendMeta = useCallback((meta: Record<string, AddressMeta>) => {

@@ -32,7 +32,15 @@ function ProxyInfo({
         borderRadius: 1
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary', fontSize: '0.75rem' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          color: 'text.secondary',
+          fontSize: '0.75rem'
+        }}
+      >
         <Typography flex={1} fontSize='inherit'>
           Review Window:{' '}
           <Box component='b' color='text.primary' fontWeight={700} marginRight={1}>
@@ -53,13 +61,20 @@ function ProxyInfo({
       <Box
         sx={{
           display: 'flex',
+          flexDirection: { sm: 'row', xs: 'column' },
           gap: 1,
           alignItems: 'center',
-          '&>.AddressCell': { bgcolor: 'background.paper', paddingY: 0.5, paddingX: 1, borderRadius: 1 }
+          '&>.AddressCell': { width: '100%', bgcolor: 'background.paper', paddingY: 0.5, paddingX: 1, borderRadius: 1 }
         }}
       >
         <AddressCell withCopy value={proxied} withAddressBook />
-        <SvgIcon component={IconArrow} fontSize='small' inheritViewBox color='primary' />
+        <SvgIcon
+          component={IconArrow}
+          fontSize='small'
+          inheritViewBox
+          color='primary'
+          sx={{ transform: { sm: 'none', xs: 'rotate(90deg)' } }}
+        />
         <AddressCell withCopy value={delegate} withAddressBook />
       </Box>
     </Box>

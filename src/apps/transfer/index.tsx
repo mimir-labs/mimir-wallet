@@ -66,7 +66,7 @@ function PageTransfer() {
   }, [addQueue, amount, api, format, isAmountValid, recipient, sending, token]);
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 500, margin: '10px auto' }}>
+    <Box sx={{ width: '100%', maxWidth: 500, margin: '0 auto', padding: { sm: 2, xs: 1.5 } }}>
       <Button onClick={() => navigate(-1)} variant='outlined'>
         {'<'} Back
       </Button>

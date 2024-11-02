@@ -123,7 +123,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
             bgcolor: 'primary.main',
             color: 'common.white',
             fontWeight: 700,
-            fontSize: 10
+            fontSize: size / 3
           }}
         >
           {who && who.length > 0 ? `${threshold}/${who.length}` : 'Multi'}

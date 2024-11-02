@@ -11,41 +11,35 @@ import { FormatBalance, Fund } from '@mimir-wallet/components';
 import { useAccount, useApi } from '@mimir-wallet/hooks';
 import { formatUnits } from '@mimir-wallet/utils';
 
-function ToggleAlert({ setAlertOpen }: { setAlertOpen: (state: boolean) => void }) {
+function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {
   const { api } = useApi();
-  const { current, addresses, isLocalAccount, addAddressBook } = useAccount();
+  const { addresses, isLocalAccount, addAddressBook } = useAccount();
   const [existing, setExisting] = useState(true);
   const [fundOpen, toggleFundOpen] = useToggle(false);
   const [forceHide, setForceHide] = useState(false);
 
   const hasThisAccount = useMemo(
-    () => !!current && (isLocalAccount(current) || !!addresses.find(({ watchlist }) => !!watchlist)),
-    [addresses, current, isLocalAccount]
+    () => isLocalAccount(address) || !!addresses.find(({ watchlist }) => !!watchlist),
+    [addresses, address, isLocalAccount]
   );
 
   useEffect(() => {
-    let unSubPromise: Promise<() => void> | undefined;
+    const unSubPromise: Promise<() => void> = api.derive.balances.all(address, (allBalances) => {
+      const existing = allBalances.freeBalance
+        .add(allBalances.reservedBalance)
+        .gte(api.consts.balances.existentialDeposit);
 
-    if (current) {
-      unSubPromise = api.derive.balances.all(current, (allBalances) => {
-        const existing = allBalances.freeBalance
-          .add(allBalances.reservedBalance)
-          .gte(api.consts.balances.existentialDeposit);
-
-        setExisting(existing);
-      });
-    } else {
-      setExisting(true);
-    }
+      setExisting(existing);
+    });
 
     return () => {
       unSubPromise?.then((unsub) => unsub());
     };
-  }, [api, current, setAlertOpen]);
+  }, [address, api, setAlertOpen]);
 
   useEffect(() => {
     setForceHide(false);
-  }, [current]);
+  }, [address]);
 
   const alertOpen = !forceHide && (!hasThisAccount || !existing);
 
@@ -56,7 +50,13 @@ function ToggleAlert({ setAlertOpen }: { setAlertOpen: (state: boolean) => void 
   return alertOpen ? (
     <>
       <Box
-        onClick={toggleFundOpen}
+        onClick={
+          !existing
+            ? toggleFundOpen
+            : () => {
+                addAddressBook(address, true);
+              }
+        }
         sx={{
           zIndex: 10,
           cursor: 'pointer',
@@ -89,7 +89,7 @@ function ToggleAlert({ setAlertOpen }: { setAlertOpen: (state: boolean) => void 
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                addAddressBook(current, true);
+                addAddressBook(address, true);
               }}
             >
               {'Add to watch list>>'}
@@ -113,7 +113,7 @@ function ToggleAlert({ setAlertOpen }: { setAlertOpen: (state: boolean) => void 
         defaultValue={formatUnits(api.consts.balances.existentialDeposit, api.registry.chainDecimals[0])}
         onClose={toggleFundOpen}
         open={fundOpen}
-        receipt={current}
+        receipt={address}
       />
     </>
   ) : null;

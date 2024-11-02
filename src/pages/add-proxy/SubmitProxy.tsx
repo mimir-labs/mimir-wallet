@@ -96,6 +96,8 @@ function SubmitProxy({
       return;
     }
 
+    toggleAlertOpen(false);
+
     if (proxyArgs.length > 1) {
       addQueue({
         call: api.tx.utility.batchAll(
@@ -116,7 +118,7 @@ function SubmitProxy({
           setProxyArgs([]);
         }
       });
-  }, [addQueue, api, proxied, proxyArgs, setProxyArgs]);
+  }, [addQueue, api, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
 
   const handleClickAction = useAsyncFn(async () => {
     const detacted: Set<string> = new Set();

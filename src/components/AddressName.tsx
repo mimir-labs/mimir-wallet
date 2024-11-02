@@ -50,7 +50,7 @@ function extractIdentity(address: string, identity: DeriveAccountRegistration): 
 
 function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
   const address = value?.toString() || '';
-  const { api } = useApi();
+  const { identityApi } = useApi();
   const info = useDeriveAccountInfo(address);
   const [chainName, setChainName] = useState<React.ReactNode>(() => extractName(address.toString()));
   const { meta } = useAddressMeta(address);
@@ -66,12 +66,12 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
       parentCache.set(cacheAddr, identity.parent.toString());
     }
 
-    if (api && isFunction(api.query.identity?.identityOf)) {
+    if (identityApi && isFunction(identityApi.query.identity?.identityOf)) {
       setChainName(() => (identity?.display ? extractIdentity(cacheAddr, identity) : extractName(cacheAddr)));
     } else if (nickname) {
       setChainName(nickname);
     }
-  }, [api, info, address]);
+  }, [identityApi, info, address]);
 
   if (isZeroAddress) {
     return <>ZeroAddress</>;

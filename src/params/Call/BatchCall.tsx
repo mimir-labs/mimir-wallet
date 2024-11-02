@@ -9,6 +9,7 @@ import { isArray } from '@polkadot/util';
 import React, { useMemo, useState } from 'react';
 
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
+import { ellipsisMixin } from '@mimir-wallet/components/utils';
 import { Call as CallComp } from '@mimir-wallet/params';
 
 import { CallDisplayDetail, CallDisplayDetailMinor, CallDisplaySection } from '../CallDisplay';
@@ -36,13 +37,14 @@ function Item({
     <Grid
       container
       columns={{ sm: 11, xs: 8 }}
-      sx={{ cursor: 'pointer', height: 40, paddingX: 1.2, fontSize: '0.75rem' }}
+      sx={{ cursor: 'pointer', height: 40, paddingX: { sm: 1.2, xs: 0.8 }, fontSize: '0.75rem' }}
       onClick={toggleOpen}
+      spacing={0.4}
     >
       <Grid size={1} sx={{ display: 'flex', alignItems: 'center' }}>
         {index}
       </Grid>
-      <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+      <Grid size={3} sx={{ display: 'flex', alignItems: 'center', ...ellipsisMixin() }}>
         <CallDisplaySection section={action?.[0]} method={action?.[1]} />
       </Grid>
       <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -77,8 +79,15 @@ function Item({
       {Top}
       {isOpen && (
         <Stack
-          spacing={1}
-          sx={{ marginBottom: 1, marginLeft: 1, marginRight: 1, bgcolor: 'white', borderRadius: 1, padding: 1 }}
+          spacing={{ sm: 1.2, xs: 0.8 }}
+          sx={{
+            marginBottom: { sm: 1.2, xs: 0.8 },
+            marginLeft: { sm: 1.2, xs: 0.8 },
+            marginRight: { sm: 1.2, xs: 0.8 },
+            bgcolor: 'white',
+            borderRadius: 1,
+            padding: { sm: 1.2, xs: 0.8 }
+          }}
         >
           <CallComp from={from} registry={registry} call={call} jsonFallback={jsonFallback} />
         </Stack>
