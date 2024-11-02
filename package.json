@@ -7,7 +7,7 @@
   "homepage": "/",
   "license": "Apache-2.0",
   "name": "mimir-wallet",
-  "packageManager": "yarn@4.5.0",
+  "packageManager": "yarn@4.5.1",
   "private": true,
   "repository": {
     "type": "git",
@@ -15,7 +15,7 @@
   },
   "sideEffects": false,
   "type": "commonjs",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "build": "vite build",
     "commit": "cz",
