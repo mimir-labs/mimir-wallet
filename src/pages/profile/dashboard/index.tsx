@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, Paper, Stack } from '@mui/material';
+import { Box, Button, Paper, Stack } from '@mui/material';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useMemo, useRef } from 'react';
 
@@ -15,6 +15,7 @@ import PendingTx from './PendingTx';
 import Structure from './Structure';
 
 function Dashboard({ address }: { address: string }) {
+  const { genesisHash } = useApi();
   const [tokenInfo] = useTokenInfo();
   const balances = useNativeBalances(address);
   const { tokenSymbol, api } = useApi();
@@ -49,6 +50,15 @@ function Dashboard({ address }: { address: string }) {
 
   return (
     <Stack spacing={2} width='100%'>
+      {[
+        '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
+        '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed'
+      ].includes(genesisHash) && (
+        <Box component='a' href='https://wave.bifrost.io' target='_blank' rel='noreferrer'>
+          <Box component='img' src='/images/bifrost.webp' sx={{ width: '100%', borderRadius: 2 }} />
+        </Box>
+      )}
+
       <Hero address={address} totalUsd={totalUsd} changes={changes} />
 
       <Paper sx={{ borderRadius: '20px', padding: 1, display: 'inline-flex', gap: { sm: 1, xs: 0.5 } }}>
