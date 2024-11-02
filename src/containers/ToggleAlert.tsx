@@ -2,51 +2,67 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
-import { useContext, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { FormatBalance, Fund } from '@mimir-wallet/components';
-import { useApi, useSelectedAccount, useToggle } from '@mimir-wallet/hooks';
+import { useAccount, useApi } from '@mimir-wallet/hooks';
+import { formatUnits } from '@mimir-wallet/utils';
 
-import { BaseContainerCtx } from './BaseContainer';
-
-function ToggleAlert({ setAlertOpen }: { setAlertOpen: (state: boolean) => void }) {
+function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {
   const { api } = useApi();
-  const selected = useSelectedAccount();
-  const { alertOpen } = useContext(BaseContainerCtx);
-  const [open, toggleOpen] = useToggle();
+  const { addresses, isLocalAccount, addAddressBook } = useAccount();
+  const [existing, setExisting] = useState(true);
+  const [fundOpen, toggleFundOpen] = useToggle(false);
+  const [forceHide, setForceHide] = useState(false);
+
+  const hasThisAccount = useMemo(
+    () => isLocalAccount(address) || !!addresses.find(({ watchlist }) => !!watchlist),
+    [addresses, address, isLocalAccount]
+  );
 
   useEffect(() => {
-    let unSubPromise: Promise<() => void> | undefined;
+    const unSubPromise: Promise<() => void> = api.derive.balances.all(address, (allBalances) => {
+      const existing = allBalances.freeBalance
+        .add(allBalances.reservedBalance)
+        .gte(api.consts.balances.existentialDeposit);
 
-    if (selected) {
-      unSubPromise = api.derive.balances.all(selected, (allBalances) => {
-        if (allBalances.freeBalance.add(allBalances.reservedBalance).lt(api.consts.balances.existentialDeposit)) {
-          setAlertOpen(true);
-        } else {
-          setAlertOpen(false);
-        }
-      });
-    } else {
-      setAlertOpen(false);
-    }
+      setExisting(existing);
+    });
 
     return () => {
       unSubPromise?.then((unsub) => unsub());
     };
-  }, [api, setAlertOpen, selected]);
+  }, [address, api, setAlertOpen]);
+
+  useEffect(() => {
+    setForceHide(false);
+  }, [address]);
+
+  const alertOpen = !forceHide && (!hasThisAccount || !existing);
+
+  useEffect(() => {
+    setAlertOpen(alertOpen);
+  }, [alertOpen, setAlertOpen]);
 
   return alertOpen ? (
     <>
       <Box
-        onClick={toggleOpen}
+        onClick={
+          !existing
+            ? toggleFundOpen
+            : () => {
+                addAddressBook(address, true);
+              }
+        }
         sx={{
+          zIndex: 10,
           cursor: 'pointer',
-          position: 'fixed',
+          position: 'sticky',
           top: 56,
           width: '100%',
-          zIndex: 1201,
           paddingX: 2,
           display: 'flex',
           alignItems: 'center',
@@ -57,15 +73,48 @@ function ToggleAlert({ setAlertOpen }: { setAlertOpen: (state: boolean) => void 
         }}
       >
         <SvgIcon component={IconInfo} inheritViewBox />
-        <Typography sx={{ flex: '1' }}>
-          To prevent this account from being purged, please transfer{' '}
-          <FormatBalance value={api.consts.balances.existentialDeposit} /> to keep the account alive.
-        </Typography>
-        <IconButton color='inherit' onClick={() => setAlertOpen(false)}>
+        {!existing && (
+          <Typography sx={{ flex: '1' }}>
+            To prevent this account from being purged, please transfer{' '}
+            <FormatBalance value={api.consts.balances.existentialDeposit} /> to keep the account alive.
+          </Typography>
+        )}
+
+        {!hasThisAccount && (
+          <Typography sx={{ flex: '1' }}>
+            You are not a member of this account, currently in Watch-only mode.
+            <Box
+              component='span'
+              sx={{ cursor: 'pointer', ':hover': { textDecorationLine: 'underline' } }}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                addAddressBook(address, true);
+              }}
+            >
+              {'Add to watch list>>'}
+            </Box>
+          </Typography>
+        )}
+
+        <IconButton
+          color='inherit'
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setForceHide(true);
+          }}
+        >
           <SvgIcon component={IconClose} inheritViewBox />
         </IconButton>
       </Box>
-      <Fund defaultValue={api.consts.balances.existentialDeposit} onClose={toggleOpen} open={open} receipt={selected} />
+
+      <Fund
+        defaultValue={formatUnits(api.consts.balances.existentialDeposit, api.registry.chainDecimals[0])}
+        onClose={toggleFundOpen}
+        open={fundOpen}
+        receipt={address}
+      />
     </>
   ) : null;
 }

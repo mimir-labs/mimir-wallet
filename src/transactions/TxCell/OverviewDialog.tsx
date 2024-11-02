@@ -1,23 +1,36 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Filtered } from '@mimir-wallet/hooks/ctx/types';
-
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { IMethod } from '@polkadot/types/types';
+import { HexString } from '@polkadot/util/types';
 import React from 'react';
 
-import { TxOverview } from '@mimir-wallet/components';
-import { CalldataStatus, type Transaction } from '@mimir-wallet/hooks/types';
+import { HistoryTxOverview, TxOverview } from '@mimir-wallet/components';
+import { useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { type AccountData, FilterPath, type Transaction, TransactionStatus } from '@mimir-wallet/hooks/types';
 
 interface Props {
-  tx: Transaction;
-  approveFiltered?: Filtered;
-  cancelFiltered?: Filtered;
+  account: AccountData;
+  transaction: Transaction;
   open: boolean;
   onClose: () => void;
 }
 
-function OverviewDialog({ approveFiltered, cancelFiltered, onClose, open, tx }: Props) {
+function OverviewDialog({ account, transaction, onClose, open }: Props) {
+  const { api } = useApi();
+  const { addQueue } = useTxQueue();
+
+  const onApprove = (call: IMethod | HexString, filterPaths: FilterPath[]) => {
+    addQueue({
+      accountId: transaction.address,
+      call: api.createType('Call', call),
+      filterPaths,
+      transaction
+    });
+    onClose();
+  };
+
   return (
     <Dialog fullWidth maxWidth='lg' onClose={onClose} open={open}>
       <DialogTitle>Progress Overview</DialogTitle>
@@ -28,12 +41,10 @@ function OverviewDialog({ approveFiltered, cancelFiltered, onClose, open, tx }: 
           borderRadius: 1
         }}
       >
-        {open && (
-          <TxOverview
-            approveFiltered={tx.status < CalldataStatus.Success ? approveFiltered : undefined}
-            cancelFiltered={tx.status < CalldataStatus.Success ? cancelFiltered : undefined}
-            tx={tx}
-          />
+        {open && transaction.status < TransactionStatus.Success ? (
+          <TxOverview account={account} call={transaction.call} transaction={transaction} onApprove={onApprove} />
+        ) : (
+          <HistoryTxOverview transaction={transaction} />
         )}
       </DialogContent>
     </Dialog>

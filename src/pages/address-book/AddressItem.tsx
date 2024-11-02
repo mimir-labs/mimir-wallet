@@ -8,15 +8,18 @@ import { Link } from 'react-router-dom';
 import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
 import IconQr from '@mimir-wallet/assets/svg/icon-qr.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
-import { AddressCell, AddressRow, CopyButton, EditAddressDialog } from '@mimir-wallet/components';
+import { AddressCell, AddressRow, CopyButton, EditAddressDialog, QrcodeAddress } from '@mimir-wallet/components';
 import { useAddressMeta, useToggle } from '@mimir-wallet/hooks';
 import { chainLinks } from '@mimir-wallet/utils';
 
 function Icons({ address }: { address: string }) {
+  const [qrOpen, toggleQrOpen] = useToggle();
+
   return (
     <>
+      <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={address} />
       <CopyButton color='primary' size='small' value={address} />
-      <IconButton color='primary' size='small'>
+      <IconButton color='primary' size='small' onClick={toggleQrOpen}>
         <SvgIcon component={IconQr} inheritViewBox />
       </IconButton>
       <IconButton
@@ -42,14 +45,32 @@ function AddressItem({ address }: { address: string }) {
   return (
     <>
       <EditAddressDialog address={address} onClose={toggleOpen} open={open} />
+
       {downSm && (
-        <Paper sx={{ borderRadius: '20px', padding: 1.5, boxShadow: '0px 0px 10px rgba(21, 31, 52, 0.06)' }}>
-          <AddressCell icons={<Icons address={address} />} shorten value={address} withCopy={false} />
+        <Paper
+          sx={{
+            borderRadius: '20px',
+            padding: 1.5,
+            boxShadow: '0px 0px 10px rgba(21, 31, 52, 0.06)',
+            '.AddressCell-Content': {
+              marginLeft: 1
+            },
+            '.AddressCell-Name': {
+              fontSize: '1.125rem'
+            },
+            '.AddressCell-Address': {
+              marginTop: 1,
+              fontSize: '0.875rem'
+            }
+          }}
+        >
+          <AddressCell iconSize={50} icons={<Icons address={address} />} shorten value={address} withCopy={false} />
           <Box sx={{ display: 'flex', gap: 1, marginTop: 2 }}>
-            <Button onClick={toggleOpen} variant='outlined'>
+            <Button size='small' onClick={toggleOpen} variant='outlined' sx={{ marginLeft: 6 }}>
               Edit
             </Button>
             <Button
+              size='small'
               component={Link}
               endIcon={<SvgIcon component={IconSend} inheritViewBox />}
               to={`/transfer?to=${address}`}

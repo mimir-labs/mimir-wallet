@@ -1,25 +1,20 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Transaction } from '@mimir-wallet/hooks/types';
-
-import { Box, Chip, Paper, SvgIcon, Typography } from '@mui/material';
+import { Box, Chip, Paper, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
-import { Empty } from '@mimir-wallet/components';
-import { useAddressMeta, useDapp, usePendingTransactions } from '@mimir-wallet/hooks';
-import { extraTransaction } from '@mimir-wallet/transactions';
+import { AppName, Empty } from '@mimir-wallet/components';
+import { usePendingTransactions } from '@mimir-wallet/hooks';
+import { Transaction, TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { formatTransactionId } from '@mimir-wallet/transactions';
 
 function Row({ isStart, transaction }: { transaction: Transaction; isStart: boolean }) {
-  const { meta } = useAddressMeta(transaction.sender);
-  const [approvals] = useMemo(
-    (): [number, Transaction[]] => (meta ? extraTransaction(meta, transaction) : [0, []]),
-    [meta, transaction]
+  const counts = useMemo(
+    () => transaction.children.filter((item) => item.status === TransactionStatus.Success).length,
+    [transaction]
   );
-  const destTx = transaction.top;
-  const dapp = useDapp(transaction.initTransaction.website);
 
   return (
     <Box
@@ -38,14 +33,20 @@ function Row({ isStart, transaction }: { transaction: Transaction; isStart: bool
       }}
       to='/transactions'
     >
-      {dapp ? (
-        <Box component='img' src={dapp.icon} width={16} />
-      ) : (
-        <SvgIcon color='primary' component={IconSend} inheritViewBox />
+      <AppName
+        hiddenName
+        iconSize={16}
+        website={transaction.website}
+        appName={transaction.appName}
+        iconUrl={transaction.iconUrl}
+      />
+      <Typography sx={{ width: 120 }}>No.{formatTransactionId(transaction.id)}</Typography>
+      <Typography sx={{ flex: '1' }}>
+        {transaction.section}.{transaction.method}
+      </Typography>
+      {transaction.type === TransactionType.Multisig && (
+        <Chip color='primary' label={`${counts}/${transaction.threshold}`} size='small' />
       )}
-      <Typography sx={{ width: 120 }}>No.{destTx.uuid.slice(0, 8).toUpperCase()}</Typography>
-      <Typography sx={{ flex: '1' }}>{destTx.action}</Typography>
-      <Chip color='primary' label={`${approvals}/${meta?.threshold}`} size='small' />
     </Box>
   );
 }
@@ -72,7 +73,7 @@ function Transactions({ address }: { address?: string }) {
           }}
         >
           {pendingTransactions.map((item, index) => (
-            <Row isStart={index === 0} key={item.uuid} transaction={item} />
+            <Row isStart={index === 0} key={item.id} transaction={item} />
           ))}
         </Box>
       ) : (

@@ -28,7 +28,7 @@ const createTypography: Func = () => ({
   h1: {
     fontSize: '2rem',
     fontWeight: 700,
-    lineHeight: 1.2,
+    lineHeight: 1.1,
     '@media (max-width:600px)': {
       fontSize: '1.8rem'
     }
@@ -36,7 +36,7 @@ const createTypography: Func = () => ({
   h2: {
     fontSize: '1.75rem',
     fontWeight: 700,
-    lineHeight: 1.2,
+    lineHeight: 1.1,
     '@media (max-width:600px)': {
       fontSize: '1.6rem'
     }
@@ -44,7 +44,7 @@ const createTypography: Func = () => ({
   h3: {
     fontSize: '1.5rem',
     fontWeight: 700,
-    lineHeight: 1.2,
+    lineHeight: 1.1,
     '@media (max-width:600px)': {
       fontSize: '1.375rem'
     }
@@ -52,22 +52,22 @@ const createTypography: Func = () => ({
   h4: {
     fontSize: '1.25rem',
     fontWeight: 700,
-    lineHeight: 1.2
+    lineHeight: 1.1
   },
   h5: {
     fontSize: '1.125rem',
     fontWeight: 700,
-    lineHeight: 1.2
+    lineHeight: 1.1
   },
   h6: {
     fontSize: '1rem',
     fontWeight: 700,
-    lineHeight: 1.2
+    lineHeight: 1.1
   },
   inherit: {
     fontSize: '0.875rem',
     fontWeight: 400,
-    lineHeight: 1.2
+    lineHeight: 1.1
   },
   body1: {
     fontSize: '0.875rem'

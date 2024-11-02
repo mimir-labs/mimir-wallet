@@ -6,12 +6,13 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 
 import { Box } from '@mui/material';
 import { Polkadot as PolkadotIcon } from '@polkadot/react-identicon/icons/Polkadot';
-import keyring from '@polkadot/ui-keyring';
-import { isHex, isU8a } from '@polkadot/util';
+import { hexToU8a, isHex, isU8a } from '@polkadot/util';
 import React, { useCallback, useMemo } from 'react';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import { walletConfig } from '@mimir-wallet/config';
 import { useAddressMeta } from '@mimir-wallet/hooks';
+import { addressEq } from '@mimir-wallet/utils';
 
 interface Props {
   className?: string;
@@ -32,7 +33,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
   const { address, publicKey } = useMemo(() => {
     try {
       const _value = isCodec(value) ? value.toString() : value;
-      const address = isU8a(_value) || isHex(_value) ? keyring.encodeAddress(_value, prefix) : _value || '';
+      const address = isU8a(_value) || isHex(_value) ? encodeAddress(_value, prefix) : _value || '';
 
       return { address, publicKey: '0x' };
     } catch {
@@ -41,7 +42,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
   }, [prefix, value]);
   const { meta } = useAddressMeta(value?.toString());
 
-  const { isInjected, isMultisig, source, threshold, who } = meta || {};
+  const { isInjected, isMultisig, source, threshold, who, multipleMultisig } = meta || {};
 
   const extensionIcon = isInjected ? walletConfig[source || '']?.icon : undefined;
 
@@ -49,7 +50,9 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
     onClick?.(value?.toString());
   }, [onClick, value]);
 
-  if (isMe) {
+  const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
+
+  if (isMe || isZeroAddress) {
     return (
       <Box
         className={`${className} IdentityIcon`}
@@ -70,7 +73,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
           lineHeight: 1
         }}
       >
-        Me
+        {isMe ? 'Me' : '0'}
       </Box>
     );
   }
@@ -103,7 +106,7 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
           }}
         />
       ) : null}
-      {isMultisig && (
+      {((who && who.length > 0) || multipleMultisig) && (
         <Box
           component='span'
           sx={{
@@ -111,21 +114,19 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
             left: 0,
             right: 0,
             bottom: 0,
-            height: 12 + size / 8,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             width: '100%',
-            borderRadius: `${6 + size / 16}px`,
+            height: Math.max(12, size / 2.5),
+            borderRadius: `${Math.max(12, size / 2.5) / 2}px`,
             bgcolor: 'primary.main',
             color: 'common.white',
             fontWeight: 700,
-            fontSize: '0.75rem',
-            transformOrigin: 'center',
-            transform: size < 24 ? `scale(${size / 24})` : undefined
+            fontSize: size / 3
           }}
         >
-          {threshold}/{who?.length}
+          {who && who.length > 0 ? `${threshold}/${who.length}` : 'Multi'}
         </Box>
       )}
     </Box>

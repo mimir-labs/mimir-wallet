@@ -18,15 +18,14 @@ import {
   Switch,
   Typography
 } from '@mui/material';
-import keyring from '@polkadot/ui-keyring';
 import { isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
-import { AddAddressDialog, Address, AddressRow, Input } from '@mimir-wallet/components';
-import { useApi, useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
-import { isLocalAccount, isLocalAddress } from '@mimir-wallet/utils';
+import { Address, AddressRow, Input } from '@mimir-wallet/components';
+import { useAccount, useApi, useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
@@ -48,9 +47,10 @@ function checkError(
   ];
 }
 
-function PageCreateMultisig() {
+function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
   const navigate = useNavigate();
   const { systemChain } = useApi();
+  const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [name, setName] = useState<string>('');
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({
     address: '',
@@ -58,8 +58,7 @@ function PageCreateMultisig() {
   });
   const [flexible, setFlexible] = useState(false);
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
-    useSelectMultisig();
-  const [addOpen, toggleAdd] = useToggle();
+    useSelectMultisig(undefined, undefined, threshold1);
   const [addressError, setAddressError] = useState<Error | null>(null);
   const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
 
@@ -72,14 +71,14 @@ function PageCreateMultisig() {
   const handleAdd = useCallback(() => {
     if (isAddressValid) {
       if (!isLocalAddress(address) && !isLocalAccount(address)) {
-        toggleAdd();
+        addAddressBook(address, false, select);
       } else {
         select(address);
       }
     } else {
       setAddressError(new Error('Please input correct address'));
     }
-  }, [address, isAddressValid, select, toggleAdd]);
+  }, [addAddressBook, address, isAddressValid, isLocalAccount, isLocalAddress, select]);
 
   const _onChangeThreshold = useCallback(
     (value: string) => {
@@ -125,21 +124,20 @@ function PageCreateMultisig() {
           ) : (
             <Stack spacing={1.5}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant='h3'>Create Multisig</Typography>
+                <Typography variant='h3'>{threshold1 ? 'Create 1/N Multisig' : 'Create Multisig'}</Typography>
                 {/* <Button variant='outlined'>Import</Button> */}
               </Box>
               <Divider />
               <Input label='Name' onChange={setName} placeholder='input multisig account name' value={name} />
               <Input
                 endButton={
-                  <>
-                    <Button onClick={handleAdd} variant='contained'>
-                      Add
-                    </Button>
-                    {address && isAddressValid && (
-                      <AddAddressDialog defaultAddress={address} onAdded={select} onClose={toggleAdd} open={addOpen} />
-                    )}
-                  </>
+                  <Button
+                    disabled={threshold1 ? signatories.length === 1 : false}
+                    onClick={handleAdd}
+                    variant='contained'
+                  >
+                    Add
+                  </Button>
                 }
                 error={addressError}
                 label='Add Members'
@@ -150,7 +148,7 @@ function PageCreateMultisig() {
                     setAddressError(null);
                   }
 
-                  setAddress({ isAddressValid, address: isAddressValid ? keyring.encodeAddress(value) : value });
+                  setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value) : value });
                 }}
                 placeholder='input address'
                 value={address}
@@ -167,9 +165,29 @@ function PageCreateMultisig() {
                   <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
                   <AccountSelect accounts={signatories} onClick={unselect} title='Members' type='delete' />
                 </Box>
-                {memberError && <FormHelperText sx={{ color: 'error.main' }}>{memberError.message}</FormHelperText>}
+                {threshold1 && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 0.5,
+                      marginTop: 1,
+                      color: 'text.secondary',
+                      lineHeight: 1.1,
+                      fontSize: '0.75rem'
+                    }}
+                  >
+                    <SvgIcon inheritViewBox component={IconInfo} fontSize='inherit' />
+                    Every member can directly initiate transactions. Please select trusted accounts as members.
+                  </Box>
+                )}
+                {memberError && (
+                  <FormHelperText sx={{ marginTop: 1, color: 'error.main' }}>{memberError.message}</FormHelperText>
+                )}
               </Paper>
               <Input
+                disabled={threshold1}
                 defaultValue={String(threshold)}
                 error={thresholdError}
                 label='Threshold'
@@ -179,7 +197,11 @@ function PageCreateMultisig() {
                 <Typography fontWeight={700}>Flexible Multisig</Typography>
                 <Switch checked={flexible} onChange={(e) => setFlexible(e.target.checked)} />
               </Box>
-              <Alert severity='warning'>
+              <Alert
+                icon={<SvgIcon inheritViewBox component={IconInfo} sx={{ fontSize: '0.875rem' }} />}
+                severity='warning'
+                sx={{ '.MuiAlert-message': { overflow: 'visible' } }}
+              >
                 <AlertTitle>Notice</AlertTitle>
                 {flexible ? (
                   <ul>
@@ -231,10 +253,10 @@ function PageCreateMultisig() {
                   if (item.pure) {
                     setPrepare({
                       creator: item.creator,
-                      who: item.who.map((address) => keyring.encodeAddress(address)),
+                      who: item.who.map((address) => encodeAddress(address)),
                       threshold: item.threshold,
                       name: item.name,
-                      pure: item.pure ? keyring.encodeAddress(item.pure) : null,
+                      pure: item.pure ? encodeAddress(item.pure) : null,
                       blockNumber: item.blockNumber,
                       extrinsicIndex: item.extrinsicIndex
                     });

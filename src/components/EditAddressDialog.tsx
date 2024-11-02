@@ -17,7 +17,7 @@ function Content({ address, onClose }: { address: string; onClose?: () => void }
       <DialogContent>
         <Stack spacing={2}>
           <Input label='Name' onChange={setName} placeholder='input name for contact' value={name} />
-          <Input label='Address' placeholder='input address' value={address} />
+          <Input disabled label='Address' placeholder='input address' value={address} />
         </Stack>
       </DialogContent>
       <DialogActions>
@@ -44,7 +44,7 @@ function AddAddressDialog({ address, onClose, open }: { address: string; open: b
   return (
     <Dialog fullWidth maxWidth='sm' onClick={(e) => e.stopPropagation()} onClose={onClose} open={open}>
       <DialogTitle>
-        <Typography variant='h4'>Edit Address</Typography>
+        <Typography variant='h4'>Edit Name</Typography>
       </DialogTitle>
       <Content address={address} onClose={onClose} />
     </Dialog>

@@ -1,125 +1,116 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ApiPromise } from '@polkadot/api';
+import type { HistoryTransaction, Transaction } from './types';
 
-import { addressEq } from '@polkadot/util-crypto';
-import { useEffect, useRef, useState } from 'react';
-import useSWR from 'swr';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { isEqual } from 'lodash-es';
+import { useEffect, useState } from 'react';
 
-import { getServiceUrl } from '@mimir-wallet/utils/service';
+import { encodeAddress } from '@mimir-wallet/api';
+import { fetcher } from '@mimir-wallet/utils';
+import { serviceUrl } from '@mimir-wallet/utils/chain-links';
 
-import { BestTx, Calldata, Transaction } from './types';
-import { useApi } from './useApi';
-import { createTransaction, mergeCalldata } from './utils';
+function transformTransaction(transaction: Transaction): Transaction {
+  const tx = { ...transaction };
 
-function extraTransaction(api: ApiPromise, transactionCache: Map<string, Transaction>, calldatas: Calldata[][]): void {
-  if (calldatas.length === 0) return;
+  tx.address = encodeAddress(tx.address);
 
-  for (const items of calldatas) {
-    if (items.length === 0) continue;
-
-    let transaction: Transaction | undefined | null = transactionCache.get(items[items.length - 1].uuid);
-
-    if (!transaction) {
-      transaction = createTransaction(api, items[items.length - 1], true);
-      transactionCache.set(transaction.uuid, transaction);
-    }
-
-    for (let i = items.length - 2; i >= 0; i--) {
-      const calldata = items[i];
-
-      transaction = transaction.addChild(createTransaction(api, calldata, true));
-      transactionCache.set(transaction.uuid, transaction);
-    }
-
-    const initTransaction = transaction;
-
-    while (true) {
-      if (!transaction.initTransaction) {
-        transaction.initTransaction = initTransaction;
-      } else if ((transaction.initTransaction.height || 0) > (initTransaction.height || 0)) {
-        transaction.initTransaction = initTransaction;
-      }
-
-      if (transaction === transaction.parent) {
-        break;
-      }
-
-      transaction = transaction.parent;
-    }
+  if (tx.delegate) {
+    tx.delegate = encodeAddress(tx.delegate);
   }
+
+  if (tx.members) {
+    tx.members = tx.members.map((item) => encodeAddress(item));
+  }
+
+  return {
+    ...tx,
+    children: tx.children.map((item) => transformTransaction(item))
+  };
 }
 
-export function usePendingTransactions(address?: string | null): [transactions: Transaction[], isLoading: boolean] {
-  const { api, isApiReady } = useApi();
+export function usePendingTransactions(
+  address?: string | null
+): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
+  const { data, isFetched, isFetching } = useQuery<Transaction[]>({
+    initialData: [],
+    queryHash: serviceUrl(`tx/pending?address=${address}`),
+    queryKey: [address ? serviceUrl(`tx/pending?address=${address}`) : null],
+    structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
+      const nextData = (next as Transaction[]).map((item) => transformTransaction(item));
 
-  const { data, isLoading, mutate } = useSWR<{ bestTx: BestTx[]; tx: Calldata[][] }>(
-    isApiReady && address ? getServiceUrl(`tx/pending?address=${address}`) : null
-  );
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-
-  useEffect(() => {
-    if (address && data) {
-      const transactionCache: Map<string, Transaction> = new Map();
-
-      extraTransaction(api, transactionCache, data.tx);
-
-      if (data.bestTx.length > 0) {
-        mergeCalldata(api, transactionCache, data.bestTx).then(() => {
-          setTransactions(Array.from(transactionCache.values()).filter((item) => addressEq(address, item.sender)));
-        });
-      } else {
-        setTransactions(Array.from(transactionCache.values()).filter((item) => addressEq(address, item.sender)));
-      }
+      return isEqual(prev, nextData) ? (prev as Transaction[]) || [] : nextData;
     }
-  }, [address, api, data]);
+  });
 
-  useEffect(() => {
-    if (!isApiReady) return;
-    let timeout: any;
-
-    const unsub = api.rpc.chain.subscribeNewHeads(() => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        mutate();
-      }, 1000);
-    });
-
-    return () => {
-      unsub.then((fn) => fn());
-    };
-  }, [api.rpc.chain, isApiReady, mutate]);
-
-  return [transactions, isLoading];
+  return [data, isFetched, isFetching];
 }
 
 export function useHistoryTransactions(
   address?: string | null,
-  page = 1,
-  limit = 10
-): [transactions: Transaction[], page: number, limit: number, total: number, isLoading: boolean] {
-  const { api, isApiReady } = useApi();
-  const totalRef = useRef<number>(0);
+  limit = 20
+): [
+  transactions: HistoryTransaction[],
+  isFetched: boolean,
+  isFetching: boolean,
+  hasNextPage: boolean,
+  isFetchingNextPage: boolean,
+  fetchNextPage: () => void
+] {
+  const [txs, setTxs] = useState<HistoryTransaction[]>([]);
 
-  const { data, isLoading } = useSWR<{ tx: Calldata[][]; page: number; limit: number; total: number }>(
-    isApiReady && address ? getServiceUrl(`tx/history?address=${address}&page=${page}&limit=${limit}`) : null
-  );
+  const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
+    initialPageParam: null,
+    queryKey: [address ? serviceUrl(`tx/history?address=${address}&limit=${limit}`) : null],
+    queryFn: async ({ pageParam, queryKey }) => {
+      if (!queryKey[0]) {
+        return undefined;
+      }
 
-  if (data) {
-    totalRef.current = data.total;
-  }
+      return fetcher(pageParam ? `${queryKey[0]}&next_cursor=${pageParam}` : `${queryKey[0]}`);
+    },
+    getNextPageParam: (data, allPages) => {
+      if (allPages.length === 100) {
+        return null;
+      }
 
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+      if (data.length) {
+        return data.length === limit ? data[data.length - 1].uuid : null;
+      }
+
+      return null;
+    },
+    maxPages: 100,
+    refetchInterval: 0
+  });
 
   useEffect(() => {
-    if (address && data) {
-      const transactionCache: Map<string, Transaction> = new Map();
+    if (data) {
+      setTxs((value) => {
+        const newData = data.pages.flat().map((item) => transformTransaction(item) as HistoryTransaction);
 
-      extraTransaction(api, transactionCache, data.tx);
-      setTransactions(Array.from(transactionCache.values()).filter((item) => addressEq(address, item.sender)));
+        return isEqual(newData, value) ? value : newData;
+      });
     }
-  }, [address, api, data]);
+  }, [data]);
 
-  return [transactions, data?.page || page, data?.limit || limit, totalRef.current, isLoading];
+  return [txs, isFetched, isFetching, hasNextPage, isFetchingNextPage, fetchNextPage];
+}
+
+export function useTransactionDetail(
+  id?: string
+): [transactions: Transaction | null, isFetched: boolean, isFetching: boolean] {
+  const { data, isFetched, isFetching } = useQuery<Transaction | null>({
+    initialData: null,
+    queryHash: serviceUrl(`tx-details/${id}`),
+    queryKey: [id ? serviceUrl(`tx-details/${id}`) : null],
+    structuralSharing: (prev: unknown | undefined, next: unknown): Transaction | null => {
+      const nextData = next ? transformTransaction(next as Transaction) : null;
+
+      return isEqual(prev, nextData) ? (prev as Transaction) || null : nextData;
+    }
+  });
+
+  return [data, isFetched, isFetching];
 }

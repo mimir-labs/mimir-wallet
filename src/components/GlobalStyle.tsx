@@ -16,24 +16,24 @@ function GlobalStyle() {
             src: "url('/fonts/SofiaSansSemiCondensed-VariableFont_wght.ttf')"
           },
           'body,html': {
-            lineHeight: 1.2
+            lineHeight: 1.1
           },
           body: {
             background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
           },
           'html,body,#root': {
-            height: '100%'
+            minHeight: '100dvh'
           },
           ul: {
             paddingLeft: 0,
             margin: 0
           },
           ':root': {
-            '--toastify-text-color-light': palette.text.primary,
-            '--toastify-color-info': palette.info.main,
-            '--toastify-color-success': palette.success.main,
-            '--toastify-color-warning': palette.warning.main,
-            '--toastify-color-error': palette.error.main
+            '--toastify-text-color-light': `${palette.text.primary} !important`,
+            '--toastify-color-info': `${palette.info.main} !important`,
+            '--toastify-color-success': `${palette.success.main} !important`,
+            '--toastify-color-warning': `${palette.warning.main} !important`,
+            '--toastify-color-error': `${palette.error.main} !important`
           },
           '.Toastify__toast-icon': {
             width: 'auto',

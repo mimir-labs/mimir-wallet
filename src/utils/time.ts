@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@mimir-wallet/constants';
+
 const timeUnits: [string, number][] = [
   ['Y', 1000 * 60 * 60 * 24 * 365], // years
   ['M', 1000 * 60 * 60 * 24 * 30], // months
@@ -45,18 +47,26 @@ export function formatTimeStr(duration: number, format: string) {
   });
 }
 
-export function formatCountdown(value: number | string, format: string) {
-  const target = new Date(value).getTime();
-  const current = Date.now();
-  const diff = Math.max(target - current, 0);
-
-  return formatTimeStr(diff, format);
+export function autoFormatTimeStr(duration: number) {
+  return duration > ONE_DAY * 1000
+    ? `${formatTimeStr(duration, 'D')} days`
+    : duration > ONE_HOUR * 1000
+      ? `${formatTimeStr(duration, 'H')} hours`
+      : duration > ONE_MINUTE * 1000
+        ? `${formatTimeStr(duration, 'm')} minutes`
+        : `${formatTimeStr(duration, 's')} seconds`;
 }
 
-export function formatAgo(value: number | string, format: string) {
+export function formatCountdown(value: number | string, current = Date.now()) {
   const target = new Date(value).getTime();
-  const current = Date.now();
+  const diff = Math.max(target - current, 0);
+
+  return autoFormatTimeStr(diff);
+}
+
+export function formatAgo(value: number | string, current = Date.now()) {
+  const target = new Date(value).getTime();
   const diff = Math.max(current - target, 0);
 
-  return formatTimeStr(diff, format);
+  return autoFormatTimeStr(diff);
 }

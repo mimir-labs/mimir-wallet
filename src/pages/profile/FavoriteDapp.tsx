@@ -3,7 +3,7 @@
 
 import type { DappOption } from '@mimir-wallet/config';
 
-import Grid from '@mui/material/Unstable_Grid2';
+import { Grid2 as Grid } from '@mui/material';
 
 import { DappCell } from '@mimir-wallet/components';
 
@@ -22,7 +22,7 @@ function FavoriteDapps({
     <Grid columns={{ xs: 12 }} container spacing={2.5}>
       {dapps.map((dapp, index) => {
         return (
-          <Grid key={index} lg={4} sm={6} xs={12}>
+          <Grid key={index} size={{ lg: 4, sm: 6, xs: 12 }}>
             <DappCell addFavorite={addFavorite} dapp={dapp} isFavorite={isFavorite} removeFavorite={removeFavorite} />
           </Grid>
         );

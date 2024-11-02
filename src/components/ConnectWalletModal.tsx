@@ -1,19 +1,28 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, Dialog, DialogContent, DialogTitle, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Grid2 as Grid,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import { AccessCredentials, initializePlutonicationDAppClientWithModal } from '@plutonication/plutonication';
-import React, { useContext } from 'react';
+import React from 'react';
 
 import { walletConfig } from '@mimir-wallet/config';
-import { WalletCtx } from '@mimir-wallet/hooks';
+import { useWallet } from '@mimir-wallet/hooks';
 
 import { toastError } from './ToastRoot';
 import WalletIcon from './WalletIcon';
 
 function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: string; downloadUrl: string }) {
-  const { connect, connectedWallets, disconnect, wallets } = useContext(WalletCtx);
+  const { connect, connectedWallets, disconnect, wallets } = useWallet();
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
 
@@ -77,7 +86,7 @@ function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => v
         <DialogContent sx={{ overflow: 'hidden' }}>
           <Grid columns={{ xs: 12 }} container spacing={{ sm: 4, xs: 2 }}>
             {Object.entries(walletConfig).map(([id, config]) => (
-              <Grid key={id} sm={3} xs={4}>
+              <Grid key={id} size={{ sm: 3, xs: 4 }}>
                 <WalletCell downloadUrl={config.downloadUrl} id={id} name={config.name} />
               </Grid>
             ))}

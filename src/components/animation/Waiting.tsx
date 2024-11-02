@@ -1,14 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box } from '@mui/material';
 import lottie, { AnimationItem } from 'lottie-web';
 import { useEffect, useRef } from 'react';
 
-import DataJson from './waiting-data.json';
+import DataJson from './lottie-waiting.json';
 
-function Waiting({ size = 28 }: { size?: number }) {
-  const container = useRef<HTMLDivElement>();
+function Waiting({ size = 28, loop = false }: { size?: number; loop?: boolean }) {
+  const container = useRef(null);
 
   useEffect(() => {
     let animation: AnimationItem | null = null;
@@ -17,7 +16,7 @@ function Waiting({ size = 28 }: { size?: number }) {
       animation = lottie.loadAnimation({
         container: container.current,
         renderer: 'svg',
-        loop: true,
+        loop,
         autoplay: true,
         animationData: DataJson
       });
@@ -26,9 +25,9 @@ function Waiting({ size = 28 }: { size?: number }) {
     return () => {
       animation?.destroy();
     };
-  }, []);
+  }, [loop]);
 
-  return <Box ref={container} sx={{ width: size, height: size }} />;
+  return <div ref={container} style={{ width: size, height: size }} />;
 }
 
 export default Waiting;

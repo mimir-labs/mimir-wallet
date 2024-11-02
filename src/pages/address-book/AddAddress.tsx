@@ -4,19 +4,15 @@
 import { Button } from '@mui/material';
 import React from 'react';
 
-import { AddAddressDialog } from '@mimir-wallet/components';
-import { useToggle } from '@mimir-wallet/hooks';
+import { useAccount } from '@mimir-wallet/hooks';
 
 function AddAddress() {
-  const [open, toggleOpen] = useToggle();
+  const { addAddressBook } = useAccount();
 
   return (
-    <>
-      <Button onClick={toggleOpen} variant='outlined'>
-        Add New Contact
-      </Button>
-      <AddAddressDialog onClose={toggleOpen} open={open} />
-    </>
+    <Button onClick={() => addAddressBook()} variant='outlined'>
+      Add New Contact
+    </Button>
   );
 }
 

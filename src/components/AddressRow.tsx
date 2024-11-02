@@ -4,7 +4,7 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import IconEdit from '@mimir-wallet/assets/svg/icon-edit.svg?react';
 import { useAddressMeta } from '@mimir-wallet/hooks';
@@ -17,9 +17,9 @@ import IdentityIcon from './IdentityIcon';
 interface Props {
   defaultName?: string;
   value?: AccountId | AccountIndex | Address | string | null;
-  size?: 'small' | 'medium' | 'large';
   shorten?: boolean;
   isMe?: boolean;
+  iconSize?: number;
   withAddress?: boolean;
   withCopy?: boolean;
   withName?: boolean;
@@ -56,18 +56,14 @@ function AddressRow({
   isMe,
   onClick,
   shorten,
-  size = 'medium',
   value,
+  iconSize,
   withAddress = false,
   withCopy = false,
   withEdit,
   withName = true
 }: Props) {
   const [editing, setEditing] = useState(false);
-
-  const [iconSize, spacing] = useMemo((): [number, number] => {
-    return size === 'small' ? [20, 0.5] : size === 'medium' ? [30, 0.5] : [40, 0.5];
-  }, [size]);
 
   const _onClick = useCallback(() => {
     onClick?.(value?.toString());
@@ -79,7 +75,7 @@ function AddressRow({
       className='AddressRow'
       direction='row'
       onClick={_onClick}
-      spacing={spacing}
+      spacing={0.5}
       sx={{ cursor: onClick ? 'pointer' : undefined }}
     >
       <IdentityIcon className='AddressRow-Icon' isMe={isMe} size={iconSize} value={value} />

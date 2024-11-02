@@ -5,10 +5,11 @@ import type { DeriveAccountRegistration } from '@polkadot/api-derive/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { Box } from '@mui/material';
-import { isFunction } from '@polkadot/util';
-import React, { useEffect, useState } from 'react';
+import { hexToU8a, isFunction } from '@polkadot/util';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { useAddressMeta, useApi, useDeriveAccountInfo } from '@mimir-wallet/hooks';
+import { addressEq } from '@mimir-wallet/utils';
 
 interface Props {
   defaultName?: string;
@@ -48,29 +49,35 @@ function extractIdentity(address: string, identity: DeriveAccountRegistration): 
 }
 
 function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
-  const { api } = useApi();
-  const info = useDeriveAccountInfo(value);
-  const [chainName, setChainName] = useState<React.ReactNode>(() => extractName((value || '').toString()));
-  const { meta } = useAddressMeta(value?.toString());
+  const address = value?.toString() || '';
+  const { identityApi } = useApi();
+  const info = useDeriveAccountInfo(address);
+  const [chainName, setChainName] = useState<React.ReactNode>(() => extractName(address.toString()));
+  const { meta } = useAddressMeta(address);
+  const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
 
   // set the actual nickname, local name, accountId
   useEffect((): void => {
     const { accountId, identity, nickname } = info || {};
 
-    const cacheAddr = (accountId || value || '').toString();
+    const cacheAddr = (accountId || address).toString();
 
     if (identity?.parent) {
       parentCache.set(cacheAddr, identity.parent.toString());
     }
 
-    if (api && isFunction(api.query.identity?.identityOf)) {
+    if (identityApi && isFunction(identityApi.query.identity?.identityOf)) {
       setChainName(() => (identity?.display ? extractIdentity(cacheAddr, identity) : extractName(cacheAddr)));
     } else if (nickname) {
       setChainName(nickname);
     }
-  }, [api, info, value]);
+  }, [identityApi, info, address]);
 
-  return <>{chainName || meta?.name || defaultName || `${value?.toString().slice(0, 8).toUpperCase()}`}</>;
+  if (isZeroAddress) {
+    return <>ZeroAddress</>;
+  }
+
+  return <>{chainName || meta?.name || defaultName || address.slice(0, 8).toUpperCase()}</>;
 }
 
 export default React.memo(AddressName);

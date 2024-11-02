@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ISubmittableResult } from '@polkadot/types/types';
-import type { TxEvents } from '@mimir-wallet/utils';
+import type { TxEvents } from '@mimir-wallet/api';
 
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { HexString } from '@polkadot/util/types';

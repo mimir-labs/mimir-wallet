@@ -39,19 +39,18 @@ export default defineConfig(({ mode }) => ({
             '@polkadot/api-augment',
             '@polkadot/api-base',
             '@polkadot/api-derive',
-            '@polkadot/apps-config',
-            '@polkadot/keyring',
             '@polkadot/react-identicon',
             '@polkadot/types',
             '@polkadot/types-codec',
             '@polkadot/types-known',
-            '@polkadot/ui-keyring',
             '@polkadot/util',
             '@polkadot/util-crypto'
           ],
-          mui: ['@mui/lab', '@mui/material', '@mui/system'],
+          'polkadot-config': ['@polkadot/apps-config/api/typesBundle'],
+          mui: ['@mui/lab', '@mui/material', '@mui/system', 'material-ui-popup-state'],
           reactflow: ['reactflow'],
           lottie: ['lottie-web'],
+          lodash: ['lodash-es', 'lodash'],
           common: [
             'copy-to-clipboard',
             'json2mq',
@@ -61,8 +60,9 @@ export default defineConfig(({ mode }) => ({
             'react-json-view',
             'react-toastify',
             'socket.io-client',
-            'swr',
-            'uuid'
+            '@tanstack/react-query',
+            'uuid',
+            'react-draggable-list'
           ]
         }
       }

@@ -50,14 +50,16 @@ export interface InputAddressProps {
   balance?: BN | string | number | null;
   isSign?: boolean;
   filtered?: string[];
+  excluded?: string[];
+  shorten?: boolean;
 }
 
 export interface InputNumberProps extends Omit<InputProps, 'defaultValue' | 'value' | 'onChange'> {
   format?: [decimals: number, unit: string];
-  defaultValue?: string | BN;
-  value?: BN;
-  onChange?: (value: BN) => void;
-  maxValue?: BN | null;
+  defaultValue?: string | { toString: () => string };
+  value?: string;
+  onChange?: (value: string) => void;
+  maxValue?: string | { toString: () => string } | null;
   withMax?: boolean;
 }
 

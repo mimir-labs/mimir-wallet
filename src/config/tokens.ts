@@ -3,7 +3,7 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { allEndpoints, localEndpoint } from './api';
+import { allEndpoints } from './api';
 
 export type Token = {
   Icon: string;
@@ -13,10 +13,10 @@ export type Token = {
 export type Asset = Token & { assetId: string | HexString };
 
 export function findToken(genesisHash: string): Token {
-  const endpoint = allEndpoints.find((item) => item.genesisHash === genesisHash) || localEndpoint;
+  const endpoint = allEndpoints.find((item) => item.genesisHash === genesisHash);
 
   return {
-    Icon: endpoint.tokenIcon,
+    Icon: endpoint?.tokenIcon || '/token-icons/Polkadot.png',
     genesisHash
   };
 }

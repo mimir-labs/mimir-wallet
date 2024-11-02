@@ -4,7 +4,7 @@
 import { useMemo } from 'react';
 
 import { usePendingTransactions } from '@mimir-wallet/hooks';
-import { CalldataStatus } from '@mimir-wallet/hooks/types';
+import { TransactionStatus } from '@mimir-wallet/hooks/types';
 
 export function usePendingTx(address: string, url: string) {
   const [transactions] = usePendingTransactions(address);
@@ -12,16 +12,12 @@ export function usePendingTx(address: string, url: string) {
   return useMemo(
     () =>
       transactions.filter((item) => {
-        if (item.status > CalldataStatus.Pending) {
-          return false;
-        }
-
-        if (!item.initTransaction.website) {
+        if (item.status > TransactionStatus.Pending || !item.website) {
           return false;
         }
 
         const urlIn = new URL(url);
-        const urlThis = new URL(item.initTransaction.website);
+        const urlThis = new URL(item.website);
 
         return urlIn.origin === urlThis.origin;
       }),

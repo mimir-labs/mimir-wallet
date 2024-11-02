@@ -3,7 +3,8 @@
 
 import { useContext } from 'react';
 
-import { TxQueueCtx, TxState } from './ctx/TxQueue';
+import { TxQueueCtx, TxState } from '@mimir-wallet/providers/TxQueue';
+
 import { createNamedHook } from './createNamedHook';
 
 function useTxQueueImpl(): TxState {

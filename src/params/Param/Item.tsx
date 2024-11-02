@@ -1,33 +1,35 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ParamType } from '../types';
-
-import { Box, Stack } from '@mui/material';
+import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
 import React from 'react';
 
 interface Props {
+  type?: 'horizontal' | 'vertical';
   name?: React.ReactNode;
   content?: React.ReactNode;
-  type: ParamType;
-  alignItem?: 'start' | 'center' | 'end';
 }
 
-function Item({ alignItem = 'center', content, name, type }: Props) {
-  if (type === 'base') {
+function Item({ content, name, type = 'horizontal' }: Props) {
+  if (type === 'vertical') {
     return (
       <Stack spacing={0.5}>
-        <Box fontWeight={700}>{name}</Box>
-        <Box>{content}</Box>
+        <Typography fontWeight={700}>{name}</Typography>
+
+        <Box sx={{ padding: 1, bgcolor: 'secondary.main', borderRadius: 1 }}>{content}</Box>
       </Stack>
     );
   }
 
   return (
-    <Stack alignItems={alignItem} direction='row'>
-      <Box sx={{ width: '30%', maxWidth: 130, fontWeight: 700, textTransform: 'capitalize' }}>{name}</Box>
-      <Box sx={{ width: '70%', flex: '1 0 auto' }}>{content}</Box>
-    </Stack>
+    <Grid container spacing={1} columns={10} sx={{ width: '100%', fontSize: '0.75rem' }}>
+      <Grid sx={{ display: 'flex', alignItems: 'center', fontWeight: 700 }} size={2}>
+        {name}
+      </Grid>
+      <Grid sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }} size={8}>
+        {content}
+      </Grid>
+    </Grid>
   );
 }
 

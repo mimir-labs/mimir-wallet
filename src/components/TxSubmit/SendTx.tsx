@@ -1,0 +1,208 @@
+// Copyright 2023-2024 dev.mimir authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import type { SubmittableExtrinsic } from '@polkadot/api/types';
+import type { Extrinsic } from '@polkadot/types/interfaces';
+import type { ExtrinsicPayloadValue, ISubmittableResult } from '@polkadot/types/types';
+import type { HexString } from '@polkadot/util/types';
+import type { BuildTx } from './hooks/useBuildTx';
+
+import { LoadingButton } from '@mui/lab';
+import { Alert, AlertTitle, Box, Divider, SvgIcon, Tooltip, Typography } from '@mui/material';
+import React, { useContext, useState } from 'react';
+
+import { sign, signAndSend, TxEvents } from '@mimir-wallet/api';
+import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
+import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
+import { useWallet } from '@mimir-wallet/hooks';
+import { TxToastCtx } from '@mimir-wallet/providers';
+import { service } from '@mimir-wallet/utils';
+
+import AddressName from '../AddressName';
+import FormatBalance from '../FormatBalance';
+import LockItem, { LockContainer } from '../LockItem';
+import { toastError } from '../ToastRoot';
+import { useTxReserve } from './hooks/useTxReserve';
+
+function SendTx({
+  buildTx,
+  note,
+  onlySign,
+  website,
+  iconUrl,
+  appName,
+  onError,
+  onFinalized,
+  onResults,
+  onSignature,
+  beforeSend
+}: {
+  buildTx: BuildTx;
+  website?: string | null;
+  iconUrl?: string | null;
+  appName?: string | null;
+  note?: string;
+  onlySign?: boolean;
+  onResults?: (results: ISubmittableResult) => void;
+  onFinalized?: (results: ISubmittableResult) => void;
+  onError?: (error: unknown) => void;
+  onSignature?: (signer: string, signature: HexString, tx: Extrinsic, payload: ExtrinsicPayloadValue) => void;
+  beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
+}) {
+  const { accountSource } = useWallet();
+  const { addToast } = useContext(TxToastCtx);
+  const [loading, setLoading] = useState(false);
+  const { txBundle, isLoading, error, hashSet } = buildTx;
+  const { isLoading: isTxReserveLoading, reserve, unreserve, delay } = useTxReserve(txBundle);
+
+  const onConfirm = async () => {
+    let events: TxEvents = new TxEvents();
+
+    if (!txBundle) {
+      return;
+    }
+
+    const { tx, signer } = txBundle;
+
+    if (!signer) {
+      return;
+    }
+
+    const source = accountSource(signer);
+
+    if (!source) {
+      toastError('No available signing address.');
+
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      for await (const item of hashSet) {
+        await service.updateCalldata(item);
+      }
+
+      if (onlySign) {
+        addToast({ events });
+
+        const [signature, payload, extrinsicHash] = await sign(tx, signer, source);
+
+        await service.uploadWebsite(extrinsicHash.toHex(), website, appName, iconUrl, note);
+
+        onSignature?.(signer, signature, tx, payload);
+        events.emit('success', 'Sign success');
+        setLoading(false);
+      } else {
+        events = signAndSend(tx, signer, source, {
+          beforeSend
+        });
+
+        addToast({ events });
+
+        events.on('inblock', (result) => {
+          service.uploadWebsite(result.txHash.toHex(), website, appName, iconUrl, note);
+          onResults?.(result);
+        });
+        events.on('error', (error) => {
+          setLoading(false);
+          onError?.(error);
+        });
+
+        events.on('finalized', (result) => {
+          setLoading(false);
+          onFinalized?.(result);
+          setTimeout(() => {
+            // clear all listener after 3s
+            events.removeAllListeners();
+          }, 3000);
+        });
+      }
+    } catch (error) {
+      onError?.(error);
+      events.emit('error', error);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {(Object.keys(reserve).length > 0 || Object.keys(unreserve).length > 0 || Object.keys(delay).length > 0) && (
+        <LockContainer>
+          {Object.entries(delay).map(([address, delay], index) => (
+            <Box
+              key={`delay-${address}-${index}`}
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: { xs: 0.5, sm: 1 } }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
+                <SvgIcon color='primary' component={IconClock} inheritViewBox sx={{ opacity: 0.5 }} />
+                <Typography>Review window</Typography>
+                <Tooltip title='Another execution transaction is needed after the review window.'>
+                  <SvgIcon color='primary' component={IconQuestion} inheritViewBox sx={{ opacity: 0.5 }} />
+                </Tooltip>
+              </Box>
+
+              <span>{delay.toString()} Blocks</span>
+            </Box>
+          ))}
+
+          {Object.keys(delay).length > 0 && <Divider />}
+
+          {Object.entries(reserve).map(([address, { value }], index) => (
+            <LockItem
+              key={`lock-${address}-${index}`}
+              address={address}
+              isUnLock={false}
+              value={value}
+              tip={
+                <>
+                  <FormatBalance value={value} /> in{' '}
+                  <b>
+                    <AddressName value={address} />
+                  </b>{' '}
+                  will be reserved for initiate transaction.
+                </>
+              }
+            />
+          ))}
+          {Object.entries(unreserve).map(([address, { value }], index) => (
+            <LockItem
+              key={`unlock-${address}-${index}`}
+              address={address}
+              isUnLock
+              value={value}
+              tip={
+                <>
+                  <FormatBalance value={value} /> in{' '}
+                  <b>
+                    <AddressName value={address} />
+                  </b>{' '}
+                  will be unreserved for execute transaction.
+                </>
+              }
+            />
+          ))}
+        </LockContainer>
+      )}
+
+      {error ? (
+        <Alert severity='error'>
+          <AlertTitle>{error.message}</AlertTitle>
+        </Alert>
+      ) : null}
+
+      <LoadingButton
+        fullWidth
+        variant='contained'
+        color='primary'
+        onClick={error ? undefined : onConfirm}
+        loading={loading || isLoading || isTxReserveLoading}
+        disabled={!txBundle?.signer || !!error}
+      >
+        Submit
+      </LoadingButton>
+    </>
+  );
+}
+
+export default React.memo(SendTx);

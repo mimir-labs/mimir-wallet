@@ -7,7 +7,7 @@ export const ellipsisMixin = (width?: number | string): CSSObject => ({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  width
+  maxWidth: width
 });
 
 export const ellipsisLinesMixin = (lines: number): CSSObject => ({

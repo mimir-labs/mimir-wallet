@@ -3,17 +3,17 @@
 
 import type { AccountBalance } from '@mimir-wallet/hooks/types';
 
-import { Box, Button, Divider, Paper, Stack, SvgIcon, Typography } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
+import { Box, Button, Divider, Grid2 as Grid, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
+import IconAdd from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
 import IconFund from '@mimir-wallet/assets/svg/icon-fund-fill.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@mimir-wallet/assets/svg/icon-set.svg?react';
 import { FormatBalance } from '@mimir-wallet/components';
-import { useAddressMeta, useApi, useTokenInfo } from '@mimir-wallet/hooks';
+import { useApi, useTokenInfo } from '@mimir-wallet/hooks';
 
 function Info({
   address,
@@ -24,7 +24,6 @@ function Info({
   balances?: AccountBalance;
   toggleFundOpen: () => void;
 }) {
-  const { meta } = useAddressMeta(address);
   const [tokenInfo] = useTokenInfo();
   const { tokenSymbol } = useApi();
 
@@ -44,7 +43,7 @@ function Info({
   const changes = Number(tokenInfo?.[tokenSymbol]?.price_change || '0');
 
   return (
-    <Paper sx={{ width: '100%', height: 'auto', borderRadius: 2, padding: 2 }}>
+    <Paper sx={{ flex: 1, width: '100%', height: 'auto', borderRadius: 2, padding: 2 }}>
       <Stack spacing={2}>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: { lg: 'nowrap', xs: 'wrap' } }}>
           <Typography sx={{ flex: '1', whiteSpace: 'nowrap' }} variant='h1'>
@@ -54,7 +53,8 @@ function Info({
               sx={{
                 marginLeft: 0.5,
                 verticalAlign: 'middle',
-                color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500'
+                color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'grey.500',
+                fontSize: '0.875rem'
               }}
             >
               {(changes * 100).toFixed(2)}%
@@ -71,8 +71,16 @@ function Info({
             >
               Fund
             </Button>
-            {meta?.isMultisig && (
-              <Button component={Link} sx={{ minWidth: 0 }} to='/account-setting' variant='outlined'>
+            <Button
+              component={Link}
+              endIcon={<SvgIcon component={IconAdd} inheritViewBox />}
+              to='/add-proxy'
+              variant='outlined'
+            >
+              Proxy
+            </Button>
+            {address && (
+              <Button component={Link} sx={{ minWidth: 0 }} to={`/account-setting/${address}`} variant='outlined'>
                 <SvgIcon component={IconSet} inheritViewBox />
               </Button>
             )}
@@ -81,7 +89,7 @@ function Info({
         <Divider />
         <Box>
           <Grid columns={{ xs: 12 }} container spacing={2}>
-            <Grid xs={6}>
+            <Grid size={{ xs: 6 }}>
               <Box>
                 <Typography color='text.secondary'>Total balance</Typography>
                 <Typography variant='h5'>
@@ -89,7 +97,7 @@ function Info({
                 </Typography>
               </Box>
             </Grid>
-            <Grid xs={6}>
+            <Grid size={{ xs: 6 }}>
               <Box>
                 <Typography color='text.secondary'>Transferable balance</Typography>
                 <Typography variant='h5'>
@@ -97,7 +105,7 @@ function Info({
                 </Typography>
               </Box>
             </Grid>
-            <Grid xs={6}>
+            <Grid size={{ xs: 6 }}>
               <Box>
                 <Typography color='text.secondary'>Locked Balance</Typography>
                 <Typography variant='h5'>
@@ -105,7 +113,7 @@ function Info({
                 </Typography>
               </Box>
             </Grid>
-            <Grid xs={6}>
+            <Grid size={{ xs: 6 }}>
               <Box>
                 <Typography color='text.secondary'>Reserved balance</Typography>
                 <Typography variant='h5'>

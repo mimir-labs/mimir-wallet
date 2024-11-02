@@ -3,6 +3,8 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { SubmittableExtrinsicFunction } from '@polkadot/api/promise/types';
+import type { HexString } from '@polkadot/util/types';
+import type { Endpoint } from '@mimir-wallet/config';
 
 // helpers for HOC props
 export type OmitProps<T, K> = Pick<T, Exclude<keyof T, K>>;
@@ -24,6 +26,7 @@ export interface ApiState {
   systemName: string;
   systemVersion: string;
   tokenSymbol: string;
+  genesisHash: HexString;
 }
 
 export interface ApiProps extends ApiState {
@@ -32,6 +35,10 @@ export interface ApiProps extends ApiState {
   apiUrl: string;
   isApiConnected: boolean;
   isApiInitialized: boolean;
+  network: string;
+  chain: Endpoint;
+  metadata: Record<string, HexString>;
+  identityApi: ApiPromise | null;
 }
 
 export interface OnChangeCbObs {

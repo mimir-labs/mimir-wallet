@@ -5,11 +5,14 @@ import { Paper } from '@mui/material';
 import React from 'react';
 
 import { AddressOverview } from '@mimir-wallet/components';
+import { useQueryAccount } from '@mimir-wallet/hooks';
 
 function Members({ address }: { address?: string }) {
+  const [account] = useQueryAccount(address);
+
   return (
     <Paper sx={{ width: '100%', height: '40vh', borderRadius: 2 }}>
-      <AddressOverview key={address} value={address} />
+      <AddressOverview key={account?.address || 'none'} account={account} />
     </Paper>
   );
 }

@@ -1,17 +1,15 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useContext } from 'react';
-
-import { SelectAccountCtx } from './ctx/SelectedAccount';
 import { createNamedHook } from './createNamedHook';
+import { useAccount } from './useAccounts';
 
 function useSelectedAccountImpl(): string | undefined {
-  return useContext(SelectAccountCtx).selected;
+  return useAccount().current;
 }
 
-function useSelectedAccountCallbackImpl(): (address: string) => void {
-  return useContext(SelectAccountCtx).selectAccount;
+function useSelectedAccountCallbackImpl(): (address: string, confirm?: boolean) => void {
+  return useAccount().setCurrent;
 }
 
 export const useSelectedAccount = createNamedHook('useSelectedAccount', useSelectedAccountImpl);

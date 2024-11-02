@@ -3,16 +3,17 @@
 
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import { keyring } from '@polkadot/ui-keyring';
 import { u8aToHex } from '@polkadot/util';
+import { HexString } from '@polkadot/util/types';
+import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import store from 'store';
 
+import { decodeAddress, encodeAddress } from '@mimir-wallet/api';
 import { utm } from '@mimir-wallet/config';
 import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
-import { useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
-import { addressToHex, service } from '@mimir-wallet/utils';
+import { useAccount, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
+import { addressToHex, service, store } from '@mimir-wallet/utils';
 
 interface Props {
   name?: string;
@@ -21,17 +22,19 @@ interface Props {
   checkField: () => boolean;
 }
 
-export function createMultisig(signatories: string[], threshold: number, name: string): string {
-  const result = keyring.addMultisig(signatories, threshold, {
-    name,
-    isMimir: true
-  });
+async function createMultisig(signatories: string[], threshold: number, name: string): Promise<string> {
+  const address = encodeAddress(createKeyMulti(signatories, threshold));
+
+  await service.createMultisig(
+    signatories.map((value) => addressToHex(value)),
+    threshold,
+    name
+  );
 
   store.set(
     DETECTED_ACCOUNT_KEY,
-    Array.from([...(store.get(DETECTED_ACCOUNT_KEY) || []), u8aToHex(result.pair.addressRaw)])
+    Array.from(new Set([...((store.get(DETECTED_ACCOUNT_KEY) as HexString[]) || []), u8aToHex(decodeAddress(address))]))
   );
-  const { address } = result.pair;
 
   return address;
 }
@@ -41,6 +44,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const selectAccount = useSelectedAccountCallback();
+  const { addAddress, resync } = useAccount();
 
   const handleCreate = useCallback(async () => {
     if (!name || !checkField()) return;
@@ -48,24 +52,22 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
     try {
       setIsLoading(true);
 
-      const address = createMultisig(signatories, threshold, name);
+      const address = await createMultisig(signatories, threshold, name);
+
+      await resync();
 
       utm && (await service.utm(addressToHex(address), utm));
 
-      await service.createMultisig(
-        signatories.map((value) => addressToHex(value)),
-        threshold,
-        name
-      );
-
       selectAccount(address);
+      addAddress(address, name);
+
       navigate('/');
     } catch {
       /* empty */
     }
 
     setIsLoading(false);
-  }, [checkField, name, navigate, selectAccount, signatories, threshold]);
+  }, [name, checkField, signatories, threshold, resync, selectAccount, addAddress, navigate]);
 
   return (
     <>

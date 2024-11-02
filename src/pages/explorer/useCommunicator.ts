@@ -4,20 +4,23 @@
 import type { SignerPayloadJSON } from '@polkadot/types/types';
 import type { State } from '@mimir-wallet/communicator/types';
 
-import keyring from '@polkadot/ui-keyring';
 import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import { IframeCommunicator } from '@mimir-wallet/communicator';
-import { useApi, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
+import { useAddressMeta, useApi, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
 
 export function useCommunicator(
   iframeRef: MutableRefObject<HTMLIFrameElement | null>,
-  url: string
+  url: string,
+  iconUrl?: string,
+  appName?: string
 ): IframeCommunicator | null {
   const [communicator, setCommunicator] = useState<IframeCommunicator | null>(null);
   const { api } = useApi();
   const { addQueue } = useTxQueue();
   const selected = useSelectedAccount();
+  const { meta } = useAddressMeta(selected);
 
   const state: State = {
     extrinsicSign: (payload: SignerPayloadJSON, id: string) => {
@@ -33,10 +36,12 @@ export function useCommunicator(
 
       return new Promise((resolve, reject) => {
         addQueue({
-          extrinsic: api.tx[call.section][call.method](...call.args),
-          accountId: keyring.encodeAddress(payload.address),
+          call: api.tx[call.section][call.method](...call.args),
+          accountId: encodeAddress(payload.address),
           onlySign: true,
           website: website.origin,
+          iconUrl,
+          appName,
           onSignature: (signer, signature, tx, payload) => {
             console.log(payload);
             resolve({ id, signature, signer, payload } as any);
@@ -48,14 +53,11 @@ export function useCommunicator(
     getAccounts: () => {
       if (!selected) return [];
 
-      const meta = keyring.getAccount(selected)?.meta;
-
       return [
         {
           address: selected,
-          genesisHash: meta?.genesisHash,
           name: meta?.name,
-          type: meta?.type || 'ed25519' // for polkadot-api
+          type: (meta?.cryptoType || 'ed25519') as 'ed25519' // for polkadot-api
         }
       ];
     }

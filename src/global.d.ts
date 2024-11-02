@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Injected } from '@polkadot/extension-inject/types';
+import type { Endpoint } from './config';
 
 declare global {
   interface Window {
+    currentChain: Endpoint;
     walletExtension?: { isNovaWallet?: boolean };
     injectedWeb3?: Record<
       string,

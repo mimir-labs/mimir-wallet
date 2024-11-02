@@ -4,11 +4,9 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 
-import keyring from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
 
-import { api } from '@mimir-wallet/api';
-import { findEndpoint } from '@mimir-wallet/config';
+import { encodeAddress } from '@mimir-wallet/api';
 
 export function accountExplorerLink(
   value?: AccountId | AccountIndex | Address | HexString | string | null
@@ -16,36 +14,44 @@ export function accountExplorerLink(
   const _value = value?.toString();
 
   if (_value && _value.length > 47 && isAddress(_value)) {
-    const explorerUrl = findEndpoint(api.genesisHash.toHex())?.explorerUrl;
+    const explorerUrl = window.currentChain.explorerUrl;
 
     if (explorerUrl) {
-      return `${explorerUrl}account/${keyring.encodeAddress(_value, api.registry.chainSS58)}`;
+      return `${explorerUrl}account/${encodeAddress(_value)}`;
     }
   }
 
   return undefined;
 }
 
+export function extrinsicExplorerLink(value?: string | { toString: () => string }): string | undefined {
+  const _value = value?.toString();
+
+  const explorerUrl = window.currentChain.explorerUrl;
+
+  if (explorerUrl) {
+    return `${explorerUrl}extrinsic/${_value}`;
+  }
+
+  return undefined;
+}
+
 export function subsquareUrl(path?: string): string | undefined {
-  const baseUrl = findEndpoint(api.genesisHash.toHex())?.subsquareUrl;
+  const baseUrl = window.currentChain.subsquareUrl;
 
   return baseUrl ? `${baseUrl}${path || ''}` : undefined;
 }
 
 export function proposalApi(): string | undefined {
-  return findEndpoint(api.genesisHash.toHex())?.proposalApi;
+  return window.currentChain.proposalApi;
 }
 
-export async function serviceUrl(path: string): Promise<string> {
-  await api.isReady;
-
-  const url: string = findEndpoint(api.genesisHash.toHex())?.serviceUrl || 'http://127.0.0.1:8080/';
+export function serviceUrl(path: string): string {
+  const url: string = window.currentChain.serviceUrl || 'http://127.0.0.1:8080/';
 
   return `${url}${path}`;
 }
 
 export async function socketUrl(): Promise<string> {
-  await api.isReady;
-
-  return findEndpoint(api.genesisHash.toHex()).socketUrl || 'ws://127.0.0.1:8080/ws';
+  return window.currentChain.socketUrl || 'ws://127.0.0.1:8080/ws';
 }

@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, SvgIcon } from '@mui/material';
+import { Box, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
@@ -9,10 +9,13 @@ import { useSelectedAccount } from '@mimir-wallet/hooks';
 
 import AccountMenu from './AccountMenu';
 import AddressCell from './AddressCell';
+import IdentityIcon from './IdentityIcon';
 
 function AccountSelect() {
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -38,11 +41,10 @@ function AccountSelect() {
           borderColor: 'secondary.main',
           gap: 2,
           display: 'flex',
-          alignItems: 'center',
-          maxWidth: 192
+          alignItems: 'center'
         }}
       >
-        <AddressCell shorten showType size='small' value={selected} />
+        {downSm ? <IdentityIcon value={selected} /> : <AddressCell shorten showType value={selected} />}
         <SvgIcon component={ArrowDown} fontSize='small' inheritViewBox />
       </Box>
       <AccountMenu anchor='right' onClose={handleAccountClose} open={!!anchorEl} />

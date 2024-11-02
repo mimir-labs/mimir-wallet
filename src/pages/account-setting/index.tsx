@@ -1,129 +1,43 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Button, FormHelperText, Paper, Stack, Typography } from '@mui/material';
-import keyring from '@polkadot/ui-keyring';
-import { u8aToHex } from '@polkadot/util';
-import { addressEq, decodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
-import { useCallback, useMemo, useState } from 'react';
+import type { u128, Vec } from '@polkadot/types';
+import type { PalletProxyProxyDefinition } from '@polkadot/types/lookup';
+import type { ITuple } from '@polkadot/types/types';
+
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { Box, Button, Paper, Stack, Tab, Typography } from '@mui/material';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { AddAddressDialog, Input, toastSuccess } from '@mimir-wallet/components';
+import { Input, toastSuccess } from '@mimir-wallet/components';
 import {
+  useAccount,
   useAddressMeta,
   useApi,
+  useCall,
   usePendingTransactions,
-  useSelectedAccount,
-  useSelectedAccountCallback,
-  useToggle,
-  useTxQueue
+  useQueryAccount
 } from '@mimir-wallet/hooks';
-import { CalldataStatus } from '@mimir-wallet/hooks/types';
-import { isLocalAccount, isLocalAddress, service } from '@mimir-wallet/utils';
 
-import AccountSelect from '../create-multisig/AccountSelect';
-import { useSelectMultisig } from '../create-multisig/useSelectMultisig';
-
-function checkError(
-  signatories: string[],
-  isThresholdValid: boolean,
-  hasSoloAccount: boolean
-): [Error | null, Error | null] {
-  return [
-    signatories.length < 2
-      ? new Error('Please select at least two members')
-      : hasSoloAccount
-        ? null
-        : new Error('You need add at least one local account'),
-    isThresholdValid ? null : new Error(`Threshold must great than 2 and less equal than ${signatories.length}`)
-  ];
-}
+import MemberSet from './MemberSet';
+import ProxySet from './ProxySet';
 
 function AccountSetting() {
-  const navigate = useNavigate();
-  const { address: addressParam } = useParams<'address'>();
-  const selected = useSelectedAccount();
-  const account = addressParam || selected;
-  const { meta, name, saveName, setName } = useAddressMeta(account);
   const { api } = useApi();
-  const [txs] = usePendingTransactions(account);
-  const pendingTxs = useMemo(() => txs.filter((item) => item.status < CalldataStatus.Success), [txs]);
-  const selectAccount = useSelectedAccountCallback();
-  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
-    useSelectMultisig(meta?.who, meta?.threshold);
-  const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({
-    address: '',
-    isAddressValid: false
-  });
-  const [addOpen, toggleAdd] = useToggle();
-  const [addressError, setAddressError] = useState<Error | null>(null);
-  const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
+  const navigate = useNavigate();
+  const { isLocalAccount } = useAccount();
+  const { address } = useParams() as { address: string };
+  const { setName, name, saveName } = useAddressMeta(address);
+  const [account] = useQueryAccount(address);
+  const [error, setError] = useState<Error>();
+  const [txs] = usePendingTransactions(address);
+  const [tab, setTab] = useState('0');
+  const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(api.query.proxy.proxies, [address]);
 
-  const { addQueue } = useTxQueue();
-
-  const checkField = useCallback((): boolean => {
-    const errors = checkError(signatories, isThresholdValid, hasSoloAccount);
-
-    setErrors(errors);
-
-    return !errors[0] && !errors[1];
-  }, [hasSoloAccount, isThresholdValid, signatories]);
-
-  const _onClick = useCallback(async () => {
-    await saveName((name) => toastSuccess(`Save name to ${name} success`));
-
-    if (!meta?.who || !meta?.threshold || !account) return;
-    if (!checkField()) return;
-    const oldMultiAddress = encodeMultiAddress(meta.who, meta.threshold);
-    const newMultiAddress = encodeMultiAddress(signatories, threshold);
-
-    if (!addressEq(newMultiAddress, oldMultiAddress)) {
-      addQueue({
-        beforeSend: () =>
-          service.createMultisig(
-            signatories.map((address) => u8aToHex(decodeAddress(address))),
-            threshold,
-            name,
-            false
-          ),
-        extrinsic: api.tx.utility.batchAll([
-          api.tx.proxy.addProxy(newMultiAddress, 0, 0),
-          api.tx.proxy.removeProxy(oldMultiAddress, 0, 0)
-        ]),
-        accountId: account
-      });
-    }
-  }, [
-    checkField,
-    saveName,
-    meta?.who,
-    meta?.threshold,
-    account,
-    signatories,
-    threshold,
-    addQueue,
-    api.tx.utility,
-    api.tx.proxy,
-    name
-  ]);
-
-  const _handleAdd = useCallback(() => {
-    if (isAddressValid) {
-      if (!isLocalAddress(address) && !isLocalAccount(address)) {
-        toggleAdd();
-      } else {
-        select(address);
-      }
-    } else {
-      setAddressError(new Error('Please input correct address'));
-    }
-  }, [address, isAddressValid, select, toggleAdd]);
-
-  const _onChangeThreshold = useCallback(
-    (value: string) => {
-      setThreshold(Number(value));
-    },
-    [setThreshold]
+  const multisigDelegates = useMemo(
+    () => (account?.type === 'pure' ? account.delegatees.filter((item) => item.type === 'multisig') : []),
+    [account]
   );
 
   return (
@@ -134,97 +48,107 @@ function AccountSetting() {
             {'<'} Back
           </Button>
         </Box>
-        <Typography variant='h3'>Wallet Setting</Typography>
-        <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
-          <Input
-            helper='All members will see this name'
-            label='Name'
-            onChange={(value) => setName(value)}
-            placeholder='Please input account name'
-            value={name}
-          />
-        </Paper>
-        <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
-          {pendingTxs.length > 0 && (
-            <Box
-              color='primary.main'
-              onClick={() => {
-                if (!account) return;
+        <Typography variant='h3'>Setting</Typography>
 
-                selectAccount(account);
-                navigate('/transactions');
-              }}
-              sx={{ cursor: 'pointer', marginBottom: 2, fontWeight: 700 }}
-            >
-              Please process {pendingTxs.length} Pending Transaction first
-            </Box>
-          )}
-          {meta?.isMultisig && !meta.isFlexible && (
-            <Box color='warning.main' sx={{ marginBottom: 2, fontWeight: 700 }}>
-              Static multisig account can not change members.
-            </Box>
-          )}
-          <Stack
-            spacing={2}
-            sx={{
-              opacity: !meta?.isMultisig || !meta?.isFlexible || pendingTxs.length > 0 ? 0.5 : undefined,
-              pointerEvents: !meta?.isMultisig || !meta?.isFlexible || pendingTxs.length > 0 ? 'none' : undefined
-            }}
-          >
+        <Box>
+          <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
+            Name
+          </Typography>
+          <Paper component={Stack} sx={{ padding: 2, borderRadius: 2 }} spacing={1}>
             <Input
-              endButton={
-                <Button onClick={_handleAdd} variant='contained'>
-                  Add
-                </Button>
-              }
-              error={addressError}
-              label='Add Member'
+              label='Name'
               onChange={(value) => {
-                const isAddressValid = isAddressUtil(value);
-
-                if (isAddressValid) {
-                  setAddressError(null);
+                if (value) {
+                  setError(undefined);
                 }
 
-                setAddress({ isAddressValid, address: isAddressValid ? keyring.encodeAddress(value) : value });
+                setName(value);
               }}
-              placeholder='input address'
-              value={address}
+              placeholder='Please input account name'
+              value={name}
+              error={error}
             />
-            <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: 2,
-                  flexDirection: { xs: 'column', sm: 'row' }
-                }}
-              >
-                <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
-                <AccountSelect accounts={signatories} onClick={unselect} title='Multisig Members' type='delete' />
-              </Box>
-              {memberError && <FormHelperText sx={{ color: 'error.main' }}>{memberError.message}</FormHelperText>}
-            </Paper>
-            <Input
-              defaultValue={String(threshold)}
-              error={thresholdError}
-              label='Threshold'
-              onChange={_onChangeThreshold}
-            />
-          </Stack>
-        </Paper>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button fullWidth variant='outlined'>
-            Cancel
-          </Button>
-          <Button disabled={!name} fullWidth onClick={_onClick}>
-            Save
-          </Button>
+            <Typography fontSize='0.75rem' color='textSecondary' marginTop={1}>
+              All members will see this name
+            </Typography>
+            <Button
+              disabled={!address || !isLocalAccount(address)}
+              fullWidth
+              onClick={() => {
+                if (!name) {
+                  setError(new Error('Please input wallet name'));
+                } else {
+                  saveName((name) => toastSuccess(`Save name to ${name} success`));
+                }
+              }}
+            >
+              Save
+            </Button>
+          </Paper>
         </Box>
+
+        {(account?.type === 'multisig' || (account?.type === 'pure' && multisigDelegates.length > 0)) && (
+          <Box>
+            <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
+              Multisig Information
+            </Typography>
+            <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
+              {account?.type === 'pure' && txs.length > 0 && (
+                <Box
+                  color='primary.main'
+                  onClick={() => {
+                    navigate('/transactions');
+                  }}
+                  sx={{ cursor: 'pointer', marginBottom: 2, fontWeight: 700 }}
+                >
+                  Please process {txs.length} Pending Transaction first
+                </Box>
+              )}
+
+              {account && account.type === 'multisig' && <MemberSet account={account} disabled />}
+
+              {account &&
+                account.type === 'pure' &&
+                (multisigDelegates.length > 1 ? (
+                  <>
+                    <TabContext value={tab}>
+                      <Box>
+                        <TabList onChange={(_, value) => setTab(value)} variant='scrollable' scrollButtons='auto'>
+                          {multisigDelegates.map((_, index) => (
+                            <Tab
+                              sx={{ padding: 1 }}
+                              label={`Members Set${index + 1}`}
+                              value={String(index)}
+                              key={index}
+                            />
+                          ))}
+                        </TabList>
+                      </Box>
+                      {multisigDelegates.map((item, index) => (
+                        <TabPanel key={index} value={String(index)} sx={{ padding: 0, marginTop: 2 }}>
+                          <MemberSet account={item} pureAccount={account} disabled={!!txs.length} />
+                        </TabPanel>
+                      ))}
+                    </TabContext>
+                  </>
+                ) : (
+                  <MemberSet account={multisigDelegates[0]} pureAccount={account} disabled={!!txs.length} />
+                ))}
+            </Paper>
+          </Box>
+        )}
+
+        {proxies && proxies[0].length > 0 && (
+          <Box>
+            <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
+              Proxy Information
+            </Typography>
+            <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
+              <ProxySet address={address} proxies={proxies[0]} />
+            </Paper>
+          </Box>
+        )}
       </Stack>
-      {address && isAddressValid && (
-        <AddAddressDialog defaultAddress={address} onAdded={select} onClose={toggleAdd} open={addOpen} />
-      )}
     </>
   );
 }

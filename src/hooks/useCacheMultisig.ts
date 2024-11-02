@@ -1,22 +1,24 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import useSWR from 'swr';
+import { useQuery } from '@tanstack/react-query';
 
-import { service } from '@mimir-wallet/utils';
+import { serviceUrl } from '@mimir-wallet/utils/chain-links';
 
 import { CacheMultisig } from './types';
-import { useAccounts } from './useAccounts';
+import { useAccount } from './useAccounts';
 
 export function useCacheMultisig(): [data: CacheMultisig[], isLoading: boolean] {
-  const accounts = useAccounts();
-  const { data, isLoading } = useSWR<CacheMultisig[]>(
-    service.getServiceUrl(
-      accounts.allAccounts.length > 0
-        ? `multisig/pending?${accounts.allAccountsHex.map((address) => `addresses=${address}`).join('&')}`
+  const { accounts } = useAccount();
+  const { data, isLoading } = useQuery<CacheMultisig[]>({
+    refetchInterval: false,
+    queryHash: serviceUrl(`multisig/pending?${accounts.map((address) => `addresses=${address}`).join('&')}`),
+    queryKey: [
+      accounts.length > 0
+        ? serviceUrl(`multisig/pending?${accounts.map((address) => `addresses=${address}`).join('&')}`)
         : null
-    )
-  );
+    ]
+  });
 
-  return [data || [], isLoading];
+  return [data?.filter((item) => item.who && item.threshold) || [], isLoading];
 }

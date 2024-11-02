@@ -1,8 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { isPromise } from '@polkadot/util';
-
 export class FetchError extends Error {
   public statusCode: number;
 
@@ -19,11 +17,15 @@ export class NetworkError extends Error {
 }
 
 export async function fetcher(resource: URL | string | Promise<URL | string>, init?: RequestInit): Promise<any> {
-  if (isPromise(resource)) {
-    resource = await resource;
+  let url: string | URL;
+
+  if (resource instanceof Promise) {
+    url = await resource;
+  } else {
+    url = resource;
   }
 
-  return fetch(resource, init)
+  return fetch(url, init)
     .catch(() => {
       throw new NetworkError();
     })

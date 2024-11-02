@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { Call } from '@polkadot/types/interfaces';
 import type { PalletAssetsAssetStatus } from '@polkadot/types/lookup';
 import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
@@ -33,93 +32,127 @@ export interface CacheMultisig {
   isDone: boolean;
 }
 
-export type AccountDataType = 'unknown' | 'eoa' | 'multi' | 'proxy';
+export type DelegateeProp = {
+  proxyType: string;
+  proxyNetwork: HexString;
+  proxyDelay: number;
+};
 
-export interface AccountData {
-  type: AccountDataType;
-  name: string | null;
-  address: HexString;
-  isValid: boolean;
-  networks: HexString[];
+export type AccountDataExtra = {
+  cryptoType?: string;
+  source?: string;
+  isProxied?: boolean;
+  isProxy?: boolean;
+  proxyType?: string;
+  proxyNetwork?: HexString;
+  proxyDelay?: number;
+};
+
+export type AccountDataType = {
+  createdAt: number;
+  address: string;
+  name?: string | null;
   isMimir?: boolean;
-}
+  delegatees: (AccountData & DelegateeProp)[];
+};
 
-export interface EOAAccountData extends AccountData {
-  type: 'eoa';
-}
-
-export interface MultiAccountData extends AccountData {
-  type: 'multi';
-  who: AccountData[];
+export type MultisigAccountData = AccountDataType & {
+  type: 'multisig';
   threshold: number;
-}
+  members: AccountData[];
+};
 
-export interface ProxyAccountData extends AccountData {
-  type: 'proxy';
-  delegators: AccountData[];
-  isMulti: boolean;
+export type PureAccountData = AccountDataType & {
+  type: 'pure';
+  createdBlock: string;
+  createdBlockHash: HexString;
+  createdExtrinsicHash: HexString;
+  createdExtrinsicIndex: number;
   creator: HexString;
-  height: number;
-  index: number;
-}
+  disambiguationIndex: number;
+  network: HexString;
+};
 
-export enum CalldataStatus {
+type BaseAccountData = AccountDataType & {
+  type: 'account';
+};
+
+export type AccountData = MultisigAccountData | PureAccountData | BaseAccountData;
+
+export enum TransactionStatus {
   Initialized = 0,
   Pending = 1,
   Success = 2,
   Failed = 3,
   MemberChanged = 4,
-  Cancelled = 5
+  Cancelled = 5,
+  AnnounceRemoved = 6,
+  AnnounceReject = 7
 }
 
-export interface Calldata {
-  uuid: string;
-  hash: HexString;
-  metadata?: HexString | null;
-  sender: HexString;
-  isStart: boolean;
-  isEnd: boolean;
-  status: CalldataStatus;
-
-  height?: number;
-  index?: number;
-  blockTime?: string;
-  isValid: boolean;
-
-  website?: string;
-  note?: string;
+export enum TransactionType {
+  Unknown = 0,
+  Multisig = 1,
+  Proxy = 2,
+  Announce = 3
 }
 
-export interface Transaction {
-  isFinalized: boolean;
-
-  top: Transaction;
-  parent: Transaction;
-  cancelTx: Transaction | null;
+type BaseTransaction = {
+  id: number;
+  address: string;
+  callHash: HexString;
+  section?: string;
+  method?: string;
+  call?: HexString | null;
+  status: TransactionStatus;
+  type: TransactionType;
+  createdBlock: string;
+  createdBlockHash: HexString;
+  createdExtrinsicIndex: number;
+  createdExtrinsicHash: HexString;
+  executedBlock?: string;
+  executedBlockHash?: HexString;
+  executedExtrinsicIndex?: number;
+  executedExtrinsicHash?: HexString;
+  cancelBlock?: string;
+  cancelBlockHash?: HexString;
+  cancelExtrinsicIndex?: number;
+  cancelExtrinsicHash?: HexString;
+  announceUpdateBlock?: string;
+  announceUpdateBlockHash?: HexString;
+  announceUpdateExtrinsicIndex?: number;
+  announceUpdateExtrinsicHash?: HexString;
+  createdAt: number;
+  updatedAt: number;
+  sendFromMimir: boolean;
+  website?: string | null;
+  appName?: string | null;
+  iconUrl?: string | null;
+  note?: string | null;
+  threshold?: number;
+  members?: string[];
+  delegate?: string;
   children: Transaction[];
-  cancelChildren: Transaction[];
+};
 
-  uuid: string;
-  hash: HexString;
-  call: Call | null;
-  sender: string;
-  status: CalldataStatus;
-  isValid: boolean;
-  height?: number;
-  index?: number;
-  blockTime: number;
+export type UnknownTransaction = BaseTransaction & {
+  type: TransactionType.Unknown;
+};
 
-  action: string;
-  section: string;
-  method: string;
+export type MultisigTransaction = BaseTransaction & {
+  type: TransactionType.Multisig;
+  threshold: number;
+  members: HexString[];
+};
 
-  website?: string;
-  note?: string;
+export type ProxyTransaction = BaseTransaction & {
+  type: TransactionType.Proxy | TransactionType.Announce;
+  delegate?: HexString;
+};
 
-  initTransaction: Transaction;
+export type Transaction = UnknownTransaction | MultisigTransaction | ProxyTransaction;
 
-  addChild(transaction: Transaction): Transaction;
-}
+export type HistoryTransaction = Transaction & { uuid: string };
 
 export interface TokenInfo {
   asset_type: string;
@@ -144,18 +177,6 @@ export interface TokenInfo {
   vesting_balance: string;
 }
 
-export interface BestTx {
-  addresses: HexString[];
-  blockNumber: number;
-  blockHash: HexString;
-  extrinsicHash: HexString;
-  extrinsicIndex: number;
-  genesisHash: HexString;
-  id: number;
-  method: HexString;
-  signer: HexString;
-}
-
 export type NewTxMessage = {
   uuid: string;
   action: string;
@@ -178,7 +199,7 @@ export type ExecuteTxMessage = {
   uuid: string;
   action: string;
   executer: HexString;
-  status: CalldataStatus;
+  status: TransactionStatus;
   blockTime: string;
   blockHeight: number;
   extrinsicIndex: number;
@@ -252,4 +273,58 @@ export interface SafetyLevel {
   severity: 'none' | 'warning' | 'error';
   title: string;
   message: string;
+}
+
+export interface AddressMeta {
+  name?: string;
+  cryptoType?: string;
+  isMimir?: boolean;
+  isPure?: boolean;
+  isProxied?: boolean;
+  isProxy?: boolean;
+  isInjected?: boolean;
+  isMultisig?: boolean;
+  multipleMultisig?: boolean;
+  source?: string;
+  threshold?: number;
+  who?: string[];
+}
+
+type MultisigFilterPath = {
+  id: string;
+  type: 'multisig';
+  multisig: string;
+  otherSignatures: string[];
+  threshold: number;
+  address: string;
+};
+
+type ProxyFilterPath = {
+  id: string;
+  type: 'proxy';
+  real: string;
+  proxyType: string;
+  delay?: number;
+  address: string;
+};
+
+type OriginFilterPath = {
+  id: string;
+  type: 'origin';
+  address: string;
+};
+
+export type FilterPath = MultisigFilterPath | ProxyFilterPath | OriginFilterPath;
+
+export type FilterPathWithoutId =
+  | Omit<MultisigFilterPath, 'id'>
+  | Omit<ProxyFilterPath, 'id'>
+  | Omit<OriginFilterPath, 'id'>;
+
+export interface BatchTxItem {
+  id: number;
+  calldata: HexString;
+  website?: string;
+  iconUrl?: string;
+  appName?: string;
 }

@@ -9,6 +9,7 @@ import { TypeDefInfo } from '@polkadot/types/types';
 import Account from './Account';
 import Amount from './Amount';
 import Balance from './Balance';
+import CallName from './CallName';
 import Unknown from './Unknown';
 
 interface TypeToComponent {
@@ -33,6 +34,7 @@ const componentDef: TypeToComponent[] = [
   { c: Account, t: ['AccountId', 'Address', 'LookupSource', 'MultiAddress'] },
   { c: Amount, t: ['AccountIndex', 'i8', 'i16', 'i32', 'i64', 'i128', 'u8', 'u16', 'u32', 'u64', 'u128', 'u256'] },
   { c: Balance, t: ['Amount', 'Balance', 'BalanceOf'] },
+  { c: CallName, t: ['Call'] },
   { c: Unknown, t: ['Unknown'] }
 ];
 

@@ -1,0 +1,176 @@
+// Copyright 2023-2024 dev.mimir authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import type { CallProps } from '../types';
+
+import { Box, Button, Grid2 as Grid, IconButton, Stack, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
+import { Call } from '@polkadot/types/interfaces';
+import { isArray } from '@polkadot/util';
+import React, { useMemo, useState } from 'react';
+
+import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
+import { ellipsisMixin } from '@mimir-wallet/components/utils';
+import { Call as CallComp } from '@mimir-wallet/params';
+
+import { CallDisplayDetail, CallDisplayDetailMinor, CallDisplaySection } from '../CallDisplay';
+import { findAction } from '../utils';
+import FunctionArgs from './FunctionArgs';
+
+function Item({
+  from,
+  call,
+  index,
+  registry,
+  jsonFallback,
+  isOpen,
+  toggleOpen
+}: {
+  index: number;
+  isOpen: boolean;
+  toggleOpen: () => void;
+} & CallProps) {
+  const action = useMemo(() => (call ? findAction(registry, call) : null), [registry, call]);
+  const { breakpoints } = useTheme();
+  const downSm = useMediaQuery(breakpoints.down('sm'));
+
+  const Top = (
+    <Grid
+      container
+      columns={{ sm: 11, xs: 8 }}
+      sx={{ cursor: 'pointer', height: 40, paddingX: { sm: 1.2, xs: 0.8 }, fontSize: '0.75rem' }}
+      onClick={toggleOpen}
+      spacing={0.4}
+    >
+      <Grid size={1} sx={{ display: 'flex', alignItems: 'center' }}>
+        {index}
+      </Grid>
+      <Grid size={3} sx={{ display: 'flex', alignItems: 'center', ...ellipsisMixin() }}>
+        <CallDisplaySection section={action?.[0]} method={action?.[1]} />
+      </Grid>
+      <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+        <CallDisplayDetail registry={registry} call={call} />
+      </Grid>
+      {!downSm && (
+        <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+          <CallDisplayDetailMinor registry={registry} call={call} />
+        </Grid>
+      )}
+
+      <Grid size={1} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
+        <IconButton
+          size='small'
+          sx={{ justifySelf: 'end', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', fontSize: '0.75rem' }}
+          color='primary'
+        >
+          <SvgIcon inheritViewBox component={ArrowDown} />
+        </IconButton>
+      </Grid>
+    </Grid>
+  );
+
+  return (
+    <Box
+      sx={{
+        borderRadius: 1,
+        overflow: 'hidden',
+        bgcolor: 'secondary.main'
+      }}
+    >
+      {Top}
+      {isOpen && (
+        <Stack
+          spacing={{ sm: 1.2, xs: 0.8 }}
+          sx={{
+            marginBottom: { sm: 1.2, xs: 0.8 },
+            marginLeft: { sm: 1.2, xs: 0.8 },
+            marginRight: { sm: 1.2, xs: 0.8 },
+            bgcolor: 'white',
+            borderRadius: 1,
+            padding: { sm: 1.2, xs: 0.8 }
+          }}
+        >
+          <CallComp from={from} registry={registry} call={call} jsonFallback={jsonFallback} />
+        </Stack>
+      )}
+    </Box>
+  );
+}
+
+function BatchCall({ from, registry, call, jsonFallback, ...props }: CallProps) {
+  const [isOpen, setOpen] = useState<Record<number, boolean>>({});
+
+  const calls: Call[] | null = isArray(call.args?.[0]) ? (call.args[0] as Call[]) : null;
+
+  if (!calls) {
+    return <FunctionArgs from={from} registry={registry} call={call} jsonFallback={jsonFallback} {...props} />;
+  }
+
+  return (
+    <Stack spacing={1} width='100%'>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontWeight: 700,
+          fontSize: '0.875rem'
+        }}
+      >
+        Actions
+        <Box>
+          <Button
+            color='primary'
+            size='small'
+            variant='text'
+            onClick={() =>
+              setOpen(
+                Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
+                  result[index] = true;
+
+                  return result;
+                }, {})
+              )
+            }
+          >
+            Expand all
+          </Button>
+          <Button
+            color='primary'
+            size='small'
+            variant='text'
+            onClick={() =>
+              setOpen(
+                Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
+                  result[index] = false;
+
+                  return result;
+                }, {})
+              )
+            }
+          >
+            Collapse all
+          </Button>
+        </Box>
+      </Box>
+      {calls.map((call, index) => (
+        <Item
+          from={from}
+          index={index + 1}
+          key={index}
+          isOpen={!!isOpen[index]}
+          call={call}
+          registry={registry}
+          jsonFallback={jsonFallback}
+          toggleOpen={() =>
+            setOpen((values) => ({
+              ...values,
+              [index]: !values[index]
+            }))
+          }
+        />
+      ))}
+    </Stack>
+  );
+}
+
+export default React.memo(BatchCall);

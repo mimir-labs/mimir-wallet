@@ -1,28 +1,91 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
+import type { AccountData, DelegateeProp, MultisigAccountData } from '@mimir-wallet/hooks/types';
 
-import { Paper, useTheme } from '@mui/material';
+import dagre from '@dagrejs/dagre';
+import { Box, Paper, SvgIcon, useTheme } from '@mui/material';
 import React, { useEffect } from 'react';
-import ReactFlow, { Edge, Handle, Node, NodeProps, Position, useEdgesState, useNodesState } from 'reactflow';
+import ReactFlow, {
+  BaseEdge,
+  Controls,
+  Edge,
+  EdgeLabelRenderer,
+  EdgeProps,
+  getSmoothStepPath,
+  Handle,
+  MiniMap,
+  Node,
+  NodeProps,
+  Position,
+  useEdgesState,
+  useNodesState
+} from 'reactflow';
 
-import { getAddressMeta } from '@mimir-wallet/utils';
+import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 
 import AddressCell from './AddressCell';
 
 interface Props {
-  value?: AccountId | AccountIndex | Address | string | null;
+  showControls?: boolean;
+  showMiniMap?: boolean;
+  account?: AccountData | null;
 }
 
-type NodeData = { parentId: string | null; members: string[]; address: string };
+type NodeData = {
+  isTop?: boolean;
+  isLeaf?: boolean;
+  account: AccountData;
+  type: 'multisig' | 'proxy' | 'unknown';
+  delay?: number;
+  proxyType?: string;
+};
+
+const dagreGraph = new dagre.graphlib.Graph();
+
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+export function getLayoutedElements(nodes: Node[], edges: Edge[], nodeWidth = 330, nodeHeight = 70, direction = 'RL') {
+  const isHorizontal = direction === 'LR' || direction === 'RL';
+
+  dagreGraph.setGraph({ rankdir: direction });
+
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+  });
+
+  edges.forEach((edge) => {
+    dagreGraph.setEdge(edge.source, edge.target);
+  });
+
+  dagre.layout(dagreGraph);
+
+  const newNodes: Node[] = nodes.map((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    const newNode = {
+      ...node,
+      targetPosition: isHorizontal ? Position.Left : Position.Top,
+      sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
+      // We are shifting the dagre node position (anchor=center center) to the top left
+      // so it matches the React Flow node anchor point (top left).
+      position: {
+        x: nodeWithPosition.x - nodeWidth / 2,
+        y: nodeWithPosition.y - nodeHeight / 2
+      }
+    };
+
+    return newNode;
+  });
+
+  return { nodes: newNodes, edges };
+}
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
   const { palette } = useTheme();
 
   return (
     <>
-      {data.members.length > 0 && (
+      {(data.account.type === 'multisig' || !!data.account.delegatees.length) && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
@@ -30,10 +93,10 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
           type='source'
         />
       )}
-      <Paper sx={{ width: 220, height: 71, padding: 1 }}>
-        <AddressCell showType value={data.address} withCopy />
+      <Paper sx={{ display: 'flex', alignItems: 'center', width: 270, padding: 1 }}>
+        <AddressCell value={data.account.address} withCopy withAddressBook />
       </Paper>
-      {data.parentId && (
+      {!data.isTop && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Right}
@@ -45,129 +108,216 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
   );
 });
 
+export const AddressEdge = React.memo(
+  ({
+    id,
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+    data
+  }: EdgeProps<{ label?: string; color?: string; labelBgColor?: string; delay?: number }>) => {
+    const [edgePath, labelX, labelY] = getSmoothStepPath({
+      sourceX,
+      sourceY,
+      sourcePosition,
+      targetX,
+      targetY,
+      targetPosition,
+      borderRadius: 10
+    });
+
+    return (
+      <>
+        <BaseEdge id={id} path={edgePath} style={{ stroke: data?.color }} />
+
+        {data && (
+          <EdgeLabelRenderer>
+            <Box
+              sx={{
+                display: data.label ? 'flex' : 'none',
+                alignItems: 'center',
+                position: 'absolute',
+                transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+                background: '#ffcc00',
+                minWidth: 40,
+                height: 16,
+                padding: '2px',
+                borderRadius: '8px',
+                fontSize: 10,
+                fontWeight: 700,
+                bgcolor: data.labelBgColor,
+                color: 'white',
+                gap: '2px'
+              }}
+            >
+              {!!data.delay && <SvgIcon component={IconClock} inheritViewBox sx={{ fontSize: '0.75rem' }} />}
+              <Box sx={{ flex: '1', textAlign: 'center' }}>{data.label}</Box>
+            </Box>
+          </EdgeLabelRenderer>
+        )}
+      </>
+    );
+  }
+);
+
 const nodeTypes = {
   AddressNode
 };
 
-function makeNodes(
-  address: string,
-  parentId: string | null,
-  xPos: number,
-  yPos: number,
-  xOffset: number,
-  yOffset: number,
-  onYChange?: (offset: number) => void,
-  nodes: Node<NodeData>[] = [],
-  edges: Edge[] = []
-): void {
-  const meta = getAddressMeta(address);
+const edgeTypes = {
+  AddressEdge
+};
 
-  const nodeId = `${parentId}-${address}`;
+function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges: Edge[] = []) {
+  function createNode(
+    id: string,
+    account: AccountData,
+    isTop: boolean,
+    type: 'multisig' | 'proxy' | 'unknown',
+    proxyType?: string,
+    delay?: number
+  ): Node<NodeData> {
+    return {
+      id,
+      resizing: true,
+      type: 'AddressNode',
+      data: {
+        account,
+        isTop,
+        isLeaf: account.type !== 'multisig' && account.delegatees.length === 0,
+        type,
+        proxyType,
+        delay
+      },
+      position: { x: 0, y: 0 },
+      connectable: false
+    };
+  }
 
-  const node: Node<NodeData> = {
-    id: nodeId,
-    resizing: true,
-    type: 'AddressNode',
-    data: { address, parentId, members: meta.who || [] },
-    position: { x: xPos, y: yPos },
-    connectable: false
-  };
-
-  nodes.push(node);
-
-  if (parentId) {
-    edges.push({
-      id: `${parentId}_to_${nodeId}`,
+  function makeEdge(
+    parentId: string,
+    nodeId: string,
+    label: string = '',
+    delay?: number,
+    color: string = '#d9d9d9',
+    labelBgColor: string = '#fff'
+  ): Edge {
+    return {
+      id: `${parentId}->${nodeId}`,
       source: parentId,
       target: nodeId,
-      type: 'smoothstep',
-      style: { stroke: '#d9d9d9' },
-      animated: true
-    });
+      type: 'AddressEdge',
+      data: { label, delay, color, labelBgColor }
+    };
   }
 
-  if (meta.delegators) {
-    const nextX = xPos - xOffset;
-    const childCount = meta.delegators.length;
-
-    const startY = yPos - ((childCount - 1) * yOffset) / 2;
-    let nextY = startY;
-
-    meta.delegators.forEach((_address, index) => {
-      makeNodes(
-        _address,
-        nodeId,
-        nextX,
-        nextY,
-        xOffset,
-        yOffset,
-        (offset: number) => {
-          onYChange?.(offset);
-          nextY += offset;
-        },
-        nodes,
-        edges
-      );
-
-      if (index < childCount - 1) {
-        nextY += yOffset * (getAddressMeta(_address).who?.length || 1);
+  type NodeInfo =
+    | {
+        from: 'delegate';
+        parent: AccountData;
+        value: AccountData & DelegateeProp;
+        parentId: string;
       }
-    });
-
-    const oldY = node.position.y;
-
-    node.position.y = (nextY + startY) / 2;
-    onYChange?.(node.position.y - oldY);
-  } else if (meta.who) {
-    const nextX = xPos - xOffset;
-    const childCount = meta.who.length;
-
-    const startY = yPos - ((childCount - 1) * yOffset) / 2;
-    let nextY = startY;
-
-    meta.who.forEach((_address, index) => {
-      makeNodes(
-        _address,
-        nodeId,
-        nextX,
-        nextY,
-        xOffset,
-        yOffset,
-        (offset: number) => {
-          onYChange?.(offset);
-          nextY += offset;
-        },
-        nodes,
-        edges
-      );
-
-      if (index < childCount - 1) {
-        nextY += yOffset * (getAddressMeta(_address).who?.length || 1);
+    | {
+        from: 'member';
+        parent: MultisigAccountData;
+        value: AccountData;
+        parentId: string;
       }
-    });
+    | {
+        from: 'origin';
+        parent: null;
+        value: AccountData;
+        parentId: string | null;
+      };
 
-    const oldY = node.position.y;
+  function dfs(node: NodeInfo) {
+    const nodeId = node.parentId ? `${node.parentId}_${JSON.stringify(node.value)}` : JSON.stringify(node.value);
 
-    node.position.y = (nextY + startY) / 2;
-    onYChange?.(node.position.y - oldY);
+    if (!node.parentId) {
+      nodes.push(
+        createNode(
+          nodeId,
+          node.value,
+          true,
+          node.from === 'delegate' ? 'proxy' : node.from === 'member' ? 'multisig' : 'unknown',
+          node.from === 'delegate' ? node.value.proxyType : undefined,
+          node.from === 'delegate' ? node.value.proxyDelay : undefined
+        )
+      );
+    } else {
+      nodes.push(
+        createNode(
+          nodeId,
+          node.value,
+          false,
+          node.from === 'delegate' ? 'proxy' : node.from === 'member' ? 'multisig' : 'unknown',
+          node.from === 'delegate' ? node.value.proxyType : undefined,
+          node.from === 'delegate' ? node.value.proxyDelay : undefined
+        )
+      );
+      edges.push(
+        makeEdge(
+          node.parentId,
+          nodeId,
+          node.from === 'delegate' ? node.value.proxyType : '',
+          node.from === 'delegate' ? node.value.proxyDelay : undefined,
+          node.from === 'delegate' ? '#B700FF' : '#AEAEAE',
+          node.from === 'delegate' ? '#B700FF' : '#AEAEAE'
+        )
+      );
+    }
+
+    // traverse the members or delegatees of the current account
+    for (const child of node.value.delegatees) {
+      dfs({
+        from: 'delegate',
+        parent: node.value,
+        value: child,
+        parentId: nodeId
+      });
+    }
+
+    if (node.value.type === 'multisig') {
+      // traverse the member or members of the current account
+      for (const child of node.value.members) {
+        dfs({
+          from: 'member',
+          parent: node.value,
+          value: child,
+          parentId: nodeId
+        });
+      }
+    }
   }
+
+  dfs({
+    from: 'origin',
+    parent: null,
+    value: topAccount,
+    parentId: null
+  });
 }
 
-function AddressOverview({ value }: Props) {
+function AddressOverview({ account, showControls, showMiniMap }: Props) {
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   useEffect(() => {
-    if (!value) return;
+    if (!account) return;
 
-    const nodes: Node<NodeData>[] = [];
-    const edges: Edge[] = [];
+    const initialNodes: Node<NodeData>[] = [];
+    const initialEdges: Edge[] = [];
 
-    makeNodes(value.toString(), null, 0, 0, 300, 90, undefined, nodes, edges);
+    makeNodes(account, initialNodes, initialEdges);
+    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges);
 
     setNodes(nodes);
     setEdges(edges);
-  }, [value, setEdges, setNodes]);
+  }, [account, setEdges, setNodes]);
 
   return (
     <ReactFlow
@@ -181,11 +331,15 @@ function AddressOverview({ value }: Props) {
       maxZoom={1.5}
       minZoom={0.1}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       nodes={nodes}
       onEdgesChange={onEdgesChange}
       onNodesChange={onNodesChange}
       zoomOnScroll
-    />
+    >
+      {showMiniMap && <MiniMap pannable zoomable />}
+      {showControls && <Controls />}
+    </ReactFlow>
   );
 }
 

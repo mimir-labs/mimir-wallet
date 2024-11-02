@@ -1,8 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import useSWR from 'swr';
 
 import { chainLinks } from '@mimir-wallet/utils';
 
@@ -22,7 +22,11 @@ export interface ProposalData {
 }
 
 export function useProposal(): ProposalData[] {
-  const { data } = useSWR(chainLinks.proposalApi || null, (key) => fetch(key).then((res) => res.json()));
+  const proposalApi = chainLinks.proposalApi();
+  const { data } = useQuery<{ items: ProposalData[] }>({
+    queryHash: `${proposalApi}`,
+    queryKey: [proposalApi || null]
+  });
 
   return useMemo(() => data?.items || [], [data]);
 }

@@ -4,18 +4,18 @@
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
-import { BN, bnToBn } from '@polkadot/util';
 import React, { useCallback, useState } from 'react';
 
-import { useApi, useCall, useGroupAccounts, useTxQueue } from '@mimir-wallet/hooks';
+import { useApi, useCall, useGroupAccounts, useInputNumber, useTxQueue } from '@mimir-wallet/hooks';
+import { parseUnits } from '@mimir-wallet/utils';
 
 import AddressCell from './AddressCell';
+import Input from './Input';
 import InputAddress from './InputAddress';
-import InputNumber from './InputNumber';
 
 interface Props {
   open: boolean;
-  defaultValue?: string | BN;
+  defaultValue?: string | { toString: () => string };
   receipt?: string;
   onClose: () => void;
 }
@@ -29,19 +29,21 @@ function Content({
 }: {
   sending?: string;
   setSending: React.Dispatch<string>;
-  value?: BN;
-  setValue: React.Dispatch<BN>;
+  value?: string;
+  setValue: React.Dispatch<string>;
   receipt?: string;
 }) {
   const { api } = useApi();
   const balances = useCall<DeriveBalancesAll>(api.derive.balances.all, [sending]);
-  const { accounts, injected, testing } = useGroupAccounts();
+  const { injected } = useGroupAccounts();
 
   return (
     <DialogContent>
       <Stack spacing={2}>
         <InputAddress
-          filtered={[...injected, ...testing, ...accounts]}
+          withBalance
+          balance={balances?.freeBalance}
+          filtered={injected}
           isSign
           label='Sending From'
           onChange={setSending}
@@ -50,10 +52,10 @@ function Content({
         <Stack spacing={1}>
           <Typography fontWeight={700}>To</Typography>
           <Box bgcolor='secondary.main' borderRadius={1} padding={1}>
-            <AddressCell shorten={false} showType value={receipt} withCopy />
+            <AddressCell shorten={false} showType value={receipt} withCopy withAddressBook />
           </Box>
         </Stack>
-        <InputNumber label='Amount' maxValue={balances?.availableBalance} onChange={setValue} value={value} withMax />
+        <Input label='Amount' onChange={setValue} value={value} />
       </Stack>
     </DialogContent>
   );
@@ -66,7 +68,7 @@ function Action({
   value
 }: {
   receipt?: string;
-  value?: BN;
+  value?: string;
   sending?: string;
   onClose: () => void;
 }) {
@@ -75,12 +77,13 @@ function Action({
   const handleClick = useCallback(() => {
     if (receipt && sending && value) {
       addQueue({
-        extrinsic: api.tx.balances.transferKeepAlive(receipt, value),
+        call: api.tx.balances.transferKeepAlive(receipt, parseUnits(value, api.registry.chainDecimals[0])),
         accountId: sending,
-        onResults: () => onClose()
+        website: 'mimir://internal/fund'
       });
+      onClose();
     }
-  }, [addQueue, api.tx.balances, onClose, receipt, sending, value]);
+  }, [addQueue, api, onClose, receipt, sending, value]);
 
   return (
     <DialogActions>
@@ -96,7 +99,7 @@ function Action({
 
 function Fund({ defaultValue, onClose, open, receipt }: Props) {
   const [sending, setSending] = useState<string>();
-  const [value, setValue] = useState<BN>(bnToBn(defaultValue || '0'));
+  const [[value], setValue] = useInputNumber(defaultValue?.toString() || '0', false, 0);
 
   return (
     <Dialog fullWidth onClose={onClose} open={open}>

@@ -3,7 +3,11 @@
 
 export const SWITCH_ACCOUNT_REMIND_KEY = 'switch_account_remind';
 
-export const SELECT_ACCOUNT_KEY = 'selected_account';
+export const API_METADATA_KEY = 'api_metadata';
+export const CURRENT_NETWORK_KEY = 'current_network';
+export const CURRENT_ADDRESS_PREFIX = 'current_address:';
+
+export const BATCH_TX_PREFIX = 'batch_tx:';
 
 export const FAVORITE_DAPP_KEY = 'favorite_dapp';
 export const DETECTED_ACCOUNT_KEY = 'detected_account';

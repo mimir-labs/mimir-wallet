@@ -2,27 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, Button, Paper } from '@mui/material';
-import { useEffect } from 'react';
 
-import { useAddressMeta, useQueryParam, useSelectedAccount } from '@mimir-wallet/hooks';
+import { useQueryAccount, useQueryParam, useSelectedAccount } from '@mimir-wallet/hooks';
 
 import HistoryTransactions from './HistoryTransactions';
 import PendingTransactions from './PendingTransactions';
 
-function MultisigList({
-  address,
-  limit,
-  page,
-  setPage
-}: {
-  address: string;
-  page?: number;
-  limit?: number;
-  setPage: (value: string) => void;
-}) {
+function MultisigList({ address }: { address: string }) {
+  const [account] = useQueryAccount(address);
+
   const [type, setType] = useQueryParam<'pending' | 'history'>('status', 'pending');
 
-  const _setPage = (value: number) => setPage(value.toString());
+  if (!account) return null;
 
   return (
     <Box>
@@ -43,61 +34,22 @@ function MultisigList({
           History
         </Button>
       </Paper>
-      {type === 'history' ? (
-        <HistoryTransactions address={address} limit={limit} page={page} setPage={_setPage} />
-      ) : (
-        <PendingTransactions address={address} />
-      )}
-    </Box>
-  );
-}
 
-function AccountList({
-  address,
-  limit,
-  page,
-  setPage
-}: {
-  address: string;
-  page?: number;
-  limit?: number;
-  setPage: (value: string) => void;
-}) {
-  const _setPage = (value: number) => setPage(value.toString());
-
-  return (
-    <Box>
-      <HistoryTransactions address={address} limit={limit} page={page} setPage={_setPage} />
+      {type === 'history' ? <HistoryTransactions account={account} /> : <PendingTransactions account={account} />}
     </Box>
   );
 }
 
 function Content({ address }: { address: string }) {
-  const { meta } = useAddressMeta(address);
-  const [page, setPage] = useQueryParam<string>('page', '1');
-  const [limit] = useQueryParam<string>('limit', '10');
-
-  if (!meta || meta.isMultisig)
-    return <MultisigList address={address} limit={Number(limit) || 10} page={Number(page) || 1} setPage={setPage} />;
-
-  return <AccountList address={address} limit={Number(limit) || 10} page={Number(page) || 1} setPage={setPage} />;
+  return <MultisigList address={address} />;
 }
 
 function PageTransaction() {
-  const [address, setAddress] = useQueryParam<string>('address');
   const selected = useSelectedAccount();
 
-  useEffect(() => {
-    if (!address) {
-      selected && setAddress(selected, { replace: true });
-    } else {
-      selected && setAddress(selected);
-    }
-  }, [address, selected, setAddress]);
+  if (!selected) return null;
 
-  if (!address) return null;
-
-  return <Content address={address} />;
+  return <Content address={selected} />;
 }
 
 export default PageTransaction;

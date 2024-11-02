@@ -85,7 +85,7 @@ export function useAssets(): AssetInfo[] {
   return allAssets;
 }
 
-export function useAssetInfo(assetId?: string | BN): AssetInfoBase | undefined {
+export function useAssetInfo(assetId?: string | BN | null): AssetInfoBase | undefined {
   const { api, isApiReady } = useApi();
   const [info, setInfo] = useState<AssetInfoBase>();
 

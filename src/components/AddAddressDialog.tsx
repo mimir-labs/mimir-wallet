@@ -2,43 +2,51 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
-import { keyring } from '@polkadot/ui-keyring';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { events } from '@mimir-wallet/events';
+import { decodeAddress, encodeAddress } from '@mimir-wallet/api';
+import { useAccount } from '@mimir-wallet/hooks';
+import { addressEq } from '@mimir-wallet/utils';
 
 import Input from './Input';
 import { toastError } from './ToastRoot';
 
 function Content({
   defaultAddress,
-  defaultName,
+  watchlist,
   onAdded,
   onClose
 }: {
   defaultAddress?: string;
-  defaultName?: string;
+  watchlist?: boolean;
   onAdded?: (address: string) => void;
   onClose?: () => void;
 }) {
-  const [name, setName] = useState<string>(defaultName || '');
+  const { addAddress, addresses } = useAccount();
+  const [name, setName] = useState<string>('');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
 
   const _onChangeAddress = useCallback((addressInput: string) => {
     let address = '';
 
     try {
-      const publicKey = keyring.decodeAddress(addressInput);
+      const publicKey = decodeAddress(addressInput);
 
-      address = keyring.encodeAddress(publicKey);
+      address = encodeAddress(publicKey);
       setAddress(address);
     } catch {
       setAddress(addressInput);
     }
   }, []);
 
-  const exists = useMemo(() => address && isAddress(address) && keyring.getAddress(address), [address]);
+  const exists = useMemo(
+    () =>
+      address &&
+      isAddress(address) &&
+      addresses.findIndex((item) => item.watchlist === watchlist && addressEq(item.address, address)) > -1,
+    [address, addresses, watchlist]
+  );
 
   const _onCommit = useCallback((): void => {
     try {
@@ -48,14 +56,13 @@ function Content({
         throw new Error('not a valid address');
       }
 
-      keyring.saveAddress(address, { name: name.trim() });
+      addAddress(address, name.trim(), watchlist);
       onAdded?.(address);
-      events.emit('account_meta_changed', address);
       onClose?.();
     } catch (error) {
       toastError(error);
     }
-  }, [address, name, onAdded, onClose]);
+  }, [address, name, onAdded, onClose, addAddress, watchlist]);
 
   return (
     <>
@@ -85,13 +92,13 @@ function Content({
 
 function AddAddressDialog({
   defaultAddress,
-  defaultName,
+  watchlist,
   onAdded,
   onClose,
   open
 }: {
   defaultAddress?: string;
-  defaultName?: string;
+  watchlist?: boolean;
   open: boolean;
   onAdded?: (address: string) => void;
   onClose?: () => void;
@@ -100,10 +107,10 @@ function AddAddressDialog({
     <Dialog fullWidth maxWidth='sm' onClick={(e) => e.stopPropagation()} onClose={onClose} open={open}>
       <DialogTitle>
         <Typography textAlign='center' variant='h4'>
-          Add New Contact
+          {watchlist ? 'Add Watchlist' : 'Add New Contact'}
         </Typography>
       </DialogTitle>
-      <Content defaultAddress={defaultAddress} defaultName={defaultName} onAdded={onAdded} onClose={onClose} />
+      <Content defaultAddress={defaultAddress} watchlist={watchlist} onAdded={onAdded} onClose={onClose} />
     </Dialog>
   );
 }

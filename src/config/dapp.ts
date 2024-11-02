@@ -5,44 +5,118 @@ import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 
 import { isArray } from '@polkadot/util';
-import store from 'store';
 
+import BatchIcon from '@mimir-wallet/assets/images/batch.svg';
+import Failed from '@mimir-wallet/assets/images/failed.svg';
+import LogoCircle from '@mimir-wallet/assets/svg/logo-circle.svg';
 import { FAVORITE_DAPP_KEY } from '@mimir-wallet/constants';
+import { store } from '@mimir-wallet/utils';
 
 export interface DappOption {
-  // (1 - 999) is internal app
+  // (1 - 500) is internal app
+  // (500 - 999) is internal feature
   // (1000 - ...) is external app
   id: number;
-  internal: boolean;
   icon: string;
   name: string;
   description: string;
   url: string;
   supportedChains: true | HexString[];
-  tags: string[];
+  tags?: string[];
   website?: string;
   twitter?: string;
   discord?: string;
   github?: string;
+  isDrawer?: boolean;
+  Component?: () => Promise<React.ComponentType>; // only for mimir://dapp/*
 }
 
 export const dapps: DappOption[] = [
   {
     id: 1,
-    internal: true,
     icon: '/dapp-icons/transfer.png',
     name: 'Transfer',
     description: 'Swiftly complete asset transfers with other users, developed by Mimir.',
-    url: '/transfer',
+    url: 'mimir://app/transfer',
     supportedChains: true,
     tags: ['Assets'],
     website: 'https://mimir.global',
     twitter: 'https://twitter.com/Mimir_global',
-    github: 'https://github.com/mimir-labs'
+    github: 'https://github.com/mimir-labs',
+    Component: () => import('@mimir-wallet/apps/transfer').then((res) => res.default)
+  },
+  {
+    id: 2,
+    name: 'Cache',
+    description: 'Build cache transaction',
+    url: 'mimir://app/batch',
+    icon: BatchIcon,
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Batch', 'Cache'],
+    Component: () => import('@mimir-wallet/apps/batch').then((res) => res.default),
+    isDrawer: true
+  },
+  {
+    id: 500,
+    icon: LogoCircle,
+    name: 'Setup',
+    description: 'setup member of proxy',
+    url: 'mimir://internal/setup',
+    supportedChains: true
+  },
+  {
+    id: 501,
+    icon: LogoCircle,
+    name: 'Fund',
+    description: 'Fund',
+    url: 'mimir://internal/fund',
+    supportedChains: true
+  },
+  {
+    id: 502,
+    icon: Failed,
+    name: 'Cancel',
+    description: 'Cancel Tx',
+    url: 'mimir://internal/cancel',
+    supportedChains: true
+  },
+  {
+    id: 503,
+    icon: Failed,
+    name: 'Deny Announcement',
+    description: 'Deny announcement',
+    url: 'mimir://internal/deny-announcement',
+    supportedChains: true
+  },
+  {
+    id: 505,
+    icon: LogoCircle,
+    name: 'Create Pure',
+    description: 'Create Pure',
+    url: 'mimir://internal/create-pure',
+    supportedChains: true
+  },
+  {
+    id: 506,
+    icon: LogoCircle,
+    name: 'Execute Announcement',
+    description: 'Execute Announcement',
+    url: 'mimir://internal/execute-announcement',
+    supportedChains: true
+  },
+  {
+    id: 507,
+    icon: LogoCircle,
+    name: 'Remove All Proxies',
+    description: 'Remove All Proxies',
+    url: 'mimir://internal/remove-proxies',
+    supportedChains: true
   },
   {
     id: 1000,
-    internal: false,
     icon: '/dapp-icons/apps.svg',
     name: 'Apps',
     description:
@@ -55,7 +129,6 @@ export const dapps: DappOption[] = [
   },
   {
     id: 1001,
-    internal: false,
     icon: '/dapp-icons/subsquare.svg',
     name: 'Subsquare(Rococo)',
     description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
@@ -68,7 +141,6 @@ export const dapps: DappOption[] = [
   },
   {
     id: 1002,
-    internal: false,
     icon: '/dapp-icons/subsquare.svg',
     name: 'Subsquare(Polkadot)',
     description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
@@ -81,7 +153,6 @@ export const dapps: DappOption[] = [
   },
   {
     id: 1003,
-    internal: false,
     icon: '/dapp-icons/subsquare.svg',
     name: 'Subsquare(Kusama)',
     description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
@@ -94,7 +165,6 @@ export const dapps: DappOption[] = [
   },
   {
     id: 1004,
-    internal: false,
     icon: '/dapp-icons/staking.png',
     name: 'Staking',
     description:
@@ -110,7 +180,6 @@ export const dapps: DappOption[] = [
   },
   {
     id: 1005,
-    internal: false,
     icon: '/dapp-icons/bifrost.png',
     name: 'Bifrost App',
     description:
@@ -129,7 +198,6 @@ export const dapps: DappOption[] = [
   },
   {
     id: 1006,
-    internal: false,
     icon: '/dapp-icons/crust.webp',
     name: 'Crust Files',
     description:
@@ -144,12 +212,11 @@ export const dapps: DappOption[] = [
   },
   {
     id: 1007,
-    internal: false,
     icon: '/dapp-icons/avail.png',
     name: 'Avail Staking',
     description:
       'Avail Staking Dashboard is the easiest way to stake AVAIL, check validator stats, manage your nominations and join nomination pools. Stake on Avail (AVAIL).',
-    url: 'https://crustfiles.io/',
+    url: 'https://staking.avail.tools/#/overview',
     supportedChains: [
       '0xb91746b45e0346cc2f815a520b9c6cb4d5c0902af848db0a80f85932d2e8276a',
       '0xd3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70'

@@ -1,10 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { hexToU8a } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { useAddresses, useAllAccounts } from '@mimir-wallet/hooks';
-import { getAddressMeta, isLocalAccount } from '@mimir-wallet/utils';
+import { encodeAddress } from '@mimir-wallet/api';
+import { useAccount, useWallet } from '@mimir-wallet/hooks';
 
 interface UseSelectMultisig {
   unselected: string[];
@@ -17,19 +18,33 @@ interface UseSelectMultisig {
   unselect: (value: string) => void;
 }
 
-export function useSelectMultisig(defaultSignatories?: string[], defaultThreshold?: number): UseSelectMultisig {
-  const { allAddresses } = useAddresses();
-  const all = useAllAccounts(allAddresses);
+export function useSelectMultisig(
+  defaultSignatories?: string[],
+  defaultThreshold?: number,
+  threshold1?: boolean
+): UseSelectMultisig {
+  const { accountSource } = useWallet();
+  const { accounts, addresses } = useAccount();
+  const all = useMemo(
+    () =>
+      (threshold1 ? [encodeAddress(hexToU8a('0x0', 256))] : []).concat(
+        accounts.map((item) => item.address).concat(addresses.map((item) => item.address))
+      ),
+    [accounts, addresses, threshold1]
+  );
   const [signatories, setSignatories] = useState<string[]>(defaultSignatories || []);
-  const [threshold, setThreshold] = useState<number>(defaultThreshold || 2);
+  const [threshold, setThreshold] = useState<number>(defaultThreshold || (threshold1 ? 1 : 2));
 
-  const unselected = useMemo(() => all.filter((account) => !signatories.includes(account)), [all, signatories]);
+  const unselected = useMemo(
+    () => Array.from(new Set(all.filter((account) => !signatories.includes(account)))),
+    [all, signatories]
+  );
 
   const hasSoloAccount = useMemo(
-    () => !!signatories.find((address) => isLocalAccount(address) && !getAddressMeta(address).isMultisig),
-    [signatories]
+    () => !!signatories.find((address) => !!accountSource(address)),
+    [accountSource, signatories]
   );
-  const isThresholdValid = Number(threshold) >= 2 && Number(threshold) <= signatories.length;
+  const isThresholdValid = Number(threshold) >= (threshold1 ? 1 : 2) && Number(threshold) <= signatories.length;
 
   const select = useCallback((value: string) => {
     setSignatories((accounts) => (accounts.includes(value) ? accounts : accounts.concat(value)));

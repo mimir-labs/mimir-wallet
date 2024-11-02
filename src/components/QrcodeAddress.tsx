@@ -3,9 +3,11 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Box, Dialog, DialogContent, Typography } from '@mui/material';
+import { Avatar, Box, Dialog, DialogContent, Typography } from '@mui/material';
 import qrcode from 'qrcode-generator';
 import React, { useEffect, useRef } from 'react';
+
+import { useApi } from '@mimir-wallet/hooks';
 
 import CopyButton from './CopyButton';
 
@@ -16,6 +18,7 @@ interface Props {
 }
 
 function Content({ value }: { value: string }) {
+  const { chain } = useApi();
   const qr = useRef(qrcode(0, 'M'));
   const container = useRef<HTMLDivElement>();
 
@@ -32,18 +35,24 @@ function Content({ value }: { value: string }) {
 
   return (
     <Box>
-      <Box
-        ref={container}
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto',
-          width: 300,
-          height: 300
-        }}
-      />
-      <Typography marginTop={1}>
+      <Box sx={{ position: 'relative' }}>
+        <Box
+          ref={container}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto',
+            width: 300,
+            height: 300
+          }}
+        />
+        <Avatar
+          src={chain.icon}
+          sx={{ width: 50, height: 50, margin: 'auto', position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+        />
+      </Box>
+      <Typography marginTop={1} textAlign='center'>
         {value}
         <CopyButton value={value} />
       </Typography>
