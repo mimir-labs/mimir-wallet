@@ -22,12 +22,12 @@ export function useAnnouncementProgress(
   const status = transaction.status;
   const type = transaction.type;
   const delegate = useMemo(
-    () => account.delegatees.find((item) => addressEq(item.address, transaction.delegate)),
+    () => account.delegatees.find((item) => addressEq(item.address, transaction.delegate) && item.proxyDelay > 0),
     [account.delegatees, transaction.delegate]
   );
 
   const result = useCall<ITuple<[Vec<PalletProxyAnnouncement>, u128]>>(
-    api.query.proxy.announcements,
+    api.query.proxy?.announcements,
     status === TransactionStatus.Pending && type === TransactionType.Announce ? [transaction.delegate] : []
   );
   const bestNumber = useCall<BlockNumber>(api.derive.chain.bestNumber);
@@ -35,7 +35,7 @@ export function useAnnouncementProgress(
 
   const announcement = useMemo(
     () =>
-      announcements?.find(
+      announcements?.findLast(
         (item) =>
           addressEq(item.real.toString(), transaction.address) && u8aEq(item.callHash.toHex(), transaction.callHash)
       ),

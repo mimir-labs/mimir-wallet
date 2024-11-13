@@ -29,7 +29,7 @@ function Cell({ title, children }: { title: React.ReactNode; children: React.Rea
         <Box sx={{ fontWeight: 700 }}>{title}</Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box component='span' sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-            Power by
+            Powered by
           </Box>
           <img src={Logo} alt='mimir' height={14} />
         </Box>

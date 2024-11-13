@@ -36,7 +36,7 @@ export const dapps: DappOption[] = [
     id: 1,
     icon: '/dapp-icons/transfer.png',
     name: 'Transfer',
-    description: 'Swiftly complete asset transfers with other users, developed by Mimir.',
+    description: 'Swiftly transfer assets.',
     url: 'mimir://app/transfer',
     supportedChains: true,
     tags: ['Assets'],
@@ -48,7 +48,7 @@ export const dapps: DappOption[] = [
   {
     id: 2,
     name: 'Cache',
-    description: 'Build cache transaction',
+    description: 'Batch multiple actions into one.',
     url: 'mimir://app/batch',
     icon: BatchIcon,
     supportedChains: true,
@@ -116,11 +116,18 @@ export const dapps: DappOption[] = [
     supportedChains: true
   },
   {
+    id: 507,
+    icon: LogoCircle,
+    name: 'Remove Account',
+    description: 'Remove Account',
+    url: 'mimir://internal/remove-account',
+    supportedChains: true
+  },
+  {
     id: 1000,
     icon: '/dapp-icons/apps.svg',
     name: 'Apps',
-    description:
-      'Using the Mimir-modified version of the Polkadot.js App, users can quickly perform all operations related to Substrate.',
+    description: "Transactions can be constructed according to users' needs",
     url: 'https://apps.mimir.global/',
     supportedChains: true,
     tags: ['Wallet', 'Tool'],
@@ -168,7 +175,7 @@ export const dapps: DappOption[] = [
     icon: '/dapp-icons/staking.png',
     name: 'Staking',
     description:
-      'Staking DOT natively provides the function of securing the network and allows you to collect DOT tokens for your help.',
+      'Polkadot Staking Dashboard is the easiest way to stake DOT, check validator stats, manage your nominations and join nomination pools.',
     url: 'https://staking.mimir.global/',
     supportedChains: [
       '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',

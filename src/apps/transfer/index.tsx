@@ -30,7 +30,7 @@ function PageTransfer() {
   const [assetId, setAssetId] = useQueryParam<string>('assetId', 'native', { replace: true });
   const [sending, setSending] = useState<string | undefined>(fromParam || selected || '');
   const [recipient, setRecipient] = useState<string>(toParam || '');
-  const [[amount, isAmountValid], setAmount] = useInputNumber('0', false, 0);
+  const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
   const { addQueue } = useTxQueue();
   const filtered = useAllAccounts();
   const { addresses } = useAccount();
@@ -38,7 +38,7 @@ function PageTransfer() {
   const [format, sendingBalances] = useTransferBalance(token, sending);
 
   useEffect(() => {
-    setAmount('0');
+    setAmount('');
   }, [assetId, setAmount]);
 
   const handleClick = useCallback(() => {

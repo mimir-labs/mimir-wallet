@@ -15,6 +15,7 @@ import {
   ListItemButton,
   Menu,
   MenuItem,
+  Stack,
   SvgIcon,
   Typography,
   useMediaQuery,
@@ -334,58 +335,76 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
           overflowY: 'auto'
         }}
       >
-        <List sx={{ width: { sm: 370, xs: 330 }, maxWidth: '80vw', fontSize: { sm: '0.875rem', xs: '0.75rem' } }}>
+        <List
+          component={Stack}
+          spacing={{ sm: 1.5, xs: 1 }}
+          sx={{ width: { sm: 370, xs: 330 }, maxWidth: '80vw', fontSize: { sm: '0.875rem', xs: '0.75rem' } }}
+        >
           {current && (
-            <>
-              <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
-                <SvgIcon opacity={0.6} inheritViewBox component={IconUser} fontSize='small' />
-                Current Account
-              </Typography>
+            <Box>
+              <>
+                <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
+                  <SvgIcon opacity={0.6} inheritViewBox component={IconUser} fontSize='small' />
+                  Current Account
+                </Typography>
 
-              <AccountCell key={`current-${current}`} onClose={onClose} value={current} selected />
-            </>
+                <AccountCell key={`current-${current}`} onClose={onClose} value={current} selected />
+              </>
+            </Box>
           )}
 
           {grouped.mimir.length > 0 && (
-            <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
-              <SvgIcon opacity={0.6} inheritViewBox component={IconUnion} fontSize='small' />
-              Mimir Wallet
-            </Typography>
+            <Box>
+              <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
+                <SvgIcon opacity={0.6} inheritViewBox component={IconUnion} fontSize='small' />
+                Mimir Wallet
+              </Typography>
+              {grouped.mimir.map((account) => (
+                <AccountCell
+                  key={`multisig-${account}`}
+                  onClose={onClose}
+                  onSelect={onSelect}
+                  value={account}
+                  selected={account === current}
+                />
+              ))}
+            </Box>
           )}
-          {grouped.mimir.map((account) => (
-            <AccountCell
-              key={`multisig-${account}`}
-              onClose={onClose}
-              onSelect={onSelect}
-              value={account}
-              selected={account === current}
-            />
-          ))}
           <Divider sx={{ marginY: 0.5 }} />
 
           {grouped.injected.length > 0 && (
-            <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
-              <SvgIcon opacity={0.6} inheritViewBox component={IconExtension} fontSize='small' />
-              Extension Wallet
-            </Typography>
+            <Box>
+              <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
+                <SvgIcon opacity={0.6} inheritViewBox component={IconExtension} fontSize='small' />
+                Extension Wallet
+              </Typography>
+              {grouped.injected.map((account) => (
+                <AccountCell key={`extension-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
+              ))}
+            </Box>
           )}
-          {grouped.injected.map((account) => (
-            <AccountCell key={`extension-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
-          ))}
           <Divider sx={{ marginY: 0.5 }} />
 
-          <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
-            <Box component='span' style={{ flex: '1', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <SvgIcon opacity={0.6} inheritViewBox component={IconWatch} fontSize='small' />
-              Watchlist
-            </Box>
-            <IconButton color='inherit' size='small' onClick={() => addAddressBook(undefined, true)}>
-              <SvgIcon component={IconAdd} inheritViewBox />
-            </IconButton>
-          </Typography>
-          {watchlist.map(({ address }) => (
-            <AccountCell key={`extension-${address}`} watchlist onClose={onClose} onSelect={onSelect} value={address} />
-          ))}
+          <Box>
+            <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
+              <Box component='span' style={{ flex: '1', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <SvgIcon opacity={0.6} inheritViewBox component={IconWatch} fontSize='small' />
+                Watchlist
+              </Box>
+              <IconButton color='inherit' size='small' onClick={() => addAddressBook(undefined, true)}>
+                <SvgIcon component={IconAdd} inheritViewBox />
+              </IconButton>
+            </Typography>
+            {watchlist.map(({ address }) => (
+              <AccountCell
+                key={`extension-${address}`}
+                watchlist
+                onClose={onClose}
+                onSelect={onSelect}
+                value={address}
+              />
+            ))}
+          </Box>
         </List>
       </Box>
 

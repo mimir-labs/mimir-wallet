@@ -49,7 +49,7 @@ function checkError(
 
 function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
   const navigate = useNavigate();
-  const { systemChain } = useApi();
+  const { chain } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [name, setName] = useState<string>('');
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({
@@ -170,7 +170,6 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
                       gap: 0.5,
                       marginTop: 1,
                       color: 'text.secondary',
@@ -179,7 +178,7 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
                     }}
                   >
                     <SvgIcon inheritViewBox component={IconInfo} fontSize='inherit' />
-                    Every member can directly initiate transactions. Please select trusted accounts as members.
+                    All members can initiate transactions.
                   </Box>
                 )}
                 {memberError && (
@@ -205,13 +204,17 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
                 <AlertTitle>Notice</AlertTitle>
                 {flexible ? (
                   <ul>
-                    <li>You are trying to create a flexible multisig on {systemChain}.</li>
+                    <li>
+                      Only on <Box component='img' sx={{ verticalAlign: 'middle' }} width={16} src={chain.icon} />{' '}
+                      {chain.name}.
+                    </li>
                     <li>Initiating a transaction is required.</li>
                   </ul>
                 ) : (
                   <ul>
-                    <li>This multisig could be used on {systemChain}, Kusama and all their parachains.</li>
-                    <li>Once created, the multisig members and threshold cannot be modified.</li>
+                    <li>All chains supported.</li>
+                    <li>Unchangeable members and thresholds.</li>
+                    <li>No gas fee for creation.</li>
                   </ul>
                 )}
               </Alert>

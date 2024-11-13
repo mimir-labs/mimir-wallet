@@ -17,12 +17,13 @@ export function useCommunicator(
   appName?: string
 ): IframeCommunicator | null {
   const [communicator, setCommunicator] = useState<IframeCommunicator | null>(null);
-  const { api } = useApi();
+  const { api, genesisHash } = useApi();
   const { addQueue } = useTxQueue();
   const selected = useSelectedAccount();
   const { meta } = useAddressMeta(selected);
 
   const state: State = {
+    genesisHash,
     extrinsicSign: (payload: SignerPayloadJSON, id: string) => {
       console.log(payload);
 

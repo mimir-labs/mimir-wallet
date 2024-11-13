@@ -73,10 +73,10 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
   );
 
   useEffect(() => {
-    if (addressEq(proxied, proxy)) {
+    if (!pure && addressEq(proxied, proxy)) {
       setProxy(undefined);
     }
-  }, [proxied, proxy]);
+  }, [proxied, proxy, pure]);
 
   const estimateCustom =
     Number(custom) * blockInterval > ONE_DAY * 1000
@@ -109,7 +109,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
                 display: 'flex',
                 flexDirection: { sm: 'row', xs: 'column' },
                 gap: 1,
-                alignItems: 'center'
+                alignItems: { sm: 'start', xs: 'center' }
               }}
             >
               {pure ? (
@@ -129,7 +129,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
                 fontSize='small'
                 inheritViewBox
                 color='primary'
-                sx={{ cursor: 'pointer', transform: { sm: 'translateY(14px)', xs: 'rotate(90deg)' } }}
+                sx={{ cursor: 'pointer', transform: { sm: 'translateY(48px)', xs: 'rotate(90deg)' } }}
                 onClick={pure ? undefined : swap}
               />
               <InputAddress
@@ -234,9 +234,8 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
             <Alert severity='warning' sx={{ '.MuiAlert-message': { overflow: 'visible' } }}>
               <AlertTitle>Notice</AlertTitle>
               <ul>
-                <li>Proxy account can have selected authority of proxied account.</li>
-                <li>A deposit is necessary for proxy creation.</li>
-                <li>Only All authority can delete proxy.</li>
+                <li>A deposit is required for proxy creation.</li>
+                <li>Only accounts with full authority (ANY) can delete a proxy.</li>
               </ul>
             </Alert>
 

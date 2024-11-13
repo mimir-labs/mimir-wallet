@@ -33,7 +33,7 @@ function AccountSetting() {
   const [error, setError] = useState<Error>();
   const [txs] = usePendingTransactions(address);
   const [tab, setTab] = useState('0');
-  const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(api.query.proxy.proxies, [address]);
+  const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(api.query.proxy?.proxies, [address]);
 
   const multisigDelegates = useMemo(
     () => (account?.type === 'pure' ? account.delegatees.filter((item) => item.type === 'multisig') : []),
@@ -138,13 +138,13 @@ function AccountSetting() {
           </Box>
         )}
 
-        {proxies && proxies[0].length > 0 && (
+        {api.tx.proxy && proxies && account && proxies[0].length > 0 && (
           <Box>
             <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
               Proxy Information
             </Typography>
             <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
-              <ProxySet address={address} proxies={proxies[0]} />
+              <ProxySet account={account} address={address} proxies={proxies[0]} />
             </Paper>
           </Box>
         )}

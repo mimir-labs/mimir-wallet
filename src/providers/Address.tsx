@@ -102,11 +102,18 @@ export function AddressCtxRoot({ address, chain, children }: Props): React.React
 
         setSwitchAddress(undefined);
         currentRef.current = value;
-        setSearchParams(new URLSearchParams({ address: value }));
+
+        // update url
+        const newSearchParams = new URLSearchParams(searchParams);
+
+        newSearchParams.set('address', value);
+
+        // update storage
+        setSearchParams(newSearchParams);
         store.set(`${CURRENT_ADDRESS_PREFIX}${chain.key}`, value);
       }
     },
-    [chain.key, setSearchParams]
+    [chain.key, searchParams, setSearchParams]
   );
 
   const appendMeta = useCallback((meta: Record<string, AddressMeta>) => {

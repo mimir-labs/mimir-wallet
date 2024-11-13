@@ -51,11 +51,15 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
     <>
       <Box
         onClick={
-          !existing
-            ? toggleFundOpen
-            : () => {
-                addAddressBook(address, true);
-              }
+          !hasThisAccount && !existing
+            ? undefined
+            : !hasThisAccount
+              ? () => {
+                  addAddressBook(address, true);
+                }
+              : !existing
+                ? toggleFundOpen
+                : undefined
         }
         sx={{
           zIndex: 10,
@@ -63,35 +67,43 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
           position: 'sticky',
           top: 56,
           width: '100%',
-          paddingX: 2,
+          paddingLeft: { sm: 2, xs: 1 },
+          paddingY: 0.5,
           display: 'flex',
           alignItems: 'center',
-          height: 36,
-          gap: 1,
+          height: 'auto',
+          gap: { sm: 1, xs: 0.5 },
           bgcolor: 'primary.main',
           color: 'primary.contrastText'
         }}
       >
         <SvgIcon component={IconInfo} inheritViewBox />
         {!existing && (
-          <Typography sx={{ flex: '1' }}>
+          <Typography
+            sx={{ flex: '1' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              toggleFundOpen(true);
+            }}
+          >
             To prevent this account from being purged, please transfer{' '}
-            <FormatBalance value={api.consts.balances.existentialDeposit} /> to keep the account alive.
+            <FormatBalance value={api.consts.balances.existentialDeposit} />
+            {api.registry.chainTokens[0].toString()} to keep the account alive.
           </Typography>
         )}
 
         {!hasThisAccount && (
-          <Typography sx={{ flex: '1' }}>
+          <Typography
+            sx={{ flex: '1' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              addAddressBook(address, true);
+            }}
+          >
             You are not a member of this account, currently in Watch-only mode.
-            <Box
-              component='span'
-              sx={{ cursor: 'pointer', ':hover': { textDecorationLine: 'underline' } }}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                addAddressBook(address, true);
-              }}
-            >
+            <Box component='span' sx={{ cursor: 'pointer', ':hover': { textDecorationLine: 'underline' } }}>
               {'Add to watch list>>'}
             </Box>
           </Typography>
@@ -99,6 +111,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
 
         <IconButton
           color='inherit'
+          size='small'
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();

@@ -6,7 +6,7 @@ import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { decodeAddress, encodeAddress } from '@mimir-wallet/api';
-import { useAccount } from '@mimir-wallet/hooks';
+import { useAccount, useDeriveAccountInfo } from '@mimir-wallet/hooks';
 import { addressEq } from '@mimir-wallet/utils';
 
 import Input from './Input';
@@ -26,6 +26,8 @@ function Content({
   const { addAddress, addresses } = useAccount();
   const [name, setName] = useState<string>('');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
+  const info = useDeriveAccountInfo(address);
+  const { identity } = info || {};
 
   const _onChangeAddress = useCallback((addressInput: string) => {
     let address = '';
@@ -56,19 +58,27 @@ function Content({
         throw new Error('not a valid address');
       }
 
-      addAddress(address, name.trim(), watchlist);
+      addAddress(address, identity?.display ? identity.display : name.trim(), watchlist);
       onAdded?.(address);
       onClose?.();
     } catch (error) {
       toastError(error);
     }
-  }, [address, name, onAdded, onClose, addAddress, watchlist]);
+  }, [address, addAddress, identity?.display, name, watchlist, onAdded, onClose]);
 
   return (
     <>
       <DialogContent>
         <Stack spacing={2}>
-          <Input label='Name' onChange={setName} placeholder='input name for contact' value={name} />
+          {identity?.display ? (
+            <Input
+              label='Identity'
+              disabled
+              value={`${identity.displayParent || identity.display}${identity.displayParent ? `/${identity.display}` : ''}`}
+            />
+          ) : (
+            <Input label='Name' onChange={setName} placeholder='input name for contact' value={name} />
+          )}
           <Input
             error={exists ? new Error('Already in related account') : null}
             label='Address'
@@ -82,7 +92,7 @@ function Content({
         <Button fullWidth onClick={onClose} variant='outlined'>
           Cancel
         </Button>
-        <Button disabled={!name || !address} fullWidth onClick={_onCommit} variant='contained'>
+        <Button disabled={(!name && !identity?.display) || !address} fullWidth onClick={_onCommit} variant='contained'>
           Save
         </Button>
       </DialogActions>

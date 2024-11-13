@@ -6,7 +6,8 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 
-import { useApi, useCall, useGroupAccounts, useInputNumber, useTxQueue } from '@mimir-wallet/hooks';
+import { signAndSend } from '@mimir-wallet/api';
+import { useApi, useCall, useGroupAccounts, useInputNumber, useWallet } from '@mimir-wallet/hooks';
 import { parseUnits } from '@mimir-wallet/utils';
 
 import AddressCell from './AddressCell';
@@ -52,7 +53,7 @@ function Content({
         <Stack spacing={1}>
           <Typography fontWeight={700}>To</Typography>
           <Box bgcolor='secondary.main' borderRadius={1} padding={1}>
-            <AddressCell shorten={false} showType value={receipt} withCopy withAddressBook />
+            <AddressCell shorten showType value={receipt} withCopy withAddressBook />
           </Box>
         </Stack>
         <Input label='Amount' onChange={setValue} value={value} />
@@ -73,17 +74,24 @@ function Action({
   onClose: () => void;
 }) {
   const { api } = useApi();
-  const { addQueue } = useTxQueue();
+  const { accountSource } = useWallet();
   const handleClick = useCallback(() => {
     if (receipt && sending && value) {
-      addQueue({
-        call: api.tx.balances.transferKeepAlive(receipt, parseUnits(value, api.registry.chainDecimals[0])),
-        accountId: sending,
-        website: 'mimir://internal/fund'
-      });
-      onClose();
+      const source = accountSource(sending);
+
+      if (source) {
+        const events = signAndSend(
+          api.tx.balances.transferKeepAlive(receipt, parseUnits(value, api.registry.chainDecimals[0])),
+          sending,
+          source
+        );
+
+        events.on('inblock', () => {
+          onClose();
+        });
+      }
     }
-  }, [addQueue, api, onClose, receipt, sending, value]);
+  }, [accountSource, api, onClose, receipt, sending, value]);
 
   return (
     <DialogActions>

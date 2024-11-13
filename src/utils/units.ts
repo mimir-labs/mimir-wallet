@@ -81,7 +81,7 @@ export const formatDisplay = (value: string): [string, string, string] => {
   } else if (preLen > 6) {
     display = `${(Number(BigInt(pre) / BigInt(1e3)) / 1000).toFixed(3)} M`;
   } else if (preLen > 3) {
-    display = `${(Number(BigInt(pre) / BigInt(1e1)) / 1000).toFixed(3)} K`;
+    display = `${(Number(BigInt(pre) / BigInt(1)) / 1000).toFixed(3)} K`;
   } else {
     display = `${pre}.${suf}`;
   }

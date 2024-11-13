@@ -80,7 +80,7 @@ async function loadOnReady(api: ApiPromise, chain: Endpoint): Promise<ApiState> 
 
   // explicitly override the ss58Format as specified
   api.registry.setChainProperties(
-    api.registry.createType('ChainProperties', { ss58Format, tokenDecimals, tokenSymbol })
+    api.registry.createType('ChainProperties', { ss58Format: chain.ss58Format, tokenDecimals, tokenSymbol })
   );
 
   // first setup the UI helpers

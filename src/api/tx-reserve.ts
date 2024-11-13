@@ -17,13 +17,13 @@ export async function txReserve(
   api: ApiPromise,
   call: Call,
   address: string,
-  reserve: Record<string, { value: BN; type: 'multisig' | 'proxy' }> = {},
-  unreserve: Record<string, { value: BN; type: 'multisig' | 'proxy' }> = {},
+  reserve: Record<string, { value: BN }> = {},
+  unreserve: Record<string, { value: BN }> = {},
   delay: Record<string, BN> = {}
 ) {
   if (api.tx.multisig?.approveAsMulti.is(call) || api.tx.multisig?.asMulti.is(call)) {
     const threshold = call.args[0];
-    const multisigAddress = encodeMultiAddress([address, ...call.args[1]], threshold);
+    const multisigAddress = encodeMultiAddress([address, ...call.args[1]], threshold, api.registry.chainSS58);
     const info = await api.query.multisig.multisigs<Option<Multisig>>(
       multisigAddress,
       api.tx.multisig.approveAsMulti.is(call) ? call.args[3] : call.args[3].hash
@@ -34,25 +34,28 @@ export async function txReserve(
 
       if (approvals.length >= threshold.toNumber() - 1) {
         if (api.tx.multisig.asMulti.is(call)) {
-          unreserve[depositor.toString()] = { value: deposit, type: 'multisig' };
+          unreserve[depositor.toString()] = { value: deposit };
           await txReserve(api, call.args[3], multisigAddress, reserve, unreserve, delay);
         }
       }
     } else {
       reserve[address] = {
-        value: api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.mul(threshold)),
-        type: 'multisig'
+        value: api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.mul(threshold))
       };
     }
+  } else if (api.tx.multisig?.asMultiThreshold1.is(call)) {
+    const multisigAddress = encodeMultiAddress([address, ...call.args[0]], 1, api.registry.chainSS58);
+
+    await txReserve(api, call.args[1], multisigAddress, reserve, unreserve, delay);
   } else if (api.tx.multisig?.cancelAsMulti.is(call)) {
     const threshold = call.args[0];
-    const multisigAddress = encodeMultiAddress([address, ...call.args[1]], threshold);
+    const multisigAddress = encodeMultiAddress([address, ...call.args[1]], threshold, api.registry.chainSS58);
     const info = await api.query.multisig.multisigs<Option<Multisig>>(multisigAddress, call.args[3]);
 
     if (info.isSome) {
       const { depositor, deposit } = info.unwrap();
 
-      unreserve[depositor.toString()] = { value: deposit, type: 'multisig' };
+      unreserve[depositor.toString()] = { value: deposit };
     }
   } else if (api.tx.proxy?.announce.is(call)) {
     const real = call.args[0].toString();
@@ -62,13 +65,12 @@ export async function txReserve(
       [api.query.proxy.announcements, address],
       [api.query.proxy.proxies, real]
     ]);
-    const deposit = announcements[1];
 
     reserve[address] = {
-      value: (deposit.gtn(0) ? deposit : api.consts.proxy.announcementDepositBase).add(
-        api.consts.proxy.announcementDepositFactor
-      ),
-      type: 'proxy'
+      value:
+        announcements[0].length === 0
+          ? api.consts.proxy.announcementDepositBase.add(api.consts.proxy.announcementDepositFactor)
+          : api.consts.proxy.announcementDepositFactor
     };
 
     const proxy = proxies[0].find((item) => addressEq(item.delegate, address) && item.delay.gtn(0));
@@ -82,9 +84,9 @@ export async function txReserve(
     const announcements = await api.query.proxy.announcements(delegate);
 
     if (announcements[0].length <= 1) {
-      unreserve[delegate] = { value: announcements[1], type: 'proxy' };
+      unreserve[delegate] = { value: announcements[1] };
     } else {
-      unreserve[delegate] = { value: api.consts.proxy.announcementDepositFactor, type: 'proxy' };
+      unreserve[delegate] = { value: api.consts.proxy.announcementDepositFactor };
     }
 
     await txReserve(api, call.args[3], real, reserve, unreserve, delay);
@@ -92,44 +94,61 @@ export async function txReserve(
     const announcements = await api.query.proxy.announcements(address);
 
     if (announcements[0].length <= 1) {
-      unreserve[address] = { value: announcements[1], type: 'proxy' };
+      unreserve[address] = { value: announcements[1] };
     } else {
-      unreserve[address] = { value: api.consts.proxy.announcementDepositFactor, type: 'proxy' };
+      unreserve[address] = { value: api.consts.proxy.announcementDepositFactor };
     }
   } else if (api.tx.proxy?.rejectAnnouncement?.is(call)) {
     const delegate = call.args[0].toString();
     const announcements = await api.query.proxy.announcements(delegate);
 
     if (announcements[0].length <= 1) {
-      unreserve[delegate] = { value: announcements[1], type: 'proxy' };
+      unreserve[delegate] = { value: announcements[1] };
     } else {
-      unreserve[delegate] = { value: api.consts.proxy.announcementDepositFactor, type: 'proxy' };
+      unreserve[delegate] = { value: api.consts.proxy.announcementDepositFactor };
     }
   } else if (api.tx.proxy?.createPure?.is(call)) {
     reserve[address] = {
-      value: api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor),
-      type: 'proxy'
+      value: api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor)
     };
   } else if (api.tx.proxy?.removeProxy?.is(call)) {
     const proxies = await api.query.proxy.proxies(address);
 
     if (proxies[0].length <= 1) {
-      unreserve[address] = { value: proxies[1], type: 'proxy' };
+      unreserve[address] = { value: proxies[1] };
     } else {
-      unreserve[address] = { value: api.consts.proxy.proxyDepositFactor, type: 'proxy' };
+      unreserve[address] = { value: api.consts.proxy.proxyDepositFactor };
+    }
+  } else if (api.tx.proxy?.addProxy?.is(call)) {
+    const proxies = await api.query.proxy.proxies(address);
+
+    if (proxies[0].length === 0) {
+      reserve[address] = {
+        value: api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor)
+      };
+    } else {
+      reserve[address] = { value: api.consts.proxy.proxyDepositFactor };
     }
   } else if (api.tx.proxy?.removeProxies?.is(call)) {
     const proxies = await api.query.proxy.proxies(address);
 
-    unreserve[address] = { value: proxies[1], type: 'proxy' };
+    unreserve[address] = { value: proxies[1] };
   } else if (api.tx.proxy?.proxy?.is(call)) {
     await txReserve(api, call.args[2], call.args[0].toString(), reserve, unreserve, delay);
+  } else if (api.tx.proxy?.killPure?.is(call)) {
+    const address = call.args[0].toString();
+
+    if (unreserve[address]) {
+      unreserve[address] = { value: unreserve[address].value.add(api.consts.proxy.proxyDepositBase) };
+    } else {
+      unreserve[address] = { value: api.consts.proxy.proxyDepositBase };
+    }
   }
 }
 
 export async function extrinsicReserve(api: ApiPromise, signer: string, tx: SubmittableExtrinsic<'promise'>) {
-  const reserve: Record<string, { value: BN; type: 'multisig' | 'proxy' }> = {};
-  const unreserve: Record<string, { value: BN; type: 'multisig' | 'proxy' }> = {};
+  const reserve: Record<string, { value: BN }> = {};
+  const unreserve: Record<string, { value: BN }> = {};
   const delay: Record<string, BN> = {};
 
   const call = api.createType('Call', tx.method);

@@ -65,7 +65,6 @@ function CallDisplayDetail({ registry, call }: { registry: Registry; call?: IMet
           shorten
           withName
           withAddress={false}
-          withCopy
           iconSize={20}
           defaultName='Real'
           value={call.args[0].toString()}
@@ -79,7 +78,6 @@ function CallDisplayDetail({ registry, call }: { registry: Registry; call?: IMet
           shorten
           withName
           withAddress={false}
-          withCopy
           iconSize={20}
           defaultName='Real'
           value={call.args[1].toString()}
@@ -93,7 +91,6 @@ function CallDisplayDetail({ registry, call }: { registry: Registry; call?: IMet
           shorten
           withName
           withAddress={false}
-          withCopy
           iconSize={20}
           defaultName='Proxy'
           value={call.args[0].toString()}

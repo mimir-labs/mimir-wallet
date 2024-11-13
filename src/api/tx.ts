@@ -3,7 +3,15 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { SignerOptions, SubmittableExtrinsic } from '@polkadot/api/types';
-import type { DispatchError, ExtrinsicEra, Hash, Header, Index, SignerPayload } from '@polkadot/types/interfaces';
+import type {
+  DispatchError,
+  Extrinsic,
+  ExtrinsicEra,
+  Hash,
+  Header,
+  Index,
+  SignerPayload
+} from '@polkadot/types/interfaces';
 import type { SpRuntimeDispatchError } from '@polkadot/types/lookup';
 import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
@@ -213,7 +221,49 @@ export async function sign(
     throw new Error('No signer');
   }
 
-  const { signature } = await accountSigner.signPayload(payload.toPayload());
+  const { signature, signedTransaction } = await accountSigner.signPayload(payload.toPayload());
+
+  if (signedTransaction) {
+    const ext = api.registry.createTypeUnsafe<Extrinsic>('Extrinsic', [signedTransaction]);
+
+    const newSignerPayload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
+      objectSpread(
+        {},
+        {
+          address: signer,
+          assetId: ext.assetId && ext.assetId.isSome ? ext.assetId.toHex() : null,
+          blockHash: payload.blockHash,
+          blockNumber: signingInfo.header ? signingInfo.header.number : 0,
+          era: ext.era.toHex(),
+          genesisHash: payload.genesisHash,
+          metadataHash: ext.metadataHash ? ext.metadataHash.toHex() : null,
+          method: ext.method.toHex(),
+          mode: ext.mode ? ext.mode.toHex() : null,
+          nonce: ext.nonce.toHex(),
+          runtimeVersion: payload.runtimeVersion,
+          signedExtensions: payload.signedExtensions,
+          tip: ext.tip ? ext.tip.toHex() : null,
+          version: payload.version
+        }
+      )
+    ]);
+
+    if (!ext.isSigned) {
+      throw new Error(
+        `When using the signedTransaction field, the transaction must be signed. Recieved isSigned: ${ext.isSigned}`
+      );
+    }
+
+    const errMsg = (field: string) => `signAndSend: ${field} does not match the original payload`;
+
+    if (payload.method.toHex() !== ext.method.toHex()) {
+      throw new Error(errMsg('call data'));
+    }
+
+    extrinsic.addSignature(signer, signature, newSignerPayload.toPayload());
+
+    return [signature, newSignerPayload.toPayload(), extrinsic.hash];
+  }
 
   extrinsic.addSignature(signer, signature, payload.toPayload());
 
@@ -233,18 +283,18 @@ export function signAndSend(
     .then((extrinsic) => {
       events.emit('signed', extrinsic.signature);
 
-      return api.call.blockBuilder.applyExtrinsic(extrinsic);
+      return extrinsic;
     })
-    .then(async (result) => {
-      if (result.isErr) {
-        if (result.asErr.isInvalid) {
-          throw new Error(`Invalid Transaction: ${result.asErr.asInvalid.type}`);
-        } else {
-          throw new Error(`Unknown Error: ${result.asErr.asUnknown.type}`);
-        }
-      } else if (result.asOk.isErr) {
-        throw _assetDispatchError(result.asOk.asErr);
-      }
+    .then(async () => {
+      // if (result.isErr) {
+      //   if (result.asErr.isInvalid) {
+      //     throw new Error(`Invalid Transaction: ${result.asErr.asInvalid.type}`);
+      //   } else {
+      //     throw new Error(`Unknown Error: ${result.asErr.asUnknown.type}`);
+      //   }
+      // } else if (result.asOk.isErr) {
+      //   throw _assetDispatchError(result.asOk.asErr);
+      // }
 
       await beforeSend?.(extrinsic);
 

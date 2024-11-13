@@ -60,7 +60,7 @@ function ToastRoot() {
   );
 }
 
-export function toastSuccess(message: string) {
+export function toastSuccess(message: any) {
   return toast.success(message);
 }
 

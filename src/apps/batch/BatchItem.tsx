@@ -108,6 +108,7 @@ function BatchItem({
         <Box
           sx={{
             display: 'flex',
+            flexDirection: 'column',
             justifyContent: 'space-between',
             gap: { sm: 1.2, xs: 0.8 },
             padding: { sm: 1.2, xs: 0.8 },

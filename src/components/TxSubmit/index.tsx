@@ -205,6 +205,9 @@ function TxSubmit({
 
           {isFetched && (
             <SendTx
+              disabled={
+                !safetyCheck || safetyCheck.severity === 'error' || (safetyCheck.severity === 'warning' && !isConfirm)
+              }
               buildTx={buildTx}
               note={note}
               onlySign={onlySign}
