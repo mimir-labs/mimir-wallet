@@ -21,9 +21,9 @@ export function useFollowAccounts() {
     const urlCurrent = searchParams.get('address');
     const urlNetwork = searchParams.get('network');
 
-    const newSearchParams = new URLSearchParams(searchParams);
-
     if (!urlCurrent || !urlNetwork) {
+      const newSearchParams = new URLSearchParams(searchParams);
+
       currentRef.current && newSearchParams.set('address', currentRef.current);
       newSearchParams.set('network', networkRef.current);
       setSearchParams(newSearchParams, { replace: true });
