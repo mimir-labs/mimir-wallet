@@ -27,10 +27,11 @@ import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@mimir-wallet/assets/svg/icon-set.svg?react';
 import { Address, AddressName, Fund, IdentityIcon, QrcodeAddress } from '@mimir-wallet/components';
 import { ONE_DAY } from '@mimir-wallet/constants';
-import { useAccount, useQueryAccount } from '@mimir-wallet/hooks';
+import { useAccount, useApi, useQueryAccount } from '@mimir-wallet/hooks';
 import { chainLinks, formatDisplay } from '@mimir-wallet/utils';
 
 function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string; changes: number }) {
+  const { chain } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [open, toggleOpen] = useToggle(false);
   const [qrOpen, toggleQrOpen] = useToggle(false);
@@ -162,6 +163,11 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               <a target='_blank' href={chainLinks.accountExplorerLink(address)} rel='noreferrer'>
                 <Avatar style={{ width: 16, height: 16 }} src={SubscanImg} alt='subscan' />
               </a>
+              {chain.subsquareUrl && (
+                <Link to={`/explorer/${encodeURIComponent(chain.subsquareUrl)}`}>
+                  <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
+                </Link>
+              )}
             </Box>
 
             <Divider sx={{ display: { sm: 'block', xs: 'none' }, maxWidth: 250, minWidth: 200 }} />

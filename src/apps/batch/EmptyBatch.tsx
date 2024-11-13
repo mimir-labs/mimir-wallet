@@ -25,10 +25,9 @@ function EmptyBatch({ onAdd, onClose }: { onAdd?: () => void; onClose?: () => vo
         />
         <circle opacity='0.21' cx='18.2568' cy='84.8008' r='18' fill='#5F45FF' />
       </svg>
-      <Typography variant='h6'>Add an initial transaction to the cache</Typography>
+      <Typography variant='h6'>Add a transaction to the cache</Typography>
       <Typography fontSize='0.75rem' textAlign='center'>
-        Save gas and signatures by adding multiple Multisig transactions to a single transaction. You can reorder and
-        delete individual transactions in a cache.
+        Batch multiple actions into one
       </Typography>
       {/* <Button onClick={onAdd} color='primary'>
         Add New Transaction

@@ -63,16 +63,21 @@ function App({ address, chain }: { address?: string; chain: Endpoint }) {
             element: <BaseContainer auth withSideBar={false} withPadding />,
             children: [
               {
+                path: '/add-proxy',
+                element: <PageAddProxy />
+              }
+            ]
+          },
+          {
+            element: <BaseContainer auth={false} withSideBar={false} withPadding />,
+            children: [
+              {
                 path: '/create-multisig',
                 element: <PageCreateMultisig />
               },
               {
                 path: '/create-multisig-one',
                 element: <PageCreateMultisig threshold1 />
-              },
-              {
-                path: '/add-proxy',
-                element: <PageAddProxy />
               },
               {
                 path: '/create-pure',

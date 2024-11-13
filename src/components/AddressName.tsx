@@ -4,10 +4,11 @@
 import type { DeriveAccountRegistration } from '@polkadot/api-derive/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Box } from '@mui/material';
+import { Box, SvgIcon } from '@mui/material';
 import { hexToU8a, isFunction } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import IconIdentity from '@mimir-wallet/assets/svg/identity.svg?react';
 import { useAddressMeta, useApi, useDeriveAccountInfo } from '@mimir-wallet/hooks';
 import { addressEq } from '@mimir-wallet/utils';
 
@@ -34,12 +35,32 @@ function extractName(address: string): React.ReactNode {
 }
 
 function extractIdentity(address: string, identity: DeriveAccountRegistration): React.ReactNode {
-  const displayName = identity.display;
-  const { displayParent } = identity;
+  const judgements = identity.judgements.filter(([, judgement]) => !judgement.isFeePaid);
+  const isGood = judgements.some(([, judgement]) => judgement.isKnownGood || judgement.isReasonable);
+  const isBad = judgements.some(([, judgement]) => judgement.isErroneous || judgement.isLowQuality);
+
+  const displayName = isGood ? identity.display : (identity.display || '').replace(/[^\x20-\x7E]/g, '');
+  const displayParent =
+    identity.displayParent && (isGood ? identity.displayParent : identity.displayParent.replace(/[^\x20-\x7E]/g, ''));
+
   const elem = (
-    <Box component='span'>
+    <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center' }}>
+      <SvgIcon
+        component={IconIdentity}
+        inheritViewBox
+        sx={{
+          marginRight: '0.2em',
+          color: isBad ? 'error.main' : isGood ? 'primary.main' : 'grey.300',
+          fontSize: 'inherit'
+        }}
+      />
       <Box component='span'>{displayParent || displayName}</Box>
-      {displayParent && <Box component='span' sx={{ opacity: 0.5 }}>{`/${displayName || ''}`}</Box>}
+      {displayParent && <span>/</span>}
+      {displayParent && (
+        <Box component='span' sx={{ opacity: 0.5 }}>
+          {displayName}
+        </Box>
+      )}
     </Box>
   );
 

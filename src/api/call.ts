@@ -17,15 +17,15 @@ export function findTargetCall(
     return [address, call];
   }
 
-  if (api.tx.proxy.proxy.is(call)) {
+  if (api.tx.proxy?.proxy.is(call)) {
     return findTargetCall(api, call.args[0].toString(), call.args[2]);
   }
 
-  if (api.tx.proxy.proxyAnnounced.is(call)) {
+  if (api.tx.proxy?.proxyAnnounced.is(call)) {
     return findTargetCall(api, call.args[1].toString(), call.args[3]);
   }
 
-  if (api.tx.proxy.announce.is(call)) {
+  if (api.tx.proxy?.announce.is(call)) {
     return findTargetCall(api, call.args[0].toString(), null);
   }
 

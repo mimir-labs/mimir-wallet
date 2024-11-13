@@ -8,11 +8,11 @@ import {
   Box,
   Button,
   Divider,
+  Drawer,
   IconButton,
   Paper,
   Stack,
   SvgIcon,
-  SwipeableDrawer,
   Typography,
   useMediaQuery,
   useTheme
@@ -184,8 +184,8 @@ function TopContent() {
 }
 
 function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideBar: boolean }) {
-  const { connectedWallets, openWallet } = useWallet();
-  const { closeSidebar, openSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const { connectedWallets, openWallet, wallets } = useWallet();
+  const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
   const { pathname } = useLocation();
@@ -230,7 +230,12 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
         }}
       >
         {Object.entries(walletConfig).map(([id]) => (
-          <WalletIcon disabled={!connectedWallets.includes(id)} id={id} key={id} sx={{ width: 20, height: 20 }} />
+          <WalletIcon
+            disabled={!wallets[id] || !connectedWallets.includes(id)}
+            id={id}
+            key={id}
+            sx={{ width: 20, height: 20 }}
+          />
         ))}
       </Box>
     </Stack>
@@ -239,7 +244,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
   return (
     <>
       {downMd || !withSideBar ? (
-        <SwipeableDrawer
+        <Drawer
           PaperProps={{
             sx: {
               width: 280,
@@ -253,12 +258,11 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
           }}
           anchor={downMd ? 'right' : 'left'}
           onClose={closeSidebar}
-          onOpen={openSidebar}
           open={sidebarOpen}
           variant='temporary'
         >
           {element}
-        </SwipeableDrawer>
+        </Drawer>
       ) : (
         <Box
           sx={{

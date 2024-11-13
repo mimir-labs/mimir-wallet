@@ -18,8 +18,8 @@ const EMPTY_STATE = {
 
 export type TxReserve = {
   isLoading: boolean;
-  reserve: Record<string, { value: BN; type: 'multisig' | 'proxy' }>;
-  unreserve: Record<string, { value: BN; type: 'multisig' | 'proxy' }>;
+  reserve: Record<string, { value: BN }>;
+  unreserve: Record<string, { value: BN }>;
   delay: Record<string, BN>;
 };
 

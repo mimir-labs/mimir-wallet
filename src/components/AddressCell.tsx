@@ -59,7 +59,13 @@ function AddressCell({
             component='span'
             fontSize='inherit'
             fontWeight={700}
-            sx={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            sx={{
+              display: 'inline-flex',
+              maxWidth: 100,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
           >
             <AddressName defaultName={defaultName} value={value} />
           </Typography>

@@ -155,7 +155,7 @@ export function callFilter(api: ApiPromise, proxyType: string, address: string, 
   const callFunction = api.registry.findMetaCall(method.callIndex);
 
   if (!matchProxyType(proxyType, callFunction)) {
-    throw new Error(`No permissions to dispatch ${callFunction.section}.${callFunction.method}`);
+    throw new Error(`Insufficient permissions to initiate ${callFunction.section}.${callFunction.method}`);
   }
 
   if (api.tx.proxy?.addProxy.is(method) || api.tx.proxy?.removeProxy.is(method)) {

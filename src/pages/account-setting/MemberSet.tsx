@@ -41,7 +41,7 @@ function MemberSet({
   disabled?: boolean;
 }) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const { api } = useApi();
+  const { api, chainSS58 } = useApi();
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
     useSelectMultisig(
       account.members.map((item) => item.address),
@@ -69,7 +69,7 @@ function MemberSet({
     if (!pureAccount) return;
 
     const oldMultiAddress = account.address;
-    const newMultiAddress = encodeMultiAddress(signatories, threshold);
+    const newMultiAddress = encodeMultiAddress(signatories, threshold, chainSS58);
 
     if (!addressEq(newMultiAddress, oldMultiAddress)) {
       addQueue({
@@ -88,7 +88,7 @@ function MemberSet({
           )
       });
     }
-  }, [checkField, pureAccount, account, signatories, threshold, addQueue, api.tx.utility, api.tx.proxy]);
+  }, [checkField, pureAccount, account.address, account.name, signatories, threshold, chainSS58, addQueue, api]);
 
   const _handleAdd = useCallback(() => {
     if (isAddressValid) {

@@ -25,6 +25,7 @@ import { toastError } from '../ToastRoot';
 import { useTxReserve } from './hooks/useTxReserve';
 
 function SendTx({
+  disabled,
   buildTx,
   note,
   onlySign,
@@ -37,6 +38,7 @@ function SendTx({
   onSignature,
   beforeSend
 }: {
+  disabled?: boolean;
   buildTx: BuildTx;
   website?: string | null;
   iconUrl?: string | null;
@@ -137,7 +139,7 @@ function SendTx({
               <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
                 <SvgIcon color='primary' component={IconClock} inheritViewBox sx={{ opacity: 0.5 }} />
                 <Typography>Review window</Typography>
-                <Tooltip title='Another execution transaction is needed after the review window.'>
+                <Tooltip title='This transaction needs to be executed manually after review window ends.'>
                   <SvgIcon color='primary' component={IconQuestion} inheritViewBox sx={{ opacity: 0.5 }} />
                 </Tooltip>
               </Box>
@@ -197,7 +199,7 @@ function SendTx({
         color='primary'
         onClick={error ? undefined : onConfirm}
         loading={loading || isLoading || isTxReserveLoading}
-        disabled={!txBundle?.signer || !!error}
+        disabled={!txBundle?.signer || !!error || disabled}
       >
         Submit
       </LoadingButton>

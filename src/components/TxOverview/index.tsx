@@ -15,6 +15,7 @@ import type {
 import { LoadingButton } from '@mui/lab';
 import { Paper, SvgIcon, useTheme } from '@mui/material';
 import { alpha, Box } from '@mui/system';
+import { blake2AsHex } from '@polkadot/util-crypto';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import ReactFlow, { Controls, Edge, Handle, Node, NodeProps, Position, useEdgesState, useNodesState } from 'reactflow';
 
@@ -191,7 +192,7 @@ function makeNodes(
     labelBgColor: string = '#fff'
   ): Edge {
     return {
-      id: `${parentId}->${nodeId}`,
+      id: `${parentId}-${label}.${delay || 0}>${nodeId}`,
       source: parentId,
       target: nodeId,
       type: 'AddressEdge',
@@ -264,7 +265,12 @@ function makeNodes(
           ? transaction.status !== TransactionStatus.Success
           : transaction.status === TransactionStatus.Pending));
 
-    const nodeId = node.parentId ? `${node.parentId}_${JSON.stringify(node.value)}` : JSON.stringify(node.value);
+    const nodeId = node.parentId
+      ? blake2AsHex(
+          `${node.parentId}-${node.from === 'delegate' ? `${node.value.proxyDelay}.${node.value.proxyType}.${node.value.proxyNetwork}` : node.from === 'member' ? 'member' : ''}-${node.value.address}`,
+          64
+        )
+      : blake2AsHex(node.value.address, 64);
 
     if (!node.parent) {
       nodes.push(createNode(nodeId, node.value, true, path.slice(), approvalForThisPath, transaction));

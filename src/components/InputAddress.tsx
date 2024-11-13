@@ -152,6 +152,9 @@ function InputAddress({
         ref={wrapper}
         sx={{
           position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          height: 60,
           padding: 1,
           borderRadius: 1,
           border: '1px solid',

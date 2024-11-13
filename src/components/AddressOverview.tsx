@@ -5,6 +5,7 @@ import type { AccountData, DelegateeProp, MultisigAccountData } from '@mimir-wal
 
 import dagre from '@dagrejs/dagre';
 import { Box, Paper, SvgIcon, useTheme } from '@mui/material';
+import { blake2AsHex } from '@polkadot/util-crypto';
 import React, { useEffect } from 'react';
 import ReactFlow, {
   BaseEdge,
@@ -206,7 +207,7 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
     labelBgColor: string = '#fff'
   ): Edge {
     return {
-      id: `${parentId}->${nodeId}`,
+      id: `${parentId}-${label}.${delay || 0}>${nodeId}`,
       source: parentId,
       target: nodeId,
       type: 'AddressEdge',
@@ -234,8 +235,13 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
         parentId: string | null;
       };
 
-  function dfs(node: NodeInfo) {
-    const nodeId = node.parentId ? `${node.parentId}_${JSON.stringify(node.value)}` : JSON.stringify(node.value);
+  function dfs(node: NodeInfo, deep: number = 0) {
+    const nodeId = node.parentId
+      ? blake2AsHex(
+          `${node.parentId}-${node.from === 'delegate' ? `${node.value.proxyDelay}.${node.value.proxyType}.${node.value.proxyNetwork}` : node.from === 'member' ? 'member' : ''}-${node.value.address}`,
+          64
+        )
+      : blake2AsHex(node.value.address, 64);
 
     if (!node.parentId) {
       nodes.push(
@@ -273,23 +279,29 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
 
     // traverse the members or delegatees of the current account
     for (const child of node.value.delegatees) {
-      dfs({
-        from: 'delegate',
-        parent: node.value,
-        value: child,
-        parentId: nodeId
-      });
+      dfs(
+        {
+          from: 'delegate',
+          parent: node.value,
+          value: child,
+          parentId: nodeId
+        },
+        deep + 1
+      );
     }
 
     if (node.value.type === 'multisig') {
       // traverse the member or members of the current account
       for (const child of node.value.members) {
-        dfs({
-          from: 'member',
-          parent: node.value,
-          value: child,
-          parentId: nodeId
-        });
+        dfs(
+          {
+            from: 'member',
+            parent: node.value,
+            value: child,
+            parentId: nodeId
+          },
+          deep + 1
+        );
       }
     }
   }
@@ -329,7 +341,7 @@ function AddressOverview({ account, showControls, showMiniMap }: Props) {
         nodes
       }}
       maxZoom={1.5}
-      minZoom={0.1}
+      minZoom={0}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       nodes={nodes}

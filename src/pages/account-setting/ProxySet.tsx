@@ -3,6 +3,7 @@
 
 import type { Vec } from '@polkadot/types';
 import type { PalletProxyProxyDefinition } from '@polkadot/types/lookup';
+import type { AccountData, PureAccountData } from '@mimir-wallet/hooks/types';
 
 import {
   Alert,
@@ -29,15 +30,24 @@ import { useToggle } from 'react-use';
 import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 import IconDelete from '@mimir-wallet/assets/svg/icon-delete.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
-import { AddressRow } from '@mimir-wallet/components';
+import { Address, AddressCell } from '@mimir-wallet/components';
 import { useAccount, useAddressMeta, useApi, useTxQueue } from '@mimir-wallet/hooks';
 
-function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletProxyProxyDefinition> }) {
+function ProxySet({
+  account,
+  address,
+  proxies
+}: {
+  account: AccountData;
+  address: string;
+  proxies: Vec<PalletProxyProxyDefinition>;
+}) {
   const { api } = useApi();
   const { isLocalAccount } = useAccount();
   const { addQueue } = useTxQueue();
   const { meta } = useAddressMeta(address);
   const [isOpen, toggleOpen] = useToggle(false);
+  const [isAlertOpen, toggleAlertOpen] = useToggle(false);
 
   const isReadOnly = useMemo(() => !isLocalAccount(address), [address, isLocalAccount]);
 
@@ -47,6 +57,20 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
       call: api.tx.proxy.removeProxies(),
       website: 'mimir://internal/remove-proxies'
     });
+  };
+
+  const handleKill = (pureAccount: PureAccountData) => {
+    addQueue({
+      accountId: pureAccount.address,
+      call: api.tx.proxy.killPure(
+        pureAccount.creator,
+        'Any',
+        pureAccount.disambiguationIndex,
+        pureAccount.createdBlock,
+        pureAccount.createdExtrinsicIndex
+      ),
+      website: 'mimir://internal/remove-account'
+    });
     toggleOpen(false);
   };
 
@@ -55,7 +79,7 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
       <Stack spacing={2}>
         <Box sx={{ borderRadius: 1, padding: 1, bgcolor: 'secondary.main' }}>
           <Typography fontWeight={700}>Proxy Account</Typography>
-          <Stack spacing={1} sx={{ marginTop: 0.5, borderRadius: 1, padding: 1, bgcolor: 'white' }}>
+          <Stack spacing={1} sx={{ marginTop: 1 }}>
             {proxies.map((proxy, index) => (
               <Box
                 key={index}
@@ -64,12 +88,13 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   bgcolor: 'white',
-                  borderRadius: 0.5,
+                  borderRadius: 1,
+                  padding: 0.5,
                   gap: 0.5
                 }}
               >
                 <Box sx={{ flex: '1' }}>
-                  <AddressRow withAddress withName shorten value={proxy.delegate.toString()} />
+                  <AddressCell shorten value={proxy.delegate.toString()} />
                 </Box>
                 {proxy.delay.gt(BN_ZERO) ? (
                   <Tooltip title={`Delay Blocks: ${[proxy.delay]}`}>
@@ -88,7 +113,7 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
                     sx={{ fontSize: 'inherit' }}
                     onClick={
                       proxies.length === 1 && meta.isPure
-                        ? toggleOpen
+                        ? toggleAlertOpen
                         : () => {
                             addQueue({
                               accountId: address,
@@ -127,35 +152,60 @@ function ProxySet({ address, proxies }: { address: string; proxies: Vec<PalletPr
           Add New Proxy
         </Button>
 
-        <Button variant='contained' fullWidth color='error' onClick={meta.isPure ? toggleOpen : handleDelete}>
-          Delete All
-        </Button>
+        {meta.isPure ? (
+          <Button variant='contained' fullWidth color='error' onClick={toggleOpen}>
+            Delete Account
+          </Button>
+        ) : (
+          <Button variant='contained' fullWidth color='error' onClick={handleDelete}>
+            Delete All
+          </Button>
+        )}
       </Stack>
 
-      <Dialog maxWidth='sm' fullWidth open={isOpen} onClose={toggleOpen}>
-        <DialogTitle>Attention</DialogTitle>
+      {account.type === 'pure' && (
+        <Dialog maxWidth='sm' fullWidth open={isOpen} onClose={toggleOpen}>
+          <DialogTitle>Attention</DialogTitle>
 
-        <DialogContent>
-          <Typography>
-            If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control this
-            account. Please make sure to carefully confirm the following:
-          </Typography>
+          <DialogContent>
+            <Typography>
+              If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control in
+              this account. Make sure all of your assets in the <Address shorten value={address} /> account:
+            </Typography>
 
-          <br />
+            <br />
 
-          <Typography>1. The assets of this account have been successfully transferred.</Typography>
-          <Typography>2. The account is not bound to any other application functions.</Typography>
-          <br />
+            <Typography>1. The assets of this account are transferable.</Typography>
+            <Typography>2. The account have been securely transferred.</Typography>
+            <br />
 
-          <Typography>Please note that thisaction is irreversible.</Typography>
-        </DialogContent>
+            <Typography>Please note that thisaction is irreversible.</Typography>
+          </DialogContent>
 
-        <DialogActions>
-          <Button variant='contained' fullWidth color='error' onClick={handleDelete}>
-            Continue
-          </Button>
-        </DialogActions>
-      </Dialog>
+          <DialogActions>
+            <Button variant='contained' fullWidth color='error' onClick={() => handleKill(account)}>
+              Continue
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      {account.type === 'pure' && (
+        <Dialog maxWidth='sm' fullWidth open={isAlertOpen} onClose={toggleAlertOpen}>
+          <DialogTitle>Attention</DialogTitle>
+
+          <DialogContent>
+            <Typography>
+              If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control in
+              this account and the initial deposit will not be withdrawn.
+            </Typography>
+
+            <br />
+
+            <Typography>Please use Delete Account.</Typography>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }

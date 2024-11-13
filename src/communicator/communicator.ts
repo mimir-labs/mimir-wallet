@@ -3,8 +3,19 @@
 
 import type { MessageTypes, ResponseTypes, TransportRequestMessage } from '@polkadot/extension-base/background/types';
 import type { SignerPayloadJSON } from '@polkadot/types/types';
+import type { HexString } from '@polkadot/util/types';
 import type { MutableRefObject } from 'react';
 import type { State } from './types';
+
+import { assert } from '@polkadot/util';
+
+import { allEndpoints } from '@mimir-wallet/config';
+
+declare module '@polkadot/extension-base/background/types' {
+  export interface RequestSignatures {
+    'pub(call.get)': [HexString, HexString];
+  }
+}
 
 export abstract class Communicator {
   #state: MutableRefObject<State>;
@@ -81,8 +92,21 @@ export abstract class Communicator {
       case 'pub(rpc.unsubscribe)':
         throw new Error('not implements');
 
+      case 'pub(call.get)':
+        return this.getCall(request as HexString);
+
       default:
         throw new Error(`Unable to handle message of type ${type}`);
     }
+  }
+
+  private async getCall(hash: HexString): Promise<HexString> {
+    const endpoint = allEndpoints.find((item) => item.genesisHash === this.#state.current.genesisHash);
+
+    assert(endpoint, 'not support get call for current chain');
+
+    const { data } = await fetch(`${endpoint.serviceUrl}calldata/${hash}`).then((res) => res.json());
+
+    return data;
   }
 }

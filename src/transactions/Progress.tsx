@@ -13,9 +13,8 @@ import { addressEq, autoFormatTimeStr } from '@mimir-wallet/utils';
 
 import Approve from './buttons/Approve';
 import Cancel from './buttons/Cancel';
-import Deny from './buttons/Deny';
 import ExecuteAnnounce from './buttons/ExecuteAnnounce';
-import Remove from './buttons/Remove';
+import RemoveOrDeny from './buttons/RemoveOrDeny';
 import ViewPending from './buttons/ViewPending';
 import { useAnnouncementProgress } from './hooks/useAnnouncementProgress';
 import { approvalCounts } from './utils';
@@ -207,15 +206,15 @@ function AnnounceContent({
               left: 0,
               top: 0,
               bottom: 0,
-              bgcolor: 'primary.main',
+              bgcolor: leftTime ? 'primary.main' : 'success.main',
               width: `${(currentBlock > endBlock ? 1 : (currentBlock - startBlock) / (endBlock - startBlock)) * 100}%`
             }}
           />
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography sx={{ flex: '1' }}>{currentBlock >= endBlock ? 'Review finished' : 'Under Reviewing'}</Typography>
-          {leftTimeFormat ? `${leftTimeFormat} left` : ''}
+          <Typography sx={{ flex: '1' }}>{currentBlock >= endBlock ? 'Finished' : 'Reviewing'}</Typography>
+          {leftTime ? (leftTimeFormat ? `${leftTimeFormat} left` : '') : ''}
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -316,8 +315,9 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           <ExecuteAnnounce account={account} transaction={transaction} />
           <ViewPending transaction={transaction} filterPaths={filterPaths} />
           <Cancel account={account} transaction={transaction} />
-          <Remove transaction={transaction} />
-          <Deny transaction={transaction} />
+          <RemoveOrDeny transaction={transaction} />
+          {/* <Remove transaction={transaction} />
+          <Deny transaction={transaction} /> */}
         </Stack>
       )}
     </Stack>

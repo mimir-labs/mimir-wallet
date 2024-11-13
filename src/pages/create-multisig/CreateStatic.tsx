@@ -75,7 +75,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
         <DialogTitle>Create Static Multisig</DialogTitle>
         <DialogContent>
           <ul>
-            <li>You're creating a non-Flexible multisig, members can't be modified.</li>
+            <li>You're creating a non-Flexible multisig, members and threshold can't be modified.</li>
             <li>You need to submit signature to confirm your identity; this isn't a transaction.</li>
           </ul>
         </DialogContent>

@@ -7,7 +7,7 @@ import { objectSpread } from '@polkadot/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
-import { addressEq, loadWallet, store } from '@mimir-wallet/utils';
+import { addressEq, documentReadyPromise, loadWallet, store } from '@mimir-wallet/utils';
 
 interface Props {
   children?: React.ReactNode;
@@ -26,6 +26,8 @@ async function getWallet() {
   const connectWallets: string[] = (store.get(CONNECTED_WALLETS_KEY) as string[]) || [];
 
   const promises: Promise<WalletAccount[]>[] = [];
+
+  await documentReadyPromise();
 
   for (const wallet of connectWallets) {
     if (window.injectedWeb3?.[wallet]) {

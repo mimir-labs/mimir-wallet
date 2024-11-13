@@ -17,9 +17,10 @@ import {
   Typography
 } from '@mui/material';
 import React, { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAsyncFn, useToggle } from 'react-use';
 
-import { Address, AddressRow } from '@mimir-wallet/components';
+import { Address, AddressRow, toastSuccess } from '@mimir-wallet/components';
 import { useApi, useTxQueue } from '@mimir-wallet/hooks';
 
 function ConfirmDialog({
@@ -98,26 +99,41 @@ function SubmitProxy({
 
     toggleAlertOpen(false);
 
-    if (proxyArgs.length > 1) {
-      addQueue({
-        call: api.tx.utility.batchAll(
-          proxyArgs.map((item) => api.tx.proxy.addProxy(item.delegate, item.proxyType as any, item.delay))
-        ).method,
-        accountId: proxied,
-        website: 'mimir://internal/setup',
-        onResults: () => {
-          setProxyArgs([]);
+    const call =
+      proxyArgs.length > 1
+        ? api.tx.utility.batchAll(
+            proxyArgs.map((item) => api.tx.proxy.addProxy(item.delegate, item.proxyType as any, item.delay))
+          ).method
+        : api.tx.proxy.addProxy(proxyArgs[0].delegate, proxyArgs[0].proxyType as any, proxyArgs[0].delay).method;
+
+    addQueue({
+      call,
+      accountId: proxied,
+      website: 'mimir://internal/setup',
+      onResults: (result) => {
+        setProxyArgs([]);
+        const events = result.events.filter((item) => api.events.proxy.ProxyAdded.is(item.event));
+
+        if (events.length > 0) {
+          toastSuccess(
+            <Box marginLeft={1.5} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+              <Typography fontWeight={700}>Proxy Added</Typography>
+              <Typography fontSize={12}>
+                <Address value={proxied} shorten /> added {proxyArgs.length} new proxy
+              </Typography>
+              <Typography
+                component={Link}
+                fontSize={12}
+                to={`/?address=${proxied.toString()}&tab=structure`}
+                sx={{ color: 'primary.main', textDecoration: 'none' }}
+              >
+                Account Structure{'>'}
+              </Typography>
+            </Box>
+          );
         }
-      });
-    } else
-      addQueue({
-        call: api.tx.proxy.addProxy(proxyArgs[0].delegate, proxyArgs[0].proxyType as any, proxyArgs[0].delay).method,
-        accountId: proxied,
-        website: 'mimir://internal/setup',
-        onResults: () => {
-          setProxyArgs([]);
-        }
-      });
+      }
+    });
   }, [addQueue, api, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
 
   const handleClickAction = useAsyncFn(async () => {
