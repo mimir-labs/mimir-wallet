@@ -8,11 +8,11 @@ import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { FilterPath } from '@mimir-wallet/hooks/types';
 
-import { u8aSorted } from '@polkadot/util';
+import { isString, u8aSorted } from '@polkadot/util';
 
 import { callFilter, decodeAddress } from '@mimir-wallet/api';
 
-export type TxBundle = { tx: SubmittableExtrinsic<'promise'>; signer?: string };
+export type TxBundle = { tx: SubmittableExtrinsic<'promise'>; signer: string };
 
 async function asMulti(
   api: ApiPromise,
@@ -57,20 +57,29 @@ async function asMulti(
       );
 }
 
+export function buildTx(
+  api: ApiPromise,
+  call: IMethod,
+  path: [FilterPath, ...FilterPath[]],
+  calls?: Set<HexString>
+): Promise<TxBundle>;
+export function buildTx(api: ApiPromise, call: IMethod, account: string, calls?: Set<HexString>): Promise<TxBundle>;
+
 export async function buildTx(
   api: ApiPromise,
   call: IMethod,
-  path: FilterPath[],
-  account?: string,
+  pathOrAccount: [FilterPath, ...FilterPath[]] | string,
   calls: Set<HexString> = new Set()
 ): Promise<TxBundle> {
   const functionMeta = api.registry.findMetaCall(call.callIndex);
 
   let tx = api.tx[functionMeta.section][functionMeta.method](...call.args);
 
-  if (path.length === 0) {
-    return { tx, signer: account };
+  if (isString(pathOrAccount)) {
+    return { tx, signer: pathOrAccount };
   }
+
+  const path = pathOrAccount;
 
   for (const item of path) {
     if (item.type === 'multisig') {

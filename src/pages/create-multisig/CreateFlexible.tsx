@@ -301,13 +301,17 @@ function CreateFlexible({
         onChange={setSigner}
         value={signer}
       />
-      <LockContainer>
-        <LockItem
-          address={signer}
-          tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.'
-          value={reservedAmount}
-        />
-      </LockContainer>
+
+      {signer && (
+        <LockContainer>
+          <LockItem
+            address={signer}
+            tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.'
+            value={reservedAmount}
+          />
+        </LockContainer>
+      )}
+
       <Divider sx={{ marginY: 1.5 }} />
       <Box sx={{ display: 'flex', gap: 1 }}>
         {pure ? (

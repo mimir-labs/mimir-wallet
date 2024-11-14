@@ -18,7 +18,7 @@ import { useToggle } from 'react-use';
 
 import Drag from '@mimir-wallet/assets/images/drag.svg';
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
-import IconCopy from '@mimir-wallet/assets/svg/icon-copy.svg?react';
+import IconCopy from '@mimir-wallet/assets/svg/icon-add-copy.svg?react';
 import IconDelete from '@mimir-wallet/assets/svg/icon-delete.svg?react';
 import { AppName } from '@mimir-wallet/components';
 import { useApi } from '@mimir-wallet/hooks';

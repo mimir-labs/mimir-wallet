@@ -30,7 +30,7 @@ export function useTransferBalance(
   token?: TransferToken,
   sender?: string,
   recipient?: string
-): [format: [decimals: number, unit: string], sendingBalance: BN, recipientBalance: BN] {
+): [format: [decimals: number, symbol: string], sendingBalance: BN, recipientBalance: BN] {
   const { api } = useApi();
   const [sendingBalance, setSendingBalance] = useState<BN>(BN_ZERO);
   const [recipientBalance, setRecipientBalance] = useState<BN>(BN_ZERO);

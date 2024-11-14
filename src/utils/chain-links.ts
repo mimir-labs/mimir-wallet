@@ -51,7 +51,3 @@ export function serviceUrl(path: string): string {
 
   return `${url}${path}`;
 }
-
-export async function socketUrl(): Promise<string> {
-  return window.currentChain.socketUrl || 'ws://127.0.0.1:8080/ws';
-}

@@ -4,7 +4,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
 
-import { chainLinks } from '@mimir-wallet/utils';
+import { useApi } from '@mimir-wallet/hooks';
 
 interface SocketProps {
   isConnected: boolean;
@@ -52,30 +52,32 @@ function unsubscribe(topic: string) {
 }
 
 export function SocketCtxRoot({ children }: { children: React.ReactNode }) {
+  const { chain } = useApi();
   const [isConnected, setConnected] = useState(false);
 
   useEffect(() => {
-    !socket &&
-      chainLinks.socketUrl().then((url) => {
-        socket = io(url, {
-          path: '/ws',
-          transports: ['websocket']
-        });
+    if (socket) {
+      socket.disconnect();
+    }
 
-        // restore the subscriptions upon reconnection
-        socket.on('connect', () => {
-          setConnected(true);
+    socket = io(chain.socketUrl, {
+      path: '/ws',
+      transports: ['websocket']
+    });
 
-          if (subscriptions.size && !socket.recovered) {
-            socket.emit('subscribe', Array.from(subscriptions.keys()));
-          }
-        });
+    // restore the subscriptions upon reconnection
+    socket.on('connect', () => {
+      setConnected(true);
 
-        socket.on('disconnect', () => {
-          setConnected(false);
-        });
-      });
-  }, []);
+      if (subscriptions.size && !socket.recovered) {
+        socket.emit('subscribe', Array.from(subscriptions.keys()));
+      }
+    });
+
+    socket.on('disconnect', () => {
+      setConnected(false);
+    });
+  }, [chain.socketUrl]);
 
   const state = useMemo(() => ({ isConnected, socket, subscribe, unsubscribe }), [isConnected]);
 

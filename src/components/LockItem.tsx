@@ -5,10 +5,11 @@ import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Box, IconButton, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Box, CircularProgress, IconButton, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import { BN } from '@polkadot/util';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import IconFail from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
 import IconFund from '@mimir-wallet/assets/svg/icon-fund-fill.svg?react';
 import IconLock from '@mimir-wallet/assets/svg/icon-lock.svg?react';
@@ -24,23 +25,31 @@ import Fund from './Fund';
 
 interface Props {
   isUnLock?: boolean;
-  address?: AccountId | AccountIndex | Address | string | null;
-  value?: Compact<any> | BN | string | number;
+  address: AccountId | AccountIndex | Address | string;
+  value: Compact<any> | BN | string | number;
   tip?: React.ReactNode;
+  onEnoughtState?: (address: string, isEnought: boolean | 'pending') => void;
 }
 
-function LockItem({ address, isUnLock, tip, value }: Props) {
+function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   const { api } = useApi();
   const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [address]);
   const [open, toggleOpen] = useToggle();
+  const onEnoughtStateRef = useRef(onEnoughtState);
+
+  onEnoughtStateRef.current = onEnoughtState;
 
   const isEnought = useMemo(() => {
-    if (value && allBalances) {
+    if (allBalances) {
       return allBalances.availableBalance.gte(new BN(value.toString()));
     }
 
-    return true;
+    return 'pending';
   }, [allBalances, value]);
+
+  useEffect(() => {
+    onEnoughtStateRef.current?.(encodeAddress(address.toString()), isEnought);
+  }, [address, isEnought]);
 
   const icon = (
     <SvgIcon color='primary' component={isUnLock ? IconUnLock : IconLock} inheritViewBox sx={{ opacity: 0.5 }} />
@@ -67,21 +76,26 @@ function LockItem({ address, isUnLock, tip, value }: Props) {
           </Tooltip>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
-          {!isUnLock && !isEnought && (
+          {!isUnLock && isEnought === false && (
             <IconButton color='primary' onClick={toggleOpen} size='small'>
               <SvgIcon component={IconFund} inheritViewBox />
             </IconButton>
           )}
+
           <Typography>
             <FormatBalance value={value} />
           </Typography>
-          {!isUnLock && (
-            <SvgIcon
-              color={isEnought ? 'success' : 'error'}
-              component={isEnought ? IconSuccess : IconFail}
-              inheritViewBox
-            />
-          )}
+
+          {!isUnLock &&
+            (isEnought === 'pending' ? (
+              <CircularProgress size={16} />
+            ) : (
+              <SvgIcon
+                color={isEnought ? 'success' : 'error'}
+                component={isEnought ? IconSuccess : IconFail}
+                inheritViewBox
+              />
+            ))}
         </Box>
       </Box>
     </>
