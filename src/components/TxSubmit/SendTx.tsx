@@ -22,7 +22,6 @@ import AddressName from '../AddressName';
 import FormatBalance from '../FormatBalance';
 import LockItem, { LockContainer } from '../LockItem';
 import { toastError } from '../ToastRoot';
-import { useTxReserve } from './hooks/useTxReserve';
 
 function SendTx({
   disabled,
@@ -54,8 +53,10 @@ function SendTx({
   const { accountSource } = useWallet();
   const { addToast } = useContext(TxToastCtx);
   const [loading, setLoading] = useState(false);
-  const { txBundle, isLoading, error, hashSet } = buildTx;
-  const { isLoading: isTxReserveLoading, reserve, unreserve, delay } = useTxReserve(txBundle);
+  const { txBundle, isLoading, error, hashSet, reserve, unreserve, delay } = buildTx;
+  const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
+
+  const isEnought = Object.keys(reserve).reduce<boolean>((result, item) => result && !!enoughtState[item], true);
 
   const onConfirm = async () => {
     let events: TxEvents = new TxEvents();
@@ -165,6 +166,9 @@ function SendTx({
                   will be reserved for initiate transaction.
                 </>
               }
+              onEnoughtState={(address, isEnought) =>
+                setEnoughtState((state) => ({ ...state, [address]: isEnought === true }))
+              }
             />
           ))}
           {Object.entries(unreserve).map(([address, { value }], index) => (
@@ -198,8 +202,8 @@ function SendTx({
         variant='contained'
         color='primary'
         onClick={error ? undefined : onConfirm}
-        loading={loading || isLoading || isTxReserveLoading}
-        disabled={!txBundle?.signer || !!error || disabled}
+        loading={loading || isLoading}
+        disabled={!txBundle?.signer || !!error || !isEnought || disabled}
       >
         Submit
       </LoadingButton>

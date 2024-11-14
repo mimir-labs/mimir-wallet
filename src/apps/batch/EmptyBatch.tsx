@@ -45,6 +45,7 @@ function EmptyBatch({ onAdd, onClose }: { onAdd?: () => void; onClose?: () => vo
         onClick={onClose}
         to={`/explorer/${encodeURIComponent(`https://apps.mimir.global`)}`}
         color='primary'
+        variant='outlined'
       >
         Go to PolkadotJS
       </Button>

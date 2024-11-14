@@ -11,7 +11,7 @@ import { useApi } from '@mimir-wallet/hooks';
 import { formatDisplay, formatUnits } from '@mimir-wallet/utils';
 
 interface Props extends BoxProps {
-  format?: [decimals: number, unit: string];
+  format?: [decimals: number, symbol: string];
   label?: React.ReactNode;
   value?: Compact<any> | BN | string | number | null;
   withCurrency?: boolean;

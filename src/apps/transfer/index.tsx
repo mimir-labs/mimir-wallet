@@ -1,9 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, Paper, Stack, Switch, Typography } from '@mui/material';
+import { BN } from '@polkadot/util';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToggle } from 'react-use';
 
 import { FormatBalance, Input, InputAddress } from '@mimir-wallet/components';
 import {
@@ -36,6 +38,11 @@ function PageTransfer() {
   const { addresses } = useAccount();
   const [token, setToken] = useState<TransferToken>();
   const [format, sendingBalances] = useTransferBalance(token, sending);
+  const [keepAlive, toggleKeepAlive] = useToggle(true);
+
+  const isInsufficientBalance = keepAlive
+    ? sendingBalances.sub(api.consts.balances.existentialDeposit).lt(new BN(parseUnits(amount, format[0]).toString()))
+    : sendingBalances.lt(new BN(parseUnits(amount, format[0]).toString()));
 
   useEffect(() => {
     setAmount('');
@@ -49,7 +56,9 @@ function PageTransfer() {
 
       if (token.isNative) {
         addQueue({
-          call: api.tx.balances.transferKeepAlive(recipient, parseUnits(amount, format[0])).method,
+          call: keepAlive
+            ? api.tx.balances.transferKeepAlive(recipient, parseUnits(amount, format[0])).method
+            : api.tx.balances.transferAllowDeath(recipient, parseUnits(amount, format[0])).method,
           accountId: sending,
           website: 'mimir://app/transfer'
         });
@@ -57,13 +66,15 @@ function PageTransfer() {
         if (!api.tx.assets) return;
 
         addQueue({
-          call: api.tx.assets.transferKeepAlive(token.assetId, recipient, parseUnits(amount, format[0])).method,
+          call: keepAlive
+            ? api.tx.assets.transferKeepAlive(token.assetId, recipient, parseUnits(amount, format[0])).method
+            : api.tx.assets.transfer(token.assetId, recipient, parseUnits(amount, format[0])).method,
           accountId: sending,
           website: 'mimir://app/transfer'
         });
       }
     }
-  }, [addQueue, amount, api, format, isAmountValid, recipient, sending, token]);
+  }, [addQueue, amount, api, format, isAmountValid, keepAlive, recipient, sending, token]);
 
   return (
     <Box sx={{ width: '100%', maxWidth: 500, margin: '0 auto', padding: { sm: 2, xs: 1.5 } }}>
@@ -111,16 +122,29 @@ function PageTransfer() {
                 variant='outlined'
                 sx={{ borderRadius: 0.5, padding: 0.5, paddingY: 0.1, minWidth: 0 }}
                 onClick={() => {
-                  setAmount(formatUnits(sendingBalances, format[0]));
+                  setAmount(
+                    keepAlive
+                      ? formatUnits(sendingBalances.sub(api.consts.balances.existentialDeposit), format[0])
+                      : formatUnits(sendingBalances, format[0])
+                  );
                 }}
               >
                 Max
               </Button>
             }
           />
+          <Box sx={{ display: 'flex', justifyContent: 'end', gap: 0.5 }}>
+            <Switch checked={keepAlive} onChange={(e) => toggleKeepAlive(e.target.checked)} />
+            Keep Sender Alive
+          </Box>
           <SelectToken assetId={assetId} onChange={setToken} setAssetId={setAssetId} />
-          <Button disabled={!amount || !recipient || !isValidNumber} fullWidth onClick={handleClick}>
-            Review
+          <Button
+            disabled={!amount || !recipient || !isValidNumber || isInsufficientBalance}
+            fullWidth
+            onClick={handleClick}
+            color={isInsufficientBalance ? 'error' : 'primary'}
+          >
+            {isInsufficientBalance ? `Insufficient ${format[1] || ''} balance` : 'Review'}
           </Button>
         </Stack>
       </Paper>

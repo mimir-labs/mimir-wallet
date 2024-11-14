@@ -18,6 +18,7 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import SubscanImg from '@mimir-wallet/assets/images/subscan.svg';
 import IconAdd from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
 import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
@@ -164,7 +165,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
                 <Avatar style={{ width: 16, height: 16 }} src={SubscanImg} alt='subscan' />
               </a>
               {chain.subsquareUrl && (
-                <Link to={`/explorer/${encodeURIComponent(chain.subsquareUrl)}`}>
+                <Link to={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address)}`)}`}>
                   <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
                 </Link>
               )}

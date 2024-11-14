@@ -13,6 +13,14 @@ import { encodeMultiAddress } from '@polkadot/util-crypto';
 
 import { addressEq } from '@mimir-wallet/utils';
 
+function _increaseValue(values: Record<string, { value: BN }>, key: string, amount: BN) {
+  if (values[key]) {
+    values[key].value = values[key].value.add(amount);
+  } else {
+    values[key] = { value: amount };
+  }
+}
+
 export async function txReserve(
   api: ApiPromise,
   call: Call,
@@ -34,14 +42,16 @@ export async function txReserve(
 
       if (approvals.length >= threshold.toNumber() - 1) {
         if (api.tx.multisig.asMulti.is(call)) {
-          unreserve[depositor.toString()] = { value: deposit };
+          _increaseValue(unreserve, depositor.toString(), deposit);
           await txReserve(api, call.args[3], multisigAddress, reserve, unreserve, delay);
         }
       }
     } else {
-      reserve[address] = {
-        value: api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.mul(threshold))
-      };
+      _increaseValue(
+        reserve,
+        address,
+        api.consts.multisig.depositBase.add(api.consts.multisig.depositFactor.mul(threshold))
+      );
     }
   } else if (api.tx.multisig?.asMultiThreshold1.is(call)) {
     const multisigAddress = encodeMultiAddress([address, ...call.args[0]], 1, api.registry.chainSS58);
@@ -55,7 +65,7 @@ export async function txReserve(
     if (info.isSome) {
       const { depositor, deposit } = info.unwrap();
 
-      unreserve[depositor.toString()] = { value: deposit };
+      _increaseValue(unreserve, depositor.toString(), deposit);
     }
   } else if (api.tx.proxy?.announce.is(call)) {
     const real = call.args[0].toString();
@@ -66,12 +76,13 @@ export async function txReserve(
       [api.query.proxy.proxies, real]
     ]);
 
-    reserve[address] = {
-      value:
-        announcements[0].length === 0
-          ? api.consts.proxy.announcementDepositBase.add(api.consts.proxy.announcementDepositFactor)
-          : api.consts.proxy.announcementDepositFactor
-    };
+    _increaseValue(
+      reserve,
+      address,
+      announcements[0].length === 0
+        ? api.consts.proxy.announcementDepositBase.add(api.consts.proxy.announcementDepositFactor)
+        : api.consts.proxy.announcementDepositFactor
+    );
 
     const proxy = proxies[0].find((item) => addressEq(item.delegate, address) && item.delay.gtn(0));
 
@@ -84,9 +95,9 @@ export async function txReserve(
     const announcements = await api.query.proxy.announcements(delegate);
 
     if (announcements[0].length <= 1) {
-      unreserve[delegate] = { value: announcements[1] };
+      _increaseValue(unreserve, delegate, announcements[1]);
     } else {
-      unreserve[delegate] = { value: api.consts.proxy.announcementDepositFactor };
+      _increaseValue(unreserve, delegate, api.consts.proxy.announcementDepositFactor);
     }
 
     await txReserve(api, call.args[3], real, reserve, unreserve, delay);
@@ -94,54 +105,50 @@ export async function txReserve(
     const announcements = await api.query.proxy.announcements(address);
 
     if (announcements[0].length <= 1) {
-      unreserve[address] = { value: announcements[1] };
+      _increaseValue(unreserve, address, announcements[1]);
     } else {
-      unreserve[address] = { value: api.consts.proxy.announcementDepositFactor };
+      _increaseValue(unreserve, address, api.consts.proxy.announcementDepositFactor);
     }
   } else if (api.tx.proxy?.rejectAnnouncement?.is(call)) {
     const delegate = call.args[0].toString();
     const announcements = await api.query.proxy.announcements(delegate);
 
     if (announcements[0].length <= 1) {
-      unreserve[delegate] = { value: announcements[1] };
+      _increaseValue(unreserve, delegate, announcements[1]);
     } else {
-      unreserve[delegate] = { value: api.consts.proxy.announcementDepositFactor };
+      _increaseValue(unreserve, delegate, api.consts.proxy.announcementDepositFactor);
     }
   } else if (api.tx.proxy?.createPure?.is(call)) {
-    reserve[address] = {
-      value: api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor)
-    };
+    _increaseValue(reserve, address, api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor));
   } else if (api.tx.proxy?.removeProxy?.is(call)) {
     const proxies = await api.query.proxy.proxies(address);
 
     if (proxies[0].length <= 1) {
-      unreserve[address] = { value: proxies[1] };
+      _increaseValue(unreserve, address, proxies[1]);
     } else {
-      unreserve[address] = { value: api.consts.proxy.proxyDepositFactor };
+      _increaseValue(unreserve, address, api.consts.proxy.proxyDepositFactor);
     }
   } else if (api.tx.proxy?.addProxy?.is(call)) {
     const proxies = await api.query.proxy.proxies(address);
 
     if (proxies[0].length === 0) {
-      reserve[address] = {
-        value: api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor)
-      };
+      _increaseValue(reserve, address, api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor));
     } else {
-      reserve[address] = { value: api.consts.proxy.proxyDepositFactor };
+      _increaseValue(reserve, address, api.consts.proxy.proxyDepositFactor);
     }
   } else if (api.tx.proxy?.removeProxies?.is(call)) {
     const proxies = await api.query.proxy.proxies(address);
 
-    unreserve[address] = { value: proxies[1] };
+    _increaseValue(unreserve, address, proxies[1]);
   } else if (api.tx.proxy?.proxy?.is(call)) {
     await txReserve(api, call.args[2], call.args[0].toString(), reserve, unreserve, delay);
   } else if (api.tx.proxy?.killPure?.is(call)) {
     const address = call.args[0].toString();
 
-    if (unreserve[address]) {
-      unreserve[address] = { value: unreserve[address].value.add(api.consts.proxy.proxyDepositBase) };
-    } else {
-      unreserve[address] = { value: api.consts.proxy.proxyDepositBase };
+    _increaseValue(unreserve, address, api.consts.proxy.proxyDepositBase);
+  } else if (api.tx.utility.batch.is(call) || api.tx.utility.forceBatch.is(call) || api.tx.utility.batchAll.is(call)) {
+    for (const item of call.args[0]) {
+      await txReserve(api, item, address, reserve, unreserve, delay);
     }
   }
 }

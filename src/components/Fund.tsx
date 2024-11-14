@@ -3,6 +3,7 @@
 
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 
+import { LoadingButton } from '@mui/lab';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 
@@ -75,8 +76,10 @@ function Action({
 }) {
   const { api } = useApi();
   const { accountSource } = useWallet();
+  const [loading, setLoading] = useState(false);
   const handleClick = useCallback(() => {
     if (receipt && sending && value) {
+      setLoading(true);
       const source = accountSource(sending);
 
       if (source) {
@@ -87,7 +90,11 @@ function Action({
         );
 
         events.on('inblock', () => {
+          setLoading(false);
           onClose();
+        });
+        events.on('error', () => {
+          setLoading(false);
         });
       }
     }
@@ -98,9 +105,9 @@ function Action({
       <Button fullWidth onClick={onClose} variant='outlined'>
         Cancel
       </Button>
-      <Button disabled={!receipt || !sending || !value} fullWidth onClick={handleClick}>
+      <LoadingButton loading={loading} disabled={!receipt || !sending || !value} fullWidth onClick={handleClick}>
         Submit
-      </Button>
+      </LoadingButton>
     </DialogActions>
   );
 }

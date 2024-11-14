@@ -314,7 +314,7 @@ export const paseoEndpoints: Endpoint[] = [
     genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
     serviceUrl:
       process.env.NODE_ENV === 'production' ? 'https://paseo-api.mimir.global/' : 'https://dev-api.mimir.global/',
-    socketUrl: 'wss://paseo-api.mimir.global/',
+    socketUrl: process.env.NODE_ENV === 'production' ? 'wss://paseo-api.mimir.global/' : 'wss://dev-api.mimir.global/',
     explorerUrl: 'https://paseo.subscan.io/'
   }
 ];

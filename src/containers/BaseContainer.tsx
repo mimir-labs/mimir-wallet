@@ -10,6 +10,7 @@ import { useAccount, useApi, useFollowAccounts, useToggle, useTxQueue } from '@m
 import { useWallet } from '@mimir-wallet/hooks/useWallet';
 
 import SideBar from './SideBar';
+import SubscribeTx from './SubscribeTx';
 import ToggleAlert from './ToggleAlert';
 import TopBar from './TopBar';
 
@@ -61,7 +62,10 @@ function BaseContainer({
       <TopBar />
 
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned && current && (
-        <ToggleAlert address={current} setAlertOpen={setAlertOpen} />
+        <>
+          <ToggleAlert address={current} setAlertOpen={setAlertOpen} />
+          <SubscribeTx address={current} />
+        </>
       )}
 
       {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (
