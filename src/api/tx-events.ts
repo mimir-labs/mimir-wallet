@@ -5,7 +5,6 @@ import type { ISubmittableResult } from '@polkadot/types/types';
 import type { U8aLike } from '@polkadot/util/types';
 
 import EventEmitter from 'eventemitter3';
-import { v4 as uuidv4 } from 'uuid';
 
 type EventTypes = {
   signed: (signature: U8aLike) => void;
@@ -17,8 +16,6 @@ type EventTypes = {
 };
 
 export class TxEvents extends EventEmitter<EventTypes> {
-  public uuid: string = uuidv4();
-
   public status: keyof EventTypes | 'pending' = 'pending';
 
   public signature?: U8aLike;
