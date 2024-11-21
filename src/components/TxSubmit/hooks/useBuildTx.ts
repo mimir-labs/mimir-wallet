@@ -4,7 +4,7 @@
 import type { IMethod } from '@polkadot/types/types';
 import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
-import type { FilterPath } from '@mimir-wallet/hooks/types';
+import type { FilterPath, Transaction } from '@mimir-wallet/hooks/types';
 import type { TxBundle } from '../utils';
 
 import { useEffect, useState } from 'react';
@@ -34,7 +34,12 @@ export type BuildTx = {
   delay: Record<string, BN>;
 };
 
-export function useBuildTx(method: IMethod | HexString, filterPath: FilterPath[], account?: string): BuildTx {
+export function useBuildTx(
+  method: IMethod | HexString,
+  filterPath: FilterPath[],
+  account?: string,
+  transaction?: Transaction | null | undefined
+): BuildTx {
   const { api } = useApi();
   const [state, setState] = useState<Record<string, BuildTx>>({});
 
@@ -42,31 +47,45 @@ export function useBuildTx(method: IMethod | HexString, filterPath: FilterPath[]
     if (filterPath.length > 0) {
       const hashSet = new Set<HexString>();
 
-      buildTx(api, api.createType('Call', method), filterPath as [FilterPath, ...FilterPath[]], hashSet).then(
-        async (bundle) => {
+      const key = filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '');
+
+      buildTx(api, api.createType('Call', method), filterPath as [FilterPath, ...FilterPath[]], transaction, hashSet)
+        .then(async (bundle) => {
           const { reserve, unreserve, delay } = await extrinsicReserve(api, bundle.signer, bundle.tx);
-          const key = filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '');
 
           setState((state) => ({
             ...state,
             [key]: { isLoading: false, txBundle: bundle, error: null, hashSet, reserve, unreserve, delay }
           }));
-        }
-      );
+        })
+        .catch((error) => {
+          setState((state) => ({
+            ...state,
+            [key]: { ...EMPTY_STATE, isLoading: false, error }
+          }));
+        });
     } else if (account) {
       const hashSet = new Set<HexString>();
 
-      buildTx(api, api.createType('Call', method), account, hashSet).then(async (bundle) => {
-        const { reserve, unreserve, delay } = await extrinsicReserve(api, bundle.signer, bundle.tx);
-        const key = account;
+      const key = account;
 
-        setState((state) => ({
-          ...state,
-          [key]: { isLoading: false, txBundle: bundle, error: null, hashSet, reserve, unreserve, delay }
-        }));
-      });
+      buildTx(api, api.createType('Call', method), account, transaction, hashSet)
+        .then(async (bundle) => {
+          const { reserve, unreserve, delay } = await extrinsicReserve(api, bundle.signer, bundle.tx);
+
+          setState((state) => ({
+            ...state,
+            [key]: { isLoading: false, txBundle: bundle, error: null, hashSet, reserve, unreserve, delay }
+          }));
+        })
+        .catch((error) => {
+          setState((state) => ({
+            ...state,
+            [key]: { ...EMPTY_STATE, isLoading: false, error }
+          }));
+        });
     }
-  }, [account, api, filterPath, method]);
+  }, [account, api, filterPath, method, transaction]);
 
   const key =
     filterPath.length > 0 ? filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '') : account || '';

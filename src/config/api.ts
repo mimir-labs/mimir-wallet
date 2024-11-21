@@ -310,7 +310,7 @@ export const paseoEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/Paseo.png',
     name: 'Paseo',
     ss58Format: 0,
-    wsUrl: 'wss://paseo.rpc.amforc.com',
+    wsUrl: 'wss://rpc.ibp.network/paseo',
     genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
     serviceUrl:
       process.env.NODE_ENV === 'production' ? 'https://paseo-api.mimir.global/' : 'https://dev-api.mimir.global/',

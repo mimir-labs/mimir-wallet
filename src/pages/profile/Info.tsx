@@ -80,7 +80,12 @@ function Info({
               Proxy
             </Button>
             {address && (
-              <Button component={Link} sx={{ minWidth: 0 }} to={`/account-setting/${address}`} variant='outlined'>
+              <Button
+                component={Link}
+                sx={{ minWidth: 0 }}
+                to={`/account-setting?address=${address}`}
+                variant='outlined'
+              >
                 <SvgIcon component={IconSet} inheritViewBox />
               </Button>
             )}

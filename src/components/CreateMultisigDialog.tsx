@@ -32,12 +32,12 @@ function CreateMultisigDialog({ open, onClose }: { open: boolean; onClose: () =>
           }
         }}
       >
-        <Box component={Link} onClick={onClose} to='/create-multisig'>
+        <Box sx={{ borderRadius: 1 }} component={Link} onClick={onClose} to='/create-multisig'>
           <img style={{ borderRadius: 25 }} src={NormalImg} width={50} height={50} alt='normal multisig' />
           <Typography variant='h4'>Normal Multisig</Typography>
           <Box sx={{ width: '100%' }}>Multisig with {'Threshold > 1'}</Box>
         </Box>
-        <Box component={Link} onClick={onClose} to='/create-multisig-one'>
+        <Box sx={{ borderRadius: 1 }} component={Link} onClick={onClose} to='/create-multisig-one'>
           <img style={{ borderRadius: 25 }} src={OneOfOneImg} width={50} height={50} alt='normal multisig' />
           <Typography variant='h4'>1/N Multisig</Typography>
           <Box sx={{ width: '100%' }}>Multisig with Threshold = 1</Box>

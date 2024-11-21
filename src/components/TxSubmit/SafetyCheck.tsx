@@ -1,17 +1,21 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { IMethod } from '@polkadot/types/types';
 import type { SafetyLevel } from '@mimir-wallet/hooks/types';
 
+import { LoadingButton } from '@mui/lab';
 import { Box, CircularProgress, SvgIcon, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 
+import { simulate } from '@mimir-wallet/api';
 import Logo from '@mimir-wallet/assets/images/logo.png';
 import IconFailed from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import IconSuccess from '@mimir-wallet/assets/svg/icon-success.svg?react';
+import { useApi } from '@mimir-wallet/hooks';
 
-function Cell({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
+function Cell({ title, children, img }: { img: React.ReactNode; title: React.ReactNode; children: React.ReactNode }) {
   return (
     <Box
       sx={{
@@ -31,7 +35,7 @@ function Cell({ title, children }: { title: React.ReactNode; children: React.Rea
           <Box component='span' sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
             Powered by
           </Box>
-          <img src={Logo} alt='mimir' height={14} />
+          {img}
         </Box>
       </Box>
       {children}
@@ -39,20 +43,83 @@ function Cell({ title, children }: { title: React.ReactNode; children: React.Rea
   );
 }
 
+const EMPTY_SIMULATION = {
+  isDone: false,
+  success: false,
+  error: null,
+  isLoading: false
+};
+
 function SafetyCheck({
   isTxBundleLoading,
+  call,
+  account,
   txError,
   safetyCheck
 }: {
   isTxBundleLoading: boolean;
   txError?: Error | null;
   safetyCheck?: SafetyLevel;
+  call: IMethod;
+  account?: string;
 }) {
+  const [simulation, setSimulation] = useState<{
+    isDone: boolean;
+    success: boolean;
+    error: string | null;
+    isLoading: boolean;
+  }>(EMPTY_SIMULATION);
+  const { api, chain } = useApi();
+
+  const handleSimulate = () => {
+    if (account && call) {
+      setSimulation({ ...EMPTY_SIMULATION, isLoading: true });
+      simulate(api, chain.wsUrl, call, account)
+        .then(({ success, error }) => {
+          setSimulation({ isDone: true, success, error, isLoading: false });
+        })
+        .catch((error) => {
+          setSimulation({ isDone: true, success: false, error: error.message || 'Unknown Error', isLoading: false });
+        });
+    }
+  };
+
   return (
     <Box>
       <Typography fontWeight={700}>Transaction Check</Typography>
+      <Cell title='Simulation' img={<img src='/images/chopsticks.webp' alt='chopticks' height={24} />}>
+        {simulation.isDone ? (
+          <>
+            {simulation.success ? (
+              <SvgIcon color='success' component={IconSuccess} inheritViewBox />
+            ) : (
+              <SvgIcon color='error' component={IconFailed} inheritViewBox />
+            )}
+
+            <Typography
+              sx={{
+                fontWeight: 700,
+                color: simulation.success ? 'success.main' : 'error.main'
+              }}
+            >
+              {simulation.success ? 'Success' : simulation.error || 'Unknown Error'}
+            </Typography>
+          </>
+        ) : (
+          <LoadingButton
+            variant='outlined'
+            loading={simulation.isLoading}
+            onClick={handleSimulate}
+            startIcon={simulation.isLoading ? <CircularProgress size={20} /> : null}
+            loadingPosition='start'
+          >
+            {simulation.isLoading ? '~30s' : 'Simulate'}
+          </LoadingButton>
+        )}
+      </Cell>
+
       {safetyCheck && safetyCheck.severity === 'none' ? null : (
-        <Cell title='Cross-chain Check'>
+        <Cell title='Cross-chain Check' img={<img src={Logo} alt='mimir' height={14} />}>
           {!safetyCheck && <CircularProgress size={20} />}
           {safetyCheck && (
             <>
@@ -77,7 +144,7 @@ function SafetyCheck({
           )}
         </Cell>
       )}
-      <Cell title='Authority Check'>
+      <Cell title='Authority Check' img={<img src={Logo} alt='mimir' height={14} />}>
         {isTxBundleLoading && <CircularProgress size={20} />}
         {!isTxBundleLoading && (
           <>

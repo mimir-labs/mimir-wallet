@@ -14,12 +14,16 @@ import { createNamedHook } from './createNamedHook';
 import { useAccount } from './useAccounts';
 import { useLocalStore } from './useStore';
 
-type GroupName = 'mimir' | 'injected';
+type GroupName = 'mimir' | 'injected' | 'hide';
 
-function groupAccounts(accounts: (AccountDataExtra & AccountData)[]): Record<GroupName, string[]> {
+function groupAccounts(
+  accounts: (AccountDataExtra & AccountData)[],
+  hideenAccounts: (AccountDataExtra & AccountData)[]
+): Record<GroupName, string[]> {
   const ret: Record<GroupName, string[]> = {
     mimir: [],
-    injected: []
+    injected: [],
+    hide: hideenAccounts.map(({ address }) => address)
   };
 
   for (let i = 0; i < accounts.length; i++) {
@@ -36,14 +40,14 @@ function groupAccounts(accounts: (AccountDataExtra & AccountData)[]): Record<Gro
 }
 
 function useGroupAccountsImpl(filter?: (account: AccountData) => boolean): Record<GroupName, string[]> {
-  const { accounts } = useAccount();
+  const { accounts, hideenAccounts } = useAccount();
 
   const allAddress = useMemo(
     () => accounts.filter((a): a is AccountData => (filter ? filter(a) : true)),
     [accounts, filter]
   );
 
-  return useMemo(() => groupAccounts(allAddress), [allAddress]);
+  return useMemo(() => groupAccounts(allAddress, hideenAccounts), [allAddress, hideenAccounts]);
 }
 
 export const useGroupAccounts = createNamedHook('useGroupAccounts', useGroupAccountsImpl);

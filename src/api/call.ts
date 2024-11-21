@@ -25,9 +25,9 @@ export function findTargetCall(
     return findTargetCall(api, call.args[1].toString(), call.args[3]);
   }
 
-  if (api.tx.proxy?.announce.is(call)) {
-    return findTargetCall(api, call.args[0].toString(), null);
-  }
+  // if (api.tx.proxy?.announce.is(call)) {
+  //   return findTargetCall(api, call.args[0].toString(), null);
+  // }
 
   if (api.tx.multisig.asMulti.is(call)) {
     return findTargetCall(api, encodeAddress(createKeyMulti(call.args[1], call.args[0])), call.args[3]);
@@ -37,9 +37,9 @@ export function findTargetCall(
     return findTargetCall(api, encodeAddress(createKeyMulti(call.args[0], 1)), call.args[1]);
   }
 
-  if (api.tx.multisig.approveAsMulti.is(call)) {
-    return findTargetCall(api, encodeAddress(createKeyMulti(call.args[1], call.args[0])), null);
-  }
+  // if (api.tx.multisig.approveAsMulti.is(call)) {
+  //   return findTargetCall(api, encodeAddress(createKeyMulti(call.args[1], call.args[0])), null);
+  // }
 
   return [address, call];
 }

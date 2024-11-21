@@ -135,7 +135,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               <AddressName value={address} />
               <IconButton
                 component={Link}
-                to={`/account-setting/${address}`}
+                to={`/account-setting?address=${address}`}
                 color='primary'
                 sx={{ bgcolor: 'secondary.main', fontSize: '1.2rem' }}
               >

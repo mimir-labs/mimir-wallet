@@ -36,7 +36,7 @@ import IconUnion from '@mimir-wallet/assets/svg/icon-union.svg?react';
 import IconUser from '@mimir-wallet/assets/svg/icon-user.svg?react';
 import IconWatch from '@mimir-wallet/assets/svg/icon-watch.svg?react';
 import { findToken } from '@mimir-wallet/config';
-import { useAccount, useApi, useGroupAccounts, useNativeBalances } from '@mimir-wallet/hooks';
+import { useAccount, useApi, useGroupAccounts, useNativeBalances, useWallet } from '@mimir-wallet/hooks';
 
 import AddressCell from './AddressCell';
 import CreateMultisigDialog from './CreateMultisigDialog';
@@ -62,16 +62,19 @@ function AccountCell({
   onSelect,
   watchlist,
   selected,
+  isHide,
   value
 }: {
   onClose?: () => void;
   selected?: boolean;
   value?: string;
   watchlist?: boolean;
+  isHide?: boolean;
   onSelect?: (address: string) => void;
 }) {
   const { genesisHash } = useApi();
-  const { isLocalAccount, deleteAddress } = useAccount();
+  const { accountSource } = useWallet();
+  const { isLocalAccount, deleteAddress, showAccount, hideAccount } = useAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const balances = useNativeBalances(value);
@@ -110,10 +113,23 @@ function AccountCell({
         }}
       >
         {value && isLocalAccount(value) && (
-          <MenuItem component={Link} disableRipple onClick={onClose} to={`/account-setting/${value}`}>
-            Setting
-          </MenuItem>
+          <>
+            {!accountSource(value) && (
+              <MenuItem
+                disableRipple
+                onClick={() => {
+                  isHide ? showAccount(value) : hideAccount(value);
+                }}
+              >
+                {isHide ? 'Show' : 'Hide'}
+              </MenuItem>
+            )}
+            <MenuItem component={Link} disableRipple onClick={onClose} to={`/account-setting?address=${value}`}>
+              Setting
+            </MenuItem>
+          </>
         )}
+
         {value && watchlist && (
           <MenuItem disableRipple onClick={() => deleteAddress(value)}>
             Delete
@@ -405,6 +421,24 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
               />
             ))}
           </Box>
+
+          {grouped.hide.length > 0 && (
+            <Box>
+              <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5, paddingX: 1 }}>
+                Hidden Accounts
+              </Typography>
+              {grouped.hide.map((account) => (
+                <AccountCell
+                  isHide
+                  key={`hide-account-${account}`}
+                  onClose={onClose}
+                  onSelect={onSelect}
+                  value={account}
+                />
+              ))}
+            </Box>
+          )}
+          <Divider sx={{ marginY: 0.5 }} />
         </List>
       </Box>
 

@@ -97,6 +97,8 @@ function CallDisplayDetail({ registry, call }: { registry: Registry; call?: IMet
         />
       </Box>
     );
+  } else if (['proxy.removeProxies'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
+    comp = <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>Remove Proxies</Box>;
   } else {
     if (!params) {
       return null;

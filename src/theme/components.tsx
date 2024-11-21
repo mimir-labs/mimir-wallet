@@ -427,6 +427,24 @@ const createComponents: Func = () => ({
         marginBottom: 0
       }
     }
+  },
+
+  MuiList: {
+    styleOverrides: {
+      root: {
+        '&.MuiMenu-list': {
+          padding: '8px'
+        }
+      }
+    }
+  },
+
+  MuiMenuItem: {
+    styleOverrides: {
+      root: {
+        borderRadius: '5px'
+      }
+    }
   }
 });
 

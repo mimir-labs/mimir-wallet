@@ -92,7 +92,7 @@ function TxItems({
     if (!transaction.call) return null;
 
     try {
-      return api.createType('Call', transaction.call);
+      return api.registry.createTypeUnsafe('Call', [transaction.call]) as IMethod;
     } catch {
       return null;
     }

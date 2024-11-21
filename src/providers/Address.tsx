@@ -5,13 +5,16 @@ import type { Endpoint } from '@mimir-wallet/config';
 import type { AddressMeta } from '@mimir-wallet/hooks/types';
 import type { AddressState } from './types';
 
+import { u8aToHex } from '@polkadot/util';
+import { HexString } from '@polkadot/util/types';
 import { isAddress } from '@polkadot/util-crypto';
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { ApiCtx, encodeAddress } from '@mimir-wallet/api';
+import { ApiCtx, decodeAddress, encodeAddress } from '@mimir-wallet/api';
 import { AddAddressDialog } from '@mimir-wallet/components';
-import { CURRENT_ADDRESS_PREFIX, SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
+import { CURRENT_ADDRESS_PREFIX, HIDE_ACCOUNT_PREFIX, SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
+import { useLocalStore } from '@mimir-wallet/hooks';
 import { addressEq, store } from '@mimir-wallet/utils';
 
 import { sync } from './sync';
@@ -49,6 +52,7 @@ export function AddressCtxRoot({ address, chain, children }: Props): React.React
     onAdded?: (address: string) => void;
     onClose?: () => void;
   }>({ open: false });
+  const [hideAccountHex, setHideAccountHex] = useLocalStore<HexString[]>(`${HIDE_ACCOUNT_PREFIX}${chain.key}`, []);
 
   const currentRef = useRef<string | undefined>(address ? encodeAddress(address) : undefined);
 
@@ -142,9 +146,36 @@ export function AddressCtxRoot({ address, chain, children }: Props): React.React
     []
   );
 
+  const [visibleAccounts, hideenAccounts] = useMemo(() => {
+    return [
+      state.accounts.filter((item) => !hideAccountHex.includes(u8aToHex(decodeAddress(item.address)))),
+      state.accounts.filter((item) => hideAccountHex.includes(u8aToHex(decodeAddress(item.address))))
+    ];
+  }, [hideAccountHex, state.accounts]);
+
+  const showAccount = useCallback(
+    (address: string) => {
+      const addressHex = u8aToHex(decodeAddress(address));
+
+      setHideAccountHex((value) => value.filter((item) => item !== addressHex));
+    },
+    [setHideAccountHex]
+  );
+
+  const hideAccount = useCallback(
+    (address: string) => {
+      const addressHex = u8aToHex(decodeAddress(address));
+
+      setHideAccountHex((value) => Array.from(new Set([...value, addressHex])));
+    },
+    [setHideAccountHex]
+  );
+
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const value = {
     ...state,
+    accounts: visibleAccounts,
+    hideenAccounts,
     current: currentRef.current,
     metas,
     addresses,
@@ -163,7 +194,9 @@ export function AddressCtxRoot({ address, chain, children }: Props): React.React
     addAddressBook,
     deleteAddress,
     isLocalAccount,
-    isLocalAddress
+    isLocalAddress,
+    showAccount,
+    hideAccount
   };
 
   return (

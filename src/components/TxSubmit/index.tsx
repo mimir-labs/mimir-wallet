@@ -81,7 +81,7 @@ function TxSubmit({
   const filterPaths = useFilterPaths(accountData, transaction);
   const [addressChain, setAddressChain] = useState<FilterPath[]>(propsFilterPaths || []);
   const [, addTx] = useBatchTxs(account);
-  const buildTx = useBuildTx(call, addressChain, account);
+  const buildTx = useBuildTx(call, addressChain, account, transaction);
 
   const handleAddBatch = useCallback(() => {
     addTx([
@@ -157,7 +157,13 @@ function TxSubmit({
 
           <Call account={account} method={call} transaction={transaction} />
 
-          <SafetyCheck isTxBundleLoading={buildTx.isLoading} txError={buildTx.error} safetyCheck={safetyCheck} />
+          <SafetyCheck
+            isTxBundleLoading={buildTx.isLoading}
+            call={call}
+            account={account}
+            txError={buildTx.error}
+            safetyCheck={safetyCheck}
+          />
         </Stack>
 
         <Stack
