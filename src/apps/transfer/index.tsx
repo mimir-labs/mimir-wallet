@@ -139,7 +139,7 @@ function PageTransfer() {
           </Box>
           <SelectToken assetId={assetId} onChange={setToken} setAssetId={setAssetId} />
           <Button
-            disabled={!amount || !recipient || !isValidNumber || isInsufficientBalance}
+            disabled={!amount || !recipient || !isValidNumber}
             fullWidth
             onClick={handleClick}
             color={isInsufficientBalance ? 'error' : 'primary'}

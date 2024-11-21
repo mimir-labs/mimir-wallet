@@ -62,6 +62,7 @@ export interface WalletState {
 
 export interface AddressState {
   accounts: (AccountDataExtra & AccountData)[];
+  hideenAccounts: (AccountDataExtra & AccountData)[];
   addresses: { address: string; name: string; watchlist?: boolean }[];
   current?: string;
   isMultisigSyned: boolean;
@@ -81,4 +82,6 @@ export interface AddressState {
   deleteAddress: (address: string) => void;
   isLocalAccount: (address: string) => boolean;
   isLocalAddress: (address: string, watchlist?: boolean) => boolean;
+  hideAccount: (address: string) => void;
+  showAccount: (address: string) => void;
 }

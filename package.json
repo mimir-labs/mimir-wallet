@@ -35,6 +35,7 @@
     "validate": "run-p lint test:ci test:e2e:headless"
   },
   "dependencies": {
+    "@acala-network/chopsticks-core": "^1.0.1",
     "@dagrejs/dagre": "^1.1.4",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",

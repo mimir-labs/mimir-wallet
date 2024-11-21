@@ -6,6 +6,7 @@ export const SWITCH_ACCOUNT_REMIND_KEY = 'switch_account_remind';
 export const API_METADATA_KEY = 'api_metadata';
 export const CURRENT_NETWORK_KEY = 'current_network';
 export const CURRENT_ADDRESS_PREFIX = 'current_address:';
+export const HIDE_ACCOUNT_PREFIX = 'hide_address:';
 
 export const BATCH_TX_PREFIX = 'batch_tx:';
 

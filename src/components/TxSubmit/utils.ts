@@ -6,11 +6,12 @@ import type { SubmittableExtrinsic } from '@polkadot/api-base/types';
 import type { Timepoint } from '@polkadot/types/interfaces';
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
-import type { FilterPath } from '@mimir-wallet/hooks/types';
+import type { FilterPath, Transaction } from '@mimir-wallet/hooks/types';
 
 import { isString, u8aSorted } from '@polkadot/util';
 
 import { callFilter, decodeAddress } from '@mimir-wallet/api';
+import { addressEq } from '@mimir-wallet/utils';
 
 export type TxBundle = { tx: SubmittableExtrinsic<'promise'>; signer: string };
 
@@ -61,14 +62,22 @@ export function buildTx(
   api: ApiPromise,
   call: IMethod,
   path: [FilterPath, ...FilterPath[]],
+  transaction?: Transaction | null,
   calls?: Set<HexString>
 ): Promise<TxBundle>;
-export function buildTx(api: ApiPromise, call: IMethod, account: string, calls?: Set<HexString>): Promise<TxBundle>;
+export function buildTx(
+  api: ApiPromise,
+  call: IMethod,
+  account: string,
+  transaction?: Transaction | null,
+  calls?: Set<HexString>
+): Promise<TxBundle>;
 
 export async function buildTx(
   api: ApiPromise,
   call: IMethod,
   pathOrAccount: [FilterPath, ...FilterPath[]] | string,
+  transaction?: Transaction | null,
   calls: Set<HexString> = new Set()
 ): Promise<TxBundle> {
   const functionMeta = api.registry.findMetaCall(call.callIndex);
@@ -84,14 +93,26 @@ export async function buildTx(
   for (const item of path) {
     if (item.type === 'multisig') {
       tx = await asMulti(api, tx, item.multisig, item.threshold, item.otherSignatures);
+      transaction = transaction?.children.find(({ address }) => addressEq(address, item.address));
     } else if (item.type === 'proxy') {
       callFilter(api, item.proxyType, item.address, tx.method);
 
       if (item.delay) {
         calls.add(tx.method.toHex());
         tx = api.tx.proxy.announce(item.real, tx.method.hash);
+        transaction = transaction?.children.find(({ address }) => addressEq(address, item.address));
       } else {
-        tx = api.tx.proxy.proxy(item.real, item.proxyType as any, tx.method);
+        const delegate = transaction?.delegate;
+
+        transaction = transaction?.children.find(
+          ({ address }) => addressEq(address, delegate) && addressEq(address, item.address)
+        );
+
+        if (transaction?.call) {
+          tx = api.tx(api.registry.createType('Call', transaction.call));
+        } else {
+          tx = api.tx.proxy.proxy(item.real, item.proxyType as any, tx.method);
+        }
       }
     }
   }

@@ -3,6 +3,7 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { SignerOptions, SubmittableExtrinsic } from '@polkadot/api/types';
+import type { Null, Result } from '@polkadot/types';
 import type {
   DispatchError,
   Extrinsic,
@@ -12,7 +13,10 @@ import type {
   Index,
   SignerPayload
 } from '@polkadot/types/interfaces';
-import type { SpRuntimeDispatchError } from '@polkadot/types/lookup';
+import type {
+  SpRuntimeDispatchError,
+  SpRuntimeTransactionValidityTransactionValidityError
+} from '@polkadot/types/lookup';
 import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
@@ -280,22 +284,35 @@ export function signAndSend(
 
   extractParams(api, signer, source)
     .then((params) => extrinsic.signAsync(signer, params))
-    .then((extrinsic) => {
+    .then(async (extrinsic) => {
       events.emit('signed', extrinsic.signature);
+
+      let result: Result<
+        Result<Null, SpRuntimeDispatchError>,
+        SpRuntimeTransactionValidityTransactionValidityError
+      > | null = null;
+
+      try {
+        result = await api.call.blockBuilder.applyExtrinsic(extrinsic);
+      } catch {
+        /* empty */
+      }
+
+      if (result) {
+        if (result.isErr) {
+          if (result.asErr.isInvalid) {
+            throw new Error(`Invalid Transaction: ${result.asErr.asInvalid.type}`);
+          } else {
+            throw new Error(`Unknown Error: ${result.asErr.asUnknown.type}`);
+          }
+        } else if (result.asOk.isErr) {
+          throw _assetDispatchError(result.asOk.asErr);
+        }
+      }
 
       return extrinsic;
     })
     .then(async () => {
-      // if (result.isErr) {
-      //   if (result.asErr.isInvalid) {
-      //     throw new Error(`Invalid Transaction: ${result.asErr.asInvalid.type}`);
-      //   } else {
-      //     throw new Error(`Unknown Error: ${result.asErr.asUnknown.type}`);
-      //   }
-      // } else if (result.asOk.isErr) {
-      //   throw _assetDispatchError(result.asOk.asErr);
-      // }
-
       await beforeSend?.(extrinsic);
 
       const unsubPromise = extrinsic.send((result) => {

@@ -46,6 +46,7 @@ export default defineConfig(({ mode }) => ({
             '@polkadot/util',
             '@polkadot/util-crypto'
           ],
+          chopsticks: ['@acala-network/chopsticks-core'],
           'polkadot-config': ['@polkadot/apps-config/api/typesBundle'],
           mui: ['@mui/lab', '@mui/material', '@mui/system', 'material-ui-popup-state'],
           reactflow: ['reactflow'],
@@ -82,6 +83,7 @@ export default defineConfig(({ mode }) => ({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.png', 'robots.txt', 'apple-touch-icon.png', 'icons/*.svg', 'fonts/*.woff2'],
             injectManifest: {
+              maximumFileSizeToCacheInBytes: 3000000,
               buildPlugins: {
                 vite: [tsconfigPaths()]
               }

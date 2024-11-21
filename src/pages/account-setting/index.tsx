@@ -8,7 +8,7 @@ import type { ITuple } from '@polkadot/types/types';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Button, Paper, Stack, Tab, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { Input, toastSuccess } from '@mimir-wallet/components';
 import {
@@ -26,8 +26,7 @@ import ProxySet from './ProxySet';
 function AccountSetting() {
   const { api } = useApi();
   const navigate = useNavigate();
-  const { isLocalAccount } = useAccount();
-  const { address } = useParams() as { address: string };
+  const { isLocalAccount, current: address } = useAccount();
   const { setName, name, saveName } = useAddressMeta(address);
   const [account] = useQueryAccount(address);
   const [error, setError] = useState<Error>();
@@ -138,7 +137,7 @@ function AccountSetting() {
           </Box>
         )}
 
-        {api.tx.proxy && proxies && account && proxies[0].length > 0 && (
+        {api.tx.proxy && address && proxies && account && proxies[0].length > 0 && (
           <Box>
             <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
               Proxy Information

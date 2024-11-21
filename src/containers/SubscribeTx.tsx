@@ -9,7 +9,7 @@ import { decodeAddress } from '@polkadot/util-crypto';
 import { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Address, toastSuccess } from '@mimir-wallet/components';
+import { Address, toastError, toastSuccess } from '@mimir-wallet/components';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
 import { SocketCtx } from '@mimir-wallet/socket';
 import { formatTransactionId } from '@mimir-wallet/transactions';
@@ -36,10 +36,12 @@ function SubscribeTx({ address }: { address: string }) {
 
     const handler = (message: TxMessage) => {
       if (message.status > TransactionStatus.Pending) {
-        toastSuccess(
+        (message.status === TransactionStatus.Success ? toastSuccess : toastError)(
           <Box marginLeft={1.5} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             <Typography fontWeight={700}>Transaction</Typography>
-            <Typography fontSize={12}>Transaction {formatTransactionId(message.id)} Executed</Typography>
+            <Typography fontSize={12}>
+              Transaction {formatTransactionId(message.id)} Executed {TransactionStatus[message.status]}
+            </Typography>
             <Typography
               component={Link}
               fontSize={12}
@@ -89,9 +91,10 @@ function SubscribeTx({ address }: { address: string }) {
       }
     };
 
-    subscribe(topic, handler);
+    const unsub = subscribe(topic, handler);
 
     return () => {
+      unsub();
       unsubscribe(topic);
     };
   }, [address, subscribe, unsubscribe]);

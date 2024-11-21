@@ -54,7 +54,7 @@ function App({ address, chain }: { address?: string; chain: Endpoint }) {
                 element: <PageAddressBook />
               },
               {
-                path: '/account-setting/:address',
+                path: '/account-setting',
                 element: <PageAccountSetting />
               }
             ]
