@@ -17,10 +17,12 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GH_PAT }}
     name: release
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Setup Node
@@ -35,4 +37,4 @@ jobs:
       - name: Semantic Release
         run: yarn semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
