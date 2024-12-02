@@ -3,9 +3,7 @@ name: Release
   push:
     branches:
       - master
-      - next
-      - beta
-      - "*.x"
+
 permissions:
   contents: read # for checkout
 
@@ -16,6 +14,8 @@ jobs:
       issues: write # to be able to comment on released issues
       pull-requests: write # to be able to comment on released pull requests
       id-token: write # to enable use of OIDC for npm provenance
+    if: "startsWith(github.event.head_commit.message, 'chore: release')"
+
     name: release
     runs-on: ubuntu-latest
     steps:
@@ -33,6 +33,7 @@ jobs:
       - name: yarn install
         run: yarn install --frozen-lockfile
 
-      - run: npx semantic-release@21.0.2
+      - name: Semantic Release
+        run: yarn semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
