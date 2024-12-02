@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Portal } from '@mui/material';
-import { IconProps, Icons, toast, ToastContainer } from 'react-toastify';
+import { type IconProps, Icons, toast, ToastContainer } from 'react-toastify';
 import { injectStyle } from 'react-toastify/dist/inject-style';
 
 import { FailedAnimation, NoticeAnimation, SuccessAnimation } from './animation';

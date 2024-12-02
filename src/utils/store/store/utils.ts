@@ -12,7 +12,7 @@ export function deserialize(strVal: string | null) {
 
   try {
     val = JSON.parse(strVal);
-  } catch (e) {
+  } catch {
     val = strVal;
   }
 

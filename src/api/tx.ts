@@ -24,7 +24,8 @@ import { getSpecTypes } from '@polkadot/types-known';
 import { assert, formatBalance, isBn, isNumber, objectSpread } from '@polkadot/util';
 import { base64Encode } from '@polkadot/util-crypto';
 
-import { api } from '@mimir-wallet/api';
+import { statics } from '@mimir-wallet/api';
+import { walletConfig } from '@mimir-wallet/config';
 import { CONNECT_ORIGIN } from '@mimir-wallet/constants';
 
 import { TxEvents } from './tx-events';
@@ -56,7 +57,7 @@ export class TxModuleError extends Error {
 
 function _assetDispatchError(dispatch: DispatchError | SpRuntimeDispatchError): Error {
   if (dispatch.isModule) {
-    const error = api.registry.findMetaError(dispatch.asModule);
+    const error = statics.api.registry.findMetaError(dispatch.asModule);
 
     return new TxModuleError(
       `Cause by ${error.section}.${error.method}: ${error.docs.join('\n')}`,
@@ -82,7 +83,7 @@ function _assetDispatchError(dispatch: DispatchError | SpRuntimeDispatchError): 
 }
 
 async function extractParams(api: ApiPromise, address: string, source: string): Promise<Partial<SignerOptions>> {
-  const injected = await window.injectedWeb3?.[source || ''].enable(CONNECT_ORIGIN);
+  const injected = await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(CONNECT_ORIGIN);
   const signer = injected?.signer;
   const metadata = injected?.metadata;
 
@@ -140,7 +141,7 @@ export function checkSubmittableResult(result: ISubmittableResult, checkProxy = 
 
   if (checkProxy) {
     for (const { event } of result.events) {
-      if (!api.events.proxy.ProxyExecuted.is(event)) continue;
+      if (!statics.api.events.proxy.ProxyExecuted.is(event)) continue;
 
       if (event.data.result.isErr) {
         throw _assetDispatchError(event.data.result.asErr);
@@ -156,12 +157,12 @@ function makeSignOptions(
   extras: { blockHash?: Hash; era?: ExtrinsicEra; nonce?: Index }
 ): SignatureOptions {
   return objectSpread(
-    { blockHash: api.genesisHash, genesisHash: api.genesisHash, withSignedTransaction: true },
+    { blockHash: statics.api.genesisHash, genesisHash: statics.api.genesisHash, withSignedTransaction: true },
     partialOptions,
     extras,
     {
-      runtimeVersion: api.runtimeVersion,
-      signedExtensions: api.registry.signedExtensions
+      runtimeVersion: statics.api.runtimeVersion,
+      signedExtensions: statics.api.registry.signedExtensions
     }
   );
 }
@@ -187,7 +188,7 @@ function makeEraOptions(
 
   return makeSignOptions(partialOptions, {
     blockHash: header.hash,
-    era: api.registry.createTypeUnsafe<ExtrinsicEra>('ExtrinsicEra', [
+    era: statics.api.registry.createTypeUnsafe<ExtrinsicEra>('ExtrinsicEra', [
       {
         current: header.number,
         period: partialOptions.era || mortalLength
@@ -207,12 +208,12 @@ export async function sign(
   source: string
 ): Promise<[HexString, SignerPayloadJSON, Hash]> {
   const options = optionsOrNonce();
-  const signingInfo = await api.derive.tx.signingInfo(signer, options.nonce, options.era);
+  const signingInfo = await statics.api.derive.tx.signingInfo(signer, options.nonce, options.era);
   const eraOptions = makeEraOptions(options, signingInfo);
 
-  const { signer: accountSigner } = await extractParams(api, signer, source);
+  const { signer: accountSigner } = await extractParams(statics.api, signer, source);
 
-  const payload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
+  const payload = statics.api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
     objectSpread({}, eraOptions, {
       address: signer,
       blockNumber: signingInfo.header ? signingInfo.header.number : 0,
@@ -228,9 +229,9 @@ export async function sign(
   const { signature, signedTransaction } = await accountSigner.signPayload(payload.toPayload());
 
   if (signedTransaction) {
-    const ext = api.registry.createTypeUnsafe<Extrinsic>('Extrinsic', [signedTransaction]);
+    const ext = statics.api.registry.createTypeUnsafe<Extrinsic>('Extrinsic', [signedTransaction]);
 
-    const newSignerPayload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
+    const newSignerPayload = statics.api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
       objectSpread(
         {},
         {
@@ -282,7 +283,7 @@ export function signAndSend(
 ): TxEvents {
   const events = new TxEvents();
 
-  extractParams(api, signer, source)
+  extractParams(statics.api, signer, source)
     .then((params) => extrinsic.signAsync(signer, params))
     .then(async (extrinsic) => {
       events.emit('signed', extrinsic.signature);
@@ -293,7 +294,7 @@ export function signAndSend(
       > | null = null;
 
       try {
-        result = await api.call.blockBuilder.applyExtrinsic(extrinsic);
+        result = await statics.api.call.blockBuilder.applyExtrinsic(extrinsic);
       } catch {
         /* empty */
       }

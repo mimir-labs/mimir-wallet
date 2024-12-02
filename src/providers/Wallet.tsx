@@ -6,8 +6,11 @@ import type { WalletAccount, WalletState } from './types';
 import { objectSpread } from '@polkadot/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { walletConfig } from '@mimir-wallet/config';
 import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
 import { addressEq, documentReadyPromise, loadWallet, store } from '@mimir-wallet/utils';
+
+import { WalletCtx } from './context';
 
 interface Props {
   children?: React.ReactNode;
@@ -30,8 +33,8 @@ async function getWallet() {
   await documentReadyPromise();
 
   for (const wallet of connectWallets) {
-    if (window.injectedWeb3?.[wallet]) {
-      promises.push(loadWallet(window.injectedWeb3[wallet], CONNECT_ORIGIN, wallet));
+    if (window.injectedWeb3?.[walletConfig[wallet]?.key || '']) {
+      promises.push(loadWallet(window.injectedWeb3[walletConfig[wallet].key], CONNECT_ORIGIN, wallet));
     }
   }
 
@@ -39,8 +42,6 @@ async function getWallet() {
 
   return data.flat();
 }
-
-export const WalletCtx = React.createContext<WalletState>({} as WalletState);
 
 export function WalletCtxRoot({ children }: Props) {
   const [walletState, setWalletState] = useState<WalletState>({
@@ -63,7 +64,7 @@ export function WalletCtxRoot({ children }: Props) {
   }, []);
 
   const connect = useCallback(async (name: string) => {
-    const provider = window.injectedWeb3?.[name];
+    const provider = window.injectedWeb3?.[walletConfig[name]?.key];
 
     if (provider) {
       const walletAccounts = await loadWallet(provider, CONNECT_ORIGIN, name);

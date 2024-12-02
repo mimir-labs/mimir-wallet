@@ -3,7 +3,7 @@
 
 import type { BlockEntry, Database, KeyValueEntry } from '@acala-network/chopsticks-core';
 
-import { DBSchema, IDBPDatabase, openDB } from 'idb';
+import { type DBSchema, type IDBPDatabase, openDB } from 'idb';
 
 interface Schema extends DBSchema {
   keyValue: {

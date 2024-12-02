@@ -5,7 +5,7 @@ import type { TxEvents } from '@mimir-wallet/api';
 
 import { Box, Typography } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
-import { toast, ToastOptions } from 'react-toastify';
+import { toast, type ToastOptions } from 'react-toastify';
 
 import { FailedAnimation, SuccessAnimation, WaitingAnimation } from '../animation';
 import TxError from '../TxError';

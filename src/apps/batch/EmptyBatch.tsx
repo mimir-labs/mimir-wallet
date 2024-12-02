@@ -4,7 +4,6 @@
 import { Box, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function EmptyBatch({ onAdd, onClose }: { onAdd?: () => void; onClose?: () => void }) {
   return (
     <Box

@@ -34,7 +34,6 @@ export class SessionStorage extends Events<StorageEvent> {
     });
   }
 
-  // eslint-disable-next-line class-methods-use-this
   public get(key: string | null): unknown {
     if (!key) return undefined;
 

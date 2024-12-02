@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-/* eslint-disable operator-linebreak */
 import type { ApiPromise } from '@polkadot/api';
 
 import { BN, BN_THOUSAND, BN_TWO, bnMin } from '@polkadot/util';

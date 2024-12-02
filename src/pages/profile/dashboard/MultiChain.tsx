@@ -5,6 +5,7 @@ import { Avatar, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { encodeAddress } from '@mimir-wallet/api';
+import { CopyButton } from '@mimir-wallet/components';
 import { allEndpoints } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks';
 
@@ -44,6 +45,7 @@ function MultiChain({ address }: { address: string }) {
                 <span style={{ fontSize: '0.75rem' }}>
                   {addressSpec.slice(0, 8)}...{addressSpec.slice(-8)}
                 </span>
+                <CopyButton value={addressSpec} />
               </Box>
             </Box>
             <Button

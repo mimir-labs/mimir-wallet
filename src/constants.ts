@@ -29,3 +29,5 @@ export const NOT_CREATE_MULTISIG_NOW_KEY = 'not_create_multisig_now';
 
 export const EXTENSION_PREFIX = 'mimir-wallet';
 export const MESSAGE_ORIGIN_WALLET = `${EXTENSION_PREFIX}wallet`;
+
+export const ADDRESS_BOOK_UPGRADE_VERSION_KEY = 'address_book_upgrade_version';

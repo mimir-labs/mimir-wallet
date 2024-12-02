@@ -59,7 +59,6 @@ function Row({
     [api, decimals, symbol, tokenSymbol]
   );
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   function RowMain() {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
@@ -98,7 +97,6 @@ function Row({
     );
   }
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   function RowSub() {
     return (
       <Paper

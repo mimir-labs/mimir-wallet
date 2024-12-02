@@ -15,6 +15,8 @@ import { allEndpoints, Endpoint, typesBundle } from '@mimir-wallet/config';
 import { useApiUrl } from '@mimir-wallet/hooks';
 import { service } from '@mimir-wallet/utils';
 
+import { ApiCtx, DEFAULT_AUX, statics } from './defaults';
+
 interface Props {
   children: React.ReactNode;
   chain: Endpoint;
@@ -28,23 +30,7 @@ interface ChainData {
   systemVersion: string;
 }
 
-export const DEFAULT_AUX = ['Aux1', 'Aux2', 'Aux3', 'Aux4', 'Aux5', 'Aux6', 'Aux7', 'Aux8', 'Aux9'];
-
-export function encodeAddress(key: string | Uint8Array, ss58Format = window?.currentChain?.ss58Format) {
-  return encodeAddressBase(key, ss58Format);
-}
-
-export function decodeAddress(address: string) {
-  return decodeAddressBase(address);
-}
-
-export const ApiCtx = React.createContext<ApiProps>({} as unknown as ApiProps);
-
 const EMPTY_STATE = { hasInjectedAccounts: false, isApiReady: false } as unknown as ApiState;
-
-let api: ApiPromise;
-
-export { api };
 
 async function retrieve(api: ApiPromise): Promise<ChainData> {
   const [systemChain, systemChainType, systemName, systemVersion] = await Promise.all([
@@ -129,7 +115,7 @@ async function createApi(apiUrl: string, onError: (error: unknown) => void): Pro
   try {
     const provider = new WsProvider(apiUrl);
 
-    api = new ApiPromise({
+    statics.api = new ApiPromise({
       provider,
       typesBundle,
       typesChain: {
@@ -158,7 +144,7 @@ export function ApiCtxRoot({ chain, children }: Props): React.ReactElement<Props
   const value = useMemo<ApiProps>(
     () =>
       objectSpread({}, state, {
-        api,
+        api: statics.api,
         apiError,
         wsUrl: chain.wsUrl,
         isApiConnected,
@@ -167,7 +153,7 @@ export function ApiCtxRoot({ chain, children }: Props): React.ReactElement<Props
         genesisHash: chain.genesisHash,
         chain,
         apiUrl: chain.wsUrl,
-        identityApi: (chain.identityNetwork && apiSystemPeople) || api
+        identityApi: (chain.identityNetwork && apiSystemPeople) || statics.api
       }),
     [state, apiError, chain, isApiConnected, isApiInitialized, apiSystemPeople]
   );
@@ -181,11 +167,11 @@ export function ApiCtxRoot({ chain, children }: Props): React.ReactElement<Props
     };
 
     createApi(chain.wsUrl, onError).then(() => {
-      api.on('connected', () => setIsApiConnected(true));
-      api.on('disconnected', () => setIsApiConnected(false));
-      api.on('error', onError);
-      api.on('ready', (): void => {
-        loadOnReady(api, chain).then(setState).catch(onError);
+      statics.api.on('connected', () => setIsApiConnected(true));
+      statics.api.on('disconnected', () => setIsApiConnected(false));
+      statics.api.on('error', onError);
+      statics.api.on('ready', (): void => {
+        loadOnReady(statics.api, chain).then(setState).catch(onError);
       });
       setIsApiInitialized(true);
     });

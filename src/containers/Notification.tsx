@@ -37,12 +37,10 @@ function Notification() {
 
   const now = Date.now();
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   function TxLink({ uuid }: { uuid: string }) {
     return <MuiLink>No.{uuid.slice(0, 8).toUpperCase()}</MuiLink>;
   }
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   function Item({ message: { blockTime, raw, sender, type } }: { message: PushMessageData }) {
     return (
       <Stack

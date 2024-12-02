@@ -66,7 +66,6 @@ function createTheme(mode: PaletteMode): Theme {
   });
 }
 
-/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 const ToggleThemeContext = React.createContext(() => {});
 
 function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
