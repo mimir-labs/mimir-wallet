@@ -4712,7 +4712,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/commit-analyzer@npm:^13.0.0-beta.1":
+"@semantic-release/changelog@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "@semantic-release/changelog@npm:6.0.3"
+  dependencies:
+    "@semantic-release/error": "npm:^3.0.0"
+    aggregate-error: "npm:^3.0.0"
+    fs-extra: "npm:^11.0.0"
+    lodash: "npm:^4.17.4"
+  peerDependencies:
+    semantic-release: ">=18.0.0"
+  checksum: 10c0/94c9c287d34fde6d4c6c574869e853dc04180b1d9e6036097d83e0d14783bf5bb8e546fdc4fac2e979d636fa170fd573eaa4265b9d332e436e4813b7aebe7728
+  languageName: node
+  linkType: hard
+
+"@semantic-release/commit-analyzer@npm:^13.0.0, @semantic-release/commit-analyzer@npm:^13.0.0-beta.1":
   version: 13.0.0
   resolution: "@semantic-release/commit-analyzer@npm:13.0.0"
   dependencies:
@@ -4730,6 +4744,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@semantic-release/error@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@semantic-release/error@npm:3.0.0"
+  checksum: 10c0/51f06d11186a6efc543b44996ca1c368a77c6ed18dd823f0362188c37b7ef32f3580bd17654f594e6a72b931ebe69b44bbcb1ee16c755a1d3e44dcb652b47275
+  languageName: node
+  linkType: hard
+
 "@semantic-release/error@npm:^4.0.0":
   version: 4.0.0
   resolution: "@semantic-release/error@npm:4.0.0"
@@ -4737,7 +4758,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/github@npm:^11.0.0":
+"@semantic-release/git@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "@semantic-release/git@npm:10.0.1"
+  dependencies:
+    "@semantic-release/error": "npm:^3.0.0"
+    aggregate-error: "npm:^3.0.0"
+    debug: "npm:^4.0.0"
+    dir-glob: "npm:^3.0.0"
+    execa: "npm:^5.0.0"
+    lodash: "npm:^4.17.4"
+    micromatch: "npm:^4.0.0"
+    p-reduce: "npm:^2.0.0"
+  peerDependencies:
+    semantic-release: ">=18.0.0"
+  checksum: 10c0/90077068b97ff894e5f6bea05d0c7482929d3bae64c242a1556bc85db4d8f0a52b71215300472539b95248778cdf239a3f8cbad5effaaba719a32bf347dbdd93
+  languageName: node
+  linkType: hard
+
+"@semantic-release/github@npm:^11.0.0, @semantic-release/github@npm:^11.0.1":
   version: 11.0.1
   resolution: "@semantic-release/github@npm:11.0.1"
   dependencies:
@@ -4763,7 +4802,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/npm@npm:^12.0.0":
+"@semantic-release/npm@npm:^12.0.0, @semantic-release/npm@npm:^12.0.1":
   version: 12.0.1
   resolution: "@semantic-release/npm@npm:12.0.1"
   dependencies:
@@ -4786,7 +4825,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/release-notes-generator@npm:^14.0.0-beta.1":
+"@semantic-release/release-notes-generator@npm:^14.0.0-beta.1, @semantic-release/release-notes-generator@npm:^14.0.1":
   version: 14.0.1
   resolution: "@semantic-release/release-notes-generator@npm:14.0.1"
   dependencies:
@@ -8580,7 +8619,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dir-glob@npm:^3.0.1":
+"dir-glob@npm:^3.0.0, dir-glob@npm:^3.0.1":
   version: 3.0.1
   resolution: "dir-glob@npm:3.0.1"
   dependencies:
@@ -9549,7 +9588,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"execa@npm:5.1.1":
+"execa@npm:5.1.1, execa@npm:^5.0.0":
   version: 5.1.1
   resolution: "execa@npm:5.1.1"
   dependencies:
@@ -12437,7 +12476,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:4.17.21, lodash@npm:^4.17.20, lodash@npm:^4.17.21":
+"lodash@npm:4.17.21, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: 10c0/d8cbea072bb08655bb4c989da418994b073a608dffa608b09ac04b43a791b12aeae7cd7ad919aa4c925f33b48490b5cfe6c1f71d827956071dae2e7bb3a6b74c
@@ -12770,7 +12809,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"micromatch@npm:^4.0.2, micromatch@npm:^4.0.4, micromatch@npm:^4.0.8, micromatch@npm:~4.0.8":
+"micromatch@npm:^4.0.0, micromatch@npm:^4.0.2, micromatch@npm:^4.0.4, micromatch@npm:^4.0.8, micromatch@npm:~4.0.8":
   version: 4.0.8
   resolution: "micromatch@npm:4.0.8"
   dependencies:
@@ -12862,6 +12901,12 @@ __metadata:
     "@polkadot/types-known": "npm:^14.3.1"
     "@polkadot/util": "npm:^13.2.3"
     "@polkadot/util-crypto": "npm:^13.2.3"
+    "@semantic-release/changelog": "npm:^6.0.3"
+    "@semantic-release/commit-analyzer": "npm:^13.0.0"
+    "@semantic-release/git": "npm:^10.0.1"
+    "@semantic-release/github": "npm:^11.0.1"
+    "@semantic-release/npm": "npm:^12.0.1"
+    "@semantic-release/release-notes-generator": "npm:^14.0.1"
     "@tailwindcss/forms": "npm:^0.5.7"
     "@tanstack/react-query": "npm:^5.59.20"
     "@testing-library/cypress": "npm:^10.0.2"
@@ -13979,6 +14024,13 @@ __metadata:
   version: 7.0.2
   resolution: "p-map@npm:7.0.2"
   checksum: 10c0/e10548036648d1c043153f9997112fe5a7de54a319210238628f8ea22ee36587fd6ee740811f88b60bbf29d932e23ae35df7fced40df477116c84c18e797047e
+  languageName: node
+  linkType: hard
+
+"p-reduce@npm:^2.0.0":
+  version: 2.1.0
+  resolution: "p-reduce@npm:2.1.0"
+  checksum: 10c0/27b8ff0fb044995507a06cd6357dffba0f2b98862864745972562a21885d7906ce5c794036d2aaa63ef6303158e41e19aed9f19651dfdafb38548ecec7d0de15
   languageName: node
   linkType: hard
 
