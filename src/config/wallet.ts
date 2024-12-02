@@ -24,6 +24,13 @@ export type WalletConfig = {
 };
 
 export const walletConfig: Record<string, WalletConfig> = {
+  nova: {
+    key: 'polkadot-js',
+    icon: Nova,
+    disabledIcon: NovaDisabled,
+    name: 'Nova',
+    downloadUrl: 'https://novawallet.io/'
+  },
   'subwallet-js': {
     key: 'subwallet-js',
     icon: Subwallet,
@@ -51,13 +58,6 @@ export const walletConfig: Record<string, WalletConfig> = {
     disabledIcon: PolkagateDisabled,
     name: 'Polkagate',
     downloadUrl: 'https://polkagate.xyz/'
-  },
-  nova: {
-    key: 'polkadot-js',
-    icon: Nova,
-    disabledIcon: NovaDisabled,
-    name: 'Nova',
-    downloadUrl: 'https://novawallet.io/'
   },
   'polkadot-js': {
     key: 'polkadot-js',
