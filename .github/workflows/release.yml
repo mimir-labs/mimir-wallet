@@ -1,8 +1,7 @@
 name: Release
-"on":
-  push:
-    branches:
-      - master
+
+on:
+  workflow_dispatch:
 
 permissions:
   contents: read # for checkout
@@ -14,8 +13,6 @@ jobs:
       issues: write # to be able to comment on released issues
       pull-requests: write # to be able to comment on released pull requests
       id-token: write # to enable use of OIDC for npm provenance
-    if: "startsWith(github.event.head_commit.message, 'chore: release')"
-
     name: release
     runs-on: ubuntu-latest
     steps:
