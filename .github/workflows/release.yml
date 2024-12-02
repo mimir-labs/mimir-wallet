@@ -17,6 +17,8 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GH_PAT }}
     name: release
     runs-on: ubuntu-latest
+    environment: production
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,3 +38,8 @@ jobs:
         run: yarn semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install deps and build
+        run: |
+          yarn install
+          yarn build
