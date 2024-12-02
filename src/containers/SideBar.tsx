@@ -9,6 +9,7 @@ import {
   Button,
   Divider,
   Drawer,
+  Grid2 as Grid,
   IconButton,
   Paper,
   Stack,
@@ -188,34 +189,38 @@ function WalletContent() {
   const { connectedWallets, openWallet, wallets } = useWallet();
 
   return (
-    <Box
-      onClick={() => {
-        openWallet();
-        closeSidebar();
-      }}
+    <Grid
+      container
       sx={{
         cursor: 'pointer',
         position: 'absolute',
         left: 0,
         bottom: { md: 0, xs: 0 },
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1,
-        padding: 2
+        width: '100%',
+        paddingX: 2,
+        paddingY: 1
+      }}
+      spacing={1}
+      columns={4}
+      onClick={() => {
+        openWallet();
+        closeSidebar();
       }}
     >
       {Object.entries(walletConfig).map(([id]) => (
-        <WalletIcon
-          disabled={
-            !(id === 'nova' ? wallets[walletConfig[id].key] && window?.walletExtension?.isNovaWallet : wallets[id]) ||
-            !connectedWallets.includes(id)
-          }
-          id={id}
-          key={id}
-          sx={{ width: 20, height: 20 }}
-        />
+        <Grid size={1} key={id}>
+          <WalletIcon
+            disabled={
+              !(id === 'nova' ? wallets[walletConfig[id].key] && window?.walletExtension?.isNovaWallet : wallets[id]) ||
+              !connectedWallets.includes(id)
+            }
+            id={id}
+            key={id}
+            sx={{ width: 20, height: 20 }}
+          />
+        </Grid>
       ))}
-    </Box>
+    </Grid>
   );
 }
 
