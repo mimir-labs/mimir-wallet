@@ -17,6 +17,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GH_PAT }}
     name: release
     runs-on: ubuntu-latest
+    environment: staging
 
     steps:
       - name: Checkout
@@ -38,3 +39,17 @@ jobs:
         run: yarn semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Build
+        run: yarn build
+
+      - name: Deploy to staging
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_port: ${{ secrets.PORT }}
+          remote_key: ${{ secrets.KEY }}
+          remote_path: ${{ secrets.TARGET }}
+          path: dist/

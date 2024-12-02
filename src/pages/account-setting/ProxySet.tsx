@@ -188,12 +188,12 @@ function ProxySet({
 
             <br />
 
-            <Stack alignItems='center' direction='row' spacing={0.5} sx={{ fontWeight: 700 }}>
+            <Stack alignItems='center' direction='row' spacing={0.5}>
               <span>Balance:</span>
               <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
-              <Typography sx={{ fontWeight: 700 }}>
-                <FormatBalance value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
-              </Typography>
+              <Box component='span' sx={{ color: 'text.secondary' }}>
+                <FormatBalance withCurrency value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
+              </Box>
             </Stack>
           </DialogContent>
 

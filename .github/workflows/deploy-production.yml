@@ -1,9 +1,7 @@
 name: Deploy production
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
+  workflow_dispatch:
 
 jobs:
   deploy-production:
@@ -26,7 +24,7 @@ jobs:
           yarn install
           yarn build
 
-      - name: Deploy to server
+      - name: Deploy to production
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr
