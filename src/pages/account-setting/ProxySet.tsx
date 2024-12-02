@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { Vec } from '@polkadot/types';
 import type { PalletProxyProxyDefinition } from '@polkadot/types/lookup';
 import type { AccountData, PureAccountData } from '@mimir-wallet/hooks/types';
@@ -8,6 +9,7 @@ import type { AccountData, PureAccountData } from '@mimir-wallet/hooks/types';
 import {
   Alert,
   AlertTitle,
+  Avatar,
   Box,
   Button,
   Chip,
@@ -30,8 +32,9 @@ import { useToggle } from 'react-use';
 import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 import IconDelete from '@mimir-wallet/assets/svg/icon-delete.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
-import { Address, AddressCell } from '@mimir-wallet/components';
-import { useAccount, useAddressMeta, useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { Address, AddressCell, FormatBalance } from '@mimir-wallet/components';
+import { findToken } from '@mimir-wallet/config';
+import { useAccount, useAddressMeta, useApi, useCall, useTxQueue } from '@mimir-wallet/hooks';
 
 function ProxySet({
   account,
@@ -48,6 +51,8 @@ function ProxySet({
   const { meta } = useAddressMeta(address);
   const [isOpen, toggleOpen] = useToggle(false);
   const [isAlertOpen, toggleAlertOpen] = useToggle(false);
+  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
+  const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [address]);
 
   const isReadOnly = useMemo(() => !isLocalAccount(address), [address, isLocalAccount]);
 
@@ -180,6 +185,16 @@ function ProxySet({
             <br />
 
             <Typography>Please note that thisaction is irreversible.</Typography>
+
+            <br />
+
+            <Stack alignItems='center' direction='row' spacing={0.5} sx={{ fontWeight: 700 }}>
+              <span>Balance:</span>
+              <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
+              <Typography sx={{ fontWeight: 700 }}>
+                <FormatBalance value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
+              </Typography>
+            </Stack>
           </DialogContent>
 
           <DialogActions>
