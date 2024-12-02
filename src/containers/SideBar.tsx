@@ -193,15 +193,12 @@ function WalletContent() {
       container
       sx={{
         cursor: 'pointer',
-        position: 'absolute',
-        left: 0,
         bottom: { md: 0, xs: 0 },
         width: '100%',
-        paddingX: 2,
-        paddingY: 1
+        bgcolor: 'background.paper'
       }}
       spacing={1}
-      columns={4}
+      columns={5}
       onClick={() => {
         openWallet();
         closeSidebar();
@@ -231,7 +228,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
   const { pathname } = useLocation();
 
   const element = (
-    <Stack gap={2.5}>
+    <Stack gap={{ sm: 2.5, xs: 2 }}>
       <Box
         sx={{
           zIndex: 10,
@@ -253,8 +250,6 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
       <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
       <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
       <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
-
-      <WalletContent />
     </Stack>
   );
 
@@ -278,7 +273,10 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
           open={sidebarOpen}
           variant='temporary'
         >
-          {element}
+          <Box sx={{ flex: 1, overflowY: 'auto' }}>{element}</Box>
+          <Box>
+            <WalletContent />
+          </Box>
         </Drawer>
       ) : (
         <Box
@@ -286,14 +284,17 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
             position: 'sticky',
             top: offsetTop + 56,
             flex: 'none',
+            display: 'flex',
+            flexDirection: 'column',
             width: 222,
             height: `calc(100dvh - ${offsetTop}px - 1px - 56px)`,
-            paddingX: 1.5,
-            paddingY: 2,
             bgcolor: 'background.paper'
           }}
         >
-          {element}
+          <Box sx={{ flex: 1, overflowY: 'auto', paddingX: 1.5, paddingY: 2 }}>{element}</Box>
+          <Box sx={{ paddingX: 2, paddingY: 1 }}>
+            <WalletContent />
+          </Box>
         </Box>
       )}
 
