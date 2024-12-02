@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.2.0...v1.2.1) (2024-12-02)
+
+
+### Bug Fixes
+
+* kill pure account dialog balance style ([#79](https://github.com/mimir-labs/mimir-wallet/issues/79)) ([cb0d613](https://github.com/mimir-labs/mimir-wallet/commit/cb0d6131e5e15b64211c55c80c266b7f1b5bac6f))
+
 # [1.2.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.1.0...v1.2.0) (2024-12-02)
 
 
