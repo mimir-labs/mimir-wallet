@@ -3,6 +3,7 @@
 
 import eslintPlugin from '@nabla/vite-plugin-eslint';
 import react from '@vitejs/plugin-react-swc';
+import { readFileSync } from 'fs';
 import path from 'node:path';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
@@ -10,7 +11,12 @@ import { VitePWA } from 'vite-plugin-pwa';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
+const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
+
 export default defineConfig(({ mode }) => ({
+  define: {
+    'process.env.VERSION': JSON.stringify(packageJson.version)
+  },
   test: {
     css: false,
     include: ['src/**/__tests__/*'],

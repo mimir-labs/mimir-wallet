@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { createContext, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -80,12 +80,19 @@ function BaseContainer({
           <Box
             sx={{
               width: '100%',
-              display: queue.length > 0 ? 'none' : 'block',
+              display: queue.length > 0 ? 'none' : 'flex',
+              flexDirection: 'column',
+              gap: 3,
               flex: '1',
               padding: withPadding ? { xs: 1.5, md: 2 } : 0
             }}
           >
-            <Outlet />
+            <Box sx={{ flex: 1 }}>
+              <Outlet />
+            </Box>
+            <Typography sx={{ fontWeight: 700, color: 'text.secondary', textAlign: 'center' }}>
+              Version: {process.env.VERSION}
+            </Typography>
           </Box>
 
           {queue.length > 0 ? (
