@@ -36,9 +36,4 @@ jobs:
       - name: Semantic Release
         run: yarn semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install deps and build
-        run: |
-          yarn install
-          yarn build
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
