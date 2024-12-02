@@ -445,6 +445,14 @@ const createComponents: Func = () => ({
         borderRadius: '5px'
       }
     }
+  },
+
+  MuiTableCell: {
+    styleOverrides: {
+      head: {
+        fontWeight: 700
+      }
+    }
   }
 });
 

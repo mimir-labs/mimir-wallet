@@ -5,18 +5,13 @@ import type { TxToast, TxToastState } from './types';
 
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { TxToastCtx } from './context';
+
 interface Props {
   children?: React.ReactNode;
 }
 
-export interface TxToastInterface {
-  state: TxToastState[];
-  addToast: (toast: TxToast) => () => void;
-}
-
 let id = 0;
-
-export const TxToastCtx = React.createContext<TxToastInterface>({} as TxToastInterface);
 
 export function TxToastCtxRoot({ children }: Props): React.ReactElement<Props> {
   const [state, setState] = useState<TxToastState[]>([]);

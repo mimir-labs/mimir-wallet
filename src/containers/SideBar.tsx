@@ -183,8 +183,43 @@ function TopContent() {
   );
 }
 
-function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideBar: boolean }) {
+function WalletContent() {
+  const { closeSidebar } = useContext(BaseContainerCtx);
   const { connectedWallets, openWallet, wallets } = useWallet();
+
+  return (
+    <Box
+      onClick={() => {
+        openWallet();
+        closeSidebar();
+      }}
+      sx={{
+        cursor: 'pointer',
+        position: 'absolute',
+        left: 0,
+        bottom: { md: 0, xs: 0 },
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        padding: 2
+      }}
+    >
+      {Object.entries(walletConfig).map(([id]) => (
+        <WalletIcon
+          disabled={
+            !(id === 'nova' ? wallets[walletConfig[id].key] && window?.walletExtension?.isNovaWallet : wallets[id]) ||
+            !connectedWallets.includes(id)
+          }
+          id={id}
+          key={id}
+          sx={{ width: 20, height: 20 }}
+        />
+      ))}
+    </Box>
+  );
+}
+
+function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideBar: boolean }) {
   const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
@@ -213,31 +248,8 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
       <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
       <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
       <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
-      <Box
-        onClick={() => {
-          openWallet();
-          closeSidebar();
-        }}
-        sx={{
-          cursor: 'pointer',
-          position: 'absolute',
-          left: 0,
-          bottom: { md: 0, xs: 0 },
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          padding: 2
-        }}
-      >
-        {Object.entries(walletConfig).map(([id]) => (
-          <WalletIcon
-            disabled={!wallets[id] || !connectedWallets.includes(id)}
-            id={id}
-            key={id}
-            sx={{ width: 20, height: 20 }}
-          />
-        ))}
-      </Box>
+
+      <WalletContent />
     </Stack>
   );
 

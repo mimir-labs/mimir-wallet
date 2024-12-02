@@ -17,7 +17,17 @@ import { Paper, SvgIcon, useTheme } from '@mui/material';
 import { alpha, Box } from '@mui/system';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
-import ReactFlow, { Controls, Edge, Handle, Node, NodeProps, Position, useEdgesState, useNodesState } from 'reactflow';
+import {
+  Controls,
+  type Edge,
+  Handle,
+  type Node,
+  type NodeProps,
+  Position,
+  ReactFlow,
+  useEdgesState,
+  useNodesState
+} from 'reactflow';
 
 import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
 import IconFail from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
@@ -29,7 +39,8 @@ import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
 import { addressEq } from '@mimir-wallet/utils';
 
 import AddressCell from '../AddressCell';
-import { AddressEdge, getLayoutedElements } from '../AddressOverview';
+import AddressEdge from '../AddressEdge';
+import { getLayoutedElements } from '../utils';
 
 interface State {
   onApprove?: (call: IMethod | HexString, path: FilterPath[]) => void;

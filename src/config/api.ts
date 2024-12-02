@@ -28,8 +28,8 @@ export type Endpoint = {
 export const polkadotEndpoints: Endpoint[] = [
   {
     key: 'polkadot',
-    icon: '/chain-icons/Polkadot.png',
-    tokenIcon: '/token-icons/Polkadot.png',
+    icon: '/chain-icons/Polkadot.svg',
+    tokenIcon: '/token-icons/Polkadot.svg',
     name: 'Polkadot',
     wsUrl: 'wss://polkadot.api.onfinality.io/public-ws',
     genesisHash: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
@@ -44,7 +44,7 @@ export const polkadotEndpoints: Endpoint[] = [
   {
     key: 'assethub-polkadot',
     icon: '/chain-icons/assethub.svg',
-    tokenIcon: '/token-icons/Polkadot.png',
+    tokenIcon: '/token-icons/Polkadot.svg',
     name: 'AssetHub',
     wsUrl: 'wss://polkadot-asset-hub-rpc.polkadot.io',
     genesisHash: '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f',
@@ -56,7 +56,7 @@ export const polkadotEndpoints: Endpoint[] = [
   },
   // {
   //   icon: '/chain-icons/bridgehub.svg',
-  //   tokenIcon: '/token-icons/Polkadot.png',
+  //   tokenIcon: '/token-icons/Polkadot.svg',
   //   name: 'BridgeHub',
   //   wsUrl: 'wss://polkadot-bridge-hub-rpc.polkadot.io/',
   //   genesisHash: '0xdcf691b5a3fbe24adc99ddc959c0561b973e329b1aef4c4b22e7bb2ddecb4464',
@@ -67,7 +67,7 @@ export const polkadotEndpoints: Endpoint[] = [
   {
     key: 'coretime-polkadot',
     icon: '/chain-icons/coretime-polkadot.webp',
-    tokenIcon: '/token-icons/Polkadot.png',
+    tokenIcon: '/token-icons/Polkadot.svg',
     name: 'Coretime',
     wsUrl: 'wss://polkadot-coretime-rpc.polkadot.io',
     genesisHash: '0xefb56e30d9b4a24099f88820987d0f45fb645992416535d87650d98e00f46fc4',
@@ -80,7 +80,7 @@ export const polkadotEndpoints: Endpoint[] = [
   {
     key: 'collectives-polkadot',
     icon: '/chain-icons/collectives.svg',
-    tokenIcon: '/token-icons/Polkadot.png',
+    tokenIcon: '/token-icons/Polkadot.svg',
     name: 'Collectives',
     wsUrl: 'wss://polkadot-collectives-rpc.polkadot.io',
     genesisHash: '0x46ee89aa2eedd13e988962630ec9fb7565964cf5023bb351f2b6b25c1b68b0b2',
@@ -95,7 +95,7 @@ export const polkadotEndpoints: Endpoint[] = [
   {
     key: 'people-polkadot',
     icon: '/chain-icons/people.svg',
-    tokenIcon: '/token-icons/Polkadot.png',
+    tokenIcon: '/token-icons/Polkadot.svg',
     name: 'People',
     wsUrl: 'wss://polkadot-people-rpc.polkadot.io',
     genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',

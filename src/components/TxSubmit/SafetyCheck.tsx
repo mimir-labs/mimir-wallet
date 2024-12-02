@@ -5,7 +5,7 @@ import type { IMethod } from '@polkadot/types/types';
 import type { SafetyLevel } from '@mimir-wallet/hooks/types';
 
 import { LoadingButton } from '@mui/lab';
-import { Box, CircularProgress, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, SvgIcon, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
 import { simulate } from '@mimir-wallet/api';
@@ -70,13 +70,15 @@ function SafetyCheck({
     isLoading: boolean;
   }>(EMPTY_SIMULATION);
   const { api, chain } = useApi();
+  const [html, setHtml] = useState<string>('');
 
   const handleSimulate = () => {
     if (account && call) {
       setSimulation({ ...EMPTY_SIMULATION, isLoading: true });
       simulate(api, chain.wsUrl, call, account)
-        .then(({ success, error }) => {
+        .then(({ success, html, error }) => {
           setSimulation({ isDone: true, success, error, isLoading: false });
+          setHtml(html);
         })
         .catch((error) => {
           setSimulation({ isDone: true, success: false, error: error.message || 'Unknown Error', isLoading: false });
@@ -89,22 +91,39 @@ function SafetyCheck({
       <Typography fontWeight={700}>Transaction Check</Typography>
       <Cell title='Simulation' img={<img src='/images/chopsticks.webp' alt='chopticks' height={24} />}>
         {simulation.isDone ? (
-          <>
+          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
             {simulation.success ? (
               <SvgIcon color='success' component={IconSuccess} inheritViewBox />
             ) : (
               <SvgIcon color='error' component={IconFailed} inheritViewBox />
             )}
 
-            <Typography
-              sx={{
-                fontWeight: 700,
-                color: simulation.success ? 'success.main' : 'error.main'
-              }}
-            >
-              {simulation.success ? 'Success' : simulation.error || 'Unknown Error'}
-            </Typography>
-          </>
+            <Box sx={{ position: 'relative' }}>
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  color: simulation.success ? 'success.main' : 'error.main'
+                }}
+              >
+                {simulation.success ? 'Success' : simulation.error || 'Unknown Error'}
+              </Typography>
+
+              <Button
+                sx={{ position: 'absolute', top: '100%', right: 0, paddingX: 0, minWidth: 0 }}
+                variant='text'
+                onClick={() => {
+                  const newWindow = window.open();
+
+                  newWindow?.document.open();
+                  newWindow?.document.write(html);
+                  newWindow?.document.close();
+                }}
+                size='small'
+              >
+                Details
+              </Button>
+            </Box>
+          </Box>
         ) : (
           <LoadingButton
             variant='outlined'

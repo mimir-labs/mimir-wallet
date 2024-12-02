@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { IMethod } from '@polkadot/types/types';
+import type { HexString } from '@polkadot/util/types';
+
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { IMethod } from '@polkadot/types/types';
-import { HexString } from '@polkadot/util/types';
 import React from 'react';
 
 import { HistoryTxOverview, TxOverview } from '@mimir-wallet/components';

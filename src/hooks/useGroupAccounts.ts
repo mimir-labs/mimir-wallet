@@ -18,12 +18,12 @@ type GroupName = 'mimir' | 'injected' | 'hide';
 
 function groupAccounts(
   accounts: (AccountDataExtra & AccountData)[],
-  hideenAccounts: (AccountDataExtra & AccountData)[]
+  hideAccountHex: HexString[]
 ): Record<GroupName, string[]> {
   const ret: Record<GroupName, string[]> = {
     mimir: [],
     injected: [],
-    hide: hideenAccounts.map(({ address }) => address)
+    hide: []
   };
 
   for (let i = 0; i < accounts.length; i++) {
@@ -31,6 +31,8 @@ function groupAccounts(
 
     if (account.source) {
       ret.injected.push(account.address);
+    } else if (hideAccountHex.includes(u8aToHex(decodeAddress(account.address)))) {
+      ret.hide.push(account.address);
     } else {
       ret.mimir.push(account.address);
     }
@@ -40,14 +42,14 @@ function groupAccounts(
 }
 
 function useGroupAccountsImpl(filter?: (account: AccountData) => boolean): Record<GroupName, string[]> {
-  const { accounts, hideenAccounts } = useAccount();
+  const { accounts, hideAccountHex } = useAccount();
 
   const allAddress = useMemo(
     () => accounts.filter((a): a is AccountData => (filter ? filter(a) : true)),
     [accounts, filter]
   );
 
-  return useMemo(() => groupAccounts(allAddress, hideenAccounts), [allAddress, hideenAccounts]);
+  return useMemo(() => groupAccounts(allAddress, hideAccountHex), [allAddress, hideAccountHex]);
 }
 
 export const useGroupAccounts = createNamedHook('useGroupAccounts', useGroupAccountsImpl);

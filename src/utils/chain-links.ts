@@ -13,7 +13,7 @@ export function accountExplorerLink(
 ): string | undefined {
   const _value = value?.toString();
 
-  if (_value && _value.length > 47 && isAddress(_value)) {
+  if (_value && isAddress(_value)) {
     const explorerUrl = window.currentChain.explorerUrl;
 
     if (explorerUrl) {

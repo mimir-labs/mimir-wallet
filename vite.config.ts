@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import eslintPlugin from '@nabla/vite-plugin-eslint';
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -27,6 +28,13 @@ export default defineConfig(({ mode }) => ({
       enabled: true,
       reporter: ['text', 'lcov'],
       reportsDirectory: 'coverage'
+    }
+  },
+  resolve: {
+    alias: {
+      'browser-wasm-executor.js': path.resolve(
+        'node_modules/@acala-network/chopsticks-core/dist/esm/wasm-executor/browser-wasm-executor.js'
+      )
     }
   },
   build: {
@@ -59,10 +67,12 @@ export default defineConfig(({ mode }) => ({
             'qrcode-generator',
             'react-ga4',
             'react-json-view',
+            'jsondiffpatch',
             'react-toastify',
             'socket.io-client',
             '@tanstack/react-query',
-            'react-draggable-list'
+            'react-draggable-list',
+            'papaparse'
           ]
         }
       }

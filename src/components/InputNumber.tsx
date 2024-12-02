@@ -11,15 +11,7 @@ import { useInputNumber } from '@mimir-wallet/hooks';
 import FormatBalance from './FormatBalance';
 import Input from './Input';
 
-function InputNumber({
-  defaultValue,
-  format,
-  maxValue,
-  onChange,
-  value: propsValue,
-  withMax,
-  ...props
-}: InputNumberProps) {
+function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...props }: InputNumberProps) {
   const _defaultValue = useMemo(() => defaultValue?.toString(), [defaultValue]);
   const [[value], setValue] = useInputNumber(_defaultValue);
 

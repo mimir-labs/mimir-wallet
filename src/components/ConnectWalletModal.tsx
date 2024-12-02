@@ -21,12 +21,13 @@ import { useWallet } from '@mimir-wallet/hooks';
 import { toastError } from './ToastRoot';
 import WalletIcon from './WalletIcon';
 
-function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: string; downloadUrl: string }) {
+function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downloadUrl: string }) {
   const { connect, connectedWallets, disconnect, wallets } = useWallet();
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
 
-  const name = id === 'polkadot-js' && window?.walletExtension?.isNovaWallet ? 'Nova' : propsName;
+  const isInstalled =
+    id === 'nova' ? wallets[walletConfig[id].key] && window?.walletExtension?.isNovaWallet : wallets[id];
 
   return (
     <Stack
@@ -35,9 +36,9 @@ function WalletCell({ downloadUrl, id, name: propsName }: { name: string; id: st
       spacing={1}
       sx={{ '>.MuiButton-root': { width: '100%' }, width: '100%' }}
     >
-      <WalletIcon disabled={!wallets[id]} id={id} sx={{ width: { sm: 64, xs: 40 }, height: { sm: 64, xs: 40 } }} />
+      <WalletIcon disabled={!isInstalled} id={id} sx={{ width: { sm: 64, xs: 40 }, height: { sm: 64, xs: 40 } }} />
       <Typography>{name}</Typography>
-      {wallets[id] ? (
+      {isInstalled ? (
         connectedWallets.includes(id) ? (
           <Button color='error' onClick={() => disconnect(id)} size={downSm ? 'small' : 'medium'} variant='outlined'>
             Disconnect

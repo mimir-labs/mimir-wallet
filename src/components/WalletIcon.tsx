@@ -1,11 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, BoxProps } from '@mui/material';
+import { Box, type BoxProps } from '@mui/material';
 import React from 'react';
 
-import Nova from '@mimir-wallet/assets/images/nova.svg';
-import NovaDisabled from '@mimir-wallet/assets/images/nova-disabled.png';
 import { walletConfig } from '@mimir-wallet/config';
 
 interface Props extends BoxProps {
@@ -14,9 +12,8 @@ interface Props extends BoxProps {
 }
 
 function WalletIcon({ disabled, id, ...props }: Props) {
-  const icon = id === 'polkadot-js' && window?.walletExtension?.isNovaWallet ? Nova : walletConfig[id].icon;
-  const disabledIcon =
-    id === 'polkadot-js' && window?.walletExtension?.isNovaWallet ? NovaDisabled : walletConfig[id].disabledIcon;
+  const icon = walletConfig[id].icon;
+  const disabledIcon = walletConfig[id].disabledIcon;
 
   return <Box component='img' src={disabled ? disabledIcon : icon} {...props} />;
 }

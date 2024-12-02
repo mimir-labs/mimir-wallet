@@ -1,10 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Call } from '@polkadot/types/interfaces';
 import type { CallProps } from '../types';
 
 import { Box, Button, Grid2 as Grid, IconButton, Stack, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
-import { Call } from '@polkadot/types/interfaces';
 import { isArray } from '@polkadot/util';
 import React, { useMemo, useState } from 'react';
 

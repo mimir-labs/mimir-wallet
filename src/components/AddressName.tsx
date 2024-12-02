@@ -20,10 +20,6 @@ interface Props {
 const displayCache = new Map<string, React.ReactNode>();
 const parentCache = new Map<string, string>();
 
-export function getParentAccount(value: string): string | undefined {
-  return parentCache.get(value);
-}
-
 function extractName(address: string): React.ReactNode {
   const displayCached = displayCache.get(address);
 

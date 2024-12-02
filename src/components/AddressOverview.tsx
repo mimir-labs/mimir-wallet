@@ -4,28 +4,25 @@
 import type { AccountData, DelegateeProp, MultisigAccountData } from '@mimir-wallet/hooks/types';
 
 import dagre from '@dagrejs/dagre';
-import { Box, Paper, SvgIcon, useTheme } from '@mui/material';
+import { Paper, useTheme } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import React, { useEffect } from 'react';
-import ReactFlow, {
-  BaseEdge,
+import {
   Controls,
-  Edge,
-  EdgeLabelRenderer,
-  EdgeProps,
-  getSmoothStepPath,
+  type Edge,
   Handle,
   MiniMap,
-  Node,
-  NodeProps,
+  type Node,
+  type NodeProps,
   Position,
+  ReactFlow,
   useEdgesState,
   useNodesState
 } from 'reactflow';
 
-import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
-
 import AddressCell from './AddressCell';
+import AddressEdge from './AddressEdge';
+import { getLayoutedElements } from './utils';
 
 interface Props {
   showControls?: boolean;
@@ -45,41 +42,6 @@ type NodeData = {
 const dagreGraph = new dagre.graphlib.Graph();
 
 dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-export function getLayoutedElements(nodes: Node[], edges: Edge[], nodeWidth = 330, nodeHeight = 70, direction = 'RL') {
-  const isHorizontal = direction === 'LR' || direction === 'RL';
-
-  dagreGraph.setGraph({ rankdir: direction });
-
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-  });
-
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
-  });
-
-  dagre.layout(dagreGraph);
-
-  const newNodes: Node[] = nodes.map((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id);
-    const newNode = {
-      ...node,
-      targetPosition: isHorizontal ? Position.Left : Position.Top,
-      sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
-      // We are shifting the dagre node position (anchor=center center) to the top left
-      // so it matches the React Flow node anchor point (top left).
-      position: {
-        x: nodeWithPosition.x - nodeWidth / 2,
-        y: nodeWithPosition.y - nodeHeight / 2
-      }
-    };
-
-    return newNode;
-  });
-
-  return { nodes: newNodes, edges };
-}
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
   const { palette } = useTheme();
@@ -109,67 +71,12 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
   );
 });
 
-export const AddressEdge = React.memo(
-  ({
-    id,
-    sourceX,
-    sourceY,
-    sourcePosition,
-    targetX,
-    targetY,
-    targetPosition,
-    data
-  }: EdgeProps<{ label?: string; color?: string; labelBgColor?: string; delay?: number }>) => {
-    const [edgePath, labelX, labelY] = getSmoothStepPath({
-      sourceX,
-      sourceY,
-      sourcePosition,
-      targetX,
-      targetY,
-      targetPosition,
-      borderRadius: 10
-    });
-
-    return (
-      <>
-        <BaseEdge id={id} path={edgePath} style={{ stroke: data?.color }} />
-
-        {data && (
-          <EdgeLabelRenderer>
-            <Box
-              sx={{
-                display: data.label ? 'flex' : 'none',
-                alignItems: 'center',
-                position: 'absolute',
-                transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-                background: '#ffcc00',
-                minWidth: 40,
-                height: 16,
-                padding: '2px',
-                borderRadius: '8px',
-                fontSize: 10,
-                fontWeight: 700,
-                bgcolor: data.labelBgColor,
-                color: 'white',
-                gap: '2px'
-              }}
-            >
-              {!!data.delay && <SvgIcon component={IconClock} inheritViewBox sx={{ fontSize: '0.75rem' }} />}
-              <Box sx={{ flex: '1', textAlign: 'center' }}>{data.label}</Box>
-            </Box>
-          </EdgeLabelRenderer>
-        )}
-      </>
-    );
-  }
-);
-
 const nodeTypes = {
   AddressNode
 };
 
 const edgeTypes = {
-  AddressEdge
+  AddressEdge: AddressEdge
 };
 
 function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges: Edge[] = []) {

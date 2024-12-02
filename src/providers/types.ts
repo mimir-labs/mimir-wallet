@@ -12,6 +12,7 @@ import type { AccountData, AccountDataExtra, AddressMeta, FilterPath, Transactio
 export interface Filtered {
   [key: string]: Filtered | undefined;
 }
+
 export interface TxQueue {
   id?: number;
   accountId?: AccountId | Address | string;
@@ -31,12 +32,22 @@ export interface TxQueue {
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }
 
+export interface TxState {
+  queue: TxQueue[];
+  addQueue: (queue: TxQueue) => void;
+}
+
 export interface TxToast {
   id?: number;
   style?: 'notification' | 'dialog';
   onRemove?: () => void;
   onChange?: () => void;
   events: TxEvents;
+}
+
+export interface TxToastInterface {
+  state: TxToastState[];
+  addToast: (toast: TxToast) => () => void;
 }
 
 export type TxToastState = Omit<Required<TxToast>, 'onChange'> & { onChange?: () => void };
@@ -62,8 +73,8 @@ export interface WalletState {
 
 export interface AddressState {
   accounts: (AccountDataExtra & AccountData)[];
-  hideenAccounts: (AccountDataExtra & AccountData)[];
-  addresses: { address: string; name: string; watchlist?: boolean }[];
+  hideAccountHex: HexString[];
+  addresses: { address: string; name: string; networks: string[]; watchlist?: boolean }[];
   current?: string;
   isMultisigSyned: boolean;
   switchAddress?: string;
@@ -72,7 +83,13 @@ export interface AddressState {
   appendMeta: (meta: Record<string, AddressMeta>) => void;
   setCurrent: (address: string, confirm?: boolean) => void;
   setAccountName: (address: string, name: string) => void;
-  addAddress: (address: string, name: string, watchlist?: boolean, genesisHash?: HexString) => void;
+  addAddress: (
+    address: string,
+    name: string,
+    networks?: string[],
+    watchlist?: boolean,
+    genesisHash?: HexString
+  ) => void;
   addAddressBook: (
     address?: string,
     watchlist?: boolean,

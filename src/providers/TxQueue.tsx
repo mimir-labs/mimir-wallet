@@ -6,16 +6,12 @@ import type { TxQueue } from './types';
 import { GenericExtrinsic } from '@polkadot/types';
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { TxQueueCtx } from './context';
+
 interface Props {
   children?: React.ReactNode;
 }
 
-export interface TxState {
-  queue: TxQueue[];
-  addQueue: (queue: TxQueue) => void;
-}
-
-export const TxQueueCtx = React.createContext<TxState>({} as TxState);
 let queueId = 1;
 
 export function TxQueueCtxRoot({ children }: Props): React.ReactElement<Props> {

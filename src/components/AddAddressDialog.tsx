@@ -6,7 +6,7 @@ import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { decodeAddress, encodeAddress } from '@mimir-wallet/api';
-import { useAccount, useDeriveAccountInfo } from '@mimir-wallet/hooks';
+import { useAccount, useApi, useDeriveAccountInfo } from '@mimir-wallet/hooks';
 import { addressEq } from '@mimir-wallet/utils';
 
 import Input from './Input';
@@ -24,6 +24,7 @@ function Content({
   onClose?: () => void;
 }) {
   const { addAddress, addresses } = useAccount();
+  const { network } = useApi();
   const [name, setName] = useState<string>('');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
   const info = useDeriveAccountInfo(address);
@@ -58,13 +59,13 @@ function Content({
         throw new Error('not a valid address');
       }
 
-      addAddress(address, identity?.display ? identity.display : name.trim(), watchlist);
+      addAddress(address, identity?.display ? identity.display : name.trim(), [network], watchlist);
       onAdded?.(address);
       onClose?.();
     } catch (error) {
       toastError(error);
     }
-  }, [address, addAddress, identity?.display, name, watchlist, onAdded, onClose]);
+  }, [address, addAddress, identity?.display, name, network, watchlist, onAdded, onClose]);
 
   return (
     <>

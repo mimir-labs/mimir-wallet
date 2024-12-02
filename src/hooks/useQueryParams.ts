@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useCallback, useMemo, useRef } from 'react';
-import { NavigateOptions, useSearchParams } from 'react-router-dom';
+import { type NavigateOptions, useSearchParams } from 'react-router-dom';
 import * as searchQuery from 'search-query-parser';
 
 export function useQueryParam<T>(

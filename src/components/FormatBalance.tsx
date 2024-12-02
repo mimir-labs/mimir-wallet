@@ -3,7 +3,7 @@
 
 import type { Compact } from '@polkadot/types';
 
-import { Box, BoxProps } from '@mui/material';
+import { Box, type BoxProps } from '@mui/material';
 import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 

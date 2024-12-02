@@ -1,14 +1,14 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { HexString } from '@polkadot/util/types';
 import type { Endpoint } from '@mimir-wallet/config';
 import type { AddressMeta } from '@mimir-wallet/hooks/types';
 import type { AddressState } from './types';
 
 import { u8aToHex } from '@polkadot/util';
-import { HexString } from '@polkadot/util/types';
 import { isAddress } from '@polkadot/util-crypto';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { ApiCtx, decodeAddress, encodeAddress } from '@mimir-wallet/api';
@@ -17,10 +17,10 @@ import { CURRENT_ADDRESS_PREFIX, HIDE_ACCOUNT_PREFIX, SWITCH_ACCOUNT_REMIND_KEY 
 import { useLocalStore } from '@mimir-wallet/hooks';
 import { addressEq, store } from '@mimir-wallet/utils';
 
+import { AddressCtx, WalletCtx } from './context';
 import { sync } from './sync';
-import { _useAddresses } from './useAddresses';
+import { useAddresses } from './useAddresses';
 import { deriveAddressMeta } from './utils';
-import { WalletCtx } from './Wallet';
 
 interface Props {
   address?: string;
@@ -33,8 +33,6 @@ const EMPTY_STATE = {
   isMultisigSyned: false
 } as unknown as AddressState;
 
-export const AddressCtx = React.createContext<AddressState>({} as AddressState);
-
 export function AddressCtxRoot({ address, chain, children }: Props): React.ReactElement<Props> {
   const [state, setState] = useState<AddressState>({
     ...EMPTY_STATE
@@ -43,7 +41,7 @@ export function AddressCtxRoot({ address, chain, children }: Props): React.React
   const [switchAddress, setSwitchAddress] = useState<string>();
   const { genesisHash } = useContext(ApiCtx);
   const { isWalletReady, walletAccounts } = useContext(WalletCtx);
-  const [addresses, addAddress, deleteAddress] = _useAddresses();
+  const [addresses, addAddress, deleteAddress] = useAddresses();
   const [metas, setMetas] = useState<Record<string, AddressMeta>>({});
   const [addAddressDialog, setAddAddressDialog] = useState<{
     defaultAddress?: string;
@@ -146,13 +144,6 @@ export function AddressCtxRoot({ address, chain, children }: Props): React.React
     []
   );
 
-  const [visibleAccounts, hideenAccounts] = useMemo(() => {
-    return [
-      state.accounts.filter((item) => !hideAccountHex.includes(u8aToHex(decodeAddress(item.address)))),
-      state.accounts.filter((item) => hideAccountHex.includes(u8aToHex(decodeAddress(item.address))))
-    ];
-  }, [hideAccountHex, state.accounts]);
-
   const showAccount = useCallback(
     (address: string) => {
       const addressHex = u8aToHex(decodeAddress(address));
@@ -171,11 +162,9 @@ export function AddressCtxRoot({ address, chain, children }: Props): React.React
     [setHideAccountHex]
   );
 
-  // eslint-disable-next-line react/jsx-no-constructed-context-values
   const value = {
     ...state,
-    accounts: visibleAccounts,
-    hideenAccounts,
+    hideAccountHex,
     current: currentRef.current,
     metas,
     addresses,

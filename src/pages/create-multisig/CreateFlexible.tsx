@@ -4,6 +4,7 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { EventRecord } from '@polkadot/types/interfaces';
+import type { HexString } from '@polkadot/util/types';
 import type { PrepareFlexible } from './types';
 
 import { LoadingButton } from '@mui/lab';
@@ -20,7 +21,6 @@ import {
   Typography
 } from '@mui/material';
 import { u8aEq, u8aToHex } from '@polkadot/util';
-import { HexString } from '@polkadot/util/types';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -97,6 +97,8 @@ function CreateFlexible({
   const [loadingCancel, setLoadingCancel] = useState(false);
   const { addToast } = useContext(TxToastCtx);
   const source = useMemo(() => (signer ? accountSource(signer) : undefined), [accountSource, signer]);
+  const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
+  const isEnought = signer ? !!enoughtState[signer] : false;
 
   const reservedAmount = useMemo(() => {
     const baseReserve = api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2));
@@ -308,6 +310,9 @@ function CreateFlexible({
             address={signer}
             tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.'
             value={reservedAmount}
+            onEnoughtState={(address, isEnought) =>
+              setEnoughtState((state) => ({ ...state, [address]: isEnought === true }))
+            }
           />
         </LockContainer>
       )}
@@ -348,7 +353,7 @@ function CreateFlexible({
             Set Members
           </LoadingButton>
         ) : (
-          <LoadingButton disabled={!signer} fullWidth loading={loadingFirst} onClick={createPure}>
+          <LoadingButton disabled={!signer || !isEnought} fullWidth loading={loadingFirst} onClick={createPure}>
             Create
           </LoadingButton>
         )}
