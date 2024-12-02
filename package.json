@@ -15,7 +15,7 @@
   },
   "sideEffects": false,
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scripts": {
     "build": "vite build",
     "commit": "cz",
@@ -122,6 +122,7 @@
     "postcss": "^8.4.41",
     "prettier": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.9",
+    "semantic-release": "^24.2.0",
     "start-server-and-test": "^2.0.5",
     "stylelint": "^16.8.2",
     "stylelint-config-standard": "^36.0.1",
