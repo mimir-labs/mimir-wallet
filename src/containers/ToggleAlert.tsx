@@ -51,15 +51,13 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
     <>
       <Box
         onClick={
-          !hasThisAccount && !existing
-            ? undefined
-            : !hasThisAccount
-              ? () => {
-                  addAddressBook(address, true);
-                }
-              : !existing
-                ? toggleFundOpen
-                : undefined
+          hasThisAccount
+            ? !existing
+              ? () => toggleFundOpen(true)
+              : undefined
+            : () => {
+                addAddressBook(address, true);
+              }
         }
         sx={{
           zIndex: 10,
@@ -78,15 +76,8 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
         }}
       >
         <SvgIcon component={IconInfo} inheritViewBox />
-        {!existing && (
-          <Typography
-            sx={{ flex: '1' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              toggleFundOpen(true);
-            }}
-          >
+        {hasThisAccount && !existing && (
+          <Typography sx={{ flex: '1' }}>
             To prevent this account from being purged, please transfer{' '}
             <FormatBalance value={api.consts.balances.existentialDeposit} />
             {api.registry.chainTokens[0].toString()} to keep the account alive.
@@ -94,14 +85,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
         )}
 
         {!hasThisAccount && (
-          <Typography
-            sx={{ flex: '1' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              addAddressBook(address, true);
-            }}
-          >
+          <Typography sx={{ flex: '1' }}>
             You are not a member of this account, currently in Watch-only mode.
             <Box component='span' sx={{ cursor: 'pointer', ':hover': { textDecorationLine: 'underline' } }}>
               {'Add to watch list>>'}
