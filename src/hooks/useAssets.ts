@@ -3,10 +3,10 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { Option } from '@polkadot/types';
-import type { PalletAssetsAssetMetadata } from '@polkadot/types/lookup';
+import type { PalletAssetsAssetDetails, PalletAssetsAssetMetadata } from '@polkadot/types/lookup';
 import type { AssetInfo, PalletAssetRegistryAssetDetails } from './types';
 
-import { type BN, BN_ZERO } from '@polkadot/util';
+import { type BN, BN_ZERO, isHex } from '@polkadot/util';
 import { useQuery } from '@tanstack/react-query';
 
 import { Asset, findAssets } from '@mimir-wallet/config';
@@ -118,22 +118,27 @@ async function fetchAssetInfo({
   }
 
   if (api.query.assets) {
-    return Promise.all([api.query.assets.metadata(assetId), api.query.assets.asset(assetId)]).then(
-      ([metadata, asset]) => {
-        return [
-          {
-            isNative: false,
-            assetId: assetId.toString(),
-            name: metadata.name.toUtf8(),
-            symbol: metadata.symbol.toUtf8(),
-            decimals: metadata.decimals.toNumber(),
-            existentialDeposit: metadata.deposit.toBigInt(),
-            icon: findAssets(api.genesisHash.toHex()).find((item) => item.assetId === assetId)?.Icon
-          },
-          asset.unwrapOrDefault().minBalance
-        ];
-      }
-    );
+    return Promise.all(
+      isHex(assetId)
+        ? [
+            api.query.foreignAssets.metadata<PalletAssetsAssetMetadata>(assetId),
+            api.query.foreignAssets.asset<Option<PalletAssetsAssetDetails>>(assetId)
+          ]
+        : [api.query.assets.metadata(assetId), api.query.assets.asset(assetId)]
+    ).then(([metadata, asset]) => {
+      return [
+        {
+          isNative: false,
+          assetId: assetId.toString(),
+          name: metadata.name.toUtf8(),
+          symbol: metadata.symbol.toUtf8(),
+          decimals: metadata.decimals.toNumber(),
+          existentialDeposit: metadata.deposit.toBigInt(),
+          icon: findAssets(api.genesisHash.toHex()).find((item) => item.assetId === assetId)?.Icon
+        },
+        asset.unwrapOrDefault().minBalance
+      ];
+    });
   } else if (api.query.assetRegistry?.assets) {
     return api.query.assetRegistry.assets(assetId).then((metadata) => {
       if ((metadata as Option<PalletAssetRegistryAssetDetails>).isSome) {
