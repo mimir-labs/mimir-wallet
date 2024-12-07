@@ -112,6 +112,8 @@ export default function findComponent(
       }
 
       return Account;
+    } else {
+      return Account;
     }
   }
 

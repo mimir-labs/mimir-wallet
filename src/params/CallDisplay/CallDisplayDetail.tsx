@@ -3,7 +3,7 @@
 
 import type { IMethod, Registry } from '@polkadot/types/types';
 
-import { Box, Typography } from '@mui/material';
+import { Avatar, Box, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { AddressRow, FormatBalance } from '@mimir-wallet/components';
@@ -46,7 +46,24 @@ function CallDisplayDetail({ registry, call }: { registry: Registry; call?: IMet
 
     comp = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Box component='img' src={asset?.Icon} sx={{ width: 20, height: 20 }} />
+        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20 }}>
+          T
+        </Avatar>
+        <Typography>
+          -<FormatBalance value={call.args[2].toString()} />
+        </Typography>
+      </Box>
+    );
+  } else if (
+    ['tokens.transfer', 'tokens.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
+  ) {
+    const asset = findAssets(genesisHash).find((asset) => asset.assetId === call.args[1].toString());
+
+    comp = (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20 }}>
+          T
+        </Avatar>
         <Typography>
           -<FormatBalance value={call.args[2].toString()} />
         </Typography>

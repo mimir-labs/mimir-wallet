@@ -17,8 +17,6 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
   const { api } = useApi();
   const [from, targetCall] = useMemo(() => findTargetCall(api, address, call), [address, api, call]);
 
-  console.log(from, targetCall);
-
   if (!call) {
     return null;
   }

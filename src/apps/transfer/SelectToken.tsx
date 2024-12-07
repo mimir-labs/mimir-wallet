@@ -5,21 +5,23 @@ import { Avatar, FormControl, MenuItem, Select, Typography } from '@mui/material
 import React, { useEffect, useState } from 'react';
 
 import { findToken } from '@mimir-wallet/config';
-import { useApi, useAssets } from '@mimir-wallet/hooks';
+import { useApi, useAssetBalances } from '@mimir-wallet/hooks';
 
 import { TransferToken } from './types';
 
 function SelectToken({
+  address,
   assetId,
   onChange,
   setAssetId
 }: {
+  address?: string;
   assetId: string;
   setAssetId: (assetId: string) => void;
   onChange: (value: TransferToken) => void;
 }) {
   const { api } = useApi();
-  const assets = useAssets();
+  const assets = useAssetBalances(address);
   const [tokens, setTokens] = useState<TransferToken[]>([]);
 
   useEffect(() => {
@@ -33,16 +35,7 @@ function SelectToken({
       symbol: api.registry.chainTokens[0].toString(),
       decimals: api.registry.chainDecimals[0]
     };
-    const _tokens: TransferToken[] = [nativeToken].concat(
-      assets.map((item) => ({
-        isNative: false,
-        assetId: item.assetId,
-        icon: item.Icon,
-        name: item.name,
-        symbol: item.symbol,
-        decimals: item.decimals
-      }))
-    );
+    const _tokens: TransferToken[] = [nativeToken, ...assets];
 
     setTokens(_tokens);
   }, [api, assets]);
@@ -72,7 +65,9 @@ function SelectToken({
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
             value={item.assetId}
           >
-            <Avatar alt={item.name} src={item.icon} sx={{ width: 32, height: 32 }} />
+            <Avatar alt={item.name} src={item.icon} sx={{ width: 32, height: 32 }}>
+              {(item.symbol || item.name).slice(0, 1)}
+            </Avatar>
             <Typography>
               {item.name}{' '}
               <Typography color='text.secondary' component='span'>

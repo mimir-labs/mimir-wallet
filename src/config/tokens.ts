@@ -46,6 +46,21 @@ export const assets: Asset[] = [
     Icon: '/token-icons/MYTH.webp',
     genesisHash: '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f',
     assetId: '0x010100a534'
+  },
+  {
+    Icon: '/token-icons/USDC.svg',
+    genesisHash: '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d',
+    assetId: '22'
+  },
+  {
+    Icon: '/token-icons/USDT.svg',
+    genesisHash: '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d',
+    assetId: '10'
+  },
+  {
+    Icon: '/token-icons/Polkadot.svg',
+    genesisHash: '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d',
+    assetId: '5'
   }
 ];
 
