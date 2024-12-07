@@ -1,3 +1,16 @@
+# [1.3.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.2.1...v1.3.0) (2024-12-07)
+
+
+### Bug Fixes
+
+* only show fund alert when has permission ([#81](https://github.com/mimir-labs/mimir-wallet/issues/81)) ([75b1576](https://github.com/mimir-labs/mimir-wallet/commit/75b15765fe020a9568833af41b03ec70742e6c8e))
+
+
+### Features
+
+* display all on-chain assets and add hydration assets display ([#80](https://github.com/mimir-labs/mimir-wallet/issues/80)) ([8f4bcc6](https://github.com/mimir-labs/mimir-wallet/commit/8f4bcc6b10a6aba48d2aabf59c677be385eae35e))
+* optimize transaction and batch call content display ([#82](https://github.com/mimir-labs/mimir-wallet/issues/82)) ([6aecb87](https://github.com/mimir-labs/mimir-wallet/commit/6aecb87908862c2477d4f7cf908676eb941f29d8))
+
 ## [1.2.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.2.0...v1.2.1) (2024-12-02)
 
 
