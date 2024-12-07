@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
+import type { Option } from '@polkadot/types';
+import type { PalletAssetsAssetAccount } from '@polkadot/types/lookup';
 import type { OrmlTokensAccountData } from '@mimir-wallet/hooks/types';
 import type { TransferToken } from './types';
 
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN, BN_ZERO, isHex } from '@polkadot/util';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/hooks';
@@ -22,10 +24,14 @@ function _listenAssetBalance(
   assetId: string,
   setBalance: (value: BN) => void
 ): Promise<() => void> {
-  if (api.query.assets) {
-    return api.query.assets.account(assetId, address, (result) => {
-      setBalance(result.unwrapOrDefault().balance);
-    });
+  if (api.query.assets || api.query.foreignAssets) {
+    return isHex(assetId)
+      ? (api.query.foreignAssets.account(assetId, address, (result: Option<PalletAssetsAssetAccount>) => {
+          setBalance(result.unwrapOrDefault().balance);
+        }) as unknown as Promise<() => void>)
+      : api.query.assets.account(assetId, address, (result) => {
+          setBalance(result.unwrapOrDefault().balance);
+        });
   }
 
   return api.query.tokens.accounts(address, assetId, (result: OrmlTokensAccountData) => {

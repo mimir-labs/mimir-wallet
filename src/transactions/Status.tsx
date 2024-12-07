@@ -30,6 +30,7 @@ export function AnnouncementStatus({ account, transaction }: { account: AccountD
         display: 'flex',
         alignItems: 'center',
         gap: 0.5,
+        whiteSpace: 'nowrap',
         color:
           status === 'indexing' || status === 'reviewing'
             ? 'warning.main'
@@ -98,6 +99,7 @@ export function Status({ transaction }: { transaction: Transaction }) {
         display: 'flex',
         alignItems: 'center',
         gap: 0.5,
+        whiteSpace: 'nowrap',
         color:
           status < TransactionStatus.Success
             ? 'warning.main'

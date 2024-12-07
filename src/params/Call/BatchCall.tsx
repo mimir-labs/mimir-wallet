@@ -4,7 +4,7 @@
 import type { Call } from '@polkadot/types/interfaces';
 import type { CallProps } from '../types';
 
-import { Box, Button, Grid2 as Grid, IconButton, Stack, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Button, Grid2 as Grid, IconButton, Stack, SvgIcon } from '@mui/material';
 import { isArray } from '@polkadot/util';
 import React, { useMemo, useState } from 'react';
 
@@ -30,13 +30,11 @@ function Item({
   toggleOpen: () => void;
 } & CallProps) {
   const action = useMemo(() => (call ? findAction(registry, call) : null), [registry, call]);
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
 
   const Top = (
     <Grid
       container
-      columns={{ sm: 11, xs: 8 }}
+      columns={{ lg: 12, md: 9, sm: 12, xs: 9 }}
       sx={{ cursor: 'pointer', height: 40, paddingX: { sm: 1.2, xs: 0.8 }, fontSize: '0.75rem' }}
       onClick={toggleOpen}
       spacing={0.4}
@@ -44,17 +42,21 @@ function Item({
       <Grid size={1} sx={{ display: 'flex', alignItems: 'center' }}>
         {index}
       </Grid>
-      <Grid size={3} sx={{ display: 'flex', alignItems: 'center', ...ellipsisMixin() }}>
+      <Grid size={4} sx={{ display: 'flex', alignItems: 'center', ...ellipsisMixin() }}>
         <CallDisplaySection section={action?.[0]} method={action?.[1]} />
       </Grid>
       <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
         <CallDisplayDetail registry={registry} call={call} />
       </Grid>
-      {!downSm && (
-        <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
-          <CallDisplayDetailMinor registry={registry} call={call} />
-        </Grid>
-      )}
+      <Grid
+        size={3}
+        sx={{
+          display: { lg: 'flex !important', md: 'none !important', sm: 'flex !important', xs: 'none !important' },
+          alignItems: 'center'
+        }}
+      >
+        <CallDisplayDetailMinor registry={registry} call={call} />
+      </Grid>
 
       <Grid size={1} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
         <IconButton

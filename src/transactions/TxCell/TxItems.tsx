@@ -122,20 +122,20 @@ function TxItems({
               height: 40
             }
           }}
-          columns={12}
-          spacing={{ sm: 2, xs: 1 }}
+          columns={{ lg: 15, md: 12, sm: 10 }}
+          spacing={1}
           onClick={toggleDetailOpen}
         >
           <Grid size={2}>
             <AppCell transaction={transaction} />
           </Grid>
-          <Grid size={2}>
+          <Grid size={5}>
             <ActionTextCell section={transaction.section} method={transaction.method} />
           </Grid>
-          <Grid size={2}>
+          <Grid sx={{ display: { lg: 'flex !important', xs: 'none !important' } }} size={3}>
             <ActionDisplayCell api={api} call={call} />
           </Grid>
-          <Grid size={2}>
+          <Grid sx={{ display: { md: 'flex !important', xs: 'none !important' } }} size={2}>
             <TimeCell
               time={transaction.status < TransactionStatus.Success ? transaction.createdAt : transaction.updatedAt}
             />
