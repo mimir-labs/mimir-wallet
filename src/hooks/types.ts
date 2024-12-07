@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { PalletAssetsAssetStatus } from '@polkadot/types/lookup';
+import type { Bytes, Option, Struct, u8, u128 } from '@polkadot/types';
 import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
-import type { Asset } from '@mimir-wallet/config';
 
 export type CallParam = any;
 
@@ -227,32 +226,20 @@ export interface PushMessageData {
   updatedAt: string;
 }
 
-export interface AssetInfoBase {
-  readonly isNative: boolean;
-  // metadata
+export type AssetInfo<T extends boolean = boolean> = {
   readonly name: string;
   readonly symbol: string;
   readonly decimals: number;
-}
-
-export type AssetInfo = Asset &
-  AssetInfoBase & {
-    // for assets
-    readonly assetsInfo?: {
-      readonly owner: string;
-      readonly issuer: string;
-      readonly admin: string;
-      readonly freezer: string;
-      readonly supply: BN;
-      readonly deposit: BN;
-      readonly minBalance: BN;
-      readonly isSufficient: boolean;
-      readonly accounts: number;
-      readonly sufficients: number;
-      readonly approvals: number;
-      readonly status: PalletAssetsAssetStatus;
-    };
-  };
+  readonly icon?: string;
+} & (T extends false
+  ? {
+      readonly isNative: false;
+      readonly assetId: string;
+    }
+  : {
+      readonly isNative: true;
+      readonly assetId: 'native';
+    });
 
 export interface AccountBalance {
   total: BN;
@@ -265,7 +252,10 @@ export interface AccountBalance {
 }
 
 export type AccountAssetInfo = AssetInfo & {
-  balance: BN;
+  total: BN;
+  locked: BN;
+  reserved: BN;
+  transferrable: BN;
   account: string;
 };
 
@@ -327,4 +317,17 @@ export interface BatchTxItem {
   website?: string;
   iconUrl?: string;
   appName?: string;
+}
+
+export interface PalletAssetRegistryAssetDetails extends Struct {
+  readonly name: Option<Bytes>;
+  readonly symbol: Option<Bytes>;
+  readonly decimals: Option<u8>;
+  readonly existentialDeposit: u128;
+}
+
+export interface OrmlTokensAccountData extends Struct {
+  readonly free: u128;
+  readonly reserved: u128;
+  readonly frozen: u128;
 }

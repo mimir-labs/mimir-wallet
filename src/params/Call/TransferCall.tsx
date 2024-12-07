@@ -74,7 +74,7 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
 
     const [section, method] = action;
 
-    if (section !== 'balances' && section !== 'assets') {
+    if (section !== 'balances' && section !== 'assets' && section !== 'tokens') {
       return null;
     }
 
@@ -93,22 +93,50 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
       } else {
         return null;
       }
-    } else if (method === 'forceTransfer') {
-      assetId = call.args[0].toString();
-      from = call.args[1].toString();
-      to = call.args[2].toString();
-      value = call.args[3].toString();
-    } else if (method === 'transfer' || method === 'transferKeepAlive') {
-      assetId = call.args[0].toString();
-      to = call.args[1].toString();
-      value = call.args[2].toString();
+    } else if (section === 'assets') {
+      if (method === 'forceTransfer') {
+        assetId = call.args[0].toString();
+        from = call.args[1].toString();
+        to = call.args[2].toString();
+        value = call.args[3].toString();
+      } else if (method === 'transfer' || method === 'transferKeepAlive') {
+        assetId = call.args[0].toString();
+        to = call.args[1].toString();
+        value = call.args[2].toString();
+      } else if (method === 'transferAll') {
+        assetId = call.args[1].toString();
+        to = call.args[0].toString();
+        value = '0';
+        isAll = true;
+      } else {
+        return null;
+      }
+    } else if (section === 'tokens') {
+      if (method === 'transfer' || method === 'transferKeepAlive') {
+        assetId = call.args[1].toString();
+        to = call.args[0].toString();
+        value = call.args[2].toString();
+      } else if (method === 'forceTransfer') {
+        to = call.args[1].toString();
+        from = call.args[0].toString();
+        assetId = call.args[2].toString();
+        value = call.args[3].toString();
+      } else if (method === 'transferAll') {
+        to = call.args[0].toString();
+        assetId = call.args[1].toString();
+        value = '0';
+        isAll = true;
+      } else {
+        return null;
+      }
     } else {
       return null;
     }
 
     return [assetId, from, to, value, isAll] as const;
   }, [action, call.args, propFrom]);
-  const assetInfo = useAssetInfo(results?.[0]);
+
+  const [assetInfo] = useAssetInfo(results?.[0]);
 
   if (!results) return <FunctionArgs from={propFrom} registry={registry} call={call} jsonFallback={jsonFallback} />;
 

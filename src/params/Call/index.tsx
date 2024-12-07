@@ -21,7 +21,7 @@ function Call({ registry, call, ...props }: CallProps) {
     return <BatchCall registry={registry} call={call} {...props} />;
   }
 
-  if (action.startsWith('balances.') || action.startsWith('assets')) {
+  if (action.startsWith('balances.') || action.startsWith('assets.') || action.startsWith('tokens.')) {
     return <TransferCall registry={registry} call={call} {...props} />;
   }
 

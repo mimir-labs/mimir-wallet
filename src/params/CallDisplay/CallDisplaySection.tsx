@@ -25,7 +25,17 @@ function CallDisplaySection({ section, method }: { section?: string; method?: st
     );
   }
 
-  if (['assets.transfer', 'assets.transferKeepAlive', 'assets.forceTransfer'].includes(`${section}.${method}`)) {
+  if (
+    [
+      'assets.transfer',
+      'assets.transferKeepAlive',
+      'assets.forceTransfer',
+      'tokens.transfer',
+      'tokens.transferKeepAlive',
+      'tokens.transferAll',
+      'tokens.forceTransfer'
+    ].includes(`${section}.${method}`)
+  ) {
     return (
       <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
         <SvgIcon color='primary' component={IconSend} inheritViewBox />

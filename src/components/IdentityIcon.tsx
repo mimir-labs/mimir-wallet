@@ -7,12 +7,14 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 import { Box } from '@mui/material';
 import { Polkadot as PolkadotIcon } from '@polkadot/react-identicon/icons/Polkadot';
 import { hexToU8a, isHex, isU8a } from '@polkadot/util';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { encodeAddress } from '@mimir-wallet/api';
 import { walletConfig } from '@mimir-wallet/config';
-import { useAddressMeta } from '@mimir-wallet/hooks';
+import { useAddressMeta, useCopyClipboard } from '@mimir-wallet/hooks';
 import { addressEq } from '@mimir-wallet/utils';
+
+import { toastSuccess } from './ToastRoot';
 
 interface Props {
   className?: string;
@@ -20,7 +22,6 @@ interface Props {
   size?: number;
   value?: AccountId | AccountIndex | Address | string | Uint8Array | null;
   isMe?: boolean;
-  onClick?: (value?: string) => void;
 }
 
 function isCodec(
@@ -29,7 +30,7 @@ function isCodec(
   return !!(value && (value as AccountId).toHuman);
 }
 
-function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Props) {
+function IdentityIcon({ className, isMe, prefix, size = 30, value }: Props) {
   const { address, publicKey } = useMemo(() => {
     try {
       const _value = isCodec(value) ? value.toString() : value;
@@ -41,14 +42,11 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
     }
   }, [prefix, value]);
   const { meta } = useAddressMeta(value?.toString());
+  const [, copy] = useCopyClipboard();
 
   const { isInjected, isMultisig, source, threshold, who, multipleMultisig } = meta || {};
 
   const extensionIcon = isInjected ? walletConfig[source || '']?.icon : undefined;
-
-  const _onClick = useCallback(() => {
-    onClick?.(value?.toString());
-  }, [onClick, value]);
 
   const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
 
@@ -57,9 +55,13 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
       <Box
         className={`${className} IdentityIcon`}
         component='span'
-        onClick={_onClick}
+        onClick={(e) => {
+          e.stopPropagation();
+          copy(address);
+          toastSuccess('Copied to clipboard');
+        }}
         sx={{
-          cursor: onClick ? 'pointer' : undefined,
+          cursor: 'copy',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -82,9 +84,13 @@ function IdentityIcon({ className, isMe, onClick, prefix, size = 30, value }: Pr
     <Box
       className={`${className} IdentityIcon`}
       component='span'
-      onClick={_onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        copy(address);
+        toastSuccess('Copied to clipboard');
+      }}
       sx={{
-        cursor: onClick ? 'pointer' : undefined,
+        cursor: 'copy',
         position: 'relative',
         width: size,
         height: size + (isMultisig ? 6 + size / 16 : 0),

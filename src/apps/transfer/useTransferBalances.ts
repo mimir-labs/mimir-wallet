@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
+import type { OrmlTokensAccountData } from '@mimir-wallet/hooks/types';
 import type { TransferToken } from './types';
 
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -21,9 +22,15 @@ function _listenAssetBalance(
   assetId: string,
   setBalance: (value: BN) => void
 ): Promise<() => void> {
-  return api.query.assets.account(assetId, address, (result) => {
-    setBalance(result.unwrapOrDefault().balance);
-  });
+  if (api.query.assets) {
+    return api.query.assets.account(assetId, address, (result) => {
+      setBalance(result.unwrapOrDefault().balance);
+    });
+  }
+
+  return api.query.tokens.accounts(address, assetId, (result: OrmlTokensAccountData) => {
+    setBalance(result.free.sub(result.frozen));
+  }) as unknown as Promise<() => void>;
 }
 
 export function useTransferBalance(

@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { BN } from '@polkadot/util';
 import type { AccountBalance } from '@mimir-wallet/hooks/types';
 
 import {
@@ -16,7 +17,6 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { type BN, BN_ZERO } from '@polkadot/util';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ import { useApi, useAssetBalances } from '@mimir-wallet/hooks';
 function AssetRow({
   assetId,
   decimals,
-  icon: propsIcon,
+  icon,
   locked,
   reserved,
   symbol,
@@ -44,8 +44,7 @@ function AssetRow({
   reserved?: BN;
   total?: BN;
 }) {
-  const { api, genesisHash, tokenSymbol } = useApi();
-  const icon = useMemo(() => propsIcon || findToken(genesisHash).Icon, [genesisHash, propsIcon]);
+  const { api, tokenSymbol } = useApi();
   const format = useMemo(
     (): [decimals: number, unit: string] => [decimals || api.registry.chainDecimals[0], symbol || tokenSymbol],
     [api.registry.chainDecimals, decimals, symbol, tokenSymbol]
@@ -55,7 +54,9 @@ function AssetRow({
     <TableRow>
       <TableCell>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Avatar alt='Token' src={icon} sx={{ width: 30, height: 30 }} />
+          <Avatar alt='Token' src={icon} sx={{ width: 30, height: 30 }}>
+            {(symbol || tokenSymbol).slice(0, 1)}
+          </Avatar>
           {symbol || tokenSymbol}
         </Box>
       </TableCell>
@@ -75,7 +76,7 @@ function AssetRow({
         <Button
           component={Link}
           endIcon={<SvgIcon component={IconSend} inheritViewBox />}
-          to={`/transfer?assetId=${assetId}`}
+          to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}`}
           variant='outlined'
           size='small'
         >
@@ -87,6 +88,7 @@ function AssetRow({
 }
 
 function Assets({ address, nativeBalance }: { address: string; nativeBalance?: AccountBalance }) {
+  const { genesisHash } = useApi();
   const assets = useAssetBalances(address);
 
   return (
@@ -121,19 +123,20 @@ function Assets({ address, nativeBalance }: { address: string; nativeBalance?: A
             locked={nativeBalance?.locked}
             reserved={nativeBalance?.reserved}
             total={nativeBalance?.total}
+            icon={findToken(genesisHash).Icon}
             transferrable={nativeBalance?.transferrable}
           />
           {assets.map((item) => (
             <AssetRow
               assetId={item.assetId}
               decimals={item.decimals}
-              icon={item.Icon}
+              icon={item.icon}
               key={`asset-balance-${item.assetId}`}
-              locked={BN_ZERO}
-              reserved={BN_ZERO}
+              locked={item.locked}
+              reserved={item.reserved}
               symbol={item.symbol}
-              total={item.balance}
-              transferrable={item.balance}
+              total={item.total}
+              transferrable={item.transferrable}
             />
           ))}
         </TableBody>

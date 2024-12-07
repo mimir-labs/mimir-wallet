@@ -12,6 +12,7 @@ import {
   useAccount,
   useAllAccounts,
   useApi,
+  useAssetInfo,
   useInputNumber,
   useQueryParam,
   useSelectedAccount,
@@ -39,9 +40,10 @@ function PageTransfer() {
   const [token, setToken] = useState<TransferToken>();
   const [format, sendingBalances] = useTransferBalance(token, sending);
   const [keepAlive, toggleKeepAlive] = useToggle(true);
+  const [, existentialDeposit] = useAssetInfo(token?.isNative ? null : token?.assetId);
 
   const isInsufficientBalance = keepAlive
-    ? sendingBalances.sub(api.consts.balances.existentialDeposit).lt(new BN(parseUnits(amount, format[0]).toString()))
+    ? sendingBalances.sub(existentialDeposit).lt(new BN(parseUnits(amount, format[0]).toString()))
     : sendingBalances.lt(new BN(parseUnits(amount, format[0]).toString()));
 
   useEffect(() => {
@@ -63,15 +65,23 @@ function PageTransfer() {
           website: 'mimir://app/transfer'
         });
       } else {
-        if (!api.tx.assets) return;
-
-        addQueue({
-          call: keepAlive
-            ? api.tx.assets.transferKeepAlive(token.assetId, recipient, parseUnits(amount, format[0])).method
-            : api.tx.assets.transfer(token.assetId, recipient, parseUnits(amount, format[0])).method,
-          accountId: sending,
-          website: 'mimir://app/transfer'
-        });
+        if (api.tx.assets) {
+          addQueue({
+            call: keepAlive
+              ? api.tx.assets.transferKeepAlive(token.assetId, recipient, parseUnits(amount, format[0])).method
+              : api.tx.assets.transfer(token.assetId, recipient, parseUnits(amount, format[0])).method,
+            accountId: sending,
+            website: 'mimir://app/transfer'
+          });
+        } else if (api.tx.tokens) {
+          addQueue({
+            call: keepAlive
+              ? api.tx.tokens.transferKeepAlive(recipient, token.assetId, parseUnits(amount, format[0])).method
+              : api.tx.tokens.transfer(recipient, token.assetId, parseUnits(amount, format[0])).method,
+            accountId: sending,
+            website: 'mimir://app/transfer'
+          });
+        }
       }
     }
   }, [addQueue, amount, api, format, isAmountValid, keepAlive, recipient, sending, token]);
@@ -124,7 +134,7 @@ function PageTransfer() {
                 onClick={() => {
                   setAmount(
                     keepAlive
-                      ? formatUnits(sendingBalances.sub(api.consts.balances.existentialDeposit), format[0])
+                      ? formatUnits(sendingBalances.sub(existentialDeposit), format[0])
                       : formatUnits(sendingBalances, format[0])
                   );
                 }}
@@ -137,7 +147,7 @@ function PageTransfer() {
             <Switch checked={keepAlive} onChange={(e) => toggleKeepAlive(e.target.checked)} />
             Keep Sender Alive
           </Box>
-          <SelectToken assetId={assetId} onChange={setToken} setAssetId={setAssetId} />
+          <SelectToken address={sending} assetId={assetId} onChange={setToken} setAssetId={setAssetId} />
           <Button
             disabled={!amount || !recipient || !isValidNumber}
             fullWidth

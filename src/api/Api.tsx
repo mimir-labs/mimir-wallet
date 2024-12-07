@@ -8,7 +8,6 @@ import type { ApiProps, ApiState } from './types';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance, isTestChain, objectSpread, stringify } from '@polkadot/util';
-import { decodeAddress as decodeAddressBase, encodeAddress as encodeAddressBase } from '@polkadot/util-crypto';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { allEndpoints, Endpoint, typesBundle } from '@mimir-wallet/config';
