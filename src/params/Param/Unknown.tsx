@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, Dialog } from '@mui/material';
-import { isString } from '@polkadot/util';
+import { isHex, isString } from '@polkadot/util';
 import React, { useMemo } from 'react';
 import ReactJson from 'react-json-view';
 import { useToggle } from 'react-use';
+
+import { Bytes } from '@mimir-wallet/components';
 
 import { ParamProps } from './types';
 
@@ -16,8 +18,12 @@ function Unknown({ name, value }: ParamProps) {
     return value.toHuman();
   }, [value]);
 
+  if (isHex(human)) {
+    return <Bytes value={human} />;
+  }
+
   if (isString(human)) {
-    return human.toString();
+    return human.toString().slice(0, 32);
   }
 
   return (

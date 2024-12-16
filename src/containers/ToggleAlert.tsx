@@ -13,14 +13,14 @@ import { formatUnits } from '@mimir-wallet/utils';
 
 function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {
   const { api } = useApi();
-  const { addresses, isLocalAccount, addAddressBook } = useAccount();
+  const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [existing, setExisting] = useState(true);
   const [fundOpen, toggleFundOpen] = useToggle(false);
   const [forceHide, setForceHide] = useState(false);
 
   const hasThisAccount = useMemo(
-    () => isLocalAccount(address) || !!addresses.find(({ watchlist }) => !!watchlist),
-    [addresses, address, isLocalAccount]
+    () => isLocalAccount(address) || isLocalAddress(address, true),
+    [address, isLocalAccount, isLocalAddress]
   );
 
   useEffect(() => {
@@ -35,11 +35,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
     return () => {
       unSubPromise?.then((unsub) => unsub());
     };
-  }, [address, api, setAlertOpen]);
-
-  useEffect(() => {
-    setForceHide(false);
-  }, [address]);
+  }, [address, api]);
 
   const alertOpen = !forceHide && (!hasThisAccount || !existing);
 

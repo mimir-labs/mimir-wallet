@@ -17,6 +17,9 @@ export default defineConfig(({ mode }) => ({
   define: {
     'process.env.VERSION': JSON.stringify(packageJson.version)
   },
+  server: {
+    host: '0.0.0.0'
+  },
   test: {
     css: false,
     include: ['src/**/__tests__/*'],
