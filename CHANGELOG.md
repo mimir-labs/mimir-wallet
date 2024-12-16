@@ -1,3 +1,16 @@
+# [1.4.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.3.0...v1.4.0) (2024-12-16)
+
+
+### Bug Fixes
+
+* fix display issue for some call parameters ([#84](https://github.com/mimir-labs/mimir-wallet/issues/84)) ([d9c0e39](https://github.com/mimir-labs/mimir-wallet/commit/d9c0e3988792c3b437ed9a05b15e0218b9483684))
+
+
+### Features
+
+* add transaction sharing link feature ([#86](https://github.com/mimir-labs/mimir-wallet/issues/86)) ([46aefc5](https://github.com/mimir-labs/mimir-wallet/commit/46aefc5b8d1be9f7787daa0ac6dd161e7194af6d))
+* set different page titles for each route ([#85](https://github.com/mimir-labs/mimir-wallet/issues/85)) ([1be43cd](https://github.com/mimir-labs/mimir-wallet/commit/1be43cd9be55243fe7e0b6982dde7b0f68a3c613))
+
 # [1.3.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.2.1...v1.3.0) (2024-12-07)
 
 
