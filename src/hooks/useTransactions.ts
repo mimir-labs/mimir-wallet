@@ -31,12 +31,13 @@ function transformTransaction(transaction: Transaction): Transaction {
 }
 
 export function usePendingTransactions(
-  address?: string | null
+  address?: string | null,
+  txId?: string
 ): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
   const { data, isFetched, isFetching } = useQuery<Transaction[]>({
     initialData: [],
-    queryHash: serviceUrl(`tx/pending?address=${address}`),
-    queryKey: [address ? serviceUrl(`tx/pending?address=${address}`) : null],
+    queryHash: serviceUrl(`tx/pending?address=${address}&tx_id=${txId || ''}`),
+    queryKey: [address ? serviceUrl(`tx/pending?address=${address}&tx_id=${txId || ''}`) : null],
     structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
       const nextData = (next as Transaction[]).map((item) => transformTransaction(item));
 
@@ -49,7 +50,8 @@ export function usePendingTransactions(
 
 export function useHistoryTransactions(
   address?: string | null,
-  limit = 20
+  limit = 20,
+  txId?: string
 ): [
   transactions: HistoryTransaction[],
   isFetched: boolean,
@@ -62,7 +64,7 @@ export function useHistoryTransactions(
 
   const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
     initialPageParam: null,
-    queryKey: [address ? serviceUrl(`tx/history?address=${address}&limit=${limit}`) : null],
+    queryKey: [address ? serviceUrl(`tx/history?address=${address}&limit=${limit}&tx_id=${txId || ''}`) : null],
     queryFn: async ({ pageParam, queryKey }) => {
       if (!queryKey[0]) {
         return undefined;

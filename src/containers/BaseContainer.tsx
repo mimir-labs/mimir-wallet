@@ -6,7 +6,7 @@ import { createContext, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
 import { ConnectWalletModal, MimirLoading, SwitchAccountDialog, TxSubmit } from '@mimir-wallet/components';
-import { useAccount, useApi, useFollowAccounts, useToggle, useTxQueue } from '@mimir-wallet/hooks';
+import { useAccount, useApi, useFollowAccounts, usePageTitle, useToggle, useTxQueue } from '@mimir-wallet/hooks';
 import { useWallet } from '@mimir-wallet/hooks/useWallet';
 
 import SideBar from './SideBar';
@@ -48,6 +48,7 @@ function BaseContainer({
   );
 
   useFollowAccounts();
+  usePageTitle();
 
   if (!current && auth) {
     return <Navigate to='/welcome' replace />;

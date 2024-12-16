@@ -15,8 +15,12 @@ import { skeleton } from './skeleton';
 
 const limit = 20;
 
-function HistoryTransactions({ account }: { account: AccountData }) {
-  const [data, isFetched, isFetching, hasNexPage, , fetchNextPage] = useHistoryTransactions(account.address, limit);
+function HistoryTransactions({ account, txId }: { account: AccountData; txId?: string }) {
+  const [data, isFetched, isFetching, hasNexPage, , fetchNextPage] = useHistoryTransactions(
+    account.address,
+    limit,
+    txId
+  );
 
   if (isFetched && data && data.length === 0) {
     return <Empty height='80dvh' />;

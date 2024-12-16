@@ -12,6 +12,7 @@ function MultisigList({ address }: { address: string }) {
   const [account] = useQueryAccount(address);
 
   const [type, setType] = useQueryParam<'pending' | 'history'>('status', 'pending');
+  const [txId] = useQueryParam<string>('tx_id');
 
   if (!account) return null;
 
@@ -35,7 +36,11 @@ function MultisigList({ address }: { address: string }) {
         </Button>
       </Paper>
 
-      {type === 'history' ? <HistoryTransactions account={account} /> : <PendingTransactions account={account} />}
+      {type === 'history' ? (
+        <HistoryTransactions account={account} txId={txId} />
+      ) : (
+        <PendingTransactions account={account} txId={txId} />
+      )}
     </Box>
   );
 }
