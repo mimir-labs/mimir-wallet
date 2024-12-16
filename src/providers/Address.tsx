@@ -88,7 +88,7 @@ export function AddressCtxRoot({ address, chain, children }: Props): React.React
   );
   const isLocalAddress = useCallback(
     (address: string, watchlist?: boolean) =>
-      addresses.findIndex((item) => (watchlist ? !!item.watchlist : true) && addressEq(item.address, address)) > -1,
+      addresses.some((item) => (watchlist ? !!item.watchlist : true) && addressEq(item.address, address)),
     [addresses]
   );
   const _setCurrent = useCallback(

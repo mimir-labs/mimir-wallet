@@ -10,14 +10,18 @@ import { AddressRow, FormatBalance } from '@mimir-wallet/components';
 import { findAssets, findToken } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks';
 
-import Param from '../Param';
-import { extractParams } from '../utils';
-
-function CallDisplayDetail({ registry, call }: { registry: Registry; call?: IMethod | null }) {
+function CallDisplayDetail({
+  registry,
+  fallbackWithName,
+  call
+}: {
+  registry: Registry;
+  fallbackWithName?: boolean;
+  call?: IMethod | null;
+}) {
   const { genesisHash } = useApi();
   let comp: React.ReactNode;
 
-  const params = useMemo(() => (call ? extractParams(call) : null), [call]);
   const calllFunction = useMemo(() => (call ? registry.findMetaCall(call?.callIndex) : null), [call, registry]);
 
   if (!call || !calllFunction) {
@@ -117,17 +121,7 @@ function CallDisplayDetail({ registry, call }: { registry: Registry; call?: IMet
   } else if (['proxy.removeProxies'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
     comp = <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>Remove Proxies</Box>;
   } else {
-    if (!params) {
-      return null;
-    }
-
-    comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        {params.params.length > 0 ? (
-          <Param registry={registry} type={params.params[0].type} value={params.values[0]} />
-        ) : null}
-      </Box>
-    );
+    return fallbackWithName ? `${calllFunction.section}.${calllFunction.method}` : null;
   }
 
   return comp;

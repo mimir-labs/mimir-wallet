@@ -15,13 +15,67 @@ export function useSafetyCheck(call: IMethod) {
   const [isConfirm, , setConfirm] = useToggle(false);
 
   useEffect(() => {
-    service.safetyCheck(call.toHex()).then((level) => {
-      if (level.severity === 'none') {
-        setConfirm(true);
-      }
+    const section = api.registry.findMetaCall(call.callIndex).section;
 
-      setSafetyCheck(level);
-    });
+    if (
+      [
+        'system',
+        'scheduler',
+        'preimage',
+        'babe',
+        'timestamp',
+        'indices',
+        'balances',
+        'staking',
+        'session',
+        'grandpa',
+        'treasury',
+        'convictionVoting',
+        'referenda',
+        'whitelist',
+        'parameters',
+        'claims',
+        'vesting',
+        'bounties',
+        'childBounties',
+        'electionProviderMultiPhase',
+        'voterList',
+        'nominationPools',
+        'fastUnstake',
+        'configuration',
+        'initializer',
+        'hrmp',
+        'parasDisputes',
+        'parasSlashing',
+        'onDemand',
+        'registrar',
+        'slots',
+        'auctions',
+        'crowdloan',
+        'coretime',
+        'stateTrieMigration',
+        'messageQueue',
+        'assetRate',
+        'beefy',
+        'paraSudoWrapper',
+        'sudo'
+      ].includes(section)
+    ) {
+      setConfirm(true);
+      setSafetyCheck({
+        severity: 'none',
+        title: 'Success',
+        message: 'This transaction is safe to execute.'
+      });
+    } else {
+      service.safetyCheck(call.toHex()).then((level) => {
+        if (level.severity === 'none') {
+          setConfirm(true);
+        }
+
+        setSafetyCheck(level);
+      });
+    }
   }, [api, call, setConfirm]);
 
   return [safetyCheck, isConfirm, setConfirm] as const;

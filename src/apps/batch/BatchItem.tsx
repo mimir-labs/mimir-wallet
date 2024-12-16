@@ -83,7 +83,7 @@ function BatchItem({
           <AppName website={website} iconUrl={iconUrl} appName={appName} />
         </Grid>
         <Grid size={2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <CallDisplayDetail registry={api.registry} call={call} />
+          <CallDisplayDetail fallbackWithName registry={api.registry} call={call} />
         </Grid>
         <Grid size={1} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
