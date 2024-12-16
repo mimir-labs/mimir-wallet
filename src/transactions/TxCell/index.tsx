@@ -3,10 +3,23 @@
 
 import type { AccountData, Transaction } from '@mimir-wallet/hooks/types';
 
-import { Box, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  Divider,
+  IconButton,
+  Paper,
+  Stack,
+  SvgIcon,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import moment from 'moment';
 import React from 'react';
 
+import IconShare from '@mimir-wallet/assets/svg/icon-share.svg?react';
+import { useCopyClipboard } from '@mimir-wallet/hooks';
 import { TransactionStatus } from '@mimir-wallet/hooks/types';
 
 import { formatTransactionId } from '../utils';
@@ -24,6 +37,7 @@ function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
   const { status } = transaction;
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
+  const [isCopied, copy] = useCopyClipboard();
 
   return (
     <Paper component={Stack} spacing={1.2} sx={{ padding: { sm: 1.5, xs: 1.2 }, borderRadius: 2 }}>
@@ -42,9 +56,24 @@ function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
                     : 'error.main'
             }}
           />
-          <Typography color='primary.main' fontWeight={700} variant='h4'>
+          <Typography color='primary.main' fontWeight={700} variant='h6'>
             No {formatTransactionId(transaction.id)}
           </Typography>
+          <Tooltip title={isCopied ? 'Copied' : 'Copy the transaction URL'}>
+            <IconButton
+              color='primary'
+              size='small'
+              onClick={() => {
+                const url = new URL(window.location.href);
+
+                url.searchParams.set('tx_id', transaction.id.toString());
+
+                copy(`${window.location.origin}/transactions/${transaction.id}`);
+              }}
+            >
+              <SvgIcon component={IconShare} />
+            </IconButton>
+          </Tooltip>
         </Stack>
         <Typography>
           {transaction.status < TransactionStatus.Success

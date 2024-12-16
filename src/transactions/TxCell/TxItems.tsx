@@ -87,6 +87,7 @@ function TxItems({
 }) {
   const { api } = useApi();
   const [detailOpen, toggleDetailOpen] = useToggle(defaultOpen);
+
   const [overviewOpen, toggleOverviewOpen] = useToggle();
   const call = useMemo(() => {
     if (!transaction.call) return null;
@@ -171,7 +172,7 @@ function TxItems({
               marginBottom: { md: 1.5, xs: 1.2 }
             }}
           >
-            <Extrinsic transaction={transaction} call={call} />
+            <Extrinsic defaultOpen={detailOpen} transaction={transaction} call={call} />
             <Progress openOverview={toggleOverviewOpen} account={account} transaction={transaction} />
           </Box>
         )}

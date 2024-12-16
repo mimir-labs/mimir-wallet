@@ -26,8 +26,16 @@ export function Item({ content, title }: { title?: React.ReactNode; content?: Re
   );
 }
 
-function Extrinsic({ transaction, call }: { transaction: Transaction; call?: IMethod | null }) {
-  const [isOpen, toggleOpen] = useToggle();
+function Extrinsic({
+  defaultOpen,
+  transaction,
+  call
+}: {
+  defaultOpen?: boolean;
+  transaction: Transaction;
+  call?: IMethod | null;
+}) {
+  const [isOpen, toggleOpen] = useToggle(defaultOpen);
 
   return (
     <>

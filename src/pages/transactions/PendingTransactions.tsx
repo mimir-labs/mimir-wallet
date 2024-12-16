@@ -12,8 +12,8 @@ import { TxCell } from '@mimir-wallet/transactions';
 
 import { skeleton } from './skeleton';
 
-function PendingTransactions({ account }: { account: AccountData }) {
-  const [transactions, isFetched, isFetching] = usePendingTransactions(account.address);
+function PendingTransactions({ account, txId }: { account: AccountData; txId?: string }) {
+  const [transactions, isFetched, isFetching] = usePendingTransactions(account.address, txId);
 
   const showSkeleton = isFetching && !isFetched;
 
