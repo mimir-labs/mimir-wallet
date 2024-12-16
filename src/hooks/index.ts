@@ -24,6 +24,7 @@ export * from './useInput';
 export * from './useInputNumber';
 export * from './useIsMountedRef';
 export * from './useMessages';
+export * from './usePageTitle';
 export * from './useProposals';
 export * from './useProxyTypes';
 export * from './useQueryAccount';
