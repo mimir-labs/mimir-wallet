@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.4.0...v1.5.0) (2024-12-17)
+
+
+### Features
+
+* add zkVerify chain support ([#87](https://github.com/mimir-labs/mimir-wallet/issues/87)) ([c2e591b](https://github.com/mimir-labs/mimir-wallet/commit/c2e591b67aea5230fe594c89c1d329fd66917908))
+
 # [1.4.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.3.0...v1.4.0) (2024-12-16)
 
 
