@@ -370,6 +370,18 @@ export const solochainEndpoints: Endpoint[] = [
     serviceUrl: 'https://avail-turing-api.mimir.global/',
     socketUrl: 'wss://avail-turing-api.mimir.global/',
     explorerUrl: 'https://avail-turing.subscan.io/'
+  },
+  {
+    key: 'zkverify-testnet',
+    icon: '/chain-icons/zkverify.svg',
+    tokenIcon: '/token-icons/ACME.svg',
+    name: 'zkVerify Testnet',
+    wsUrl: 'wss://testnet-rpc.zkverify.io',
+    genesisHash: '0xc00425dcaa0a1bc5bf1163a2d69d7abb2cc6180de78b4e10297b31a4d9cc928a',
+    ss58Format: 251,
+    serviceUrl: 'https://zkverify-testnet-api.mimir.global/',
+    socketUrl: 'wss://zkverify-testnet-api.mimir.global/',
+    explorerUrl: 'https://zkverify-explorer.zeeve.net/'
   }
 ];
 
