@@ -186,8 +186,8 @@ export const polkadotEndpoints: Endpoint[] = [
   },
   {
     key: 'nexus',
-    icon: '/chain-icons/hydration.svg',
-    tokenIcon: '/token-icons/HDX.svg',
+    icon: '/chain-icons/nexus.webp',
+    tokenIcon: '/token-icons/BRIDGE.webp',
     name: 'Hyperbridge (Nexus)',
     wsUrl: 'wss://hyperbridge-nexus-rpc.blockops.network/',
     genesisHash: '0x61ea8a51fd4a058ee8c0e86df0a89cc85b8b67a0a66432893d09719050c9f540',

@@ -37,7 +37,10 @@ function CallDisplayDetail({
 
     comp = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Box component='img' src={token.Icon} sx={{ width: 20, height: 20 }} />
+        <Avatar alt='Token' src={token.Icon} sx={{ width: 20, height: 20, borderRadius: '50%' }}>
+          T
+        </Avatar>
+
         <Typography>
           -<FormatBalance value={call.args[1].toString()} />
         </Typography>
@@ -50,7 +53,7 @@ function CallDisplayDetail({
 
     comp = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20 }}>
+        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20, borderRadius: '50%' }}>
           T
         </Avatar>
         <Typography>
@@ -65,7 +68,7 @@ function CallDisplayDetail({
 
     comp = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20 }}>
+        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20, borderRadius: '50%' }}>
           T
         </Avatar>
         <Typography>
