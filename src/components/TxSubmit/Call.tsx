@@ -66,6 +66,7 @@ function Call({
 }) {
   const { api } = useApi();
 
+  // TODO: check if the call is a multisig, if so, use the blake2 of the call data as the call hash
   const { callData, callHash, callName } = useMemo(() => extractState(method), [method]);
   const [isOpen, toggleOpen] = useToggle();
 

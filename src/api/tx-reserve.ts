@@ -9,7 +9,7 @@ import type { PalletProxyAnnouncement, PalletProxyProxyDefinition } from '@polka
 import type { ITuple } from '@polkadot/types/types';
 import type { BN } from '@polkadot/util';
 
-import { encodeMultiAddress } from '@polkadot/util-crypto';
+import { blake2AsU8a, encodeMultiAddress } from '@polkadot/util-crypto';
 
 import { addressEq } from '@mimir-wallet/utils';
 
@@ -34,7 +34,8 @@ export async function txReserve(
     const multisigAddress = encodeMultiAddress([address, ...call.args[1]], threshold, api.registry.chainSS58);
     const info = await api.query.multisig.multisigs<Option<Multisig>>(
       multisigAddress,
-      api.tx.multisig.approveAsMulti.is(call) ? call.args[3] : call.args[3].hash
+      // IMPORTANT: the hash is used to identify the multisig transaction
+      api.tx.multisig.approveAsMulti.is(call) ? call.args[3] : blake2AsU8a(call.args[3].toU8a())
     );
 
     if (info.isSome) {

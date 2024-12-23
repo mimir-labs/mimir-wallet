@@ -40,7 +40,9 @@ function PageTransfer() {
   const [token, setToken] = useState<TransferToken>();
   const [format, sendingBalances] = useTransferBalance(token, sending);
   const [keepAlive, toggleKeepAlive] = useToggle(true);
-  const [, existentialDeposit] = useAssetInfo(token?.isNative ? null : token?.assetId);
+  const [, assetExistentialDeposit] = useAssetInfo(token?.isNative ? null : token?.assetId);
+
+  const existentialDeposit = token?.isNative ? api.consts.balances.existentialDeposit : assetExistentialDeposit;
 
   const isInsufficientBalance = keepAlive
     ? sendingBalances.sub(existentialDeposit).lt(new BN(parseUnits(amount, format[0]).toString()))
