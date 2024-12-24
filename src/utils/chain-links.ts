@@ -15,9 +15,12 @@ export function accountExplorerLink(
 
   if (_value && isAddress(_value)) {
     const explorerUrl = window.currentChain.explorerUrl;
+    const isStatescan = window.currentChain.statescan;
 
     if (explorerUrl) {
-      return `${explorerUrl}account/${encodeAddress(_value)}`;
+      return isStatescan
+        ? `${explorerUrl}/#/accounts/${encodeAddress(_value)}`
+        : `${explorerUrl}account/${encodeAddress(_value)}`;
     }
   }
 
@@ -28,9 +31,10 @@ export function extrinsicExplorerLink(value?: string | { toString: () => string 
   const _value = value?.toString();
 
   const explorerUrl = window.currentChain.explorerUrl;
+  const isStatescan = window.currentChain.statescan;
 
   if (explorerUrl) {
-    return `${explorerUrl}extrinsic/${_value}`;
+    return isStatescan ? `${explorerUrl}/#/extrinsics/${_value}` : `${explorerUrl}extrinsic/${_value}`;
   }
 
   return undefined;

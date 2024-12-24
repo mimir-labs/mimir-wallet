@@ -19,6 +19,7 @@ export type Endpoint = {
   genesisHash: string;
   socketUrl: string;
   serviceUrl: string;
+  statescan?: boolean;
   explorerUrl?: string;
   proposalApi?: string;
   subsquareUrl?: string;
@@ -194,6 +195,7 @@ export const polkadotEndpoints: Endpoint[] = [
     ss58Format: 42,
     serviceUrl: 'https://nexus-api.mimir.global/',
     socketUrl: 'wss://nexus-api.mimir.global/',
+    statescan: true,
     explorerUrl: 'https://nexus.statescan.io/'
   }
 ];
