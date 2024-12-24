@@ -1,16 +1,16 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import Fearless from '@mimir-wallet/assets/images/fearless.png';
-import FearlessDisabled from '@mimir-wallet/assets/images/fearless-disabled.png';
+import Fearless from '@mimir-wallet/assets/images/fearless.svg';
+import FearlessDisabled from '@mimir-wallet/assets/images/fearless-disabled.svg';
 import Nova from '@mimir-wallet/assets/images/nova.svg';
-import NovaDisabled from '@mimir-wallet/assets/images/nova-disabled.png';
-import Plutonication from '@mimir-wallet/assets/images/plutonication-icon.png';
+import NovaDisabled from '@mimir-wallet/assets/images/nova-disabled.svg';
+import Plutonication from '@mimir-wallet/assets/images/plutonication.webp';
 import PolkadotJs from '@mimir-wallet/assets/images/polkadotjs.svg';
 import PolkadotJsDisabled from '@mimir-wallet/assets/images/polkadotjs-disabled.svg';
-import Polkagate from '@mimir-wallet/assets/images/polkagate.png';
-import PolkagateDisabled from '@mimir-wallet/assets/images/polkagate-disabled.png';
-import Subwallet from '@mimir-wallet/assets/images/subwallet.png';
+import Polkagate from '@mimir-wallet/assets/images/polkagate.webp';
+import PolkagateDisabled from '@mimir-wallet/assets/images/polkagate-disabled.webp';
+import Subwallet from '@mimir-wallet/assets/images/subwallet.webp';
 import SubwalletDisabled from '@mimir-wallet/assets/images/subwallet-disabled.svg';
 import Talisman from '@mimir-wallet/assets/images/talisman.svg';
 import TalismanDisabled from '@mimir-wallet/assets/images/talisman-disabled.svg';
