@@ -1,14 +1,14 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Button, CircularProgress, Divider, Menu, MenuItem, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { Box, Button, CircularProgress, Grid2 as Grid, Popover, Stack, Typography } from '@mui/material';
+import React, { useMemo, useState } from 'react';
 
 import { findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks';
 
 function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
-  const { genesisHash, isApiConnected, isApiReady } = useApi();
+  const { genesisHash, isApiConnected, isApiReady, network } = useApi();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -49,7 +49,7 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
           {!isApiConnected || !isApiReady ? 'Connecting...' : endpoint?.name}
         </Button>
       )}
-      <Menu
+      <Popover
         anchorEl={anchorEl}
         anchorOrigin={{
           vertical: 'bottom',
@@ -59,7 +59,7 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
         open={open}
         slotProps={{
           paper: {
-            sx: { width: 200 }
+            sx: { width: 600, padding: { sm: 1.5, xs: 1 } }
           }
         }}
         transformOrigin={{
@@ -67,31 +67,51 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
           horizontal: 'right'
         }}
       >
-        {Object.keys(groupEndpoints).map((group, index) => {
-          return (
+        <Stack spacing={1}>
+          {Object.keys(groupEndpoints).map((group) => (
             <Box key={`group-${group}`}>
-              {index > 0 && <Divider sx={{ my: 0.5 }} />}
-              <Typography color='primary.main' sx={{ textTransform: 'capitalize', paddingLeft: 1 }}>
+              <Typography
+                variant='h6'
+                color='primary.main'
+                sx={{ textTransform: 'capitalize', paddingLeft: 1, marginBottom: { sm: 1, xs: 0.5 } }}
+              >
                 {group}
               </Typography>
-              {groupEndpoints[group].map((endpoint, index) => (
-                <MenuItem
-                  disableRipple
-                  key={endpoint.genesisHash || index}
-                  onClick={() => {
-                    window.location.href = `${window.location.origin}?network=${endpoint.key}`;
+              <Grid container columns={{ sm: 3, xs: 2 }} spacing={{ sm: 1, xs: 0.5 }}>
+                {groupEndpoints[group].map((endpoint) => (
+                  <Grid size={1} key={endpoint.key}>
+                    <Button
+                      fullWidth
+                      sx={{
+                        borderRadius: 0.5,
+                        justifyContent: 'flex-start',
+                        color: 'text.primary',
+                        fontWeight: 400,
+                        bgcolor: network === endpoint.key ? 'secondary.main' : 'transparent',
+                        boxShadow: 'none',
+                        textAlign: 'left',
+                        paddingX: 1,
+                        ':hover,:active': {
+                          boxShadow: 'none',
+                          bgcolor: 'secondary.main'
+                        }
+                      }}
+                      onClick={() => {
+                        window.location.href = `${window.location.origin}?network=${endpoint.key}`;
 
-                    handleClose();
-                  }}
-                >
-                  <Box component='img' src={endpoint.icon} sx={{ width: 20, borderRadius: 1, marginRight: 1 }} />
-                  {endpoint.name}
-                </MenuItem>
-              ))}
+                        handleClose();
+                      }}
+                    >
+                      <Box component='img' src={endpoint.icon} sx={{ width: 20, borderRadius: 1, marginRight: 1 }} />
+                      {endpoint.name}
+                    </Button>
+                  </Grid>
+                ))}
+              </Grid>
             </Box>
-          );
-        })}
-      </Menu>
+          ))}
+        </Stack>
+      </Popover>
     </>
   );
 }
