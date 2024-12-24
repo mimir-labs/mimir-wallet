@@ -25,12 +25,16 @@ export function useAddresses() {
           };
 
           if (v && v.address && v.meta?.name && (v.meta.networks ? v.meta.networks.includes(network) : true)) {
-            values.push({
-              address: encodeAddress(v.address),
-              name: v.meta.name,
-              watchlist: v.meta.watchlist,
-              networks: v.meta.networks || []
-            });
+            try {
+              values.push({
+                address: encodeAddress(v.address),
+                name: v.meta.name,
+                watchlist: v.meta.watchlist,
+                networks: v.meta.networks || []
+              });
+            } catch {
+              /* empty */
+            }
           }
         }
       });

@@ -41,8 +41,8 @@ function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
 
   return (
     <Paper component={Stack} spacing={1.2} sx={{ padding: { sm: 1.5, xs: 1.2 }, borderRadius: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Stack alignItems='center' direction='row' spacing={1.25}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+        <Stack alignItems='center' direction='row' spacing={1.25} flexGrow={1}>
           <Box
             sx={{
               width: 8,
@@ -56,30 +56,32 @@ function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
                     : 'error.main'
             }}
           />
-          <Typography color='primary.main' fontWeight={700} variant='h6'>
+          <Typography color='primary.main' fontWeight={700} variant='h4'>
             No {formatTransactionId(transaction.id)}
           </Typography>
-          <Tooltip title={isCopied ? 'Copied' : 'Copy the transaction URL'}>
-            <IconButton
-              color='primary'
-              size='small'
-              onClick={() => {
-                const url = new URL(window.location.href);
-
-                url.searchParams.set('tx_id', transaction.id.toString());
-
-                copy(`${window.location.origin}/transactions/${transaction.id}`);
-              }}
-            >
-              <SvgIcon component={IconShare} />
-            </IconButton>
-          </Tooltip>
         </Stack>
+
         <Typography>
           {transaction.status < TransactionStatus.Success
             ? moment(transaction.createdAt).format()
             : moment(transaction.updatedAt).format()}
         </Typography>
+
+        <Tooltip title={isCopied ? 'Copied' : 'Copy the transaction URL'}>
+          <IconButton
+            color='primary'
+            size='small'
+            onClick={() => {
+              const url = new URL(window.location.href);
+
+              url.searchParams.set('tx_id', transaction.id.toString());
+
+              copy(`${window.location.origin}/transactions/${transaction.id}`);
+            }}
+          >
+            <SvgIcon component={IconShare} />
+          </IconButton>
+        </Tooltip>
       </Box>
       <Divider orientation='horizontal' />
       {downSm ? (
