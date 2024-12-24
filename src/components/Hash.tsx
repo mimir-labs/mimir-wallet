@@ -22,23 +22,25 @@ function Hash({ value, withCopy, withExplorer }: Props) {
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
 
+  const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(stringValue) : undefined;
+
   return (
     <Box
-      component='a'
+      component={explorerLink ? 'a' : 'span'}
       sx={{
         display: 'inline-flex',
         gap: 0.4,
         alignItems: 'center',
         textDecoration: 'none',
         color: 'inherit',
-        ':hover': withExplorer ? { textDecoration: 'underline' } : {}
+        ':hover': explorerLink ? { textDecoration: 'underline' } : {}
       }}
-      href={withExplorer ? chainLinks.extrinsicExplorerLink(stringValue) : undefined}
+      href={explorerLink}
       target='_blank'
     >
       {downSm ? `${stringValue?.slice(0, 8)}...${stringValue?.slice(-8)}` : stringValue}
       {withCopy && <CopyButton sx={{ padding: 0 }} size='small' value={stringValue} />}
-      {withExplorer && (
+      {explorerLink && (
         <IconButton color='inherit' size='small' sx={{ padding: 0 }}>
           <SvgIcon component={IconLink} inheritViewBox />
         </IconButton>
