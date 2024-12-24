@@ -1,0 +1,36 @@
+name: Deploy production
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - run: yarn install
+      - run: yarn build
+
+      - name: Deploy to production
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_port: ${{ secrets.PORT }}
+          remote_key: ${{ secrets.KEY }}
+          remote_path: ${{ secrets.TARGET }}
+          path: dist/
