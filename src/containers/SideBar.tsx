@@ -14,6 +14,7 @@ import {
   Paper,
   Stack,
   SvgIcon,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
@@ -141,22 +142,30 @@ function TopContent() {
               </Typography>
             </Stack>
             <Divider sx={{ marginY: 1 }} />
-            <IconButton color='primary' onClick={toggleQrOpen} size='small'>
-              <SvgIcon component={IconQr} inheritViewBox />
-            </IconButton>
-            <CopyButton color='primary' value={selected} />
-            <IconButton
-              color='primary'
-              component='a'
-              href={chainLinks.accountExplorerLink(selected)}
-              size='small'
-              target='_blank'
-            >
-              <SvgIcon component={IconLink} inheritViewBox />
-            </IconButton>
-            <IconButton color='primary' component={Link} size='small' to={`/transfer?from=${selected}`}>
-              <SvgIcon component={IconTransfer} inheritViewBox />
-            </IconButton>
+            <Tooltip title='QR Code'>
+              <IconButton color='primary' onClick={toggleQrOpen} size='small'>
+                <SvgIcon component={IconQr} inheritViewBox />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Copy'>
+              <CopyButton color='primary' value={selected} />
+            </Tooltip>
+            <Tooltip title='Explorer'>
+              <IconButton
+                color='primary'
+                component='a'
+                href={chainLinks.accountExplorerLink(selected)}
+                size='small'
+                target='_blank'
+              >
+                <SvgIcon component={IconLink} inheritViewBox />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Transfer'>
+              <IconButton color='primary' component={Link} size='small' to={`/transfer?from=${selected}`}>
+                <SvgIcon component={IconTransfer} inheritViewBox />
+              </IconButton>
+            </Tooltip>
           </Paper>
         ) : (
           <Button size='large' fullWidth sx={{ borderRadius: 1, height: 48 }} onClick={toggleCreateMultisigOpen}>
