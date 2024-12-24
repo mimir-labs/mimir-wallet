@@ -1,55 +1,31 @@
-name: Release
-
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 permissions:
-  contents: read # for checkout
+  contents: write
+  pull-requests: write
+
+name: release-please
 
 jobs:
-  release:
-    permissions:
-      contents: write # to be able to publish a GitHub release
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
-      id-token: write # to enable use of OIDC for npm provenance
-    env:
-      GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-    name: release
+  release-please:
     runs-on: ubuntu-latest
-    environment: staging
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: googleapis/release-please-action@v4
+        id: release
         with:
-          persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: node
+      - uses: actions/checkout@v4
+        with:
           fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: yarn
-
-      - name: yarn install
-        run: yarn install --frozen-lockfile
-
-      - name: Semantic Release
-        run: yarn semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-
-      - name: Build
-        run: yarn build
-
-      - name: Deploy to staging
-        uses: burnett01/rsync-deployments@6.0.0
-        with:
-          switches: -avzr
-          remote_host: ${{ secrets.HOST }}
-          remote_user: ${{ secrets.USERNAME }}
-          remote_port: ${{ secrets.PORT }}
-          remote_key: ${{ secrets.KEY }}
-          remote_path: ${{ secrets.TARGET }}
-          path: dist/
+          node-version: "20"
+          cache: "yarn"
+      - run: yarn install
+      - run: yarn build
