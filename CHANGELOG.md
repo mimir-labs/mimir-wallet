@@ -1,3 +1,18 @@
+# [1.6.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.5.0...v1.6.0) (2024-12-24)
+
+
+### Bug Fixes
+
+* fix ui display issues in Lock and Transaction share ([#95](https://github.com/mimir-labs/mimir-wallet/issues/95)) ([f3daa38](https://github.com/mimir-labs/mimir-wallet/commit/f3daa387e4d6ec566f8176ac87b54195fc19ed04))
+* remove underline and icon for hash when no explorer link ([#98](https://github.com/mimir-labs/mimir-wallet/issues/98)) ([f2d0e46](https://github.com/mimir-labs/mimir-wallet/commit/f2d0e462a51d28c1ab1a885ce277d63863879536))
+
+
+### Features
+
+* optimize connect wallet layout ([#97](https://github.com/mimir-labs/mimir-wallet/issues/97)) ([bbb7eeb](https://github.com/mimir-labs/mimir-wallet/commit/bbb7eebff1f3735533e4a5e06f6ef6c86b0d0c1d))
+* optimize network selection layout ([#96](https://github.com/mimir-labs/mimir-wallet/issues/96)) ([d55ab71](https://github.com/mimir-labs/mimir-wallet/commit/d55ab71b4cbe49d930f1a8b4388cd33d2bc431b2))
+* use blake2 hash when the call is for multisig transaction ([#93](https://github.com/mimir-labs/mimir-wallet/issues/93)) ([42573ab](https://github.com/mimir-labs/mimir-wallet/commit/42573abb122a68da9c3ca4dd0ec5e6bfee8812d1))
+
 # [1.5.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.4.0...v1.5.0) (2024-12-17)
 
 
