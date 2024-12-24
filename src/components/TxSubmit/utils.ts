@@ -9,6 +9,7 @@ import type { HexString } from '@polkadot/util/types';
 import type { FilterPath, Transaction } from '@mimir-wallet/hooks/types';
 
 import { isString, u8aSorted } from '@polkadot/util';
+import { blake2AsU8a } from '@polkadot/util-crypto';
 
 import { callFilter, decodeAddress } from '@mimir-wallet/api';
 import { addressEq } from '@mimir-wallet/utils';
@@ -23,7 +24,8 @@ async function asMulti(
   otherSignatories: string[]
 ) {
   const [info, { weight }] = await Promise.all([
-    api.query.multisig.multisigs(multisig, tx.method.hash),
+    // IMPORTANT: the hash is used to identify the multisig transaction
+    api.query.multisig.multisigs(multisig, blake2AsU8a(tx.method.toU8a())),
     tx.paymentInfo(multisig)
   ]);
 

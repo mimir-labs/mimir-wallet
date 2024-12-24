@@ -183,6 +183,17 @@ export const polkadotEndpoints: Endpoint[] = [
     explorerUrl: 'https://hydration.subscan.io/',
     proposalApi: 'https://hydration.subsquare.io/api/gov2/referendums?simple=true',
     subsquareUrl: 'https://hydration.subsquare.io/'
+  },
+  {
+    key: 'nexus',
+    icon: '/chain-icons/nexus.webp',
+    tokenIcon: '/token-icons/BRIDGE.webp',
+    name: 'Hyperbridge (Nexus)',
+    wsUrl: 'wss://hyperbridge-nexus-rpc.blockops.network/',
+    genesisHash: '0x61ea8a51fd4a058ee8c0e86df0a89cc85b8b67a0a66432893d09719050c9f540',
+    ss58Format: 42,
+    serviceUrl: 'https://nexus-api.mimir.global/',
+    socketUrl: 'wss://nexus-api.mimir.global/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
