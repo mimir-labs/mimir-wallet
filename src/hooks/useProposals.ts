@@ -4,7 +4,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
-import { chainLinks } from '@mimir-wallet/utils';
+import { chainLinks } from '@mimir-wallet/api/chain-links';
 
 export interface ProposalData {
   referendumIndex: number;

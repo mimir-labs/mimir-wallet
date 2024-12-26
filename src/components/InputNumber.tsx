@@ -6,7 +6,7 @@ import type { InputNumberProps } from './types';
 import { Box, Button } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
 
-import { useInputNumber } from '@mimir-wallet/hooks';
+import { useInputNumber } from '@mimir-wallet/hooks/useInputNumber';
 
 import FormatBalance from './FormatBalance';
 import Input from './Input';

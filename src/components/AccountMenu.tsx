@@ -26,6 +26,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
+import { useGroupAccounts } from '@mimir-wallet/accounts/useGroupAccounts';
 import IconAdd from '@mimir-wallet/assets/svg/icon-add.svg?react';
 import IconAddFill from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
@@ -36,7 +38,9 @@ import IconUnion from '@mimir-wallet/assets/svg/icon-union.svg?react';
 import IconUser from '@mimir-wallet/assets/svg/icon-user.svg?react';
 import IconWatch from '@mimir-wallet/assets/svg/icon-watch.svg?react';
 import { findToken } from '@mimir-wallet/config';
-import { useAccount, useApi, useGroupAccounts, useNativeBalances, useWallet } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useNativeBalances } from '@mimir-wallet/hooks/useBalances';
+import { useAccountSource } from '@mimir-wallet/wallet/useWallet';
 
 import AddressCell from './AddressCell';
 import CreateMultisigDialog from './CreateMultisigDialog';
@@ -73,12 +77,12 @@ function AccountCell({
   onSelect?: (address: string) => void;
 }) {
   const { genesisHash } = useApi();
-  const { accountSource } = useWallet();
   const { isLocalAccount, deleteAddress, showAccount, hideAccount } = useAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const balances = useNativeBalances(value);
   const icon = useMemo(() => findToken(genesisHash).Icon, [genesisHash]);
+  const source = useAccountSource(value);
 
   const handleMore = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -112,10 +116,11 @@ function AccountCell({
           horizontal: 'right'
         }}
       >
-        {value && isLocalAccount(value) && (
-          <>
-            {!accountSource(value) && (
+        {value &&
+          isLocalAccount(value) && [
+            source ? null : (
               <MenuItem
+                key='hide-0'
                 disableRipple
                 onClick={() => {
                   isHide ? showAccount(value) : hideAccount(value);
@@ -123,15 +128,20 @@ function AccountCell({
               >
                 {isHide ? 'Show' : 'Hide'}
               </MenuItem>
-            )}
-            <MenuItem component={Link} disableRipple onClick={onClose} to={`/account-setting?address=${value}`}>
+            ),
+            <MenuItem
+              key='setting-1'
+              component={Link}
+              disableRipple
+              onClick={onClose}
+              to={`/account-setting?address=${value}`}
+            >
               Setting
             </MenuItem>
-          </>
-        )}
+          ]}
 
         {value && watchlist && (
-          <MenuItem disableRipple onClick={() => deleteAddress(value)}>
+          <MenuItem key='delete-2' disableRipple onClick={() => deleteAddress(value)}>
             Delete
           </MenuItem>
         )}

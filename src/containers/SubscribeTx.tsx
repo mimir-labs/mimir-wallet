@@ -6,12 +6,13 @@ import type { HexString } from '@polkadot/util/types';
 import { Box, Typography } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Address, toastError, toastSuccess } from '@mimir-wallet/components';
+import { Address } from '@mimir-wallet/components';
+import { toastError, toastSuccess } from '@mimir-wallet/components/utils';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
-import { SocketCtx } from '@mimir-wallet/socket';
+import { subscribe } from '@mimir-wallet/socket';
 import { formatTransactionId } from '@mimir-wallet/transactions';
 
 type TxMessage = {
@@ -29,8 +30,6 @@ type TxMessage = {
 };
 
 function SubscribeTx({ address }: { address: string }) {
-  const { subscribe, unsubscribe } = useContext(SocketCtx);
-
   useEffect(() => {
     const topic = `tx:${u8aToHex(decodeAddress(address))}`;
 
@@ -95,9 +94,8 @@ function SubscribeTx({ address }: { address: string }) {
 
     return () => {
       unsub();
-      unsubscribe(topic);
     };
-  }, [address, subscribe, unsubscribe]);
+  }, [address]);
 
   return null;
 }

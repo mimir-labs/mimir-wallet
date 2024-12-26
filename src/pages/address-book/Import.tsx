@@ -6,9 +6,9 @@ import { isAddress } from '@polkadot/util-crypto';
 import { parse } from 'papaparse';
 import { useRef } from 'react';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import IconDownload from '@mimir-wallet/assets/svg/icon-download.svg?react';
-import { toastError, toastSuccess } from '@mimir-wallet/components';
-import { useAccount } from '@mimir-wallet/hooks';
+import { toastError, toastSuccess } from '@mimir-wallet/components/utils';
 
 function Import() {
   const { addAddress } = useAccount();

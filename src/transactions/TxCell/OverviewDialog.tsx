@@ -8,8 +8,9 @@ import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import React from 'react';
 
 import { HistoryTxOverview, TxOverview } from '@mimir-wallet/components';
-import { useApi, useTxQueue } from '@mimir-wallet/hooks';
 import { type AccountData, FilterPath, type Transaction, TransactionStatus } from '@mimir-wallet/hooks/types';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 
 interface Props {
   account: AccountData;

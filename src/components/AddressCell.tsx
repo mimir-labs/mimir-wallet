@@ -7,8 +7,9 @@ import { alpha, Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/m
 import { hexToU8a } from '@polkadot/util';
 import React from 'react';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
-import { useAccount, useAddressMeta } from '@mimir-wallet/hooks';
 import { addressEq } from '@mimir-wallet/utils';
 
 import AddressComp from './Address';
@@ -25,7 +26,6 @@ interface Props {
   withCopy?: boolean;
   withAddressBook?: boolean;
   width?: number | string;
-  isMe?: boolean;
   namePost?: React.ReactNode | null;
   icons?: React.ReactNode;
 }
@@ -33,7 +33,6 @@ interface Props {
 function AddressCell({
   defaultName,
   icons,
-  isMe,
   namePost,
   shorten = true,
   showType = false,
@@ -51,7 +50,7 @@ function AddressCell({
 
   return (
     <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
-      <IdentityIcon className='AddressCell-Icon' isMe={isMe} size={iconSize} value={value} />
+      <IdentityIcon className='AddressCell-Icon' size={iconSize} value={value} />
       <Stack className='AddressCell-Content' spacing={spacingCol}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Typography

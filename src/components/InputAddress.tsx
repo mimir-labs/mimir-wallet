@@ -20,9 +20,10 @@ import {
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
 import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
-import { useAccount, useToggle } from '@mimir-wallet/hooks';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 
 import AddressCell from './AddressCell';
 import FormatBalance from './FormatBalance';

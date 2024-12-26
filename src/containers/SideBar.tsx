@@ -22,6 +22,8 @@ import {
 import { useContext, useMemo, useState } from 'react';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 
+import { useSelectedAccount } from '@mimir-wallet/accounts/useSelectedAccount';
+import { chainLinks } from '@mimir-wallet/api/chain-links';
 import ArrowRight from '@mimir-wallet/assets/svg/ArrowRight.svg?react';
 import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
@@ -41,10 +43,12 @@ import {
   WalletIcon
 } from '@mimir-wallet/components';
 import { findToken, walletConfig } from '@mimir-wallet/config';
-import { useApi, useCall, useSelectedAccount, useToggle, useWallet } from '@mimir-wallet/hooks';
-import { chainLinks } from '@mimir-wallet/utils';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
+import { useWallet } from '@mimir-wallet/wallet/useWallet';
 
-import { BaseContainerCtx } from './BaseContainer';
+import { BaseContainerCtx } from './context';
 import ToggleSidebar from './ToggleSidebar';
 
 function NavLink({

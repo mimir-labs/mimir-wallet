@@ -22,10 +22,13 @@ import { isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { encodeAddress } from '@mimir-wallet/api';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { Address, AddressRow, Input } from '@mimir-wallet/components';
-import { useAccount, useApi, useCacheMultisig, useToggle } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCacheMultisig } from '@mimir-wallet/hooks/useCacheMultisig';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';

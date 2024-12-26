@@ -23,7 +23,8 @@ import { Link } from 'react-router-dom';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 import { FormatBalance } from '@mimir-wallet/components';
 import { findToken } from '@mimir-wallet/config';
-import { useApi, useAssetBalances } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useAssetBalances } from '@mimir-wallet/hooks/useBalances';
 
 function AssetRow({
   assetId,

@@ -4,8 +4,9 @@
 import { LoadingButton } from '@mui/lab';
 import React from 'react';
 
-import { useApi, useTxQueue } from '@mimir-wallet/hooks';
 import { type AccountData, type FilterPath, type Transaction, TransactionType } from '@mimir-wallet/hooks/types';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 
 function Approve({
   account,

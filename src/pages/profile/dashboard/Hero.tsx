@@ -19,7 +19,10 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
 import { encodeAddress } from '@mimir-wallet/api';
+import { chainLinks } from '@mimir-wallet/api/chain-links';
 import StatescanImg from '@mimir-wallet/assets/images/statescan.svg';
 import SubscanImg from '@mimir-wallet/assets/images/subscan.svg';
 import IconAdd from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
@@ -28,10 +31,10 @@ import IconProxy from '@mimir-wallet/assets/svg/icon-proxy-fill.svg?react';
 import IconQrcode from '@mimir-wallet/assets/svg/icon-qr.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@mimir-wallet/assets/svg/icon-set.svg?react';
-import { Address, AddressName, Fund, IdentityIcon, QrcodeAddress } from '@mimir-wallet/components';
+import { Address, AddressName, CopyButton, Fund, IdentityIcon, QrcodeAddress } from '@mimir-wallet/components';
 import { ONE_DAY } from '@mimir-wallet/constants';
-import { useAccount, useApi, useQueryAccount } from '@mimir-wallet/hooks';
-import { chainLinks, formatDisplay } from '@mimir-wallet/utils';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { formatDisplay } from '@mimir-wallet/utils';
 
 function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string; changes: number }) {
   const { chain } = useApi();
@@ -156,8 +159,9 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               }}
             >
               <Address value={address} shorten={downSm} />
-              <IconButton color='primary' onClick={toggleQrOpen} sx={{ padding: 0 }}>
-                <SvgIcon component={IconQrcode} inheritViewBox sx={{ opacity: 0.5 }} />
+              <CopyButton value={address} color='primary' sx={{ opacity: 0.5 }} />
+              <IconButton color='primary' onClick={toggleQrOpen} sx={{ padding: 0, opacity: 0.5 }}>
+                <SvgIcon component={IconQrcode} inheritViewBox />
               </IconButton>
             </Box>
 

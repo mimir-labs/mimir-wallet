@@ -9,7 +9,7 @@ import moment from 'moment';
 import React from 'react';
 
 import { AppName, Bytes, Hash } from '@mimir-wallet/components';
-import { useToggle } from '@mimir-wallet/hooks';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 
 import Target from './Target';
 

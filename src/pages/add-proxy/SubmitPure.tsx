@@ -6,7 +6,8 @@ import { u8aToHex } from '@polkadot/util';
 import React from 'react';
 
 import { decodeAddress } from '@mimir-wallet/api';
-import { useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 import { service } from '@mimir-wallet/utils';
 
 function SubmitPure({

@@ -7,7 +7,7 @@ import { Stack } from '@mui/material';
 import React from 'react';
 
 import { Empty } from '@mimir-wallet/components';
-import { usePendingTransactions } from '@mimir-wallet/hooks';
+import { usePendingTransactions } from '@mimir-wallet/hooks/useTransactions';
 import { TxCell } from '@mimir-wallet/transactions';
 
 import { skeleton } from './skeleton';

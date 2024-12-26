@@ -7,7 +7,9 @@ import { Box, Typography } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 import { toast, type ToastOptions } from 'react-toastify';
 
-import { FailedAnimation, SuccessAnimation, WaitingAnimation } from '../animation';
+import FailedAnimation from '../animation/Failed';
+import SuccessAnimation from '../animation/Success';
+import WaitingAnimation from '../animation/Waiting';
 import TxError from '../TxError';
 
 function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions] {

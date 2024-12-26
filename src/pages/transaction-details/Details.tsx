@@ -11,7 +11,7 @@ import { useToggle } from 'react-use';
 
 import { findTargetCall } from '@mimir-wallet/api';
 import { AddressCell, Bytes, Hash } from '@mimir-wallet/components';
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { FunctionArgs } from '@mimir-wallet/params';
 
 function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {

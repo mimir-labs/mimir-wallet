@@ -3,19 +3,19 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { serviceUrl } from '@mimir-wallet/utils/chain-links';
+import { chainLinks } from '@mimir-wallet/api/chain-links';
 
 import { CacheMultisig } from './types';
-import { useAccount } from './useAccounts';
+import { useAddressStore } from './useAddressStore';
 
 export function useCacheMultisig(): [data: CacheMultisig[], isLoading: boolean] {
-  const { accounts } = useAccount();
+  const { accounts } = useAddressStore();
   const { data, isLoading } = useQuery<CacheMultisig[]>({
     refetchInterval: false,
-    queryHash: serviceUrl(`multisig/pending?${accounts.map((address) => `addresses=${address}`).join('&')}`),
+    queryHash: chainLinks.serviceUrl(`multisig/pending?${accounts.map((address) => `addresses=${address}`).join('&')}`),
     queryKey: [
       accounts.length > 0
-        ? serviceUrl(`multisig/pending?${accounts.map((address) => `addresses=${address}`).join('&')}`)
+        ? chainLinks.serviceUrl(`multisig/pending?${accounts.map((address) => `addresses=${address}`).join('&')}`)
         : null
     ]
   });

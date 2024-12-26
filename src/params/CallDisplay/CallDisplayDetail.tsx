@@ -8,7 +8,7 @@ import React, { useMemo } from 'react';
 
 import { AddressRow, FormatBalance } from '@mimir-wallet/components';
 import { findAssets, findToken } from '@mimir-wallet/config';
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 function CallDisplayDetail({
   registry,

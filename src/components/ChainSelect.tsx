@@ -5,7 +5,7 @@ import { Box, Button, CircularProgress, Grid2 as Grid, Popover, Stack, Typograph
 import React, { useMemo, useState } from 'react';
 
 import { findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
   const { genesisHash, isApiConnected, isApiReady, network } = useApi();

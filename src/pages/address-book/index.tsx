@@ -3,8 +3,8 @@
 
 import { Box, Stack } from '@mui/material';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { Empty } from '@mimir-wallet/components';
-import { useAccount } from '@mimir-wallet/hooks';
 
 import AddAddress from './AddAddress';
 import AddressItem from './AddressItem';

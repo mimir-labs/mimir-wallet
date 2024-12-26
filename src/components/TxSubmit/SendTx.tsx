@@ -9,19 +9,19 @@ import type { BuildTx } from './hooks/useBuildTx';
 
 import { LoadingButton } from '@mui/lab';
 import { Alert, AlertTitle, Box, Divider, SvgIcon, Tooltip, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 
 import { sign, signAndSend, TxEvents } from '@mimir-wallet/api';
 import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
-import { useWallet } from '@mimir-wallet/hooks';
-import { TxToastCtx } from '@mimir-wallet/providers';
+import { addTxToast } from '@mimir-wallet/hooks/useTxQueue';
 import { service } from '@mimir-wallet/utils';
+import { useAccountSource } from '@mimir-wallet/wallet/useWallet';
 
 import AddressName from '../AddressName';
 import FormatBalance from '../FormatBalance';
 import LockItem, { LockContainer } from '../LockItem';
-import { toastError } from '../ToastRoot';
+import { toastError } from '../utils';
 
 function SendTx({
   disabled,
@@ -50,11 +50,10 @@ function SendTx({
   onSignature?: (signer: string, signature: HexString, tx: Extrinsic, payload: ExtrinsicPayloadValue) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }) {
-  const { accountSource } = useWallet();
-  const { addToast } = useContext(TxToastCtx);
   const [loading, setLoading] = useState(false);
   const { txBundle, isLoading, error, hashSet, reserve, unreserve, delay } = buildTx;
   const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
+  const source = useAccountSource(txBundle?.signer);
 
   const isEnought = Object.keys(reserve).reduce<boolean>((result, item) => result && !!enoughtState[item], true);
 
@@ -71,8 +70,6 @@ function SendTx({
       return;
     }
 
-    const source = accountSource(signer);
-
     if (!source) {
       toastError('No available signing address.');
 
@@ -87,7 +84,7 @@ function SendTx({
       }
 
       if (onlySign) {
-        addToast({ events });
+        addTxToast({ events });
 
         const [signature, payload, extrinsicHash] = await sign(tx, signer, source);
 
@@ -101,7 +98,7 @@ function SendTx({
           beforeSend
         });
 
-        addToast({ events });
+        addTxToast({ events });
 
         events.on('inblock', (result) => {
           service.uploadWebsite(result.txHash.toHex(), website, appName, iconUrl, note);
@@ -205,7 +202,7 @@ function SendTx({
         loading={loading || isLoading}
         disabled={!txBundle?.signer || !!error || !isEnought || disabled}
       >
-        Submit
+        Submit1
       </LoadingButton>
     </>
   );

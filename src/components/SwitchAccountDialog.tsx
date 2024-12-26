@@ -17,8 +17,8 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@mimir-wallet/constants';
-import { useAccount } from '@mimir-wallet/hooks';
 import { store } from '@mimir-wallet/utils';
 
 import AddressCell from './AddressCell';

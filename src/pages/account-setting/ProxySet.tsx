@@ -29,12 +29,16 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 import IconDelete from '@mimir-wallet/assets/svg/icon-delete.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { Address, AddressCell, FormatBalance } from '@mimir-wallet/components';
 import { findToken } from '@mimir-wallet/config';
-import { useAccount, useAddressMeta, useApi, useCall, useTxQueue } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 
 function ProxySet({
   account,

@@ -5,10 +5,11 @@ import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { FormatBalance, Fund } from '@mimir-wallet/components';
-import { useAccount, useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { formatUnits } from '@mimir-wallet/utils';
 
 function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {

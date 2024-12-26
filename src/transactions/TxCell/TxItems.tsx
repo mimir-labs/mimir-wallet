@@ -10,8 +10,9 @@ import { Link } from 'react-router-dom';
 
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
 import { AppName } from '@mimir-wallet/components';
-import { useApi, useToggle } from '@mimir-wallet/hooks';
 import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@mimir-wallet/params';
 import { formatAgo } from '@mimir-wallet/utils';
 

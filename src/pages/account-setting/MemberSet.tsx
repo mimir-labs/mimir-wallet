@@ -8,9 +8,11 @@ import { u8aToHex } from '@polkadot/util';
 import { addressEq, decodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { encodeAddress } from '@mimir-wallet/api';
 import { Input } from '@mimir-wallet/components';
-import { useAccount, useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 import { service } from '@mimir-wallet/utils';
 
 import AccountSelect from '../create-multisig/AccountSelect';

@@ -22,17 +22,20 @@ import {
 } from '@mui/material';
 import { u8aEq, u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useSelectedAccountCallback } from '@mimir-wallet/accounts/useSelectedAccount';
 import { signAndSend } from '@mimir-wallet/api';
 import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mimir-wallet/components';
 import { utm } from '@mimir-wallet/config';
 import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
-import { useApi, useCall, useSelectedAccountCallback, useWallet } from '@mimir-wallet/hooks';
-import { TxToastCtx } from '@mimir-wallet/providers';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCall } from '@mimir-wallet/hooks/useCall';
+import { addTxToast } from '@mimir-wallet/hooks/useTxQueue';
 import { addressToHex, service, sleep, store } from '@mimir-wallet/utils';
+import { accountSource, useAccountSource, useWallet } from '@mimir-wallet/wallet/useWallet';
 
 interface Props {
   prepare: PrepareFlexible;
@@ -84,7 +87,7 @@ function CreateFlexible({
   }
 }: Props) {
   const { api } = useApi();
-  const { accountSource, walletAccounts } = useWallet();
+  const { walletAccounts } = useWallet();
   const [signer, setSigner] = useState<string | undefined>(creator || walletAccounts[0].address);
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
   const [blockNumber, setBlockNumber] = useState<number | null | undefined>(_blockNumber);
@@ -95,8 +98,7 @@ function CreateFlexible({
   const [loadingFirst, setLoadingFirst] = useState(false);
   const [loadingSecond, setLoadingSecond] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
-  const { addToast } = useContext(TxToastCtx);
-  const source = useMemo(() => (signer ? accountSource(signer) : undefined), [accountSource, signer]);
+  const source = useAccountSource(signer);
   const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
   const isEnought = signer ? !!enoughtState[signer] : false;
 
@@ -133,7 +135,7 @@ function CreateFlexible({
       setLoadingSecond(true);
       const events = signAndSend(extrinsic, signer, source, { checkProxy: true });
 
-      addToast({ events });
+      addTxToast({ events });
 
       events.once('finalized', async () => {
         while (true) {
@@ -156,13 +158,11 @@ function CreateFlexible({
       });
       events.once('error', () => setLoadingSecond(false));
     },
-    [addToast, api, navigate, selectAccount]
+    [api, navigate, selectAccount]
   );
 
   const createPure = useCallback(() => {
     if (!signer) return;
-    const source = accountSource(signer);
-
     if (!source) return;
 
     const extrinsic = api.tx.proxy.createPure('Any', 0, 0);
@@ -180,7 +180,7 @@ function CreateFlexible({
       }
     });
 
-    addToast({ events });
+    addTxToast({ events });
 
     setLoadingFirst(true);
     events.once('inblock', (result) => {
@@ -211,12 +211,10 @@ function CreateFlexible({
     events.once('error', () => {
       setLoadingFirst(false);
     });
-  }, [signer, accountSource, api, addToast, name, threshold, who, createMembers]);
+  }, [signer, source, api, name, threshold, who, createMembers]);
 
   const killPure = useCallback(
     (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
-      const source = accountSource(signer);
-
       if (!source) return;
 
       const extrinsic = api.tx.proxy.proxy(
@@ -227,7 +225,7 @@ function CreateFlexible({
 
       const events = signAndSend(extrinsic, signer, source, { checkProxy: true });
 
-      addToast({ events });
+      addTxToast({ events });
 
       setLoadingCancel(true);
       events.once('inblock', () => {
@@ -236,7 +234,7 @@ function CreateFlexible({
       });
       events.once('error', () => setLoadingCancel(false));
     },
-    [accountSource, api.tx.proxy, addToast, onCancel]
+    [source, api.tx.proxy, onCancel]
   );
 
   return (

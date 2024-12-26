@@ -10,10 +10,12 @@ import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
+import { useSelectedAccountCallback } from '@mimir-wallet/accounts/useSelectedAccount';
 import { decodeAddress, encodeAddress } from '@mimir-wallet/api';
 import { utm } from '@mimir-wallet/config';
 import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
-import { useAccount, useSelectedAccountCallback, useToggle } from '@mimir-wallet/hooks';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { addressToHex, service, store } from '@mimir-wallet/utils';
 
 interface Props {

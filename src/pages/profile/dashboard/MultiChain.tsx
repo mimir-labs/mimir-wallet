@@ -7,7 +7,7 @@ import React, { useMemo } from 'react';
 import { encodeAddress } from '@mimir-wallet/api';
 import { CopyButton } from '@mimir-wallet/components';
 import { allEndpoints } from '@mimir-wallet/config';
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 function MultiChain({ address }: { address: string }) {
   const { genesisHash } = useApi();

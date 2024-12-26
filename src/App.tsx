@@ -1,10 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Endpoint } from './config';
-
 import { useRef } from 'react';
-import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
 import BaseContainer from './containers/BaseContainer';
 import PageAccountSetting from './pages/account-setting';
@@ -18,98 +16,111 @@ import PageWelcome from './pages/profile/Welcome';
 import PageTransactionDetails from './pages/transaction-details';
 import PageTransactions from './pages/transactions';
 import PageTransfer from './pages/transfer';
-import { Providers } from './providers';
 
-function App({ address, chain }: { address?: string; chain: Endpoint }) {
+/**
+ * Main Application Component
+ *
+ * This component serves as the root of the application's routing structure.
+ * It defines all available routes and their corresponding components using React Router.
+ * The routes are organized into different sections based on authentication requirements
+ * and layout configurations (sidebar, padding).
+ *
+ * Route Categories:
+ * - Authenticated routes with sidebar and padding (main app pages)
+ * - Authenticated routes without sidebar (specific features)
+ * - Public routes (account creation flows)
+ * - Explorer routes (special layout)
+ * - Welcome and standalone pages
+ */
+function App() {
+  // Define application routing configuration using React Router
   const router = useRef(
     createBrowserRouter([
       {
-        element: (
-          <Providers address={address} chain={chain}>
-            <Outlet />
-          </Providers>
-        ),
+        // Authenticated routes with sidebar and padding
+        element: <BaseContainer auth withSideBar withPadding />,
         children: [
           {
-            element: <BaseContainer auth withSideBar withPadding />,
-            children: [
-              {
-                index: true,
-                element: <PageProfile />
-              },
-              {
-                path: '/dapp',
-                element: <PageDapp />
-              },
-              {
-                path: '/transactions',
-                element: <PageTransactions />
-              },
-              {
-                path: '/transactions/:id',
-                element: <PageTransactionDetails />
-              },
-              {
-                path: '/address-book',
-                element: <PageAddressBook />
-              },
-              {
-                path: '/account-setting',
-                element: <PageAccountSetting />
-              }
-            ]
+            index: true,
+            element: <PageProfile />
           },
           {
-            element: <BaseContainer auth withSideBar={false} withPadding />,
-            children: [
-              {
-                path: '/add-proxy',
-                element: <PageAddProxy />
-              }
-            ]
+            path: '/dapp',
+            element: <PageDapp />
           },
           {
-            element: <BaseContainer auth={false} withSideBar={false} withPadding />,
-            children: [
-              {
-                path: '/create-multisig',
-                element: <PageCreateMultisig />
-              },
-              {
-                path: '/create-multisig-one',
-                element: <PageCreateMultisig threshold1 />
-              },
-              {
-                path: '/create-pure',
-                element: <PageAddProxy pure />
-              }
-            ]
+            path: '/transactions',
+            element: <PageTransactions />
           },
           {
-            element: <BaseContainer auth withSideBar={false} withPadding={false} />,
-            children: [
-              {
-                path: '/explorer/:url',
-                element: <PageExplorer />
-              }
-            ]
+            path: '/transactions/:id',
+            element: <PageTransactionDetails />
           },
           {
-            element: <BaseContainer auth={false} withSideBar withPadding />,
-            children: [
-              {
-                path: '/welcome',
-                element: <PageWelcome />
-              }
-            ]
+            path: '/address-book',
+            element: <PageAddressBook />
+          },
+          {
+            path: '/account-setting',
+            element: <PageAccountSetting />
           }
         ]
       },
       {
+        // Authenticated routes without sidebar
+        element: <BaseContainer auth withSideBar={false} withPadding />,
+        children: [
+          {
+            path: '/add-proxy',
+            element: <PageAddProxy />
+          }
+        ]
+      },
+      {
+        // Public routes for account creation
+        element: <BaseContainer auth={false} withSideBar={false} withPadding />,
+        children: [
+          {
+            path: '/create-multisig',
+            element: <PageCreateMultisig />
+          },
+          {
+            path: '/create-multisig-one',
+            element: <PageCreateMultisig threshold1 />
+          },
+          {
+            path: '/create-pure',
+            element: <PageAddProxy pure />
+          }
+        ]
+      },
+      {
+        // Explorer routes without padding
+        element: <BaseContainer auth withSideBar={false} withPadding={false} />,
+        children: [
+          {
+            path: '/explorer/:url',
+            element: <PageExplorer />
+          }
+        ]
+      },
+      {
+        // Welcome page for new users
+        element: <BaseContainer auth={false} withSideBar withPadding />,
+        children: [
+          {
+            path: '/welcome',
+            element: <PageWelcome />
+          }
+        ]
+      },
+      {
+        // Standalone transfer page
         path: '/transfer',
         element: <PageTransfer />
       },
       {
+        // Redirect all unmatched routes to home
         path: '*',
         element: <Navigate replace to='/' />
       }

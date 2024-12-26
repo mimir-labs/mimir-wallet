@@ -16,7 +16,9 @@ import IconLock from '@mimir-wallet/assets/svg/icon-lock.svg?react';
 import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
 import IconSuccess from '@mimir-wallet/assets/svg/icon-success-fill.svg?react';
 import IconUnLock from '@mimir-wallet/assets/svg/icon-unlock.svg?react';
-import { useApi, useCall, useToggle } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { formatUnits } from '@mimir-wallet/utils';
 
 import AddressName from './AddressName';

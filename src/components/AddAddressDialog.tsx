@@ -5,12 +5,14 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typog
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { decodeAddress, encodeAddress } from '@mimir-wallet/api';
-import { useAccount, useApi, useDeriveAccountInfo } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useDeriveAccountInfo } from '@mimir-wallet/hooks/useDeriveAccountInfo';
 import { addressEq } from '@mimir-wallet/utils';
 
 import Input from './Input';
-import { toastError } from './ToastRoot';
+import { toastError } from './utils';
 
 function Content({
   defaultAddress,

@@ -10,10 +10,10 @@ import IconMenu from '@mimir-wallet/assets/svg/icon-menu.svg?react';
 import IconSetting from '@mimir-wallet/assets/svg/icon-set.svg?react';
 import LogoCircle from '@mimir-wallet/assets/svg/logo-circle.svg';
 import { AccountSelect, ChainSelect } from '@mimir-wallet/components';
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
-import { BaseContainerCtx } from './BaseContainer';
 import BatchButton from './BatchButton';
+import { BaseContainerCtx } from './context';
 
 function TopBar() {
   const { isApiReady } = useApi();

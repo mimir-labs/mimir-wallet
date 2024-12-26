@@ -13,7 +13,8 @@ import IconFund from '@mimir-wallet/assets/svg/icon-fund-fill.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@mimir-wallet/assets/svg/icon-set.svg?react';
 import { FormatBalance } from '@mimir-wallet/components';
-import { useApi, useTokenInfo } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useTokenInfo } from '@mimir-wallet/hooks/useTokenInfo';
 
 function Info({
   address,

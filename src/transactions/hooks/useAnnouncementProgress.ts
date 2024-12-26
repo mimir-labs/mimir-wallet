@@ -9,8 +9,9 @@ import type { ITuple } from '@polkadot/types/types';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
-import { useApi, useCall } from '@mimir-wallet/hooks';
 import { AccountData, ProxyTransaction, TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCall } from '@mimir-wallet/hooks/useCall';
 import { addressEq } from '@mimir-wallet/utils';
 
 export function useAnnouncementProgress(

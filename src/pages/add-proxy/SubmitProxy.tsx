@@ -20,8 +20,10 @@ import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAsyncFn, useToggle } from 'react-use';
 
-import { Address, AddressRow, toastSuccess } from '@mimir-wallet/components';
-import { useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { Address, AddressRow } from '@mimir-wallet/components';
+import { toastSuccess } from '@mimir-wallet/components/utils';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 
 function ConfirmDialog({
   open,

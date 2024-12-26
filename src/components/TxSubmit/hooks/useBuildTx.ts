@@ -10,7 +10,7 @@ import type { TxBundle } from '../utils';
 import { useEffect, useState } from 'react';
 
 import { extrinsicReserve } from '@mimir-wallet/api';
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 import { buildTx } from '../utils';
 

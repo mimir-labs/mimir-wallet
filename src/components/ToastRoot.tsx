@@ -2,21 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Portal } from '@mui/material';
-import { type IconProps, Icons, toast, ToastContainer } from 'react-toastify';
+import { type IconProps, Icons, ToastContainer } from 'react-toastify';
 import { injectStyle } from 'react-toastify/dist/inject-style';
 
-import { FailedAnimation, NoticeAnimation, SuccessAnimation } from './animation';
-import TxError from './TxError';
+import FailedAnimation from './animation/Failed';
+import NoticeAnimation from './animation/Notice';
+import SuccessAnimation from './animation/Success';
 
 injectStyle();
-
-function getMessage(value: unknown): React.ReactNode {
-  if (typeof value === 'string') {
-    return value.toString();
-  }
-
-  return <TxError error={value} />;
-}
 
 const icon = (props: IconProps) => {
   if (props.type === 'info') {
@@ -58,18 +51,6 @@ function ToastRoot() {
       />
     </Portal>
   );
-}
-
-export function toastSuccess(message: any) {
-  return toast.success(message);
-}
-
-export function toastError(error: any) {
-  return toast.error(getMessage(error));
-}
-
-export function toastWarn(error: any) {
-  return toast.warn(getMessage(error));
 }
 
 export default ToastRoot;

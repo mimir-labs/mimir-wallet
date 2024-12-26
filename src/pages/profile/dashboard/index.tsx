@@ -5,7 +5,11 @@ import { Box, Button, Paper, Stack } from '@mui/material';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useMemo, useRef } from 'react';
 
-import { useApi, useNativeBalances, useQueryAccount, useQueryParam, useTokenInfo } from '@mimir-wallet/hooks';
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useNativeBalances } from '@mimir-wallet/hooks/useBalances';
+import { useQueryParam } from '@mimir-wallet/hooks/useQueryParams';
+import { useTokenInfo } from '@mimir-wallet/hooks/useTokenInfo';
 import { formatUnits } from '@mimir-wallet/utils';
 
 import Assets from './Assets';
@@ -61,7 +65,15 @@ function Dashboard({ address }: { address: string }) {
 
       <Hero address={address} totalUsd={totalUsd} changes={changes} />
 
-      <Paper sx={{ borderRadius: '20px', padding: 1, display: 'inline-flex', gap: { sm: 1, xs: 0.5 } }}>
+      <Paper
+        sx={{
+          alignSelf: 'flex-start',
+          borderRadius: '20px',
+          padding: 1,
+          display: 'inline-flex',
+          gap: { sm: 1, xs: 0.5 }
+        }}
+      >
         {tabsRef.current
           .filter((item) => (item.tab === 'multichain' ? account?.type !== 'pure' : true))
           .map((item) => (

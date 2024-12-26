@@ -8,7 +8,7 @@ import React, { useMemo } from 'react';
 
 import { Address, AddressName, CopyButton, FormatBalance, IdentityIcon } from '@mimir-wallet/components';
 import { ellipsisMixin } from '@mimir-wallet/components/utils';
-import { useAssetInfo } from '@mimir-wallet/hooks';
+import { useAssetInfo } from '@mimir-wallet/hooks/useAssets';
 
 import { findAction } from '../utils';
 import FunctionArgs from './FunctionArgs';

@@ -5,12 +5,13 @@ import { Box, Button, IconButton, Paper, SvgIcon, Typography, useMediaQuery, use
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
+import { chainLinks } from '@mimir-wallet/api/chain-links';
 import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
 import IconQr from '@mimir-wallet/assets/svg/icon-qr.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 import { AddressCell, AddressRow, CopyButton, EditAddressDialog, QrcodeAddress } from '@mimir-wallet/components';
-import { useAddressMeta, useToggle } from '@mimir-wallet/hooks';
-import { chainLinks } from '@mimir-wallet/utils';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 
 function Icons({ address }: { address: string }) {
   const [qrOpen, toggleQrOpen] = useToggle();

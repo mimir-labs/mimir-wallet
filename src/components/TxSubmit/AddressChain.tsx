@@ -8,7 +8,7 @@ import React, { useLayoutEffect, useMemo } from 'react';
 
 import IconClock from '@mimir-wallet/assets/svg/icon-clock.svg?react';
 import { AddressCell } from '@mimir-wallet/components';
-import { useWallet } from '@mimir-wallet/hooks';
+import { useAccountSource } from '@mimir-wallet/wallet/useWallet';
 
 interface Props {
   deep: number;
@@ -18,8 +18,8 @@ interface Props {
 }
 
 function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Props) {
-  const { accountSource } = useWallet();
   const selected = addressChain.at(deep) || '';
+  const source = useAccountSource((selected as FilterPath)?.address);
 
   const addresses = useMemo(
     () => Array.from(new Set(filterPaths.map((item) => item[0]).filter((item) => !!item))),
@@ -106,7 +106,7 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
         </Select>
       </FormControl>
 
-      {selected && !accountSource(selected.address) && (
+      {selected && !source && (
         <Box sx={{ paddingTop: deep === 0 ? 0 : 1, paddingLeft: deep === 0 ? 0 : 1 }}>
           <AddressChain
             addressChain={addressChain}

@@ -4,7 +4,7 @@
 import { Button } from '@mui/material';
 import React from 'react';
 
-import { useAccount } from '@mimir-wallet/hooks';
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 
 function AddAddress() {
   const { addAddressBook } = useAccount();

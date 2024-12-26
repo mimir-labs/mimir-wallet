@@ -4,18 +4,8 @@
 import type { Injected } from '@polkadot/extension-inject/types';
 
 import { encodeAddress } from '@mimir-wallet/api';
-
-import { sleep } from './common';
-
-export function documentReadyPromise(): Promise<void> {
-  return new Promise((resolve): void => {
-    if (document.readyState === 'complete') {
-      resolve();
-    } else {
-      window.addEventListener('load', () => resolve());
-    }
-  });
-}
+import { sleep } from '@mimir-wallet/utils/common';
+import { documentReadyPromise } from '@mimir-wallet/utils/document';
 
 export async function loadWallet(
   { enable }: { enable: (origin: string) => Promise<Injected> },

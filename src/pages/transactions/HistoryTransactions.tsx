@@ -8,7 +8,7 @@ import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { Empty } from '@mimir-wallet/components';
-import { useHistoryTransactions } from '@mimir-wallet/hooks';
+import { useHistoryTransactions } from '@mimir-wallet/hooks/useTransactions';
 import { TxCell } from '@mimir-wallet/transactions';
 
 import { skeleton } from './skeleton';

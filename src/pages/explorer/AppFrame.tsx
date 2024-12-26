@@ -1,14 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// Copyright 2023-2024 dev.mimir authors & contributors
-// SPDX-License-Identifier: Apache-2.0
-
 import { CircularProgress, Stack } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
 
+import { useSelectedAccount } from '@mimir-wallet/accounts/useSelectedAccount';
 import { AppIframe } from '@mimir-wallet/components';
-import { useApi, useSelectedAccount } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 import PendingTx from './PendingTx';
 import { useCommunicator } from './useCommunicator';

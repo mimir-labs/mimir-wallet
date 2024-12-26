@@ -5,7 +5,8 @@ import { Avatar, FormControl, MenuItem, Select, Typography } from '@mui/material
 import React, { useEffect, useState } from 'react';
 
 import { findToken } from '@mimir-wallet/config';
-import { useApi, useAssetBalances } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useAssetBalances } from '@mimir-wallet/hooks/useBalances';
 
 import { TransferToken } from './types';
 

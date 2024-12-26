@@ -7,9 +7,13 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 
+import { useGroupAccounts } from '@mimir-wallet/accounts/useGroupAccounts';
 import { signAndSend } from '@mimir-wallet/api';
-import { useApi, useCall, useGroupAccounts, useInputNumber, useWallet } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useInputNumber } from '@mimir-wallet/hooks/useInputNumber';
 import { parseUnits } from '@mimir-wallet/utils';
+import { useAccountSource } from '@mimir-wallet/wallet/useWallet';
 
 import AddressCell from './AddressCell';
 import Input from './Input';
@@ -75,12 +79,11 @@ function Action({
   onClose: () => void;
 }) {
   const { api } = useApi();
-  const { accountSource } = useWallet();
   const [loading, setLoading] = useState(false);
+  const source = useAccountSource(sending);
   const handleClick = useCallback(() => {
     if (receipt && sending && value) {
       setLoading(true);
-      const source = accountSource(sending);
 
       if (source) {
         const events = signAndSend(
@@ -98,7 +101,7 @@ function Action({
         });
       }
     }
-  }, [accountSource, api, onClose, receipt, sending, value]);
+  }, [source, api, onClose, receipt, sending, value]);
 
   return (
     <DialogActions>
