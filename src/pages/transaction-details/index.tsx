@@ -4,7 +4,8 @@
 import { CircularProgress, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useParams } from 'react-router-dom';
 
-import { useQueryAccount, useTransactionDetail } from '@mimir-wallet/hooks';
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
+import { useTransactionDetail } from '@mimir-wallet/hooks/useTransactions';
 import { TxCell, TxProgress } from '@mimir-wallet/transactions';
 
 import Details from './Details';

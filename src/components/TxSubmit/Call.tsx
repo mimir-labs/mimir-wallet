@@ -20,7 +20,8 @@ import moment from 'moment';
 import { useMemo } from 'react';
 
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
-import { useApi, useToggle } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { Call as CallComp } from '@mimir-wallet/params';
 
 import Bytes from '../Bytes';

@@ -6,12 +6,12 @@ import type { AccountData, ProxyTransaction, Transaction } from '@mimir-wallet/h
 import { Box, Button, CircularProgress, SvgIcon } from '@mui/material';
 import { useMemo } from 'react';
 
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
 import IconFailed from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
 import IconMember from '@mimir-wallet/assets/svg/icon-member-fill.svg?react';
 import IconSuccess from '@mimir-wallet/assets/svg/icon-success-fill.svg?react';
 import IconWaiting from '@mimir-wallet/assets/svg/icon-waiting-fill.svg?react';
-import { useAddressMeta } from '@mimir-wallet/hooks';
 import { TransactionStatus } from '@mimir-wallet/hooks/types';
 
 import { useAnnouncementStatus } from './hooks/useAnnouncementStatus';

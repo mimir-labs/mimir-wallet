@@ -8,8 +8,10 @@ import { Box, SvgIcon } from '@mui/material';
 import { hexToU8a, isFunction } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 import IconIdentity from '@mimir-wallet/assets/svg/identity.svg?react';
-import { useAddressMeta, useApi, useDeriveAccountInfo } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useDeriveAccountInfo } from '@mimir-wallet/hooks/useDeriveAccountInfo';
 import { addressEq } from '@mimir-wallet/utils';
 
 interface Props {

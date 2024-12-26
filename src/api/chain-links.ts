@@ -6,9 +6,9 @@ import type { HexString } from '@polkadot/util/types';
 
 import { isAddress } from '@polkadot/util-crypto';
 
-import { encodeAddress } from '@mimir-wallet/api';
+import { encodeAddress } from './defaults';
 
-export function accountExplorerLink(
+function accountExplorerLink(
   value?: AccountId | AccountIndex | Address | HexString | string | null
 ): string | undefined {
   const _value = value?.toString();
@@ -27,7 +27,7 @@ export function accountExplorerLink(
   return undefined;
 }
 
-export function extrinsicExplorerLink(value?: string | { toString: () => string }): string | undefined {
+function extrinsicExplorerLink(value?: string | { toString: () => string }): string | undefined {
   const _value = value?.toString();
 
   const explorerUrl = window.currentChain.explorerUrl;
@@ -40,18 +40,26 @@ export function extrinsicExplorerLink(value?: string | { toString: () => string 
   return undefined;
 }
 
-export function subsquareUrl(path?: string): string | undefined {
+function subsquareUrl(path?: string): string | undefined {
   const baseUrl = window.currentChain.subsquareUrl;
 
   return baseUrl ? `${baseUrl}${path || ''}` : undefined;
 }
 
-export function proposalApi(): string | undefined {
+function proposalApi(): string | undefined {
   return window.currentChain.proposalApi;
 }
 
-export function serviceUrl(path: string): string {
+function serviceUrl(path: string): string {
   const url: string = window.currentChain.serviceUrl || 'http://127.0.0.1:8080/';
 
   return `${url}${path}`;
 }
+
+export const chainLinks = {
+  accountExplorerLink,
+  extrinsicExplorerLink,
+  subsquareUrl,
+  proposalApi,
+  serviceUrl
+};

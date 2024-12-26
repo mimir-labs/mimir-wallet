@@ -8,8 +8,8 @@ import React from 'react';
 import { useAsyncFn } from 'react-use';
 
 import { isSuperset } from '@mimir-wallet/api';
-import { toastWarn } from '@mimir-wallet/components';
-import { useApi } from '@mimir-wallet/hooks';
+import { toastWarn } from '@mimir-wallet/components/utils';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { addressEq } from '@mimir-wallet/utils';
 
 function AddProxy({

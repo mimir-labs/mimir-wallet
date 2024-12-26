@@ -17,9 +17,12 @@ import DraggableList from 'react-draggable-list';
 import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import IconAdd from '@mimir-wallet/assets/svg/icon-add.svg?react';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
-import { useAccount, useApi, useBatchTxs, useTxQueue } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useBatchTxs } from '@mimir-wallet/hooks/useBatchTxs';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 
 // import AddNewCache from './AddNewCache';
 import BatchItem from './BatchItem';

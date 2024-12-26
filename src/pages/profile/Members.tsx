@@ -4,8 +4,8 @@
 import { Paper } from '@mui/material';
 import React from 'react';
 
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
 import { AddressOverview } from '@mimir-wallet/components';
-import { useQueryAccount } from '@mimir-wallet/hooks';
 
 function Members({ address }: { address?: string }) {
   const [account] = useQueryAccount(address);

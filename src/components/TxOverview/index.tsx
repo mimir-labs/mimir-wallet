@@ -16,7 +16,7 @@ import { LoadingButton } from '@mui/lab';
 import { Paper, SvgIcon, useTheme } from '@mui/material';
 import { alpha, Box } from '@mui/system';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import React, { createContext, useContext, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import {
   Controls,
   type Edge,
@@ -34,9 +34,10 @@ import IconFail from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
 import IconSuccess from '@mimir-wallet/assets/svg/icon-success-fill.svg?react';
 import IconSuccessOutlined from '@mimir-wallet/assets/svg/icon-success-outlined.svg?react';
 import IconWaiting from '@mimir-wallet/assets/svg/icon-waiting-fill.svg?react';
-import { filterPathId, useWallet } from '@mimir-wallet/hooks';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { filterPathId } from '@mimir-wallet/hooks/useFilterPaths';
 import { addressEq } from '@mimir-wallet/utils';
+import { useAccountSource } from '@mimir-wallet/wallet/useWallet';
 
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
@@ -66,11 +67,9 @@ type NodeData = {
 const context = createContext<State>({} as State);
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
-  const { accountSource } = useWallet();
   const { palette } = useTheme();
   const { onApprove } = useContext(context);
-
-  const source = useMemo(() => accountSource(data.account.address), [accountSource, data.account.address]);
+  const source = useAccountSource(data.account.address);
 
   const { call, transaction } = data;
 

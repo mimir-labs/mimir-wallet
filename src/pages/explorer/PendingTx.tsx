@@ -5,9 +5,10 @@ import { Box, Button, Drawer, IconButton, lighten, Stack, SvgIcon, Typography } 
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
 import ExpandArrow from '@mimir-wallet/assets/svg/expand-arrow.svg?react';
 import { Empty } from '@mimir-wallet/components';
-import { useQueryAccount, useToggle } from '@mimir-wallet/hooks';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { TxCell } from '@mimir-wallet/transactions';
 
 import { usePendingTx } from './usePendingTx';

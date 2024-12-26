@@ -7,8 +7,9 @@ import { alpha, Box, Button, Divider, Paper, Stack, type StackProps, Typography 
 import React, { useMemo } from 'react';
 
 import { AddressCell } from '@mimir-wallet/components';
-import { useBlockInterval, useFilterPaths } from '@mimir-wallet/hooks';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { useBlockInterval } from '@mimir-wallet/hooks/useBlockInterval';
+import { useFilterPaths } from '@mimir-wallet/hooks/useFilterPaths';
 import { addressEq, autoFormatTimeStr } from '@mimir-wallet/utils';
 
 import Approve from './buttons/Approve';

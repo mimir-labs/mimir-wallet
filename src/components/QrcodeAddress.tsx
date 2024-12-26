@@ -7,7 +7,7 @@ import { Avatar, Box, Dialog, DialogContent, Typography } from '@mui/material';
 import qrcode from 'qrcode-generator';
 import React, { useEffect, useRef } from 'react';
 
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 import CopyButton from './CopyButton';
 

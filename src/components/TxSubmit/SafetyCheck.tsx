@@ -13,7 +13,7 @@ import Logo from '@mimir-wallet/assets/images/logo.png';
 import IconFailed from '@mimir-wallet/assets/svg/icon-failed-fill.svg?react';
 import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import IconSuccess from '@mimir-wallet/assets/svg/icon-success.svg?react';
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 function Cell({ title, children, img }: { img: React.ReactNode; title: React.ReactNode; children: React.ReactNode }) {
   return (

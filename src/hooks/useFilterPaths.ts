@@ -12,9 +12,9 @@ import type {
 
 import { useMemo } from 'react';
 
-import { useWallet } from '@mimir-wallet/hooks';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
 import { addressEq } from '@mimir-wallet/utils';
+import { accountSource } from '@mimir-wallet/wallet/useWallet';
 
 export function filterPathId(deep: number, filterPath: FilterPathWithoutId) {
   if (filterPath.type === 'proxy') {
@@ -195,11 +195,9 @@ function findFilterPaths(
 }
 
 export function useFilterPaths(account?: AccountData | null, transaction?: Transaction | null) {
-  const { accountSource } = useWallet();
-
   return useMemo(() => {
     if (!account) return [];
 
     return findFilterPaths(account, accountSource, transaction);
-  }, [account, accountSource, transaction]);
+  }, [account, transaction]);
 }

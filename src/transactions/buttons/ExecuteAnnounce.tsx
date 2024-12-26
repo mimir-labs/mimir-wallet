@@ -8,10 +8,13 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typog
 import React, { useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { Input, toastError } from '@mimir-wallet/components';
-import { useApi, useTxQueue, useWallet } from '@mimir-wallet/hooks';
+import { Input } from '@mimir-wallet/components';
+import { toastError } from '@mimir-wallet/components/utils';
 import { TransactionType } from '@mimir-wallet/hooks/types';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 import { addressEq } from '@mimir-wallet/utils';
+import { useWallet } from '@mimir-wallet/wallet/useWallet';
 
 import { useAnnouncementStatus } from '../hooks/useAnnouncementStatus';
 

@@ -4,7 +4,7 @@
 import { Grid2 as Grid } from '@mui/material';
 
 import { DappCell } from '@mimir-wallet/components';
-import { useDapps } from '@mimir-wallet/hooks';
+import { useDapps } from '@mimir-wallet/hooks/useDapp';
 
 function PageDapp() {
   const { addFavorite, dapps, isFavorite, removeFavorite } = useDapps();

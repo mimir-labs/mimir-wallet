@@ -3,7 +3,7 @@
 
 import { useContext } from 'react';
 
-import { BaseContainerCtx } from './BaseContainer';
+import { BaseContainerCtx } from './context';
 
 function ToggleSidebar() {
   const { openSidebar } = useContext(BaseContainerCtx);

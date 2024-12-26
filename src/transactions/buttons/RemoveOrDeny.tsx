@@ -6,8 +6,10 @@ import type { Transaction } from '@mimir-wallet/hooks/types';
 import { LoadingButton } from '@mui/lab';
 import React from 'react';
 
-import { useAccount, useApi, useTxQueue } from '@mimir-wallet/hooks';
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 
 function RemoveOrDeny({ transaction }: { transaction: Transaction }) {
   const { api } = useApi();

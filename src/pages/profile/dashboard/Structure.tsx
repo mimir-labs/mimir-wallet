@@ -5,9 +5,9 @@ import { Box, Button, Dialog, DialogContent, IconButton, Paper, SvgIcon, useMedi
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
 import { AddressOverview } from '@mimir-wallet/components';
-import { useQueryAccount } from '@mimir-wallet/hooks';
 
 function Relation({ address }: { address: string }) {
   const [account] = useQueryAccount(address);

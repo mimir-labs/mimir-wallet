@@ -1,32 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  alpha,
-  Box,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Grid2 as Grid,
-  Stack,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
+import { alpha, Box, Button, Dialog, DialogContent, DialogTitle, Grid2 as Grid } from '@mui/material';
 import { AccessCredentials, initializePlutonicationDAppClientWithModal } from '@plutonication/plutonication';
 import React, { useMemo } from 'react';
 
 import { walletConfig } from '@mimir-wallet/config';
-import { useWallet } from '@mimir-wallet/hooks';
+import { connectWallet, disconnectWallet } from '@mimir-wallet/wallet/connect';
+import { useWallet } from '@mimir-wallet/wallet/useWallet';
 
-import { toastError } from './ToastRoot';
+import { toastError } from './utils';
 import WalletIcon from './WalletIcon';
 
 function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downloadUrl: string }) {
-  const { connect, connectedWallets, disconnect, wallets } = useWallet();
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
+  const { connectedWallets, wallets } = useWallet();
 
   const isInstalled =
     id === 'nova' ? wallets[walletConfig[id].key] && window?.walletExtension?.isNovaWallet : wallets[id];
@@ -51,7 +38,7 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
         connectedWallets.includes(id) ? (
           <Button
             color='error'
-            onClick={() => disconnect(id)}
+            onClick={() => disconnectWallet(id)}
             size='small'
             variant='text'
             sx={({ palette }) => ({ bgcolor: alpha(palette.error.main, 0.1) })}
@@ -59,7 +46,7 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
             Disconnect
           </Button>
         ) : (
-          <Button onClick={() => connect(id).catch(toastError)} size='small' variant='outlined'>
+          <Button onClick={() => connectWallet(id).catch(toastError)} size='small' variant='outlined'>
             Connect
           </Button>
         )
@@ -78,7 +65,7 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
               console.log(receivedPubkey);
             });
 
-            connect('plutonication').catch(toastError);
+            connectWallet('plutonication').catch(toastError);
           }}
           size='small'
           variant='outlined'
@@ -91,55 +78,6 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
         </Button>
       )}
     </Box>
-  );
-
-  return (
-    <Stack
-      alignItems='center'
-      justifyContent='center'
-      spacing={1}
-      sx={{ '>.MuiButton-root': { width: '100%' }, width: '100%' }}
-    >
-      <WalletIcon disabled={!isInstalled} id={id} sx={{ width: { sm: 64, xs: 40 }, height: { sm: 64, xs: 40 } }} />
-      <Typography>{name}</Typography>
-      {isInstalled ? (
-        connectedWallets.includes(id) ? (
-          <Button color='error' onClick={() => disconnect(id)} size={downSm ? 'small' : 'medium'} variant='outlined'>
-            Disconnect
-          </Button>
-        ) : (
-          <Button onClick={() => connect(id).catch(toastError)} size={downSm ? 'small' : 'medium'} variant='outlined'>
-            Connect
-          </Button>
-        )
-      ) : id === 'plutonication' ? (
-        <Button
-          onClick={async () => {
-            const accessCredentials = new AccessCredentials(
-              'wss://plutonication.com/',
-              'Mimir',
-              'https://plutonication.com/dapp/mimir-icon',
-              'Mimir'
-            );
-
-            await initializePlutonicationDAppClientWithModal(accessCredentials, (receivedPubkey: string) => {
-              /* */
-              console.log(receivedPubkey);
-            });
-
-            connect('plutonication').catch(toastError);
-          }}
-          size={downSm ? 'small' : 'medium'}
-          variant='outlined'
-        >
-          Connect
-        </Button>
-      ) : (
-        <Button component='a' href={downloadUrl} size={downSm ? 'small' : 'medium'} target='_blank' variant='outlined'>
-          Download
-        </Button>
-      )}
-    </Stack>
   );
 }
 

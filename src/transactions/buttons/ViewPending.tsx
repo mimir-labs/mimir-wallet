@@ -6,7 +6,7 @@ import type { FilterPath, Transaction } from '@mimir-wallet/hooks/types';
 import { Button } from '@mui/material';
 import React from 'react';
 
-import { useAccount } from '@mimir-wallet/hooks';
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { TransactionStatus } from '@mimir-wallet/hooks/types';
 
 function findSubPendingTx(transaction: Transaction): Transaction | null {

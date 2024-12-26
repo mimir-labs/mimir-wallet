@@ -3,7 +3,7 @@
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import reactRefresh from 'eslint-plugin-react-refresh';
 import react from 'eslint-plugin-react';
 import tseslint from 'typescript-eslint'
 import prettier from 'eslint-plugin-prettier/recommended';
@@ -15,7 +15,7 @@ import headers from "eslint-plugin-headers";
 export default tseslint.config(
   { ignores: ['dist','eslint.config.js', '.yarn/'] },
   {
-    extends: [js.configs.recommended, prettier, ...tseslint.configs.recommended, importPlugin.flatConfigs.recommended],
+    extends: [js.configs.recommended, prettier, ...tseslint.configs.recommended, reactRefresh.configs.vite, importPlugin.flatConfigs.recommended],
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
@@ -26,17 +26,12 @@ export default tseslint.config(
       'react-hooks': reactHooks,
       // @ts-ignore
       'react': react,
-      'react-refresh': reactRefresh,
       "simple-import-sort": simpleImportSort,
       headers
     },
     // @ts-ignore
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
       '@typescript-eslint/naming-convention': 'off',
       '@typescript-eslint/padding-line-between-statements': 'off',
       '@typescript-eslint/prefer-enum-initializers': 'off',
@@ -59,12 +54,8 @@ export default tseslint.config(
         additionalHooks: '(useAsyncFn|useDebounceFn)'
       }],
       'import/no-deprecated': 'error',
-      'import/order': 'off',
-      'import/no-extraneous-dependencies': 'off',
       'import/no-unresolved': 'off',
-      'import/prefer-default-export': 'off',
-      'import/no-mutable-exports': 'off',
-      'import/no-cycle': 'off',
+      'import/no-cycle': ['error', { maxDepth: Infinity, ignoreExternal: true, allowUnsafeDynamicCyclicDependency: false }],
       'padding-line-between-statements': [
         'error',
         { blankLine: 'always', prev: ['const', 'let', 'var'], next: '*' },

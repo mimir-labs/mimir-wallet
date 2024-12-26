@@ -6,7 +6,7 @@ import React, { useMemo } from 'react';
 
 import LogoCircle from '@mimir-wallet/assets/images/logo-circle.png';
 import IconExternal from '@mimir-wallet/assets/svg/icon-external-app.svg?react';
-import { useDapp } from '@mimir-wallet/hooks';
+import { useDapp } from '@mimir-wallet/hooks/useDapp';
 
 function AppName({
   website,

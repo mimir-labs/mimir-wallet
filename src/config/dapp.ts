@@ -9,8 +9,6 @@ import { isArray } from '@polkadot/util';
 import BatchIcon from '@mimir-wallet/assets/images/batch.svg';
 import Failed from '@mimir-wallet/assets/images/failed.svg';
 import LogoCircle from '@mimir-wallet/assets/svg/logo-circle.svg';
-import { ADDRESS_BOOK_UPGRADE_VERSION_KEY, FAVORITE_DAPP_KEY } from '@mimir-wallet/constants';
-import { store } from '@mimir-wallet/utils';
 
 export interface DappOption {
   // (1 - 500) is internal app
@@ -240,31 +238,4 @@ export function findSupportedDapps(api: ApiPromise): DappOption[] {
   return dapps.filter((item) =>
     isArray(item.supportedChains) ? item.supportedChains.includes(api.genesisHash.toHex()) : true
   );
-}
-
-export function initializeFavoriteDapps() {
-  if (!store.get(FAVORITE_DAPP_KEY)) {
-    store.set(FAVORITE_DAPP_KEY, [1, 1000]);
-  }
-}
-
-export function upgradeAddresBook() {
-  const addressBookVersion = store.get(ADDRESS_BOOK_UPGRADE_VERSION_KEY);
-
-  if (addressBookVersion === '1') {
-    return;
-  }
-
-  store.each((key: string, value) => {
-    if (key.startsWith('address:0x')) {
-      const v = value as { address: string; meta: { name: string; watchlist?: boolean; genesisHash?: HexString } };
-
-      store.set(key, {
-        address: v.address,
-        meta: { name: v.meta.name, watchlist: !!v.meta.watchlist, networks: ['polkadot', 'paseo'] }
-      });
-    }
-  });
-
-  store.set(ADDRESS_BOOK_UPGRADE_VERSION_KEY, '1');
 }

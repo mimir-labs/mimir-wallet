@@ -26,10 +26,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import IconArrow from '@mimir-wallet/assets/svg/icon-arrow.svg?react';
 import { Input, InputAddress } from '@mimir-wallet/components';
 import { ONE_DAY, ONE_HOUR } from '@mimir-wallet/constants';
-import { useAccount, useApi, useBlockInterval, useCall, useInput, useProxyTypes } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useBlockInterval } from '@mimir-wallet/hooks/useBlockInterval';
+import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useInput } from '@mimir-wallet/hooks/useInput';
+import { useProxyTypes } from '@mimir-wallet/hooks/useProxyTypes';
 import { addressEq } from '@mimir-wallet/utils';
 
 import AddProxy from './AddProxy';

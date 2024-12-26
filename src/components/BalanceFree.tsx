@@ -6,7 +6,8 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 
 import React from 'react';
 
-import { useApi, useCall } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCall } from '@mimir-wallet/hooks/useCall';
 
 import FormatBalance from './FormatBalance';
 

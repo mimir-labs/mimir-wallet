@@ -6,8 +6,8 @@ import type { HexString } from '@polkadot/util/types';
 import { Box, IconButton, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 
+import { chainLinks } from '@mimir-wallet/api/chain-links';
 import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
-import { chainLinks } from '@mimir-wallet/utils';
 
 import CopyButton from './CopyButton';
 

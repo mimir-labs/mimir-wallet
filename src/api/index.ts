@@ -1,8 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-export { statics, ApiCtx, encodeAddress, decodeAddress } from './defaults';
-export { ApiCtxRoot } from './Api';
+export { statics, encodeAddress, decodeAddress } from './defaults';
+export { initializeApi } from './initialize';
 
 export * from './callFilter';
 export * from './call';

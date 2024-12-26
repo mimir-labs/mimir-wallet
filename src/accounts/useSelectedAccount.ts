@@ -1,8 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { createNamedHook } from './createNamedHook';
-import { useAccount } from './useAccounts';
+import { createNamedHook } from '../hooks/createNamedHook';
+import { useAccount } from './useAccount';
 
 function useSelectedAccountImpl(): string | undefined {
   return useAccount().current;

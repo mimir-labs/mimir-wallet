@@ -21,9 +21,12 @@ import {
 } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
 import IconBatch from '@mimir-wallet/assets/svg/icon-batch.svg?react';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
-import { useBatchTxs, useFilterPaths, useQueryAccount, useWallet } from '@mimir-wallet/hooks';
+import { useBatchTxs } from '@mimir-wallet/hooks/useBatchTxs';
+import { useFilterPaths } from '@mimir-wallet/hooks/useFilterPaths';
+import { useAccountSource, useWallet } from '@mimir-wallet/wallet/useWallet';
 
 import Input from '../Input';
 import InputAddress from '../InputAddress';
@@ -73,7 +76,7 @@ function TxSubmit({
   onSignature,
   beforeSend
 }: Props) {
-  const { walletAccounts, accountSource } = useWallet();
+  const { walletAccounts } = useWallet();
   const [account, setAccount] = useState<string | undefined>(accountId?.toString() || walletAccounts?.[0].address);
   const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
   const [note, setNote] = useState<string>(transaction?.note || '');
@@ -82,6 +85,7 @@ function TxSubmit({
   const [addressChain, setAddressChain] = useState<FilterPath[]>(propsFilterPaths || []);
   const [, addTx] = useBatchTxs(account);
   const buildTx = useBuildTx(call, addressChain, account, transaction);
+  const source = useAccountSource(accountId?.toString());
 
   const handleAddBatch = useCallback(() => {
     addTx([
@@ -180,7 +184,7 @@ function TxSubmit({
           })}
           spacing={2}
         >
-          {!accountId || !!accountSource(accountId.toString()) ? (
+          {!accountId || !!source ? (
             <InputAddress
               label='Select Signer'
               placeholder='Please select signer'

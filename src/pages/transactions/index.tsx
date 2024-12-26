@@ -3,7 +3,9 @@
 
 import { Box, Button, Paper } from '@mui/material';
 
-import { useQueryAccount, useQueryParam, useSelectedAccount } from '@mimir-wallet/hooks';
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
+import { useSelectedAccount } from '@mimir-wallet/accounts/useSelectedAccount';
+import { useQueryParam } from '@mimir-wallet/hooks/useQueryParams';
 
 import HistoryTransactions from './HistoryTransactions';
 import PendingTransactions from './PendingTransactions';

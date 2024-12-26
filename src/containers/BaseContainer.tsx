@@ -2,26 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, Typography } from '@mui/material';
-import { createContext, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
+import AccountConsumer from '@mimir-wallet/accounts/Consumer';
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { ConnectWalletModal, MimirLoading, SwitchAccountDialog, TxSubmit } from '@mimir-wallet/components';
-import { useAccount, useApi, useFollowAccounts, usePageTitle, useToggle, useTxQueue } from '@mimir-wallet/hooks';
-import { useWallet } from '@mimir-wallet/hooks/useWallet';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useFollowAccounts } from '@mimir-wallet/hooks/useFollowAccounts';
+import { usePageTitle } from '@mimir-wallet/hooks/usePageTitle';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
+import { useWallet } from '@mimir-wallet/wallet/useWallet';
 
+import AddAddressBook from './AddAddressBook';
+import { BaseContainerCtx } from './context';
 import SideBar from './SideBar';
 import SubscribeTx from './SubscribeTx';
 import ToggleAlert from './ToggleAlert';
 import TopBar from './TopBar';
-
-interface State {
-  sidebarOpen: boolean;
-  alertOpen: boolean;
-  openSidebar: () => void;
-  closeSidebar: () => void;
-}
-
-export const BaseContainerCtx = createContext<State>({} as State);
 
 function BaseContainer({
   auth,
@@ -57,6 +56,8 @@ function BaseContainer({
   return (
     <BaseContainerCtx.Provider value={value}>
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
+      <AccountConsumer />
+      <AddAddressBook />
 
       <SwitchAccountDialog />
 

@@ -8,8 +8,11 @@ import type { AccountData, Transaction } from '@mimir-wallet/hooks/types';
 import { LoadingButton } from '@mui/lab';
 import React, { useMemo } from 'react';
 
-import { useAccount, useApi, useCall, useTxQueue } from '@mimir-wallet/hooks';
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { TransactionType } from '@mimir-wallet/hooks/types';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 import { addressEq } from '@mimir-wallet/utils';
 
 function Cancel({ account, transaction }: { account: AccountData; transaction: Transaction }) {

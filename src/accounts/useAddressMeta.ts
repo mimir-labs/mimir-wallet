@@ -1,16 +1,15 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AddressMeta } from './types';
+import type { AddressMeta } from '@mimir-wallet/hooks/types';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { toastError } from '@mimir-wallet/components';
+import { toastError } from '@mimir-wallet/components/utils';
 import { addressToHex, service } from '@mimir-wallet/utils';
+import { useAccountSource } from '@mimir-wallet/wallet/useWallet';
 
-import { createNamedHook } from './createNamedHook';
-import { useAccount } from './useAccounts';
-import { useWallet } from './useWallet';
+import { useAccount } from './useAccount';
 
 interface UseAddressMeta {
   meta: AddressMeta;
@@ -19,9 +18,9 @@ interface UseAddressMeta {
   saveName: (cb?: (name: string) => void) => Promise<void>;
 }
 
-function useAddressMetaImpl(value?: string | null): UseAddressMeta {
+export function useAddressMeta(value?: string | null): UseAddressMeta {
   const { metas, addAddress, setAccountName, isLocalAccount } = useAccount();
-  const { accountSource } = useWallet();
+  const source = useAccountSource(value);
   const _meta = metas[value || ''];
 
   const [meta, setMeta] = useState<AddressMeta>(_meta || {});
@@ -44,7 +43,7 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
       if (name === meta.name) return;
 
       try {
-        if (isLocalAccount(value) && !accountSource(value)) {
+        if (isLocalAccount(value) && !source) {
           await service.updateAccountName(addressToHex(value), name);
           setAccountName(value, name);
           cb?.(name);
@@ -56,7 +55,7 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
         toastError(error);
       }
     },
-    [accountSource, isLocalAccount, meta.name, name, setAccountName, addAddress, value]
+    [source, isLocalAccount, meta.name, name, setAccountName, addAddress, value]
   );
 
   return {
@@ -66,5 +65,3 @@ function useAddressMetaImpl(value?: string | null): UseAddressMeta {
     saveName
   };
 }
-
-export const useAddressMeta = createNamedHook('useAddressMeta', useAddressMetaImpl);

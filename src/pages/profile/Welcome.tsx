@@ -18,11 +18,14 @@ import {
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
+import { useUnConfirmMultisigs } from '@mimir-wallet/accounts/useGroupAccounts';
+import { useSelectedAccountCallback } from '@mimir-wallet/accounts/useSelectedAccount';
 import IconAdd from '@mimir-wallet/assets/svg/icon-add.svg?react';
 // import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 import { AddressCell, CreateMultisigDialog } from '@mimir-wallet/components';
-import { useAccount, useSelectedAccountCallback, useToggle, useUnConfirmMultisigs } from '@mimir-wallet/hooks';
-import { useWallet } from '@mimir-wallet/hooks/useWallet';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
+import { useWallet } from '@mimir-wallet/wallet/useWallet';
 
 function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onCreateMultisig: () => void }) {
   const selectAccount = useSelectedAccountCallback();

@@ -3,8 +3,8 @@
 
 import { useMemo } from 'react';
 
-import { usePendingTransactions } from '@mimir-wallet/hooks';
 import { TransactionStatus } from '@mimir-wallet/hooks/types';
+import { usePendingTransactions } from '@mimir-wallet/hooks/useTransactions';
 
 export function usePendingTx(address: string, url: string) {
   const [transactions] = usePendingTransactions(address);

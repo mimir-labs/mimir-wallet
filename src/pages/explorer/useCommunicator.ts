@@ -6,9 +6,12 @@ import type { State } from '@mimir-wallet/communicator/types';
 
 import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
+import { useSelectedAccount } from '@mimir-wallet/accounts/useSelectedAccount';
 import { encodeAddress } from '@mimir-wallet/api';
 import { IframeCommunicator } from '@mimir-wallet/communicator';
-import { useAddressMeta, useApi, useSelectedAccount, useTxQueue } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 
 export function useCommunicator(
   iframeRef: MutableRefObject<HTMLIFrameElement | null>,

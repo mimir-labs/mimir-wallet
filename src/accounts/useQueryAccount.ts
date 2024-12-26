@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
-import type { AccountData, AddressMeta, DelegateeProp } from './types';
+import type { AccountData, AddressMeta, DelegateeProp } from '@mimir-wallet/hooks/types';
 
 import { useQuery } from '@tanstack/react-query';
 import { isEqual } from 'lodash-es';
 import { useEffect } from 'react';
 
 import { encodeAddress } from '@mimir-wallet/api';
-import { serviceUrl } from '@mimir-wallet/utils/chain-links';
+import { chainLinks } from '@mimir-wallet/api/chain-links';
+import { createNamedHook } from '@mimir-wallet/hooks/createNamedHook';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
-import { createNamedHook } from './createNamedHook';
-import { useAccount } from './useAccounts';
-import { useApi } from './useApi';
+import { useAccount } from './useAccount';
 
 function transformAccount(genesisHash: HexString, account: AccountData): AccountData {
   if (account.type === 'pure' && account.network !== genesisHash) {
@@ -83,8 +83,8 @@ function useQueryAccountImpl(
   const { appendMeta } = useAccount();
   const { data, isFetched, isFetching } = useQuery<AccountData | null>({
     initialData: null,
-    queryHash: serviceUrl(`accounts/full/${address}`),
-    queryKey: [address ? serviceUrl(`accounts/full/${address}`) : null],
+    queryHash: chainLinks.serviceUrl(`accounts/full/${address}`),
+    queryKey: [address ? chainLinks.serviceUrl(`accounts/full/${address}`) : null],
     structuralSharing: (prev, next): AccountData | null => {
       if (!next) {
         return null;

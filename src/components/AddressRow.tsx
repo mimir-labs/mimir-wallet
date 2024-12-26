@@ -6,8 +6,8 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 import IconEdit from '@mimir-wallet/assets/svg/icon-edit.svg?react';
-import { useAddressMeta } from '@mimir-wallet/hooks';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
@@ -18,7 +18,6 @@ interface Props {
   defaultName?: string;
   value?: AccountId | AccountIndex | Address | string | null;
   shorten?: boolean;
-  isMe?: boolean;
   iconSize?: number;
   withAddress?: boolean;
   withCopy?: boolean;
@@ -53,7 +52,6 @@ function EditName({
 
 function AddressRow({
   defaultName,
-  isMe,
   onClick,
   shorten,
   value,
@@ -78,7 +76,7 @@ function AddressRow({
       spacing={0.5}
       sx={{ cursor: onClick ? 'pointer' : undefined }}
     >
-      <IdentityIcon className='AddressRow-Icon' isMe={isMe} size={iconSize} value={value} />
+      <IdentityIcon className='AddressRow-Icon' size={iconSize} value={value} />
       {withName && (
         <Box component='span' sx={{ fontWeight: withName && withAddress ? 700 : undefined }}>
           {editing ? (

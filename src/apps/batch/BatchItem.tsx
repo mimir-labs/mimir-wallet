@@ -21,7 +21,7 @@ import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
 import IconCopy from '@mimir-wallet/assets/svg/icon-add-copy.svg?react';
 import IconDelete from '@mimir-wallet/assets/svg/icon-delete.svg?react';
 import { AppName } from '@mimir-wallet/components';
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { Call, CallDisplayDetail } from '@mimir-wallet/params';
 
 export type BatchItemType = BatchTxItem & {

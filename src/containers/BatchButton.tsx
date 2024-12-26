@@ -5,10 +5,11 @@ import { Badge, Box, IconButton, Popover, SvgIcon, SwipeableDrawer } from '@mui/
 import React, { useEffect, useRef } from 'react';
 import { useToggle } from 'react-use';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import Batch from '@mimir-wallet/apps/batch';
 import IconBatch from '@mimir-wallet/assets/svg/icon-batch.svg?react';
 import { events } from '@mimir-wallet/events';
-import { useAccount, useBatchTxs } from '@mimir-wallet/hooks';
+import { useBatchTxs } from '@mimir-wallet/hooks/useBatchTxs';
 
 function BatchButton() {
   const { current } = useAccount();

@@ -5,8 +5,9 @@ import type { IMethod } from '@polkadot/types/types';
 
 import { useEffect, useState } from 'react';
 
-import { useApi, useToggle } from '@mimir-wallet/hooks';
 import { SafetyLevel } from '@mimir-wallet/hooks/types';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { service } from '@mimir-wallet/utils';
 
 export function useSafetyCheck(call: IMethod) {

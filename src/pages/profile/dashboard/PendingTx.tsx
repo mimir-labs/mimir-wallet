@@ -5,8 +5,9 @@ import { Paper, Skeleton } from '@mui/material';
 import { Stack } from '@mui/system';
 import React from 'react';
 
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
 import { Empty } from '@mimir-wallet/components';
-import { usePendingTransactions, useQueryAccount } from '@mimir-wallet/hooks';
+import { usePendingTransactions } from '@mimir-wallet/hooks/useTransactions';
 import { TxCell } from '@mimir-wallet/transactions';
 
 const skeleton = (

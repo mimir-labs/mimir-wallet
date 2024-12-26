@@ -10,15 +10,14 @@ import { Box, Button, Paper, Stack, Tab, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Input, toastSuccess } from '@mimir-wallet/components';
-import {
-  useAccount,
-  useAddressMeta,
-  useApi,
-  useCall,
-  usePendingTransactions,
-  useQueryAccount
-} from '@mimir-wallet/hooks';
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
+import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
+import { Input } from '@mimir-wallet/components';
+import { toastSuccess } from '@mimir-wallet/components/utils';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useCall } from '@mimir-wallet/hooks/useCall';
+import { usePendingTransactions } from '@mimir-wallet/hooks/useTransactions';
 
 import MemberSet from './MemberSet';
 import ProxySet from './ProxySet';

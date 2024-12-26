@@ -6,8 +6,8 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { AppName, Empty } from '@mimir-wallet/components';
-import { usePendingTransactions } from '@mimir-wallet/hooks';
 import { Transaction, TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
+import { usePendingTransactions } from '@mimir-wallet/hooks/useTransactions';
 import { formatTransactionId } from '@mimir-wallet/transactions';
 
 function Row({ isStart, transaction }: { transaction: Transaction; isStart: boolean }) {

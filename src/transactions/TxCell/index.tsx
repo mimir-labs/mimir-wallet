@@ -19,8 +19,8 @@ import moment from 'moment';
 import React from 'react';
 
 import IconShare from '@mimir-wallet/assets/svg/icon-share.svg?react';
-import { useCopyClipboard } from '@mimir-wallet/hooks';
 import { TransactionStatus } from '@mimir-wallet/hooks/types';
+import { useCopyClipboard } from '@mimir-wallet/hooks/useCopyClipboard';
 
 import { formatTransactionId } from '../utils';
 import TxItems from './TxItems';

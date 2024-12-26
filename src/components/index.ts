@@ -1,7 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-export * from './animation';
+export { default as CongratsAnimation } from './animation/Congrats';
+export { default as FailedAnimation } from './animation/Failed';
+export { default as NoticeAnimation } from './animation/Notice';
+export { default as SuccessAnimation } from './animation/Success';
+export { default as WaitingAnimation } from './animation/Waiting';
+export { default as MimirLoading } from './animation/MimirLoading';
 export { default as AccountMenu } from './AccountMenu';
 export { default as AccountSelect } from './AccountSelect';
 export { default as AddAddressDialog } from './AddAddressDialog';
@@ -32,7 +37,7 @@ export { default as InputNumber } from './InputNumber';
 export { default as LockItem, LockContainer } from './LockItem';
 export { default as QrcodeAddress } from './QrcodeAddress';
 export { default as SwitchAccountDialog } from './SwitchAccountDialog';
-export { default as ToastRoot, toastError, toastSuccess, toastWarn } from './ToastRoot';
+export { default as ToastRoot } from './ToastRoot';
 export { default as TxError } from './TxError';
 export { default as TxOverview } from './TxOverview';
 export { default as HistoryTxOverview } from './TxOverview/HistoryTxOverview';

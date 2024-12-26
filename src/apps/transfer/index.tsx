@@ -7,17 +7,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
+import { useAllAccounts } from '@mimir-wallet/accounts/useGroupAccounts';
+import { useSelectedAccount } from '@mimir-wallet/accounts/useSelectedAccount';
 import { FormatBalance, Input, InputAddress } from '@mimir-wallet/components';
-import {
-  useAccount,
-  useAllAccounts,
-  useApi,
-  useAssetInfo,
-  useInputNumber,
-  useQueryParam,
-  useSelectedAccount,
-  useTxQueue
-} from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useAssetInfo } from '@mimir-wallet/hooks/useAssets';
+import { useInputNumber } from '@mimir-wallet/hooks/useInputNumber';
+import { useQueryParam } from '@mimir-wallet/hooks/useQueryParams';
+import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 import { formatUnits, isValidNumber, parseUnits } from '@mimir-wallet/utils';
 
 import SelectToken from './SelectToken';

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { SubmittableExtrinsicFunction } from '@polkadot/api/promise/types';
 import type { HexString } from '@polkadot/util/types';
 import type { Endpoint } from '@mimir-wallet/config';
 
@@ -15,24 +14,16 @@ export interface BareProps {
 }
 
 export interface ApiState {
-  apiDefaultTx: SubmittableExtrinsicFunction;
-  apiDefaultTxSudo: SubmittableExtrinsicFunction;
   chainSS58: number;
   isApiReady: boolean;
-  isDevelopment: boolean;
-  specName: string;
-  specVersion: string;
-  systemChain: string;
-  systemName: string;
-  systemVersion: string;
   tokenSymbol: string;
   genesisHash: HexString;
 }
 
 export interface ApiProps extends ApiState {
   api: ApiPromise;
-  apiError: string | null;
   apiUrl: string;
+  apiError: string | null;
   isApiConnected: boolean;
   isApiInitialized: boolean;
   network: string;

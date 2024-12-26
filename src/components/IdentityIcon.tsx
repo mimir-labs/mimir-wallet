@@ -1,27 +1,27 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { IdentityProps } from '@polkadot/react-identicon/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
+import type { Circle } from '@polkadot/ui-shared/icons/types';
 
 import { Box } from '@mui/material';
-import { Polkadot as PolkadotIcon } from '@polkadot/react-identicon/icons/Polkadot';
+import { polkadotIcon } from '@polkadot/ui-shared';
 import { hexToU8a, isHex, isU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 import { encodeAddress } from '@mimir-wallet/api';
 import { walletConfig } from '@mimir-wallet/config';
-import { useAddressMeta, useCopyClipboard } from '@mimir-wallet/hooks';
+import { useCopyClipboard } from '@mimir-wallet/hooks/useCopyClipboard';
 import { addressEq } from '@mimir-wallet/utils';
 
-import { toastSuccess } from './ToastRoot';
+import { toastSuccess } from './utils';
 
 interface Props {
   className?: string;
-  prefix?: IdentityProps['prefix'];
+  prefix?: number;
   size?: number;
   value?: AccountId | AccountIndex | Address | string | Uint8Array | null;
-  isMe?: boolean;
 }
 
 function isCodec(
@@ -30,15 +30,19 @@ function isCodec(
   return !!(value && (value as AccountId).toHuman);
 }
 
-function IdentityIcon({ className, isMe, prefix, size = 30, value }: Props) {
-  const { address, publicKey } = useMemo(() => {
+function renderCircle({ cx, cy, fill, r }: Circle, index: number) {
+  return <circle key={index} cx={cx} cy={cy} fill={fill} r={r} />;
+}
+
+function IdentityIcon({ className, prefix, size = 30, value }: Props) {
+  const { address } = useMemo(() => {
     try {
       const _value = isCodec(value) ? value.toString() : value;
       const address = isU8a(_value) || isHex(_value) ? encodeAddress(_value, prefix) : _value || '';
 
-      return { address, publicKey: '0x' };
+      return { address };
     } catch {
-      return { address: '', publicKey: '0x' };
+      return { address: '' };
     }
   }, [prefix, value]);
   const { meta } = useAddressMeta(value?.toString());
@@ -50,7 +54,9 @@ function IdentityIcon({ className, isMe, prefix, size = 30, value }: Props) {
 
   const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
 
-  if (isMe || isZeroAddress) {
+  const circles = useMemo(() => polkadotIcon(address, { isAlternative: false }), [address]);
+
+  if (isZeroAddress) {
     return (
       <Box
         className={`${className} IdentityIcon`}
@@ -75,7 +81,7 @@ function IdentityIcon({ className, isMe, prefix, size = 30, value }: Props) {
           lineHeight: 1
         }}
       >
-        {isMe ? 'Me' : '0'}
+        0
       </Box>
     );
   }
@@ -98,7 +104,31 @@ function IdentityIcon({ className, isMe, prefix, size = 30, value }: Props) {
         borderRadius: '50%'
       }}
     >
-      <PolkadotIcon address={address} publicKey={publicKey} size={size} />
+      {isZeroAddress ? (
+        <Box
+          className={`${className} IdentityIcon`}
+          component='span'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: size,
+            height: size,
+            bgcolor: 'primary.main',
+            borderRadius: '50%',
+            color: 'common.white',
+            fontWeight: 800,
+            fontSize: size / 2,
+            lineHeight: 1
+          }}
+        >
+          0
+        </Box>
+      ) : (
+        <svg viewBox='0 0 64 64' width={size} height={size}>
+          {circles.map(renderCircle)}
+        </svg>
+      )}
       {extensionIcon ? (
         <Box
           component='img'
@@ -107,8 +137,8 @@ function IdentityIcon({ className, isMe, prefix, size = 30, value }: Props) {
             position: 'absolute',
             right: -2,
             bottom: -2,
-            width: size / 2.5,
-            height: size / 2.5
+            width: size / 2.2,
+            height: size / 2.2
           }}
         />
       ) : null}

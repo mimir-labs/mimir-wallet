@@ -7,7 +7,7 @@ import { Box, type BoxProps } from '@mui/material';
 import { BN } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { formatDisplay, formatUnits } from '@mimir-wallet/utils';
 
 interface Props extends BoxProps {

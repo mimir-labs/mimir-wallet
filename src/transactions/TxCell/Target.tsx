@@ -8,7 +8,7 @@ import React, { useMemo } from 'react';
 
 import { findTargetCall } from '@mimir-wallet/api';
 import { AddressRow } from '@mimir-wallet/components';
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { Call as CallComp } from '@mimir-wallet/params';
 
 import { Item } from './Extrinsic';

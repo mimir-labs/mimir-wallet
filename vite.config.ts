@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import eslintPlugin from '@nabla/vite-plugin-eslint';
-import react from '@vitejs/plugin-react-swc';
+import react from '@vitejs/plugin-react';
 import { readFileSync } from 'fs';
 import path from 'node:path';
 import { defineConfig } from 'vite';
@@ -56,7 +56,7 @@ export default defineConfig(({ mode }) => ({
             '@polkadot/api-augment',
             '@polkadot/api-base',
             '@polkadot/api-derive',
-            '@polkadot/react-identicon',
+            '@polkadot/ui-shared',
             '@polkadot/types',
             '@polkadot/types-codec',
             '@polkadot/types-known',

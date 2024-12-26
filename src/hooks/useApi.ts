@@ -3,14 +3,17 @@
 
 import type { ApiProps } from '@mimir-wallet/api/types';
 
-import { useContext } from 'react';
+import { create } from 'zustand';
 
-import { ApiCtx } from '@mimir-wallet/api';
-
-import { createNamedHook } from './createNamedHook';
-
-function useApiImpl(): ApiProps {
-  return useContext(ApiCtx);
-}
-
-export const useApi = createNamedHook('useApi', useApiImpl);
+export const useApi = create<ApiProps>()(
+  () =>
+    ({
+      isApiConnected: false,
+      isApiInitialized: false,
+      apiError: null,
+      isApiReady: false,
+      tokenSymbol: '',
+      metadata: {},
+      identityApi: null
+    }) as unknown as ApiProps
+);

@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 import IconStar from '@mimir-wallet/assets/svg/icon-star.svg?react';
 import { ellipsisLinesMixin } from '@mimir-wallet/components/utils';
-import { useToggle } from '@mimir-wallet/hooks';
+import { useToggle } from '@mimir-wallet/hooks/useToggle';
 
 import DappDetails from './DappDetails';
 

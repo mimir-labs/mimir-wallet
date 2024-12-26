@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
-import type { AccountData, AccountDataExtra } from './types';
+import type { AccountData, AccountDataExtra } from '@mimir-wallet/hooks/types';
 
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { useCallback, useMemo } from 'react';
 
 import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
+import { createNamedHook } from '@mimir-wallet/hooks/createNamedHook';
+import { useLocalStore } from '@mimir-wallet/hooks/useStore';
 
-import { createNamedHook } from './createNamedHook';
-import { useAccount } from './useAccounts';
-import { useLocalStore } from './useStore';
+import { useAccount } from './useAccount';
 
 type GroupName = 'mimir' | 'injected' | 'hide';
 

@@ -12,7 +12,9 @@ import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
 import { ellipsisMixin } from '@mimir-wallet/components/utils';
 import { Call as CallComp } from '@mimir-wallet/params';
 
-import { CallDisplayDetail, CallDisplayDetailMinor, CallDisplaySection } from '../CallDisplay';
+import CallDisplayDetail from '../CallDisplay/CallDisplayDetail';
+import CallDisplayDetailMinor from '../CallDisplay/CallDisplayDetailMinor';
+import CallDisplaySection from '../CallDisplay/CallDisplaySection';
 import { findAction } from '../utils';
 import FunctionArgs from './FunctionArgs';
 

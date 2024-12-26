@@ -4,8 +4,8 @@
 import { Box, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 
+import { useSelectedAccount } from '@mimir-wallet/accounts/useSelectedAccount';
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
-import { useSelectedAccount } from '@mimir-wallet/hooks';
 
 import AccountMenu from './AccountMenu';
 import AddressCell from './AddressCell';

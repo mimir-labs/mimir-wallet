@@ -4,8 +4,8 @@
 import { Box, Button, Link as MuiLink, Stack, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-import { useApi } from '@mimir-wallet/hooks';
-import { chainLinks } from '@mimir-wallet/utils';
+import { chainLinks } from '@mimir-wallet/api/chain-links';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 interface Props {
   info: React.ReactNode;

@@ -4,10 +4,10 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import React from 'react';
 
-import { useAddressMeta } from '@mimir-wallet/hooks';
+import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 
 import Input from './Input';
-import { toastSuccess } from './ToastRoot';
+import { toastSuccess } from './utils';
 
 function Content({ address, onClose }: { address: string; onClose?: () => void }) {
   const { name, saveName, setName } = useAddressMeta(address);

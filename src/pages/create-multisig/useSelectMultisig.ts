@@ -4,8 +4,9 @@
 import { hexToU8a } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { encodeAddress } from '@mimir-wallet/api';
-import { useAccount, useWallet } from '@mimir-wallet/hooks';
+import { accountSource } from '@mimir-wallet/wallet/useWallet';
 
 interface UseSelectMultisig {
   unselected: string[];
@@ -23,7 +24,6 @@ export function useSelectMultisig(
   defaultThreshold?: number,
   threshold1?: boolean
 ): UseSelectMultisig {
-  const { accountSource } = useWallet();
   const { accounts, addresses } = useAccount();
   const all = useMemo(
     () =>
@@ -40,10 +40,7 @@ export function useSelectMultisig(
     [all, signatories]
   );
 
-  const hasSoloAccount = useMemo(
-    () => !!signatories.find((address) => !!accountSource(address)),
-    [accountSource, signatories]
-  );
+  const hasSoloAccount = useMemo(() => !!signatories.find((address) => !!accountSource(address)), [signatories]);
   const isThresholdValid = Number(threshold) >= (threshold1 ? 1 : 2) && Number(threshold) <= signatories.length;
 
   const select = useCallback((value: string) => {

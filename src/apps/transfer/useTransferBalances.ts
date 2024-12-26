@@ -10,7 +10,7 @@ import type { TransferToken } from './types';
 import { BN, BN_ZERO, isHex } from '@polkadot/util';
 import { useEffect, useMemo, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/hooks';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 function _listenNativeBalance(api: ApiPromise, address: string, setBalance: (value: BN) => void): Promise<() => void> {
   return api.derive.balances.all(address, (result) => {
