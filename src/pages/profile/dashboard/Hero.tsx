@@ -10,6 +10,7 @@ import {
   Paper,
   Stack,
   SvgIcon,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
@@ -22,6 +23,7 @@ import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
 import { encodeAddress } from '@mimir-wallet/api';
 import { chainLinks } from '@mimir-wallet/api/chain-links';
+import StatescanImg from '@mimir-wallet/assets/images/statescan.svg';
 import SubscanImg from '@mimir-wallet/assets/images/subscan.svg';
 import IconAdd from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
 import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
@@ -165,13 +167,21 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
               <span>Mimir Secured {days} Days</span>
-              <a target='_blank' href={chainLinks.accountExplorerLink(address)} rel='noreferrer'>
-                <Avatar style={{ width: 16, height: 16 }} src={SubscanImg} alt='subscan' />
-              </a>
+              <Tooltip title={window.currentChain.statescan ? 'Statescan' : 'Subscan'}>
+                <a target='_blank' href={chainLinks.accountExplorerLink(address)} rel='noreferrer'>
+                  <Avatar
+                    style={{ width: 16, height: 16 }}
+                    src={window.currentChain.statescan ? StatescanImg : SubscanImg}
+                    alt='subscan'
+                  />
+                </a>
+              </Tooltip>
               {chain.subsquareUrl && (
-                <Link to={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address)}`)}`}>
-                  <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
-                </Link>
+                <Tooltip title='Subsquare'>
+                  <Link to={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address)}`)}`}>
+                    <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
+                  </Link>
+                </Tooltip>
               )}
             </Box>
 

@@ -54,7 +54,12 @@ const createComponents: Func = () => ({
         }
       }),
       outlined: ({ ownerState, theme }) => ({
-        borderColor: ownerState.color !== 'inherit' ? theme.palette[ownerState.color || 'primary'].main : undefined
+        borderColor: ownerState.color !== 'inherit' ? theme.palette[ownerState.color || 'primary'].main : undefined,
+        ':hover': {
+          backgroundColor:
+            ownerState.color !== 'inherit' ? theme.palette[ownerState.color || 'primary'].main : undefined,
+          color: ownerState.color !== 'inherit' ? theme.palette[ownerState.color || 'primary'].contrastText : undefined
+        }
       }),
       startIcon: {
         '>*:nth-of-type(1)': {
