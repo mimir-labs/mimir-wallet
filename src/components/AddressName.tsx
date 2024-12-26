@@ -9,6 +9,7 @@ import { hexToU8a, isFunction } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
+import { encodeAddress } from '@mimir-wallet/api';
 import IconIdentity from '@mimir-wallet/assets/svg/identity.svg?react';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useDeriveAccountInfo } from '@mimir-wallet/hooks/useDeriveAccountInfo';
@@ -68,7 +69,8 @@ function extractIdentity(address: string, identity: DeriveAccountRegistration): 
 }
 
 function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
-  const address = value?.toString() || '';
+  const address = useMemo(() => encodeAddress(value?.toString()), [value]);
+
   const { identityApi } = useApi();
   const info = useDeriveAccountInfo(address);
   const [chainName, setChainName] = useState<React.ReactNode>(() => extractName(address.toString()));

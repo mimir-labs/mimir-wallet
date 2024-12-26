@@ -18,7 +18,7 @@ function AppFrame({ url, iconUrl, appName }: { url: string; iconUrl?: string; ap
   const selected = useSelectedAccount();
 
   const appUrl = useMemo(() => {
-    return `${url}?rpc=${encodeURIComponent(apiUrl)}`;
+    return `${url}?rpc=${encodeURIComponent(Array.isArray(apiUrl) ? apiUrl[0] : apiUrl)}`;
   }, [apiUrl, url]);
 
   useCommunicator(iframeRef, appUrl, iconUrl, appName);

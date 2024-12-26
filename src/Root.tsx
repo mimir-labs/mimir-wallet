@@ -5,7 +5,7 @@ import { StyledEngineProvider } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRef } from 'react';
 
-import { GlobalStyle, ToastRoot, TxToast } from '@mimir-wallet/components';
+import { GlobalStyle } from '@mimir-wallet/components';
 import { ThemeProvider } from '@mimir-wallet/theme';
 import { fetcher } from '@mimir-wallet/utils';
 
@@ -38,9 +38,7 @@ function Root({ children }: { children: React.ReactNode }) {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider>
-        <ToastRoot />
         <QueryClientProvider client={queryClient.current}>
-          <TxToast />
           <GlobalStyle />
           {children}
         </QueryClientProvider>

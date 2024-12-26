@@ -1,4 +1,14 @@
-# [1.6.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.5.0...v1.6.0) (2024-12-24)
+## [1.7.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.6.0...v1.7.0) (2024-12-26)
+
+
+### Features
+
+* add explorer link and statescan icon ([#105](https://github.com/mimir-labs/mimir-wallet/issues/105)) ([854b65c](https://github.com/mimir-labs/mimir-wallet/commit/854b65cf81d8bca2bd507818cf45a2588682e83d))
+* add nexus explorer link and support statescan url pattern ([#103](https://github.com/mimir-labs/mimir-wallet/issues/103)) ([01bdaa2](https://github.com/mimir-labs/mimir-wallet/commit/01bdaa25ad6e425b9a0f059c50ac74e25235defc))
+* add tooltips to sidebar buttons ([#100](https://github.com/mimir-labs/mimir-wallet/issues/100)) ([19e87c2](https://github.com/mimir-labs/mimir-wallet/commit/19e87c2ee4c65ea06d71b600f55e8dc9ad76a816))
+* update button with outlined variant style ([#104](https://github.com/mimir-labs/mimir-wallet/issues/104)) ([4fc2cd3](https://github.com/mimir-labs/mimir-wallet/commit/4fc2cd3f77992bd48272f032b032c16b2a8c5c6d))
+
+## [1.6.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.5.0...v1.6.0) (2024-12-24)
 
 
 ### Bug Fixes
@@ -13,14 +23,14 @@
 * optimize network selection layout ([#96](https://github.com/mimir-labs/mimir-wallet/issues/96)) ([d55ab71](https://github.com/mimir-labs/mimir-wallet/commit/d55ab71b4cbe49d930f1a8b4388cd33d2bc431b2))
 * use blake2 hash when the call is for multisig transaction ([#93](https://github.com/mimir-labs/mimir-wallet/issues/93)) ([42573ab](https://github.com/mimir-labs/mimir-wallet/commit/42573abb122a68da9c3ca4dd0ec5e6bfee8812d1))
 
-# [1.5.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.4.0...v1.5.0) (2024-12-17)
+## [1.5.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.4.0...v1.5.0) (2024-12-17)
 
 
 ### Features
 
 * add zkVerify chain support ([#87](https://github.com/mimir-labs/mimir-wallet/issues/87)) ([c2e591b](https://github.com/mimir-labs/mimir-wallet/commit/c2e591b67aea5230fe594c89c1d329fd66917908))
 
-# [1.4.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.3.0...v1.4.0) (2024-12-16)
+## [1.4.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.3.0...v1.4.0) (2024-12-16)
 
 
 ### Bug Fixes
@@ -33,7 +43,7 @@
 * add transaction sharing link feature ([#86](https://github.com/mimir-labs/mimir-wallet/issues/86)) ([46aefc5](https://github.com/mimir-labs/mimir-wallet/commit/46aefc5b8d1be9f7787daa0ac6dd161e7194af6d))
 * set different page titles for each route ([#85](https://github.com/mimir-labs/mimir-wallet/issues/85)) ([1be43cd](https://github.com/mimir-labs/mimir-wallet/commit/1be43cd9be55243fe7e0b6982dde7b0f68a3c613))
 
-# [1.3.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.2.1...v1.3.0) (2024-12-07)
+## [1.3.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.2.1...v1.3.0) (2024-12-07)
 
 
 ### Bug Fixes
@@ -46,16 +56,6 @@
 * display all on-chain assets and add hydration assets display ([#80](https://github.com/mimir-labs/mimir-wallet/issues/80)) ([8f4bcc6](https://github.com/mimir-labs/mimir-wallet/commit/8f4bcc6b10a6aba48d2aabf59c677be385eae35e))
 * optimize transaction and batch call content display ([#82](https://github.com/mimir-labs/mimir-wallet/issues/82)) ([6aecb87](https://github.com/mimir-labs/mimir-wallet/commit/6aecb87908862c2477d4f7cf908676eb941f29d8))
 
-## [1.7.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.6.0...v1.7.0) (2024-12-26)
-
-
-### Features
-
-* add explorer link and statescan icon ([#105](https://github.com/mimir-labs/mimir-wallet/issues/105)) ([854b65c](https://github.com/mimir-labs/mimir-wallet/commit/854b65cf81d8bca2bd507818cf45a2588682e83d))
-* add nexus explorer link and support statescan url pattern ([#103](https://github.com/mimir-labs/mimir-wallet/issues/103)) ([01bdaa2](https://github.com/mimir-labs/mimir-wallet/commit/01bdaa25ad6e425b9a0f059c50ac74e25235defc))
-* add tooltips to sidebar buttons ([#100](https://github.com/mimir-labs/mimir-wallet/issues/100)) ([19e87c2](https://github.com/mimir-labs/mimir-wallet/commit/19e87c2ee4c65ea06d71b600f55e8dc9ad76a816))
-* update button with outlined variant style ([#104](https://github.com/mimir-labs/mimir-wallet/issues/104)) ([4fc2cd3](https://github.com/mimir-labs/mimir-wallet/commit/4fc2cd3f77992bd48272f032b032c16b2a8c5c6d))
-
 ## [1.2.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.2.0...v1.2.1) (2024-12-02)
 
 
@@ -63,7 +63,7 @@
 
 * kill pure account dialog balance style ([#79](https://github.com/mimir-labs/mimir-wallet/issues/79)) ([cb0d613](https://github.com/mimir-labs/mimir-wallet/commit/cb0d6131e5e15b64211c55c80c266b7f1b5bac6f))
 
-# [1.2.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.1.0...v1.2.0) (2024-12-02)
+## [1.2.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.1.0...v1.2.0) (2024-12-02)
 
 
 ### Bug Fixes
