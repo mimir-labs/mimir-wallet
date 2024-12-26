@@ -46,6 +46,16 @@
 * display all on-chain assets and add hydration assets display ([#80](https://github.com/mimir-labs/mimir-wallet/issues/80)) ([8f4bcc6](https://github.com/mimir-labs/mimir-wallet/commit/8f4bcc6b10a6aba48d2aabf59c677be385eae35e))
 * optimize transaction and batch call content display ([#82](https://github.com/mimir-labs/mimir-wallet/issues/82)) ([6aecb87](https://github.com/mimir-labs/mimir-wallet/commit/6aecb87908862c2477d4f7cf908676eb941f29d8))
 
+## [1.7.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.6.0...v1.7.0) (2024-12-26)
+
+
+### Features
+
+* add explorer link and statescan icon ([#105](https://github.com/mimir-labs/mimir-wallet/issues/105)) ([854b65c](https://github.com/mimir-labs/mimir-wallet/commit/854b65cf81d8bca2bd507818cf45a2588682e83d))
+* add nexus explorer link and support statescan url pattern ([#103](https://github.com/mimir-labs/mimir-wallet/issues/103)) ([01bdaa2](https://github.com/mimir-labs/mimir-wallet/commit/01bdaa25ad6e425b9a0f059c50ac74e25235defc))
+* add tooltips to sidebar buttons ([#100](https://github.com/mimir-labs/mimir-wallet/issues/100)) ([19e87c2](https://github.com/mimir-labs/mimir-wallet/commit/19e87c2ee4c65ea06d71b600f55e8dc9ad76a816))
+* update button with outlined variant style ([#104](https://github.com/mimir-labs/mimir-wallet/issues/104)) ([4fc2cd3](https://github.com/mimir-labs/mimir-wallet/commit/4fc2cd3f77992bd48272f032b032c16b2a8c5c6d))
+
 ## [1.2.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.2.0...v1.2.1) (2024-12-02)
 
 
