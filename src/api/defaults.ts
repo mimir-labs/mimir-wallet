@@ -7,7 +7,11 @@ import { decodeAddress as decodeAddressBase, encodeAddress as encodeAddressBase 
 
 export const DEFAULT_AUX = ['Aux1', 'Aux2', 'Aux3', 'Aux4', 'Aux5', 'Aux6', 'Aux7', 'Aux8', 'Aux9'];
 
-export function encodeAddress(key: string | Uint8Array, ss58Format = window?.currentChain?.ss58Format) {
+export function encodeAddress(key?: string | Uint8Array, ss58Format = window?.currentChain?.ss58Format) {
+  if (!key) {
+    return '';
+  }
+
   return encodeAddressBase(key, ss58Format);
 }
 

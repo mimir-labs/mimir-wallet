@@ -42,7 +42,7 @@ export const generateHtmlDiff = async (block: Block, diff: [HexString, HexString
 
 export async function simulate(
   api: ApiPromise,
-  rpc: string,
+  rpc: string | string[],
   call: IMethod,
   address: string
 ): Promise<{

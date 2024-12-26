@@ -70,10 +70,10 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
  * Creates and initializes a new Polkadot API instance
  * Handles metadata retrieval and API setup with error handling
  *
- * @param apiUrl - WebSocket URL for the chain
+ * @param apiUrl - WebSocket URL(s) for the chain
  * @param onError - Error handler callback
  */
-async function createApi(apiUrl: string, onError: (error: unknown) => void): Promise<void> {
+async function createApi(apiUrl: string | string[], onError: (error: unknown) => void): Promise<void> {
   // Try to get metadata from service
   let metadata: Record<string, HexString> = {};
 
@@ -114,7 +114,7 @@ export async function initializeApi(chain: Endpoint) {
     api: statics.api,
     chainSS58: chain.ss58Format,
     genesisHash: chain.genesisHash,
-    apiUrl: chain.wsUrl,
+    apiUrl: Object.values(chain.wsUrl),
     network: chain.key,
     chain: chain
   });
@@ -128,7 +128,7 @@ export async function initializeApi(chain: Endpoint) {
   };
 
   // Initialize main blockchain API connection
-  createApi(chain.wsUrl, onError).then(() => {
+  createApi(Object.values(chain.wsUrl), onError).then(() => {
     // Set up event listeners for connection state
     statics.api.on('connected', () => useApi.setState({ isApiConnected: true }));
     statics.api.on('disconnected', () => useApi.setState({ isApiConnected: false }));
@@ -150,7 +150,7 @@ export async function initializeApi(chain: Endpoint) {
 
     if (peopleEndpoint) {
       // Create WebSocket provider for identity network
-      const provider = new WsProvider(peopleEndpoint.wsUrl);
+      const provider = new WsProvider(Object.values(peopleEndpoint.wsUrl));
 
       // Initialize identity API with custom types
       ApiPromise.create({

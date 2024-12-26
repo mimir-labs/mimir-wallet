@@ -7,7 +7,14 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 import AccountConsumer from '@mimir-wallet/accounts/Consumer';
 import { useAccount } from '@mimir-wallet/accounts/useAccount';
-import { ConnectWalletModal, MimirLoading, SwitchAccountDialog, TxSubmit } from '@mimir-wallet/components';
+import {
+  ConnectWalletModal,
+  MimirLoading,
+  SwitchAccountDialog,
+  ToastRoot,
+  TxSubmit,
+  TxToast
+} from '@mimir-wallet/components';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useFollowAccounts } from '@mimir-wallet/hooks/useFollowAccounts';
 import { usePageTitle } from '@mimir-wallet/hooks/usePageTitle';
@@ -56,6 +63,8 @@ function BaseContainer({
   return (
     <BaseContainerCtx.Provider value={value}>
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
+      <ToastRoot />
+      <TxToast />
       <AccountConsumer />
       <AddAddressBook />
 

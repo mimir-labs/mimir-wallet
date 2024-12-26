@@ -4,6 +4,7 @@
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import { CURRENT_ADDRESS_PREFIX, CURRENT_NETWORK_KEY } from '@mimir-wallet/constants';
 import { store } from '@mimir-wallet/utils';
 
@@ -26,15 +27,15 @@ export function useFollowAccounts() {
     if (!urlCurrent || !urlNetwork) {
       const newSearchParams = new URLSearchParams(searchParams);
 
-      currentRef.current && newSearchParams.set('address', currentRef.current);
+      currentRef.current && newSearchParams.set('address', encodeAddress(currentRef.current));
       newSearchParams.set('network', networkRef.current);
       setSearchParams(newSearchParams, { replace: true });
     }
 
     if (urlCurrent && urlNetwork) {
-      store.set(`${CURRENT_ADDRESS_PREFIX}${urlNetwork}`, urlCurrent);
+      store.set(`${CURRENT_ADDRESS_PREFIX}${urlNetwork}`, encodeAddress(urlCurrent));
       store.set(CURRENT_NETWORK_KEY, urlNetwork);
-      useAddressStore.setState({ current: urlCurrent });
+      useAddressStore.setState({ current: encodeAddress(urlCurrent) });
     }
   }, [searchParams, setSearchParams, urlCurrent, urlNetwork]);
 }

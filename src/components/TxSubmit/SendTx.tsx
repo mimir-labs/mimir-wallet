@@ -202,7 +202,7 @@ function SendTx({
         loading={loading || isLoading}
         disabled={!txBundle?.signer || !!error || !isEnought || disabled}
       >
-        Submit1
+        Submit
       </LoadingButton>
     </>
   );

@@ -5,10 +5,11 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 
 import { alpha, Box, Chip, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import { hexToU8a } from '@polkadot/util';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
+import { encodeAddress } from '@mimir-wallet/api';
 import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
 import { addressEq } from '@mimir-wallet/utils';
 
@@ -44,7 +45,7 @@ function AddressCell({
 }: Props) {
   const [spacing, spacingCol] = [0.5, 0.2];
 
-  const address = value?.toString();
+  const address = useMemo(() => encodeAddress(value?.toString()), [value]);
   const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
 

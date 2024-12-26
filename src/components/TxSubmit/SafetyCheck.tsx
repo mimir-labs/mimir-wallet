@@ -75,7 +75,7 @@ function SafetyCheck({
   const handleSimulate = () => {
     if (account && call) {
       setSimulation({ ...EMPTY_SIMULATION, isLoading: true });
-      simulate(api, chain.wsUrl, call, account)
+      simulate(api, Object.values(chain.wsUrl), call, account)
         .then(({ success, html, error }) => {
           setSimulation({ isDone: true, success, error, isLoading: false });
           setHtml(html);
