@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 import type { PrepareFlexible } from './types';
@@ -32,7 +31,7 @@ import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@mim
 import { utm } from '@mimir-wallet/config';
 import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
 import { useApi } from '@mimir-wallet/hooks/useApi';
-import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useNativeBalances } from '@mimir-wallet/hooks/useBalances';
 import { addTxToast } from '@mimir-wallet/hooks/useTxQueue';
 import { addressToHex, service, sleep, store } from '@mimir-wallet/utils';
 import { accountSource, useAccountSource, useWallet } from '@mimir-wallet/wallet/useWallet';
@@ -94,7 +93,7 @@ function CreateFlexible({
   const [extrinsicIndex, setExtrinsicIndex] = useState<number | null | undefined>(_extrinsicIndex);
   const navigate = useNavigate();
   const selectAccount = useSelectedAccountCallback();
-  const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [signer]);
+  const [allBalances] = useNativeBalances(signer);
   const [loadingFirst, setLoadingFirst] = useState(false);
   const [loadingSecond, setLoadingSecond] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
@@ -105,10 +104,7 @@ function CreateFlexible({
   const reservedAmount = useMemo(() => {
     const baseReserve = api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2));
 
-    if (
-      allBalances &&
-      allBalances.freeBalance.add(allBalances.reservedBalance).gte(api.consts.balances.existentialDeposit)
-    ) {
+    if (allBalances && allBalances.free.gte(api.consts.balances.existentialDeposit)) {
       baseReserve.iadd(api.consts.balances.existentialDeposit.divn(10)); // for gas
     } else {
       baseReserve.iadd(api.consts.balances.existentialDeposit.muln(1.1)); // mul 1.1 for gas

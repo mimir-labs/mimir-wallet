@@ -15,6 +15,7 @@ import {
   ListItemButton,
   Menu,
   MenuItem,
+  Skeleton,
   Stack,
   SvgIcon,
   Typography,
@@ -80,7 +81,7 @@ function AccountCell({
   const { isLocalAccount, deleteAddress, showAccount, hideAccount } = useAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const balances = useNativeBalances(value);
+  const [balances, isFetched] = useNativeBalances(value);
   const icon = useMemo(() => findToken(genesisHash).Icon, [genesisHash]);
   const source = useAccountSource(value);
 
@@ -163,10 +164,14 @@ function AccountCell({
           }}
         >
           <AddressCell shorten showType value={value} withCopy withAddressBook />
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 700 }}>
-            <FormatBalance value={balances?.total} />
-            <Avatar alt='Token' src={icon} sx={{ width: 16, height: 16 }} />
-          </Box>
+          {isFetched ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 700 }}>
+              <FormatBalance value={balances?.total} />
+              <Avatar alt='Token' src={icon} sx={{ width: 16, height: 16 }} />
+            </Box>
+          ) : (
+            <Skeleton variant='text' width={40} />
+          )}
           {value && (isLocalAccount(value) || watchlist) && (
             <IconButton color='inherit' onClick={handleMore} sx={{ padding: { sm: 1, xs: 0.4 } }}>
               <SvgIcon component={IconMore} inheritViewBox />

@@ -24,7 +24,6 @@ export interface ApiProps extends ApiState {
   api: ApiPromise;
   apiUrl: string | string[];
   apiError: string | null;
-  isApiConnected: boolean;
   isApiInitialized: boolean;
   network: string;
   chain: Endpoint;

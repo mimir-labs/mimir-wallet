@@ -4,7 +4,7 @@
 import type { HexString } from '@polkadot/util/types';
 import type { ApiState } from './types';
 
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance } from '@polkadot/util';
 
@@ -12,6 +12,7 @@ import { allEndpoints, Endpoint, typesBundle } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { service } from '@mimir-wallet/utils';
 
+import { ApiProvider } from './ApiProvider';
 import { DEFAULT_AUX, statics } from './defaults';
 
 /**
@@ -39,8 +40,14 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
   const tokenDecimals = properties.tokenDecimals.unwrapOr([api.registry.createType('u32', 12)]);
 
   // Debug logging for chain configuration
-  console.debug('tokenDecimals', tokenDecimals);
-  console.debug('tokenSymbol', tokenSymbol);
+  console.debug(
+    'tokenDecimals',
+    tokenDecimals.map((b) => b.toNumber())
+  );
+  console.debug(
+    'tokenSymbol',
+    tokenSymbol.map((b) => b.toString())
+  );
   console.debug('ss58Format', ss58Format);
   console.debug('genesisHash', api.genesisHash.toHex());
 
@@ -71,9 +78,14 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
  * Handles metadata retrieval and API setup with error handling
  *
  * @param apiUrl - WebSocket URL(s) for the chain
+ * @param httpUrl - HTTP URL for the chain
  * @param onError - Error handler callback
  */
-async function createApi(apiUrl: string | string[], onError: (error: unknown) => void): Promise<void> {
+async function createApi(
+  apiUrl: string | string[],
+  httpUrl: string,
+  onError?: (error: unknown) => void
+): Promise<void> {
   // Try to get metadata from service
   let metadata: Record<string, HexString> = {};
 
@@ -85,10 +97,11 @@ async function createApi(apiUrl: string | string[], onError: (error: unknown) =>
 
   try {
     // Initialize WebSocket provider and API
-    const provider = new WsProvider(apiUrl);
+    const provider = new ApiProvider(apiUrl, httpUrl);
 
     statics.api = new ApiPromise({
       provider,
+      registry: statics.registry,
       typesBundle,
       typesChain: {
         Crust: {
@@ -98,7 +111,7 @@ async function createApi(apiUrl: string | string[], onError: (error: unknown) =>
       metadata
     });
   } catch (error) {
-    onError(error);
+    onError?.(error);
   }
 }
 
@@ -128,10 +141,8 @@ export async function initializeApi(chain: Endpoint) {
   };
 
   // Initialize main blockchain API connection
-  createApi(Object.values(chain.wsUrl), onError).then(() => {
+  createApi(Object.values(chain.wsUrl), chain.httpUrl, onError).then(() => {
     // Set up event listeners for connection state
-    statics.api.on('connected', () => useApi.setState({ isApiConnected: true }));
-    statics.api.on('disconnected', () => useApi.setState({ isApiConnected: false }));
     statics.api.on('error', onError);
 
     // Handle API ready state
@@ -150,7 +161,7 @@ export async function initializeApi(chain: Endpoint) {
 
     if (peopleEndpoint) {
       // Create WebSocket provider for identity network
-      const provider = new WsProvider(Object.values(peopleEndpoint.wsUrl));
+      const provider = new ApiProvider(Object.values(peopleEndpoint.wsUrl), peopleEndpoint.httpUrl);
 
       // Initialize identity API with custom types
       ApiPromise.create({

@@ -1,8 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
-
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import React, { useCallback, useState } from 'react';
@@ -10,7 +8,7 @@ import React, { useCallback, useState } from 'react';
 import { useGroupAccounts } from '@mimir-wallet/accounts/useGroupAccounts';
 import { signAndSend } from '@mimir-wallet/api';
 import { useApi } from '@mimir-wallet/hooks/useApi';
-import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useNativeBalances } from '@mimir-wallet/hooks/useBalances';
 import { useInputNumber } from '@mimir-wallet/hooks/useInputNumber';
 import { parseUnits } from '@mimir-wallet/utils';
 import { useAccountSource } from '@mimir-wallet/wallet/useWallet';
@@ -39,8 +37,7 @@ function Content({
   setValue: React.Dispatch<string>;
   receipt?: string;
 }) {
-  const { api } = useApi();
-  const balances = useCall<DeriveBalancesAll>(api.derive.balances.all, [sending]);
+  const [balances] = useNativeBalances(sending);
   const { injected } = useGroupAccounts();
 
   return (
@@ -48,7 +45,7 @@ function Content({
       <Stack spacing={2}>
         <InputAddress
           withBalance
-          balance={balances?.freeBalance}
+          balance={balances?.transferrable}
           filtered={injected}
           isSign
           label='Sending From'

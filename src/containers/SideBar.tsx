@@ -1,8 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
-
 import {
   Avatar,
   Box,
@@ -12,6 +10,7 @@ import {
   Grid2 as Grid,
   IconButton,
   Paper,
+  Skeleton,
   Stack,
   SvgIcon,
   Tooltip,
@@ -44,7 +43,7 @@ import {
 } from '@mimir-wallet/components';
 import { findToken, walletConfig } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks/useApi';
-import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useNativeBalances } from '@mimir-wallet/hooks/useBalances';
 import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { useWallet } from '@mimir-wallet/wallet/useWallet';
 
@@ -108,7 +107,7 @@ function TopContent() {
   const [createMultisigOpen, toggleCreateMultisigOpen] = useToggle();
   const { connectedWallets, openWallet } = useWallet();
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
-  const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [selected]);
+  const [allBalances, isFetched] = useNativeBalances(selected);
   const { closeSidebar } = useContext(BaseContainerCtx);
   const isConnected = Object.keys(connectedWallets).length > 0;
   const { breakpoints } = useTheme();
@@ -139,12 +138,16 @@ function TopContent() {
               <SvgIcon color='primary' component={ArrowRight} inheritViewBox />
             </Stack>
             <Divider sx={{ marginY: 1 }} />
-            <Stack alignItems='center' direction='row' spacing={0.5}>
-              <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
-              <Typography color='text.secondary' fontSize={12}>
-                <FormatBalance value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
-              </Typography>
-            </Stack>
+            {isFetched ? (
+              <Stack alignItems='center' direction='row' spacing={0.5}>
+                <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
+                <Typography color='text.secondary' fontSize={12}>
+                  <FormatBalance value={allBalances?.total} />
+                </Typography>
+              </Stack>
+            ) : (
+              <Skeleton variant='text' width={50} height={14} />
+            )}
             <Divider sx={{ marginY: 1 }} />
             <Tooltip title='QR Code'>
               <IconButton color='primary' onClick={toggleQrOpen} size='small'>

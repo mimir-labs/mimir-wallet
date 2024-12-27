@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
@@ -17,7 +16,7 @@ import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react'
 import IconSuccess from '@mimir-wallet/assets/svg/icon-success-fill.svg?react';
 import IconUnLock from '@mimir-wallet/assets/svg/icon-unlock.svg?react';
 import { useApi } from '@mimir-wallet/hooks/useApi';
-import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useNativeBalances } from '@mimir-wallet/hooks/useBalances';
 import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { formatUnits } from '@mimir-wallet/utils';
 
@@ -35,7 +34,7 @@ interface Props {
 
 function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   const { api } = useApi();
-  const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [address]);
+  const [allBalances] = useNativeBalances(address.toString());
   const [open, toggleOpen] = useToggle();
   const onEnoughtStateRef = useRef(onEnoughtState);
 
@@ -43,7 +42,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 
   const isEnought = useMemo(() => {
     if (allBalances) {
-      return allBalances.availableBalance.gte(new BN(value.toString()));
+      return allBalances.transferrable.gte(new BN(value.toString()));
     }
 
     return 'pending';

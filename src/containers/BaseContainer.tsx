@@ -38,7 +38,7 @@ function BaseContainer({
   withSideBar: boolean;
   withPadding: boolean;
 }) {
-  const { isApiConnected, isApiReady } = useApi();
+  const { isApiReady } = useApi();
   const { isWalletReady, closeWallet, walletOpen } = useWallet();
   const { current, isMultisigSyned } = useAccount();
   const { queue } = useTxQueue();
@@ -72,14 +72,14 @@ function BaseContainer({
 
       <TopBar />
 
-      {isApiReady && isApiConnected && isWalletReady && isMultisigSyned && current && (
+      {isApiReady && isWalletReady && isMultisigSyned && current && (
         <>
           <ToggleAlert address={current} setAlertOpen={setAlertOpen} />
           <SubscribeTx address={current} />
         </>
       )}
 
-      {isApiReady && isApiConnected && isWalletReady && isMultisigSyned ? (
+      {isApiReady && isWalletReady && isMultisigSyned ? (
         <Box
           sx={{
             display: 'flex',
