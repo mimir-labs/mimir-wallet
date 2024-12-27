@@ -1,46 +1,141 @@
-# Getting Started with Create React App
+# Mimir Wallet
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The best enterprise-level multi-signature account (multisig) management tool for Polkadot, Kusama, and other substrate-based chains.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- 🔐 Advanced Multi-signature Account Management
+- 🌐 Cross-chain Support (Polkadot, Kusama, and other substrate chains)
+- 📱 Progressive Web App (PWA) Support
+- 🎨 Modern Material UI Design
+- ⚡ Built with React and Vite
+- 🔄 Real-time Transaction Monitoring
+- 📊 Transaction History and Explorer
+- 📘 Address Book Management
+- 🔗 DApp Integration Support
 
-### `yarn dev`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+- React 18
+- TypeScript
+- Vite
+- Material UI v6
+- Polkadot.js API
+- React Query
+- React Router
+- TailwindCSS
+- Socket.io for real-time updates
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Prerequisites
 
-### `yarn test`
+- Node.js >= 20
+- Yarn package manager (v4.5.3 or later)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Development
 
-### `yarn build`
+1. Clone the repository:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+git clone https://github.com/mimir-labs/mimir-wallet.git
+cd mimir-wallet
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Install dependencies:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+yarn install
+```
 
-### `yarn eject`
+3. Start the development server:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+yarn dev
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The app will be available at http://localhost:5173
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Building for Production
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+To create a production build:
 
-## Learn More
+```bash
+yarn build
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+To preview the production build:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+yarn preview
+```
+
+## Testing
+
+- Run unit tests:
+
+```bash
+yarn test
+```
+
+- Run E2E tests:
+
+```bash
+yarn test:e2e
+```
+
+- Run all tests and validation:
+
+```bash
+yarn validate
+```
+
+## Code Quality
+
+The project uses several tools to maintain code quality:
+
+- ESLint for code linting
+- TypeScript for type checking
+- Husky for git hooks
+- Commitizen for conventional commits
+
+To run linting:
+
+```bash
+yarn lint
+```
+
+## Browser Support
+
+### Production
+
+- Edge >= 18
+- Firefox >= 60
+- Chrome >= 61
+- Safari >= 11
+- Opera >= 48
+
+### Development
+
+- Latest Chrome
+- Latest Firefox
+
+## License
+
+Licensed under the Apache License, Version 2.0
+
+## Links
+
+- Homepage: https://app.mimir.global
+- Repository: https://github.com/mimir-labs/mimir-wallet
+- Issue Tracker: https://github.com/mimir-labs/mimir-wallet/issues
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes using Commitizen (`yarn commit`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+Made with ❤️ by mimir team

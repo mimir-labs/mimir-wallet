@@ -28,7 +28,6 @@
     "test:e2e": "yarn preview:test 'cypress open'",
     "test:e2e:headless": "yarn preview:test 'cypress run'",
     "test:e2e:ci": "vite build && yarn preview:test 'cypress run --record'",
-    "format": "prettier -uw --cache --ignore-path .gitignore .",
     "run-tsc": "tsc",
     "run-eslint": "eslint --cache --fix",
     "lint": "run-p run-tsc run-eslint",
