@@ -17,7 +17,6 @@ export { default as AddressOverview } from './AddressOverview';
 export { default as AddressRow } from './AddressRow';
 export { default as AppIframe } from './AppIframe';
 export { default as AppName } from './AppName';
-export { default as BalanceFree } from './BalanceFree';
 export { default as Bytes } from './Bytes';
 export { default as ChainSelect } from './ChainSelect';
 export { default as ConnectWalletModal } from './ConnectWalletModal';

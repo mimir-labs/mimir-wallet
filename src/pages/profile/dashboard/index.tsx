@@ -21,7 +21,7 @@ import Structure from './Structure';
 function Dashboard({ address }: { address: string }) {
   const { genesisHash } = useApi();
   const [tokenInfo] = useTokenInfo();
-  const balances = useNativeBalances(address);
+  const [balances] = useNativeBalances(address);
   const { tokenSymbol, api } = useApi();
   const [tab, setTab] = useQueryParam('tab', 'asset', { replace: true });
   const tabsRef = useRef([

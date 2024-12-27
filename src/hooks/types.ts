@@ -245,10 +245,8 @@ export interface AccountBalance {
   total: BN;
   locked: BN;
   reserved: BN;
+  free: BN;
   transferrable: BN;
-  bonded: BN;
-  redeemable: BN;
-  unbonding: BN;
 }
 
 export type AccountAssetInfo = AssetInfo & {

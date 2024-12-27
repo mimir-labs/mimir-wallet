@@ -8,7 +8,7 @@ import { findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 
 function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
-  const { genesisHash, isApiConnected, isApiReady, network } = useApi();
+  const { genesisHash, isApiReady, network } = useApi();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -27,7 +27,7 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
     <>
       {onlyLogo ? (
         <Button onClick={handleClick} sx={{ borderColor: 'secondary.main' }} variant='outlined'>
-          {isApiConnected && isApiReady ? (
+          {isApiReady ? (
             <img alt='' src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} />
           ) : (
             <CircularProgress size={20} />
@@ -37,7 +37,7 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
         <Button
           onClick={handleClick}
           startIcon={
-            isApiConnected && isApiReady ? (
+            isApiReady ? (
               <img alt='' src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} />
             ) : (
               <CircularProgress size={20} />
@@ -46,7 +46,7 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
           sx={{ borderColor: 'secondary.main' }}
           variant='outlined'
         >
-          {!isApiConnected || !isApiReady ? 'Connecting...' : endpoint?.name}
+          {!isApiReady ? 'Connecting...' : endpoint?.name}
         </Button>
       )}
       <Popover

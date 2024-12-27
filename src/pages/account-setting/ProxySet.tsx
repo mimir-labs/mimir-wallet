@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import type { Vec } from '@polkadot/types';
 import type { PalletProxyProxyDefinition } from '@polkadot/types/lookup';
 import type { AccountData, PureAccountData } from '@mimir-wallet/hooks/types';
@@ -37,7 +36,7 @@ import IconInfo from '@mimir-wallet/assets/svg/icon-info-fill.svg?react';
 import { Address, AddressCell, FormatBalance } from '@mimir-wallet/components';
 import { findToken } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks/useApi';
-import { useCall } from '@mimir-wallet/hooks/useCall';
+import { useNativeBalances } from '@mimir-wallet/hooks/useBalances';
 import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 
 function ProxySet({
@@ -56,7 +55,7 @@ function ProxySet({
   const [isOpen, toggleOpen] = useToggle(false);
   const [isAlertOpen, toggleAlertOpen] = useToggle(false);
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
-  const allBalances = useCall<DeriveBalancesAll>(api.derive.balances?.all, [address]);
+  const [allBalances] = useNativeBalances(address);
 
   const isReadOnly = useMemo(() => !isLocalAccount(address), [address, isLocalAccount]);
 
@@ -196,7 +195,7 @@ function ProxySet({
               <span>Balance:</span>
               <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
               <Box component='span' sx={{ color: 'text.secondary' }}>
-                <FormatBalance withCurrency value={allBalances?.freeBalance.add(allBalances.reservedBalance)} />
+                <FormatBalance withCurrency value={allBalances?.total} />
               </Box>
             </Stack>
           </DialogContent>

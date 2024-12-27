@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
+import type { Registry } from '@polkadot/types/types';
 
+import { TypeRegistry } from '@polkadot/types';
 import { decodeAddress as decodeAddressBase, encodeAddress as encodeAddressBase } from '@polkadot/util-crypto';
 
 export const DEFAULT_AUX = ['Aux1', 'Aux2', 'Aux3', 'Aux4', 'Aux5', 'Aux6', 'Aux7', 'Aux8', 'Aux9'];
@@ -19,4 +21,4 @@ export function decodeAddress(address: string) {
   return decodeAddressBase(address);
 }
 
-export const statics: { api: ApiPromise } = {} as any;
+export const statics: { api: ApiPromise; registry: Registry } = { registry: new TypeRegistry() } as any;

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { DeriveBalancesAll, DeriveStakingAccount } from '@polkadot/api-derive/types';
 import type { Option } from '@polkadot/types';
 import type { AccountId, AccountId32 } from '@polkadot/types/interfaces';
 import type { PalletAssetsAssetAccount } from '@polkadot/types/lookup';
@@ -11,47 +10,41 @@ import type { AccountAssetInfo, AccountBalance, AssetInfo, OrmlTokensAccountData
 import { BN_ZERO, isHex } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
 
 import { useApi } from './useApi';
 import { useAssets } from './useAssets';
-import { useCall } from './useCall';
 
-function calcUnbonding(stakingInfo?: DeriveStakingAccount) {
-  if (!stakingInfo?.unlocking) {
-    return BN_ZERO;
+async function getBalances({ queryKey }: { queryKey: [ApiPromise, string | undefined | null] }) {
+  const [api, address] = queryKey;
+
+  if (!address) {
+    throw new Error('Address is required');
   }
 
-  const filtered = stakingInfo.unlocking
-    .filter(({ remainingEras, value }) => value.gt(BN_ZERO) && remainingEras.gt(BN_ZERO))
-    .map((unlock) => unlock.value);
-  const total = filtered.reduce((total, value) => total.add(value), BN_ZERO);
-
-  return total;
+  return Promise.all([api.query.system.account(address)]).then(([account]) => ({
+    total: account.data.free.add(account.data.reserved),
+    reserved: account.data.reserved,
+    locked: account.data.frozen,
+    free: account.data.free,
+    transferrable: account.data.free.sub(account.data.frozen)
+  }));
 }
 
-export function useNativeBalances(address?: AccountId | AccountId32 | string | null): AccountBalance | undefined {
-  const { api } = useApi();
-  const [balances, setBalances] = useState<AccountBalance>();
-  const balancesAll = useCall<DeriveBalancesAll>(api.derive.balances?.all, address ? [address] : []);
-  const stakingInfo = useCall<DeriveStakingAccount>(api.derive.staking?.account, address ? [address] : []);
+export function useNativeBalances(
+  address?: AccountId | AccountId32 | string | null
+): [AccountBalance | undefined, boolean, boolean] {
+  const { api, isApiReady } = useApi();
+  const queryHash = blake2AsHex(`${api.genesisHash.toHex()}-native-balances-${address?.toString()}`);
 
-  useEffect(() => {
-    if (balancesAll) {
-      setBalances({
-        // some chains don't have "active" in the Ledger
-        bonded: stakingInfo?.stakingLedger.active?.unwrap() || BN_ZERO,
-        reserved: balancesAll.reservedBalance,
-        locked: balancesAll.lockedBalance,
-        redeemable: stakingInfo?.redeemable || BN_ZERO,
-        total: balancesAll.freeBalance.add(balancesAll.reservedBalance),
-        transferrable: balancesAll.availableBalance,
-        unbonding: calcUnbonding(stakingInfo)
-      });
-    }
-  }, [balancesAll, stakingInfo]);
+  const { data, isFetched, isFetching } = useQuery({
+    queryKey: [api, address?.toString()] as const,
+    queryHash,
+    refetchInterval: 12000,
+    queryFn: getBalances,
+    enabled: isApiReady && !!address
+  });
 
-  return balances;
+  return [data, isFetched, isFetching];
 }
 
 async function getAssetBalances({
@@ -121,7 +114,7 @@ export function useAssetBalances(address?: AccountId | AccountId32 | string | nu
     queryHash,
     refetchInterval: 12000,
     queryFn: getAssetBalances,
-    enabled: isApiReady
+    enabled: isApiReady && !!address
   });
 
   return data ?? [];

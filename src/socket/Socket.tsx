@@ -19,7 +19,7 @@ const RECONNECT_INTERVAL = 3000;
 const subscriptions: Map<string, Set<(data: any) => void>> = new Map();
 
 // Store topics that need to be resubscribed after reconnection
-const pendingSubscriptions: Set<string> = new Set();
+const pendingSubscriptions: Map<string, Set<(data: any) => void>> = new Map();
 
 /**
  * Subscribe to a socket topic and set up a listener for incoming data
@@ -50,7 +50,7 @@ export function subscribe(topic: string, listener: (data: any) => void) {
       socket.emit('subscribe', [topic]);
     } else {
       // Queue subscription for when connection is established
-      pendingSubscriptions.add(topic);
+      pendingSubscriptions.set(topic, listeners);
     }
   }
 
@@ -110,7 +110,7 @@ function attemptReconnect(chain: Endpoint) {
 export function initializeSocket(chain: Endpoint) {
   // Cleanup existing socket connection if any
   if (socket) {
-    disconnect();
+    socket.disconnect();
   }
 
   // Create new socket connection with configuration
@@ -120,7 +120,6 @@ export function initializeSocket(chain: Endpoint) {
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionDelayMax: 5000,
-    reconnectionAttempts: 5,
     timeout: 20000
   });
 
@@ -133,12 +132,20 @@ export function initializeSocket(chain: Endpoint) {
     const activeTopics = Array.from(subscriptions.keys());
 
     if (activeTopics.length && !socket.recovered) {
-      socket.emit('subscribe', activeTopics);
+      subscriptions.forEach((listeners, topic) => {
+        listeners.forEach((listener) => {
+          subscribe(topic, listener);
+        });
+      });
     }
 
     // Handle any pending subscriptions that accumulated while disconnected
     if (pendingSubscriptions.size > 0) {
-      socket.emit('subscribe', Array.from(pendingSubscriptions));
+      pendingSubscriptions.forEach((listeners, topic) => {
+        listeners.forEach((listener) => {
+          subscribe(topic, listener);
+        });
+      });
       pendingSubscriptions.clear();
     }
   });

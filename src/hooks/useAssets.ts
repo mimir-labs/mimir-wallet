@@ -95,7 +95,7 @@ export function useAssets(): AssetInfo[] {
   const { api, isApiReady } = useApi();
   const { data } = useQuery({
     queryKey: [api] as const,
-    queryHash: api.genesisHash.toHex(),
+    queryHash: `${api.genesisHash.toHex()}-assets`,
     refetchInterval: 60000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
