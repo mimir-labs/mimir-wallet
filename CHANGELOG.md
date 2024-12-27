@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.8.0...v1.8.1) (2024-12-27)
+
+
+### Bug Fixes
+
+* improve wallet connection initialization and error handling ([#114](https://github.com/mimir-labs/mimir-wallet/issues/114)) ([1c3f89a](https://github.com/mimir-labs/mimir-wallet/commit/1c3f89a236a46f566791a6ec81d5b9655899258b))
+
 ## [1.8.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.7.0...v1.8.0) (2024-12-27)
 
 
