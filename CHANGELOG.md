@@ -8,6 +8,14 @@
 * add tooltips to sidebar buttons ([#100](https://github.com/mimir-labs/mimir-wallet/issues/100)) ([19e87c2](https://github.com/mimir-labs/mimir-wallet/commit/19e87c2ee4c65ea06d71b600f55e8dc9ad76a816))
 * update button with outlined variant style ([#104](https://github.com/mimir-labs/mimir-wallet/issues/104)) ([4fc2cd3](https://github.com/mimir-labs/mimir-wallet/commit/4fc2cd3f77992bd48272f032b032c16b2a8c5c6d))
 
+## [1.8.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.7.0...v1.8.0) (2024-12-27)
+
+
+### Features
+
+* Add multiple endpoint to connect chain ([#110](https://github.com/mimir-labs/mimir-wallet/issues/110)) ([033d710](https://github.com/mimir-labs/mimir-wallet/commit/033d7105cd66aeffade8cc0754bf17d10e82eebb))
+* **api:** support http and ws provider for chain connection ([#112](https://github.com/mimir-labs/mimir-wallet/issues/112)) ([4da9ed8](https://github.com/mimir-labs/mimir-wallet/commit/4da9ed83136f7397d9d9b1f2802687bb74e92b66))
+
 ## [1.6.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.5.0...v1.6.0) (2024-12-24)
 
 
