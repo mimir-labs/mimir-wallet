@@ -1,3 +1,5 @@
+# Changelog
+
 ## [1.7.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.6.0...v1.7.0) (2024-12-26)
 
 
