@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.7.0...v1.8.0) (2024-12-27)
+
+
+### Features
+
+* Add multiple endpoint to connect chain ([#110](https://github.com/mimir-labs/mimir-wallet/issues/110)) ([033d710](https://github.com/mimir-labs/mimir-wallet/commit/033d7105cd66aeffade8cc0754bf17d10e82eebb))
+* **api:** support http and ws provider for chain connection ([#112](https://github.com/mimir-labs/mimir-wallet/issues/112)) ([4da9ed8](https://github.com/mimir-labs/mimir-wallet/commit/4da9ed83136f7397d9d9b1f2802687bb74e92b66))
+
 ## [1.7.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.6.0...v1.7.0) (2024-12-26)
 
 
