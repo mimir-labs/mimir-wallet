@@ -23,6 +23,18 @@ export async function initializeWallet() {
   for (const wallet of connectWallets) {
     if (window.injectedWeb3?.[walletConfig[wallet]?.key || '']) {
       promises.push(loadWallet(window.injectedWeb3[walletConfig[wallet].key], CONNECT_ORIGIN, wallet));
+    } else {
+      // If the wallet is not found, wait for 300ms and try again
+      setTimeout(() => {
+        if (window.injectedWeb3?.[walletConfig[wallet]?.key || '']) {
+          loadWallet(window.injectedWeb3[walletConfig[wallet].key], CONNECT_ORIGIN, wallet).then((res) => {
+            useWallet.setState((state) => ({
+              walletAccounts: [...state.walletAccounts, ...res],
+              wallets: window.injectedWeb3 || {}
+            }));
+          });
+        }
+      }, 300);
     }
   }
 
