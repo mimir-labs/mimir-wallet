@@ -10,7 +10,9 @@ import type {
   ProviderStats
 } from '@polkadot/rpc-provider/types';
 
-import { HttpProvider, WsProvider } from '@polkadot/api';
+import { WsProvider } from '@polkadot/api';
+
+import { HttpProvider } from './HttpProvider';
 
 interface SubscriptionHandler {
   callback: ProviderInterfaceCallback;
