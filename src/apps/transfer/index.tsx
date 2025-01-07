@@ -1,8 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Button, Divider, Paper, Stack, Switch, Typography } from '@mui/material';
-import { BN } from '@polkadot/util';
+import { Box, Button, Divider, Paper, Skeleton, Stack, Switch, Typography } from '@mui/material';
+import { BN, isHex } from '@polkadot/util';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
@@ -36,7 +36,7 @@ function PageTransfer() {
   const filtered = useAllAccounts();
   const { addresses } = useAccount();
   const [token, setToken] = useState<TransferToken>();
-  const [format, sendingBalances] = useTransferBalance(token, sending);
+  const [format, sendingBalances, isSendingFetched] = useTransferBalance(token, sending);
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [, assetExistentialDeposit] = useAssetInfo(token?.isNative ? null : token?.assetId);
 
@@ -65,11 +65,19 @@ function PageTransfer() {
           website: 'mimir://app/transfer'
         });
       } else {
-        if (api.tx.assets) {
+        if (api.tx.assets || api.tx.foreignAssets) {
           addQueue({
             call: keepAlive
-              ? api.tx.assets.transferKeepAlive(token.assetId, recipient, parseUnits(amount, format[0])).method
-              : api.tx.assets.transfer(token.assetId, recipient, parseUnits(amount, format[0])).method,
+              ? api.tx[isHex(token.assetId) ? 'foreignAssets' : 'assets'].transferKeepAlive(
+                  token.assetId,
+                  recipient,
+                  parseUnits(amount, format[0])
+                ).method
+              : api.tx[isHex(token.assetId) ? 'foreignAssets' : 'assets'].transfer(
+                  token.assetId,
+                  recipient,
+                  parseUnits(amount, format[0])
+                ).method,
             accountId: sending,
             website: 'mimir://app/transfer'
           });
@@ -118,9 +126,13 @@ function PageTransfer() {
             label={
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 Amount
-                <span style={{ opacity: 0.5 }}>
-                  Balance: <FormatBalance format={format} value={sendingBalances} />
-                </span>
+                {!isSendingFetched ? (
+                  <Skeleton variant='text' width={50} height={14} />
+                ) : (
+                  <span style={{ opacity: 0.5 }}>
+                    Balance: <FormatBalance format={format} value={sendingBalances} />
+                  </span>
+                )}
               </Box>
             }
             value={amount}

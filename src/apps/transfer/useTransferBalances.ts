@@ -8,78 +8,60 @@ import type { OrmlTokensAccountData } from '@mimir-wallet/hooks/types';
 import type { TransferToken } from './types';
 
 import { BN, BN_ZERO, isHex } from '@polkadot/util';
-import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { useApi } from '@mimir-wallet/hooks/useApi';
 
-function _listenNativeBalance(api: ApiPromise, address: string, setBalance: (value: BN) => void): Promise<() => void> {
-  return api.derive.balances.all(address, (result) => {
-    setBalance(result.availableBalance);
-  });
+async function _getNativeBalance(api: ApiPromise, address: string): Promise<BN> {
+  return api.derive.balances.all(address).then((result) => result.availableBalance);
 }
 
-function _listenAssetBalance(
-  api: ApiPromise,
-  address: string,
-  assetId: string,
-  setBalance: (value: BN) => void
-): Promise<() => void> {
+async function _getAssetBalance(api: ApiPromise, address: string, assetId: string): Promise<BN> {
   if (api.query.assets || api.query.foreignAssets) {
     return isHex(assetId)
-      ? (api.query.foreignAssets.account(assetId, address, (result: Option<PalletAssetsAssetAccount>) => {
-          setBalance(result.unwrapOrDefault().balance);
-        }) as unknown as Promise<() => void>)
-      : api.query.assets.account(assetId, address, (result) => {
-          setBalance(result.unwrapOrDefault().balance);
+      ? api.query.foreignAssets.account(assetId, address).then((result) => {
+          return (result as Option<PalletAssetsAssetAccount>).unwrapOrDefault().balance;
+        })
+      : api.query.assets.account(assetId, address).then((result) => {
+          return (result as Option<PalletAssetsAssetAccount>).unwrapOrDefault().balance;
         });
   }
 
-  return api.query.tokens.accounts(address, assetId, (result: OrmlTokensAccountData) => {
-    setBalance(result.free.sub(result.frozen));
-  }) as unknown as Promise<() => void>;
+  return api.query.tokens.accounts(address, assetId).then((result) => {
+    return (result as unknown as OrmlTokensAccountData).free.sub((result as unknown as OrmlTokensAccountData).frozen);
+  });
+}
+
+function _retrieveBalance({
+  queryKey: [api, address, token]
+}: {
+  queryKey: [api: ApiPromise, address?: string, token?: TransferToken];
+}): Promise<BN> {
+  if (!address || !token) {
+    return Promise.resolve(BN_ZERO);
+  }
+
+  if (token?.isNative) {
+    return _getNativeBalance(api, address);
+  }
+
+  return _getAssetBalance(api, address, token.assetId);
 }
 
 export function useTransferBalance(
   token?: TransferToken,
-  sender?: string,
-  recipient?: string
-): [format: [decimals: number, symbol: string], sendingBalance: BN, recipientBalance: BN] {
-  const { api } = useApi();
-  const [sendingBalance, setSendingBalance] = useState<BN>(BN_ZERO);
-  const [recipientBalance, setRecipientBalance] = useState<BN>(BN_ZERO);
+  sender?: string
+): [format: [decimals: number, symbol: string], sendingBalance: BN, isFetched: boolean, isFetching: boolean] {
+  const { api, isApiReady } = useApi();
+  const { data, isFetching, isFetched } = useQuery({
+    queryKey: [api, sender, token] as const,
+    queryHash: `_retrieveBalance.${api.genesisHash.toHex()}-${sender}-${token?.isNative ? 'native' : token?.assetId}.sender`,
+    queryFn: _retrieveBalance,
+    refetchInterval: 60000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    enabled: isApiReady && !!sender && !!token
+  });
 
-  useEffect(() => {
-    const unsubPromises: Array<Promise<() => void>> = [];
-
-    if (token) {
-      if (token.isNative) {
-        if (sender) {
-          unsubPromises.push(_listenNativeBalance(api, sender, setSendingBalance));
-        }
-
-        if (recipient) {
-          unsubPromises.push(_listenNativeBalance(api, recipient, setRecipientBalance));
-        }
-      } else {
-        const { assetId } = token;
-
-        if (sender) {
-          unsubPromises.push(_listenAssetBalance(api, sender, assetId, setSendingBalance));
-        }
-
-        if (recipient) {
-          unsubPromises.push(_listenAssetBalance(api, recipient, assetId, setRecipientBalance));
-        }
-      }
-    }
-
-    return () => {
-      unsubPromises.forEach((promise) => promise.then((unsub) => unsub()));
-    };
-  }, [api, recipient, sender, token]);
-
-  return useMemo(
-    () => [token ? [token.decimals, token.symbol] : [0, ''], sendingBalance, recipientBalance],
-    [recipientBalance, sendingBalance, token]
-  );
+  return [token ? [token.decimals, token.symbol] : [0, ''], data ?? BN_ZERO, isFetched, isFetching];
 }

@@ -279,7 +279,7 @@ export const polkadotEndpoints: Endpoint[] = [
       IBP1: 'wss://nexus.ibp.network',
       IBP2: 'wss://nexus.dotters.network'
     },
-    httpUrl: 'https://nexus.dotters.network',
+    httpUrl: 'https://nexus.ibp.network',
     genesisHash: '0x61ea8a51fd4a058ee8c0e86df0a89cc85b8b67a0a66432893d09719050c9f540',
     ss58Format: 0,
     serviceUrl: 'https://nexus-api.mimir.global/',
@@ -403,7 +403,7 @@ export const kusamaEndpoints: Endpoint[] = [
     },
     httpUrl: 'https://bifrost-rpc.liebi.com',
     genesisHash: '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed',
-    ss58Format: 2,
+    ss58Format: 0,
     serviceUrl: 'https://bifrost-kusama-api.mimir.global/',
     socketUrl: 'wss://bifrost-kusama-api.mimir.global/',
     explorerUrl: 'https://bifrost.subscan.io/',
