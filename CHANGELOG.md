@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.2](https://github.com/mimir-labs/mimir-wallet/compare/v1.8.1...v1.8.2) (2025-01-07)
+
+
+### Bug Fixes
+
+* support foreign assets transfer ([#118](https://github.com/mimir-labs/mimir-wallet/issues/118)) ([50513df](https://github.com/mimir-labs/mimir-wallet/commit/50513dfd226137232e3e0250d4c3d57a8e113699))
+
 ## [1.8.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.8.0...v1.8.1) (2024-12-27)
 
 
