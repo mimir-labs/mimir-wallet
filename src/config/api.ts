@@ -69,7 +69,7 @@ export const polkadotEndpoints: Endpoint[] = [
       RadiumBlock: 'wss://statemint.public.curie.radiumblock.co/ws',
       Stakeworld: 'wss://dot-rpc.stakeworld.io/assethub'
     },
-    httpUrl: 'https://statemint.api.onfinality.io/public-ws',
+    httpUrl: 'https://statemint.api.onfinality.io/public',
     genesisHash: '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f',
     ss58Format: 0,
     serviceUrl: 'https://assethub-polkadot-api.mimir.global/',
@@ -93,9 +93,9 @@ export const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/Polkadot.svg',
     name: 'Coretime',
     wsUrl: {
+      Parity: 'wss://polkadot-coretime-rpc.polkadot.io',
       IBP1: 'wss://sys.ibp.network/coretime-polkadot',
-      IBP2: 'wss://coretime-polkadot.dotters.network',
-      Parity: 'wss://polkadot-coretime-rpc.polkadot.io'
+      IBP2: 'wss://coretime-polkadot.dotters.network'
     },
     httpUrl: 'https://polkadot-coretime-rpc.polkadot.io',
     genesisHash: '0xefb56e30d9b4a24099f88820987d0f45fb645992416535d87650d98e00f46fc4',
@@ -121,7 +121,7 @@ export const polkadotEndpoints: Endpoint[] = [
       RadiumBlock: 'wss://collectives.public.curie.radiumblock.co/ws',
       Stakeworld: 'wss://dot-rpc.stakeworld.io/collectives'
     },
-    httpUrl: 'https://polkadot-collectives-rpc.polkadot.io',
+    httpUrl: 'https://collectives.api.onfinality.io/public',
     genesisHash: '0x46ee89aa2eedd13e988962630ec9fb7565964cf5023bb351f2b6b25c1b68b0b2',
     ss58Format: 0,
     serviceUrl: 'https://collectives-polkadot-api.mimir.global/',
@@ -143,7 +143,7 @@ export const polkadotEndpoints: Endpoint[] = [
       Parity: 'wss://polkadot-people-rpc.polkadot.io',
       RadiumBlock: 'wss://people-polkadot.public.curie.radiumblock.co/ws'
     },
-    httpUrl: 'https://people-polkadot.dotters.network',
+    httpUrl: 'https://sys.ibp.network/people-polkadot',
     genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
     ss58Format: 0,
     serviceUrl: 'https://people-polkadot-api.mimir.global/',
@@ -156,10 +156,10 @@ export const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/bnc.png',
     name: 'Bifrost',
     wsUrl: {
+      Liebi: 'wss://hk.p.bifrost-rpc.liebi.com/ws',
       Dwellir: 'wss://bifrost-polkadot-rpc.dwellir.com',
       IBP1: 'wss://bifrost-polkadot.ibp.network',
       IBP2: 'wss://bifrost-polkadot.dotters.network',
-      Liebi: 'wss://hk.p.bifrost-rpc.liebi.com/ws',
       LiebiEU: 'wss://eu.bifrost-polkadot-rpc.liebi.com/ws'
     },
     httpUrl: 'https://hk.p.bifrost-rpc.liebi.com',
@@ -275,8 +275,8 @@ export const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/BRIDGE.webp',
     name: 'Hyperbridge (Nexus)',
     wsUrl: {
-      BlockOps: 'wss://hyperbridge-nexus-rpc.blockops.network',
       IBP1: 'wss://nexus.ibp.network',
+      BlockOps: 'wss://hyperbridge-nexus-rpc.blockops.network',
       IBP2: 'wss://nexus.dotters.network'
     },
     httpUrl: 'https://nexus.ibp.network',
@@ -331,7 +331,7 @@ export const kusamaEndpoints: Endpoint[] = [
       RadiumBlock: 'wss://statemine.public.curie.radiumblock.co/ws',
       Stakeworld: 'wss://ksm-rpc.stakeworld.io/assethub'
     },
-    httpUrl: 'https://asset-hub-kusama-rpc.dwellir.com',
+    httpUrl: 'https://statemine-rpc-tn.dwellir.com',
     genesisHash: '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a',
     ss58Format: 2,
     serviceUrl: 'https://assethub-kusama-api.mimir.global/',
@@ -355,11 +355,11 @@ export const kusamaEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/Kusama.png',
     name: 'Coretime Kusama',
     wsUrl: {
+      Parity: 'wss://kusama-coretime-rpc.polkadot.io',
       Dwellir: 'wss://coretime-kusama-rpc.dwellir.com',
       IBP1: 'wss://sys.ibp.network/coretime-kusama',
       IBP2: 'wss://coretime-kusama.dotters.network',
       LuckyFriday: 'wss://rpc-coretime-kusama.luckyfriday.io',
-      Parity: 'wss://kusama-coretime-rpc.polkadot.io',
       Stakeworld: 'wss://ksm-rpc.stakeworld.io/coretime'
     },
     httpUrl: 'https://kusama-coretime-rpc.polkadot.io',
@@ -376,11 +376,11 @@ export const kusamaEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/Kusama.png',
     name: 'People Kusama',
     wsUrl: {
+      Parity: 'wss://kusama-people-rpc.polkadot.io',
       Dwellir: 'wss://people-kusama-rpc.dwellir.com',
       IBP1: 'wss://sys.ibp.network/people-kusama',
       IBP2: 'wss://people-kusama.dotters.network',
       LuckyFriday: 'wss://rpc-people-kusama.luckyfriday.io',
-      Parity: 'wss://kusama-people-rpc.polkadot.io',
       Stakeworld: 'wss://ksm-rpc.stakeworld.io/people'
     },
     httpUrl: 'https://kusama-people-rpc.polkadot.io',
@@ -396,8 +396,8 @@ export const kusamaEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/bnc.png',
     name: 'Bifrost Kusama',
     wsUrl: {
-      Dwellir: 'wss://bifrost-rpc.dwellir.com',
       Liebi: 'wss://bifrost-rpc.liebi.com/ws',
+      Dwellir: 'wss://bifrost-rpc.dwellir.com',
       LiebiUS: 'wss://us.bifrost-rpc.liebi.com/ws',
       RadiumBlock: 'wss://bifrost.public.curie.radiumblock.co/ws'
     },
@@ -478,10 +478,10 @@ export const paseoEndpoints: Endpoint[] = [
     ss58Format: 0,
     wsUrl: {
       Dwellir: 'wss://paseo-rpc.dwellir.com',
-      Amforc: 'wss://paseo.rpc.amforc.com',
       IBP1: 'wss://rpc.ibp.network/paseo',
-      IBP2: 'wss://paseo.dotters.network',
       StakeWorld: 'wss://pas-rpc.stakeworld.io',
+      IBP2: 'wss://paseo.dotters.network',
+      Amforc: 'wss://paseo.rpc.amforc.com',
       Zondax: 'wss://api2.zondax.ch/pas/node/rpc'
     },
     httpUrl: 'https://paseo-rpc.dwellir.com',
@@ -518,14 +518,14 @@ export const solochainEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/cru.svg',
     name: 'Crust',
     wsUrl: {
+      OnFinality: 'wss://crust.api.onfinality.io/public-ws',
+      Dwellir: 'wss://crust-mainnet-rpc.dwellir.com',
       'Crust Network': 'wss://rpc.crust.network',
       'Crust Network APP': 'wss://rpc.crustnetwork.app',
       'Crust Network CC': 'wss://rpc.crustnetwork.cc',
-      'Crust Network XYZ': 'wss://rpc.crustnetwork.xyz',
-      Dwellir: 'wss://crust-mainnet-rpc.dwellir.com',
-      OnFinality: 'wss://crust.api.onfinality.io/public-ws'
+      'Crust Network XYZ': 'wss://rpc.crustnetwork.xyz'
     },
-    httpUrl: 'https://crust-mainnet-rpc.dwellir.com',
+    httpUrl: 'https://crust.api.onfinality.io/public',
     genesisHash: '0x8b404e7ed8789d813982b9cb4c8b664c05b3fbf433309f603af014ec9ce56a8c',
     ss58Format: 66,
     serviceUrl: 'https://crust-api.mimir.global/',
