@@ -30,58 +30,64 @@ const pendingSubscriptions: Map<string, Set<(data: any) => void>> = new Map();
  * @returns Cleanup function to unsubscribe and remove listener
  */
 export function subscribe(topic: string, listener: (data: any) => void) {
-  // Get or create listener set for this topic
-  let listeners = subscriptions.get(topic);
+  if (!socket.connected) {
+    let listeners = pendingSubscriptions.get(topic);
 
-  if (!listeners) {
-    listeners = new Set();
-    subscriptions.set(topic, listeners);
-  }
-
-  // Add new listener to the set
-  listeners.add(listener);
-
-  // Attach the event listener to the socket
-  socket.on(topic, listener);
-
-  // If this is the first listener for this topic, subscribe to it
-  if (listeners.size === 1) {
-    if (socket.connected) {
-      socket.emit('subscribe', [topic]);
-    } else {
-      // Queue subscription for when connection is established
+    if (!listeners) {
+      listeners = new Set();
       pendingSubscriptions.set(topic, listeners);
+    }
+
+    listeners.add(listener);
+
+    // Queue subscription for when connection is established
+    pendingSubscriptions.set(topic, listeners);
+  } else {
+    // Get or create listener set for this topic
+    let listeners = subscriptions.get(topic);
+
+    if (!listeners) {
+      listeners = new Set();
+      subscriptions.set(topic, listeners);
+    }
+
+    // Add new listener to the set
+    listeners.add(listener);
+
+    // Attach the event listener to the socket
+    socket.on(topic, listener);
+
+    // If this is the first listener for this topic, subscribe to it
+    if (listeners.size === 1) {
+      socket.emit('subscribe', [topic]);
     }
   }
 
   // Return cleanup function for unsubscribing
   return () => {
-    unsubscribe(topic, listener);
+    const pendingListeners = pendingSubscriptions.get(topic);
+    const listeners = subscriptions.get(topic);
+
+    pendingListeners?.delete(listener);
+    listeners?.delete(listener);
+    socket.off(topic, listener);
   };
 }
 
 /**
  * Unsubscribe a specific listener from a socket topic
  * @param topic - The topic to unsubscribe from
- * @param listener - The listener to remove
  */
-export function unsubscribe(topic: string, listener: (data: any) => void) {
-  const listeners = subscriptions.get(topic);
+export function unsubscribe(topic: string) {
+  subscriptions.delete(topic);
+  pendingSubscriptions.delete(topic);
 
-  if (!listeners) return;
+  if (socket.connected) {
+    socket.emit('unsubscribe', [topic]);
+  }
 
-  // Remove specific listener
-  listeners.delete(listener);
-  socket.off(topic, listener);
-
-  // If no listeners remain, clean up the topic
-  if (listeners.size === 0) {
-    subscriptions.delete(topic);
-    pendingSubscriptions.delete(topic);
-
-    if (socket.connected) {
-      socket.emit('unsubscribe', topic);
-    }
+  if (socket.connected) {
+    socket.emit('unsubscribe', topic);
   }
 }
 

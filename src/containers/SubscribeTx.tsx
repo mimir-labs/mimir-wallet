@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { Address } from '@mimir-wallet/components';
 import { toastError, toastSuccess } from '@mimir-wallet/components/utils';
 import { TransactionStatus, TransactionType } from '@mimir-wallet/hooks/types';
-import { subscribe } from '@mimir-wallet/socket';
+import { subscribe, unsubscribe } from '@mimir-wallet/socket';
 import { formatTransactionId } from '@mimir-wallet/transactions';
 
 type TxMessage = {
@@ -94,6 +94,7 @@ function SubscribeTx({ address }: { address: string }) {
 
     return () => {
       unsub();
+      unsubscribe(topic);
     };
   }, [address]);
 
