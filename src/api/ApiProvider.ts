@@ -11,6 +11,7 @@ import type {
 } from '@polkadot/rpc-provider/types';
 
 import { WsProvider } from '@polkadot/api';
+import EventEmitter from 'eventemitter3';
 
 import { HttpProvider } from './HttpProvider';
 
@@ -21,6 +22,7 @@ interface SubscriptionHandler {
 export class ApiProvider implements ProviderInterface {
   #wsUrl: string | string[];
   #httpUrl: string;
+  #eventEmitter: EventEmitter = new EventEmitter();
 
   #wsProvider: WsProvider;
   #httpProvider: HttpProvider;
@@ -69,7 +71,7 @@ export class ApiProvider implements ProviderInterface {
    */
 
   public async connect(): Promise<void> {
-    this.#wsProvider.connect();
+    return this.#wsProvider.connect();
   }
 
   /**
@@ -77,7 +79,7 @@ export class ApiProvider implements ProviderInterface {
    */
 
   public async disconnect(): Promise<void> {
-    this.#wsProvider.disconnect();
+    return this.#wsProvider.disconnect();
   }
 
   /**
@@ -98,7 +100,15 @@ export class ApiProvider implements ProviderInterface {
    * @return unsubscribe function
    */
   public on(type: ProviderInterfaceEmitted, sub: ProviderInterfaceEmitCb): () => void {
-    return this.#wsProvider.on(type, sub);
+    this.#eventEmitter.on(type, sub);
+
+    if (type === 'connected') {
+      this.#eventEmitter.emit('connected');
+    }
+
+    return () => {
+      this.#eventEmitter.off(type, sub);
+    };
   }
 
   /**

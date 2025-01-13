@@ -1,11 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DeriveAccountRegistration } from '@polkadot/api-derive/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
+import type { PalletIdentityJudgement } from '@polkadot/types/lookup';
 
 import { Box, SvgIcon } from '@mui/material';
-import { hexToU8a, isFunction } from '@polkadot/util';
+import { hexToU8a } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
@@ -33,14 +33,18 @@ function extractName(address: string): React.ReactNode {
   return '';
 }
 
-function extractIdentity(address: string, identity: DeriveAccountRegistration): React.ReactNode {
-  const judgements = identity.judgements.filter(([, judgement]) => !judgement.isFeePaid);
-  const isGood = judgements.some(([, judgement]) => judgement.isKnownGood || judgement.isReasonable);
-  const isBad = judgements.some(([, judgement]) => judgement.isErroneous || judgement.isLowQuality);
+function extractIdentity(
+  address: string,
+  _display: string,
+  _judgements: PalletIdentityJudgement[],
+  _displayParent?: string
+): React.ReactNode {
+  const judgements = _judgements.filter((judgement) => !judgement.isFeePaid);
+  const isGood = judgements.some((judgement) => judgement.isKnownGood || judgement.isReasonable);
+  const isBad = judgements.some((judgement) => judgement.isErroneous || judgement.isLowQuality);
 
-  const displayName = isGood ? identity.display : (identity.display || '').replace(/[^\x20-\x7E]/g, '');
-  const displayParent =
-    identity.displayParent && (isGood ? identity.displayParent : identity.displayParent.replace(/[^\x20-\x7E]/g, ''));
+  const displayName = isGood ? _display : (_display || '').replace(/[^\x20-\x7E]/g, '');
+  const displayParent = _displayParent && (isGood ? _displayParent : _displayParent.replace(/[^\x20-\x7E]/g, ''));
 
   const elem = (
     <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -72,27 +76,27 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
   const address = useMemo(() => encodeAddress(value?.toString()), [value]);
 
   const { identityApi } = useApi();
-  const info = useDeriveAccountInfo(address);
+  const [identity] = useDeriveAccountInfo(address);
   const [chainName, setChainName] = useState<React.ReactNode>(() => extractName(address.toString()));
   const { meta } = useAddressMeta(address);
   const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
 
   // set the actual nickname, local name, accountId
   useEffect((): void => {
-    const { accountId, identity, nickname } = info || {};
+    const { display, displayParent, judgements } = identity || {};
 
-    const cacheAddr = (accountId || address).toString();
+    const cacheAddr = address.toString();
 
-    if (identity?.parent) {
-      parentCache.set(cacheAddr, identity.parent.toString());
+    if (displayParent) {
+      parentCache.set(cacheAddr, displayParent);
     }
 
-    if (identityApi && isFunction(identityApi.query.identity?.identityOf)) {
-      setChainName(() => (identity?.display ? extractIdentity(cacheAddr, identity) : extractName(cacheAddr)));
-    } else if (nickname) {
-      setChainName(nickname);
+    if (display && judgements) {
+      setChainName(() =>
+        display ? extractIdentity(cacheAddr, display, judgements, displayParent) : extractName(cacheAddr)
+      );
     }
-  }, [identityApi, info, address]);
+  }, [identityApi, address, identity]);
 
   if (isZeroAddress) {
     return <>ZeroAddress</>;

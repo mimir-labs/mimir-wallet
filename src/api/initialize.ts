@@ -140,6 +140,10 @@ export async function initializeApi(chain: Endpoint) {
     });
   };
 
+  const peopleEndpoint: Endpoint | undefined = chain.identityNetwork
+    ? allEndpoints.find((item) => item.key === chain.identityNetwork)
+    : undefined;
+
   // Initialize main blockchain API connection
   createApi(Object.values(chain.wsUrl), chain.httpUrl, onError).then(() => {
     // Set up event listeners for connection state
@@ -147,7 +151,10 @@ export async function initializeApi(chain: Endpoint) {
 
     // Handle API ready state
     statics.api.on('ready', (): void => {
-      useApi.setState(loadOnReady(statics.api, chain));
+      useApi.setState({
+        ...loadOnReady(statics.api, chain),
+        ...(peopleEndpoint ? {} : { identityApi: statics.api })
+      });
     });
 
     // Update API initialization state
@@ -156,20 +163,17 @@ export async function initializeApi(chain: Endpoint) {
 
   // Initialize secondary identity network API if configured
   // This is used for additional identity-related features
-  if (chain.identityNetwork) {
-    const peopleEndpoint = allEndpoints.find((item) => item.key === chain.identityNetwork);
+  if (peopleEndpoint) {
+    // Create WebSocket provider for identity network
+    const provider = new ApiProvider(Object.values(peopleEndpoint.wsUrl), peopleEndpoint.httpUrl);
 
-    if (peopleEndpoint) {
-      // Create WebSocket provider for identity network
-      const provider = new ApiProvider(Object.values(peopleEndpoint.wsUrl), peopleEndpoint.httpUrl);
-
-      // Initialize identity API with custom types
-      ApiPromise.create({
-        provider,
-        typesBundle
-      }).then((api) => {
-        useApi.setState({ identityApi: api });
-      });
-    }
+    // Initialize identity API with custom types
+    ApiPromise.create({
+      provider,
+      typesBundle,
+      metadata: {}
+    }).then((api) => {
+      useApi.setState({ identityApi: api });
+    });
   }
 }
