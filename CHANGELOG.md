@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.3](https://github.com/mimir-labs/mimir-wallet/compare/v1.8.2...v1.8.3) (2025-01-13)
+
+
+### Bug Fixes
+
+* fix socket reconnection and subscription handling ([#120](https://github.com/mimir-labs/mimir-wallet/issues/120)) ([e83ecd8](https://github.com/mimir-labs/mimir-wallet/commit/e83ecd83b0f23c68790bc5c95dc4f09c529622a9))
+* optimize identity query and display ([#122](https://github.com/mimir-labs/mimir-wallet/issues/122)) ([b3b6c36](https://github.com/mimir-labs/mimir-wallet/commit/b3b6c362ba9b5efea4c405af92fda99b70c2f6ef))
+
 ## [1.8.2](https://github.com/mimir-labs/mimir-wallet/compare/v1.8.1...v1.8.2) (2025-01-07)
 
 
