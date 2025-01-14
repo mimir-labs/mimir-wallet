@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.8.3...v1.9.0) (2025-01-14)
+
+
+### Features
+
+* Add PolkaIdentity dapp and add matrix support ([#124](https://github.com/mimir-labs/mimir-wallet/issues/124)) ([f2325b6](https://github.com/mimir-labs/mimir-wallet/commit/f2325b627c264015bb887e8771bc9c9303e52115))
+* Add signed transaction with sign options: withSignedTransaction ([#123](https://github.com/mimir-labs/mimir-wallet/issues/123)) ([22d2f40](https://github.com/mimir-labs/mimir-wallet/commit/22d2f40b326fbcbe98a2089084f279036fa7613e))
+
 ## [1.8.3](https://github.com/mimir-labs/mimir-wallet/compare/v1.8.2...v1.8.3) (2025-01-13)
 
 
