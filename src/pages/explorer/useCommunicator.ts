@@ -39,6 +39,8 @@ export function useCommunicator(
       const website = new URL(url);
 
       return new Promise((resolve, reject) => {
+        const { withSignedTransaction } = payload;
+
         addQueue({
           call: api.tx[call.section][call.method](...call.args),
           accountId: encodeAddress(payload.address),
@@ -46,9 +48,8 @@ export function useCommunicator(
           website: website.origin,
           iconUrl,
           appName,
-          onSignature: (signer, signature, tx, payload) => {
-            console.log(payload);
-            resolve({ id, signature, signer, payload } as any);
+          onSignature: (signer, signature, signedTransaction, payload) => {
+            resolve({ id, signature, signer, payload, ...(withSignedTransaction ? { signedTransaction } : {}) } as any);
           },
           onReject: () => reject(new Error('User reject'))
         });

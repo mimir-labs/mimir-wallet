@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { AccountId, Address, Extrinsic } from '@polkadot/types/interfaces';
+import type { AccountId, Address } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { TxEvents } from '@mimir-wallet/api';
@@ -26,7 +26,12 @@ export interface TxQueue {
   onError?: (error: unknown) => void;
   onResults?: (results: ISubmittableResult) => void;
   onFinalized?: (results: ISubmittableResult) => void;
-  onSignature?: (signer: string, signature: HexString, tx: Extrinsic, payload: ExtrinsicPayloadValue) => void;
+  onSignature?: (
+    signer: string,
+    signature: HexString,
+    signedTransaction: HexString,
+    payload: ExtrinsicPayloadValue
+  ) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }
 
