@@ -3,7 +3,18 @@
 
 import type { DappOption } from '@mimir-wallet/config';
 
-import { alpha, Box, Button, IconButton, Paper, Stack, SvgIcon, SwipeableDrawer, Typography } from '@mui/material';
+import {
+  alpha,
+  Avatar,
+  Box,
+  Button,
+  IconButton,
+  Paper,
+  Stack,
+  SvgIcon,
+  SwipeableDrawer,
+  Typography
+} from '@mui/material';
 import React, { createElement, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -93,7 +104,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box sx={{ flex: '1' }}>
-              <Box component='img' src={dapp.icon} sx={{ width: 32, height: 32 }} />
+              <Avatar src={dapp.icon} sx={{ width: 32, height: 32 }} />
             </Box>
             <Button
               onClick={(e) => {
