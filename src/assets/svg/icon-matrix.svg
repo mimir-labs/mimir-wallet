@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="#1a1a1a"/>
+
+  <!-- Matrix dots -->
+  <circle cx="30" cy="30" r="4" fill="#00ff99"/>
+  <circle cx="70" cy="30" r="4" fill="#00ff99"/>
+  <circle cx="50" cy="50" r="4" fill="#00ff99"/>
+  <circle cx="30" cy="70" r="4" fill="#00ff99"/>
+  <circle cx="70" cy="70" r="4" fill="#00ff99"/>
+
+  <!-- Connecting lines -->
+  <path d="M30 30 L50 50 L70 30" stroke="#00ff99" stroke-width="2" fill="none"/>
+  <path d="M30 70 L50 50 L70 70" stroke="#00ff99" stroke-width="2" fill="none"/>
+  <path d="M30 30 L30 70" stroke="#00ff99" stroke-width="2" fill="none"/>
+  <path d="M70 30 L70 70" stroke="#00ff99" stroke-width="2" fill="none"/>
+
+  <!-- Animated pulse effect -->
+  <circle cx="50" cy="50" r="8" fill="none" stroke="#00ff99" stroke-width="2">
+    <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

@@ -19,6 +19,7 @@ import React from 'react';
 
 import IconDiscord from '@mimir-wallet/assets/svg/icon-discord.svg?react';
 import IconGithub from '@mimir-wallet/assets/svg/icon-github.svg?react';
+import IconMatrix from '@mimir-wallet/assets/svg/icon-matrix.svg?react';
 import IconWebsite from '@mimir-wallet/assets/svg/icon-website.svg?react';
 import IconX from '@mimir-wallet/assets/svg/icon-x.svg?react';
 import { type DappOption, findToken } from '@mimir-wallet/config';
@@ -50,9 +51,9 @@ function SupportedChains({ supported }: { supported: string[] | true }) {
 function Contents({ dapp }: { dapp: DappOption }) {
   return (
     <DialogContent>
-      <Stack spacing={1} sx={{ position: 'relative' }}>
+      <Stack spacing={1} sx={{ position: 'relative', overflow: 'hidden' }}>
         <SupportedChains supported={dapp.supportedChains} />
-        <Box component='img' src={dapp.icon} sx={{ width: 64, height: 64 }} />
+        <Avatar src={dapp.icon} sx={{ width: 64, height: 64 }} />
         <Typography variant='h3'>{dapp.name}</Typography>
         <Box
           sx={{ display: 'flex', alignItems: 'center', gap: 1, '>.MuiIconButton-root': { bgcolor: 'secondary.main' } }}
@@ -81,6 +82,11 @@ function Contents({ dapp }: { dapp: DappOption }) {
           {dapp.twitter && (
             <IconButton color='primary' component='a' href={dapp.twitter} size='small' target='_blank'>
               <SvgIcon component={IconX} inheritViewBox />
+            </IconButton>
+          )}
+          {dapp.matrix && (
+            <IconButton color='primary' component='a' href={dapp.matrix} size='small' target='_blank'>
+              <SvgIcon component={IconMatrix} inheritViewBox />
             </IconButton>
           )}
         </Box>
