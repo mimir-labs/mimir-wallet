@@ -21,7 +21,7 @@ import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@p
 import type { HexString } from '@polkadot/util/types';
 
 import { getSpecTypes } from '@polkadot/types-known';
-import { assert, formatBalance, isBn, isNumber, objectSpread } from '@polkadot/util';
+import { assert, formatBalance, isBn, isHex, isNumber, objectSpread, u8aToHex } from '@polkadot/util';
 import { base64Encode } from '@polkadot/util-crypto';
 
 import { statics } from '@mimir-wallet/api';
@@ -157,7 +157,7 @@ function makeSignOptions(
   extras: { blockHash?: Hash; era?: ExtrinsicEra; nonce?: Index }
 ): SignatureOptions {
   return objectSpread(
-    { blockHash: statics.api.genesisHash, genesisHash: statics.api.genesisHash, withSignedTransaction: true },
+    { blockHash: statics.api.genesisHash, genesisHash: statics.api.genesisHash },
     partialOptions,
     extras,
     {
@@ -206,19 +206,20 @@ export async function sign(
   extrinsic: SubmittableExtrinsic<'promise'>,
   signer: string,
   source: string
-): Promise<[HexString, SignerPayloadJSON, Hash]> {
+): Promise<[signature: HexString, payload: SignerPayloadJSON, txHash: Hash, signedTransaction: HexString]> {
   const options = optionsOrNonce();
   const signingInfo = await statics.api.derive.tx.signingInfo(signer, options.nonce, options.era);
   const eraOptions = makeEraOptions(options, signingInfo);
 
-  const { signer: accountSigner } = await extractParams(statics.api, signer, source);
+  const { signer: accountSigner, withSignedTransaction } = await extractParams(statics.api, signer, source);
 
   const payload = statics.api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
     objectSpread({}, eraOptions, {
       address: signer,
       blockNumber: signingInfo.header ? signingInfo.header.number : 0,
       method: extrinsic.method,
-      version: extrinsic.version
+      version: extrinsic.version,
+      withSignedTransaction
     })
   ]);
 
@@ -267,12 +268,19 @@ export async function sign(
 
     extrinsic.addSignature(signer, signature, newSignerPayload.toPayload());
 
-    return [signature, newSignerPayload.toPayload(), extrinsic.hash];
+    return [
+      signature,
+      newSignerPayload.toPayload(),
+      extrinsic.hash,
+      isHex(signedTransaction) ? signedTransaction : u8aToHex(signedTransaction)
+    ];
   }
 
   extrinsic.addSignature(signer, signature, payload.toPayload());
 
-  return [signature, payload.toPayload(), extrinsic.hash];
+  console.log('signedTransaction', extrinsic.toHex());
+
+  return [signature, payload.toPayload(), extrinsic.hash, extrinsic.toHex()];
 }
 
 export function signAndSend(

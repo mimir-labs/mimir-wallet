@@ -10,6 +10,6 @@ export interface State {
   extrinsicSign(
     payload: SignerPayloadJSON,
     id: string
-  ): Promise<{ id: string; signature: HexString; signedTransaction: HexString }>;
+  ): Promise<{ id: string; signature: HexString; signedTransaction?: HexString }>;
   getAccounts(): ResponseTypes['pub(accounts.list)'];
 }

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { Extrinsic } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { BuildTx } from './hooks/useBuildTx';
@@ -47,7 +46,7 @@ function SendTx({
   onResults?: (results: ISubmittableResult) => void;
   onFinalized?: (results: ISubmittableResult) => void;
   onError?: (error: unknown) => void;
-  onSignature?: (signer: string, signature: HexString, tx: Extrinsic, payload: ExtrinsicPayloadValue) => void;
+  onSignature?: (signer: string, signature: HexString, tx: HexString, payload: ExtrinsicPayloadValue) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
@@ -86,11 +85,11 @@ function SendTx({
       if (onlySign) {
         addTxToast({ events });
 
-        const [signature, payload, extrinsicHash] = await sign(tx, signer, source);
+        const [signature, payload, extrinsicHash, signedTransaction] = await sign(tx, signer, source);
 
         await service.uploadWebsite(extrinsicHash.toHex(), website, appName, iconUrl, note);
 
-        onSignature?.(signer, signature, tx, payload);
+        onSignature?.(signer, signature, signedTransaction, payload);
         events.emit('success', 'Sign success');
         setLoading(false);
       } else {
