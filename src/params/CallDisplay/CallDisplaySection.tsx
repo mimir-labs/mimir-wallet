@@ -5,6 +5,7 @@ import { Box, SvgIcon } from '@mui/material';
 import React from 'react';
 
 import IconCancel from '@mimir-wallet/assets/svg/icon-cancel.svg?react';
+import IconIdentity from '@mimir-wallet/assets/svg/icon-identity.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 
 function CallDisplaySection({ section, method }: { section?: string; method?: string }) {
@@ -40,6 +41,15 @@ function CallDisplaySection({ section, method }: { section?: string; method?: st
       <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
         <SvgIcon color='primary' component={IconSend} inheritViewBox />
         Assets Transfer
+      </Box>
+    );
+  }
+
+  if (['identity.setIdentity'].includes(`${section}.${method}`)) {
+    return (
+      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+        <SvgIcon color='primary' component={IconIdentity} inheritViewBox />
+        Identity
       </Box>
     );
   }

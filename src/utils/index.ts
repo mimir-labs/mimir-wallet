@@ -3,6 +3,7 @@
 
 export * from './address';
 export * from './common';
+export * from './utf8';
 export * from './check';
 export * from './fetcher';
 export * as service from './service';
