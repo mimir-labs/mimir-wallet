@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.9.0...v1.10.0) (2025-01-15)
+
+
+### Features
+
+* add polkaidentity integration and identity call display ([#126](https://github.com/mimir-labs/mimir-wallet/issues/126)) ([b0d55b1](https://github.com/mimir-labs/mimir-wallet/commit/b0d55b1953fec09743283bb89bb92d954b4ea3ce))
+
 ## [1.9.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.8.3...v1.9.0) (2025-01-14)
 
 
