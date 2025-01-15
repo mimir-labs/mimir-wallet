@@ -96,6 +96,10 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
         display ? extractIdentity(cacheAddr, display, judgements, displayParent) : extractName(cacheAddr)
       );
     }
+
+    if (!display) {
+      setChainName(() => extractName(cacheAddr));
+    }
   }, [identityApi, address, identity]);
 
   if (isZeroAddress) {

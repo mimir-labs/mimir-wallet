@@ -24,7 +24,7 @@ function AppFrame({ url, iconUrl, appName }: { url: string; iconUrl?: string; ap
   useCommunicator(iframeRef, appUrl, iconUrl, appName);
 
   return (
-    <Stack key={selected || 'none'} sx={{ height: '100%', position: 'relative', paddingBottom: '60px' }}>
+    <Stack key={selected || 'none'} sx={{ height: '100%', position: 'relative' }}>
       {loading && (
         <CircularProgress sx={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, margin: 'auto' }} />
       )}

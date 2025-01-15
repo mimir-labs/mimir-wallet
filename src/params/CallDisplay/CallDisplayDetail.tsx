@@ -9,6 +9,7 @@ import React, { useMemo } from 'react';
 import { AddressRow, FormatBalance } from '@mimir-wallet/components';
 import { findAssets, findToken } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks/useApi';
+import { dataToUtf8 } from '@mimir-wallet/utils';
 
 function CallDisplayDetail({
   registry,
@@ -123,6 +124,12 @@ function CallDisplayDetail({
     );
   } else if (['proxy.removeProxies'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
     comp = <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>Remove Proxies</Box>;
+  } else if (['identity.setIdentity'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
+    comp = (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold' }}>
+        {dataToUtf8((call.args?.[0] as any)?.display)}
+      </Box>
+    );
   } else {
     return fallbackWithName ? `${calllFunction.section}.${calllFunction.method}` : null;
   }

@@ -8,6 +8,7 @@ import React, { useMemo } from 'react';
 import { findAction } from '../utils';
 import BatchCall from './BatchCall';
 import FunctionArgs from './FunctionArgs';
+import SetIdentity from './SetIdentity';
 import TransferCall from './TransferCall';
 
 function Call({ registry, call, ...props }: CallProps) {
@@ -23,6 +24,10 @@ function Call({ registry, call, ...props }: CallProps) {
 
   if (action.startsWith('balances.') || action.startsWith('assets.') || action.startsWith('tokens.')) {
     return <TransferCall registry={registry} call={call} {...props} />;
+  }
+
+  if (action.startsWith('identity.')) {
+    return <SetIdentity registry={registry} call={call} {...props} />;
   }
 
   return <FunctionArgs registry={registry} call={call} {...props} />;

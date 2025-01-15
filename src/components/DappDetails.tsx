@@ -17,12 +17,12 @@ import {
 import { isArray } from '@polkadot/util';
 import React from 'react';
 
+import IconMatrix from '@mimir-wallet/assets/images/matrix.svg?react';
 import IconDiscord from '@mimir-wallet/assets/svg/icon-discord.svg?react';
 import IconGithub from '@mimir-wallet/assets/svg/icon-github.svg?react';
-import IconMatrix from '@mimir-wallet/assets/svg/icon-matrix.svg?react';
 import IconWebsite from '@mimir-wallet/assets/svg/icon-website.svg?react';
 import IconX from '@mimir-wallet/assets/svg/icon-x.svg?react';
-import { type DappOption, findToken } from '@mimir-wallet/config';
+import { type DappOption, findEndpoint } from '@mimir-wallet/config';
 
 interface Props {
   open: boolean;
@@ -39,8 +39,15 @@ function SupportedChains({ supported }: { supported: string[] | true }) {
         ? supported.map((genesisHash) => (
             <Avatar
               key={genesisHash}
-              src={findToken(genesisHash).Icon}
-              sx={{ width: 16, height: 16, marginLeft: '-4px' }}
+              src={findEndpoint(genesisHash)?.icon}
+              sx={{
+                width: 16,
+                height: 16,
+                marginLeft: '-4px',
+                bgcolor: 'background.default',
+                border: '1px solid',
+                borderColor: 'background.default'
+              }}
             />
           ))
         : 'All Chains'}

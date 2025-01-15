@@ -7,25 +7,18 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 import type { PalletIdentityJudgement } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
 
-import { u8aToString } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { useQuery } from '@tanstack/react-query';
+
+import { dataToUtf8 } from '@mimir-wallet/utils';
 
 import { createNamedHook } from './createNamedHook';
 import { useApi } from './useApi';
 
-function dataAsString(data: Data) {
-  if (!data) {
-    return data;
-  }
-
-  return data.isRaw ? u8aToString(data.asRaw.toU8a(true)) : data.isNone ? undefined : data.toHex();
-}
-
 function extractOther(additional: Vec<ITuple<[Data, Data]>>) {
   return additional.reduce<Record<string, string>>((other, [_key, _value]) => {
-    const key = dataAsString(_key);
-    const value = dataAsString(_value);
+    const key = dataToUtf8(_key);
+    const value = dataToUtf8(_value);
 
     if (key && value) {
       other[key] = value;
@@ -55,22 +48,23 @@ async function getIdentityInfo({
   let judgements: PalletIdentityJudgement[] | undefined;
   let legal: string | undefined;
   let matrix: string | undefined;
+  let element: string | undefined;
   let other: Record<string, string> | undefined;
   let riot: string | undefined;
   let twitter: string | undefined;
   let web: string | undefined;
 
   if (identity.isSome) {
-    display = dataAsString(identity.unwrap()[0].info.display);
+    display = dataToUtf8(identity.unwrap()[0].info.display);
   } else {
     const superOf = await api.query.identity.superOf(value);
 
     if (superOf.isSome) {
-      display = dataAsString(superOf.unwrap()[1]);
+      display = dataToUtf8(superOf.unwrap()[1]);
       const superIdentity = await api.query.identity.identityOf(superOf.unwrap()[0]);
 
       identity = superIdentity;
-      displayParent = dataAsString(superIdentity.unwrap()[0].info.display);
+      displayParent = dataToUtf8(superIdentity.unwrap()[0].info.display);
     }
   }
 
@@ -79,16 +73,17 @@ async function getIdentityInfo({
 
     judgements = identity.unwrap()[0].judgements.map((item) => item[1]);
 
-    discord = dataAsString(info.getT('discord'));
-    email = dataAsString(info.email);
-    github = dataAsString(info.getT('github'));
-    image = dataAsString(info.image);
-    legal = dataAsString(info.legal);
-    matrix = dataAsString(info.getT('matrix'));
+    discord = dataToUtf8(info.getT('discord'));
+    email = dataToUtf8(info.email);
+    github = dataToUtf8(info.getT('github'));
+    image = dataToUtf8(info.image);
+    legal = dataToUtf8(info.legal);
+    matrix = dataToUtf8(info.getT('matrix'));
+    element = dataToUtf8(info.getT('element'));
     other = info.additional ? extractOther(info.additional) : {};
-    riot = dataAsString(info.riot);
-    twitter = dataAsString(info.twitter);
-    web = dataAsString(info.web);
+    riot = dataToUtf8(info.riot);
+    twitter = dataToUtf8(info.twitter);
+    web = dataToUtf8(info.web);
   }
 
   return {
@@ -98,6 +93,7 @@ async function getIdentityInfo({
     email,
     github,
     image,
+    element,
     judgements,
     legal,
     matrix,
@@ -119,6 +115,8 @@ function useDeriveAccountInfoImpl(value?: AccountId | AccountIndex | Address | U
     queryFn: getIdentityInfo,
     enabled: !!identityApi && !!identityApi.query?.identity?.identityOf && !!value
   });
+
+  console.log(data);
 
   return [data, isFetched, isFetching] as const;
 }
