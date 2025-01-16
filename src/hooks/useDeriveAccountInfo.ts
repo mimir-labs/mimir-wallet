@@ -116,8 +116,6 @@ function useDeriveAccountInfoImpl(value?: AccountId | AccountIndex | Address | U
     enabled: !!identityApi && !!identityApi.query?.identity?.identityOf && !!value
   });
 
-  console.log(data);
-
   return [data, isFetched, isFetching] as const;
 }
 
