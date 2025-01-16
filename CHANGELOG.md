@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.10.0...v1.10.1) (2025-01-16)
+
+
+### Bug Fixes
+
+* fix asset decimals display in transfer and call display ([#128](https://github.com/mimir-labs/mimir-wallet/issues/128)) ([6e8ed81](https://github.com/mimir-labs/mimir-wallet/commit/6e8ed81bfc7775598337ebd83a296471614117bb))
+
 ## [1.10.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.9.0...v1.10.0) (2025-01-15)
 
 
