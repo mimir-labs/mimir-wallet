@@ -58,7 +58,7 @@ function CallDisplayDetail({
           T
         </Avatar>
         <Typography>
-          -<FormatBalance value={call.args[2].toString()} />
+          -<FormatBalance value={call.args[2].toString()} assetId={call.args[0].toString()} />
         </Typography>
       </Box>
     );
@@ -73,7 +73,7 @@ function CallDisplayDetail({
           T
         </Avatar>
         <Typography>
-          -<FormatBalance value={call.args[2].toString()} />
+          -<FormatBalance value={call.args[2].toString()} assetId={call.args[1].toString()} />
         </Typography>
       </Box>
     );

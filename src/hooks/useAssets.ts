@@ -172,7 +172,7 @@ export function useAssetInfo(assetId?: string | null): [AssetInfo<false> | undef
   const { api, isApiReady } = useApi();
   const { data } = useQuery({
     queryKey: [api, assetId] as const,
-    queryHash: `${api.genesisHash.toHex()}-${assetId}`,
+    queryHash: `${api.genesisHash.toHex()}-asset-info-${assetId}`,
     queryFn: fetchAssetInfo,
     refetchInterval: 60000,
     refetchOnMount: false,
