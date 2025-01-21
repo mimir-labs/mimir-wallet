@@ -36,12 +36,8 @@ function FormatBalance({ format, label, value, withCurrency, assetId, ...props }
       {label}
       <Box component='span'>
         {major}
-        {rest ? (
-          <Box component='span'>
-            .{rest}
-            {unit || ''}
-          </Box>
-        ) : null}
+        {rest ? <Box component='span'>.{rest}</Box> : null}
+        {unit || ''}
       </Box>
       <Box component='span'>{withCurrency ? ` ${currency}` : ''}</Box>
     </Box>

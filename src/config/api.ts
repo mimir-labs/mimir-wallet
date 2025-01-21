@@ -286,6 +286,24 @@ export const polkadotEndpoints: Endpoint[] = [
     socketUrl: 'wss://nexus-api.mimir.global/',
     statescan: true,
     explorerUrl: 'https://nexus.statescan.io/'
+  },
+  {
+    key: 'polimec',
+    icon: '/chain-icons/polimec.svg',
+    tokenIcon: '/token-icons/PLMC.webp',
+    name: 'Polimec Polkadot',
+    wsUrl: {
+      IBP1: 'wss://polimec.ibp.network',
+      Amforc: 'wss://polimec.rpc.amforc.com',
+      'Polimec Foundation': 'wss://rpc.polimec.org',
+      IBP2: 'wss://polimec.dotters.network',
+      Helikon: 'wss://rpc.helikon.io/polimec'
+    },
+    httpUrl: 'https://polimec.ibp.network',
+    genesisHash: '0x7eb9354488318e7549c722669dcbdcdc526f1fef1420e7944667212f3601fdbd',
+    ss58Format: 41,
+    serviceUrl: 'https://polimec-api.mimir.global/',
+    socketUrl: 'wss://polimec-api.mimir.global/'
   }
 ];
 export const kusamaEndpoints: Endpoint[] = [
