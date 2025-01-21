@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.10.1...v1.11.0) (2025-01-21)
+
+
+### Features
+
+* add polimec chain support ([#130](https://github.com/mimir-labs/mimir-wallet/issues/130)) ([ad89ee3](https://github.com/mimir-labs/mimir-wallet/commit/ad89ee3d535470d158edf6fd49dc8e2f2477d07a))
+
 ## [1.10.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.10.0...v1.10.1) (2025-01-16)
 
 
