@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.12.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.11.0...v1.12.0) (2025-01-27)
+
+
+### Features
+
+* Update lock alert styles ([#135](https://github.com/mimir-labs/mimir-wallet/issues/135)) ([ba03dfa](https://github.com/mimir-labs/mimir-wallet/commit/ba03dfaf826e0e2bc1065b4859e834b32867c8eb))
+* Update polkadotidentity url ([#133](https://github.com/mimir-labs/mimir-wallet/issues/133)) ([669bb99](https://github.com/mimir-labs/mimir-wallet/commit/669bb993fbec7873adbb6d2f9c5fd6f99e6898b0))
+
+
+### Bug Fixes
+
+* fix multisig address display in multisig call ([#132](https://github.com/mimir-labs/mimir-wallet/issues/132)) ([5d26a29](https://github.com/mimir-labs/mimir-wallet/commit/5d26a29acbd95569d099dda2ca3692f39fd7aebf))
+
 ## [1.11.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.10.1...v1.11.0) (2025-01-21)
 
 
