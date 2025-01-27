@@ -31,7 +31,7 @@ function ToastDialog({ events, onChange, onRemove }: { onRemove: () => void; eve
 
     const onSign = () => {
       setImg(ImgTxPending);
-      setText('Boardcasting transaction');
+      setText('Broadcasting transaction');
       setStatus('pending');
     };
 

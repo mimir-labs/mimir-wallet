@@ -426,14 +426,6 @@ const createComponents: Func = () => ({
     }
   },
 
-  MuiAlertTitle: {
-    styleOverrides: {
-      root: {
-        marginBottom: 0
-      }
-    }
-  },
-
   MuiList: {
     styleOverrides: {
       root: {

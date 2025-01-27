@@ -4,7 +4,8 @@
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Box, CircularProgress, IconButton, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Alert, Box, CircularProgress, IconButton, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Stack } from '@mui/system';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo, useRef } from 'react';
 
@@ -53,7 +54,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   }, [address, isEnought]);
 
   const icon = (
-    <SvgIcon color='primary' component={isUnLock ? IconUnLock : IconLock} inheritViewBox sx={{ opacity: 0.5 }} />
+    <SvgIcon color='primary' component={isUnLock ? IconUnLock : IconLock} inheritViewBox fontSize='medium' />
   );
 
   return (
@@ -66,47 +67,48 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
           receipt={address.toString()}
         />
       )}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: { xs: 0.5, sm: 1 } }}>
+      <Alert
+        severity={isEnought ? 'success' : 'error'}
+        icon={icon}
+        sx={{ alignItems: 'center' }}
+        action={
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
+            {!isUnLock && isEnought === false && (
+              <IconButton color='primary' onClick={toggleOpen} size='small'>
+                <SvgIcon component={IconFund} inheritViewBox />
+              </IconButton>
+            )}
+
+            <Typography>
+              <FormatBalance value={value} />
+            </Typography>
+
+            {!isUnLock &&
+              (isEnought === 'pending' ? (
+                <CircularProgress size={16} />
+              ) : (
+                <SvgIcon
+                  color={isEnought ? 'success' : 'error'}
+                  component={isEnought ? IconSuccess : IconFail}
+                  inheritViewBox
+                />
+              ))}
+          </Box>
+        }
+      >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
-          {icon}
           <AddressName value={address} /> {isUnLock ? 'unlock' : 'lock'}
           <Tooltip title={tip}>
             <SvgIcon color='primary' component={IconQuestion} inheritViewBox sx={{ opacity: 0.5 }} />
           </Tooltip>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
-          {!isUnLock && isEnought === false && (
-            <IconButton color='primary' onClick={toggleOpen} size='small'>
-              <SvgIcon component={IconFund} inheritViewBox />
-            </IconButton>
-          )}
-
-          <Typography>
-            <FormatBalance value={value} />
-          </Typography>
-
-          {!isUnLock &&
-            (isEnought === 'pending' ? (
-              <CircularProgress size={16} />
-            ) : (
-              <SvgIcon
-                color={isEnought ? 'success' : 'error'}
-                component={isEnought ? IconSuccess : IconFail}
-                inheritViewBox
-              />
-            ))}
-        </Box>
-      </Box>
+      </Alert>
     </>
   );
 }
 
 export const LockContainer = React.memo(({ children }: { children: React.ReactNode }) => {
-  return (
-    <Stack bgcolor='secondary.main' borderRadius={1} padding={1} spacing={1}>
-      {children}
-    </Stack>
-  );
+  return <Stack spacing={1}>{children}</Stack>;
 });
 
 export default React.memo(LockItem);

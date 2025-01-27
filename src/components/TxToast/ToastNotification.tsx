@@ -46,7 +46,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       () => (
         <Box marginLeft={1.5}>
           <Typography fontWeight={700}>Waiting</Typography>
-          <Typography fontSize={12}>Boardcasting transaction</Typography>
+          <Typography fontSize={12}>Broadcasting transaction</Typography>
         </Box>
       ),
       { icon: <WaitingAnimation />, autoClose: false }
