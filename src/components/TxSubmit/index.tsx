@@ -22,6 +22,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 
 import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
+import { encodeAddress } from '@mimir-wallet/api';
 import IconBatch from '@mimir-wallet/assets/svg/icon-batch.svg?react';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
 import { useBatchTxs } from '@mimir-wallet/hooks/useBatchTxs';
@@ -82,7 +83,7 @@ function TxSubmit({
   beforeSend
 }: Props) {
   const { walletAccounts } = useWallet();
-  const [account, setAccount] = useState<string | undefined>(accountId?.toString() || walletAccounts?.[0].address);
+  const [account, setAccount] = useState<string | undefined>(encodeAddress(accountId || walletAccounts?.[0].address));
   const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
   const [note, setNote] = useState<string>(transaction?.note || '');
   const [accountData, isFetched] = useQueryAccount(account);

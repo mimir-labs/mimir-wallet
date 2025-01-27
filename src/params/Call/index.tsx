@@ -7,6 +7,7 @@ import React, { useMemo } from 'react';
 
 import { findAction } from '../utils';
 import BatchCall from './BatchCall';
+import CancelAsMulti from './CancelAsMulti';
 import FunctionArgs from './FunctionArgs';
 import SetIdentity from './SetIdentity';
 import TransferCall from './TransferCall';
@@ -20,6 +21,10 @@ function Call({ registry, call, ...props }: CallProps) {
 
   if (action === 'utility.batchAll' || action === 'utility.batch' || action === 'utility.forceBatch') {
     return <BatchCall registry={registry} call={call} {...props} />;
+  }
+
+  if (action === 'multisig.cancelAsMulti') {
+    return <CancelAsMulti registry={registry} call={call} {...props} />;
   }
 
   if (action.startsWith('balances.') || action.startsWith('assets.') || action.startsWith('tokens.')) {

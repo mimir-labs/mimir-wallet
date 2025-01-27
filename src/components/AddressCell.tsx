@@ -20,7 +20,7 @@ import IdentityIcon from './IdentityIcon';
 
 interface Props {
   defaultName?: string;
-  value?: AccountId | AccountIndex | Address | string | null;
+  value?: AccountId | AccountIndex | Address | Uint8Array | string | null;
   iconSize?: number;
   shorten?: boolean;
   showType?: boolean;
@@ -45,13 +45,13 @@ function AddressCell({
 }: Props) {
   const [spacing, spacingCol] = [0.5, 0.2];
 
-  const address = useMemo(() => encodeAddress(value?.toString()), [value]);
+  const address = useMemo(() => encodeAddress(value), [value]);
   const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
 
   return (
     <Stack alignItems='center' className='AddressCell' direction='row' flex='1' spacing={spacing} width={width}>
-      <IdentityIcon className='AddressCell-Icon' size={iconSize} value={value} />
+      <IdentityIcon className='AddressCell-Icon' size={iconSize} value={address} />
       <Stack className='AddressCell-Content' spacing={spacingCol}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Typography
