@@ -9,18 +9,16 @@ import { isAddress } from '@polkadot/util-crypto';
 import { encodeAddress } from './defaults';
 
 function accountExplorerLink(
-  value?: AccountId | AccountIndex | Address | HexString | string | null
+  value?: AccountId | AccountIndex | Address | HexString | Uint8Array | string | null
 ): string | undefined {
-  const _value = value?.toString();
+  const _value = encodeAddress(value);
 
   if (_value && isAddress(_value)) {
     const explorerUrl = window.currentChain.explorerUrl;
     const isStatescan = window.currentChain.statescan;
 
     if (explorerUrl) {
-      return isStatescan
-        ? `${explorerUrl}/#/accounts/${encodeAddress(_value)}`
-        : `${explorerUrl}account/${encodeAddress(_value)}`;
+      return isStatescan ? `${explorerUrl}/#/accounts/${_value}` : `${explorerUrl}account/${_value}`;
     }
   }
 

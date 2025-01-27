@@ -14,9 +14,7 @@ function Address({
   shorten?: boolean;
   value?: AccountId | AccountIndex | AddressType | string | null;
 }) {
-  const address = value?.toString();
-
-  const format = useMemo(() => (address ? encodeAddress(address) : undefined), [address]);
+  const format = useMemo(() => encodeAddress(value), [value]);
 
   return shorten ? `${format?.slice(0, 6)}…${format?.slice(-6)}` : format;
 }

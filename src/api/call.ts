@@ -30,11 +30,19 @@ export function findTargetCall(
   // }
 
   if (api.tx.multisig.asMulti.is(call)) {
-    return findTargetCall(api, encodeAddress(createKeyMulti(call.args[1], call.args[0])), call.args[3]);
+    return findTargetCall(
+      api,
+      encodeAddress(createKeyMulti(call.args[1].map((item) => item.toString()).concat(address), call.args[0])),
+      call.args[3]
+    );
   }
 
   if (api.tx.multisig.asMultiThreshold1.is(call)) {
-    return findTargetCall(api, encodeAddress(createKeyMulti(call.args[0], 1)), call.args[1]);
+    return findTargetCall(
+      api,
+      encodeAddress(createKeyMulti(call.args[0].map((item) => item.toString()).concat(address), 1)),
+      call.args[1]
+    );
   }
 
   // if (api.tx.multisig.approveAsMulti.is(call)) {

@@ -73,7 +73,7 @@ function extractIdentity(
 }
 
 function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
-  const address = useMemo(() => encodeAddress(value?.toString()), [value]);
+  const address = useMemo(() => encodeAddress(value), [value]);
 
   const { identityApi } = useApi();
   const [identity] = useDeriveAccountInfo(address);
