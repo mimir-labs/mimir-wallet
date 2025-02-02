@@ -9,8 +9,9 @@ import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance } from '@polkadot/util';
 
 import { allEndpoints, Endpoint, typesBundle } from '@mimir-wallet/config';
+import { NETWORK_RPC_PREFIX } from '@mimir-wallet/constants';
 import { useApi } from '@mimir-wallet/hooks/useApi';
-import { service } from '@mimir-wallet/utils';
+import { service, store } from '@mimir-wallet/utils';
 
 import { ApiProvider } from './ApiProvider';
 import { DEFAULT_AUX, statics } from './defaults';
@@ -84,6 +85,7 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
 async function createApi(
   apiUrl: string | string[],
   httpUrl: string,
+  network: string,
   onError?: (error: unknown) => void
 ): Promise<void> {
   // Try to get metadata from service
@@ -96,8 +98,9 @@ async function createApi(
   }
 
   try {
+    const wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string;
     // Initialize WebSocket provider and API
-    const provider = new ApiProvider(apiUrl, httpUrl);
+    const provider = new ApiProvider(wsUrl ? [wsUrl].concat(apiUrl) : apiUrl, httpUrl);
 
     statics.api = new ApiPromise({
       provider,
@@ -145,7 +148,7 @@ export async function initializeApi(chain: Endpoint) {
     : undefined;
 
   // Initialize main blockchain API connection
-  createApi(Object.values(chain.wsUrl), chain.httpUrl, onError).then(() => {
+  createApi(Object.values(chain.wsUrl), chain.httpUrl, chain.key, onError).then(() => {
     // Set up event listeners for connection state
     statics.api.on('error', onError);
 

@@ -7,14 +7,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 import AccountConsumer from '@mimir-wallet/accounts/Consumer';
 import { useAccount } from '@mimir-wallet/accounts/useAccount';
-import {
-  ConnectWalletModal,
-  MimirLoading,
-  SwitchAccountDialog,
-  ToastRoot,
-  TxSubmit,
-  TxToast
-} from '@mimir-wallet/components';
+import { ConnectWalletModal, SwitchAccountDialog, ToastRoot, TxSubmit, TxToast } from '@mimir-wallet/components';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useFollowAccounts } from '@mimir-wallet/hooks/useFollowAccounts';
 import { usePageTitle } from '@mimir-wallet/hooks/usePageTitle';
@@ -24,6 +17,7 @@ import { useWallet } from '@mimir-wallet/wallet/useWallet';
 
 import AddAddressBook from './AddAddressBook';
 import { BaseContainerCtx } from './context';
+import Initializing from './Initializing';
 import SideBar from './SideBar';
 import SubscribeTx from './SubscribeTx';
 import ToggleAlert from './ToggleAlert';
@@ -31,10 +25,12 @@ import TopBar from './TopBar';
 
 function BaseContainer({
   auth,
+  skipConnect = false,
   withSideBar,
   withPadding
 }: {
   auth: boolean;
+  skipConnect?: boolean;
   withSideBar: boolean;
   withPadding: boolean;
 }) {
@@ -79,7 +75,7 @@ function BaseContainer({
         </>
       )}
 
-      {isApiReady && isWalletReady && isMultisigSyned ? (
+      {skipConnect || (isApiReady && isWalletReady && isMultisigSyned) ? (
         <Box
           sx={{
             display: 'flex',
@@ -120,21 +116,7 @@ function BaseContainer({
           ) : null}
         </Box>
       ) : (
-        <Box
-          sx={{
-            background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)',
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 56,
-            bottom: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <MimirLoading />
-        </Box>
+        <Initializing />
       )}
     </BaseContainerCtx.Provider>
   );

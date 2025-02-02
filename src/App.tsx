@@ -5,7 +5,6 @@ import { useRef } from 'react';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
 import BaseContainer from './containers/BaseContainer';
-import PageAccountSetting from './pages/account-setting';
 import PageAddProxy from './pages/add-proxy';
 import PageAddressBook from './pages/address-book';
 import PageCreateMultisig from './pages/create-multisig';
@@ -13,6 +12,7 @@ import PageDapp from './pages/dapp';
 import PageExplorer from './pages/explorer';
 import PageProfile from './pages/profile';
 import PageWelcome from './pages/profile/Welcome';
+import PageSetting from './pages/setting';
 import PageTransactionDetails from './pages/transaction-details';
 import PageTransactions from './pages/transactions';
 import PageTransfer from './pages/transfer';
@@ -62,7 +62,7 @@ function App() {
           },
           {
             path: '/account-setting',
-            element: <PageAccountSetting />
+            element: <PageSetting type='account' />
           }
         ]
       },
@@ -111,6 +111,15 @@ function App() {
           {
             path: '/welcome',
             element: <PageWelcome />
+          }
+        ]
+      },
+      {
+        element: <BaseContainer auth={false} skipConnect withSideBar withPadding />,
+        children: [
+          {
+            path: '/setting',
+            element: <PageSetting type='general' />
           }
         ]
       },

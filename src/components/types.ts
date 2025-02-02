@@ -11,6 +11,7 @@ import type React from 'react';
 export interface InputProps {
   defaultValue?: string;
   value?: string;
+  color?: 'error' | 'primary' | 'secondary' | 'info' | 'success' | 'warning';
   disabled?: boolean;
   label?: React.ReactNode;
   error?: Error | null;
