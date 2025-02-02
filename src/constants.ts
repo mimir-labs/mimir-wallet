@@ -31,3 +31,5 @@ export const EXTENSION_PREFIX = 'mimir-wallet';
 export const MESSAGE_ORIGIN_WALLET = `${EXTENSION_PREFIX}wallet`;
 
 export const ADDRESS_BOOK_UPGRADE_VERSION_KEY = 'address_book_upgrade_version';
+
+export const NETWORK_RPC_PREFIX = 'network_rpc:';

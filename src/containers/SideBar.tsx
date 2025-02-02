@@ -30,6 +30,7 @@ import IconDapp from '@mimir-wallet/assets/svg/icon-dapp.svg?react';
 import IconHome from '@mimir-wallet/assets/svg/icon-home.svg?react';
 import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
 import IconQr from '@mimir-wallet/assets/svg/icon-qr.svg?react';
+import IconSetting from '@mimir-wallet/assets/svg/icon-set.svg?react';
 import IconTransaction from '@mimir-wallet/assets/svg/icon-transaction.svg?react';
 import IconTransfer from '@mimir-wallet/assets/svg/icon-transfer.svg?react';
 import {
@@ -253,6 +254,7 @@ function WalletContent() {
 }
 
 function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideBar: boolean }) {
+  const { isApiReady } = useApi();
   const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
@@ -275,12 +277,13 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
         </IconButton>
       </Box>
 
-      {pathname !== '/welcome' && <TopContent />}
+      {pathname !== '/welcome' && isApiReady && <TopContent />}
 
       <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
       <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
       <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
       <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
+      <NavLink Icon={IconSetting} label='Setting' onClick={closeSidebar} to='/setting' />
     </Stack>
   );
 

@@ -22,3 +22,7 @@ export const isValidURL = (url: string, protocolsAllowed = ['https:']): boolean 
     return false;
   }
 };
+
+export const isValidWsUrl = (url: string): boolean => {
+  return isValidURL(url, ['wss:', 'ws:']);
+};

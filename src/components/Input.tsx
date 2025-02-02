@@ -14,6 +14,7 @@ function Input({
   endAdornment,
   endButton,
   enterKeyHint,
+  color,
   error,
   fullWidth = true,
   helper,
@@ -44,7 +45,7 @@ function Input({
   );
 
   return (
-    <FormControl error={!!error} fullWidth={fullWidth} size={size} variant='outlined'>
+    <FormControl error={!!error} fullWidth={fullWidth} color={color} size={size} variant='outlined'>
       {label && <InputLabel shrink>{label}</InputLabel>}
       <Box sx={{ display: 'flex', gap: 1.25, justifyContent: 'space-between' }}>
         {startButton}
@@ -57,6 +58,7 @@ function Input({
           inputProps={{
             enterKeyHint
           }}
+          color={color}
           multiline={multiline}
           onBlur={onBlur}
           onChange={_onChange}
