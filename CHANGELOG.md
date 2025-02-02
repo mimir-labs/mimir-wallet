@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.12.0...v1.13.0) (2025-02-02)
+
+
+### Features
+
+* add network setting page for RPC customization ([#136](https://github.com/mimir-labs/mimir-wallet/issues/136)) ([8814a74](https://github.com/mimir-labs/mimir-wallet/commit/8814a7471961dc3c0176fe3b1f11e3360d51b931))
+
 ## [1.12.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.11.0...v1.12.0) (2025-01-27)
 
 
