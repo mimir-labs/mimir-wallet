@@ -18,8 +18,10 @@ import {
 import moment from 'moment';
 import React from 'react';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import IconShare from '@mimir-wallet/assets/svg/icon-share.svg?react';
 import { TransactionStatus } from '@mimir-wallet/hooks/types';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useCopyClipboard } from '@mimir-wallet/hooks/useCopyClipboard';
 
 import { formatTransactionId } from '../utils';
@@ -38,6 +40,7 @@ function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
   const [isCopied, copy] = useCopyClipboard();
+  const { network } = useApi();
 
   return (
     <Paper component={Stack} spacing={1.2} sx={{ padding: { sm: 1.5, xs: 1.2 }, borderRadius: 2 }}>
@@ -76,7 +79,9 @@ function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
 
               url.searchParams.set('tx_id', transaction.id.toString());
 
-              copy(`${window.location.origin}/transactions/${transaction.id}`);
+              copy(
+                `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address)}`
+              );
             }}
           >
             <SvgIcon component={IconShare} />
