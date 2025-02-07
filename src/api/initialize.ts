@@ -4,7 +4,7 @@
 import type { HexString } from '@polkadot/util/types';
 import type { ApiState } from './types';
 
-import { ApiPromise } from '@polkadot/api';
+import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance } from '@polkadot/util';
 
@@ -74,6 +74,18 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
   };
 }
 
+function getApiProvider(apiUrl: string | string[], httpUrl: string, network: string) {
+  const wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string;
+
+  if (wsUrl) {
+    return new WsProvider(wsUrl);
+  }
+
+  const provider = new ApiProvider(apiUrl, httpUrl);
+
+  return provider;
+}
+
 /**
  * Creates and initializes a new Polkadot API instance
  * Handles metadata retrieval and API setup with error handling
@@ -98,9 +110,8 @@ async function createApi(
   }
 
   try {
-    const wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string;
     // Initialize WebSocket provider and API
-    const provider = new ApiProvider(wsUrl ? [wsUrl].concat(apiUrl) : apiUrl, httpUrl);
+    const provider = getApiProvider(apiUrl, httpUrl, network);
 
     statics.api = new ApiPromise({
       provider,
@@ -168,7 +179,7 @@ export async function initializeApi(chain: Endpoint) {
   // This is used for additional identity-related features
   if (peopleEndpoint) {
     // Create WebSocket provider for identity network
-    const provider = new ApiProvider(Object.values(peopleEndpoint.wsUrl), peopleEndpoint.httpUrl);
+    const provider = getApiProvider(Object.values(peopleEndpoint.wsUrl), peopleEndpoint.httpUrl, peopleEndpoint.key);
 
     // Initialize identity API with custom types
     ApiPromise.create({
