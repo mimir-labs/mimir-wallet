@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.13.0...v1.13.1) (2025-02-07)
+
+
+### Bug Fixes
+
+* add network and address params when share transaction ([#140](https://github.com/mimir-labs/mimir-wallet/issues/140)) ([b0a55ee](https://github.com/mimir-labs/mimir-wallet/commit/b0a55eece077ccc9b204c6c245fa8efee02c1fa8))
+
 ## [1.13.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.12.0...v1.13.0) (2025-02-07)
 
 
