@@ -20,6 +20,7 @@ export interface DappOption {
   description: string;
   url: string;
   supportedChains: true | HexString[];
+  destChain?: Record<HexString, HexString>;
   tags?: string[];
   website?: string;
   twitter?: string;
@@ -253,6 +254,23 @@ export const dapps: DappOption[] = [
       '0x638cd2b9af4b3bb54b8c1f0d22711fc89924ca93300f0caf25a580432b29d050',
       '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f'
     ],
+    destChain: {
+      '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3':
+        '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
+      '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f':
+        '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
+      '0xefb56e30d9b4a24099f88820987d0f45fb645992416535d87650d98e00f46fc4':
+        '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
+      '0x46ee89aa2eedd13e988962630ec9fb7565964cf5023bb351f2b6b25c1b68b0b2':
+        '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
+      // kusama
+      '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe':
+        '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f',
+      '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a':
+        '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f',
+      '0x638cd2b9af4b3bb54b8c1f0d22711fc89924ca93300f0caf25a580432b29d050':
+        '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f'
+    },
     tags: ['Identity'],
     matrix: 'https://matrix.to/#/#polkaidentity:matrix.org'
   }

@@ -1,7 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DappOption } from '@mimir-wallet/config';
+import type { HexString } from '@polkadot/util/types';
+import type { DappOption, Endpoint } from '@mimir-wallet/config';
 
 import {
   alpha,
@@ -20,9 +21,11 @@ import { useNavigate } from 'react-router-dom';
 
 import IconStar from '@mimir-wallet/assets/svg/icon-star.svg?react';
 import { ellipsisLinesMixin } from '@mimir-wallet/components/utils';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useToggle } from '@mimir-wallet/hooks/useToggle';
 
 import DappDetails from './DappDetails';
+import SwitchChain from './SwitchChain';
 
 interface Props {
   addFavorite: (id: number) => void;
@@ -32,9 +35,11 @@ interface Props {
 }
 
 function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
+  const { genesisHash } = useApi();
   const navigate = useNavigate();
   const [detailsOpen, toggleOpen, setDetailsOpen] = useToggle();
   const [isDrawerOpen, toggleDrawerOpen, setDrawerOpen] = useToggle();
+  const [switchChain, setSwitchChain] = useState<HexString>();
   const [element, setElement] = useState<JSX.Element>();
   const _isFavorite = useMemo(() => isFavorite(dapp.id), [dapp.id, isFavorite]);
   const toggleFavorite = useCallback(
@@ -54,7 +59,11 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
     setDetailsOpen(false);
 
     if (!dapp.isDrawer) {
-      navigate(`/explorer/${encodeURIComponent(dapp.url)}`);
+      if (dapp.destChain && dapp.destChain[genesisHash]) {
+        setSwitchChain(dapp.destChain[genesisHash]);
+      } else {
+        navigate(`/explorer/${encodeURIComponent(dapp.url)}`);
+      }
     } else {
       dapp.Component?.().then((C) => {
         setDrawerOpen(true);
@@ -65,7 +74,14 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
         );
       });
     }
-  }, [dapp, navigate, setDetailsOpen, setDrawerOpen]);
+  }, [dapp, genesisHash, navigate, setDetailsOpen, setDrawerOpen, setSwitchChain]);
+
+  const handleSwitchChain = useCallback(
+    (endpoint: Endpoint) => {
+      window.location.href = `/explorer/${encodeURIComponent(dapp.url)}?network=${endpoint.key}`;
+    },
+    [dapp.url]
+  );
 
   return (
     <>
@@ -83,6 +99,15 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
         >
           {element}
         </SwipeableDrawer>
+      )}
+
+      {switchChain && (
+        <SwitchChain
+          open={!!switchChain}
+          genesisHash={switchChain}
+          onClose={() => setSwitchChain(undefined)}
+          onOpen={handleSwitchChain}
+        />
       )}
 
       <Paper sx={{ cursor: 'pointer', display: 'block', padding: 2, textDecoration: 'none' }} onClick={openApp}>
