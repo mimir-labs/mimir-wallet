@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.13.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.12.0...v1.13.0) (2025-02-07)
+
+
+### Features
+
+* add network setting page for RPC customization ([#136](https://github.com/mimir-labs/mimir-wallet/issues/136)) ([8814a74](https://github.com/mimir-labs/mimir-wallet/commit/8814a7471961dc3c0176fe3b1f11e3360d51b931))
+* add switch chain for some special dapp ([#138](https://github.com/mimir-labs/mimir-wallet/issues/138)) ([b182815](https://github.com/mimir-labs/mimir-wallet/commit/b182815f3f5a64cc957fc4a08182f8669539c68e))
+* upgrade @polkadot/* dependencies ([#139](https://github.com/mimir-labs/mimir-wallet/issues/139)) ([8f7debf](https://github.com/mimir-labs/mimir-wallet/commit/8f7debf377c6cda52f9ffa78cad802f95022409b))
+
 ## [1.12.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.11.0...v1.12.0) (2025-01-27)
 
 
