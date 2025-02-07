@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { Data, Vec } from '@polkadot/types';
+import type { Bytes, Data, Option, Vec } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
-import type { PalletIdentityJudgement } from '@polkadot/types/lookup';
+import type { PalletIdentityJudgement, PalletIdentityRegistration } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
 
 import { blake2AsHex } from '@polkadot/util-crypto';
@@ -37,7 +37,9 @@ async function getIdentityInfo({
     throw new Error('api or value is required');
   }
 
-  let identity = await api.query.identity.identityOf(value);
+  let identity = (await api.query.identity.identityOf(value)) as unknown as Option<
+    ITuple<[PalletIdentityRegistration, Option<Bytes>]>
+  >;
 
   let display: string | undefined;
   let displayParent: string | undefined;
@@ -61,7 +63,9 @@ async function getIdentityInfo({
 
     if (superOf.isSome) {
       display = dataToUtf8(superOf.unwrap()[1]);
-      const superIdentity = await api.query.identity.identityOf(superOf.unwrap()[0]);
+      const superIdentity = (await api.query.identity.identityOf(superOf.unwrap()[0])) as unknown as Option<
+        ITuple<[PalletIdentityRegistration, Option<Bytes>]>
+      >;
 
       identity = superIdentity;
       displayParent = dataToUtf8(superIdentity.unwrap()[0].info.display);
