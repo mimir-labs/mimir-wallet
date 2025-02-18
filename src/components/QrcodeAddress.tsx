@@ -3,10 +3,11 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Avatar, Box, Dialog, DialogContent, Typography } from '@mui/material';
+import { Avatar, Box, Dialog, DialogContent, Tab, Tabs, Typography } from '@mui/material';
 import qrcode from 'qrcode-generator';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import { encodeAddress } from '@mimir-wallet/api';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 
 import CopyButton from './CopyButton';
@@ -61,10 +62,32 @@ function Content({ value }: { value: string }) {
 }
 
 function QrcodeAddress({ onClose, open, value }: Props) {
+  const [tab, setTab] = useState('unified'); // unified or original
+  const { chain, chainSS58 } = useApi();
+
+  const unifiedValue = useMemo(
+    () => encodeAddress(value, chain.relayChainSs58Format ?? chain.ss58Format),
+    [value, chain.relayChainSs58Format, chain.ss58Format]
+  );
+  const originalValue = useMemo(() => encodeAddress(value, chain.ss58Format), [value, chain.ss58Format]);
+  const valueString = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
+
   return (
     <Dialog fullWidth maxWidth='xs' onClose={onClose} open={open}>
       <DialogContent>
-        <Content value={value?.toString() || ''} />
+        {chain.relayChainSs58Format !== undefined ? (
+          <>
+            <Tabs variant='fullWidth' onChange={(_, value) => setTab(value)} value={tab}>
+              <Tab value='unified' label='Unified Format' />
+              <Tab value='original' label='Original Format' />
+            </Tabs>
+
+            {tab === 'unified' && chain.relayChainSs58Format !== undefined && <Content value={unifiedValue} />}
+            {tab === 'original' && <Content value={originalValue} />}
+          </>
+        ) : (
+          <Content value={valueString} />
+        )}
       </DialogContent>
     </Dialog>
   );

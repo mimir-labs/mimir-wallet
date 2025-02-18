@@ -20,6 +20,7 @@ export { default as AppName } from './AppName';
 export { default as Bytes } from './Bytes';
 export { default as ChainSelect } from './ChainSelect';
 export { default as ConnectWalletModal } from './ConnectWalletModal';
+export { default as CopyAddress } from './CopyAddress';
 export { default as CopyButton } from './CopyButton';
 export { default as CreateMultisigDialog } from './CreateMultisigDialog';
 export { default as DappCell } from './DappCell';

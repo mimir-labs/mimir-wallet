@@ -12,6 +12,7 @@ import React, { useMemo } from 'react';
 import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 import { encodeAddress } from '@mimir-wallet/api';
 import { walletConfig } from '@mimir-wallet/config';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useCopyClipboard } from '@mimir-wallet/hooks/useCopyClipboard';
 import { addressEq } from '@mimir-wallet/utils';
 
@@ -35,16 +36,17 @@ function renderCircle({ cx, cy, fill, r }: Circle, index: number) {
 }
 
 function IdentityIcon({ className, prefix, size = 30, value }: Props) {
+  const { chainSS58 } = useApi();
   const { address } = useMemo(() => {
     try {
       const _value = isCodec(value) ? value.toString() : value;
-      const address = isU8a(_value) || isHex(_value) ? encodeAddress(_value, prefix) : _value || '';
+      const address = isU8a(_value) || isHex(_value) ? encodeAddress(_value, prefix ?? chainSS58) : _value || '';
 
       return { address };
     } catch {
       return { address: '' };
     }
-  }, [prefix, value]);
+  }, [chainSS58, prefix, value]);
   const { meta } = useAddressMeta(value?.toString());
   const [, copy] = useCopyClipboard();
 

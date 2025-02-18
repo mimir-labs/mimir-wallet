@@ -31,13 +31,13 @@ import IconProxy from '@mimir-wallet/assets/svg/icon-proxy-fill.svg?react';
 import IconQrcode from '@mimir-wallet/assets/svg/icon-qr.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@mimir-wallet/assets/svg/icon-set.svg?react';
-import { Address, AddressName, CopyButton, Fund, IdentityIcon, QrcodeAddress } from '@mimir-wallet/components';
+import { Address, AddressName, CopyAddress, Fund, IdentityIcon, QrcodeAddress } from '@mimir-wallet/components';
 import { ONE_DAY } from '@mimir-wallet/constants';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { formatDisplay } from '@mimir-wallet/utils';
 
 function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string; changes: number }) {
-  const { chain } = useApi();
+  const { chain, chainSS58 } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [open, toggleOpen] = useToggle(false);
   const [qrOpen, toggleQrOpen] = useToggle(false);
@@ -159,7 +159,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               }}
             >
               <Address value={address} shorten={downSm} />
-              <CopyButton value={address} color='primary' sx={{ opacity: 0.5 }} />
+              <CopyAddress value={address} color='primary' sx={{ opacity: 0.5 }} />
               <IconButton color='primary' onClick={toggleQrOpen} sx={{ padding: 0, opacity: 0.5 }}>
                 <SvgIcon component={IconQrcode} inheritViewBox />
               </IconButton>
@@ -167,18 +167,20 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
               <span>Mimir Secured {days} Days</span>
-              <Tooltip title={window.currentChain.statescan ? 'Statescan' : 'Subscan'}>
-                <a target='_blank' href={chainLinks.accountExplorerLink(address)} rel='noreferrer'>
+              <Tooltip title={chain.statescan ? 'Statescan' : 'Subscan'}>
+                <a target='_blank' href={chainLinks.accountExplorerLink(chain, address)} rel='noreferrer'>
                   <Avatar
                     style={{ width: 16, height: 16 }}
-                    src={window.currentChain.statescan ? StatescanImg : SubscanImg}
+                    src={chain.statescan ? StatescanImg : SubscanImg}
                     alt='subscan'
                   />
                 </a>
               </Tooltip>
               {chain.subsquareUrl && (
                 <Tooltip title='Subsquare'>
-                  <Link to={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address)}`)}`}>
+                  <Link
+                    to={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address, chainSS58)}`)}`}
+                  >
                     <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
                   </Link>
                 </Tooltip>

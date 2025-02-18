@@ -65,7 +65,7 @@ export default defineConfig(({ mode }) => ({
           ],
           chopsticks: ['@acala-network/chopsticks-core'],
           'polkadot-config': ['@polkadot/apps-config/api/typesBundle'],
-          mui: ['@mui/lab', '@mui/material', '@mui/system', 'material-ui-popup-state'],
+          mui: ['@mui/lab', '@mui/material', 'material-ui-popup-state'],
           reactflow: ['reactflow'],
           lottie: ['lottie-web'],
           lodash: ['lodash-es', 'lodash'],

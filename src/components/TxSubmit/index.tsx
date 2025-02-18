@@ -25,6 +25,7 @@ import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
 import { encodeAddress } from '@mimir-wallet/api';
 import IconBatch from '@mimir-wallet/assets/svg/icon-batch.svg?react';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useBatchTxs } from '@mimir-wallet/hooks/useBatchTxs';
 import { useFilterPaths } from '@mimir-wallet/hooks/useFilterPaths';
 import { useAccountSource, useWallet } from '@mimir-wallet/wallet/useWallet';
@@ -83,7 +84,10 @@ function TxSubmit({
   beforeSend
 }: Props) {
   const { walletAccounts } = useWallet();
-  const [account, setAccount] = useState<string | undefined>(encodeAddress(accountId || walletAccounts?.[0].address));
+  const { chain, chainSS58 } = useApi();
+  const [account, setAccount] = useState<string | undefined>(
+    encodeAddress(accountId || walletAccounts?.[0].address, chainSS58)
+  );
   const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
   const [note, setNote] = useState<string>(transaction?.note || '');
   const [accountData, isFetched] = useQueryAccount(account);
@@ -221,6 +225,7 @@ function TxSubmit({
 
           {isFetched && (
             <SendTx
+              chain={chain}
               disabled={
                 !safetyCheck || safetyCheck.severity === 'error' || (safetyCheck.severity === 'warning' && !isConfirm)
               }

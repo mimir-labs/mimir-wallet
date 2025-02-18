@@ -13784,7 +13784,6 @@ __metadata:
     "@eslint/js": "npm:^9.15.0"
     "@mui/lab": "npm:6.0.0-beta.15"
     "@mui/material": "npm:^6.1.7"
-    "@mui/system": "npm:^6.1.7"
     "@nabla/vite-plugin-eslint": "npm:^2.0.4"
     "@plutonication/plutonication": "npm:^1.1.0"
     "@polkadot/api": "npm:^15.5.2"

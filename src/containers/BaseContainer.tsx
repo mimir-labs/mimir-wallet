@@ -22,6 +22,7 @@ import SideBar from './SideBar';
 import SubscribeTx from './SubscribeTx';
 import ToggleAlert from './ToggleAlert';
 import TopBar from './TopBar';
+import UnifiedAddress from './UnifiedAddress';
 
 function BaseContainer({
   auth,
@@ -63,6 +64,7 @@ function BaseContainer({
       <TxToast />
       <AccountConsumer />
       <AddAddressBook />
+      {isApiReady && isWalletReady && isMultisigSyned && current && <UnifiedAddress address={current} />}
 
       <SwitchAccountDialog />
 

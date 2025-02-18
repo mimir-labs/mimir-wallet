@@ -17,9 +17,9 @@ interface Props {
 }
 
 function ProfileWrapper({ assets, dapps, info, member, proposals, transaction }: Props) {
-  const { api } = useApi();
+  const { api, chain } = useApi();
   const genesisHash = api.genesisHash.toHex();
-  const url = chainLinks.subsquareUrl();
+  const url = chainLinks.subsquareUrl(chain);
 
   return (
     <Stack spacing={2}>

@@ -11,11 +11,12 @@ import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 import { encodeAddress } from '@mimir-wallet/api';
 import IconAddressBook from '@mimir-wallet/assets/svg/icon-address-book.svg?react';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { addressEq } from '@mimir-wallet/utils';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
-import CopyButton from './CopyButton';
+import CopyAddress from './CopyAddress';
 import IdentityIcon from './IdentityIcon';
 
 interface Props {
@@ -45,7 +46,8 @@ function AddressCell({
 }: Props) {
   const [spacing, spacingCol] = [0.5, 0.2];
 
-  const address = useMemo(() => encodeAddress(value), [value]);
+  const { chainSS58 } = useApi();
+  const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
   const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
 
@@ -92,7 +94,7 @@ function AddressCell({
           sx={{ height: 18, display: 'flex', alignItems: 'center', fontSize: '0.875em' }}
         >
           <AddressComp shorten={shorten} value={address} />
-          {withCopy && <CopyButton size='small' sx={{ fontSize: 'inherit' }} value={address} />}
+          {withCopy && <CopyAddress size='small' sx={{ fontSize: 'inherit' }} value={address} />}
           {icons}
           {withAddressBook &&
             address &&

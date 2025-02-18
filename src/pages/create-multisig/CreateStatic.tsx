@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
+import type { Endpoint } from '@mimir-wallet/config';
 
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
@@ -15,6 +16,7 @@ import { useSelectedAccountCallback } from '@mimir-wallet/accounts/useSelectedAc
 import { decodeAddress, encodeAddress } from '@mimir-wallet/api';
 import { utm } from '@mimir-wallet/config';
 import { DETECTED_ACCOUNT_KEY } from '@mimir-wallet/constants';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { addressToHex, service, store } from '@mimir-wallet/utils';
 
@@ -25,10 +27,17 @@ interface Props {
   checkField: () => boolean;
 }
 
-async function createMultisig(signatories: string[], threshold: number, name: string): Promise<string> {
-  const address = encodeAddress(createKeyMulti(signatories, threshold));
+async function createMultisig(
+  chain: Endpoint,
+  signatories: string[],
+  threshold: number,
+  name: string,
+  chainSS58: number
+): Promise<string> {
+  const address = encodeAddress(createKeyMulti(signatories, threshold), chainSS58);
 
   await service.createMultisig(
+    chain,
     signatories.map((value) => addressToHex(value)),
     threshold,
     name
@@ -45,6 +54,7 @@ async function createMultisig(signatories: string[], threshold: number, name: st
 function CreateStatic({ checkField, name, signatories, threshold }: Props) {
   const [open, toggleOpen] = useToggle();
   const navigate = useNavigate();
+  const { chain, chainSS58 } = useApi();
   const [isLoading, setIsLoading] = useState(false);
   const selectAccount = useSelectedAccountCallback();
   const { addAddress, resync } = useAccount();
@@ -55,11 +65,11 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
     try {
       setIsLoading(true);
 
-      const address = await createMultisig(signatories, threshold, name);
+      const address = await createMultisig(chain, signatories, threshold, name, chainSS58);
 
       await resync();
 
-      utm && (await service.utm(addressToHex(address), utm));
+      utm && (await service.utm(chain, addressToHex(address), utm));
 
       selectAccount(address);
       addAddress(address, name);
@@ -70,7 +80,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
     }
 
     setIsLoading(false);
-  }, [name, checkField, signatories, threshold, resync, selectAccount, addAddress, navigate]);
+  }, [name, checkField, signatories, threshold, resync, selectAccount, addAddress, navigate, chain, chainSS58]);
 
   return (
     <>

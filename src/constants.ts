@@ -15,13 +15,7 @@ export const DETECTED_ACCOUNT_KEY = 'detected_account';
 
 export const LAST_READ_MESSAGE_KEY = 'last_read_message';
 
-export const ONE_DAY = 86400;
-export const ONE_HOUR = 3600;
-export const ONE_MINUTE = 60;
-
 export const CONNECTED_WALLETS_KEY = 'connected_wallets';
-
-export const CONNECT_ORIGIN = 'mimir-wallet';
 
 export const UTM_KEY = 'utm_source';
 
@@ -33,3 +27,11 @@ export const MESSAGE_ORIGIN_WALLET = `${EXTENSION_PREFIX}wallet`;
 export const ADDRESS_BOOK_UPGRADE_VERSION_KEY = 'address_book_upgrade_version';
 
 export const NETWORK_RPC_PREFIX = 'network_rpc:';
+
+export const UNIFIED_ADDRESS_FORMAT_KEY = 'unified_address_format';
+
+export const CONNECT_ORIGIN = 'mimir-wallet';
+
+export const ONE_DAY = 86400;
+export const ONE_HOUR = 3600;
+export const ONE_MINUTE = 60;

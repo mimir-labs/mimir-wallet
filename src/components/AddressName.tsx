@@ -73,9 +73,9 @@ function extractIdentity(
 }
 
 function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
-  const address = useMemo(() => encodeAddress(value), [value]);
+  const { chainSS58, identityApi } = useApi();
+  const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
-  const { identityApi } = useApi();
   const [identity] = useDeriveAccountInfo(address);
   const [chainName, setChainName] = useState<React.ReactNode>(() => extractName(address.toString()));
   const { meta } = useAddressMeta(address);

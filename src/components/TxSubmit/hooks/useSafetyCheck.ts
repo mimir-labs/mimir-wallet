@@ -11,7 +11,7 @@ import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { service } from '@mimir-wallet/utils';
 
 export function useSafetyCheck(call: IMethod) {
-  const { api } = useApi();
+  const { api, chain } = useApi();
   const [safetyCheck, setSafetyCheck] = useState<SafetyLevel>();
   const [isConfirm, , setConfirm] = useToggle(false);
 
@@ -69,7 +69,7 @@ export function useSafetyCheck(call: IMethod) {
         message: 'This transaction is safe to execute.'
       });
     } else {
-      service.safetyCheck(call.toHex()).then((level) => {
+      service.safetyCheck(chain, call.toHex()).then((level) => {
         if (level.severity === 'none') {
           setConfirm(true);
         }
@@ -77,7 +77,7 @@ export function useSafetyCheck(call: IMethod) {
         setSafetyCheck(level);
       });
     }
-  }, [api, call, setConfirm]);
+  }, [api, call, chain, setConfirm]);
 
   return [safetyCheck, isConfirm, setConfirm] as const;
 }

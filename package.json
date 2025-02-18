@@ -40,7 +40,6 @@
     "@emotion/styled": "^11.13.0",
     "@mui/lab": "6.0.0-beta.15",
     "@mui/material": "^6.1.7",
-    "@mui/system": "^6.1.7",
     "@plutonication/plutonication": "^1.1.0",
     "@polkadot/api": "^15.5.2",
     "@polkadot/api-derive": "^15.5.2",

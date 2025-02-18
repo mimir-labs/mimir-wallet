@@ -9,7 +9,7 @@ import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance } from '@polkadot/util';
 
 import { allEndpoints, Endpoint, typesBundle } from '@mimir-wallet/config';
-import { NETWORK_RPC_PREFIX } from '@mimir-wallet/constants';
+import { NETWORK_RPC_PREFIX, UNIFIED_ADDRESS_FORMAT_KEY } from '@mimir-wallet/constants';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { service, store } from '@mimir-wallet/utils';
 
@@ -36,7 +36,10 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
   });
 
   // Extract and set chain-specific properties
-  const ss58Format = chain.ss58Format;
+  const ss58Format =
+    store.get(UNIFIED_ADDRESS_FORMAT_KEY) === 'unified'
+      ? (chain.relayChainSs58Format ?? chain.ss58Format)
+      : chain.ss58Format;
   const tokenSymbol = properties.tokenSymbol.unwrapOr([formatBalance.getDefaults().unit, ...DEFAULT_AUX]);
   const tokenDecimals = properties.tokenDecimals.unwrapOr([api.registry.createType('u32', 12)]);
 
@@ -49,12 +52,13 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
     'tokenSymbol',
     tokenSymbol.map((b) => b.toString())
   );
+  console.debug('chain ss58Format', properties.ss58Format.toHuman());
   console.debug('ss58Format', ss58Format);
   console.debug('genesisHash', api.genesisHash.toHex());
 
   // Override chain properties with specified SS58 format
   api.registry.setChainProperties(
-    api.registry.createType('ChainProperties', { ss58Format: chain.ss58Format, tokenDecimals, tokenSymbol })
+    api.registry.createType('ChainProperties', { ss58Format, tokenDecimals, tokenSymbol })
   );
 
   // Configure balance formatting for UI display
@@ -95,6 +99,7 @@ function getApiProvider(apiUrl: string | string[], httpUrl: string, network: str
  * @param onError - Error handler callback
  */
 async function createApi(
+  chain: Endpoint,
   apiUrl: string | string[],
   httpUrl: string,
   network: string,
@@ -104,7 +109,7 @@ async function createApi(
   let metadata: Record<string, HexString> = {};
 
   try {
-    metadata = await service.getMetadata();
+    metadata = await service.getMetadata(chain);
   } catch {
     /* empty */
   }
@@ -139,7 +144,11 @@ export async function initializeApi(chain: Endpoint) {
   // Initialize API state with static configuration
   useApi.setState({
     api: statics.api,
-    chainSS58: chain.ss58Format,
+    // If the address format is unified, use the relay chain ss58 format
+    chainSS58:
+      store.get(UNIFIED_ADDRESS_FORMAT_KEY) === 'unified'
+        ? (chain.relayChainSs58Format ?? chain.ss58Format)
+        : chain.ss58Format,
     genesisHash: chain.genesisHash,
     apiUrl: Object.values(chain.wsUrl),
     network: chain.key,
@@ -159,7 +168,7 @@ export async function initializeApi(chain: Endpoint) {
     : undefined;
 
   // Initialize main blockchain API connection
-  createApi(Object.values(chain.wsUrl), chain.httpUrl, chain.key, onError).then(() => {
+  createApi(chain, Object.values(chain.wsUrl), chain.httpUrl, chain.key, onError).then(() => {
     // Set up event listeners for connection state
     statics.api.on('error', onError);
 

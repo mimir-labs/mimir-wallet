@@ -6,6 +6,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { useAccount } from '@mimir-wallet/accounts/useAccount';
 import { encodeAddress } from '@mimir-wallet/api';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { accountSource } from '@mimir-wallet/wallet/useWallet';
 
 interface UseSelectMultisig {
@@ -25,12 +26,13 @@ export function useSelectMultisig(
   threshold1?: boolean
 ): UseSelectMultisig {
   const { accounts, addresses } = useAccount();
+  const { chainSS58 } = useApi();
   const all = useMemo(
     () =>
-      (threshold1 ? [encodeAddress(hexToU8a('0x0', 256))] : []).concat(
+      (threshold1 ? [encodeAddress(hexToU8a('0x0', 256), chainSS58)] : []).concat(
         accounts.map((item) => item.address).concat(addresses.map((item) => item.address))
       ),
-    [accounts, addresses, threshold1]
+    [accounts, addresses, threshold1, chainSS58]
   );
   const [signatories, setSignatories] = useState<string[]>(defaultSignatories || []);
   const [threshold, setThreshold] = useState<number>(defaultThreshold || (threshold1 ? 1 : 2));

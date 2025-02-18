@@ -5,7 +5,7 @@ import { Box, Button, Paper } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 import AccountSetting from './account-setting';
-import NetworkSetting from './network';
+import GeneralSetting from './general-setting';
 
 function Setting({ type }: { type: 'general' | 'account' }) {
   return (
@@ -41,13 +41,7 @@ function Setting({ type }: { type: 'general' | 'account' }) {
         </Button>
       </Paper>
 
-      {type === 'account' ? (
-        <AccountSetting />
-      ) : (
-        <>
-          <NetworkSetting />
-        </>
-      )}
+      {type === 'account' ? <AccountSetting /> : <GeneralSetting />}
     </Box>
   );
 }

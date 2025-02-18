@@ -26,24 +26,27 @@ function Content({
   onClose?: () => void;
 }) {
   const { addAddress, addresses } = useAccount();
-  const { network } = useApi();
+  const { network, chainSS58 } = useApi();
   const [name, setName] = useState<string>('');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
   const [info] = useDeriveAccountInfo(address);
   const { display, displayParent } = info || {};
 
-  const _onChangeAddress = useCallback((addressInput: string) => {
-    let address = '';
+  const _onChangeAddress = useCallback(
+    (addressInput: string) => {
+      let address = '';
 
-    try {
-      const publicKey = decodeAddress(addressInput);
+      try {
+        const publicKey = decodeAddress(addressInput);
 
-      address = encodeAddress(publicKey);
-      setAddress(address);
-    } catch {
-      setAddress(addressInput);
-    }
-  }, []);
+        address = encodeAddress(publicKey, chainSS58);
+        setAddress(address);
+      } catch {
+        setAddress(addressInput);
+      }
+    },
+    [chainSS58]
+  );
 
   const exists = useMemo(
     () =>

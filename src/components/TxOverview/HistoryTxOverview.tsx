@@ -5,8 +5,7 @@ import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { FilterPath, Transaction } from '@mimir-wallet/hooks/types';
 
-import { Paper, SvgIcon, useTheme } from '@mui/material';
-import { Box } from '@mui/system';
+import { Box, Paper, SvgIcon, useTheme } from '@mui/material';
 import React, { createContext, useEffect } from 'react';
 import {
   Controls,

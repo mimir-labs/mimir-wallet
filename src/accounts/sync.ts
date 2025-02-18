@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
+import type { Endpoint } from '@mimir-wallet/config';
 import type { AccountData, AccountDataExtra } from '../hooks/types';
 
 import { encodeAddress } from '@mimir-wallet/api';
@@ -10,7 +11,8 @@ import { service } from '@mimir-wallet/utils';
 export function extraAccounts(
   genesisHash: HexString,
   walletAccounts: { address: string; name?: string; type?: string; source: string }[],
-  data: AccountData[]
+  data: AccountData[],
+  ss58Format: number
 ): (AccountDataExtra & AccountData)[] {
   const accountMap: Record<string, AccountDataExtra & AccountData> = {};
 
@@ -20,11 +22,11 @@ export function extraAccounts(
   for (const item of data) {
     const account: AccountData = {
       ...item,
-      address: encodeAddress(item.address),
+      address: encodeAddress(item.address, ss58Format),
       delegatees: item.delegatees
         .filter((delegatee: any) => delegatee.proxyNetwork === genesisHash)
         .map((delegatee: any) => {
-          const address = encodeAddress(delegatee.address);
+          const address = encodeAddress(delegatee.address, ss58Format);
 
           proxy.push(address);
 
@@ -48,7 +50,10 @@ export function extraAccounts(
     if (account.type === 'multisig') {
       accountMap[account.address] = {
         ...account,
-        members: account.members.map((member) => ({ ...member, address: encodeAddress(member.address) }))
+        members: account.members.map((member) => ({
+          ...member,
+          address: encodeAddress(member.address, ss58Format)
+        }))
       };
 
       continue;
@@ -84,12 +89,17 @@ export function extraAccounts(
 }
 
 export async function sync(
+  chain: Endpoint,
   genesisHash: HexString,
   walletAccounts: { address: string; name?: string; type?: string; source: string }[],
+  chainSS58: number,
   cb: (values: (AccountDataExtra & AccountData)[]) => void
 ): Promise<void> {
-  const data = await service.getMultisigs(walletAccounts.map((item) => item.address));
-  const accounts = extraAccounts(genesisHash, walletAccounts, data);
+  const data = await service.getMultisigs(
+    chain,
+    walletAccounts.map((item) => item.address)
+  );
+  const accounts = extraAccounts(genesisHash, walletAccounts, data, chainSS58);
 
   cb(accounts);
 }

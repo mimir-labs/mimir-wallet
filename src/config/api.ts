@@ -13,6 +13,7 @@ export type Endpoint = {
   icon: string;
   tokenIcon: string;
   ss58Format: number;
+  relayChainSs58Format?: number;
   genesisHash: HexString;
   socketUrl: string;
   serviceUrl: string;
@@ -72,6 +73,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://statemint.api.onfinality.io/public',
     genesisHash: '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f',
     ss58Format: 0,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://assethub-polkadot-api.mimir.global/',
     socketUrl: 'wss://assethub-polkadot-api.mimir.global/',
     explorerUrl: 'https://assethub-polkadot.subscan.io/',
@@ -100,6 +102,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://polkadot-coretime-rpc.polkadot.io',
     genesisHash: '0xefb56e30d9b4a24099f88820987d0f45fb645992416535d87650d98e00f46fc4',
     ss58Format: 0,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://coretime-polkadot-api.mimir.global/',
     socketUrl: 'wss://coretime-polkadot-api.mimir.global/',
     explorerUrl: 'https://coretime-polkadot.subscan.io/',
@@ -124,6 +127,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://collectives.api.onfinality.io/public',
     genesisHash: '0x46ee89aa2eedd13e988962630ec9fb7565964cf5023bb351f2b6b25c1b68b0b2',
     ss58Format: 0,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://collectives-polkadot-api.mimir.global/',
     socketUrl: 'wss://collectives-polkadot-api.mimir.global/',
     explorerUrl: 'https://collectives-polkadot.subscan.io/',
@@ -146,6 +150,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://sys.ibp.network/people-polkadot',
     genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
     ss58Format: 0,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://people-polkadot-api.mimir.global/',
     socketUrl: 'wss://people-polkadot-api.mimir.global/',
     explorerUrl: 'https://people-polkadot.subscan.io/'
@@ -165,6 +170,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://hk.p.bifrost-rpc.liebi.com',
     genesisHash: '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
     ss58Format: 0,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://bifrost-polkadot-api.mimir.global/',
     socketUrl: 'wss://bifrost-polkadot-api.mimir.global/',
     explorerUrl: 'https://bifrost.subscan.io/',
@@ -185,6 +191,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://crust-parachain.crustapps.net',
     genesisHash: '0x4319cc49ee79495b57a1fec4d2bd43f59052dcc690276de566c2691d6df4f7b8',
     ss58Format: 88,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://crust-polkadot-api.mimir.global/',
     socketUrl: 'wss://crust-polkadot-api.mimir.global/',
     explorerUrl: 'https://crust-parachain.subscan.io/'
@@ -200,6 +207,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://rpc-pendulum.prd.pendulumchain.tech',
     genesisHash: '0x5d3c298622d5634ed019bf61ea4b71655030015bde9beb0d6a24743714462c86',
     ss58Format: 56,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://pendulum-api.mimir.global/',
     socketUrl: 'wss://pendulum-api.mimir.global/',
     explorerUrl: 'https://pendulum.subscan.io/'
@@ -221,6 +229,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://acala-rpc-0.aca-api.network',
     genesisHash: '0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c',
     ss58Format: 10,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://acala-api.mimir.global/',
     socketUrl: 'wss://acala-api.mimir.global/',
     explorerUrl: 'https://acala.subscan.io/',
@@ -242,6 +251,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://phala.api.onfinality.io/public',
     genesisHash: '0x1bb969d85965e4bb5a651abbedf21a54b6b31a21f66b5401cc3f1e286268d736',
     ss58Format: 30,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://phala-api.mimir.global/',
     socketUrl: 'wss://phala-api.mimir.global/',
     explorerUrl: 'https://phala.subscan.io/',
@@ -263,6 +273,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://hydration-rpc.n.dwellir.com',
     genesisHash: '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d',
     ss58Format: 63,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://hydration-api.mimir.global/',
     socketUrl: 'wss://hydration-api.mimir.global/',
     explorerUrl: 'https://hydration.subscan.io/',
@@ -282,6 +293,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://nexus.ibp.network',
     genesisHash: '0x61ea8a51fd4a058ee8c0e86df0a89cc85b8b67a0a66432893d09719050c9f540',
     ss58Format: 0,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://nexus-api.mimir.global/',
     socketUrl: 'wss://nexus-api.mimir.global/',
     statescan: true,
@@ -302,6 +314,7 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://polimec.ibp.network',
     genesisHash: '0x7eb9354488318e7549c722669dcbdcdc526f1fef1420e7944667212f3601fdbd',
     ss58Format: 41,
+    relayChainSs58Format: 0,
     serviceUrl: 'https://polimec-api.mimir.global/',
     socketUrl: 'wss://polimec-api.mimir.global/'
   }

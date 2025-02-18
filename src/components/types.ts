@@ -1,8 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ButtonProps, Theme } from '@mui/material';
-import type { SystemStyleObject } from '@mui/system';
+import type { ButtonProps, SxProps, Theme } from '@mui/material';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { AccountId } from '@polkadot/types/interfaces';
 import type { BN } from '@polkadot/util';
@@ -28,7 +27,7 @@ export interface InputProps {
   endButton?: React.ReactNode;
   multiline?: boolean;
   rows?: number;
-  inputSx?: SystemStyleObject<Theme>;
+  inputSx?: SxProps<Theme>;
   autoComplete?: 'on' | 'off' | 'name' | 'email' | 'username' | 'current-password' | 'new-password';
   tabIndex?: number;
   onChange?: (value: string) => void;

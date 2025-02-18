@@ -8,10 +8,12 @@ import { Link } from 'react-router-dom';
 
 import { chainLinks } from '@mimir-wallet/api/chain-links';
 import { ellipsisMixin } from '@mimir-wallet/components/utils';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 function Proposals({ data }: { data: Array<ProposalData> }) {
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
+  const { chain } = useApi();
 
   return (
     <Stack component={Paper} padding={{ sm: 2, xs: 1 }} spacing={1} sx={{ bgcolor: 'common.white' }}>
@@ -40,7 +42,7 @@ function Proposals({ data }: { data: Array<ProposalData> }) {
             <MuiLink
               color='inherit'
               component={Link}
-              to={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`) || '')}`}
+              to={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(chain, `referenda/${item.referendumIndex}`) || '')}`}
               underline='hover'
             >
               {item.title || `[${item.onchainData.trackInfo?.name}] Referendum #${item.referendumIndex}`}

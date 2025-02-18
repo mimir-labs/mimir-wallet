@@ -52,7 +52,7 @@ function checkError(
 
 function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
   const navigate = useNavigate();
-  const { chain } = useApi();
+  const { chain, chainSS58 } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [name, setName] = useState<string>('');
   const [{ address, isAddressValid }, setAddress] = useState<{ isAddressValid: boolean; address: string }>({
@@ -151,7 +151,10 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
                     setAddressError(null);
                   }
 
-                  setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value) : value });
+                  setAddress({
+                    isAddressValid,
+                    address: isAddressValid ? encodeAddress(value, chainSS58) : value
+                  });
                 }}
                 placeholder='input address'
                 value={address}
@@ -259,10 +262,10 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
                   if (item.pure) {
                     setPrepare({
                       creator: item.creator,
-                      who: item.who.map((address) => encodeAddress(address)),
+                      who: item.who.map((address) => encodeAddress(address, chainSS58)),
                       threshold: item.threshold,
                       name: item.name,
-                      pure: item.pure ? encodeAddress(item.pure) : null,
+                      pure: item.pure ? encodeAddress(item.pure, chainSS58) : null,
                       blockNumber: item.blockNumber,
                       extrinsicIndex: item.extrinsicIndex
                     });

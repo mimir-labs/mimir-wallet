@@ -23,7 +23,7 @@ import {
 } from './actions';
 
 export function useAccount() {
-  const { chain } = useApi();
+  const { network, chainSS58 } = useApi();
 
   const {
     accounts,
@@ -44,7 +44,7 @@ export function useAccount() {
         return;
       }
 
-      const value = encodeAddress(address);
+      const value = encodeAddress(address, chainSS58);
 
       useAddressStore.setState({ switchAddress: undefined });
 
@@ -55,7 +55,7 @@ export function useAccount() {
       setSearchParams(newSearchParams);
 
       // update storage
-      store.set(`${CURRENT_ADDRESS_PREFIX}${chain.key}`, value);
+      store.set(`${CURRENT_ADDRESS_PREFIX}${network}`, value);
 
       useAddressStore.setState({ current: value });
     }
@@ -66,7 +66,7 @@ export function useAccount() {
   if (currentAddress) {
     current = currentAddress;
   } else {
-    current = store.get(`${CURRENT_ADDRESS_PREFIX}${chain.key}`) as string | undefined;
+    current = store.get(`${CURRENT_ADDRESS_PREFIX}${network}`) as string | undefined;
   }
 
   return {

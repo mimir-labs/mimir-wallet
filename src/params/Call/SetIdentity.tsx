@@ -12,7 +12,7 @@ import IconEmail from '@mimir-wallet/assets/images/email.svg';
 import IconGithub from '@mimir-wallet/assets/images/github.svg';
 import IconMatrix from '@mimir-wallet/assets/images/matrix.svg';
 import IconTwitter from '@mimir-wallet/assets/images/x.svg';
-import { Address, CopyButton, IdentityIcon } from '@mimir-wallet/components';
+import { Address, CopyAddress, IdentityIcon } from '@mimir-wallet/components';
 import { useCopyClipboard } from '@mimir-wallet/hooks/useCopyClipboard';
 import { dataToUtf8 } from '@mimir-wallet/utils';
 
@@ -57,7 +57,7 @@ function IdentityDisplay({
         {address && (
           <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>
             <Address value={address} shorten />
-            <CopyButton sx={{ opacity: 0.6 }} value={address} />
+            <CopyAddress sx={{ opacity: 0.6 }} value={address} />
           </span>
         )}
       </Box>

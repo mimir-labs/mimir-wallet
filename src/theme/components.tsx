@@ -255,18 +255,16 @@ const createComponents: Func = () => ({
     styleOverrides: {
       root: ({ theme }) => ({
         '.MuiDialog-paper': {
-          padding: theme.spacing(2),
+          borderRadius: theme.shape.borderRadius * 2,
           [theme.breakpoints.down('md')]: {
             maxWidth: 'calc(100% - 40px)',
             maxHeight: 'calc(100% - 40px)',
-            margin: '20px',
-            padding: '20px'
+            margin: '20px'
           },
           [theme.breakpoints.down('sm')]: {
             maxWidth: 'calc(100% - 30px)',
             maxHeight: 'calc(100% - 30px)',
-            margin: '15px',
-            padding: '15px'
+            margin: '15px'
           }
         },
         '.MuiDialog-paperFullWidth': {
@@ -286,7 +284,7 @@ const createComponents: Func = () => ({
       root: ({ theme }) => ({
         fontSize: '1.25rem',
         fontWeight: 800,
-        padding: 0,
+        padding: theme.spacing(2),
         paddingBottom: theme.spacing(1.5),
         '+.MuiDialogContent-root': {
           borderTop: `1px solid ${theme.palette.divider}`,
@@ -298,8 +296,8 @@ const createComponents: Func = () => ({
 
   MuiDialogContent: {
     styleOverrides: {
-      root: () => ({
-        padding: 0
+      root: ({ theme }) => ({
+        padding: theme.spacing(2)
       })
     }
   },
@@ -308,9 +306,7 @@ const createComponents: Func = () => ({
     styleOverrides: {
       root: ({ theme }) => ({
         borderTop: `1px solid ${theme.palette.divider}`,
-        marginTop: theme.spacing(1.5),
-        padding: 0,
-        paddingTop: theme.spacing(1.5)
+        padding: theme.spacing(2)
       })
     }
   },

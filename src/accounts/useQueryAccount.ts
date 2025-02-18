@@ -15,12 +15,12 @@ import { useApi } from '@mimir-wallet/hooks/useApi';
 
 import { useAccount } from './useAccount';
 
-function transformAccount(genesisHash: HexString, account: AccountData): AccountData {
+function transformAccount(genesisHash: HexString, account: AccountData, ss58Format: number): AccountData {
   if (account.type === 'pure' && account.network !== genesisHash) {
     return {
       createdAt: Date.now(),
       type: 'account',
-      address: encodeAddress(account.address),
+      address: encodeAddress(account.address, ss58Format),
       name: account.name,
       delegatees: []
     };
@@ -28,12 +28,12 @@ function transformAccount(genesisHash: HexString, account: AccountData): Account
 
   return {
     ...account,
-    address: encodeAddress(account.address),
+    address: encodeAddress(account.address, ss58Format),
     delegatees: account.delegatees
       .filter((item) => item.proxyNetwork === genesisHash)
-      .map((delegatee) => transformAccount(genesisHash, delegatee)) as (AccountData & DelegateeProp)[],
+      .map((delegatee) => transformAccount(genesisHash, delegatee, ss58Format)) as (AccountData & DelegateeProp)[],
     ...(account.type === 'multisig'
-      ? { members: account.members.map((member) => transformAccount(genesisHash, member)) }
+      ? { members: account.members.map((member) => transformAccount(genesisHash, member, ss58Format)) }
       : {})
   };
 }
@@ -79,18 +79,18 @@ function deriveMeta(account: AccountData, meta: Record<string, AddressMeta> = {}
 function useQueryAccountImpl(
   address?: string | null
 ): [AccountData | null | undefined, isFetched: boolean, isFetching: boolean] {
-  const { genesisHash } = useApi();
+  const { genesisHash, chain, chainSS58 } = useApi();
   const { appendMeta } = useAccount();
   const { data, isFetched, isFetching } = useQuery<AccountData | null>({
     initialData: null,
-    queryHash: chainLinks.serviceUrl(`accounts/full/${address}`),
-    queryKey: [address ? chainLinks.serviceUrl(`accounts/full/${address}`) : null],
+    queryHash: chainLinks.serviceUrl(chain, `accounts/full/${address}`),
+    queryKey: [address ? chainLinks.serviceUrl(chain, `accounts/full/${address}`) : null],
     structuralSharing: (prev, next): AccountData | null => {
       if (!next) {
         return null;
       }
 
-      const nextData = transformAccount(genesisHash, next as AccountData);
+      const nextData = transformAccount(genesisHash, next as AccountData, chainSS58);
 
       return isEqual(prev, nextData) ? (prev as AccountData) : nextData;
     }

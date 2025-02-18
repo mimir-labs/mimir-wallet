@@ -3,6 +3,7 @@
 
 import { walletConfig } from '@mimir-wallet/config';
 import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@mimir-wallet/constants';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { store } from '@mimir-wallet/utils';
 
 import { useWallet } from './useWallet';
@@ -13,10 +14,11 @@ import { loadWallet } from './utils';
  * @param name - The name of the wallet to connect
  */
 export async function connectWallet(name: string) {
+  const { chainSS58 } = useApi.getState();
   const provider = window.injectedWeb3?.[walletConfig[name]?.key];
 
   if (provider) {
-    const walletAccounts = await loadWallet(provider, CONNECT_ORIGIN, name);
+    const walletAccounts = await loadWallet(provider, CONNECT_ORIGIN, name, chainSS58);
 
     useWallet.setState((state) => {
       const newValue = [...state.connectedWallets, name];
