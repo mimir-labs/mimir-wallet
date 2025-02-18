@@ -23,6 +23,9 @@ export type Endpoint = {
   identityNetwork?: string;
 };
 
+const isDevEnv =
+  window.location.hostname.startsWith('dev.mimir.global') || window.location.hostname.startsWith('localhost');
+
 export const polkadotEndpoints: Endpoint[] = [
   {
     key: 'polkadot',
@@ -508,7 +511,25 @@ export const paseoEndpoints: Endpoint[] = [
       process.env.NODE_ENV === 'production' ? 'https://paseo-api.mimir.global/' : 'https://dev-api.mimir.global/',
     socketUrl: process.env.NODE_ENV === 'production' ? 'wss://paseo-api.mimir.global/' : 'wss://dev-api.mimir.global/',
     explorerUrl: 'https://paseo.subscan.io/'
-  }
+  },
+  ...(isDevEnv
+    ? ([
+        {
+          key: 'xcavate-dev',
+          icon: '/chain-icons/xcavate.png',
+          tokenIcon: '/token-icons/XCAV.png',
+          name: 'Xcavate Devnet',
+          wsUrl: {
+            'xcavate Devnet': 'wss://rpc2-paseo.xcavate.io'
+          },
+          httpUrl: 'https://rpc2-paseo.xcavate.io/',
+          genesisHash: '0xea6cf77a91a79c49a3d4f8d0a6dda7af31c126a0bfa02d7738aa2026b5122e74',
+          ss58Format: 42,
+          serviceUrl: 'https://xcavate-dev-api.mimir.global/',
+          socketUrl: 'wss://xcavate-dev-api.mimir.global/'
+        }
+      ] as const)
+    : [])
 ];
 export const solochainEndpoints: Endpoint[] = [
   {
@@ -597,6 +618,21 @@ export const solochainEndpoints: Endpoint[] = [
     serviceUrl: 'https://zkverify-testnet-api.mimir.global/',
     socketUrl: 'wss://zkverify-testnet-api.mimir.global/',
     explorerUrl: 'https://zkverify-explorer.zeeve.net/'
+  },
+  {
+    key: '5ire',
+    icon: '/chain-icons/5ire.svg',
+    tokenIcon: '/token-icons/5IRE.webp',
+    name: '5ire',
+    wsUrl: {
+      '5ire': 'wss://rpc.5ire.network'
+    },
+    httpUrl: 'https://rpc.5ire.network/',
+    genesisHash: '0x8c24aac175a803c999b25e1cdd89fefcf2ce6af24e27aa9b773463a7fa88c385',
+    ss58Format: 42,
+    serviceUrl: 'https://5ire-api.mimir.global/',
+    socketUrl: 'wss://5ire-api.mimir.global/',
+    explorerUrl: 'https://5irescan.io/'
   }
 ];
 
