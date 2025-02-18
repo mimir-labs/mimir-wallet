@@ -52,7 +52,7 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
     'tokenSymbol',
     tokenSymbol.map((b) => b.toString())
   );
-  console.debug('chain ss58Format', properties.ss58Format.toHuman());
+  console.debug('onchain ss58Format', api.registry.chainSS58);
   console.debug('ss58Format', ss58Format);
   console.debug('genesisHash', api.genesisHash.toHex());
 

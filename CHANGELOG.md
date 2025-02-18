@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.13.1...v1.14.0) (2025-02-18)
+
+
+### Features
+
+* Add chain support for 5ire network and xcavate devnet ([#143](https://github.com/mimir-labs/mimir-wallet/issues/143)) ([d2d981f](https://github.com/mimir-labs/mimir-wallet/commit/d2d981f46d662b0fc571dda9471bcc1501320642))
+
 ## [1.13.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.13.0...v1.13.1) (2025-02-07)
 
 
