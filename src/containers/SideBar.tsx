@@ -36,7 +36,7 @@ import IconTransfer from '@mimir-wallet/assets/svg/icon-transfer.svg?react';
 import {
   AccountMenu,
   AddressCell,
-  CopyButton,
+  CopyAddress,
   CreateMultisigDialog,
   FormatBalance,
   QrcodeAddress,
@@ -101,7 +101,7 @@ function NavLink({
 }
 
 function TopContent() {
-  const { api } = useApi();
+  const { api, chain } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [qrOpen, toggleQrOpen] = useToggle();
@@ -156,13 +156,13 @@ function TopContent() {
               </IconButton>
             </Tooltip>
             <Tooltip title='Copy'>
-              <CopyButton color='primary' value={selected} />
+              <CopyAddress color='primary' value={selected} />
             </Tooltip>
             <Tooltip title='Explorer'>
               <IconButton
                 color='primary'
                 component='a'
-                href={chainLinks.accountExplorerLink(selected)}
+                href={chainLinks.accountExplorerLink(chain, selected)}
                 size='small'
                 target='_blank'
               >

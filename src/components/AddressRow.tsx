@@ -9,6 +9,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useAddressMeta } from '@mimir-wallet/accounts/useAddressMeta';
 import { encodeAddress } from '@mimir-wallet/api';
 import IconEdit from '@mimir-wallet/assets/svg/icon-edit.svg?react';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
@@ -34,7 +35,8 @@ function EditName({
   onDone: () => void;
   address?: AccountId | AccountIndex | Address | string | null;
 }) {
-  const { name, saveName, setName } = useAddressMeta(encodeAddress(address));
+  const { chainSS58 } = useApi();
+  const { name, saveName, setName } = useAddressMeta(encodeAddress(address, chainSS58));
 
   return (
     <Box
@@ -64,7 +66,8 @@ function AddressRow({
 }: Props) {
   const [editing, setEditing] = useState(false);
 
-  const address = useMemo(() => encodeAddress(value), [value]);
+  const { chainSS58 } = useApi();
+  const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
   const _onClick = useCallback(() => {
     onClick?.(address);

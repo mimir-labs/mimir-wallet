@@ -10,23 +10,25 @@ import { chainLinks } from '@mimir-wallet/api/chain-links';
 import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
 import IconQr from '@mimir-wallet/assets/svg/icon-qr.svg?react';
 import IconSend from '@mimir-wallet/assets/svg/icon-send-fill.svg?react';
-import { AddressCell, AddressRow, CopyButton, EditAddressDialog, QrcodeAddress } from '@mimir-wallet/components';
+import { AddressCell, AddressRow, CopyAddress, EditAddressDialog, QrcodeAddress } from '@mimir-wallet/components';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useToggle } from '@mimir-wallet/hooks/useToggle';
 
 function Icons({ address }: { address: string }) {
+  const { chain } = useApi();
   const [qrOpen, toggleQrOpen] = useToggle();
 
   return (
     <>
       <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={address} />
-      <CopyButton color='primary' size='small' value={address} />
+      <CopyAddress color='primary' size='small' value={address} />
       <IconButton color='primary' size='small' onClick={toggleQrOpen}>
         <SvgIcon component={IconQr} inheritViewBox />
       </IconButton>
       <IconButton
         color='primary'
         component='a'
-        href={chainLinks.accountExplorerLink(address)}
+        href={chainLinks.accountExplorerLink(chain, address)}
         size='small'
         target='_blank'
       >

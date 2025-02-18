@@ -40,7 +40,7 @@ function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
   const [isCopied, copy] = useCopyClipboard();
-  const { network } = useApi();
+  const { network, chainSS58 } = useApi();
 
   return (
     <Paper component={Stack} spacing={1.2} sx={{ padding: { sm: 1.5, xs: 1.2 }, borderRadius: 2 }}>
@@ -80,7 +80,7 @@ function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
               url.searchParams.set('tx_id', transaction.id.toString());
 
               copy(
-                `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address)}`
+                `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chainSS58)}`
               );
             }}
           >

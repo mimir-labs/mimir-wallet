@@ -4,8 +4,7 @@
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { Alert, Box, CircularProgress, IconButton, SvgIcon, Tooltip, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Alert, Box, CircularProgress, IconButton, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo, useRef } from 'react';
 
@@ -34,7 +33,7 @@ interface Props {
 }
 
 function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
-  const { api } = useApi();
+  const { api, chainSS58 } = useApi();
   const [allBalances] = useNativeBalances(address.toString());
   const [open, toggleOpen] = useToggle();
   const onEnoughtStateRef = useRef(onEnoughtState);
@@ -50,8 +49,8 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   }, [allBalances, value]);
 
   useEffect(() => {
-    onEnoughtStateRef.current?.(encodeAddress(address.toString()), isEnought);
-  }, [address, isEnought]);
+    onEnoughtStateRef.current?.(encodeAddress(address.toString(), chainSS58), isEnought);
+  }, [address, isEnought, chainSS58]);
 
   const icon = (
     <SvgIcon color='primary' component={isUnLock ? IconUnLock : IconLock} inheritViewBox fontSize='medium' />

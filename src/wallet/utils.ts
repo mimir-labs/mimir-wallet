@@ -11,6 +11,7 @@ export async function loadWallet(
   { enable }: { enable: (origin: string) => Promise<Injected> },
   origin: string,
   source: string,
+  ss58Format: number,
   delay = 0
 ) {
   if (delay) {
@@ -23,7 +24,7 @@ export async function loadWallet(
     const accounts = await injected.accounts.get(true);
 
     return accounts.map(({ address, name, type }) => {
-      return { address: encodeAddress(address), name, type, source };
+      return { address: encodeAddress(address, ss58Format), name, type, source };
     });
   } catch (error) {
     console.error(error);

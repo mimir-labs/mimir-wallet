@@ -17,10 +17,10 @@ import { useWallet } from '@mimir-wallet/wallet/useWallet';
 import { sync } from './sync';
 
 export async function resync() {
-  const { genesisHash } = useApi.getState();
+  const { genesisHash, chain, chainSS58 } = useApi.getState();
   const { walletAccounts } = useWallet.getState();
 
-  await sync(genesisHash, walletAccounts, (values) => {
+  await sync(chain, genesisHash, walletAccounts, chainSS58, (values) => {
     useAddressStore.setState((state) => ({
       accounts: isEqual(values, state.accounts) ? state.accounts : values,
       isMultisigSyned: true
@@ -91,10 +91,11 @@ export function setAccountName(address: string, name: string) {
 }
 
 export function setName(address: string, name: string, networks?: string[], watchlist?: boolean) {
+  const { chainSS58 } = useApi.getState();
   const stored = store.get(`address:${addressToHex(address)}`) as any;
 
   store.set(`address:${addressToHex(address)}`, {
-    address: encodeAddress(address),
+    address: encodeAddress(address, chainSS58),
     meta: {
       name,
       watchlist: stored?.meta?.watchlist ?? watchlist,

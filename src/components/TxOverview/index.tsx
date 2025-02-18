@@ -13,8 +13,7 @@ import type {
 } from '@mimir-wallet/hooks/types';
 
 import { LoadingButton } from '@mui/lab';
-import { Paper, SvgIcon, useTheme } from '@mui/material';
-import { alpha, Box } from '@mui/system';
+import { alpha, Box, Paper, SvgIcon, useTheme } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import React, { createContext, useContext, useEffect } from 'react';
 import {

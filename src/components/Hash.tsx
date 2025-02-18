@@ -8,6 +8,7 @@ import React from 'react';
 
 import { chainLinks } from '@mimir-wallet/api/chain-links';
 import IconLink from '@mimir-wallet/assets/svg/icon-link.svg?react';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 import CopyButton from './CopyButton';
 
@@ -18,11 +19,12 @@ interface Props {
 }
 
 function Hash({ value, withCopy, withExplorer }: Props) {
+  const { chain } = useApi();
   const stringValue = value?.toString();
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
 
-  const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(stringValue) : undefined;
+  const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(chain, stringValue) : undefined;
 
   return (
     <Box

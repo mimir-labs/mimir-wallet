@@ -85,7 +85,7 @@ function CreateFlexible({
     who
   }
 }: Props) {
-  const { api } = useApi();
+  const { api, chain } = useApi();
   const { walletAccounts } = useWallet();
   const [signer, setSigner] = useState<string | undefined>(creator || walletAccounts[0].address);
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
@@ -136,7 +136,7 @@ function CreateFlexible({
       events.once('finalized', async () => {
         while (true) {
           try {
-            const data = await service.getFullAccount(pure);
+            const data = await service.getFullAccount(chain, pure);
 
             if (data) {
               break;
@@ -154,7 +154,7 @@ function CreateFlexible({
       });
       events.once('error', () => setLoadingSecond(false));
     },
-    [api, navigate, selectAccount]
+    [api, chain, navigate, selectAccount]
   );
 
   const createPure = useCallback(() => {
@@ -167,6 +167,7 @@ function CreateFlexible({
         if (!name) throw new Error('Please provide account name');
 
         await service.prepareMultisig(
+          chain,
           addressToHex(extrinsic.signer.toString()),
           extrinsic.hash.toHex(),
           name,
@@ -201,13 +202,13 @@ function CreateFlexible({
           )
         );
 
-        utm && service.utm(addressToHex(_pure), utm);
+        utm && service.utm(chain, addressToHex(_pure), utm);
       }
     });
     events.once('error', () => {
       setLoadingFirst(false);
     });
-  }, [signer, source, api, name, threshold, who, createMembers]);
+  }, [signer, source, api, chain, name, threshold, who, createMembers]);
 
   const killPure = useCallback(
     (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {

@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { chainLinks } from '@mimir-wallet/api/chain-links';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 
 export interface ProposalData {
   referendumIndex: number;
@@ -22,7 +23,8 @@ export interface ProposalData {
 }
 
 export function useProposal(): ProposalData[] {
-  const proposalApi = chainLinks.proposalApi();
+  const { chain } = useApi();
+  const proposalApi = chainLinks.proposalApi(chain);
   const { data } = useQuery<{ items: ProposalData[] }>({
     queryHash: `${proposalApi}`,
     queryKey: [proposalApi || null]

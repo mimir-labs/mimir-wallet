@@ -6,7 +6,7 @@ import type { CallProps } from '../types';
 import { alpha, Box, lighten, Skeleton } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { Address, AddressName, CopyButton, FormatBalance, IdentityIcon } from '@mimir-wallet/components';
+import { Address, AddressName, CopyAddress, FormatBalance, IdentityIcon } from '@mimir-wallet/components';
 import { ellipsisMixin } from '@mimir-wallet/components/utils';
 import { useAssetInfo } from '@mimir-wallet/hooks/useAssets';
 
@@ -48,7 +48,7 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
           <Box component='span' sx={{ ...ellipsisMixin(150) }}>
             <AddressName value={address} />
           </Box>
-          <CopyButton size='small' value={address} color='default' sx={{ color: 'text.secondary' }} />
+          <CopyAddress size='small' value={address} color='default' sx={{ color: 'text.secondary' }} />
         </Box>
         <Box sx={{ fontSize: '10px', color: 'text.secondary', lineHeight: '12px' }}>
           <Address shorten value={address} />

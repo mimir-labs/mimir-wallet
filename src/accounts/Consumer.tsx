@@ -20,7 +20,7 @@ import { deriveAddressMeta } from './utils';
  * This component doesn't render anything but handles important background tasks
  */
 function AddressConsumer() {
-  const { genesisHash, network } = useApi();
+  const { genesisHash, network, chain, chainSS58 } = useApi();
   const { isWalletReady, walletAccounts } = useWallet();
   const { accounts, addresses } = useAccount();
 
@@ -41,7 +41,7 @@ function AddressConsumer() {
           if (v && v.address && v.meta?.name && (v.meta.networks ? v.meta.networks.includes(network) : true)) {
             try {
               values.push({
-                address: encodeAddress(v.address),
+                address: encodeAddress(v.address, chainSS58),
                 name: v.meta.name,
                 watchlist: v.meta.watchlist,
                 networks: v.meta.networks || []
@@ -69,7 +69,7 @@ function AddressConsumer() {
         });
       }
     });
-  }, [network]);
+  }, [chainSS58, network]);
 
   // Update address metadata when accounts or addresses change
   useEffect(() => {
@@ -85,7 +85,7 @@ function AddressConsumer() {
 
     if (isWalletReady) {
       // Initial sync when wallet is ready
-      sync(genesisHash, walletAccounts, (values) => {
+      sync(chain, genesisHash, walletAccounts, chainSS58, (values) => {
         useAddressStore.setState((state) => ({
           accounts: isEqual(values, state.accounts) ? state.accounts : values,
           isMultisigSyned: true
@@ -94,7 +94,7 @@ function AddressConsumer() {
 
       // Set up periodic sync every 6 seconds
       interval = setInterval(() => {
-        sync(genesisHash, walletAccounts, (values) => {
+        sync(chain, genesisHash, walletAccounts, chainSS58, (values) => {
           useAddressStore.setState((state) => ({
             accounts: isEqual(values, state.accounts) ? state.accounts : values,
             isMultisigSyned: true
@@ -107,7 +107,7 @@ function AddressConsumer() {
     return () => {
       clearInterval(interval);
     };
-  }, [genesisHash, isWalletReady, walletAccounts]);
+  }, [genesisHash, isWalletReady, walletAccounts, chainSS58, chain]);
 
   // Component doesn't render anything visible
   return null;

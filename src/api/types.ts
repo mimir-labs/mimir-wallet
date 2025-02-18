@@ -14,7 +14,7 @@ export interface BareProps {
 }
 
 export interface ApiState {
-  chainSS58: number;
+  chainSS58: number; // the ss58 format of the chain, if unified address format is enabled, it will be the relay chain ss58 format
   isApiReady: boolean;
   tokenSymbol: string;
   genesisHash: HexString;

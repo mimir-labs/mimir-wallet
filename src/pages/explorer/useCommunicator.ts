@@ -20,7 +20,7 @@ export function useCommunicator(
   appName?: string
 ): IframeCommunicator | null {
   const [communicator, setCommunicator] = useState<IframeCommunicator | null>(null);
-  const { api, genesisHash } = useApi();
+  const { api, genesisHash, chainSS58 } = useApi();
   const { addQueue } = useTxQueue();
   const selected = useSelectedAccount();
   const { meta } = useAddressMeta(selected);
@@ -43,7 +43,7 @@ export function useCommunicator(
 
         addQueue({
           call: api.tx[call.section][call.method](...call.args),
-          accountId: encodeAddress(payload.address),
+          accountId: encodeAddress(payload.address, chainSS58),
           onlySign: true,
           website: website.origin,
           iconUrl,

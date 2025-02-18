@@ -43,7 +43,7 @@ function MemberSet({
   disabled?: boolean;
 }) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const { api, chainSS58 } = useApi();
+  const { api, chain, chainSS58 } = useApi();
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
     useSelectMultisig(
       account.members.map((item) => item.address),
@@ -83,6 +83,7 @@ function MemberSet({
         website: 'mimir://internal/setup',
         beforeSend: () =>
           service.createMultisig(
+            chain,
             signatories.map((address) => u8aToHex(decodeAddress(address))),
             threshold,
             account.name,
@@ -90,7 +91,7 @@ function MemberSet({
           )
       });
     }
-  }, [checkField, pureAccount, account.address, account.name, signatories, threshold, chainSS58, addQueue, api]);
+  }, [checkField, pureAccount, account.address, account.name, signatories, threshold, chain, chainSS58, addQueue, api]);
 
   const _handleAdd = useCallback(() => {
     if (isAddressValid) {
@@ -142,7 +143,7 @@ function MemberSet({
               setAddressError(null);
             }
 
-            setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value) : value });
+            setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value, chainSS58) : value });
           }}
           placeholder='input address'
           value={address}

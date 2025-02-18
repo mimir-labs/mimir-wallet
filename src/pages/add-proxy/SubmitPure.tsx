@@ -23,7 +23,7 @@ function SubmitPure({
   custom: string;
   proxyType: string;
 }) {
-  const { api } = useApi();
+  const { api, chain } = useApi();
   const { addQueue } = useTxQueue();
 
   return (
@@ -42,7 +42,7 @@ function SubmitPure({
           accountId: proxy,
           website: 'mimir://internal/create-pure',
           beforeSend: async (extrinsic) => {
-            await service.prepareMultisig(u8aToHex(decodeAddress(proxy)), extrinsic.hash.toHex(), name);
+            await service.prepareMultisig(chain, u8aToHex(decodeAddress(proxy)), extrinsic.hash.toHex(), name);
           }
         });
       }}

@@ -4,6 +4,7 @@
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { ExtrinsicPayloadValue, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
+import type { Endpoint } from '@mimir-wallet/config';
 import type { BuildTx } from './hooks/useBuildTx';
 
 import { LoadingButton } from '@mui/lab';
@@ -23,6 +24,7 @@ import LockItem, { LockContainer } from '../LockItem';
 import { toastError } from '../utils';
 
 function SendTx({
+  chain,
   disabled,
   buildTx,
   note,
@@ -36,6 +38,7 @@ function SendTx({
   onSignature,
   beforeSend
 }: {
+  chain: Endpoint;
   disabled?: boolean;
   buildTx: BuildTx;
   website?: string | null;
@@ -79,7 +82,7 @@ function SendTx({
 
     try {
       for await (const item of hashSet) {
-        await service.updateCalldata(item);
+        await service.updateCalldata(chain, item);
       }
 
       if (onlySign) {
@@ -87,7 +90,7 @@ function SendTx({
 
         const [signature, payload, extrinsicHash, signedTransaction] = await sign(tx, signer, source);
 
-        await service.uploadWebsite(extrinsicHash.toHex(), website, appName, iconUrl, note);
+        await service.uploadWebsite(chain, extrinsicHash.toHex(), website, appName, iconUrl, note);
 
         onSignature?.(signer, signature, signedTransaction, payload);
         events.emit('success', 'Sign success');
@@ -100,7 +103,7 @@ function SendTx({
         addTxToast({ events });
 
         events.on('inblock', (result) => {
-          service.uploadWebsite(result.txHash.toHex(), website, appName, iconUrl, note);
+          service.uploadWebsite(chain, result.txHash.toHex(), website, appName, iconUrl, note);
           onResults?.(result);
         });
         events.on('error', (error) => {

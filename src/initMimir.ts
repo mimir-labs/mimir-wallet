@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { encodeAddress, isAddress } from '@polkadot/util-crypto';
+import { isAddress } from '@polkadot/util-crypto';
 
 import { CURRENT_ADDRESS_PREFIX, CURRENT_NETWORK_KEY } from '@mimir-wallet/constants';
 import { store } from '@mimir-wallet/utils';
@@ -30,8 +30,6 @@ export function initMimir() {
     }
   }
 
-  window.currentChain = chain;
-
   store.set(CURRENT_NETWORK_KEY, chain.key);
 
   let address: string | undefined;
@@ -39,9 +37,9 @@ export function initMimir() {
   const localAddress = store.get(`${CURRENT_ADDRESS_PREFIX}${chain.key}`) as string;
 
   if (urlAddress && isAddress(urlAddress)) {
-    address = encodeAddress(urlAddress, chain.ss58Format);
+    address = urlAddress;
   } else if (localAddress && isAddress(localAddress)) {
-    address = encodeAddress(localAddress, chain.ss58Format);
+    address = localAddress;
   }
 
   if (address) {

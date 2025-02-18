@@ -6,6 +6,7 @@ import type { AddressMeta } from '@mimir-wallet/hooks/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { toastError } from '@mimir-wallet/components/utils';
+import { useApi } from '@mimir-wallet/hooks/useApi';
 import { addressToHex, service } from '@mimir-wallet/utils';
 import { useAccountSource } from '@mimir-wallet/wallet/useWallet';
 
@@ -20,6 +21,7 @@ interface UseAddressMeta {
 
 export function useAddressMeta(value?: string | null): UseAddressMeta {
   const { metas, addAddress, setAccountName, isLocalAccount } = useAccount();
+  const { chain } = useApi();
   const source = useAccountSource(value);
   const _meta = metas[value || ''];
 
@@ -44,7 +46,7 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
 
       try {
         if (isLocalAccount(value) && !source) {
-          await service.updateAccountName(addressToHex(value), name);
+          await service.updateAccountName(chain, addressToHex(value), name);
           setAccountName(value, name);
           cb?.(name);
         } else {
@@ -55,7 +57,7 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
         toastError(error);
       }
     },
-    [source, isLocalAccount, meta.name, name, setAccountName, addAddress, value]
+    [chain, source, isLocalAccount, meta.name, name, setAccountName, addAddress, value]
   );
 
   return {
