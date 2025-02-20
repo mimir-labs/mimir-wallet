@@ -631,8 +631,8 @@ export const solochainEndpoints: Endpoint[] = [
     genesisHash: '0x8c24aac175a803c999b25e1cdd89fefcf2ce6af24e27aa9b773463a7fa88c385',
     ss58Format: 42,
     serviceUrl: 'https://5ire-api.mimir.global/',
-    socketUrl: 'wss://5ire-api.mimir.global/',
-    explorerUrl: 'https://5irescan.io/'
+    socketUrl: 'wss://5ire-api.mimir.global/'
+    // explorerUrl: 'https://5irescan.io/'
   }
 ];
 
