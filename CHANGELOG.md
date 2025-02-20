@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.14.0...v1.15.0) (2025-02-20)
+
+
+### Features
+
+* remove 5ire explorer due to malicious explorer ([#145](https://github.com/mimir-labs/mimir-wallet/issues/145)) ([a74bf34](https://github.com/mimir-labs/mimir-wallet/commit/a74bf34ace900a5ad8e0d08f94b98ec24759ab45))
+
 ## [1.14.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.13.1...v1.14.0) (2025-02-18)
 
 
