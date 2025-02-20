@@ -618,22 +618,22 @@ export const solochainEndpoints: Endpoint[] = [
     serviceUrl: 'https://zkverify-testnet-api.mimir.global/',
     socketUrl: 'wss://zkverify-testnet-api.mimir.global/',
     explorerUrl: 'https://zkverify-explorer.zeeve.net/'
+  },
+  {
+    key: '5ire',
+    icon: '/chain-icons/5ire.svg',
+    tokenIcon: '/token-icons/5IRE.webp',
+    name: '5ire',
+    wsUrl: {
+      '5ire': 'wss://rpc.5ire.network'
+    },
+    httpUrl: 'https://rpc.5ire.network/',
+    genesisHash: '0x8c24aac175a803c999b25e1cdd89fefcf2ce6af24e27aa9b773463a7fa88c385',
+    ss58Format: 42,
+    serviceUrl: 'https://5ire-api.mimir.global/',
+    socketUrl: 'wss://5ire-api.mimir.global/'
+    // explorerUrl: 'https://5irescan.io/'
   }
-  // {
-  //   key: '5ire',
-  //   icon: '/chain-icons/5ire.svg',
-  //   tokenIcon: '/token-icons/5IRE.webp',
-  //   name: '5ire',
-  //   wsUrl: {
-  //     '5ire': 'wss://rpc.5ire.network'
-  //   },
-  //   httpUrl: 'https://rpc.5ire.network/',
-  //   genesisHash: '0x8c24aac175a803c999b25e1cdd89fefcf2ce6af24e27aa9b773463a7fa88c385',
-  //   ss58Format: 42,
-  //   serviceUrl: 'https://5ire-api.mimir.global/',
-  //   socketUrl: 'wss://5ire-api.mimir.global/',
-  //   explorerUrl: 'https://5irescan.io/'
-  // }
 ];
 
 export const allEndpoints = polkadotEndpoints.concat(kusamaEndpoints).concat(paseoEndpoints).concat(solochainEndpoints);
