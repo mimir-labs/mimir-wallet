@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HexString } from '@polkadot/util/types';
 import type { DappOption, Endpoint } from '@mimir-wallet/config';
 
 import {
@@ -35,11 +34,11 @@ interface Props {
 }
 
 function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
-  const { genesisHash } = useApi();
+  const { network } = useApi();
   const navigate = useNavigate();
   const [detailsOpen, toggleOpen, setDetailsOpen] = useToggle();
   const [isDrawerOpen, toggleDrawerOpen, setDrawerOpen] = useToggle();
-  const [switchChain, setSwitchChain] = useState<HexString>();
+  const [switchChain, setSwitchChain] = useState<string>();
   const [element, setElement] = useState<JSX.Element>();
   const _isFavorite = useMemo(() => isFavorite(dapp.id), [dapp.id, isFavorite]);
   const toggleFavorite = useCallback(
@@ -59,10 +58,12 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
     setDetailsOpen(false);
 
     if (!dapp.isDrawer) {
-      if (dapp.destChain && dapp.destChain[genesisHash]) {
-        setSwitchChain(dapp.destChain[genesisHash]);
+      if (dapp.destChain && dapp.destChain[network]) {
+        setSwitchChain(dapp.destChain[network]);
       } else {
-        navigate(`/explorer/${encodeURIComponent(dapp.url)}`);
+        const url = dapp.urlSearch?.(network) || dapp.url;
+
+        navigate(`/explorer/${encodeURIComponent(url)}?network=${network}`);
       }
     } else {
       dapp.Component?.().then((C) => {
@@ -74,13 +75,15 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
         );
       });
     }
-  }, [dapp, genesisHash, navigate, setDetailsOpen, setDrawerOpen, setSwitchChain]);
+  }, [dapp, network, navigate, setDetailsOpen, setDrawerOpen, setSwitchChain]);
 
   const handleSwitchChain = useCallback(
     (endpoint: Endpoint) => {
-      window.location.href = `/explorer/${encodeURIComponent(dapp.url)}?network=${endpoint.key}`;
+      const url = dapp.urlSearch?.(endpoint.key) || dapp.url;
+
+      window.location.href = `/explorer/${encodeURIComponent(url)}?network=${endpoint.key}`;
     },
-    [dapp.url]
+    [dapp]
   );
 
   return (
@@ -104,7 +107,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
       {switchChain && (
         <SwitchChain
           open={!!switchChain}
-          genesisHash={switchChain}
+          network={switchChain}
           onClose={() => setSwitchChain(undefined)}
           onOpen={handleSwitchChain}
         />
@@ -129,7 +132,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box sx={{ flex: '1' }}>
-              <Avatar src={dapp.icon} sx={{ width: 32, height: 32 }} />
+              <Avatar variant='square' src={dapp.icon} sx={{ width: 32, height: 32 }} />
             </Box>
             <Button
               onClick={(e) => {

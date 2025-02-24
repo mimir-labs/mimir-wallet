@@ -4,11 +4,11 @@
 import { Box, Button, CircularProgress, Grid2 as Grid, Popover, Stack, Typography } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 
-import { findEndpoint, groupedEndpoints } from '@mimir-wallet/config';
+import { allEndpoints, groupedEndpoints } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 
 function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
-  const { genesisHash, isApiReady, network } = useApi();
+  const { isApiReady, network } = useApi();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -20,7 +20,7 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
     setAnchorEl(null);
   };
 
-  const endpoint = useMemo(() => findEndpoint(genesisHash), [genesisHash]);
+  const endpoint = useMemo(() => allEndpoints.find((item) => item.key === network), [network]);
   const groupEndpoints = useMemo(() => groupedEndpoints(), []);
 
   return (

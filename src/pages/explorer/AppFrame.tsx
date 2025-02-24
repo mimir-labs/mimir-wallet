@@ -6,20 +6,18 @@ import { useMemo, useRef, useState } from 'react';
 
 import { useSelectedAccount } from '@mimir-wallet/accounts/useSelectedAccount';
 import { AppIframe } from '@mimir-wallet/components';
-import { useApi } from '@mimir-wallet/hooks/useApi';
 
 import PendingTx from './PendingTx';
 import { useCommunicator } from './useCommunicator';
 
 function AppFrame({ url, iconUrl, appName }: { url: string; iconUrl?: string; appName?: string }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const { apiUrl } = useApi();
   const [loading, setLoading] = useState(true);
   const selected = useSelectedAccount();
 
   const appUrl = useMemo(() => {
-    return `${url}?rpc=${encodeURIComponent(Array.isArray(apiUrl) ? apiUrl[0] : apiUrl)}`;
-  }, [apiUrl, url]);
+    return `${url}`;
+  }, [url]);
 
   useCommunicator(iframeRef, appUrl, iconUrl, appName);
 

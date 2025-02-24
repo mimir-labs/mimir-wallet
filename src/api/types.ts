@@ -22,7 +22,6 @@ export interface ApiState {
 
 export interface ApiProps extends ApiState {
   api: ApiPromise;
-  apiUrl: string | string[];
   apiError: string | null;
   isApiInitialized: boolean;
   network: string;
