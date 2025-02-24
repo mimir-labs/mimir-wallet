@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Badge, Box, IconButton, Popover, SvgIcon, SwipeableDrawer } from '@mui/material';
+import { Badge, Box, IconButton, Popover, SvgIcon, SwipeableDrawer, Tooltip } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 import { useToggle } from 'react-use';
 
@@ -54,19 +54,21 @@ function BatchButton() {
           }
         }}
       >
-        <IconButton
-          ref={anchorEl}
-          sx={{
-            border: '1px solid',
-            borderColor: 'secondary.main',
-            borderRadius: 1,
-            ':hover': { bgcolor: 'primary.main', color: 'primary.contrastText' }
-          }}
-          color='primary'
-          onClick={toggleDrawerOpen}
-        >
-          <SvgIcon inheritViewBox component={IconBatch} />
-        </IconButton>
+        <Tooltip title='Cache'>
+          <IconButton
+            ref={anchorEl}
+            sx={{
+              border: '1px solid',
+              borderColor: 'secondary.main',
+              borderRadius: 1,
+              ':hover': { bgcolor: 'primary.main', color: 'primary.contrastText' }
+            }}
+            color='primary'
+            onClick={toggleDrawerOpen}
+          >
+            <SvgIcon inheritViewBox component={IconBatch} />
+          </IconButton>
+        </Tooltip>
       </Badge>
 
       <Popover

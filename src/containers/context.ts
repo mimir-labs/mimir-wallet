@@ -5,9 +5,13 @@ import { createContext } from 'react';
 
 export interface State {
   sidebarOpen: boolean;
-  alertOpen: boolean;
+  rightSidebarOpen: boolean;
+  rightSidebarElement: React.ReactNode;
   openSidebar: () => void;
   closeSidebar: () => void;
+  openRightSidebar: () => void;
+  closeRightSidebar: () => void;
+  setRightSidebarElement: (element: React.ReactNode) => void;
 }
 
 export const BaseContainerCtx = createContext<State>({} as State);

@@ -18,6 +18,7 @@ import { useWallet } from '@mimir-wallet/wallet/useWallet';
 import AddAddressBook from './AddAddressBook';
 import { BaseContainerCtx } from './context';
 import Initializing from './Initializing';
+import RightSideBar from './RightSideBar';
 import SideBar from './SideBar';
 import SubscribeTx from './SubscribeTx';
 import ToggleAlert from './ToggleAlert';
@@ -39,14 +40,27 @@ function BaseContainer({
   const { current, isMultisigSyned } = useAccount();
   const { queue } = useTxQueue();
   const [sidebarOpen, , setSidebarOpen] = useToggle(false);
+  const [rightSidebarOpen, , setRightSidebarOpen] = useToggle(false);
   const [alertOpen, setAlertOpen] = useState<boolean>(true);
+  const [rightSidebarElement, setRightSidebarElement] = useState<React.ReactNode>(null);
 
   const openSidebar = useCallback(() => setSidebarOpen(true), [setSidebarOpen]);
   const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
+  const openRightSidebar = useCallback(() => setRightSidebarOpen(true), [setRightSidebarOpen]);
+  const closeRightSidebar = useCallback(() => setRightSidebarOpen(false), [setRightSidebarOpen]);
 
   const value = useMemo(
-    () => ({ alertOpen, sidebarOpen, openSidebar, closeSidebar }),
-    [alertOpen, closeSidebar, openSidebar, sidebarOpen]
+    () => ({
+      sidebarOpen,
+      rightSidebarOpen,
+      openSidebar,
+      closeSidebar,
+      openRightSidebar,
+      closeRightSidebar,
+      rightSidebarElement,
+      setRightSidebarElement
+    }),
+    [closeRightSidebar, closeSidebar, openRightSidebar, openSidebar, rightSidebarElement, rightSidebarOpen, sidebarOpen]
   );
 
   useFollowAccounts();
@@ -63,7 +77,6 @@ function BaseContainer({
       <TxToast />
       <AccountConsumer />
       <AddAddressBook />
-
       <SwitchAccountDialog />
 
       <TopBar />
@@ -114,6 +127,8 @@ function BaseContainer({
               <TxSubmit {...queue[0]} />
             </Box>
           ) : null}
+
+          <RightSideBar offsetTop={alertOpen ? 36 : 0} />
         </Box>
       ) : (
         <Initializing />

@@ -47,7 +47,7 @@ function AccountSelect({ accounts, disabled, onClick, title, type }: Props) {
             <AddressRow iconSize={24} value={account} />
             {addressEq(hexToU8a('0x0', 256), account) && (
               <Tooltip title='The SS58 address for 0x0000000000000000000000000000000000000000000000000000000000000000 which cannot be controlled.'>
-                <SvgIcon color='primary' component={IconQuestion} inheritViewBox sx={{ opacity: 0.5 }} />
+                <SvgIcon color='primary' component={IconQuestion} inheritViewBox />
               </Tooltip>
             )}
             <IconButton

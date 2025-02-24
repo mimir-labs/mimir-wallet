@@ -14,11 +14,20 @@ import { useApi } from '@mimir-wallet/hooks/useApi';
 
 import BatchButton from './BatchButton';
 import { BaseContainerCtx } from './context';
+import TemplateButton from './TemplateButton';
 
 function TopBar() {
   const { isApiReady } = useApi();
   const { pathname } = useLocation();
-  const { closeSidebar, openSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const {
+    closeSidebar,
+    openSidebar,
+    sidebarOpen,
+    rightSidebarOpen,
+    openRightSidebar,
+    closeRightSidebar,
+    setRightSidebarElement
+  } = useContext(BaseContainerCtx);
   const isInAppPage = pathname.startsWith('/explorer');
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
@@ -51,6 +60,14 @@ function TopBar() {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: { sm: 2, xs: 1 } }}>
         {isApiReady && isInAppPage && <AccountSelect />}
         {/* <Notification /> */}
+        {isApiReady && (
+          <TemplateButton
+            setElement={setRightSidebarElement}
+            isOpen={rightSidebarOpen}
+            open={openRightSidebar}
+            close={closeRightSidebar}
+          />
+        )}
         {isApiReady && <BatchButton />}
         <ChainSelect onlyLogo={isInAppPage && downSm} />
         {isApiReady && (

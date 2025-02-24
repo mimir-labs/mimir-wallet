@@ -9,6 +9,7 @@ import { isArray } from '@polkadot/util';
 import BatchIcon from '@mimir-wallet/assets/images/batch.svg';
 import Failed from '@mimir-wallet/assets/images/failed.svg';
 import LogoCircle from '@mimir-wallet/assets/svg/logo-circle.svg';
+import TemplateIcon from '@mimir-wallet/assets/svg/template.svg';
 
 export interface DappOption {
   // (1 - 500) is internal app
@@ -121,6 +122,14 @@ export const dapps: DappOption[] = [
     name: 'Remove Account',
     description: 'Remove Account',
     url: 'mimir://internal/remove-account',
+    supportedChains: true
+  },
+  {
+    id: 508,
+    icon: TemplateIcon,
+    name: 'Template',
+    description: 'Template',
+    url: 'mimir://internal/template',
     supportedChains: true
   },
   {

@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import './style.css';
+
 import moment from 'moment';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';

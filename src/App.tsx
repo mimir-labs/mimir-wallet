@@ -10,6 +10,7 @@ import PageAddressBook from './pages/address-book';
 import PageCreateMultisig from './pages/create-multisig';
 import PageDapp from './pages/dapp';
 import PageExplorer from './pages/explorer';
+import PageExtrinsic from './pages/extrinsic';
 import PageProfile from './pages/profile';
 import PageWelcome from './pages/profile/Welcome';
 import PageSetting from './pages/setting';
@@ -63,6 +64,10 @@ function App() {
           {
             path: '/account-setting',
             element: <PageSetting type='account' />
+          },
+          {
+            path: '/extrinsic',
+            element: <PageExtrinsic />
           }
         ]
       },

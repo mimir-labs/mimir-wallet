@@ -6,7 +6,8 @@ import type { CallProps } from '../types';
 
 import { getTypeDef } from '@polkadot/types';
 import React, { useEffect, useState } from 'react';
-import ReactJson from 'react-json-view';
+
+import JsonView from '@mimir-wallet/components/JsonView';
 
 import Param from '../Param';
 import Item from '../Param/Item';
@@ -41,7 +42,7 @@ function FunctionArgs({ registry, call, jsonFallback, displayType }: CallProps) 
           />
         ))
       ) : jsonFallback ? (
-        <ReactJson enableClipboard indentWidth={2} src={call.toHuman() as any} theme='summerfruit:inverted' />
+        <JsonView data={call.toHuman()} />
       ) : null}
     </>
   ) : null;

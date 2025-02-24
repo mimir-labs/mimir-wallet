@@ -99,7 +99,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
           <AddressName value={address} /> {isUnLock ? 'unlock' : 'lock'}
           <Tooltip title={tip}>
-            <SvgIcon color='primary' component={IconQuestion} inheritViewBox sx={{ opacity: 0.5 }} />
+            <SvgIcon color='primary' component={IconQuestion} inheritViewBox />
           </Tooltip>
         </Box>
       </Alert>

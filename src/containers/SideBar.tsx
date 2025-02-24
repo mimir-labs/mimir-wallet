@@ -322,7 +322,9 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
             flexDirection: 'column',
             width: 222,
             height: `calc(100dvh - ${offsetTop}px - 1px - 56px)`,
-            bgcolor: 'background.paper'
+            bgcolor: 'background.paper',
+            borderRight: '1px solid',
+            borderColor: 'divider'
           }}
         >
           <Box sx={{ flex: 1, overflowY: 'auto', paddingX: 1.5, paddingY: 2 }}>{element}</Box>

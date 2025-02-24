@@ -26,7 +26,7 @@ function Item({ content, name, type = 'horizontal' }: Props) {
       <Grid sx={{ display: 'flex', alignItems: 'center', fontWeight: 700 }} size={2}>
         {name}
       </Grid>
-      <Grid sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }} size={8}>
+      <Grid sx={{ display: 'flex', alignItems: 'center', minHeight: 28, color: 'text.secondary' }} size={8}>
         {content}
       </Grid>
     </Grid>

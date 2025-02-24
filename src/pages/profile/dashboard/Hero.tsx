@@ -106,6 +106,17 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
       >
         Proxy
       </Button>
+      <Button
+        component={Link}
+        to='/extrinsic'
+        variant='outlined'
+        color='primary'
+        size='small'
+        endIcon={<SvgIcon component={IconProxy} inheritViewBox />}
+        sx={{ height: 26, gridColumn: 'span 1 / span 1' }}
+      >
+        Extransic
+      </Button>
     </Box>
   );
 

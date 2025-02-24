@@ -4,11 +4,13 @@
 import type { IMethod } from '@polkadot/types/types';
 import type { Transaction } from '@mimir-wallet/hooks/types';
 
-import { Box, Divider, Grid2 as Grid, Stack } from '@mui/material';
+import { Box, Button, Divider, Grid2 as Grid, Stack, SvgIcon } from '@mui/material';
 import moment from 'moment';
 import React from 'react';
 
+import IconTemplate from '@mimir-wallet/assets/svg/icon-template.svg?react';
 import { AppName, Bytes, Hash } from '@mimir-wallet/components';
+import { events } from '@mimir-wallet/events';
 import { useToggle } from '@mimir-wallet/hooks/useToggle';
 
 import Target from './Target';
@@ -36,6 +38,8 @@ function Extrinsic({
   call?: IMethod | null;
 }) {
   const [isOpen, toggleOpen] = useToggle(defaultOpen);
+
+  const txCallHex = transaction.call;
 
   return (
     <>
@@ -71,7 +75,27 @@ function Extrinsic({
         {isOpen && (
           <>
             <Item title='Call Hash' content={<Hash value={transaction.callHash} withCopy />} />
-            {transaction.call && <Item title='Call Data' content={<Bytes value={transaction.call} />} />}
+            {txCallHex && (
+              <Item
+                title='Call Data'
+                content={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Bytes value={txCallHex} />
+                    <Button
+                      variant='outlined'
+                      size='small'
+                      endIcon={
+                        <SvgIcon sx={{ fontSize: '0.75rem !important' }} inheritViewBox component={IconTemplate} />
+                      }
+                      sx={{ paddingX: 1, paddingY: 0.3, fontSize: '0.75rem' }}
+                      onClick={() => events.emit('template_add', txCallHex)}
+                    >
+                      + Template
+                    </Button>
+                  </Box>
+                }
+              />
+            )}
             {transaction.note && <Item title='Note' content={transaction.note} />}
             <Item title='Created Block' content={transaction.createdBlock} />
             <Item title='Created Time' content={moment(transaction.createdAt).format()} />
