@@ -273,6 +273,17 @@ export const dapps: DappOption[] = [
     },
     tags: ['Identity'],
     matrix: 'https://matrix.to/#/#polkaidentity:matrix.org'
+  },
+  {
+    id: 1009,
+    icon: '/dapp-icons/bounty.jpeg',
+    name: 'Bounty Manager',
+    description: 'The go-to tool for curators to execute their bounty duties and users to explore bounties.',
+    url: 'https://bountymanager.io/',
+    supportedChains: ['0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3'],
+    tags: ['Bounty', 'Tool'],
+    website: 'https://bountymanager.io/',
+    github: 'https://github.com/galaniprojects/Polkadot-Bounty-Manager'
   }
 ];
 
