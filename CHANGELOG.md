@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.15.0...v1.16.0) (2025-02-24)
+
+
+### Features
+
+* Add bounty manager app support ([#147](https://github.com/mimir-labs/mimir-wallet/issues/147)) ([493adf0](https://github.com/mimir-labs/mimir-wallet/commit/493adf0714905f594b73d152307c3f8acd1e3731))
+
 ## [1.15.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.14.0...v1.15.0) (2025-02-20)
 
 
