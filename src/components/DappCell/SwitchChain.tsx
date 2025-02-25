@@ -1,8 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HexString } from '@polkadot/util/types';
-
 import {
   Avatar,
   Box,
@@ -16,17 +14,17 @@ import {
 } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { type Endpoint, findEndpoint } from '@mimir-wallet/config';
+import { allEndpoints, type Endpoint } from '@mimir-wallet/config';
 
 interface Props {
-  genesisHash: HexString;
+  network: string;
   open: boolean;
   onClose: () => void;
   onOpen: (network: Endpoint) => void;
 }
 
-function SwitchChain({ genesisHash, onClose, onOpen, open }: Props) {
-  const endpoint = useMemo(() => findEndpoint(genesisHash), [genesisHash]);
+function SwitchChain({ network, onClose, onOpen, open }: Props) {
+  const endpoint = useMemo(() => allEndpoints.find((item) => item.key === network), [network]);
 
   return (
     <Dialog fullWidth maxWidth='xs' onClose={onClose} open={open}>

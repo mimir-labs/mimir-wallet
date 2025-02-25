@@ -41,12 +41,12 @@ export function useDapp(website?: string | null): DappOption | undefined {
 }
 
 export function useDapps(): UseDapps {
-  const { api } = useApi();
+  const { network } = useApi();
   const [favoriteIds, setFavoriteIds] = useLocalStore<number[]>(FAVORITE_DAPP_KEY, []);
 
   const dapps = useMemo(
-    () => findSupportedDapps(api).filter((item) => !item.url.startsWith('mimir://internal')),
-    [api]
+    () => findSupportedDapps(network).filter((item) => !item.url.startsWith('mimir://internal')),
+    [network]
   );
   const favorites = useMemo(() => dapps.filter((item) => favoriteIds.includes(item.id)), [dapps, favoriteIds]);
 

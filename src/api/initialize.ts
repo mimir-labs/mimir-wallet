@@ -142,7 +142,6 @@ export async function initializeApi(chain: Endpoint) {
     api: statics.api,
     chainSS58: chain.ss58Format,
     genesisHash: chain.genesisHash,
-    apiUrl: Object.values(chain.wsUrl),
     network: chain.key,
     chain: chain
   });

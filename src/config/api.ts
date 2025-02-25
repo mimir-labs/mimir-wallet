@@ -646,7 +646,3 @@ export function groupedEndpoints(): Record<string, Endpoint[]> {
     paseo: paseoEndpoints
   };
 }
-
-export function findEndpoint(genesisHash: string): Endpoint | undefined {
-  return allEndpoints.find((item) => item.genesisHash === genesisHash);
-}
