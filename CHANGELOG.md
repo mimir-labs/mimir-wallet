@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.16.0...v1.17.0) (2025-02-25)
+
+
+### Features
+
+* add dot console support and custom url search for apps ([#150](https://github.com/mimir-labs/mimir-wallet/issues/150)) ([0319f22](https://github.com/mimir-labs/mimir-wallet/commit/0319f224b09682f69d11e729808831f62b742c69))
+
 ## [1.16.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.15.0...v1.16.0) (2025-02-24)
 
 
