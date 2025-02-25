@@ -22,7 +22,7 @@ import IconDiscord from '@mimir-wallet/assets/svg/icon-discord.svg?react';
 import IconGithub from '@mimir-wallet/assets/svg/icon-github.svg?react';
 import IconWebsite from '@mimir-wallet/assets/svg/icon-website.svg?react';
 import IconX from '@mimir-wallet/assets/svg/icon-x.svg?react';
-import { type DappOption, findEndpoint } from '@mimir-wallet/config';
+import { allEndpoints, type DappOption } from '@mimir-wallet/config';
 
 interface Props {
   open: boolean;
@@ -36,10 +36,10 @@ function SupportedChains({ supported }: { supported: string[] | true }) {
     <Box sx={{ position: 'absolute', right: 0, top: 0, display: 'flex', alignItems: 'center' }}>
       <Typography marginRight={1}>Supported on</Typography>
       {isArray(supported)
-        ? supported.map((genesisHash) => (
+        ? supported.map((network) => (
             <Avatar
-              key={genesisHash}
-              src={findEndpoint(genesisHash)?.icon}
+              key={network}
+              src={allEndpoints.find((item) => item.key === network)?.icon}
               sx={{
                 width: 16,
                 height: 16,
@@ -60,7 +60,7 @@ function Contents({ dapp }: { dapp: DappOption }) {
     <DialogContent>
       <Stack spacing={1} sx={{ position: 'relative', overflow: 'hidden' }}>
         <SupportedChains supported={dapp.supportedChains} />
-        <Avatar src={dapp.icon} sx={{ width: 64, height: 64 }} />
+        <Avatar variant='square' src={dapp.icon} sx={{ width: 64, height: 64 }} />
         <Typography variant='h3'>{dapp.name}</Typography>
         <Box
           sx={{ display: 'flex', alignItems: 'center', gap: 1, '>.MuiIconButton-root': { bgcolor: 'secondary.main' } }}

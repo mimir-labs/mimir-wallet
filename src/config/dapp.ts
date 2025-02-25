@@ -1,14 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ApiPromise } from '@polkadot/api';
-import type { HexString } from '@polkadot/util/types';
-
 import { isArray } from '@polkadot/util';
 
 import BatchIcon from '@mimir-wallet/assets/images/batch.svg';
 import Failed from '@mimir-wallet/assets/images/failed.svg';
 import LogoCircle from '@mimir-wallet/assets/svg/logo-circle.svg';
+
+import { allEndpoints } from './api';
 
 export interface DappOption {
   // (1 - 500) is internal app
@@ -19,8 +18,8 @@ export interface DappOption {
   name: string;
   description: string;
   url: string;
-  supportedChains: true | HexString[];
-  destChain?: Record<HexString, HexString>;
+  supportedChains: true | string[];
+  destChain?: Record<string, string>;
   tags?: string[];
   website?: string;
   twitter?: string;
@@ -29,6 +28,7 @@ export interface DappOption {
   matrix?: string;
   isDrawer?: boolean;
   Component?: () => Promise<React.ComponentType>; // only for mimir://dapp/*
+  urlSearch?: (network: string) => string;
 }
 
 export const dapps: DappOption[] = [
@@ -132,19 +132,16 @@ export const dapps: DappOption[] = [
     supportedChains: true,
     tags: ['Wallet', 'Tool'],
     website: 'https://polkadot.js.org/',
-    github: 'https://github.com/polkadot-js'
-  },
-  {
-    id: 1001,
-    icon: '/dapp-icons/subsquare.svg',
-    name: 'Subsquare(Rococo)',
-    description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
-    url: 'https://rococo.subsquare.io/',
-    supportedChains: ['0x6408de7737c59c238890533af25896a2c20608d8b380bb01029acb392781063e'],
-    tags: ['Governance'],
-    website: 'https://www.subsquare.io/',
-    twitter: 'https://twitter.com/OpensquareN',
-    github: 'https://github.com/opensquare-network'
+    github: 'https://github.com/polkadot-js',
+    urlSearch(network) {
+      const wsUrl = allEndpoints.find((item) => item.key === network)?.wsUrl;
+
+      if (!wsUrl) {
+        return this.url;
+      }
+
+      return `${this.url}?rpc=${encodeURIComponent(Object.values(wsUrl)[0])}`;
+    }
   },
   {
     id: 1002,
@@ -152,7 +149,7 @@ export const dapps: DappOption[] = [
     name: 'Subsquare(Polkadot)',
     description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
     url: 'https://polkadot.subsquare.io/',
-    supportedChains: ['0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3'],
+    supportedChains: ['polkadot'],
     tags: ['Governance'],
     website: 'https://www.subsquare.io/',
     twitter: 'https://twitter.com/OpensquareN',
@@ -164,7 +161,7 @@ export const dapps: DappOption[] = [
     name: 'Subsquare(Kusama)',
     description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
     url: 'https://kusama.subsquare.io/',
-    supportedChains: ['0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'],
+    supportedChains: ['kusama'],
     tags: ['Governance'],
     website: 'https://www.subsquare.io/',
     twitter: 'https://twitter.com/OpensquareN',
@@ -177,10 +174,7 @@ export const dapps: DappOption[] = [
     description:
       'Polkadot Staking Dashboard is the easiest way to stake DOT, check validator stats, manage your nominations and join nomination pools.',
     url: 'https://staking.mimir.global/',
-    supportedChains: [
-      '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
-      '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'
-    ],
+    supportedChains: ['polkadot', 'kusama'],
     tags: ['Staking'],
     website: 'https://staking.polkadot.network/',
     github: 'https://github.com/paritytech/polkadot-staking-dashboard'
@@ -192,13 +186,7 @@ export const dapps: DappOption[] = [
     description:
       'The Bifrost App integrates operations such as cross-chain transfers, swaps, and Yield Farming, providing vital liquidity and asset management services for the Polkadot ecosystem. This makes Bifrost an indispensable part of the Polkadot ecosystem.',
     url: 'https://bifrost.app/',
-    supportedChains: [
-      '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
-      '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
-      '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
-      '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed',
-      '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f'
-    ],
+    supportedChains: ['polkadot', 'bifrost-polkadot', 'kusama', 'bifrost-kusama', 'assethub-polkadot'],
     tags: ['Defi'],
     website: 'https://bifrost.finance/',
     github: 'https://github.com/bifrost-finance'
@@ -210,7 +198,7 @@ export const dapps: DappOption[] = [
     description:
       "Crust Files is the world's first Web 3.0 personal file storage application, launched by Crust Network. The Crust Files application enables safe storage of your personal files on IPFS, secured by the Crust Network public blockchain.",
     url: 'https://crustfiles.io/',
-    supportedChains: ['0x8b404e7ed8789d813982b9cb4c8b664c05b3fbf433309f603af014ec9ce56a8c'],
+    supportedChains: ['crust'],
     tags: ['Defi'],
     website: 'https://crust.network/',
     twitter: 'https://x.com/CrustNetwork',
@@ -224,10 +212,7 @@ export const dapps: DappOption[] = [
     description:
       'Avail Staking Dashboard is the easiest way to stake AVAIL, check validator stats, manage your nominations and join nomination pools. Stake on Avail (AVAIL).',
     url: 'https://staking.avail.tools/#/overview',
-    supportedChains: [
-      '0xb91746b45e0346cc2f815a520b9c6cb4d5c0902af848db0a80f85932d2e8276a',
-      '0xd3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70'
-    ],
+    supportedChains: ['avail', 'avail-turing'],
     tags: ['Staking'],
     website: 'https://www.availproject.org/',
     twitter: 'https://x.com/AvailProject',
@@ -243,33 +228,26 @@ export const dapps: DappOption[] = [
     url: 'https://app.polkaidentity.com/',
     supportedChains: [
       // polkadot
-      '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
-      '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f',
-      '0xefb56e30d9b4a24099f88820987d0f45fb645992416535d87650d98e00f46fc4',
-      '0x46ee89aa2eedd13e988962630ec9fb7565964cf5023bb351f2b6b25c1b68b0b2',
-      '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
+      'polkadot',
+      'assethub-polkadot',
+      'coretime-polkadot',
+      'collectives-polkadot',
+      'people-polkadot',
       // kusama
-      '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
-      '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a',
-      '0x638cd2b9af4b3bb54b8c1f0d22711fc89924ca93300f0caf25a580432b29d050',
-      '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f'
+      'kusama',
+      'assethub-kusama',
+      'coretime-kusama',
+      'people-kusama'
     ],
     destChain: {
-      '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3':
-        '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
-      '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f':
-        '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
-      '0xefb56e30d9b4a24099f88820987d0f45fb645992416535d87650d98e00f46fc4':
-        '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
-      '0x46ee89aa2eedd13e988962630ec9fb7565964cf5023bb351f2b6b25c1b68b0b2':
-        '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
+      polkadot: 'people-polkadot',
+      'assethub-polkadot': 'people-polkadot',
+      'coretime-polkadot': 'people-polkadot',
+      'collectives-polkadot': 'people-polkadot',
       // kusama
-      '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe':
-        '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f',
-      '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a':
-        '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f',
-      '0x638cd2b9af4b3bb54b8c1f0d22711fc89924ca93300f0caf25a580432b29d050':
-        '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f'
+      kusama: 'people-kusama',
+      'assethub-kusama': 'people-kusama',
+      'coretime-kusama': 'people-kusama'
     },
     tags: ['Identity'],
     matrix: 'https://matrix.to/#/#polkaidentity:matrix.org'
@@ -280,15 +258,55 @@ export const dapps: DappOption[] = [
     name: 'Bounty Manager',
     description: 'The go-to tool for curators to execute their bounty duties and users to explore bounties.',
     url: 'https://bountymanager.io/',
-    supportedChains: ['0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3'],
+    supportedChains: ['polkadot'],
     tags: ['Bounty', 'Tool'],
     website: 'https://bountymanager.io/',
     github: 'https://github.com/galaniprojects/Polkadot-Bounty-Manager'
+  },
+  {
+    id: 1010,
+    icon: '/dapp-icons/dot-console.svg',
+    name: 'ĐÓTConsole',
+    description: 'Substrate development console.',
+    url: 'https://dotconsole.app',
+    supportedChains: [
+      'polkadot',
+      'assethub-polkadot',
+      'coretime-polkadot',
+      'collectives-polkadot',
+      'people-polkadot',
+      'hydration',
+      'kusama',
+      'assethub-kusama',
+      'people-kusama',
+      'paseo'
+    ],
+    tags: ['Utility', 'Tool'],
+    website: 'https://dotconsole.app/',
+    github: 'https://github.com/tien/dot-console',
+    urlSearch(network) {
+      const chain = {
+        polkadot: 'polkadot',
+        'assethub-polkadot': 'polkadot-asset-hub',
+        'coretime-polkadot': 'polkadot-coretime',
+        'collectives-polkadot': 'polkadot-collectives',
+        'people-polkadot': 'polkadot-people',
+        hydration: 'hydration',
+        kusama: 'kusama',
+        'assethub-kusama': 'kusama-asset-hub',
+        'people-kusama': 'kusama-people',
+        paseo: 'paseo'
+      }[network];
+
+      if (!chain) {
+        return this.url;
+      }
+
+      return `${this.url}?chain=${chain}`;
+    }
   }
 ];
 
-export function findSupportedDapps(api: ApiPromise): DappOption[] {
-  return dapps.filter((item) =>
-    isArray(item.supportedChains) ? item.supportedChains.includes(api.genesisHash.toHex()) : true
-  );
+export function findSupportedDapps(network: string): DappOption[] {
+  return dapps.filter((item) => (isArray(item.supportedChains) ? item.supportedChains.includes(network) : true));
 }
