@@ -200,14 +200,18 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
             borderRadius: 9999
           })}
         >
-          {isAll ? (
-            'All'
-          ) : assetId !== null ? (
+          {assetId !== null ? (
             assetInfo ? (
-              <FormatBalance value={value} withCurrency format={[assetInfo.decimals, assetInfo.symbol]} />
+              isAll ? (
+                `All ${assetInfo.symbol}`
+              ) : (
+                <FormatBalance value={value} withCurrency format={[assetInfo.decimals, assetInfo.symbol]} />
+              )
             ) : (
               <Skeleton variant='text' sx={{ width: 50 }} />
             )
+          ) : isAll ? (
+            'All'
           ) : (
             <FormatBalance value={value} withCurrency />
           )}

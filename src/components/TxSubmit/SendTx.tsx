@@ -137,7 +137,7 @@ function SendTx({
                 <SvgIcon color='primary' component={IconClock} inheritViewBox sx={{ opacity: 0.5 }} />
                 <Typography>Review window</Typography>
                 <Tooltip title='This transaction needs to be executed manually after review window ends.'>
-                  <SvgIcon color='primary' component={IconQuestion} inheritViewBox sx={{ opacity: 0.5 }} />
+                  <SvgIcon color='primary' component={IconQuestion} inheritViewBox />
                 </Tooltip>
               </Box>
 

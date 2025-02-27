@@ -26,7 +26,7 @@ async function getBalances({ queryKey }: { queryKey: [ApiPromise, string | undef
     reserved: account.data.reserved,
     locked: account.data.frozen,
     free: account.data.free,
-    transferrable: account.data.free.sub(account.data.frozen)
+    transferrable: account.data.free.add(account.data.reserved).sub(account.data.frozen)
   }));
 }
 
@@ -90,7 +90,7 @@ async function getAssetBalances({
               free: result.free,
               locked: result.frozen,
               reserved: result.reserved,
-              transferrable: result.free.sub(result.frozen),
+              transferrable: result.free.add(result.reserved).sub(result.frozen),
               account: address.toString()
             }))
             .filter((result, index) => result.free.add(result.reserved).gt(BN_ZERO) || !!allAssets[index].icon);

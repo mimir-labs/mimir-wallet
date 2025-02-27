@@ -11,10 +11,6 @@ function GlobalStyle() {
       <CssBaseline />
       <GlobalStyles
         styles={({ palette }) => ({
-          '@font-face': {
-            'font-family': 'Sofia Sans Semi Condensed',
-            src: "url('/fonts/SofiaSansSemiCondensed-VariableFont_wght.ttf')"
-          },
           'body,html': {
             lineHeight: 1.1
           },

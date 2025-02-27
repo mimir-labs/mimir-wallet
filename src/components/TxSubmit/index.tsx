@@ -25,6 +25,8 @@ import { useQueryAccount } from '@mimir-wallet/accounts/useQueryAccount';
 import { encodeAddress } from '@mimir-wallet/api';
 import IconBatch from '@mimir-wallet/assets/svg/icon-batch.svg?react';
 import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
+import IconTemplate from '@mimir-wallet/assets/svg/icon-template.svg?react';
+import { events } from '@mimir-wallet/events';
 import { useBatchTxs } from '@mimir-wallet/hooks/useBatchTxs';
 import { useFilterPaths } from '@mimir-wallet/hooks/useFilterPaths';
 import { useAccountSource, useWallet } from '@mimir-wallet/wallet/useWallet';
@@ -104,6 +106,10 @@ function TxSubmit({
     ]);
     onClose?.();
   }, [addTx, appName, call, iconUrl, onClose, website]);
+
+  const handleAddTemplate = useCallback(() => {
+    events.emit('template_add', call.toHex());
+  }, [call]);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -253,6 +259,18 @@ function TxSubmit({
               startIcon={<SvgIcon component={IconBatch} inheritViewBox />}
             >
               Add To Cache
+            </Button>
+          )}
+
+          {!transaction && (
+            <Button
+              fullWidth
+              onClick={handleAddTemplate}
+              color='primary'
+              variant='outlined'
+              startIcon={<SvgIcon component={IconTemplate} inheritViewBox />}
+            >
+              Add To Template
             </Button>
           )}
         </Stack>

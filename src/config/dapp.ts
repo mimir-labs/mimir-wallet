@@ -6,6 +6,7 @@ import { isArray } from '@polkadot/util';
 import BatchIcon from '@mimir-wallet/assets/images/batch.svg';
 import Failed from '@mimir-wallet/assets/images/failed.svg';
 import LogoCircle from '@mimir-wallet/assets/svg/logo-circle.svg';
+import TemplateIcon from '@mimir-wallet/assets/svg/template.svg';
 
 import { allEndpoints } from './api';
 
@@ -28,8 +29,72 @@ export interface DappOption {
   matrix?: string;
   isDrawer?: boolean;
   Component?: () => Promise<React.ComponentType>; // only for mimir://dapp/*
-  urlSearch?: (network: string) => string;
+  urlSearch?: (network: string) => URL;
 }
+
+export const PolkadotJsApp = {
+  id: 1000,
+  icon: '/dapp-icons/apps.svg',
+  name: 'Apps',
+  description: "Transactions can be constructed according to users' needs",
+  url: 'https://apps.mimir.global/',
+  supportedChains: true as const,
+  tags: ['Wallet', 'Tool'],
+  website: 'https://polkadot.js.org/',
+  github: 'https://github.com/polkadot-js',
+  urlSearch(network: string) {
+    const wsUrl = allEndpoints.find((item) => item.key === network)?.wsUrl;
+
+    if (!wsUrl) {
+      return new URL(this.url);
+    }
+
+    return new URL(`${this.url}?rpc=${encodeURIComponent(Object.values(wsUrl)[0])}`);
+  }
+};
+
+export const DotConsoleApp = {
+  id: 1010,
+  icon: '/dapp-icons/dot-console.svg',
+  name: 'ĐÓTConsole',
+  description: 'Substrate development console.',
+  url: 'https://dotconsole.app',
+  supportedChains: [
+    'polkadot',
+    'assethub-polkadot',
+    'coretime-polkadot',
+    'collectives-polkadot',
+    'people-polkadot',
+    'hydration',
+    'kusama',
+    'assethub-kusama',
+    'people-kusama',
+    'paseo'
+  ],
+  tags: ['Utility', 'Tool'],
+  website: 'https://dotconsole.app/',
+  github: 'https://github.com/tien/dot-console',
+  urlSearch(network: string) {
+    const chain = {
+      polkadot: 'polkadot',
+      'assethub-polkadot': 'polkadot-asset-hub',
+      'coretime-polkadot': 'polkadot-coretime',
+      'collectives-polkadot': 'polkadot-collectives',
+      'people-polkadot': 'polkadot-people',
+      hydration: 'hydration',
+      kusama: 'kusama',
+      'assethub-kusama': 'kusama-asset-hub',
+      'people-kusama': 'kusama-people',
+      paseo: 'paseo'
+    }[network];
+
+    if (!chain) {
+      return new URL(this.url);
+    }
+
+    return new URL(`${this.url}?chain=${chain}`);
+  }
+};
 
 export const dapps: DappOption[] = [
   {
@@ -124,25 +189,14 @@ export const dapps: DappOption[] = [
     supportedChains: true
   },
   {
-    id: 1000,
-    icon: '/dapp-icons/apps.svg',
-    name: 'Apps',
-    description: "Transactions can be constructed according to users' needs",
-    url: 'https://apps.mimir.global/',
-    supportedChains: true,
-    tags: ['Wallet', 'Tool'],
-    website: 'https://polkadot.js.org/',
-    github: 'https://github.com/polkadot-js',
-    urlSearch(network) {
-      const wsUrl = allEndpoints.find((item) => item.key === network)?.wsUrl;
-
-      if (!wsUrl) {
-        return this.url;
-      }
-
-      return `${this.url}?rpc=${encodeURIComponent(Object.values(wsUrl)[0])}`;
-    }
+    id: 508,
+    icon: TemplateIcon,
+    name: 'Template',
+    description: 'Template',
+    url: 'mimir://internal/template',
+    supportedChains: true
   },
+  PolkadotJsApp,
   {
     id: 1002,
     icon: '/dapp-icons/subsquare.svg',
@@ -263,48 +317,7 @@ export const dapps: DappOption[] = [
     website: 'https://bountymanager.io/',
     github: 'https://github.com/galaniprojects/Polkadot-Bounty-Manager'
   },
-  {
-    id: 1010,
-    icon: '/dapp-icons/dot-console.svg',
-    name: 'ĐÓTConsole',
-    description: 'Substrate development console.',
-    url: 'https://dotconsole.app',
-    supportedChains: [
-      'polkadot',
-      'assethub-polkadot',
-      'coretime-polkadot',
-      'collectives-polkadot',
-      'people-polkadot',
-      'hydration',
-      'kusama',
-      'assethub-kusama',
-      'people-kusama',
-      'paseo'
-    ],
-    tags: ['Utility', 'Tool'],
-    website: 'https://dotconsole.app/',
-    github: 'https://github.com/tien/dot-console',
-    urlSearch(network) {
-      const chain = {
-        polkadot: 'polkadot',
-        'assethub-polkadot': 'polkadot-asset-hub',
-        'coretime-polkadot': 'polkadot-coretime',
-        'collectives-polkadot': 'polkadot-collectives',
-        'people-polkadot': 'polkadot-people',
-        hydration: 'hydration',
-        kusama: 'kusama',
-        'assethub-kusama': 'kusama-asset-hub',
-        'people-kusama': 'kusama-people',
-        paseo: 'paseo'
-      }[network];
-
-      if (!chain) {
-        return this.url;
-      }
-
-      return `${this.url}?chain=${chain}`;
-    }
-  }
+  DotConsoleApp
 ];
 
 export function findSupportedDapps(network: string): DappOption[] {

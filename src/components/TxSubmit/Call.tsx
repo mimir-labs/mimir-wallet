@@ -10,6 +10,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Divider,
   Grid2 as Grid,
   Stack,
@@ -20,6 +21,7 @@ import moment from 'moment';
 import { useMemo } from 'react';
 
 import ArrowDown from '@mimir-wallet/assets/svg/ArrowDown.svg?react';
+import { events } from '@mimir-wallet/events';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { Call as CallComp } from '@mimir-wallet/params';
@@ -69,12 +71,28 @@ function Call({
 
   // TODO: check if the call is a multisig, if so, use the blake2 of the call data as the call hash
   const { callData, callHash, callName } = useMemo(() => extractState(method), [method]);
-  const [isOpen, toggleOpen] = useToggle();
+  const [isOpen, toggleOpen] = useToggle(true);
 
   const details = (
     <Stack spacing={0.4} sx={{ bgcolor: 'secondary.main', borderRadius: 1, padding: 1 }}>
       <Item label='Call Hash' value={<Hash value={callHash} withCopy />} />
-      <Item label='Call Data' value={<Bytes value={callData} />} />
+      <Item
+        label='Call Data'
+        value={
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Bytes value={callData} />
+            <Button
+              sx={{ fontSize: '0.75rem', fontWeight: 400 }}
+              size='small'
+              color='primary'
+              variant='text'
+              onClick={() => events.emit('call_data_view', callData)}
+            >
+              View Detail
+            </Button>
+          </Box>
+        }
+      />
 
       {transaction?.note && <Item label='Call Data' value={transaction.note} />}
       {transaction?.createdBlock && <Item label='Created Block' value={transaction.createdBlock} />}

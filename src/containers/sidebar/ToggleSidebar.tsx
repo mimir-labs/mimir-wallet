@@ -1,13 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useContext } from 'react';
-
-import { BaseContainerCtx } from './context';
-
-function ToggleSidebar() {
-  const { openSidebar } = useContext(BaseContainerCtx);
-
+function ToggleSidebar({ style, onClick }: { onClick: () => void; style?: React.CSSProperties }) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -15,8 +9,8 @@ function ToggleSidebar() {
       height='18'
       viewBox='0 0 14 18'
       fill='none'
-      onClick={openSidebar}
-      style={{ zIndex: 100, cursor: 'pointer', position: 'fixed', top: 0, bottom: 0, margin: 'auto' }}
+      onClick={onClick}
+      style={{ zIndex: 100, cursor: 'pointer', position: 'fixed', top: 0, bottom: 0, margin: 'auto', ...style }}
     >
       <path d='M0 0H5C9.97056 0 14 4.02944 14 9C14 13.9706 9.97056 18 5 18H0V0Z' fill='#2700FF' />
       <path

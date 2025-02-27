@@ -66,7 +66,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
           paddingY: 0.5,
           display: 'flex',
           alignItems: 'center',
-          height: 'auto',
+          height: 38,
           gap: { sm: 1, xs: 0.5 },
           bgcolor: 'primary.main',
           color: 'primary.contrastText'

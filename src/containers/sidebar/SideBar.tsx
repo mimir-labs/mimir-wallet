@@ -18,7 +18,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 
 import { useSelectedAccount } from '@mimir-wallet/accounts/useSelectedAccount';
@@ -45,10 +45,10 @@ import {
 import { findToken, walletConfig } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useNativeBalances } from '@mimir-wallet/hooks/useBalances';
+import { useMimirLayout } from '@mimir-wallet/hooks/useMimirLayout';
 import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { useWallet } from '@mimir-wallet/wallet/useWallet';
 
-import { BaseContainerCtx } from './context';
 import ToggleSidebar from './ToggleSidebar';
 
 function NavLink({
@@ -109,7 +109,7 @@ function TopContent() {
   const { connectedWallets, openWallet } = useWallet();
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [allBalances, isFetched] = useNativeBalances(selected);
-  const { closeSidebar } = useContext(BaseContainerCtx);
+  const { closeSidebar } = useMimirLayout();
   const isConnected = Object.keys(connectedWallets).length > 0;
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
@@ -202,7 +202,7 @@ function TopContent() {
 }
 
 function WalletContent() {
-  const { closeSidebar } = useContext(BaseContainerCtx);
+  const { closeSidebar } = useMimirLayout();
   const { connectedWallets, openWallet, wallets } = useWallet();
 
   // Sort walletConfig: connected first, unconnected second, not installed last
@@ -255,10 +255,11 @@ function WalletContent() {
 
 function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideBar: boolean }) {
   const { isApiReady } = useApi();
-  const { closeSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const { closeSidebar, openSidebar, sidebarOpen } = useMimirLayout();
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
   const { pathname } = useLocation();
+  const [isOpen, setIsOpen] = useState(true);
 
   const element = (
     <Stack gap={{ sm: 2.5, xs: 2 }}>
@@ -321,18 +322,38 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
             display: 'flex',
             flexDirection: 'column',
             width: 222,
+            marginLeft: isOpen ? 0 : '-222px',
             height: `calc(100dvh - ${offsetTop}px - 1px - 56px)`,
-            bgcolor: 'background.paper'
+            bgcolor: 'background.paper',
+            borderRight: '1px solid',
+            borderColor: 'divider',
+            transition: 'margin-left 0.15s ease-in-out'
           }}
         >
           <Box sx={{ flex: 1, overflowY: 'auto', paddingX: 1.5, paddingY: 2 }}>{element}</Box>
           <Box sx={{ paddingX: 2, paddingY: 1 }}>
             <WalletContent />
           </Box>
+
+          {/* for pc and has sidebar */}
+          {!downMd && withSideBar && (
+            <ToggleSidebar
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: isOpen ? 0 : -14,
+                margin: '0',
+                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'right 0.15s ease-in-out, transform 0.15s ease-in-out'
+              }}
+              onClick={() => setIsOpen((open) => !open)}
+            />
+          )}
         </Box>
       )}
 
-      {!withSideBar && !downMd && !sidebarOpen && <ToggleSidebar />}
+      {/* for pc and no sidebar */}
+      {!downMd && !withSideBar && !sidebarOpen && <ToggleSidebar onClick={openSidebar} />}
     </>
   );
 }

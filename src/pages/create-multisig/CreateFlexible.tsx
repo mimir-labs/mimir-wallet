@@ -266,11 +266,7 @@ function CreateFlexible({
               </>
             }
           >
-            <SvgIcon
-              component={IconQuestion}
-              inheritViewBox
-              sx={{ marginLeft: 1, color: 'primary.main', opacity: 0.5 }}
-            />
+            <SvgIcon component={IconQuestion} inheritViewBox sx={{ marginLeft: 1, color: 'primary.main' }} />
           </Tooltip>
         </AccordionSummary>
         <AccordionDetails>

@@ -523,7 +523,7 @@ export const paseoEndpoints: Endpoint[] = [
             'xcavate Devnet': 'wss://rpc2-paseo.xcavate.io'
           },
           httpUrl: 'https://rpc2-paseo.xcavate.io/',
-          genesisHash: '0xea6cf77a91a79c49a3d4f8d0a6dda7af31c126a0bfa02d7738aa2026b5122e74',
+          genesisHash: '0x4939146f39ed8077256aacac688f45b66f8a4ad360d805a69a28bc90082483a4',
           ss58Format: 42,
           serviceUrl: 'https://xcavate-dev-api.mimir.global/',
           socketUrl: 'wss://xcavate-dev-api.mimir.global/'

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, IconButton, Stack, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
-import { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import Logo from '@mimir-wallet/assets/images/logo.png';
@@ -11,14 +10,16 @@ import IconSetting from '@mimir-wallet/assets/svg/icon-set.svg?react';
 import LogoCircle from '@mimir-wallet/assets/svg/logo-circle.svg';
 import { AccountSelect, ChainSelect } from '@mimir-wallet/components';
 import { useApi } from '@mimir-wallet/hooks/useApi';
+import { useMimirLayout } from '@mimir-wallet/hooks/useMimirLayout';
 
 import BatchButton from './BatchButton';
-import { BaseContainerCtx } from './context';
+import TemplateButton from './TemplateButton';
 
 function TopBar() {
   const { isApiReady } = useApi();
   const { pathname } = useLocation();
-  const { closeSidebar, openSidebar, sidebarOpen } = useContext(BaseContainerCtx);
+  const { closeSidebar, openSidebar, sidebarOpen, rightSidebarOpen, openRightSidebar, closeRightSidebar } =
+    useMimirLayout();
   const isInAppPage = pathname.startsWith('/explorer');
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
@@ -51,6 +52,7 @@ function TopBar() {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: { sm: 2, xs: 1 } }}>
         {isApiReady && isInAppPage && <AccountSelect />}
         {/* <Notification /> */}
+        {isApiReady && <TemplateButton isOpen={rightSidebarOpen} open={openRightSidebar} close={closeRightSidebar} />}
         {isApiReady && <BatchButton />}
         <ChainSelect onlyLogo={isInAppPage && downSm} />
         {isApiReady && (
