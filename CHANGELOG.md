@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.17.0...v1.18.0) (2025-02-27)
+
+
+### Features
+
+* add template transaction feature ([#149](https://github.com/mimir-labs/mimir-wallet/issues/149)) ([728d8f6](https://github.com/mimir-labs/mimir-wallet/commit/728d8f6804dcadd1b2480810d2a437cd495f4b9e))
+
 ## [1.17.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.16.0...v1.17.0) (2025-02-25)
 
 
