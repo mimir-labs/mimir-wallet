@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, Typography } from '@mui/material';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
 import AccountConsumer from '@mimir-wallet/accounts/Consumer';
@@ -11,18 +11,17 @@ import { ConnectWalletModal, SwitchAccountDialog, ToastRoot, TxSubmit, TxToast }
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useFollowAccounts } from '@mimir-wallet/hooks/useFollowAccounts';
 import { usePageTitle } from '@mimir-wallet/hooks/usePageTitle';
-import { useToggle } from '@mimir-wallet/hooks/useToggle';
 import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 import { useWallet } from '@mimir-wallet/wallet/useWallet';
 
+import RightSideBar from './sidebar/RightSideBar';
+import SideBar from './sidebar/SideBar';
 import AddAddressBook from './AddAddressBook';
-import { BaseContainerCtx } from './context';
 import Initializing from './Initializing';
-import RightSideBar from './RightSideBar';
-import SideBar from './SideBar';
 import SubscribeTx from './SubscribeTx';
 import ToggleAlert from './ToggleAlert';
-import TopBar from './TopBar';
+import TopBar from './topbar';
+import ViewCallData from './ViewCallData';
 
 function BaseContainer({
   auth,
@@ -39,29 +38,7 @@ function BaseContainer({
   const { isWalletReady, closeWallet, walletOpen } = useWallet();
   const { current, isMultisigSyned } = useAccount();
   const { queue } = useTxQueue();
-  const [sidebarOpen, , setSidebarOpen] = useToggle(false);
-  const [rightSidebarOpen, , setRightSidebarOpen] = useToggle(false);
   const [alertOpen, setAlertOpen] = useState<boolean>(true);
-  const [rightSidebarElement, setRightSidebarElement] = useState<React.ReactNode>(null);
-
-  const openSidebar = useCallback(() => setSidebarOpen(true), [setSidebarOpen]);
-  const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
-  const openRightSidebar = useCallback(() => setRightSidebarOpen(true), [setRightSidebarOpen]);
-  const closeRightSidebar = useCallback(() => setRightSidebarOpen(false), [setRightSidebarOpen]);
-
-  const value = useMemo(
-    () => ({
-      sidebarOpen,
-      rightSidebarOpen,
-      openSidebar,
-      closeSidebar,
-      openRightSidebar,
-      closeRightSidebar,
-      rightSidebarElement,
-      setRightSidebarElement
-    }),
-    [closeRightSidebar, closeSidebar, openRightSidebar, openSidebar, rightSidebarElement, rightSidebarOpen, sidebarOpen]
-  );
 
   useFollowAccounts();
   usePageTitle();
@@ -71,7 +48,7 @@ function BaseContainer({
   }
 
   return (
-    <BaseContainerCtx.Provider value={value}>
+    <>
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
       <ToastRoot />
       <TxToast />
@@ -85,6 +62,7 @@ function BaseContainer({
         <>
           <ToggleAlert address={current} setAlertOpen={setAlertOpen} />
           <SubscribeTx address={current} />
+          <ViewCallData />
         </>
       )}
 
@@ -92,10 +70,11 @@ function BaseContainer({
         <Box
           sx={{
             display: 'flex',
-            minHeight: `calc(100dvh - ${alertOpen ? 37 : 0}px - 1px - 56px)`
+            minHeight: `calc(100dvh - ${alertOpen ? 38 : 0}px - 1px - 56px)`,
+            width: '100%'
           }}
         >
-          <SideBar offsetTop={alertOpen ? 36 : 0} withSideBar={withSideBar} />
+          <SideBar offsetTop={alertOpen ? 38 : 0} withSideBar={withSideBar} />
 
           <Box
             sx={{
@@ -128,12 +107,12 @@ function BaseContainer({
             </Box>
           ) : null}
 
-          <RightSideBar offsetTop={alertOpen ? 36 : 0} />
+          <RightSideBar offsetTop={alertOpen ? 38 : 0} />
         </Box>
       ) : (
         <Initializing />
       )}
-    </BaseContainerCtx.Provider>
+    </>
   );
 }
 

@@ -16,6 +16,7 @@ type EventTypes = {
   batch_tx_added: (value: BatchTxItem[], alert: boolean) => void;
   template_open: () => void;
   template_add: (callData: HexString) => void;
+  call_data_view: (callData: HexString) => void;
 };
 
 export const events = new Events<EventTypes>();

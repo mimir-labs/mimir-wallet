@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Call } from '@polkadot/types/interfaces';
-import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { Box, Button, Divider, IconButton, Link, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Divider, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import IconArrowLeft from '@mimir-wallet/assets/svg/icon-arrow-left.svg?react';
@@ -14,19 +13,9 @@ import JsonView from '@mimir-wallet/components/JsonView';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useInput } from '@mimir-wallet/hooks/useInput';
 
+import DotConsoleLink from '../call-data-view/DotConsoleLink';
+import { decodeCallData } from '../call-data-view/utils';
 import { useSavedTemplate } from './useSavedTemplate';
-
-function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {
-  if (!callData) return [null, null];
-
-  try {
-    const call = registry.createType('Call', callData);
-
-    return [call, null];
-  } catch (error) {
-    return [null, error as Error];
-  }
-}
 
 function AddTemplate({ onBack, defaultCallData }: { defaultCallData?: HexString; onBack: () => void }) {
   const { network, api } = useApi();
@@ -70,11 +59,8 @@ function AddTemplate({ onBack, defaultCallData }: { defaultCallData?: HexString;
         placeholder='0x...'
         helper={
           <Box color='text.primary'>
-            You can edit it in the{' '}
-            <Link underline='hover' target='_blank'>
-              DOT Console
-            </Link>{' '}
-            and then click Import or directly paste the Encoded Call Data.
+            You can edit it in the <DotConsoleLink network={network} /> and then click Import or directly paste the
+            Encoded Call Data.
           </Box>
         }
         value={callData}

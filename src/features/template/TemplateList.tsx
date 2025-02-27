@@ -1,9 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Button, Divider, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Divider, IconButton, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 
 import IconAdd from '@mimir-wallet/assets/svg/icon-add-fill.svg?react';
+import IconClose from '@mimir-wallet/assets/svg/icon-close.svg?react';
 import IconQuestion from '@mimir-wallet/assets/svg/icon-question-fill.svg?react';
 import { Empty } from '@mimir-wallet/components';
 import { useApi } from '@mimir-wallet/hooks/useApi';
@@ -11,7 +12,7 @@ import { useApi } from '@mimir-wallet/hooks/useApi';
 import TemplateItem from './TemplateItem';
 import { useSavedTemplate } from './useSavedTemplate';
 
-function TemplateList({ onAdd }: { onAdd: () => void }) {
+function TemplateList({ onAdd, onClose }: { onAdd: () => void; onClose: () => void }) {
   const { network } = useApi();
   const { template, removeTemplate, editTemplateName } = useSavedTemplate(network);
 
@@ -19,7 +20,7 @@ function TemplateList({ onAdd }: { onAdd: () => void }) {
     <Stack spacing={2} height='100%'>
       <Box display='flex' gap={0.5} alignItems='center'>
         <Typography variant='h4'>Call Template</Typography>
-        <Tooltip title='Template'>
+        <Tooltip title='Save frequently used on-chain operation templates for repeated use in the future.'>
           <SvgIcon color='primary' component={IconQuestion} inheritViewBox />
         </Tooltip>
         <Box sx={{ flex: 1 }} />
@@ -33,6 +34,14 @@ function TemplateList({ onAdd }: { onAdd: () => void }) {
         >
           Add
         </Button>
+        <IconButton
+          sx={{ border: '1px solid', bordercolor: 'primary.main' }}
+          size='small'
+          color='primary'
+          onClick={onClose}
+        >
+          <SvgIcon component={IconClose} inheritViewBox />
+        </IconButton>
       </Box>
 
       <Divider />

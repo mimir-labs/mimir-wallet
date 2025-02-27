@@ -12,24 +12,20 @@ import Template from '@mimir-wallet/features/template';
 
 function TemplateButton({
   isOpen,
-  setElement,
   open,
   close
 }: {
   isOpen: boolean;
-  setElement: (element: React.ReactNode) => void;
-  open: () => void;
+  open: (element: React.ReactNode) => void;
   close: () => void;
 }) {
   useEffect(() => {
     const onOpen = () => {
-      setElement(<Template />);
-      open();
+      open(<Template onClose={close} />);
     };
 
     const onAdd = (callData: HexString) => {
-      setElement(<Template defaultCallData={callData} defaultAdded />);
-      open();
+      open(<Template defaultCallData={callData} defaultAdded onClose={close} />);
     };
 
     events.on('template_open', onOpen);
@@ -39,7 +35,7 @@ function TemplateButton({
       events.off('template_open', onOpen);
       events.off('template_add', onAdd);
     };
-  }, [open, setElement]);
+  }, [open, close]);
 
   return (
     <Tooltip title='Template'>
@@ -54,12 +50,11 @@ function TemplateButton({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          setElement(<Template />);
 
           if (isOpen) {
             close();
           } else {
-            open();
+            open(<Template onClose={close} />);
           }
         }}
       >

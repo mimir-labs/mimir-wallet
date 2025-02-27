@@ -1,27 +1,44 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Registry } from '@polkadot/types/types';
-
-import { Box, IconButton, Link, SvgIcon, Typography } from '@mui/material';
+import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import IconDelete from '@mimir-wallet/assets/svg/icon-delete.svg?react';
 import IconEdit from '@mimir-wallet/assets/svg/icon-edit.svg?react';
 import { CopyButton } from '@mimir-wallet/components';
+import { DotConsoleApp, PolkadotJsApp } from '@mimir-wallet/config';
 import { useApi } from '@mimir-wallet/hooks/useApi';
 import { CallDisplaySection } from '@mimir-wallet/params';
 
-function decodeCallData(registry: Registry, callData: string): [string, string] | undefined {
-  if (!callData) return undefined;
+import { decodeCallSection } from './utils';
 
-  try {
-    const call = registry.createType('Call', callData);
+function DotConsoleButton({ network, call }: { network: string; call: string }) {
+  const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
 
-    return [call.section, call.method];
-  } catch {
-    return undefined;
+  if (!isDotConsoleSupport) {
+    const url = PolkadotJsApp.urlSearch(network);
+
+    url.hash = `#/extrinsics/decode/${call}`;
+
+    return (
+      <IconButton component={Link} size='small' color='inherit' to={`/explorer/${encodeURIComponent(url.toString())}`}>
+        <img src={PolkadotJsApp.icon} alt='Polkadot.js' width={16} height={16} />
+      </IconButton>
+    );
   }
+
+  const url = DotConsoleApp.urlSearch(network);
+
+  url.pathname = '/extrinsics';
+  url.searchParams.set('callData', call);
+
+  return (
+    <IconButton component={Link} size='small' color='inherit' to={`/explorer/${encodeURIComponent(url.toString())}`}>
+      <img src={DotConsoleApp.icon} alt='Polkadot.js' width={16} height={16} />
+    </IconButton>
+  );
 }
 
 function TemplateItem({
@@ -35,14 +52,14 @@ function TemplateItem({
   onDelete: () => void;
   onEditName: (name: string) => void;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const [section, setSection] = useState<string | undefined>(undefined);
   const [method, setMethod] = useState<string | undefined>(undefined);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
 
   useEffect(() => {
-    const result = decodeCallData(api.registry, call);
+    const result = decodeCallSection(api.registry, call);
 
     if (!result) return;
 
@@ -106,9 +123,7 @@ function TemplateItem({
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <IconButton component={Link} target='_blank' size='small' color='inherit'>
-          <Box sx={{ width: 14, height: 14, transform: 'translateY(2px)' }}>📟</Box>
-        </IconButton>
+        <DotConsoleButton network={network} call={call} />
         <IconButton size='small' color='error' onClick={() => onDelete()}>
           <SvgIcon component={IconDelete} inheritViewBox />
         </IconButton>

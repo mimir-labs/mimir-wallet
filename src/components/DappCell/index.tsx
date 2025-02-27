@@ -3,18 +3,7 @@
 
 import type { DappOption, Endpoint } from '@mimir-wallet/config';
 
-import {
-  alpha,
-  Avatar,
-  Box,
-  Button,
-  IconButton,
-  Paper,
-  Stack,
-  SvgIcon,
-  SwipeableDrawer,
-  Typography
-} from '@mui/material';
+import { alpha, Avatar, Box, Button, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { createElement, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -63,7 +52,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
       } else {
         const url = dapp.urlSearch?.(network) || dapp.url;
 
-        navigate(`/explorer/${encodeURIComponent(url)}?network=${network}`);
+        navigate(`/explorer/${encodeURIComponent(url.toString())}?network=${network}`);
       }
     } else {
       dapp.Component?.().then((C) => {
@@ -81,7 +70,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
     (endpoint: Endpoint) => {
       const url = dapp.urlSearch?.(endpoint.key) || dapp.url;
 
-      window.location.href = `/explorer/${encodeURIComponent(url)}?network=${endpoint.key}`;
+      window.location.href = `/explorer/${encodeURIComponent(url.toString())}?network=${endpoint.key}`;
     },
     [dapp]
   );
@@ -91,17 +80,16 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
       <DappDetails dapp={dapp} onClose={toggleOpen} open={detailsOpen} onOpen={openApp} />
 
       {dapp.isDrawer && (
-        <SwipeableDrawer
+        <Drawer
           ModalProps={{
             keepMounted: false
           }}
           anchor='right'
           open={isDrawerOpen}
-          onOpen={toggleDrawerOpen}
           onClose={toggleDrawerOpen}
         >
           {element}
-        </SwipeableDrawer>
+        </Drawer>
       )}
 
       {switchChain && (
