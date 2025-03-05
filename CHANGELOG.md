@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.19.0...v1.19.1) (2025-03-05)
+
+
+### Bug Fixes
+
+* Add missing chain icons for Westend and AssetHub ([#156](https://github.com/mimir-labs/mimir-wallet/issues/156)) ([6da764a](https://github.com/mimir-labs/mimir-wallet/commit/6da764ae70f2bde30bd52c4854f3554327b599ec))
+
 ## [1.19.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.18.0...v1.19.0) (2025-03-05)
 
 
