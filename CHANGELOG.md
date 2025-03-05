@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.19.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.18.0...v1.19.0) (2025-03-05)
+
+
+### Features
+
+* Add paseo assethub, westend, westend assethub networks ([#153](https://github.com/mimir-labs/mimir-wallet/issues/153)) ([3295f57](https://github.com/mimir-labs/mimir-wallet/commit/3295f579daf8480fdc93a3db2faf607430b5d37d))
+
+
+### Bug Fixes
+
+* Fix typos and update batch-related components ([#155](https://github.com/mimir-labs/mimir-wallet/issues/155)) ([2df1855](https://github.com/mimir-labs/mimir-wallet/commit/2df18558e24875d84afb4341b8aa1919347c3f42))
+
 ## [1.18.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.17.0...v1.18.0) (2025-02-27)
 
 
