@@ -309,6 +309,7 @@ export const polkadotEndpoints: Endpoint[] = [
     socketUrl: 'wss://polimec-api.mimir.global/'
   }
 ];
+
 export const kusamaEndpoints: Endpoint[] = [
   {
     key: 'kusama',
@@ -490,6 +491,7 @@ export const kusamaEndpoints: Endpoint[] = [
     subsquareUrl: 'https://khala.subsquare.io/'
   }
 ];
+
 export const paseoEndpoints: Endpoint[] = [
   {
     key: 'paseo',
@@ -512,6 +514,25 @@ export const paseoEndpoints: Endpoint[] = [
     socketUrl: process.env.NODE_ENV === 'production' ? 'wss://paseo-api.mimir.global/' : 'wss://dev-api.mimir.global/',
     explorerUrl: 'https://paseo.subscan.io/'
   },
+  {
+    key: 'assethub-paseo',
+    icon: '/chain-icons/assethub-paseo.webp',
+    tokenIcon: '/token-icons/Paseo.png',
+    name: 'AssetHub Paseo',
+    ss58Format: 0,
+    wsUrl: {
+      Dwellir: 'wss://asset-hub-paseo-rpc.dwellir.com',
+      IBP1: 'wss://sys.ibp.network/asset-hub-paseo',
+      IBP2: 'wss://asset-hub-paseo.dotters.network',
+      StakeWorld: 'wss://pas-rpc.stakeworld.io/assethub',
+      TurboFlakes: 'wss://sys.turboflakes.io/asset-hub-paseo'
+    },
+    httpUrl: 'https://asset-hub-paseo-rpc.dwellir.com',
+    genesisHash: '0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2',
+    serviceUrl: 'https://assethub-paseo-api.mimir.global/',
+    socketUrl: 'wss://assethub-paseo-api.mimir.global/',
+    explorerUrl: 'https://assethub-paseo.subscan.io/'
+  },
   ...(isDevEnv
     ? ([
         {
@@ -531,6 +552,51 @@ export const paseoEndpoints: Endpoint[] = [
       ] as const)
     : [])
 ];
+
+export const westendEndpoints: Endpoint[] = [
+  {
+    key: 'westend',
+    icon: '/chain-icons/Westend.webp',
+    tokenIcon: '/token-icons/WND.webp',
+    name: 'Westend',
+    ss58Format: 42,
+    wsUrl: {
+      Dwellir: 'wss://westend-rpc.dwellir.com',
+      OnFinality: 'wss://westend.api.onfinality.io/public-ws',
+      Parity: 'wss://westend-rpc.polkadot.io',
+      IBP1: 'wss://rpc.ibp.network/westend',
+      'Dwellir Tunisia': 'wss://westend-rpc-tn.dwellir.com',
+      IBP2: 'wss://westend.dotters.network',
+      RadiumBlock: 'wss://westend.public.curie.radiumblock.co/ws'
+    },
+    httpUrl: 'https://westend-rpc.dwellir.com',
+    genesisHash: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e',
+    serviceUrl: 'https://westend-api.mimir.global/',
+    socketUrl: 'wss://westend-api.mimir.global/',
+    explorerUrl: 'https://westend.subscan.io/'
+  },
+  {
+    key: 'assethub-westend',
+    icon: '/chain-icons/assethub-westend.webp',
+    tokenIcon: '/token-icons/WND.webp',
+    name: 'AssetHub Westend',
+    ss58Format: 42,
+    wsUrl: {
+      Dwellir: 'wss://asset-hub-westend-rpc.dwellir.com',
+      IBP1: 'wss://sys.ibp.network/asset-hub-westend',
+      Parity: 'wss://westend-asset-hub-rpc.polkadot.io',
+      'Dwellir Tunisia': 'wss://westmint-rpc-tn.dwellir.com',
+      IBP2: 'wss://asset-hub-westend.dotters.network',
+      'Permanence DAO EU': 'wss://asset-hub-westend.rpc.permanence.io'
+    },
+    httpUrl: 'https://asset-hub-westend-rpc.dwellir.com',
+    genesisHash: '0x67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9',
+    serviceUrl: 'https://assethub-westend-api.mimir.global/',
+    socketUrl: 'wss://assethub-westend-api.mimir.global/',
+    explorerUrl: 'https://assethub-westend.subscan.io/'
+  }
+];
+
 export const solochainEndpoints: Endpoint[] = [
   {
     key: 'vara',
@@ -636,13 +702,18 @@ export const solochainEndpoints: Endpoint[] = [
   }
 ];
 
-export const allEndpoints = polkadotEndpoints.concat(kusamaEndpoints).concat(paseoEndpoints).concat(solochainEndpoints);
+export const allEndpoints = polkadotEndpoints
+  .concat(kusamaEndpoints)
+  .concat(paseoEndpoints)
+  .concat(westendEndpoints)
+  .concat(solochainEndpoints);
 
 export function groupedEndpoints(): Record<string, Endpoint[]> {
   return {
     polkadot: polkadotEndpoints,
     kusama: kusamaEndpoints,
     soloChain: solochainEndpoints,
-    paseo: paseoEndpoints
+    paseo: paseoEndpoints,
+    westend: westendEndpoints
   };
 }

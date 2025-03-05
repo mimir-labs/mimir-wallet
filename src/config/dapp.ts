@@ -69,7 +69,10 @@ export const DotConsoleApp = {
     'kusama',
     'assethub-kusama',
     'people-kusama',
-    'paseo'
+    'paseo',
+    'assethub-paseo',
+    'westend',
+    'assethub-westend'
   ],
   tags: ['Utility', 'Tool'],
   website: 'https://dotconsole.app/',
@@ -85,7 +88,10 @@ export const DotConsoleApp = {
       kusama: 'kusama',
       'assethub-kusama': 'kusama-asset-hub',
       'people-kusama': 'kusama-people',
-      paseo: 'paseo'
+      paseo: 'paseo',
+      'assethub-paseo': 'paseo-asset-hub',
+      westend: 'westend',
+      'assethub-westend': 'westend-asset-hub'
     }[network];
 
     if (!chain) {
