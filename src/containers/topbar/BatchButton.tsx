@@ -54,7 +54,7 @@ function BatchButton() {
           }
         }}
       >
-        <Tooltip title='Cache'>
+        <Tooltip title='Batch'>
           <IconButton
             ref={anchorEl}
             sx={{
@@ -86,7 +86,7 @@ function BatchButton() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}>
           <SvgIcon inheritViewBox component={IconBatch} sx={{ color: 'primary.main', width: 32, height: 32 }} />
-          <span>New transaction has been added to Cache</span>
+          <span>New transaction has been added to Batch</span>
         </Box>
       </Popover>
 

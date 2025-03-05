@@ -258,7 +258,7 @@ function TxSubmit({
               variant='outlined'
               startIcon={<SvgIcon component={IconBatch} inheritViewBox />}
             >
-              Add To Cache
+              Add To Batch
             </Button>
           )}
 

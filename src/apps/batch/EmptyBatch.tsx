@@ -24,7 +24,7 @@ function EmptyBatch({ onAdd, onClose }: { onAdd?: () => void; onClose?: () => vo
         />
         <circle opacity='0.21' cx='18.2568' cy='84.8008' r='18' fill='#5F45FF' />
       </svg>
-      <Typography variant='h6'>Add a transaction to the cache</Typography>
+      <Typography variant='h6'>Add a transaction to the Batch</Typography>
       <Typography fontSize='0.75rem' textAlign='center'>
         Batch multiple actions into one
       </Typography>
