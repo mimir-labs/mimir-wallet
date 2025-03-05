@@ -24,7 +24,6 @@ import { useApi } from '@mimir-wallet/hooks/useApi';
 import { useBatchTxs } from '@mimir-wallet/hooks/useBatchTxs';
 import { useTxQueue } from '@mimir-wallet/hooks/useTxQueue';
 
-// import AddNewCache from './AddNewCache';
 import BatchItem from './BatchItem';
 import EmptyBatch from './EmptyBatch';
 
@@ -48,7 +47,7 @@ function Batch({ onClose }: { onClose?: () => void }) {
         ) : (
           <Stack spacing={2} sx={{ height: '100%' }}>
             <Typography variant='h4' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              Cache
+              Batch
               {/* <Button color='primary' variant='outlined' onClick={toggleOpen}>
                 Add New
               </Button> */}
@@ -64,7 +63,7 @@ function Batch({ onClose }: { onClose?: () => void }) {
             <Divider />
 
             <Stack sx={{ flex: '1', overflowY: 'auto' }} spacing={1}>
-              <Typography>Next Cache</Typography>
+              <Typography>Next Batch</Typography>
               {current && (
                 <Box ref={containerRef} style={{ touchAction: 'pan-y' }}>
                   <DraggableList
@@ -158,20 +157,12 @@ function Batch({ onClose }: { onClose?: () => void }) {
                   onClose?.();
                 }}
               >
-                Confirm Cache
+                Confirm Batch
               </Button>
             </Box>
           </Stack>
         )}
       </Box>
-
-      {/* <AddNewCache
-        isOpen={isOpen}
-        onClose={toggleOpen}
-        onAddTxs={(txs) => {
-          addTx(txs, false);
-        }}
-      /> */}
     </>
   );
 }

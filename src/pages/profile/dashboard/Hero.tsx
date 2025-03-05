@@ -115,7 +115,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
         endIcon={<SvgIcon component={IconProxy} inheritViewBox />}
         sx={{ height: 26, gridColumn: 'span 1 / span 1' }}
       >
-        Extransic
+        Extrinsic
       </Button>
     </Box>
   );

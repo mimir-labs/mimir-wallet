@@ -118,7 +118,7 @@ export const dapps: DappOption[] = [
   },
   {
     id: 2,
-    name: 'Cache',
+    name: 'Batch',
     description: 'Batch multiple actions into one.',
     url: 'mimir://app/batch',
     icon: BatchIcon,
@@ -126,7 +126,7 @@ export const dapps: DappOption[] = [
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Batch', 'Cache'],
+    tags: ['Batch', 'utility'],
     Component: () => import('@mimir-wallet/apps/batch').then((res) => res.default),
     isDrawer: true
   },
