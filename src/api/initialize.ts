@@ -79,7 +79,7 @@ function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: st
   const wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string;
 
   if (wsUrl || !httpUrl) {
-    return new WsProvider(wsUrl);
+    return new WsProvider(wsUrl || apiUrl);
   }
 
   const provider = new ApiProvider(apiUrl, httpUrl);
