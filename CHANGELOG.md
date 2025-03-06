@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.19.1...v1.20.0) (2025-03-06)
+
+
+### Features
+
+* Add assethub westend next network ([#158](https://github.com/mimir-labs/mimir-wallet/issues/158)) ([5450696](https://github.com/mimir-labs/mimir-wallet/commit/5450696c11f0d9df6e06d7f29eb0705cb3473ec2))
+
 ## [1.19.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.19.0...v1.19.1) (2025-03-05)
 
 
