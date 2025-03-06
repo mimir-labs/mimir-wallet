@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.1](https://github.com/mimir-labs/mimir-wallet/compare/v1.20.0...v1.20.1) (2025-03-06)
+
+
+### Bug Fixes
+
+* Add missing wsUrl parameter in API initialization to resolve connection failure ([#160](https://github.com/mimir-labs/mimir-wallet/issues/160)) ([07ce599](https://github.com/mimir-labs/mimir-wallet/commit/07ce599e690e7e9600acffc8ddeff67ad3cbfc17))
+
 ## [1.20.0](https://github.com/mimir-labs/mimir-wallet/compare/v1.19.1...v1.20.0) (2025-03-06)
 
 
