@@ -9,7 +9,7 @@ export type Endpoint = {
   key: string;
   name: string;
   wsUrl: Record<string, string>;
-  httpUrl: string;
+  httpUrl?: string;
   icon: string;
   tokenIcon: string;
   ss58Format: number;
@@ -594,6 +594,19 @@ export const westendEndpoints: Endpoint[] = [
     serviceUrl: 'https://assethub-westend-api.mimir.global/',
     socketUrl: 'wss://assethub-westend-api.mimir.global/',
     explorerUrl: 'https://assethub-westend.subscan.io/'
+  },
+  {
+    key: 'assethub-next-westend',
+    icon: '/chain-icons/assethub-westend.webp',
+    tokenIcon: '/token-icons/WND.webp',
+    name: 'AssetHub Next',
+    ss58Format: 42,
+    wsUrl: {
+      Parity: 'wss://westend-asset-hub-next-rpc.parity-chains-scw.parity.io',
+    },
+    genesisHash: '0x6ddaae15f85a6a5035da7c842ba7a8a90c06d1f53d410a08d19fe899d9d9c7c8',
+    serviceUrl: 'https://assethub-next-westend-api.mimir.global/',
+    socketUrl: 'wss://assethub-next-westend-api.mimir.global/'
   }
 ];
 
