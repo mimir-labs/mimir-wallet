@@ -75,10 +75,10 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
   };
 }
 
-function getApiProvider(apiUrl: string | string[], httpUrl: string, network: string) {
+function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: string) {
   const wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string;
 
-  if (wsUrl) {
+  if (wsUrl || !httpUrl) {
     return new WsProvider(wsUrl);
   }
 
@@ -97,8 +97,8 @@ function getApiProvider(apiUrl: string | string[], httpUrl: string, network: str
  */
 async function createApi(
   apiUrl: string | string[],
-  httpUrl: string,
   network: string,
+  httpUrl?: string,
   onError?: (error: unknown) => void
 ): Promise<void> {
   // Try to get metadata from service
@@ -112,7 +112,7 @@ async function createApi(
 
   try {
     // Initialize WebSocket provider and API
-    const provider = getApiProvider(apiUrl, httpUrl, network);
+    const provider = getApiProvider(apiUrl, network, httpUrl);
 
     statics.api = new ApiPromise({
       provider,
@@ -159,7 +159,7 @@ export async function initializeApi(chain: Endpoint) {
     : undefined;
 
   // Initialize main blockchain API connection
-  createApi(Object.values(chain.wsUrl), chain.httpUrl, chain.key, onError).then(() => {
+  createApi(Object.values(chain.wsUrl), chain.key, chain.httpUrl, onError).then(() => {
     // Set up event listeners for connection state
     statics.api.on('error', onError);
 
@@ -179,7 +179,7 @@ export async function initializeApi(chain: Endpoint) {
   // This is used for additional identity-related features
   if (peopleEndpoint) {
     // Create WebSocket provider for identity network
-    const provider = getApiProvider(Object.values(peopleEndpoint.wsUrl), peopleEndpoint.httpUrl, peopleEndpoint.key);
+    const provider = getApiProvider(Object.values(peopleEndpoint.wsUrl), peopleEndpoint.key, peopleEndpoint.httpUrl);
 
     // Initialize identity API with custom types
     ApiPromise.create({
