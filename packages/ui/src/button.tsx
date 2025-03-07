@@ -12,7 +12,7 @@ const CustomButton = extendVariants(Button, {
       lg: 'h-10 min-w-10 px-4'
     },
     isIconOnly: {
-      true: 'min-w-0'
+      true: 'min-w-0 px-0'
     },
     isDisabled: {
       true: 'pointer-events-auto bg-divider-300 text-white border-none'
