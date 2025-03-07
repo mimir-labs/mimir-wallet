@@ -17,8 +17,6 @@ import { useInput } from '@/hooks/useInput';
 import { useProxyTypes } from '@/hooks/useProxyTypes';
 import { addressEq } from '@/utils';
 import {
-  Alert,
-  AlertTitle,
   Box,
   Button,
   Divider,
@@ -35,6 +33,8 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
+
+import { Alert } from '@mimir-wallet/ui';
 
 import AddProxy from './AddProxy';
 import ProxyInfo from './ProxyInfo';
@@ -198,13 +198,12 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
             )}
 
             {pure && proxyType !== 'Any' && (
-              <Alert severity='warning'>
-                <AlertTitle>
-                  You have selected a Pure Proxy with non-ANY permissions, which means that the assets in this account
+              <Alert
+                color='warning'
+                title='You have selected a Pure Proxy with non-ANY permissions, which means that the assets in this account
                   cannot be moved, and you will not be able to add or remove new proxies. Please ensure the security of
-                  your assets.
-                </AlertTitle>
-              </Alert>
+                  your assets.'
+              />
             )}
 
             {!pure && (
@@ -235,13 +234,18 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
 
             {!!(proxyArgs.length + (existsProxies.length || 0)) && <Divider />}
 
-            <Alert severity='warning' sx={{ '.MuiAlert-message': { overflow: 'visible' } }}>
-              <AlertTitle>Notice</AlertTitle>
-              <ul>
-                <li>A deposit is required for proxy creation.</li>
-                <li>Only accounts with full authority (ANY) can delete a proxy.</li>
-              </ul>
-            </Alert>
+            <Alert
+              color='warning'
+              classNames={{
+                base: 'items-start'
+              }}
+              title={
+                <ul className='leading-[20px]'>
+                  <li>A deposit is required for proxy creation.</li>
+                  <li>Only accounts with full authority (ANY) can delete a proxy.</li>
+                </ul>
+              }
+            />
 
             {pure ? (
               <SubmitPure proxy={proxy} name={name} reviewWindow={reviewWindow} custom={custom} proxyType={proxyType} />

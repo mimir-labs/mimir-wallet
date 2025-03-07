@@ -7,11 +7,9 @@ import type { AccountId, Address } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { useAccount } from '@/accounts/useAccount';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import React, { useCallback } from 'react';
 
-import { Tooltip } from '@mimir-wallet/ui';
 import { Button, type ButtonProps } from '@mimir-wallet/ui';
 
 interface Props extends Omit<ButtonProps, 'onPress' | 'onClick'> {
@@ -55,9 +53,6 @@ function TxButton({
   ...props
 }: Props) {
   const { addQueue } = useTxQueue();
-  const { isLocalAccount } = useAccount();
-
-  const hasPermission = accountId ? isLocalAccount(accountId.toString()) : true;
 
   const handlePress = useCallback(() => {
     if (getCall) {
@@ -76,16 +71,6 @@ function TxButton({
 
     onDone?.();
   }, [accountId, addQueue, beforeSend, filterPaths, getCall, onDone, onResults, transaction, website]);
-
-  if (!hasPermission) {
-    return (
-      <Tooltip showArrow closeDelay={0} content='You have no permission' color='warning'>
-        <Button {...props} isDisabled>
-          {children}
-        </Button>
-      </Tooltip>
-    );
-  }
 
   return (
     <Button {...props} isDisabled={isDisabled || disabled} onPress={overrideAction || handlePress}>

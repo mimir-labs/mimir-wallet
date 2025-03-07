@@ -2655,6 +2655,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@heroui/alert@npm:^2.2.15":
+  version: 2.2.15
+  resolution: "@heroui/alert@npm:2.2.15"
+  dependencies:
+    "@heroui/button": "npm:2.2.15"
+    "@heroui/react-utils": "npm:2.1.8"
+    "@heroui/shared-icons": "npm:2.1.6"
+    "@heroui/shared-utils": "npm:2.1.7"
+    "@react-aria/utils": "npm:3.27.0"
+    "@react-stately/utils": "npm:3.10.5"
+  peerDependencies:
+    "@heroui/system": ">=2.4.7"
+    "@heroui/theme": ">=2.4.6"
+    react: ">=18 || >=19.0.0-rc.0"
+    react-dom: ">=18 || >=19.0.0-rc.0"
+  checksum: 10c0/b4dd42ec6b0a7708566e46af2d2edc940466459e5b40f6ba2cfe583849e513507effd56c347e8c0068b08a6e6730f1f8bdb6f7d8ff277039118ebf671436b6bd
+  languageName: node
+  linkType: hard
+
 "@heroui/aria-utils@npm:2.2.12":
   version: 2.2.12
   resolution: "@heroui/aria-utils@npm:2.2.12"
@@ -2674,7 +2693,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@heroui/button@npm:^2.2.15":
+"@heroui/button@npm:2.2.15, @heroui/button@npm:^2.2.15":
   version: 2.2.15
   resolution: "@heroui/button@npm:2.2.15"
   dependencies:
@@ -3338,6 +3357,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@mimir-wallet/ui@workspace:packages/ui"
   dependencies:
+    "@heroui/alert": "npm:^2.2.15"
     "@heroui/button": "npm:^2.2.15"
     "@heroui/modal": "npm:^2.2.12"
     "@heroui/progress": "npm:^2.2.11"
@@ -11753,12 +11773,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.1.5":
-  version: 9.1.6
-  resolution: "husky@npm:9.1.6"
+"husky@npm:^9.1.7":
+  version: 9.1.7
+  resolution: "husky@npm:9.1.7"
   bin:
     husky: bin.js
-  checksum: 10c0/705673db4a247c1febd9c5df5f6a3519106cf0335845027bb50a15fba9b1f542cb2610932ede96fd08008f6d9f49db0f15560509861808b0031cdc0e7c798bac
+  checksum: 10c0/35bb110a71086c48906aa7cd3ed4913fb913823715359d65e32e0b964cb1e255593b0ae8014a5005c66a68e6fa66c38dcfa8056dbbdfb8b0187c0ffe7ee3a58f
   languageName: node
   linkType: hard
 
@@ -13675,7 +13695,7 @@ __metadata:
     commitizen: "npm:^4.3.0"
     cz-conventional-changelog: "npm:^3.3.0"
     eslint: "npm:^9.21.0"
-    husky: "npm:^9.1.5"
+    husky: "npm:^9.1.7"
     lint-staged: "npm:^15.2.9"
     npm-run-all2: "npm:^7.0.2"
     release-please: "npm:^16.18.0"

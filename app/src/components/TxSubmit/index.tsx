@@ -7,6 +7,7 @@ import type { AccountId, Address } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
+import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { encodeAddress } from '@/api';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
@@ -16,19 +17,10 @@ import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useAccountSource, useWallet } from '@/wallet/useWallet';
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  IconButton,
-  Paper,
-  Stack,
-  SvgIcon,
-  Typography
-} from '@mui/material';
+import { Box, Checkbox, Divider, FormControlLabel, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
+
+import { Alert, Button, Tooltip } from '@mimir-wallet/ui';
 
 import Input from '../Input';
 import InputAddress from '../InputAddress';
@@ -93,6 +85,9 @@ function TxSubmit({
   const [, addTx] = useBatchTxs(account);
   const buildTx = useBuildTx(call, addressChain, account, transaction);
   const source = useAccountSource(accountId?.toString());
+  const { isLocalAccount } = useAccount();
+
+  const hasPermission = accountId ? isLocalAccount(accountId.toString()) : true;
 
   const handleAddBatch = useCallback(() => {
     addTx([
@@ -181,98 +176,99 @@ function TxSubmit({
           />
         </Stack>
 
-        <Stack
-          sx={({ shadows }) => ({
-            position: 'sticky',
-            top: 0,
-            alignSelf: 'start',
-            width: { md: '40%', xs: '100%' },
-            height: 'auto',
-            padding: { sm: 2, xs: 1.5 },
-            borderRadius: 2,
-            boxShadow: shadows[1],
-            bgcolor: { md: 'transparent', xs: 'background.paper' }
-          })}
-          spacing={2}
-        >
-          {!accountId || !!source ? (
-            <InputAddress
-              label='Select Signer'
-              placeholder='Please select signer'
-              value={account}
-              onChange={setAccount}
-              isSign
-              filtered={accountId ? [accountId.toString()] : walletAccounts.map((item) => item.address)}
-            />
-          ) : (
-            <AddressChain
-              deep={0}
-              filterPaths={filterPaths}
-              addressChain={addressChain}
-              setAddressChain={setAddressChain}
-            />
+        <div className='sticky top-0 self-start w-full md:w-[40%] h-auto p-4 sm:p-5 shadow-medium rounded-large bg-content1 space-y-5'>
+          {hasPermission && (
+            <>
+              {!accountId || !!source ? (
+                <InputAddress
+                  label='Select Signer'
+                  placeholder='Please select signer'
+                  value={account}
+                  onChange={setAccount}
+                  isSign
+                  filtered={accountId ? [accountId.toString()] : walletAccounts.map((item) => item.address)}
+                />
+              ) : (
+                <AddressChain
+                  deep={0}
+                  filterPaths={filterPaths}
+                  addressChain={addressChain}
+                  setAddressChain={setAddressChain}
+                />
+              )}
+
+              <Input label='Note(Optional)' onChange={setNote} value={note} placeholder='Please note' />
+
+              <Divider />
+
+              {safetyCheck && safetyCheck.severity === 'warning' && (
+                <FormControlLabel
+                  control={<Checkbox checked={isConfirm} onChange={(e) => setConfirm(e.target.checked)} />}
+                  label='I confirm recipient address exsits on the destination chain.'
+                />
+              )}
+
+              {isFetched && (
+                <SendTx
+                  disabled={
+                    !safetyCheck ||
+                    safetyCheck.severity === 'error' ||
+                    (safetyCheck.severity === 'warning' && !isConfirm)
+                  }
+                  buildTx={buildTx}
+                  note={note}
+                  onlySign={onlySign}
+                  website={transaction?.website || website}
+                  iconUrl={transaction?.iconUrl || iconUrl}
+                  appName={transaction?.appName || appName}
+                  onError={onError}
+                  onFinalized={onFinalized}
+                  onResults={(...args) => {
+                    onClose?.();
+                    onResults?.(...args);
+                  }}
+                  onSignature={(...args) => {
+                    onClose?.();
+                    onSignature?.(...args);
+                  }}
+                  beforeSend={beforeSend}
+                />
+              )}
+
+              {!transaction && (
+                <Button fullWidth onPress={handleAddBatch} color='primary' variant='ghost' startContent={<IconBatch />}>
+                  Add To Batch
+                </Button>
+              )}
+
+              {!transaction && (
+                <Button
+                  fullWidth
+                  onPress={handleAddTemplate}
+                  color='primary'
+                  variant='ghost'
+                  startContent={<IconTemplate />}
+                >
+                  Add To Template
+                </Button>
+              )}
+            </>
           )}
+          {!hasPermission && (
+            <>
+              <Alert
+                color='danger'
+                title="You are currently not a member of this Account and won't be able to submit this transaction."
+              />
 
-          <Input label='Note(Optional)' onChange={setNote} value={note} placeholder='Please note' />
-
-          <Divider />
-
-          {safetyCheck && safetyCheck.severity === 'warning' && (
-            <FormControlLabel
-              control={<Checkbox checked={isConfirm} onChange={(e) => setConfirm(e.target.checked)} />}
-              label='I confirm recipient address exsits on the destination chain.'
-            />
+              <Tooltip content='You are currently not a member of this Account'>
+                <Button fullWidth variant='solid' color='primary' isDisabled>
+                  Submit
+                </Button>
+              </Tooltip>
+            </>
           )}
-
-          {isFetched && (
-            <SendTx
-              disabled={
-                !safetyCheck || safetyCheck.severity === 'error' || (safetyCheck.severity === 'warning' && !isConfirm)
-              }
-              buildTx={buildTx}
-              note={note}
-              onlySign={onlySign}
-              website={transaction?.website || website}
-              iconUrl={transaction?.iconUrl || iconUrl}
-              appName={transaction?.appName || appName}
-              onError={onError}
-              onFinalized={onFinalized}
-              onResults={(...args) => {
-                onClose?.();
-                onResults?.(...args);
-              }}
-              onSignature={(...args) => {
-                onClose?.();
-                onSignature?.(...args);
-              }}
-              beforeSend={beforeSend}
-            />
-          )}
-
-          {!transaction && (
-            <Button
-              fullWidth
-              onClick={handleAddBatch}
-              color='primary'
-              variant='outlined'
-              startIcon={<SvgIcon component={IconBatch} inheritViewBox />}
-            >
-              Add To Batch
-            </Button>
-          )}
-
-          {!transaction && (
-            <Button
-              fullWidth
-              onClick={handleAddTemplate}
-              color='primary'
-              variant='outlined'
-              startIcon={<SvgIcon component={IconTemplate} inheritViewBox />}
-            >
-              Add To Template
-            </Button>
-          )}
-        </Stack>
+        </div>
       </Paper>
     </Box>
   );

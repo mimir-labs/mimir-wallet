@@ -15,12 +15,11 @@ import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useToggle } from '@/hooks/useToggle';
 import { formatUnits } from '@/utils';
-import { Alert, Box, IconButton, SvgIcon, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo, useRef } from 'react';
 
-import { Spinner, Tooltip } from '@mimir-wallet/ui';
+import { Alert, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
 
 import AddressName from './AddressName';
 import FormatBalance from './FormatBalance';
@@ -54,9 +53,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
     onEnoughtStateRef.current?.(encodeAddress(address.toString()), isEnought);
   }, [address, isEnought]);
 
-  const icon = (
-    <SvgIcon color='primary' component={isUnLock ? IconUnLock : IconLock} inheritViewBox fontSize='medium' />
-  );
+  const icon = <div>{isUnLock ? <IconUnLock className='text-primary' /> : <IconLock className='text-primary' />}</div>;
 
   return (
     <>
@@ -69,40 +66,37 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
         />
       )}
       <Alert
-        severity={isEnought ? 'success' : 'error'}
+        color={isEnought ? 'success' : 'danger'}
         icon={icon}
-        sx={{ alignItems: 'center' }}
-        action={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
+        endContent={
+          <div className='flex items-center gap-[5px] sm:gap-2.5'>
             {!isUnLock && isEnought === false && (
-              <IconButton color='primary' onClick={toggleOpen} size='small'>
-                <SvgIcon component={IconFund} inheritViewBox />
-              </IconButton>
+              <Button isIconOnly color='primary' variant='light' onPress={toggleOpen} size='sm'>
+                <IconFund />
+              </Button>
             )}
 
-            <Typography>
+            <p>
               <FormatBalance value={value} />
-            </Typography>
+            </p>
 
             {!isUnLock &&
               (isEnought === 'pending' ? (
                 <Spinner size='sm' variant='spinner' />
+              ) : isEnought ? (
+                <IconSuccess className='text-success' />
               ) : (
-                <SvgIcon
-                  color={isEnought ? 'success' : 'error'}
-                  component={isEnought ? IconSuccess : IconFail}
-                  inheritViewBox
-                />
+                <IconFail className='text-danger' />
               ))}
-          </Box>
+          </div>
         }
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
+        <div className='flex items-center gap-[5px] sm:gap-2.5'>
           <AddressName value={address} /> {isUnLock ? 'unlock' : 'lock'}
           <Tooltip classNames={{ content: 'max-w-[320px]' }} content={<span>{tip}</span>} closeDelay={0}>
             <IconQuestion />
           </Tooltip>
-        </Box>
+        </div>
       </Alert>
     </>
   );

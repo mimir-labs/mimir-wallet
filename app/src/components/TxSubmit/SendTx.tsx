@@ -12,11 +12,10 @@ import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { addTxToast } from '@/hooks/useTxQueue';
 import { service } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
-import { LoadingButton } from '@mui/lab';
-import { Alert, AlertTitle, Box, Divider, SvgIcon, Typography } from '@mui/material';
+import { Divider, SvgIcon } from '@mui/material';
 import React, { useState } from 'react';
 
-import { Tooltip } from '@mimir-wallet/ui';
+import { Alert, Button, Tooltip } from '@mimir-wallet/ui';
 
 import AddressName from '../AddressName';
 import FormatBalance from '../FormatBalance';
@@ -130,23 +129,20 @@ function SendTx({
       {(Object.keys(reserve).length > 0 || Object.keys(unreserve).length > 0 || Object.keys(delay).length > 0) && (
         <LockContainer>
           {Object.entries(delay).map(([address, delay], index) => (
-            <Box
-              key={`delay-${address}-${index}`}
-              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: { xs: 0.5, sm: 1 } }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
+            <div key={`delay-${address}-${index}`} className='flex items-center justify-between gap-[5px] sm:gap-2.5'>
+              <div className='flex items-center gap-[5px] sm:gap-2.5'>
                 <SvgIcon color='primary' component={IconClock} inheritViewBox sx={{ opacity: 0.5 }} />
-                <Typography>Review window</Typography>
+                <p>Review window</p>
                 <Tooltip
                   content='This transaction needs to be executed manually after review window ends.'
                   closeDelay={0}
                 >
                   <SvgIcon color='primary' component={IconQuestion} inheritViewBox />
                 </Tooltip>
-              </Box>
+              </div>
 
               <span>{delay.toString()} Blocks</span>
-            </Box>
+            </div>
           ))}
 
           {Object.keys(delay).length > 0 && <Divider />}
@@ -191,22 +187,18 @@ function SendTx({
         </LockContainer>
       )}
 
-      {error ? (
-        <Alert severity='error'>
-          <AlertTitle>{error.message}</AlertTitle>
-        </Alert>
-      ) : null}
+      {error ? <Alert color='danger' title='error.message' /> : null}
 
-      <LoadingButton
+      <Button
         fullWidth
-        variant='contained'
+        variant='solid'
         color='primary'
-        onClick={error ? undefined : onConfirm}
-        loading={loading || isLoading}
-        disabled={!txBundle?.signer || !!error || !isEnought || disabled}
+        onPress={error ? undefined : onConfirm}
+        isLoading={loading || isLoading}
+        isDisabled={!txBundle?.signer || !!error || !isEnought || disabled}
       >
         Submit
-      </LoadingButton>
+      </Button>
     </>
   );
 }
