@@ -1,0 +1,67 @@
+{
+  "author": "dev.mimir",
+  "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
+  "engines": {
+    "node": ">=20"
+  },
+  "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/ui#readme",
+  "license": "Apache-2.0",
+  "packageManager": "yarn@4.5.3",
+  "private": true,
+  "repository": {
+    "directory": "packages/ui",
+    "type": "git",
+    "url": "https://github.com/mimir-labs/mimir-wallet.git"
+  },
+  "sideEffects": true,
+  "type": "module",
+  "name": "@mimir-wallet/ui",
+  "version": "1.20.1",
+  "main": "build/index.js",
+  "module": "build/index.js",
+  "types": "build/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "@mimir-wallet/source": "./src/index.ts",
+        "types": "./build/index.d.ts",
+        "default": "./build/index.js"
+      }
+    },
+    "./styles.css": "./dist/styles.css",
+    "./hero-plugin": "./hero-plugin.js"
+  },
+  "files": [
+    "dist",
+    "build",
+    "hero-plugin.js",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --build && tailwindcss -i ./src/styles.css -o ./dist/styles.css",
+    "check-types": "tsc --noEmit",
+    "dev": "run-p dev:tsc dev:tailwindcss",
+    "dev:tsc": "tsc --watch",
+    "dev:tailwindcss": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch"
+  },
+  "dependencies": {
+    "@heroui/button": "^2.2.15",
+    "@heroui/modal": "^2.2.12",
+    "@heroui/progress": "^2.2.11",
+    "@heroui/scroll-shadow": "^2.3.10",
+    "@heroui/spinner": "^2.2.12",
+    "@heroui/system": "^2.4.11",
+    "@heroui/tabs": "^2.2.12",
+    "@heroui/theme": "^2.4.11",
+    "@heroui/tooltip": "^2.2.12",
+    "@mimir-wallet/dev": "workspace:^",
+    "framer-motion": "^12.4.10"
+  },
+  "devDependencies": {
+    "npm-run-all2": "^7.0.2",
+    "tailwind-variants": "^0.3.1",
+    "tailwindcss": "^3.4.15",
+    "typescript": "5.6.3"
+  }
+}

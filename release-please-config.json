@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/release-please/schemas/config.json",
+  "release-type": "node",
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "plugins": ["node-workspace"],
+  "packages": {
+    "app": {
+      "always-update": true
+    },
+    "packages/dev": {},
+    "packages/ui": {}
+  }
+}

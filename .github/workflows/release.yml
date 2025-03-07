@@ -19,21 +19,28 @@ jobs:
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          release-type: node
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
       - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.releases_created }}
         with:
           fetch-depth: 0
 
       - name: Setup Node
+        if: ${{ steps.release.outputs.releases_created }}
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "yarn"
-      - run: yarn install
+          node-version: 20
+
+      - name: Install dependencies
+        if: ${{ steps.release.outputs.releases_created }}
+        uses: bahmutov/npm-install@v1
+
       - run: yarn build
 
       - name: Deploy to production
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.releases_created }}
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr
