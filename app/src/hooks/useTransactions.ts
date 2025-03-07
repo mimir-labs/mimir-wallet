@@ -25,7 +25,11 @@ function transformTransaction(transaction: Transaction): Transaction {
 
   return {
     ...tx,
-    children: tx.children.map((item) => transformTransaction(item))
+    children: tx.children
+      .filter(
+        (item, index, self) => self.findIndex((t) => t.createdExtrinsicHash === item.createdExtrinsicHash) === index
+      )
+      .map((item) => transformTransaction(item))
   };
 }
 
