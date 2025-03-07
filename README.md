@@ -8,12 +8,17 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-blue)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.0-blue)](https://vitejs.dev/)
+[![GitHub Stars](https://img.shields.io/github/stars/mimir-labs/mimir-wallet.svg)](https://github.com/mimir-labs/mimir-wallet/stargazers)
 
 The most comprehensive enterprise-level multi-signature account (multisig) management tool for Polkadot, Kusama, and other substrate-based chains.
 
 [Website](https://app.mimir.global) · [Documentation](https://docs.mimir.global) · [Report Bug](https://github.com/mimir-labs/mimir-wallet/issues) · [Request Feature](https://github.com/mimir-labs/mimir-wallet/issues)
 
 </div>
+
+## 🎯 Overview
+
+Mimir Wallet is a state-of-the-art multisig wallet solution designed specifically for the Polkadot ecosystem. It combines enterprise-grade security with an intuitive user interface, making complex multisig operations simple and secure.
 
 ## ✨ Key Features
 
@@ -66,6 +71,7 @@ The most comprehensive enterprise-level multi-signature account (multisig) manag
 - Node.js >= 20
 - Yarn v4.5.3 or later
 - Git
+- A modern web browser (see [Browser Support](#-browser-support))
 
 ### Installation
 
@@ -77,6 +83,7 @@ cd mimir-wallet
 
 2. Install dependencies
 ```bash
+corepack enable  # Enable Yarn
 yarn install
 ```
 
@@ -85,7 +92,15 @@ yarn install
 yarn dev
 ```
 
-Visit http://localhost:5173 to see the app.
+The app will be available at http://localhost:5173
+
+### Production Deployment
+
+```bash
+yarn build      # Build for production
+yarn preview    # Preview production build locally
+```
+
 
 ## 🛠 Technology Stack
 
@@ -140,7 +155,15 @@ yarn commit       # Create a conventional commit
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+We love your input! We want to make contributing to Mimir Wallet as easy and transparent as possible, whether it's:
+
+- Reporting a bug
+- Discussing the current state of the code
+- Submitting a fix
+- Proposing new features
+- Becoming a maintainer
+
+### Development Process
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -148,7 +171,13 @@ We welcome contributions! Please follow these steps:
 4. Push to your branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-See our [Contributing Guide](CONTRIBUTING.md) for more details.
+### Code Style
+
+- We use Prettier for code formatting
+- Follow the TypeScript guidelines
+- Write meaningful commit messages using Conventional Commits
+
+See our [Contributing Guide](CONTRIBUTING.md) for detailed information.
 
 ## 📄 License
 

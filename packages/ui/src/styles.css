@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  p {
+    @apply text-inherit leading-inherit font-normal;
+  }
+  h1 {
+    @apply text-4xl font-bold leading-[1.2];
+  }
+  h2 {
+    @apply text-3xl font-bold leading-[1.2];
+  }
+  h3 {
+    @apply text-2xl font-bold leading-[1.2];
+  }
+  h4 {
+    @apply text-xl font-bold leading-[1.2];
+  }
+  h5 {
+    @apply text-large font-bold leading-[1.2];
+  }
+  h6 {
+    @apply text-medium font-bold leading-[1.2];
+  }
+}

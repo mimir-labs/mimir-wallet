@@ -4,6 +4,7 @@ node_modules
 .DS_Store
 dist
 dist-ssr
+build
 *.local
 .eslintcache
 coverage
@@ -25,3 +26,10 @@ yarn-error.log*
 !.yarn/releases
 !.yarn/plugins
 !.yarn/sdks
+
+# turbo
+.turbo
+packages/**/.turbo
+
+# typescript
+*.tsbuildinfo
