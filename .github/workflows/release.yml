@@ -23,24 +23,24 @@ jobs:
           manifest-file: .release-please-manifest.json
 
       - uses: actions/checkout@v4
-        if: ${{ steps.release.outputs.releases_created }}
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        if: ${{ steps.release.outputs.releases_created }}
         uses: actions/setup-node@v4
         with:
           node-version: 20
+        if: ${{ steps.release.outputs.releases_created }}
 
       - name: Install dependencies
-        if: ${{ steps.release.outputs.releases_created }}
         uses: bahmutov/npm-install@v1
+        if: ${{ steps.release.outputs.releases_created }}
 
-      - run: yarn build
+      - name: Build
+        run: yarn build
+        if: ${{ steps.release.outputs.releases_created }}
 
       - name: Deploy to production
-        if: ${{ steps.release.outputs.releases_created }}
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr
@@ -49,4 +49,5 @@ jobs:
           remote_port: ${{ secrets.PORT }}
           remote_key: ${{ secrets.KEY }}
           remote_path: ${{ secrets.TARGET }}
-          path: dist/
+          path: app/dist/
+        if: ${{ steps.release.outputs.releases_created }}

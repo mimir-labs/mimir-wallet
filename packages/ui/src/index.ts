@@ -12,6 +12,7 @@ import { Tooltip } from '@heroui/tooltip';
 export { default as Button } from './button.js';
 export { HeroUIProvider, Tooltip, ScrollShadow, CircularProgress, Spinner };
 export { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from './modal/index.js';
+export { default as Alert } from './alerts/index.js';
 export { Tabs, Tab } from './tabs/index.js';
 
 export type { ButtonProps };

@@ -6,7 +6,12 @@ import heroPlugin from '@mimir-wallet/ui/hero-plugin';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx,mdx}'],
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}',
+    '../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}'
+  ],
   plugins: [heroPlugin],
   presets: [base]
 };

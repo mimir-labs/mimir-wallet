@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import './style.css';
-import '@mimir-wallet/ui/styles.css';
 
 import moment from 'moment';
 import { createRoot } from 'react-dom/client';

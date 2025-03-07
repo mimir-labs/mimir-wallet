@@ -11,8 +11,6 @@ import { useApi } from '@/hooks/useApi';
 import { useCacheMultisig } from '@/hooks/useCacheMultisig';
 import { useToggle } from '@/hooks/useToggle';
 import {
-  Alert,
-  AlertTitle,
   Box,
   Button,
   Dialog,
@@ -28,6 +26,8 @@ import {
 import { isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { Alert } from '@mimir-wallet/ui';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
@@ -198,34 +198,36 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
                 <Typography fontWeight={700}>Flexible Multisig</Typography>
                 <Switch checked={flexible} onChange={(e) => setFlexible(e.target.checked)} />
               </Box>
+
               <Alert
+                color='warning'
+                classNames={{ title: 'mb-1 font-bold text-medium' }}
                 icon={<SvgIcon inheritViewBox component={IconInfo} sx={{ fontSize: '0.875rem' }} />}
-                severity='warning'
-                sx={{ '.MuiAlert-message': { overflow: 'visible' } }}
-              >
-                <AlertTitle>Notice</AlertTitle>
-                {flexible ? (
-                  <ul>
-                    <li>
-                      Only on{' '}
-                      <Box
-                        component='img'
-                        sx={{ display: 'inline', verticalAlign: 'middle' }}
-                        width={16}
-                        src={chain.icon}
-                      />{' '}
-                      {chain.name}.
-                    </li>
-                    <li>Initiating a transaction is required.</li>
-                  </ul>
-                ) : (
-                  <ul>
-                    <li>All chains supported.</li>
-                    <li>Unchangeable members and thresholds.</li>
-                    <li>No gas fee for creation.</li>
-                  </ul>
-                )}
-              </Alert>
+                title='Notice'
+                description={
+                  flexible ? (
+                    <ul>
+                      <li>
+                        Only on{' '}
+                        <Box
+                          component='img'
+                          sx={{ display: 'inline', verticalAlign: 'middle' }}
+                          width={16}
+                          src={chain.icon}
+                        />{' '}
+                        {chain.name}.
+                      </li>
+                      <li>Initiating a transaction is required.</li>
+                    </ul>
+                  ) : (
+                    <ul>
+                      <li>All chains supported.</li>
+                      <li>Unchangeable members and thresholds.</li>
+                      <li>No gas fee for creation.</li>
+                    </ul>
+                  )
+                }
+              />
               {flexible ? (
                 <Button
                   disabled={!name}

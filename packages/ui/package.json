@@ -46,6 +46,7 @@
     "dev:tailwindcss": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch"
   },
   "dependencies": {
+    "@heroui/alert": "^2.2.15",
     "@heroui/button": "^2.2.15",
     "@heroui/modal": "^2.2.12",
     "@heroui/progress": "^2.2.11",

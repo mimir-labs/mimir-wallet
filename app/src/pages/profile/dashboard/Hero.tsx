@@ -41,7 +41,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
   const formatUsd = formatDisplay(totalUsd);
 
   const buttons = (
-    <div className='w-full sm:w-auto grid grid-cols-2 sm:grid-cols-5 item-center gap-2'>
+    <div className='w-full sm:w-auto grid md:flex grid-cols-2 item-center gap-2'>
       <Button
         as={Link}
         to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}`}

@@ -6,7 +6,6 @@ import type { AccountData } from '@/hooks/types';
 import { Empty } from '@/components';
 import { useHistoryTransactions } from '@/hooks/useTransactions';
 import { TxCell } from '@/transactions';
-import { Box, Typography } from '@mui/material';
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -35,16 +34,12 @@ function HistoryTransactions({ account, txId }: { account: AccountData; txId?: s
       next={fetchNextPage}
       hasMore={hasNexPage}
       loader={skeleton}
-      endMessage={
-        <Typography variant='h6' fontSize='0.875rem' textAlign='center' color='textSecondary'>
-          no data more.
-        </Typography>
-      }
+      endMessage={<h6 className='text-small text-center text-foreground/50'>no data more.</h6>}
     >
       {data.map((item) => (
-        <Box key={item.id} sx={{ marginBottom: 2 }}>
+        <div key={item.id} className='mb-5'>
           <TxCell key={item.id} account={account} transaction={item} />
-        </Box>
+        </div>
       ))}
     </InfiniteScroll>
   );
