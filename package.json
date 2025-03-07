@@ -23,6 +23,7 @@
   "scripts": {
     "lint": "eslint --cache",
     "build": "turbo run build",
+    "check-types": "turbo run check-types",
     "dev": "turbo run dev",
     "commit": "cz",
     "preinstall": "npx only-allow yarn",

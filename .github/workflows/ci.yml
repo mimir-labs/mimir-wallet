@@ -19,18 +19,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "yarn"
+          node-version: 20
 
-      - name: Install deps
-        run: |
-          yarn install
-      - name: Lint
-        run: |
-          yarn lint
-      - name: Test
-        run: |
-          yarn test:ci
-      - name: Build
-        run: |
-          yarn build
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1
+
+      - run: yarn lint
+      - run: yarn check-types

@@ -18,10 +18,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "yarn"
+          node-version: 20
 
-      - run: yarn install
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1
+
       - run: yarn build
 
       - name: Deploy to staging
@@ -33,4 +34,4 @@ jobs:
           remote_port: ${{ secrets.PORT }}
           remote_key: ${{ secrets.KEY }}
           remote_path: ${{ secrets.TARGET }}
-          path: dist/
+          path: app/dist/

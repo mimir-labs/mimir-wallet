@@ -1,13 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { clientsClaim } from 'workbox-core';
+import { clientsClaim, skipWaiting } from 'workbox-core';
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
 
-declare const self: ServiceWorkerGlobalScope & Window & typeof globalThis;
+declare const self: ServiceWorkerGlobalScope;
 
-self.skipWaiting();
+skipWaiting();
 clientsClaim();
 
 precacheAndRoute(self.__WB_MANIFEST);

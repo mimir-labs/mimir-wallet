@@ -23,15 +23,20 @@ jobs:
           manifest-file: .release-please-manifest.json
 
       - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.releases_created }}
         with:
           fetch-depth: 0
 
       - name: Setup Node
+        if: ${{ steps.release.outputs.releases_created }}
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "yarn"
-      - run: yarn install
+          node-version: 20
+
+      - name: Install dependencies
+        if: ${{ steps.release.outputs.releases_created }}
+        uses: bahmutov/npm-install@v1
+
       - run: yarn build
 
       - name: Deploy to production
