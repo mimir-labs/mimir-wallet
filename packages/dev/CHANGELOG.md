@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.0](https://github.com/mimir-labs/mimir-wallet/compare/dev-v1.21.0...dev-v1.22.0) (2025-03-10)
+
+
+### Features
+
+* add global account search and refactor UI components ([#167](https://github.com/mimir-labs/mimir-wallet/issues/167)) ([31d8b77](https://github.com/mimir-labs/mimir-wallet/commit/31d8b770a683ff46eea8c6824aa8d188d234b2ec))
+
 ## [1.21.0](https://github.com/mimir-labs/mimir-wallet/compare/dev-v1.20.1...dev-v1.21.0) (2025-03-07)
 
 

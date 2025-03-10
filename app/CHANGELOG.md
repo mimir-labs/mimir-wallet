@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.22.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.21.0...mimir-wallet-app-v1.22.0) (2025-03-10)
+
+
+### Features
+
+* add global account search and refactor UI components ([#167](https://github.com/mimir-labs/mimir-wallet/issues/167)) ([31d8b77](https://github.com/mimir-labs/mimir-wallet/commit/31d8b770a683ff46eea8c6824aa8d188d234b2ec))
+
+
+### Bug Fixes
+
+* Remove duplicate dirty data in transaction approval ([#165](https://github.com/mimir-labs/mimir-wallet/issues/165)) ([c1ac94e](https://github.com/mimir-labs/mimir-wallet/commit/c1ac94ec51c133ea3cf3d2d5ee2398ac63b398a5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/dev bumped to 1.22.0
+    * @mimir-wallet/ui bumped to 1.22.0
+
 ## [1.21.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.20.1...mimir-wallet-app-v1.21.0) (2025-03-07)
 
 
