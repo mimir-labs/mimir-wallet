@@ -8,11 +8,7 @@
     "app": {
       "always-update": true
     },
-    "packages/dev": {
-      "skip-github-release": true
-    },
-    "packages/ui": {
-      "skip-github-release": true
-    }
+    "packages/dev": {},
+    "packages/ui": {}
   }
 }
