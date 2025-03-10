@@ -10,12 +10,12 @@ import { utm } from '@/config';
 import { DETECTED_ACCOUNT_KEY } from '@/constants';
 import { useToggle } from '@/hooks/useToggle';
 import { addressToHex, service, store } from '@/utils';
-import { LoadingButton } from '@mui/lab';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 interface Props {
   name?: string;
@@ -73,32 +73,33 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
 
   return (
     <>
-      <Dialog onClose={toggleOpen} open={open}>
-        <DialogTitle>Create Static Multisig</DialogTitle>
-        <DialogContent>
-          <ul>
-            <li>You're creating a non-Flexible multisig, members and threshold can't be modified.</li>
-            <li>You need to submit signature to confirm your identity; this isn't a transaction.</li>
-          </ul>
-        </DialogContent>
-        <DialogActions>
-          <Button fullWidth onClick={toggleOpen} variant='outlined'>
-            Cancel
-          </Button>
-          <LoadingButton fullWidth loading={isLoading} onClick={handleCreate}>
-            Create
-          </LoadingButton>
-        </DialogActions>
-      </Dialog>
+      <Modal onClose={toggleOpen} isOpen={open} size='xl'>
+        <ModalContent className='w-auto'>
+          <ModalHeader>Create Static Multisig</ModalHeader>
+          <ModalBody>
+            <ul>
+              <li>You're creating a non-Flexible multisig, members and threshold can't be modified.</li>
+              <li>You need to submit signature to confirm your identity; this isn't a transaction.</li>
+            </ul>
+          </ModalBody>
+          <ModalFooter>
+            <Button fullWidth onPress={toggleOpen} variant='ghost'>
+              Cancel
+            </Button>
+            <Button fullWidth isLoading={isLoading} onPress={handleCreate}>
+              Create
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Button
-        disabled={!name}
+        isDisabled={!name}
         fullWidth
-        onClick={() => {
+        onPress={() => {
           if (!(name && checkField())) return;
 
           toggleOpen();
         }}
-        variant='contained'
       >
         Create
       </Button>

@@ -10,24 +10,12 @@ import { Address, AddressRow, Input } from '@/components';
 import { useApi } from '@/hooks/useApi';
 import { useCacheMultisig } from '@/hooks/useCacheMultisig';
 import { useToggle } from '@/hooks/useToggle';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogContent,
-  Divider,
-  FormHelperText,
-  Paper,
-  Stack,
-  SvgIcon,
-  Switch,
-  Typography
-} from '@mui/material';
+import { Box, Button, Divider, FormHelperText, Paper, Stack, SvgIcon, Switch, Typography } from '@mui/material';
 import { isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Alert } from '@mimir-wallet/ui';
+import { Alert, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
@@ -255,9 +243,9 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
         </Paper>
       </Box>
 
-      <Dialog fullWidth maxWidth='sm' onClose={toggleOpen} open={open}>
-        <DialogContent sx={{ paddingY: 1 }}>
-          <Stack spacing={1.5}>
+      <Modal onClose={toggleOpen} isOpen={open}>
+        <ModalContent>
+          <ModalBody className='gap-4'>
             {prepares.map((item, index) => (
               <Button
                 color='secondary'
@@ -279,14 +267,14 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
                 sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'text.primary' }}
               >
                 <AddressRow defaultName={item.name} value={item.pure} />
-                <Typography fontWeight={400}>
+                <p>
                   <Address shorten value={item.pure} />
-                </Typography>
+                </p>
               </Button>
             ))}
-          </Stack>
-        </DialogContent>
-      </Dialog>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

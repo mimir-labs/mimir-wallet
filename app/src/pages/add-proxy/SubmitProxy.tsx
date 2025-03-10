@@ -7,22 +7,12 @@ import { Address, AddressRow, TxButton } from '@/components';
 import { toastSuccess } from '@/components/utils';
 import { useApi } from '@/hooks/useApi';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import {
-  Box,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControlLabel,
-  Stack,
-  Typography
-} from '@mui/material';
+import { Box, Checkbox, FormControlLabel } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAsyncFn, useToggle } from 'react-use';
 
-import { Button } from '@mimir-wallet/ui';
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 function ConfirmDialog({
   open,
@@ -38,44 +28,48 @@ function ConfirmDialog({
   const [checked, toggleChecked] = useToggle(false);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm'>
-      <DialogTitle>
-        Safety Alert
-        <Typography marginTop={1.5}>
-          We have detected that, because your proxy account also has its own proxy, the following accounts can
-          indirectly control your account.
-        </Typography>
-      </DialogTitle>
-      <Stack component={DialogContent} spacing={1.5}>
-        <Typography>Indirect Controllers</Typography>
-        {list.map((address) => (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: 1,
-              borderRadius: 1,
-              border: '1px solid',
-              borderColor: 'grey.300'
-            }}
-            key={address}
-          >
-            <AddressRow withAddress={false} withName value={address} />
-            <Address shorten value={address} />
-          </Box>
-        ))}
-      </Stack>
-      <DialogActions>
-        <Stack spacing={1.5} width='100%'>
-          <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label='I Understand' />
+    <Modal isOpen={open} onClose={onClose} size='2xl'>
+      <ModalContent>
+        <ModalHeader className='flex-col gap-4'>
+          Safety Alert
+          <p className='text-small'>
+            We have detected that, because your proxy account also has its own proxy, the following accounts can
+            indirectly control your account.
+          </p>
+        </ModalHeader>
+        <Divider />
+        <ModalBody className='gap-4'>
+          <p>Indirect Controllers</p>
+          {list.map((address) => (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: 1,
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'grey.300'
+              }}
+              key={address}
+            >
+              <AddressRow withAddress={false} withName value={address} />
+              <Address shorten value={address} />
+            </Box>
+          ))}
+        </ModalBody>
+        <Divider />
+        <ModalFooter>
+          <div className='flex flex-col gap-4 w-full'>
+            <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label='I Understand' />
 
-          <Button fullWidth color='primary' disabled={!checked} onPress={onSubmit}>
-            Confirm
-          </Button>
-        </Stack>
-      </DialogActions>
-    </Dialog>
+            <Button fullWidth color='primary' isDisabled={!checked} onPress={onSubmit}>
+              Confirm
+            </Button>
+          </div>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
 
@@ -117,20 +111,20 @@ function SubmitProxy({
 
         if (events.length > 0) {
           toastSuccess(
-            <Box marginLeft={1.5} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-              <Typography fontWeight={700}>Proxy Added</Typography>
-              <Typography fontSize={12}>
+            <div className='ml-4 flex flex-col gap-1'>
+              <p>
+                <b>Proxy Added</b>
+              </p>
+              <p className='text-tiny'>
                 <Address value={proxied} shorten /> added {proxyArgs.length} new proxy
-              </Typography>
-              <Typography
-                component={Link}
-                fontSize={12}
+              </p>
+              <Link
+                className='text-tiny text-primary no-underline'
                 to={`/?address=${proxied.toString()}&tab=structure`}
-                sx={{ color: 'primary.main', textDecoration: 'none' }}
               >
                 Account Structure{'>'}
-              </Typography>
-            </Box>
+              </Link>
+            </div>
           );
         }
       }

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
+import { encodeAddress } from '@/api';
+import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconMore from '@/assets/svg/icon-more.svg?react';
 import { findToken } from '@/config';
 import { useApi } from '@/hooks/useApi';
@@ -20,18 +22,20 @@ function AccountCell({
   onSelect,
   watchlist,
   selected,
+  withAdd = false,
   isHide = false,
   value
 }: {
   onClose?: () => void;
   selected?: boolean;
   value?: string;
+  withAdd?: boolean;
   watchlist?: boolean;
   isHide?: boolean;
   onSelect?: (address: string) => void;
 }) {
   const { genesisHash } = useApi();
-  const { isLocalAccount, deleteAddress, showAccount, hideAccount } = useAccount();
+  const { isLocalAccount, deleteAddress, showAccount, hideAccount, addAddressBook } = useAccount();
   const [balances, isFetched] = useNativeBalances(value);
   const icon = useMemo(() => findToken(genesisHash).Icon, [genesisHash]);
   const source = useAccountSource(value);
@@ -58,6 +62,18 @@ function AccountCell({
         </div>
       ) : (
         <Skeleton className='w-[40px]' />
+      )}
+
+      {withAdd && (
+        <Button
+          isIconOnly
+          color='default'
+          size='sm'
+          variant='light'
+          onPress={() => addAddressBook(encodeAddress(value), true)}
+        >
+          <IconAdd />
+        </Button>
       )}
 
       {value && (isLocalAccount(value) || watchlist) && (

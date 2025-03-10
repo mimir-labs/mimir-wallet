@@ -43,9 +43,7 @@ export interface TxState {
 
 export interface TxToast {
   id?: number;
-  style?: 'notification' | 'dialog';
   onRemove?: () => void;
-  onChange?: () => void;
   events: TxEvents;
 }
 
@@ -85,31 +83,12 @@ export const useTxQueue = create<TxState>()((set) => ({
 
 export function addTxToast(toast: TxToast) {
   const _id = ++toastId;
-  const style = toast.style || 'notification';
 
   const onRemove = () => {
     useTxQueue.setState((state) => ({ toasts: state.toasts.filter((item) => item.id !== _id) }));
   };
 
-  const onChange =
-    style === 'dialog'
-      ? () => {
-          useTxQueue.setState((state) => ({
-            ...state,
-            toasts: state.toasts.map((item) =>
-              item.id === _id
-                ? {
-                    ...item,
-                    style: 'notification',
-                    onChange: undefined
-                  }
-                : item
-            )
-          }));
-        }
-      : undefined;
-
   useTxQueue.setState((state) => ({
-    toasts: [...state.toasts, { id: _id, events: toast.events, style, onRemove, onChange }]
+    toasts: [...state.toasts, { id: _id, events: toast.events, onRemove }]
   }));
 }

@@ -4,9 +4,10 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { useApi } from '@/hooks/useApi';
-import { Avatar, Box, Dialog, DialogContent, Typography } from '@mui/material';
 import qrcode from 'qrcode-generator';
 import React, { useEffect, useRef } from 'react';
+
+import { Avatar, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 import CopyButton from './CopyButton';
 
@@ -19,7 +20,7 @@ interface Props {
 function Content({ value }: { value: string }) {
   const { chain } = useApi();
   const qr = useRef(qrcode(0, 'M'));
-  const container = useRef<HTMLDivElement>();
+  const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setTimeout(() => {
@@ -33,39 +34,32 @@ function Content({ value }: { value: string }) {
   }, [value]);
 
   return (
-    <Box>
-      <Box sx={{ position: 'relative' }}>
-        <Box
-          ref={container}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto',
-            width: 300,
-            height: 300
-          }}
-        />
+    <div>
+      <div className='relative'>
+        <div className='flex items-center justify-center my-0 mx-auto w-[300px] h-[300px]' ref={container} />
         <Avatar
+          className='absolute left-0 right-0 top-0 bottom-0 m-auto bg-transparent'
           src={chain.icon}
-          sx={{ width: 50, height: 50, margin: 'auto', position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+          style={{ width: 50, height: 50 }}
         />
-      </Box>
-      <Typography marginTop={1} textAlign='center' sx={{ wordBreak: 'break-all' }}>
+      </div>
+      <p className='mt-2.5 break-all text-center'>
         {value}
         <CopyButton value={value} />
-      </Typography>
-    </Box>
+      </p>
+    </div>
   );
 }
 
 function QrcodeAddress({ onClose, open, value }: Props) {
   return (
-    <Dialog fullWidth maxWidth='xs' onClose={onClose} open={open}>
-      <DialogContent>
-        <Content value={value?.toString() || ''} />
-      </DialogContent>
-    </Dialog>
+    <Modal hideCloseButton onClose={onClose} isOpen={open}>
+      <ModalContent>
+        <ModalBody className='py-5'>
+          <Content value={value?.toString() || ''} />
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }
 
