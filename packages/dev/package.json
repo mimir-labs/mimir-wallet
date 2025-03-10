@@ -16,7 +16,7 @@
   "sideEffects": true,
   "type": "module",
   "name": "@mimir-wallet/dev",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "eslint-config-prettier": "^10.0.2",
