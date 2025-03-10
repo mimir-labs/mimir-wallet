@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.22.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.22.0...mimir-wallet-app-v1.22.1) (2025-03-10)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/dev bumped to 1.23.0
+    * @mimir-wallet/ui bumped to 1.23.0
+
 ## [1.22.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.21.0...mimir-wallet-app-v1.22.0) (2025-03-10)
 
 
