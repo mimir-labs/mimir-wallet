@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.22.2](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.22.1...mimir-wallet-app-v1.22.2) (2025-03-10)
+
+
+### Bug Fixes
+
+* modal style and account menu style ([#170](https://github.com/mimir-labs/mimir-wallet/issues/170)) ([f0ef59f](https://github.com/mimir-labs/mimir-wallet/commit/f0ef59f798024b1b956079889b2190e5bb0c566d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/dev bumped to 1.24.0
+    * @mimir-wallet/ui bumped to 1.24.0
+
 ## [1.22.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.22.0...mimir-wallet-app-v1.22.1) (2025-03-10)
 
 
