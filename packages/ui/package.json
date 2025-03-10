@@ -46,16 +46,22 @@
     "dev:tailwindcss": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch"
   },
   "dependencies": {
-    "@heroui/alert": "^2.2.15",
-    "@heroui/button": "^2.2.15",
-    "@heroui/modal": "^2.2.12",
-    "@heroui/progress": "^2.2.11",
+    "@heroui/alert": "^2.2.16",
+    "@heroui/avatar": "^2.2.12",
+    "@heroui/button": "^2.2.16",
+    "@heroui/divider": "^2.2.11",
+    "@heroui/drawer": "^2.2.13",
+    "@heroui/dropdown": "^2.3.16",
+    "@heroui/modal": "^2.2.13",
+    "@heroui/popover": "^2.3.16",
+    "@heroui/progress": "^2.2.12",
     "@heroui/scroll-shadow": "^2.3.10",
-    "@heroui/spinner": "^2.2.12",
-    "@heroui/system": "^2.4.11",
-    "@heroui/tabs": "^2.2.12",
-    "@heroui/theme": "^2.4.11",
-    "@heroui/tooltip": "^2.2.12",
+    "@heroui/skeleton": "^2.2.10",
+    "@heroui/spinner": "^2.2.13",
+    "@heroui/system": "^2.4.12",
+    "@heroui/tabs": "^2.2.13",
+    "@heroui/theme": "^2.4.12",
+    "@heroui/tooltip": "^2.2.13",
     "@mimir-wallet/dev": "workspace:^",
     "framer-motion": "^12.4.10"
   },
@@ -63,6 +69,6 @@
     "npm-run-all2": "^7.0.2",
     "tailwind-variants": "^0.3.1",
     "tailwindcss": "^3.4.15",
-    "typescript": "5.6.3"
+    "typescript": "^5.8.2"
   }
 }

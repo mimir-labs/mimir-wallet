@@ -5,7 +5,6 @@ import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { chainLinks } from '@/api/chain-links';
 import ArrowRight from '@/assets/svg/ArrowRight.svg?react';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
-import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconDapp from '@/assets/svg/icon-dapp.svg?react';
 import IconHome from '@/assets/svg/icon-home.svg?react';
 import IconLink from '@/assets/svg/icon-link.svg?react';
@@ -32,7 +31,6 @@ import {
   Avatar,
   Box,
   Divider,
-  Drawer,
   Grid2 as Grid,
   Paper,
   Skeleton,
@@ -45,7 +43,7 @@ import {
 import { useMemo, useState } from 'react';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 
-import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, Tooltip } from '@mimir-wallet/ui';
 
 import ToggleSidebar from './ToggleSidebar';
 
@@ -282,21 +280,6 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
 
   const element = (
     <Stack gap={{ sm: 2.5, xs: 2 }}>
-      <Box
-        sx={{
-          zIndex: 10,
-          display: { md: 'none', xs: 'flex' },
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 2
-        }}
-      >
-        <Typography variant='h3'>Menu</Typography>
-        <Button isIconOnly onPress={closeSidebar} color='default'>
-          <SvgIcon component={IconClose} inheritViewBox fontSize='large' />
-        </Button>
-      </Box>
-
       {pathname !== '/welcome' && isApiReady && <TopContent />}
 
       <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
@@ -311,26 +294,22 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
     <>
       {downMd || !withSideBar ? (
         <Drawer
-          PaperProps={{
-            sx: {
-              width: 280,
-              paddingX: 1.5,
-              paddingY: 2,
-              borderTopRightRadius: { md: 20, xs: 0 },
-              borderBottomRightRadius: { md: 20, xs: 0 },
-              borderTopLeftRadius: { md: 0, xs: 20 },
-              borderBottomLeftRadius: { md: 0, xs: 20 }
-            }
-          }}
-          anchor={downMd ? 'right' : 'left'}
+          size='xs'
+          radius='lg'
+          hideCloseButton={!downMd}
+          placement={downMd ? 'right' : 'left'}
           onClose={closeSidebar}
-          open={sidebarOpen}
-          variant='temporary'
+          isOpen={sidebarOpen}
         >
-          <Box sx={{ flex: 1, overflowY: 'auto' }}>{element}</Box>
-          <Box>
-            <WalletContent />
-          </Box>
+          <DrawerContent className='max-w-[280px]'>
+            <DrawerHeader className='md:hidden'>
+              <h3>Menu</h3>
+            </DrawerHeader>
+            <DrawerBody className='scrollbar-hide py-4 px-4'>{element}</DrawerBody>
+            <DrawerFooter className='px-4'>
+              <WalletContent />
+            </DrawerFooter>
+          </DrawerContent>
         </Drawer>
       ) : (
         <Box

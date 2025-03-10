@@ -15,26 +15,13 @@ import { findToken } from '@/config';
 import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import {
-  Alert,
-  AlertTitle,
-  Avatar,
-  Box,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Stack,
-  Typography
-} from '@mui/material';
+import { Alert, AlertTitle, Avatar, Box, Chip, Stack, Typography } from '@mui/material';
 import { BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
 
 function ProxySet({
   account,
@@ -148,72 +135,76 @@ function ProxySet({
       </Stack>
 
       {account.type === 'pure' && (
-        <Dialog maxWidth='sm' fullWidth open={isOpen} onClose={toggleOpen}>
-          <DialogTitle>Attention</DialogTitle>
+        <Modal size='xl' isOpen={isOpen} onClose={toggleOpen}>
+          <ModalContent>
+            <ModalHeader>Attention</ModalHeader>
 
-          <DialogContent>
-            <Typography>
-              If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control in
-              this account. Make sure all of your assets in the <Address shorten value={address} /> account:
-            </Typography>
+            <ModalBody>
+              <p>
+                If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control
+                in this account. Make sure all of your assets in the <Address shorten value={address} /> account:
+              </p>
 
-            <br />
+              <br />
 
-            <Typography>1. The assets of this account are transferable.</Typography>
-            <Typography>2. The account have been securely transferred.</Typography>
-            <br />
+              <p>1. The assets of this account are transferable.</p>
+              <p>2. The account have been securely transferred.</p>
+              <br />
 
-            <Typography>Please note that thisaction is irreversible.</Typography>
+              <p>Please note that thisaction is irreversible.</p>
 
-            <br />
+              <br />
 
-            <Stack alignItems='center' direction='row' spacing={0.5}>
-              <span>Balance:</span>
-              <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
-              <Box component='span' sx={{ color: 'text.secondary' }}>
-                <FormatBalance withCurrency value={allBalances?.total} />
-              </Box>
-            </Stack>
-          </DialogContent>
+              <div className='flex flex-row items-center gap-[5px]'>
+                <span>Balance:</span>
+                <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
+                <Box component='span' sx={{ color: 'text.secondary' }}>
+                  <FormatBalance withCurrency value={allBalances?.total} />
+                </Box>
+              </div>
+            </ModalBody>
 
-          <DialogActions>
-            <TxButton
-              fullWidth
-              color='danger'
-              accountId={account.address}
-              website='mimir://internal/remove-account'
-              getCall={() =>
-                api.tx.proxy.killPure(
-                  account.creator,
-                  'Any',
-                  account.disambiguationIndex,
-                  account.createdBlock,
-                  account.createdExtrinsicIndex
-                )
-              }
-              onDone={() => toggleOpen(false)}
-            >
-              Continue
-            </TxButton>
-          </DialogActions>
-        </Dialog>
+            <ModalFooter>
+              <TxButton
+                fullWidth
+                color='danger'
+                accountId={account.address}
+                website='mimir://internal/remove-account'
+                getCall={() =>
+                  api.tx.proxy.killPure(
+                    account.creator,
+                    'Any',
+                    account.disambiguationIndex,
+                    account.createdBlock,
+                    account.createdExtrinsicIndex
+                  )
+                }
+                onDone={() => toggleOpen(false)}
+              >
+                Continue
+              </TxButton>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
 
       {account.type === 'pure' && (
-        <Dialog maxWidth='sm' fullWidth open={isAlertOpen} onClose={toggleAlertOpen}>
-          <DialogTitle>Attention</DialogTitle>
+        <Modal size='xl' isOpen={isAlertOpen} onClose={toggleAlertOpen}>
+          <ModalContent>
+            <ModalHeader>Attention</ModalHeader>
 
-          <DialogContent>
-            <Typography>
-              If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control in
-              this account and the initial deposit will not be withdrawn.
-            </Typography>
+            <ModalBody className='py-5'>
+              <p>
+                If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control
+                in this account and the initial deposit will not be withdrawn.
+              </p>
 
-            <br />
+              <br />
 
-            <Typography>Please use Delete Account.</Typography>
-          </DialogContent>
-        </Dialog>
+              <p>Please use Delete Account.</p>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       )}
     </>
   );

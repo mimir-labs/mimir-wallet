@@ -110,3 +110,10 @@ export async function safetyCheck(method: HexString) {
     headers: jsonHeader
   });
 }
+
+export async function getAccount(address: string) {
+  return fetcher(chainLinks.serviceUrl(`accounts/full/${address}`), {
+    method: 'GET',
+    headers: jsonHeader
+  });
+}

@@ -69,7 +69,7 @@ function ChainSelect({ onlyLogo }: { onlyLogo: boolean }) {
           horizontal: 'right'
         }}
       >
-        <ScrollShadow className='max-h-[80dvh] no-scrollbar'>
+        <ScrollShadow className='max-h-[80dvh] scrollbar-hide'>
           <div className='space-y-2.5'>
             {Object.keys(groupEndpoints).map((group) => (
               <Box key={`group-${group}`}>

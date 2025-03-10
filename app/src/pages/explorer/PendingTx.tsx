@@ -6,9 +6,9 @@ import ExpandArrow from '@/assets/svg/expand-arrow.svg?react';
 import { Empty } from '@/components';
 import { useToggle } from '@/hooks/useToggle';
 import { TxCell } from '@/transactions';
-import { Box, Button, Drawer, IconButton, lighten, Stack, SvgIcon, Typography } from '@mui/material';
 import React from 'react';
-import { Link } from 'react-router-dom';
+
+import { Button } from '@mimir-wallet/ui';
 
 import { usePendingTx } from './usePendingTx';
 
@@ -19,82 +19,49 @@ interface Props {
 
 function PendingTx({ address, url }: Props) {
   const txs = usePendingTx(address, url);
-  const [expand, toggleExpand] = useToggle();
+  const [expanded, toggleExpand] = useToggle();
   const [account] = useQueryAccount(address);
+  const counts = txs.length || 0;
 
   return (
-    <Drawer
-      ModalProps={{
-        keepMounted: true
-      }}
-      PaperProps={{
-        sx: ({ palette }) => ({
-          height: 340,
-          bgcolor: lighten(palette.primary.main, 0.95),
-          overflow: 'visible',
-          pointerEvents: 'all !important'
-        })
-      }}
-      sx={{ zIndex: 1100 }}
-      anchor='bottom'
-      onClose={toggleExpand}
-      open={expand}
-    >
-      <Box
+    <>
+      <div
+        data-expanded={expanded}
+        className='pointer-events-none fixed w-full h-full left-0 right-0 top-0 bottom-0 bg-black/15 opacity-0 data-[expanded=true]:opacity-100 transition-opacity'
         onClick={toggleExpand}
-        sx={({ palette }) => ({
-          cursor: 'pointer',
-          position: 'absolute',
-          top: -60,
-          left: 0,
-          right: 0,
-          visibility: 'visible',
-          height: 60,
-          paddingX: { sm: 2.4, xs: 1.5 },
-          bgcolor: lighten(palette.primary.main, 0.95),
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        })}
+        style={{ pointerEvents: expanded ? 'auto' : 'none' }}
+      />
+
+      <div
+        data-expanded={expanded}
+        className='fixed bottom-0 left-0 right-0 w-full h-[calc(50vh+60px)] bg-secondary translate-y-[50vh] transition-all data-[expanded=true]:translate-y-0'
       >
-        <Typography color='primary.main' variant='h6'>
-          {txs.length} Pending Transactions
-        </Typography>
-        <IconButton
-          color='primary'
-          sx={{
-            transition: 'all 150ms',
-            marginLeft: 1,
-            bgcolor: 'secondary.main',
-            transformOrigin: 'center',
-            transform: `rotateZ(${expand ? '180deg' : '0deg'})`
-          }}
-        >
-          <SvgIcon component={ExpandArrow} inheritViewBox />
-        </IconButton>
-      </Box>
-      <Stack
-        spacing={1}
-        sx={{
-          paddingX: { sm: 2.4, xs: 1.5 },
-          paddingY: { sm: 2, xs: 1.5 },
-          height: 340,
-          marginTop: 1,
-          overflowY: 'auto'
-        }}
-      >
-        {account && txs.length > 0 ? (
-          txs.map((item) => <TxCell account={account} defaultOpen={false} key={item.id} transaction={item} />)
-        ) : (
-          <Empty height={280} label='No Pending Transactions' />
-        )}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button component={Link} to='/transactions' variant='text'>
-            View All
+        <div className='cursor-pointer flex items-center justify-between h-[60px] px-6' onClick={toggleExpand}>
+          <h6 data-expanded={expanded} className='font-bold text-medium text-secondary-foreground'>
+            {counts} Pending Transactions
+          </h6>
+          <Button
+            data-expanded={expanded}
+            isIconOnly
+            size='sm'
+            color='secondary'
+            radius='full'
+            className='bg-primary/5 data-[expanded=true]:rotate-180'
+            onPress={toggleExpand}
+          >
+            <ExpandArrow />
           </Button>
-        </Box>
-      </Stack>
-    </Drawer>
+        </div>
+
+        <div className='h-[50vh] p-5 overflow-y-auto space-y-5'>
+          {account && txs.length > 0 ? (
+            txs.map((item) => <TxCell account={account} defaultOpen={false} key={item.id} transaction={item} />)
+          ) : (
+            <Empty height={280} label='No Pending Transactions' />
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 

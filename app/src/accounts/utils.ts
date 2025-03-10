@@ -1,7 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { HexString } from '@polkadot/util/types';
 import type { AccountData, AccountDataExtra, AddressMeta, DelegateeProp, MultisigAccountData } from '../hooks/types';
+
+import { decodeAddress } from '@/api';
+import { u8aToHex } from '@polkadot/util';
 
 export function deriveAddressMeta(
   accounts: (AccountDataExtra & AccountData)[],
@@ -62,6 +66,33 @@ export function deriveAddressMeta(
   }
 
   return meta;
+}
+
+export type GroupName = 'mimir' | 'injected' | 'hide';
+
+export function groupAccounts(
+  accounts: (AccountDataExtra & AccountData)[],
+  hideAccountHex: HexString[]
+): Record<GroupName, string[]> {
+  const ret: Record<GroupName, string[]> = {
+    mimir: [],
+    injected: [],
+    hide: []
+  };
+
+  for (let i = 0; i < accounts.length; i++) {
+    const account = accounts[i];
+
+    if (account.source) {
+      ret.injected.push(account.address);
+    } else if (hideAccountHex.includes(u8aToHex(decodeAddress(account.address)))) {
+      ret.hide.push(account.address);
+    } else {
+      ret.mimir.push(account.address);
+    }
+  }
+
+  return ret;
 }
 
 // export function deriveAddressMeta(

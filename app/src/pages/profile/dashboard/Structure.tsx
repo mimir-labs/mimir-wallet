@@ -4,9 +4,11 @@
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { AddressOverview } from '@/components';
-import { Box, Button, Dialog, DialogContent, IconButton, Paper, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Button, IconButton, Paper, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
+
+import { Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 function Relation({ address }: { address: string }) {
   const [account] = useQueryAccount(address);
@@ -41,22 +43,24 @@ function Relation({ address }: { address: string }) {
           showMiniMap={!downSm}
         />
       </Paper>
-      <Dialog fullScreen open={isOpen} onClose={toggleOpen}>
-        <IconButton
-          color='inherit'
-          sx={{ zIndex: 1, position: 'absolute', right: 16, top: 16 }}
-          onClick={() => {
-            toggleOpen(false);
-          }}
-        >
-          <SvgIcon component={IconClose} inheritViewBox />
-        </IconButton>
-        <DialogContent>
-          <Box sx={{ width: '100%', height: '100%' }}>
-            <AddressOverview key={account?.address || 'none'} account={account} showControls showMiniMap={false} />
-          </Box>
-        </DialogContent>
-      </Dialog>
+      <Modal size='full' isOpen={isOpen} onClose={toggleOpen}>
+        <ModalContent>
+          <IconButton
+            color='inherit'
+            sx={{ zIndex: 1, position: 'absolute', right: 16, top: 16 }}
+            onClick={() => {
+              toggleOpen(false);
+            }}
+          >
+            <SvgIcon component={IconClose} inheritViewBox />
+          </IconButton>
+          <ModalBody>
+            <Box sx={{ width: '100%', height: '100%' }}>
+              <AddressOverview key={account?.address || 'none'} account={account} showControls showMiniMap={false} />
+            </Box>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

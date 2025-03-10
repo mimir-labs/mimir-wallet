@@ -2,18 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { allEndpoints, type Endpoint } from '@/config';
-import {
-  Avatar,
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Stack,
-  Typography
-} from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { Avatar, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 interface Props {
   network: string;
@@ -26,37 +17,28 @@ function SwitchChain({ network, onClose, onOpen, open }: Props) {
   const endpoint = useMemo(() => allEndpoints.find((item) => item.key === network), [network]);
 
   return (
-    <Dialog fullWidth maxWidth='xs' onClose={onClose} open={open}>
-      <DialogTitle>Switch Network</DialogTitle>
-      <DialogContent>
-        <Stack spacing={2}>
-          <Typography>
-            This app has been migrated to the {endpoint?.name}. To continue using it, please switch to the following
-            network.
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 1,
-              padding: 1,
-              borderRadius: 1,
-              border: '1px solid',
-              borderColor: 'secondary.main'
-            }}
-          >
-            <Avatar sx={{ width: 20, height: 20 }} src={endpoint?.icon} />
-            {endpoint?.name}
-          </Box>
-        </Stack>
-      </DialogContent>
-      <DialogActions sx={{ justifyContent: 'center' }}>
-        <Button fullWidth size='large' onClick={endpoint ? () => onOpen(endpoint) : undefined}>
-          Confirm
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <Modal size='xl' onClose={onClose} isOpen={open}>
+      <ModalContent>
+        <ModalHeader>Switch Network</ModalHeader>
+        <ModalBody>
+          <div className='space-y-5'>
+            <p>
+              This app has been migrated to the {endpoint?.name}. To continue using it, please switch to the following
+              network.
+            </p>
+            <div className='flex justify-center items-center gap-2.5 p-2.5 rounded-medium border-1 border-secondary'>
+              <Avatar className='bg-transparent w-[20px] h-[20px]' src={endpoint?.icon} />
+              {endpoint?.name}
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button fullWidth size='lg' onPress={endpoint ? () => onOpen(endpoint) : undefined}>
+            Confirm
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
 

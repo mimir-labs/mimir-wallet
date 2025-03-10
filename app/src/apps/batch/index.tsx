@@ -3,7 +3,6 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
-import IconClose from '@/assets/svg/icon-close.svg?react';
 import { TxButton } from '@/components';
 import { useApi } from '@/hooks/useApi';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
@@ -31,7 +30,7 @@ function Batch({ onClose }: { onClose?: () => void }) {
 
   return (
     <>
-      <Box sx={{ width: '50vw', maxWidth: 560, minWidth: 340, height: '100%', padding: { sm: 2, xs: 1.5 } }}>
+      <Box sx={{ width: '50vw', maxWidth: 560, minWidth: 320, height: '100%' }}>
         {txs.length === 0 ? (
           <EmptyBatch onAdd={toggleOpen} onClose={onClose} />
         ) : (
@@ -41,16 +40,6 @@ function Batch({ onClose }: { onClose?: () => void }) {
               {/* <Button color='primary' variant='outlined' onClick={toggleOpen}>
                 Add New
               </Button> */}
-              <Button
-                isIconOnly
-                variant='light'
-                size='sm'
-                onPress={() => {
-                  onClose?.();
-                }}
-              >
-                <IconClose />
-              </Button>
             </div>
             <Divider />
 

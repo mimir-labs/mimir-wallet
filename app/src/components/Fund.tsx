@@ -9,8 +9,10 @@ import { useInputNumber } from '@/hooks/useInputNumber';
 import { parseUnits } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import React, { useCallback, useState } from 'react';
+
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
 import Input from './Input';
@@ -40,7 +42,7 @@ function Content({
   const { injected } = useGroupAccounts();
 
   return (
-    <DialogContent>
+    <ModalBody>
       <Stack spacing={2}>
         <InputAddress
           withBalance
@@ -59,7 +61,7 @@ function Content({
         </Stack>
         <Input label='Amount' onChange={setValue} value={value} />
       </Stack>
-    </DialogContent>
+    </ModalBody>
   );
 }
 
@@ -100,14 +102,14 @@ function Action({
   }, [source, api, onClose, receipt, sending, value]);
 
   return (
-    <DialogActions>
+    <ModalFooter>
       <Button fullWidth onClick={onClose} variant='outlined'>
         Cancel
       </Button>
       <LoadingButton loading={loading} disabled={!(receipt && sending && value)} fullWidth onClick={handleClick}>
         Submit
       </LoadingButton>
-    </DialogActions>
+    </ModalFooter>
   );
 }
 
@@ -116,11 +118,13 @@ function Fund({ defaultValue, onClose, open, receipt }: Props) {
   const [[value], setValue] = useInputNumber(defaultValue?.toString() || '0', false, 0);
 
   return (
-    <Dialog fullWidth onClose={onClose} open={open}>
-      <DialogTitle>Fund</DialogTitle>
-      <Content receipt={receipt} sending={sending} setSending={setSending} setValue={setValue} value={value} />
-      <Action onClose={onClose} receipt={receipt} sending={sending} value={value} />
-    </Dialog>
+    <Modal size='lg' onClose={onClose} isOpen={open}>
+      <ModalContent>
+        <ModalHeader>Fund</ModalHeader>
+        <Content receipt={receipt} sending={sending} setSending={setSending} setValue={setValue} value={value} />
+        <Action onClose={onClose} receipt={receipt} sending={sending} value={value} />
+      </ModalContent>
+    </Modal>
   );
 }
 

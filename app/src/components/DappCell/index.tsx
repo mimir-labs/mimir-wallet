@@ -7,9 +7,11 @@ import IconStar from '@/assets/svg/icon-star.svg?react';
 import { ellipsisLinesMixin } from '@/components/utils';
 import { useApi } from '@/hooks/useApi';
 import { useToggle } from '@/hooks/useToggle';
-import { alpha, Avatar, Box, Button, Drawer, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import { alpha, Avatar, Box, Button, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { createElement, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { Drawer, DrawerBody, DrawerContent } from '@mimir-wallet/ui';
 
 import DappDetails from './DappDetails';
 import SwitchChain from './SwitchChain';
@@ -79,15 +81,10 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
       <DappDetails dapp={dapp} onClose={toggleOpen} open={detailsOpen} onOpen={openApp} />
 
       {dapp.isDrawer && (
-        <Drawer
-          ModalProps={{
-            keepMounted: false
-          }}
-          anchor='right'
-          open={isDrawerOpen}
-          onClose={toggleDrawerOpen}
-        >
-          {element}
+        <Drawer placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
+          <DrawerContent className='max-w-full w-auto py-5'>
+            <DrawerBody>{element}</DrawerBody>
+          </DrawerContent>
         </Drawer>
       )}
 

@@ -9,7 +9,6 @@ import { encodeAddress } from '@/api';
 import IconIdentity from '@/assets/svg/identity.svg?react';
 import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
 import { addressEq } from '@/utils';
-import { Box, SvgIcon } from '@mui/material';
 import { hexToU8a } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -45,24 +44,19 @@ function extractIdentity(
   const displayParent = _displayParent && (isGood ? _displayParent : _displayParent.replace(/[^\x20-\x7E]/g, ''));
 
   const elem = (
-    <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center' }}>
-      <SvgIcon
-        component={IconIdentity}
-        inheritViewBox
-        sx={{
-          marginRight: '0.2em',
-          color: isBad ? 'error.main' : isGood ? 'primary.main' : 'grey.300',
-          fontSize: 'inherit'
-        }}
+    <span className='inline-flex items-center'>
+      <IconIdentity
+        width='1em'
+        height='1em'
+        style={{ marginRight: '0.2em' }}
+        data-is-bad={isBad}
+        data-is-good={isGood}
+        className='text-divider-300 data-[is-bad=true]:text-danger data-[is-good=true]:text-primary'
       />
-      <Box component='span'>{displayParent || displayName}</Box>
+      <span>{displayParent || displayName}</span>
       {displayParent && <span>/</span>}
-      {displayParent && (
-        <Box component='span' sx={{ opacity: 0.5 }}>
-          {displayName}
-        </Box>
-      )}
-    </Box>
+      {displayParent && <span style={{ opacity: 0.5 }}>{displayName}</span>}
+    </span>
   );
 
   displayCache.set(address, elem);

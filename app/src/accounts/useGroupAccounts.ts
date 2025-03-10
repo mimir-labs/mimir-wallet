@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AccountDataExtra } from '@/hooks/types';
+import type { AccountData } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { DETECTED_ACCOUNT_KEY } from '@/constants';
@@ -12,33 +12,7 @@ import { decodeAddress } from '@polkadot/util-crypto';
 import { useCallback, useMemo } from 'react';
 
 import { useAccount } from './useAccount';
-
-type GroupName = 'mimir' | 'injected' | 'hide';
-
-function groupAccounts(
-  accounts: (AccountDataExtra & AccountData)[],
-  hideAccountHex: HexString[]
-): Record<GroupName, string[]> {
-  const ret: Record<GroupName, string[]> = {
-    mimir: [],
-    injected: [],
-    hide: []
-  };
-
-  for (let i = 0; i < accounts.length; i++) {
-    const account = accounts[i];
-
-    if (account.source) {
-      ret.injected.push(account.address);
-    } else if (hideAccountHex.includes(u8aToHex(decodeAddress(account.address)))) {
-      ret.hide.push(account.address);
-    } else {
-      ret.mimir.push(account.address);
-    }
-  }
-
-  return ret;
-}
+import { groupAccounts, type GroupName } from './utils';
 
 function useGroupAccountsImpl(filter?: (account: AccountData) => boolean): Record<GroupName, string[]> {
   const { accounts, hideAccountHex } = useAccount();

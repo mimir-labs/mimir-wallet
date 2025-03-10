@@ -10,7 +10,7 @@ export default heroui({
     radius: {
       small: '5px',
       medium: '10px',
-      large: '15px'
+      large: '20px'
     },
     boxShadow: {
       small: '0px 0px 6px 0px rgba(21, 31, 52, 0.04)',
@@ -63,7 +63,7 @@ export default heroui({
         },
         secondary: {
           foreground: '#2700FF',
-          DEFAULT: 'rgba(39, 0, 255, 0.05)'
+          DEFAULT: '#eee6ff'
         },
         success: {
           foreground: '#FFF',

@@ -10,9 +10,10 @@ import { useApi } from '@/hooks/useApi';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { addressEq } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useToggle } from 'react-use';
+
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import { useAnnouncementStatus } from '../hooks/useAnnouncementStatus';
 
@@ -91,20 +92,22 @@ function ExecuteAnnounce({ account, transaction }: { account: AccountData; trans
         Execute
       </TxButton>
 
-      <Dialog fullWidth maxWidth='sm' onClose={toggleOpen} open={isOpen}>
-        <DialogTitle>Call Data</DialogTitle>
-        <DialogContent>
-          <Stack spacing={1.5}>
-            <Typography>Fill Call Data to execute this transaction.</Typography>
-            <Input value={calldata} onChange={setCalldata} />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <TxButton fullWidth variant='solid' color='primary' overrideAction={handleExecute}>
-            Execute
-          </TxButton>
-        </DialogActions>
-      </Dialog>
+      <Modal size='2xl' onClose={toggleOpen} isOpen={isOpen}>
+        <ModalContent>
+          <ModalHeader>Call Data</ModalHeader>
+          <ModalBody>
+            <div className='space-y-4'>
+              <p>Fill Call Data to execute this transaction.</p>
+              <Input value={calldata} onChange={setCalldata} />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <TxButton fullWidth variant='solid' color='primary' overrideAction={handleExecute}>
+              Execute
+            </TxButton>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

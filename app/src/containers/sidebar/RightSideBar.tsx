@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useMimirLayout } from '@/hooks/useMimirLayout';
-import { Box, Drawer, useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
+
+import { Drawer, DrawerBody, DrawerContent } from '@mimir-wallet/ui';
 
 function RightSideBar({ offsetTop = 0 }: { offsetTop?: number }) {
   const { rightSidebarOpen, closeRightSidebar, rightSidebarElement } = useMimirLayout();
@@ -30,25 +32,21 @@ function RightSideBar({ offsetTop = 0 }: { offsetTop?: number }) {
     <>
       {downMd ? (
         <Drawer
-          PaperProps={{
-            sx: {
-              width: '50vw',
-              maxWidth: 560,
-              minWidth: 340,
-              paddingX: 1.5,
-              paddingY: 2
-            }
-          }}
-          anchor={downMd ? 'right' : 'left'}
+          size='xs'
+          radius='none'
+          hideCloseButton
+          placement='right'
           onClose={closeRightSidebar}
-          open={isOpen}
-          variant='temporary'
+          isOpen={rightSidebarOpen}
         >
-          <Box sx={{ flex: 1, overflowY: 'auto' }}>{rightSidebarElement}</Box>
+          <DrawerContent>
+            <DrawerBody className='py-5'>{rightSidebarElement}</DrawerBody>
+          </DrawerContent>
         </Drawer>
       ) : (
-        <Box
-          sx={{
+        <div
+          className='bg-content1 border-l-1 border-l-divider transition-[margin-right] duration-150 ease-in-out'
+          style={{
             position: 'sticky',
             top: offsetTop + 56,
             flex: 'none',
@@ -56,17 +54,11 @@ function RightSideBar({ offsetTop = 0 }: { offsetTop?: number }) {
             flexDirection: 'column',
             width: 350,
             marginRight: isOpen ? 0 : '-350px',
-            height: `calc(100dvh - ${offsetTop}px - 1px - 56px)`,
-            bgcolor: 'background.paper',
-            borderLeft: '1px solid',
-            borderColor: 'divider',
-            transition: 'margin-right 0.15s ease-in-out'
+            height: `calc(100dvh - ${offsetTop}px - 1px - 56px)`
           }}
         >
-          <Box sx={{ flex: 1, overflowY: 'auto', paddingX: 1.5, paddingY: 2, paddingBottom: 7 }}>
-            {rightSidebarElement}
-          </Box>
-        </Box>
+          <div className='flex-1 overflow-y-auto px-4 py-5 pb-[70px]'>{rightSidebarElement}</div>
+        </div>
       )}
     </>
   );
