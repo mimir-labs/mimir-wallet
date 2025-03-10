@@ -3,16 +3,23 @@
 
 import type { ButtonProps } from '@heroui/button';
 
+import { Avatar, AvatarGroup } from '@heroui/avatar';
+import { Divider } from '@heroui/divider';
 import { CircularProgress } from '@heroui/progress';
 import { ScrollShadow } from '@heroui/scroll-shadow';
+import { Skeleton } from '@heroui/skeleton';
 import { Spinner } from '@heroui/spinner';
 import { HeroUIProvider } from '@heroui/system';
 import { Tooltip } from '@heroui/tooltip';
 
+export { Avatar, AvatarGroup, HeroUIProvider, Tooltip, ScrollShadow, CircularProgress, Spinner, Divider, Skeleton };
+
 export { default as Button } from './button.js';
-export { HeroUIProvider, Tooltip, ScrollShadow, CircularProgress, Spinner };
 export { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from './modal/index.js';
-export { default as Alert } from './alerts/index.js';
+export { default as Alert } from './alert/index.js';
+export { Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader } from './drawer/index.js';
+export { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from './dropdown/index.js';
+export { Popover, PopoverTrigger, PopoverContent, FreeSoloPopover } from './popover/index.js';
 export { Tabs, Tab } from './tabs/index.js';
 
 export type { ButtonProps };

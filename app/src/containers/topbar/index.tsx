@@ -26,7 +26,7 @@ function TopBar() {
   return (
     <Box
       sx={{
-        zIndex: 10,
+        zIndex: 50,
         position: 'sticky',
         top: 0,
         width: '100%',

@@ -6,7 +6,7 @@ import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { Box, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 
-import AccountMenu from './AccountMenu';
+import AccountMenu from './account-menu';
 import AddressCell from './AddressCell';
 import IdentityIcon from './IdentityIcon';
 

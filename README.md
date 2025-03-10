@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Mimir Wallet](./src/assets/images/logo.png)
+![Mimir Wallet](./app/src/assets/images/logo.png)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
@@ -128,11 +128,6 @@ yarn preview    # Preview production build locally
 yarn dev          # Start development server
 yarn build        # Build for production
 yarn preview      # Preview production build
-
-# Testing
-yarn test         # Run unit tests
-yarn test:e2e     # Run end-to-end tests
-yarn validate     # Run all tests and validations
 
 # Code Quality
 yarn lint         # Run ESLint

@@ -3,13 +3,13 @@
 
 import AccountConsumer from '@/accounts/Consumer';
 import { useAccount } from '@/accounts/useAccount';
-import { ConnectWalletModal, SwitchAccountDialog, ToastRoot, TxSubmit, TxToast } from '@/components';
+import { ConnectWalletModal, ToastRoot, TxSubmit, TxToast } from '@/components';
 import { useApi } from '@/hooks/useApi';
 import { useFollowAccounts } from '@/hooks/useFollowAccounts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { useWallet } from '@/wallet/useWallet';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -53,7 +53,6 @@ function BaseContainer({
       <TxToast />
       <AccountConsumer />
       <AddAddressBook />
-      <SwitchAccountDialog />
 
       <TopBar />
 
@@ -75,23 +74,20 @@ function BaseContainer({
         >
           <SideBar offsetTop={alertOpen ? 38 : 0} withSideBar={withSideBar} />
 
-          <Box
-            sx={{
-              width: '100%',
+          <div
+            className='relative w-full flex-col gap-6 flex-1 p-4 sm:p-5'
+            style={{
               display: queue.length > 0 ? 'none' : 'flex',
-              flexDirection: 'column',
-              gap: 3,
-              flex: '1',
-              padding: withPadding ? { xs: 1.5, md: 2 } : 0
+              padding: withPadding ? undefined : 0
             }}
           >
-            <Box sx={{ flex: 1 }}>
+            <div className='h-full flex-1 z-10'>
               <Outlet />
-            </Box>
-            <Typography sx={{ fontWeight: 700, color: 'text.secondary', textAlign: 'center' }}>
+            </div>
+            <p className='z-0 absolute bottom-0 left-0 right-0 font-bold text-foreground/50 text-center'>
               Version: {process.env.VERSION}
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
           {queue.length > 0 ? (
             <Box

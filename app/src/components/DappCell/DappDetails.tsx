@@ -7,21 +7,11 @@ import IconGithub from '@/assets/svg/icon-github.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import IconX from '@/assets/svg/icon-x.svg?react';
 import { allEndpoints, type DappOption } from '@/config';
-import {
-  Avatar,
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Divider,
-  IconButton,
-  Stack,
-  SvgIcon,
-  Typography
-} from '@mui/material';
+import { SvgIcon } from '@mui/material';
 import { isArray } from '@polkadot/util';
 import React from 'react';
+
+import { Avatar, Button, Divider, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
 
 interface Props {
   open: boolean;
@@ -32,88 +22,79 @@ interface Props {
 
 function SupportedChains({ supported }: { supported: string[] | true }) {
   return (
-    <Box sx={{ position: 'absolute', right: 0, top: 0, display: 'flex', alignItems: 'center' }}>
-      <Typography marginRight={1}>Supported on</Typography>
+    <div className='absolute right-0 top-0 flex items-center'>
+      <p className='mr-2.5'>Supported on</p>
       {isArray(supported)
         ? supported.map((network) => (
             <Avatar
               key={network}
               src={allEndpoints.find((item) => item.key === network)?.icon}
-              sx={{
-                width: 16,
-                height: 16,
-                marginLeft: '-4px',
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'background.default'
-              }}
+              className='w-[16px] h-[16px] -ml-1 bg-background-default border-1 border-white'
             />
           ))
         : 'All Chains'}
-    </Box>
+    </div>
   );
 }
 
 function Contents({ dapp }: { dapp: DappOption }) {
   return (
-    <DialogContent>
-      <Stack spacing={1} sx={{ position: 'relative', overflow: 'hidden' }}>
+    <ModalBody>
+      <div className='space-y-2.5 relative overflow-hidden'>
         <SupportedChains supported={dapp.supportedChains} />
-        <Avatar variant='square' src={dapp.icon} sx={{ width: 64, height: 64 }} />
-        <Typography variant='h3'>{dapp.name}</Typography>
-        <Box
-          sx={{ display: 'flex', alignItems: 'center', gap: 1, '>.MuiIconButton-root': { bgcolor: 'secondary.main' } }}
-        >
+        <Avatar radius='md' src={dapp.icon} className='w-[64px] h-[64px]' />
+        <h3>{dapp.name}</h3>
+        <div className='flex items-center gap-2.5'>
           {dapp.tags?.map((tag, index) => (
-            <Button color='secondary' key={index} size='small' sx={{ fontWeight: 500 }}>
+            <Button color='secondary' key={index} size='sm'>
               {tag}
             </Button>
           ))}
-          <Divider orientation='vertical' sx={{ height: 12 }} />
+          <Divider orientation='vertical' className='h-[12px]' />
           {dapp.website && (
-            <IconButton color='primary' component='a' href={dapp.website} size='small' target='_blank'>
+            <Button isIconOnly color='secondary' as='a' href={dapp.website} size='sm' target='_blank'>
               <SvgIcon component={IconWebsite} inheritViewBox />
-            </IconButton>
+            </Button>
           )}
           {dapp.github && (
-            <IconButton color='primary' component='a' href={dapp.github} size='small' target='_blank'>
+            <Button isIconOnly color='secondary' as='a' href={dapp.github} size='sm' target='_blank'>
               <SvgIcon component={IconGithub} inheritViewBox />
-            </IconButton>
+            </Button>
           )}
           {dapp.discord && (
-            <IconButton color='primary' component='a' href={dapp.discord} size='small' target='_blank'>
+            <Button isIconOnly color='secondary' as='a' href={dapp.discord} size='sm' target='_blank'>
               <SvgIcon component={IconDiscord} inheritViewBox />
-            </IconButton>
+            </Button>
           )}
           {dapp.twitter && (
-            <IconButton color='primary' component='a' href={dapp.twitter} size='small' target='_blank'>
+            <Button isIconOnly color='secondary' as='a' href={dapp.twitter} size='sm' target='_blank'>
               <SvgIcon component={IconX} inheritViewBox />
-            </IconButton>
+            </Button>
           )}
           {dapp.matrix && (
-            <IconButton color='primary' component='a' href={dapp.matrix} size='small' target='_blank'>
+            <Button isIconOnly color='secondary' as='a' href={dapp.matrix} size='sm' target='_blank'>
               <SvgIcon component={IconMatrix} inheritViewBox />
-            </IconButton>
+            </Button>
           )}
-        </Box>
-        <Typography fontWeight={500} variant='h6'>
-          {dapp.description}
-        </Typography>
-      </Stack>
-    </DialogContent>
+        </div>
+        <h6 className='font-medium'>{dapp.description}</h6>
+      </div>
+    </ModalBody>
   );
 }
 
 function DappDetails({ dapp, onClose, onOpen, open }: Props) {
   return (
-    <Dialog fullWidth maxWidth='sm' onClose={onClose} open={open}>
-      <Contents dapp={dapp} />
-      <DialogActions sx={{ justifyContent: 'center' }}>
-        <Button size='large' sx={{ width: 195 }} onClick={onOpen}>
-          Open
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <Modal size='lg' hideCloseButton onClose={onClose} isOpen={open}>
+      <ModalContent>
+        <Contents dapp={dapp} />
+        <ModalFooter className='justify-center'>
+          <Button size='lg' className='w-[195px]' onPress={onOpen}>
+            Open
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
 

@@ -8,7 +8,7 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { encodeAddress } from '@/api';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { addressEq } from '@/utils';
-import { alpha, Box, Chip } from '@mui/material';
+import { alpha, Chip } from '@mui/material';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
@@ -52,8 +52,8 @@ function AddressCell({
     <div className='AddressCell flex-1 flex items-center gap-[5px]' style={{ width }}>
       <IdentityIcon className='AddressCell-Icon' size={iconSize} value={address} />
       <div className='AddressCell-Content space-y-[2px]'>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <span className='AddressCell-Name inline-flex max-w-[100] overflow-hidden text-ellipsis whitespace-nowrap font-bold'>
+        <div className='flex items-center gap-1'>
+          <span className='AddressCell-Name inline-flex max-w-[100px] overflow-hidden text-ellipsis whitespace-nowrap font-bold'>
             <AddressName defaultName={defaultName} value={value} />
           </span>
           {namePost}
@@ -70,7 +70,7 @@ function AddressCell({
               )}
             </>
           )}
-        </Box>
+        </div>
         <span className='AddressCell-Address text-foreground/50 h-[18px] flex items-center text-tiny'>
           <AddressComp shorten={shorten} value={address} />
           {withCopy && <CopyButton size='sm' value={address} className='opacity-50' />}

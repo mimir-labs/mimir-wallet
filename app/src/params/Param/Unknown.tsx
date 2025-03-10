@@ -5,10 +5,11 @@ import type { ParamProps } from './types';
 
 import { Bytes } from '@/components';
 import JsonView from '@/components/JsonView';
-import { Box, Dialog } from '@mui/material';
 import { isHex, isString } from '@polkadot/util';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
+
+import { Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 function Unknown({ name, value }: ParamProps) {
   const [open, toggleOpen] = useToggle(false);
@@ -27,17 +28,17 @@ function Unknown({ name, value }: ParamProps) {
 
   return (
     <span onClick={(e) => e.stopPropagation()}>
-      <Box
-        component='span'
-        sx={{ cursor: 'pointer', color: 'primary.main', fontSize: '0.75rem', fontWeight: 700 }}
-        onClick={toggleOpen}
-      >
+      <span className='cursor-pointer text-primary text-tiny font-bold' onClick={toggleOpen}>
         View {name || 'Details'}
-      </Box>
+      </span>
 
-      <Dialog fullWidth maxWidth='sm' open={open} onClose={toggleOpen}>
-        <JsonView data={human} />
-      </Dialog>
+      <Modal size='xl' isOpen={open} onClose={toggleOpen} scrollBehavior='inside'>
+        <ModalContent>
+          <ModalBody className='py-5 px-5'>
+            <JsonView data={human} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </span>
   );
 }

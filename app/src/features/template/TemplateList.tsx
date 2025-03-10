@@ -38,7 +38,7 @@ function TemplateList({ onAdd, onClose }: { onAdd: () => void; onClose: () => vo
 
       <Divider />
 
-      <Stack spacing={1} height='100%' overflow='auto' className='no-scrollbar'>
+      <Stack spacing={1} height='100%' overflow='auto' className='scrollbar-hide'>
         <Typography>Saved</Typography>
         {template.length > 0 ? (
           template.map(({ name, call }, index) => (
@@ -57,7 +57,7 @@ function TemplateList({ onAdd, onClose }: { onAdd: () => void; onClose: () => vo
 
       {/* <Divider />
 
-      <Stack spacing={1} height='calc((100% - 100px) * 0.4)' overflow='auto' className='no-scrollbar'>
+      <Stack spacing={1} height='calc((100% - 100px) * 0.4)' overflow='auto' className='scrollbar-hide'>
         <Box display='flex' gap={0.5} alignItems='center' justifyContent='space-between'>
           <Typography>Suggestions</Typography>
           <Typography fontSize='0.75rem' color='textSecondary'>

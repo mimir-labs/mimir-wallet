@@ -30,15 +30,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
 
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
 
       - name: Build
         run: yarn build
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
 
       - name: Deploy to production
         uses: burnett01/rsync-deployments@6.0.0
@@ -50,4 +50,4 @@ jobs:
           remote_key: ${{ secrets.KEY }}
           remote_path: ${{ secrets.TARGET }}
           path: app/dist/
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}

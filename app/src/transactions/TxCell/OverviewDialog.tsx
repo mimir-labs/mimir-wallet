@@ -4,8 +4,9 @@
 import { HistoryTxOverview, TxOverview } from '@/components';
 import { type AccountData, type Transaction, TransactionStatus } from '@/hooks/types';
 import { useApi } from '@/hooks/useApi';
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import React from 'react';
+
+import { Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
 interface Props {
   account: AccountData;
@@ -18,28 +19,24 @@ function OverviewDialog({ account, transaction, onClose, open }: Props) {
   const { api } = useApi();
 
   return (
-    <Dialog fullWidth maxWidth='lg' onClose={onClose} open={open}>
-      <DialogTitle>Progress Overview</DialogTitle>
-      <DialogContent
-        sx={{
-          height: '50vh',
-          bgcolor: 'secondary.main',
-          borderRadius: 1
-        }}
-      >
-        {open && transaction.status < TransactionStatus.Success ? (
-          <TxOverview
-            api={api}
-            account={account}
-            call={transaction.call}
-            transaction={transaction}
-            onApprove={onClose}
-          />
-        ) : (
-          <HistoryTxOverview transaction={transaction} />
-        )}
-      </DialogContent>
-    </Dialog>
+    <Modal size='5xl' onClose={onClose} isOpen={open}>
+      <ModalContent>
+        <ModalHeader>Progress Overview</ModalHeader>
+        <ModalBody className='flex-auto h-[50dvh] bg-secondary border-medium'>
+          {open && transaction.status < TransactionStatus.Success ? (
+            <TxOverview
+              api={api}
+              account={account}
+              call={transaction.call}
+              transaction={transaction}
+              onApprove={onClose}
+            />
+          ) : (
+            <HistoryTxOverview transaction={transaction} />
+          )}
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }
 

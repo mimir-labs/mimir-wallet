@@ -22,7 +22,7 @@ function AppFrame({ url, iconUrl, appName }: { url: string; iconUrl?: string; ap
   useCommunicator(iframeRef, appUrl, iconUrl, appName);
 
   return (
-    <div key={selected || 'none'} className='h-full relative'>
+    <div key={selected || 'none'} className='h-full relative' style={{ paddingBottom: 59 }}>
       {loading && <Spinner size='lg' variant='wave' className='absolute left-0 top-0 right-0 bottom-0 m-auto' />}
       {url && <AppIframe appUrl={appUrl} iframeRef={iframeRef} key={url} onLoad={() => setLoading(false)} />}
       {url && selected && <PendingTx address={selected} url={url} />}

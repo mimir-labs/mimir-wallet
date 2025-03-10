@@ -29,7 +29,7 @@ const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton({ va
       variant={props.variant || 'light'}
       {...props}
       ref={ref}
-      className={'w-5 h-5 min-w-[0px] min-h-[0px] opacity-50 text-inherit '.concat(props.className || '')}
+      className={'w-5 h-5 min-w-[0px] min-h-[0px] opacity-50 '.concat(props.className || '')}
     >
       {copied ? <IconSuccess className='w-4 h-4' /> : <IconCopy className='w-4 h-4' />}
     </Button>

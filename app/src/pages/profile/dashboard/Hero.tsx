@@ -129,7 +129,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               }}
             >
               <AddressName value={address} />
-              <Button isIconOnly as={Link} to={`/account-setting?address=${address}`} color='secondary'>
+              <Button isIconOnly as={Link} size='lg' to={`/account-setting?address=${address}`} color='secondary'>
                 <IconSet className='w-[22px] h-[22px]' />
               </Button>
             </Typography>

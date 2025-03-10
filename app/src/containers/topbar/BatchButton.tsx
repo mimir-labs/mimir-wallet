@@ -6,11 +6,11 @@ import Batch from '@/apps/batch';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
-import { Badge, Box, Drawer, Popover, SvgIcon } from '@mui/material';
+import { Badge, Popover } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 import { useToggle } from 'react-use';
 
-import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Button, Drawer, DrawerBody, DrawerContent, Tooltip } from '@mimir-wallet/ui';
 
 function BatchButton() {
   const { current } = useAccount();
@@ -83,14 +83,18 @@ function BatchButton() {
           horizontal: 'center'
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, padding: 2 }}>
-          <SvgIcon inheritViewBox component={IconBatch} sx={{ color: 'primary.main', width: 32, height: 32 }} />
+        <div className='flex items-center gap-2.5 p-5'>
+          <IconBatch className='w-[32px] h-[32px]' />
           <span>New transaction has been added to Batch</span>
-        </Box>
+        </div>
       </Popover>
 
-      <Drawer anchor='right' open={isDrawerOpen} onClose={() => toggleDrawerOpen(false)}>
-        <Batch onClose={() => toggleDrawerOpen(false)} />
+      <Drawer size='xl' placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
+        <DrawerContent className='max-w-full w-auto py-5'>
+          <DrawerBody>
+            <Batch onClose={() => toggleDrawerOpen(false)} />
+          </DrawerBody>
+        </DrawerContent>
       </Drawer>
     </>
   );
