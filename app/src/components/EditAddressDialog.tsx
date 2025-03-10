@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from '@mui/material';
 import React from 'react';
+
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import Input from './Input';
 import { toastSuccess } from './utils';
@@ -13,40 +14,41 @@ function Content({ address, onClose }: { address: string; onClose?: () => void }
 
   return (
     <>
-      <DialogContent>
-        <Stack spacing={2}>
+      <ModalBody>
+        <div className='space-y-5'>
           <Input label='Name' onChange={setName} placeholder='input name for contact' value={name} />
           <Input disabled label='Address' placeholder='input address' value={address} />
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Button fullWidth onClick={onClose} variant='outlined'>
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <Button fullWidth onPress={onClose} variant='ghost'>
           Cancel
         </Button>
         <Button
-          disabled={!(name && address)}
+          isDisabled={!(name && address)}
           fullWidth
-          onClick={() => {
+          onPress={() => {
             onClose?.();
             saveName((name) => toastSuccess(`Save name to ${name} success`));
           }}
-          variant='contained'
         >
           Save
         </Button>
-      </DialogActions>
+      </ModalFooter>
     </>
   );
 }
 
 function AddAddressDialog({ address, onClose, open }: { address: string; open: boolean; onClose?: () => void }) {
   return (
-    <Dialog fullWidth maxWidth='sm' onClick={(e) => e.stopPropagation()} onClose={onClose} open={open}>
-      <DialogTitle>
-        <h4>Edit Name</h4>
-      </DialogTitle>
-      <Content address={address} onClose={onClose} />
-    </Dialog>
+    <Modal size='xl' onClose={onClose} isOpen={open}>
+      <ModalContent>
+        <ModalHeader>
+          <h4>Edit Name</h4>
+        </ModalHeader>
+        <Content address={address} onClose={onClose} />
+      </ModalContent>
+    </Modal>
   );
 }
 

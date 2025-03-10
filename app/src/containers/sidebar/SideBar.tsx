@@ -262,7 +262,7 @@ function WalletContent() {
             }
             id={id}
             key={id}
-            sx={{ width: 20, height: 20 }}
+            style={{ width: 20, height: 20 }}
           />
         </Grid>
       ))}

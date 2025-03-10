@@ -4,9 +4,10 @@
 import { walletConfig } from '@/config';
 import { connectWallet, disconnectWallet } from '@/wallet/connect';
 import { useWallet } from '@/wallet/useWallet';
-import { alpha, Box, Button, Dialog, DialogContent, DialogTitle, Grid2 as Grid } from '@mui/material';
 import { AccessCredentials, initializePlutonicationDAppClientWithModal } from '@plutonication/plutonication';
 import React, { useMemo } from 'react';
+
+import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
 import { toastError } from './utils';
 import WalletIcon from './WalletIcon';
@@ -18,40 +19,26 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
     id === 'nova' ? wallets[walletConfig[id].key] && window?.walletExtension?.isNovaWallet : wallets[id];
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        gap: 0.5,
-        borderRadius: 1,
-        border: '1px solid',
-        borderColor: 'secondary.main',
-        padding: 1,
-        bgcolor: connectedWallets.includes(id) ? 'secondary.main' : 'transparent'
-      }}
+    <div
+      data-connected={connectedWallets.includes(id)}
+      className='flex items-center justify-start gap-1 rounded-medium border-1 border-secondary p-2.5 bg-transparent data-[connected=true]:bg-secondary'
     >
-      <WalletIcon disabled={!isInstalled} id={id} sx={{ width: 20, height: 20 }} />
-      <Box sx={{ flex: 1, fontSize: '1rem' }}>{name}</Box>
+      <WalletIcon disabled={!isInstalled} id={id} style={{ width: 20, height: 20 }} />
+      <div className='flex-1 text-medium'>{name}</div>
       {isInstalled ? (
         connectedWallets.includes(id) ? (
-          <Button
-            color='error'
-            onClick={() => disconnectWallet(id)}
-            size='small'
-            variant='text'
-            sx={({ palette }) => ({ bgcolor: alpha(palette.error.main, 0.1) })}
-          >
+          <Button className='h-7' color='danger' onPress={() => disconnectWallet(id)} variant='flat'>
             Disconnect
           </Button>
         ) : (
-          <Button onClick={() => connectWallet(id).catch(toastError)} size='small' variant='outlined'>
+          <Button className='h-7' onPress={() => connectWallet(id).catch(toastError)} variant='ghost'>
             Connect
           </Button>
         )
       ) : id === 'plutonication' ? (
         <Button
-          onClick={async () => {
+          className='h-7'
+          onPress={async () => {
             const accessCredentials = new AccessCredentials(
               'wss://plutonication.com/',
               'Mimir',
@@ -63,17 +50,16 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
 
             connectWallet('plutonication').catch(toastError);
           }}
-          size='small'
-          variant='outlined'
+          variant='ghost'
         >
           Connect
         </Button>
       ) : (
-        <Button component='a' href={downloadUrl} size='small' target='_blank' variant='text'>
+        <Button as='a' href={downloadUrl} target='_blank' variant='light'>
           Download
         </Button>
       )}
-    </Box>
+    </div>
   );
 }
 
@@ -97,18 +83,18 @@ function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => v
 
   return (
     <>
-      <Dialog maxWidth='sm' onClose={onClose} open={open}>
-        <DialogTitle textAlign='center'>Connect Wallet</DialogTitle>
-        <DialogContent sx={{ overflow: 'hidden', maxWidth: '474px' }}>
-          <Grid columns={{ sm: 4, xs: 2 }} container rowSpacing={2} columnSpacing={1}>
-            {sortedWalletConfig.map(([id, config]) => (
-              <Grid key={id} size={2}>
-                <WalletCell downloadUrl={config.downloadUrl} id={id} name={config.name} />
-              </Grid>
-            ))}
-          </Grid>
-        </DialogContent>
-      </Dialog>
+      <Modal onClose={onClose} isOpen={open} size='xl'>
+        <ModalContent>
+          <ModalHeader className='justify-center'>Connect Wallet</ModalHeader>
+          <ModalBody>
+            <div className='grid grid-cols-2 sm:grid-cols-2 gap-x-5 gap-y-2.5'>
+              {sortedWalletConfig.map(([id, config]) => (
+                <WalletCell key={id} downloadUrl={config.downloadUrl} id={id} name={config.name} />
+              ))}
+            </div>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <plutonication-modal />
     </>
   );

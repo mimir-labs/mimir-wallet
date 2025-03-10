@@ -5,7 +5,6 @@ import type { AccountData } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { groupAccounts, type GroupName } from '@/accounts/utils';
-import { encodeAddress } from '@/api';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconExtension from '@/assets/svg/icon-extension.svg?react';
 import IconGlobal from '@/assets/svg/icon-global.svg?react';
@@ -110,28 +109,17 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
           <div className='space-y-2.5 w-full text-tiny sm:text-small'>
             {searchAccount && (
               <>
-                <div className='flex items-center gap-1'>
-                  <div className='flex-1 flex items-center gap-1'>
-                    <IconGlobal className='opacity-60' />
-                    Searched Account
-                  </div>
-
-                  <Button
-                    isIconOnly
-                    color='default'
-                    size='sm'
-                    variant='light'
-                    onPress={() => addAddressBook(encodeAddress(searchAccount.address), true)}
-                  >
-                    <IconAdd />
-                  </Button>
+                <div className='flex-1 flex items-center gap-1'>
+                  <IconGlobal className='opacity-60' />
+                  Searched Account
                 </div>
 
                 <AccountCell
                   key={`searched-${searchAccount.address}`}
                   onClose={onClose}
+                  onSelect={onSelect}
                   value={searchAccount.address}
-                  selected
+                  withAdd
                 />
 
                 <Divider />
