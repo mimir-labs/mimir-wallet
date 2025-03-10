@@ -19,7 +19,10 @@ export { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from './moda
 export { default as Alert } from './alert/index.js';
 export { Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader } from './drawer/index.js';
 export { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from './dropdown/index.js';
+export { Input } from './input/index.js';
+export { Listbox, ListboxItem, ListboxSection } from './listbox/index.js';
 export { Popover, PopoverTrigger, PopoverContent, FreeSoloPopover } from './popover/index.js';
+export { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from './table/index.js';
 export { Tabs, Tab } from './tabs/index.js';
 
 export type { ButtonProps };

@@ -117,3 +117,51 @@ export async function getAccount(address: string) {
     headers: jsonHeader
   });
 }
+
+export async function addProposer(address: string, proposer: string, signature: string, signer: string, time: string) {
+  return fetcher(chainLinks.serviceUrl(`accounts/${address}/proposer/add`), {
+    method: 'POST',
+    body: JSON.stringify({ proposer, signature, signer, time }),
+    headers: jsonHeader
+  });
+}
+
+export async function removeProposer(
+  address: string,
+  proposer: string,
+  signature: string,
+  signer: string,
+  time: string
+) {
+  return fetcher(chainLinks.serviceUrl(`accounts/${address}/proposer/remove`), {
+    method: 'PUT',
+    body: JSON.stringify({ proposer, signature, signer, time }),
+    headers: jsonHeader
+  });
+}
+
+export async function submitPropose(
+  address: string,
+  call: HexString,
+  signer: string,
+  signature: string,
+  time: string,
+  appName?: string,
+  iconUrl?: string,
+  note?: string,
+  website?: string
+) {
+  return fetcher(chainLinks.serviceUrl(`tx/propose/${address}`), {
+    method: 'POST',
+    body: JSON.stringify({ call, signer, signature, time, appName, iconUrl, note, website }),
+    headers: jsonHeader
+  });
+}
+
+export async function removePropose(proposeId: number, signer: string, signature: string, time: string) {
+  return fetcher(chainLinks.serviceUrl(`tx/propose/${proposeId}/remove`), {
+    method: 'PUT',
+    body: JSON.stringify({ signer, signature, time }),
+    headers: jsonHeader
+  });
+}

@@ -66,7 +66,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
         />
       )}
       <Alert
-        color={isEnought ? 'success' : 'danger'}
+        color={!isEnought && !isUnLock ? 'danger' : 'success'}
         icon={icon}
         endContent={
           <div className='flex items-center gap-[5px] sm:gap-2.5'>

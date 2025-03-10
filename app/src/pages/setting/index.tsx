@@ -1,54 +1,40 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Button, Paper } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+import { Tab, Tabs } from '@mimir-wallet/ui';
 
 import AccountSetting from './account-setting';
 import NetworkSetting from './network';
 
 function Setting({ type }: { type: 'general' | 'account' }) {
-  return (
-    <Box
-      maxWidth='sm'
-      sx={{
-        width: 500,
-        maxWidth: '100%',
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-        alignItems: 'stretch'
-      }}
-    >
-      <Paper sx={{ borderRadius: '20px', padding: 1, display: 'inline-flex', alignSelf: 'start', gap: 1 }}>
-        <Button
-          component={Link}
-          to='/account-setting'
-          sx={{ borderRadius: 1, paddingX: 3 }}
-          variant={type === 'account' ? 'contained' : 'text'}
-        >
-          Wallet Setting
-        </Button>
-        <Button
-          component={Link}
-          to='/setting'
-          color='primary'
-          sx={{ borderRadius: 1, paddingX: 3 }}
-          variant={type === 'general' ? 'contained' : 'text'}
-        >
-          General Setting
-        </Button>
-      </Paper>
+  const navigate = useNavigate();
 
-      {type === 'account' ? (
-        <AccountSetting />
-      ) : (
-        <>
+  return (
+    <div className='max-w-full w-[500px] mx-auto flex flex-col gap-5 items-stretch'>
+      <Tabs
+        color='primary'
+        aria-label='Setting'
+        selectedKey={type}
+        onSelectionChange={(key) => {
+          if (key === 'account') {
+            navigate('/account-setting');
+          } else {
+            navigate('/setting');
+          }
+        }}
+      >
+        <Tab key='account' title='Wallet Setting'>
+          <AccountSetting />
+        </Tab>
+        <Tab key='general' title='General Setting'>
           <NetworkSetting />
-        </>
-      )}
-    </Box>
+        </Tab>
+      </Tabs>
+
+      <div className='h-5' />
+    </div>
   );
 }
 

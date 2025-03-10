@@ -510,8 +510,13 @@ export const paseoEndpoints: Endpoint[] = [
     httpUrl: 'https://paseo-rpc.dwellir.com',
     genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
     serviceUrl:
-      process.env.NODE_ENV === 'production' ? 'https://paseo-api.mimir.global/' : 'https://dev-api.mimir.global/',
-    socketUrl: process.env.NODE_ENV === 'production' ? 'wss://paseo-api.mimir.global/' : 'wss://dev-api.mimir.global/',
+      process.env.NODE_ENV === 'production' && !isDevEnv
+        ? 'https://paseo-api.mimir.global/'
+        : 'https://dev-api.mimir.global/',
+    socketUrl:
+      process.env.NODE_ENV === 'production' && !isDevEnv
+        ? 'wss://paseo-api.mimir.global/'
+        : 'wss://dev-api.mimir.global/',
     explorerUrl: 'https://paseo.subscan.io/'
   },
   {
@@ -544,7 +549,7 @@ export const paseoEndpoints: Endpoint[] = [
             'xcavate Devnet': 'wss://rpc2-paseo.xcavate.io'
           },
           httpUrl: 'https://rpc2-paseo.xcavate.io/',
-          genesisHash: '0x4939146f39ed8077256aacac688f45b66f8a4ad360d805a69a28bc90082483a4',
+          genesisHash: '0xea979dc47498ad76dd4dedb153d4d029d8739dd6d2ff7ff969decc9a4ff5e005',
           ss58Format: 42,
           serviceUrl: 'https://xcavate-dev-api.mimir.global/',
           socketUrl: 'wss://xcavate-dev-api.mimir.global/'

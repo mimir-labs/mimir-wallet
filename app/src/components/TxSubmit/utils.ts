@@ -46,7 +46,7 @@ async function asMulti(
         threshold,
         u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
         timepoint,
-        tx.method,
+        tx.method.toU8a(),
         false,
         weight
       )
@@ -54,7 +54,7 @@ async function asMulti(
         threshold,
         u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
         timepoint,
-        tx.method,
+        tx.method.toU8a(),
         weight
       );
 }

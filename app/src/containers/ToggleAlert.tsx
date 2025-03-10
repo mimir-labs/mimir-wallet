@@ -56,7 +56,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
               }
         }
         sx={{
-          zIndex: 10,
+          zIndex: 50,
           cursor: 'pointer',
           position: 'sticky',
           top: 56,

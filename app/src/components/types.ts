@@ -39,12 +39,13 @@ export interface InputProps {
 }
 
 export interface InputAddressProps {
+  className?: string;
   format?: [decimals: number, unit: string];
+  iconSize?: number;
   defaultValue?: string;
   value?: string;
   disabled?: boolean;
   label?: React.ReactNode;
-  error?: Error | null;
   placeholder?: string;
   onChange?: (value: string) => void;
   withBalance?: boolean;
@@ -53,6 +54,7 @@ export interface InputAddressProps {
   filtered?: string[];
   excluded?: string[];
   shorten?: boolean;
+  helper?: React.ReactNode;
 }
 
 export interface InputNumberProps extends Omit<InputProps, 'defaultValue' | 'value' | 'onChange'> {

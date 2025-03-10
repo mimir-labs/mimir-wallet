@@ -5,6 +5,7 @@ import type { HistoryTransaction, Transaction } from './types';
 
 import { encodeAddress } from '@/api';
 import { chainLinks } from '@/api/chain-links';
+import { events } from '@/events';
 import { fetcher } from '@/utils';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { isEqual } from 'lodash-es';
@@ -23,6 +24,10 @@ function transformTransaction(transaction: Transaction): Transaction {
     tx.members = tx.members.map((item) => encodeAddress(item));
   }
 
+  if (tx.proposer) {
+    tx.proposer = encodeAddress(tx.proposer);
+  }
+
   return {
     ...tx,
     children: tx.children
@@ -37,7 +42,7 @@ export function usePendingTransactions(
   address?: string | null,
   txId?: string
 ): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
-  const { data, isFetched, isFetching } = useQuery<Transaction[]>({
+  const { data, isFetched, isFetching, refetch } = useQuery<Transaction[]>({
     initialData: [],
     queryHash: chainLinks.serviceUrl(`tx/pending?address=${address}&tx_id=${txId || ''}`),
     queryKey: [address ? chainLinks.serviceUrl(`tx/pending?address=${address}&tx_id=${txId || ''}`) : null],
@@ -47,6 +52,14 @@ export function usePendingTransactions(
       return isEqual(prev, nextData) ? (prev as Transaction[]) || [] : nextData;
     }
   });
+
+  useEffect(() => {
+    events.on('refetch_pending_tx', refetch);
+
+    return () => {
+      events.off('refetch_pending_tx', refetch);
+    };
+  }, [refetch]);
 
   return [data, isFetched, isFetching];
 }

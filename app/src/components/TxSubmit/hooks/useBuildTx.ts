@@ -44,25 +44,35 @@ export function useBuildTx(
 
   useEffect(() => {
     if (filterPath.length > 0) {
-      const hashSet = new Set<HexString>();
+      if (!filterPath.some((item) => item.type === 'proposer')) {
+        const hashSet = new Set<HexString>();
 
-      const key = filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '');
+        const key = filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '');
 
-      buildTx(api, api.createType('Call', method), filterPath as [FilterPath, ...FilterPath[]], transaction, hashSet)
-        .then(async (bundle) => {
-          const { reserve, unreserve, delay } = await extrinsicReserve(api, bundle.signer, bundle.tx);
+        buildTx(api, api.createType('Call', method), filterPath as [FilterPath, ...FilterPath[]], transaction, hashSet)
+          .then(async (bundle) => {
+            const { reserve, unreserve, delay } = await extrinsicReserve(api, bundle.signer, bundle.tx);
 
-          setState((state) => ({
-            ...state,
-            [key]: { isLoading: false, txBundle: bundle, error: null, hashSet, reserve, unreserve, delay }
-          }));
-        })
-        .catch((error) => {
-          setState((state) => ({
-            ...state,
-            [key]: { ...EMPTY_STATE, isLoading: false, error }
-          }));
-        });
+            setState((state) => ({
+              ...state,
+              [key]: { isLoading: false, txBundle: bundle, error: null, hashSet, reserve, unreserve, delay }
+            }));
+          })
+          .catch((error) => {
+            console.error(error);
+            setState((state) => ({
+              ...state,
+              [key]: { ...EMPTY_STATE, isLoading: false, error }
+            }));
+          });
+      } else {
+        const key = filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '');
+
+        setState((state) => ({
+          ...state,
+          [key]: { ...EMPTY_STATE, isLoading: false }
+        }));
+      }
     } else if (account) {
       const hashSet = new Set<HexString>();
 
@@ -78,6 +88,7 @@ export function useBuildTx(
           }));
         })
         .catch((error) => {
+          console.error(error);
           setState((state) => ({
             ...state,
             [key]: { ...EMPTY_STATE, isLoading: false, error }

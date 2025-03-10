@@ -26,7 +26,9 @@ async function getBalances({ queryKey }: { queryKey: [ApiPromise, string | undef
     reserved: account.data.reserved,
     locked: account.data.frozen,
     free: account.data.free,
-    transferrable: account.data.free.add(account.data.reserved).sub(account.data.frozen)
+    transferrable: account.data.free
+      .add(account.data.reserved)
+      .sub(account.data.reserved.gt(account.data.frozen) ? account.data.reserved : account.data.frozen)
   }));
 }
 

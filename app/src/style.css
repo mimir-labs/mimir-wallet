@@ -24,4 +24,7 @@
   h6 {
     @apply text-medium font-bold leading-[1.2];
   }
+  input::placeholder {
+    @apply text-foreground/50;
+  }
 }

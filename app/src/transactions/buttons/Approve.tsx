@@ -18,7 +18,9 @@ function Approve({
   const { api } = useApi();
 
   if (
-    (transaction.type !== TransactionType.Multisig && transaction.type !== TransactionType.Proxy) ||
+    (transaction.type !== TransactionType.Multisig &&
+      transaction.type !== TransactionType.Proxy &&
+      transaction.type !== TransactionType.Propose) ||
     !filterPaths.length
   ) {
     return null;

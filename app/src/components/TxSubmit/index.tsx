@@ -18,7 +18,8 @@ import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useAccountSource, useWallet } from '@/wallet/useWallet';
 import { Box, Checkbox, Divider, FormControlLabel, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Alert, Button, Tooltip } from '@mimir-wallet/ui';
 
@@ -31,6 +32,7 @@ import { useSafetyCheck } from './hooks/useSafetyCheck';
 import AddressChain from './AddressChain';
 import AppInfo from './AppInfo';
 import Call from './Call';
+import ProposeTx from './ProposeTx';
 import SafetyCheck from './SafetyCheck';
 import Sender from './Sender';
 import SendTx from './SendTx';
@@ -83,6 +85,12 @@ function TxSubmit({
   const filterPaths = useFilterPaths(accountData, transaction);
   const [addressChain, setAddressChain] = useState<FilterPath[]>(propsFilterPaths || []);
   const [, addTx] = useBatchTxs(account);
+  const navigate = useNavigate();
+  const isPropose = useMemo(
+    () => addressChain.length > 0 && addressChain.some((item) => item.type === 'proposer'),
+    [addressChain]
+  );
+
   const buildTx = useBuildTx(call, addressChain, account, transaction);
   const source = useAccountSource(accountId?.toString());
   const { isLocalAccount } = useAccount();
@@ -208,7 +216,7 @@ function TxSubmit({
                 />
               )}
 
-              {isFetched && (
+              {!isPropose && isFetched && (
                 <SendTx
                   disabled={
                     !safetyCheck ||
@@ -232,6 +240,26 @@ function TxSubmit({
                     onSignature?.(...args);
                   }}
                   beforeSend={beforeSend}
+                />
+              )}
+              {isPropose && !transaction && (
+                <ProposeTx
+                  call={call}
+                  account={account}
+                  proposer={addressChain.find((item) => item.type === 'proposer')?.address}
+                  website={website}
+                  iconUrl={iconUrl}
+                  appName={appName}
+                  note={note}
+                  onProposed={() => {
+                    onClose?.();
+
+                    if (onlySign) {
+                      onError?.(new Error('This transaction is proposed, please wait for it to be initialized.'));
+                    } else {
+                      navigate('/transactions');
+                    }
+                  }}
                 />
               )}
 

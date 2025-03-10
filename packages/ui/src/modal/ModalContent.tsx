@@ -12,7 +12,7 @@ import { useDialog } from '@react-aria/dialog';
 import { DismissButton } from '@react-aria/overlays';
 import { chain, mergeProps, useViewportSize } from '@react-aria/utils';
 import { domAnimation, LazyMotion, m } from 'framer-motion';
-import { cloneElement, isValidElement, KeyboardEvent, ReactNode, useCallback, useMemo } from 'react';
+import { cloneElement, isValidElement, KeyboardEvent, ReactNode, useCallback, useMemo, useRef } from 'react';
 
 const scaleInOut = {
   enter: {
@@ -73,6 +73,8 @@ const ModalContent = (props: ModalContentProps) => {
     onClose
   } = useModalContext();
 
+  const ref = useRef<HTMLDivElement>(null);
+
   const Component = as || DialogComponent || 'div';
 
   const viewport = useViewportSize();
@@ -106,7 +108,7 @@ const ModalContent = (props: ModalContentProps) => {
     <Component
       {...contentProps}
       onKeyDown={chain(contentProps.onKeyDown, onKeyDown)}
-      ref={null}
+      ref={ref}
       onClick={(e: any) => {
         e.stopPropagation();
       }}

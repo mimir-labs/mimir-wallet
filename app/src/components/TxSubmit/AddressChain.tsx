@@ -77,8 +77,24 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
                 <AddressCell value={item.address} withCopy showType />
                 {item.type !== 'origin' && (
                   <Chip
-                    color={item.type === 'multisig' ? 'secondary' : item.type === 'proxy' ? 'default' : 'primary'}
-                    label={item.type === 'multisig' ? 'AsMulti' : item.type === 'proxy' ? 'Proxy' : ''}
+                    color={
+                      item.type === 'multisig'
+                        ? 'secondary'
+                        : item.type === 'proxy'
+                          ? 'default'
+                          : item.type === 'proposer'
+                            ? 'warning'
+                            : 'primary'
+                    }
+                    label={
+                      item.type === 'multisig'
+                        ? 'AsMulti'
+                        : item.type === 'proxy'
+                          ? 'Proxy'
+                          : item.type === 'proposer'
+                            ? 'Proposer'
+                            : ''
+                    }
                     size='medium'
                     sx={{
                       fontSize: '0.75rem',

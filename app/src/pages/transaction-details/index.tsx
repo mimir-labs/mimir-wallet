@@ -34,14 +34,7 @@ function PageTransactionDetails() {
 
         <Details transaction={transaction} />
 
-        <TxProgress
-          account={account}
-          transaction={transaction}
-          sx={{
-            borderRadius: 2,
-            bgcolor: 'background.paper'
-          }}
-        />
+        <TxProgress account={account} transaction={transaction} className='rounded-large bg-content1' />
       </Stack>
     );
   }

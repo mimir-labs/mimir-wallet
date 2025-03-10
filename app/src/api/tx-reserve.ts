@@ -43,7 +43,14 @@ export async function txReserve(
       if (approvals.length >= threshold.toNumber() - 1) {
         if (api.tx.multisig.asMulti.is(call)) {
           _increaseValue(unreserve, depositor.toString(), deposit);
-          await txReserve(api, call.args[3], multisigAddress, reserve, unreserve, delay);
+          await txReserve(
+            api,
+            api.registry.createType('Call', call.args[3].toU8a()),
+            multisigAddress,
+            reserve,
+            unreserve,
+            delay
+          );
         }
       }
     } else {
@@ -56,7 +63,14 @@ export async function txReserve(
   } else if (api.tx.multisig?.asMultiThreshold1.is(call)) {
     const multisigAddress = encodeMultiAddress([address, ...call.args[0]], 1, api.registry.chainSS58);
 
-    await txReserve(api, call.args[1], multisigAddress, reserve, unreserve, delay);
+    await txReserve(
+      api,
+      api.registry.createType('Call', call.args[1].toU8a()),
+      multisigAddress,
+      reserve,
+      unreserve,
+      delay
+    );
   } else if (api.tx.multisig?.cancelAsMulti.is(call)) {
     const threshold = call.args[0];
     const multisigAddress = encodeMultiAddress([address, ...call.args[1]], threshold, api.registry.chainSS58);
@@ -100,7 +114,7 @@ export async function txReserve(
       _increaseValue(unreserve, delegate, api.consts.proxy.announcementDepositFactor);
     }
 
-    await txReserve(api, call.args[3], real, reserve, unreserve, delay);
+    await txReserve(api, api.registry.createType('Call', call.args[3].toU8a()), real, reserve, unreserve, delay);
   } else if (api.tx.proxy?.removeAnnouncement?.is(call)) {
     const announcements = await api.query.proxy.announcements(address);
 
@@ -141,14 +155,21 @@ export async function txReserve(
 
     _increaseValue(unreserve, address, proxies[1]);
   } else if (api.tx.proxy?.proxy?.is(call)) {
-    await txReserve(api, call.args[2], call.args[0].toString(), reserve, unreserve, delay);
+    await txReserve(
+      api,
+      api.registry.createType('Call', call.args[2].toU8a()),
+      call.args[0].toString(),
+      reserve,
+      unreserve,
+      delay
+    );
   } else if (api.tx.proxy?.killPure?.is(call)) {
     const address = call.args[0].toString();
 
     _increaseValue(unreserve, address, api.consts.proxy.proxyDepositBase);
   } else if (api.tx.utility.batch.is(call) || api.tx.utility.forceBatch.is(call) || api.tx.utility.batchAll.is(call)) {
     for (const item of call.args[0]) {
-      await txReserve(api, item, address, reserve, unreserve, delay);
+      await txReserve(api, api.registry.createType('Call', item.toU8a()), address, reserve, unreserve, delay);
     }
   }
 }

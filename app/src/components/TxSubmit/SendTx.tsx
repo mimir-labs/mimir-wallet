@@ -12,10 +12,9 @@ import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { addTxToast } from '@/hooks/useTxQueue';
 import { service } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
-import { Divider, SvgIcon } from '@mui/material';
 import React, { useState } from 'react';
 
-import { Alert, Button, Tooltip } from '@mimir-wallet/ui';
+import { Alert, Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import AddressName from '../AddressName';
 import FormatBalance from '../FormatBalance';
@@ -131,13 +130,13 @@ function SendTx({
           {Object.entries(delay).map(([address, delay], index) => (
             <div key={`delay-${address}-${index}`} className='flex items-center justify-between gap-[5px] sm:gap-2.5'>
               <div className='flex items-center gap-[5px] sm:gap-2.5'>
-                <SvgIcon color='primary' component={IconClock} inheritViewBox sx={{ opacity: 0.5 }} />
+                <IconClock className='text-primary opacity-50' />
                 <p>Review window</p>
                 <Tooltip
                   content='This transaction needs to be executed manually after review window ends.'
                   closeDelay={0}
                 >
-                  <SvgIcon color='primary' component={IconQuestion} inheritViewBox />
+                  <IconQuestion className='text-primary' />
                 </Tooltip>
               </div>
 
@@ -187,7 +186,7 @@ function SendTx({
         </LockContainer>
       )}
 
-      {error ? <Alert color='danger' title='error.message' /> : null}
+      {error ? <Alert color='danger' title={<p className='break-all'>{error.message}</p>} /> : null}
 
       <Button
         fullWidth
