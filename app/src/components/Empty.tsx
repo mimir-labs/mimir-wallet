@@ -3,9 +3,17 @@
 
 import NullImg from '@/assets/images/Null.png';
 
-function Empty({ height, label }: { label?: string; height: number | string }) {
+interface Props {
+  label?: string;
+  height: number | string;
+  className?: string;
+}
+
+function Empty({ height, label, className = '' }: Props) {
+  const cn = 'flex flex-col items-center justify-center gap-5';
+
   return (
-    <div className='flex flex-col items-center justify-center gap-5' style={{ height }}>
+    <div className={`${cn} ${className}`} style={{ height }}>
       <img alt='null' src={NullImg} width={100} />
       <h4>{label || 'No data here.'}</h4>
     </div>

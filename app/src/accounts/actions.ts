@@ -8,10 +8,12 @@ import { decodeAddress, encodeAddress } from '@/api';
 import { HIDE_ACCOUNT_PREFIX } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
 import { useApi } from '@/hooks/useApi';
-import { addressEq, addressToHex, store } from '@/utils';
+import { addressEq, addressToHex } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
 import { u8aToHex } from '@polkadot/util';
 import { isEqual } from 'lodash-es';
+
+import { store } from '@mimir-wallet/service';
 
 import { sync } from './sync';
 

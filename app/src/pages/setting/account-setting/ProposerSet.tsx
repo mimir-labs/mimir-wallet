@@ -50,6 +50,7 @@ function AddModal({
   const [proposer, setProposer] = useState<string | undefined>();
   const [signer, setSigner] = useState<string | undefined>();
   const filtered = useManageProposerFilter(account);
+  const [loading, setLoading] = useState(false);
 
   const handleConfirm = async (proposer: string) => {
     if (!signer) {
@@ -80,6 +81,7 @@ function AddModal({
     }
 
     try {
+      setLoading(true);
       const time = new Date().toUTCString();
       const message = `${type === 'add' ? 'Setting Proposer:' : 'Removing Proposer:'}
 Proposer: ${proposer}
@@ -103,6 +105,8 @@ Genesis Hash: ${genesisHash}`;
       onClose();
     } catch (error) {
       toastError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -140,6 +144,7 @@ Genesis Hash: ${genesisHash}`;
             color={type === 'add' ? 'primary' : 'danger'}
             variant={type === 'add' ? 'solid' : 'flat'}
             isDisabled={!signer || (type === 'add' && !proposer)}
+            isLoading={loading}
             onPress={
               type === 'add'
                 ? proposer
@@ -150,7 +155,7 @@ Genesis Hash: ${genesisHash}`;
                   : undefined
             }
           >
-            Confirm
+            {type === 'add' ? 'Confirm' : 'Delete'}
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -175,7 +180,8 @@ function ProposerSet({ account, refetch }: { account: AccountDataWithProposers; 
         <Table
           removeWrapper
           classNames={{
-            th: 'bg-transparent'
+            th: 'bg-transparent text-small font-bold',
+            td: 'text-small'
           }}
         >
           <TableHeader>
@@ -184,7 +190,10 @@ function ProposerSet({ account, refetch }: { account: AccountDataWithProposers; 
             <TableColumn align='end'>Operation</TableColumn>
           </TableHeader>
 
-          <TableBody items={proposers} emptyContent={<Empty height='150px' label='No proposers' />}>
+          <TableBody
+            items={proposers}
+            emptyContent={<Empty className='text-foreground' height='150px' label='No proposers' />}
+          >
             {(item) => (
               <TableRow key={item.proposer}>
                 <TableCell>

@@ -9,7 +9,9 @@ import { AccountSelect, ChainSelect } from '@/components';
 import { useApi } from '@/hooks/useApi';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { Box, IconButton, Stack, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
+import { Link } from '@mimir-wallet/ui';
 
 import BatchButton from './BatchButton';
 import TemplateButton from './TemplateButton';
@@ -40,7 +42,7 @@ function TopBar() {
         boxShadow: 'inset 0px -1px 0px #E6F0FF'
       }}
     >
-      <Link to='/'>
+      <Link href='/'>
         <img
           alt=''
           src={isInAppPage && downSm ? LogoCircle : Logo}

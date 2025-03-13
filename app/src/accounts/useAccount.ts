@@ -5,9 +5,10 @@ import { encodeAddress } from '@/api';
 import { CURRENT_ADDRESS_PREFIX, SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
 import { useApi } from '@/hooks/useApi';
-import { store } from '@/utils';
 import { isAddress } from '@polkadot/util-crypto';
 import { useSearchParams } from 'react-router-dom';
+
+import { store } from '@mimir-wallet/service';
 
 import {
   addAddressBook,

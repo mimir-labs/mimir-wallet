@@ -10,9 +10,8 @@ import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useAccountSource } from '@/wallet/useWallet';
 import React, { useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 
-import { Avatar, Button, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@mimir-wallet/ui';
+import { Avatar, Button, Link, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@mimir-wallet/ui';
 
 import AddressCell from '../AddressCell';
 import FormatBalance from '../FormatBalance';
@@ -95,7 +94,6 @@ function AccountCell({
                     color='primary'
                     className='justify-start text-foreground'
                     onPress={() => {
-                      console.log('hide', isHide);
                       isHide ? showAccount(value) : hideAccount(value);
                     }}
                   >
@@ -111,7 +109,7 @@ function AccountCell({
                   color='primary'
                   className='justify-start text-foreground'
                   onPress={onClose}
-                  to={`/account-setting?address=${value}`}
+                  href={`/account-setting?address=${value}`}
                 >
                   Setting
                 </Button>

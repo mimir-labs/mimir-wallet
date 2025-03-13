@@ -17,11 +17,11 @@ import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useAccountSource, useWallet } from '@/wallet/useWallet';
-import { Box, Checkbox, Divider, FormControlLabel, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Divider, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Alert, Button, Tooltip } from '@mimir-wallet/ui';
+import { Alert, Button, Checkbox, Tooltip } from '@mimir-wallet/ui';
 
 import Input from '../Input';
 import InputAddress from '../InputAddress';
@@ -46,6 +46,7 @@ interface Props {
   website?: string;
   iconUrl?: string;
   appName?: string;
+  relatedBatches?: number[];
   onReject?: () => void;
   onClose?: () => void;
   onError?: (error: unknown) => void;
@@ -68,6 +69,7 @@ function TxSubmit({
   website,
   appName,
   iconUrl,
+  relatedBatches,
   filterPaths: propsFilterPaths,
   onReject,
   onClose,
@@ -210,10 +212,9 @@ function TxSubmit({
               <Divider />
 
               {safetyCheck && safetyCheck.severity === 'warning' && (
-                <FormControlLabel
-                  control={<Checkbox checked={isConfirm} onChange={(e) => setConfirm(e.target.checked)} />}
-                  label='I confirm recipient address exsits on the destination chain.'
-                />
+                <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
+                  I confirm recipient address exsits on the destination chain.
+                </Checkbox>
               )}
 
               {!isPropose && isFetched && (
@@ -229,6 +230,7 @@ function TxSubmit({
                   website={transaction?.website || website}
                   iconUrl={transaction?.iconUrl || iconUrl}
                   appName={transaction?.appName || appName}
+                  relatedBatches={relatedBatches}
                   onError={onError}
                   onFinalized={onFinalized}
                   onResults={(...args) => {

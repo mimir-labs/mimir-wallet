@@ -5,8 +5,9 @@ import type { HexString } from '@polkadot/util/types';
 import type { AccountData, AccountDataExtra, AddressMeta } from './types';
 
 import { HIDE_ACCOUNT_PREFIX } from '@/constants';
-import { store } from '@/utils';
 import { create } from 'zustand';
+
+import { store } from '@mimir-wallet/service';
 
 export interface AddressState {
   accounts: (AccountDataExtra & AccountData)[];

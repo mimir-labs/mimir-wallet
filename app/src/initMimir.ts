@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CURRENT_ADDRESS_PREFIX, CURRENT_NETWORK_KEY } from '@/constants';
-import { store } from '@/utils';
 import { encodeAddress, isAddress } from '@polkadot/util-crypto';
+
+import { store } from '@mimir-wallet/service';
 
 import { allEndpoints } from './config';
 

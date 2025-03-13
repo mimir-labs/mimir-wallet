@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DotConsoleApp, PolkadotJsApp } from '@/config';
-import { Link } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+
+import { Link } from '@mimir-wallet/ui';
 
 function DotConsoleLink({ network }: { network: string }) {
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
@@ -14,7 +14,7 @@ function DotConsoleLink({ network }: { network: string }) {
     url.hash = '#/extrinsics';
 
     return (
-      <Link component={RouterLink} underline='hover' to={`/explorer/${encodeURIComponent(url.toString())}`}>
+      <Link underline='hover' href={`/explorer/${encodeURIComponent(url.toString())}`}>
         Polkadot.js
       </Link>
     );
@@ -25,7 +25,7 @@ function DotConsoleLink({ network }: { network: string }) {
   url.pathname = '/extrinsics';
 
   return (
-    <Link component={RouterLink} underline='hover' to={`/explorer/${encodeURIComponent(url.toString())}`}>
+    <Link underline='hover' href={`/explorer/${encodeURIComponent(url.toString())}`}>
       DOT Console
     </Link>
   );

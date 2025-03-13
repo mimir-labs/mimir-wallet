@@ -9,7 +9,8 @@ import type { AccountAssetInfo, AccountBalance, AssetInfo, OrmlTokensAccountData
 
 import { BN_ZERO, isHex } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import { useQuery } from '@tanstack/react-query';
+
+import { useQuery } from '@mimir-wallet/service';
 
 import { useApi } from './useApi';
 import { useAssets } from './useAssets';

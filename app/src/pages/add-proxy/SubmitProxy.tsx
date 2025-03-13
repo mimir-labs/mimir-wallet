@@ -7,12 +7,21 @@ import { Address, AddressRow, TxButton } from '@/components';
 import { toastSuccess } from '@/components/utils';
 import { useApi } from '@/hooks/useApi';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { Box, Checkbox, FormControlLabel } from '@mui/material';
+import { Box } from '@mui/material';
 import React, { useCallback, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAsyncFn, useToggle } from 'react-use';
 
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import {
+  Button,
+  Checkbox,
+  Divider,
+  Link,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader
+} from '@mimir-wallet/ui';
 
 function ConfirmDialog({
   open,
@@ -61,7 +70,9 @@ function ConfirmDialog({
         <Divider />
         <ModalFooter>
           <div className='flex flex-col gap-4 w-full'>
-            <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label='I Understand' />
+            <Checkbox size='sm' isSelected={checked} onValueChange={toggleChecked}>
+              I Understand
+            </Checkbox>
 
             <Button fullWidth color='primary' isDisabled={!checked} onPress={onSubmit}>
               Confirm
@@ -120,7 +131,7 @@ function SubmitProxy({
               </p>
               <Link
                 className='text-tiny text-primary no-underline'
-                to={`/?address=${proxied.toString()}&tab=structure`}
+                href={`/?address=${proxied.toString()}&tab=structure`}
               >
                 Account Structure{'>'}
               </Link>

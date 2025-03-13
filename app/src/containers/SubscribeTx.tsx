@@ -12,7 +12,8 @@ import { Box, Typography } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+
+import { Link } from '@mimir-wallet/ui';
 
 type TxMessage = {
   id: number;
@@ -40,14 +41,9 @@ function SubscribeTx({ address }: { address: string }) {
             <Typography fontSize={12}>
               Transaction {formatTransactionId(message.id)} Executed {TransactionStatus[message.status]}
             </Typography>
-            <Typography
-              component={Link}
-              fontSize={12}
-              to='/transactions?status=history'
-              sx={{ color: 'primary.main', textDecoration: 'none' }}
-            >
+            <Link className='text-primary text-tiny' underline='active' href='/transactions?status=history'>
               View Transaction{'>'}
-            </Typography>
+            </Link>
           </Box>
         );
       } else if (message.isNew) {

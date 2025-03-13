@@ -151,7 +151,7 @@ function AccountSetting() {
               classNames={{ content: 'max-w-[300px]' }}
               content='The proposer can submit the transaction without any signatures. Once the members approve, the transaction can be initiated.'
             >
-              <IconQuestion />
+              <IconQuestion className='text-primary' />
             </Tooltip>
           </h6>
           <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>

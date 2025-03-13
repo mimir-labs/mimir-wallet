@@ -3,13 +3,14 @@
 
 import type { TokenInfo } from './types';
 
-import { chainLinks } from '@/api/chain-links';
-import { useQuery } from '@tanstack/react-query';
+import { service } from '@/utils';
+
+import { useQuery } from '@mimir-wallet/service';
 
 export function useTokenInfo(): [tokenInfo: Record<string, TokenInfo> | undefined, isLoading: boolean] {
   const { data, isFetching } = useQuery<{ detail: Record<string, TokenInfo>; token: string[] }>({
-    queryHash: chainLinks.serviceUrl('scan/token'),
-    queryKey: [chainLinks.serviceUrl('scan/token')]
+    queryHash: service.getNetworkUrl('scan/token'),
+    queryKey: [service.getNetworkUrl('scan/token')]
   });
 
   return [data?.detail, isFetching];

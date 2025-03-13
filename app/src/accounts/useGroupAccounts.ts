@@ -6,10 +6,11 @@ import type { HexString } from '@polkadot/util/types';
 
 import { DETECTED_ACCOUNT_KEY } from '@/constants';
 import { createNamedHook } from '@/hooks/createNamedHook';
-import { useLocalStore } from '@/hooks/useStore';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { useCallback, useMemo } from 'react';
+
+import { useLocalStore } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
 import { groupAccounts, type GroupName } from './utils';

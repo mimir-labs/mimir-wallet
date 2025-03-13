@@ -5,12 +5,12 @@ import type { AccountData, AccountDataWithProposers, AddressMeta, DelegateeProp 
 import type { HexString } from '@polkadot/util/types';
 
 import { encodeAddress } from '@/api';
-import { chainLinks } from '@/api/chain-links';
-import { createNamedHook } from '@/hooks/createNamedHook';
 import { useApi } from '@/hooks/useApi';
-import { useQuery } from '@tanstack/react-query';
+import { service } from '@/utils';
 import { isEqual } from 'lodash-es';
 import { useEffect } from 'react';
+
+import { useQuery } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
 
@@ -90,15 +90,15 @@ function deriveMeta(account: AccountData, meta: Record<string, AddressMeta> = {}
   }
 }
 
-function useQueryAccountImpl(
+export function useQueryAccount(
   address?: string | null
 ): [AccountDataWithProposers | null | undefined, isFetched: boolean, isFetching: boolean, refetch: () => void] {
   const { genesisHash } = useApi();
   const { appendMeta } = useAccount();
   const { data, isFetched, isFetching, refetch } = useQuery<AccountDataWithProposers | null>({
     initialData: null,
-    queryHash: chainLinks.serviceUrl(`accounts/full/${address}`),
-    queryKey: [address ? chainLinks.serviceUrl(`accounts/full/${address}`) : null],
+    queryHash: service.getNetworkUrl(`accounts/full/${address}`),
+    queryKey: [address ? service.getNetworkUrl(`accounts/full/${address}`) : null],
     structuralSharing: (prev, next): AccountDataWithProposers | null => {
       if (!next) {
         return null;
@@ -121,5 +121,3 @@ function useQueryAccountImpl(
 
   return [data, isFetched, isFetching, refetch];
 }
-
-export const useQueryAccount = createNamedHook('useQueryAccount', useQueryAccountImpl);

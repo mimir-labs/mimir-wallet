@@ -6,7 +6,8 @@ import type { WalletAccount } from './types';
 import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@/constants';
 import { documentReadyPromise } from '@/utils/document';
-import { store } from '@/utils/store';
+
+import { store } from '@mimir-wallet/service';
 
 import { useWallet } from './useWallet';
 import { loadWallet } from './utils';

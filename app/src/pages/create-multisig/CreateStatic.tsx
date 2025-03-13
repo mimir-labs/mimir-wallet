@@ -9,12 +9,13 @@ import { decodeAddress, encodeAddress } from '@/api';
 import { utm } from '@/config';
 import { DETECTED_ACCOUNT_KEY } from '@/constants';
 import { useToggle } from '@/hooks/useToggle';
-import { addressToHex, service, store } from '@/utils';
+import { addressToHex, service } from '@/utils';
 import { u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { store } from '@mimir-wallet/service';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 interface Props {

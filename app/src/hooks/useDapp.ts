@@ -5,8 +5,9 @@ import { type DappOption, dapps, findSupportedDapps } from '@/config';
 import { FAVORITE_DAPP_KEY } from '@/constants';
 import { useCallback, useMemo } from 'react';
 
+import { useLocalStore } from '@mimir-wallet/service';
+
 import { useApi } from './useApi';
-import { useLocalStore } from './useStore';
 
 interface UseDapps {
   dapps: DappOption[];

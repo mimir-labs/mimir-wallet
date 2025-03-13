@@ -8,11 +8,10 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { encodeAddress } from '@/api';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { addressEq } from '@/utils';
-import { alpha, Chip } from '@mui/material';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { Button } from '@mimir-wallet/ui';
+import { Button, Chip } from '@mimir-wallet/ui';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
@@ -59,14 +58,15 @@ function AddressCell({
           {namePost}
           {showType && (
             <>
-              {isMultisig && <Chip color='secondary' label='Multisig' size='small' sx={{ fontSize: 12 }} />}
+              {isMultisig && (
+                <Chip color='secondary' size='sm'>
+                  Multisig
+                </Chip>
+              )}
               {(isPure || isProxied) && (
-                <Chip
-                  color='default'
-                  sx={{ bgcolor: alpha('#B700FF', 0.05), color: '#B700FF', fontSize: 12 }}
-                  label={isPure ? 'Pure' : 'Proxied'}
-                  size='small'
-                />
+                <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
+                  {isPure ? 'Pure' : 'Proxied'}
+                </Chip>
               )}
             </>
           )}

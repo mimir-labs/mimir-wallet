@@ -219,6 +219,8 @@ function appendProposers(
   }
 
   for (const proposer of proposers) {
+    if (!accountSource(proposer.proposer)) continue;
+
     paths.push([
       first,
       {

@@ -15,13 +15,23 @@ import { findToken } from '@/config';
 import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { Alert, AlertTitle, Avatar, Box, Chip, Stack, Typography } from '@mui/material';
+import { Alert, AlertTitle, Avatar, Box, Stack, Typography } from '@mui/material';
 import { BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
+import {
+  Button,
+  Chip,
+  Divider,
+  Link,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Tooltip
+} from '@mimir-wallet/ui';
 
 function ProxySet({
   account,
@@ -70,7 +80,7 @@ function ProxySet({
                     <IconClock className='w-4 h-4 opacity-70' />
                   </Tooltip>
                 ) : null}
-                <Chip color='secondary' label={proxy.proxyType.toString()} />
+                <Chip color='secondary'>{proxy.proxyType.toString()}</Chip>
                 {!isReadOnly && (
                   <TxButton
                     isIconOnly
@@ -113,7 +123,7 @@ function ProxySet({
           </ul>
         </Alert>
 
-        <Button as={Link} color='primary' fullWidth to='/add-proxy'>
+        <Button as={Link} color='primary' fullWidth href='/add-proxy'>
           Add New Proxy
         </Button>
 

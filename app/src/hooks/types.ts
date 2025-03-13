@@ -344,6 +344,7 @@ export interface BatchTxItem {
   website?: string;
   iconUrl?: string;
   appName?: string;
+  relatedBatch?: number;
 }
 
 export interface PalletAssetRegistryAssetDetails extends Struct {

@@ -4,12 +4,12 @@
 import type { HistoryTransaction, Transaction } from './types';
 
 import { encodeAddress } from '@/api';
-import { chainLinks } from '@/api/chain-links';
 import { events } from '@/events';
-import { fetcher } from '@/utils';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { service } from '@/utils';
 import { isEqual } from 'lodash-es';
 import { useEffect, useState } from 'react';
+
+import { fetcher, useInfiniteQuery, useQuery } from '@mimir-wallet/service';
 
 function transformTransaction(transaction: Transaction): Transaction {
   const tx = { ...transaction };
@@ -44,8 +44,8 @@ export function usePendingTransactions(
 ): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
   const { data, isFetched, isFetching, refetch } = useQuery<Transaction[]>({
     initialData: [],
-    queryHash: chainLinks.serviceUrl(`tx/pending?address=${address}&tx_id=${txId || ''}`),
-    queryKey: [address ? chainLinks.serviceUrl(`tx/pending?address=${address}&tx_id=${txId || ''}`) : null],
+    queryHash: service.getNetworkUrl(`tx/pending?address=${address}&tx_id=${txId || ''}`),
+    queryKey: [address ? service.getNetworkUrl(`tx/pending?address=${address}&tx_id=${txId || ''}`) : null],
     structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
       const nextData = (next as Transaction[]).map((item) => transformTransaction(item));
 
@@ -81,7 +81,7 @@ export function useHistoryTransactions(
   const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
     initialPageParam: null,
     queryKey: [
-      address ? chainLinks.serviceUrl(`tx/history?address=${address}&limit=${limit}&tx_id=${txId || ''}`) : null
+      address ? service.getNetworkUrl(`tx/history?address=${address}&limit=${limit}&tx_id=${txId || ''}`) : null
     ],
     queryFn: async ({ pageParam, queryKey }) => {
       if (!queryKey[0]) {
@@ -123,8 +123,8 @@ export function useTransactionDetail(
 ): [transactions: Transaction | null, isFetched: boolean, isFetching: boolean] {
   const { data, isFetched, isFetching } = useQuery<Transaction | null>({
     initialData: null,
-    queryHash: chainLinks.serviceUrl(`tx-details/${id}`),
-    queryKey: [id ? chainLinks.serviceUrl(`tx-details/${id}`) : null],
+    queryHash: service.getNetworkUrl(`tx-details/${id}`),
+    queryKey: [id ? service.getNetworkUrl(`tx-details/${id}`) : null],
     structuralSharing: (prev: unknown | undefined, next: unknown): Transaction | null => {
       const nextData = next ? transformTransaction(next as Transaction) : null;
 

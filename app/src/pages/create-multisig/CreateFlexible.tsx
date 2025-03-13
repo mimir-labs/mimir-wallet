@@ -15,7 +15,7 @@ import { DETECTED_ACCOUNT_KEY } from '@/constants';
 import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { addTxToast } from '@/hooks/useTxQueue';
-import { addressToHex, service, sleep, store } from '@/utils';
+import { addressToHex, service, sleep } from '@/utils';
 import { accountSource, useAccountSource, useWallet } from '@/wallet/useWallet';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Stack, Typography } from '@mui/material';
 import { u8aEq, u8aToHex } from '@polkadot/util';
@@ -23,6 +23,7 @@ import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { store } from '@mimir-wallet/service';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 interface Props {

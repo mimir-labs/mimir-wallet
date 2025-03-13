@@ -3,12 +3,10 @@
 
 import { GlobalStyle } from '@/components';
 import { ThemeProvider } from '@/theme';
-import { fetcher } from '@/utils';
 import { StyledEngineProvider } from '@mui/material';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { QueryProvider } from '@mimir-wallet/service';
 import { HeroUIProvider } from '@mimir-wallet/ui';
 
 /**
@@ -26,26 +24,16 @@ import { HeroUIProvider } from '@mimir-wallet/ui';
  * - Custom fetcher function for data queries
  */
 function Root({ children }: { children: React.ReactNode }) {
-  const queryClient = useRef(
-    new QueryClient({
-      defaultOptions: {
-        queries: {
-          refetchInterval: 6_000,
-          queryFn: ({ queryKey }) => (queryKey[0] ? fetcher(queryKey[0] as string) : null)
-        }
-      }
-    })
-  );
   const navigate = useNavigate();
 
   return (
     <HeroUIProvider navigate={navigate}>
       <StyledEngineProvider injectFirst>
         <ThemeProvider>
-          <QueryClientProvider client={queryClient.current}>
+          <QueryProvider>
             <GlobalStyle />
             {children}
-          </QueryClientProvider>
+          </QueryProvider>
         </ThemeProvider>
       </StyledEngineProvider>
     </HeroUIProvider>

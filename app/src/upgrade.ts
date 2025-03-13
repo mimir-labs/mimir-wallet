@@ -4,7 +4,8 @@
 import type { HexString } from '@polkadot/util/types';
 
 import { ADDRESS_BOOK_UPGRADE_VERSION_KEY } from '@/constants';
-import { store } from '@/utils';
+
+import { store } from '@mimir-wallet/service';
 
 export function upgradeAddresBook() {
   const addressBookVersion = store.get(ADDRESS_BOOK_UPGRADE_VERSION_KEY);

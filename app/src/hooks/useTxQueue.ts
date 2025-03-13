@@ -21,6 +21,7 @@ export interface TxQueue {
   website?: string;
   iconUrl?: string;
   appName?: string;
+  relatedBatches?: number[];
   onReject?: () => void;
   onClose?: () => void;
   onError?: (error: unknown) => void;

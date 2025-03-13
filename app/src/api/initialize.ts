@@ -7,10 +7,12 @@ import type { ApiState } from './types';
 import { allEndpoints, type Endpoint, typesBundle } from '@/config';
 import { NETWORK_RPC_PREFIX } from '@/constants';
 import { useApi } from '@/hooks/useApi';
-import { service, store } from '@/utils';
+import { service } from '@/utils';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance } from '@polkadot/util';
+
+import { store } from '@mimir-wallet/service';
 
 import { ApiProvider } from './ApiProvider';
 import { DEFAULT_AUX, statics } from './defaults';

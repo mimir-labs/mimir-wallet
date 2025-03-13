@@ -5,12 +5,14 @@ import { Input } from '@/components';
 import { allEndpoints } from '@/config';
 import { NETWORK_RPC_PREFIX } from '@/constants';
 import { useApi } from '@/hooks/useApi';
-import { isValidWsUrl, store } from '@/utils';
+import { isValidWsUrl } from '@/utils';
 import { LoadingButton } from '@mui/lab';
 import { Alert, Avatar, Box, Divider, Paper, Stack } from '@mui/material';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { useMemo, useState } from 'react';
 import { useAsyncFn } from 'react-use';
+
+import { store } from '@mimir-wallet/service';
 
 function NetworkSetting() {
   const { network } = useApi();

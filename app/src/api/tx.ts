@@ -291,7 +291,7 @@ export function signAndSend(
   extractParams(statics.api, signer, source)
     .then((params) => extrinsic.signAsync(signer, params))
     .then(async (extrinsic) => {
-      events.emit('signed', extrinsic.signature);
+      events.emit('signed', extrinsic.signature, extrinsic);
 
       let result: Result<
         Result<Null, SpRuntimeDispatchError>,
@@ -320,7 +320,7 @@ export function signAndSend(
 
       return extrinsic;
     })
-    .then(async () => {
+    .then(async (extrinsic) => {
       await beforeSend?.(extrinsic);
 
       const unsubPromise = extrinsic.send((result) => {

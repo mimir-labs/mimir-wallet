@@ -1,22 +1,22 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { StorageEvent } from '../types';
+import type { StorageEvent } from '../types.js';
 
-import Events from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
-import { deserialize, getAllItems, serialize } from './utils';
+import { deserialize, getAllItems, serialize } from './utils.js';
 
-export class LocalStorage extends Events<StorageEvent> {
+export class SessionStorage extends EventEmitter<StorageEvent> {
   #items: Map<string, unknown> = new Map();
 
   constructor() {
     super();
 
-    this.#items = getAllItems(localStorage);
+    this.#items = getAllItems(sessionStorage);
     window.addEventListener('storage', (event) => {
-      if (event.storageArea === localStorage) {
-        if (localStorage.length === 0) {
+      if (event.storageArea === sessionStorage) {
+        if (sessionStorage.length === 0) {
           // clear storage
 
           for (const [key, value] of this.#items) {
@@ -37,13 +37,13 @@ export class LocalStorage extends Events<StorageEvent> {
   public get(key: string | null): unknown {
     if (!key) return undefined;
 
-    const val = localStorage.getItem(key);
+    const val = sessionStorage.getItem(key);
 
     return deserialize(val);
   }
 
   public set(key: string, value: unknown) {
-    localStorage.setItem(key, serialize(value));
+    sessionStorage.setItem(key, serialize(value));
     const oldValue = this.#items.get(key);
 
     this.#items.set(key, value);
@@ -51,7 +51,7 @@ export class LocalStorage extends Events<StorageEvent> {
   }
 
   public remove(key: string) {
-    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
     const oldValue = this.#items.get(key);
 
     this.#items.delete(key);
@@ -59,8 +59,8 @@ export class LocalStorage extends Events<StorageEvent> {
   }
 
   public each(fn: (key: string, val: unknown) => void): void {
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
+    for (let i = sessionStorage.length - 1; i >= 0; i--) {
+      const key = sessionStorage.key(i);
 
       if (key) fn(key, this.get(key));
     }

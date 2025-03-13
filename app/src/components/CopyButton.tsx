@@ -17,6 +17,8 @@ const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton({ va
 
   const handleClick = useCallback(() => {
     copy(value?.toString() || '');
+
+    return true;
   }, [copy, value]);
 
   return (

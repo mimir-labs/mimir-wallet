@@ -7,15 +7,15 @@ import { extendVariants } from '@heroui/system';
 const CustomModal = extendVariants(Modal, {
   variants: {
     size: {
-      xs: { body: 'py-4' },
-      sm: { body: 'py-4' },
-      md: { body: 'py-4' },
-      lg: { body: 'py-4' },
-      xl: { body: 'py-4' },
-      '2xl': { body: 'py-4' },
-      '3xl': { body: 'py-4' },
-      '4xl': { body: 'py-4' },
-      full: { body: 'py-4' }
+      xs: { body: 'py-4 px-4 sm:px-5' },
+      sm: { body: 'py-4 px-4 sm:px-5' },
+      md: { body: 'py-4 px-4 sm:px-5' },
+      lg: { body: 'py-4 px-4 sm:px-5' },
+      xl: { body: 'py-4 px-4 sm:px-5' },
+      '2xl': { body: 'py-4 px-4 sm:px-5' },
+      '3xl': { body: 'py-4 px-4 sm:px-5' },
+      '4xl': { body: 'py-4 px-4 sm:px-5' },
+      full: { body: 'py-4 px-4 sm:px-5' }
     }
   },
   defaultVariants: {

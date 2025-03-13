@@ -29,6 +29,7 @@ function SendTx({
   website,
   iconUrl,
   appName,
+  relatedBatches,
   onError,
   onFinalized,
   onResults,
@@ -41,6 +42,7 @@ function SendTx({
   iconUrl?: string | null;
   appName?: string | null;
   note?: string;
+  relatedBatches?: number[];
   onlySign?: boolean;
   onResults?: (results: ISubmittableResult) => void;
   onFinalized?: (results: ISubmittableResult) => void;
@@ -86,7 +88,7 @@ function SendTx({
 
         const [signature, payload, extrinsicHash, signedTransaction] = await sign(tx, signer, source);
 
-        await service.uploadWebsite(extrinsicHash.toHex(), website, appName, iconUrl, note);
+        await service.uploadWebsite(extrinsicHash.toHex(), website, appName, iconUrl, note, relatedBatches);
 
         onSignature?.(signer, signature, signedTransaction, payload);
         events.emit('success', 'Sign success');
@@ -98,8 +100,10 @@ function SendTx({
 
         addTxToast({ events });
 
+        events.on('signed', (_, extrinsic) => {
+          service.uploadWebsite(extrinsic.hash.toHex(), website, appName, iconUrl, note, relatedBatches);
+        });
         events.on('inblock', (result) => {
-          service.uploadWebsite(result.txHash.toHex(), website, appName, iconUrl, note);
           onResults?.(result);
         });
         events.on('error', (error) => {
