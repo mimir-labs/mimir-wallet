@@ -113,9 +113,9 @@ function CreateFlexible({
         api.tx.proxy.proxy(
           pure,
           'Any',
-          api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, api.registry.chainSS58), 'Any', 0)
+          api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, api.registry.chainSS58), 'Any', 0).toU8a()
         ),
-        api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0))
+        api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0).toU8a())
       ]);
 
       setLoadingSecond(true);
@@ -206,7 +206,7 @@ function CreateFlexible({
       const extrinsic = api.tx.proxy.proxy(
         pure,
         'Any',
-        api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex)
+        api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex).toU8a()
       );
 
       const events = signAndSend(extrinsic, signer, source, { checkProxy: true });

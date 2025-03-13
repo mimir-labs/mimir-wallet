@@ -114,7 +114,7 @@ export async function buildTx(
         if (_transaction?.call) {
           tx = api.tx(api.registry.createType('Call', _transaction.call));
         } else {
-          tx = api.tx.proxy.proxy(item.real, item.proxyType as any, tx.method);
+          tx = api.tx.proxy.proxy(item.real, item.proxyType as any, tx.method.toU8a());
         }
       }
     }
