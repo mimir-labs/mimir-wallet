@@ -10,10 +10,19 @@ const CustomLink = extendVariants(Link, {
       sm: 'text-[length:inherit]',
       md: 'text-[length:inherit]',
       lg: 'text-[length:inherit]'
+    },
+    color: {
+      primary: 'text-primary',
+      secondary: 'text-secondary',
+      danger: 'text-danger',
+      success: 'text-success',
+      warning: 'text-warning',
+      foreground: 'text-foreground'
     }
   },
   defaultVariants: {
-    size: 'md'
+    size: 'md',
+    color: 'primary'
   },
   compoundVariants: []
 }) as typeof Link;

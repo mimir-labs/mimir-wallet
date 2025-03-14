@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { HexString } from '@polkadot/util/types';
+
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
@@ -13,7 +15,15 @@ import { Button, Tooltip } from '@mimir-wallet/ui';
 import TemplateItem from './TemplateItem';
 import { useSavedTemplate } from './useSavedTemplate';
 
-function TemplateList({ onAdd, onClose }: { onAdd: () => void; onClose: () => void }) {
+function TemplateList({
+  onAdd,
+  onClose,
+  onView
+}: {
+  onAdd: () => void;
+  onClose: () => void;
+  onView: (name: string, call: HexString) => void;
+}) {
   const { network } = useApi();
   const { template, removeTemplate, editTemplateName } = useSavedTemplate(network);
 
@@ -47,6 +57,7 @@ function TemplateList({ onAdd, onClose }: { onAdd: () => void; onClose: () => vo
               name={name}
               call={call}
               onEditName={(name) => editTemplateName(index, name)}
+              onView={onView}
               onDelete={() => removeTemplate(index)}
             />
           ))

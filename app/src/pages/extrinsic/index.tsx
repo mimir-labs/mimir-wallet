@@ -100,7 +100,7 @@ function PageExtrinsic() {
               <Typography fontWeight={700}>
                 {parsedCallData.section}.{parsedCallData.method}
               </Typography>
-              <Link as='button' underline='none' color='primary' onClick={() => setShowDetail(!showDetail)}>
+              <Link as='button' underline='none' color='primary' onPress={() => setShowDetail(!showDetail)}>
                 {showDetail ? 'Hide' : 'Details'}
               </Link>
             </Box>
