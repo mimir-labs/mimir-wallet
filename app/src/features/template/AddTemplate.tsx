@@ -12,14 +12,25 @@ import { useInput } from '@/hooks/useInput';
 import { Box, Button, Divider, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import DotConsoleButton from '../call-data-view/DotConsoleButton';
 import DotConsoleLink from '../call-data-view/DotConsoleLink';
 import { decodeCallData } from '../call-data-view/utils';
 import { useSavedTemplate } from './useSavedTemplate';
 
-function AddTemplate({ onBack, defaultCallData }: { defaultCallData?: HexString; onBack: () => void }) {
+function AddTemplate({
+  isView = false,
+  onBack,
+  defaultCallData,
+  defaultName
+}: {
+  isView?: boolean;
+  defaultCallData?: HexString;
+  defaultName?: string;
+  onBack: () => void;
+}) {
   const { network, api } = useApi();
   const { addTemplate } = useSavedTemplate(network);
-  const [name, setName] = useInput('');
+  const [name, setName] = useInput(defaultName || '');
   const [callData, setCallData] = useInput(defaultCallData || '');
   const [parsedCallData, setParsedCallData] = useState<Call | null>(null);
   const [callDataError, setCallDataError] = useState<Error | null>(null);
@@ -46,21 +57,23 @@ function AddTemplate({ onBack, defaultCallData }: { defaultCallData?: HexString;
         <IconButton color='inherit' onClick={onBack}>
           <SvgIcon inheritViewBox component={IconArrowLeft} />
         </IconButton>
-        <Typography variant='h4'>Add New Template</Typography>
+        <Typography variant='h4'>{isView ? 'View Template' : 'Add New Template'}</Typography>
       </Box>
 
       <Divider />
 
-      <Input label='Name' value={name} onChange={setName} />
+      <Input disabled={isView} label='Name' value={name} onChange={setName} />
 
       <Input
         label='Call Data'
         placeholder='0x...'
         helper={
-          <Box color='text.primary'>
-            You can edit it in the <DotConsoleLink network={network} /> and then click Import or directly paste the
-            Encoded Call Data.
-          </Box>
+          isView ? null : (
+            <Box color='text.primary'>
+              You can edit it in the <DotConsoleLink network={network} /> and then click Import or directly paste the
+              Encoded Call Data.
+            </Box>
+          )
         }
         value={callData}
         onChange={setCallData}
@@ -87,9 +100,13 @@ function AddTemplate({ onBack, defaultCallData }: { defaultCallData?: HexString;
         </Box>
       )}
 
-      <Button variant='contained' color='primary' disabled={!(name && callData) || !!callDataError} onClick={onAdd}>
-        Add
-      </Button>
+      {isView ? (
+        <DotConsoleButton call={callData} network={network} />
+      ) : (
+        <Button variant='contained' color='primary' disabled={!(name && callData) || !!callDataError} onClick={onAdd}>
+          Add
+        </Button>
+      )}
     </Stack>
   );
 }

@@ -19,6 +19,9 @@ function Template({
   onClose: () => void;
 }) {
   const [isAdd, setIsAdd] = useState(defaultAdded);
+  const [isView, setIsView] = useState(false);
+  const [viewTemplate, setViewTemplate] = useState<HexString | undefined>(undefined);
+  const [viewTemplateName, setViewTemplateName] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const handleTemplateAdd = () => {
@@ -34,7 +37,27 @@ function Template({
 
   if (isAdd) return <AddTemplate defaultCallData={defaultCallData} onBack={() => setIsAdd(false)} />;
 
-  return <TemplateList onAdd={() => setIsAdd(true)} onClose={onClose} />;
+  if (isView)
+    return (
+      <AddTemplate
+        isView
+        defaultCallData={viewTemplate}
+        defaultName={viewTemplateName}
+        onBack={() => setIsView(false)}
+      />
+    );
+
+  return (
+    <TemplateList
+      onAdd={() => setIsAdd(true)}
+      onClose={onClose}
+      onView={(name, call) => {
+        setViewTemplate(call);
+        setViewTemplateName(name);
+        setIsView(true);
+      }}
+    />
+  );
 }
 
 export default Template;
