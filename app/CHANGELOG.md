@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.24.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.23.0...mimir-wallet-app-v1.24.0) (2025-03-14)
+
+
+### Features
+
+* add template detail view functionality ([#174](https://github.com/mimir-labs/mimir-wallet/issues/174)) ([cb0504c](https://github.com/mimir-labs/mimir-wallet/commit/cb0504c0c72440ec48edcf6a16129236edd3e102))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/ui bumped to 1.26.0
+
 ## [1.23.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.22.2...mimir-wallet-app-v1.23.0) (2025-03-14)
 
 
