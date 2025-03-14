@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { HexString } from '@polkadot/util/types';
+
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { CopyButton } from '@/components';
@@ -34,7 +36,7 @@ function DotConsoleButton({ network, call }: { network: string; call: string }) 
       href={`/explorer/${encodeURIComponent(url.toString())}`}
       variant='light'
     >
-      <img src={DotConsoleApp.icon} alt='Polkadot.js' width={16} height={16} />
+      <img src={DotConsoleApp.icon} alt='Dot Console' width={16} height={16} />
     </Button>
   );
 }
@@ -43,12 +45,14 @@ function TemplateItem({
   name,
   call,
   onDelete,
-  onEditName
+  onEditName,
+  onView
 }: {
   name: string;
-  call: string;
+  call: HexString;
   onDelete: () => void;
   onEditName: (name: string) => void;
+  onView: (name: string, call: HexString) => void;
 }) {
   const { api, network } = useApi();
   const [section, setSection] = useState<string | undefined>(undefined);
@@ -103,7 +107,9 @@ function TemplateItem({
       </div>
 
       <div className='flex items-center'>
-        <CallDisplaySection section={section} method={method} />
+        <Link as='button' underline='always' color='foreground' onPress={() => onView(name, call)}>
+          <CallDisplaySection section={section} method={method} />
+        </Link>
         <CopyButton value={call} size='sm' />
       </div>
 
