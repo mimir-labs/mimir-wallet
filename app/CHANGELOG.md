@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.23.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.22.2...mimir-wallet-app-v1.23.0) (2025-03-14)
+
+
+### Features
+
+* Add proposer management for multisig members and enable propose transaction submission ([#171](https://github.com/mimir-labs/mimir-wallet/issues/171)) ([086421e](https://github.com/mimir-labs/mimir-wallet/commit/086421e2ea2c54056670c997b5ecf0ab3d50d54b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/ui bumped to 1.25.0
+
 ## [1.22.2](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.22.1...mimir-wallet-app-v1.22.2) (2025-03-10)
 
 

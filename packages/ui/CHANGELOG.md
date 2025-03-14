@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v1.24.0...ui-v1.25.0) (2025-03-14)
+
+
+### Features
+
+* Add proposer management for multisig members and enable propose transaction submission ([#171](https://github.com/mimir-labs/mimir-wallet/issues/171)) ([086421e](https://github.com/mimir-labs/mimir-wallet/commit/086421e2ea2c54056670c997b5ecf0ab3d50d54b))
+
 ## [1.24.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v1.23.0...ui-v1.24.0) (2025-03-10)
 
 
