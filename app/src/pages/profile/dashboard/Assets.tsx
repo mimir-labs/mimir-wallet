@@ -47,7 +47,7 @@ function AssetRow({
 }) {
   const { api, tokenSymbol } = useApi();
   const format = useMemo(
-    (): [decimals: number, unit: string] => [decimals || api.registry.chainDecimals[0], symbol || tokenSymbol],
+    (): [decimals: number, unit: string] => [decimals ?? api.registry.chainDecimals[0], symbol || tokenSymbol],
     [api.registry.chainDecimals, decimals, symbol, tokenSymbol]
   );
 

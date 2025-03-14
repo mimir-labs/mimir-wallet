@@ -41,7 +41,7 @@ function SubscribeTx({ address }: { address: string }) {
             <Typography fontSize={12}>
               Transaction {formatTransactionId(message.id)} Executed {TransactionStatus[message.status]}
             </Typography>
-            <Link className='text-primary text-tiny' underline='active' href='/transactions?status=history'>
+            <Link color='primary' className='text-tiny' underline='active' href='/transactions?status=history'>
               View Transaction{'>'}
             </Link>
           </Box>
@@ -53,14 +53,9 @@ function SubscribeTx({ address }: { address: string }) {
             <Typography fontSize={12}>
               New Transaction by <Address shorten value={message.triggerAddress} />
             </Typography>
-            <Typography
-              component={Link}
-              fontSize={12}
-              to='/transactions?status=pending'
-              sx={{ color: 'primary.main', textDecoration: 'none' }}
-            >
+            <Link color='primary' className='text-tiny' underline='active' href='/transactions?status=pending'>
               View Pending{'>'}
-            </Typography>
+            </Link>
           </Box>
         );
       } else if (message.status === TransactionStatus.Pending) {
@@ -71,14 +66,9 @@ function SubscribeTx({ address }: { address: string }) {
               <Typography fontSize={12}>
                 <Address shorten value={message.triggerAddress} /> approve Transaction {formatTransactionId(message.id)}
               </Typography>
-              <Typography
-                component={Link}
-                fontSize={12}
-                to='/transactions?status=pending'
-                sx={{ color: 'primary.main', textDecoration: 'none' }}
-              >
+              <Link color='primary' className='text-tiny' underline='active' href='/transactions?status=pending'>
                 View Pending{'>'}
-              </Typography>
+              </Link>
             </Box>
           );
         }
