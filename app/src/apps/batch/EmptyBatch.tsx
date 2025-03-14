@@ -5,7 +5,14 @@ import { Box } from '@mui/material';
 
 import { Button, Link } from '@mimir-wallet/ui';
 
-function EmptyBatch({ onClose }: { onAdd?: () => void; onClose?: () => void; onHandleRestore?: () => void }) {
+function EmptyBatch({
+  onClose,
+  onHandleRestore
+}: {
+  onAdd?: () => void;
+  onClose?: () => void;
+  onHandleRestore?: () => void;
+}) {
   return (
     <Box
       sx={{
@@ -47,9 +54,9 @@ function EmptyBatch({ onClose }: { onAdd?: () => void; onClose?: () => void; onH
       >
         Go to PolkadotJS
       </Button>
-      {/* <Button onPress={onHandleRestore} color='primary' variant='ghost'>
+      <Button onPress={onHandleRestore} color='primary' variant='ghost'>
         Restore
-      </Button> */}
+      </Button>
     </Box>
   );
 }
