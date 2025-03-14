@@ -40,9 +40,9 @@ function Batch({ onClose }: { onClose?: () => void }) {
         <div className='flex flex-col gap-5 h-full'>
           <div className='flex items-center justify-between text-xl font-bold'>
             Batch
-            {/* <Button variant='ghost' onPress={toggleRestore}>
+            <Button variant='ghost' onPress={toggleRestore}>
               Restore
-            </Button> */}
+            </Button>
             {/* <Button color='primary' variant='outlined' onClick={toggleOpen}>
                 Add New
               </Button> */}
