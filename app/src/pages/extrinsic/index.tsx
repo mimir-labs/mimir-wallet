@@ -11,8 +11,10 @@ import { events } from '@/events';
 import { useApi } from '@/hooks/useApi';
 import { useInput } from '@/hooks/useInput';
 import { Call as CallComp } from '@/params';
-import { Box, Divider, Link, Paper, Stack, Typography } from '@mui/material';
+import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+
+import { Link } from '@mimir-wallet/ui';
 
 function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {
   if (!callData) return [null, null];
@@ -53,7 +55,7 @@ function PageExtrinsic() {
           label={
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5 }}>
               Call Data
-              <Link component='button' underline='none' color='primary' onClick={() => events.emit('template_open')}>
+              <Link as='button' underline='none' color='primary' onClick={() => events.emit('template_open')}>
                 View Template
               </Link>
             </Box>
@@ -98,7 +100,7 @@ function PageExtrinsic() {
               <Typography fontWeight={700}>
                 {parsedCallData.section}.{parsedCallData.method}
               </Typography>
-              <Link component='button' underline='none' color='primary' onClick={() => setShowDetail(!showDetail)}>
+              <Link as='button' underline='none' color='primary' onClick={() => setShowDetail(!showDetail)}>
                 {showDetail ? 'Hide' : 'Details'}
               </Link>
             </Box>

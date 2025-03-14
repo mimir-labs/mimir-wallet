@@ -5,7 +5,7 @@ import type { AccountData, Transaction } from '@/hooks/types';
 
 import { encodeAddress } from '@/api';
 import IconShare from '@/assets/svg/icon-share.svg?react';
-import { TransactionStatus } from '@/hooks/types';
+import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { useApi } from '@/hooks/useApi';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { Box, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
@@ -49,9 +49,11 @@ function TxCell({ withDetails, defaultOpen, account, transaction }: Props) {
                     : 'error.main'
             }}
           />
-          <Typography color='primary.main' fontWeight={700} variant='h4'>
-            No {formatTransactionId(transaction.id)}
-          </Typography>
+          {transaction.type === TransactionType.Propose ? (
+            <h4 className='text-primary'>Propose {transaction.id}</h4>
+          ) : (
+            <h4 className='text-primary'>No {formatTransactionId(transaction.id)}</h4>
+          )}
         </Stack>
 
         <Typography>

@@ -21,8 +21,8 @@ interface Props extends BoxProps {
 function FormatBalance({ format, label, value, withCurrency, assetId, ...props }: Props): React.ReactElement<Props> {
   const { api } = useApi();
   const [assetInfo] = useAssetInfo(assetId);
-  const decimals = format?.[0] || (assetId ? assetInfo?.decimals : api.registry.chainDecimals[0]);
-  const currency = format?.[1] || (assetId ? assetInfo?.symbol : api.registry.chainTokens[0]);
+  const decimals = format?.[0] ?? (assetId ? assetInfo?.decimals : api.registry.chainDecimals[0]);
+  const currency = format?.[1] ?? (assetId ? assetInfo?.symbol : api.registry.chainTokens[0]);
   const [major, rest, unit] = useMemo(() => {
     const _value = formatUnits(BigInt(value?.toString() || 0), decimals || 0);
 

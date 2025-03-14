@@ -9,7 +9,8 @@ import type { TransferToken } from './types';
 
 import { useApi } from '@/hooks/useApi';
 import { type BN, BN_ZERO, isHex } from '@polkadot/util';
-import { useQuery } from '@tanstack/react-query';
+
+import { useQuery } from '@mimir-wallet/service';
 
 async function _getNativeBalance(api: ApiPromise, address: string): Promise<BN> {
   return api.derive.balances.all(address).then((result) => result.availableBalance);

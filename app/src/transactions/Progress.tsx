@@ -1,25 +1,29 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, ProxyTransaction, Transaction } from '@/hooks/types';
+import type { AccountData, ProposeTransaction, ProxyTransaction, Transaction } from '@/hooks/types';
 
 import { AddressCell } from '@/components';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { addressEq, autoFormatTimeStr } from '@/utils';
-import { alpha, Box, Button, Divider, Paper, Stack, type StackProps, Typography } from '@mui/material';
+import { alpha, Box, Divider } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { Button } from '@mimir-wallet/ui';
 
 import Approve from './buttons/Approve';
 import Cancel from './buttons/Cancel';
 import ExecuteAnnounce from './buttons/ExecuteAnnounce';
 import RemoveOrDeny from './buttons/RemoveOrDeny';
+import RemovePropose from './buttons/RemovePropose';
 import ViewPending from './buttons/ViewPending';
 import { useAnnouncementProgress } from './hooks/useAnnouncementProgress';
 import { approvalCounts } from './utils';
 
-interface Props extends StackProps {
+interface Props {
+  className?: string;
   account: AccountData;
   transaction: Transaction;
   openOverview?: () => void;
@@ -40,17 +44,7 @@ function ProgressItem({
   );
 
   return (
-    <Paper
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 0.5,
-        padding: 0.5,
-        width: '100%',
-        bgcolor: 'secondary.main'
-      }}
-      variant='elevation'
-    >
+    <div className='flex flex-col gap-[5px] p-[5px] w-full bg-secondary rounded-md'>
       <AddressCell showType withCopy withAddressBook shorten value={address} />
       <Box
         sx={({ palette }) => ({
@@ -74,18 +68,12 @@ function ProgressItem({
           }}
         />
       </Box>
-    </Paper>
+    </div>
   );
 }
 
 function Content({ children }: { children: React.ReactNode }) {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'stretch', minHeight: 20 }}>
-      <Box sx={{ flex: '1', paddingY: 0.5 }}>
-        <Stack spacing={1}>{children}</Stack>
-      </Box>
-    </Box>
-  );
+  return <div className='space-y-2.5'>{children}</div>;
 }
 
 function MultisigContent({
@@ -100,7 +88,7 @@ function MultisigContent({
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 700, flex: '1' }}>Confirmations</Typography>
+        <p className='font-bold flex-1'>Confirmations</p>
         {button}
       </Box>
 
@@ -145,7 +133,7 @@ function ProxyContent({
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 700, flex: '1' }}>Proxy</Typography>
+        <p className='font-bold flex-1'>Proxy</p>
         {button}
       </Box>
 
@@ -162,6 +150,20 @@ function ProxyContent({
         ) : transaction.delegate ? (
           <ProgressItem address={transaction.delegate} />
         ) : null}
+      </Content>
+    </>
+  );
+}
+
+function ProposeContent({ transaction }: { transaction: ProposeTransaction }) {
+  return (
+    <>
+      <div className='flex items-center justify-between font-bold'>Proposer</div>
+
+      <Content>
+        <div className='flex flex-col gap-[5px] p-[5px] w-full bg-secondary rounded-md'>
+          <AddressCell showType withCopy withAddressBook shorten value={transaction.proposer} />
+        </div>
       </Content>
     </>
   );
@@ -185,48 +187,35 @@ function AnnounceContent({
 
   const element =
     transaction.status === TransactionStatus.Pending ? (
-      <Stack spacing={1}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography sx={{ fontWeight: 700, flex: '1' }}>Review Time</Typography>
-        </Box>
-        <Box
-          sx={({ palette }) => ({
-            overflow: 'hidden',
-            borderRadius: '2px',
-            position: 'relative',
-            marginX: 3.5,
-            height: '4px',
-            bgcolor: alpha(palette.primary.main, 0.1)
-          })}
-        >
-          <Box
-            sx={{
-              borderRadius: '2px',
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 0,
-              bgcolor: leftTime ? 'primary.main' : 'success.main',
+      <div className='space-y-2.5'>
+        <div className='flex items-center justify-between'>
+          <p className='font-bold flex-1'>Review Time</p>
+        </div>
+        <div className='overflow-hidden rounded-[2px] relative h-[4px] bg-primary/10'>
+          <div
+            data-left={!!leftTime}
+            className='rounded-[2px] absolute left-0 top-0 bottom-0 data-[left=true]:bg-primary data-[left=false]:bg-success'
+            style={{
               width: `${(currentBlock > endBlock ? 1 : (currentBlock - startBlock) / (endBlock - startBlock)) * 100}%`
             }}
           />
-        </Box>
+        </div>
 
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography sx={{ flex: '1' }}>{currentBlock >= endBlock ? 'Finished' : 'Reviewing'}</Typography>
+          <p className='flex-1'>{currentBlock >= endBlock ? 'Finished' : 'Reviewing'}</p>
           {leftTime ? (leftTimeFormat ? `${leftTimeFormat} left` : '') : ''}
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography sx={{ fontWeight: 700, flex: '1' }}>Proxy</Typography>
+          <p className='font-bold flex-1'>Proxy</p>
           {button}
         </Box>
-      </Stack>
+      </div>
     ) : (
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 700, flex: '1' }}>Proxy</Typography>
+      <div className='flex items-center justify-between'>
+        <p className='font-bold flex-1'>Proxy</p>
         {button}
-      </Box>
+      </div>
     );
 
   return (
@@ -255,18 +244,8 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
   const filterPaths = useFilterPaths(account, transaction);
 
   return (
-    <Stack
-      bgcolor='secondary.main'
-      component={Paper}
-      minWidth={280}
-      padding={2}
-      spacing={1}
-      variant='elevation'
-      {...props}
-    >
-      <Typography sx={{ fontWeight: 700, color: 'primary.main' }} variant='h6'>
-        Progress
-      </Typography>
+    <div className={'bg-primary/5 rounded-md min-w-[280px] p-5 space-y-2.5 '.concat(props.className || '')}>
+      <p className='font-bold text-primary'>Progress</p>
       <Divider />
 
       {transaction.type === TransactionType.Multisig ? (
@@ -275,7 +254,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           transaction={transaction}
           button={
             openOverview ? (
-              <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
+              <Button onPress={openOverview} size='sm' variant='light'>
                 Overview
               </Button>
             ) : null
@@ -287,7 +266,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           transaction={transaction}
           button={
             openOverview ? (
-              <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
+              <Button onPress={openOverview} size='sm' variant='light'>
                 Overview
               </Button>
             ) : null
@@ -299,28 +278,29 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           transaction={transaction}
           button={
             openOverview ? (
-              <Button onClick={openOverview} size='small' sx={{ alignSelf: 'start' }} variant='text'>
+              <Button onPress={openOverview} size='sm' variant='light'>
                 Overview
               </Button>
             ) : null
           }
         />
+      ) : transaction.type === TransactionType.Propose ? (
+        <ProposeContent transaction={transaction} />
       ) : null}
 
       <Divider />
 
       {transaction.status < TransactionStatus.Success && (
-        <Stack spacing={1}>
+        <div className='space-y-2.5'>
           <Approve account={account} transaction={transaction} filterPaths={filterPaths} />
           <ExecuteAnnounce account={account} transaction={transaction} />
           <ViewPending transaction={transaction} filterPaths={filterPaths} />
           <Cancel account={account} transaction={transaction} />
           <RemoveOrDeny transaction={transaction} />
-          {/* <Remove transaction={transaction} />
-          <Deny transaction={transaction} /> */}
-        </Stack>
+          <RemovePropose account={account} transaction={transaction} />
+        </div>
       )}
-    </Stack>
+    </div>
   );
 }
 

@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import IconDownload from '@/assets/svg/icon-download.svg?react';
-import { store } from '@/utils';
 import { Button, SvgIcon } from '@mui/material';
 import { encodeAddress } from '@polkadot/util-crypto';
 import moment from 'moment';
 import { unparse } from 'papaparse';
+
+import { store } from '@mimir-wallet/service';
 
 function Export() {
   const handleExport = () => {

@@ -3,9 +3,10 @@
 
 import { encodeAddress } from '@/api';
 import { CURRENT_ADDRESS_PREFIX, CURRENT_NETWORK_KEY } from '@/constants';
-import { store } from '@/utils';
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import { store } from '@mimir-wallet/service';
 
 import { useAddressStore } from './useAddressStore';
 import { useApi } from './useApi';

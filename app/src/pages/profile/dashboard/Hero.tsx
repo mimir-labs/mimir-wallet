@@ -19,10 +19,9 @@ import { useApi } from '@/hooks/useApi';
 import { formatDisplay } from '@/utils';
 import { Avatar, Box, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Button, Link, Tooltip } from '@mimir-wallet/ui';
 
 function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string; changes: number }) {
   const { chain } = useApi();
@@ -44,7 +43,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
     <div className='w-full sm:w-auto grid md:flex grid-cols-2 item-center gap-2'>
       <Button
         as={Link}
-        to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}`}
+        href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}`}
         variant='solid'
         color='primary'
         size='md'
@@ -77,7 +76,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
       </Button>
       <Button
         as={Link}
-        to='/add-proxy'
+        href='/add-proxy'
         variant='ghost'
         color='primary'
         size='md'
@@ -88,7 +87,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
       </Button>
       <Button
         as={Link}
-        to='/extrinsic'
+        href='/extrinsic'
         variant='ghost'
         color='primary'
         size='md'
@@ -129,7 +128,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               }}
             >
               <AddressName value={address} />
-              <Button isIconOnly as={Link} size='lg' to={`/account-setting?address=${address}`} color='secondary'>
+              <Button isIconOnly as={Link} size='lg' href={`/account-setting?address=${address}`} color='secondary'>
                 <IconSet className='w-[22px] h-[22px]' />
               </Button>
             </Typography>
@@ -161,17 +160,17 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
               <span>Mimir Secured {days} Days</span>
               <Tooltip content={window.currentChain.statescan ? 'Statescan' : 'Subscan'} closeDelay={0}>
-                <a target='_blank' href={chainLinks.accountExplorerLink(address)} rel='noreferrer'>
+                <Link target='_blank' href={chainLinks.accountExplorerLink(address)} rel='noreferrer'>
                   <Avatar
                     style={{ width: 16, height: 16 }}
                     src={window.currentChain.statescan ? StatescanImg : SubscanImg}
                     alt='subscan'
                   />
-                </a>
+                </Link>
               </Tooltip>
               {chain.subsquareUrl && (
                 <Tooltip content='Subsquare' closeDelay={0}>
-                  <Link to={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address)}`)}`}>
+                  <Link href={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address)}`)}`}>
                     <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
                   </Link>
                 </Tooltip>

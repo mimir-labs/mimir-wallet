@@ -41,9 +41,9 @@ import {
   useTheme
 } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { Link, matchPath, useLocation } from 'react-router-dom';
+import { matchPath, useLocation } from 'react-router-dom';
 
-import { Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, Tooltip } from '@mimir-wallet/ui';
+import { Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, Link, Tooltip } from '@mimir-wallet/ui';
 
 import ToggleSidebar from './ToggleSidebar';
 
@@ -72,7 +72,7 @@ function NavLink({
       radius='md'
       startContent={<Icon className='w-5 h-5' />}
       className='h-[50px] justify-start px-[15px] py-[20px] text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary'
-      to={to}
+      href={to}
       variant='light'
     >
       <p
@@ -173,7 +173,7 @@ function TopContent() {
                   variant='light'
                   as={Link}
                   size='sm'
-                  to={`/transfer?from=${selected}`}
+                  href={`/transfer?from=${selected}`}
                 >
                   <IconTransfer className='w-4 h-4' />
                 </Button>

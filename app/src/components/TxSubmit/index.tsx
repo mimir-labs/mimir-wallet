@@ -17,10 +17,11 @@ import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useAccountSource, useWallet } from '@/wallet/useWallet';
-import { Box, Checkbox, Divider, FormControlLabel, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { Box, Divider, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { Alert, Button, Tooltip } from '@mimir-wallet/ui';
+import { Alert, Button, Checkbox, Tooltip } from '@mimir-wallet/ui';
 
 import Input from '../Input';
 import InputAddress from '../InputAddress';
@@ -31,6 +32,7 @@ import { useSafetyCheck } from './hooks/useSafetyCheck';
 import AddressChain from './AddressChain';
 import AppInfo from './AppInfo';
 import Call from './Call';
+import ProposeTx from './ProposeTx';
 import SafetyCheck from './SafetyCheck';
 import Sender from './Sender';
 import SendTx from './SendTx';
@@ -44,6 +46,7 @@ interface Props {
   website?: string;
   iconUrl?: string;
   appName?: string;
+  relatedBatches?: number[];
   onReject?: () => void;
   onClose?: () => void;
   onError?: (error: unknown) => void;
@@ -66,6 +69,7 @@ function TxSubmit({
   website,
   appName,
   iconUrl,
+  relatedBatches,
   filterPaths: propsFilterPaths,
   onReject,
   onClose,
@@ -83,6 +87,12 @@ function TxSubmit({
   const filterPaths = useFilterPaths(accountData, transaction);
   const [addressChain, setAddressChain] = useState<FilterPath[]>(propsFilterPaths || []);
   const [, addTx] = useBatchTxs(account);
+  const navigate = useNavigate();
+  const isPropose = useMemo(
+    () => addressChain.length > 0 && addressChain.some((item) => item.type === 'proposer'),
+    [addressChain]
+  );
+
   const buildTx = useBuildTx(call, addressChain, account, transaction);
   const source = useAccountSource(accountId?.toString());
   const { isLocalAccount } = useAccount();
@@ -202,13 +212,12 @@ function TxSubmit({
               <Divider />
 
               {safetyCheck && safetyCheck.severity === 'warning' && (
-                <FormControlLabel
-                  control={<Checkbox checked={isConfirm} onChange={(e) => setConfirm(e.target.checked)} />}
-                  label='I confirm recipient address exsits on the destination chain.'
-                />
+                <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
+                  I confirm recipient address exsits on the destination chain.
+                </Checkbox>
               )}
 
-              {isFetched && (
+              {!isPropose && isFetched && (
                 <SendTx
                   disabled={
                     !safetyCheck ||
@@ -221,6 +230,7 @@ function TxSubmit({
                   website={transaction?.website || website}
                   iconUrl={transaction?.iconUrl || iconUrl}
                   appName={transaction?.appName || appName}
+                  relatedBatches={relatedBatches}
                   onError={onError}
                   onFinalized={onFinalized}
                   onResults={(...args) => {
@@ -232,6 +242,26 @@ function TxSubmit({
                     onSignature?.(...args);
                   }}
                   beforeSend={beforeSend}
+                />
+              )}
+              {isPropose && !transaction && (
+                <ProposeTx
+                  call={call}
+                  account={account}
+                  proposer={addressChain.find((item) => item.type === 'proposer')?.address}
+                  website={website}
+                  iconUrl={iconUrl}
+                  appName={appName}
+                  note={note}
+                  onProposed={() => {
+                    onClose?.();
+
+                    if (onlySign) {
+                      onError?.(new Error('This transaction is proposed, please wait for it to be initialized.'));
+                    } else {
+                      navigate('/transactions');
+                    }
+                  }}
                 />
               )}
 

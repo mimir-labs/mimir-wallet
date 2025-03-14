@@ -72,15 +72,11 @@ export function extraAccounts(
     };
   }
 
-  return Object.values(accountMap)
-    .filter((item) =>
-      item.type === 'multisig' ? item.members.findIndex((member) => !!accountMap[member.address]) > -1 : true
-    )
-    .map((item): AccountDataExtra & AccountData => ({
-      ...item,
-      isProxied: proxied.includes(item.address),
-      isProxy: proxy.includes(item.address)
-    }));
+  return Object.values(accountMap).map((item): AccountDataExtra & AccountData => ({
+    ...item,
+    isProxied: proxied.includes(item.address),
+    isProxy: proxy.includes(item.address)
+  }));
 }
 
 export async function sync(

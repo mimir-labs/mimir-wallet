@@ -7,6 +7,8 @@ import moment from 'moment';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 
+import { API_CLIENT_GATEWAY } from '@mimir-wallet/service';
+
 import { initializeAccount } from './accounts/initialize';
 import { initializeWallet } from './wallet/initialize';
 import { initializeApi } from './api';
@@ -15,6 +17,7 @@ import { initGa } from './initGa';
 import { initMimir } from './initMimir';
 import { initializeSocket } from './socket';
 import { upgradeAddresBook } from './upgrade';
+import { initService } from './utils';
 
 // Set default date-time format for the entire application
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
@@ -25,6 +28,8 @@ const root = createRoot(document.getElementById('root') as HTMLElement);
 // Initialize core Mimir wallet configuration and get initial chain and address settings
 // This sets up the basic configuration needed for the wallet to function
 const { chain, address } = initMimir();
+
+initService(API_CLIENT_GATEWAY, chain.serviceUrl);
 
 // Upgrade address book data structure if needed (for backward compatibility)
 // This ensures older versions of stored address data are compatible with current version
@@ -50,7 +55,7 @@ initializeSocket(chain);
 root.render(<App />);
 
 // Production-only features
-if (process.env.NODE_ENV === 'production') {
+if (import.meta.env.PROD) {
   // Register Service Worker for PWA functionality
   // This enables offline capabilities and app-like features
   registerSW();

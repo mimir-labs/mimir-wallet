@@ -8,7 +8,8 @@ import type { AssetInfo, PalletAssetRegistryAssetDetails } from './types';
 
 import { type Asset, findAssets } from '@/config';
 import { type BN, BN_ZERO, isHex } from '@polkadot/util';
-import { useQuery } from '@tanstack/react-query';
+
+import { useQuery } from '@mimir-wallet/service';
 
 import { useApi } from './useApi';
 

@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -63,6 +64,7 @@ export default defineConfig(({ mode }) => ({
     }
   },
   plugins: [
+    legacy(),
     tsconfigPaths(),
     react(),
     svgr({ svgrOptions: { ref: true } }),

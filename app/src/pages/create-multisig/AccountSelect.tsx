@@ -47,7 +47,10 @@ function AccountSelect({ accounts, disabled, onClick, title, type }: Props) {
           >
             <AddressRow iconSize={24} value={account} />
             {addressEq(hexToU8a('0x0', 256), account) && (
-              <Tooltip content='The SS58 address for 0x0000000000000000000000000000000000000000000000000000000000000000 which cannot be controlled.'>
+              <Tooltip
+                classNames={{ content: 'max-w-[500px] break-all' }}
+                content='The SS58 address for 0x0000000000000000000000000000000000000000000000000000000000000000 which cannot be controlled.'
+              >
                 <IconQuestion />
               </Tooltip>
             )}

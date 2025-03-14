@@ -77,6 +77,9 @@ type BaseAccountData = AccountDataType & {
 };
 
 export type AccountData = MultisigAccountData | PureAccountData | BaseAccountData;
+export type AccountDataWithProposers = AccountData & {
+  proposers: { proposer: string; creator: string; createdAt: string; network: HexString }[];
+};
 
 export enum TransactionStatus {
   Initialized = 0,
@@ -93,7 +96,8 @@ export enum TransactionType {
   Unknown = 0,
   Multisig = 1,
   Proxy = 2,
-  Announce = 3
+  Announce = 3,
+  Propose = 4
 }
 
 type BaseTransaction = {
@@ -105,10 +109,10 @@ type BaseTransaction = {
   call?: HexString | null;
   status: TransactionStatus;
   type: TransactionType;
-  createdBlock: string;
-  createdBlockHash: HexString;
-  createdExtrinsicIndex: number;
-  createdExtrinsicHash: HexString;
+  createdBlock?: string;
+  createdBlockHash?: HexString;
+  createdExtrinsicIndex?: number;
+  createdExtrinsicHash?: HexString;
   executedBlock?: string;
   executedBlockHash?: HexString;
   executedExtrinsicIndex?: number;
@@ -131,25 +135,43 @@ type BaseTransaction = {
   threshold?: number;
   members?: string[];
   delegate?: string;
+  proposer?: string;
   children: Transaction[];
 };
 
 export type UnknownTransaction = BaseTransaction & {
   type: TransactionType.Unknown;
+  createdBlock: string;
+  createdBlockHash: HexString;
+  createdExtrinsicIndex: number;
+  createdExtrinsicHash: HexString;
 };
 
 export type MultisigTransaction = BaseTransaction & {
   type: TransactionType.Multisig;
+  createdBlock: string;
+  createdBlockHash: HexString;
+  createdExtrinsicIndex: number;
+  createdExtrinsicHash: HexString;
   threshold: number;
   members: HexString[];
 };
 
 export type ProxyTransaction = BaseTransaction & {
   type: TransactionType.Proxy | TransactionType.Announce;
+  createdBlock: string;
+  createdBlockHash: HexString;
+  createdExtrinsicIndex: number;
+  createdExtrinsicHash: HexString;
   delegate?: HexString;
 };
 
-export type Transaction = UnknownTransaction | MultisigTransaction | ProxyTransaction;
+export type ProposeTransaction = BaseTransaction & {
+  type: TransactionType.Propose;
+  proposer: string;
+};
+
+export type Transaction = UnknownTransaction | MultisigTransaction | ProxyTransaction | ProposeTransaction;
 
 export type HistoryTransaction = Transaction & { uuid: string };
 
@@ -302,12 +324,19 @@ type OriginFilterPath = {
   address: string;
 };
 
-export type FilterPath = MultisigFilterPath | ProxyFilterPath | OriginFilterPath;
+type ProposerFilterPath = {
+  id: string;
+  type: 'proposer';
+  address: string;
+};
+
+export type FilterPath = MultisigFilterPath | ProxyFilterPath | OriginFilterPath | ProposerFilterPath;
 
 export type FilterPathWithoutId =
   | Omit<MultisigFilterPath, 'id'>
   | Omit<ProxyFilterPath, 'id'>
-  | Omit<OriginFilterPath, 'id'>;
+  | Omit<OriginFilterPath, 'id'>
+  | Omit<ProposerFilterPath, 'id'>;
 
 export interface BatchTxItem {
   id: number;
@@ -315,6 +344,7 @@ export interface BatchTxItem {
   website?: string;
   iconUrl?: string;
   appName?: string;
+  relatedBatch?: number;
 }
 
 export interface PalletAssetRegistryAssetDetails extends Struct {

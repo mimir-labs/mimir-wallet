@@ -17,6 +17,7 @@ type EventTypes = {
   template_open: () => void;
   template_add: (callData: HexString) => void;
   call_data_view: (callData: HexString) => void;
+  refetch_pending_tx: () => void;
 };
 
 export const events = new Events<EventTypes>();

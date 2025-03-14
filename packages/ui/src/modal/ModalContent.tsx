@@ -9,10 +9,11 @@ import { TRANSITION_EASINGS, TRANSITION_VARIANTS } from '@heroui/framer-utils';
 import { useModalContext } from '@heroui/modal';
 import { CloseIcon } from '@heroui/shared-icons';
 import { useDialog } from '@react-aria/dialog';
+import { useInteractOutside } from '@react-aria/interactions';
 import { DismissButton } from '@react-aria/overlays';
 import { chain, mergeProps, useViewportSize } from '@react-aria/utils';
 import { domAnimation, LazyMotion, m } from 'framer-motion';
-import { cloneElement, isValidElement, KeyboardEvent, ReactNode, useCallback, useMemo } from 'react';
+import { cloneElement, isValidElement, KeyboardEvent, ReactNode, useCallback, useMemo, useRef } from 'react';
 
 const scaleInOut = {
   enter: {
@@ -73,6 +74,7 @@ const ModalContent = (props: ModalContentProps) => {
     onClose
   } = useModalContext();
 
+  const ref = useRef<HTMLDivElement>(null);
   const Component = as || DialogComponent || 'div';
 
   const viewport = useViewportSize();
@@ -102,15 +104,17 @@ const ModalContent = (props: ModalContentProps) => {
 
   const contentProps = getDialogProps(mergeProps(dialogProps, otherProps));
 
+  useInteractOutside({
+    ref,
+    onInteractOutside: (e) => {
+      if ((e.target as HTMLDivElement).contains(ref.current)) {
+        onClose();
+      }
+    }
+  });
+
   const content = (
-    <Component
-      {...contentProps}
-      onKeyDown={chain(contentProps.onKeyDown, onKeyDown)}
-      ref={null}
-      onClick={(e: any) => {
-        e.stopPropagation();
-      }}
-    >
+    <Component {...contentProps} onKeyDown={chain(contentProps.onKeyDown, onKeyDown)} ref={ref}>
       <DismissButton onDismiss={onClose} />
       {!hideCloseButton && closeButtonContent}
       {typeof children === 'function' ? children(onClose) : children}
@@ -135,11 +139,10 @@ const ModalContent = (props: ModalContentProps) => {
           initial='exit'
           variants={TRANSITION_VARIANTS.fade}
           {...(getBackdropProps() as HTMLMotionProps<'div'>)}
-          onClick={onClose}
         />
       </LazyMotion>
     );
-  }, [backdrop, disableAnimation, getBackdropProps, onClose]);
+  }, [backdrop, disableAnimation, getBackdropProps]);
 
   // set the height dynamically to avoid keyboard covering the bottom modal
   const viewportStyle = {
@@ -147,12 +150,7 @@ const ModalContent = (props: ModalContentProps) => {
   };
 
   const contents = disableAnimation ? (
-    <div
-      className={slots.wrapper({ class: classNames?.wrapper })}
-      data-slot='wrapper'
-      style={viewportStyle as any}
-      onClick={onClose}
-    >
+    <div className={slots.wrapper({ class: classNames?.wrapper })} data-slot='wrapper' style={viewportStyle as any}>
       {content}
     </div>
   ) : (
@@ -166,7 +164,6 @@ const ModalContent = (props: ModalContentProps) => {
         variants={scaleInOut}
         {...(motionProps as any)}
         style={viewportStyle as any}
-        onClick={onClose}
       >
         {content}
       </m.div>

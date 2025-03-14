@@ -23,7 +23,8 @@ import {
   TableRow
 } from '@mui/material';
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+
+import { Link } from '@mimir-wallet/ui';
 
 function AssetRow({
   assetId,
@@ -46,7 +47,7 @@ function AssetRow({
 }) {
   const { api, tokenSymbol } = useApi();
   const format = useMemo(
-    (): [decimals: number, unit: string] => [decimals || api.registry.chainDecimals[0], symbol || tokenSymbol],
+    (): [decimals: number, unit: string] => [decimals ?? api.registry.chainDecimals[0], symbol || tokenSymbol],
     [api.registry.chainDecimals, decimals, symbol, tokenSymbol]
   );
 
@@ -76,7 +77,7 @@ function AssetRow({
         <Button
           component={Link}
           endIcon={<SvgIcon component={IconSend} inheritViewBox />}
-          to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}`}
+          href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}`}
           variant='outlined'
           size='small'
         >

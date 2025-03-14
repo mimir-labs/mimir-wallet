@@ -24,7 +24,9 @@ import {
   useTheme
 } from '@mui/material';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+import { Link } from '@mimir-wallet/ui';
 
 function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onCreateMultisig: () => void }) {
   const selectAccount = useSelectedAccountCallback();
@@ -58,7 +60,7 @@ function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onC
       <Button color='primary' variant='outlined' fullWidth onClick={onCreateMultisig}>
         Create Multisig Account
       </Button>
-      <Button component={Link} to='/create-pure' color='primary' variant='outlined' fullWidth>
+      <Button component={Link} href='/create-pure' color='primary' variant='outlined' fullWidth>
         Create Pure Proxy
       </Button>
       <Button onClick={handleClick} variant='text' color='primary'>

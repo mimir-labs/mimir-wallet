@@ -6,8 +6,10 @@ import type { FilterPath } from '@/hooks/types';
 import IconClock from '@/assets/svg/icon-clock.svg?react';
 import { AddressCell } from '@/components';
 import { useAccountSource } from '@/wallet/useWallet';
-import { alpha, Box, Chip, FormControl, InputLabel, MenuItem, Select, SvgIcon } from '@mui/material';
+import { Box, FormControl, InputLabel, MenuItem, Select, SvgIcon } from '@mui/material';
 import React, { useLayoutEffect, useMemo } from 'react';
+
+import { Chip } from '@mimir-wallet/ui';
 
 interface Props {
   deep: number;
@@ -77,27 +79,37 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
                 <AddressCell value={item.address} withCopy showType />
                 {item.type !== 'origin' && (
                   <Chip
-                    color={item.type === 'multisig' ? 'secondary' : item.type === 'proxy' ? 'default' : 'primary'}
-                    label={item.type === 'multisig' ? 'AsMulti' : item.type === 'proxy' ? 'Proxy' : ''}
-                    size='medium'
-                    sx={{
-                      fontSize: '0.75rem',
-                      ...(item.type === 'proxy' ? { bgcolor: alpha('#B700FF', 0.05), color: '#B700FF' } : {})
-                    }}
-                  />
+                    color={
+                      item.type === 'multisig'
+                        ? 'secondary'
+                        : item.type === 'proxy'
+                          ? 'default'
+                          : item.type === 'proposer'
+                            ? 'default'
+                            : 'primary'
+                    }
+                    size='sm'
+                    data-type={item.type}
+                    className='data-[type=proxy]:bg-[#B700FF]/5 data-[type=proxy]:text-[#B700FF] data-[type=proposer]:bg-[#00A19C]/5 data-[type=proposer]:text-[#00A19C]'
+                  >
+                    {item.type === 'multisig'
+                      ? 'AsMulti'
+                      : item.type === 'proxy'
+                        ? 'Proxy'
+                        : item.type === 'proposer'
+                          ? 'Proposer'
+                          : ''}
+                  </Chip>
                 )}
                 {item.type === 'proxy' && (
-                  <Chip
-                    color='secondary'
-                    label={
+                  <Chip color='secondary' size='sm'>
+                    {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         {!!item.delay && <SvgIcon component={IconClock} inheritViewBox sx={{ fontSize: '0.75rem' }} />}
                         {item.proxyType}
                       </Box>
                     }
-                    size='medium'
-                    sx={{ fontSize: '0.75rem' }}
-                  />
+                  </Chip>
                 )}
               </Box>
             </MenuItem>

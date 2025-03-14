@@ -53,10 +53,12 @@ function Extrinsic({
             <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />
           }
         />
-        <Item
-          title='Created Extrinsic'
-          content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
-        />
+        {transaction.createdExtrinsicHash && (
+          <Item
+            title='Created Extrinsic'
+            content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
+          />
+        )}
         {transaction.executedExtrinsicHash && (
           <Item
             title='Executed Extrinsic'
@@ -96,7 +98,7 @@ function Extrinsic({
               />
             )}
             {transaction.note && <Item title='Note' content={transaction.note} />}
-            <Item title='Created Block' content={transaction.createdBlock} />
+            {transaction.createdBlock && <Item title='Created Block' content={transaction.createdBlock} />}
             <Item title='Created Time' content={moment(transaction.createdAt).format()} />
             {transaction.executedBlock && <Item title='Executed Block' content={transaction.executedBlock} />}
             {transaction.cancelBlock && <Item title='Cancel Block' content={transaction.cancelBlock} />}

@@ -9,7 +9,8 @@ import type { ITuple } from '@polkadot/types/types';
 
 import { dataToUtf8 } from '@/utils';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import { useQuery } from '@tanstack/react-query';
+
+import { useQuery } from '@mimir-wallet/service';
 
 import { createNamedHook } from './createNamedHook';
 import { useApi } from './useApi';

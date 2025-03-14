@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { chainLinks } from '@/api/chain-links';
-import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
+
+import { useQuery } from '@mimir-wallet/service';
 
 export interface ProposalData {
   referendumIndex: number;

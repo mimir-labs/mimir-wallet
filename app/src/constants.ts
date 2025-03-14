@@ -9,6 +9,7 @@ export const CURRENT_ADDRESS_PREFIX = 'current_address:';
 export const HIDE_ACCOUNT_PREFIX = 'hide_address:';
 
 export const BATCH_TX_PREFIX = 'batch_tx:';
+export const BATCH_SYNC_TX_PREFIX = 'batch_sync_tx:';
 
 export const FAVORITE_DAPP_KEY = 'favorite_dapp';
 export const DETECTED_ACCOUNT_KEY = 'detected_account';

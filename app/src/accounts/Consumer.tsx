@@ -4,10 +4,11 @@
 import { encodeAddress } from '@/api';
 import { useAddressStore } from '@/hooks/useAddressStore';
 import { useApi } from '@/hooks/useApi';
-import { store } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
 import { isEqual } from 'lodash-es';
 import { useEffect, useLayoutEffect } from 'react';
+
+import { store } from '@mimir-wallet/service';
 
 import { sync } from './sync';
 import { useAccount } from './useAccount';

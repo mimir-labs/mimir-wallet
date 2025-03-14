@@ -7,9 +7,10 @@ import { useNativeBalances } from '@/hooks/useBalances';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { useTokenInfo } from '@/hooks/useTokenInfo';
 import { formatUnits } from '@/utils';
-import { Box, Button, Paper, Stack } from '@mui/material';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useMemo, useRef } from 'react';
+
+import { Link, Tab, Tabs } from '@mimir-wallet/ui';
 
 import Assets from './Assets';
 import Hero from './Hero';
@@ -52,46 +53,39 @@ function Dashboard({ address }: { address: string }) {
   );
 
   return (
-    <Stack spacing={2} width='100%'>
+    <div className='w-full space-y-5'>
       {[
         '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
         '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed'
       ].includes(genesisHash) && (
-        <Box component='a' href='https://wave.bifrost.io' target='_blank' rel='noreferrer'>
-          <Box component='img' src='/images/bifrost.webp' sx={{ width: '100%', borderRadius: 2 }} />
-        </Box>
+        <Link href='https://wave.bifrost.io' target='_blank' rel='noreferrer'>
+          <img className='w-full border-medium' src='/images/bifrost.webp' />
+        </Link>
       )}
 
       <Hero address={address} totalUsd={totalUsd} changes={changes} />
 
-      <Paper
-        sx={{
-          alignSelf: 'flex-start',
-          borderRadius: '20px',
-          padding: 1,
-          display: 'inline-flex',
-          gap: { sm: 1, xs: 0.5 }
+      <Tabs
+        color='primary'
+        aria-label='Transaction'
+        selectedKey={tab}
+        onSelectionChange={(key) => setTab(key.toString())}
+        classNames={{
+          base: 'w-full'
         }}
       >
         {tabsRef.current
           .filter((item) => (item.tab === 'multichain' ? account?.type !== 'pure' : true))
           .map((item) => (
-            <Button
-              key={item.tab}
-              onClick={() => setTab(item.tab)}
-              sx={{ borderRadius: 1, paddingX: { sm: 3, xs: 0.5 }, opacity: tab === item.tab ? 1 : 0.5 }}
-              variant={tab === item.tab ? 'contained' : 'text'}
-            >
-              {item.label}
-            </Button>
+            <Tab key={item.tab} title={item.label}>
+              {tab === 'asset' && <Assets address={address} nativeBalance={balances} />}
+              {tab === 'structure' && <Structure address={address} />}
+              {tab === 'transaction' && <PendingTx address={address} />}
+              {account?.type !== 'pure' && tab === 'multichain' && <MultiChain address={address} />}
+            </Tab>
           ))}
-      </Paper>
-
-      {tab === 'asset' && <Assets address={address} nativeBalance={balances} />}
-      {tab === 'structure' && <Structure address={address} />}
-      {tab === 'transaction' && <PendingTx address={address} />}
-      {account?.type !== 'pure' && tab === 'multichain' && <MultiChain address={address} />}
-    </Stack>
+      </Tabs>
+    </div>
   );
 }
 

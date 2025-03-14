@@ -1,12 +1,16 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BaseStore } from '@/utils/store/BaseStore';
+import type { BaseStore } from '../store/BaseStore.js';
 
-import { session, store } from '@/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export function useStore<T>(isSession: boolean, key: string): [T | undefined, (value: T | ((value: T) => T)) => void];
+import { session, store } from '../store/index.js';
+
+export function useStore<T>(
+  isSession: boolean,
+  key: string
+): [T | undefined, (value: T | ((value: T | undefined) => T)) => void];
 export function useStore<T>(
   isSession: boolean,
   key: string,
@@ -20,6 +24,9 @@ export function useStore<T>(
 ): [T | undefined, (value: T | ((value: T) => T)) => void] {
   const ref = useRef<BaseStore>(isSession ? session : store);
   const [value, setValue] = useState<T | undefined>((ref.current.get(key) as T) || defaultValue);
+  const latestValue = useRef<T | undefined>(value);
+
+  latestValue.current = value;
 
   useEffect(() => {
     const store = ref.current;
@@ -48,27 +55,21 @@ export function useStore<T>(
   return [
     value || defaultValue,
     useCallback(
-      (value: T | ((value: T) => T)) => {
-        setValue((oldValue) => {
-          let newValue: T;
-
-          if (typeof value === 'function') {
-            newValue = (value as (v: T | undefined) => T)(oldValue);
-          } else {
-            newValue = value;
-          }
+      (_value: T | ((value: T) => T)) => {
+        if (typeof _value === 'function') {
+          const newValue = (_value as (v: T | undefined) => T)(latestValue.current);
 
           ref.current.set(key, newValue);
-
-          return newValue;
-        });
+        } else {
+          ref.current.set(key, _value);
+        }
       },
       [key]
     )
   ];
 }
 
-export function useLocalStore<T>(key: string): [T | undefined, (value: T | ((value: T) => T)) => void];
+export function useLocalStore<T>(key: string): [T | undefined, (value: T | ((value: T | undefined) => T)) => void];
 export function useLocalStore<T>(key: string, defaultValue: T): [T, (value: T | ((value: T) => T)) => void];
 
 export function useLocalStore<T>(
@@ -78,7 +79,7 @@ export function useLocalStore<T>(
   return useStore<T>(false, key, defaultValue as T);
 }
 
-export function useSessionStore<T>(key: string): [T | undefined, (value: T | ((value: T) => T)) => void];
+export function useSessionStore<T>(key: string): [T | undefined, (value: T | ((value: T | undefined) => T)) => void];
 export function useSessionStore<T>(key: string, defaultValue: T): [T, (value: T | ((value: T) => T)) => void];
 
 export function useSessionStore<T>(

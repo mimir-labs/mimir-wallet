@@ -5,13 +5,11 @@ import type { ProposalData } from '@/hooks/useProposals';
 
 import { chainLinks } from '@/api/chain-links';
 import { ellipsisMixin } from '@/components/utils';
-import { Box, Chip, Link as MuiLink, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Box, Paper, Stack, Typography } from '@mui/material';
+
+import { Chip, Link } from '@mimir-wallet/ui';
 
 function Proposals({ data }: { data: ProposalData[] }) {
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
-
   return (
     <Stack component={Paper} padding={{ sm: 2, xs: 1 }} spacing={1} sx={{ bgcolor: 'common.white' }}>
       {data.slice(0, 3).map((item, index) => (
@@ -36,19 +34,19 @@ function Proposals({ data }: { data: ProposalData[] }) {
           >
             <span style={{ opacity: 0.5 }}>#{item.referendumIndex}</span>
             &nbsp;·&nbsp;
-            <MuiLink
-              color='inherit'
-              component={Link}
-              to={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`) || '')}`}
+            <Link
+              href={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`) || '')}`}
               underline='hover'
             >
               {item.title || `[${item.onchainData.trackInfo?.name}] Referendum #${item.referendumIndex}`}
-            </MuiLink>
+            </Link>
           </Typography>
           <Box sx={{ width: '20%' }}>
             <Box component='img' src='/dapp-icons/subsquare.svg' sx={{ width: 30, height: 30 }} />
           </Box>
-          <Chip color='secondary' label={item.state.name} size={downSm ? 'small' : 'medium'} />
+          <Chip color='secondary' size='sm'>
+            {item.state.name}
+          </Chip>
         </Box>
       ))}
     </Stack>

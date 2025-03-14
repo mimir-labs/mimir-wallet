@@ -3,6 +3,7 @@
 
 import type {
   AccountData,
+  AccountDataWithProposers,
   DelegateeProp,
   FilterPath,
   FilterPathWithoutId,
@@ -22,6 +23,10 @@ export function filterPathId(_deep: number, filterPath: FilterPathWithoutId) {
 
   if (filterPath.type === 'multisig') {
     return `${filterPath.type}:${filterPath.address}.${filterPath.threshold}.${filterPath.multisig}.${filterPath.otherSignatures.join('_')}`;
+  }
+
+  if (filterPath.type === 'proposer') {
+    return `${filterPath.type}:${filterPath.address}`;
   }
 
   return `${filterPath.type}:${filterPath.address}`;
@@ -193,10 +198,58 @@ function findFilterPaths(
   return paths;
 }
 
+function appendProposers(
+  paths: FilterPath[][],
+  account: AccountData,
+  proposers?: AccountDataWithProposers['proposers'] | null
+) {
+  if (!proposers || proposers.length === 0) return;
+
+  let first = paths.at(0)?.at(0);
+
+  if (!first) {
+    first = {
+      id: filterPathId(0, {
+        type: 'origin',
+        address: account.address
+      }),
+      type: 'origin',
+      address: account.address
+    };
+  }
+
+  for (const proposer of proposers) {
+    if (!accountSource(proposer.proposer)) continue;
+
+    paths.push([
+      first,
+      {
+        id: filterPathId(0, { type: 'proposer', address: proposer.proposer }),
+        type: 'proposer',
+        address: proposer.proposer
+      }
+    ]);
+  }
+}
+
 export function useFilterPaths(account?: AccountData | null, transaction?: Transaction | null) {
   return useMemo(() => {
     if (!account) return [];
 
-    return findFilterPaths(account, accountSource, transaction);
+    // always calculate the full filter paths for the propose transaction
+    if (transaction && transaction.type === TransactionType.Propose) {
+      const paths = findFilterPaths(account, accountSource);
+
+      return paths;
+    } else {
+      const paths = findFilterPaths(account, accountSource, transaction);
+
+      // append the proposers when there is no transaction
+      if (!transaction) {
+        appendProposers(paths, account, (account as AccountDataWithProposers).proposers);
+      }
+
+      return paths;
+    }
   }, [account, transaction]);
 }

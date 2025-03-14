@@ -7,7 +7,7 @@ import { useWallet } from '@/wallet/useWallet';
 import { AccessCredentials, initializePlutonicationDAppClientWithModal } from '@plutonication/plutonication';
 import React, { useMemo } from 'react';
 
-import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import { Button, Link, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
 import { toastError } from './utils';
 import WalletIcon from './WalletIcon';
@@ -46,7 +46,7 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
               'Mimir'
             );
 
-            await initializePlutonicationDAppClientWithModal(accessCredentials, (_receivedPubkey: string) => {});
+            await initializePlutonicationDAppClientWithModal(accessCredentials);
 
             connectWallet('plutonication').catch(toastError);
           }}
@@ -55,7 +55,7 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
           Connect
         </Button>
       ) : (
-        <Button as='a' href={downloadUrl} target='_blank' variant='light'>
+        <Button as={Link} href={downloadUrl} target='_blank' variant='light'>
           Download
         </Button>
       )}

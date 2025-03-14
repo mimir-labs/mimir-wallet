@@ -18,11 +18,11 @@ export function findTargetCall(
   }
 
   if (api.tx.proxy?.proxy.is(call)) {
-    return findTargetCall(api, call.args[0].toString(), call.args[2]);
+    return findTargetCall(api, call.args[0].toString(), api.registry.createType('Call', call.args[2].toU8a()));
   }
 
   if (api.tx.proxy?.proxyAnnounced.is(call)) {
-    return findTargetCall(api, call.args[1].toString(), call.args[3]);
+    return findTargetCall(api, call.args[1].toString(), api.registry.createType('Call', call.args[3].toU8a()));
   }
 
   // if (api.tx.proxy?.announce.is(call)) {
@@ -33,7 +33,7 @@ export function findTargetCall(
     return findTargetCall(
       api,
       encodeAddress(createKeyMulti(call.args[1].map((item) => item.toString()).concat(address), call.args[0])),
-      call.args[3]
+      api.registry.createType('Call', call.args[3].toU8a())
     );
   }
 
@@ -41,7 +41,7 @@ export function findTargetCall(
     return findTargetCall(
       api,
       encodeAddress(createKeyMulti(call.args[0].map((item) => item.toString()).concat(address), 1)),
-      call.args[1]
+      api.registry.createType('Call', call.args[1].toU8a())
     );
   }
 

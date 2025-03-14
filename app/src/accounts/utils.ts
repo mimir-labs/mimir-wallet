@@ -95,6 +95,25 @@ export function groupAccounts(
   return ret;
 }
 
+export function reduceAccount(
+  account: AccountData,
+  cb: (account: AccountData, proxyType?: string, delay?: number) => void,
+  proxyType?: string,
+  delay?: number
+) {
+  if (account.type === 'multisig') {
+    for (const member of account.members) {
+      reduceAccount(member, cb);
+    }
+  }
+
+  for (const delegatee of account.delegatees) {
+    reduceAccount(delegatee, cb, delegatee.proxyType, delegatee.proxyDelay);
+  }
+
+  cb(account, proxyType, delay);
+}
+
 // export function deriveAddressMeta(
 //   account?: AccountDataExtra & AccountData,
 //   address?: { name: string; address: string },

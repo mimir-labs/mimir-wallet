@@ -9,7 +9,8 @@ import type { AccountAssetInfo, AccountBalance, AssetInfo, OrmlTokensAccountData
 
 import { BN_ZERO, isHex } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import { useQuery } from '@tanstack/react-query';
+
+import { useQuery } from '@mimir-wallet/service';
 
 import { useApi } from './useApi';
 import { useAssets } from './useAssets';
@@ -26,7 +27,9 @@ async function getBalances({ queryKey }: { queryKey: [ApiPromise, string | undef
     reserved: account.data.reserved,
     locked: account.data.frozen,
     free: account.data.free,
-    transferrable: account.data.free.add(account.data.reserved).sub(account.data.frozen)
+    transferrable: account.data.free
+      .add(account.data.reserved)
+      .sub(account.data.reserved.gt(account.data.frozen) ? account.data.reserved : account.data.frozen)
   }));
 }
 

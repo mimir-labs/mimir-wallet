@@ -162,8 +162,8 @@ function MemberSet({
             const newMultiAddress = encodeMultiAddress(signatories, threshold, chainSS58);
 
             return api.tx.utility.batchAll([
-              api.tx.proxy.addProxy(newMultiAddress, 0, 0),
-              api.tx.proxy.removeProxy(oldMultiAddress, 0, 0)
+              api.tx.proxy.addProxy(newMultiAddress, 0, 0).toU8a(),
+              api.tx.proxy.removeProxy(oldMultiAddress, 0, 0).toU8a()
             ]);
           }}
           website='mimir://internal/setup'

@@ -13,7 +13,8 @@ import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
 import { Box, Button, Grid2 as Grid, IconButton, Stack, SvgIcon } from '@mui/material';
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+
+import { Link } from '@mimir-wallet/ui';
 
 import Progress from '../Progress';
 import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
@@ -66,7 +67,7 @@ function ActionsCell({ withDetails, detailOpen }: { withDetails?: boolean; detai
           />
         </IconButton>
       ) : (
-        <Button component={Link} to='/transactions' variant='text'>
+        <Button component={Link} href='/transactions' variant='text'>
           View More
         </Button>
       )}

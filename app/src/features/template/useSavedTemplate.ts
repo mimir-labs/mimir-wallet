@@ -4,8 +4,9 @@
 import type { TemplateInfo } from './types';
 
 import { TEMPLATE_PREFIX } from '@/constants';
-import { useLocalStore } from '@/hooks/useStore';
 import { useCallback } from 'react';
+
+import { useLocalStore } from '@mimir-wallet/service';
 
 export function useSavedTemplate(key: string) {
   const [template, setTemplate] = useLocalStore<TemplateInfo[]>(`${TEMPLATE_PREFIX}:${key}`, []);

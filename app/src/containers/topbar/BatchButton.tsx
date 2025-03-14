@@ -89,7 +89,14 @@ function BatchButton() {
         </div>
       </Popover>
 
-      <Drawer size='xl' placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
+      <Drawer
+        hideCloseButton
+        size='xl'
+        placement='right'
+        radius='none'
+        isOpen={isDrawerOpen}
+        onClose={toggleDrawerOpen}
+      >
         <DrawerContent className='max-w-full w-auto py-5'>
           <DrawerBody>
             <Batch onClose={() => toggleDrawerOpen(false)} />

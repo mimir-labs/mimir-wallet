@@ -46,7 +46,7 @@ async function asMulti(
         threshold,
         u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
         timepoint,
-        tx.method,
+        tx.method.toU8a(),
         false,
         weight
       )
@@ -54,7 +54,7 @@ async function asMulti(
         threshold,
         u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
         timepoint,
-        tx.method,
+        tx.method.toU8a(),
         weight
       );
 }
@@ -114,7 +114,7 @@ export async function buildTx(
         if (_transaction?.call) {
           tx = api.tx(api.registry.createType('Call', _transaction.call));
         } else {
-          tx = api.tx.proxy.proxy(item.real, item.proxyType as any, tx.method);
+          tx = api.tx.proxy.proxy(item.real, item.proxyType as any, tx.method.toU8a());
         }
       }
     }

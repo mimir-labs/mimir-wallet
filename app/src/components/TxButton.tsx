@@ -20,6 +20,7 @@ interface Props extends Omit<ButtonProps, 'onPress' | 'onClick'> {
   website?: string;
   iconUrl?: string;
   appName?: string;
+  relatedBatches?: number[];
   onReject?: () => void;
   onClose?: () => void;
   onError?: (error: unknown) => void;
@@ -43,6 +44,9 @@ function TxButton({
   accountId,
   transaction,
   website,
+  appName,
+  iconUrl,
+  relatedBatches,
   filterPaths,
   beforeSend,
   onResults,
@@ -63,14 +67,30 @@ function TxButton({
         transaction: transaction || undefined,
         call,
         website,
+        appName,
+        iconUrl,
         filterPaths,
+        relatedBatches,
         onResults: (result) => onResults?.(result),
         beforeSend: async (extrinsic) => beforeSend?.(extrinsic)
       });
     }
 
     onDone?.();
-  }, [accountId, addQueue, beforeSend, filterPaths, getCall, onDone, onResults, transaction, website]);
+  }, [
+    accountId,
+    addQueue,
+    appName,
+    beforeSend,
+    filterPaths,
+    getCall,
+    iconUrl,
+    onDone,
+    onResults,
+    relatedBatches,
+    transaction,
+    website
+  ]);
 
   return (
     <Button {...props} isDisabled={isDisabled || disabled} onPress={overrideAction || handlePress}>

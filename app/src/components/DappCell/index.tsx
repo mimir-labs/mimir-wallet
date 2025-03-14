@@ -81,7 +81,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
       <DappDetails dapp={dapp} onClose={toggleOpen} open={detailsOpen} onOpen={openApp} />
 
       {dapp.isDrawer && (
-        <Drawer placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
+        <Drawer hideCloseButton placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
           <DrawerContent className='max-w-full w-auto py-5'>
             <DrawerBody>{element}</DrawerBody>
           </DrawerContent>

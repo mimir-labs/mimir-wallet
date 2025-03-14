@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box } from '@mui/material';
-import { Link } from 'react-router-dom';
 
-import { Button } from '@mimir-wallet/ui';
+import { Button, Link } from '@mimir-wallet/ui';
 
-function EmptyBatch({ onClose }: { onAdd?: () => void; onClose?: () => void }) {
+function EmptyBatch({ onClose }: { onAdd?: () => void; onClose?: () => void; onHandleRestore?: () => void }) {
   return (
     <Box
       sx={{
@@ -34,7 +33,7 @@ function EmptyBatch({ onClose }: { onAdd?: () => void; onClose?: () => void }) {
       <Button
         as={Link}
         onPress={onClose}
-        to={`/explorer/${encodeURIComponent('mimir://app/transfer')}`}
+        href={`/explorer/${encodeURIComponent('mimir://app/transfer')}`}
         color='primary'
       >
         Add New Transfer
@@ -42,12 +41,15 @@ function EmptyBatch({ onClose }: { onAdd?: () => void; onClose?: () => void }) {
       <Button
         as={Link}
         onPress={onClose}
-        to={`/explorer/${encodeURIComponent('https://apps.mimir.global')}`}
+        href={`/explorer/${encodeURIComponent('https://apps.mimir.global')}`}
         color='primary'
         variant='ghost'
       >
         Go to PolkadotJS
       </Button>
+      {/* <Button onPress={onHandleRestore} color='primary' variant='ghost'>
+        Restore
+      </Button> */}
     </Box>
   );
 }

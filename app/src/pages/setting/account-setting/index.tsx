@@ -8,6 +8,7 @@ import type { ITuple } from '@polkadot/types/types';
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Input } from '@/components';
 import { toastSuccess } from '@/components/utils';
 import { useApi } from '@/hooks/useApi';
@@ -18,7 +19,10 @@ import { Box, Button, Paper, Stack, Tab, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Tooltip } from '@mimir-wallet/ui';
+
 import MemberSet from './MemberSet';
+import ProposerSet from './ProposerSet';
 import ProxySet from './ProxySet';
 
 function AccountSetting() {
@@ -26,7 +30,7 @@ function AccountSetting() {
   const navigate = useNavigate();
   const { isLocalAccount, current: address } = useAccount();
   const { setName, name, saveName } = useAddressMeta(address);
-  const [account] = useQueryAccount(address);
+  const [account, , , refetch] = useQueryAccount(address);
   const [error, setError] = useState<Error>();
   const [txs] = usePendingTransactions(address);
   const [tab, setTab] = useState('0');
@@ -128,14 +132,32 @@ function AccountSetting() {
       )}
 
       {api.tx.proxy && address && proxies && account && proxies[0].length > 0 && (
-        <Box>
+        <div>
           <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
             Proxy Information
           </Typography>
           <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
             <ProxySet account={account} address={address} proxies={proxies[0]} />
           </Paper>
-        </Box>
+        </div>
+      )}
+
+      {account && (
+        <div>
+          <h6 className='text-foreground/50 mb-2.5 flex items-center gap-1'>
+            Proposer
+            <Tooltip
+              closeDelay={0}
+              classNames={{ content: 'max-w-[300px]' }}
+              content='The proposer can submit the transaction without any signatures. Once the members approve, the transaction can be initiated.'
+            >
+              <IconQuestion className='text-primary' />
+            </Tooltip>
+          </h6>
+          <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
+            <ProposerSet account={account} refetch={refetch} />
+          </Paper>
+        </div>
       )}
     </Stack>
   );

@@ -48,16 +48,9 @@ function proposalApi(): string | undefined {
   return window.currentChain.proposalApi;
 }
 
-function serviceUrl(path: string): string {
-  const url: string = window.currentChain.serviceUrl || 'http://127.0.0.1:8080/';
-
-  return `${url}${path}`;
-}
-
 export const chainLinks = {
   accountExplorerLink,
   extrinsicExplorerLink,
   subsquareUrl,
-  proposalApi,
-  serviceUrl
+  proposalApi
 };

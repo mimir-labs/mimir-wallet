@@ -11,7 +11,7 @@ import { SvgIcon } from '@mui/material';
 import { isArray } from '@polkadot/util';
 import React from 'react';
 
-import { Avatar, Button, Divider, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
+import { Avatar, Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
 
 interface Props {
   open: boolean;
@@ -52,27 +52,27 @@ function Contents({ dapp }: { dapp: DappOption }) {
           ))}
           <Divider orientation='vertical' className='h-[12px]' />
           {dapp.website && (
-            <Button isIconOnly color='secondary' as='a' href={dapp.website} size='sm' target='_blank'>
+            <Button isIconOnly color='secondary' as={Link} href={dapp.website} size='sm' target='_blank'>
               <SvgIcon component={IconWebsite} inheritViewBox />
             </Button>
           )}
           {dapp.github && (
-            <Button isIconOnly color='secondary' as='a' href={dapp.github} size='sm' target='_blank'>
+            <Button isIconOnly color='secondary' as={Link} href={dapp.github} size='sm' target='_blank'>
               <SvgIcon component={IconGithub} inheritViewBox />
             </Button>
           )}
           {dapp.discord && (
-            <Button isIconOnly color='secondary' as='a' href={dapp.discord} size='sm' target='_blank'>
+            <Button isIconOnly color='secondary' as={Link} href={dapp.discord} size='sm' target='_blank'>
               <SvgIcon component={IconDiscord} inheritViewBox />
             </Button>
           )}
           {dapp.twitter && (
-            <Button isIconOnly color='secondary' as='a' href={dapp.twitter} size='sm' target='_blank'>
+            <Button isIconOnly color='secondary' as={Link} href={dapp.twitter} size='sm' target='_blank'>
               <SvgIcon component={IconX} inheritViewBox />
             </Button>
           )}
           {dapp.matrix && (
-            <Button isIconOnly color='secondary' as='a' href={dapp.matrix} size='sm' target='_blank'>
+            <Button isIconOnly color='secondary' as={Link} href={dapp.matrix} size='sm' target='_blank'>
               <SvgIcon component={IconMatrix} inheritViewBox />
             </Button>
           )}
