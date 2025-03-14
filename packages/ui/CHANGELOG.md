@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.26.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v1.25.0...ui-v1.26.0) (2025-03-14)
+
+
+### Features
+
+* add template detail view functionality ([#174](https://github.com/mimir-labs/mimir-wallet/issues/174)) ([cb0504c](https://github.com/mimir-labs/mimir-wallet/commit/cb0504c0c72440ec48edcf6a16129236edd3e102))
+
 ## [1.25.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v1.24.0...ui-v1.25.0) (2025-03-14)
 
 
