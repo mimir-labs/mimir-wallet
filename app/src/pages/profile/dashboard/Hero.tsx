@@ -3,8 +3,6 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
-import { encodeAddress } from '@/api';
-import { chainLinks } from '@/api/chain-links';
 import StatescanImg from '@/assets/images/statescan.svg';
 import SubscanImg from '@/assets/images/subscan.svg';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
@@ -15,12 +13,12 @@ import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@/assets/svg/icon-set.svg?react';
 import { Address, AddressName, CopyButton, Fund, IdentityIcon, QrcodeAddress } from '@/components';
 import { ONE_DAY } from '@/constants';
-import { useApi } from '@/hooks/useApi';
 import { formatDisplay } from '@/utils';
 import { Avatar, Box, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
+import { chainLinks, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Link, Tooltip } from '@mimir-wallet/ui';
 
 function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string; changes: number }) {

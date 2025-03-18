@@ -7,9 +7,9 @@ import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Empty } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import TemplateItem from './TemplateItem';

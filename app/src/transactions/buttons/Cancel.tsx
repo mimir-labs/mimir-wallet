@@ -8,10 +8,10 @@ import type { PalletMultisigMultisig } from '@polkadot/types/lookup';
 import { useAccount } from '@/accounts/useAccount';
 import { TxButton } from '@/components';
 import { TransactionType } from '@/hooks/types';
-import { useApi } from '@/hooks/useApi';
 import { useCall } from '@/hooks/useCall';
-import { addressEq } from '@/utils';
 import React, { useMemo } from 'react';
+
+import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 
 function Cancel({ account, transaction }: { account: AccountData; transaction: Transaction }) {
   const { api } = useApi();

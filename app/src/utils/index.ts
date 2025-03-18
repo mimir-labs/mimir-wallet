@@ -3,7 +3,6 @@
 
 import { ClientService } from '@mimir-wallet/service';
 
-export * from './address';
 export * from './common';
 export * from './utf8';
 export * from './check';

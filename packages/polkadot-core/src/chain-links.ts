@@ -6,7 +6,7 @@ import type { HexString } from '@polkadot/util/types';
 
 import { isAddress } from '@polkadot/util-crypto';
 
-import { encodeAddress } from './defaults';
+import { encodeAddress, statics } from './defaults.js';
 
 function accountExplorerLink(
   value?: AccountId | AccountIndex | Address | HexString | Uint8Array | string | null
@@ -14,8 +14,8 @@ function accountExplorerLink(
   const _value = encodeAddress(value);
 
   if (_value && isAddress(_value)) {
-    const explorerUrl = window.currentChain.explorerUrl;
-    const isStatescan = window.currentChain.statescan;
+    const explorerUrl = statics.chain.explorerUrl;
+    const isStatescan = statics.chain.statescan;
 
     if (explorerUrl) {
       return isStatescan ? `${explorerUrl}/#/accounts/${_value}` : `${explorerUrl}account/${_value}`;
@@ -28,8 +28,8 @@ function accountExplorerLink(
 function extrinsicExplorerLink(value?: string | { toString: () => string }): string | undefined {
   const _value = value?.toString();
 
-  const explorerUrl = window.currentChain.explorerUrl;
-  const isStatescan = window.currentChain.statescan;
+  const explorerUrl = statics.chain.explorerUrl;
+  const isStatescan = statics.chain.statescan;
 
   if (explorerUrl) {
     return isStatescan ? `${explorerUrl}/#/extrinsics/${_value}` : `${explorerUrl}extrinsic/${_value}`;
@@ -39,13 +39,13 @@ function extrinsicExplorerLink(value?: string | { toString: () => string }): str
 }
 
 function subsquareUrl(path?: string): string | undefined {
-  const baseUrl = window.currentChain.subsquareUrl;
+  const baseUrl = statics.chain.subsquareUrl;
 
   return baseUrl ? `${baseUrl}${path || ''}` : undefined;
 }
 
 function proposalApi(): string | undefined {
-  return window.currentChain.proposalApi;
+  return statics.chain.proposalApi;
 }
 
 export const chainLinks = {

@@ -10,10 +10,10 @@ import type { ITuple } from '@polkadot/types/types';
 import { dataToUtf8 } from '@/utils';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 import { createNamedHook } from './createNamedHook';
-import { useApi } from './useApi';
 
 function extractOther(additional: Vec<ITuple<[Data, Data]>>) {
   return additional.reduce<Record<string, string>>((other, [_key, _value]) => {

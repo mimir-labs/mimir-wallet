@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { chainLinks } from '@/api/chain-links';
 import IconLink from '@/assets/svg/icon-link.svg?react';
 import IconQr from '@/assets/svg/icon-qr.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
@@ -11,6 +10,7 @@ import { useToggle } from '@/hooks/useToggle';
 import { useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 
+import { chainLinks } from '@mimir-wallet/polkadot-core';
 import { Button, Link } from '@mimir-wallet/ui';
 
 function Icons({ address }: { address: string }) {

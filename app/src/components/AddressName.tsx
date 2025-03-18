@@ -5,12 +5,12 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 import type { PalletIdentityJudgement } from '@polkadot/types/lookup';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { encodeAddress } from '@/api';
 import IconIdentity from '@/assets/svg/identity.svg?react';
 import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
-import { addressEq } from '@/utils';
 import { hexToU8a } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
+
+import { addressEq, encodeAddress } from '@mimir-wallet/polkadot-core';
 
 interface Props {
   defaultName?: string;

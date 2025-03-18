@@ -5,16 +5,16 @@ import type { HexString } from '@polkadot/util/types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useSelectedAccountCallback } from '@/accounts/useSelectedAccount';
-import { decodeAddress, encodeAddress } from '@/api';
 import { utm } from '@/config';
 import { DETECTED_ACCOUNT_KEY } from '@/constants';
 import { useToggle } from '@/hooks/useToggle';
-import { addressToHex, service } from '@/utils';
+import { service } from '@/utils';
 import { u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { addressToHex, decodeAddress, encodeAddress } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 

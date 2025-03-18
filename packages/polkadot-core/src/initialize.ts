@@ -2,20 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
-import type { ApiState } from './types';
+import type { ApiState, Endpoint } from './types.js';
 
-import { allEndpoints, type Endpoint, typesBundle } from '@/config';
-import { NETWORK_RPC_PREFIX } from '@/constants';
-import { useApi } from '@/hooks/useApi';
-import { service } from '@/utils';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance } from '@polkadot/util';
 
-import { store } from '@mimir-wallet/service';
+import { type ClientService, store } from '@mimir-wallet/service';
 
-import { ApiProvider } from './ApiProvider';
-import { DEFAULT_AUX, statics } from './defaults';
+import { typesBundle } from './api-types/index.js';
+import { ApiProvider } from './ApiProvider.js';
+import { allEndpoints } from './config.js';
+import { DEFAULT_AUX, NETWORK_RPC_PREFIX, statics } from './defaults.js';
+import { useApi } from './useApi.js';
 
 /**
  * Initializes and configures the API after it's ready
@@ -97,6 +96,7 @@ function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: st
  * @param onError - Error handler callback
  */
 async function createApi(
+  clientService: ClientService,
   apiUrl: string | string[],
   network: string,
   httpUrl?: string,
@@ -106,7 +106,7 @@ async function createApi(
   let metadata: Record<string, HexString> = {};
 
   try {
-    metadata = await service.getMetadata();
+    metadata = await clientService.getMetadata();
   } catch {
     /* empty */
   }
@@ -118,7 +118,7 @@ async function createApi(
     statics.api = new ApiPromise({
       provider,
       registry: statics.registry,
-      typesBundle,
+      typesBundle: typesBundle,
       typesChain: {
         Crust: {
           DispatchErrorModule: 'DispatchErrorModuleU8'
@@ -137,7 +137,9 @@ async function createApi(
  *
  * @param chain - Configuration for the target blockchain endpoint
  */
-export async function initializeApi(chain: Endpoint) {
+export async function initializeApi(chain: Endpoint, clientService: ClientService) {
+  statics.chain = chain;
+
   // Initialize API state with static configuration
   useApi.setState({
     api: statics.api,
@@ -160,7 +162,7 @@ export async function initializeApi(chain: Endpoint) {
     : undefined;
 
   // Initialize main blockchain API connection
-  createApi(Object.values(chain.wsUrl), chain.key, chain.httpUrl, onError).then(() => {
+  createApi(clientService, Object.values(chain.wsUrl), chain.key, chain.httpUrl, onError).then(() => {
     // Set up event listeners for connection state
     statics.api.on('error', onError);
 

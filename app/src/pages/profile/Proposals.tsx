@@ -3,10 +3,10 @@
 
 import type { ProposalData } from '@/hooks/useProposals';
 
-import { chainLinks } from '@/api/chain-links';
 import { ellipsisMixin } from '@/components/utils';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 
+import { chainLinks } from '@mimir-wallet/polkadot-core';
 import { Chip, Link } from '@mimir-wallet/ui';
 
 function Proposals({ data }: { data: ProposalData[] }) {

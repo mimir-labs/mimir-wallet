@@ -20,7 +20,6 @@ import IconSuccessOutlined from '@/assets/svg/icon-success-outlined.svg?react';
 import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { filterPathId } from '@/hooks/useFilterPaths';
-import { addressEq } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import { Paper, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
@@ -37,6 +36,8 @@ import {
   useEdgesState,
   useNodesState
 } from 'reactflow';
+
+import { addressEq } from '@mimir-wallet/polkadot-core';
 
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';

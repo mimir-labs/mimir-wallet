@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
-import { chainLinks } from '@/api/chain-links';
 import ArrowRight from '@/assets/svg/ArrowRight.svg?react';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import IconDapp from '@/assets/svg/icon-dapp.svg?react';
@@ -22,7 +21,6 @@ import {
   WalletIcon
 } from '@/components';
 import { findToken, walletConfig } from '@/config';
-import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useToggle } from '@/hooks/useToggle';
@@ -43,6 +41,7 @@ import {
 import { useMemo, useState } from 'react';
 import { matchPath, useLocation } from 'react-router-dom';
 
+import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, Link, Tooltip } from '@mimir-wallet/ui';
 
 import ToggleSidebar from './ToggleSidebar';

@@ -1,12 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { decodeAddress } from '@/api';
 import { TxButton } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { service } from '@/utils';
 import { u8aToHex } from '@polkadot/util';
 import React from 'react';
+
+import { decodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 function SubmitPure({
   proxy,

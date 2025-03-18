@@ -1,0 +1,64 @@
+{
+  "author": "dev.mimir",
+  "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
+  "engines": {
+    "node": ">=20"
+  },
+  "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/polkadot-core#readme",
+  "license": "Apache-2.0",
+  "packageManager": "yarn@4.5.3",
+  "private": true,
+  "repository": {
+    "directory": "packages/polkadot-core",
+    "type": "git",
+    "url": "https://github.com/mimir-labs/mimir-wallet.git"
+  },
+  "sideEffects": true,
+  "type": "module",
+  "name": "@mimir-wallet/polkadot-core",
+  "version": "1.25.0",
+  "main": "build/index.js",
+  "module": "build/index.js",
+  "types": "build/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "@mimir-wallet/source": "./src/index.ts",
+        "types": "./build/index.d.ts",
+        "default": "./build/index.js"
+      }
+    }
+  },
+  "files": [
+    "build",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "check-types": "tsc --noEmit",
+    "dev": "tsc --watch"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "zustand": ">=5"
+  },
+  "dependencies": {
+    "@polkadot/api": "^15.8.1",
+    "@polkadot/api-derive": "^15.8.1",
+    "@polkadot/apps-config": "^0.151.1",
+    "@polkadot/types": "^15.8.1",
+    "@polkadot/types-known": "^15.8.1",
+    "@polkadot/ui-shared": "^3.12.2",
+    "@polkadot/util": "^13.4.3",
+    "@polkadot/util-crypto": "^13.4.3"
+  },
+  "devDependencies": {
+    "@mimir-wallet/service": "workspace:^",
+    "@polkadot/extension-base": "^0.58.5",
+    "@polkadot/extension-inject": "^0.58.5",
+    "npm-run-all2": "^7.0.2",
+    "typescript": "^5.8.2"
+  }
+}

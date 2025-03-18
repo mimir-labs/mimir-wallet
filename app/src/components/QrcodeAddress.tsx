@@ -3,10 +3,10 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { useApi } from '@/hooks/useApi';
 import qrcode from 'qrcode-generator';
 import React, { useEffect, useRef } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 import CopyButton from './CopyButton';

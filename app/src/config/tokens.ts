@@ -3,7 +3,7 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { allEndpoints } from './api';
+import { allEndpoints } from '@mimir-wallet/polkadot-core';
 
 export type Token = {
   Icon: string;

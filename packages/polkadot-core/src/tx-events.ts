@@ -5,7 +5,7 @@ import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { ISubmittableResult } from '@polkadot/types/types';
 import type { U8aLike } from '@polkadot/util/types';
 
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 type EventTypes = {
   signed: (signature: U8aLike, extrinsic: SubmittableExtrinsic<'promise'>) => void;

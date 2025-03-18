@@ -7,8 +7,9 @@ import type { HexString } from '@polkadot/util/types';
 import type { MutableRefObject } from 'react';
 import type { State } from './types';
 
-import { allEndpoints } from '@/config';
 import { assert } from '@polkadot/util';
+
+import { allEndpoints } from '@mimir-wallet/polkadot-core';
 
 declare module '@polkadot/extension-base/background/types' {
   export interface RequestSignatures {

@@ -1,16 +1,18 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DappOption } from '@/config';
+
 import IconMatrix from '@/assets/images/matrix.svg?react';
 import IconDiscord from '@/assets/svg/icon-discord.svg?react';
 import IconGithub from '@/assets/svg/icon-github.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import IconX from '@/assets/svg/icon-x.svg?react';
-import { allEndpoints, type DappOption } from '@/config';
 import { SvgIcon } from '@mui/material';
 import { isArray } from '@polkadot/util';
 import React from 'react';
 
+import { allEndpoints } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
 
 interface Props {

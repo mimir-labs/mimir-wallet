@@ -5,11 +5,11 @@ import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { AddressRow } from '@/components';
-import { addressEq } from '@/utils';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { hexToU8a } from '@polkadot/util';
 import React from 'react';
 
+import { addressEq } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 interface Props {

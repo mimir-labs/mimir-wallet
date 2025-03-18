@@ -4,10 +4,11 @@
 import type React from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
-import { encodeAddress } from '@/api';
 import { accountSource } from '@/wallet/useWallet';
 import { hexToU8a } from '@polkadot/util';
 import { useCallback, useMemo, useState } from 'react';
+
+import { encodeAddress } from '@mimir-wallet/polkadot-core';
 
 interface UseSelectMultisig {
   unselected: string[];

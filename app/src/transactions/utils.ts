@@ -4,7 +4,8 @@
 import type { AccountData, Transaction } from '@/hooks/types';
 
 import { TransactionStatus, TransactionType } from '@/hooks/types';
-import { addressEq } from '@/utils';
+
+import { addressEq } from '@mimir-wallet/polkadot-core';
 
 export function approvalCounts(account: AccountData, transaction: Transaction): [counts: number, threshold: number] {
   if (account.type !== 'multisig') {

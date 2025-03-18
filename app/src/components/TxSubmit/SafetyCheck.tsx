@@ -4,16 +4,15 @@
 import type { SafetyLevel } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
-import { simulate } from '@/api';
 import Logo from '@/assets/images/logo.png';
 import IconFailed from '@/assets/svg/icon-failed-fill.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success.svg?react';
-import { useApi } from '@/hooks/useApi';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, SvgIcon, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
+import { simulate, useApi } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
 
 function Cell({ title, children, img }: { img: React.ReactNode; title: React.ReactNode; children: React.ReactNode }) {

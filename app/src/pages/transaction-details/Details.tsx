@@ -4,14 +4,14 @@
 import type { Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
-import { findTargetCall } from '@/api';
 import { AddressCell, Bytes, Hash } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { FunctionArgs } from '@/params';
 import { Alert, AlertTitle, Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import moment from 'moment';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
+
+import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
 
 function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (

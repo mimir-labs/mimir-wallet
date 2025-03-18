@@ -2,13 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
-import { decodeAddress, encodeAddress } from '@/api';
-import { useApi } from '@/hooks/useApi';
 import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
-import { addressEq } from '@/utils';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { addressEq, decodeAddress, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import Input from './Input';

@@ -3,6 +3,7 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { SignerOptions, SubmittableExtrinsic } from '@polkadot/api/types';
+import type { Injected } from '@polkadot/extension-inject/types';
 import type { Null, Result } from '@polkadot/types';
 import type {
   DispatchError,
@@ -20,14 +21,13 @@ import type {
 import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { statics } from '@/api';
-import { walletConfig } from '@/config';
-import { CONNECT_ORIGIN } from '@/constants';
+// import { walletConfig } from '@/config';
+// import { CONNECT_ORIGIN } from '@/constants';
 import { getSpecTypes } from '@polkadot/types-known';
-import { assert, formatBalance, isBn, isHex, isNumber, objectSpread, u8aToHex } from '@polkadot/util';
+import { assert, formatBalance, isBn, isFunction, isHex, isNumber, objectSpread, u8aToHex } from '@polkadot/util';
 import { base64Encode } from '@polkadot/util-crypto';
 
-import { TxEvents } from './tx-events';
+import { TxEvents } from './tx-events.js';
 
 type Options = {
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
@@ -54,9 +54,9 @@ export class TxModuleError extends Error {
   }
 }
 
-function _assetDispatchError(dispatch: DispatchError | SpRuntimeDispatchError): Error {
+function _assetDispatchError(api: ApiPromise, dispatch: DispatchError | SpRuntimeDispatchError): Error {
   if (dispatch.isModule) {
-    const error = statics.api.registry.findMetaError(dispatch.asModule);
+    const error = api.registry.findMetaError(dispatch.asModule);
 
     return new TxModuleError(
       `Cause by ${error.section}.${error.method}: ${error.docs.join('\n')}`,
@@ -81,8 +81,13 @@ function _assetDispatchError(dispatch: DispatchError | SpRuntimeDispatchError): 
   return new TxDispatchError(`Dispatch Error: ${dispatch.type}`);
 }
 
-async function extractParams(api: ApiPromise, address: string, source: string): Promise<Partial<SignerOptions>> {
-  const injected = await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(CONNECT_ORIGIN);
+async function extractParams(
+  api: ApiPromise,
+  address: string,
+  _injected: Injected | (() => Promise<Injected>)
+): Promise<Partial<SignerOptions>> {
+  const injected = isFunction(_injected) ? await _injected() : _injected;
+
   const signer = injected?.signer;
   const metadata = injected?.metadata;
 
@@ -127,10 +132,10 @@ async function extractParams(api: ApiPromise, address: string, source: string): 
   return { signer };
 }
 
-export function checkSubmittableResult(result: ISubmittableResult, checkProxy = false) {
+export function checkSubmittableResult(api: ApiPromise, result: ISubmittableResult, checkProxy = false) {
   if (result.isError) {
     if (result.dispatchError) {
-      throw _assetDispatchError(result.dispatchError);
+      throw _assetDispatchError(api, result.dispatchError);
     }
 
     if (result.internalError) {
@@ -140,10 +145,10 @@ export function checkSubmittableResult(result: ISubmittableResult, checkProxy = 
 
   if (checkProxy) {
     for (const { event } of result.events) {
-      if (!statics.api.events.proxy.ProxyExecuted.is(event)) continue;
+      if (!api.events.proxy.ProxyExecuted.is(event)) continue;
 
       if (event.data.result.isErr) {
-        throw _assetDispatchError(event.data.result.asErr);
+        throw _assetDispatchError(api, event.data.result.asErr);
       }
     }
   }
@@ -152,21 +157,18 @@ export function checkSubmittableResult(result: ISubmittableResult, checkProxy = 
 }
 
 function makeSignOptions(
+  api: ApiPromise,
   partialOptions: Partial<SignerOptions>,
   extras: { blockHash?: Hash; era?: ExtrinsicEra; nonce?: Index }
 ): SignatureOptions {
-  return objectSpread(
-    { blockHash: statics.api.genesisHash, genesisHash: statics.api.genesisHash },
-    partialOptions,
-    extras,
-    {
-      runtimeVersion: statics.api.runtimeVersion,
-      signedExtensions: statics.api.registry.signedExtensions
-    }
-  );
+  return objectSpread({ blockHash: api.genesisHash, genesisHash: api.genesisHash }, partialOptions, extras, {
+    runtimeVersion: api.runtimeVersion,
+    signedExtensions: api.registry.signedExtensions
+  });
 }
 
 function makeEraOptions(
+  api: ApiPromise,
   partialOptions: Partial<SignerOptions>,
   { header, mortalLength, nonce }: { header: Header | null; mortalLength: number; nonce: Index }
 ): SignatureOptions {
@@ -182,12 +184,12 @@ function makeEraOptions(
       delete partialOptions.blockHash;
     }
 
-    return makeSignOptions(partialOptions, { nonce });
+    return makeSignOptions(api, partialOptions, { nonce });
   }
 
-  return makeSignOptions(partialOptions, {
+  return makeSignOptions(api, partialOptions, {
     blockHash: header.hash,
-    era: statics.api.registry.createTypeUnsafe<ExtrinsicEra>('ExtrinsicEra', [
+    era: api.registry.createTypeUnsafe<ExtrinsicEra>('ExtrinsicEra', [
       {
         current: header.number,
         period: partialOptions.era || mortalLength
@@ -202,17 +204,18 @@ function optionsOrNonce(partialOptions: Partial<SignerOptions> = {}): Partial<Si
 }
 
 export async function sign(
+  api: ApiPromise,
   extrinsic: SubmittableExtrinsic<'promise'>,
   signer: string,
-  source: string
+  injected: Injected | (() => Promise<Injected>)
 ): Promise<[signature: HexString, payload: SignerPayloadJSON, txHash: Hash, signedTransaction: HexString]> {
   const options = optionsOrNonce();
-  const signingInfo = await statics.api.derive.tx.signingInfo(signer, options.nonce, options.era);
-  const eraOptions = makeEraOptions(options, signingInfo);
+  const signingInfo = await api.derive.tx.signingInfo(signer, options.nonce, options.era);
+  const eraOptions = makeEraOptions(api, options, signingInfo);
 
-  const { signer: accountSigner, withSignedTransaction } = await extractParams(statics.api, signer, source);
+  const { signer: accountSigner, withSignedTransaction } = await extractParams(api, signer, injected);
 
-  const payload = statics.api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
+  const payload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
     objectSpread({}, eraOptions, {
       address: signer,
       blockNumber: signingInfo.header ? signingInfo.header.number : 0,
@@ -229,9 +232,9 @@ export async function sign(
   const { signature, signedTransaction } = await accountSigner.signPayload(payload.toPayload());
 
   if (signedTransaction) {
-    const ext = statics.api.registry.createTypeUnsafe<Extrinsic>('Extrinsic', [signedTransaction]);
+    const ext = api.registry.createTypeUnsafe<Extrinsic>('Extrinsic', [signedTransaction]);
 
-    const newSignerPayload = statics.api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
+    const newSignerPayload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
       objectSpread(
         {},
         {
@@ -281,14 +284,15 @@ export async function sign(
 }
 
 export function signAndSend(
+  api: ApiPromise,
   extrinsic: SubmittableExtrinsic<'promise'>,
   signer: string,
-  source: string,
+  injected: Injected | (() => Promise<Injected>),
   { beforeSend, checkProxy }: Options = {}
 ): TxEvents {
   const events = new TxEvents();
 
-  extractParams(statics.api, signer, source)
+  extractParams(api, signer, injected)
     .then((params) => extrinsic.signAsync(signer, params))
     .then(async (extrinsic) => {
       events.emit('signed', extrinsic.signature, extrinsic);
@@ -299,7 +303,7 @@ export function signAndSend(
       > | null = null;
 
       try {
-        result = await statics.api.call.blockBuilder.applyExtrinsic(extrinsic);
+        result = await api.call.blockBuilder.applyExtrinsic(extrinsic);
       } catch {
         /* empty */
       }
@@ -314,7 +318,7 @@ export function signAndSend(
         }
 
         if (result.asOk.isErr) {
-          throw _assetDispatchError(result.asOk.asErr);
+          throw _assetDispatchError(api, result.asOk.asErr);
         }
       }
 
@@ -335,7 +339,7 @@ export function signAndSend(
 
         if (result.isInBlock) {
           try {
-            checkSubmittableResult(result, checkProxy);
+            checkSubmittableResult(api, result, checkProxy);
             events.emit('inblock', result);
           } catch (error) {
             events.emit('error', error);

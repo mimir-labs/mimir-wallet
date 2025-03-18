@@ -8,9 +8,8 @@ import { events } from '@/events';
 import { randomAsNumber } from '@polkadot/util-crypto';
 import { useCallback, useMemo } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { useLocalStore } from '@mimir-wallet/service';
-
-import { useApi } from './useApi';
 
 type BatchTxs = Record<string, BatchTxItem[]>; // address => BatchTxItem[]
 

@@ -4,8 +4,9 @@
 import type { HexString } from '@polkadot/util/types';
 import type { AccountData, AccountDataExtra } from '../hooks/types';
 
-import { encodeAddress } from '@/api';
 import { service } from '@/utils';
+
+import { encodeAddress } from '@mimir-wallet/polkadot-core';
 
 export function extraAccounts(
   genesisHash: HexString,

@@ -4,8 +4,9 @@
 import type { HexString } from '@polkadot/util/types';
 import type { AccountData, AccountDataExtra, AddressMeta, DelegateeProp, MultisigAccountData } from '../hooks/types';
 
-import { decodeAddress } from '@/api';
 import { u8aToHex } from '@polkadot/util';
+
+import { decodeAddress } from '@mimir-wallet/polkadot-core';
 
 export function deriveAddressMeta(
   accounts: (AccountDataExtra & AccountData)[],

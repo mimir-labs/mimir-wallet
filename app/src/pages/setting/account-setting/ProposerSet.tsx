@@ -8,13 +8,13 @@ import { AddressRow, Empty, InputAddress } from '@/components';
 import { toastError } from '@/components/utils';
 import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
-import { useApi } from '@/hooks/useApi';
 import { useManageProposerFilter } from '@/hooks/useProposeFilter';
 import { service } from '@/utils';
 import { accountSource } from '@/wallet/useWallet';
 import { useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import {
   Button,
   Divider,

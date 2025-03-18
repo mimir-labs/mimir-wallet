@@ -8,12 +8,12 @@ import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { Input, InputAddress, TxButton } from '@/components';
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
-import { useApi } from '@/hooks/useApi';
 import { useInput } from '@/hooks/useInput';
 import { Call as CallComp } from '@/params';
 import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Link } from '@mimir-wallet/ui';
 
 function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {

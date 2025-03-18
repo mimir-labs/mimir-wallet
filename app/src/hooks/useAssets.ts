@@ -9,9 +9,8 @@ import type { AssetInfo, PalletAssetRegistryAssetDetails } from './types';
 import { type Asset, findAssets } from '@/config';
 import { type BN, BN_ZERO, isHex } from '@polkadot/util';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
-
-import { useApi } from './useApi';
 
 function _transform(assets: Asset[], metadatas: [id: string, metadata: PalletAssetsAssetMetadata][]): AssetInfo[] {
   const assetInfo: AssetInfo[] = [];

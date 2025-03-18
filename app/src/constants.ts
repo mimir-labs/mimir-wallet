@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { NETWORK_RPC_PREFIX as NETWORK_RPC_PREFIX_CORE } from '@mimir-wallet/polkadot-core';
+
 export const SWITCH_ACCOUNT_REMIND_KEY = 'switch_account_remind';
 
 export const API_METADATA_KEY = 'api_metadata';
@@ -33,6 +35,6 @@ export const MESSAGE_ORIGIN_WALLET = `${EXTENSION_PREFIX}wallet`;
 
 export const ADDRESS_BOOK_UPGRADE_VERSION_KEY = 'address_book_upgrade_version';
 
-export const NETWORK_RPC_PREFIX = 'network_rpc:';
+export const NETWORK_RPC_PREFIX = NETWORK_RPC_PREFIX_CORE;
 
 export const TEMPLATE_PREFIX = 'template:';

@@ -3,8 +3,9 @@
 
 import type { AccountId, AccountIndex, Address as AddressType } from '@polkadot/types/interfaces';
 
-import { encodeAddress } from '@/api';
 import React, { useMemo } from 'react';
+
+import { encodeAddress } from '@mimir-wallet/polkadot-core';
 
 function Address({
   shorten,

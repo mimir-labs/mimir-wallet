@@ -5,12 +5,12 @@ import type { ProxyArgs } from './types';
 
 import { Address, AddressRow, TxButton } from '@/components';
 import { toastSuccess } from '@/components/utils';
-import { useApi } from '@/hooks/useApi';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { Box } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import { useAsyncFn, useToggle } from 'react-use';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import {
   Button,
   Checkbox,

@@ -3,10 +3,11 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { chainLinks } from '@/api/chain-links';
 import IconLink from '@/assets/svg/icon-link.svg?react';
 import { IconButton, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
+
+import { chainLinks } from '@mimir-wallet/polkadot-core';
 
 import CopyButton from './CopyButton';
 

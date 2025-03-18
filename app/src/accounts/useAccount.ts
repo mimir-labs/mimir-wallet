@@ -1,13 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { encodeAddress } from '@/api';
 import { CURRENT_ADDRESS_PREFIX, SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
-import { useApi } from '@/hooks/useApi';
 import { isAddress } from '@polkadot/util-crypto';
 import { useSearchParams } from 'react-router-dom';
 
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import {

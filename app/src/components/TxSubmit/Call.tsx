@@ -7,7 +7,6 @@ import type { HexString } from '@polkadot/util/types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { events } from '@/events';
-import { useApi } from '@/hooks/useApi';
 import { useToggle } from '@/hooks/useToggle';
 import { Call as CallComp } from '@/params';
 import {
@@ -24,6 +23,8 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import { useMemo } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 import Bytes from '../Bytes';
 import Hash from '../Hash';
