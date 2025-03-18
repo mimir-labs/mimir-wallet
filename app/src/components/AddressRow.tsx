@@ -4,10 +4,11 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { encodeAddress } from '@/api';
 import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
 import React, { useCallback, useMemo, useState } from 'react';
+
+import { encodeAddress } from '@mimir-wallet/polkadot-core';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';

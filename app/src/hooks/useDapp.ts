@@ -5,9 +5,8 @@ import { type DappOption, dapps, findSupportedDapps } from '@/config';
 import { FAVORITE_DAPP_KEY } from '@/constants';
 import { useCallback, useMemo } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { useLocalStore } from '@mimir-wallet/service';
-
-import { useApi } from './useApi';
 
 interface UseDapps {
   dapps: DappOption[];

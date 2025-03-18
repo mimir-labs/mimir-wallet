@@ -4,10 +4,11 @@
 import type { TransferToken } from './types';
 
 import { findToken } from '@/config';
-import { useApi } from '@/hooks/useApi';
 import { useAssetBalances } from '@/hooks/useBalances';
 import { Avatar, FormControl, MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 function SelectToken({
   address,

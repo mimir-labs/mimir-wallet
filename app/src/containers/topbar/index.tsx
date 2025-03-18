@@ -6,11 +6,11 @@ import IconMenu from '@/assets/svg/icon-menu.svg?react';
 import IconSetting from '@/assets/svg/icon-set.svg?react';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import { AccountSelect, ChainSelect } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { Box, IconButton, Stack, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Link } from '@mimir-wallet/ui';
 
 import BatchButton from './BatchButton';

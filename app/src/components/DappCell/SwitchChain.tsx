@@ -1,9 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { allEndpoints, type Endpoint } from '@/config';
 import React, { useMemo } from 'react';
 
+import { allEndpoints, type Endpoint } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 interface Props {

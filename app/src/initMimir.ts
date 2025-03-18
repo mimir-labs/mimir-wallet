@@ -4,9 +4,8 @@
 import { CURRENT_ADDRESS_PREFIX, CURRENT_NETWORK_KEY } from '@/constants';
 import { encodeAddress, isAddress } from '@polkadot/util-crypto';
 
+import { allEndpoints } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
-
-import { allEndpoints } from './config';
 
 export function initMimir() {
   const search = new URLSearchParams(window.location.search);

@@ -6,8 +6,9 @@ import type { Transaction } from '@/hooks/types';
 import { useAccount } from '@/accounts/useAccount';
 import { TxButton } from '@/components';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
-import { useApi } from '@/hooks/useApi';
 import React from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 function RemoveOrDeny({ transaction }: { transaction: Transaction }) {
   const { api } = useApi();

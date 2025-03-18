@@ -4,10 +4,11 @@
 import type { SafetyLevel } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
-import { useApi } from '@/hooks/useApi';
 import { useToggle } from '@/hooks/useToggle';
 import { service } from '@/utils';
 import { useEffect, useState } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 export function useSafetyCheck(call: IMethod) {
   const { api } = useApi();

@@ -6,14 +6,16 @@ import type { ExtrinsicPayloadValue, ISubmittableResult } from '@polkadot/types/
 import type { HexString } from '@polkadot/util/types';
 import type { BuildTx } from './hooks/useBuildTx';
 
-import { sign, signAndSend, TxEvents } from '@/api';
 import IconClock from '@/assets/svg/icon-clock.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
+import { CONNECT_ORIGIN } from '@/constants';
 import { addTxToast } from '@/hooks/useTxQueue';
 import { service } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
+import { enableWallet } from '@/wallet/utils';
 import React, { useState } from 'react';
 
+import { sign, signAndSend, TxEvents, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import AddressName from '../AddressName';
@@ -50,6 +52,7 @@ function SendTx({
   onSignature?: (signer: string, signature: HexString, tx: HexString, payload: ExtrinsicPayloadValue) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }) {
+  const { api } = useApi();
   const [loading, setLoading] = useState(false);
   const { txBundle, isLoading, error, hashSet, reserve, unreserve, delay } = buildTx;
   const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
@@ -86,7 +89,9 @@ function SendTx({
       if (onlySign) {
         addTxToast({ events });
 
-        const [signature, payload, extrinsicHash, signedTransaction] = await sign(tx, signer, source);
+        const [signature, payload, extrinsicHash, signedTransaction] = await sign(api, tx, signer, () =>
+          enableWallet(source, CONNECT_ORIGIN)
+        );
 
         await service.uploadWebsite(extrinsicHash.toHex(), website, appName, iconUrl, note, relatedBatches);
 
@@ -94,7 +99,7 @@ function SendTx({
         events.emit('success', 'Sign success');
         setLoading(false);
       } else {
-        events = signAndSend(tx, signer, source, {
+        events = signAndSend(api, tx, signer, () => enableWallet(source, CONNECT_ORIGIN), {
           beforeSend
         });
 

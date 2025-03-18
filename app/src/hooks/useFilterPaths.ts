@@ -12,9 +12,10 @@ import type {
 } from '@/hooks/types';
 
 import { TransactionStatus, TransactionType } from '@/hooks/types';
-import { addressEq } from '@/utils';
 import { accountSource } from '@/wallet/useWallet';
 import { useMemo } from 'react';
+
+import { addressEq } from '@mimir-wallet/polkadot-core';
 
 export function filterPathId(_deep: number, filterPath: FilterPathWithoutId) {
   if (filterPath.type === 'proxy') {

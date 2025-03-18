@@ -11,9 +11,9 @@ import type {
 } from '@polkadot/rpc-provider/types';
 
 import { WsProvider } from '@polkadot/api';
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
-import { HttpProvider } from './HttpProvider';
+import { HttpProvider } from './HttpProvider.js';
 
 interface SubscriptionHandler {
   callback: ProviderInterfaceCallback;

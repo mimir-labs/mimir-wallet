@@ -6,8 +6,9 @@ import type { ApiPromise } from '@polkadot/api';
 import { BN, BN_THOUSAND, BN_TWO, bnMin } from '@polkadot/util';
 import { useMemo } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
+
 import { createNamedHook } from './createNamedHook';
-import { useApi } from './useApi';
 import { A_DAY } from './useBlocksPerDays';
 
 // Some chains incorrectly use these, i.e. it is set to values such as 0 or even 2

@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
-import { encodeAddress } from '@/api';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconMore from '@/assets/svg/icon-more.svg?react';
 import { findToken } from '@/config';
-import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useAccountSource } from '@/wallet/useWallet';
 import React, { useCallback, useMemo } from 'react';
 
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Link, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@mimir-wallet/ui';
 
 import AddressCell from '../AddressCell';

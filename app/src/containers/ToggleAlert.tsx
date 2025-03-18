@@ -5,11 +5,12 @@ import { useAccount } from '@/accounts/useAccount';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { FormatBalance, Fund } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { formatUnits } from '@/utils';
 import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {
   const { api } = useApi();

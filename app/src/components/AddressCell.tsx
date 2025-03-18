@@ -5,12 +5,11 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { encodeAddress } from '@/api';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
-import { addressEq } from '@/utils';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
+import { addressEq, encodeAddress } from '@mimir-wallet/polkadot-core';
 import { Button, Chip } from '@mimir-wallet/ui';
 
 import AddressComp from './Address';

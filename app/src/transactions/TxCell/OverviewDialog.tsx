@@ -3,9 +3,9 @@
 
 import { HistoryTxOverview, TxOverview } from '@/components';
 import { type AccountData, type Transaction, TransactionStatus } from '@/hooks/types';
-import { useApi } from '@/hooks/useApi';
 import React from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
 interface Props {

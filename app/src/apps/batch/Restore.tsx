@@ -4,10 +4,10 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { Empty } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { useBatchSync } from '@/hooks/useBatchSync';
 import { CallDisplaySection } from '@/params';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Divider, Spinner } from '@mimir-wallet/ui';
 
 import BatchItem from './BatchItem';

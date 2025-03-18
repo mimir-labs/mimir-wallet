@@ -7,10 +7,11 @@ import type { HexString } from '@polkadot/util/types';
 import IconArrowLeft from '@/assets/svg/icon-arrow-left.svg?react';
 import { Input } from '@/components';
 import JsonView from '@/components/JsonView';
-import { useApi } from '@/hooks/useApi';
 import { useInput } from '@/hooks/useInput';
 import { Box, Button, Divider, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 import DotConsoleButton from '../call-data-view/DotConsoleButton';
 import DotConsoleLink from '../call-data-view/DotConsoleLink';

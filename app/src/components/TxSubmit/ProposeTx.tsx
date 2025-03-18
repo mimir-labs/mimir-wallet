@@ -5,11 +5,11 @@ import type { IMethod } from '@polkadot/types/types';
 
 import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
-import { useApi } from '@/hooks/useApi';
 import { service } from '@/utils';
 import { accountSource } from '@/wallet/useWallet';
 import React, { useState } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 import { toastError } from '../utils';

@@ -11,7 +11,8 @@ import type { MountedRef } from './useIsMountedRef';
 import { isFunction, isNull, isUndefined, nextTick } from '@polkadot/util';
 import { useEffect, useRef, useState } from 'react';
 
-import { useApi } from './useApi';
+import { useApi } from '@mimir-wallet/polkadot-core';
+
 import { useIsMountedRef } from './useIsMountedRef';
 
 type VoidFn = () => void;

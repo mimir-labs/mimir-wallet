@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
-import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { useTokenInfo } from '@/hooks/useTokenInfo';
@@ -10,6 +9,7 @@ import { formatUnits } from '@/utils';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useMemo, useRef } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Link, Tab, Tabs } from '@mimir-wallet/ui';
 
 import Assets from './Assets';

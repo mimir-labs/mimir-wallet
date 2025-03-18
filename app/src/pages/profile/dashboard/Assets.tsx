@@ -7,7 +7,6 @@ import type { BN } from '@polkadot/util';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { FormatBalance } from '@/components';
 import { findToken } from '@/config';
-import { useApi } from '@/hooks/useApi';
 import { useAssetBalances } from '@/hooks/useBalances';
 import {
   Avatar,
@@ -24,6 +23,7 @@ import {
 } from '@mui/material';
 import React, { useMemo } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Link } from '@mimir-wallet/ui';
 
 function AssetRow({

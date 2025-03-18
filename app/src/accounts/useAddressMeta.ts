@@ -4,9 +4,11 @@
 import type { AddressMeta } from '@/hooks/types';
 
 import { toastError } from '@/components/utils';
-import { addressToHex, service } from '@/utils';
+import { service } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import { useCallback, useEffect, useState } from 'react';
+
+import { addressToHex } from '@mimir-wallet/polkadot-core';
 
 import { useAccount } from './useAccount';
 

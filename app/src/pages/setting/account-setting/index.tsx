@@ -11,7 +11,6 @@ import { useQueryAccount } from '@/accounts/useQueryAccount';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Input } from '@/components';
 import { toastSuccess } from '@/components/utils';
-import { useApi } from '@/hooks/useApi';
 import { useCall } from '@/hooks/useCall';
 import { usePendingTransactions } from '@/hooks/useTransactions';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
@@ -19,6 +18,7 @@ import { Box, Button, Paper, Stack, Tab, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
 
 import MemberSet from './MemberSet';

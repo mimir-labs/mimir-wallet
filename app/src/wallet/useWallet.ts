@@ -4,10 +4,10 @@
 import type { WalletState } from './types';
 
 import { CONNECTED_WALLETS_KEY } from '@/constants';
-import { addressEq } from '@/utils/address';
 import { useMemo } from 'react';
 import { create } from 'zustand';
 
+import { addressEq } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 export const useWallet = create<WalletState>()((set) => ({

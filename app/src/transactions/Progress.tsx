@@ -7,10 +7,11 @@ import { AddressCell } from '@/components';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
-import { addressEq, autoFormatTimeStr } from '@/utils';
+import { autoFormatTimeStr } from '@/utils';
 import { alpha, Box, Divider } from '@mui/material';
 import React, { useMemo } from 'react';
 
+import { addressEq } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 import Approve from './buttons/Approve';

@@ -3,12 +3,12 @@
 
 import type { HistoryTransaction, Transaction } from './types';
 
-import { encodeAddress } from '@/api';
 import { events } from '@/events';
 import { service } from '@/utils';
 import { isEqual } from 'lodash-es';
 import { useEffect, useState } from 'react';
 
+import { encodeAddress } from '@mimir-wallet/polkadot-core';
 import { fetcher, useInfiniteQuery, useQuery } from '@mimir-wallet/service';
 
 function transformTransaction(transaction: Transaction): Transaction {

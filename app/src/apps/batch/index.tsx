@@ -4,13 +4,13 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import { TxButton } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { Box } from '@mui/material';
 import { useRef, useState } from 'react';
 import DraggableList from 'react-draggable-list';
 import { useToggle } from 'react-use';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox, Divider, Link } from '@mimir-wallet/ui';
 
 import BatchItemDrag from './BatchItemDrag';

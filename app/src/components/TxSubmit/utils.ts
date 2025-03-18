@@ -8,10 +8,10 @@ import type { Timepoint } from '@polkadot/types/interfaces';
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { callFilter, decodeAddress } from '@/api';
-import { addressEq } from '@/utils';
 import { isString, u8aSorted } from '@polkadot/util';
 import { blake2AsU8a } from '@polkadot/util-crypto';
+
+import { addressEq, callFilter, decodeAddress } from '@mimir-wallet/polkadot-core';
 
 export type TxBundle = { tx: SubmittableExtrinsic<'promise'>; signer: string };
 

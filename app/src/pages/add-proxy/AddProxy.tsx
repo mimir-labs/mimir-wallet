@@ -3,13 +3,12 @@
 
 import type { ProxyArgs } from './types';
 
-import { isSuperset } from '@/api';
 import { toastWarn } from '@/components/utils';
-import { useApi } from '@/hooks/useApi';
-import { addressEq } from '@/utils';
 import { LoadingButton } from '@mui/lab';
 import React from 'react';
 import { useAsyncFn } from 'react-use';
+
+import { addressEq, isSuperset, useApi } from '@mimir-wallet/polkadot-core';
 
 function AddProxy({
   proxied,

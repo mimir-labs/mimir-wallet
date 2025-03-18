@@ -9,7 +9,8 @@ import type { MountedRef } from './useIsMountedRef';
 import { isUndefined, nextTick } from '@polkadot/util';
 import { useEffect, useRef, useState } from 'react';
 
-import { useApi } from './useApi';
+import { useApi } from '@mimir-wallet/polkadot-core';
+
 import { handleError, transformIdentity, unsubscribe } from './useCall';
 import { useIsMountedRef } from './useIsMountedRef';
 

@@ -7,9 +7,9 @@ import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
 import type { TxBundle } from '../utils';
 
-import { extrinsicReserve } from '@/api';
-import { useApi } from '@/hooks/useApi';
 import { useEffect, useState } from 'react';
+
+import { extrinsicReserve, useApi } from '@mimir-wallet/polkadot-core';
 
 import { buildTx } from '../utils';
 

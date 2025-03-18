@@ -7,9 +7,9 @@ import type { Option } from '@polkadot/types';
 import type { PalletAssetsAssetAccount } from '@polkadot/types/lookup';
 import type { TransferToken } from './types';
 
-import { useApi } from '@/hooks/useApi';
 import { type BN, BN_ZERO, isHex } from '@polkadot/util';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 async function _getNativeBalance(api: ApiPromise, address: string): Promise<BN> {

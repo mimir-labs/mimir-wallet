@@ -3,8 +3,6 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-export const API_URL_KEY = 'apiUrl';
-
 export type Endpoint = {
   key: string;
   name: string;

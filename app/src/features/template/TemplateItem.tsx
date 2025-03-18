@@ -7,10 +7,10 @@ import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { CopyButton } from '@/components';
 import { DotConsoleApp } from '@/config';
-import { useApi } from '@/hooks/useApi';
 import { CallDisplaySection } from '@/params';
 import { useEffect, useState } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Link } from '@mimir-wallet/ui';
 
 import { decodeCallSection } from './utils';

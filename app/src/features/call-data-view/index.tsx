@@ -6,9 +6,10 @@ import type { Call } from '@polkadot/types/interfaces';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { Input } from '@/components';
 import JsonView from '@/components/JsonView';
-import { useApi } from '@/hooks/useApi';
 import { Box, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 import { decodeCallData } from './utils';
 

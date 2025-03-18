@@ -7,11 +7,11 @@ import type { PalletProxyAnnouncement } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
 
 import { type AccountData, type ProxyTransaction, TransactionStatus, TransactionType } from '@/hooks/types';
-import { useApi } from '@/hooks/useApi';
 import { useCall } from '@/hooks/useCall';
-import { addressEq } from '@/utils';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
+
+import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 
 export function useAnnouncementProgress(
   transaction: ProxyTransaction,

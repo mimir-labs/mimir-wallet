@@ -4,15 +4,13 @@
 import type { AddressMeta } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { decodeAddress, encodeAddress } from '@/api';
 import { HIDE_ACCOUNT_PREFIX } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
-import { useApi } from '@/hooks/useApi';
-import { addressEq, addressToHex } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
 import { u8aToHex } from '@polkadot/util';
 import { isEqual } from 'lodash-es';
 
+import { addressEq, addressToHex, decodeAddress, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { sync } from './sync';
