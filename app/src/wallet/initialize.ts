@@ -10,7 +10,17 @@ import { documentReadyPromise } from '@/utils/document';
 import { store } from '@mimir-wallet/service';
 
 import { useWallet } from './useWallet';
-import { loadWallet } from './utils';
+import { enableWallet, loadWallet } from './utils';
+
+async function _initialize(wallet: string) {
+  if (window.injectedWeb3?.[walletConfig[wallet]?.key || '']) {
+    const injected = await enableWallet(wallet, CONNECT_ORIGIN);
+
+    return loadWallet(injected, wallet);
+  }
+
+  return [];
+}
 
 export async function initializeWallet() {
   const connectWallets: string[] = (store.get(CONNECTED_WALLETS_KEY) as string[]) || [];
@@ -22,21 +32,7 @@ export async function initializeWallet() {
 
   // Attempt to reconnect to previously connected wallets
   for (const wallet of connectWallets) {
-    if (window.injectedWeb3?.[walletConfig[wallet]?.key || '']) {
-      promises.push(loadWallet(window.injectedWeb3[walletConfig[wallet].key], CONNECT_ORIGIN, wallet));
-    } else {
-      // If the wallet is not found, wait for 300ms and try again
-      setTimeout(() => {
-        if (window.injectedWeb3?.[walletConfig[wallet]?.key || '']) {
-          loadWallet(window.injectedWeb3[walletConfig[wallet].key], CONNECT_ORIGIN, wallet).then((res) => {
-            useWallet.setState((state) => ({
-              walletAccounts: [...state.walletAccounts, ...res],
-              wallets: window.injectedWeb3 || {}
-            }));
-          });
-        }
-      }, 300);
-    }
+    promises.push(_initialize(wallet));
   }
 
   const data = (await Promise.all(promises)).flat();

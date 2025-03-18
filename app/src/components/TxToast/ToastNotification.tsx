@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TxEvents } from '@/api';
+import type { TxEvents } from '@mimir-wallet/polkadot-core';
 
 import { Box, Typography } from '@mui/material';
 import React, { useEffect, useRef } from 'react';

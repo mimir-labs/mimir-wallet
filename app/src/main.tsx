@@ -7,17 +7,17 @@ import moment from 'moment';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 
+import { initializeApi } from '@mimir-wallet/polkadot-core';
 import { API_CLIENT_GATEWAY } from '@mimir-wallet/service';
 
 import { initializeAccount } from './accounts/initialize';
 import { initializeWallet } from './wallet/initialize';
-import { initializeApi } from './api';
 import App from './App';
 import { initGa } from './initGa';
 import { initMimir } from './initMimir';
 import { initializeSocket } from './socket';
 import { upgradeAddresBook } from './upgrade';
-import { initService } from './utils';
+import { initService, service } from './utils';
 
 // Set default date-time format for the entire application
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
@@ -37,7 +37,7 @@ upgradeAddresBook();
 
 // Initialize blockchain API connection with selected chain
 // This establishes connection to the blockchain node and sets up API instance
-initializeApi(chain);
+initializeApi(chain, service);
 
 // Set up wallet connection and state management
 // This initializes wallet providers (like Polkadot.js) and restores previous connections

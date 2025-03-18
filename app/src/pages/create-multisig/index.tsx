@@ -4,10 +4,8 @@
 import type { PrepareFlexible } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
-import { encodeAddress } from '@/api';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Address, AddressRow, Input } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { useCacheMultisig } from '@/hooks/useCacheMultisig';
 import { useToggle } from '@/hooks/useToggle';
 import { Box, Button, Divider, FormHelperText, Paper, Stack, SvgIcon, Switch, Typography } from '@mui/material';
@@ -15,6 +13,7 @@ import { isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 import AccountSelect from './AccountSelect';

@@ -10,12 +10,10 @@ import { useAccount } from '@/accounts/useAccount';
 import IconArrow from '@/assets/svg/icon-arrow.svg?react';
 import { Input, InputAddress } from '@/components';
 import { ONE_DAY, ONE_HOUR } from '@/constants';
-import { useApi } from '@/hooks/useApi';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useCall } from '@/hooks/useCall';
 import { useInput } from '@/hooks/useInput';
 import { useProxyTypes } from '@/hooks/useProxyTypes';
-import { addressEq } from '@/utils';
 import {
   Box,
   Button,
@@ -34,6 +32,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert } from '@mimir-wallet/ui';
 
 import AddProxy from './AddProxy';

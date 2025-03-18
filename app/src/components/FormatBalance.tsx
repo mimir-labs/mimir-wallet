@@ -4,11 +4,12 @@
 import type { Compact } from '@polkadot/types';
 import type { BN } from '@polkadot/util';
 
-import { useApi } from '@/hooks/useApi';
 import { useAssetInfo } from '@/hooks/useAssets';
 import { formatDisplay, formatUnits } from '@/utils';
 import { Box, type BoxProps } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 interface Props extends BoxProps {
   format?: [decimals: number, symbol: string];

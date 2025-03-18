@@ -17,7 +17,7 @@ export async function connectWallet(name: string) {
   const provider = window.injectedWeb3?.[walletConfig[name]?.key];
 
   if (provider) {
-    const walletAccounts = await loadWallet(provider, CONNECT_ORIGIN, name);
+    const walletAccounts = await loadWallet(await provider.enable(CONNECT_ORIGIN), CONNECT_ORIGIN);
 
     useWallet.setState((state) => {
       const newValue = [...state.connectedWallets, name];

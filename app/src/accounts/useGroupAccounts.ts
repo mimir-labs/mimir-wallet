@@ -5,7 +5,6 @@ import type { AccountData } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { DETECTED_ACCOUNT_KEY } from '@/constants';
-import { createNamedHook } from '@/hooks/createNamedHook';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { useCallback, useMemo } from 'react';
@@ -15,7 +14,7 @@ import { useLocalStore } from '@mimir-wallet/service';
 import { useAccount } from './useAccount';
 import { groupAccounts, type GroupName } from './utils';
 
-function useGroupAccountsImpl(filter?: (account: AccountData) => boolean): Record<GroupName, string[]> {
+export function useGroupAccounts(filter?: (account: AccountData) => boolean): Record<GroupName, string[]> {
   const { accounts, hideAccountHex } = useAccount();
 
   const allAddress = useMemo(
@@ -25,8 +24,6 @@ function useGroupAccountsImpl(filter?: (account: AccountData) => boolean): Recor
 
   return useMemo(() => groupAccounts(allAddress, hideAccountHex), [allAddress, hideAccountHex]);
 }
-
-export const useGroupAccounts = createNamedHook('useGroupAccounts', useGroupAccountsImpl);
 
 export function useAllAccounts(others?: string[]): string[] {
   const { accounts } = useAccount();

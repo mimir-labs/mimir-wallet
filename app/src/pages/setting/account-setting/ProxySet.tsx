@@ -12,7 +12,6 @@ import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Address, AddressCell, FormatBalance, TxButton } from '@/components';
 import { findToken } from '@/config';
-import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { Alert, AlertTitle, Avatar, Box, Stack, Typography } from '@mui/material';
@@ -20,6 +19,7 @@ import { BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import {
   Button,
   Chip,

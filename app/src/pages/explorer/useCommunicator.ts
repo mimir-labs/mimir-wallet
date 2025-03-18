@@ -6,11 +6,11 @@ import type { SignerPayloadJSON } from '@polkadot/types/types';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
-import { encodeAddress } from '@/api';
 import { IframeCommunicator } from '@/communicator';
-import { useApi } from '@/hooks/useApi';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { type MutableRefObject, useEffect, useRef, useState } from 'react';
+
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 export function useCommunicator(
   iframeRef: MutableRefObject<HTMLIFrameElement | null>,

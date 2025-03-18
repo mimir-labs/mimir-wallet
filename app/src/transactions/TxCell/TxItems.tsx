@@ -7,13 +7,13 @@ import type { IMethod } from '@polkadot/types/types';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { AppName } from '@/components';
 import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@/hooks/types';
-import { useApi } from '@/hooks/useApi';
 import { useToggle } from '@/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
 import { Box, Button, Grid2 as Grid, IconButton, Stack, SvgIcon } from '@mui/material';
 import React, { useMemo } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Link } from '@mimir-wallet/ui';
 
 import Progress from '../Progress';

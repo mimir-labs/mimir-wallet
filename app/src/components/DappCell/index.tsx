@@ -1,16 +1,17 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DappOption, Endpoint } from '@/config';
+import type { DappOption } from '@/config';
+import type { Endpoint } from '@mimir-wallet/polkadot-core';
 
 import IconStar from '@/assets/svg/icon-star.svg?react';
 import { ellipsisLinesMixin } from '@/components/utils';
-import { useApi } from '@/hooks/useApi';
 import { useToggle } from '@/hooks/useToggle';
 import { alpha, Avatar, Box, Button, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { createElement, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Drawer, DrawerBody, DrawerContent } from '@mimir-wallet/ui';
 
 import DappDetails from './DappDetails';

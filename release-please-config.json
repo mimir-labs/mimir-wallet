@@ -5,10 +5,12 @@
   "bump-patch-for-minor-pre-major": true,
   "plugins": ["node-workspace"],
   "packages": {
+    "packages/dev": {},
+    "packages/ui": {},
+    "packages/polkadot-core": {},
+    "packages/service": {},
     "app": {
       "always-update": true
-    },
-    "packages/dev": {},
-    "packages/ui": {}
+    }
   }
 }

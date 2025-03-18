@@ -1,13 +1,30 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Endpoint } from '@/config';
 import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 
 // helpers for HOC props
 export type OmitProps<T, K> = Pick<T, Exclude<keyof T, K>>;
 export type SubtractProps<T, K> = OmitProps<T, keyof K>;
+
+export type Endpoint = {
+  key: string;
+  name: string;
+  wsUrl: Record<string, string>;
+  httpUrl?: string;
+  icon: string;
+  tokenIcon: string;
+  ss58Format: number;
+  genesisHash: HexString;
+  socketUrl: string;
+  serviceUrl: string;
+  statescan?: boolean;
+  explorerUrl?: string;
+  proposalApi?: string;
+  subsquareUrl?: string;
+  identityNetwork?: string;
+};
 
 export interface BareProps {
   className?: string;

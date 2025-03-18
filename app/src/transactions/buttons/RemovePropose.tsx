@@ -9,13 +9,13 @@ import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
 import { events } from '@/events';
 import { TransactionType } from '@/hooks/types';
-import { useApi } from '@/hooks/useApi';
 import { useProposeFilterForRemove } from '@/hooks/useProposeFilter';
 import { service } from '@/utils';
 import { accountSource } from '@/wallet/useWallet';
 import React, { useState } from 'react';
 import { useToggle } from 'react-use';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 function Content({

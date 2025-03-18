@@ -4,15 +4,14 @@
 import type { MultisigAccountData, PureAccountData } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
-import { encodeAddress } from '@/api';
 import { Input, TxButton } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { service } from '@/utils';
 import { Box, FormHelperText, Paper, Stack } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 import AccountSelect from '../../create-multisig/AccountSelect';

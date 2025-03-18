@@ -5,10 +5,11 @@ import type { IMethod, Registry } from '@polkadot/types/types';
 
 import { AddressRow, FormatBalance } from '@/components';
 import { findAssets, findToken } from '@/config';
-import { useApi } from '@/hooks/useApi';
 import { dataToUtf8 } from '@/utils';
 import { Avatar, Box, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 function CallDisplayDetail({
   registry,

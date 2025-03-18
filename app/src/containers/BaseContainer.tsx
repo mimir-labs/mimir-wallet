@@ -4,13 +4,15 @@
 import AccountConsumer from '@/accounts/Consumer';
 import { useAccount } from '@/accounts/useAccount';
 import { ConnectWalletModal, ToastRoot, TxSubmit, TxToast } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { useFollowAccounts } from '@/hooks/useFollowAccounts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
+import WalletConsumer from '@/wallet/Consumer';
 import { useWallet } from '@/wallet/useWallet';
 import { useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 import RightSideBar from './sidebar/RightSideBar';
 import SideBar from './sidebar/SideBar';
@@ -51,6 +53,7 @@ function BaseContainer({
       <ToastRoot />
       <TxToast />
       <AccountConsumer />
+      <WalletConsumer />
       <AddAddressBook />
 
       <TopBar />

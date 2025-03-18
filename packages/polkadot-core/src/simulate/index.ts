@@ -7,14 +7,14 @@ import type { IMethod } from '@polkadot/types/types';
 import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
 
-import { typesBundle } from '@/config';
 import { BuildBlockMode, decodeBlockStorageDiff, setup } from '@acala-network/chopsticks-core';
 import DiffMatchPatch from 'diff-match-patch';
 import { create } from 'jsondiffpatch';
 import { cloneDeep, template } from 'lodash-es';
 
-import { IdbDatabase } from './db';
-import { simulateTemplate } from './template';
+import { typesBundle } from '../api-types/index.js';
+import { IdbDatabase } from './db.js';
+import { simulateTemplate } from './template.js';
 
 const diffPatcher = create({
   arrays: { detectMove: false },

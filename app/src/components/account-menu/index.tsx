@@ -11,11 +11,12 @@ import IconGlobal from '@/assets/svg/icon-global.svg?react';
 import IconUnion from '@/assets/svg/icon-union.svg?react';
 import IconUser from '@/assets/svg/icon-user.svg?react';
 import IconWatch from '@/assets/svg/icon-watch.svg?react';
-import { addressEq, service } from '@/utils';
+import { service } from '@/utils';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { addressEq } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader } from '@mimir-wallet/ui';
 
 import AccountCell from './AccountCell';

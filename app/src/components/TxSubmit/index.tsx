@@ -9,7 +9,6 @@ import type { HexString } from '@polkadot/util/types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
-import { encodeAddress } from '@/api';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconTemplate from '@/assets/svg/icon-template.svg?react';
@@ -21,6 +20,7 @@ import { Box, Divider, IconButton, Paper, Stack, SvgIcon, Typography } from '@mu
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { encodeAddress } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Checkbox, Tooltip } from '@mimir-wallet/ui';
 
 import Input from '../Input';

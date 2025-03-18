@@ -2,16 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useGroupAccounts } from '@/accounts/useGroupAccounts';
-import { signAndSend } from '@/api';
-import { useApi } from '@/hooks/useApi';
+import { CONNECT_ORIGIN } from '@/constants';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { parseUnits } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
+import { enableWallet } from '@/wallet/utils';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Stack } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 
+import { signAndSend, useApi } from '@mimir-wallet/polkadot-core';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
@@ -85,9 +86,10 @@ function Action({
 
       if (source) {
         const events = signAndSend(
+          api,
           api.tx.balances.transferKeepAlive(receipt, parseUnits(value, api.registry.chainDecimals[0])),
           sending,
-          source
+          () => enableWallet(source, CONNECT_ORIGIN)
         );
 
         events.on('inblock', () => {

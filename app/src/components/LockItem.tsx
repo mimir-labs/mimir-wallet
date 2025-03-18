@@ -4,14 +4,12 @@
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { encodeAddress } from '@/api';
 import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
 import IconFund from '@/assets/svg/icon-fund-fill.svg?react';
 import IconLock from '@/assets/svg/icon-lock.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconUnLock from '@/assets/svg/icon-unlock.svg?react';
-import { useApi } from '@/hooks/useApi';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useToggle } from '@/hooks/useToggle';
 import { formatUnits } from '@/utils';
@@ -19,6 +17,7 @@ import { Stack } from '@mui/system';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo, useRef } from 'react';
 
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
 
 import AddressName from './AddressName';

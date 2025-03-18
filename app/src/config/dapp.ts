@@ -7,7 +7,7 @@ import LogoCircle from '@/assets/svg/logo-circle.svg';
 import TemplateIcon from '@/assets/svg/template.svg';
 import { isArray } from '@polkadot/util';
 
-import { allEndpoints } from './api';
+import { allEndpoints } from '@mimir-wallet/polkadot-core';
 
 export interface DappOption {
   // (1 - 500) is internal app

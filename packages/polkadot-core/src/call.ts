@@ -6,7 +6,7 @@ import type { IMethod } from '@polkadot/types/types';
 
 import { createKeyMulti } from '@polkadot/util-crypto';
 
-import { encodeAddress } from './defaults';
+import { encodeAddress } from './defaults.js';
 
 export function findTargetCall(
   api: ApiPromise,

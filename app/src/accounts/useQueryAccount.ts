@@ -4,12 +4,11 @@
 import type { AccountData, AccountDataWithProposers, AddressMeta, DelegateeProp } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { encodeAddress } from '@/api';
-import { useApi } from '@/hooks/useApi';
 import { service } from '@/utils';
 import { isEqual } from 'lodash-es';
 import { useEffect } from 'react';
 
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';

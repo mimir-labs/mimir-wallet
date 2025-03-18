@@ -5,9 +5,10 @@ import type { AccountData, Transaction } from '@/hooks/types';
 
 import { reduceAccount } from '@/accounts/utils';
 import { TransactionType } from '@/hooks/types';
-import { addressEq } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
 import { useEffect, useState } from 'react';
+
+import { addressEq } from '@mimir-wallet/polkadot-core';
 
 export function useProposeFilterForRemove(account: AccountData, transaction: Transaction) {
   const [filtered, setFiltered] = useState<string[]>([]);

@@ -3,8 +3,9 @@
 
 import { TxButton } from '@/components';
 import { type AccountData, type FilterPath, type Transaction, TransactionType } from '@/hooks/types';
-import { useApi } from '@/hooks/useApi';
 import React from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 function Approve({
   account,

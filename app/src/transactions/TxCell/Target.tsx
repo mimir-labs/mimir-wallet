@@ -3,12 +3,12 @@
 
 import type { IMethod } from '@polkadot/types/types';
 
-import { findTargetCall } from '@/api';
 import { AddressRow } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { Call as CallComp } from '@/params';
 import { Alert, AlertTitle } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
 
 import { Item } from './Extrinsic';
 

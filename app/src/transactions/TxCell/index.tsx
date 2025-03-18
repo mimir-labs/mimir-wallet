@@ -3,15 +3,14 @@
 
 import type { AccountData, Transaction } from '@/hooks/types';
 
-import { encodeAddress } from '@/api';
 import IconShare from '@/assets/svg/icon-share.svg?react';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
-import { useApi } from '@/hooks/useApi';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { Box, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import moment from 'moment';
 import React from 'react';
 
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import { formatTransactionId } from '../utils';

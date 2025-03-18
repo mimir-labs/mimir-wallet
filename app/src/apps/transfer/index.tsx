@@ -7,7 +7,6 @@ import { useAccount } from '@/accounts/useAccount';
 import { useAllAccounts } from '@/accounts/useGroupAccounts';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { FormatBalance, Input, InputAddress, TxButton } from '@/components';
-import { useApi } from '@/hooks/useApi';
 import { useAssetInfo } from '@/hooks/useAssets';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useQueryParam } from '@/hooks/useQueryParams';
@@ -17,6 +16,8 @@ import { BN, isHex } from '@polkadot/util';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 import SelectToken from './SelectToken';
 import { useTransferBalance } from './useTransferBalances';

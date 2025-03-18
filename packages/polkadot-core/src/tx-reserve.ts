@@ -9,8 +9,9 @@ import type { PalletProxyAnnouncement, PalletProxyProxyDefinition } from '@polka
 import type { ITuple } from '@polkadot/types/types';
 import type { BN } from '@polkadot/util';
 
-import { addressEq } from '@/utils';
 import { blake2AsU8a, encodeMultiAddress } from '@polkadot/util-crypto';
+
+import { addressEq } from './utils.js';
 
 function _increaseValue(values: Record<string, { value: BN }>, key: string, amount: BN) {
   if (values[key]) {

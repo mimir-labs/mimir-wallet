@@ -1,12 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { encodeAddress } from '@/api';
 import { CopyButton } from '@/components';
-import { allEndpoints } from '@/config';
-import { useApi } from '@/hooks/useApi';
 import { Avatar, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { allEndpoints, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 function MultiChain({ address }: { address: string }) {
   const { genesisHash } = useApi();

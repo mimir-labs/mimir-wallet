@@ -6,13 +6,12 @@ import type { AccountData, Transaction } from '@/hooks/types';
 import { Input, TxButton } from '@/components';
 import { toastError } from '@/components/utils';
 import { TransactionType } from '@/hooks/types';
-import { useApi } from '@/hooks/useApi';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { addressEq } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
 import React, { useState } from 'react';
 import { useToggle } from 'react-use';
 
+import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import { useAnnouncementStatus } from '../hooks/useAnnouncementStatus';

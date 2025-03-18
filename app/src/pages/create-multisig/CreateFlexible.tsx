@@ -7,22 +7,22 @@ import type { HexString } from '@polkadot/util/types';
 import type { PrepareFlexible } from './types';
 
 import { useSelectedAccountCallback } from '@/accounts/useSelectedAccount';
-import { signAndSend } from '@/api';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@/components';
 import { utm } from '@/config';
-import { DETECTED_ACCOUNT_KEY } from '@/constants';
-import { useApi } from '@/hooks/useApi';
+import { CONNECT_ORIGIN, DETECTED_ACCOUNT_KEY } from '@/constants';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { addTxToast } from '@/hooks/useTxQueue';
-import { addressToHex, service, sleep } from '@/utils';
+import { service, sleep } from '@/utils';
 import { accountSource, useAccountSource, useWallet } from '@/wallet/useWallet';
+import { enableWallet } from '@/wallet/utils';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Stack, Typography } from '@mui/material';
 import { u8aEq, u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { addressToHex, signAndSend, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
@@ -119,7 +119,9 @@ function CreateFlexible({
       ]);
 
       setLoadingSecond(true);
-      const events = signAndSend(extrinsic, signer, source, { checkProxy: true });
+      const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
+        checkProxy: true
+      });
 
       addTxToast({ events });
 
@@ -152,7 +154,7 @@ function CreateFlexible({
     if (!source) return;
 
     const extrinsic = api.tx.proxy.createPure('Any', 0, 0);
-    const events = signAndSend(extrinsic, signer, source, {
+    const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
       beforeSend: async (extrinsic) => {
         if (!name) throw new Error('Please provide account name');
 
@@ -209,7 +211,9 @@ function CreateFlexible({
         api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex).toU8a()
       );
 
-      const events = signAndSend(extrinsic, signer, source, { checkProxy: true });
+      const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
+        checkProxy: true
+      });
 
       addTxToast({ events });
 
@@ -220,7 +224,7 @@ function CreateFlexible({
       });
       events.once('error', () => setLoadingCancel(false));
     },
-    [source, api.tx.proxy, onCancel]
+    [source, api, onCancel]
   );
 
   return (

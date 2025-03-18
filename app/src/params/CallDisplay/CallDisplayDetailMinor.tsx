@@ -7,9 +7,10 @@ import type { IMethod, Registry } from '@polkadot/types/types';
 
 import { AddressRow, FormatBalance } from '@/components';
 import { findAssets } from '@/config';
-import { useApi } from '@/hooks/useApi';
 import { Avatar, Box, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 function CallDisplayDetailMinor({ registry, call }: { registry: Registry; call?: IMethod | null }) {
   const { genesisHash } = useApi();

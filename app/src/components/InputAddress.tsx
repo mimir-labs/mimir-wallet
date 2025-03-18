@@ -5,7 +5,6 @@ import type { AccountData } from '@/hooks/types';
 import type { InputAddressProps } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
-import { encodeAddress } from '@/api';
 import IconWarning from '@/assets/svg/icon-warning-fill.svg?react';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -14,6 +13,7 @@ import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
+import { encodeAddress } from '@mimir-wallet/polkadot-core';
 import { Avatar, FreeSoloPopover, Listbox, ListboxItem } from '@mimir-wallet/ui';
 
 import Address from './Address';

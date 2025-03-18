@@ -10,9 +10,9 @@ import type { AccountAssetInfo, AccountBalance, AssetInfo, OrmlTokensAccountData
 import { BN_ZERO, isHex } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
-import { useApi } from './useApi';
 import { useAssets } from './useAssets';
 
 async function getBalances({ queryKey }: { queryKey: [ApiPromise, string | undefined | null] }) {
