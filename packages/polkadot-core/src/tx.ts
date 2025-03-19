@@ -325,9 +325,6 @@ export function signAndSend(
       return extrinsic;
     })
     .then(async (extrinsic) => {
-      console.log(extrinsic.toJSON());
-      console.log(extrinsic.toHuman());
-      console.log(extrinsic.toHex());
       await beforeSend?.(extrinsic);
 
       const unsub = await extrinsic.send((result) => {
