@@ -29,11 +29,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
+          cache: 'yarn'
           node-version: 20
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1
+        run: |
+          yarn install --immutable
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
       - name: Build
