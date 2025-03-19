@@ -325,12 +325,15 @@ export function signAndSend(
       return extrinsic;
     })
     .then(async (extrinsic) => {
+      console.log(extrinsic.toJSON());
+      console.log(extrinsic.toHuman());
+      console.log(extrinsic.toHex());
       await beforeSend?.(extrinsic);
 
-      const unsubPromise = extrinsic.send((result) => {
+      const unsub = await extrinsic.send((result) => {
         if (result.isFinalized) {
           events.emit('finalized', result);
-          unsubPromise.then((unsub) => unsub());
+          unsub();
         }
 
         if (result.isCompleted) {
@@ -343,7 +346,7 @@ export function signAndSend(
             events.emit('inblock', result);
           } catch (error) {
             events.emit('error', error);
-            unsubPromise.then((unsub) => unsub());
+            unsub();
           }
         }
       });
