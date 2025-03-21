@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.26.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.25.1...mimir-wallet-app-v1.26.0) (2025-03-21)
+
+
+### Features
+
+* add bounty manager dapp support for paseo chain ([#181](https://github.com/mimir-labs/mimir-wallet/issues/181)) ([a85afe8](https://github.com/mimir-labs/mimir-wallet/commit/a85afe832cf4bc81c2098ad3fc686c454c2b1a66))
+* enable restore batch from remote ([#173](https://github.com/mimir-labs/mimir-wallet/issues/173)) ([8ae601a](https://github.com/mimir-labs/mimir-wallet/commit/8ae601a4c5df27cba95667d4a0e4e6d8a8abbe18))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.26.0
+    * @mimir-wallet/service bumped to 1.26.0
+    * @mimir-wallet/ui bumped to 1.26.0
+
 ## [1.25.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.25.0...mimir-wallet-app-v1.25.1) (2025-03-19)
 
 
