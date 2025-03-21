@@ -6,6 +6,4 @@ const isDevEnv =
   window.location.hostname.startsWith('dev.mimir.global') ||
   window.location.hostname.startsWith('localhost');
 
-export const API_CLIENT_GATEWAY = isDevEnv
-  ? 'https://dev-mimir-client.mimir.global'
-  : 'https://mimir-client.mimir.global';
+export const API_CLIENT_GATEWAY = isDevEnv ? 'https://mimir-client.mimir.global' : 'https://mimir-client.mimir.global';

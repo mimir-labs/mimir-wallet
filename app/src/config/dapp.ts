@@ -317,7 +317,7 @@ export const dapps: DappOption[] = [
     name: 'Bounty Manager',
     description: 'The go-to tool for curators to execute their bounty duties and users to explore bounties.',
     url: 'https://bountymanager.io/',
-    supportedChains: ['polkadot'],
+    supportedChains: ['polkadot', 'paseo'],
     tags: ['Bounty', 'Tool'],
     website: 'https://bountymanager.io/',
     github: 'https://github.com/galaniprojects/Polkadot-Bounty-Manager'
