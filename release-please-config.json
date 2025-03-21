@@ -3,14 +3,32 @@
   "release-type": "node",
   "bump-minor-pre-major": true,
   "bump-patch-for-minor-pre-major": true,
-  "plugins": ["node-workspace"],
   "packages": {
-    "packages/dev": {},
-    "packages/ui": {},
-    "packages/polkadot-core": {},
-    "packages/service": {},
+    "packages/ui": {
+      "component": "ui"
+    },
+    "packages/polkadot-core": {
+      "component": "polkadot-core"
+    },
+    "packages/service": {
+      "component": "service"
+    },
     "app": {
+      "component": "mimir-wallet-app",
       "always-update": true
     }
-  }
+  },
+  "plugins": [
+    {
+      "type": "node-workspace",
+      "merge": false
+    },
+    {
+      "type": "linked-versions",
+      "groupName": "main group",
+      "components": [
+        "ui", "polkadot-core", "service", "mimir-wallet-app"
+      ]
+    }
+  ]
 }
