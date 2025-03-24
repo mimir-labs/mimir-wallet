@@ -44,14 +44,16 @@ function Restore({ onClose }: { onClose: () => void }) {
       {current && !!txs?.length && (
         <>
           <Alert className='flex-grow-0' color='success' title={`${txs.length} Transactions Founded`} />
-          {txs?.map((item) => (
-            <BatchItem key={item.id} from={current} calldata={item.call}>
-              <div className='col-span-1 flex items-center'>{item.id}</div>
-              <div className='col-span-2 flex items-center'>
-                <CallDisplaySection section={item.section} method={item.method} />
-              </div>
-            </BatchItem>
-          ))}
+          <div className='flex-1 space-y-5 overflow-y-auto scrollbar-hide'>
+            {txs?.map((item) => (
+              <BatchItem key={item.id} from={current} calldata={item.call}>
+                <div className='col-span-1 flex items-center'>{item.id}</div>
+                <div className='col-span-2 flex items-center'>
+                  <CallDisplaySection section={item.section} method={item.method} />
+                </div>
+              </BatchItem>
+            ))}
+          </div>
         </>
       )}
 

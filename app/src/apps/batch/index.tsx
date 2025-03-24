@@ -49,7 +49,7 @@ function Batch({ onClose }: { onClose?: () => void }) {
           </div>
           <Divider />
 
-          <div className='flex-1 overflow-y-auto space-y-2.5'>
+          <div className='flex-1 overflow-y-auto space-y-2.5 scrollbar-hide'>
             <p>Next Batch</p>
             {current && (
               <Box ref={containerRef} style={{ touchAction: 'pan-y' }}>
