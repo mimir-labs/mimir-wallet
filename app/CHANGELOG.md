@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.26.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.26.0...mimir-wallet-app-v1.26.1) (2025-03-24)
+
+
+### Bug Fixes
+
+* fix batch scrollbar issue ([#182](https://github.com/mimir-labs/mimir-wallet/issues/182)) ([4b23d75](https://github.com/mimir-labs/mimir-wallet/commit/4b23d758bd0bb960af3eda4540a75e8734de08aa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.26.1
+    * @mimir-wallet/service bumped to 1.26.1
+    * @mimir-wallet/ui bumped to 1.26.1
+
 ## [1.26.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.25.1...mimir-wallet-app-v1.26.0) (2025-03-21)
 
 
