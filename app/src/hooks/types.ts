@@ -53,6 +53,7 @@ export type AccountDataType = {
   name?: string | null;
   isMimir?: boolean;
   delegatees: (AccountData & DelegateeProp)[];
+  proposers?: { proposer: string; creator: string; createdAt: string; network: HexString }[];
 };
 
 export type MultisigAccountData = AccountDataType & {
@@ -77,9 +78,6 @@ type BaseAccountData = AccountDataType & {
 };
 
 export type AccountData = MultisigAccountData | PureAccountData | BaseAccountData;
-export type AccountDataWithProposers = AccountData & {
-  proposers: { proposer: string; creator: string; createdAt: string; network: HexString }[];
-};
 
 export enum TransactionStatus {
   Initialized = 0,

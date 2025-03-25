@@ -3,7 +3,6 @@
 
 import type {
   AccountData,
-  AccountDataWithProposers,
   DelegateeProp,
   FilterPath,
   FilterPathWithoutId,
@@ -199,11 +198,7 @@ function findFilterPaths(
   return paths;
 }
 
-function appendProposers(
-  paths: FilterPath[][],
-  account: AccountData,
-  proposers?: AccountDataWithProposers['proposers'] | null
-) {
+function appendProposers(paths: FilterPath[][], account: AccountData, proposers?: AccountData['proposers'] | null) {
   if (!proposers || proposers.length === 0) return;
 
   let first = paths.at(0)?.at(0);
@@ -247,7 +242,7 @@ export function useFilterPaths(account?: AccountData | null, transaction?: Trans
 
       // append the proposers when there is no transaction
       if (!transaction) {
-        appendProposers(paths, account, (account as AccountDataWithProposers).proposers);
+        appendProposers(paths, account, account.proposers);
       }
 
       return paths;

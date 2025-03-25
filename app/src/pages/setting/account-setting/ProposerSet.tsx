@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AccountDataWithProposers } from '@/hooks/types';
+import type { AccountData } from '@/hooks/types';
 
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import { AddressRow, Empty, InputAddress } from '@/components';
@@ -163,14 +163,14 @@ Genesis Hash: ${genesisHash}`;
   );
 }
 
-function ProposerSet({ account, refetch }: { account: AccountDataWithProposers; refetch: () => void }) {
+function ProposerSet({ account, refetch }: { account: AccountData; refetch: () => void }) {
   const { genesisHash } = useApi();
   const [isOpen, toggleOpen] = useToggle(false);
   const [type, setType] = useState<'add' | 'delete'>('add');
   const [deleteProposer, setDeleteProposer] = useState<string>();
 
   const proposers = useMemo(
-    () => account.proposers.filter((item) => item.network === genesisHash),
+    () => account.proposers?.filter((item) => item.network === genesisHash),
     [account.proposers, genesisHash]
   );
 
