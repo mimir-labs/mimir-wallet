@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.26.3](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.26.2...mimir-wallet-app-v1.26.3) (2025-03-25)
+
+
+### Bug Fixes
+
+* fix icon color to use currentColor ([#186](https://github.com/mimir-labs/mimir-wallet/issues/186)) ([424b4f2](https://github.com/mimir-labs/mimir-wallet/commit/424b4f211d590497b697a0108da841af0c00e51b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.26.3
+    * @mimir-wallet/service bumped to 1.26.3
+    * @mimir-wallet/ui bumped to 1.26.3
+
 ## [1.26.2](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.26.1...mimir-wallet-app-v1.26.2) (2025-03-25)
 
 
