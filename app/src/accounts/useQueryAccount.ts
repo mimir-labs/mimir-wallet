@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AccountDataWithProposers, AddressMeta, DelegateeProp } from '@/hooks/types';
+import type { AccountData, AddressMeta, DelegateeProp } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { service } from '@/utils';
@@ -13,13 +13,15 @@ import { useQuery } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
 
-function transformAccount(genesisHash: HexString, account: AccountDataWithProposers): AccountDataWithProposers {
-  const proposers = account.proposers?.map((item) => ({
-    proposer: encodeAddress(item.proposer),
-    creator: encodeAddress(item.creator),
-    createdAt: item.createdAt,
-    network: item.network
-  }));
+function transformAccount(genesisHash: HexString, account: AccountData): AccountData {
+  const proposers = account.proposers
+    ?.filter((item) => item.network === genesisHash)
+    .map((item) => ({
+      proposer: encodeAddress(item.proposer),
+      creator: encodeAddress(item.creator),
+      createdAt: item.createdAt,
+      network: item.network
+    }));
 
   if (account.type === 'pure' && account.network !== genesisHash) {
     return {
@@ -37,14 +39,10 @@ function transformAccount(genesisHash: HexString, account: AccountDataWithPropos
     address: encodeAddress(account.address),
     delegatees: account.delegatees
       .filter((item) => item.proxyNetwork === genesisHash)
-      .map((delegatee) =>
-        transformAccount(genesisHash, delegatee as unknown as AccountDataWithProposers)
-      ) as (AccountDataWithProposers & DelegateeProp)[],
+      .map((delegatee) => transformAccount(genesisHash, delegatee)) as (AccountData & DelegateeProp)[],
     ...(account.type === 'multisig'
       ? {
-          members: account.members.map((member) =>
-            transformAccount(genesisHash, member as unknown as AccountDataWithProposers)
-          )
+          members: account.members.map((member) => transformAccount(genesisHash, member))
         }
       : {}),
     proposers
@@ -91,21 +89,21 @@ function deriveMeta(account: AccountData, meta: Record<string, AddressMeta> = {}
 
 export function useQueryAccount(
   address?: string | null
-): [AccountDataWithProposers | null | undefined, isFetched: boolean, isFetching: boolean, refetch: () => void] {
+): [AccountData | null | undefined, isFetched: boolean, isFetching: boolean, refetch: () => void] {
   const { genesisHash } = useApi();
   const { appendMeta } = useAccount();
-  const { data, isFetched, isFetching, refetch } = useQuery<AccountDataWithProposers | null>({
+  const { data, isFetched, isFetching, refetch } = useQuery<AccountData | null>({
     initialData: null,
     queryHash: service.getNetworkUrl(`accounts/full/${address}`),
     queryKey: [address ? service.getNetworkUrl(`accounts/full/${address}`) : null],
-    structuralSharing: (prev, next): AccountDataWithProposers | null => {
+    structuralSharing: (prev, next): AccountData | null => {
       if (!next) {
         return null;
       }
 
-      const nextData = transformAccount(genesisHash, next as AccountDataWithProposers);
+      const nextData = transformAccount(genesisHash, next as AccountData);
 
-      return isEqual(prev, nextData) ? (prev as AccountDataWithProposers) : nextData;
+      return isEqual(prev, nextData) ? (prev as AccountData) : nextData;
     }
   });
 
