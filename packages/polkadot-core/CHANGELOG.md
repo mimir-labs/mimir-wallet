@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.27.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v1.26.3...polkadot-core-v1.27.0) (2025-03-25)
+
+
+### Miscellaneous Chores
+
+* **polkadot-core:** Synchronize main group versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 1.27.0
+
 ## [1.26.3](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v1.26.2...polkadot-core-v1.26.3) (2025-03-25)
 
 

@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.27.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.26.3...mimir-wallet-app-v1.27.0) (2025-03-25)
+
+
+### Features
+
+* add delete address book functionality ([#190](https://github.com/mimir-labs/mimir-wallet/issues/190)) ([1336121](https://github.com/mimir-labs/mimir-wallet/commit/1336121f91c6cb05c9384ca93f70a0cf397d17e9))
+
+
+### Bug Fixes
+
+* filter proposers by network when displaying proposers ([#188](https://github.com/mimir-labs/mimir-wallet/issues/188)) ([1244c57](https://github.com/mimir-labs/mimir-wallet/commit/1244c57a473826d94ecbb7e7cadb5627004fef99))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.27.0
+    * @mimir-wallet/service bumped to 1.27.0
+    * @mimir-wallet/ui bumped to 1.27.0
+
 ## [1.26.3](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.26.2...mimir-wallet-app-v1.26.3) (2025-03-25)
 
 
