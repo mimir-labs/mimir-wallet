@@ -5,15 +5,10 @@ import type { Option } from '@polkadot/types';
 import type { KitchensinkRuntimeProxyType } from '@polkadot/types/lookup';
 import type { IMethod, Registry } from '@polkadot/types/types';
 
-import { AddressRow, FormatBalance } from '@/components';
-import { findAssets } from '@/config';
-import { Avatar, Box, Typography } from '@mui/material';
+import { AddressRow } from '@/components';
 import React, { useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
-
 function CallDisplayDetailMinor({ registry, call }: { registry: Registry; call?: IMethod | null }) {
-  const { genesisHash } = useApi();
   let comp: React.ReactNode;
 
   const calllFunction = useMemo(() => (call ? registry.findMetaCall(call?.callIndex) : null), [call, registry]);
@@ -28,66 +23,40 @@ function CallDisplayDetailMinor({ registry, call }: { registry: Registry; call?:
     )
   ) {
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <AddressRow
-          shorten
-          withName
-          withAddress={false}
-          withCopy
-          iconSize={20}
-          defaultName='Real'
-          value={call.args[0].toString()}
-        />
-      </Box>
+      <div className='flex items-center gap-1'>
+        <AddressRow shorten withName withAddress={false} withCopy iconSize={20} value={call.args[0].toString()} />
+      </div>
     );
   } else if (
     ['assets.transfer', 'assets.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
   ) {
-    const asset = findAssets(genesisHash).find((asset) => asset.assetId === call.args[0].toString());
-
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20 }}>
-          T
-        </Avatar>
-        <Typography>
-          -<FormatBalance value={call.args[2].toString()} />
-        </Typography>
-      </Box>
+      <div className='flex items-center gap-1'>
+        <AddressRow shorten withName withAddress={false} withCopy iconSize={20} value={call.args[1].toString()} />
+      </div>
     );
   } else if (
     ['tokens.transfer', 'tokens.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
   ) {
-    const asset = findAssets(genesisHash).find((asset) => asset.assetId === call.args[1].toString());
-
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20 }}>
-          T
-        </Avatar>
-        <Typography>
-          -<FormatBalance value={call.args[2].toString()} />
-        </Typography>
-      </Box>
+      <div className='flex items-center gap-1'>
+        <AddressRow shorten withName withAddress={false} withCopy iconSize={20} value={call.args[1].toString()} />
+      </div>
     );
   } else if (['proxy.proxy'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <div className='flex items-center gap-1'>
         {(call.args[1] as Option<KitchensinkRuntimeProxyType>)?.unwrapOrDefault?.()?.type}
-      </Box>
+      </div>
     );
   } else if (['proxy.proxyAnnounced'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <div className='flex items-center gap-1'>
         {(call.args[2] as Option<KitchensinkRuntimeProxyType>)?.unwrapOrDefault?.()?.type}
-      </Box>
+      </div>
     );
   } else if (['proxy.addProxy', 'proxy.removeProxy'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
-    comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        {(call.args[1] as KitchensinkRuntimeProxyType)?.type}
-      </Box>
-    );
+    comp = <div className='flex items-center gap-1'>{(call.args[1] as KitchensinkRuntimeProxyType)?.type}</div>;
   } else {
     return null;
   }
