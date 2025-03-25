@@ -7,10 +7,10 @@ import { ADDRESS_BOOK_UPGRADE_VERSION_KEY } from '@/constants';
 
 import { store } from '@mimir-wallet/service';
 
-export function upgradeAddresBook() {
+function upgradeAddressBookV1() {
   const addressBookVersion = store.get(ADDRESS_BOOK_UPGRADE_VERSION_KEY);
 
-  if (addressBookVersion === '1') {
+  if (Number(addressBookVersion) >= 1) {
     return;
   }
 
@@ -26,4 +26,8 @@ export function upgradeAddresBook() {
   });
 
   store.set(ADDRESS_BOOK_UPGRADE_VERSION_KEY, '1');
+}
+
+export function upgradeAddresBook() {
+  upgradeAddressBookV1();
 }

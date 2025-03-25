@@ -17,6 +17,7 @@ import {
   isLocalAccount,
   isLocalAddress,
   resync,
+  setAccountName,
   setName,
   showAccount
 } from './actions';
@@ -84,7 +85,7 @@ export function useAccount() {
     isLocalAccount: isLocalAccount,
     isLocalAddress: isLocalAddress,
     resync: resync,
-    setAccountName: setName,
+    setAccountName,
     setCurrent,
     showAccount: showAccount
   };

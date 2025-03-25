@@ -3,10 +3,7 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import IconEdit from '@/assets/svg/icon-edit.svg?react';
-import { Box, IconButton, Stack, SvgIcon } from '@mui/material';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { encodeAddress } from '@mimir-wallet/polkadot-core';
 
@@ -23,84 +20,34 @@ interface Props {
   withAddress?: boolean;
   withCopy?: boolean;
   withName?: boolean;
-  withEdit?: boolean;
-  onClick?: (value?: string) => void;
-}
-
-function EditName({
-  address,
-  onDone
-}: {
-  onDone: () => void;
-  address?: AccountId | AccountIndex | Address | string | null;
-}) {
-  const { name, saveName, setName } = useAddressMeta(encodeAddress(address));
-
-  return (
-    <Box
-      autoFocus
-      component='input'
-      onBlur={() => {
-        saveName();
-        onDone();
-      }}
-      onChange={(e) => setName(e.target.value)}
-      sx={{ border: 'none', outline: 'none' }}
-      value={name}
-    />
-  );
 }
 
 function AddressRow({
   defaultName,
-  onClick,
   shorten,
   value,
   iconSize,
   withAddress = false,
   withCopy = false,
-  withEdit,
   withName = true
 }: Props) {
-  const [editing, setEditing] = useState(false);
-
   const address = useMemo(() => encodeAddress(value), [value]);
 
-  const _onClick = useCallback(() => {
-    onClick?.(address);
-  }, [onClick, address]);
-
   return (
-    <Stack
-      alignItems='center'
-      className='AddressRow'
-      direction='row'
-      onClick={_onClick}
-      spacing={0.5}
-      sx={{ cursor: onClick ? 'pointer' : undefined }}
-    >
+    <div className='AddressRow inline-flex items-center gap-[5px]'>
       <IdentityIcon className='AddressRow-Icon' size={iconSize} value={address} />
       {withName && (
-        <Box component='span' sx={{ fontWeight: withName && withAddress ? 700 : undefined }}>
-          {editing ? (
-            <EditName address={address} onDone={() => setEditing(false)} />
-          ) : (
-            <AddressName defaultName={defaultName} value={address} />
-          )}
-        </Box>
+        <span style={{ fontWeight: withName && withAddress ? 700 : undefined }}>
+          <AddressName defaultName={defaultName} value={address} />
+        </span>
       )}
       {withAddress && (
-        <Box component='span'>
+        <span>
           <AddressComp shorten={shorten} value={address} />
-        </Box>
+        </span>
       )}
       {withCopy && <CopyButton value={address} className='opacity-50' />}
-      {withEdit && (
-        <IconButton color='inherit' onClick={() => setEditing(true)} size='small' sx={{ opacity: 0.5 }}>
-          <SvgIcon component={IconEdit} inheritViewBox />
-        </IconButton>
-      )}
-    </Stack>
+    </div>
   );
 }
 
