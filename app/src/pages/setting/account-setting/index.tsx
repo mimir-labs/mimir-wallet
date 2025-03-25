@@ -71,7 +71,7 @@ function AccountSetting() {
               if (!name) {
                 setError(new Error('Please input wallet name'));
               } else {
-                saveName((name) => toastSuccess(`Save name to ${name} success`));
+                saveName(false, (name) => toastSuccess(`Save name to ${name} success`));
               }
             }}
           >

@@ -5,7 +5,6 @@ import type { AddressMeta } from '@/hooks/types';
 
 import { toastError } from '@/components/utils';
 import { service } from '@/utils';
-import { useAccountSource } from '@/wallet/useWallet';
 import { useCallback, useEffect, useState } from 'react';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
@@ -16,12 +15,11 @@ interface UseAddressMeta {
   meta: AddressMeta;
   name: string;
   setName: React.Dispatch<string>;
-  saveName: (cb?: (name: string) => void) => Promise<void>;
+  saveName: (isAddressBook: boolean, cb?: (name: string) => void) => Promise<void>;
 }
 
 export function useAddressMeta(value?: string | null): UseAddressMeta {
-  const { metas, addAddress, setAccountName, isLocalAccount } = useAccount();
-  const source = useAccountSource(value);
+  const { metas, addAddress, setAccountName } = useAccount();
   const _meta = metas[value || ''];
 
   const [meta, setMeta] = useState<AddressMeta>(_meta || {});
@@ -38,13 +36,13 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
   }, [_meta]);
 
   const saveName = useCallback(
-    async (cb?: (name: string) => void) => {
+    async (isAddressBook: boolean, cb?: (name: string) => void) => {
       if (!(value && name)) return;
 
       if (name === meta.name) return;
 
       try {
-        if (isLocalAccount(value) && !source) {
+        if (!isAddressBook) {
           await service.updateAccountName(addressToHex(value), name);
           setAccountName(value, name);
           cb?.(name);
@@ -56,13 +54,13 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
         toastError(error);
       }
     },
-    [source, isLocalAccount, meta.name, name, setAccountName, addAddress, value]
+    [addAddress, meta.name, name, setAccountName, value]
   );
 
   return {
     meta,
     name,
-    setName,
-    saveName
+    setName: setName,
+    saveName: saveName
   };
 }

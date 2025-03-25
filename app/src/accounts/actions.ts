@@ -92,6 +92,7 @@ export function setAccountName(address: string, name: string) {
 export function setName(address: string, name: string, networks?: string[], watchlist?: boolean) {
   const stored = store.get(`address:${addressToHex(address)}`) as any;
 
+  console.log('setName', address, name, networks, watchlist);
   store.set(`address:${addressToHex(address)}`, {
     address: encodeAddress(address),
     meta: {

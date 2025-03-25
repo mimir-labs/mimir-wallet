@@ -29,7 +29,7 @@ function Content({ address, onClose }: { address: string; onClose?: () => void }
           fullWidth
           onPress={() => {
             onClose?.();
-            saveName((name) => toastSuccess(`Save name to ${name} success`));
+            saveName(true, (name) => toastSuccess(`Save name to ${name} success`));
           }}
         >
           Save
@@ -39,7 +39,7 @@ function Content({ address, onClose }: { address: string; onClose?: () => void }
   );
 }
 
-function AddAddressDialog({ address, onClose, open }: { address: string; open: boolean; onClose?: () => void }) {
+function EditAddressDialog({ address, onClose, open }: { address: string; open: boolean; onClose?: () => void }) {
   return (
     <Modal size='xl' onClose={onClose} isOpen={open}>
       <ModalContent>
@@ -52,4 +52,4 @@ function AddAddressDialog({ address, onClose, open }: { address: string; open: b
   );
 }
 
-export default React.memo(AddAddressDialog);
+export default React.memo(EditAddressDialog);
