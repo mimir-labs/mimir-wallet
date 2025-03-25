@@ -5,6 +5,7 @@
     stroke="currentColor"
     stroke-width="2"
     stroke-linecap="round"
+    fill="currentColor"
   />
   <path
     d="M22 6l-10 7L2 6"
@@ -12,6 +13,7 @@
     stroke="currentColor"
     stroke-width="2"
     stroke-linecap="round"
+    fill="currentColor"
   />
   <path
     d="M2 6l10 7 10-7"
@@ -19,5 +21,6 @@
     stroke="currentColor"
     stroke-width="2"
     stroke-linecap="round"
+    fill="currentColor"
   />
 </svg>
