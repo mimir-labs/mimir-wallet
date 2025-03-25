@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.26.2](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.26.1...mimir-wallet-app-v1.26.2) (2025-03-25)
+
+
+### Bug Fixes
+
+* fix transfer display issue in batch call ([#184](https://github.com/mimir-labs/mimir-wallet/issues/184)) ([ece89a0](https://github.com/mimir-labs/mimir-wallet/commit/ece89a05d74d367c13f5da42f5b7f864c7432ce7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.26.2
+    * @mimir-wallet/service bumped to 1.26.2
+    * @mimir-wallet/ui bumped to 1.26.2
+
 ## [1.26.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.26.0...mimir-wallet-app-v1.26.1) (2025-03-24)
 
 
