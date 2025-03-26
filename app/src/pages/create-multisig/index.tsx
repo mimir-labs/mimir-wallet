@@ -265,7 +265,7 @@ function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
                 }}
                 sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'text.primary' }}
               >
-                <AddressRow defaultName={item.name} value={item.pure} />
+                <AddressRow defaultName={item.name} withAddress withName value={item.pure} />
                 <p>
                   <Address shorten value={item.pure} />
                 </p>

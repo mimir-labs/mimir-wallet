@@ -113,9 +113,9 @@ function CreateFlexible({
         api.tx.proxy.proxy(
           pure,
           'Any',
-          api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, api.registry.chainSS58), 'Any', 0).toU8a()
+          api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, api.registry.chainSS58), 'Any', 0).method.toU8a()
         ),
-        api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0).toU8a())
+        api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0).method.toU8a())
       ]);
 
       setLoadingSecond(true);
