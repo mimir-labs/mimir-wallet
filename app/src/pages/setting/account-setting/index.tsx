@@ -149,7 +149,7 @@ function AccountSetting() {
             <Tooltip
               closeDelay={0}
               classNames={{ content: 'max-w-[300px]' }}
-              content='The proposer can submit the transaction without any signatures. Once the members approve, the transaction can be initiated.'
+              content='Proposers can suggest transactions but cannot approve or execute them. Signers should review and approve transactions first.'
             >
               <IconQuestion className='text-primary' />
             </Tooltip>

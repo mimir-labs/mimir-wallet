@@ -4,7 +4,7 @@
 import type { HexString } from '@polkadot/util/types';
 import type { ApiState, Endpoint } from './types.js';
 
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance } from '@polkadot/util';
 
@@ -79,7 +79,7 @@ function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: st
   const wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string;
 
   if (wsUrl || !httpUrl) {
-    return new WsProvider(wsUrl || apiUrl);
+    return new ApiProvider(wsUrl || apiUrl);
   }
 
   const provider = new ApiProvider(apiUrl, httpUrl);
