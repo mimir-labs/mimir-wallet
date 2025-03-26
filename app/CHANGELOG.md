@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.27.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.27.0...mimir-wallet-app-v1.27.1) (2025-03-26)
+
+
+### Bug Fixes
+
+* fix create flexible multisig error when creating multisig account ([#191](https://github.com/mimir-labs/mimir-wallet/issues/191)) ([565540f](https://github.com/mimir-labs/mimir-wallet/commit/565540f21980a9e19323bdac566706bd6a752dea))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.27.1
+    * @mimir-wallet/service bumped to 1.27.1
+    * @mimir-wallet/ui bumped to 1.27.1
+
 ## [1.27.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.26.3...mimir-wallet-app-v1.27.0) (2025-03-25)
 
 
