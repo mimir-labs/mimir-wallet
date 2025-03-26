@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.28.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v1.27.1...polkadot-core-v1.28.0) (2025-03-26)
+
+
+### Features
+
+* optimize rpc connection and improve network stability ([#193](https://github.com/mimir-labs/mimir-wallet/issues/193)) ([4c59ddc](https://github.com/mimir-labs/mimir-wallet/commit/4c59ddcc86574df1fa271f5fa28e7e1b4f11aec0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 1.28.0
+
 ## [1.27.1](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v1.27.0...polkadot-core-v1.27.1) (2025-03-26)
 
 
