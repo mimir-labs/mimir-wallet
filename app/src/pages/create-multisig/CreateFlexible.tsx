@@ -208,7 +208,7 @@ function CreateFlexible({
       const extrinsic = api.tx.proxy.proxy(
         pure,
         'Any',
-        api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex).toU8a()
+        api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex).method.toU8a()
       );
 
       const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
