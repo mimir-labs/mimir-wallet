@@ -102,7 +102,9 @@ function BaseContainer({
           <RightSideBar offsetTop={alertOpen ? 38 : 0} />
         </div>
       ) : (
-        <Initializing />
+        <div>
+          <Initializing />
+        </div>
       )}
     </>
   );

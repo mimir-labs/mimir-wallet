@@ -6,10 +6,11 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 import qrcode from 'qrcode-generator';
 import React, { useEffect, useRef } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 import CopyButton from './CopyButton';
+import InputNetwork from './InputNetwork';
 
 interface Props {
   open: boolean;
@@ -22,19 +23,22 @@ function Content({ value }: { value: string }) {
   const qr = useRef(qrcode(0, 'M'));
   const container = useRef<HTMLDivElement>(null);
 
+  const ss58FormatValue = encodeAddress(value, chain.ss58Format);
+
   useEffect(() => {
     setTimeout(() => {
       qr.current = qrcode(0, 'M');
 
-      qr.current.addData(value);
+      qr.current.addData(ss58FormatValue);
       qr.current.make();
 
       if (container.current) container.current.innerHTML = qr.current.createImgTag(7);
     }, 100);
-  }, [value]);
+  }, [ss58FormatValue]);
 
   return (
     <div>
+      <InputNetwork />
       <div className='relative'>
         <div className='flex items-center justify-center my-0 mx-auto w-[300px] h-[300px]' ref={container} />
         <Avatar
@@ -44,8 +48,8 @@ function Content({ value }: { value: string }) {
         />
       </div>
       <p className='mt-2.5 break-all text-center'>
-        {value}
-        <CopyButton value={value} />
+        {ss58FormatValue}
+        <CopyButton value={ss58FormatValue} />
       </p>
     </div>
   );
@@ -53,10 +57,12 @@ function Content({ value }: { value: string }) {
 
 function QrcodeAddress({ onClose, open, value }: Props) {
   return (
-    <Modal hideCloseButton onClose={onClose} isOpen={open}>
+    <Modal hideCloseButton onClose={onClose} isOpen={open} size='sm'>
       <ModalContent>
         <ModalBody className='py-5'>
-          <Content value={value?.toString() || ''} />
+          <SubApiRoot>
+            <Content value={value?.toString() || ''} />
+          </SubApiRoot>
         </ModalBody>
       </ModalContent>
     </Modal>

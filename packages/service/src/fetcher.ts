@@ -30,12 +30,20 @@ export async function fetcher(resource: URL | string | Promise<URL | string>, in
       throw new NetworkError();
     })
     .then(async (res) => {
-      const json = await res.json();
+      try {
+        const json = await res.json();
 
-      if (!res.ok) {
-        throw new FetchError(json?.message || 'An error occurred while fetching the data.', json?.statusCode || 500);
+        if (!res.ok) {
+          throw new FetchError(json?.message || 'An error occurred while fetching the data.', json?.statusCode || 500);
+        }
+
+        return json;
+      } catch {
+        if (res.ok) {
+          return null;
+        } else {
+          throw new FetchError(res.statusText, res.status);
+        }
       }
-
-      return json;
     });
 }

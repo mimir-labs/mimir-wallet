@@ -7,7 +7,7 @@ import IconLink from '@/assets/svg/icon-link.svg?react';
 import { IconButton, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 
-import { chainLinks } from '@mimir-wallet/polkadot-core';
+import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
 
 import CopyButton from './CopyButton';
 
@@ -18,11 +18,12 @@ interface Props {
 }
 
 function Hash({ value, withCopy, withExplorer }: Props) {
+  const { chain } = useApi();
   const stringValue = value?.toString();
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
 
-  const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(stringValue) : undefined;
+  const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(chain, stringValue) : undefined;
 
   const C = explorerLink ? 'a' : 'span';
 

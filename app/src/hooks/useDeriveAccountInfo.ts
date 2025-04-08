@@ -10,10 +10,8 @@ import type { ITuple } from '@polkadot/types/types';
 import { dataToUtf8 } from '@/utils';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useIdentityApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
-
-import { createNamedHook } from './createNamedHook';
 
 function extractOther(additional: Vec<ITuple<[Data, Data]>>) {
   return additional.reduce<Record<string, string>>((other, [_key, _value]) => {
@@ -108,19 +106,17 @@ async function getIdentityInfo({
   };
 }
 
-function useDeriveAccountInfoImpl(value?: AccountId | AccountIndex | Address | Uint8Array | string | null) {
-  const { identityApi } = useApi();
-  const queryHash = blake2AsHex(`${identityApi?.genesisHash.toHex()}-identity-info-${value?.toString()}`);
+export function useDeriveAccountInfo(value?: AccountId | AccountIndex | Address | Uint8Array | string | null) {
+  const identityApi = useIdentityApi();
+  const queryHash = blake2AsHex(`${identityApi?.network}-identity-info-${value?.toString()}`);
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [identityApi, value?.toString()] as const,
+    queryKey: [identityApi?.api, value?.toString()] as const,
     queryHash,
     refetchInterval: 12000,
     queryFn: getIdentityInfo,
-    enabled: !!identityApi && !!identityApi.query?.identity?.identityOf && !!value
+    enabled: !!identityApi && !!identityApi.isApiReady && !!identityApi.api?.query?.identity?.identityOf && !!value
   });
 
   return [data, isFetched, isFetching] as const;
 }
-
-export const useDeriveAccountInfo = createNamedHook('useDeriveAccountInfo', useDeriveAccountInfoImpl);

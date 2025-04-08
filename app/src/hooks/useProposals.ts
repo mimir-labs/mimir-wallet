@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { chainLinks } from '@mimir-wallet/polkadot-core';
+import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 export interface ProposalData {
@@ -22,7 +22,8 @@ export interface ProposalData {
 }
 
 export function useProposal(): ProposalData[] {
-  const proposalApi = chainLinks.proposalApi();
+  const { chain } = useApi();
+  const proposalApi = chainLinks.proposalApi(chain);
   const { data } = useQuery<{ items: ProposalData[] }>({
     queryHash: `${proposalApi}`,
     queryKey: [proposalApi || null]

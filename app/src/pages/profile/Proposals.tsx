@@ -6,10 +6,12 @@ import type { ProposalData } from '@/hooks/useProposals';
 import { ellipsisMixin } from '@/components/utils';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 
-import { chainLinks } from '@mimir-wallet/polkadot-core';
+import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
 import { Chip, Link } from '@mimir-wallet/ui';
 
 function Proposals({ data }: { data: ProposalData[] }) {
+  const { chain } = useApi();
+
   return (
     <Stack component={Paper} padding={{ sm: 2, xs: 1 }} spacing={1} sx={{ bgcolor: 'common.white' }}>
       {data.slice(0, 3).map((item, index) => (
@@ -35,7 +37,7 @@ function Proposals({ data }: { data: ProposalData[] }) {
             <span style={{ opacity: 0.5 }}>#{item.referendumIndex}</span>
             &nbsp;·&nbsp;
             <Link
-              href={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(`referenda/${item.referendumIndex}`) || '')}`}
+              href={`/explorer/${encodeURIComponent(chainLinks.subsquareUrl(chain, `referenda/${item.referendumIndex}`) || '')}`}
               underline='hover'
             >
               {item.title || `[${item.onchainData.trackInfo?.name}] Referendum #${item.referendumIndex}`}

@@ -1,20 +1,20 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HexString } from '@polkadot/util/types';
-import type { ApiState, Endpoint } from './types.js';
+import type { ApiProps, ApiState, Endpoint } from './types.js';
 
 import { ApiPromise } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { formatBalance } from '@polkadot/util';
 
-import { type ClientService, store } from '@mimir-wallet/service';
+import { store } from '@mimir-wallet/service';
 
 import { typesBundle } from './api-types/index.js';
 import { ApiProvider } from './ApiProvider.js';
-import { allEndpoints } from './config.js';
-import { DEFAULT_AUX, NETWORK_RPC_PREFIX, statics } from './defaults.js';
-import { useApi } from './useApi.js';
+import { DEFAULT_AUX, NETWORK_RPC_PREFIX } from './defaults.js';
+import { getMetadata, saveMetadata } from './metadata.js';
+import { StoredRegistry } from './registry.js';
+import { useAllApis } from './useApiStore.js';
 
 /**
  * Initializes and configures the API after it's ready
@@ -96,39 +96,32 @@ function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: st
  * @param onError - Error handler callback
  */
 async function createApi(
-  clientService: ClientService,
   apiUrl: string | string[],
   network: string,
-  httpUrl?: string,
-  onError?: (error: unknown) => void
-): Promise<void> {
-  // Try to get metadata from service
-  let metadata: Record<string, HexString> = {};
+  httpUrl?: string
+): Promise<[ApiPromise, StoredRegistry]> {
+  // Initialize WebSocket provider and API
+  const provider = getApiProvider(apiUrl, network, httpUrl);
 
-  try {
-    metadata = await clientService.getMetadata();
-  } catch {
-    /* empty */
-  }
+  const registry = new StoredRegistry();
 
-  try {
-    // Initialize WebSocket provider and API
-    const provider = getApiProvider(apiUrl, network, httpUrl);
+  const metadata = await getMetadata(network);
 
-    statics.api = new ApiPromise({
+  return [
+    new ApiPromise({
       provider,
-      registry: statics.registry,
+      registry: registry as any,
       typesBundle: typesBundle,
       typesChain: {
         Crust: {
           DispatchErrorModule: 'DispatchErrorModuleU8'
         }
       },
-      metadata
-    });
-  } catch (error) {
-    onError?.(error);
-  }
+      metadata,
+      rpcCacheCapacity: 1
+    }),
+    registry
+  ];
 }
 
 /**
@@ -137,60 +130,78 @@ async function createApi(
  *
  * @param chain - Configuration for the target blockchain endpoint
  */
-export async function initializeApi(chain: Endpoint, clientService: ClientService) {
-  statics.chain = chain;
+export async function initializeApi(chain: Endpoint) {
+  if (useAllApis.getState().chains[chain.key]) {
+    return;
+  }
 
   // Initialize API state with static configuration
-  useApi.setState({
-    api: statics.api,
-    chainSS58: chain.ss58Format,
-    genesisHash: chain.genesisHash,
-    network: chain.key,
-    chain: chain
-  });
+  useAllApis.setState((state) => ({
+    chains: {
+      ...state.chains,
+      [chain.key]: {
+        chainSS58: chain.ss58Format,
+        genesisHash: chain.genesisHash,
+        network: chain.key,
+        chain: chain
+      } as ApiProps
+    }
+  }));
 
   // Error handler for API connection issues
   const onError = (error: unknown): void => {
     console.error(error);
-    useApi.setState({
-      apiError: (error as Error).message
-    });
+    useAllApis.setState((state) => ({
+      chains: {
+        ...state.chains,
+        [chain.key]: {
+          ...state.chains[chain.key],
+          apiError: (error as Error).message
+        }
+      }
+    }));
   };
 
-  const peopleEndpoint: Endpoint | undefined = chain.identityNetwork
-    ? allEndpoints.find((item) => item.key === chain.identityNetwork)
-    : undefined;
-
   // Initialize main blockchain API connection
-  createApi(clientService, Object.values(chain.wsUrl), chain.key, chain.httpUrl, onError).then(() => {
-    // Set up event listeners for connection state
-    statics.api.on('error', onError);
+  return new Promise<void>((resolve) => {
+    createApi(Object.values(chain.wsUrl), chain.key, chain.httpUrl)
+      .then(([api, registry]) => {
+        // Set up event listeners for connection state
+        api.on('error', onError);
 
-    // Handle API ready state
-    statics.api.on('ready', (): void => {
-      useApi.setState({
-        ...loadOnReady(statics.api, chain),
-        ...(peopleEndpoint ? {} : { identityApi: statics.api })
-      });
-    });
+        // Handle API ready state
+        api.on('ready', (): void => {
+          resolve();
+          useAllApis.setState((state) => ({
+            chains: {
+              ...state.chains,
+              [chain.key]: {
+                ...state.chains[chain.key],
+                ...loadOnReady(api, chain),
+                api: api
+              }
+            }
+          }));
+          api.rpc.state.subscribeRuntimeVersion((runtimeVersion) => {
+            const specVersion = runtimeVersion.specVersion.toString();
+            const metadata = registry.latestMetadata.toHex();
 
-    // Update API initialization state
-    useApi.setState({ isApiInitialized: true, api: statics.api });
+            saveMetadata(chain.key, api.genesisHash.toHex(), specVersion, metadata);
+          });
+        });
+
+        // Update API initialization state
+        useAllApis.setState((state) => ({
+          chains: {
+            ...state.chains,
+            [chain.key]: {
+              ...state.chains[chain.key],
+              isApiInitialized: true,
+              api: api
+            }
+          }
+        }));
+      })
+      .catch(onError);
   });
-
-  // Initialize secondary identity network API if configured
-  // This is used for additional identity-related features
-  if (peopleEndpoint) {
-    // Create WebSocket provider for identity network
-    const provider = getApiProvider(Object.values(peopleEndpoint.wsUrl), peopleEndpoint.key, peopleEndpoint.httpUrl);
-
-    // Initialize identity API with custom types
-    ApiPromise.create({
-      provider,
-      typesBundle,
-      metadata: {}
-    }).then((api) => {
-      useApi.setState({ identityApi: api });
-    });
-  }
 }

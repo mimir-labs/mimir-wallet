@@ -3,10 +3,10 @@
 
 import { useAddressStore } from '@/hooks/useAddressStore';
 
-import { encodeAddress } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, type Endpoint } from '@mimir-wallet/polkadot-core';
 
-export async function initializeAccount(address?: string) {
+export async function initializeAccount(chain: Endpoint, address?: string) {
   useAddressStore.setState({
-    current: address ? encodeAddress(address) : undefined
+    current: address ? encodeAddress(address, chain.ss58Format) : undefined
   });
 }

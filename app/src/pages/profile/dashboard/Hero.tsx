@@ -21,8 +21,8 @@ import { useToggle } from 'react-use';
 import { chainLinks, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Link, Tooltip } from '@mimir-wallet/ui';
 
-function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string; changes: number }) {
-  const { chain } = useApi();
+function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string | number; changes: number }) {
+  const { chain, network } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [open, toggleOpen] = useToggle(false);
   const [qrOpen, toggleQrOpen] = useToggle(false);
@@ -35,7 +35,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
     [address, isLocalAccount, isLocalAddress]
   );
   const days = account ? Math.ceil((Date.now() - account.createdAt) / (ONE_DAY * 1000)) : '--';
-  const formatUsd = formatDisplay(totalUsd);
+  const formatUsd = formatDisplay(totalUsd.toString());
 
   const buttons = (
     <div className='w-full sm:w-auto grid md:flex grid-cols-2 item-center gap-2'>
@@ -157,18 +157,20 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
               <span>Mimir Secured {days} Days</span>
-              <Tooltip content={window.currentChain.statescan ? 'Statescan' : 'Subscan'} closeDelay={0}>
-                <Link target='_blank' href={chainLinks.accountExplorerLink(address)} rel='noreferrer'>
+              <Tooltip content={chain.statescan ? 'Statescan' : 'Subscan'} closeDelay={0}>
+                <Link target='_blank' href={chainLinks.accountExplorerLink(chain, address)} rel='noreferrer'>
                   <Avatar
                     style={{ width: 16, height: 16 }}
-                    src={window.currentChain.statescan ? StatescanImg : SubscanImg}
+                    src={chain.statescan ? StatescanImg : SubscanImg}
                     alt='subscan'
                   />
                 </Link>
               </Tooltip>
               {chain.subsquareUrl && (
                 <Tooltip content='Subsquare' closeDelay={0}>
-                  <Link href={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address)}`)}`}>
+                  <Link
+                    href={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address, chain.ss58Format)}`)}`}
+                  >
                     <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
                   </Link>
                 </Tooltip>
@@ -206,9 +208,10 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               component='span'
               sx={{
                 marginRight: 0.5,
-                color: changes >= 0 ? 'success.main' : 'error.main'
+                color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'text.secondary'
               }}
             >
+              {changes > 0 ? '+' : ''}
               {(changes * 100).toFixed(2)}%
             </Box>
             <span style={{ fontWeight: 400 }}>Last 24 Hours</span>
@@ -218,7 +221,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
         {downSm && buttons}
       </Paper>
 
-      <Fund onClose={toggleOpen} open={open} receipt={address} />
+      <Fund onClose={toggleOpen} open={open} receipt={address} defaultNetwork={network} />
       <QrcodeAddress open={qrOpen} onClose={toggleQrOpen} value={address} />
     </>
   );

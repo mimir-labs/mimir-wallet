@@ -26,13 +26,13 @@ import ProposerSet from './ProposerSet';
 import ProxySet from './ProxySet';
 
 function AccountSetting() {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const navigate = useNavigate();
   const { isLocalAccount, current: address } = useAccount();
   const { setName, name, saveName } = useAddressMeta(address);
   const [account, , , refetch] = useQueryAccount(address);
   const [error, setError] = useState<Error>();
-  const [txs] = usePendingTransactions(address);
+  const [txs] = usePendingTransactions(network, address);
   const [tab, setTab] = useState('0');
   const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(api.query.proxy?.proxies, [address]);
 

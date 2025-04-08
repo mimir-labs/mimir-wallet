@@ -19,7 +19,7 @@ export function useCommunicator(
   appName?: string
 ): IframeCommunicator | null {
   const [communicator, setCommunicator] = useState<IframeCommunicator | null>(null);
-  const { api, genesisHash } = useApi();
+  const { api, genesisHash, chainSS58, allApis } = useApi();
   const { addQueue } = useTxQueue();
   const selected = useSelectedAccount();
   const { meta } = useAddressMeta(selected);
@@ -27,8 +27,10 @@ export function useCommunicator(
   const state: State = {
     genesisHash,
     extrinsicSign: (payload: SignerPayloadJSON, id: string) => {
-      if (payload.genesisHash && payload.genesisHash !== api.genesisHash.toHex()) {
-        throw new Error(`Extrinsic genesisHash error, only supported ${api.runtimeChain.toString()}`);
+      const network = Object.values(allApis).find((item) => item.genesisHash === payload.genesisHash)?.network;
+
+      if (!network) {
+        throw new Error(`Network not supported`);
       }
 
       const call = api.registry.createType('Call', payload.method);
@@ -40,7 +42,8 @@ export function useCommunicator(
 
         addQueue({
           call: api.tx[call.section][call.method](...call.args),
-          accountId: encodeAddress(payload.address),
+          accountId: encodeAddress(payload.address, chainSS58),
+          network,
           onlySign: true,
           website: website.origin,
           iconUrl,

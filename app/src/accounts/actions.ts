@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AddressMeta } from '@/hooks/types';
+import type { AccountData } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { HIDE_ACCOUNT_PREFIX } from '@/constants';
@@ -10,16 +10,16 @@ import { useWallet } from '@/wallet/useWallet';
 import { u8aToHex } from '@polkadot/util';
 import { isEqual } from 'lodash-es';
 
-import { addressEq, addressToHex, decodeAddress, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, decodeAddress } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { sync } from './sync';
+import { deriveAccountMeta } from './utils';
 
-export async function resync() {
-  const { genesisHash } = useApi.getState();
+export async function resync(chainSS58: number) {
   const { walletAccounts } = useWallet.getState();
 
-  await sync(genesisHash, walletAccounts, (values) => {
+  await sync(chainSS58, walletAccounts, (values) => {
     useAddressStore.setState((state) => ({
       accounts: isEqual(values, state.accounts) ? state.accounts : values,
       isMultisigSyned: true
@@ -39,41 +39,38 @@ export function isLocalAddress(address: string, watchlist?: boolean) {
   return addresses.some((item) => (watchlist ? !!item.watchlist : true) && addressEq(item.address, address));
 }
 
-export function appendMeta(meta: Record<string, AddressMeta>) {
-  useAddressStore.setState((state) => ({
-    metas: Object.entries(meta).reduce(
-      (result, item) => {
-        result[item[0]] = { ...result[item[0]], ...item[1] };
+export function updateMeta(account: AccountData) {
+  useAddressStore.setState((state) => {
+    const newMetas = { ...state.metas };
 
-        return result;
-      },
-      { ...state.metas }
-    )
-  }));
+    deriveAccountMeta(account, newMetas);
+
+    return {
+      metas: newMetas
+    };
+  });
 }
 
-export function showAccount(address: string) {
+export function showAccount(chain: string, address: string) {
   const { hideAccountHex } = useAddressStore.getState();
-  const { chain } = useApi.getState();
   const addressHex = u8aToHex(decodeAddress(address));
 
   const filteredHex = hideAccountHex.filter((item) => item !== addressHex);
 
-  store.set(`${HIDE_ACCOUNT_PREFIX}${chain.key}`, filteredHex);
+  store.set(`${HIDE_ACCOUNT_PREFIX}${chain}`, filteredHex);
 
   useAddressStore.setState({
     hideAccountHex: filteredHex
   });
 }
 
-export function hideAccount(address: string) {
+export function hideAccount(chain: string, address: string) {
   const { hideAccountHex } = useAddressStore.getState();
-  const { chain } = useApi.getState();
   const addressHex = u8aToHex(decodeAddress(address));
 
   const newHideAccountHex = Array.from(new Set<HexString>([...hideAccountHex, addressHex]));
 
-  store.set(`${HIDE_ACCOUNT_PREFIX}${chain.key}`, newHideAccountHex);
+  store.set(`${HIDE_ACCOUNT_PREFIX}${chain}`, newHideAccountHex);
 
   useAddressStore.setState({
     hideAccountHex: newHideAccountHex
@@ -89,16 +86,14 @@ export function setAccountName(address: string, name: string) {
   });
 }
 
-export function setName(address: string, name: string, networks?: string[], watchlist?: boolean) {
+export function setName(address: string, name: string, watchlist?: boolean) {
   const stored = store.get(`address:${addressToHex(address)}`) as any;
 
-  console.log('setName', address, name, networks, watchlist);
   store.set(`address:${addressToHex(address)}`, {
-    address: encodeAddress(address),
+    address: address,
     meta: {
       name,
-      watchlist: stored?.meta?.watchlist ?? watchlist,
-      networks: Array.from(new Set([...(stored?.meta?.networks || []), ...(networks || [])]))
+      watchlist: stored?.meta?.watchlist ?? watchlist
     }
   });
 }

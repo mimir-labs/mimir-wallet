@@ -1,17 +1,16 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CURRENT_ADDRESS_PREFIX, SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
+import { CURRENT_ADDRESS_HEX_KEY, SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
 import { isAddress } from '@polkadot/util-crypto';
 import { useSearchParams } from 'react-router-dom';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import {
   addAddressBook,
-  appendMeta,
   deleteAddress,
   hideAccount,
   isLocalAccount,
@@ -19,11 +18,12 @@ import {
   resync,
   setAccountName,
   setName,
-  showAccount
+  showAccount,
+  updateMeta
 } from './actions';
 
 export function useAccount() {
-  const { chain } = useApi();
+  const { chainSS58 } = useApi();
 
   const {
     accounts,
@@ -44,7 +44,7 @@ export function useAccount() {
         return;
       }
 
-      const value = encodeAddress(address);
+      const value = encodeAddress(address, chainSS58);
 
       useAddressStore.setState({ switchAddress: undefined });
 
@@ -55,7 +55,7 @@ export function useAccount() {
       setSearchParams(newSearchParams);
 
       // update storage
-      store.set(`${CURRENT_ADDRESS_PREFIX}${chain.key}`, value);
+      store.set(CURRENT_ADDRESS_HEX_KEY, addressToHex(value));
 
       useAddressStore.setState({ current: value });
     }
@@ -66,27 +66,29 @@ export function useAccount() {
   if (currentAddress) {
     current = currentAddress;
   } else {
-    current = store.get(`${CURRENT_ADDRESS_PREFIX}${chain.key}`) as string | undefined;
+    const stored = store.get(CURRENT_ADDRESS_HEX_KEY) as string | undefined;
+
+    current = stored ? encodeAddress(stored, chainSS58) : undefined;
   }
 
   return {
-    accounts,
-    addresses,
-    current,
-    hideAccountHex,
+    accounts: accounts,
+    addresses: addresses,
+    current: current,
+    hideAccountHex: hideAccountHex,
     isMultisigSyned,
-    metas,
-    switchAddress,
+    metas: metas,
+    switchAddress: switchAddress,
     addAddress: setName,
     addAddressBook: addAddressBook,
-    appendMeta: appendMeta,
+    updateMeta: updateMeta,
     deleteAddress: deleteAddress,
     hideAccount: hideAccount,
     isLocalAccount: isLocalAccount,
     isLocalAddress: isLocalAddress,
     resync: resync,
-    setAccountName,
-    setCurrent,
+    setAccountName: setAccountName,
+    setCurrent: setCurrent,
     showAccount: showAccount
   };
 }

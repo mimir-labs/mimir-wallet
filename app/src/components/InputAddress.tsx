@@ -5,6 +5,7 @@ import type { AccountData } from '@/hooks/types';
 import type { InputAddressProps } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconWarning from '@/assets/svg/icon-warning-fill.svg?react';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -13,7 +14,6 @@ import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { encodeAddress } from '@mimir-wallet/polkadot-core';
 import { Avatar, FreeSoloPopover, Listbox, ListboxItem } from '@mimir-wallet/ui';
 
 import Address from './Address';
@@ -113,7 +113,7 @@ function InputAddress({
     const key = value || '';
 
     if (isAddress(key)) {
-      onChange?.(encodeAddress(key));
+      onChange?.(key);
     }
   }, [value, onChange]);
 
@@ -205,6 +205,8 @@ function InputAddress({
             onChange={setInputValue}
             onClick={handleOpen}
           />
+
+          <ArrowDown className='absolute right-2.5 top-1/2 -translate-y-1/2' style={{ color: 'inherit' }} />
         </div>
 
         {value && !isLocalAccount(value) && !isLocalAddress(value) && (

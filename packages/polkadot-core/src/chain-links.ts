@@ -3,19 +3,21 @@
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
+import type { Endpoint } from './types.js';
 
 import { isAddress } from '@polkadot/util-crypto';
 
-import { encodeAddress, statics } from './defaults.js';
+import { encodeAddress } from './defaults.js';
 
 function accountExplorerLink(
+  chain: Endpoint,
   value?: AccountId | AccountIndex | Address | HexString | Uint8Array | string | null
 ): string | undefined {
-  const _value = encodeAddress(value);
+  const _value = encodeAddress(value, chain.ss58Format);
 
   if (_value && isAddress(_value)) {
-    const explorerUrl = statics.chain.explorerUrl;
-    const isStatescan = statics.chain.statescan;
+    const explorerUrl = chain.explorerUrl;
+    const isStatescan = chain.statescan;
 
     if (explorerUrl) {
       return isStatescan ? `${explorerUrl}/#/accounts/${_value}` : `${explorerUrl}account/${_value}`;
@@ -25,11 +27,11 @@ function accountExplorerLink(
   return undefined;
 }
 
-function extrinsicExplorerLink(value?: string | { toString: () => string }): string | undefined {
+function extrinsicExplorerLink(chain: Endpoint, value?: string | { toString: () => string }): string | undefined {
   const _value = value?.toString();
 
-  const explorerUrl = statics.chain.explorerUrl;
-  const isStatescan = statics.chain.statescan;
+  const explorerUrl = chain.explorerUrl;
+  const isStatescan = chain.statescan;
 
   if (explorerUrl) {
     return isStatescan ? `${explorerUrl}/#/extrinsics/${_value}` : `${explorerUrl}extrinsic/${_value}`;
@@ -38,14 +40,14 @@ function extrinsicExplorerLink(value?: string | { toString: () => string }): str
   return undefined;
 }
 
-function subsquareUrl(path?: string): string | undefined {
-  const baseUrl = statics.chain.subsquareUrl;
+function subsquareUrl(chain: Endpoint, path?: string): string | undefined {
+  const baseUrl = chain.subsquareUrl;
 
   return baseUrl ? `${baseUrl}${path || ''}` : undefined;
 }
 
-function proposalApi(): string | undefined {
-  return statics.chain.proposalApi;
+function proposalApi(chain: Endpoint): string | undefined {
+  return chain.proposalApi;
 }
 
 export const chainLinks = {

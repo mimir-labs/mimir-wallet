@@ -9,6 +9,8 @@ import { useAssetInfo } from '@/hooks/useAssets';
 import { alpha, Box, lighten, Skeleton } from '@mui/material';
 import React, { useMemo } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
+
 import { findAction } from '../utils';
 import FunctionArgs from './FunctionArgs';
 
@@ -58,6 +60,7 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
 }
 
 function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProps) {
+  const { network } = useApi();
   const action = useMemo(() => findAction(registry, call), [registry, call]);
 
   const results = useMemo(() => {
@@ -135,7 +138,7 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
     return [assetId, from, to, value, isAll] as const;
   }, [action, call.args, propFrom]);
 
-  const [assetInfo] = useAssetInfo(results?.[0]);
+  const [assetInfo] = useAssetInfo(network, results?.[0]);
 
   if (!results) return <FunctionArgs from={propFrom} registry={registry} call={call} jsonFallback={jsonFallback} />;
 

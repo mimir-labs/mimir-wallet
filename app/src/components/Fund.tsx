@@ -8,18 +8,18 @@ import { useInputNumber } from '@/hooks/useInputNumber';
 import { parseUnits } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
-import { LoadingButton } from '@mui/lab';
-import { Box, Button, Stack } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 
-import { signAndSend, useApi } from '@mimir-wallet/polkadot-core';
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { signAndSend, SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
 import Input from './Input';
 import InputAddress from './InputAddress';
+import InputNetwork from './InputNetwork';
 
 interface Props {
+  defaultNetwork?: string;
   open: boolean;
   defaultValue?: string | { toString: () => string };
   receipt?: string;
@@ -44,7 +44,7 @@ function Content({
 
   return (
     <ModalBody>
-      <Stack spacing={2}>
+      <div className='flex flex-col gap-5'>
         <InputAddress
           withBalance
           balance={balances?.transferrable}
@@ -54,14 +54,17 @@ function Content({
           onChange={setSending}
           value={sending}
         />
-        <Stack spacing={1}>
+        <div className='flex flex-col gap-2'>
           <p className='font-bold'>To</p>
-          <Box bgcolor='secondary.main' borderRadius={1} padding={1}>
+          <div className='rounded-md bg-secondary p-2'>
             <AddressCell shorten showType value={receipt} withCopy withAddressBook />
-          </Box>
-        </Stack>
+          </div>
+        </div>
+
+        <InputNetwork label='Select Network' />
+
         <Input label='Amount' onChange={setValue} value={value} />
-      </Stack>
+      </div>
     </ModalBody>
   );
 }
@@ -105,28 +108,30 @@ function Action({
 
   return (
     <ModalFooter>
-      <Button fullWidth onClick={onClose} variant='outlined'>
+      <Button fullWidth onPress={onClose} variant='ghost'>
         Cancel
       </Button>
-      <LoadingButton loading={loading} disabled={!(receipt && sending && value)} fullWidth onClick={handleClick}>
+      <Button isLoading={loading} isDisabled={!(receipt && sending && value)} fullWidth onPress={handleClick}>
         Submit
-      </LoadingButton>
+      </Button>
     </ModalFooter>
   );
 }
 
-function Fund({ defaultValue, onClose, open, receipt }: Props) {
+function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const [sending, setSending] = useState<string>();
   const [[value], setValue] = useInputNumber(defaultValue?.toString() || '0', false, 0);
 
   return (
-    <Modal size='lg' onClose={onClose} isOpen={open}>
-      <ModalContent>
-        <ModalHeader>Fund</ModalHeader>
-        <Content receipt={receipt} sending={sending} setSending={setSending} setValue={setValue} value={value} />
-        <Action onClose={onClose} receipt={receipt} sending={sending} value={value} />
-      </ModalContent>
-    </Modal>
+    <SubApiRoot defaultNetwork={defaultNetwork}>
+      <Modal size='lg' onClose={onClose} isOpen={open}>
+        <ModalContent>
+          <ModalHeader>Fund</ModalHeader>
+          <Content receipt={receipt} sending={sending} setSending={setSending} setValue={setValue} value={value} />
+          <Action onClose={onClose} receipt={receipt} sending={sending} value={value} />
+        </ModalContent>
+      </Modal>
+    </SubApiRoot>
   );
 }
 

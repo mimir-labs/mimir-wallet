@@ -10,24 +10,11 @@ import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
 import { hexToU8a } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { addressEq, encodeAddress } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 interface Props {
   defaultName?: string;
   value: AccountId | AccountIndex | Address | string | Uint8Array | null | undefined;
-}
-
-const displayCache = new Map<string, React.ReactNode>();
-const parentCache = new Map<string, string>();
-
-function extractName(address: string): React.ReactNode {
-  const displayCached = displayCache.get(address);
-
-  if (displayCached) {
-    return displayCached;
-  }
-
-  return '';
 }
 
 function extractIdentity(
@@ -59,16 +46,15 @@ function extractIdentity(
     </span>
   );
 
-  displayCache.set(address, elem);
-
   return elem;
 }
 
 function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
-  const address = useMemo(() => encodeAddress(value), [value]);
+  const { chainSS58 } = useApi();
+  const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
   const [identity] = useDeriveAccountInfo(address);
-  const [chainName, setChainName] = useState<React.ReactNode>(() => extractName(address.toString()));
+  const [chainName, setChainName] = useState<React.ReactNode>(null);
   const { meta } = useAddressMeta(address);
   const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
 
@@ -78,18 +64,12 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
 
     const cacheAddr = address.toString();
 
-    if (displayParent) {
-      parentCache.set(cacheAddr, displayParent);
-    }
-
     if (display && judgements) {
-      setChainName(() =>
-        display ? extractIdentity(cacheAddr, display, judgements, displayParent) : extractName(cacheAddr)
-      );
+      setChainName(() => (display ? extractIdentity(cacheAddr, display, judgements, displayParent) : null));
     }
 
     if (!display) {
-      setChainName(() => extractName(cacheAddr));
+      setChainName(null);
     }
   }, [address, identity]);
 

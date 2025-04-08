@@ -9,10 +9,10 @@ import { walletConfig } from '@/config';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { Box } from '@mui/material';
 import { polkadotIcon } from '@polkadot/ui-shared';
-import { hexToU8a, isHex, isU8a } from '@polkadot/util';
+import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { addressEq, encodeAddress } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 import { toastSuccess } from './utils';
 
@@ -23,27 +23,13 @@ interface Props {
   value?: AccountId | AccountIndex | Address | string | Uint8Array | null;
 }
 
-function isCodec(
-  value?: AccountId | AccountIndex | Address | string | Uint8Array | null
-): value is AccountId | AccountIndex | Address {
-  return !!(value && (value as AccountId).toHuman);
-}
-
 function renderCircle({ cx, cy, fill, r }: Circle, index: number) {
   return <circle key={index} cx={cx} cy={cy} fill={fill} r={r} />;
 }
 
 function IdentityIcon({ className, prefix, size = 30, value }: Props) {
-  const { address } = useMemo(() => {
-    try {
-      const _value = isCodec(value) ? value.toString() : value;
-      const address = isU8a(_value) || isHex(_value) ? encodeAddress(_value, prefix) : _value || '';
-
-      return { address };
-    } catch {
-      return { address: '' };
-    }
-  }, [prefix, value]);
+  const { chainSS58 } = useApi();
+  const address = encodeAddress(value, prefix ?? chainSS58);
   const { meta } = useAddressMeta(value?.toString());
   const [, copy] = useCopyClipboard();
 

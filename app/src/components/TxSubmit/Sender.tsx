@@ -2,20 +2,27 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AddressCell } from '@/components';
-import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Avatar, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
+
 function Sender({ address }: { address: string }) {
+  const { chain } = useApi();
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
 
   return (
-    <Box>
-      <Typography fontWeight={700}>Sending From</Typography>
-      <Box sx={{ display: 'flex', bgcolor: 'secondary.main', borderRadius: 0.5, padding: 1, marginTop: 0.8 }}>
+    <div>
+      <p className='font-bold'>Sending From</p>
+      <div className='flex bg-secondary rounded-small p-2.5 mt-2'>
         <AddressCell value={address} withCopy shorten={downMd} />
-      </Box>
-    </Box>
+        <div className='flex items-center gap-1'>
+          <Avatar src={chain.icon} alt={chain.name} style={{ width: 20, height: 20, background: 'transparent' }} />
+          {chain.name}
+        </div>
+      </div>
+    </div>
   );
 }
 

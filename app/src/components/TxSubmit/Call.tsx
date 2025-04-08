@@ -67,7 +67,7 @@ function Call({
   method: IMethod;
   transaction?: Transaction | null;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
 
   // TODO: check if the call is a multisig, if so, use the blake2 of the call data as the call hash
   const { callData, callHash, callName } = useMemo(() => extractState(method), [method]);
@@ -86,7 +86,7 @@ function Call({
               size='small'
               color='primary'
               variant='text'
-              onClick={() => events.emit('call_data_view', callData)}
+              onClick={() => events.emit('call_data_view', network, callData)}
             >
               View Detail
             </Button>

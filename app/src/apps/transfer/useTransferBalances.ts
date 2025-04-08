@@ -4,19 +4,29 @@
 import type { OrmlTokensAccountData } from '@/hooks/types';
 import type { ApiPromise } from '@polkadot/api';
 import type { Option } from '@polkadot/types';
-import type { PalletAssetsAssetAccount } from '@polkadot/types/lookup';
+import type {
+  AcalaPrimitivesCurrencyAssetIds,
+  AcalaPrimitivesCurrencyCurrencyId,
+  PalletAssetsAssetAccount
+} from '@polkadot/types/lookup';
 import type { TransferToken } from './types';
 
 import { type BN, BN_ZERO, isHex } from '@polkadot/util';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 async function _getNativeBalance(api: ApiPromise, address: string): Promise<BN> {
-  return api.derive.balances.all(address).then((result) => result.availableBalance);
+  return api.query.system
+    .account(address)
+    .then((account) =>
+      account.data.free
+        .add(account.data.reserved)
+        .sub(account.data.reserved.gt(account.data.frozen) ? account.data.reserved : account.data.frozen)
+    );
 }
 
-async function _getAssetBalance(api: ApiPromise, address: string, assetId: string): Promise<BN> {
+async function _getAssetBalance(api: ApiPromise, network: string, address: string, assetId: string): Promise<BN> {
   if (api.query.assets || api.query.foreignAssets) {
     return isHex(assetId)
       ? api.query.foreignAssets.account(assetId, address).then((result) => {
@@ -27,15 +37,58 @@ async function _getAssetBalance(api: ApiPromise, address: string, assetId: strin
         });
   }
 
-  return api.query.tokens.accounts(address, assetId).then((result) => {
-    return (result as unknown as OrmlTokensAccountData).free.sub((result as unknown as OrmlTokensAccountData).frozen);
-  });
+  if (api.query.tokens) {
+    if (network === 'acala' || network === 'karura') {
+      const id: AcalaPrimitivesCurrencyAssetIds = api.registry.createType('AcalaPrimitivesCurrencyAssetIds', assetId);
+      let currencyId: AcalaPrimitivesCurrencyCurrencyId | null = null;
+
+      if (id.isErc20) {
+        currencyId = api.registry.createType<AcalaPrimitivesCurrencyCurrencyId>('AcalaPrimitivesCurrencyCurrencyId', {
+          Erc20: id.asErc20.toHex()
+        });
+      } else if (id.isForeignAssetId) {
+        currencyId = api.registry.createType<AcalaPrimitivesCurrencyCurrencyId>('AcalaPrimitivesCurrencyCurrencyId', {
+          ForeignAsset: id.asForeignAssetId.toNumber()
+        });
+      } else if (id.isStableAssetId) {
+        currencyId = api.registry.createType<AcalaPrimitivesCurrencyCurrencyId>('AcalaPrimitivesCurrencyCurrencyId', {
+          StableAssetPoolToken: id.asStableAssetId.toNumber()
+        });
+      } else if (id.isNativeAssetId) {
+        const nativeAssetId: AcalaPrimitivesCurrencyCurrencyId =
+          api.registry.createType<AcalaPrimitivesCurrencyCurrencyId>(
+            'AcalaPrimitivesCurrencyCurrencyId',
+            id.asNativeAssetId
+          );
+
+        currencyId = nativeAssetId;
+      } else {
+        currencyId = null;
+      }
+
+      if (currencyId) {
+        return api.query.tokens.accounts(address, currencyId).then((result) => {
+          return (result as unknown as OrmlTokensAccountData).free.sub(
+            (result as unknown as OrmlTokensAccountData).frozen
+          );
+        });
+      } else {
+        return Promise.resolve(BN_ZERO);
+      }
+    }
+
+    return api.query.tokens.accounts(address, assetId).then((result) => {
+      return (result as unknown as OrmlTokensAccountData).free.sub((result as unknown as OrmlTokensAccountData).frozen);
+    });
+  }
+
+  return Promise.resolve(BN_ZERO);
 }
 
 function _retrieveBalance({
-  queryKey: [api, address, token]
+  queryKey: [api, network, address, token]
 }: {
-  queryKey: [api: ApiPromise, address?: string, token?: TransferToken];
+  queryKey: [api: ApiPromise, network: string, address?: string, token?: TransferToken];
 }): Promise<BN> {
   if (!(address && token)) {
     return Promise.resolve(BN_ZERO);
@@ -45,17 +98,17 @@ function _retrieveBalance({
     return _getNativeBalance(api, address);
   }
 
-  return _getAssetBalance(api, address, token.assetId);
+  return _getAssetBalance(api, network, address, token.assetId);
 }
 
 export function useTransferBalance(
   token?: TransferToken,
   sender?: string
 ): [format: [decimals: number, symbol: string], sendingBalance: BN, isFetched: boolean, isFetching: boolean] {
-  const { api, isApiReady } = useApi();
+  const { api, network, isApiReady } = useApi();
   const { data, isFetching, isFetched } = useQuery({
-    queryKey: [api, sender, token] as const,
-    queryHash: `_retrieveBalance.${api.genesisHash.toHex()}-${sender}-${token?.isNative ? 'native' : token?.assetId}.sender`,
+    queryKey: [api, network, sender, token] as const,
+    queryHash: `_retrieveBalance.${network}-${sender ? addressToHex(sender) : ''}-${token?.isNative ? 'native' : token?.assetId}.sender`,
     queryFn: _retrieveBalance,
     refetchInterval: 60000,
     refetchOnMount: false,

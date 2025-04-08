@@ -1,24 +1,23 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AddressMeta, DelegateeProp } from '@/hooks/types';
+import type { AccountData, DelegateeProp } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { service } from '@/utils';
 import { isEqual } from 'lodash-es';
 import { useEffect } from 'react';
 
 import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
+import { useClientQuery, useQuery } from '@mimir-wallet/service';
 
-import { useAccount } from './useAccount';
+import { updateMeta } from './actions';
 
-function transformAccount(genesisHash: HexString, account: AccountData): AccountData {
+function transformAccount(chainSS58: number, genesisHash: HexString, account: AccountData): AccountData {
   const proposers = account.proposers
     ?.filter((item) => item.network === genesisHash)
     .map((item) => ({
-      proposer: encodeAddress(item.proposer),
-      creator: encodeAddress(item.creator),
+      proposer: encodeAddress(item.proposer, chainSS58),
+      creator: encodeAddress(item.creator, chainSS58),
       createdAt: item.createdAt,
       network: item.network
     }));
@@ -27,7 +26,7 @@ function transformAccount(genesisHash: HexString, account: AccountData): Account
     return {
       createdAt: Date.now(),
       type: 'account',
-      address: encodeAddress(account.address),
+      address: encodeAddress(account.address, chainSS58),
       name: account.name,
       delegatees: [],
       proposers
@@ -36,72 +35,34 @@ function transformAccount(genesisHash: HexString, account: AccountData): Account
 
   return {
     ...account,
-    address: encodeAddress(account.address),
+    address: encodeAddress(account.address, chainSS58),
     delegatees: account.delegatees
       .filter((item) => item.proxyNetwork === genesisHash)
-      .map((delegatee) => transformAccount(genesisHash, delegatee)) as (AccountData & DelegateeProp)[],
+      .map((delegatee) => transformAccount(chainSS58, genesisHash, delegatee)) as (AccountData & DelegateeProp)[],
     ...(account.type === 'multisig'
       ? {
-          members: account.members.map((member) => transformAccount(genesisHash, member))
+          members: account.members.map((member) => transformAccount(chainSS58, genesisHash, member))
         }
       : {}),
     proposers
   };
 }
 
-function deriveMeta(account: AccountData, meta: Record<string, AddressMeta> = {}) {
-  meta[account.address] = {
-    ...meta[account.address],
-    isMimir: !!account.isMimir,
-    isPure: account.type === 'pure',
-    isMultisig: account.type === 'multisig'
-  };
-
-  if (account.delegatees.length > 0) {
-    meta[account.address] = {
-      ...meta[account.address],
-      isProxied: true
-    };
-  }
-
-  if (account.type === 'multisig') {
-    meta[account.address] = {
-      ...meta[account.address],
-      threshold: account.threshold,
-      who: account.members.map((item) => item.address)
-    };
-  }
-
-  for (const item of account.delegatees) {
-    deriveMeta(item, meta);
-    meta[item.address] = {
-      ...meta[item.address],
-      isProxy: true
-    };
-  }
-
-  if (account.type === 'multisig') {
-    for (const item of account.members) {
-      deriveMeta(item, meta);
-    }
-  }
-}
-
 export function useQueryAccount(
   address?: string | null
 ): [AccountData | null | undefined, isFetched: boolean, isFetching: boolean, refetch: () => void] {
-  const { genesisHash } = useApi();
-  const { appendMeta } = useAccount();
+  const { genesisHash, chainSS58, network } = useApi();
+  const { queryHash, queryKey } = useClientQuery(address ? `chains/${network}/${address}/details` : null);
   const { data, isFetched, isFetching, refetch } = useQuery<AccountData | null>({
     initialData: null,
-    queryHash: service.getNetworkUrl(`accounts/full/${address}`),
-    queryKey: [address ? service.getNetworkUrl(`accounts/full/${address}`) : null],
+    queryHash,
+    queryKey,
     structuralSharing: (prev, next): AccountData | null => {
       if (!next) {
         return null;
       }
 
-      const nextData = transformAccount(genesisHash, next as AccountData);
+      const nextData = transformAccount(chainSS58, genesisHash, next as AccountData);
 
       return isEqual(prev, nextData) ? (prev as AccountData) : nextData;
     }
@@ -109,12 +70,9 @@ export function useQueryAccount(
 
   useEffect(() => {
     if (data) {
-      const meta: Record<string, AddressMeta> = {};
-
-      deriveMeta(data, meta);
-      appendMeta(meta);
+      updateMeta(data);
     }
-  }, [appendMeta, data]);
+  }, [data]);
 
   return [data, isFetched, isFetching, refetch];
 }

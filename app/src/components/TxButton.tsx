@@ -3,17 +3,20 @@
 
 import type { FilterPath, Transaction } from '@/hooks/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { AccountId, Address } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { useTxQueue } from '@/hooks/useTxQueue';
+import { useWallet } from '@/wallet/useWallet';
 import React, { useCallback } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, type ButtonProps } from '@mimir-wallet/ui';
 
+import { toastError } from './utils';
+
 interface Props extends Omit<ButtonProps, 'onPress' | 'onClick'> {
-  accountId?: AccountId | Address | string;
+  accountId?: string;
   filterPaths?: FilterPath[];
   transaction?: Transaction | null;
   onlySign?: boolean;
@@ -56,14 +59,24 @@ function TxButton({
   overrideAction,
   ...props
 }: Props) {
+  const { network } = useApi();
   const { addQueue } = useTxQueue();
+  const { walletAccounts } = useWallet();
 
   const handlePress = useCallback(() => {
     if (getCall) {
       const call = getCall();
 
+      const address = accountId || transaction?.address || walletAccounts[0].address;
+
+      if (!address) {
+        toastError('Please select an account');
+
+        return;
+      }
+
       addQueue({
-        accountId,
+        accountId: address,
         transaction: transaction || undefined,
         call,
         website,
@@ -72,24 +85,27 @@ function TxButton({
         filterPaths,
         relatedBatches,
         onResults: (result) => onResults?.(result),
-        beforeSend: async (extrinsic) => beforeSend?.(extrinsic)
+        beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
+        network
       });
     }
 
     onDone?.();
   }, [
-    accountId,
-    addQueue,
-    appName,
-    beforeSend,
-    filterPaths,
     getCall,
-    iconUrl,
     onDone,
-    onResults,
-    relatedBatches,
+    accountId,
     transaction,
-    website
+    walletAccounts,
+    addQueue,
+    website,
+    appName,
+    iconUrl,
+    filterPaths,
+    relatedBatches,
+    network,
+    onResults,
+    beforeSend
   ]);
 
   return (

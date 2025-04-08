@@ -5,13 +5,13 @@ import type { MultisigAccountData, PureAccountData } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { Input, TxButton } from '@/components';
-import { service } from '@/utils';
 import { Box, FormHelperText, Paper, Stack } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
 
 import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 import { Button } from '@mimir-wallet/ui';
 
 import AccountSelect from '../../create-multisig/AccountSelect';
@@ -42,7 +42,7 @@ function MemberSet({
   disabled?: boolean;
 }) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const { api, chainSS58 } = useApi();
+  const { api, chainSS58, network } = useApi();
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
     useSelectMultisig(
       account.members.map((item) => item.address),
@@ -113,7 +113,7 @@ function MemberSet({
               setAddressError(null);
             }
 
-            setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value) : value });
+            setAddress({ isAddressValid, address: isAddressValid ? encodeAddress(value, chainSS58) : value });
           }}
           placeholder='input address'
           value={address}
@@ -168,10 +168,10 @@ function MemberSet({
           website='mimir://internal/setup'
           beforeSend={() =>
             service.createMultisig(
+              network,
               signatories.map((address) => u8aToHex(decodeAddress(address))),
               threshold,
-              account.name,
-              false
+              account.name
             )
           }
         >

@@ -4,115 +4,117 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { Option } from '@polkadot/types';
 import type { PalletAssetsAssetDetails, PalletAssetsAssetMetadata } from '@polkadot/types/lookup';
-import type { AssetInfo, PalletAssetRegistryAssetDetails } from './types';
+import type { AssetInfo, AssetMetadata, PalletAssetRegistryAssetDetails, TokenInfo } from './types';
 
-import { type Asset, findAssets } from '@/config';
+import { assets, findAssets } from '@/config';
 import { type BN, BN_ZERO, isHex } from '@polkadot/util';
+import { isEqual } from 'lodash-es';
+import { useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
+import { useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
+import { service, useQuery } from '@mimir-wallet/service';
 
-function _transform(assets: Asset[], metadatas: [id: string, metadata: PalletAssetsAssetMetadata][]): AssetInfo[] {
-  const assetInfo: AssetInfo[] = [];
+import { useTokenInfo, useTokenInfoAll } from './useTokenInfo';
 
-  for (const [id, metadata] of metadatas) {
-    const asset = assets.find((item) => item.assetId === id);
-
-    assetInfo.push({
-      isNative: false,
-      name: metadata.name.toUtf8(),
-      symbol: metadata.symbol.toUtf8(),
-      decimals: metadata.decimals.toNumber(),
-      icon: asset?.Icon,
-      assetId: id
-    });
-  }
-
-  return assetInfo.sort((l) => (l.icon ? -1 : 1));
-}
-
-function _transformAssetRegistry(
-  assets: Asset[],
-  metadatas: [id: string, metadata: Option<PalletAssetRegistryAssetDetails>][]
+function _extraAsset(
+  network: string,
+  data: {
+    id: string;
+    name: string;
+    symbol: string;
+    decimals: number;
+    icon: string | null;
+    price: number;
+    isVerified: boolean;
+    isInitialized: false;
+  }[],
+  tokenInfo?: TokenInfo
 ): AssetInfo[] {
-  const assetInfo: AssetInfo[] = [];
+  return data.map((item) => {
+    const asset = assets.find(({ assetId }) => item.id === assetId);
 
-  for (const [id, metadata] of metadatas) {
-    const asset = assets.find((item) => item.assetId === id);
-
-    if (metadata.isSome) {
-      const { name, symbol, decimals } = metadata.unwrap();
-
-      if (name.isSome && symbol.isSome && decimals.isSome) {
-        assetInfo.push({
-          isNative: false,
-          name: name.unwrap().toUtf8(),
-          symbol: symbol.unwrap().toUtf8(),
-          decimals: decimals.unwrap().toNumber(),
-          icon: asset?.Icon,
-          assetId: id
-        });
-      }
-    }
-  }
-
-  return assetInfo.sort((l) => (l.icon ? -1 : 1));
+    return {
+      network: network,
+      isNative: false,
+      assetId: item.id,
+      name: item.name,
+      symbol: item.symbol,
+      decimals: item.decimals,
+      icon: asset?.Icon || item.icon || undefined,
+      price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
+      change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
+    };
+  });
 }
 
-async function fetchAssets({ queryKey }: { queryKey: [ApiPromise] }): Promise<AssetInfo[]> {
-  const api = queryKey[0];
-  const configAssets = findAssets(api.genesisHash.toHex());
-
-  if (api.query.assets) {
-    return Promise.all([api.query.assets.metadata.entries(), api.query.foreignAssets.metadata.entries()]).then(
-      ([_metadatas, _foreignMetadatas]) => {
-        const metadatas: [string, PalletAssetsAssetMetadata][] = _metadatas.map(([key, value]) => [
-          key.args[0].toString(),
-          value
-        ]);
-        const foreignMetadatas = _foreignMetadatas.map(
-          ([key, value]) => [key.args[0].toHex(), value] as [string, PalletAssetsAssetMetadata]
-        );
-
-        return _transform(configAssets, metadatas.concat(foreignMetadatas));
-      }
-    );
-  }
-
-  if (api.query.assetRegistry?.assets) {
-    return api.query.assetRegistry.assets.entries().then((entries) => {
-      const assets = entries.map(
-        ([key, value]) => [key.args[0].toString(), value] as [string, Option<PalletAssetRegistryAssetDetails>]
-      );
-
-      return _transformAssetRegistry(configAssets, assets);
-    });
-  }
-
-  return Promise.resolve([]);
-}
-
-export function useAssets(): AssetInfo[] {
-  const { api, isApiReady } = useApi();
-  const { data } = useQuery({
-    queryKey: [api] as const,
-    queryHash: `${api.genesisHash.toHex()}-assets`,
-    refetchInterval: 60000,
+export function useAssets(network: string): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean] {
+  const [tokenInfo] = useTokenInfo(network);
+  const { data, isFetched, isFetching } = useQuery<AssetInfo[]>({
+    queryHash: service.getClientUrl(`chains/${network}/all-assets`),
+    queryKey: [service.getClientUrl(`chains/${network}/all-assets`)],
+    refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    queryFn: fetchAssets,
-    enabled: isApiReady
+    structuralSharing: (prev, next): AssetInfo[] => {
+      if (!next) {
+        return [];
+      }
+
+      const nextData = _extraAsset(network, next as any, tokenInfo);
+
+      return isEqual(prev, nextData) ? (prev as AssetInfo[]) : nextData;
+    }
   });
 
-  return data ?? [];
+  return [
+    useMemo(
+      () =>
+        data?.map((item) => ({
+          ...item,
+          price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
+          change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
+        })),
+      [data, tokenInfo]
+    ),
+    isFetched,
+    isFetching
+  ];
+}
+
+export function useAssetsAll(): [
+  data: Record<string, AssetInfo[]> | undefined,
+  isFetched: boolean,
+  isFetching: boolean
+] {
+  const [tokenInfo] = useTokenInfoAll();
+  const { data, isFetched, isFetching } = useQuery<Record<string, AssetInfo[]>>({
+    queryKey: [service.getClientUrl(`assets/all`)],
+    queryHash: service.getClientUrl(`assets/all`),
+    refetchInterval: 60 * 10 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    structuralSharing: (prev, next): Record<string, AssetInfo[]> | undefined => {
+      if (!next) {
+        return undefined;
+      }
+
+      const nextData = Object.fromEntries(
+        Object.entries(next).map(([network, assets]) => [network, _extraAsset(network, assets, tokenInfo?.[network])])
+      );
+
+      return isEqual(prev, nextData) ? (prev as Record<string, AssetInfo[]>) : nextData;
+    }
+  });
+
+  return [data, isFetched, isFetching];
 }
 
 async function fetchAssetInfo({
   queryKey
 }: {
-  queryKey: [ApiPromise, string | undefined | null];
+  queryKey: [api: ApiPromise, assetId: string | undefined | null, network: string, tokenInfo?: TokenInfo];
 }): Promise<[AssetInfo<false>, BN] | undefined> {
-  const [api, assetId] = queryKey;
+  const [api, assetId, network, tokenInfo] = queryKey;
 
   if (!assetId) {
     return Promise.resolve(undefined);
@@ -129,13 +131,17 @@ async function fetchAssetInfo({
     ).then(([metadata, asset]) => {
       return [
         {
+          network: network,
+          genesisHash: api.genesisHash.toHex(),
           isNative: false,
           assetId: assetId.toString(),
           name: metadata.name.toUtf8(),
           symbol: metadata.symbol.toUtf8(),
           decimals: metadata.decimals.toNumber(),
           existentialDeposit: metadata.deposit.toBigInt(),
-          icon: findAssets(api.genesisHash.toHex()).find((item) => item.assetId === assetId)?.Icon
+          icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
+          price: parseFloat(tokenInfo?.detail?.[metadata.symbol.toUtf8()]?.price || '0'),
+          change24h: parseFloat(tokenInfo?.detail?.[metadata.symbol.toUtf8()]?.price_change || '0')
         },
         asset.unwrapOrDefault().minBalance
       ];
@@ -152,12 +158,16 @@ async function fetchAssetInfo({
         if (name.isSome && symbol.isSome && decimals.isSome) {
           return [
             {
+              network: network,
+              genesisHash: api.genesisHash.toHex(),
               isNative: false,
               assetId: assetId.toString(),
               name: name.unwrap().toUtf8(),
               symbol: symbol.unwrap().toUtf8(),
               decimals: decimals.unwrap().toNumber(),
-              icon: findAssets(api.genesisHash.toHex()).find((item) => item.assetId === assetId)?.Icon
+              icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
+              price: parseFloat(tokenInfo?.detail?.[symbol.unwrap().toUtf8()]?.price || '0'),
+              change24h: parseFloat(tokenInfo?.detail?.[symbol.unwrap().toUtf8()]?.price_change || '0')
             },
             existentialDeposit
           ];
@@ -168,19 +178,74 @@ async function fetchAssetInfo({
     });
   }
 
+  if (api.query.assetRegistry?.currencyMetadatas) {
+    return await api.query.assetRegistry.currencyMetadatas(assetId).then((metadata) => {
+      if ((metadata as Option<AssetMetadata>).isSome) {
+        const { name, symbol, decimals, minimalBalance } = (metadata as Option<AssetMetadata>).unwrap();
+
+        return [
+          {
+            network: network,
+            genesisHash: api.genesisHash.toHex(),
+            isNative: false,
+            assetId: assetId.toString(),
+            name: name.toUtf8(),
+            symbol: symbol.toUtf8(),
+            decimals: decimals.toNumber(),
+            icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
+            price: parseFloat(tokenInfo?.detail?.[symbol.toUtf8()]?.price || '0'),
+            change24h: parseFloat(tokenInfo?.detail?.[symbol.toUtf8()]?.price_change || '0')
+          },
+          minimalBalance
+        ];
+      }
+
+      return undefined;
+    });
+  }
+
+  if (api.query.assetRegistry?.assetMetadatas) {
+    return api.query.assetRegistry.assetMetadatas(assetId).then((metadata) => {
+      if ((metadata as Option<AssetMetadata>).isSome) {
+        const { name, symbol, decimals, minimalBalance } = (metadata as Option<AssetMetadata>).unwrap();
+
+        return [
+          {
+            network: network,
+            genesisHash: api.genesisHash.toHex(),
+            isNative: false,
+            assetId: assetId.toString(),
+            name: name.toUtf8(),
+            symbol: symbol.toUtf8(),
+            decimals: decimals.toNumber(),
+            icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
+            price: parseFloat(tokenInfo?.detail?.[symbol.toUtf8()]?.price || '0'),
+            change24h: parseFloat(tokenInfo?.detail?.[symbol.toUtf8()]?.price_change || '0')
+          },
+          minimalBalance
+        ];
+      }
+
+      return undefined;
+    });
+  }
+
   return Promise.resolve(undefined);
 }
 
-export function useAssetInfo(assetId?: string | null): [AssetInfo<false> | undefined, BN] {
-  const { api, isApiReady } = useApi();
+export function useAssetInfo(network: string, assetId?: string | null): [AssetInfo<false> | undefined, BN] {
+  const { allApis } = useApi();
+  const api: ValidApiState | undefined = allApis[network];
+  const [tokenInfo] = useTokenInfo(network);
+  const queryHash = `${network}-${api?.genesisHash}-asset-info-${assetId}-all`;
   const { data } = useQuery({
-    queryKey: [api, assetId] as const,
-    queryHash: `${api.genesisHash.toHex()}-asset-info-${assetId}`,
+    queryKey: [api?.api, assetId, network, tokenInfo] as const,
+    queryHash,
     queryFn: fetchAssetInfo,
-    refetchInterval: 60000,
+    refetchInterval: 60_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    enabled: isApiReady && !!assetId
+    enabled: !!api && api.isApiReady && !!assetId
   });
 
   return [data?.[0], data?.[1] ?? BN_ZERO];

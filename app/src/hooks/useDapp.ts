@@ -1,11 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { type DappOption, dapps, findSupportedDapps } from '@/config';
+import { type DappOption, dapps } from '@/config';
 import { FAVORITE_DAPP_KEY } from '@/constants';
 import { useCallback, useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
 import { useLocalStore } from '@mimir-wallet/service';
 
 interface UseDapps {
@@ -40,14 +39,13 @@ export function useDapp(website?: string | null): DappOption | undefined {
 }
 
 export function useDapps(): UseDapps {
-  const { network } = useApi();
   const [favoriteIds, setFavoriteIds] = useLocalStore<number[]>(FAVORITE_DAPP_KEY, []);
 
-  const dapps = useMemo(
-    () => findSupportedDapps(network).filter((item) => !item.url.startsWith('mimir://internal')),
-    [network]
+  const validDapps = useMemo(() => dapps.filter((item) => !item.url.startsWith('mimir://internal')), []);
+  const favorites = useMemo(
+    () => validDapps.filter((item) => favoriteIds.includes(item.id)),
+    [validDapps, favoriteIds]
   );
-  const favorites = useMemo(() => dapps.filter((item) => favoriteIds.includes(item.id)), [dapps, favoriteIds]);
 
   const addFavorite = useCallback(
     (id: number) => {
@@ -67,12 +65,12 @@ export function useDapps(): UseDapps {
 
   return useMemo(
     () => ({
-      dapps,
+      dapps: validDapps,
       favorites,
       addFavorite,
       removeFavorite,
       isFavorite
     }),
-    [addFavorite, dapps, favorites, isFavorite, removeFavorite]
+    [addFavorite, favorites, isFavorite, removeFavorite, validDapps]
   );
 }

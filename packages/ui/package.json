@@ -48,6 +48,7 @@
   "dependencies": {
     "@heroui/alert": "^2.2.16",
     "@heroui/avatar": "^2.2.12",
+    "@heroui/badge": "^2.2.10",
     "@heroui/button": "^2.2.16",
     "@heroui/checkbox": "^2.3.15",
     "@heroui/chip": "^2.2.12",
@@ -63,6 +64,7 @@
     "@heroui/scroll-shadow": "^2.3.10",
     "@heroui/skeleton": "^2.2.10",
     "@heroui/spinner": "^2.2.13",
+    "@heroui/switch": "^2.2.14",
     "@heroui/system": "^2.4.12",
     "@heroui/table": "^2.2.15",
     "@heroui/tabs": "^2.2.13",
