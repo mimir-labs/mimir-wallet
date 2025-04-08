@@ -20,7 +20,7 @@ function CallDisplayDetail({
   fallbackWithName?: boolean;
   call?: IMethod | null;
 }) {
-  const { genesisHash } = useApi();
+  const { network, genesisHash } = useApi();
   let comp: React.ReactNode;
 
   const calllFunction = useMemo(() => (call ? registry.findMetaCall(call?.callIndex) : null), [call, registry]);
@@ -50,7 +50,7 @@ function CallDisplayDetail({
   } else if (
     ['assets.transfer', 'assets.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
   ) {
-    const asset = findAssets(genesisHash).find((asset) => asset.assetId === call.args[0].toString());
+    const asset = findAssets(network).find((asset) => asset.assetId === call.args[0].toString());
 
     comp = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

@@ -10,12 +10,12 @@ import IconClock from '@/assets/svg/icon-clock.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { CONNECT_ORIGIN } from '@/constants';
 import { addTxToast } from '@/hooks/useTxQueue';
-import { service } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
 import React, { useState } from 'react';
 
 import { sign, signAndSend, TxEvents, useApi } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 import { Alert, Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import AddressName from '../AddressName';
@@ -52,7 +52,7 @@ function SendTx({
   onSignature?: (signer: string, signature: HexString, tx: HexString, payload: ExtrinsicPayloadValue) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const [loading, setLoading] = useState(false);
   const { txBundle, isLoading, error, hashSet, reserve, unreserve, delay } = buildTx;
   const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
@@ -83,7 +83,7 @@ function SendTx({
 
     try {
       for await (const item of hashSet) {
-        await service.updateCalldata(item);
+        await service.updateCalldata(network, item);
       }
 
       if (onlySign) {
@@ -93,7 +93,7 @@ function SendTx({
           enableWallet(source, CONNECT_ORIGIN)
         );
 
-        await service.uploadWebsite(extrinsicHash.toHex(), website, appName, iconUrl, note, relatedBatches);
+        await service.uploadWebsite(network, extrinsicHash.toHex(), website, appName, iconUrl, note, relatedBatches);
 
         onSignature?.(signer, signature, signedTransaction, payload);
         events.emit('success', 'Sign success');
@@ -106,7 +106,7 @@ function SendTx({
         addTxToast({ events });
 
         events.on('signed', (_, extrinsic) => {
-          service.uploadWebsite(extrinsic.hash.toHex(), website, appName, iconUrl, note, relatedBatches);
+          service.uploadWebsite(network, extrinsic.hash.toHex(), website, appName, iconUrl, note, relatedBatches);
         });
         events.on('inblock', (result) => {
           onResults?.(result);

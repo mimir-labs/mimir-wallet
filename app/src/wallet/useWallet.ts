@@ -34,5 +34,5 @@ export function useAccountSource(address?: string | null) {
 }
 
 export function accountSource(address: string) {
-  return useWallet.getState().walletAccounts.find((item) => item.address === address)?.source;
+  return useWallet.getState().walletAccounts.find((item) => addressEq(item.address, address))?.source;
 }

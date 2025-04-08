@@ -3,7 +3,7 @@
 
 import type { BaseStore } from '../store/BaseStore.js';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { session, store } from '../store/index.js';
 
@@ -22,11 +22,17 @@ export function useStore<T>(
   key: string,
   defaultValue?: T
 ): [T | undefined, (value: T | ((value: T) => T)) => void] {
+  const defaultValueRef = useRef(defaultValue);
   const ref = useRef<BaseStore>(isSession ? session : store);
-  const [value, setValue] = useState<T | undefined>((ref.current.get(key) as T) || defaultValue);
+  const [value, setValue] = useState<T | undefined>((ref.current.get(key) as T) || defaultValueRef.current);
   const latestValue = useRef<T | undefined>(value);
 
   latestValue.current = value;
+  defaultValueRef.current = defaultValue;
+
+  useLayoutEffect(() => {
+    setValue((ref.current.get(key) as T) || defaultValueRef.current);
+  }, [key]);
 
   useEffect(() => {
     const store = ref.current;

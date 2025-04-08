@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TxButton } from '@/components';
-import { service } from '@/utils';
 import { u8aToHex } from '@polkadot/util';
 import React from 'react';
 
 import { decodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 
 function SubmitPure({
   proxy,
@@ -21,7 +21,7 @@ function SubmitPure({
   custom: string;
   proxyType: string;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
 
   return (
     <TxButton
@@ -38,7 +38,7 @@ function SubmitPure({
       beforeSend={
         proxy
           ? async (extrinsic) => {
-              await service.prepareMultisig(u8aToHex(decodeAddress(proxy)), extrinsic.hash.toHex(), name);
+              await service.prepareMultisig(network, u8aToHex(decodeAddress(proxy)), extrinsic.hash.toHex(), name);
             }
           : undefined
       }

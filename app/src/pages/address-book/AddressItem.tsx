@@ -12,13 +12,14 @@ import { useToggle } from '@/hooks/useToggle';
 import { useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 
-import { chainLinks } from '@mimir-wallet/polkadot-core';
+import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 function Icons({ address }: { address: string }) {
   const [qrOpen, toggleQrOpen] = useToggle();
   const [deleteOpen, toggleDeleteOpen] = useToggle();
   const { deleteAddress } = useAccount();
+  const { chain } = useApi();
 
   return (
     <>
@@ -32,7 +33,7 @@ function Icons({ address }: { address: string }) {
         color='primary'
         variant='light'
         as={Link}
-        href={chainLinks.accountExplorerLink(address)}
+        href={chainLinks.accountExplorerLink(chain, address)}
         size='sm'
         target='_blank'
       >

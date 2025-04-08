@@ -5,38 +5,34 @@ import { useAccount } from '@/accounts/useAccount';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { FormatBalance, Fund } from '@/components';
+import { useNativeBalances } from '@/hooks/useBalances';
 import { formatUnits } from '@/utils';
 import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 
 function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [existing, setExisting] = useState(true);
   const [fundOpen, toggleFundOpen] = useToggle(false);
   const [forceHide, setForceHide] = useState(false);
+  const [nativeBalances] = useNativeBalances(address);
 
   const hasThisAccount = useMemo(
     () => isLocalAccount(address) || isLocalAddress(address, true),
     [address, isLocalAccount, isLocalAddress]
   );
 
-  useEffect(() => {
-    const unSubPromise: Promise<() => void> = api.derive.balances.all(address, (allBalances) => {
-      const existing = allBalances.freeBalance
-        .add(allBalances.reservedBalance)
-        .gte(api.consts.balances.existentialDeposit);
+  useLayoutEffect(() => {
+    if (nativeBalances) {
+      const existing = nativeBalances.total.gte(api.consts.balances.existentialDeposit);
 
       setExisting(existing);
-    });
-
-    return () => {
-      unSubPromise?.then((unsub) => unsub());
-    };
-  }, [address, api]);
+    }
+  }, [address, api, nativeBalances]);
 
   const alertOpen = !forceHide && !(hasThisAccount && existing);
 
@@ -104,6 +100,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
       </Box>
 
       <Fund
+        defaultNetwork={network}
         defaultValue={formatUnits(api.consts.balances.existentialDeposit, api.registry.chainDecimals[0])}
         onClose={toggleFundOpen}
         open={fundOpen}

@@ -1,17 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AccountData, AddressMeta } from '@/hooks/types';
+
 import { useAddressStore } from '@/hooks/useAddressStore';
 import { useWallet } from '@/wallet/useWallet';
 import { isEqual } from 'lodash-es';
 import { useEffect, useLayoutEffect } from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { sync } from './sync';
 import { useAccount } from './useAccount';
-import { deriveAddressMeta } from './utils';
+import { deriveAccountMeta } from './utils';
 
 /**
  * AddressConsumer component
@@ -19,7 +21,7 @@ import { deriveAddressMeta } from './utils';
  * This component doesn't render anything but handles important background tasks
  */
 function AddressConsumer() {
-  const { genesisHash, network } = useApi();
+  const { chainSS58 } = useApi();
   const { isWalletReady, walletAccounts } = useWallet();
   const { accounts, addresses } = useAccount();
 
@@ -28,22 +30,21 @@ function AddressConsumer() {
   useLayoutEffect(() => {
     // Helper function to get stored address values
     const getValues = () => {
-      const values: { address: string; name: string; watchlist?: boolean; networks: string[] }[] = [];
+      const values: { address: string; name: string; watchlist?: boolean }[] = [];
 
       store.each((key: string, value) => {
         if (key.startsWith('address:0x')) {
           const v = value as {
             address: string;
-            meta: { name: string; watchlist?: boolean; networks?: string[] };
+            meta: { name: string; watchlist?: boolean };
           };
 
-          if (v?.address && v.meta?.name && (v.meta.networks ? v.meta.networks.includes(network) : true)) {
+          if (v?.address && v.meta?.name) {
             try {
               values.push({
-                address: encodeAddress(v.address),
+                address: encodeAddress(v.address, chainSS58),
                 name: v.meta.name,
-                watchlist: v.meta.watchlist,
-                networks: v.meta.networks || []
+                watchlist: v.meta.watchlist
               });
             } catch {
               /* empty */
@@ -68,45 +69,94 @@ function AddressConsumer() {
         });
       }
     });
-  }, [network]);
+  }, [chainSS58]);
 
   // Update address metadata when accounts or addresses change
   useEffect(() => {
-    useAddressStore.setState({
-      metas: deriveAddressMeta(accounts, addresses)
+    useAddressStore.setState((state) => {
+      const newMetas = Object.fromEntries(Object.entries(state.metas).map((item) => [item[0], { ...item[1] }]));
+
+      for (const account of accounts) {
+        deriveAccountMeta(account, newMetas);
+      }
+
+      // delete injected accounts from metas
+      for (const [, meta] of Object.entries(newMetas)) {
+        delete meta.isInjected;
+        delete meta.source;
+        delete meta.cryptoType;
+      }
+
+      // add injected accounts to metas
+      for (const account of walletAccounts) {
+        const addressHex = addressToHex(account.address);
+
+        newMetas[addressHex] = {
+          ...newMetas[addressHex],
+          isInjected: true,
+          source: account.source,
+          cryptoType: account.type || 'ed25519',
+          name: account.name || newMetas[addressHex].name || ''
+        } as AddressMeta;
+      }
+
+      for (const { name, address } of addresses) {
+        const addressHex = addressToHex(address);
+
+        newMetas[addressHex] = {
+          ...newMetas[addressHex],
+          name
+        };
+      }
+
+      return {
+        metas: newMetas
+      };
     });
-  }, [accounts, addresses]);
+  }, [accounts, addresses, walletAccounts]);
 
   // Sync multisig accounts periodically
   // This effect handles initial sync and periodic updates of multisig account data
   useEffect(() => {
     let interval: any;
 
+    const updateAccounts = (values: AccountData[]) => {
+      useAddressStore.setState((state) => {
+        const newWalletAccounts = walletAccounts
+          .filter((account) => !values.some((a) => addressEq(a.address, account.address)))
+          .map(
+            (account): AccountData => ({
+              createdAt: Date.now(),
+              address: encodeAddress(account.address, chainSS58),
+              name: account.name,
+              delegatees: [],
+              type: 'account'
+            })
+          );
+        const newAccounts = [...values, ...newWalletAccounts];
+
+        return {
+          accounts: isEqual(newAccounts, state.accounts) ? state.accounts : newAccounts,
+          isMultisigSyned: true
+        };
+      });
+    };
+
     if (isWalletReady) {
       // Initial sync when wallet is ready
-      sync(genesisHash, walletAccounts, (values) => {
-        useAddressStore.setState((state) => ({
-          accounts: isEqual(values, state.accounts) ? state.accounts : values,
-          isMultisigSyned: true
-        }));
-      });
+      sync(chainSS58, walletAccounts, updateAccounts);
 
       // Set up periodic sync every 6 seconds
       interval = setInterval(() => {
-        sync(genesisHash, walletAccounts, (values) => {
-          useAddressStore.setState((state) => ({
-            accounts: isEqual(values, state.accounts) ? state.accounts : values,
-            isMultisigSyned: true
-          }));
-        });
-      }, 6000);
+        sync(chainSS58, walletAccounts, updateAccounts);
+      }, 12000);
     }
 
     // Cleanup interval on unmount or when dependencies change
     return () => {
       clearInterval(interval);
     };
-  }, [genesisHash, isWalletReady, walletAccounts]);
+  }, [isWalletReady, chainSS58, walletAccounts]);
 
   // Component doesn't render anything visible
   return null;

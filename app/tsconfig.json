@@ -10,8 +10,7 @@
       "vitest/globals",
       "vite-plugin-pwa/client",
       "vite-plugin-pwa/react",
-      "vite-plugin-svgr/client",
-      "@polkadot/api-augment"
+      "vite-plugin-svgr/client"
     ],
     "paths": {
       "@/*": ["./src/*"]

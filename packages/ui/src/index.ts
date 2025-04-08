@@ -4,6 +4,7 @@
 import type { ButtonProps } from '@heroui/button';
 
 import { Avatar, AvatarGroup } from '@heroui/avatar';
+import { Badge } from '@heroui/badge';
 import { Divider } from '@heroui/divider';
 import { CircularProgress } from '@heroui/progress';
 import { ScrollShadow } from '@heroui/scroll-shadow';
@@ -11,7 +12,7 @@ import { Skeleton } from '@heroui/skeleton';
 import { Spinner } from '@heroui/spinner';
 import { HeroUIProvider } from '@heroui/system';
 
-export { Avatar, AvatarGroup, HeroUIProvider, ScrollShadow, CircularProgress, Spinner, Divider, Skeleton };
+export { Avatar, AvatarGroup, Badge, HeroUIProvider, ScrollShadow, CircularProgress, Spinner, Divider, Skeleton };
 
 export { Button, ButtonGroup } from './button/index.js';
 export { Checkbox, CheckboxGroup, CheckboxIcon } from './checkbox/index.js';
@@ -24,6 +25,7 @@ export { Input } from './input/index.js';
 export { default as Link } from './link/index.js';
 export { Listbox, ListboxItem, ListboxSection } from './listbox/index.js';
 export { Popover, PopoverTrigger, PopoverContent, FreeSoloPopover } from './popover/index.js';
+export { Switch } from './switch/index.js';
 export { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from './table/index.js';
 export { Tabs, Tab } from './tabs/index.js';
 export { default as Tooltip } from './tooltip/index.js';

@@ -5,13 +5,13 @@ import type { SafetyLevel } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
 import { useToggle } from '@/hooks/useToggle';
-import { service } from '@/utils';
 import { useEffect, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 
 export function useSafetyCheck(call: IMethod) {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const [safetyCheck, setSafetyCheck] = useState<SafetyLevel>();
   const [isConfirm, , setConfirm] = useToggle(false);
 
@@ -69,7 +69,7 @@ export function useSafetyCheck(call: IMethod) {
         message: 'This transaction is safe to execute.'
       });
     } else {
-      service.safetyCheck(call.toHex()).then((level) => {
+      service.safetyCheck(network, call.toHex()).then((level) => {
         if (level.severity === 'none') {
           setConfirm(true);
         }
@@ -77,7 +77,7 @@ export function useSafetyCheck(call: IMethod) {
         setSafetyCheck(level);
       });
     }
-  }, [api, call, setConfirm]);
+  }, [api, call, network, setConfirm]);
 
   return [safetyCheck, isConfirm, setConfirm] as const;
 }

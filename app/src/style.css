@@ -27,4 +27,8 @@
   input::placeholder {
     @apply text-foreground/50;
   }
+
+  body {
+    @apply leading-[1.2];
+  }
 }

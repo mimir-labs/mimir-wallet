@@ -8,6 +8,7 @@ import { events } from '@/events';
 import Template from '@/features/template';
 import React, { useEffect } from 'react';
 
+import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 function TemplateButton({
@@ -21,11 +22,19 @@ function TemplateButton({
 }) {
   useEffect(() => {
     const onOpen = () => {
-      open(<Template onClose={close} />);
+      open(
+        <SubApiRoot>
+          <Template onClose={close} />
+        </SubApiRoot>
+      );
     };
 
-    const onAdd = (callData: HexString) => {
-      open(<Template defaultCallData={callData} defaultAdded onClose={close} />);
+    const onAdd = (network: string, callData: HexString) => {
+      open(
+        <SubApiRoot defaultNetwork={network}>
+          <Template defaultCallData={callData} defaultAdded onClose={close} />
+        </SubApiRoot>
+      );
     };
 
     events.on('template_open', onOpen);
@@ -49,7 +58,11 @@ function TemplateButton({
           if (isOpen) {
             close();
           } else {
-            open(<Template onClose={close} />);
+            open(
+              <SubApiRoot>
+                <Template onClose={close} />
+              </SubApiRoot>
+            );
           }
         }}
       >

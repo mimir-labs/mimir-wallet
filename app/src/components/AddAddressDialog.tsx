@@ -24,24 +24,27 @@ function Content({
   onClose?: () => void;
 }) {
   const { addAddress, addresses } = useAccount();
-  const { network } = useApi();
+  const { chainSS58 } = useApi();
   const [name, setName] = useState<string>('');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
   const [info] = useDeriveAccountInfo(address);
   const { display, displayParent } = info || {};
 
-  const _onChangeAddress = useCallback((addressInput: string) => {
-    let address = '';
+  const _onChangeAddress = useCallback(
+    (addressInput: string) => {
+      let address = '';
 
-    try {
-      const publicKey = decodeAddress(addressInput);
+      try {
+        const publicKey = decodeAddress(addressInput);
 
-      address = encodeAddress(publicKey);
-      setAddress(address);
-    } catch {
-      setAddress(addressInput);
-    }
-  }, []);
+        address = encodeAddress(publicKey, chainSS58);
+        setAddress(address);
+      } catch {
+        setAddress(addressInput);
+      }
+    },
+    [chainSS58]
+  );
 
   const exists = useMemo(
     () =>
@@ -59,13 +62,13 @@ function Content({
         throw new Error('not a valid address');
       }
 
-      addAddress(address, display ? display : name.trim(), [network], watchlist);
+      addAddress(address, display ? display : name.trim(), watchlist);
       onAdded?.(address);
       onClose?.();
     } catch (error) {
       toastError(error);
     }
-  }, [address, addAddress, display, name, network, watchlist, onAdded, onClose]);
+  }, [address, addAddress, display, name, watchlist, onAdded, onClose]);
 
   return (
     <>

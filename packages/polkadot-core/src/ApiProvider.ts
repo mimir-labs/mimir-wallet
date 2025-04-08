@@ -44,7 +44,7 @@ const ALIASES: Record<string, string> = {
 
 const RETRY_DELAY = 2_500;
 
-const DEFAULT_TIMEOUT_MS = 60 * 1000;
+const DEFAULT_TIMEOUT_MS = 15 * 1000;
 const TIMEOUT_INTERVAL = 5_000;
 
 /** @internal Clears a Record<*> of all keys, optionally with all callback on clear */
@@ -61,6 +61,29 @@ function eraseRecord<T>(record: Record<string, T>, cb?: (item: T) => void): void
 /** @internal Creates a default/empty stats object */
 function defaultEndpointStats(): EndpointStats {
   return { bytesRecv: 0, bytesSent: 0, cached: 0, errors: 0, requests: 0, subscriptions: 0, timeout: 0 };
+}
+
+function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  retries: number = 10,
+  delay: number = 1000
+): Promise<Response> {
+  return fetch(url, options)
+    .then((response) => {
+      if (response.ok) {
+        return response;
+      }
+
+      throw new Error(`${response.status}::${response.statusText}`);
+    })
+    .catch((error) => {
+      if (retries > 0) {
+        return new Promise((resolve) => setTimeout(() => resolve(fetchWithRetry(url, options, retries - 1)), delay));
+      }
+
+      throw error;
+    });
 }
 
 export class ApiProvider implements ProviderInterface {
@@ -194,8 +217,6 @@ export class ApiProvider implements ProviderInterface {
         // timeout any handlers that have not had a response
         this.#timeoutId = setInterval(() => this.#timeoutHandlers(), TIMEOUT_INTERVAL);
       } catch (error) {
-        console.error(error);
-
         this.#emit('error', error);
 
         throw error;
@@ -366,8 +387,7 @@ export class ApiProvider implements ProviderInterface {
     this.#stats.total.bytesSent += body.length;
 
     try {
-      const response = await fetch(httpUrl, {
-        keepalive: true,
+      const response = await fetchWithRetry(httpUrl, {
         body,
         headers: {
           Accept: 'application/json',
@@ -408,7 +428,9 @@ export class ApiProvider implements ProviderInterface {
     const httpUrl = this.#http;
 
     if (!subscription && !this.#isWsConnected && httpUrl) {
-      return this.#httpSend(body, httpUrl);
+      return this.#httpSend<T>(body, httpUrl).catch(() => {
+        return this.#wsSend<T>(id, body, method, params, subscription);
+      });
     }
 
     return this.#wsSend(id, body, method, params, subscription);

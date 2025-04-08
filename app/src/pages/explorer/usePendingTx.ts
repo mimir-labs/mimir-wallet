@@ -5,8 +5,11 @@ import { TransactionStatus } from '@/hooks/types';
 import { usePendingTransactions } from '@/hooks/useTransactions';
 import { useMemo } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
+
 export function usePendingTx(address: string, url: string) {
-  const [transactions] = usePendingTransactions(address);
+  const { network } = useApi();
+  const [transactions] = usePendingTransactions(network, address);
 
   return useMemo(
     () =>

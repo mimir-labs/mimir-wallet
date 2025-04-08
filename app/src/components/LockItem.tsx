@@ -33,7 +33,7 @@ interface Props {
 }
 
 function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
-  const { api } = useApi();
+  const { api, chainSS58, network } = useApi();
   const [allBalances] = useNativeBalances(address.toString());
   const [open, toggleOpen] = useToggle();
   const onEnoughtStateRef = useRef(onEnoughtState);
@@ -49,8 +49,8 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   }, [allBalances, value]);
 
   useEffect(() => {
-    onEnoughtStateRef.current?.(encodeAddress(address.toString()), isEnought);
-  }, [address, isEnought]);
+    onEnoughtStateRef.current?.(encodeAddress(address.toString(), chainSS58), isEnought);
+  }, [address, isEnought, chainSS58]);
 
   const icon = <div>{isUnLock ? <IconUnLock className='text-primary' /> : <IconLock className='text-primary' />}</div>;
 
@@ -58,6 +58,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
     <>
       {value && address && (
         <Fund
+          defaultNetwork={network}
           defaultValue={formatUnits(value, api.registry.chainDecimals[0])}
           onClose={toggleOpen}
           open={open}

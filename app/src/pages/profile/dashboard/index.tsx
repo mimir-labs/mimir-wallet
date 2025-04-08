@@ -2,14 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
-import { useNativeBalances } from '@/hooks/useBalances';
+import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { useQueryParam } from '@/hooks/useQueryParams';
-import { useTokenInfo } from '@/hooks/useTokenInfo';
-import { formatUnits } from '@/utils';
-import { BN, BN_ZERO } from '@polkadot/util';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Link, Tab, Tabs } from '@mimir-wallet/ui';
 
 import Assets from './Assets';
@@ -20,9 +17,6 @@ import Structure from './Structure';
 
 function Dashboard({ address }: { address: string }) {
   const { genesisHash } = useApi();
-  const [tokenInfo] = useTokenInfo();
-  const [balances] = useNativeBalances(address);
-  const { tokenSymbol, api } = useApi();
   const [tab, setTab] = useQueryParam('tab', 'asset', { replace: true });
   const tabsRef = useRef([
     { tab: 'asset', label: 'Asset' },
@@ -31,26 +25,7 @@ function Dashboard({ address }: { address: string }) {
     { tab: 'multichain', label: 'Multi-Chain' }
   ]);
   const [account] = useQueryAccount(address);
-
-  const [total] = useMemo(() => {
-    const price = tokenInfo?.[tokenSymbol]?.price || '0';
-
-    const priceBN = new BN(Math.ceil(Number(price) * 1e6));
-
-    return [
-      balances?.total.mul(priceBN).divn(1e6),
-      balances?.transferrable.mul(priceBN).divn(1e6),
-      balances?.locked.mul(priceBN).divn(1e6),
-      balances?.reserved.mul(priceBN).divn(1e6)
-    ];
-  }, [balances, tokenInfo, tokenSymbol]);
-
-  const changes = Number(tokenInfo?.[tokenSymbol]?.price_change || '0');
-
-  const totalUsd = useMemo(
-    () => formatUnits(total || BN_ZERO, api.registry.chainDecimals[0]),
-    [api.registry.chainDecimals, total]
-  );
+  const [totalUsd, changes] = useBalanceTotalUsd(address);
 
   return (
     <div className='w-full space-y-5'>
@@ -78,8 +53,12 @@ function Dashboard({ address }: { address: string }) {
           .filter((item) => (item.tab === 'multichain' ? account?.type !== 'pure' : true))
           .map((item) => (
             <Tab key={item.tab} title={item.label}>
-              {tab === 'asset' && <Assets address={address} nativeBalance={balances} />}
-              {tab === 'structure' && <Structure address={address} />}
+              {tab === 'asset' && <Assets address={address} />}
+              {tab === 'structure' && (
+                <SubApiRoot>
+                  <Structure address={address} />
+                </SubApiRoot>
+              )}
               {tab === 'transaction' && <PendingTx address={address} />}
               {account?.type !== 'pure' && tab === 'multichain' && <MultiChain address={address} />}
             </Tab>

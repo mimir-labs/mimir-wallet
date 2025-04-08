@@ -31,7 +31,7 @@ import { Link } from '@mimir-wallet/ui';
 function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onCreateMultisig: () => void }) {
   const selectAccount = useSelectedAccountCallback();
   const [selected, setSelected] = useState<string>(accounts[0].address);
-  const [, confirm] = useUnConfirmMultisigs();
+  const [confirm] = useUnConfirmMultisigs();
   const navigate = useNavigate();
 
   const handleClick = () => {

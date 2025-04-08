@@ -13,8 +13,8 @@ import { utm } from '@/config';
 import { CONNECT_ORIGIN, DETECTED_ACCOUNT_KEY } from '@/constants';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { addTxToast } from '@/hooks/useTxQueue';
-import { service, sleep } from '@/utils';
-import { accountSource, useAccountSource, useWallet } from '@/wallet/useWallet';
+import { sleep } from '@/utils';
+import { accountSource, useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Stack, Typography } from '@mui/material';
 import { u8aEq, u8aToHex } from '@polkadot/util';
@@ -23,7 +23,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { addressToHex, signAndSend, useApi } from '@mimir-wallet/polkadot-core';
-import { store } from '@mimir-wallet/service';
+import { service, store } from '@mimir-wallet/service';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 interface Props {
@@ -75,9 +75,8 @@ function CreateFlexible({
     who
   }
 }: Props) {
-  const { api } = useApi();
-  const { walletAccounts } = useWallet();
-  const [signer, setSigner] = useState<string | undefined>(creator || walletAccounts[0].address);
+  const { api, network, setRootNetwork, chain } = useApi();
+  const [signer, setSigner] = useState<string>('');
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
   const [blockNumber, setBlockNumber] = useState<number | null | undefined>(_blockNumber);
   const [extrinsicIndex, setExtrinsicIndex] = useState<number | null | undefined>(_extrinsicIndex);
@@ -128,7 +127,7 @@ function CreateFlexible({
       events.once('finalized', async () => {
         while (true) {
           try {
-            const data = await service.getFullAccount(pure);
+            const data = await service.getFullAccount(network, pure);
 
             if (data) {
               break;
@@ -141,12 +140,13 @@ function CreateFlexible({
         }
 
         selectAccount(pure);
+        setRootNetwork(network);
 
         navigate('/');
       });
       events.once('error', () => setLoadingSecond(false));
     },
-    [api, navigate, selectAccount]
+    [api, selectAccount, setRootNetwork, network, navigate]
   );
 
   const createPure = useCallback(() => {
@@ -159,6 +159,7 @@ function CreateFlexible({
         if (!name) throw new Error('Please provide account name');
 
         await service.prepareMultisig(
+          network,
           addressToHex(extrinsic.signer.toString()),
           extrinsic.hash.toHex(),
           name,
@@ -193,13 +194,13 @@ function CreateFlexible({
           )
         );
 
-        utm && service.utm(addressToHex(_pure), utm);
+        utm && service.utm(network, addressToHex(_pure), utm);
       }
     });
     events.once('error', () => {
       setLoadingFirst(false);
     });
-  }, [signer, source, api, name, threshold, who, createMembers]);
+  }, [signer, source, api, name, threshold, who, createMembers, network]);
 
   const killPure = useCallback(
     (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
@@ -235,16 +236,22 @@ function CreateFlexible({
       <Accordion expanded={false}>
         <AccordionSummary>
           <ItemStep>1</ItemStep>
-          {pure ? (
-            <>
-              <Box color='primary.main' component='span'>
-                <Address shorten value={pure} />
-              </Box>
-              &nbsp; Created!
-            </>
-          ) : (
-            <>Create Flexible Multisig Account</>
-          )}
+          <div className='flex items-center gap-2 justify-between'>
+            {pure ? (
+              <>
+                <Box color='primary.main' component='span'>
+                  <Address shorten value={pure} />
+                </Box>
+                &nbsp; Created!
+              </>
+            ) : (
+              <>Create Flexible Multisig Account</>
+            )}
+            <div className='flex gap-1 items-centertext-small'>
+              <img src={chain.icon} style={{ width: 20, height: 20 }} />
+              {chain.name}
+            </div>
+          </div>
         </AccordionSummary>
       </Accordion>
       <Accordion expanded>

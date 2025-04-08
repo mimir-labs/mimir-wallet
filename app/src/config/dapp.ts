@@ -5,7 +5,6 @@ import BatchIcon from '@/assets/images/batch.svg';
 import Failed from '@/assets/images/failed.svg';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import TemplateIcon from '@/assets/svg/template.svg';
-import { isArray } from '@polkadot/util';
 
 import { allEndpoints } from '@mimir-wallet/polkadot-core';
 
@@ -205,26 +204,61 @@ export const dapps: DappOption[] = [
   {
     id: 1002,
     icon: '/dapp-icons/subsquare.svg',
-    name: 'Subsquare(Polkadot)',
+    name: 'Subsquare',
     description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
     url: 'https://polkadot.subsquare.io/',
-    supportedChains: ['polkadot'],
+    supportedChains: [
+      'polkadot',
+      'assethub-polkadot',
+      'kusama',
+      'assethub-kusama',
+      'acala',
+      'phala',
+      'collectives-polkadot',
+      'bifrost-polkadot',
+      'hydration',
+      'bifrost-kusama',
+      'karura',
+      'westend',
+      'assethub-westend',
+      'paseo',
+      'assethub-paseo',
+      'crust',
+      'vara',
+      'zkverify-testnet'
+    ],
     tags: ['Governance'],
     website: 'https://www.subsquare.io/',
     twitter: 'https://twitter.com/OpensquareN',
-    github: 'https://github.com/opensquare-network'
-  },
-  {
-    id: 1003,
-    icon: '/dapp-icons/subsquare.svg',
-    name: 'Subsquare(Kusama)',
-    description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
-    url: 'https://kusama.subsquare.io/',
-    supportedChains: ['kusama'],
-    tags: ['Governance'],
-    website: 'https://www.subsquare.io/',
-    twitter: 'https://twitter.com/OpensquareN',
-    github: 'https://github.com/opensquare-network'
+    github: 'https://github.com/opensquare-network',
+    urlSearch(network: string) {
+      const url = {
+        polkadot: 'https://polkadot.subsquare.io/',
+        'assethub-polkadot': 'https://polkadot.subsquare.io/assethub',
+        kusama: 'https://kusama.subsquare.io/',
+        'assethub-kusama': 'https://kusama.subsquare.io/assethub',
+        acala: 'https://acala.subsquare.io/',
+        phala: 'https://phala.subsquare.io/',
+        'collectives-polkadot': 'https://collectives.subsquare.io/',
+        'bifrost-polkadot': 'https://bifrost.subsquare.io/',
+        hydration: 'https://hydration.subsquare.io/',
+        'bifrost-kusama': 'https://bifrost-kusama.subsquare.io/',
+        karura: 'https://karura.subsquare.io/',
+        westend: 'https://westend.subsquare.io/',
+        'assethub-westend': 'https://westend.subsquare.io/assethub',
+        paseo: 'https://paseo.subsquare.io/',
+        'assethub-paseo': 'https://paseo.subsquare.io/assethub',
+        crust: 'https://crust.subsquare.io/',
+        vara: 'https://vara.subsquare.io/',
+        'zkverify-testnet': 'https://zkverify-testnet.subsquare.io/'
+      }[network];
+
+      if (!url) {
+        return new URL(this.url);
+      }
+
+      return new URL(url);
+    }
   },
   {
     id: 1004,
@@ -298,16 +332,6 @@ export const dapps: DappOption[] = [
       'coretime-kusama',
       'people-kusama'
     ],
-    destChain: {
-      polkadot: 'people-polkadot',
-      'assethub-polkadot': 'people-polkadot',
-      'coretime-polkadot': 'people-polkadot',
-      'collectives-polkadot': 'people-polkadot',
-      // kusama
-      kusama: 'people-kusama',
-      'assethub-kusama': 'people-kusama',
-      'coretime-kusama': 'people-kusama'
-    },
     tags: ['Identity'],
     matrix: 'https://matrix.to/#/#polkaidentity:matrix.org'
   },
@@ -324,7 +348,3 @@ export const dapps: DappOption[] = [
   },
   DotConsoleApp
 ];
-
-export function findSupportedDapps(network: string): DappOption[] {
-  return dapps.filter((item) => (isArray(item.supportedChains) ? item.supportedChains.includes(network) : true));
-}

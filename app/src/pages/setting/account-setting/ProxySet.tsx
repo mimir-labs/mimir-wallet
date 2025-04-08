@@ -42,7 +42,7 @@ function ProxySet({
   address: string;
   proxies: Vec<PalletProxyProxyDefinition>;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const { isLocalAccount } = useAccount();
   const { addQueue } = useTxQueue();
   const { meta } = useAddressMeta(address);
@@ -100,7 +100,8 @@ function ProxySet({
                                 proxies.length === 1
                                   ? api.tx.proxy.removeProxies()
                                   : api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType, proxy.delay),
-                              website: 'mimir://internal/setup'
+                              website: 'mimir://internal/setup',
+                              network
                             });
                           }
                     }

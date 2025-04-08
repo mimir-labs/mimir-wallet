@@ -93,7 +93,7 @@ function SubmitProxy({
   proxyArgs: ProxyArgs[];
   setProxyArgs: React.Dispatch<React.SetStateAction<ProxyArgs[]>>;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const [alertOpen, toggleAlertOpen] = useToggle(false);
   const { addQueue } = useTxQueue();
   const [detacted, setDetacted] = useState<string[]>([]);
@@ -116,6 +116,7 @@ function SubmitProxy({
       call,
       accountId: proxied,
       website: 'mimir://internal/setup',
+      network,
       onResults: (result) => {
         setProxyArgs([]);
         const events = result.events.filter((item) => api.events.proxy.ProxyAdded.is(item.event));
@@ -140,7 +141,7 @@ function SubmitProxy({
         }
       }
     });
-  }, [addQueue, api, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
+  }, [addQueue, api, network, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
 
   const handleClickAction = useAsyncFn(async () => {
     const detacted: Set<string> = new Set();
@@ -149,7 +150,7 @@ function SubmitProxy({
       const result = await api.query.proxy.proxies(delegate);
 
       for (const item of result[0]) {
-        if (item.proxyType.type === 'Any' || item.proxyType.type === 'NonTransfer') {
+        if (item.proxyType.type === 'Any' || (item.proxyType.type as string) === 'NonTransfer') {
           detacted.add(item.delegate.toString());
         }
       }

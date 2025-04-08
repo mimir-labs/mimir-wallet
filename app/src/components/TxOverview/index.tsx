@@ -37,7 +37,7 @@ import {
   useNodesState
 } from 'reactflow';
 
-import { addressEq } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex } from '@mimir-wallet/polkadot-core';
 
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
@@ -279,10 +279,10 @@ function makeNodes(
 
     const nodeId = node.parentId
       ? blake2AsHex(
-          `${node.parentId}-${node.from === 'delegate' ? `${node.value.proxyDelay}.${node.value.proxyType}.${node.value.proxyNetwork}` : node.from === 'member' ? 'member' : ''}-${node.value.address}`,
+          `${node.parentId}-${node.from === 'delegate' ? `${node.value.proxyDelay}.${node.value.proxyType}.${node.value.proxyNetwork}` : node.from === 'member' ? 'member' : ''}-${addressToHex(node.value.address)}`,
           64
         )
-      : blake2AsHex(node.value.address, 64);
+      : blake2AsHex(addressToHex(node.value.address), 64);
 
     if (!node.parent) {
       nodes.push(createNode(nodeId, node.value, true, path.slice(), approvalForThisPath, transaction));

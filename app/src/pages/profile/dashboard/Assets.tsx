@@ -1,13 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountBalance } from '@/hooks/types';
-import type { BN } from '@polkadot/util';
+import type { AccountAssetInfo } from '@/hooks/types';
 
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { FormatBalance } from '@/components';
-import { findToken } from '@/config';
-import { useAssetBalances } from '@/hooks/useBalances';
+import { useAssetBalancesAll } from '@/hooks/useBalances';
+import { formatDisplay, formatUnits } from '@/utils';
 import {
   Avatar,
   Box,
@@ -21,12 +20,14 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
+import { BN, BN_ZERO } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Link } from '@mimir-wallet/ui';
+import { Link, Skeleton, Tooltip } from '@mimir-wallet/ui';
 
 function AssetRow({
+  network,
   assetId,
   decimals,
   icon,
@@ -34,50 +35,104 @@ function AssetRow({
   reserved,
   symbol,
   total,
-  transferrable
+  transferrable,
+  isNative,
+  price,
+  change24h
 }: {
-  symbol?: string;
+  network: string;
+  symbol: string;
   icon?: string;
-  decimals?: number;
+  decimals: number;
   transferrable?: BN;
-  assetId?: string;
-  locked?: BN;
-  reserved?: BN;
-  total?: BN;
+  assetId: string;
+  locked: BN;
+  reserved: BN;
+  total: BN;
+  isNative: boolean;
+  price: number;
+  change24h: number;
 }) {
-  const { api, tokenSymbol } = useApi();
-  const format = useMemo(
-    (): [decimals: number, unit: string] => [decimals ?? api.registry.chainDecimals[0], symbol || tokenSymbol],
-    [api.registry.chainDecimals, decimals, symbol, tokenSymbol]
+  const { allApis } = useApi();
+  const format = useMemo((): [decimals: number, unit: string] => [decimals, symbol], [decimals, symbol]);
+  const chainIcon = allApis[network]?.chain?.icon;
+  const balanceUsd = useMemo(
+    () => formatDisplay(formatUnits(total.mul(new BN((price * 1e8).toFixed(0))).div(new BN(1e8)), decimals)),
+    [total, price, decimals]
   );
 
   return (
     <TableRow>
       <TableCell>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Avatar alt='Token' src={icon} sx={{ width: 30, height: 30 }}>
-            {(symbol || tokenSymbol).slice(0, 1)}
-          </Avatar>
-          {symbol || tokenSymbol}
+          <div className='relative'>
+            <Avatar alt='Token' src={icon} sx={{ position: 'relative', width: 30, height: 30 }} />
+            <Avatar
+              alt='Chain'
+              src={chainIcon}
+              sx={{
+                border: '1px solid',
+                borderColor: 'black',
+                bgcolor: 'white',
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                width: 14,
+                height: 14
+              }}
+            />
+          </div>
+
+          {symbol}
+
+          {!isNative && <span className='text-xs text-gray-500'>{assetId}</span>}
         </Box>
       </TableCell>
-      <TableCell>
-        <FormatBalance format={format} value={total} />
+      <TableCell>{price}</TableCell>
+      <TableCell
+        data-up={change24h > 0}
+        data-down={change24h < 0}
+        className='text-foreground/50 data-[up=true]:text-success data-[down=true]:text-danger'
+      >
+        {change24h > 0 ? '+' : ''}
+        {change24h ? (change24h * 100).toFixed(2) : '0'}%
       </TableCell>
       <TableCell>
-        <FormatBalance format={format} value={transferrable} />
+        ${balanceUsd[0]}
+        {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
+        {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
       </TableCell>
       <TableCell>
-        <FormatBalance format={format} value={reserved} />
-      </TableCell>
-      <TableCell>
-        <FormatBalance format={format} value={locked} />
+        <Tooltip
+          shadow='md'
+          placement='bottom-start'
+          content={
+            <div className='space-y-4 [&_div]:flex [&_div]:items-center [&_div]:justify-between [&_div]:gap-x-4'>
+              <div>
+                <span>Transferable</span>
+                <FormatBalance format={format} value={transferrable} />
+              </div>
+              <div>
+                <span>Reserved</span>
+                <FormatBalance format={format} value={reserved} />
+              </div>
+              <div>
+                <span>Locked</span>
+                <FormatBalance format={format} value={locked} />
+              </div>
+            </div>
+          }
+        >
+          <span>
+            <FormatBalance format={format} value={total} />
+          </span>
+        </Tooltip>
       </TableCell>
       <TableCell align='right'>
         <Button
           component={Link}
           endIcon={<SvgIcon component={IconSend} inheritViewBox />}
-          href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}`}
+          href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
           variant='outlined'
           size='small'
         >
@@ -88,9 +143,36 @@ function AssetRow({
   );
 }
 
-function Assets({ address, nativeBalance }: { address: string; nativeBalance?: AccountBalance }) {
-  const { genesisHash } = useApi();
-  const assets = useAssetBalances(address);
+function Assets({ address }: { address: string }) {
+  const assets = useAssetBalancesAll(address);
+
+  const [list, done] = useMemo(() => {
+    const _list: AccountAssetInfo[] = [];
+    let done = true;
+
+    for (const item of assets) {
+      if (item.isFetched) {
+        if (item.data) {
+          _list.push(...item.data);
+        }
+      } else {
+        done = false;
+      }
+    }
+
+    return [
+      _list
+        .filter((item) => item.total.gt(BN_ZERO))
+        .sort((a, b) =>
+          b.total
+            .mul(new BN((b.price * 1e18).toFixed(0)))
+            .div(new BN((10 ** b.decimals).toString()))
+            .cmp(a.total.mul(new BN((a.price * 1e18).toFixed(0))).div(new BN((10 ** a.decimals).toString())))
+        )
+        .filter((item) => item.total.gt(BN_ZERO)),
+      done
+    ];
+  }, [assets]);
 
   return (
     <TableContainer
@@ -110,36 +192,38 @@ function Assets({ address, nativeBalance }: { address: string; nativeBalance?: A
         <TableHead>
           <TableRow>
             <TableCell>Token</TableCell>
-            <TableCell>Total</TableCell>
-            <TableCell>Transferable</TableCell>
-            <TableCell>Reserved</TableCell>
-            <TableCell>Locked</TableCell>
+            <TableCell>Price</TableCell>
+            <TableCell>24h Change</TableCell>
+            <TableCell>USD Value</TableCell>
+            <TableCell>Amount</TableCell>
             <TableCell align='right'>Operation</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          <AssetRow
-            key='native-asset'
-            assetId='native'
-            locked={nativeBalance?.locked}
-            reserved={nativeBalance?.reserved}
-            total={nativeBalance?.total}
-            icon={findToken(genesisHash).Icon}
-            transferrable={nativeBalance?.transferrable}
-          />
-          {assets.map((item) => (
+          {list.map((item) => (
             <AssetRow
+              key={`asset-balance-${item.assetId}-${item.network}`}
+              network={item.network}
               assetId={item.assetId}
               decimals={item.decimals}
               icon={item.icon}
-              key={`asset-balance-${item.assetId}`}
+              isNative={item.isNative}
               locked={item.locked}
               reserved={item.reserved}
               symbol={item.symbol}
               total={item.total}
               transferrable={item.transferrable}
+              price={item.price}
+              change24h={item.change24h}
             />
           ))}
+          {!done ? (
+            <TableRow>
+              <TableCell colSpan={6} align='center'>
+                <Skeleton className='h-8 w-full rounded-md' />
+              </TableCell>
+            </TableRow>
+          ) : null}
         </TableBody>
       </Table>
     </TableContainer>

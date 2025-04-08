@@ -17,7 +17,7 @@ import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir
 import { useAnnouncementStatus } from '../hooks/useAnnouncementStatus';
 
 function ExecuteAnnounce({ account, transaction }: { account: AccountData; transaction: Transaction }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const { addQueue } = useTxQueue();
   const { walletAccounts } = useWallet();
   const [status] = useAnnouncementStatus(transaction, account);
@@ -67,8 +67,10 @@ function ExecuteAnnounce({ account, transaction }: { account: AccountData; trans
         toastError(`can not find delegate(${delegate})`);
       } else {
         addQueue({
+          accountId: walletAccounts[0].address,
           call: api.tx.proxy.proxyAnnounced(delegate, transaction.address, proxyDefine.proxyType, call),
-          website: 'mimir://internal/execute-announcement'
+          website: 'mimir://internal/execute-announcement',
+          network
         });
       }
     } catch (error) {

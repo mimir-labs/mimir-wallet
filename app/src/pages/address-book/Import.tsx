@@ -47,16 +47,16 @@ function Import() {
                   item[header] = row[index];
                 });
 
-                if (item.address && item.name && item.network && isAddress(item.address)) {
-                  return [item.address, item.name, item.network];
+                if (item.address && item.name && isAddress(item.address)) {
+                  return [item.address, item.name];
                 }
 
                 return null;
               })
               .filter((item): item is [string, string, string] => item !== null);
 
-            for (const [address, name, network] of parsedData) {
-              addAddress(address, name, network.split(','));
+            for (const [address, name] of parsedData) {
+              addAddress(address, name);
             }
 
             toastSuccess('Import successful');

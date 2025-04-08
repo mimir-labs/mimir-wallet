@@ -1,17 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NETWORK_RPC_PREFIX as NETWORK_RPC_PREFIX_CORE } from '@mimir-wallet/polkadot-core';
-
 export const SWITCH_ACCOUNT_REMIND_KEY = 'switch_account_remind';
 
 export const API_METADATA_KEY = 'api_metadata';
 export const CURRENT_NETWORK_KEY = 'current_network';
-export const CURRENT_ADDRESS_PREFIX = 'current_address:';
+export const CURRENT_ADDRESS_HEX_KEY = 'current_address_hex';
 export const HIDE_ACCOUNT_PREFIX = 'hide_address:';
-
-export const BATCH_TX_PREFIX = 'batch_tx:';
-export const BATCH_SYNC_TX_PREFIX = 'batch_sync_tx:';
 
 export const FAVORITE_DAPP_KEY = 'favorite_dapp';
 export const DETECTED_ACCOUNT_KEY = 'detected_account';
@@ -33,8 +28,13 @@ export const NOT_CREATE_MULTISIG_NOW_KEY = 'not_create_multisig_now';
 export const EXTENSION_PREFIX = 'mimir-wallet';
 export const MESSAGE_ORIGIN_WALLET = `${EXTENSION_PREFIX}wallet`;
 
-export const ADDRESS_BOOK_UPGRADE_VERSION_KEY = 'address_book_upgrade_version';
+/** @deprecated Use CURRENT_ADDRESS_HEX_KEY instead */
+export const CURRENT_ADDRESS_PREFIX = 'current_address:';
 
-export const NETWORK_RPC_PREFIX = NETWORK_RPC_PREFIX_CORE;
-
+/** @deprecated Use BATCH_TX_ADDRESS_PREFIX instead */
+export const BATCH_TX_PREFIX = 'batch_tx:';
+export const BATCH_TX_V2_PREFIX = 'batch_tx_v2:';
+/** @deprecated Use BATCH_SYNC_TX_V2_PREFIX instead */
+export const BATCH_SYNC_TX_PREFIX = 'batch_sync_tx:';
+export const BATCH_SYNC_TX_V2_PREFIX = 'batch_sync_tx_v2:';
 export const TEMPLATE_PREFIX = 'template:';

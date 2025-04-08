@@ -9,7 +9,7 @@ import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { addressEq, encodeAddress } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Chip } from '@mimir-wallet/ui';
 
 import AddressComp from './Address';
@@ -42,7 +42,8 @@ function AddressCell({
   withCopy = false,
   withAddressBook = false
 }: Props) {
-  const address = useMemo(() => encodeAddress(value), [value]);
+  const { chainSS58 } = useApi();
+  const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
   const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
 
