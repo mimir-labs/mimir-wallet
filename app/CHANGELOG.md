@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.28.2](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.28.1...mimir-wallet-app-v1.28.2) (2025-04-08)
+
+
+### Bug Fixes
+
+* Add LiquidityRestrictions error handling for reserve lock checks ([#197](https://github.com/mimir-labs/mimir-wallet/issues/197)) ([dfe564d](https://github.com/mimir-labs/mimir-wallet/commit/dfe564dd64334caa0ea3b0f33c743762f89177f6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.28.2
+    * @mimir-wallet/service bumped to 1.28.2
+    * @mimir-wallet/ui bumped to 1.28.2
+
 ## [1.28.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.28.0...mimir-wallet-app-v1.28.1) (2025-03-31)
 
 
