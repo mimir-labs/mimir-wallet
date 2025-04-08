@@ -11,7 +11,6 @@ import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@/components';
 import { utm } from '@/config';
 import { CONNECT_ORIGIN, DETECTED_ACCOUNT_KEY } from '@/constants';
-import { useNativeBalances } from '@/hooks/useBalances';
 import { addTxToast } from '@/hooks/useTxQueue';
 import { service, sleep } from '@/utils';
 import { accountSource, useAccountSource, useWallet } from '@/wallet/useWallet';
@@ -83,7 +82,6 @@ function CreateFlexible({
   const [extrinsicIndex, setExtrinsicIndex] = useState<number | null | undefined>(_extrinsicIndex);
   const navigate = useNavigate();
   const selectAccount = useSelectedAccountCallback();
-  const [allBalances] = useNativeBalances(signer);
   const [loadingFirst, setLoadingFirst] = useState(false);
   const [loadingSecond, setLoadingSecond] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
@@ -91,17 +89,10 @@ function CreateFlexible({
   const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
   const isEnought = signer ? !!enoughtState[signer] : false;
 
-  const reservedAmount = useMemo(() => {
-    const baseReserve = api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2));
-
-    if (allBalances?.free.gte(api.consts.balances.existentialDeposit)) {
-      baseReserve.iadd(api.consts.balances.existentialDeposit.divn(10)); // for gas
-    } else {
-      baseReserve.iadd(api.consts.balances.existentialDeposit.muln(1.1)); // mul 1.1 for gas
-    }
-
-    return baseReserve;
-  }, [allBalances, api]);
+  const reservedAmount = useMemo(
+    () => api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2)),
+    [api]
+  );
 
   const createMembers = useCallback(
     (pure: string, who: string[], signer: string, source: string, threshold: number) => {

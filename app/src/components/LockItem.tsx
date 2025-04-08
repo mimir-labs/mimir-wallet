@@ -42,11 +42,14 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 
   const isEnought = useMemo(() => {
     if (allBalances) {
-      return allBalances.transferrable.gte(new BN(value.toString()));
+      return (
+        allBalances.transferrable.gte(new BN(value.toString()).add(api.consts.balances.existentialDeposit)) &&
+        allBalances.free.gte(allBalances.locked.add(new BN(value.toString())))
+      );
     }
 
     return 'pending';
-  }, [allBalances, value]);
+  }, [allBalances, api, value]);
 
   useEffect(() => {
     onEnoughtStateRef.current?.(encodeAddress(address.toString()), isEnought);
