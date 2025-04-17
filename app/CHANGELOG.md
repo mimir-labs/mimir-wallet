@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.29.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.28.2...mimir-wallet-app-v1.29.0) (2025-04-17)
+
+
+### Features
+
+* distinguish between transactions already added to batch and those not yet added in Restore page to prevent duplicate additions ([#200](https://github.com/mimir-labs/mimir-wallet/issues/200)) ([f5f26ee](https://github.com/mimir-labs/mimir-wallet/commit/f5f26ee38eb88ba71fa53a1b8105e5e92244d90a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.29.0
+    * @mimir-wallet/service bumped to 1.29.0
+    * @mimir-wallet/ui bumped to 1.29.0
+
 ## [1.28.2](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.28.1...mimir-wallet-app-v1.28.2) (2025-04-08)
 
 
