@@ -6,16 +6,32 @@ import type { TxSubmitProps } from './types';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
-import { Spinner } from '@mimir-wallet/ui';
+import { Avatar, Spinner } from '@mimir-wallet/ui';
 
+import MimirLoading from '../animation/MimirLoading';
 import TxSubmit from './TxSubmit';
 
 function Content({ accountId, ...props }: TxSubmitProps) {
-  const { isApiReady } = useApi();
+  const { isApiReady, chain } = useApi();
   const [accountData] = useQueryAccount(accountId);
 
   if (!isApiReady || !accountData) {
-    return <Spinner size='lg' variant='wave' />;
+    return (
+      <div className='w-full p-4 sm:p-5 h-auto md:h-[calc(100dvh-160px)] flex flex-col items-center justify-center gap-5'>
+        {!isApiReady ? (
+          <>
+            <MimirLoading />
+            <h6 className='flex items-center '>
+              Connecting to the&nbsp;
+              <Avatar src={chain.icon} style={{ width: 20, height: 20 }} />
+              &nbsp;{chain.name}...
+            </h6>
+          </>
+        ) : (
+          <Spinner size='lg' variant='dots' label={'Fetching account data...'} />
+        )}
+      </div>
+    );
   }
 
   return <TxSubmit {...props} accountData={accountData} />;
@@ -23,7 +39,7 @@ function Content({ accountId, ...props }: TxSubmitProps) {
 
 function TxSubmitRoot({ network, ...props }: TxSubmitProps & { network: string }) {
   return (
-    <SubApiRoot forceNetwork={network}>
+    <SubApiRoot network={network}>
       <Content {...props} />
     </SubApiRoot>
   );

@@ -1,28 +1,46 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useContext, useState } from 'react';
+import type { ValidApiState } from './types.js';
+
+import { isHex } from '@polkadot/util';
+import React, { useContext, useMemo } from 'react';
 
 import { ApiContext, SubApiContext } from './context.js';
-import { useAllApis } from './useApiStore.js';
+import { useNetworks } from './useNetworks.js';
 
-function ApiRoot({
+type Fallback = React.ComponentType<{ apiState: ValidApiState }>;
+
+function OmniApiRoot({
   children,
-  forceNetwork,
-  defaultNetwork
+  supportedNetworks,
+  network: networkOrGenesisHash,
+  Fallback
 }: {
-  forceNetwork?: string;
-  defaultNetwork?: string;
+  network: string; // network or genesisHash
+  supportedNetworks?: string[]; // network or genesisHash
+  Fallback?: Fallback;
   children: React.ReactNode;
-}): JSX.Element | null {
-  const { chains } = useAllApis();
-  const { network: rootNetwork } = useContext(ApiContext);
-  const [_network, _setNetwork] = useState<string>(() =>
-    defaultNetwork ? (chains[defaultNetwork] ? defaultNetwork : rootNetwork) : rootNetwork
-  );
+}) {
+  const { allApis, chainSS58, ss58Chain, setSs58Chain } = useContext(ApiContext);
 
-  const network = forceNetwork || _network;
-  const networkValues = chains[network];
+  const supportedApis = useMemo(() => {
+    return supportedNetworks
+      ? Object.fromEntries(
+          Object.entries(allApis).filter(([, { genesisHash, network }]) =>
+            supportedNetworks.some((networkOrGenesisHash) =>
+              isHex(networkOrGenesisHash) ? networkOrGenesisHash === genesisHash : networkOrGenesisHash === network
+            )
+          )
+        )
+      : allApis;
+  }, [allApis, supportedNetworks]);
+
+  const networkValues = useMemo(() => {
+    return isHex(networkOrGenesisHash)
+      ? Object.values(allApis).find(({ genesisHash }) => genesisHash === networkOrGenesisHash)
+      : allApis[networkOrGenesisHash];
+  }, [allApis, networkOrGenesisHash]);
 
   if (!networkValues || !networkValues.api) {
     return null;
@@ -32,14 +50,40 @@ function ApiRoot({
     <SubApiContext.Provider
       value={{
         ...networkValues,
-        network: network ? network : networkValues.network,
-        setNetwork: _setNetwork,
-        api: networkValues.api
+        chainSS58,
+        ss58Chain,
+        setSs58Chain,
+        allApis: supportedApis,
+        network: networkValues.network
       }}
     >
-      {children}
+      {Fallback && !networkValues.isApiReady ? <Fallback apiState={networkValues} /> : children}
     </SubApiContext.Provider>
   );
 }
 
-export default ApiRoot;
+function SubApiRoot({
+  children,
+  supportedNetworks,
+  network: networkOrGenesisHash,
+  Fallback
+}: {
+  network: string; // network or genesisHash
+  supportedNetworks?: string[]; // network or genesisHash
+  Fallback?: Fallback;
+  children: React.ReactNode;
+}): React.ReactNode {
+  const { mode } = useNetworks();
+
+  if (mode === 'omni') {
+    return (
+      <OmniApiRoot supportedNetworks={supportedNetworks} network={networkOrGenesisHash} Fallback={Fallback}>
+        {children}
+      </OmniApiRoot>
+    );
+  }
+
+  return children;
+}
+
+export default SubApiRoot;

@@ -30,7 +30,7 @@ export function useBatchSync(network: string, address?: string): [SyncBatchItem[
     queryHash: service.getClientUrl(`chains/${network}/${addressHex}/transactions/batch`),
     queryKey: [addressHex ? service.getClientUrl(`chains/${network}/${addressHex}/transactions/batch`) : null]
   });
-  const [, addTx] = useBatchTxs(address);
+  const [, addTx] = useBatchTxs(network, address);
   const [synced, setSynced] = useLocalStore<Record<HexString, number[]>>(`${BATCH_SYNC_TX_V2_PREFIX}${network}`, {});
   const [list, setList] = useState<SyncBatchItem[]>([]);
 

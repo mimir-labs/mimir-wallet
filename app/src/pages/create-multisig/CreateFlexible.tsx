@@ -74,7 +74,7 @@ function CreateFlexible({
     who
   }
 }: Props) {
-  const { api, network, setRootNetwork, chain } = useApi();
+  const { api, network, chain } = useApi();
   const [signer, setSigner] = useState<string>('');
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
   const [blockNumber, setBlockNumber] = useState<number | null | undefined>(_blockNumber);
@@ -118,7 +118,7 @@ function CreateFlexible({
       events.once('finalized', async () => {
         while (true) {
           try {
-            const data = await service.getFullAccount(network, pure);
+            const data = await service.getDetails(network, pure);
 
             if (data) {
               break;
@@ -131,13 +131,12 @@ function CreateFlexible({
         }
 
         selectAccount(pure);
-        setRootNetwork(network);
 
         navigate('/');
       });
       events.once('error', () => setLoadingSecond(false));
     },
-    [api, selectAccount, setRootNetwork, network, navigate]
+    [api, selectAccount, network, navigate]
   );
 
   const createPure = useCallback(() => {

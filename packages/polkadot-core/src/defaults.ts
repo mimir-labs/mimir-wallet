@@ -7,6 +7,8 @@ import { isCodec } from '@polkadot/util';
 import { decodeAddress as decodeAddressBase, encodeAddress as encodeAddressBase } from '@polkadot/util-crypto';
 
 export const NETWORK_RPC_PREFIX = 'network_rpc:';
+export const CURRENT_NETWORK_KEY = 'current_network';
+export const DEFAULE_SS58_CHAIN_KEY = 'default_ss58_chain';
 
 export const DEFAULT_AUX = ['Aux1', 'Aux2', 'Aux3', 'Aux4', 'Aux5', 'Aux6', 'Aux7', 'Aux8', 'Aux9'];
 

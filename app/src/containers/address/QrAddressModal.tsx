@@ -1,24 +1,24 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
-
+import { CopyButton, InputNetwork } from '@/components';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { useQrAddress } from '@/hooks/useQrAddress';
 import qrcode from 'qrcode-generator';
 import React, { useEffect, useRef } from 'react';
 
 import { encodeAddress, SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
-import CopyButton from './CopyButton';
-import InputNetwork from './InputNetwork';
-
-interface Props {
-  open: boolean;
-  onClose?: () => void;
-  value: AccountId | AccountIndex | Address | string | Uint8Array | null | undefined;
-}
-
-function Content({ value }: { value: string }) {
+function Content({
+  value,
+  network,
+  setNetwork
+}: {
+  value: string;
+  network: string;
+  setNetwork: (network: string) => void;
+}) {
   const { chain } = useApi();
   const qr = useRef(qrcode(0, 'M'));
   const container = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ function Content({ value }: { value: string }) {
 
   return (
     <div>
-      <InputNetwork />
+      <InputNetwork network={network} setNetwork={setNetwork} />
       <div className='relative'>
         <div className='flex items-center justify-center my-0 mx-auto w-[300px] h-[300px]' ref={container} />
         <Avatar
@@ -47,6 +47,7 @@ function Content({ value }: { value: string }) {
           style={{ width: 50, height: 50 }}
         />
       </div>
+
       <p className='mt-2.5 break-all text-center'>
         {ss58FormatValue}
         <CopyButton value={ss58FormatValue} />
@@ -55,13 +56,20 @@ function Content({ value }: { value: string }) {
   );
 }
 
-function QrcodeAddress({ onClose, open, value }: Props) {
+function QrcodeAddressModal() {
+  const [network, setNetwork] = useInputNetwork();
+  const { isOpen, close, address } = useQrAddress();
+
+  if (!address) {
+    return null;
+  }
+
   return (
-    <Modal hideCloseButton onClose={onClose} isOpen={open} size='sm'>
+    <Modal hideCloseButton onClose={close} isOpen={isOpen} size='sm'>
       <ModalContent>
         <ModalBody className='py-5'>
-          <SubApiRoot>
-            <Content value={value?.toString() || ''} />
+          <SubApiRoot network={network}>
+            <Content value={address} network={network} setNetwork={setNetwork} />
           </SubApiRoot>
         </ModalBody>
       </ModalContent>
@@ -69,4 +77,4 @@ function QrcodeAddress({ onClose, open, value }: Props) {
   );
 }
 
-export default React.memo(QrcodeAddress);
+export default React.memo(QrcodeAddressModal);

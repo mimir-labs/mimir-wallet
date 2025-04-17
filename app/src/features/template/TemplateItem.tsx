@@ -7,7 +7,6 @@ import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { CopyButton } from '@/components';
 import { DotConsoleApp } from '@/config';
-import { CallDisplaySection } from '@/params';
 import { useEffect, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
@@ -22,7 +21,7 @@ function DotConsoleButton({ network, call }: { network: string; call: string }) 
     return null;
   }
 
-  const url = DotConsoleApp.urlSearch(network);
+  const url = DotConsoleApp.urlSearch?.(network) || new URL(DotConsoleApp.url);
 
   url.pathname = '/extrinsics';
   url.searchParams.set('callData', call);
@@ -108,7 +107,7 @@ function TemplateItem({
 
       <div className='flex items-center'>
         <Link as='button' underline='always' color='foreground' onPress={() => onView(name, call)}>
-          <CallDisplaySection section={section} method={method} />
+          {section}.{method}
         </Link>
         <CopyButton value={call} size='sm' />
       </div>

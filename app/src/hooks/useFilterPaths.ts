@@ -228,7 +228,7 @@ function appendProposers(paths: FilterPath[][], account: AccountData, proposers?
   }
 }
 
-export function useFilterPaths(account?: AccountData | null, transaction?: Transaction | null) {
+export function useFilterPaths(account: AccountData, transaction?: Transaction | null) {
   return useMemo(() => {
     if (!account) return [];
 

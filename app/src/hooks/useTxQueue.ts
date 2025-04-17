@@ -13,7 +13,7 @@ import { create } from 'zustand';
 export interface TxQueue {
   id?: number;
   accountId: string;
-  call: IMethod;
+  call: IMethod | string;
   network: string;
   filterPaths?: FilterPath[];
   transaction?: Transaction;

@@ -9,7 +9,7 @@ function DotConsoleButton({ call, network }: { call: string; network: string }) 
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
 
   if (!isDotConsoleSupport) {
-    const url = PolkadotJsApp.urlSearch(network);
+    const url = PolkadotJsApp.urlSearch?.(network) || new URL(PolkadotJsApp.url);
 
     url.hash = `#/extrinsics/decode/${call}`;
 
@@ -20,7 +20,7 @@ function DotConsoleButton({ call, network }: { call: string; network: string }) 
     );
   }
 
-  const url = DotConsoleApp.urlSearch(network);
+  const url = DotConsoleApp.urlSearch?.(network) || new URL(DotConsoleApp.url);
 
   url.pathname = '/extrinsics';
   url.searchParams.set('callData', call);

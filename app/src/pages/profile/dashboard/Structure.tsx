@@ -10,7 +10,7 @@ import { useToggle } from 'react-use';
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
-function Relation({ address }: { address: string }) {
+function Relation({ address, setNetwork }: { address: string; setNetwork: (network: string) => void }) {
   const { network } = useApi();
   const [account] = useQueryAccount(address);
   const ref = useRef<HTMLDivElement>(null);
@@ -28,7 +28,7 @@ function Relation({ address }: { address: string }) {
           Overview
         </Button>
         <div className='z-[1] w-[200px] absolute right-4 top-4'>
-          <InputNetwork />
+          <InputNetwork network={network} setNetwork={setNetwork} />
         </div>
         <AddressOverview
           key={account?.address || 'none'}

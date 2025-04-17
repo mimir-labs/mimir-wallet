@@ -20,7 +20,7 @@ import { useMemo } from 'react';
 import { addressToHex, useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
 import { useQueries, useQuery } from '@mimir-wallet/service';
 
-import { useAssets, useAssetsAll } from './useAssets';
+import { useAssetsByAddress, useAssetsByAddressAll } from './useAssets';
 import { useTokenInfo, useTokenInfoAll } from './useTokenInfo';
 
 async function getBalances({ queryKey }: { queryKey: [ApiPromise | null | undefined, string | undefined | null] }) {
@@ -35,12 +35,14 @@ async function getBalances({ queryKey }: { queryKey: [ApiPromise | null | undefi
   }
 
   return Promise.all([api.query.system.account(address)]).then(([account]) => ({
-    total: account.data.free.add(account.data.reserved),
-    reserved: account.data.reserved,
-    locked: account.data.frozen,
-    free: account.data.free,
-    transferrable: account.data.free.sub(
-      account.data.frozen.gt(account.data.reserved) ? account.data.frozen.sub(account.data.reserved) : BN_ZERO
+    total: BigInt(account.data.free.add(account.data.reserved).toString()),
+    reserved: BigInt(account.data.reserved.toString()),
+    locked: BigInt(account.data.frozen.toString()),
+    free: BigInt(account.data.free.toString()),
+    transferrable: BigInt(
+      account.data.free
+        .sub(account.data.frozen.gt(account.data.reserved) ? account.data.frozen.sub(account.data.reserved) : BN_ZERO)
+        .toString()
     )
   }));
 }
@@ -78,98 +80,100 @@ async function _fetchAssetBalances({
 
   if (address && assets.length > 0) {
     if (api.query.assets) {
-      return api
-        .queryMulti?.<Option<PalletAssetsAssetAccount>[]>(
-          assets.map((item) => {
-            return isHex(item.assetId)
-              ? [api.query.foreignAssets.account, [item.assetId, address.toString()]]
-              : [api.query.assets.account, [item.assetId, address.toString()]];
-          })
+      return Promise.all(
+        assets.map(
+          (item): Promise<Option<PalletAssetsAssetAccount>> =>
+            isHex(item.assetId)
+              ? (api.query.foreignAssets.account(item.assetId, address.toString()) as Promise<
+                  Option<PalletAssetsAssetAccount>
+                >)
+              : api.query.assets.account(item.assetId, address.toString())
         )
-        .then((results) => {
-          return results
-            .map((result, index) => ({
-              ...assets[index],
-              total: result.isSome ? result.unwrap().balance : BN_ZERO,
-              free: result.isSome ? result.unwrap().balance : BN_ZERO,
-              locked: BN_ZERO,
-              reserved: BN_ZERO,
-              transferrable: result.isSome ? result.unwrap().balance : BN_ZERO,
-              account: address.toString()
-            }))
-            .filter((result) => result.total.gt(BN_ZERO));
-        });
+      ).then((results) => {
+        return results
+          .map((result, index) => ({
+            ...assets[index],
+            total: result.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,
+            free: result.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,
+            locked: 0n,
+            reserved: 0n,
+            transferrable: result.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,
+            account: address.toString()
+          }))
+          .filter((result) => result.total > 0n);
+      });
     }
 
     if (api.query.tokens) {
       if (network === 'acala' || network === 'karura') {
-        return api
-          .queryMulti?.<OrmlTokensAccountData[]>(
-            assets
-              .map((item) => {
-                const assetId: AcalaPrimitivesCurrencyAssetIds = api.registry.createType(
-                  'AcalaPrimitivesCurrencyAssetIds',
-                  item.assetId
+        return Promise.all(
+          assets
+            .map((item) => {
+              const assetId: AcalaPrimitivesCurrencyAssetIds = api.registry.createType(
+                'AcalaPrimitivesCurrencyAssetIds',
+                item.assetId
+              );
+
+              if (assetId.isErc20) {
+                return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
+                  Erc20: assetId.asErc20.toHex()
+                });
+              } else if (assetId.isForeignAssetId) {
+                return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
+                  ForeignAsset: assetId.asForeignAssetId.toNumber()
+                });
+              } else if (assetId.isStableAssetId) {
+                return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
+                  StableAssetPoolToken: assetId.asStableAssetId.toNumber()
+                });
+              } else if (assetId.isNativeAssetId) {
+                const nativeAssetId: AcalaPrimitivesCurrencyCurrencyId = api.registry.createType(
+                  'AcalaPrimitivesCurrencyCurrencyId',
+                  assetId.asNativeAssetId
                 );
 
-                if (assetId.isErc20) {
-                  return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
-                    Erc20: assetId.asErc20.toHex()
-                  });
-                } else if (assetId.isForeignAssetId) {
-                  return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
-                    ForeignAsset: assetId.asForeignAssetId.toNumber()
-                  });
-                } else if (assetId.isStableAssetId) {
-                  return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
-                    StableAssetPoolToken: assetId.asStableAssetId.toNumber()
-                  });
-                } else if (assetId.isNativeAssetId) {
-                  const nativeAssetId: AcalaPrimitivesCurrencyCurrencyId = api.registry.createType(
-                    'AcalaPrimitivesCurrencyCurrencyId',
-                    assetId.asNativeAssetId
-                  );
-
-                  return nativeAssetId;
-                } else {
-                  return null;
-                }
-              })
-              .filter((item) => !!item)
-              .map((currencyId) => [api.query.tokens.accounts, [address.toString(), currencyId]])
-          )
-          .then((results) => {
-            return results
-              .map((result, index) => ({
-                ...assets[index],
-                total: result.free.add(result.reserved),
-                free: result.free,
-                locked: result.frozen,
-                reserved: result.reserved,
-                transferrable: result.free.add(result.reserved).sub(result.frozen),
-                account: address.toString()
-              }))
-              .filter((result) => result.total.add(result.reserved).gt(BN_ZERO));
-          });
-      }
-
-      return api
-        .queryMulti?.<
-          OrmlTokensAccountData[]
-        >(assets.map((item) => [api.query.tokens.accounts, [address.toString(), item.assetId]]))
-        .then((results) => {
+                return nativeAssetId;
+              } else {
+                return null;
+              }
+            })
+            .filter((item) => !!item)
+            .map(
+              (currencyId) =>
+                api.query.tokens.accounts(address.toString(), currencyId) as Promise<OrmlTokensAccountData>
+            )
+        ).then((results) => {
           return results
             .map((result, index) => ({
               ...assets[index],
-              total: result.free.add(result.reserved),
-              free: result.free,
-              locked: result.frozen,
-              reserved: result.reserved,
-              transferrable: result.free.add(result.reserved).sub(result.frozen),
+              total: BigInt(result.free.add(result.reserved).toString()),
+              free: BigInt(result.free.toString()),
+              locked: BigInt(result.frozen.toString()),
+              reserved: BigInt(result.reserved.toString()),
+              transferrable: BigInt(result.free.add(result.reserved).sub(result.frozen).toString()),
               account: address.toString()
             }))
-            .filter((result) => result.total.add(result.reserved).gt(BN_ZERO));
+            .filter((result) => result.total > 0n);
         });
+      }
+
+      return Promise.all(
+        assets.map(
+          (item) => api.query.tokens.accounts(address.toString(), item.assetId) as Promise<OrmlTokensAccountData>
+        )
+      ).then((results) => {
+        return results
+          .map((result, index) => ({
+            ...assets[index],
+            total: BigInt(result.free.add(result.reserved).toString()),
+            free: BigInt(result.free.toString()),
+            locked: BigInt(result.frozen.toString()),
+            reserved: BigInt(result.reserved.toString()),
+            transferrable: BigInt(result.free.add(result.reserved).sub(result.frozen).toString()),
+            account: address.toString()
+          }))
+          .filter((result) => result.total > 0n);
+      });
     }
   }
 
@@ -182,7 +186,7 @@ export function useAssetBalances(
 ): [data: AccountAssetInfo[], isFetched: boolean, isFetching: boolean] {
   const { allApis } = useApi();
   const api: ValidApiState | undefined = allApis[network];
-  const [assets] = useAssets(network);
+  const [assets] = useAssetsByAddress(network, address?.toString());
   const [tokenInfo] = useTokenInfo(network);
   const queryHash = useMemo(
     () =>
@@ -205,7 +209,7 @@ export function useAssetBalances(
     refetchInterval: 12000,
     refetchOnMount: false,
     refetchOnWindowFocus: true,
-    enabled: !!address && !!api && api.isApiReady && !!assets && !!tokenInfo,
+    enabled: !!address && !!api && api.isApiReady && !!assets,
     queryFn: async ({
       queryKey: [network, api, address, assets, tokenInfo]
     }: {
@@ -230,13 +234,13 @@ export function useAssetBalances(
         icon: findToken(api.genesisHash.toHex()).Icon,
         isNative: true,
         assetId: 'native',
-        total: nativeBalances?.total ?? BN_ZERO,
-        locked: nativeBalances?.locked ?? BN_ZERO,
-        reserved: nativeBalances?.reserved ?? BN_ZERO,
-        transferrable: nativeBalances?.transferrable ?? BN_ZERO,
+        total: BigInt(nativeBalances?.total.toString() ?? '0'),
+        locked: BigInt(nativeBalances?.locked.toString() ?? '0'),
+        reserved: BigInt(nativeBalances?.reserved.toString() ?? '0'),
+        transferrable: BigInt(nativeBalances?.transferrable.toString() ?? '0'),
         account: address.toString(),
-        price: 0,
-        change24h: 0
+        price: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price || '0'),
+        change24h: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price_change || '0')
       } as AccountAssetInfo;
 
       if (!assets || assets.length === 0) {
@@ -245,8 +249,6 @@ export function useAssetBalances(
 
       try {
         const data = await _fetchAssetBalances({ queryKey: [api, network, assets, address.toString()] });
-
-        console.log(formatUnits(nativeBalances.free.toString(), api.registry.chainDecimals[0]));
 
         return [
           {
@@ -257,10 +259,10 @@ export function useAssetBalances(
             icon: findToken(api.genesisHash.toHex()).Icon,
             isNative: true,
             assetId: 'native',
-            total: nativeBalances?.total ?? BN_ZERO,
-            locked: nativeBalances?.locked ?? BN_ZERO,
-            reserved: nativeBalances?.reserved ?? BN_ZERO,
-            transferrable: nativeBalances?.transferrable ?? BN_ZERO,
+            total: BigInt(nativeBalances?.total.toString() ?? '0'),
+            locked: BigInt(nativeBalances?.locked.toString() ?? '0'),
+            reserved: BigInt(nativeBalances?.reserved.toString() ?? '0'),
+            transferrable: BigInt(nativeBalances?.transferrable.toString() ?? '0'),
             account: address.toString(),
             price: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price || '0'),
             change24h: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price_change || '0')
@@ -280,12 +282,13 @@ export function useAssetBalances(
 
 export function useAssetBalancesAll(address?: string) {
   const { allApis } = useApi();
-  const [allAssets] = useAssetsAll();
   const [allTokenInfo] = useTokenInfoAll();
+  const [allAssets] = useAssetsByAddressAll(address);
 
   return useQueries({
     queries: Object.entries(allApis).map(([network, api]) => {
       const assets = allAssets?.[network];
+
       const tokenInfo = allTokenInfo?.[network];
       const queryHash = blake2AsHex(
         `${network}-${api?.genesisHash}-assets-balances-${address ? addressToHex(address.toString()) : ''}-${
@@ -307,10 +310,10 @@ export function useAssetBalancesAll(address?: string) {
           tokenInfo: TokenInfo | undefined
         ],
         queryHash,
-        refetchInterval: 12_000,
+        refetchInterval: 60 * 1000,
         refetchOnMount: false,
         refetchOnWindowFocus: true,
-        enabled: !!address && !!api && api.isApiReady && !!assets && !!tokenInfo,
+        enabled: !!address && !!api && api.isApiReady && !!assets,
         queryFn: async ({
           queryKey: [network, api, address, assets, tokenInfo]
         }: {
@@ -328,7 +331,7 @@ export function useAssetBalancesAll(address?: string) {
 
           const nativeBalances = await getBalances({ queryKey: [api, address] });
 
-          const nativeData = {
+          const nativeData: AccountAssetInfo = {
             network: network,
             name: api.registry.chainTokens[0].toString(),
             symbol: api.registry.chainTokens[0].toString(),
@@ -336,14 +339,14 @@ export function useAssetBalancesAll(address?: string) {
             icon: findToken(api.genesisHash.toHex()).Icon,
             isNative: true,
             assetId: 'native',
-            total: nativeBalances?.total ?? BN_ZERO,
-            locked: nativeBalances?.locked ?? BN_ZERO,
-            reserved: nativeBalances?.reserved ?? BN_ZERO,
-            transferrable: nativeBalances?.transferrable ?? BN_ZERO,
+            total: nativeBalances?.total ?? 0n,
+            locked: nativeBalances?.locked ?? 0n,
+            reserved: nativeBalances?.reserved ?? 0n,
+            transferrable: nativeBalances?.transferrable ?? 0n,
             account: address.toString(),
             price: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price || '0'),
             change24h: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price_change || '0')
-          } as AccountAssetInfo;
+          };
 
           if (!assets || assets.length === 0) {
             return [nativeData];
@@ -367,20 +370,22 @@ export function useAssetBalancesAll(address?: string) {
 export function useBalanceTotalUsd(address?: string) {
   const assets = useAssetBalancesAll(address);
 
-  let lastTotal = 0;
-  let total = 0;
+  return useMemo(() => {
+    let lastTotal = 0;
+    let total = 0;
 
-  for (const item of assets) {
-    if (item.data) {
-      for (const asset of item.data) {
-        const currentTotal = parseFloat(formatUnits(asset.total, asset.decimals)) * asset.price;
+    for (const item of assets) {
+      if (item.data) {
+        for (const asset of item.data) {
+          const currentTotal = parseFloat(formatUnits(asset.total, asset.decimals)) * asset.price;
 
-        total += currentTotal;
+          total += currentTotal;
 
-        lastTotal += currentTotal / (1 + asset.change24h);
+          lastTotal += currentTotal / (1 + asset.change24h);
+        }
       }
     }
-  }
 
-  return [total, lastTotal ? (total - lastTotal) / lastTotal : 0];
+    return [total, lastTotal ? (total - lastTotal) / lastTotal : 0];
+  }, [assets]);
 }

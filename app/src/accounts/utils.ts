@@ -11,7 +11,7 @@ import { addressToHex, decodeAddress } from '@mimir-wallet/polkadot-core';
 export function deriveAccountMeta(account: AccountData, metas: Record<string, AddressMeta>) {
   const addressHex = addressToHex(account.address);
 
-  if (account.type === 'multisig') {
+  if (account.type === 'multisig' && (!metas[addressHex]?.isMultisig || (metas[addressHex]?.who || []).length === 0)) {
     const existingMeta = metas[addressHex] || {};
     const baseMeta = {
       name: account.name || existingMeta.name || '',
@@ -34,7 +34,7 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
     }
   }
 
-  if (account.type === 'pure') {
+  if (account.type === 'pure' && !metas[addressHex]?.isPure) {
     const existingMeta = metas[addressHex] || {};
     const baseMeta = {
       name: account.name || existingMeta.name || '',

@@ -12,10 +12,11 @@ import IconQr from '@/assets/svg/icon-qr.svg?react';
 import IconSetting from '@/assets/svg/icon-set.svg?react';
 import IconTransaction from '@/assets/svg/icon-transaction.svg?react';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
-import { AccountMenu, AddressCell, CopyButton, CreateMultisigDialog, QrcodeAddress, WalletIcon } from '@/components';
+import { AccountMenu, AddressCell, CopyAddress, CreateMultisigDialog, WalletIcon } from '@/components';
 import { walletConfig } from '@/config';
 import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
+import { useQrAddress } from '@/hooks/useQrAddress';
 import { useToggle } from '@/hooks/useToggle';
 import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 import { formatDisplay } from '@/utils';
@@ -55,13 +56,13 @@ function NavLink({
       size='lg'
       radius='md'
       startContent={<Icon className='w-5 h-5' />}
-      className='h-[50px] justify-between items-center px-[15px] py-[20px] text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary'
+      className='h-[50px] justify-start gap-x-2.5 items-center px-[15px] py-[20px] text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary'
       href={to}
       variant='light'
     >
       <p
         data-active={!!matched}
-        className='flex-1 text-medium font-semibold text-foreground/50 data-[active=true]:text-foreground'
+        className='text-medium font-semibold text-foreground/50 data-[active=true]:text-foreground'
       >
         {label}
       </p>
@@ -74,7 +75,6 @@ function TopContent() {
   const { chain } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [qrOpen, toggleQrOpen] = useToggle();
   const [createMultisigOpen, toggleCreateMultisigOpen] = useToggle();
   const { connectedWallets, openWallet } = useWallet();
   const [totalUsd] = useBalanceTotalUsd(selected);
@@ -83,6 +83,7 @@ function TopContent() {
   const isConnected = Object.keys(connectedWallets).length > 0;
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
+  const { open: openQr } = useQrAddress();
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -122,21 +123,21 @@ function TopContent() {
                   className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
                   color='primary'
                   variant='light'
-                  onPress={toggleQrOpen}
+                  onPress={() => openQr(selected)}
                   size='sm'
                 >
                   <IconQr className='w-4 h-4' />
                 </Button>
               </Tooltip>
               <Tooltip content='Copy' closeDelay={0}>
-                <CopyButton color='primary' value={selected} className='opacity-100' />
+                <CopyAddress address={selected} color='primary' className='opacity-100' />
               </Tooltip>
               <Tooltip content='Explorer' closeDelay={0}>
                 <Button
                   isIconOnly
                   className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
                   color='primary'
-                  as='a'
+                  as={Link}
                   variant='light'
                   href={chainLinks.accountExplorerLink(chain, selected)}
                   size='sm'
@@ -188,7 +189,6 @@ function TopContent() {
         </Button>
       )}
 
-      <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
       <AccountMenu anchor={downMd ? 'right' : 'left'} onClose={handleAccountClose} open={!!anchorEl} />
       <CreateMultisigDialog open={createMultisigOpen} onClose={toggleCreateMultisigOpen} />
     </>

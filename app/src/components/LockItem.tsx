@@ -13,7 +13,6 @@ import IconUnLock from '@/assets/svg/icon-unlock.svg?react';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useToggle } from '@/hooks/useToggle';
 import { formatUnits } from '@/utils';
-import { Stack } from '@mui/system';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo, useRef } from 'react';
 
@@ -43,8 +42,8 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   const isEnought = useMemo(() => {
     if (allBalances) {
       return (
-        allBalances.transferrable.gte(new BN(value.toString()).add(api.consts.balances.existentialDeposit)) &&
-        allBalances.free.gte(allBalances.locked.add(new BN(value.toString())))
+        allBalances.transferrable >= BigInt(value.toString()) + api.consts.balances.existentialDeposit.toBigInt() &&
+        allBalances.free >= allBalances.locked + BigInt(value.toString())
       );
     }
 
@@ -106,7 +105,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 }
 
 export const LockContainer = React.memo(({ children }: { children: React.ReactNode }) => {
-  return <Stack spacing={1}>{children}</Stack>;
+  return <div className='space-y-2.5'>{children}</div>;
 });
 
 export default React.memo(LockItem);

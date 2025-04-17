@@ -21,7 +21,7 @@ interface UseAddressMeta {
 export function useAddressMeta(value?: string | null): UseAddressMeta {
   const { network } = useApi();
   const { metas, addAddress, setAccountName } = useAccount();
-  const addressHex = useMemo(() => addressToHex(value || ''), [value]);
+  const addressHex = useMemo(() => (value ? addressToHex(value) : '0x'), [value]);
   const _meta = metas[addressHex];
 
   const [meta, setMeta] = useState<AddressMeta>(_meta || {});

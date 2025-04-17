@@ -1,8 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button } from '@heroui/button';
 import { extendVariants } from '@heroui/system';
+
+import Button from './base-button.js';
 
 const CustomButton = extendVariants(Button, {
   variants: {
@@ -43,6 +44,6 @@ const CustomButton = extendVariants(Button, {
       class: 'w-10'
     }
   ]
-}) as typeof Button;
+});
 
 export default CustomButton as typeof Button;

@@ -1,8 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useQueryAccount } from '@/accounts/useQueryAccount';
+import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useBalanceTotalUsd } from '@/hooks/useBalances';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { useRef } from 'react';
 
@@ -11,7 +12,6 @@ import { Link, Tab, Tabs } from '@mimir-wallet/ui';
 
 import Assets from './Assets';
 import Hero from './Hero';
-import MultiChain from './MultiChain';
 import PendingTx from './PendingTx';
 import Structure from './Structure';
 
@@ -21,11 +21,14 @@ function Dashboard({ address }: { address: string }) {
   const tabsRef = useRef([
     { tab: 'asset', label: 'Asset' },
     { tab: 'structure', label: 'Structure' },
-    { tab: 'transaction', label: 'Transaction' },
-    { tab: 'multichain', label: 'Multi-Chain' }
+    { tab: 'transaction', label: 'Transaction' }
   ]);
-  const [account] = useQueryAccount(address);
   const [totalUsd, changes] = useBalanceTotalUsd(address);
+  const supportedNetworks = useAddressSupportedNetworks(address);
+  const [network, setNetwork] = useInputNetwork(
+    undefined,
+    supportedNetworks?.map((item) => item.key)
+  );
 
   return (
     <div className='w-full space-y-5'>
@@ -49,20 +52,17 @@ function Dashboard({ address }: { address: string }) {
           base: 'w-full'
         }}
       >
-        {tabsRef.current
-          .filter((item) => (item.tab === 'multichain' ? account?.type !== 'pure' : true))
-          .map((item) => (
-            <Tab key={item.tab} title={item.label}>
-              {tab === 'asset' && <Assets address={address} />}
-              {tab === 'structure' && (
-                <SubApiRoot>
-                  <Structure address={address} />
-                </SubApiRoot>
-              )}
-              {tab === 'transaction' && <PendingTx address={address} />}
-              {account?.type !== 'pure' && tab === 'multichain' && <MultiChain address={address} />}
-            </Tab>
-          ))}
+        {tabsRef.current.map((item) => (
+          <Tab key={item.tab} title={item.label}>
+            {tab === 'asset' && <Assets address={address} />}
+            {tab === 'structure' && (
+              <SubApiRoot network={network} supportedNetworks={supportedNetworks?.map((item) => item.key)}>
+                <Structure address={address} setNetwork={setNetwork} />
+              </SubApiRoot>
+            )}
+            {tab === 'transaction' && <PendingTx address={address} />}
+          </Tab>
+        ))}
       </Tabs>
     </div>
   );

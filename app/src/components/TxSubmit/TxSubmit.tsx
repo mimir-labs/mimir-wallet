@@ -15,7 +15,7 @@ import { Divider, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/mat
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Checkbox } from '@mimir-wallet/ui';
 
 import Input from '../Input';
@@ -37,7 +37,7 @@ interface Props extends Omit<TxSubmitProps, 'accountId'> {
 
 function TxSubmit({
   accountData,
-  call,
+  call: propsCall,
   transaction,
   onlySign,
   website,
@@ -53,18 +53,25 @@ function TxSubmit({
   onSignature,
   beforeSend
 }: Props) {
-  const { chain, network } = useApi();
+  const { current } = useAccount();
+  const { chain, network, api } = useApi();
+  const call = useMemo(() => {
+    if (typeof propsCall === 'string') {
+      return api.registry.createType('Call', propsCall);
+    }
+
+    return propsCall;
+  }, [api, propsCall]);
   const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
   const [note, setNote] = useState<string>(transaction?.note || '');
   const filterPaths = useFilterPaths(accountData, transaction);
   const [addressChain, setAddressChain] = useState<FilterPath[]>(propsFilterPaths || []);
-  const [, addTx] = useBatchTxs(accountData.address);
+  const [, addTx] = useBatchTxs(network, accountData.address);
   const navigate = useNavigate();
   const isPropose = useMemo(
     () => addressChain.length > 0 && addressChain.some((item) => item.type === 'proposer'),
     [addressChain]
   );
-
   const buildTx = useBuildTx(call, addressChain, transaction);
 
   const { isLocalAccount } = useAccount();
@@ -72,6 +79,7 @@ function TxSubmit({
   const hasPermission = isLocalAccount(accountData.address);
 
   const handleAddBatch = useCallback(() => {
+    console.log(call.toHex());
     addTx([
       {
         calldata: call.toHex(),
@@ -170,7 +178,6 @@ function TxSubmit({
                   I confirm recipient address exsits on the destination chain.
                 </Checkbox>
               )}
-
               {!isPropose && (
                 <SendTx
                   disabled={
@@ -219,7 +226,7 @@ function TxSubmit({
                 />
               )}
 
-              {!transaction && (
+              {!transaction && addressEq(current, accountData.address) && (
                 <Button fullWidth onPress={handleAddBatch} color='primary' variant='ghost' startContent={<IconBatch />}>
                   Add To Batch
                 </Button>

@@ -1,39 +1,23 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CURRENT_ADDRESS_HEX_KEY, SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
+import { SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
 import { isAddress } from '@polkadot/util-crypto';
+import { useCallback, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
-import {
-  addAddressBook,
-  deleteAddress,
-  hideAccount,
-  isLocalAccount,
-  isLocalAddress,
-  resync,
-  setAccountName,
-  setName,
-  showAccount,
-  updateMeta
-} from './actions';
+import { addAddressBook, deleteAddress, hideAccount, resync, setAccountName, setName, showAccount } from './actions';
+import { AccountContext } from './context';
 
 export function useAccount() {
   const { chainSS58 } = useApi();
+  const { metas, updateMetas } = useContext(AccountContext);
 
-  const {
-    accounts,
-    current: currentAddress,
-    addresses,
-    hideAccountHex,
-    isMultisigSyned,
-    switchAddress,
-    metas
-  } = useAddressStore();
+  const { accounts, current, addresses, hideAccountHex, isMultisigSyned, switchAddress } = useAddressStore();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const setCurrent = (address: string, confirm?: boolean) => {
@@ -54,22 +38,33 @@ export function useAccount() {
       newSearchParams.set('address', value);
       setSearchParams(newSearchParams);
 
-      // update storage
-      store.set(CURRENT_ADDRESS_HEX_KEY, addressToHex(value));
-
       useAddressStore.setState({ current: value });
     }
   };
 
-  let current: string | undefined;
+  const isLocalAddress = useCallback(
+    (address: string, watchlist?: boolean) => {
+      return addresses.some((item) => (watchlist ? !!item.watchlist : true) && addressEq(item.address, address));
+    },
+    [addresses]
+  );
 
-  if (currentAddress) {
-    current = currentAddress;
-  } else {
-    const stored = store.get(CURRENT_ADDRESS_HEX_KEY) as string | undefined;
+  const isLocalAccount = useCallback(
+    (address: string) => {
+      return accounts.some((item) => addressEq(item.address, address));
+    },
+    [accounts]
+  );
 
-    current = stored ? encodeAddress(stored, chainSS58) : undefined;
-  }
+  // let current: string | undefined;
+
+  // if (currentAddress) {
+  //   current = currentAddress;
+  // } else {
+  //   const stored = store.get(CURRENT_ADDRESS_HEX_KEY) as string | undefined;
+
+  //   current = stored ? encodeAddress(stored, chainSS58) : undefined;
+  // }
 
   return {
     accounts: accounts,
@@ -77,11 +72,9 @@ export function useAccount() {
     current: current,
     hideAccountHex: hideAccountHex,
     isMultisigSyned,
-    metas: metas,
     switchAddress: switchAddress,
     addAddress: setName,
     addAddressBook: addAddressBook,
-    updateMeta: updateMeta,
     deleteAddress: deleteAddress,
     hideAccount: hideAccount,
     isLocalAccount: isLocalAccount,
@@ -89,6 +82,9 @@ export function useAccount() {
     resync: resync,
     setAccountName: setAccountName,
     setCurrent: setCurrent,
-    showAccount: showAccount
+    showAccount: showAccount,
+    // context
+    metas: metas,
+    updateMetas: updateMetas
   };
 }

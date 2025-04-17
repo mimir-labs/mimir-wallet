@@ -5,7 +5,7 @@ import type { HistoryTransaction, Transaction } from './types';
 
 import { events } from '@/events';
 import { isEqual } from 'lodash-es';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import {
@@ -217,8 +217,9 @@ export function useTransactionDetail(
 
 export function useMultiChainTransactionCounts(
   address?: string | null
-): [data: Record<string, { pending: number; history: number }> | undefined, isFetched: boolean, isFetching: boolean] {
+): [data: Record<string, { pending: number; history: number }>, isFetched: boolean, isFetching: boolean] {
   const { queryHash, queryKey } = useClientQuery(address ? `transactions/counts/${address}` : null);
+  const { allApis } = useApi();
 
   const { data, isFetched, isFetching } = useQuery<Record<string, { pending: number; history: number }>>({
     queryHash,
@@ -240,5 +241,12 @@ export function useMultiChainTransactionCounts(
     }
   });
 
-  return [data, isFetched, isFetching];
+  return [
+    useMemo(
+      () => Object.fromEntries(Object.entries(data || {}).filter(([network]) => allApis[network])),
+      [data, allApis]
+    ),
+    isFetched,
+    isFetching
+  ];
 }

@@ -22,12 +22,14 @@ function AddTemplate({
   isView = false,
   onBack,
   defaultCallData,
-  defaultName
+  defaultName,
+  setNetwork
 }: {
   isView?: boolean;
   defaultCallData?: HexString;
   defaultName?: string;
   onBack: () => void;
+  setNetwork: (network: string) => void;
 }) {
   const { network, api } = useApi();
   const { addTemplate } = useSavedTemplate(network);
@@ -61,7 +63,7 @@ function AddTemplate({
         <Typography variant='h4'>{isView ? 'View Template' : 'Add New Template'}</Typography>
       </Box>
 
-      <InputNetwork />
+      <InputNetwork network={network} setNetwork={setNetwork} />
 
       <Divider />
 

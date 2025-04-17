@@ -14,7 +14,7 @@ import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { service, store } from '@mimir-wallet/service';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
@@ -55,6 +55,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
   const selectAccount = useSelectedAccountCallback();
   const { addAddress, resync } = useAccount();
   const { network, chainSS58 } = useApi();
+  const { mode } = useNetworks();
 
   const handleCreate = useCallback(async () => {
     if (!(name && checkField())) return;
@@ -64,7 +65,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
 
       const address = await createMultisig(network, signatories, threshold, name);
 
-      await resync(chainSS58);
+      await resync(mode === 'omni', network, chainSS58);
 
       utm && (await service.utm(network, u8aToHex(address), utm));
 
@@ -79,7 +80,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
     }
 
     setIsLoading(false);
-  }, [name, checkField, signatories, threshold, resync, chainSS58, network, selectAccount, addAddress, navigate]);
+  }, [name, checkField, network, signatories, threshold, resync, mode, chainSS58, selectAccount, addAddress, navigate]);
 
   return (
     <>

@@ -49,7 +49,7 @@ export interface InputAddressProps {
   placeholder?: string;
   onChange?: (value: string) => void;
   withBalance?: boolean;
-  balance?: BN | string | number | null;
+  balance?: BN | bigint | string | number | null;
   isSign?: boolean;
   filtered?: string[];
   excluded?: string[];

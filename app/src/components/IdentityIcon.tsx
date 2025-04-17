@@ -6,8 +6,7 @@ import type { Circle } from '@polkadot/ui-shared/icons/types';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { walletConfig } from '@/config';
-import { useCopyClipboard } from '@/hooks/useCopyClipboard';
-import { Box } from '@mui/material';
+import { useCopyAddress } from '@/hooks/useCopyAddress';
 import { polkadotIcon } from '@polkadot/ui-shared';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
@@ -31,7 +30,7 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
   const { chainSS58 } = useApi();
   const address = encodeAddress(value, prefix ?? chainSS58);
   const { meta } = useAddressMeta(value?.toString());
-  const [, copy] = useCopyClipboard();
+  const { open: openCopy } = useCopyAddress();
 
   const { isInjected, isMultisig, source, threshold, who, multipleMultisig } = meta || {};
 
@@ -43,82 +42,70 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
 
   if (isZeroAddress) {
     return (
-      <Box
-        className={`${className} IdentityIcon`}
-        component='span'
+      <span
+        className={`bg-primary text-white ${className || ''} IdentityIcon`}
         onClick={(e) => {
           e.stopPropagation();
-          copy(address);
+          openCopy(address);
           toastSuccess('Copied to clipboard');
         }}
-        sx={{
+        style={{
           cursor: 'copy',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
           width: size,
           height: size,
-          bgcolor: 'primary.main',
           borderRadius: '50%',
-          color: 'common.white',
           fontWeight: 800,
           fontSize: Math.min(16, size / 2),
           lineHeight: 1
         }}
       >
         0
-      </Box>
+      </span>
     );
   }
 
   return (
-    <Box
-      className={`${className} IdentityIcon`}
-      component='span'
+    <span
+      className={`bg-secondary ${className || ''} IdentityIcon`}
       onClick={(e) => {
         e.stopPropagation();
-        copy(address);
+        openCopy(address);
         toastSuccess('Copied to clipboard');
       }}
-      sx={{
+      style={{
         cursor: 'copy',
         position: 'relative',
         width: size,
         height: size + (isMultisig ? 6 + size / 16 : 0),
-        bgcolor: 'secondary.main',
         borderRadius: '50%'
       }}
     >
       {isZeroAddress ? (
-        <Box
-          className={`${className} IdentityIcon`}
-          component='span'
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+        <span
+          className={`flex items-center justify-center bg-primary text-white ${className || ''} IdentityIcon`}
+          style={{
             width: size,
             height: size,
-            bgcolor: 'primary.main',
             borderRadius: '50%',
-            color: 'common.white',
             fontWeight: 800,
             fontSize: size / 2,
             lineHeight: 1
           }}
         >
           0
-        </Box>
+        </span>
       ) : (
         <svg viewBox='0 0 64 64' width={size} height={size}>
           {circles.map(renderCircle)}
         </svg>
       )}
       {extensionIcon ? (
-        <Box
-          component='img'
+        <img
           src={extensionIcon}
-          sx={{
+          style={{
             position: 'absolute',
             right: -2,
             bottom: -2,
@@ -128,9 +115,9 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
         />
       ) : null}
       {((who && who.length > 0) || multipleMultisig) && (
-        <Box
-          component='span'
-          sx={{
+        <span
+          className='bg-primary text-white'
+          style={{
             position: 'absolute',
             left: 0,
             right: 0,
@@ -141,16 +128,14 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
             width: '100%',
             height: Math.max(12, size / 2.5),
             borderRadius: `${Math.max(12, size / 2.5) / 2}px`,
-            bgcolor: 'primary.main',
-            color: 'common.white',
             fontWeight: 700,
             fontSize: size / 3
           }}
         >
           {who && who.length > 0 ? `${threshold}/${who.length}` : 'Multi'}
-        </Box>
+        </span>
       )}
-    </Box>
+    </span>
   );
 }
 

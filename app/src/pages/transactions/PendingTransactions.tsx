@@ -9,7 +9,19 @@ import React, { useMemo } from 'react';
 
 import { skeleton } from './skeleton';
 
-function PendingTransactions({ networks, address, txId }: { networks: string[]; address: string; txId?: string }) {
+function PendingTransactions({
+  isFetched,
+  isFetching,
+  networks,
+  address,
+  txId
+}: {
+  isFetched: boolean;
+  isFetching: boolean;
+  networks: string[];
+  address: string;
+  txId?: string;
+}) {
   const data = useMultichainPendingTransactions(networks, address, txId);
 
   const transactions = useMemo(
@@ -21,7 +33,7 @@ function PendingTransactions({ networks, address, txId }: { networks: string[]; 
     [data]
   );
 
-  const showSkeleton = data.some((item) => item.isFetching && !item.isFetched);
+  const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching || !item.isFetched);
 
   if (!showSkeleton && transactions.length === 0) {
     return <Empty height='80dvh' />;

@@ -9,12 +9,13 @@ import { events } from '@/events';
 import { randomAsNumber } from '@polkadot/util-crypto';
 import { useCallback, useMemo } from 'react';
 
-import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { useLocalStore } from '@mimir-wallet/service';
 
 type BatchTxs = Record<HexString, BatchTxItem[]>; // addressHex => BatchTxItem[]
 
 export function useBatchTxs(
+  network?: string | null,
   address?: string | null
 ): [
   txs: BatchTxItem[],
@@ -23,8 +24,7 @@ export function useBatchTxs(
   setTx: (txs: BatchTxItem[]) => void
 ] {
   const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
-  const { network } = useApi();
-  const [values, setValues] = useLocalStore<BatchTxs>(`${BATCH_TX_V2_PREFIX}${network}`, {});
+  const [values, setValues] = useLocalStore<BatchTxs>(network ? `${BATCH_TX_V2_PREFIX}${network}` : '', {});
 
   const txs = useMemo(() => (addressHex ? values[addressHex] || [] : []), [addressHex, values]);
   const addTx = useCallback(

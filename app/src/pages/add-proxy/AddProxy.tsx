@@ -49,9 +49,30 @@ function filterAddresses(accounts: AccountData[], genesisHash: HexString) {
     .map((item) => item.address);
 }
 
-function Content({ pure, filteredProxy }: { pure?: boolean; filteredProxy: string[] }) {
-  const { api } = useApi();
-  const { current } = useAccount();
+function AddProxy({
+  pure,
+  network,
+  proxied,
+  setNetwork,
+  setProxied
+}: {
+  pure?: boolean;
+  network: string;
+  proxied: string | undefined;
+  setNetwork: (network: string) => void;
+  setProxied: (proxied: string | undefined) => void;
+}) {
+  const { api, genesisHash } = useApi();
+  const navigate = useNavigate();
+  const { accounts, addresses, current } = useAccount();
+
+  // filter accounts by network
+  const [, filteredProxy] = useMemo(() => {
+    const filteredProxied = filterAddresses(accounts, genesisHash);
+    const filteredProxy = filteredProxied.concat(addresses.map((item) => item.address));
+
+    return [filteredProxied, filteredProxy];
+  }, [accounts, addresses, genesisHash]);
   const proxyTypes = useProxyTypes();
   const [proxyType, setProxyType] = useState<string>(proxyTypes?.[0]?.text || 'Any');
   const [name, setName] = useInput('');
@@ -60,7 +81,6 @@ function Content({ pure, filteredProxy }: { pure?: boolean; filteredProxy: strin
   const [custom, setCustom] = useState<string>('');
   const blockInterval = useBlockInterval().toNumber();
   const [proxyArgs, setProxyArgs] = useState<ProxyArgs[]>([]);
-  const [proxied, setProxied] = useState<string | undefined>(current);
   const [proxy, setProxy] = useState<string | undefined>(pure ? current : filteredProxy[0]);
   const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(pure ? undefined : api.query.proxy.proxies, [
     proxied
@@ -69,7 +89,7 @@ function Content({ pure, filteredProxy }: { pure?: boolean; filteredProxy: strin
   const swap = useCallback(() => {
     setProxied(proxy);
     setProxy(proxied);
-  }, [proxied, proxy]);
+  }, [proxied, proxy, setProxied]);
 
   const existsProxies = useMemo(
     () =>
@@ -102,188 +122,6 @@ function Content({ pure, filteredProxy }: { pure?: boolean; filteredProxy: strin
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { sm: 'row', xs: 'column' },
-          gap: 1,
-          alignItems: { sm: 'start', xs: 'center' }
-        }}
-      >
-        {pure ? (
-          <PureCell />
-        ) : (
-          <InputAddress
-            shorten
-            disabled={!!proxyArgs.length}
-            value={proxied}
-            onChange={setProxied}
-            label='Proxied Account'
-            isSign={!!pure}
-          />
-        )}
-        <SvgIcon
-          component={IconArrow}
-          fontSize='small'
-          inheritViewBox
-          color='primary'
-          sx={{ cursor: 'pointer', transform: { sm: 'translateY(48px)', xs: 'rotate(90deg)' } }}
-          onClick={pure ? undefined : swap}
-        />
-        <InputAddress
-          excluded={!pure && proxied ? [proxied] : []}
-          shorten
-          value={proxy}
-          onChange={setProxy}
-          label='Proxy Account'
-          filtered={filteredProxy}
-        />
-      </Box>
-
-      {pure && <Input label='Name' value={name} onChange={setName} />}
-
-      <FormControl fullWidth>
-        <InputLabel>Authorize</InputLabel>
-        <Select<string> variant='outlined' onChange={(e) => setProxyType(e.target.value)} value={proxyType}>
-          {proxyTypes.map(({ text }) => (
-            <MenuItem value={text} key={text}>
-              <Box sx={{ display: 'flex' }}>{text}</Box>
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography fontWeight={700}>Advanced Setting</Typography>
-        <Switch
-          checked={advanced}
-          onChange={(e) => {
-            toggleAdvanced(e.target.checked);
-            setReviewWindow(0);
-          }}
-        />
-      </Box>
-
-      {advanced && (
-        <>
-          <FormControl fullWidth>
-            <InputLabel>Review Window</InputLabel>
-            <Select<string>
-              variant='outlined'
-              onChange={(e) => setReviewWindow(Number(e.target.value))}
-              value={reviewWindow.toString()}
-            >
-              {Object.entries(reviewWindows).map(([key, text]) => (
-                <MenuItem value={key} key={key}>
-                  {text}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {reviewWindow === -1 && (
-            <Input
-              label='Custom'
-              value={custom}
-              onChange={setCustom}
-              endAdornment={<Typography color='textPrimary'>Blocks (≈ {estimateCustom})</Typography>}
-            />
-          )}
-        </>
-      )}
-
-      {pure && proxyType !== 'Any' && (
-        <Alert
-          color='warning'
-          title='You have selected a Pure Proxy with non-ANY permissions, which means that the assets in this account
-                  cannot be moved, and you will not be able to add or remove new proxies. Please ensure the security of
-                  your assets.'
-        />
-      )}
-
-      {!pure && (
-        <AddProxyButton
-          proxied={proxied}
-          proxy={proxy}
-          proxyArgs={proxyArgs}
-          reviewWindow={reviewWindow}
-          custom={custom}
-          proxyType={proxyType}
-          setProxyArgs={setProxyArgs}
-        />
-      )}
-
-      {!pure &&
-        proxyArgs.map((arg, index) => (
-          <ProxyInfo
-            key={index}
-            proxied={proxied}
-            delegate={arg.delegate}
-            delay={arg.delay}
-            proxyType={arg.proxyType}
-            onDelete={() => {
-              setProxyArgs((args) => args.filter((_, i) => index !== i));
-            }}
-          />
-        ))}
-
-      {!!(proxyArgs.length + (existsProxies.length || 0)) && <Divider />}
-
-      <Alert
-        color='warning'
-        classNames={{
-          base: 'items-start'
-        }}
-        title={
-          <ul className='leading-[20px]'>
-            <li>A deposit is required for proxy creation.</li>
-            <li>Only accounts with full authority (ANY) can delete a proxy.</li>
-          </ul>
-        }
-      />
-
-      {pure ? (
-        <SubmitPure proxy={proxy} name={name} reviewWindow={reviewWindow} custom={custom} proxyType={proxyType} />
-      ) : (
-        <SubmitProxy proxied={proxied} proxyArgs={proxyArgs} setProxyArgs={setProxyArgs} />
-      )}
-
-      {!pure && (
-        <Box sx={{ filter: 'grayscale(30%)' }}>
-          <Typography marginBottom={1} fontWeight={700} color='textSecondary'>
-            Existing Proxy
-          </Typography>
-
-          {existsProxies.map((proxy, index) => (
-            <ProxyInfo
-              key={`proxy_${index}`}
-              proxied={proxy.proxied}
-              delegate={proxy.delegate}
-              delay={proxy.delay}
-              proxyType={proxy.proxyType}
-            />
-          ))}
-        </Box>
-      )}
-    </>
-  );
-}
-
-function AddProxy({ pure }: { pure?: boolean }) {
-  const { genesisHash } = useApi();
-  const navigate = useNavigate();
-  const { accounts, addresses } = useAccount();
-
-  // filter accounts by network
-  const [, filteredProxy] = useMemo(() => {
-    const filteredProxied = filterAddresses(accounts, genesisHash);
-    const filteredProxy = filteredProxied.concat(addresses.map((item) => item.address));
-
-    return [filteredProxied, filteredProxy];
-  }, [accounts, addresses, genesisHash]);
-
-  return (
-    <>
       <Box sx={{ width: 500, maxWidth: '100%', margin: '0 auto' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Button onClick={() => navigate(-1)} size='small' variant='outlined'>
@@ -296,9 +134,172 @@ function AddProxy({ pure }: { pure?: boolean }) {
               <Typography variant='h3'>{pure ? 'Create New Pure Proxy' : 'Add Proxy'}</Typography>
             </Box>
             <Divider />
-            <InputNetwork label='Select Network' />
 
-            <Content key={genesisHash} pure={pure} filteredProxy={filteredProxy} />
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { sm: 'row', xs: 'column' },
+                gap: 1,
+                alignItems: { sm: 'start', xs: 'center' }
+              }}
+            >
+              {pure ? (
+                <PureCell />
+              ) : (
+                <InputAddress
+                  shorten
+                  disabled={!!proxyArgs.length}
+                  value={proxied}
+                  onChange={setProxied}
+                  label='Proxied Account'
+                  isSign={!!pure}
+                />
+              )}
+              <SvgIcon
+                component={IconArrow}
+                fontSize='small'
+                inheritViewBox
+                color='primary'
+                sx={{ cursor: 'pointer', transform: { sm: 'translateY(48px)', xs: 'rotate(90deg)' } }}
+                onClick={pure ? undefined : swap}
+              />
+              <InputAddress
+                excluded={!pure && proxied ? [proxied] : []}
+                shorten
+                value={proxy}
+                onChange={setProxy}
+                label='Proxy Account'
+                filtered={filteredProxy}
+              />
+            </Box>
+
+            <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
+
+            {pure && <Input label='Name' value={name} onChange={setName} />}
+
+            <FormControl fullWidth>
+              <InputLabel>Authorize</InputLabel>
+              <Select<string> variant='outlined' onChange={(e) => setProxyType(e.target.value)} value={proxyType}>
+                {proxyTypes.map(({ text }) => (
+                  <MenuItem value={text} key={text}>
+                    <Box sx={{ display: 'flex' }}>{text}</Box>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography fontWeight={700}>Advanced Setting</Typography>
+              <Switch
+                checked={advanced}
+                onChange={(e) => {
+                  toggleAdvanced(e.target.checked);
+                  setReviewWindow(0);
+                }}
+              />
+            </Box>
+
+            {advanced && (
+              <>
+                <FormControl fullWidth>
+                  <InputLabel>Review Window</InputLabel>
+                  <Select<string>
+                    variant='outlined'
+                    onChange={(e) => setReviewWindow(Number(e.target.value))}
+                    value={reviewWindow.toString()}
+                  >
+                    {Object.entries(reviewWindows).map(([key, text]) => (
+                      <MenuItem value={key} key={key}>
+                        {text}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {reviewWindow === -1 && (
+                  <Input
+                    label='Custom'
+                    value={custom}
+                    onChange={setCustom}
+                    endAdornment={<Typography color='textPrimary'>Blocks (≈ {estimateCustom})</Typography>}
+                  />
+                )}
+              </>
+            )}
+
+            {pure && proxyType !== 'Any' && (
+              <Alert
+                color='warning'
+                title='You have selected a Pure Proxy with non-ANY permissions, which means that the assets in this account
+                  cannot be moved, and you will not be able to add or remove new proxies. Please ensure the security of
+                  your assets.'
+              />
+            )}
+
+            {!pure && (
+              <AddProxyButton
+                proxied={proxied}
+                proxy={proxy}
+                proxyArgs={proxyArgs}
+                reviewWindow={reviewWindow}
+                custom={custom}
+                proxyType={proxyType}
+                setProxyArgs={setProxyArgs}
+              />
+            )}
+
+            {!pure &&
+              proxyArgs.map((arg, index) => (
+                <ProxyInfo
+                  key={index}
+                  proxied={proxied}
+                  delegate={arg.delegate}
+                  delay={arg.delay}
+                  proxyType={arg.proxyType}
+                  onDelete={() => {
+                    setProxyArgs((args) => args.filter((_, i) => index !== i));
+                  }}
+                />
+              ))}
+
+            {!!(proxyArgs.length + (existsProxies.length || 0)) && <Divider />}
+
+            <Alert
+              color='warning'
+              classNames={{
+                base: 'items-start'
+              }}
+              title={
+                <ul className='leading-[20px]'>
+                  <li>A deposit is required for proxy creation.</li>
+                  <li>Only accounts with full authority (ANY) can delete a proxy.</li>
+                </ul>
+              }
+            />
+
+            {pure ? (
+              <SubmitPure proxy={proxy} name={name} reviewWindow={reviewWindow} custom={custom} proxyType={proxyType} />
+            ) : (
+              <SubmitProxy proxied={proxied} proxyArgs={proxyArgs} setProxyArgs={setProxyArgs} />
+            )}
+
+            {!pure && (
+              <Box sx={{ filter: 'grayscale(30%)' }}>
+                <Typography marginBottom={1} fontWeight={700} color='textSecondary'>
+                  Existing Proxy
+                </Typography>
+
+                {existsProxies.map((proxy, index) => (
+                  <ProxyInfo
+                    key={`proxy_${index}`}
+                    proxied={proxy.proxied}
+                    delegate={proxy.delegate}
+                    delay={proxy.delay}
+                    proxyType={proxy.proxyType}
+                  />
+                ))}
+              </Box>
+            )}
           </Stack>
         </Paper>
       </Box>

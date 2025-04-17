@@ -3,7 +3,6 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { Bytes, Option, Struct, u8, u128 } from '@polkadot/types';
-import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
 
 export type CallParam = any;
@@ -262,18 +261,18 @@ export type AssetInfo<T extends boolean = boolean> = {
     });
 
 export interface AccountBalance {
-  total: BN;
-  locked: BN;
-  reserved: BN;
-  free: BN;
-  transferrable: BN;
+  total: bigint;
+  locked: bigint;
+  reserved: bigint;
+  free: bigint;
+  transferrable: bigint;
 }
 
 export type AccountAssetInfo = AssetInfo & {
-  total: BN;
-  locked: BN;
-  reserved: BN;
-  transferrable: BN;
+  total: bigint;
+  locked: bigint;
+  reserved: bigint;
+  transferrable: bigint;
   account: string;
 };
 

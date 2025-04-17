@@ -16,7 +16,7 @@ export function findToken(genesisHash: HexString) {
   const endpoint = allEndpoints.find((item) => item.genesisHash === genesisHash);
 
   return {
-    Icon: endpoint?.tokenIcon || '/token-icons/Polkadot.png'
+    Icon: endpoint?.tokenIcon || '/token-icons/DOT.webp'
   };
 }
 
@@ -57,7 +57,7 @@ export const assets: Asset[] = [
     assetId: '10'
   },
   {
-    Icon: '/token-icons/Polkadot.svg',
+    Icon: '/token-icons/DOT.webp',
     network: 'hydration',
     assetId: '5'
   }

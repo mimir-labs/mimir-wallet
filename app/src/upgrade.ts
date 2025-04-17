@@ -7,11 +7,19 @@ import type { BatchTxItem } from './hooks/types';
 import { addressToHex, allEndpoints } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
-import { BATCH_SYNC_TX_PREFIX, BATCH_SYNC_TX_V2_PREFIX, BATCH_TX_PREFIX, BATCH_TX_V2_PREFIX } from './constants';
+import {
+  BATCH_SYNC_TX_PREFIX,
+  BATCH_SYNC_TX_V2_PREFIX,
+  BATCH_TX_PREFIX,
+  BATCH_TX_V2_PREFIX,
+  HIDE_ACCOUNT_HEX_KEY,
+  HIDE_ACCOUNT_PREFIX
+} from './constants';
 
 const ADDRESS_BOOK_UPGRADE_VERSION_KEY = 'address_book_upgrade_version';
 const BATCH_TX_UPGRADE_VERSION_KEY = 'batch_tx_upgrade_version';
 const BATCH_SYNC_TX_UPGRADE_VERSION_KEY = 'batch_sync_tx_upgrade_version';
+const HIDE_ACCOUNT_HEX_UPGRADE_VERSION_KEY = 'hide_account_hex_upgrade_version';
 
 function upgradeAddressBookV1() {
   const addressBookVersion = store.get(ADDRESS_BOOK_UPGRADE_VERSION_KEY);
@@ -100,8 +108,31 @@ function upgradeBatchSyncTxV1() {
   store.set(BATCH_SYNC_TX_UPGRADE_VERSION_KEY, '1');
 }
 
+function upgradeHideAccountHexV1() {
+  const hideAccountHexVersion = store.get(HIDE_ACCOUNT_HEX_UPGRADE_VERSION_KEY);
+
+  if (Number(hideAccountHexVersion) >= 1) {
+    return;
+  }
+
+  const nextValue: HexString[] = [];
+
+  store.each((key: string, value) => {
+    if (key.startsWith(HIDE_ACCOUNT_PREFIX)) {
+      const v = value as HexString[];
+
+      nextValue.push(...v);
+    }
+  });
+
+  store.set(HIDE_ACCOUNT_HEX_KEY, Array.from(new Set<HexString>(nextValue)));
+
+  store.set(HIDE_ACCOUNT_HEX_UPGRADE_VERSION_KEY, '1');
+}
+
 export function upgradeAddresBook() {
   upgradeAddressBookV1();
   upgradeBatchTxV1();
   upgradeBatchSyncTxV1();
+  upgradeHideAccountHexV1();
 }

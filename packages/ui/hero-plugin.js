@@ -13,9 +13,9 @@ export default heroui({
       large: '20px'
     },
     boxShadow: {
-      small: '0px 0px 6px 0px rgba(21, 31, 52, 0.04)',
-      medium: '0px 0px 10px 0px rgba(21, 31, 52, 0.06)',
-      large: '0px 0px 14px 0px rgba(21, 31, 52, 0.08)'
+      small: '0px 0px 20px 0px rgba(21, 31, 52, 0.06)',
+      medium: '0px 0px 20px 0px rgba(21, 31, 52, 0.12)',
+      large: '0px 0px 20px 0px rgba(21, 31, 52, 0.20)'
     },
     borderWidth: {
       small: '1px',
@@ -63,7 +63,7 @@ export default heroui({
         },
         secondary: {
           foreground: '#2700FF',
-          DEFAULT: '#eee6ff'
+          DEFAULT: '#f4f2ff'
         },
         success: {
           foreground: '#FFF',

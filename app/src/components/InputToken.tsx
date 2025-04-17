@@ -86,7 +86,16 @@ function InputToken({
       </div>
     ) : token ? (
       <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
-        <Avatar alt={token.name} src={token.icon} style={{ width: 20, height: 20 }}>
+        <Avatar
+          alt={token.name}
+          fallback={
+            <div className='bg-divider-300 w-[20px] h-[20px] flex items-center justify-center rounded-full text-content1 font-bold text-medium'>
+              {token.symbol.slice(0, 1)}
+            </div>
+          }
+          src={token.icon}
+          style={{ width: 20, height: 20 }}
+        >
           {token.symbol}
         </Avatar>
         {isIconOnly || isOpen ? null : (
@@ -116,9 +125,18 @@ function InputToken({
               setAssetId(assetId);
               setInputValue('');
             }}
-            className='text-foreground data-[hover=true]:text-foreground'
+            className='h-10 text-foreground data-[hover=true]:text-foreground'
             startContent={
-              <Avatar alt={name} src={icon} style={{ width: 20, height: 20 }}>
+              <Avatar
+                alt={name}
+                fallback={
+                  <div className='bg-divider-300 w-[20px] h-[20px] flex items-center justify-center rounded-full text-content1 font-bold text-medium'>
+                    {symbol.slice(0, 1)}
+                  </div>
+                }
+                src={icon}
+                style={{ width: 20, height: 20 }}
+              >
                 {symbol}
               </Avatar>
             }

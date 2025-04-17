@@ -16,7 +16,7 @@ interface Props {
 
 function TxCellWrapper(props: Props) {
   return (
-    <SubApiRoot forceNetwork={props.transaction.network}>
+    <SubApiRoot network={props.transaction.network}>
       <TxCell {...props} />
     </SubApiRoot>
   );

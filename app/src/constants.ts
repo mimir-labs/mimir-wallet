@@ -3,10 +3,9 @@
 
 export const SWITCH_ACCOUNT_REMIND_KEY = 'switch_account_remind';
 
-export const API_METADATA_KEY = 'api_metadata';
-export const CURRENT_NETWORK_KEY = 'current_network';
-export const CURRENT_ADDRESS_HEX_KEY = 'current_address_hex';
+/** @deprecated Use CURRENT_ADDRESS_HEX_KEY instead */
 export const HIDE_ACCOUNT_PREFIX = 'hide_address:';
+export const HIDE_ACCOUNT_HEX_KEY = 'hide_address_hex';
 
 export const FAVORITE_DAPP_KEY = 'favorite_dapp';
 export const DETECTED_ACCOUNT_KEY = 'detected_account';
@@ -28,8 +27,8 @@ export const NOT_CREATE_MULTISIG_NOW_KEY = 'not_create_multisig_now';
 export const EXTENSION_PREFIX = 'mimir-wallet';
 export const MESSAGE_ORIGIN_WALLET = `${EXTENSION_PREFIX}wallet`;
 
-/** @deprecated Use CURRENT_ADDRESS_HEX_KEY instead */
 export const CURRENT_ADDRESS_PREFIX = 'current_address:';
+export const CURRENT_ADDRESS_HEX_KEY = 'current_address_hex';
 
 /** @deprecated Use BATCH_TX_ADDRESS_PREFIX instead */
 export const BATCH_TX_PREFIX = 'batch_tx:';
@@ -38,3 +37,5 @@ export const BATCH_TX_V2_PREFIX = 'batch_tx_v2:';
 export const BATCH_SYNC_TX_PREFIX = 'batch_sync_tx:';
 export const BATCH_SYNC_TX_V2_PREFIX = 'batch_sync_tx_v2:';
 export const TEMPLATE_PREFIX = 'template:';
+
+export const OMNI_CHAIN_UPGRADE_TIP_KEY = 'omni_chain_upgrade_tip';

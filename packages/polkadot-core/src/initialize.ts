@@ -15,6 +15,7 @@ import { DEFAULT_AUX, NETWORK_RPC_PREFIX } from './defaults.js';
 import { getMetadata, saveMetadata } from './metadata.js';
 import { StoredRegistry } from './registry.js';
 import { useAllApis } from './useApiStore.js';
+import { enableNetwork } from './useNetworks.js';
 
 /**
  * Initializes and configures the API after it's ready
@@ -68,7 +69,6 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
   setDeriveCache(api.genesisHash.toHex(), deriveMapCache);
 
   return {
-    chainSS58: ss58Format,
     isApiReady: true,
     tokenSymbol: tokenSymbol[0].toString(),
     genesisHash: api.genesisHash.toHex()
@@ -76,13 +76,17 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
 }
 
 function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: string) {
-  const wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string;
+  let wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string | undefined;
 
-  if (wsUrl || !httpUrl) {
-    return new ApiProvider(wsUrl || apiUrl);
+  if (wsUrl && (wsUrl.startsWith('ws://') || wsUrl.startsWith('wss://'))) {
+    /* empty */
+  } else {
+    wsUrl = undefined;
   }
 
-  const provider = new ApiProvider(apiUrl, httpUrl);
+  const apiUrls = Array.isArray(apiUrl) ? apiUrl : [apiUrl];
+
+  const provider = new ApiProvider(wsUrl ? [wsUrl, ...apiUrls] : apiUrls, httpUrl);
 
   return provider;
 }
@@ -135,12 +139,14 @@ export async function initializeApi(chain: Endpoint) {
     return;
   }
 
+  // enable network
+  enableNetwork(chain.key);
+
   // Initialize API state with static configuration
   useAllApis.setState((state) => ({
     chains: {
       ...state.chains,
       [chain.key]: {
-        chainSS58: chain.ss58Format,
         genesisHash: chain.genesisHash,
         network: chain.key,
         chain: chain
@@ -203,5 +209,19 @@ export async function initializeApi(chain: Endpoint) {
         }));
       })
       .catch(onError);
+  });
+}
+
+export function destroyApi(network: string) {
+  useAllApis.setState((state) => {
+    const apiState = state.chains[network];
+
+    if (apiState) {
+      apiState.api?.disconnect();
+    }
+
+    return {
+      chains: Object.fromEntries(Object.entries(state.chains).filter(([key]) => key !== network))
+    };
   });
 }

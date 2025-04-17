@@ -34,8 +34,15 @@ export class ClientService {
     });
   }
 
-  public getFullAccount(chain: string, address: string) {
+  public getDetails(chain: string, address: string) {
     return fetcher(this.getClientUrl(`chains/${chain}/${address}/details`), {
+      method: 'GET',
+      headers: jsonHeader
+    });
+  }
+
+  public getOmniChainDetails(address: string) {
+    return fetcher(this.getClientUrl(`omni-chain/${address}/details`), {
       method: 'GET',
       headers: jsonHeader
     });

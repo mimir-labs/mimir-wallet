@@ -11,6 +11,9 @@ export type SubtractProps<T, K> = OmitProps<T, keyof K>;
 export type Endpoint = {
   key: string;
   name: string;
+  relayChain?: string;
+  isRelayChain?: boolean;
+  isTestnet?: boolean;
   wsUrl: Record<string, string>;
   httpUrl?: string;
   icon: string;
@@ -20,13 +23,15 @@ export type Endpoint = {
   socketUrl: string;
   statescan?: boolean;
   explorerUrl?: string;
-  proposalApi?: string;
   subsquareUrl?: string;
   identityNetwork?: string;
 };
 
+export type Network = Endpoint & {
+  enabled: boolean;
+};
+
 export interface ApiState {
-  chainSS58: number;
   isApiReady: boolean;
   tokenSymbol: string;
   genesisHash: HexString;
@@ -41,7 +46,10 @@ export interface ApiProps extends ApiState {
 }
 
 export interface ApiContextProps extends ValidApiState, Omit<ApiProps, 'api'> {
-  setNetwork: (network: string) => void;
+  chainSS58: number;
+  ss58Chain: string;
+  setSs58Chain: (chain: string) => void;
+  allApis: Record<string, ValidApiState>;
 }
 
 export type ValidApiState = ApiState & {

@@ -40,19 +40,7 @@ function extrinsicExplorerLink(chain: Endpoint, value?: string | { toString: () 
   return undefined;
 }
 
-function subsquareUrl(chain: Endpoint, path?: string): string | undefined {
-  const baseUrl = chain.subsquareUrl;
-
-  return baseUrl ? `${baseUrl}${path || ''}` : undefined;
-}
-
-function proposalApi(chain: Endpoint): string | undefined {
-  return chain.proposalApi;
-}
-
 export const chainLinks = {
   accountExplorerLink,
-  extrinsicExplorerLink,
-  subsquareUrl,
-  proposalApi
+  extrinsicExplorerLink
 };

@@ -3,7 +3,9 @@
 
 import { useGroupAccounts } from '@/accounts/useGroupAccounts';
 import { CONNECT_ORIGIN } from '@/constants';
+import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useNativeBalances } from '@/hooks/useBalances';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { parseUnits } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
@@ -11,7 +13,7 @@ import { enableWallet } from '@/wallet/utils';
 import React, { useCallback, useState } from 'react';
 
 import { signAndSend, SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
 import Input from './Input';
@@ -31,13 +33,17 @@ function Content({
   sending,
   setSending,
   setValue,
-  value
+  value,
+  network,
+  setNetwork
 }: {
   sending?: string;
   setSending: React.Dispatch<string>;
   value?: string;
   setValue: React.Dispatch<string>;
   receipt?: string;
+  network: string;
+  setNetwork: React.Dispatch<string>;
 }) {
   const [balances] = useNativeBalances(sending);
   const { injected } = useGroupAccounts();
@@ -61,7 +67,7 @@ function Content({
           </div>
         </div>
 
-        <InputNetwork label='Select Network' />
+        <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
 
         <Input label='Amount' onChange={setValue} value={value} />
       </div>
@@ -121,13 +127,38 @@ function Action({
 function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const [sending, setSending] = useState<string>();
   const [[value], setValue] = useInputNumber(defaultValue?.toString() || '0', false, 0);
+  const supportedNetworks = useAddressSupportedNetworks(receipt);
+  const [network, setNetwork] = useInputNetwork(
+    defaultNetwork,
+    supportedNetworks?.map((item) => item.key)
+  );
 
   return (
-    <SubApiRoot defaultNetwork={defaultNetwork}>
+    <SubApiRoot
+      network={network}
+      supportedNetworks={supportedNetworks?.map((item) => item.key)}
+      Fallback={
+        open
+          ? ({ apiState: { chain } }) => (
+              <div className='w-[500px] max-w-full mx-auto my-0 py-10 flex items-center justify-center bg-content1 rounded-large'>
+                <Spinner size='lg' variant='dots' label={`Connecting to the ${chain.name}...`} />
+              </div>
+            )
+          : undefined
+      }
+    >
       <Modal size='lg' onClose={onClose} isOpen={open}>
         <ModalContent>
           <ModalHeader>Fund</ModalHeader>
-          <Content receipt={receipt} sending={sending} setSending={setSending} setValue={setValue} value={value} />
+          <Content
+            receipt={receipt}
+            sending={sending}
+            setSending={setSending}
+            setValue={setValue}
+            value={value}
+            network={network}
+            setNetwork={setNetwork}
+          />
           <Action onClose={onClose} receipt={receipt} sending={sending} value={value} />
         </ModalContent>
       </Modal>

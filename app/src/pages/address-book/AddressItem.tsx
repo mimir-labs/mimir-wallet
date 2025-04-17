@@ -7,7 +7,8 @@ import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconLink from '@/assets/svg/icon-link.svg?react';
 import IconQr from '@/assets/svg/icon-qr.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
-import { AddressCell, AddressRow, CopyButton, EditAddressDialog, QrcodeAddress } from '@/components';
+import { AddressCell, AddressRow, CopyAddress, EditAddressDialog } from '@/components';
+import { useQrAddress } from '@/hooks/useQrAddress';
 import { useToggle } from '@/hooks/useToggle';
 import { useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
@@ -16,16 +17,15 @@ import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 function Icons({ address }: { address: string }) {
-  const [qrOpen, toggleQrOpen] = useToggle();
   const [deleteOpen, toggleDeleteOpen] = useToggle();
   const { deleteAddress } = useAccount();
   const { chain } = useApi();
+  const { open: openQr } = useQrAddress();
 
   return (
     <>
-      <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={address} />
-      <CopyButton color='primary' size='sm' value={address} className='opacity-100' />
-      <Button isIconOnly color='primary' size='sm' variant='light' onPress={toggleQrOpen}>
+      <CopyAddress address={address} color='primary' className='opacity-100' />
+      <Button isIconOnly color='primary' size='sm' variant='light' onPress={() => openQr(address)}>
         <IconQr className='w-4 h-4' />
       </Button>
       <Button

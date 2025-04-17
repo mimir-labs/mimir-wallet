@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
-import type { AccountData, AddressMeta } from './types';
+import type { AccountData } from './types';
 
-import { HIDE_ACCOUNT_PREFIX } from '@/constants';
+import { HIDE_ACCOUNT_HEX_KEY } from '@/constants';
 import { create } from 'zustand';
 
 import { store } from '@mimir-wallet/service';
@@ -23,15 +23,13 @@ export interface AddressState {
     onClose?: () => void;
   };
   switchAddress?: string;
-  metas: Record<HexString, AddressMeta>;
 }
 
 export const useAddressStore = create<AddressState>()(() => ({
   accounts: [],
-  hideAccountHex: (store.get(HIDE_ACCOUNT_PREFIX) as HexString[]) || [],
+  hideAccountHex: (store.get(HIDE_ACCOUNT_HEX_KEY) as HexString[]) || [],
   addresses: [],
   isMultisigSyned: false,
   addAddressDialog: { open: false },
-  switchAddress: undefined,
-  metas: {}
+  switchAddress: undefined
 }));

@@ -15,7 +15,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader } from '@mimir-wallet/ui';
 
@@ -40,7 +40,6 @@ function filterAddress(keywords: string) {
 function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   const [keywords, setKeywords] = useState('');
   const { current, setCurrent, addresses, addAddressBook, accounts, hideAccountHex, metas } = useAccount();
-  const { network } = useApi();
   const [isSearching, setIsSearching] = useState(false);
   const [searchAccount, setSearchAccount] = useState<AccountData>();
 
@@ -66,7 +65,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
       );
       setIsSearching(true);
       service
-        .getFullAccount(network, keywords)
+        .getOmniChainDetails(keywords)
         .then((data) => {
           setSearchAccount(data);
         })
@@ -77,7 +76,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
       setSearchAccount(undefined);
       setGrouped(groupAccounts(accounts.filter(filterAddress(keywords)), hideAccountHex, metas));
     }
-  }, [accounts, hideAccountHex, keywords, metas, network]);
+  }, [accounts, hideAccountHex, keywords, metas]);
 
   const onSelect = useCallback(
     (address: string) => {

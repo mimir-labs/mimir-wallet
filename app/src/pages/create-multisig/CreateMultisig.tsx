@@ -35,7 +35,15 @@ function checkError(
   ];
 }
 
-function CreateMultisig({ threshold1 }: { threshold1?: boolean }) {
+function CreateMultisig({
+  threshold1,
+  network,
+  setNetwork
+}: {
+  threshold1?: boolean;
+  network: string;
+  setNetwork: (network: string) => void;
+}) {
   const navigate = useNavigate();
   const { chainSS58, chain } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
@@ -164,7 +172,7 @@ function CreateMultisig({ threshold1 }: { threshold1?: boolean }) {
                 <Switch isSelected={flexible} onValueChange={(checked) => setFlexible(checked)} />
               </div>
 
-              {flexible && <InputNetwork label='Select Network' />}
+              {flexible && <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />}
 
               <Alert
                 color='warning'

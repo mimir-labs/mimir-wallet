@@ -11,7 +11,19 @@ import { skeleton } from './skeleton';
 
 const limit = 20;
 
-function HistoryTransactions({ network, address, txId }: { network?: string; address: string; txId?: string }) {
+function HistoryTransactions({
+  isFetched: propsIsFetched,
+  isFetching: propsIsFetching,
+  network,
+  address,
+  txId
+}: {
+  isFetched: boolean;
+  isFetching: boolean;
+  network?: string;
+  address: string;
+  txId?: string;
+}) {
   const [data, isFetched, isFetching, hasNexPage, , fetchNextPage] = useHistoryTransactions(
     network,
     address,
@@ -23,7 +35,7 @@ function HistoryTransactions({ network, address, txId }: { network?: string; add
     return <Empty height='80dvh' />;
   }
 
-  if (!isFetched && isFetching) {
+  if ((!isFetched && isFetching) || (!propsIsFetched && propsIsFetching)) {
     return skeleton;
   }
 

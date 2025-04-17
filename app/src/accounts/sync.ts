@@ -26,8 +26,10 @@ function transformAccount(chainSS58: number, data: AccountData) {
 }
 
 export async function sync(
+  isOmni: boolean,
+  network: string,
   chainSS58: number,
-  walletAccounts: { address: string; name?: string; type?: string; source: string }[],
+  walletAccounts: string[],
   cb: (values: AccountData[]) => void
 ): Promise<void> {
   if (walletAccounts.length === 0) {
@@ -36,7 +38,7 @@ export async function sync(
     return;
   }
 
-  const data = await service.omniChainOwnedBy(walletAccounts.map((item) => item.address));
+  const data = await (isOmni ? service.omniChainOwnedBy(walletAccounts) : service.ownedBy(network, walletAccounts));
 
   data.forEach((item: AccountData) => {
     transformAccount(chainSS58, item);

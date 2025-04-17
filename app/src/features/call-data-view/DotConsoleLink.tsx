@@ -9,7 +9,7 @@ function DotConsoleLink({ network }: { network: string }) {
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
 
   if (!isDotConsoleSupport) {
-    const url = PolkadotJsApp.urlSearch(network);
+    const url = PolkadotJsApp.urlSearch?.(network) || new URL(PolkadotJsApp.url);
 
     url.hash = '#/extrinsics';
 
@@ -20,7 +20,7 @@ function DotConsoleLink({ network }: { network: string }) {
     );
   }
 
-  const url = DotConsoleApp.urlSearch(network);
+  const url = DotConsoleApp.urlSearch?.(network) || new URL(DotConsoleApp.url);
 
   url.pathname = '/extrinsics';
 

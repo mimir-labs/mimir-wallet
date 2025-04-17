@@ -8,7 +8,7 @@ import { useAccount } from '@/accounts/useAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconWarning from '@/assets/svg/icon-warning-fill.svg?react';
 import { useInputAddress } from '@/hooks/useInputAddress';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { isAddress } from '@polkadot/util-crypto';
 import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -95,8 +95,7 @@ function InputAddress({
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [isOpen, toggleOpen] = useToggle(false);
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
+  const upSm = useMediaQuery('sm');
 
   const options = useMemo(
     (): string[] => createOptions(accounts, addresses, isSign, inputValue, filtered, excluded),
@@ -148,7 +147,7 @@ function InputAddress({
             <AddressName value={value} />
           </div>
           <div className='inline-flex items-center gap-1 text-tiny leading-[14px] h-[14px] max-h-[14px] font-normal opacity-50'>
-            <Address value={value} shorten={downSm ? true : shorten} />
+            <Address value={value} shorten={upSm ? shorten : true} />
           </div>
         </div>
       ) : (
@@ -174,7 +173,7 @@ function InputAddress({
             onPress={() => handleSelect(item)}
             className='text-foreground data-[hover=true]:text-foreground'
           >
-            <AddressCell value={item} shorten={downSm ? true : shorten} />
+            <AddressCell value={item} shorten={upSm ? shorten : true} />
           </ListboxItem>
         ))}
       </Listbox>

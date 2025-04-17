@@ -8,46 +8,49 @@ import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { type Endpoint, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { Avatar, FreeSoloPopover, Listbox, ListboxItem, Spinner } from '@mimir-wallet/ui';
 
 interface Props {
   radius?: 'sm' | 'md' | 'lg' | 'full' | 'none';
-  isIconOnly?: boolean;
   disabled?: boolean;
   className?: string;
   contentClassName?: string;
   placeholder?: string;
   label?: string;
   helper?: React.ReactNode;
-  onChange?: (network: string) => void;
+  supportedNetworks?: string[];
+  network: string;
+  setNetwork: (network: string) => void;
 }
 
-function InputNetwork({
+function OmniChainInputNetwork({
   radius = 'md',
-  isIconOnly = false,
   disabled,
   className,
   contentClassName,
   label,
   placeholder = 'Select Network',
   helper,
-  onChange
+  network,
+  setNetwork
 }: Props) {
-  const { allApis, chain, setNetwork } = useApi();
+  const { allApis } = useApi();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useInput('');
   const [isOpen, toggleOpen] = useToggle(false);
-
   const options = Object.entries(allApis)
-    .map(([network, { chain, isApiReady }]) => ({
+    .map(([network, { chain, isApiReady, genesisHash }]) => ({
+      genesisHash,
       network,
       chain,
       isApiReady
     }))
     .filter((item) => (inputValue ? item.chain.name.toLowerCase().includes(inputValue.toLowerCase()) : true));
+
+  const chain: Endpoint | undefined = allApis[network]?.chain;
 
   const handleOpen = () => {
     toggleOpen(true);
@@ -57,12 +60,12 @@ function InputNetwork({
     toggleOpen(false);
   };
 
-  const element = (
+  const element = chain ? (
     <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
       <Avatar alt={chain.name} src={chain.icon} style={{ width: 20, height: 20, background: 'transparent' }}></Avatar>
-      {isIconOnly || isOpen ? null : <p>{chain.name}</p>}
+      {isOpen ? null : <p>{chain.name}</p>}
     </div>
-  );
+  ) : null;
 
   const popoverContent = isOpen ? (
     <FreeSoloPopover
@@ -82,13 +85,12 @@ function InputNetwork({
               isApiReady
                 ? () => {
                     setNetwork(network);
-                    onChange?.(network);
                     handleClose();
                     setInputValue('');
                   }
                 : undefined
             }
-            className='text-foreground data-[hover=true]:text-foreground'
+            className='h-10 text-foreground data-[hover=true]:text-foreground'
             startContent={
               <Avatar
                 alt={chain.name}
@@ -152,6 +154,16 @@ function InputNetwork({
       <AnimatePresence>{popoverContent}</AnimatePresence>
     </>
   );
+}
+
+function InputNetwork(props: Props) {
+  const { mode } = useNetworks();
+
+  if (mode === 'omni') {
+    return <OmniChainInputNetwork {...props} />;
+  }
+
+  return null;
 }
 
 export default React.memo(InputNetwork);

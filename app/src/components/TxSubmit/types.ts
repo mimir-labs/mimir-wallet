@@ -8,7 +8,7 @@ import type { HexString } from '@polkadot/util/types';
 
 export interface TxSubmitProps {
   accountId: string;
-  call: IMethod;
+  call: IMethod | string;
   transaction?: Transaction | null;
   filterPaths?: FilterPath[];
   onlySign?: boolean;

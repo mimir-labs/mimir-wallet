@@ -1,24 +1,21 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Input, InputNetwork } from '@/components';
+import { InputNetwork } from '@/components';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { isValidWsUrl } from '@/utils';
-import { ApiPromise, WsProvider } from '@polkadot/api';
-import { useMemo, useState } from 'react';
+import { WsProvider } from '@polkadot/api';
+import { useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
 import { NETWORK_RPC_PREFIX, SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
-import { Alert, Button, Divider } from '@mimir-wallet/ui';
+import { Alert, Autocomplete, AutocompleteItem, Button, Divider } from '@mimir-wallet/ui';
 
-function Content() {
-  const { network, allApis } = useApi();
+function Content({ network, setNetwork }: { network: string; setNetwork: (network: string) => void }) {
+  const { chain, genesisHash } = useApi();
   const [url, setUrl] = useState((store.get(`${NETWORK_RPC_PREFIX}${network}`) as string) || '');
   const [error, setError] = useState<Error | undefined>(undefined);
-
-  const chain = useMemo(() => {
-    return Object.values(allApis).find((item) => item.chain.key === network)?.chain;
-  }, [network, allApis]);
 
   const [state, handleSave] = useAsyncFn(async () => {
     if (!isValidWsUrl(url)) {
@@ -27,32 +24,43 @@ function Content() {
       return;
     }
 
-    const api = await ApiPromise.create({
-      provider: new WsProvider(url)
+    const provider = new WsProvider(url);
+
+    const rpcGenesisHash = await provider.isReady.then(() => {
+      return provider.send('chain_getBlockHash', [0]);
     });
 
-    if (api.genesisHash.toString() !== chain?.genesisHash) {
+    if (rpcGenesisHash !== genesisHash) {
       setError(new Error('Genesis hash mismatch'));
 
       return;
     }
 
     store.set(`${NETWORK_RPC_PREFIX}${network}`, url);
-
-    window.location.reload();
-  }, [url, chain, network]);
+  }, [url, genesisHash, network]);
 
   return (
     <div className='flex flex-col gap-5 p-5 bg-content1 shadow-medium rounded-large'>
-      <InputNetwork label='Select Network' />
+      <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
 
-      <Input
+      <Autocomplete
+        allowsCustomValue
+        labelPlacement='outside'
+        defaultInputValue={url}
+        defaultItems={Object.entries(chain.wsUrl)}
         label='Network RPC'
-        onChange={setUrl}
-        placeholder='Please input rpc url ws:// or wss://'
-        value={url}
-        color={error ? 'error' : undefined}
-      />
+        placeholder='Please select or input rpc url ws:// or wss://'
+        variant='bordered'
+        onInputChange={(value) => {
+          setUrl(value);
+        }}
+      >
+        {(item) => (
+          <AutocompleteItem startContent={<b>{item[0]}</b>} key={item[0]} classNames={{ title: 'text-right' }}>
+            {item[1]}
+          </AutocompleteItem>
+        )}
+      </Autocomplete>
       {error && <Alert color='danger'>{error.message}</Alert>}
 
       <Divider />
@@ -65,9 +73,11 @@ function Content() {
 }
 
 function NetworkSetting() {
+  const [network, setNetwork] = useInputNetwork();
+
   return (
-    <SubApiRoot>
-      <Content />
+    <SubApiRoot network={network}>
+      <Content key={network} network={network} setNetwork={setNetwork} />
     </SubApiRoot>
   );
 }

@@ -165,15 +165,11 @@ Genesis Hash: ${genesisHash}`;
 }
 
 function ProposerSet({ account, refetch }: { account: AccountData; refetch: () => void }) {
-  const { genesisHash } = useApi();
   const [isOpen, toggleOpen] = useToggle(false);
   const [type, setType] = useState<'add' | 'delete'>('add');
   const [deleteProposer, setDeleteProposer] = useState<string>();
 
-  const proposers = useMemo(
-    () => account.proposers?.filter((item) => item.network === genesisHash),
-    [account.proposers, genesisHash]
-  );
+  const proposers = useMemo(() => account.proposers, [account.proposers]);
 
   return (
     <>

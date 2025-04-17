@@ -11,9 +11,10 @@ const isDevEnv =
 export const polkadotEndpoints: Endpoint[] = [
   {
     key: 'polkadot',
-    icon: '/chain-icons/Polkadot.svg',
-    tokenIcon: '/token-icons/Polkadot.svg',
+    icon: '/chain-icons/Polkadot.webp',
+    tokenIcon: '/token-icons/DOT.webp',
     name: 'Polkadot',
+    isRelayChain: true,
     wsUrl: {
       Allnodes: 'wss://polkadot-rpc.publicnode.com',
       Blockops: 'wss://polkadot-public-rpc.blockops.network/ws',
@@ -33,18 +34,17 @@ export const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     socketUrl: 'wss://polkadot-api.mimir.global/',
     explorerUrl: 'https://polkadot.subscan.io/',
-    proposalApi: 'https://polkadot.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://polkadot.subsquare.io/',
     identityNetwork: 'people-polkadot'
   },
   {
     key: 'assethub-polkadot',
     icon: '/chain-icons/assethub.svg',
-    tokenIcon: '/token-icons/Polkadot.svg',
+    tokenIcon: '/token-icons/DOT.webp',
     name: 'AssetHub',
+    relayChain: 'polkadot',
     wsUrl: {
-      OnFinality: 'wss://statemint.api.onfinality.io/public-ws',
       Dwellir: 'wss://asset-hub-polkadot-rpc.dwellir.com',
+      OnFinality: 'wss://statemint.api.onfinality.io/public-ws',
       'Dwellir Tunisia': 'wss://statemint-rpc-tn.dwellir.com',
       IBP1: 'wss://sys.ibp.network/asset-hub-polkadot',
       IBP2: 'wss://asset-hub-polkadot.dotters.network',
@@ -53,16 +53,35 @@ export const polkadotEndpoints: Endpoint[] = [
       RadiumBlock: 'wss://statemint.public.curie.radiumblock.co/ws',
       Stakeworld: 'wss://dot-rpc.stakeworld.io/assethub'
     },
-    httpUrl: 'https://statemint.api.onfinality.io/public',
+    httpUrl: 'https://asset-hub-polkadot-rpc.dwellir.com',
     genesisHash: '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f',
     ss58Format: 0,
     socketUrl: 'wss://assethub-polkadot-api.mimir.global/',
     explorerUrl: 'https://assethub-polkadot.subscan.io/',
     identityNetwork: 'people-polkadot'
   },
+  {
+    key: 'people-polkadot',
+    icon: '/chain-icons/people.svg',
+    tokenIcon: '/token-icons/DOT.webp',
+    name: 'People',
+    relayChain: 'polkadot',
+    wsUrl: {
+      IBP1: 'wss://sys.ibp.network/people-polkadot',
+      IBP2: 'wss://people-polkadot.dotters.network',
+      LuckyFriday: 'wss://rpc-people-polkadot.luckyfriday.io',
+      Parity: 'wss://polkadot-people-rpc.polkadot.io',
+      RadiumBlock: 'wss://people-polkadot.public.curie.radiumblock.co/ws'
+    },
+    httpUrl: 'https://sys.ibp.network/people-polkadot',
+    genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
+    ss58Format: 0,
+    socketUrl: 'wss://people-polkadot-api.mimir.global/',
+    explorerUrl: 'https://people-polkadot.subscan.io/'
+  },
   // {
   //   icon: '/chain-icons/bridgehub.svg',
-  //   tokenIcon: '/token-icons/Polkadot.svg',
+  //   tokenIcon: '/token-icons/DOT.webp',
   //   name: 'BridgeHub',
   //   wsUrl: 'wss://polkadot-bridge-hub-rpc.polkadot.io/',
   //   genesisHash: '0xdcf691b5a3fbe24adc99ddc959c0561b973e329b1aef4c4b22e7bb2ddecb4464',
@@ -72,8 +91,9 @@ export const polkadotEndpoints: Endpoint[] = [
   {
     key: 'coretime-polkadot',
     icon: '/chain-icons/coretime-polkadot.webp',
-    tokenIcon: '/token-icons/Polkadot.svg',
+    tokenIcon: '/token-icons/DOT.webp',
     name: 'Coretime',
+    relayChain: 'polkadot',
     wsUrl: {
       Parity: 'wss://polkadot-coretime-rpc.polkadot.io',
       IBP1: 'wss://sys.ibp.network/coretime-polkadot',
@@ -89,8 +109,9 @@ export const polkadotEndpoints: Endpoint[] = [
   {
     key: 'collectives-polkadot',
     icon: '/chain-icons/collectives.svg',
-    tokenIcon: '/token-icons/Polkadot.svg',
+    tokenIcon: '/token-icons/DOT.webp',
     name: 'Collectives',
+    relayChain: 'polkadot',
     wsUrl: {
       Parity: 'wss://polkadot-collectives-rpc.polkadot.io',
       OnFinality: 'wss://collectives.api.onfinality.io/public-ws',
@@ -107,33 +128,14 @@ export const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     socketUrl: 'wss://collectives-polkadot-api.mimir.global/',
     explorerUrl: 'https://collectives-polkadot.subscan.io/',
-    proposalApi: 'https://collectives.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://collectives.subsquare.io/',
     identityNetwork: 'people-polkadot'
-  },
-  {
-    key: 'people-polkadot',
-    icon: '/chain-icons/people.svg',
-    tokenIcon: '/token-icons/Polkadot.svg',
-    name: 'People',
-    wsUrl: {
-      IBP1: 'wss://sys.ibp.network/people-polkadot',
-      IBP2: 'wss://people-polkadot.dotters.network',
-      LuckyFriday: 'wss://rpc-people-polkadot.luckyfriday.io',
-      Parity: 'wss://polkadot-people-rpc.polkadot.io',
-      RadiumBlock: 'wss://people-polkadot.public.curie.radiumblock.co/ws'
-    },
-    httpUrl: 'https://sys.ibp.network/people-polkadot',
-    genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
-    ss58Format: 0,
-    socketUrl: 'wss://people-polkadot-api.mimir.global/',
-    explorerUrl: 'https://people-polkadot.subscan.io/'
   },
   {
     key: 'bifrost-polkadot',
     icon: '/chain-icons/bifrost-polkadot.png',
     tokenIcon: '/token-icons/bnc.png',
     name: 'Bifrost',
+    relayChain: 'polkadot',
     wsUrl: {
       Liebi: 'wss://hk.p.bifrost-rpc.liebi.com/ws',
       Dwellir: 'wss://bifrost-polkadot-rpc.dwellir.com',
@@ -145,15 +147,33 @@ export const polkadotEndpoints: Endpoint[] = [
     genesisHash: '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
     ss58Format: 0,
     socketUrl: 'wss://bifrost-polkadot-api.mimir.global/',
-    explorerUrl: 'https://bifrost.subscan.io/',
-    proposalApi: 'https://bifrost.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://bifrost.subsquare.io/'
+    explorerUrl: 'https://bifrost.subscan.io/'
+  },
+  {
+    key: 'hydration',
+    icon: '/chain-icons/hydration.svg',
+    tokenIcon: '/token-icons/HDX.svg',
+    name: 'Hydration',
+    relayChain: 'polkadot',
+    wsUrl: {
+      'Galactic Council': 'wss://rpc.hydradx.cloud',
+      IBP1: 'wss://hydration.ibp.network',
+      Dwellir: 'wss://hydration-rpc.n.dwellir.com',
+      Helikon: 'wss://rpc.helikon.io/hydradx',
+      IBP2: 'wss://hydration.dotters.network'
+    },
+    httpUrl: 'https://rpc.hydradx.cloud',
+    genesisHash: '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d',
+    ss58Format: 63,
+    socketUrl: 'wss://hydration-api.mimir.global/',
+    explorerUrl: 'https://hydration.subscan.io/'
   },
   {
     key: 'crust-polkadot',
     icon: '/chain-icons/crust-polkadot.svg',
     tokenIcon: '/token-icons/cru.svg',
     name: 'Crust',
+    relayChain: 'polkadot',
     wsUrl: {
       Crust: 'wss://crust-parachain.crustapps.net',
       'Crust APP': 'wss://crust-parachain.crustnetwork.app',
@@ -171,6 +191,7 @@ export const polkadotEndpoints: Endpoint[] = [
     icon: '/chain-icons/pendulum.svg',
     tokenIcon: '/token-icons/pen.png',
     name: 'Pendulum',
+    relayChain: 'polkadot',
     wsUrl: {
       PendulumChain: 'wss://rpc-pendulum.prd.pendulumchain.tech'
     },
@@ -185,6 +206,7 @@ export const polkadotEndpoints: Endpoint[] = [
     icon: '/chain-icons/Acala.svg',
     tokenIcon: '/token-icons/ACA.svg',
     name: 'Acala',
+    relayChain: 'polkadot',
     wsUrl: {
       'Acala Foundation 3': 'wss://acala-rpc-3.aca-api.network/ws',
       'Acala Foundation 0': 'wss://acala-rpc-0.aca-api.network',
@@ -198,15 +220,14 @@ export const polkadotEndpoints: Endpoint[] = [
     genesisHash: '0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c',
     ss58Format: 10,
     socketUrl: 'wss://acala-api.mimir.global/',
-    explorerUrl: 'https://acala.subscan.io/',
-    proposalApi: 'https://acala.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://acala.subsquare.io/'
+    explorerUrl: 'https://acala.subscan.io/'
   },
   {
     key: 'phala',
     icon: '/chain-icons/phala.svg',
     tokenIcon: '/token-icons/PHA.svg',
     name: 'Phala',
+    relayChain: 'polkadot',
     wsUrl: {
       Phala: 'wss://api.phala.network/ws',
       OnFinality: 'wss://phala.api.onfinality.io/public-ws',
@@ -218,35 +239,14 @@ export const polkadotEndpoints: Endpoint[] = [
     genesisHash: '0x1bb969d85965e4bb5a651abbedf21a54b6b31a21f66b5401cc3f1e286268d736',
     ss58Format: 30,
     socketUrl: 'wss://phala-api.mimir.global/',
-    explorerUrl: 'https://phala.subscan.io/',
-    proposalApi: 'https://phala.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://phala.subsquare.io/'
-  },
-  {
-    key: 'hydration',
-    icon: '/chain-icons/hydration.svg',
-    tokenIcon: '/token-icons/HDX.svg',
-    name: 'Hydration',
-    wsUrl: {
-      'Galactic Council': 'wss://rpc.hydradx.cloud',
-      IBP1: 'wss://hydration.ibp.network',
-      Dwellir: 'wss://hydration-rpc.n.dwellir.com',
-      Helikon: 'wss://rpc.helikon.io/hydradx',
-      IBP2: 'wss://hydration.dotters.network'
-    },
-    httpUrl: 'https://rpc.hydradx.cloud',
-    genesisHash: '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d',
-    ss58Format: 63,
-    socketUrl: 'wss://hydration-api.mimir.global/',
-    explorerUrl: 'https://hydration.subscan.io/',
-    proposalApi: 'https://hydration.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://hydration.subsquare.io/'
+    explorerUrl: 'https://phala.subscan.io/'
   },
   {
     key: 'nexus',
     icon: '/chain-icons/nexus.webp',
     tokenIcon: '/token-icons/BRIDGE.webp',
     name: 'Hyperbridge (Nexus)',
+    relayChain: 'polkadot',
     wsUrl: {
       IBP1: 'wss://nexus.ibp.network',
       BlockOps: 'wss://hyperbridge-nexus-rpc.blockops.network',
@@ -264,6 +264,7 @@ export const polkadotEndpoints: Endpoint[] = [
     icon: '/chain-icons/polimec.svg',
     tokenIcon: '/token-icons/PLMC.webp',
     name: 'Polimec Polkadot',
+    relayChain: 'polkadot',
     wsUrl: {
       IBP1: 'wss://polimec.ibp.network',
       Amforc: 'wss://polimec.rpc.amforc.com',
@@ -284,6 +285,7 @@ export const kusamaEndpoints: Endpoint[] = [
     icon: '/chain-icons/Kusama.png',
     tokenIcon: '/token-icons/Kusama.png',
     name: 'Kusama',
+    isRelayChain: true,
     wsUrl: {
       Allnodes: 'wss://kusama-rpc.publicnode.com',
       OnFinality: 'wss://kusama.api.onfinality.io/public-ws',
@@ -301,8 +303,6 @@ export const kusamaEndpoints: Endpoint[] = [
     ss58Format: 2,
     socketUrl: 'wss://kusama-api.mimir.global/',
     explorerUrl: 'https://kusama.subscan.io/',
-    proposalApi: 'https://kusama.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://kusama.subsquare.io/',
     identityNetwork: 'people-kusama'
   },
   {
@@ -310,6 +310,7 @@ export const kusamaEndpoints: Endpoint[] = [
     icon: '/chain-icons/assethub-kusama.svg',
     tokenIcon: '/token-icons/Kusama.png',
     name: 'AssetHub Kusama',
+    relayChain: 'kusama',
     wsUrl: {
       Dwellir: 'wss://asset-hub-kusama-rpc.dwellir.com',
       'Dwellir Tunisia': 'wss://statemine-rpc-tn.dwellir.com',
@@ -327,20 +328,32 @@ export const kusamaEndpoints: Endpoint[] = [
     explorerUrl: 'https://assethub-kusama.subscan.io/',
     identityNetwork: 'people-kusama'
   },
-  // {
-  //   icon: '/chain-icons/bridgehub-kusama.svg',
-  //   tokenIcon: '/token-icons/Kusama.png',
-  //   name: 'BridgeHub Kusama',
-  //   wsUrl: 'wss://kusama-bridge-hub-rpc.polkadot.io',
-  //   genesisHash: '0x00dcb981df86429de8bbacf9803401f09485366c44efbf53af9ecfab03adc7e5',
-  //   socketUrl: 'wss://bridgehub-kusama-api.mimir.global/',
-  //   explorerUrl: 'https://bridgehub-kusama.subscan.io/'
-  // },
+  {
+    key: 'people-kusama',
+    icon: '/chain-icons/people-kusama.svg',
+    tokenIcon: '/token-icons/Kusama.png',
+    name: 'People Kusama',
+    relayChain: 'kusama',
+    wsUrl: {
+      Parity: 'wss://kusama-people-rpc.polkadot.io',
+      Dwellir: 'wss://people-kusama-rpc.dwellir.com',
+      IBP1: 'wss://sys.ibp.network/people-kusama',
+      IBP2: 'wss://people-kusama.dotters.network',
+      LuckyFriday: 'wss://rpc-people-kusama.luckyfriday.io',
+      Stakeworld: 'wss://ksm-rpc.stakeworld.io/people'
+    },
+    httpUrl: 'https://kusama-people-rpc.polkadot.io',
+    genesisHash: '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f',
+    ss58Format: 2,
+    socketUrl: 'wss://people-kusama-api.mimir.global/',
+    explorerUrl: 'https://people-kusama.subscan.io/'
+  },
   {
     key: 'coretime-kusama',
     icon: '/chain-icons/coretime-kusama.webp',
     tokenIcon: '/token-icons/Kusama.png',
     name: 'Coretime Kusama',
+    relayChain: 'kusama',
     wsUrl: {
       Parity: 'wss://kusama-coretime-rpc.polkadot.io',
       Dwellir: 'wss://coretime-kusama-rpc.dwellir.com',
@@ -357,29 +370,11 @@ export const kusamaEndpoints: Endpoint[] = [
     identityNetwork: 'people-kusama'
   },
   {
-    key: 'people-kusama',
-    icon: '/chain-icons/people-kusama.svg',
-    tokenIcon: '/token-icons/Kusama.png',
-    name: 'People Kusama',
-    wsUrl: {
-      Parity: 'wss://kusama-people-rpc.polkadot.io',
-      Dwellir: 'wss://people-kusama-rpc.dwellir.com',
-      IBP1: 'wss://sys.ibp.network/people-kusama',
-      IBP2: 'wss://people-kusama.dotters.network',
-      LuckyFriday: 'wss://rpc-people-kusama.luckyfriday.io',
-      Stakeworld: 'wss://ksm-rpc.stakeworld.io/people'
-    },
-    httpUrl: 'https://kusama-people-rpc.polkadot.io',
-    genesisHash: '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f',
-    ss58Format: 2,
-    socketUrl: 'wss://people-kusama-api.mimir.global/',
-    explorerUrl: 'https://people-kusama.subscan.io/'
-  },
-  {
     key: 'bifrost-kusama',
     icon: '/chain-icons/bifrost-kusama.png',
     tokenIcon: '/token-icons/bnc.png',
     name: 'Bifrost Kusama',
+    relayChain: 'kusama',
     wsUrl: {
       Liebi: 'wss://bifrost-rpc.liebi.com/ws',
       Dwellir: 'wss://bifrost-rpc.dwellir.com',
@@ -390,15 +385,14 @@ export const kusamaEndpoints: Endpoint[] = [
     genesisHash: '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed',
     ss58Format: 0,
     socketUrl: 'wss://bifrost-kusama-api.mimir.global/',
-    explorerUrl: 'https://bifrost.subscan.io/',
-    proposalApi: 'https://bifrost.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://bifrost.subsquare.io/'
+    explorerUrl: 'https://bifrost.subscan.io/'
   },
   {
     key: 'amplitude',
     icon: '/chain-icons/amplitude.svg',
     tokenIcon: '/token-icons/ampe.svg',
     name: 'Amplitude',
+    relayChain: 'kusama',
     wsUrl: {
       Dwellir: 'wss://amplitude-rpc.dwellir.com',
       PendulumChain: 'wss://rpc-amplitude.pendulumchain.tech'
@@ -413,6 +407,7 @@ export const kusamaEndpoints: Endpoint[] = [
     icon: '/chain-icons/Karura.svg',
     tokenIcon: '/token-icons/KAR.png',
     name: 'Karura',
+    relayChain: 'kusama',
     wsUrl: {
       'Acala Foundation 1': 'wss://karura-rpc-1.aca-api.network',
       'Acala Foundation 0': 'wss://karura-rpc-0.aca-api.network',
@@ -425,9 +420,7 @@ export const kusamaEndpoints: Endpoint[] = [
     genesisHash: '0xbaf5aabe40646d11f0ee8abbdc64f4a4b7674925cba08e4a05ff9ebed6e2126b',
     ss58Format: 8,
     socketUrl: 'wss://karura-api.mimir.global/',
-    explorerUrl: 'https://karura.subscan.io/',
-    proposalApi: 'https://karura.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://karura.subsquare.io/'
+    explorerUrl: 'https://karura.subscan.io/'
   }
 ];
 
@@ -438,6 +431,8 @@ export const paseoEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/Paseo.png',
     name: 'Paseo',
     ss58Format: 0,
+    isRelayChain: true,
+    isTestnet: true,
     wsUrl: {
       Dwellir: 'wss://paseo-rpc.dwellir.com',
       IBP1: 'wss://rpc.ibp.network/paseo',
@@ -457,6 +452,8 @@ export const paseoEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/Paseo.png',
     name: 'AssetHub Paseo',
     ss58Format: 0,
+    relayChain: 'paseo',
+    isTestnet: true,
     wsUrl: {
       Dwellir: 'wss://asset-hub-paseo-rpc.dwellir.com',
       IBP1: 'wss://sys.ibp.network/asset-hub-paseo',
@@ -476,6 +473,8 @@ export const paseoEndpoints: Endpoint[] = [
           icon: '/chain-icons/xcavate.png',
           tokenIcon: '/token-icons/XCAV.png',
           name: 'Xcavate Devnet',
+          relayChain: 'paseo',
+          isTestnet: true,
           wsUrl: {
             'xcavate Devnet': 'wss://rpc2-paseo.xcavate.io'
           },
@@ -494,7 +493,9 @@ export const westendEndpoints: Endpoint[] = [
     icon: '/chain-icons/Westend.webp',
     tokenIcon: '/token-icons/WND.webp',
     name: 'Westend',
-    ss58Format: 42,
+    ss58Format: 0,
+    isRelayChain: true,
+    isTestnet: true,
     wsUrl: {
       Dwellir: 'wss://westend-rpc.dwellir.com',
       OnFinality: 'wss://westend.api.onfinality.io/public-ws',
@@ -514,7 +515,9 @@ export const westendEndpoints: Endpoint[] = [
     icon: '/chain-icons/assethub-westend.webp',
     tokenIcon: '/token-icons/WND.webp',
     name: 'AssetHub Westend',
-    ss58Format: 42,
+    ss58Format: 0,
+    relayChain: 'westend',
+    isTestnet: true,
     wsUrl: {
       Dwellir: 'wss://asset-hub-westend-rpc.dwellir.com',
       IBP1: 'wss://sys.ibp.network/asset-hub-westend',
@@ -533,7 +536,9 @@ export const westendEndpoints: Endpoint[] = [
     icon: '/chain-icons/assethub-westend.webp',
     tokenIcon: '/token-icons/WND.webp',
     name: 'AssetHub Next',
-    ss58Format: 42,
+    ss58Format: 0,
+    relayChain: 'westend',
+    isTestnet: true,
     wsUrl: {
       Parity: 'wss://westend-asset-hub-next-rpc.parity-chains-scw.parity.io'
     },
@@ -557,9 +562,7 @@ export const solochainEndpoints: Endpoint[] = [
     genesisHash: '0xfe1b4c55fd4d668101126434206571a7838a8b6b93a6d1b95d607e78e6c53763',
     ss58Format: 137,
     socketUrl: 'wss://vara-api.mimir.global/',
-    explorerUrl: 'https://vara.subscan.io/',
-    proposalApi: 'https://vara.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://vara.subsquare.io/'
+    explorerUrl: 'https://vara.subscan.io/'
   },
   {
     key: 'crust',
@@ -578,9 +581,7 @@ export const solochainEndpoints: Endpoint[] = [
     genesisHash: '0x8b404e7ed8789d813982b9cb4c8b664c05b3fbf433309f603af014ec9ce56a8c',
     ss58Format: 66,
     socketUrl: 'wss://crust-api.mimir.global/',
-    explorerUrl: 'https://crust.subscan.io/',
-    proposalApi: 'https://crust.subsquare.io/api/gov2/referendums?simple=true',
-    subsquareUrl: 'https://crust.subsquare.io/'
+    explorerUrl: 'https://crust.subscan.io/'
   },
   {
     key: 'avail',
@@ -602,6 +603,7 @@ export const solochainEndpoints: Endpoint[] = [
     icon: '/chain-icons/avail.png',
     tokenIcon: '/token-icons/avail.png',
     name: 'Avail Turing',
+    isTestnet: true,
     wsUrl: {
       Avail: 'wss://turing-rpc.avail.so/ws'
     },
@@ -615,13 +617,14 @@ export const solochainEndpoints: Endpoint[] = [
     icon: '/chain-icons/zkverify.svg',
     tokenIcon: '/token-icons/ACME.svg',
     name: 'zkVerify Testnet',
+    isTestnet: true,
     wsUrl: {
       zkVerify: 'wss://testnet-rpc.zkverify.io'
     },
     genesisHash: '0xc00425dcaa0a1bc5bf1163a2d69d7abb2cc6180de78b4e10297b31a4d9cc928a',
     ss58Format: 251,
     socketUrl: 'wss://zkverify-testnet-api.mimir.global/',
-    explorerUrl: 'https://zkverify-explorer.zeeve.net/'
+    explorerUrl: 'https://zkverify-testnet.subscan.io/'
   },
   {
     key: '5ire',
@@ -644,13 +647,3 @@ export const allEndpoints = polkadotEndpoints
   .concat(paseoEndpoints)
   .concat(westendEndpoints)
   .concat(solochainEndpoints);
-
-export function groupedEndpoints(): Record<string, Endpoint[]> {
-  return {
-    polkadot: polkadotEndpoints,
-    kusama: kusamaEndpoints,
-    soloChain: solochainEndpoints,
-    paseo: paseoEndpoints,
-    westend: westendEndpoints
-  };
-}

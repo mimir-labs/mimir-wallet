@@ -8,8 +8,9 @@ import { events } from '@/events';
 import Template from '@/features/template';
 import React, { useEffect } from 'react';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
+
+let index = 0;
 
 function TemplateButton({
   isOpen,
@@ -21,19 +22,19 @@ function TemplateButton({
   close: () => void;
 }) {
   useEffect(() => {
-    const onOpen = () => {
-      open(
-        <SubApiRoot>
-          <Template onClose={close} />
-        </SubApiRoot>
-      );
+    const onOpen = (network: string) => {
+      open(<Template key={`open-${network}-${++index}`} defaultNetwork={network} onClose={close} />);
     };
 
     const onAdd = (network: string, callData: HexString) => {
       open(
-        <SubApiRoot defaultNetwork={network}>
-          <Template defaultCallData={callData} defaultAdded onClose={close} />
-        </SubApiRoot>
+        <Template
+          key={`add-${network}-${++index}`}
+          defaultNetwork={network}
+          defaultCallData={callData}
+          defaultAdded
+          onClose={close}
+        />
       );
     };
 
@@ -50,7 +51,7 @@ function TemplateButton({
     <Tooltip content='Template' closeDelay={0}>
       <Button
         isIconOnly
-        className='border-secondary'
+        className='border-secondary w-[32px] h-[32px] sm:w-[42px] sm:h-[42px] bg-secondary sm:bg-transparent'
         color='primary'
         variant='ghost'
         radius='md'
@@ -58,15 +59,11 @@ function TemplateButton({
           if (isOpen) {
             close();
           } else {
-            open(
-              <SubApiRoot>
-                <Template onClose={close} />
-              </SubApiRoot>
-            );
+            open(<Template key={`default-template`} onClose={close} />);
           }
         }}
       >
-        <IconTemplate />
+        <IconTemplate className='w-[14px] h-[14px] sm:w-[19px] sm:h-[19px]' />
       </Button>
     </Tooltip>
   );

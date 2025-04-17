@@ -13,6 +13,7 @@ import { useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Drawer, DrawerBody, DrawerContent } from '@mimir-wallet/ui';
 
 import DappDetails from './DappDetails';
+import SupportedChains from './SupportedChains';
 
 interface Props {
   addFavorite: (id: number) => void;
@@ -42,7 +43,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
     if (!dapp.isDrawer) {
       const url = dapp.urlSearch?.(network) || dapp.url;
 
-      navigate(`/explorer/${encodeURIComponent(url.toString())}?network=${network}`);
+      navigate(`/explorer/${encodeURIComponent(url.toString())}`);
     } else {
       dapp.Component?.().then((C) => {
         setDrawerOpen(true);
@@ -70,7 +71,10 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
       <div className='cursor-pointer block p-5 rounded-large bg-content1 shadow-medium' onClick={openApp}>
         <div className='space-y-5'>
           <div>
-            <h4 className='text-lg font-bold'>{dapp.name}</h4>
+            <div className='flex justify-between items-center gap-2'>
+              <h4 className='flex-1 text-lg font-bold'>{dapp.name}</h4>
+              <SupportedChains app={dapp} />
+            </div>
             <p
               className='mt-1.5 leading-[14px] h-[42px] text-tiny text-foreground/65 text-ellipsis'
               style={

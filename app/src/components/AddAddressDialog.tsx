@@ -4,7 +4,7 @@
 import { useAccount } from '@/accounts/useAccount';
 import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
 import { isAddress } from '@polkadot/util-crypto';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 import { addressEq, decodeAddress, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
@@ -29,6 +29,12 @@ function Content({
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
   const [info] = useDeriveAccountInfo(address);
   const { display, displayParent } = info || {};
+
+  useLayoutEffect(() => {
+    if (display) {
+      setName(`${displayParent || display}${displayParent ? `/${display}` : ''}`);
+    }
+  }, [display, displayParent]);
 
   const _onChangeAddress = useCallback(
     (addressInput: string) => {
@@ -74,15 +80,13 @@ function Content({
     <>
       <ModalBody>
         <div className='space-y-5'>
-          {display ? (
-            <Input
-              label='Identity'
-              disabled
-              value={`${displayParent || display}${displayParent ? `/${display}` : ''}`}
-            />
-          ) : (
-            <Input label='Name' onChange={setName} placeholder='input name for contact' value={name} />
-          )}
+          <Input
+            label='Name'
+            disabled={!!display}
+            onChange={setName}
+            placeholder='input name for contact'
+            value={name}
+          />
           <Input
             error={exists ? new Error('Already in related account') : null}
             label='Address'

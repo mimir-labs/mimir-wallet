@@ -9,13 +9,15 @@ import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 function Address({
   shorten,
-  value
+  value,
+  ss58Format
 }: {
   shorten?: boolean;
+  ss58Format?: number;
   value?: AccountId | AccountIndex | AddressType | string | null;
 }) {
   const { chainSS58 } = useApi();
-  const format = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
+  const format = useMemo(() => encodeAddress(value, ss58Format || chainSS58), [value, ss58Format, chainSS58]);
 
   return shorten ? `${format?.slice(0, 6)}…${format?.slice(-6)}` : format;
 }

@@ -9,7 +9,7 @@ import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
-import CopyButton from './CopyButton';
+import CopyAddress from './CopyAddress';
 import IdentityIcon from './IdentityIcon';
 
 interface Props {
@@ -47,7 +47,7 @@ function AddressRow({
           <AddressComp shorten={shorten} value={address} />
         </span>
       )}
-      {withCopy && <CopyButton value={address} className='opacity-50' />}
+      {withCopy && <CopyAddress address={address} className='opacity-50' />}
     </div>
   );
 }

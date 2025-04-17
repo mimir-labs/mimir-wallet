@@ -4,6 +4,7 @@
 import type { MultisigAccountData, PureAccountData } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
+import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Input, TxButton } from '@/components';
 import { Box, FormHelperText, Paper, Stack } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
@@ -12,7 +13,7 @@ import { useCallback, useState } from 'react';
 
 import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button } from '@mimir-wallet/ui';
+import { Alert, Avatar, Button } from '@mimir-wallet/ui';
 
 import AccountSelect from '../../create-multisig/AccountSelect';
 import { useSelectMultisig } from '../../create-multisig/useSelectMultisig';
@@ -42,7 +43,7 @@ function MemberSet({
   disabled?: boolean;
 }) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const { api, chainSS58, network } = useApi();
+  const { api, chainSS58, network, chain } = useApi();
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
     useSelectMultisig(
       account.members.map((item) => item.address),
@@ -142,6 +143,29 @@ function MemberSet({
           error={thresholdError}
           label='Threshold'
           onChange={_onChangeThreshold}
+        />
+
+        <Alert
+          hideIconWrapper
+          color='warning'
+          description={
+            <ul style={{ listStyle: 'outside' }}>
+              <li className='flex items-center'>
+                You are trying to modify memebers on&nbsp;
+                <Avatar src={chain.icon} className='w-4 h-4 bg-transparent' />
+                &nbsp;
+                {chain.name}.
+              </li>
+              {/* <li>You can use this proxy on Assethub due to Remote Proxy</li> */}
+            </ul>
+          }
+          classNames={{
+            title: 'font-bold text-small',
+            description: 'text-tiny'
+          }}
+          icon={<IconInfo />}
+          title='Notice'
+          variant='flat'
         />
 
         <TxButton

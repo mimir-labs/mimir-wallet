@@ -46,14 +46,14 @@
   },
   "dependencies": {
     "@acala-network/types": "^6.2.0",
-    "@polkadot/api": "^15.9.1",
-    "@polkadot/api-derive": "^15.9.1",
+    "@polkadot/api": "^15.9.2",
+    "@polkadot/api-derive": "^15.9.2",
     "@polkadot/apps-config": "^0.153.1",
-    "@polkadot/types": "^15.9.1",
-    "@polkadot/types-known": "^15.9.1",
+    "@polkadot/types": "^15.9.2",
+    "@polkadot/types-known": "^15.9.2",
     "@polkadot/ui-shared": "^3.12.2",
-    "@polkadot/util": "^13.4.3",
-    "@polkadot/util-crypto": "^13.4.3",
+    "@polkadot/util": "^13.4.4",
+    "@polkadot/util-crypto": "^13.4.4",
     "idb": "^8.0.2"
   },
   "devDependencies": {

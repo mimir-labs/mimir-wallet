@@ -9,7 +9,6 @@ import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import React, { useCallback } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Link, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
 
 import AddressCell from '../AddressCell';
@@ -31,7 +30,6 @@ function AccountCell({
   isHide?: boolean;
   onSelect?: (address: string) => void;
 }) {
-  const { network } = useApi();
   const { isLocalAccount, deleteAddress, showAccount, hideAccount, addAddressBook } = useAccount();
   const [totalUsd] = useBalanceTotalUsd(value);
   const source = useAccountSource(value);
@@ -83,7 +81,7 @@ function AccountCell({
                     color='primary'
                     className='justify-start text-foreground'
                     onPress={() => {
-                      isHide ? showAccount(network, value) : hideAccount(network, value);
+                      isHide ? showAccount(value) : hideAccount(value);
                     }}
                   >
                     {isHide ? 'Show' : 'Hide'}

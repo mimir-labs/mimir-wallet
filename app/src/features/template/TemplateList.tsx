@@ -18,11 +18,13 @@ import { useSavedTemplate } from './useSavedTemplate';
 function TemplateList({
   onAdd,
   onClose,
-  onView
+  onView,
+  setNetwork
 }: {
   onAdd: () => void;
   onClose: () => void;
   onView: (name: string, call: HexString) => void;
+  setNetwork: (network: string) => void;
 }) {
   const { network } = useApi();
   const { template, removeTemplate, editTemplateName } = useSavedTemplate(network);
@@ -46,7 +48,7 @@ function TemplateList({
         </Button>
       </Box>
 
-      <InputNetwork />
+      <InputNetwork network={network} setNetwork={setNetwork} />
 
       <Divider />
 

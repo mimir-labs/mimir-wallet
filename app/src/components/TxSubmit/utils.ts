@@ -39,7 +39,7 @@ async function asMulti(
   if (threshold === 1 && api.tx.multisig.asMultiThreshold1) {
     return api.tx.multisig.asMultiThreshold1(
       u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
-      tx.method
+      tx.method.toU8a()
     );
   }
 

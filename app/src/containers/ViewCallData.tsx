@@ -16,7 +16,7 @@ function ViewCallData() {
   useEffect(() => {
     const onView = (network: string, callData: HexString) => {
       openRightSidebar(
-        <SubApiRoot forceNetwork={network}>
+        <SubApiRoot network={network}>
           <CallDataView calldata={callData} onClose={closeRightSidebar} />
         </SubApiRoot>
       );

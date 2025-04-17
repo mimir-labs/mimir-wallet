@@ -3,6 +3,8 @@
 
 import type { TokenInfo } from './types';
 
+import { isEqual } from 'lodash-es';
+
 import { service, useClientQuery, useQuery } from '@mimir-wallet/service';
 
 export function useTokenInfo(network: string): [tokenInfo: TokenInfo | undefined, isLoading: boolean] {
@@ -12,7 +14,10 @@ export function useTokenInfo(network: string): [tokenInfo: TokenInfo | undefined
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryHash,
-    queryKey
+    queryKey,
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
+    }
   });
 
   return [data, isFetching];
@@ -24,7 +29,10 @@ export function useTokenInfoAll(): [tokenInfo: Record<string, TokenInfo> | undef
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryKey: [service.getClientUrl(`token/all`)],
-    queryHash: service.getClientUrl(`token/all`)
+    queryHash: service.getClientUrl(`token/all`),
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
+    }
   });
 
   return [data, isFetching];

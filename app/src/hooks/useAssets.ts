@@ -19,7 +19,7 @@ import { useTokenInfo, useTokenInfoAll } from './useTokenInfo';
 function _extraAsset(
   network: string,
   data: {
-    id: string;
+    assetId: string;
     name: string;
     symbol: string;
     decimals: number;
@@ -31,12 +31,12 @@ function _extraAsset(
   tokenInfo?: TokenInfo
 ): AssetInfo[] {
   return data.map((item) => {
-    const asset = assets.find(({ assetId }) => item.id === assetId);
+    const asset = assets.find(({ assetId }) => item.assetId === assetId);
 
     return {
       network: network,
       isNative: false,
-      assetId: item.id,
+      assetId: item.assetId,
       name: item.name,
       symbol: item.symbol,
       decimals: item.decimals,
@@ -55,14 +55,8 @@ export function useAssets(network: string): [data: AssetInfo[] | undefined, isFe
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    structuralSharing: (prev, next): AssetInfo[] => {
-      if (!next) {
-        return [];
-      }
-
-      const nextData = _extraAsset(network, next as any, tokenInfo);
-
-      return isEqual(prev, nextData) ? (prev as AssetInfo[]) : nextData;
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
     }
   });
 
@@ -76,6 +70,29 @@ export function useAssets(network: string): [data: AssetInfo[] | undefined, isFe
         })),
       [data, tokenInfo]
     ),
+    isFetched,
+    isFetching
+  ];
+}
+
+export function useAssetsByAddress(
+  network: string,
+  address?: string | null
+): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean] {
+  const [tokenInfo] = useTokenInfo(network);
+  const { data, isFetched, isFetching } = useQuery<AssetInfo[] | undefined>({
+    queryHash: service.getClientUrl(`chains/${network}/balances/${address}`),
+    queryKey: address ? [service.getClientUrl(`chains/${network}/balances/${address}`)] : [null],
+    refetchInterval: 60 * 10 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
+    }
+  });
+
+  return [
+    useMemo(() => (data ? _extraAsset(network, data as any, tokenInfo) : undefined), [data, network, tokenInfo]),
     isFetched,
     isFetching
   ];
@@ -107,6 +124,39 @@ export function useAssetsAll(): [
   });
 
   return [data, isFetched, isFetching];
+}
+
+export function useAssetsByAddressAll(
+  address?: string | null
+): [data: Record<string, AssetInfo[]> | undefined, isFetched: boolean, isFetching: boolean] {
+  const [tokenInfo] = useTokenInfoAll();
+  const { data, isFetched, isFetching } = useQuery<Record<string, AssetInfo[]>>({
+    queryKey: address ? [service.getClientUrl(`balances/all/${address}`)] : [null],
+    queryHash: service.getClientUrl(`balances/all/${address}`),
+    refetchInterval: 60 * 10 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
+    }
+  });
+
+  return [
+    useMemo(
+      () =>
+        data
+          ? Object.fromEntries(
+              Object.entries(data).map(([network, assets]) => [
+                network,
+                _extraAsset(network, assets as any, tokenInfo?.[network])
+              ])
+            )
+          : undefined,
+      [data, tokenInfo]
+    ),
+    isFetched,
+    isFetching
+  ];
 }
 
 async function fetchAssetInfo({

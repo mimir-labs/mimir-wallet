@@ -10,28 +10,32 @@ import { useAssetInfo } from '@/hooks/useAssets';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { formatUnits, parseUnits } from '@/utils';
-import { Box, Button, Divider, Paper, Skeleton, Stack, Switch } from '@mui/material';
 import { BN, isHex } from '@polkadot/util';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Divider, Skeleton, Switch } from '@mimir-wallet/ui';
 
 import { useTransferBalance } from './useTransferBalances';
 
 function Transfer({
   isPure,
   sending,
-  setSending,
-  defaultAssetId
+  defaultAssetId,
+  network,
+  setNetwork,
+  setSending
 }: {
   isPure: boolean;
   sending: string;
-  setSending: (sending: string) => void;
+  network: string;
   defaultAssetId?: string;
+  setSending: (sending: string) => void;
+  setNetwork: (network: string) => void;
 }) {
-  const { api, network } = useApi();
+  const { api } = useApi();
   const navigate = useNavigate();
   const [toParam] = useQueryParam<string>('to');
   const [recipient, setRecipient] = useState<string>(toParam || '');
@@ -90,12 +94,12 @@ function Transfer({
   }, [amount, api, format, isAmountValid, keepAlive, recipient, sending, token]);
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 500, margin: '0 auto', padding: { sm: 2, xs: 1.5 } }}>
-      <Button onClick={() => navigate(-1)} variant='outlined'>
+    <div className='w-full max-w-[500px] mx-auto p-4 sm:p-5'>
+      <Button onPress={() => navigate(-1)} variant='ghost'>
         {'<'} Back
       </Button>
-      <Paper sx={{ padding: 2.5, borderRadius: '20px', marginTop: 1.25 }}>
-        <Stack spacing={2}>
+      <div className='p-4 sm:p-6 rounded-large shadow-medium mt-4 bg-content1'>
+        <div className='space-y-5'>
           <h3>Transfer</h3>
           <InputAddress
             filtered={filtered}
@@ -116,7 +120,7 @@ function Transfer({
             value={recipient}
           />
 
-          <InputNetwork disabled={isPure} label='Select Network' />
+          <InputNetwork disabled={isPure} label='Select Network' network={network} setNetwork={setNetwork} />
 
           <InputToken
             network={network}
@@ -130,26 +134,31 @@ function Transfer({
             error={isAmountValid ? null : new Error('Invalid number')}
             key={token?.assetId}
             label={
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div className='flex items-center justify-between'>
                 Amount
                 {!isSendingFetched ? (
-                  <Skeleton variant='text' width={50} height={14} />
+                  <Skeleton className='w-[50px] h-[14px] rounded-small' />
                 ) : (
-                  <span style={{ opacity: 0.5 }}>
-                    Balance: <FormatBalance format={format} value={sendingBalances} />
+                  <span className='opacity-50'>
+                    Balance:{' '}
+                    <FormatBalance
+                      format={format}
+                      value={sendingBalances}
+                      assetId={token?.isNative ? undefined : token?.assetId}
+                    />
                   </span>
                 )}
-              </Box>
+              </div>
             }
             value={amount}
             onChange={setAmount}
             placeholder='Input amount'
             endAdornment={
               <Button
-                size='small'
-                variant='outlined'
-                sx={{ borderRadius: 0.5, padding: 0.5, paddingY: 0.1, minWidth: 0 }}
-                onClick={() => {
+                size='sm'
+                variant='ghost'
+                className='rounded-small p-1.5 py-[1px] min-w-0'
+                onPress={() => {
                   setAmount(
                     keepAlive
                       ? formatUnits(sendingBalances.sub(existentialDeposit), format[0])
@@ -162,10 +171,11 @@ function Transfer({
             }
           />
 
-          <Box sx={{ display: 'flex', justifyContent: 'end', gap: 0.5 }}>
-            <Switch checked={keepAlive} onChange={(e) => toggleKeepAlive(e.target.checked)} />
-            Keep Sender Alive
-          </Box>
+          <div className='flex justify-end'>
+            <Switch size='sm' isSelected={keepAlive} onValueChange={(value) => toggleKeepAlive(value)}>
+              Keep Sender Alive
+            </Switch>
+          </div>
           <TxButton
             fullWidth
             color={isInsufficientBalance ? 'danger' : 'primary'}
@@ -176,9 +186,9 @@ function Transfer({
           >
             {isInsufficientBalance ? `Insufficient ${format[1] || ''} balance` : 'Review'}
           </TxButton>
-        </Stack>
-      </Paper>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
 

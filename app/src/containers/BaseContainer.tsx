@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import AccountConsumer from '@/accounts/Consumer';
 import { useAccount } from '@/accounts/useAccount';
 import { ConnectWalletModal, ToastRoot, TxSubmit, TxToast } from '@/components';
 import { useFollowAccounts } from '@/hooks/useFollowAccounts';
@@ -14,10 +13,13 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 
+import CopyAddressModal from './address/CopyAddressModal';
+import QrAddressModal from './address/QrAddressModal';
 import RightSideBar from './sidebar/RightSideBar';
 import SideBar from './sidebar/SideBar';
 import AddAddressBook from './AddAddressBook';
 import Initializing from './Initializing';
+import OmniChainUpgradeTip from './OmniChainUpgradeTip';
 import SubscribeTx from './SubscribeTx';
 import ToggleAlert from './ToggleAlert';
 import TopBar from './topbar';
@@ -52,9 +54,9 @@ function BaseContainer({
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
       <ToastRoot />
       <TxToast />
-      <AccountConsumer />
       <WalletConsumer />
       <AddAddressBook />
+      <OmniChainUpgradeTip />
 
       <TopBar />
 
@@ -63,6 +65,8 @@ function BaseContainer({
           <ToggleAlert address={current} setAlertOpen={setAlertOpen} />
           <SubscribeTx address={current} />
           <ViewCallData />
+          <CopyAddressModal />
+          <QrAddressModal />
         </>
       )}
 

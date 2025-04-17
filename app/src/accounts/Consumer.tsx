@@ -2,17 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, AddressMeta } from '@/hooks/types';
+import type { HexString } from '@polkadot/util/types';
 
-import { useAddressStore } from '@/hooks/useAddressStore';
+import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX } from '@/constants';
+import { type AddressState, useAddressStore } from '@/hooks/useAddressStore';
 import { useWallet } from '@/wallet/useWallet';
 import { isEqual } from 'lodash-es';
-import { useEffect, useLayoutEffect } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
-import { addressEq, addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
+import { AccountContext } from './context';
 import { sync } from './sync';
-import { useAccount } from './useAccount';
 import { deriveAccountMeta } from './utils';
 
 /**
@@ -20,10 +22,76 @@ import { deriveAccountMeta } from './utils';
  * Manages address book synchronization and account state updates
  * This component doesn't render anything but handles important background tasks
  */
-function AddressConsumer() {
-  const { chainSS58 } = useApi();
+function AddressConsumer({ children }: { children: React.ReactNode }) {
+  const { chainSS58, network } = useApi();
+  const { mode } = useNetworks();
   const { isWalletReady, walletAccounts } = useWallet();
-  const { accounts, addresses } = useAccount();
+  const { accounts, addresses } = useAddressStore();
+  const [metas, setMetas] = useState<Record<HexString, AddressMeta>>({});
+
+  const updateMetas = useCallback((account: AccountData) => {
+    setMetas((prevMetas) => {
+      const newMetas = { ...prevMetas };
+
+      deriveAccountMeta(account, newMetas);
+
+      return newMetas;
+    });
+  }, []);
+
+  useLayoutEffect(() => {
+    setMetas((prevMetas) => {
+      const metas: Record<HexString, AddressMeta> = { ...prevMetas };
+
+      for (const account of accounts) {
+        deriveAccountMeta(account, metas);
+      }
+
+      // add injected accounts to metas
+      for (const account of walletAccounts) {
+        const addressHex = addressToHex(account.address);
+
+        metas[addressHex] = {
+          ...metas[addressHex],
+          isInjected: true,
+          source: account.source,
+          cryptoType: account.type || 'ed25519',
+          name: account.name || metas[addressHex].name || ''
+        } as AddressMeta;
+      }
+
+      return metas;
+    });
+  }, [accounts, walletAccounts]);
+  // add addresses book to metas
+  const finalMetas = useMemo(() => {
+    const newMetas = { ...metas };
+
+    for (const { name, address } of addresses) {
+      const addressHex = addressToHex(address);
+
+      newMetas[addressHex] = {
+        ...newMetas[addressHex],
+        name
+      };
+    }
+
+    return newMetas;
+  }, [addresses, metas]);
+
+  useEffect(() => {
+    const onChange = (state: AddressState, prevState: AddressState) => {
+      if (state.current && state.current !== prevState.current) {
+        mode === 'omni'
+          ? store.set(CURRENT_ADDRESS_HEX_KEY, addressToHex(state.current))
+          : store.set(`${CURRENT_ADDRESS_PREFIX}${network}`, state.current);
+      }
+    };
+
+    const unsubscribe = useAddressStore.subscribe(onChange);
+
+    return unsubscribe;
+  }, [mode, network]);
 
   // Initialize address book from local storage
   // This effect runs once when the network changes to load stored addresses
@@ -71,55 +139,42 @@ function AddressConsumer() {
     });
   }, [chainSS58]);
 
-  // Update address metadata when accounts or addresses change
-  useEffect(() => {
-    useAddressStore.setState((state) => {
-      const newMetas = Object.fromEntries(Object.entries(state.metas).map((item) => [item[0], { ...item[1] }]));
+  const sortedWalletAccounts = useMemo(
+    () =>
+      walletAccounts
+        .map((item) => addressToHex(item.address))
+        .sort()
+        .join(','),
+    [walletAccounts]
+  );
 
-      for (const account of accounts) {
-        deriveAccountMeta(account, newMetas);
-      }
-
-      // delete injected accounts from metas
-      for (const [, meta] of Object.entries(newMetas)) {
-        delete meta.isInjected;
-        delete meta.source;
-        delete meta.cryptoType;
-      }
-
-      // add injected accounts to metas
-      for (const account of walletAccounts) {
-        const addressHex = addressToHex(account.address);
-
-        newMetas[addressHex] = {
-          ...newMetas[addressHex],
-          isInjected: true,
-          source: account.source,
-          cryptoType: account.type || 'ed25519',
-          name: account.name || newMetas[addressHex].name || ''
-        } as AddressMeta;
-      }
-
-      for (const { name, address } of addresses) {
-        const addressHex = addressToHex(address);
-
-        newMetas[addressHex] = {
-          ...newMetas[addressHex],
-          name
-        };
-      }
-
-      return {
-        metas: newMetas
-      };
-    });
-  }, [accounts, addresses, walletAccounts]);
+  const [syncData, setSyncData] = useState<AccountData[]>([]);
 
   // Sync multisig accounts periodically
   // This effect handles initial sync and periodic updates of multisig account data
   useEffect(() => {
     let interval: any;
 
+    const update = (value: AccountData[]) =>
+      setSyncData((prevValue) => (isEqual(value, prevValue) ? prevValue : value));
+
+    if (isWalletReady) {
+      // Initial sync when wallet is ready
+      sync(mode === 'omni', network, chainSS58, sortedWalletAccounts.split(','), update);
+
+      // Set up periodic sync every 6 seconds
+      interval = setInterval(() => {
+        sync(mode === 'omni', network, chainSS58, sortedWalletAccounts.split(','), update);
+      }, 12000);
+    }
+
+    // Cleanup interval on unmount or when dependencies change
+    return () => {
+      clearInterval(interval);
+    };
+  }, [chainSS58, isWalletReady, mode, network, sortedWalletAccounts]);
+
+  useEffect(() => {
     const updateAccounts = (values: AccountData[]) => {
       useAddressStore.setState((state) => {
         const newWalletAccounts = walletAccounts
@@ -142,24 +197,11 @@ function AddressConsumer() {
       });
     };
 
-    if (isWalletReady) {
-      // Initial sync when wallet is ready
-      sync(chainSS58, walletAccounts, updateAccounts);
-
-      // Set up periodic sync every 6 seconds
-      interval = setInterval(() => {
-        sync(chainSS58, walletAccounts, updateAccounts);
-      }, 12000);
-    }
-
-    // Cleanup interval on unmount or when dependencies change
-    return () => {
-      clearInterval(interval);
-    };
-  }, [isWalletReady, chainSS58, walletAccounts]);
+    updateAccounts(syncData);
+  }, [chainSS58, syncData, walletAccounts]);
 
   // Component doesn't render anything visible
-  return null;
+  return <AccountContext.Provider value={{ metas: finalMetas, updateMetas }}>{children}</AccountContext.Provider>;
 }
 
 export default AddressConsumer;

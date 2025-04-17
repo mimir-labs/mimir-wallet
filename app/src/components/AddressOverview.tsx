@@ -4,7 +4,6 @@
 import type { AccountData, DelegateeProp, MultisigAccountData } from '@/hooks/types';
 
 import dagre from '@dagrejs/dagre';
-import { Paper, useTheme } from '@mui/material';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import React, { useEffect } from 'react';
 import {
@@ -46,26 +45,26 @@ const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
-  const { palette } = useTheme();
-
   return (
     <>
       {(data.account.type === 'multisig' || !!data.account.delegatees.length) && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
-          style={{ width: 0, height: 0, top: 35, background: palette.grey[300] }}
+          style={{ width: 0, height: 0, top: 35 }}
+          className='bg-divider-300'
           type='source'
         />
       )}
-      <Paper sx={{ display: 'flex', alignItems: 'center', width: 270, padding: 1 }}>
+      <div className='flex items-center w-[270px] p-2.5 rounded-medium bg-content1 shadow-medium'>
         <AddressCell value={data.account.address} withCopy withAddressBook />
-      </Paper>
+      </div>
       {!data.isTop && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Right}
-          style={{ width: 0, height: 0, background: palette.grey[300] }}
+          style={{ width: 0, height: 0 }}
+          className='bg-divider-300'
           type='target'
         />
       )}

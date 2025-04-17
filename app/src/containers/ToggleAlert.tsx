@@ -4,37 +4,19 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
-import { FormatBalance, Fund } from '@/components';
-import { useNativeBalances } from '@/hooks/useBalances';
-import { formatUnits } from '@/utils';
 import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useEffect, useMemo, useState } from 'react';
 
 function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {
-  const { api, network } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const [existing, setExisting] = useState(true);
-  const [fundOpen, toggleFundOpen] = useToggle(false);
   const [forceHide, setForceHide] = useState(false);
-  const [nativeBalances] = useNativeBalances(address);
 
   const hasThisAccount = useMemo(
     () => isLocalAccount(address) || isLocalAddress(address, true),
     [address, isLocalAccount, isLocalAddress]
   );
 
-  useLayoutEffect(() => {
-    if (nativeBalances) {
-      const existing = nativeBalances.total.gte(api.consts.balances.existentialDeposit);
-
-      setExisting(existing);
-    }
-  }, [address, api, nativeBalances]);
-
-  const alertOpen = !forceHide && !(hasThisAccount && existing);
+  const alertOpen = !forceHide && !hasThisAccount;
 
   useEffect(() => {
     setAlertOpen(alertOpen);
@@ -45,9 +27,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
       <Box
         onClick={
           hasThisAccount
-            ? !existing
-              ? () => toggleFundOpen(true)
-              : undefined
+            ? undefined
             : () => {
                 addAddressBook(address, true);
               }
@@ -69,13 +49,6 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
         }}
       >
         <SvgIcon component={IconInfo} inheritViewBox />
-        {hasThisAccount && !existing && (
-          <Typography sx={{ flex: '1' }}>
-            To prevent this account from being purged, please transfer{' '}
-            <FormatBalance value={api.consts.balances.existentialDeposit} />
-            {api.registry.chainTokens[0].toString()} to keep the account alive.
-          </Typography>
-        )}
 
         {!hasThisAccount && (
           <Typography sx={{ flex: '1' }}>
@@ -98,14 +71,6 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
           <SvgIcon component={IconClose} inheritViewBox />
         </IconButton>
       </Box>
-
-      <Fund
-        defaultNetwork={network}
-        defaultValue={formatUnits(api.consts.balances.existentialDeposit, api.registry.chainDecimals[0])}
-        onClose={toggleFundOpen}
-        open={fundOpen}
-        receipt={address}
-      />
     </>
   ) : null;
 }

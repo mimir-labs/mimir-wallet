@@ -4,13 +4,13 @@
 import './style.css';
 
 import type {} from '@acala-network/types';
-import type {} from '@polkadot/api-augment/substrate';
+import type {} from '@polkadot/api-augment';
 
 import moment from 'moment';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 
-import { allEndpoints, ApiRoot, initializeApi } from '@mimir-wallet/polkadot-core';
+import { ApiRoot, initializeApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { API_CLIENT_GATEWAY, initService } from '@mimir-wallet/service';
 
 import { initializeAccount } from './accounts/initialize';
@@ -29,7 +29,7 @@ const root = createRoot(document.getElementById('root') as HTMLElement);
 
 // Initialize core Mimir wallet configuration and get initial chain and address settings
 // This sets up the basic configuration needed for the wallet to function
-const { chain, address } = initMimir();
+const { chain, address } = initMimir(useNetworks.getState().mode === 'omni');
 
 initService(API_CLIENT_GATEWAY);
 
@@ -39,11 +39,7 @@ upgradeAddresBook();
 
 // Initialize blockchain API connection
 // This establishes connection to the blockchain node and sets up API instance
-initializeApi(chain).then(() => {
-  allEndpoints.forEach((endpoint) => {
-    initializeApi(endpoint);
-  });
-});
+initializeApi(chain);
 
 // Set up wallet connection and state management
 // This initializes wallet providers (like Polkadot.js) and restores previous connections
