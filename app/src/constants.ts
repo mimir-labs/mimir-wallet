@@ -33,9 +33,6 @@ export const CURRENT_ADDRESS_HEX_KEY = 'current_address_hex';
 /** @deprecated Use BATCH_TX_ADDRESS_PREFIX instead */
 export const BATCH_TX_PREFIX = 'batch_tx:';
 export const BATCH_TX_V2_PREFIX = 'batch_tx_v2:';
-/** @deprecated Use BATCH_SYNC_TX_V2_PREFIX instead */
-export const BATCH_SYNC_TX_PREFIX = 'batch_sync_tx:';
-export const BATCH_SYNC_TX_V2_PREFIX = 'batch_sync_tx_v2:';
 export const TEMPLATE_PREFIX = 'template:';
 
 export const OMNI_CHAIN_UPGRADE_TIP_KEY = 'omni_chain_upgrade_tip';

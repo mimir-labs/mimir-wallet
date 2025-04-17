@@ -3,11 +3,10 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { BATCH_SYNC_TX_V2_PREFIX } from '@/constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { service, useLocalStore, useQuery } from '@mimir-wallet/service';
+import { service, useQuery } from '@mimir-wallet/service';
 
 import { useBatchTxs } from './useBatchTxs';
 
@@ -24,23 +23,28 @@ type SyncBatchItem = {
   updatedAt: string;
 };
 
-export function useBatchSync(network: string, address?: string): [SyncBatchItem[], () => void, boolean, boolean] {
+export function useBatchSync(
+  network: string,
+  address?: string
+): [list: SyncBatchItem[], restoreList: SyncBatchItem[], () => void, boolean, boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
+
   const { data, isFetched, isFetching } = useQuery<SyncBatchItem[]>({
     queryHash: service.getClientUrl(`chains/${network}/${addressHex}/transactions/batch`),
     queryKey: [addressHex ? service.getClientUrl(`chains/${network}/${addressHex}/transactions/batch`) : null]
   });
-  const [, addTx] = useBatchTxs(network, address);
-  const [synced, setSynced] = useLocalStore<Record<HexString, number[]>>(`${BATCH_SYNC_TX_V2_PREFIX}${network}`, {});
+  const [txs, addTx] = useBatchTxs(network, address);
+  const syncedIds = useMemo(() => {
+    return txs.map((item) => item.relatedBatch).filter((item) => typeof item === 'number');
+  }, [txs]);
+  // const [synced, setSynced] = useLocalStore<Record<string, number[]>>(`${BATCH_SYNC_TX_PREFIX}${network}`, {});
   const [list, setList] = useState<SyncBatchItem[]>([]);
+  const [restoreList, setRestoreList] = useState<SyncBatchItem[]>([]);
 
   useEffect(() => {
-    setList(
-      (data || []).filter((item) =>
-        addressHex && synced[addressHex] ? !synced[addressHex]?.some((tx) => tx === item.id) : true
-      )
-    );
-  }, [data, addressHex, synced]);
+    setList((data || []).filter((item) => !syncedIds.includes(item.id)));
+    setRestoreList((data || []).filter((item) => syncedIds.includes(item.id)));
+  }, [data, address, syncedIds]);
 
   const restore = useCallback(() => {
     if (!list.length || !addressHex) return;
@@ -49,11 +53,7 @@ export function useBatchSync(network: string, address?: string): [SyncBatchItem[
       list.map((item) => ({ calldata: item.call, relatedBatch: item.id })),
       false
     );
-    setSynced((_synced) => ({
-      ..._synced,
-      [addressHex]: [...(_synced?.[addressHex] || []), ...list.map((item) => item.id)]
-    }));
-  }, [addTx, addressHex, list, setSynced]);
+  }, [addTx, addressHex, list]);
 
-  return [list, restore, isFetched, isFetching];
+  return [list, restoreList, restore, isFetched, isFetching];
 }

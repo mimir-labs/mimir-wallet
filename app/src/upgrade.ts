@@ -7,18 +7,10 @@ import type { BatchTxItem } from './hooks/types';
 import { addressToHex, allEndpoints } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
-import {
-  BATCH_SYNC_TX_PREFIX,
-  BATCH_SYNC_TX_V2_PREFIX,
-  BATCH_TX_PREFIX,
-  BATCH_TX_V2_PREFIX,
-  HIDE_ACCOUNT_HEX_KEY,
-  HIDE_ACCOUNT_PREFIX
-} from './constants';
+import { BATCH_TX_PREFIX, BATCH_TX_V2_PREFIX, HIDE_ACCOUNT_HEX_KEY, HIDE_ACCOUNT_PREFIX } from './constants';
 
 const ADDRESS_BOOK_UPGRADE_VERSION_KEY = 'address_book_upgrade_version';
 const BATCH_TX_UPGRADE_VERSION_KEY = 'batch_tx_upgrade_version';
-const BATCH_SYNC_TX_UPGRADE_VERSION_KEY = 'batch_sync_tx_upgrade_version';
 const HIDE_ACCOUNT_HEX_UPGRADE_VERSION_KEY = 'hide_account_hex_upgrade_version';
 
 function upgradeAddressBookV1() {
@@ -78,36 +70,6 @@ function upgradeBatchTxV1() {
   store.set(BATCH_TX_UPGRADE_VERSION_KEY, '1');
 }
 
-function upgradeBatchSyncTxV1() {
-  const batchSyncTxVersion = store.get(BATCH_SYNC_TX_UPGRADE_VERSION_KEY);
-
-  if (Number(batchSyncTxVersion) >= 1) {
-    return;
-  }
-
-  const nextValue: Record<string, Record<HexString, number[]>> = {};
-
-  store.each((key: string, value) => {
-    if (key.startsWith(BATCH_SYNC_TX_PREFIX)) {
-      const v = value as Record<string, number[]>;
-
-      const network = key.replace(BATCH_SYNC_TX_PREFIX, '');
-
-      nextValue[network] = Object.entries(v).reduce<Record<HexString, number[]>>((acc, [address, txs]) => {
-        acc[addressToHex(address)] = txs;
-
-        return acc;
-      }, {});
-    }
-  });
-
-  Object.entries(nextValue).forEach(([network, v]) => {
-    store.set(`${BATCH_SYNC_TX_V2_PREFIX}${network}`, v);
-  });
-
-  store.set(BATCH_SYNC_TX_UPGRADE_VERSION_KEY, '1');
-}
-
 function upgradeHideAccountHexV1() {
   const hideAccountHexVersion = store.get(HIDE_ACCOUNT_HEX_UPGRADE_VERSION_KEY);
 
@@ -133,6 +95,5 @@ function upgradeHideAccountHexV1() {
 export function upgradeAddresBook() {
   upgradeAddressBookV1();
   upgradeBatchTxV1();
-  upgradeBatchSyncTxV1();
   upgradeHideAccountHexV1();
 }
