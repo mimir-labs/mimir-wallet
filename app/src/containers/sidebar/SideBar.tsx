@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useAccount } from '@/accounts/useAccount';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import ArrowRight from '@/assets/svg/ArrowRight.svg?react';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
@@ -11,33 +12,16 @@ import IconQr from '@/assets/svg/icon-qr.svg?react';
 import IconSetting from '@/assets/svg/icon-set.svg?react';
 import IconTransaction from '@/assets/svg/icon-transaction.svg?react';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
-import {
-  AccountMenu,
-  AddressCell,
-  CopyButton,
-  CreateMultisigDialog,
-  FormatBalance,
-  QrcodeAddress,
-  WalletIcon
-} from '@/components';
-import { findToken, walletConfig } from '@/config';
-import { useNativeBalances } from '@/hooks/useBalances';
+import { AccountMenu, AddressCell, CopyAddress, CreateMultisigDialog, WalletIcon } from '@/components';
+import { walletConfig } from '@/config';
+import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
+import { useQrAddress } from '@/hooks/useQrAddress';
 import { useToggle } from '@/hooks/useToggle';
+import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
+import { formatDisplay } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
-import {
-  Avatar,
-  Box,
-  Divider,
-  Grid2 as Grid,
-  Paper,
-  Skeleton,
-  Stack,
-  SvgIcon,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
+import { Box, Divider, Grid2 as Grid, Paper, Stack, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { matchPath, useLocation } from 'react-router-dom';
 
@@ -50,11 +34,13 @@ function NavLink({
   Icon,
   label,
   onClick,
-  to
+  to,
+  endContent
 }: {
   to: string;
   Icon: React.ComponentType<any>;
   label: React.ReactNode;
+  endContent?: React.ReactNode;
   onClick: () => void;
 }) {
   const location = useLocation();
@@ -70,7 +56,7 @@ function NavLink({
       size='lg'
       radius='md'
       startContent={<Icon className='w-5 h-5' />}
-      className='h-[50px] justify-start px-[15px] py-[20px] text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary'
+      className='h-[50px] justify-start gap-x-2.5 items-center px-[15px] py-[20px] text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary'
       href={to}
       variant='light'
     >
@@ -80,23 +66,24 @@ function NavLink({
       >
         {label}
       </p>
+      {endContent}
     </Button>
   );
 }
 
 function TopContent() {
-  const { api } = useApi();
+  const { chain } = useApi();
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [qrOpen, toggleQrOpen] = useToggle();
   const [createMultisigOpen, toggleCreateMultisigOpen] = useToggle();
   const { connectedWallets, openWallet } = useWallet();
-  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
-  const [allBalances, isFetched] = useNativeBalances(selected);
+  const [totalUsd] = useBalanceTotalUsd(selected);
+  const formatUsd = formatDisplay(totalUsd.toString());
   const { closeSidebar } = useMimirLayout();
   const isConnected = Object.keys(connectedWallets).length > 0;
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
+  const { open: openQr } = useQrAddress();
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -123,16 +110,11 @@ function TopContent() {
               <SvgIcon color='primary' component={ArrowRight} inheritViewBox />
             </Stack>
             <Divider sx={{ marginY: 1 }} />
-            {isFetched ? (
-              <Stack alignItems='center' direction='row' spacing={0.5}>
-                <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
-                <Typography color='text.secondary' fontSize={12}>
-                  <FormatBalance value={allBalances?.total} />
-                </Typography>
-              </Stack>
-            ) : (
-              <Skeleton variant='text' width={50} height={14} />
-            )}
+            <p className='text-tiny text-foreground/65'>
+              $ {formatUsd[0]}
+              {formatUsd[1] ? `.${formatUsd[1]}` : ''}
+              {formatUsd[2] || ''}
+            </p>
             <Divider sx={{ marginY: 1 }} />
             <div className='flex items-center'>
               <Tooltip content='QR Code' closeDelay={0}>
@@ -141,23 +123,23 @@ function TopContent() {
                   className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
                   color='primary'
                   variant='light'
-                  onPress={toggleQrOpen}
+                  onPress={() => openQr(selected)}
                   size='sm'
                 >
                   <IconQr className='w-4 h-4' />
                 </Button>
               </Tooltip>
               <Tooltip content='Copy' closeDelay={0}>
-                <CopyButton color='primary' value={selected} className='opacity-100' />
+                <CopyAddress address={selected} color='primary' className='opacity-100' />
               </Tooltip>
               <Tooltip content='Explorer' closeDelay={0}>
                 <Button
                   isIconOnly
                   className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
                   color='primary'
-                  as='a'
+                  as={Link}
                   variant='light'
-                  href={chainLinks.accountExplorerLink(selected)}
+                  href={chainLinks.accountExplorerLink(chain, selected)}
                   size='sm'
                   target='_blank'
                 >
@@ -207,7 +189,6 @@ function TopContent() {
         </Button>
       )}
 
-      <QrcodeAddress onClose={toggleQrOpen} open={qrOpen} value={selected} />
       <AccountMenu anchor={downMd ? 'right' : 'left'} onClose={handleAccountClose} open={!!anchorEl} />
       <CreateMultisigDialog open={createMultisigOpen} onClose={toggleCreateMultisigOpen} />
     </>
@@ -271,11 +252,20 @@ function WalletContent() {
 
 function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideBar: boolean }) {
   const { isApiReady } = useApi();
+  const { current } = useAccount();
   const { closeSidebar, openSidebar, sidebarOpen } = useMimirLayout();
   const { breakpoints } = useTheme();
   const downMd = useMediaQuery(breakpoints.down('md'));
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(true);
+  const [transactionCounts] = useMultiChainTransactionCounts(current);
+  const totalCounts = useMemo(
+    () =>
+      Object.values(transactionCounts || {}).reduce((acc, item) => {
+        return acc + item.pending;
+      }, 0),
+    [transactionCounts]
+  );
 
   const element = (
     <Stack gap={{ sm: 2.5, xs: 2 }}>
@@ -283,7 +273,19 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
 
       <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
       <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
-      <NavLink Icon={IconTransaction} label='Transactions' onClick={closeSidebar} to='/transactions' />
+      <NavLink
+        Icon={IconTransaction}
+        label='Transactions'
+        endContent={
+          totalCounts ? (
+            <div className='flex justify-center items-center font-semibold text-small text-danger-foreground bg-danger aspect-1/1 w-5 leading-[1] rounded-full'>
+              {totalCounts}
+            </div>
+          ) : null
+        }
+        onClick={closeSidebar}
+        to='/transactions'
+      />
       <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
       <NavLink Icon={IconSetting} label='Setting' onClick={closeSidebar} to='/setting' />
     </Stack>

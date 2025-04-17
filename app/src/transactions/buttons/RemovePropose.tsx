@@ -10,12 +10,12 @@ import { CONNECT_ORIGIN } from '@/constants';
 import { events } from '@/events';
 import { TransactionType } from '@/hooks/types';
 import { useProposeFilterForRemove } from '@/hooks/useProposeFilter';
-import { service } from '@/utils';
 import { accountSource } from '@/wallet/useWallet';
 import React, { useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 import { Alert, Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 function Content({
@@ -27,7 +27,7 @@ function Content({
   transaction: ProposeTransaction;
   onRemove: () => void;
 }) {
-  const { genesisHash } = useApi();
+  const { genesisHash, network } = useApi();
   const [signer, setSigner] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
@@ -76,7 +76,7 @@ Genesis Hash: ${genesisHash}`;
         type: 'bytes'
       });
 
-      await service.removePropose(transaction.id, signer, result.signature, time);
+      await service.removePropose(network, transaction.id, signer, result.signature, time);
       onRemove();
       events.emit('refetch_pending_tx');
     } catch (error) {

@@ -45,7 +45,7 @@ function ProgressItem({
   );
 
   return (
-    <div className='flex flex-col gap-[5px] p-[5px] w-full bg-secondary rounded-md'>
+    <div className='flex flex-col gap-[5px] p-[5px] w-full bg-primary/5 rounded-md'>
       <AddressCell showType withCopy withAddressBook shorten value={address} />
       <Box
         sx={({ palette }) => ({
@@ -162,7 +162,7 @@ function ProposeContent({ transaction }: { transaction: ProposeTransaction }) {
       <div className='flex items-center justify-between font-bold'>Proposer</div>
 
       <Content>
-        <div className='flex flex-col gap-[5px] p-[5px] w-full bg-secondary rounded-md'>
+        <div className='flex flex-col gap-[5px] p-[5px] w-full bg-primary/5 rounded-md'>
           <AddressCell showType withCopy withAddressBook shorten value={transaction.proposer} />
         </div>
       </Content>

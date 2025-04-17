@@ -10,11 +10,10 @@ import { type AccountData, type Transaction, TransactionStatus, TransactionType 
 import { useToggle } from '@/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
-import { Box, Button, Grid2 as Grid, IconButton, Stack, SvgIcon } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Link } from '@mimir-wallet/ui';
+import { Button, Link } from '@mimir-wallet/ui';
 
 import Progress from '../Progress';
 import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
@@ -43,35 +42,23 @@ function TimeCell({ time }: { time?: number }) {
 
 function ActionsCell({ withDetails, detailOpen }: { withDetails?: boolean; detailOpen: boolean }) {
   return (
-    <Box
-      sx={{
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}
-    >
+    <div className='w-full flex justify-between items-center'>
       <div />
       {withDetails ? (
-        <IconButton color='primary'>
-          <SvgIcon
-            component={ArrowDown}
-            inheritViewBox
-            sx={{
-              transition: 'transform 0.2s',
-              transformOrigin: 'center',
-              transform: detailOpen ? 'rotateZ(180deg)' : 'rotateZ(0deg)',
-              fontSize: '0.6rem',
-              color: 'primary.main'
-            }}
+        <Button isIconOnly color='primary' variant='light' onPress={(e) => e.continuePropagation()}>
+          <ArrowDown
+            className={`transition-transform duration-200 text-primary transform-origin-center ${
+              detailOpen ? 'rotate-180' : 'rotate-0'
+            }`}
+            fontSize='0.6rem'
           />
-        </IconButton>
+        </Button>
       ) : (
-        <Button component={Link} href='/transactions' variant='text'>
+        <Button as={Link} href='/transactions' variant='light'>
           View More
         </Button>
       )}
-    </Box>
+    </div>
   );
 }
 
@@ -102,47 +89,26 @@ function TxItems({
 
   return (
     <>
-      <Stack
-        sx={() => ({
-          transition: 'all 0.2s',
-          borderRadius: 1,
-          overflow: 'hidden',
-          bgcolor: 'secondary.main'
-        })}
-      >
-        <Grid
-          container
-          sx={{
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            paddingX: { xs: 1, sm: 1.5, md: 2 },
-            fontWeight: 600,
-            '.MuiGrid2-root': {
-              display: 'flex',
-              alignItems: 'center',
-              height: 40
-            }
-          }}
-          columns={{ lg: 15, md: 12, sm: 10 }}
-          spacing={1}
+      <div className='transition-all duration-200 rounded-medium overflow-hidden bg-secondary'>
+        <div
+          className='cursor-pointer grid grid-cols-10 md:grid-cols-12 lg:grid-cols-[repeat(15,_minmax(0,_1fr))] px-2.5 sm:px-4 md:px-5 gap-2.5 font-semibold [&>div]:flex [&>div]:items-center [&>div]:h-10'
           onClick={toggleDetailOpen}
         >
-          <Grid size={2}>
+          <div className='col-span-2'>
             <AppCell transaction={transaction} />
-          </Grid>
-          <Grid size={5}>
+          </div>
+          <div className='col-span-5'>
             <ActionTextCell section={transaction.section} method={transaction.method} />
-          </Grid>
-          <Grid sx={{ display: { lg: 'flex !important', xs: 'none !important' } }} size={3}>
+          </div>
+          <div className='col-span-3 hidden lg:flex'>
             <ActionDisplayCell api={api} call={call} />
-          </Grid>
-          <Grid sx={{ display: { md: 'flex !important', xs: 'none !important' } }} size={2}>
+          </div>
+          <div className='col-span-2 hidden md:flex'>
             <TimeCell
               time={transaction.status < TransactionStatus.Success ? transaction.createdAt : transaction.updatedAt}
             />
-          </Grid>
-          <Grid size={2}>
+          </div>
+          <div className='col-span-2'>
             {transaction.status < TransactionStatus.Success ? (
               transaction.type === TransactionType.Announce ? (
                 <AnnouncementStatus transaction={transaction} account={account} />
@@ -154,30 +120,18 @@ function TxItems({
             ) : (
               <Status transaction={transaction} />
             )}
-          </Grid>
-          <Grid size='grow'>
+          </div>
+          <div className='col-span-1'>
             <ActionsCell withDetails={withDetails} detailOpen={detailOpen} />
-          </Grid>
-        </Grid>
+          </div>
+        </div>
         {withDetails && detailOpen && (
-          <Box
-            sx={{
-              display: 'flex',
-              gap: { md: 1.5, xs: 1.2 },
-              padding: { md: 1.5, xs: 1.2 },
-              flexDirection: 'row',
-              borderRadius: 1,
-              bgcolor: 'white',
-              marginLeft: { md: 1.5, xs: 1.2 },
-              marginRight: { md: 1.5, xs: 1.2 },
-              marginBottom: { md: 1.5, xs: 1.2 }
-            }}
-          >
+          <div className='flex gap-3 md:gap-4 p-3 md:p-4 flex-row rounded-medium bg-content1 mx-3 md:mx-4 mb-3 md:mb-4'>
             <Extrinsic defaultOpen={detailOpen} transaction={transaction} call={call} />
             <Progress openOverview={toggleOverviewOpen} account={account} transaction={transaction} />
-          </Box>
+          </div>
         )}
-      </Stack>
+      </div>
       <OverviewDialog account={account} transaction={transaction} onClose={toggleOverviewOpen} open={overviewOpen} />
     </>
   );

@@ -36,7 +36,6 @@ export type BuildTx = {
 export function useBuildTx(
   method: IMethod | HexString,
   filterPath: FilterPath[],
-  account?: string,
   transaction?: Transaction | null | undefined
 ): BuildTx {
   const { api } = useApi();
@@ -73,32 +72,10 @@ export function useBuildTx(
           [key]: { ...EMPTY_STATE, isLoading: false }
         }));
       }
-    } else if (account) {
-      const hashSet = new Set<HexString>();
-
-      const key = account;
-
-      buildTx(api, api.createType('Call', method), account, transaction, hashSet)
-        .then(async (bundle) => {
-          const { reserve, unreserve, delay } = await extrinsicReserve(api, bundle.signer, bundle.tx);
-
-          setState((state) => ({
-            ...state,
-            [key]: { isLoading: false, txBundle: bundle, error: null, hashSet, reserve, unreserve, delay }
-          }));
-        })
-        .catch((error) => {
-          console.error(error);
-          setState((state) => ({
-            ...state,
-            [key]: { ...EMPTY_STATE, isLoading: false, error }
-          }));
-        });
     }
-  }, [account, api, filterPath, method, transaction]);
+  }, [api, filterPath, method, transaction]);
 
-  const key =
-    filterPath.length > 0 ? filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '') : account || '';
+  const key = filterPath.length > 0 ? filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '') : 'none';
 
   return state[key] || EMPTY_STATE;
 }

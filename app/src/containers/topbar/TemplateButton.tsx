@@ -10,6 +10,8 @@ import React, { useEffect } from 'react';
 
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
+let index = 0;
+
 function TemplateButton({
   isOpen,
   open,
@@ -20,12 +22,20 @@ function TemplateButton({
   close: () => void;
 }) {
   useEffect(() => {
-    const onOpen = () => {
-      open(<Template onClose={close} />);
+    const onOpen = (network: string) => {
+      open(<Template key={`open-${network}-${++index}`} defaultNetwork={network} onClose={close} />);
     };
 
-    const onAdd = (callData: HexString) => {
-      open(<Template defaultCallData={callData} defaultAdded onClose={close} />);
+    const onAdd = (network: string, callData: HexString) => {
+      open(
+        <Template
+          key={`add-${network}-${++index}`}
+          defaultNetwork={network}
+          defaultCallData={callData}
+          defaultAdded
+          onClose={close}
+        />
+      );
     };
 
     events.on('template_open', onOpen);
@@ -41,7 +51,7 @@ function TemplateButton({
     <Tooltip content='Template' closeDelay={0}>
       <Button
         isIconOnly
-        className='border-secondary'
+        className='border-secondary w-[32px] h-[32px] sm:w-[42px] sm:h-[42px] bg-secondary sm:bg-transparent'
         color='primary'
         variant='ghost'
         radius='md'
@@ -49,11 +59,11 @@ function TemplateButton({
           if (isOpen) {
             close();
           } else {
-            open(<Template onClose={close} />);
+            open(<Template key={`default-template`} onClose={close} />);
           }
         }}
       >
-        <IconTemplate />
+        <IconTemplate className='w-[14px] h-[14px] sm:w-[19px] sm:h-[19px]' />
       </Button>
     </Tooltip>
   );

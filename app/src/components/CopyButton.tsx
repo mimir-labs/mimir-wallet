@@ -6,7 +6,7 @@ import IconSuccess from '@/assets/svg/icon-success.svg?react';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import React, { forwardRef, useCallback } from 'react';
 
-import { Button, type ButtonProps } from '@mimir-wallet/ui';
+import { Button, type ButtonProps, type PressEvent } from '@mimir-wallet/ui';
 
 interface Props extends ButtonProps {
   value?: string;
@@ -15,21 +15,26 @@ interface Props extends ButtonProps {
 const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton({ value, ...props }, ref) {
   const [copied, copy] = useCopyClipboard();
 
-  const handleClick = useCallback(() => {
-    copy(value?.toString() || '');
-
-    return true;
-  }, [copy, value]);
+  const handleClick = useCallback(
+    (e: PressEvent) => {
+      copy(value?.toString() || '');
+      props.onPress?.(e);
+    },
+    [copy, value, props]
+  );
 
   return (
     <Button
       isIconOnly
-      onPress={handleClick}
       size={props.size || 'sm'}
       color={props.color || 'default'}
       radius={props.radius || 'full'}
       variant={props.variant || 'light'}
       {...props}
+      onPress={handleClick}
+      onClick={(e) => {
+        e.preventDefault();
+      }}
       ref={ref}
       className={'w-5 h-5 min-w-[0px] min-h-[0px] opacity-50 '.concat(props.className || '')}
     >

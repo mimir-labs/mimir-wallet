@@ -23,9 +23,13 @@ async function _initialize(wallet: string) {
 }
 
 export async function initializeWallet() {
-  const connectWallets: string[] = (store.get(CONNECTED_WALLETS_KEY) as string[]) || [];
+  let connectWallets: string[] = (store.get(CONNECTED_WALLETS_KEY) as string[]) || [];
 
   const promises: Promise<WalletAccount[]>[] = [];
+
+  if (connectWallets.includes('nova') && connectWallets.includes('polkadot-js')) {
+    connectWallets = connectWallets.filter((wallet) => wallet !== 'polkadot-js');
+  }
 
   // Ensure document is ready before proceeding
   await documentReadyPromise();

@@ -3,11 +3,13 @@
 
 import type { CallProps } from '../types';
 
-import { Address, AddressName, CopyButton, FormatBalance, IdentityIcon } from '@/components';
+import { Address, AddressName, CopyAddress, FormatBalance, IdentityIcon } from '@/components';
 import { ellipsisMixin } from '@/components/utils';
 import { useAssetInfo } from '@/hooks/useAssets';
 import { alpha, Box, lighten, Skeleton } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 import { findAction } from '../utils';
 import FunctionArgs from './FunctionArgs';
@@ -47,7 +49,7 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
           <Box component='span' sx={{ ...ellipsisMixin(150) }}>
             <AddressName value={address} />
           </Box>
-          <CopyButton size='sm' value={address} color='default' />
+          {address && <CopyAddress address={address} size='sm' color='default' />}
         </Box>
         <Box sx={{ fontSize: '10px', color: 'text.secondary', lineHeight: '12px' }}>
           <Address shorten value={address} />
@@ -58,6 +60,7 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
 }
 
 function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProps) {
+  const { network } = useApi();
   const action = useMemo(() => findAction(registry, call), [registry, call]);
 
   const results = useMemo(() => {
@@ -112,17 +115,17 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
       }
     } else if (section === 'tokens') {
       if (method === 'transfer' || method === 'transferKeepAlive') {
-        assetId = call.args[1].toString();
+        assetId = call.args[1].toHex();
         to = call.args[0].toString();
         value = call.args[2].toString();
       } else if (method === 'forceTransfer') {
         to = call.args[1].toString();
         from = call.args[0].toString();
-        assetId = call.args[2].toString();
+        assetId = call.args[2].toHex();
         value = call.args[3].toString();
       } else if (method === 'transferAll') {
         to = call.args[0].toString();
-        assetId = call.args[1].toString();
+        assetId = call.args[1].toHex();
         value = '0';
         isAll = true;
       } else {
@@ -135,7 +138,7 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
     return [assetId, from, to, value, isAll] as const;
   }, [action, call.args, propFrom]);
 
-  const [assetInfo] = useAssetInfo(results?.[0]);
+  const [assetInfo] = useAssetInfo(network, results?.[0]);
 
   if (!results) return <FunctionArgs from={propFrom} registry={registry} call={call} jsonFallback={jsonFallback} />;
 

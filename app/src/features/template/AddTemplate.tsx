@@ -5,7 +5,7 @@ import type { Call } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 
 import IconArrowLeft from '@/assets/svg/icon-arrow-left.svg?react';
-import { Input } from '@/components';
+import { Input, InputNetwork } from '@/components';
 import JsonView from '@/components/JsonView';
 import { useInput } from '@/hooks/useInput';
 import { Box, Button, Divider, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
@@ -22,12 +22,14 @@ function AddTemplate({
   isView = false,
   onBack,
   defaultCallData,
-  defaultName
+  defaultName,
+  setNetwork
 }: {
   isView?: boolean;
   defaultCallData?: HexString;
   defaultName?: string;
   onBack: () => void;
+  setNetwork: (network: string) => void;
 }) {
   const { network, api } = useApi();
   const { addTemplate } = useSavedTemplate(network);
@@ -60,6 +62,8 @@ function AddTemplate({
         </IconButton>
         <Typography variant='h4'>{isView ? 'View Template' : 'Add New Template'}</Typography>
       </Box>
+
+      <InputNetwork network={network} setNetwork={setNetwork} />
 
       <Divider />
 

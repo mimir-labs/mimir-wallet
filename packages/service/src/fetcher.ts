@@ -7,6 +7,7 @@ export class FetchError extends Error {
   constructor(message: string, statusCode: number) {
     super(message);
     this.statusCode = statusCode;
+    console.log(this.message);
   }
 }
 
@@ -30,7 +31,17 @@ export async function fetcher(resource: URL | string | Promise<URL | string>, in
       throw new NetworkError();
     })
     .then(async (res) => {
-      const json = await res.json();
+      let json: any;
+
+      try {
+        json = await res.json();
+      } catch {
+        if (res.ok) {
+          return null;
+        } else {
+          throw new FetchError('An error occurred while parsing the data.', res.status);
+        }
+      }
 
       if (!res.ok) {
         throw new FetchError(json?.message || 'An error occurred while fetching the data.', json?.statusCode || 500);

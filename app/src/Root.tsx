@@ -4,10 +4,12 @@
 import { GlobalStyle } from '@/components';
 import { ThemeProvider } from '@/theme';
 import { StyledEngineProvider } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useHref, useNavigate } from 'react-router-dom';
 
 import { QueryProvider } from '@mimir-wallet/service';
 import { HeroUIProvider } from '@mimir-wallet/ui';
+
+import AccountConsumer from './accounts/Consumer';
 
 /**
  * Root Component
@@ -27,12 +29,14 @@ function Root({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   return (
-    <HeroUIProvider navigate={navigate}>
+    <HeroUIProvider navigate={navigate} useHref={useHref}>
       <StyledEngineProvider injectFirst>
         <ThemeProvider>
           <QueryProvider>
-            <GlobalStyle />
-            {children}
+            <AccountConsumer>
+              <GlobalStyle />
+              {children}
+            </AccountConsumer>
           </QueryProvider>
         </ThemeProvider>
       </StyledEngineProvider>

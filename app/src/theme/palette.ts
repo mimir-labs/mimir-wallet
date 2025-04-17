@@ -56,9 +56,9 @@ const createPalette = (mode: PaletteMode): PaletteOptions => ({
   },
   common: { black: '#151F34', white: '#fff' },
   secondary: {
-    main: 'rgba(39, 0, 255, 0.05)',
-    light: 'rgba(39, 0, 255, 0.05)',
-    dark: 'rgba(39, 0, 255, 0.05)',
+    main: '#f4f2ff',
+    light: '#f4f2ff',
+    dark: '#f4f2ff',
     contrastText: '#2700FF'
   },
   info: { main: '#2700FF', light: '#2700FF', dark: '#2700FF', contrastText: '#fff' },
@@ -67,18 +67,18 @@ const createPalette = (mode: PaletteMode): PaletteOptions => ({
     secondary: alpha('#151F34', 0.5),
     disabled: alpha('#151F34', 0.38)
   },
-  divider: 'rgba(39, 0, 255, 0.05)',
+  divider: '#f4f2ff',
   action: {
-    active: 'rgba(39, 0, 255, 0.05)',
+    active: '#f4f2ff',
     activatedOpacity: 0.05,
-    hover: 'rgba(39, 0, 255, 0.05)',
+    hover: '#f4f2ff',
     hoverOpacity: 0.05,
-    selected: 'rgba(39, 0, 255, 0.05)',
+    selected: '#f4f2ff',
     selectedOpacity: 0.05,
     disabled: alpha('#151F34', 0.26),
     disabledBackground: alpha('#151F34', 0.12),
     disabledOpacity: 0.38,
-    focus: 'rgba(39, 0, 255, 0.05)',
+    focus: '#f4f2ff',
     focusOpacity: 0.12
   }
 });

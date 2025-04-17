@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useQueryAccount } from '@/accounts/useQueryAccount';
 import ExpandArrow from '@/assets/svg/expand-arrow.svg?react';
 import { Empty } from '@/components';
 import { useToggle } from '@/hooks/useToggle';
@@ -20,7 +19,6 @@ interface Props {
 function PendingTx({ address, url }: Props) {
   const txs = usePendingTx(address, url);
   const [expanded, toggleExpand] = useToggle();
-  const [account] = useQueryAccount(address);
   const counts = txs.length || 0;
 
   return (
@@ -54,8 +52,8 @@ function PendingTx({ address, url }: Props) {
         </div>
 
         <div className='h-[50vh] p-5 overflow-y-auto space-y-5'>
-          {account && txs.length > 0 ? (
-            txs.map((item) => <TxCell account={account} defaultOpen={false} key={item.id} transaction={item} />)
+          {txs.length > 0 ? (
+            txs.map((item) => <TxCell address={address} defaultOpen={false} key={item.id} transaction={item} />)
           ) : (
             <Empty height={280} label='No Pending Transactions' />
           )}

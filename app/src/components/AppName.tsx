@@ -4,8 +4,9 @@
 import LogoCircle from '@/assets/images/logo-circle.png';
 import IconExternal from '@/assets/svg/icon-external-app.svg?react';
 import { useDapp } from '@/hooks/useDapp';
-import { alpha, Avatar, Box, SvgIcon } from '@mui/material';
 import React, { useMemo } from 'react';
+
+import { Avatar } from '@mimir-wallet/ui';
 
 function AppName({
   website,
@@ -37,41 +38,28 @@ function AppName({
         : [
             appName || websiteURL.hostname,
             iconUrl ? (
-              <Avatar key={`avatar-${website}`} src={iconUrl} style={{ width: iconSize, height: iconSize }} />
-            ) : (
-              <SvgIcon
-                component={IconExternal}
-                inheritViewBox
-                sx={({ palette }) => ({ width: iconSize, height: iconSize, color: alpha(palette.primary.main, 0.5) })}
-                key={website}
+              <Avatar
+                key={`avatar-${website}`}
+                src={iconUrl}
+                style={{ width: iconSize, height: iconSize, backgroundColor: 'transparent' }}
               />
+            ) : (
+              <IconExternal style={{ width: iconSize, height: iconSize }} className='text-primary/50' key={website} />
             )
           ];
     }
 
     return [
       'External',
-      <SvgIcon
-        component={IconExternal}
-        inheritViewBox
-        sx={({ palette }) => ({ width: iconSize, height: iconSize, color: alpha(palette.primary.main, 0.5) })}
-        key='external'
-      />
+      <IconExternal style={{ width: iconSize, height: iconSize }} className='text-primary/50' key='external' />
     ];
   }, [app, appName, iconSize, iconUrl, website]);
 
   return (
-    <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, maxWidth: '100%' }}>
-      <Box sx={{ display: 'flex', flexShrink: '0' }}>{icon}</Box>
-      {!hiddenName && (
-        <Box
-          component='span'
-          sx={{ flexGrow: '1', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
-        >
-          {name}
-        </Box>
-      )}
-    </Box>
+    <span className='inline-flex items-center gap-[5px] max-w-full'>
+      <div className='flex flex-shrink-0'>{icon}</div>
+      {!hiddenName && <span className='flex-grow overflow-hidden whitespace-nowrap text-ellipsis'>{name}</span>}
+    </span>
   );
 }
 

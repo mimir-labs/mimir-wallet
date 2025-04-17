@@ -6,7 +6,7 @@ import type { HexString } from '@polkadot/util/types';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { Empty } from '@/components';
+import { Empty, InputNetwork } from '@/components';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
@@ -18,11 +18,13 @@ import { useSavedTemplate } from './useSavedTemplate';
 function TemplateList({
   onAdd,
   onClose,
-  onView
+  onView,
+  setNetwork
 }: {
   onAdd: () => void;
   onClose: () => void;
   onView: (name: string, call: HexString) => void;
+  setNetwork: (network: string) => void;
 }) {
   const { network } = useApi();
   const { template, removeTemplate, editTemplateName } = useSavedTemplate(network);
@@ -45,6 +47,8 @@ function TemplateList({
           <IconClose />
         </Button>
       </Box>
+
+      <InputNetwork network={network} setNetwork={setNetwork} />
 
       <Divider />
 

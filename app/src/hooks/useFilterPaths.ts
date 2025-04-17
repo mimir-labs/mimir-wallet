@@ -14,22 +14,22 @@ import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { accountSource } from '@/wallet/useWallet';
 import { useMemo } from 'react';
 
-import { addressEq } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex } from '@mimir-wallet/polkadot-core';
 
 export function filterPathId(_deep: number, filterPath: FilterPathWithoutId) {
   if (filterPath.type === 'proxy') {
-    return `${filterPath.type}:${filterPath.address}.${filterPath.proxyType}.${filterPath.real}.${filterPath.delay || 0}`;
+    return `${filterPath.type}:${addressToHex(filterPath.address)}.${filterPath.proxyType}.${addressToHex(filterPath.real)}.${filterPath.delay || 0}`;
   }
 
   if (filterPath.type === 'multisig') {
-    return `${filterPath.type}:${filterPath.address}.${filterPath.threshold}.${filterPath.multisig}.${filterPath.otherSignatures.join('_')}`;
+    return `${filterPath.type}:${addressToHex(filterPath.address)}.${filterPath.threshold}.${addressToHex(filterPath.multisig)}.${filterPath.otherSignatures.map((item) => addressToHex(item)).join('_')}`;
   }
 
   if (filterPath.type === 'proposer') {
-    return `${filterPath.type}:${filterPath.address}`;
+    return `${filterPath.type}:${addressToHex(filterPath.address)}`;
   }
 
-  return `${filterPath.type}:${filterPath.address}`;
+  return `${filterPath.type}:${addressToHex(filterPath.address)}`;
 }
 
 function findFilterPaths(
@@ -228,7 +228,7 @@ function appendProposers(paths: FilterPath[][], account: AccountData, proposers?
   }
 }
 
-export function useFilterPaths(account?: AccountData | null, transaction?: Transaction | null) {
+export function useFilterPaths(account: AccountData, transaction?: Transaction | null) {
   return useMemo(() => {
     if (!account) return [];
 

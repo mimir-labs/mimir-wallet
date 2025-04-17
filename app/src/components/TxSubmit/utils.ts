@@ -22,10 +22,12 @@ async function asMulti(
   threshold: number,
   otherSignatories: string[]
 ) {
+  const u8a = api.tx(tx.toU8a()).toU8a();
+
   const [info, { weight }] = await Promise.all([
     // IMPORTANT: the hash is used to identify the multisig transaction
     api.query.multisig.multisigs(multisig, blake2AsU8a(tx.method.toU8a())),
-    tx.paymentInfo(multisig)
+    api.call.transactionPaymentApi.queryInfo(u8a, u8a.length)
   ]);
 
   let timepoint: Timepoint | null = null;
@@ -37,7 +39,7 @@ async function asMulti(
   if (threshold === 1 && api.tx.multisig.asMultiThreshold1) {
     return api.tx.multisig.asMultiThreshold1(
       u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
-      tx.method
+      tx.method.toU8a()
     );
   }
 

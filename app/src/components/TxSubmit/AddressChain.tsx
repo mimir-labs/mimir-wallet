@@ -49,7 +49,7 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
         {deep === 0 && <InputLabel>Select Signer</InputLabel>}
 
         <Select<string>
-          sx={{ display: deep === 0 ? 'none' : undefined }}
+          sx={{ display: deep === 0 && !source ? 'none' : undefined }}
           fullWidth
           variant='outlined'
           displayEmpty

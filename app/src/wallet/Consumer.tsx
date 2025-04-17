@@ -8,20 +8,21 @@ import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
 import { useEffect } from 'react';
 
-import { encodeAddress } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 import { useWallet } from './useWallet';
 
 function combineWalletAccounts(
   walletAccounts: WalletAccount[],
   source: string,
-  accounts: InjectedAccount[]
+  accounts: InjectedAccount[],
+  chainSS58: number
 ): WalletAccount[] {
   return walletAccounts
     .filter((account) => account.source !== source)
     .concat(
       accounts.map((account) => ({
-        address: encodeAddress(account.address),
+        address: encodeAddress(account.address, chainSS58),
         name: account.name,
         type: account.type,
         source
@@ -31,6 +32,7 @@ function combineWalletAccounts(
 
 function WalletConsumer() {
   const { connectedWallets } = useWallet();
+  const { chainSS58 } = useApi();
 
   useEffect(() => {
     const unsubscribes: Promise<() => void>[] = [];
@@ -43,7 +45,7 @@ function WalletConsumer() {
           window.injectedWeb3[key].enable(CONNECT_ORIGIN).then((injected) => {
             return injected.accounts.subscribe((accounts) => {
               useWallet.setState(({ walletAccounts }) => ({
-                walletAccounts: combineWalletAccounts(walletAccounts, wallet, accounts),
+                walletAccounts: combineWalletAccounts(walletAccounts, wallet, accounts, chainSS58),
                 wallets: window.injectedWeb3
               }));
             });
@@ -55,7 +57,7 @@ function WalletConsumer() {
     return () => {
       unsubscribes.forEach((unsubscribe) => unsubscribe.then((fn) => fn()));
     };
-  }, [connectedWallets]);
+  }, [connectedWallets, chainSS58]);
 
   return null;
 }

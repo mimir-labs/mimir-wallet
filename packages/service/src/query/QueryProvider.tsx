@@ -12,6 +12,7 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
       defaultOptions: {
         queries: {
           refetchInterval: 6_000,
+          experimental_prefetchInRender: true,
           queryFn: ({ queryKey }) => (queryKey[0] ? fetcher(queryKey[0] as string) : null)
         }
       }

@@ -3,18 +3,16 @@
 
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { Box, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import React, { useState } from 'react';
 
 import AccountMenu from './account-menu';
 import AddressCell from './AddressCell';
-import IdentityIcon from './IdentityIcon';
 
 function AccountSelect() {
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
+  const upSm = useMediaQuery('sm');
 
   const handleAccountOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -28,24 +26,19 @@ function AccountSelect() {
 
   return (
     <>
-      <Box
+      <div
         onClick={handleAccountOpen}
-        sx={{
-          cursor: 'pointer',
-          borderRadius: 1,
-          paddingX: 1,
-          paddingY: 0.3,
-          bgcolor: 'common.white',
-          border: '1px solid',
-          borderColor: 'secondary.main',
-          gap: 2,
-          display: 'flex',
-          alignItems: 'center'
-        }}
+        className='cursor-pointer h-[32px] sm:h-[42px] border-secondary border-1 rounded-md px-1.5 sm:px-2 bg-secondary sm:bg-transparent gap-2 flex items-center'
       >
-        {downSm ? <IdentityIcon value={selected} /> : <AddressCell shorten showType value={selected} />}
-        <SvgIcon component={ArrowDown} fontSize='small' inheritViewBox />
-      </Box>
+        <AddressCell
+          showType={upSm}
+          className='[&_.AddressCell-Address]:text-tiny [&_.AddressCell-Address]:h-[14px]'
+          iconSize={24}
+          shorten
+          value={selected}
+        />
+        <ArrowDown className='w-[14px] h-[14px] sm:w-[20px] sm:h-[20px]' />
+      </div>
       <AccountMenu anchor='right' onClose={handleAccountClose} open={!!anchorEl} />
     </>
   );

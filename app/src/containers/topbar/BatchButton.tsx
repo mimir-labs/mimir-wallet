@@ -10,11 +10,13 @@ import { Badge, Popover } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 import { useToggle } from 'react-use';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Drawer, DrawerBody, DrawerContent, Tooltip } from '@mimir-wallet/ui';
 
 function BatchButton() {
+  const { network } = useApi();
   const { current } = useAccount();
-  const [txs] = useBatchTxs(current);
+  const [txs] = useBatchTxs(network, current);
   const [isOpen, toggleOpen] = useToggle(false);
   const [isDrawerOpen, toggleDrawerOpen] = useToggle(false);
   const anchorEl = useRef<HTMLButtonElement>(null);
@@ -59,13 +61,13 @@ function BatchButton() {
           <Button
             isIconOnly
             ref={anchorEl}
-            className='border-secondary'
+            className='border-secondary w-[32px] h-[32px] sm:w-[42px] sm:h-[42px] bg-secondary sm:bg-transparent'
             color='primary'
             variant='ghost'
             radius='md'
             onPress={toggleDrawerOpen}
           >
-            <IconBatch />
+            <IconBatch className='w-[16px] h-[16px] sm:w-[22px] sm:h-[22px]' />
           </Button>
         </Tooltip>
       </Badge>

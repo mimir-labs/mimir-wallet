@@ -3,7 +3,7 @@
 
 import type { BaseStore } from '../store/BaseStore.js';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { session, store } from '../store/index.js';
 
@@ -22,17 +22,25 @@ export function useStore<T>(
   key: string,
   defaultValue?: T
 ): [T | undefined, (value: T | ((value: T) => T)) => void] {
+  const defaultValueRef = useRef(defaultValue);
   const ref = useRef<BaseStore>(isSession ? session : store);
-  const [value, setValue] = useState<T | undefined>((ref.current.get(key) as T) || defaultValue);
+  const [value, setValue] = useState<T | undefined>(
+    key ? (ref.current.get(key) as T) || defaultValueRef.current : defaultValueRef.current
+  );
   const latestValue = useRef<T | undefined>(value);
 
   latestValue.current = value;
+  defaultValueRef.current = defaultValue;
+
+  useLayoutEffect(() => {
+    setValue(key ? (ref.current.get(key) as T) || defaultValueRef.current : defaultValueRef.current);
+  }, [key]);
 
   useEffect(() => {
     const store = ref.current;
 
     const onChange = (_key: string, _: unknown, newValue: unknown) => {
-      if (key === _key) {
+      if (key && key === _key) {
         setTimeout(() => {
           setValue((value) => {
             if (JSON.stringify(value) === JSON.stringify(newValue)) {
@@ -56,6 +64,8 @@ export function useStore<T>(
     value || defaultValue,
     useCallback(
       (_value: T | ((value: T) => T)) => {
+        if (!key) return;
+
         if (typeof _value === 'function') {
           const newValue = (_value as (v: T | undefined) => T)(latestValue.current);
 

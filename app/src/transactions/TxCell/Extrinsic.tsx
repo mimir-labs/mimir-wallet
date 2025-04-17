@@ -12,6 +12,8 @@ import { Box, Button, Divider, Grid2 as Grid, Stack, SvgIcon } from '@mui/materi
 import moment from 'moment';
 import React from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
+
 import Target from './Target';
 
 export function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
@@ -36,6 +38,7 @@ function Extrinsic({
   transaction: Transaction;
   call?: IMethod | null;
 }) {
+  const { network } = useApi();
   const [isOpen, toggleOpen] = useToggle(defaultOpen);
 
   const txCallHex = transaction.call;
@@ -89,7 +92,7 @@ function Extrinsic({
                         <SvgIcon sx={{ fontSize: '0.75rem !important' }} inheritViewBox component={IconTemplate} />
                       }
                       sx={{ paddingX: 1, paddingY: 0.3, fontSize: '0.75rem' }}
-                      onClick={() => events.emit('template_add', txCallHex)}
+                      onClick={() => events.emit('template_add', network, txCallHex)}
                     >
                       + Template
                     </Button>

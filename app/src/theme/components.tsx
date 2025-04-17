@@ -154,8 +154,7 @@ const createComponents: Func = () => ({
         },
         '&.Mui-disabled': {
           '.MuiOutlinedInput-notchedOutline': {
-            borderColor: palette.grey[300],
-            backgroundColor: palette.secondary.main
+            borderColor: palette.grey[300]
           }
         }
       }),

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import IconClock from '@/assets/svg/icon-clock.svg?react';
-import { Box, SvgIcon } from '@mui/material';
 import React from 'react';
 import { BaseEdge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath } from 'reactflow';
 
@@ -32,8 +31,8 @@ function AddressEdge({
 
       {data && (
         <EdgeLabelRenderer>
-          <Box
-            sx={{
+          <div
+            style={{
               display: data.label ? 'flex' : 'none',
               alignItems: 'center',
               position: 'absolute',
@@ -45,14 +44,14 @@ function AddressEdge({
               borderRadius: '8px',
               fontSize: 10,
               fontWeight: 700,
-              bgcolor: data.labelBgColor,
+              backgroundColor: data.labelBgColor,
               color: 'white',
               gap: '2px'
             }}
           >
-            {!!data.delay && <SvgIcon component={IconClock} inheritViewBox sx={{ fontSize: '0.75rem' }} />}
-            <Box sx={{ flex: '1', textAlign: 'center' }}>{data.label}</Box>
-          </Box>
+            {!!data.delay && <IconClock className='w-3 h-3' />}
+            <div className='flex-1 text-center'>{data.label}</div>
+          </div>
         </EdgeLabelRenderer>
       )}
     </>

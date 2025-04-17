@@ -4,8 +4,9 @@
 import type { InputNumberProps } from './types';
 
 import { useInputNumber } from '@/hooks/useInputNumber';
-import { Box, Button } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
+
+import { Button } from '@mimir-wallet/ui';
 
 import FormatBalance from './FormatBalance';
 import Input from './Input';
@@ -31,10 +32,10 @@ function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...pro
           {props.endAdornment}
           {withMax && maxValue && (
             <Button
-              onClick={() => setValue(maxValue.toString())}
-              size='small'
-              sx={{ paddingY: 0.2, borderRadius: 0.5 }}
-              variant='outlined'
+              onPress={() => setValue(maxValue.toString())}
+              size='sm'
+              variant='ghost'
+              className='py-[2px] rounded-[5px]'
             >
               Max
             </Button>
@@ -42,13 +43,13 @@ function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...pro
         </>
       }
       label={
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div className='flex justify-between'>
           {props.label}
-          <Box component='span' fontWeight={400}>
+          <div className='font-normal'>
             Balance:
             <FormatBalance format={format} value={maxValue?.toString()} />
-          </Box>
-        </Box>
+          </div>
+        </div>
       }
       onChange={_onChange}
       value={value}
