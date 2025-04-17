@@ -15,7 +15,7 @@ import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 import AccountSelect from '../../create-multisig/AccountSelect';
-import { useSelectMultisig } from '../../create-multisig/useSelectMultisig';
+import { useSetMembers } from './useSetMembers';
 
 function checkError(
   signatories: string[],
@@ -28,7 +28,7 @@ function checkError(
       : hasSoloAccount
         ? null
         : new Error('You need add at least one local account'),
-    isThresholdValid ? null : new Error(`Threshold must great than 2 and less equal than ${signatories.length}`)
+    isThresholdValid ? null : new Error(`Threshold must great than 1 and less equal than ${signatories.length}`)
   ];
 }
 
@@ -44,7 +44,7 @@ function MemberSet({
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const { api, chainSS58 } = useApi();
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
-    useSelectMultisig(
+    useSetMembers(
       account.members.map((item) => item.address),
       account.threshold
     );
