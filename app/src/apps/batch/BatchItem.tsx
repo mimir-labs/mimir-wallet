@@ -26,9 +26,10 @@ interface Props {
   actions?: React.ReactNode;
   calldata: HexString;
   from: string;
+  bgcolor?: string;
 }
 
-function BatchItem({ children, actions, from, calldata }: Props) {
+function BatchItem({ children, actions, from, calldata, bgcolor }: Props) {
   const { api } = useApi();
   const [isOpen, toggleOpen] = useToggle(false);
 
@@ -37,7 +38,7 @@ function BatchItem({ children, actions, from, calldata }: Props) {
   }, [api, calldata]);
 
   return (
-    <div data-open={isOpen} className='bg-secondary rounded-medium overflow-hidden'>
+    <div data-open={isOpen} className='bg-secondary rounded-medium overflow-hidden' style={{ background: bgcolor }}>
       <div className='grid grid-cols-6 cursor-pointer h-[44px] px-2 sm:px-3 text-small' onClick={toggleOpen}>
         {children}
         <div className='col-span-2 flex items-center'>

@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { Empty } from '@/components';
 import { useBatchSync } from '@/hooks/useBatchSync';
 import { CallDisplaySection } from '@/params';
+import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Divider, Spinner } from '@mimir-wallet/ui';
@@ -15,19 +17,17 @@ import BatchItem from './BatchItem';
 function Restore({ onClose }: { onClose: () => void }) {
   const { network } = useApi();
   const { current } = useAccount();
+  const [isOpen, toggleOpen] = useToggle(true);
 
-  const [txs, restore, isFetched, isFetching] = useBatchSync(network, current);
+  const [txs, restoreList, restore, isFetched, isFetching] = useBatchSync(network, current);
 
   return (
-    <div className='flex flex-col gap-5 h-full'>
+    <div className='min-h-full space-y-5'>
       <div className='flex items-center justify-between text-xl font-bold'>
         Restore Cache Transactions
         <Button isIconOnly color='default' variant='light' onPress={onClose}>
           <IconClose className='w-5 h-5' />
         </Button>
-        {/* <Button color='primary' variant='outlined' onClick={toggleOpen}>
-        Add New
-      </Button> */}
       </div>
       <Divider />
 
@@ -44,22 +44,14 @@ function Restore({ onClose }: { onClose: () => void }) {
       {current && !!txs?.length && (
         <>
           <Alert className='flex-grow-0' color='success' title={`${txs.length} Transactions Founded`} />
-          <div className='flex-1 space-y-5 overflow-y-auto scrollbar-hide'>
-            {txs?.map((item) => (
-              <BatchItem key={item.id} from={current} calldata={item.call}>
-                <div className='col-span-1 flex items-center'>{item.id}</div>
-                <div className='col-span-2 flex items-center'>
-                  <CallDisplaySection section={item.section} method={item.method} />
-                </div>
-              </BatchItem>
-            ))}
-          </div>
-        </>
-      )}
-
-      {!!txs?.length && (
-        <>
-          <Divider />
+          {txs?.map((item) => (
+            <BatchItem key={item.id} from={current} calldata={item.call}>
+              <div className='col-span-1 flex items-center'>{item.id}</div>
+              <div className='col-span-2 flex items-center'>
+                <CallDisplaySection section={item.section} method={item.method} />
+              </div>
+            </BatchItem>
+          ))}
 
           <Button
             fullWidth
@@ -70,6 +62,30 @@ function Restore({ onClose }: { onClose: () => void }) {
           >
             Restore
           </Button>
+        </>
+      )}
+
+      {current && !!restoreList?.length && (
+        <>
+          <div onClick={toggleOpen} className='cursor-pointer flex items-center justify-between'>
+            Restored
+            <ArrowDown data-open={isOpen} className='w-5 h-5 data-[open=true]:rotate-180' />
+          </div>
+
+          {isOpen &&
+            restoreList.map((item) => (
+              <BatchItem
+                key={item.id}
+                from={current}
+                calldata={item.call}
+                bgcolor='linear-gradient(180deg, #F9F9FC 0%, #E5EBF9 100%)'
+              >
+                <div className='col-span-1 flex items-center'>{item.id}</div>
+                <div className='col-span-2 flex items-center'>
+                  <CallDisplaySection section={item.section} method={item.method} />
+                </div>
+              </BatchItem>
+            ))}
         </>
       )}
     </div>
