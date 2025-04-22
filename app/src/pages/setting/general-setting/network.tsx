@@ -14,7 +14,9 @@ import { Alert, Autocomplete, AutocompleteItem, Button, Divider } from '@mimir-w
 
 function Content({ network, setNetwork }: { network: string; setNetwork: (network: string) => void }) {
   const { chain, genesisHash } = useApi();
-  const [url, setUrl] = useState((store.get(`${NETWORK_RPC_PREFIX}${network}`) as string) || '');
+  const [url, setUrl] = useState(
+    (store.get(`${NETWORK_RPC_PREFIX}${network}`) as string) || Object.values(chain.wsUrl)[0] || ''
+  );
   const [error, setError] = useState<Error | undefined>(undefined);
 
   const [state, handleSave] = useAsyncFn(async () => {
@@ -51,13 +53,18 @@ function Content({ network, setNetwork }: { network: string; setNetwork: (networ
         label='Network RPC'
         placeholder='Please select or input rpc url ws:// or wss://'
         variant='bordered'
+        inputValue={url}
         onInputChange={(value) => {
-          setUrl(value);
+          if (isValidWsUrl(value)) {
+            setUrl(value);
+          } else if (chain.wsUrl?.[value]) {
+            setUrl(chain.wsUrl[value]);
+          }
         }}
       >
         {(item) => (
-          <AutocompleteItem startContent={<b>{item[0]}</b>} key={item[0]} classNames={{ title: 'text-right' }}>
-            {item[1]}
+          <AutocompleteItem startContent={item[1]} key={item[1]} classNames={{ title: 'text-right' }}>
+            {item[0]}
           </AutocompleteItem>
         )}
       </Autocomplete>

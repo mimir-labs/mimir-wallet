@@ -7,11 +7,13 @@ import type { Circle } from '@polkadot/ui-shared/icons/types';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { walletConfig } from '@/config';
 import { useCopyAddress } from '@/hooks/useCopyAddress';
+import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { polkadotIcon } from '@polkadot/ui-shared';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
 import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { usePress } from '@mimir-wallet/ui';
 
 import { toastSuccess } from './utils';
 
@@ -31,6 +33,14 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
   const address = encodeAddress(value, prefix ?? chainSS58);
   const { meta } = useAddressMeta(value?.toString());
   const { open: openCopy } = useCopyAddress();
+  const [, copy] = useCopyClipboard();
+  const { pressProps } = usePress({
+    onPress: () => {
+      openCopy(address);
+      copy(address);
+      toastSuccess('Copied to clipboard');
+    }
+  });
 
   const { isInjected, isMultisig, source, threshold, who, multipleMultisig } = meta || {};
 
@@ -44,11 +54,7 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
     return (
       <span
         className={`bg-primary text-white ${className || ''} IdentityIcon`}
-        onClick={(e) => {
-          e.stopPropagation();
-          openCopy(address);
-          toastSuccess('Copied to clipboard');
-        }}
+        {...pressProps}
         style={{
           cursor: 'copy',
           display: 'inline-flex',
@@ -70,11 +76,7 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
   return (
     <span
       className={`bg-secondary ${className || ''} IdentityIcon`}
-      onClick={(e) => {
-        e.stopPropagation();
-        openCopy(address);
-        toastSuccess('Copied to clipboard');
-      }}
+      {...pressProps}
       style={{
         cursor: 'copy',
         position: 'relative',
@@ -83,25 +85,9 @@ function IdentityIcon({ className, prefix, size = 30, value }: Props) {
         borderRadius: '50%'
       }}
     >
-      {isZeroAddress ? (
-        <span
-          className={`flex items-center justify-center bg-primary text-white ${className || ''} IdentityIcon`}
-          style={{
-            width: size,
-            height: size,
-            borderRadius: '50%',
-            fontWeight: 800,
-            fontSize: size / 2,
-            lineHeight: 1
-          }}
-        >
-          0
-        </span>
-      ) : (
-        <svg viewBox='0 0 64 64' width={size} height={size}>
-          {circles.map(renderCircle)}
-        </svg>
-      )}
+      <svg viewBox='0 0 64 64' width={size} height={size}>
+        {circles.map(renderCircle)}
+      </svg>
       {extensionIcon ? (
         <img
           src={extensionIcon}

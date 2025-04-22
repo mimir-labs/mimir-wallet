@@ -11,12 +11,8 @@ export function initMimir(omni: boolean) {
   const search = new URLSearchParams(window.location.search);
 
   const urlNetwork = search.get('network');
-
-  if (urlNetwork) {
-    store.set(CURRENT_NETWORK_KEY, urlNetwork);
-  }
-
   const localNetwork = store.get(CURRENT_NETWORK_KEY) as string;
+
   let network = urlNetwork || localNetwork;
 
   let chain = allEndpoints[0];

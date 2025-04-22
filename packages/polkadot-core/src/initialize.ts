@@ -157,15 +157,19 @@ export async function initializeApi(chain: Endpoint) {
   // Error handler for API connection issues
   const onError = (error: unknown): void => {
     console.error(error);
-    useAllApis.setState((state) => ({
-      chains: {
-        ...state.chains,
-        [chain.key]: {
-          ...state.chains[chain.key],
-          apiError: (error as Error).message
-        }
-      }
-    }));
+    useAllApis.setState((state) =>
+      state.chains[chain.key]
+        ? {
+            chains: {
+              ...state.chains,
+              [chain.key]: {
+                ...state.chains[chain.key],
+                apiError: (error as Error).message
+              }
+            }
+          }
+        : state
+    );
   };
 
   // Initialize main blockchain API connection
@@ -178,16 +182,20 @@ export async function initializeApi(chain: Endpoint) {
         // Handle API ready state
         api.on('ready', (): void => {
           resolve();
-          useAllApis.setState((state) => ({
-            chains: {
-              ...state.chains,
-              [chain.key]: {
-                ...state.chains[chain.key],
-                ...loadOnReady(api, chain),
-                api: api
-              }
-            }
-          }));
+          useAllApis.setState((state) =>
+            state.chains[chain.key]
+              ? {
+                  chains: {
+                    ...state.chains,
+                    [chain.key]: {
+                      ...state.chains[chain.key],
+                      ...loadOnReady(api, chain),
+                      api: api
+                    }
+                  }
+                }
+              : state
+          );
           api.rpc.state.subscribeRuntimeVersion((runtimeVersion) => {
             const specVersion = runtimeVersion.specVersion.toString();
             const metadata = registry.latestMetadata.toHex();
@@ -197,16 +205,20 @@ export async function initializeApi(chain: Endpoint) {
         });
 
         // Update API initialization state
-        useAllApis.setState((state) => ({
-          chains: {
-            ...state.chains,
-            [chain.key]: {
-              ...state.chains[chain.key],
-              isApiInitialized: true,
-              api: api
-            }
-          }
-        }));
+        useAllApis.setState((state) =>
+          state.chains[chain.key]
+            ? {
+                chains: {
+                  ...state.chains,
+                  [chain.key]: {
+                    ...state.chains[chain.key],
+                    isApiInitialized: true,
+                    api: api
+                  }
+                }
+              }
+            : state
+        );
       })
       .catch(onError);
   });

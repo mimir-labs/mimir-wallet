@@ -9,11 +9,10 @@ import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInput } from '@/hooks/useInput';
 import { Call as CallComp } from '@/params';
-import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Link } from '@mimir-wallet/ui';
+import { Divider, Link } from '@mimir-wallet/ui';
 
 function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {
   if (!callData) return [null, null];
@@ -52,9 +51,9 @@ function Extrinsic({
   }, [api.registry, callData]);
 
   return (
-    <Paper sx={{ width: '100%', maxWidth: 500, margin: '0 auto', padding: 2.5, borderRadius: '20px', marginTop: 1.25 }}>
-      <Stack spacing={2}>
-        <Typography variant='h3'>Submit Extrinsic</Typography>
+    <div className='w-full max-w-[500px] mx-auto mt-3 p-5 rounded-large bg-content1 shadow-medium'>
+      <div className='space-y-5'>
+        <h3>Submit Extrinsic</h3>
 
         <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
 
@@ -62,17 +61,17 @@ function Extrinsic({
 
         <Input
           label={
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5 }}>
+            <div className='flex items-center justify-between gap-1'>
               Call Data
               <Link as='button' underline='none' color='primary' onPress={() => events.emit('template_open', network)}>
                 View Template
               </Link>
-            </Box>
+            </div>
           }
           placeholder='0x...'
-          color={callDataError ? 'error' : 'primary'}
+          color={callDataError ? 'danger' : 'primary'}
           helper={
-            <Box color='text.primary'>
+            <div className='text-foreground mt-1'>
               You can paste the Encoded Call Data in{' '}
               <Link underline='hover' target='_blank'>
                 DOT Console
@@ -82,53 +81,47 @@ function Extrinsic({
                 Polkadot.JS
               </Link>
               .
-            </Box>
+            </div>
           }
           value={callData}
           onChange={setCallData}
         />
 
         {callDataError && (
-          <Box
-            sx={{
-              bgcolor: 'secondary.main',
-              padding: 1,
-              borderRadius: 1,
-              wordBreak: 'break-all'
-            }}
-          >
-            <Typography fontFamily='Geist Mono' color='error' fontSize='0.75rem'>
+          <div className='bg-secondary p-2.5 rounded-medium break-all'>
+            <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-tiny'>
               {callDataError.message}
-            </Typography>
-          </Box>
+            </p>
+          </div>
         )}
 
         {parsedCallData && (
-          <Stack spacing={0.5}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography fontWeight={700}>
+          <div className='space-y-[5px]'>
+            <div className='flex justify-between items-center'>
+              <p className='font-bold'>
                 {parsedCallData.section}.{parsedCallData.method}
-              </Typography>
+              </p>
               <Link as='button' underline='none' color='primary' onPress={() => setShowDetail(!showDetail)}>
                 {showDetail ? 'Hide' : 'Details'}
               </Link>
-            </Box>
+            </div>
 
-            <Box sx={{ borderRadius: 1, border: '1px solid', borderColor: 'grey.300', padding: 1 }}>
+            <div className='rounded-medium border-1 border-divider-300 p-2.5'>
               <CallComp registry={api.registry} from={sending} call={parsedCallData} jsonFallback />
-            </Box>
+            </div>
 
             {showDetail && (
-              <Box sx={{ borderRadius: 1, bgcolor: 'secondary.main', padding: 1 }}>
+              <div className='rounded-medium bg-secondary p-2.5'>
                 <JsonView data={parsedCallData.toHuman()} />
-              </Box>
+              </div>
             )}
-          </Stack>
+          </div>
         )}
 
         <Divider />
 
         <TxButton
+          fullWidth
           variant='solid'
           color='primary'
           isDisabled={!parsedCallData}
@@ -138,8 +131,8 @@ function Extrinsic({
         >
           Submit
         </TxButton>
-      </Stack>
-    </Paper>
+      </div>
+    </div>
   );
 }
 

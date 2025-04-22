@@ -10,7 +10,7 @@ import { DotConsoleApp } from '@/config';
 import { useEffect, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Link } from '@mimir-wallet/ui';
+import { Button, Link, Tooltip } from '@mimir-wallet/ui';
 
 import { decodeCallSection } from './utils';
 
@@ -71,8 +71,8 @@ function TemplateItem({
   }, [api.registry, call]);
 
   return (
-    <div className='px-3 sm:px-4 h-[40px] rounded-medium bg-secondary flex justify-between items-center gap-2.5'>
-      <div className='flex items-center w-[100px] min-w-[80px]'>
+    <div className='pl-2 sm:pl-3 h-[40px] rounded-medium bg-secondary grid grid-cols-12 gap-2'>
+      <div className='flex items-center col-span-4'>
         {isEditing ? (
           <input
             autoFocus
@@ -91,7 +91,7 @@ function TemplateItem({
             }}
           />
         ) : (
-          <p>{name}</p>
+          <p className='max-w-[80px] overflow-hidden text-ellipsis'>{name}</p>
         )}
         <Button
           isIconOnly
@@ -105,18 +105,24 @@ function TemplateItem({
         </Button>
       </div>
 
-      <div className='flex items-center'>
-        <Link as='button' underline='always' color='foreground' onPress={() => onView(name, call)}>
-          {section}.{method}
-        </Link>
-        <CopyButton value={call} size='sm' />
-      </div>
+      <div className='flex items-center justify-between col-span-8'>
+        <div className='flex items-center'>
+          <Link as='button' color='foreground' onPress={() => onView(name, call)}>
+            <Tooltip content={`${section}.${method}`} closeDelay={0} color='foreground'>
+              <span className='text-ellipsis max-w-[110px] sm:max-w-[130px] overflow-hidden underline'>
+                {section}.{method}
+              </span>
+            </Tooltip>
+          </Link>
+          <CopyButton value={call} size='sm' />
+        </div>
 
-      <div className='flex items-center'>
-        <DotConsoleButton network={network} call={call} />
-        <Button isIconOnly variant='light' size='sm' color='danger' onPress={() => onDelete()}>
-          <IconDelete />
-        </Button>
+        <div className='shrink-0'>
+          <DotConsoleButton network={network} call={call} />
+          <Button isIconOnly variant='light' size='sm' color='danger' onPress={() => onDelete()}>
+            <IconDelete />
+          </Button>
+        </div>
       </div>
     </div>
   );

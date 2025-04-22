@@ -5,18 +5,19 @@ import type { TransferToken } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useAllAccounts } from '@/accounts/useGroupAccounts';
+import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { FormatBalance, Input, InputAddress, InputNetwork, InputToken, TxButton } from '@/components';
 import { useAssetInfo } from '@/hooks/useAssets';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { formatUnits, parseUnits } from '@/utils';
 import { BN, isHex } from '@polkadot/util';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Skeleton, Switch } from '@mimir-wallet/ui';
+import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { Alert, Avatar, Button, Divider, Skeleton, Switch } from '@mimir-wallet/ui';
 
 import { useTransferBalance } from './useTransferBalances';
 
@@ -35,7 +36,8 @@ function Transfer({
   setSending: (sending: string) => void;
   setNetwork: (network: string) => void;
 }) {
-  const { api } = useApi();
+  const { api, chain } = useApi();
+  const { networks } = useNetworks();
   const navigate = useNavigate();
   const [toParam] = useQueryParam<string>('to');
   const [recipient, setRecipient] = useState<string>(toParam || '');
@@ -46,6 +48,15 @@ function Transfer({
   const [format, sendingBalances, isSendingFetched] = useTransferBalance(token, sending);
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [, assetExistentialDeposit] = useAssetInfo(network, token?.isNative ? null : token?.assetId);
+  const [recipientAccount] = useQueryAccountOmniChain(recipient);
+  const recipientNetwork =
+    recipientAccount?.type === 'pure'
+      ? networks.find((item) => item.genesisHash === recipientAccount.network)
+      : undefined;
+
+  const isRecipientSupported = useMemo(() => {
+    return recipientAccount?.type === 'pure' ? recipientAccount.network === chain.genesisHash : true;
+  }, [recipientAccount, chain]);
 
   const existentialDeposit = token?.isNative ? api.consts.balances.existentialDeposit : assetExistentialDeposit;
 
@@ -176,6 +187,21 @@ function Transfer({
               Keep Sender Alive
             </Switch>
           </div>
+
+          {!isRecipientSupported && (
+            <Alert color='danger'>
+              <div>
+                You are about to transfer to a pure account only exist on{' '}
+                <Avatar
+                  src={recipientNetwork?.icon}
+                  style={{ display: 'inline-block', width: 16, height: 16, backgroundColor: 'transparent' }}
+                />
+                &nbsp;
+                {recipientNetwork?.name}, please change to correct network.
+              </div>
+            </Alert>
+          )}
+
           <TxButton
             fullWidth
             color={isInsufficientBalance ? 'danger' : 'primary'}

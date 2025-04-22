@@ -2,28 +2,45 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { extendVariants } from '@heroui/system';
-import { Tabs } from '@heroui/tabs';
+import { Tabs as HeroTabs } from '@heroui/tabs';
 
-const CustomTabs = extendVariants(Tabs, {
+const Tabs = extendVariants(HeroTabs, {
   variants: {
     size: {
       md: {
-        tabList: 'shadow-medium rounded-large p-2.5',
+        tabList: 'rounded-large p-2.5',
         tabContent: 'font-bold',
         cursor: ['rounded-medium'],
         panel: ['p-0', 'pt-0']
       }
     },
+    variant: {
+      solid: {
+        tabList: 'bg-content1 shadow-medium'
+      },
+      underlined: {
+        tabList: 'bg-transparent shadow-none'
+      }
+    },
     color: {
       primary: {
-        tabList: 'bg-white',
         tabContent: 'text-primary/50'
       }
     }
   },
   defaultVariants: {
-    size: 'md'
-  }
-}) as typeof Tabs;
+    size: 'md',
+    variant: 'solid'
+  },
+  compoundVariants: [
+    {
+      variant: 'underlined',
+      color: 'primary',
+      class: {
+        tabContent: 'text-foreground/30'
+      } as any
+    }
+  ]
+}) as typeof HeroTabs;
 
-export default CustomTabs as typeof Tabs;
+export default Tabs;

@@ -10,9 +10,9 @@ import { useInputNumber } from '@/hooks/useInputNumber';
 import { parseUnits } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { signAndSend, SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
+import { signAndSend, SubApiRoot, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
@@ -126,12 +126,17 @@ function Action({
 
 function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const [sending, setSending] = useState<string>();
+  const { enableNetwork } = useNetworks();
   const [[value], setValue] = useInputNumber(defaultValue?.toString() || '0', false, 0);
   const supportedNetworks = useAddressSupportedNetworks(receipt);
   const [network, setNetwork] = useInputNetwork(
     defaultNetwork,
     supportedNetworks?.map((item) => item.key)
   );
+
+  useEffect(() => {
+    if (open) enableNetwork(network);
+  }, [enableNetwork, network, open]);
 
   return (
     <SubApiRoot
@@ -140,9 +145,13 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
       Fallback={
         open
           ? ({ apiState: { chain } }) => (
-              <div className='w-[500px] max-w-full mx-auto my-0 py-10 flex items-center justify-center bg-content1 rounded-large'>
-                <Spinner size='lg' variant='dots' label={`Connecting to the ${chain.name}...`} />
-              </div>
+              <Modal size='lg' onClose={onClose} isOpen={open}>
+                <ModalContent>
+                  <ModalBody>
+                    <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
             )
           : undefined
       }

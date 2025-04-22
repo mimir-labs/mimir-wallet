@@ -14,11 +14,8 @@ const DEFAULT_NETWORKS = [
   'kusama',
   'assethub-polkadot',
   'people-polkadot',
-  'bifrost-polkadot',
-  'hydration',
   'assethub-kusama',
-  'people-kusama',
-  'bifrost-kusama'
+  'people-kusama'
 ];
 
 const ENABLED_NETWORKS_KEY = 'enabled_networks';
@@ -79,12 +76,6 @@ export const useNetworks = create<{
   disableNetwork: (key: string) => {
     set((state) => {
       if (state.mode !== 'omni') {
-        return state;
-      }
-
-      const hasUsedForIdentity = state.networks.some((item) => item.identityNetwork === key && item.enabled);
-
-      if (hasUsedForIdentity) {
         return state;
       }
 

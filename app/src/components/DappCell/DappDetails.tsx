@@ -8,7 +8,6 @@ import IconDiscord from '@/assets/svg/icon-discord.svg?react';
 import IconGithub from '@/assets/svg/icon-github.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import IconX from '@/assets/svg/icon-x.svg?react';
-import { SvgIcon } from '@mui/material';
 import React from 'react';
 
 import { Avatar, Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
@@ -40,27 +39,27 @@ function Contents({ dapp }: { dapp: DappOption }) {
           <Divider orientation='vertical' className='h-[12px]' />
           {dapp.website && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.website} size='sm' target='_blank'>
-              <SvgIcon component={IconWebsite} inheritViewBox />
+              <IconWebsite className='w-4 h-4' />
             </Button>
           )}
           {dapp.github && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.github} size='sm' target='_blank'>
-              <SvgIcon component={IconGithub} inheritViewBox />
+              <IconGithub className='w-4 h-4' />
             </Button>
           )}
           {dapp.discord && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.discord} size='sm' target='_blank'>
-              <SvgIcon component={IconDiscord} inheritViewBox />
+              <IconDiscord className='w-4 h-4' />
             </Button>
           )}
           {dapp.twitter && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.twitter} size='sm' target='_blank'>
-              <SvgIcon component={IconX} inheritViewBox />
+              <IconX className='w-4 h-4' />
             </Button>
           )}
           {dapp.matrix && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.matrix} size='sm' target='_blank'>
-              <SvgIcon component={IconMatrix} inheritViewBox />
+              <IconMatrix className='w-4 h-4' />
             </Button>
           )}
         </div>

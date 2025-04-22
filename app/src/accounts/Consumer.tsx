@@ -8,7 +8,7 @@ import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX } from '@/constants';
 import { type AddressState, useAddressStore } from '@/hooks/useAddressStore';
 import { useWallet } from '@/wallet/useWallet';
 import { isEqual } from 'lodash-es';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { addressEq, addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
@@ -23,7 +23,7 @@ import { deriveAccountMeta } from './utils';
  * This component doesn't render anything but handles important background tasks
  */
 function AddressConsumer({ children }: { children: React.ReactNode }) {
-  const { chainSS58, network } = useApi();
+  const { chainSS58, network, genesisHash } = useApi();
   const { mode } = useNetworks();
   const { isWalletReady, walletAccounts } = useWallet();
   const { accounts, addresses } = useAddressStore();
@@ -39,7 +39,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setMetas((prevMetas) => {
       const metas: Record<HexString, AddressMeta> = { ...prevMetas };
 
@@ -95,7 +95,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
 
   // Initialize address book from local storage
   // This effect runs once when the network changes to load stored addresses
-  useLayoutEffect(() => {
+  useEffect(() => {
     // Helper function to get stored address values
     const getValues = () => {
       const values: { address: string; name: string; watchlist?: boolean }[] = [];
@@ -188,7 +188,11 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
               type: 'account'
             })
           );
-        const newAccounts = [...values, ...newWalletAccounts];
+        const newValues =
+          mode === 'solo'
+            ? values.filter((account) => (account.type === 'pure' ? account.network === genesisHash : true))
+            : values;
+        const newAccounts = [...newValues, ...newWalletAccounts];
 
         return {
           accounts: isEqual(newAccounts, state.accounts) ? state.accounts : newAccounts,
@@ -198,7 +202,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
     };
 
     updateAccounts(syncData);
-  }, [chainSS58, syncData, walletAccounts]);
+  }, [chainSS58, genesisHash, mode, syncData, walletAccounts]);
 
   // Component doesn't render anything visible
   return <AccountContext.Provider value={{ metas: finalMetas, updateMetas }}>{children}</AccountContext.Provider>;

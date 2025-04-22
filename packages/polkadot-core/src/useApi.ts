@@ -7,16 +7,17 @@ import { useContext } from 'react';
 
 import { ApiContext, SubApiContext } from './context.js';
 
-export function useApi(): ApiContextProps {
+export function useApi(): ApiContextProps & { isSub: boolean } {
   const subValue = useContext(SubApiContext);
   const value = useContext(ApiContext);
 
   if (subValue) {
-    return { ...subValue, chainSS58: value.chainSS58 };
+    return { ...subValue, chainSS58: value.chainSS58, isSub: true };
   }
 
   return {
     ...value,
-    chainSS58: value.chainSS58
+    chainSS58: value.chainSS58,
+    isSub: false
   };
 }

@@ -20,7 +20,7 @@ export function AnnouncementStatus({ account, transaction }: { account: AccountD
   const [status, isFetching] = useAnnouncementStatus(transaction, account);
 
   if (isFetching) {
-    return <Spinner size='sm' variant='spinner' />;
+    return <Spinner size='sm' />;
   }
 
   const SvgIcon =

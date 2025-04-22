@@ -167,9 +167,14 @@ function CreateMultisig({
                 onChange={_onChangeThreshold}
               />
 
-              <div className='flex items-center justify-between'>
-                <div className='font-bold'>Flexible Multisig</div>
-                <Switch isSelected={flexible} onValueChange={(checked) => setFlexible(checked)} />
+              <div>
+                <div className='flex items-center justify-between'>
+                  <div className='font-bold'>Flexible Multisig</div>
+                  <Switch isSelected={flexible} onValueChange={(checked) => setFlexible(checked)} />
+                </div>
+                <p className='text-foreground/50 text-tiny font-normal mt-1'>
+                  Flexible Multisig allows you to change members and thresholds
+                </p>
               </div>
 
               {flexible && <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />}

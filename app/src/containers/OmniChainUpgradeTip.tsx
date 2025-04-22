@@ -4,7 +4,7 @@
 import { OMNI_CHAIN_UPGRADE_TIP_KEY } from '@/constants';
 
 import { useLocalStore } from '@mimir-wallet/service';
-import { Button, Divider, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import { Button, Divider, Link, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 function OmniChainUpgradeTip() {
   const [isRead, setIsRead] = useLocalStore<boolean>(OMNI_CHAIN_UPGRADE_TIP_KEY, false);
@@ -40,9 +40,15 @@ function OmniChainUpgradeTip() {
               <Button color='primary' fullWidth onPress={() => setIsRead(true)}>
                 Love It!
               </Button>
-              <Button color='primary' variant='light' fullWidth onPress={() => setIsRead(true)}>
+              <Link
+                as='button'
+                color='primary'
+                size='sm'
+                className='flex w-full justify-center mt-2.5'
+                onPress={() => setIsRead(true)}
+              >
                 Close but also love it
-              </Button>
+              </Link>
             </div>
           </div>
         </ModalBody>

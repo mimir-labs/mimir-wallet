@@ -33,7 +33,7 @@ function PendingTransactions({
     [data]
   );
 
-  const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching || !item.isFetched);
+  const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching && !item.isFetched);
 
   if (!showSkeleton && transactions.length === 0) {
     return <Empty height='80dvh' />;

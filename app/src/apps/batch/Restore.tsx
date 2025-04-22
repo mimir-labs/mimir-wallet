@@ -3,14 +3,13 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import IconClose from '@/assets/svg/icon-close.svg?react';
 import { Empty } from '@/components';
 import { useBatchSync } from '@/hooks/useBatchSync';
 import { CallDisplaySection } from '@/params';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Divider, Spinner } from '@mimir-wallet/ui';
+import { Alert, Button, Spinner } from '@mimir-wallet/ui';
 
 import BatchItem from './BatchItem';
 
@@ -23,21 +22,13 @@ function Restore({ network, onClose }: { network: string; onClose: () => void })
   return (
     <SubApiRoot network={network}>
       <div className='min-h-full space-y-5'>
-        <div className='flex items-center justify-between text-xl font-bold'>
-          Restore Cache Transactions
-          <Button isIconOnly color='default' variant='light' onPress={onClose}>
-            <IconClose className='w-5 h-5' />
-          </Button>
-        </div>
-        <Divider />
-
         <Alert
           className='flex-grow-0'
           color='warning'
           title='Your transactions will be delete after transactions been restore.'
         />
 
-        {!isFetched && isFetching && <Spinner variant='dots' />}
+        {!isFetched && isFetching && <Spinner variant='wave' />}
 
         {isFetched && !txs?.length && <Empty label='No batch found' height='300px' />}
 

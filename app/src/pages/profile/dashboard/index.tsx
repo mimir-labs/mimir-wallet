@@ -12,7 +12,7 @@ import { Link, Tab, Tabs } from '@mimir-wallet/ui';
 
 import Assets from './Assets';
 import Hero from './Hero';
-import PendingTx from './PendingTx';
+// import PendingTx from './PendingTx';
 import Structure from './Structure';
 
 function Dashboard({ address }: { address: string }) {
@@ -20,8 +20,8 @@ function Dashboard({ address }: { address: string }) {
   const [tab, setTab] = useQueryParam('tab', 'asset', { replace: true });
   const tabsRef = useRef([
     { tab: 'asset', label: 'Asset' },
-    { tab: 'structure', label: 'Structure' },
-    { tab: 'transaction', label: 'Transaction' }
+    { tab: 'structure', label: 'Structure' }
+    // { tab: 'transaction', label: 'Transaction' }
   ]);
   const [totalUsd, changes] = useBalanceTotalUsd(address);
   const supportedNetworks = useAddressSupportedNetworks(address);
@@ -45,7 +45,6 @@ function Dashboard({ address }: { address: string }) {
 
       <Tabs
         color='primary'
-        aria-label='Transaction'
         selectedKey={tab}
         onSelectionChange={(key) => setTab(key.toString())}
         classNames={{
@@ -60,7 +59,7 @@ function Dashboard({ address }: { address: string }) {
                 <Structure address={address} setNetwork={setNetwork} />
               </SubApiRoot>
             )}
-            {tab === 'transaction' && <PendingTx address={address} />}
+            {/* {tab === 'transaction' && <PendingTx address={address} />} */}
           </Tab>
         ))}
       </Tabs>

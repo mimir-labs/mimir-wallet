@@ -4,10 +4,11 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconDownload from '@/assets/svg/icon-download.svg?react';
 import { toastError, toastSuccess } from '@/components/utils';
-import { Button, SvgIcon } from '@mui/material';
 import { isAddress } from '@polkadot/util-crypto';
 import { parse } from 'papaparse';
 import { useRef } from 'react';
+
+import { Button } from '@mimir-wallet/ui';
 
 function Import() {
   const { addAddress } = useAccount();
@@ -74,12 +75,7 @@ function Import() {
   };
 
   return (
-    <Button
-      color='primary'
-      variant='outlined'
-      startIcon={<SvgIcon inheritViewBox component={IconDownload} />}
-      onClick={handleButtonClick}
-    >
+    <Button color='primary' variant='ghost' startContent={<IconDownload />} onPress={handleButtonClick}>
       Import
       <input type='file' accept='.csv' hidden onChange={handleImport} ref={fileInputRef} />
     </Button>

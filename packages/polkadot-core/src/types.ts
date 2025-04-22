@@ -21,8 +21,8 @@ export type Endpoint = {
   ss58Format: number;
   genesisHash: HexString;
   socketUrl: string;
-  statescan?: boolean;
   explorerUrl?: string;
+  statescanUrl?: string;
   subsquareUrl?: string;
   identityNetwork?: string;
 };
@@ -50,6 +50,7 @@ export interface ApiContextProps extends ValidApiState, Omit<ApiProps, 'api'> {
   ss58Chain: string;
   setSs58Chain: (chain: string) => void;
   allApis: Record<string, ValidApiState>;
+  setNetwork: (network: string) => void;
 }
 
 export type ValidApiState = ApiState & {

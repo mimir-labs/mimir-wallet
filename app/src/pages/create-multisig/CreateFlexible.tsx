@@ -42,23 +42,12 @@ function filterPureAccount(api: ApiPromise, events: EventRecord[]): string | und
 
 function ItemStep({ children, disabled = false }: { disabled?: boolean; children: React.ReactNode }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 40,
-        height: 40,
-        borderRadius: 2,
-        marginRight: 1,
-        fontSize: '0.875rem',
-        fontWeight: 800,
-        color: 'common.white',
-        bgcolor: disabled ? 'secondary.main' : 'primary.main'
-      }}
+    <div
+      data-disabled={disabled}
+      className='flex items-center justify-center w-10 h-10 rounded-full text-small font-extrabold text-white data-[disabled=true]:bg-primary/5 bg-primary'
     >
       {children}
-    </Box>
+    </div>
   );
 }
 
@@ -225,42 +214,46 @@ function CreateFlexible({
       <Divider sx={{ marginY: 1.5 }} />
       <Accordion expanded={false}>
         <AccordionSummary>
-          <ItemStep>1</ItemStep>
-          <div className='flex items-center gap-2 justify-between'>
-            {pure ? (
-              <>
-                <Box color='primary.main' component='span'>
-                  <Address shorten value={pure} />
-                </Box>
-                &nbsp; Created!
-              </>
-            ) : (
-              <>Create Flexible Multisig Account</>
-            )}
-            <div className='flex gap-1 items-centertext-small'>
-              <img src={chain.icon} style={{ width: 20, height: 20 }} />
-              {chain.name}
+          <div className='flex items-center gap-2'>
+            <ItemStep>1</ItemStep>
+            <div className='flex items-center gap-2 justify-between'>
+              {pure ? (
+                <>
+                  <Box color='primary.main' component='span'>
+                    <Address shorten value={pure} />
+                  </Box>
+                  &nbsp; Created!
+                </>
+              ) : (
+                <>Create Flexible Multisig Account</>
+              )}
+              <div className='flex gap-1 items-center text-small'>
+                <img src={chain.icon} style={{ width: 20, height: 20 }} />
+                {chain.name}
+              </div>
             </div>
           </div>
         </AccordionSummary>
       </Accordion>
       <Accordion expanded>
         <AccordionSummary>
-          <ItemStep disabled={!pure}>2</ItemStep>
-          Set Members ({threshold}/{who.length})
-          <Tooltip
-            classNames={{ content: 'max-w-[320px]' }}
-            content={
-              <span>
-                Flexible Multisig is a Pure Proxy. In <b>‘set members’</b> step, you add the multisig account as its
-                proxy and remove the creator's proxy, making the multi-signature its only controller. Then transfer some
-                funds to keep Flexible alive.
-              </span>
-            }
-            closeDelay={0}
-          >
-            <IconQuestion />
-          </Tooltip>
+          <div className='flex items-center gap-2'>
+            <ItemStep disabled={!pure}>2</ItemStep>
+            Set Members ({threshold}/{who.length})
+            <Tooltip
+              classNames={{ content: 'max-w-[320px]' }}
+              content={
+                <span>
+                  Flexible Multisig is a Pure Proxy. In <b>‘set members’</b> step, you add the multisig account as its
+                  proxy and remove the creator's proxy, making the multi-signature its only controller. Then transfer
+                  some funds to keep Flexible alive.
+                </span>
+              }
+              closeDelay={0}
+            >
+              <IconQuestion />
+            </Tooltip>
+          </div>
         </AccordionSummary>
         <AccordionDetails>
           <Stack spacing={1}>

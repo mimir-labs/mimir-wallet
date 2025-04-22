@@ -5,10 +5,10 @@ import type { IMethod } from '@polkadot/types/types';
 
 import { AddressRow } from '@/components';
 import { Call as CallComp } from '@/params';
-import { Alert, AlertTitle } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
+import { Alert } from '@mimir-wallet/ui';
 
 import { Item } from './Extrinsic';
 
@@ -24,10 +24,11 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
     <>
       {targetCall ? <CallComp from={from} registry={api.registry} call={targetCall} jsonFallback /> : null}
       {!call && (
-        <Alert severity='warning'>
-          <AlertTitle>Warning</AlertTitle>
-          This transaction wasn’t initiated from Mimir. Please confirm the security of this transaction.
-        </Alert>
+        <Alert
+          color='warning'
+          title='Warning'
+          description='This transaction wasn’t initiated from Mimir. Please confirm the security of this transaction.'
+        />
       )}
       <Item title='From' content={<AddressRow iconSize={20} withCopy value={from} />} />
     </>

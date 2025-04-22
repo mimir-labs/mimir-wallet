@@ -16,26 +16,12 @@ import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useCall } from '@/hooks/useCall';
 import { useInput } from '@/hooks/useInput';
 import { useProxyTypes } from '@/hooks/useProxyTypes';
-import {
-  Box,
-  Button,
-  Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Stack,
-  SvgIcon,
-  Switch,
-  Typography
-} from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert } from '@mimir-wallet/ui';
+import { Alert, Button, Divider, Select, SelectItem, Switch } from '@mimir-wallet/ui';
 
 import AddProxyButton from './AddProxyButton';
 import ProxyInfo from './ProxyInfo';
@@ -122,27 +108,20 @@ function AddProxy({
 
   return (
     <>
-      <Box sx={{ width: 500, maxWidth: '100%', margin: '0 auto' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Button onClick={() => navigate(-1)} size='small' variant='outlined'>
+      <div className='w-[500px] max-w-full mx-auto my-0'>
+        <div className='flex items-center justify-between'>
+          <Button onPress={() => navigate(-1)} variant='ghost'>
             {'<'} Back
           </Button>
-        </Box>
-        <Paper sx={{ padding: { sm: 2, xs: 1.5 }, borderRadius: 2, marginTop: 1 }}>
-          <Stack spacing={2}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography variant='h3'>{pure ? 'Create New Pure Proxy' : 'Add Proxy'}</Typography>
-            </Box>
+        </div>
+        <div className='p-4 sm:p-5 rounded-large mt-2.5 bg-content1 shadow-medium'>
+          <div className='space-y-5'>
+            <div className='flex justify-between'>
+              <h3>{pure ? 'Create New Pure Proxy' : 'Add Proxy'}</h3>
+            </div>
             <Divider />
 
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: { sm: 'row', xs: 'column' },
-                gap: 1,
-                alignItems: { sm: 'start', xs: 'center' }
-              }}
-            >
+            <div className='flex flex-col sm:flex-row gap-2.5 items-center sm:items-start'>
               {pure ? (
                 <PureCell />
               ) : (
@@ -155,12 +134,8 @@ function AddProxy({
                   isSign={!!pure}
                 />
               )}
-              <SvgIcon
-                component={IconArrow}
-                fontSize='small'
-                inheritViewBox
-                color='primary'
-                sx={{ cursor: 'pointer', transform: { sm: 'translateY(48px)', xs: 'rotate(90deg)' } }}
+              <IconArrow
+                className='w-4 h-4 text-primary cursor-pointer rotate-90 sm translate-y-[48px]'
                 onClick={pure ? undefined : swap}
               />
               <InputAddress
@@ -171,57 +146,73 @@ function AddProxy({
                 label='Proxy Account'
                 filtered={filteredProxy}
               />
-            </Box>
+            </div>
 
             <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
 
             {pure && <Input label='Name' value={name} onChange={setName} />}
 
-            <FormControl fullWidth>
-              <InputLabel>Authorize</InputLabel>
-              <Select<string> variant='outlined' onChange={(e) => setProxyType(e.target.value)} value={proxyType}>
+            <div className='flex'>
+              <Select
+                label='Authorize'
+                placeholder='Authorize'
+                variant='bordered'
+                labelPlacement='outside'
+                selectionMode='single'
+                selectedKeys={[proxyType]}
+                onSelectionChange={(e) => {
+                  if (e.currentKey) {
+                    setProxyType(e.currentKey.toString());
+                  }
+                }}
+              >
                 {proxyTypes.map(({ text }) => (
-                  <MenuItem value={text} key={text}>
-                    <Box sx={{ display: 'flex' }}>{text}</Box>
-                  </MenuItem>
+                  <SelectItem textValue={text} key={text}>
+                    {text}
+                  </SelectItem>
                 ))}
               </Select>
-            </FormControl>
+            </div>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Typography fontWeight={700}>Advanced Setting</Typography>
+            <div className='flex items-center justify-between'>
+              <div className='font-bold'>Advanced Setting</div>
               <Switch
-                checked={advanced}
-                onChange={(e) => {
-                  toggleAdvanced(e.target.checked);
+                isSelected={advanced}
+                onValueChange={(checked) => {
+                  toggleAdvanced(checked);
                   setReviewWindow(0);
                 }}
               />
-            </Box>
+            </div>
 
             {advanced && (
               <>
-                <FormControl fullWidth>
-                  <InputLabel>Review Window</InputLabel>
-                  <Select<string>
-                    variant='outlined'
-                    onChange={(e) => setReviewWindow(Number(e.target.value))}
-                    value={reviewWindow.toString()}
+                <div className='flex'>
+                  <Select
+                    label='Review Window'
+                    labelPlacement='outside'
+                    placeholder='Review Window'
+                    variant='bordered'
+                    selectionMode='single'
+                    selectedKeys={[reviewWindow.toString()]}
+                    onSelectionChange={(e) => {
+                      if (e.currentKey) {
+                        setReviewWindow(Number(e.currentKey.toString()));
+                      }
+                    }}
                   >
                     {Object.entries(reviewWindows).map(([key, text]) => (
-                      <MenuItem value={key} key={key}>
-                        {text}
-                      </MenuItem>
+                      <SelectItem key={key}>{text}</SelectItem>
                     ))}
                   </Select>
-                </FormControl>
+                </div>
 
                 {reviewWindow === -1 && (
                   <Input
                     label='Custom'
                     value={custom}
                     onChange={setCustom}
-                    endAdornment={<Typography color='textPrimary'>Blocks (≈ {estimateCustom})</Typography>}
+                    endAdornment={<p className='text-foreground text-nowrap'>Blocks (≈ {estimateCustom})</p>}
                   />
                 )}
               </>
@@ -284,10 +275,8 @@ function AddProxy({
             )}
 
             {!pure && (
-              <Box sx={{ filter: 'grayscale(30%)' }}>
-                <Typography marginBottom={1} fontWeight={700} color='textSecondary'>
-                  Existing Proxy
-                </Typography>
+              <div style={{ filter: 'grayscale(30%)' }}>
+                <p className='mb-2.5 font-bold text-foreground/65'>Existing Proxy</p>
 
                 {existsProxies.map((proxy, index) => (
                   <ProxyInfo
@@ -298,11 +287,11 @@ function AddProxy({
                     proxyType={proxy.proxyType}
                   />
                 ))}
-              </Box>
+              </div>
             )}
-          </Stack>
-        </Paper>
-      </Box>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

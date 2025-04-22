@@ -41,7 +41,7 @@ function PageTransactionDetails() {
   const downSm = useMediaQuery(breakpoints.down('sm'));
 
   if (isFetching && !isFetched) {
-    return <Spinner />;
+    return <Spinner size='lg' variant='wave' />;
   }
 
   if (!transaction) {

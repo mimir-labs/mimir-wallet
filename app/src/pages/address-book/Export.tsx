@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import IconDownload from '@/assets/svg/icon-download.svg?react';
-import { Button, SvgIcon } from '@mui/material';
 import { encodeAddress } from '@polkadot/util-crypto';
 import moment from 'moment';
 import { unparse } from 'papaparse';
 
 import { store } from '@mimir-wallet/service';
+import { Button } from '@mimir-wallet/ui';
 
 function Export() {
   const handleExport = () => {
@@ -42,12 +42,7 @@ function Export() {
   };
 
   return (
-    <Button
-      color='primary'
-      variant='outlined'
-      startIcon={<SvgIcon inheritViewBox sx={{ transform: 'rotate(180deg)' }} component={IconDownload} />}
-      onClick={handleExport}
-    >
+    <Button color='primary' variant='ghost' startContent={<IconDownload />} onPress={handleExport}>
       Export
     </Button>
   );

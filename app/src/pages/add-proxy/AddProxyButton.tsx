@@ -4,11 +4,11 @@
 import type { ProxyArgs } from './types';
 
 import { toastWarn } from '@/components/utils';
-import { LoadingButton } from '@mui/lab';
 import React from 'react';
 import { useAsyncFn } from 'react-use';
 
 import { addressEq, isSuperset, useApi } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
 
 function AddProxyButton({
   proxied,
@@ -84,9 +84,9 @@ function AddProxyButton({
   }, [api, custom, proxied, proxy, proxyArgs, proxyType, reviewWindow, setProxyArgs]);
 
   return (
-    <LoadingButton disabled={!(proxied && proxy)} fullWidth variant='outlined' onClick={onAdd} loading={state.loading}>
+    <Button isDisabled={!(proxied && proxy)} fullWidth variant='ghost' onPress={onAdd} isLoading={state.loading}>
       Add
-    </LoadingButton>
+    </Button>
   );
 }
 

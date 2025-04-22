@@ -5,7 +5,7 @@ import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { type Endpoint, useApi } from '@mimir-wallet/polkadot-core';
 import {
@@ -60,7 +60,7 @@ function Content({ address }: { address: string }) {
   const [type, setType] = useQueryParam<string>('status', 'pending');
   const [txId] = useQueryParam<string>('tx_id');
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setSelectedPendingNetworks((selectedPendingNetworks) => {
       if (selectedPendingNetworks.length === 0 && validPendingNetworks.length > 0) {
         return validPendingNetworks.map(({ network }) => network);
@@ -115,19 +115,18 @@ function Content({ address }: { address: string }) {
                   radius='md'
                   variant='bordered'
                   color='default'
-                  className='border-divider-300'
+                  className='border-divider-300 h-8'
                   startContent={<Avatar src={validPendingNetworks[0].chain.icon} className='w-4 h-4 bg-transparent' />}
                   endContent={<ArrowDown className='w-4 h-4' />}
                 >
                   {validPendingNetworks[0].chain.name} and other {validPendingNetworks.length - 1}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className='w-[200px]'>
+              <PopoverContent className='w-[200px] rounded-medium p-1'>
                 <Listbox
                   disallowEmptySelection
                   selectedKeys={selectedPendingNetworks}
                   selectionMode='multiple'
-                  className=''
                   variant='flat'
                   onSelectionChange={(keys) =>
                     keys === 'all'
@@ -140,12 +139,12 @@ function Content({ address }: { address: string }) {
                     <ListboxItem
                       key={network}
                       startContent={<Avatar src={chain.icon} className='w-4 h-4 bg-transparent' />}
+                      className='h-8 data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground'
                       classNames={{
                         selectedIcon: 'w-auto h-auto'
                       }}
                       selectedIcon={(props) => (
                         <Checkbox
-                          classNames={{ wrapper: 'mr-0' }}
                           className='p-0'
                           size='sm'
                           isSelected={props.isSelected}
@@ -173,11 +172,10 @@ function Content({ address }: { address: string }) {
               radius='md'
               variant='bordered'
               color='default'
-              className='border-divider-300'
+              className='border-divider-300 h-8'
               startContent={<Avatar src={validPendingNetworks[0].chain.icon} className='w-4 h-4 bg-transparent' />}
             >
-              {validPendingNetworks[0].chain.name}
-              {validPendingNetworks[0].counts}
+              {validPendingNetworks[0].chain.name}({validPendingNetworks[0].counts})
             </Button>
           ))}
         {type === 'history' &&
@@ -189,19 +187,18 @@ function Content({ address }: { address: string }) {
                   radius='md'
                   variant='bordered'
                   color='default'
-                  className='border-divider-300'
+                  className='border-divider-300 h-8'
                   startContent={<Avatar src={validHistoryNetworks[0].chain.icon} className='w-4 h-4 bg-transparent' />}
                   endContent={<ArrowDown className='w-4 h-4' />}
                 >
-                  {validHistoryNetworks[0].chain.name} and other {validHistoryNetworks.length - 1}
+                  {validHistoryNetworks[0].chain.name}({validHistoryNetworks[0].counts})
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className='w-[200px]'>
+              <PopoverContent className='w-[200px] rounded-medium p-1'>
                 <Listbox
                   disallowEmptySelection
                   selectedKeys={selectedHistoryNetworks}
                   selectionMode={'single'}
-                  className=''
                   variant='flat'
                   onSelectionChange={(keys) =>
                     keys === 'all'
@@ -213,6 +210,7 @@ function Content({ address }: { address: string }) {
                   {validHistoryNetworks.map(({ network, chain, counts }) => (
                     <ListboxItem
                       key={network}
+                      className='h-8 data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground'
                       startContent={<Avatar src={chain.icon} className='w-4 h-4 bg-transparent' />}
                     >
                       {chain.name}({counts})
@@ -226,11 +224,10 @@ function Content({ address }: { address: string }) {
               radius='md'
               variant='bordered'
               color='default'
-              className='border-divider-300'
+              className='border-divider-300 h-8'
               startContent={<Avatar src={validHistoryNetworks[0].chain.icon} className='w-4 h-4 bg-transparent' />}
             >
-              {validHistoryNetworks[0].chain.name}
-              {validHistoryNetworks[0].counts}
+              {validHistoryNetworks[0].chain.name}({validHistoryNetworks[0].counts})
             </Button>
           ))}
       </div>

@@ -11,12 +11,11 @@ import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
-import { Divider, IconButton, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Checkbox } from '@mimir-wallet/ui';
+import { Alert, Button, Checkbox, Divider } from '@mimir-wallet/ui';
 
 import Input from '../Input';
 import { useBuildTx } from './hooks/useBuildTx';
@@ -105,41 +104,22 @@ function TxSubmit({
   return (
     <div className='w-full p-4 sm:p-5'>
       <div className='flex items-center justify-between mb-5'>
-        <Typography variant='h4'>Submit Transaction</Typography>
-        <IconButton
-          color='inherit'
-          onClick={() => {
+        <h4>Submit Transaction</h4>
+        <Button
+          isIconOnly
+          variant='light'
+          color='default'
+          onPress={() => {
             onClose?.();
             onReject?.();
           }}
         >
-          <SvgIcon component={IconClose} inheritViewBox />
-        </IconButton>
+          <IconClose className='w-4 h-4' />
+        </Button>
       </div>
 
-      <Paper
-        sx={({ shadows }) => ({
-          width: '100%',
-          height: { md: 'calc(100dvh - 160px)', xs: 'auto' },
-          display: 'flex',
-          flexDirection: { md: 'row', xs: 'column' },
-          padding: { md: 2, xs: 0 },
-          gap: 2,
-          overflowY: 'auto',
-          bgcolor: { md: 'background.paper', xs: 'transparent' },
-          boxShadow: { md: shadows[1], xs: shadows[0] }
-        })}
-      >
-        <Stack
-          width={{ md: '60%', xs: '100%' }}
-          spacing={2}
-          sx={({ shadows }) => ({
-            padding: { md: 0, xs: 1.5 },
-            boxShadow: { md: shadows[0], xs: shadows[1] },
-            bgcolor: { md: 'transparent', xs: 'background.paper' },
-            borderRadius: 2
-          })}
-        >
+      <div className='w-full h-[calc(100dvh-160px)] p-0 md:p-5 flex flex-col md:flex-row gap-5 overflow-y-auto bg-transparent md:bg-content1 rounded-large shadow-none md:shadow-medium'>
+        <div className='w-full md:w-[60%] p-4 md:p-0 space-y-5 shadow-medium md:shadow-none bg-content1 md:bg-transparent rounded-large'>
           <Sender address={accountData.address} />
 
           <AppInfo
@@ -157,7 +137,7 @@ function TxSubmit({
             txError={buildTx.error}
             safetyCheck={safetyCheck}
           />
-        </Stack>
+        </div>
 
         <div className='sticky top-0 self-start w-full md:w-[40%] h-auto p-4 sm:p-5 shadow-medium rounded-large bg-content1 space-y-5'>
           {hasPermission && filterPaths.length > 0 && (
@@ -255,7 +235,7 @@ function TxSubmit({
             <Alert color='danger' title={`This account doesn’t exist on ${chain.name}`} />
           ) : null}
         </div>
-      </Paper>
+      </div>
     </div>
   );
 }

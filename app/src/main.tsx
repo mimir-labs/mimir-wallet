@@ -16,7 +16,7 @@ import { API_CLIENT_GATEWAY, initService } from '@mimir-wallet/service';
 import { initializeAccount } from './accounts/initialize';
 import { initializeWallet } from './wallet/initialize';
 import App from './App';
-import { initGa } from './initGa';
+import { initGa } from './ga';
 import { initMimir } from './initMimir';
 import { initializeSocket } from './socket';
 import { upgradeAddresBook } from './upgrade';
@@ -27,9 +27,11 @@ moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
 // Create React root container for application mounting
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
+const isOmni = useNetworks.getState().mode === 'omni';
+
 // Initialize core Mimir wallet configuration and get initial chain and address settings
 // This sets up the basic configuration needed for the wallet to function
-const { chain, address } = initMimir(useNetworks.getState().mode === 'omni');
+const { chain, address } = initMimir(isOmni);
 
 initService(API_CLIENT_GATEWAY);
 

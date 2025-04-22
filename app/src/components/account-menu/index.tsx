@@ -11,7 +11,7 @@ import IconGlobal from '@/assets/svg/icon-global.svg?react';
 import IconUnion from '@/assets/svg/icon-union.svg?react';
 import IconUser from '@/assets/svg/icon-user.svg?react';
 import IconWatch from '@/assets/svg/icon-watch.svg?react';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -44,8 +44,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   const [searchAccount, setSearchAccount] = useState<AccountData>();
 
   const [grouped, setGrouped] = useState<Record<GroupName, string[]>>(groupAccounts(accounts, hideAccountHex, metas));
-  const { breakpoints } = useTheme();
-  const downMd = useMediaQuery(breakpoints.down('md'));
+  const upMd = useMediaQuery('md');
 
   useEffect(() => {
     if (!keywords) {
@@ -93,8 +92,8 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
   return (
     <Drawer
-      hideCloseButton={!downMd}
-      radius={downMd ? 'lg' : 'none'}
+      hideCloseButton={upMd}
+      radius={!upMd ? 'lg' : 'none'}
       onClose={onClose}
       isOpen={open}
       placement={anchor}
@@ -201,24 +200,6 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
                 value={address}
               />
             ))}
-
-            {grouped.hide.length > 0 && (
-              <>
-                <Divider />
-
-                <div className='flex items-center gap-1'>Hidden Accounts</div>
-
-                {grouped.hide.map((account) => (
-                  <AccountCell
-                    isHide
-                    key={`hide-account-${account}`}
-                    onClose={onClose}
-                    onSelect={onSelect}
-                    value={account}
-                  />
-                ))}
-              </>
-            )}
           </div>
         </DrawerBody>
 

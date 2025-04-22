@@ -57,7 +57,12 @@ function AddressCell({
       <IdentityIcon className='AddressCell-Icon' size={iconSize} value={address} />
       <div className='AddressCell-Content space-y-[2px]'>
         <div className='flex items-center gap-1'>
-          <span className='AddressCell-Name inline-flex max-w-[100px] overflow-hidden text-ellipsis whitespace-nowrap font-bold'>
+          <span
+            className='AddressCell-Name inline-flex overflow-hidden text-ellipsis whitespace-nowrap font-bold'
+            style={{
+              maxWidth: shorten ? 100 : 260
+            }}
+          >
             <AddressName defaultName={defaultName} value={value} />
           </span>
           {namePost}

@@ -62,7 +62,6 @@ function Content({
         defaultCallData={viewTemplate}
         defaultName={viewTemplateName}
         onBack={() => setIsView(false)}
-        setNetwork={setNetwork}
       />
     );
 

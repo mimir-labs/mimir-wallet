@@ -102,7 +102,7 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
   }
 }
 
-export type GroupName = 'mimir' | 'injected' | 'hide';
+export type GroupName = 'mimir' | 'injected';
 
 export function groupAccounts(
   accounts: AccountData[],
@@ -111,8 +111,7 @@ export function groupAccounts(
 ): Record<GroupName, string[]> {
   const ret: Record<GroupName, string[]> = {
     mimir: [],
-    injected: [],
-    hide: []
+    injected: []
   };
 
   for (let i = 0; i < accounts.length; i++) {
@@ -122,9 +121,7 @@ export function groupAccounts(
 
     if (metas[addressHex]?.isInjected) {
       ret.injected.push(account.address);
-    } else if (hideAccountHex.includes(u8aToHex(decodeAddress(account.address)))) {
-      ret.hide.push(account.address);
-    } else {
+    } else if (!hideAccountHex.includes(u8aToHex(decodeAddress(account.address)))) {
       ret.mimir.push(account.address);
     }
   }

@@ -8,10 +8,10 @@ import IconArrowLeft from '@/assets/svg/icon-arrow-left.svg?react';
 import { Input, InputNetwork } from '@/components';
 import JsonView from '@/components/JsonView';
 import { useInput } from '@/hooks/useInput';
-import { Box, Button, Divider, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Divider } from '@mimir-wallet/ui';
 
 import DotConsoleButton from '../call-data-view/DotConsoleButton';
 import DotConsoleLink from '../call-data-view/DotConsoleLink';
@@ -29,7 +29,7 @@ function AddTemplate({
   defaultCallData?: HexString;
   defaultName?: string;
   onBack: () => void;
-  setNetwork: (network: string) => void;
+  setNetwork?: (network: string) => void;
 }) {
   const { network, api } = useApi();
   const { addTemplate } = useSavedTemplate(network);
@@ -55,15 +55,15 @@ function AddTemplate({
   };
 
   return (
-    <Stack spacing={2}>
-      <Box display='flex' gap={0.5} alignItems='center'>
-        <IconButton color='inherit' onClick={onBack}>
-          <SvgIcon inheritViewBox component={IconArrowLeft} />
-        </IconButton>
-        <Typography variant='h4'>{isView ? 'View Template' : 'Add New Template'}</Typography>
-      </Box>
+    <div className='space-y-5'>
+      <div className='flex items-center gap-1'>
+        <Button isIconOnly color='primary' variant='light' onPress={onBack}>
+          <IconArrowLeft />
+        </Button>
+        <h4>{isView ? 'View Template' : 'Add New Template'}</h4>
+      </div>
 
-      <InputNetwork network={network} setNetwork={setNetwork} />
+      {setNetwork && <InputNetwork network={network} setNetwork={setNetwork} />}
 
       <Divider />
 
@@ -74,10 +74,10 @@ function AddTemplate({
         placeholder='0x...'
         helper={
           isView ? null : (
-            <Box color='text.primary'>
+            <div className='text-primary'>
               You can edit it in the <DotConsoleLink network={network} /> and then click Import or directly paste the
               Encoded Call Data.
-            </Box>
+            </div>
           )
         }
         value={callData}
@@ -85,34 +85,33 @@ function AddTemplate({
       />
 
       {callDataError && (
-        <Box
-          sx={{
-            bgcolor: 'secondary.main',
-            padding: 1,
-            borderRadius: 1,
-            wordBreak: 'break-all'
-          }}
-        >
-          <Typography fontFamily='Geist Mono' color='error' fontSize='0.75rem'>
+        <div className='bg-secondary p-2.5 rounded-medium break-all'>
+          <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-tiny'>
             {callDataError.message}
-          </Typography>
-        </Box>
+          </p>
+        </div>
       )}
 
       {parsedCallData && (
-        <Box sx={{ borderRadius: 1, bgcolor: 'secondary.main', padding: 1 }}>
+        <div className='rounded-medium bg-secondary p-2.5'>
           <JsonView data={parsedCallData.toHuman()} collapseStringsAfterLength={20} />
-        </Box>
+        </div>
       )}
 
       {isView ? (
         <DotConsoleButton call={callData} network={network} />
       ) : (
-        <Button variant='contained' color='primary' disabled={!(name && callData) || !!callDataError} onClick={onAdd}>
+        <Button
+          fullWidth
+          variant='solid'
+          color='primary'
+          isDisabled={!(name && callData) || !!callDataError}
+          onPress={onAdd}
+        >
           Add
         </Button>
       )}
-    </Stack>
+    </div>
   );
 }
 

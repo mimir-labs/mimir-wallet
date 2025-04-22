@@ -115,7 +115,6 @@ const ModalContent = (props: ModalContentProps) => {
 
   const content = (
     <Component {...contentProps} onKeyDown={chain(contentProps.onKeyDown, onKeyDown)} ref={ref}>
-      <DismissButton onDismiss={onClose} />
       {!hideCloseButton && closeButtonContent}
       {typeof children === 'function' ? children(onClose) : children}
       <DismissButton onDismiss={onClose} />

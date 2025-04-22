@@ -12,6 +12,7 @@ import { type Endpoint, useApi, useNetworks } from '@mimir-wallet/polkadot-core'
 import { Avatar, FreeSoloPopover, Listbox, ListboxItem, Spinner } from '@mimir-wallet/ui';
 
 interface Props {
+  isIconOnly?: boolean;
   radius?: 'sm' | 'md' | 'lg' | 'full' | 'none';
   disabled?: boolean;
   className?: string;
@@ -25,6 +26,7 @@ interface Props {
 }
 
 function OmniChainInputNetwork({
+  isIconOnly,
   radius = 'md',
   disabled,
   className,
@@ -63,7 +65,7 @@ function OmniChainInputNetwork({
   const element = chain ? (
     <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
       <Avatar alt={chain.name} src={chain.icon} style={{ width: 20, height: 20, background: 'transparent' }}></Avatar>
-      {isOpen ? null : <p>{chain.name}</p>}
+      {isIconOnly || isOpen ? null : <p>{chain.name}</p>}
     </div>
   ) : null;
 
@@ -76,6 +78,7 @@ function OmniChainInputNetwork({
       triggerRef={wrapperRef}
       placement='bottom-start'
       style={{ minWidth: wrapperRef.current?.clientWidth }}
+      classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <Listbox color='secondary' emptyContent='no networks' className='max-h-[250px] overflow-y-auto text-foreground'>
         {options.map(({ network, chain, isApiReady }) => (
@@ -121,7 +124,7 @@ function OmniChainInputNetwork({
         <div
           ref={wrapperRef}
           className={twMerge([
-            'group relative w-full inline-flex tap-highlight-transparent px-2 min-h-11 h-11 flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none py-2 shadow-none border-1 border-default-200 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent',
+            'group relative w-full inline-flex tap-highlight-transparent px-2 min-h-11 h-11 flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none py-2 shadow-none border-1 border-divider-300 hover:border-primary hover:bg-primary-50',
             radius === 'full'
               ? 'rounded-full'
               : radius === 'lg'
@@ -135,17 +138,28 @@ function OmniChainInputNetwork({
           ])}
         >
           {element}
-          <input
-            ref={inputRef}
-            className='absolute top-0 right-0 bottom-0 left-0 outline-none border-none pl-9 bg-transparent'
-            style={{ opacity: !isOpen ? 0 : 1 }}
-            value={inputValue}
-            placeholder={placeholder}
-            onChange={setInputValue}
+          {isIconOnly ? (
+            <div
+              className='cursor-pointer absolute top-0 right-0 bottom-0 left-0 outline-none border-none pl-9 bg-transparent'
+              onClick={handleOpen}
+            />
+          ) : (
+            <input
+              ref={inputRef}
+              className='absolute top-0 right-0 bottom-0 left-0 outline-none border-none pl-9 bg-transparent'
+              style={{ opacity: !isOpen ? 0 : 1 }}
+              value={inputValue}
+              placeholder={placeholder}
+              onChange={setInputValue}
+              onClick={handleOpen}
+            />
+          )}
+
+          <ArrowDown
+            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2'
+            style={{ color: 'inherit' }}
             onClick={handleOpen}
           />
-
-          <ArrowDown className='absolute right-2.5 top-1/2 -translate-y-1/2' style={{ color: 'inherit' }} />
         </div>
 
         {helper && <div className='text-tiny text-foreground/50'>{helper}</div>}

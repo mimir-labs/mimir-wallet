@@ -4,7 +4,7 @@
 import { useAccount } from '@/accounts/useAccount';
 import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
 import { isAddress } from '@polkadot/util-crypto';
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { addressEq, decodeAddress, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
@@ -30,7 +30,7 @@ function Content({
   const [info] = useDeriveAccountInfo(address);
   const { display, displayParent } = info || {};
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (display) {
       setName(`${displayParent || display}${displayParent ? `/${display}` : ''}`);
     }

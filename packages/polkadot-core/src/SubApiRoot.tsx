@@ -22,7 +22,7 @@ function OmniApiRoot({
   Fallback?: Fallback;
   children: React.ReactNode;
 }) {
-  const { allApis, chainSS58, ss58Chain, setSs58Chain } = useContext(ApiContext);
+  const { allApis, chainSS58, ss58Chain, setSs58Chain, setNetwork } = useContext(ApiContext);
 
   const supportedApis = useMemo(() => {
     return supportedNetworks
@@ -54,7 +54,8 @@ function OmniApiRoot({
         ss58Chain,
         setSs58Chain,
         allApis: supportedApis,
-        network: networkValues.network
+        network: networkValues.network,
+        setNetwork: setNetwork
       }}
     >
       {Fallback && !networkValues.isApiReady ? <Fallback apiState={networkValues} /> : children}

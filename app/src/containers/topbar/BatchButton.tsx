@@ -6,12 +6,12 @@ import Batch from '@/apps/batch';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
-import { Badge, Popover } from '@mui/material';
+import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useRef } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Drawer, DrawerBody, DrawerContent, Tooltip } from '@mimir-wallet/ui';
+import { Badge, Button, Drawer, DrawerBody, DrawerContent, FreeSoloPopover, Tooltip } from '@mimir-wallet/ui';
 
 function BatchButton() {
   const { network } = useApi();
@@ -19,6 +19,7 @@ function BatchButton() {
   const [txs] = useBatchTxs(network, current);
   const [isOpen, toggleOpen] = useToggle(false);
   const [isDrawerOpen, toggleDrawerOpen] = useToggle(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const anchorEl = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -35,26 +36,35 @@ function BatchButton() {
     };
   }, [toggleOpen]);
 
+  const popoverContent = isOpen ? (
+    <FreeSoloPopover
+      isOpen
+      disableDialogFocus
+      onClose={() => toggleOpen(false)}
+      ref={popoverRef}
+      triggerRef={anchorEl}
+      placement='bottom-start'
+      classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
+    >
+      <div className='flex items-center gap-2.5 p-5'>
+        <IconBatch className='w-[32px] h-[32px] text-primary' />
+        <span>New transaction has been added to Batch</span>
+      </div>
+    </FreeSoloPopover>
+  ) : null;
+
   return (
     <>
       <Badge
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
-        }}
-        badgeContent={txs.length}
+        size='sm'
+        placement='bottom-right'
+        content={txs.length}
+        shape='circle'
         color='primary'
-        max={9}
-        sx={{
-          '.MuiBadge-badge': {
-            pointerEvents: 'none',
-            fontSize: 10,
-            minWidth: 14,
-            width: 14,
-            height: 14,
-            borderRadius: '8px',
-            transform: 'scale(1) translate(0%, 0%)'
-          }
+        classNames={{
+          badge: 'bottom-0 right-0 translate-x-0 -translate-y-0 pointer-events-none'.concat(
+            txs.length ? ' opacity-100' : ' opacity-0'
+          )
         }}
       >
         <Tooltip content='Batch' closeDelay={0}>
@@ -72,24 +82,7 @@ function BatchButton() {
         </Tooltip>
       </Badge>
 
-      <Popover
-        open={isOpen}
-        onClose={() => toggleOpen(false)}
-        anchorEl={anchorEl.current}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center'
-        }}
-      >
-        <div className='flex items-center gap-2.5 p-5'>
-          <IconBatch className='w-[32px] h-[32px]' />
-          <span>New transaction has been added to Batch</span>
-        </div>
-      </Popover>
+      <AnimatePresence>{popoverContent}</AnimatePresence>
 
       <Drawer
         hideCloseButton

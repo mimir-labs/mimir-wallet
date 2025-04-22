@@ -1,38 +1,51 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 
 export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: string[]) {
-  const { network: currentNetwork, allApis } = useApi();
-  const { enableNetwork } = useNetworks();
-  const [network, setNetwork] = useState(supportedNetworks?.at(0) || defaultNetwork || currentNetwork);
+  const { allApis, network: rootNetwork, setNetwork: setRootNetwork } = useApi();
+  const { enableNetwork, mode } = useNetworks();
+  const [network, setNetwork] = useState(supportedNetworks?.at(0) || defaultNetwork || rootNetwork);
 
   const allApisRef = useRef(allApis);
 
   allApisRef.current = allApis;
 
-  useLayoutEffect(() => {
-    if (!supportedNetworks || supportedNetworks.length === 0) {
-      if (!allApisRef.current[network]) {
-        setNetwork(currentNetwork);
-      }
-    } else {
-      if (!supportedNetworks.includes(network)) {
-        const network = supportedNetworks[0];
+  useEffect(() => {
+    if (mode === 'omni') {
+      if (!supportedNetworks || supportedNetworks.length === 0) {
+        if (!allApisRef.current[network]) {
+          setNetwork(rootNetwork);
+        }
+      } else {
+        if (!supportedNetworks.includes(network)) {
+          const network = supportedNetworks[0];
 
-        setNetwork(network);
+          setNetwork(network);
+        }
       }
     }
-  }, [currentNetwork, network, supportedNetworks]);
+  }, [network, supportedNetworks, mode, rootNetwork]);
 
   useEffect(() => {
-    if (!allApisRef.current[network]) {
+    if (mode === 'omni' && !allApisRef.current[network]) {
       enableNetwork(network);
     }
-  }, [network, enableNetwork]);
+  }, [network, enableNetwork, mode]);
 
-  return [network, setNetwork] as const;
+  return [
+    network,
+    useCallback(
+      (network: string) => {
+        if (mode === 'omni') {
+          setNetwork(network);
+          setRootNetwork(network);
+        }
+      },
+      [mode, setRootNetwork]
+    )
+  ] as const;
 }

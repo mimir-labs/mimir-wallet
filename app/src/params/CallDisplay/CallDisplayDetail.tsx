@@ -6,10 +6,10 @@ import type { IMethod, Registry } from '@polkadot/types/types';
 import { AddressRow, FormatBalance } from '@/components';
 import { findAssets, findToken } from '@/config';
 import { dataToUtf8 } from '@/utils';
-import { Avatar, Box, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { Avatar } from '@mimir-wallet/ui';
 
 function CallDisplayDetail({
   registry,
@@ -37,55 +37,55 @@ function CallDisplayDetail({
     const token = findToken(genesisHash);
 
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Avatar alt='Token' src={token.Icon} sx={{ width: 20, height: 20, borderRadius: '50%' }}>
+      <div className='flex items-center gap-1'>
+        <Avatar alt='Token' src={token.Icon} style={{ width: 20, height: 20, background: 'transparent' }}>
           T
         </Avatar>
 
-        <Typography>
+        <p>
           -<FormatBalance value={call.args[1].toString()} />
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   } else if (
     ['assets.transfer', 'assets.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
   ) {
-    const asset = findAssets(network).find((asset) => asset.assetId === call.args[0].toString());
+    const asset = findAssets(network).find((asset) => asset.assetId === call.args[0].toHex());
 
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20, borderRadius: '50%' }}>
+      <div className='flex items-center gap-1'>
+        <Avatar alt='Token' src={asset?.Icon} style={{ width: 20, height: 20, background: 'transparent' }}>
           T
         </Avatar>
-        <Typography>
-          -<FormatBalance value={call.args[2].toString()} assetId={call.args[0].toString()} />
-        </Typography>
-      </Box>
+        <p>
+          -<FormatBalance value={call.args[2].toString()} assetId={call.args[0].toHex()} />
+        </p>
+      </div>
     );
   } else if (
     ['tokens.transfer', 'tokens.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
   ) {
-    const asset = findAssets(genesisHash).find((asset) => asset.assetId === call.args[1].toString());
+    const asset = findAssets(genesisHash).find((asset) => asset.assetId === call.args[1].toHex());
 
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Avatar alt='Token' src={asset?.Icon} sx={{ width: 20, height: 20, borderRadius: '50%' }}>
+      <div className='flex items-center gap-1'>
+        <Avatar alt='Token' src={asset?.Icon} style={{ width: 20, height: 20, background: 'transparent' }}>
           T
         </Avatar>
-        <Typography>
-          -<FormatBalance value={call.args[2].toString()} assetId={call.args[1].toString()} />
-        </Typography>
-      </Box>
+        <p>
+          -<FormatBalance value={call.args[2].toString()} assetId={call.args[1].toHex()} />
+        </p>
+      </div>
     );
   } else if (
     ['utility.batch', 'utility.forceBatch', 'utility.batchAll'].includes(
       `${calllFunction.section}.${calllFunction.method}`
     )
   ) {
-    comp = <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>{(call.args?.[0] as any)?.length} calls</Box>;
+    comp = <div className='flex items-center gap-1'>{(call.args?.[0] as any)?.length} calls</div>;
   } else if (['proxy.proxy', 'proxy.announce'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <div className='flex items-center gap-1'>
         <AddressRow
           shorten
           withName
@@ -94,11 +94,11 @@ function CallDisplayDetail({
           defaultName='Real'
           value={call.args[0].toString()}
         />
-      </Box>
+      </div>
     );
   } else if (['proxy.proxyAnnounced'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <div className='flex items-center gap-1'>
         <AddressRow
           shorten
           withName
@@ -107,11 +107,11 @@ function CallDisplayDetail({
           defaultName='Real'
           value={call.args[1].toString()}
         />
-      </Box>
+      </div>
     );
   } else if (['proxy.addProxy', 'proxy.removeProxy'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
     comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <div className='flex items-center gap-1'>
         <AddressRow
           shorten
           withName
@@ -120,16 +120,12 @@ function CallDisplayDetail({
           defaultName='Proxy'
           value={call.args[0].toString()}
         />
-      </Box>
+      </div>
     );
   } else if (['proxy.removeProxies'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
-    comp = <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>Remove Proxies</Box>;
+    comp = <div className='flex items-center gap-1'>Remove Proxies</div>;
   } else if (['identity.setIdentity'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
-    comp = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 'bold' }}>
-        {dataToUtf8((call.args?.[0] as any)?.display)}
-      </Box>
-    );
+    comp = <div className='flex items-center gap-1 font-bold'>{dataToUtf8((call.args?.[0] as any)?.display)}</div>;
   } else {
     return fallbackWithName ? `${calllFunction.section}.${calllFunction.method}` : null;
   }

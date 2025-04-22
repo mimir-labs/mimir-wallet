@@ -81,7 +81,7 @@ function InputToken({
   const element =
     !assets || assets.length === 0 ? (
       <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
-        <Spinner variant='gradient' size='sm' />
+        <Spinner size='sm' />
         {isIconOnly || isOpen ? null : <p className='text-foreground/50'>Fetching Assets...</p>}
       </div>
     ) : token ? (
@@ -115,6 +115,7 @@ function InputToken({
       triggerRef={wrapperRef}
       placement='bottom-start'
       style={{ width: wrapperRef.current?.clientWidth }}
+      classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <Listbox color='secondary' emptyContent='no networks' className='max-h-[250px] overflow-y-auto text-foreground'>
         {options.map(({ icon, name, symbol, assetId, transferrable, decimals }) => (
@@ -162,7 +163,7 @@ function InputToken({
         <div
           ref={wrapperRef}
           className={twMerge([
-            'group relative w-full inline-flex tap-highlight-transparent px-2 min-h-11 flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-11 py-2 shadow-none border-1 border-default-200 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent',
+            'group relative w-full inline-flex tap-highlight-transparent px-2 min-h-11 flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-11 py-2 shadow-none border-1 border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent',
             radius === 'full'
               ? 'rounded-full'
               : radius === 'lg'
@@ -185,7 +186,11 @@ function InputToken({
             onClick={handleOpen}
           />
 
-          <ArrowDown className='absolute right-2.5 top-1/2 -translate-y-1/2' style={{ color: 'inherit' }} />
+          <ArrowDown
+            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2'
+            style={{ color: 'inherit' }}
+            onClick={handleOpen}
+          />
         </div>
 
         {helper && <div className='text-tiny text-foreground/50'>{helper}</div>}

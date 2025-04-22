@@ -84,7 +84,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 
             {!isUnLock &&
               (isEnought === 'pending' ? (
-                <Spinner size='sm' variant='spinner' />
+                <Spinner size='sm' />
               ) : isEnought ? (
                 <IconSuccess className='text-success' />
               ) : (

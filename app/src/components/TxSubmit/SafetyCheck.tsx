@@ -8,38 +8,23 @@ import Logo from '@/assets/images/logo.png';
 import IconFailed from '@/assets/svg/icon-failed-fill.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success.svg?react';
-import { LoadingButton } from '@mui/lab';
-import { Box, Button, SvgIcon, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
 import { simulate, useApi } from '@mimir-wallet/polkadot-core';
-import { Spinner } from '@mimir-wallet/ui';
+import { Button, Spinner } from '@mimir-wallet/ui';
 
 function Cell({ title, children, img }: { img: React.ReactNode; title: React.ReactNode; children: React.ReactNode }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: 1,
-        bgcolor: 'secondary.main',
-        borderRadius: 1,
-        padding: 1,
-        marginTop: 0.8
-      }}
-    >
-      <Box sx={{ flex: '1' }}>
-        <Box sx={{ fontWeight: 700 }}>{title}</Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box component='span' sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-            Powered by
-          </Box>
+    <div className='flex justify-between items-center gap-2.5 bg-secondary rounded-medium p-2.5 mt-2'>
+      <div className='flex-1'>
+        <div className='font-bold'>{title}</div>
+        <div className='flex items-center gap-2.5'>
+          <span className='text-foreground/50 text-small'>Powered by</span>
           {img}
-        </Box>
-      </Box>
+        </div>
+      </div>
       {children}
-    </Box>
+    </div>
   );
 }
 
@@ -87,53 +72,46 @@ function SafetyCheck({
   };
 
   return (
-    <Box>
-      <Typography fontWeight={700}>Transaction Check</Typography>
+    <div>
+      <div className='font-bold'>Transaction Check</div>
       <Cell title='Simulation' img={<img src='/images/chopsticks.webp' alt='chopticks' className='h-[24px]' />}>
         {simulation.isDone ? (
-          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+          <div className='flex gap-1 items-center'>
             {simulation.success ? (
-              <SvgIcon color='success' component={IconSuccess} inheritViewBox />
+              <IconSuccess className='text-success w-4 h-4' />
             ) : (
-              <SvgIcon color='error' component={IconFailed} inheritViewBox />
+              <IconFailed className='text-danger w-4 h-4' />
             )}
 
-            <Box sx={{ position: 'relative' }}>
-              <Typography
-                sx={{
-                  fontWeight: 700,
-                  color: simulation.success ? 'success.main' : 'error.main'
-                }}
+            <div className='relative'>
+              <p
+                data-success={simulation.success}
+                data-error={simulation.error}
+                className='font-bold data-[success=true]:text-success data-[error]:text-danger'
               >
                 {simulation.success ? 'Success' : simulation.error || 'Unknown Error'}
-              </Typography>
+              </p>
 
               <Button
-                sx={{ position: 'absolute', top: '100%', right: 0, paddingX: 0, minWidth: 0 }}
-                variant='text'
-                onClick={() => {
+                className='absolute top-full right-0 p-0 min-w-0'
+                variant='light'
+                onPress={() => {
                   const newWindow = window.open();
 
                   newWindow?.document.open();
                   newWindow?.document.write(html);
                   newWindow?.document.close();
                 }}
-                size='small'
+                size='sm'
               >
                 Details
               </Button>
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : (
-          <LoadingButton
-            variant='outlined'
-            loading={simulation.isLoading}
-            onClick={handleSimulate}
-            startIcon={simulation.isLoading ? <Spinner size='sm' /> : null}
-            loadingPosition='start'
-          >
+          <Button variant='ghost' isLoading={simulation.isLoading} onPress={handleSimulate}>
             {simulation.isLoading ? '~30s' : 'Simulate'}
-          </LoadingButton>
+          </Button>
         )}
       </Cell>
 
@@ -142,23 +120,18 @@ function SafetyCheck({
           {!safetyCheck && <Spinner size='sm' />}
           {safetyCheck && (
             <>
-              {safetyCheck.severity === 'none' && <SvgIcon color='success' component={IconSuccess} inheritViewBox />}
-              {safetyCheck.severity === 'error' && <SvgIcon color='error' component={IconFailed} inheritViewBox />}
-              {safetyCheck.severity === 'warning' && <SvgIcon color='warning' component={IconInfo} inheritViewBox />}
+              {safetyCheck.severity === 'none' && <IconSuccess className='text-success w-4 h-4' />}
+              {safetyCheck.severity === 'error' && <IconFailed className='text-danger w-4 h-4' />}
+              {safetyCheck.severity === 'warning' && <IconInfo className='text-warning w-4 h-4' />}
 
-              <Typography
-                sx={{
-                  fontWeight: 700,
-                  color:
-                    safetyCheck.severity === 'none'
-                      ? 'success.main'
-                      : safetyCheck.severity === 'error'
-                        ? 'error.main'
-                        : 'warning.main'
-                }}
+              <p
+                data-success={safetyCheck.severity === 'none'}
+                data-error={safetyCheck.severity === 'error'}
+                data-warning={safetyCheck.severity === 'warning'}
+                className='font-bold data-[success=true]:text-success data-[error]:text-danger data-[warning]:text-warning'
               >
                 {safetyCheck?.message}
-              </Typography>
+              </p>
             </>
           )}
         </Cell>
@@ -168,23 +141,22 @@ function SafetyCheck({
         {!isTxBundleLoading && (
           <>
             {!txError ? (
-              <SvgIcon color='success' component={IconSuccess} inheritViewBox />
+              <IconSuccess className='text-success w-4 h-4' />
             ) : (
-              <SvgIcon color='error' component={IconFailed} inheritViewBox />
+              <IconFailed className='text-danger w-4 h-4' />
             )}
 
-            <Typography
-              sx={{
-                fontWeight: 700,
-                color: !txError ? 'success.main' : 'error.main'
-              }}
+            <p
+              data-success={!txError}
+              data-error={!!txError}
+              className='font-bold data-[success=true]:text-success data-[error=true]:text-danger'
             >
               {!txError ? 'Permission Granted' : 'Perimission Denied'}
-            </Typography>
+            </p>
           </>
         )}
       </Cell>
-    </Box>
+    </div>
   );
 }
 

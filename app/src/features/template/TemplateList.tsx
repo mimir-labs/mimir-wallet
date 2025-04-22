@@ -7,10 +7,9 @@ import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Empty, InputNetwork } from '@/components';
-import { Box, Divider, Stack, Typography } from '@mui/material';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import TemplateItem from './TemplateItem';
 import { useSavedTemplate } from './useSavedTemplate';
@@ -30,30 +29,32 @@ function TemplateList({
   const { template, removeTemplate, editTemplateName } = useSavedTemplate(network);
 
   return (
-    <Stack spacing={2} height='100%'>
-      <Box display='flex' gap={0.5} alignItems='center'>
-        <Typography variant='h4'>Call Template</Typography>
+    <div className='space-y-5 h-full'>
+      <div className='flex gap-1 items-center'>
+        <h4>Call Template</h4>
         <Tooltip
           content='Save frequently used on-chain operation templates for repeated use in the future.'
           closeDelay={0}
         >
           <IconQuestion />
         </Tooltip>
-        <Box sx={{ flex: 1 }} />
+
+        <div className='flex-1' />
+
         <Button variant='ghost' color='primary' endContent={<IconAdd className='w-4 h-4' />} onPress={onAdd}>
           Add
         </Button>
         <Button isIconOnly color='primary' variant='ghost' onPress={onClose}>
           <IconClose />
         </Button>
-      </Box>
+      </div>
 
       <InputNetwork network={network} setNetwork={setNetwork} />
 
       <Divider />
 
-      <Stack spacing={1} height='100%' overflow='auto' className='scrollbar-hide'>
-        <Typography>Saved</Typography>
+      <div className='space-y-2.5 h-full overflow-auto scrollbar-hide'>
+        <p>Saved</p>
         {template.length > 0 ? (
           template.map(({ name, call }, index) => (
             <TemplateItem
@@ -68,29 +69,8 @@ function TemplateList({
         ) : (
           <Empty height={300} label='No saved template' />
         )}
-      </Stack>
-
-      {/* <Divider />
-
-      <Stack spacing={1} height='calc((100% - 100px) * 0.4)' overflow='auto' className='scrollbar-hide'>
-        <Box display='flex' gap={0.5} alignItems='center' justifyContent='space-between'>
-          <Typography>Suggestions</Typography>
-          <Typography fontSize='0.75rem' color='textSecondary'>
-            Check parameter before submit transactions.
-          </Typography>
-        </Box>
-
-        {template.length > 0 ? (
-          template.map((t) => (
-            <Box key={t.name}>
-              <Typography>{t.name}</Typography>
-            </Box>
-          ))
-        ) : (
-          <Empty height='100%' label='No saved template' />
-        )}
-      </Stack> */}
-    </Stack>
+      </div>
+    </div>
   );
 }
 

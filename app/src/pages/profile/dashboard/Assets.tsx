@@ -7,6 +7,7 @@ import type { SortDescriptor } from '@react-types/shared';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
 import { useAssetBalancesAll } from '@/hooks/useBalances';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo, useState } from 'react';
 
@@ -33,6 +34,7 @@ function Assets({ address }: { address: string }) {
     column: 'balanceUsd',
     direction: 'descending'
   });
+  const upSm = useMediaQuery('sm');
 
   const [list, done] = useMemo(() => {
     const _list: AccountAssetInfo[] = [];
@@ -103,7 +105,7 @@ function Assets({ address }: { address: string }) {
   return (
     <Table
       classNames={{
-        wrapper: 'p-0 sm:p-3',
+        wrapper: 'rounded-medium sm:rounded-large p-0 sm:p-3',
         th: 'bg-transparent text-tiny px-2',
         td: 'text-small px-2',
         loadingWrapper: 'relative h-10 table-cell px-2'
@@ -126,7 +128,7 @@ function Assets({ address }: { address: string }) {
           Amount
         </TableColumn>
         <TableColumn className='sticky right-0 sm:relative bg-content1' align='end'>
-          Operation
+          <span className='hidden sm:inline'>Operation</span>
         </TableColumn>
       </TableHeader>
 
@@ -136,11 +138,7 @@ function Assets({ address }: { address: string }) {
         loadingContent={
           <>
             <Skeleton disableAnimation className='h-10 w-full rounded-md' />
-            <Spinner
-              size='sm'
-              variant='simple'
-              className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
-            />
+            <Spinner size='sm' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
           </>
         }
         emptyContent={done ? <Empty className='text-foreground' height='150px' label='No assets' /> : null}
@@ -187,9 +185,11 @@ function Assets({ address }: { address: string }) {
                     />
                   </div>
 
-                  {symbol}
+                  <div className='flex flex-col sm:flex-row items-start sm:items-center gap-0 sm:gap-1'>
+                    <span>{symbol}</span>
 
-                  {!isNative && <span className='text-xs text-gray-500'>{assetId}</span>}
+                    {!isNative && <small className='text-[10px] sm:text-tiny text-foreground/50'>{assetId}</small>}
+                  </div>
                 </div>
               </TableCell>
               <TableCell>{price}</TableCell>
@@ -236,12 +236,13 @@ function Assets({ address }: { address: string }) {
               <TableCell className='z-[1] sticky sm:relative right-0  bg-content1' align='right'>
                 <Button
                   as={Link}
-                  endContent={<IconSend />}
+                  isIconOnly={!upSm}
+                  endContent={upSm ? <IconSend /> : undefined}
                   href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
-                  variant='ghost'
-                  size='sm'
+                  variant={upSm ? 'ghost' : 'light'}
+                  size={upSm ? 'sm' : 'md'}
                 >
-                  Transfer
+                  {upSm ? 'Transfer' : <IconSend className='w-5 h-5' />}
                 </Button>
               </TableCell>
             </TableRow>
@@ -253,16 +254,3 @@ function Assets({ address }: { address: string }) {
 }
 
 export default React.memo(Assets);
-
-/* <TableRow key='loading-assetes' style={{ display: done ? 'none' : 'table-row' }}>
-          <TableCell colSpan={6} align='center'>
-            <div className='relative h-10'>
-              <Skeleton disableAnimation className='h-10 w-full rounded-md' />
-              <Spinner
-                size='sm'
-                variant='simple'
-                className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
-              />
-            </div>
-          </TableCell>
-        </TableRow> */

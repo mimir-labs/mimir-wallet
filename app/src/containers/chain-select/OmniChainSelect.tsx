@@ -31,15 +31,21 @@ function Status({ network }: { network: Network }) {
   }
 
   return (
-    <Badge
-      color={apiState.isApiReady ? 'success' : apiState.apiError ? 'danger' : 'warning'}
-      content=''
-      placement='bottom-right'
-      shape='circle'
-      size='sm'
+    <Tooltip
+      content={
+        apiState.isApiReady ? 'Connected' : apiState.apiError ? apiState.apiError || 'Connect Failed' : 'Connecting...'
+      }
     >
-      <Avatar src={network.icon} style={{ width: 32, height: 32, backgroundColor: 'transparent' }} />
-    </Badge>
+      <Badge
+        color={apiState.isApiReady ? 'success' : apiState.apiError ? 'danger' : 'warning'}
+        content=''
+        placement='bottom-right'
+        shape='circle'
+        size='sm'
+      >
+        <Avatar src={network.icon} style={{ width: 32, height: 32, backgroundColor: 'transparent' }} />
+      </Badge>
+    </Tooltip>
   );
 }
 
@@ -195,8 +201,8 @@ function OmniChainSelect() {
                               fill='none'
                             >
                               <path
-                                fill-rule='evenodd'
-                                clip-rule='evenodd'
+                                fillRule='evenodd'
+                                clipRule='evenodd'
                                 d='M2.73975 1C2.73975 1.55228 2.29203 2 1.73975 2C1.18746 2 0.739746 1.55228 0.739746 1C0.739746 0.447715 1.18746 0 1.73975 0C2.29203 0 2.73975 0.447715 2.73975 1ZM6.73975 1C6.73975 1.55228 6.29203 2 5.73975 2C5.18746 2 4.73975 1.55228 4.73975 1C4.73975 0.447715 5.18746 0 5.73975 0C6.29203 0 6.73975 0.447715 6.73975 1ZM9.73975 2C10.292 2 10.7397 1.55228 10.7397 1C10.7397 0.447715 10.292 0 9.73975 0C9.18746 0 8.73975 0.447715 8.73975 1C8.73975 1.55228 9.18746 2 9.73975 2Z'
                                 fill='white'
                               />

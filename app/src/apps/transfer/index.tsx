@@ -31,8 +31,8 @@ function PageTransfer() {
       network={network}
       supportedNetworks={supportedNetworks?.map((item) => item.key)}
       Fallback={({ apiState: { chain } }) => (
-        <div className='w-[500px] max-w-full mx-auto my-0 py-10 flex items-center justify-center bg-content1 rounded-large'>
-          <Spinner size='lg' variant='dots' label={`Connecting to the ${chain.name}...`} />
+        <div className='w-[500px] max-w-full mx-auto mt-16 py-10 flex items-center justify-center bg-content1 rounded-large'>
+          <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
         </div>
       )}
     >

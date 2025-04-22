@@ -3,16 +3,20 @@
 
 import type { ButtonProps, PressEvent } from '@heroui/button';
 
+import { Accordion, AccordionItem } from '@heroui/accordion';
 import { Autocomplete, AutocompleteItem } from '@heroui/autocomplete';
 import { Avatar, AvatarGroup } from '@heroui/avatar';
 import { Badge } from '@heroui/badge';
 import { Divider } from '@heroui/divider';
 import { CircularProgress } from '@heroui/progress';
 import { ScrollShadow } from '@heroui/scroll-shadow';
-import { Spinner } from '@heroui/spinner';
+import { Select, SelectItem } from '@heroui/select';
 import { HeroUIProvider } from '@heroui/system';
+import { usePress } from '@react-aria/interactions';
 
 export {
+  Accordion,
+  AccordionItem,
   Autocomplete,
   AutocompleteItem,
   Avatar,
@@ -21,8 +25,10 @@ export {
   HeroUIProvider,
   ScrollShadow,
   CircularProgress,
-  Spinner,
-  Divider
+  Divider,
+  Select,
+  SelectItem,
+  usePress
 };
 
 export { Button, ButtonGroup } from './button/index.js';
@@ -37,6 +43,7 @@ export { default as Link } from './link/index.js';
 export { Listbox, ListboxItem, ListboxSection } from './listbox/index.js';
 export { Popover, PopoverTrigger, PopoverContent, FreeSoloPopover } from './popover/index.js';
 export { default as Skeleton } from './skeleton/index.js';
+export { default as Spinner } from './spinner/index.js';
 export { Switch } from './switch/index.js';
 export { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from './table/index.js';
 export { Tabs, Tab } from './tabs/index.js';

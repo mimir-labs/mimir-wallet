@@ -3,24 +3,27 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
-import StatescanImg from '@/assets/images/statescan.svg';
-import SubscanImg from '@/assets/images/subscan.svg';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
+import IconLink from '@/assets/svg/icon-link.svg?react';
 import IconProxy from '@/assets/svg/icon-proxy-fill.svg?react';
 import IconQrcode from '@/assets/svg/icon-qr.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@/assets/svg/icon-set.svg?react';
 import { Address, AddressName, CopyAddress, Fund, IdentityIcon } from '@/components';
+import { toastSuccess } from '@/components/utils';
 import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
+import { useAddressExplorer } from '@/hooks/useAddressExplorer';
+import { useCopyAddress } from '@/hooks/useCopyAddress';
+import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { formatDisplay } from '@/utils';
 import { Avatar, Box, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Link, Tooltip } from '@mimir-wallet/ui';
 
 function SubsquareLink({ network, address }: { network: string; address: string }) {
@@ -44,13 +47,16 @@ function SubsquareLink({ network, address }: { network: string; address: string 
 }
 
 function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string | number; changes: number }) {
-  const { chain, network } = useApi();
+  const { network, chainSS58 } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [open, toggleOpen] = useToggle(false);
   const [account] = useQueryAccount(address);
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
   const { open: openQr } = useQrAddress();
+  const { open: openExplorer } = useAddressExplorer();
+  const { open: openCopy } = useCopyAddress();
+  const [, copy] = useCopyClipboard();
 
   const showWatchOnlyButton = useMemo(
     () => !(isLocalAccount(address) || isLocalAddress(address, true)),
@@ -162,9 +168,27 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
                 color: 'text.primary',
                 lineHeight: 1.1
               }}
+              onClick={() => {
+                copy(encodeAddress(address, chainSS58));
+                openCopy(address);
+                toastSuccess('Address copied');
+              }}
             >
               <Address value={address} shorten={downSm} />
               <CopyAddress address={address} color='primary' className='opacity-50' />
+              <Tooltip content='Explorer' closeDelay={0}>
+                <Button
+                  isIconOnly
+                  className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
+                  color='primary'
+                  variant='light'
+                  size='sm'
+                  onPress={() => openExplorer(address)}
+                >
+                  <IconLink className='w-4 h-4 opacity-50' />
+                </Button>
+              </Tooltip>
+
               <Button
                 isIconOnly
                 color='primary'
@@ -179,15 +203,6 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
               <span>Mimir Secured {days} Days</span>
-              <Tooltip content={chain.statescan ? 'Statescan' : 'Subscan'} closeDelay={0}>
-                <Link target='_blank' href={chainLinks.accountExplorerLink(chain, address)} rel='noreferrer'>
-                  <Avatar
-                    style={{ width: 16, height: 16 }}
-                    src={chain.statescan ? StatescanImg : SubscanImg}
-                    alt='subscan'
-                  />
-                </Link>
-              </Tooltip>
               <SubsquareLink network={network} address={address} />
             </Box>
 
@@ -235,7 +250,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
         {downSm && buttons}
       </Paper>
 
-      <Fund onClose={toggleOpen} open={open} receipt={address} defaultNetwork={network} />
+      <Fund onClose={toggleOpen} open={open} receipt={address} />
     </>
   );
 }

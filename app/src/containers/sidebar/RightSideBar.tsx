@@ -1,16 +1,15 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
-import { useMediaQuery, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { Drawer, DrawerBody, DrawerContent } from '@mimir-wallet/ui';
 
 function RightSideBar({ offsetTop = 0 }: { offsetTop?: number }) {
   const { rightSidebarOpen, closeRightSidebar, rightSidebarElement } = useMimirLayout();
-  const { breakpoints } = useTheme();
-  const downMd = useMediaQuery(breakpoints.down('md'));
+  const upMd = useMediaQuery('md');
   const [isOpen, setIsOpen] = useState(rightSidebarOpen);
   const [isOpenDelay, setIsOpenDelay] = useState(rightSidebarOpen);
 
@@ -30,7 +29,7 @@ function RightSideBar({ offsetTop = 0 }: { offsetTop?: number }) {
 
   return (
     <>
-      {downMd ? (
+      {!upMd ? (
         <Drawer
           size='xs'
           radius='none'

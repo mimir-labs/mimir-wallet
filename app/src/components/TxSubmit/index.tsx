@@ -28,7 +28,7 @@ function Content({ accountId, ...props }: TxSubmitProps) {
             </h6>
           </>
         ) : (
-          <Spinner size='lg' variant='dots' label={'Fetching account data...'} />
+          <Spinner size='lg' variant='wave' label={'Fetching account data...'} />
         )}
       </div>
     );

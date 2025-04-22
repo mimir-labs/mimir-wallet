@@ -6,7 +6,6 @@ import type { ProxyArgs } from './types';
 import { Address, AddressRow, TxButton } from '@/components';
 import { toastSuccess } from '@/components/utils';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { Box } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import { useAsyncFn, useToggle } from 'react-use';
 
@@ -50,21 +49,13 @@ function ConfirmDialog({
         <ModalBody className='gap-4'>
           <p>Indirect Controllers</p>
           {list.map((address) => (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: 1,
-                borderRadius: 1,
-                border: '1px solid',
-                borderColor: 'grey.300'
-              }}
+            <div
+              className='flex justify-between items-center p-2.5 rounded-medium border-1 border-divider-300'
               key={address}
             >
               <AddressRow withAddress={false} withName value={address} />
               <Address shorten value={address} />
-            </Box>
+            </div>
           ))}
         </ModalBody>
         <Divider />

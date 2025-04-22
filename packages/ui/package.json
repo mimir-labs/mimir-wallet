@@ -60,7 +60,6 @@
     "@heroui/drawer": "^2.2.14",
     "@heroui/dropdown": "^2.3.17",
     "@heroui/input": "^2.4.17",
-    "@heroui/link": "^2.2.14",
     "@heroui/listbox": "^2.3.16",
     "@heroui/modal": "^2.2.14",
     "@heroui/popover": "^2.3.17",
@@ -86,6 +85,9 @@
     "framer-motion": "^12.4.10"
   },
   "devDependencies": {
+    "@heroui/accordion": "^2.2.14",
+    "@heroui/select": "^2.4.17",
+    "@react-types/link": "^3.6.0",
     "npm-run-all2": "^7.0.2",
     "tailwind-variants": "^0.3.1",
     "tailwindcss": "^3.4.15",

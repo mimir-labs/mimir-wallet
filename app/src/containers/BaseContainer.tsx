@@ -14,6 +14,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useApi } from '@mimir-wallet/polkadot-core';
 
 import CopyAddressModal from './address/CopyAddressModal';
+import ExplorerAddressModal from './address/ExplorerAddressModal';
 import QrAddressModal from './address/QrAddressModal';
 import RightSideBar from './sidebar/RightSideBar';
 import SideBar from './sidebar/SideBar';
@@ -67,6 +68,7 @@ function BaseContainer({
           <ViewCallData />
           <CopyAddressModal />
           <QrAddressModal />
+          <ExplorerAddressModal />
         </>
       )}
 

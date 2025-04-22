@@ -6,10 +6,10 @@ import type { Call } from '@polkadot/types/interfaces';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { Input } from '@/components';
 import JsonView from '@/components/JsonView';
-import { Box, IconButton, Stack, SvgIcon, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
 
 import { decodeCallData } from './utils';
 
@@ -26,42 +26,35 @@ function CallDataViewer({ calldata, onClose }: { calldata: string; onClose: () =
   }, [api.registry, calldata]);
 
   return (
-    <Stack spacing={2}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant='h4'>Call Data Details</Typography>
-        <IconButton
-          sx={{ border: '1px solid', bordercolor: 'primary.main' }}
-          size='small'
-          color='primary'
-          onClick={onClose}
-        >
-          <SvgIcon component={IconClose} inheritViewBox />
-        </IconButton>
-      </Box>
+    <div className='space-y-5'>
+      <div className='flex items-center justify-between'>
+        <h4>Call Data Details</h4>
+        <Button isIconOnly color='primary' variant='ghost' onPress={onClose}>
+          <IconClose />
+        </Button>
+      </div>
 
       <Input label='Call Data' placeholder='0x...' disabled value={calldata} />
 
       {callDataError && (
-        <Box
-          sx={{
-            bgcolor: 'secondary.main',
-            padding: 1,
-            borderRadius: 1,
-            wordBreak: 'break-all'
-          }}
-        >
-          <Typography fontFamily='Geist Mono' color='error' fontSize='0.75rem'>
+        <div className='bg-secondary p-2.5 rounded-medium break-all'>
+          <div
+            style={{
+              fontFamily: 'Geist Mono'
+            }}
+            className='text-danger text-tiny'
+          >
             {callDataError.message}
-          </Typography>
-        </Box>
+          </div>
+        </div>
       )}
 
       {parsedCallData && (
-        <Box sx={{ borderRadius: 1, bgcolor: 'secondary.main', padding: 1 }}>
+        <div className='rounded-medium bg-secondary p-2.5'>
           <JsonView data={parsedCallData.toHuman()} collapseStringsAfterLength={20} />
-        </Box>
+        </div>
       )}
-    </Stack>
+    </div>
   );
 }
 

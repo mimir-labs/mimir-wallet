@@ -34,6 +34,7 @@ export const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     socketUrl: 'wss://polkadot-api.mimir.global/',
     explorerUrl: 'https://polkadot.subscan.io/',
+    statescanUrl: 'https://polkadot.statescan.io/',
     identityNetwork: 'people-polkadot'
   },
   {
@@ -58,6 +59,7 @@ export const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     socketUrl: 'wss://assethub-polkadot-api.mimir.global/',
     explorerUrl: 'https://assethub-polkadot.subscan.io/',
+    statescanUrl: 'https://assethub-polkadot.statescan.io/',
     identityNetwork: 'people-polkadot'
   },
   {
@@ -77,7 +79,8 @@ export const polkadotEndpoints: Endpoint[] = [
     genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
     ss58Format: 0,
     socketUrl: 'wss://people-polkadot-api.mimir.global/',
-    explorerUrl: 'https://people-polkadot.subscan.io/'
+    explorerUrl: 'https://people-polkadot.subscan.io/',
+    statescanUrl: 'https://people-polkadot.statescan.io/'
   },
   // {
   //   icon: '/chain-icons/bridgehub.svg',
@@ -104,6 +107,7 @@ export const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     socketUrl: 'wss://coretime-polkadot-api.mimir.global/',
     explorerUrl: 'https://coretime-polkadot.subscan.io/',
+    statescanUrl: 'https://coretime-polkadot.statescan.io/',
     identityNetwork: 'people-polkadot'
   },
   {
@@ -128,6 +132,7 @@ export const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     socketUrl: 'wss://collectives-polkadot-api.mimir.global/',
     explorerUrl: 'https://collectives-polkadot.subscan.io/',
+    statescanUrl: 'https://collectives.statescan.io/',
     identityNetwork: 'people-polkadot'
   },
   {
@@ -256,8 +261,7 @@ export const polkadotEndpoints: Endpoint[] = [
     genesisHash: '0x61ea8a51fd4a058ee8c0e86df0a89cc85b8b67a0a66432893d09719050c9f540',
     ss58Format: 0,
     socketUrl: 'wss://nexus-api.mimir.global/',
-    statescan: true,
-    explorerUrl: 'https://nexus.statescan.io/'
+    statescanUrl: 'https://nexus.statescan.io/'
   },
   {
     key: 'polimec',
@@ -275,7 +279,8 @@ export const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://polimec.ibp.network',
     genesisHash: '0x7eb9354488318e7549c722669dcbdcdc526f1fef1420e7944667212f3601fdbd',
     ss58Format: 41,
-    socketUrl: 'wss://polimec-api.mimir.global/'
+    socketUrl: 'wss://polimec-api.mimir.global/',
+    statescanUrl: 'https://polimec.statescan.io/'
   }
 ];
 
@@ -303,6 +308,7 @@ export const kusamaEndpoints: Endpoint[] = [
     ss58Format: 2,
     socketUrl: 'wss://kusama-api.mimir.global/',
     explorerUrl: 'https://kusama.subscan.io/',
+    statescanUrl: 'https://kusama.statescan.io/',
     identityNetwork: 'people-kusama'
   },
   {
@@ -326,6 +332,7 @@ export const kusamaEndpoints: Endpoint[] = [
     ss58Format: 2,
     socketUrl: 'wss://assethub-kusama-api.mimir.global/',
     explorerUrl: 'https://assethub-kusama.subscan.io/',
+    statescanUrl: 'https://assethub-kusama.statescan.io/',
     identityNetwork: 'people-kusama'
   },
   {
@@ -346,7 +353,8 @@ export const kusamaEndpoints: Endpoint[] = [
     genesisHash: '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f',
     ss58Format: 2,
     socketUrl: 'wss://people-kusama-api.mimir.global/',
-    explorerUrl: 'https://people-kusama.subscan.io/'
+    explorerUrl: 'https://people-kusama.subscan.io/',
+    statescanUrl: 'https://people-kusama.statescan.io/'
   },
   {
     key: 'coretime-kusama',
@@ -367,6 +375,7 @@ export const kusamaEndpoints: Endpoint[] = [
     ss58Format: 2,
     socketUrl: 'wss://coretime-kusama-api.mimir.global/',
     explorerUrl: 'https://coretime-kusama.subscan.io/',
+    statescanUrl: 'https://coretime-kusama.statescan.io/',
     identityNetwork: 'people-kusama'
   },
   {
@@ -444,7 +453,8 @@ export const paseoEndpoints: Endpoint[] = [
     httpUrl: 'https://paseo-rpc.dwellir.com',
     genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
     socketUrl: !isDevEnv ? 'wss://paseo-api.mimir.global/' : 'wss://dev-api.mimir.global/',
-    explorerUrl: 'https://paseo.subscan.io/'
+    explorerUrl: 'https://paseo.subscan.io/',
+    statescanUrl: 'https://paseo.statescan.io/'
   },
   {
     key: 'assethub-paseo',
@@ -464,7 +474,8 @@ export const paseoEndpoints: Endpoint[] = [
     httpUrl: 'https://asset-hub-paseo-rpc.dwellir.com',
     genesisHash: '0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2',
     socketUrl: 'wss://assethub-paseo-api.mimir.global/',
-    explorerUrl: 'https://assethub-paseo.subscan.io/'
+    explorerUrl: 'https://assethub-paseo.subscan.io/',
+    statescanUrl: 'https://assethub-paseo.statescan.io/'
   },
   ...(isDevEnv
     ? ([
@@ -493,7 +504,7 @@ export const westendEndpoints: Endpoint[] = [
     icon: '/chain-icons/Westend.webp',
     tokenIcon: '/token-icons/WND.webp',
     name: 'Westend',
-    ss58Format: 0,
+    ss58Format: 42,
     isRelayChain: true,
     isTestnet: true,
     wsUrl: {
@@ -508,14 +519,15 @@ export const westendEndpoints: Endpoint[] = [
     httpUrl: 'https://westend-rpc.dwellir.com',
     genesisHash: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e',
     socketUrl: 'wss://westend-api.mimir.global/',
-    explorerUrl: 'https://westend.subscan.io/'
+    explorerUrl: 'https://westend.subscan.io/',
+    statescanUrl: 'https://westend.statescan.io/'
   },
   {
     key: 'assethub-westend',
     icon: '/chain-icons/assethub-westend.webp',
     tokenIcon: '/token-icons/WND.webp',
     name: 'AssetHub Westend',
-    ss58Format: 0,
+    ss58Format: 42,
     relayChain: 'westend',
     isTestnet: true,
     wsUrl: {
@@ -529,21 +541,23 @@ export const westendEndpoints: Endpoint[] = [
     httpUrl: 'https://asset-hub-westend-rpc.dwellir.com',
     genesisHash: '0x67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9',
     socketUrl: 'wss://assethub-westend-api.mimir.global/',
-    explorerUrl: 'https://assethub-westend.subscan.io/'
+    explorerUrl: 'https://assethub-westend.subscan.io/',
+    statescanUrl: 'https://assethub-westend.statescan.io/'
   },
   {
     key: 'assethub-next-westend',
     icon: '/chain-icons/assethub-westend.webp',
     tokenIcon: '/token-icons/WND.webp',
     name: 'AssetHub Next',
-    ss58Format: 0,
+    ss58Format: 42,
     relayChain: 'westend',
     isTestnet: true,
     wsUrl: {
       Parity: 'wss://westend-asset-hub-next-rpc.parity-chains-scw.parity.io'
     },
     genesisHash: '0x6ddaae15f85a6a5035da7c842ba7a8a90c06d1f53d410a08d19fe899d9d9c7c8',
-    socketUrl: 'wss://assethub-next-westend-api.mimir.global/'
+    socketUrl: 'wss://assethub-next-westend-api.mimir.global/',
+    explorerUrl: 'https://assethub-westend-next.subscan.io/'
   }
 ];
 

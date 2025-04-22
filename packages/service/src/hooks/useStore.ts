@@ -3,7 +3,8 @@
 
 import type { BaseStore } from '../store/BaseStore.js';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { isEqual } from 'lodash-es';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { session, store } from '../store/index.js';
 
@@ -32,23 +33,18 @@ export function useStore<T>(
   latestValue.current = value;
   defaultValueRef.current = defaultValue;
 
-  useLayoutEffect(() => {
-    setValue(key ? (ref.current.get(key) as T) || defaultValueRef.current : defaultValueRef.current);
-  }, [key]);
-
   useEffect(() => {
+    setValue(key ? (ref.current.get(key) as T) || defaultValueRef.current : defaultValueRef.current);
     const store = ref.current;
 
     const onChange = (_key: string, _: unknown, newValue: unknown) => {
       if (key && key === _key) {
-        setTimeout(() => {
-          setValue((value) => {
-            if (JSON.stringify(value) === JSON.stringify(newValue)) {
-              return value;
-            }
+        setValue((value) => {
+          if (isEqual(value, newValue)) {
+            return value;
+          }
 
-            return newValue as T;
-          });
+          return newValue as T;
         });
       }
     };

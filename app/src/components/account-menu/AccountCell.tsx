@@ -19,7 +19,6 @@ function AccountCell({
   watchlist,
   selected,
   withAdd = false,
-  isHide = false,
   value
 }: {
   onClose?: () => void;
@@ -27,10 +26,9 @@ function AccountCell({
   value: string;
   withAdd?: boolean;
   watchlist?: boolean;
-  isHide?: boolean;
   onSelect?: (address: string) => void;
 }) {
-  const { isLocalAccount, deleteAddress, showAccount, hideAccount, addAddressBook } = useAccount();
+  const { isLocalAccount, deleteAddress, hideAccount, addAddressBook } = useAccount();
   const [totalUsd] = useBalanceTotalUsd(value);
   const source = useAccountSource(value);
   const formatUsd = formatDisplay(totalUsd.toString());
@@ -81,10 +79,10 @@ function AccountCell({
                     color='primary'
                     className='justify-start text-foreground'
                     onPress={() => {
-                      isHide ? showAccount(value) : hideAccount(value);
+                      hideAccount(value);
                     }}
                   >
-                    {isHide ? 'Show' : 'Hide'}
+                    Hide
                   </Button>
                 ),
                 <Button
