@@ -13,7 +13,7 @@ import { API_CLIENT_GATEWAY } from '@mimir-wallet/service';
 import { initializeAccount } from './accounts/initialize';
 import { initializeWallet } from './wallet/initialize';
 import App from './App';
-import { initGa } from './initGa';
+import { initGa } from './ga';
 import { initMimir } from './initMimir';
 import { initializeSocket } from './socket';
 import { upgradeAddresBook } from './upgrade';
