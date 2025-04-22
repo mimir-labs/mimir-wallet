@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.30.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.29.0...mimir-wallet-app-v1.30.0) (2025-04-22)
+
+
+### Features
+
+* Update google analytic config ([#202](https://github.com/mimir-labs/mimir-wallet/issues/202)) ([4f23dca](https://github.com/mimir-labs/mimir-wallet/commit/4f23dcad47d466453d909b7b38a5fcdf48f3a663))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.30.0
+    * @mimir-wallet/service bumped to 1.30.0
+    * @mimir-wallet/ui bumped to 1.30.0
+
 ## [1.29.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.28.2...mimir-wallet-app-v1.29.0) (2025-04-17)
 
 
