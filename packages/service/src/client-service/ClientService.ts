@@ -188,4 +188,19 @@ export class ClientService {
       headers: jsonHeader
     });
   }
+
+  public removeBatch(
+    chain: string,
+    address: string,
+    ids: number[],
+    signature: string,
+    signer: string,
+    timestamp: string | number
+  ) {
+    return fetcher(this.getClientUrl(`/v1/chains/${chain}/${address}/transactions/batch/remove`), {
+      method: 'POST',
+      body: JSON.stringify({ ids, signature, signer, timestamp }),
+      headers: jsonHeader
+    });
+  }
 }

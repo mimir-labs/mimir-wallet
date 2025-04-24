@@ -57,3 +57,36 @@ export function useManageProposerFilter(account: AccountData) {
 
   return filtered;
 }
+
+export function useProposersAndMembersFilter(account?: AccountData | null) {
+  const [filtered, setFiltered] = useState<string[]>([]);
+  const { walletAccounts } = useWallet();
+
+  useEffect(() => {
+    if (!account) {
+      setFiltered([]);
+
+      return;
+    }
+
+    const addresses: Set<string> = new Set();
+
+    reduceAccount(account, (account, proxyType, delay) => {
+      if (!proxyType || delay === 0) {
+        if (walletAccounts.some((item) => addressEq(item.address, account.address))) {
+          addresses.add(account.address);
+        }
+      }
+    });
+
+    account.proposers?.forEach((proposer) => {
+      if (walletAccounts.some((item) => addressEq(item.address, proposer.proposer))) {
+        addresses.add(proposer.proposer);
+      }
+    });
+
+    setFiltered(Array.from(addresses));
+  }, [account, walletAccounts]);
+
+  return filtered;
+}

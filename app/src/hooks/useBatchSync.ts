@@ -26,8 +26,15 @@ type SyncBatchItem = {
 export function useBatchSync(
   network: string,
   address?: string
-): [list: SyncBatchItem[], restoreList: SyncBatchItem[], () => void, boolean, boolean] {
-  const { data, isFetched, isFetching } = useQuery<SyncBatchItem[]>({
+): [
+  list: SyncBatchItem[],
+  restoreList: SyncBatchItem[],
+  restore: (ids: number[]) => void,
+  isFetched: boolean,
+  isFetching: boolean,
+  refetch: () => void
+] {
+  const { data, isFetched, isFetching, refetch } = useQuery<SyncBatchItem[]>({
     queryHash: service.getClientUrl(`/v1/chains/${network}/${address}/transactions/batch`),
     queryKey: [address ? service.getClientUrl(`/v1/chains/${network}/${address}/transactions/batch`) : null]
   });
@@ -44,14 +51,17 @@ export function useBatchSync(
     setRestoreList((data || []).filter((item) => syncedIds.includes(item.id)));
   }, [data, address, syncedIds]);
 
-  const restore = useCallback(() => {
-    if (!list.length || !address) return;
+  const restore = useCallback(
+    (values: number[]) => {
+      if (!list.length || !address) return;
 
-    addTx(
-      list.map((item) => ({ calldata: item.call, relatedBatch: item.id })),
-      false
-    );
-  }, [addTx, address, list]);
+      addTx(
+        list.filter((item) => values.includes(item.id)).map((item) => ({ calldata: item.call, relatedBatch: item.id })),
+        false
+      );
+    },
+    [addTx, address, list]
+  );
 
-  return [list, restoreList, restore, isFetched, isFetching];
+  return [list, restoreList, restore, isFetched, isFetching, refetch];
 }

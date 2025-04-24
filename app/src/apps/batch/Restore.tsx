@@ -2,15 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
+import { useQueryAccount } from '@/accounts/useQueryAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { Empty } from '@/components';
+import { toastError } from '@/components/utils';
+import { walletConfig } from '@/config';
+import { CONNECT_ORIGIN } from '@/constants';
 import { useBatchSync } from '@/hooks/useBatchSync';
+import { useProposersAndMembersFilter } from '@/hooks/useProposeFilter';
 import { CallDisplaySection } from '@/params';
+import { service } from '@/utils';
+import { accountSource } from '@/wallet/useWallet';
+import { useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Divider, Spinner } from '@mimir-wallet/ui';
+import { Alert, Button, Checkbox, Divider, Spinner } from '@mimir-wallet/ui';
 
 import BatchItem from './BatchItem';
 
@@ -18,11 +26,71 @@ function Restore({ onClose }: { onClose: () => void }) {
   const { network } = useApi();
   const { current } = useAccount();
   const [isOpen, toggleOpen] = useToggle(true);
+  const [selected, setSelected] = useState<number[]>([]);
 
-  const [txs, restoreList, restore, isFetched, isFetching] = useBatchSync(network, current);
+  const [txs, restoreList, restore, isFetched, isFetching, refetch] = useBatchSync(network, current);
+  const isCheckAll = selected.length === txs.length;
+  const isCheckSome = selected.length > 0 && selected.length < txs.length;
+  const [account] = useQueryAccount(current);
+  const filtered = useProposersAndMembersFilter(account);
+  const [loading, setLoading] = useState(false);
+
+  const handleDelete = async () => {
+    if (filtered.length === 0 || selected.length === 0 || !current) {
+      return;
+    }
+
+    const signer = filtered[0];
+
+    const source = accountSource(signer);
+
+    if (!source) {
+      toastError('No signer found');
+
+      return;
+    }
+
+    const injected = await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(CONNECT_ORIGIN);
+    const injectSigner = injected?.signer;
+
+    if (!injectSigner) {
+      toastError(`Please connect to the wallet: ${walletConfig[source]?.name || source}`);
+
+      return;
+    }
+
+    if (!injectSigner.signRaw) {
+      toastError(`Wallet ${walletConfig[source]?.name || source} does not support signRaw`);
+
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const time = new Date().toUTCString();
+      const message = `Sign for remove mimir batch
+IDs: ${selected}
+Address: ${current}
+Timestamp: ${time}`;
+
+      const result = await injectSigner.signRaw({
+        address: signer,
+        data: message,
+        type: 'bytes'
+      });
+
+      await service.removeBatch(network, current, selected, result.signature, signer, time);
+      setSelected([]);
+      refetch();
+    } catch (error) {
+      toastError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className='min-h-full space-y-5'>
+    <div className='flex flex-col gap-5 h-full'>
       <div className='flex items-center justify-between text-xl font-bold'>
         Restore Cache Transactions
         <Button isIconOnly color='default' variant='light' onPress={onClose}>
@@ -41,53 +109,96 @@ function Restore({ onClose }: { onClose: () => void }) {
 
       {isFetched && !txs?.length && <Empty label='No batch found' height='300px' />}
 
-      {current && !!txs?.length && (
-        <>
-          <Alert className='flex-grow-0' color='success' title={`${txs.length} Transactions Founded`} />
-          {txs?.map((item) => (
-            <BatchItem key={item.id} from={current} calldata={item.call}>
-              <div className='col-span-1 flex items-center'>{item.id}</div>
-              <div className='col-span-2 flex items-center'>
-                <CallDisplaySection section={item.section} method={item.method} />
-              </div>
-            </BatchItem>
-          ))}
+      <div className='flex-1 overflow-y-auto space-y-2.5 scrollbar-hide'>
+        {current && !!txs?.length && (
+          <>
+            <Alert className='flex-grow-0' color='success' title={`${txs.length} Transactions Founded`} />
 
-          <Button
-            fullWidth
-            onPress={() => {
-              restore();
-              onClose?.();
-            }}
-          >
-            Restore
-          </Button>
-        </>
-      )}
-
-      {current && !!restoreList?.length && (
-        <>
-          <div onClick={toggleOpen} className='cursor-pointer flex items-center justify-between'>
-            Restored
-            <ArrowDown data-open={isOpen} className='w-5 h-5 data-[open=true]:rotate-180' />
-          </div>
-
-          {isOpen &&
-            restoreList.map((item) => (
-              <BatchItem
-                key={item.id}
-                from={current}
-                calldata={item.call}
-                bgcolor='linear-gradient(180deg, #F9F9FC 0%, #E5EBF9 100%)'
-              >
-                <div className='col-span-1 flex items-center'>{item.id}</div>
+            {txs?.map((item) => (
+              <BatchItem key={item.id} from={current} calldata={item.call}>
+                <div className='col-span-1 flex items-center'>
+                  <Checkbox
+                    size='sm'
+                    isSelected={selected.includes(item.id)}
+                    onValueChange={(state) => {
+                      setSelected((values) => (state ? [...values, item.id] : values.filter((v) => item.id !== v)));
+                    }}
+                  >
+                    {item.id}
+                  </Checkbox>
+                </div>
                 <div className='col-span-2 flex items-center'>
                   <CallDisplaySection section={item.section} method={item.method} />
                 </div>
               </BatchItem>
             ))}
-        </>
-      )}
+          </>
+        )}
+
+        {current && !!restoreList?.length && (
+          <>
+            <div onClick={toggleOpen} className='cursor-pointer flex items-center justify-between'>
+              Restored
+              <ArrowDown data-open={isOpen} className='w-5 h-5 data-[open=true]:rotate-180' />
+            </div>
+
+            {isOpen &&
+              restoreList.map((item) => (
+                <BatchItem
+                  key={item.id}
+                  from={current}
+                  calldata={item.call}
+                  bgcolor='linear-gradient(180deg, #F9F9FC 0%, #E5EBF9 100%)'
+                >
+                  <div className='col-span-1 flex items-center'>{item.id}</div>
+                  <div className='col-span-2 flex items-center'>
+                    <CallDisplaySection section={item.section} method={item.method} />
+                  </div>
+                </BatchItem>
+              ))}
+          </>
+        )}
+      </div>
+
+      <Divider />
+      <div className='flex gap-5'>
+        <div className='flex-1 flex items-center'>
+          <Checkbox
+            size='sm'
+            isSelected={isCheckAll || isCheckSome}
+            isIndeterminate={isCheckSome}
+            onValueChange={(checked) => {
+              if (checked) {
+                setSelected(txs.map((item) => item.id));
+              } else {
+                setSelected([]);
+              }
+            }}
+          >
+            All
+          </Checkbox>
+        </div>
+
+        <Button
+          isDisabled={selected.length === 0 || filtered.length === 0 || !current}
+          color='danger'
+          variant='ghost'
+          isLoading={loading}
+          onPress={handleDelete}
+        >
+          Delete
+        </Button>
+
+        <Button
+          isDisabled={selected.length === 0}
+          onPress={() => {
+            restore(selected);
+            onClose?.();
+          }}
+        >
+          Restore
+        </Button>
+      </div>
     </div>
   );
 }
