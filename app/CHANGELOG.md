@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.31.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.30.0...mimir-wallet-app-v1.31.0) (2025-04-24)
+
+
+### Features
+
+* remove batch restore functionality ([#204](https://github.com/mimir-labs/mimir-wallet/issues/204)) ([d44d36b](https://github.com/mimir-labs/mimir-wallet/commit/d44d36b4f60166dc03f97c31e9dbda0526d45a95))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 1.31.0
+    * @mimir-wallet/service bumped to 1.31.0
+    * @mimir-wallet/ui bumped to 1.31.0
+
 ## [1.30.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.29.0...mimir-wallet-app-v1.30.0) (2025-04-22)
 
 
