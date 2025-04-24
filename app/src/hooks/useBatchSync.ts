@@ -26,14 +26,20 @@ type SyncBatchItem = {
 export function useBatchSync(
   network: string,
   address?: string
-): [list: SyncBatchItem[], restoreList: SyncBatchItem[], () => void, boolean, boolean] {
+): [
+  list: SyncBatchItem[],
+  restoreList: SyncBatchItem[],
+  restore: (ids: number[]) => void,
+  isFetched: boolean,
+  isFetching: boolean,
+  refetch: () => void
+] {
   const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
-
-  const { data, isFetched, isFetching } = useQuery<SyncBatchItem[]>({
-    queryHash: service.getClientUrl(`chains/${network}/${addressHex}/transactions/batch`),
-    queryKey: [addressHex ? service.getClientUrl(`chains/${network}/${addressHex}/transactions/batch`) : null]
+  const { data, isFetched, isFetching, refetch } = useQuery<SyncBatchItem[]>({
+    queryHash: service.getClientUrl(`/chains/${network}/${addressHex}/transactions/batch`),
+    queryKey: [address ? service.getClientUrl(`/chains/${network}/${addressHex}/transactions/batch`) : null]
   });
-  const [txs, addTx] = useBatchTxs(network, address);
+  const [txs, addTx] = useBatchTxs(network, addressHex);
   const syncedIds = useMemo(() => {
     return txs.map((item) => item.relatedBatch).filter((item) => typeof item === 'number');
   }, [txs]);
@@ -46,14 +52,17 @@ export function useBatchSync(
     setRestoreList((data || []).filter((item) => syncedIds.includes(item.id)));
   }, [data, address, syncedIds]);
 
-  const restore = useCallback(() => {
-    if (!list.length || !addressHex) return;
+  const restore = useCallback(
+    (values: number[]) => {
+      if (!list.length || !addressHex) return;
 
-    addTx(
-      list.map((item) => ({ calldata: item.call, relatedBatch: item.id })),
-      false
-    );
-  }, [addTx, addressHex, list]);
+      addTx(
+        list.filter((item) => values.includes(item.id)).map((item) => ({ calldata: item.call, relatedBatch: item.id })),
+        false
+      );
+    },
+    [addTx, addressHex, list]
+  );
 
-  return [list, restoreList, restore, isFetched, isFetching];
+  return [list, restoreList, restore, isFetched, isFetching, refetch];
 }

@@ -122,19 +122,17 @@ function Content({
 
       <Divider />
 
-      <SubApiRoot network={network}>
-        <Actions
-          address={address}
-          txs={txs}
-          selected={selected}
-          relatedBatches={relatedBatches}
-          setTxs={setTxs}
-          deleteTx={deleteTx}
-          setSelected={setSelected}
-          setRelatedBatches={setRelatedBatches}
-          onClose={onClose}
-        />
-      </SubApiRoot>
+      <Actions
+        address={address}
+        txs={txs}
+        selected={selected}
+        relatedBatches={relatedBatches}
+        setTxs={setTxs}
+        deleteTx={deleteTx}
+        setSelected={setSelected}
+        setRelatedBatches={setRelatedBatches}
+        onClose={onClose}
+      />
     </>
   );
 }
@@ -188,19 +186,23 @@ function Batch({
         <Divider />
 
         {isRestore ? (
-          <Restore network={network} onClose={toggleRestore} />
+          <SubApiRoot network={network}>
+            <Restore onClose={toggleRestore} />
+          </SubApiRoot>
         ) : txs.length === 0 ? (
           <EmptyBatch onAdd={toggleOpen} onClose={onClose} onHandleRestore={toggleRestore} />
         ) : (
-          <Content
-            address={address}
-            network={network}
-            txs={txs}
-            addTx={addTx}
-            deleteTx={deleteTx}
-            setTxs={setTxs}
-            onClose={onClose}
-          />
+          <SubApiRoot network={network}>
+            <Content
+              address={address}
+              network={network}
+              txs={txs}
+              addTx={addTx}
+              deleteTx={deleteTx}
+              setTxs={setTxs}
+              onClose={onClose}
+            />
+          </SubApiRoot>
         )}
       </div>
     </div>

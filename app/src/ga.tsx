@@ -8,7 +8,7 @@ const isBrowser = typeof window !== 'undefined';
 export function initGa() {
   if (isBrowser) {
     if (location.hostname === 'app.mimir.global') {
-      ReactGA.initialize('G-2MD2S3XXRG');
+      ReactGA.initialize('G-8GQYDFDBZ6');
     } else if (location.hostname === 'dev.mimir.global') {
       ReactGA.initialize('G-4987GHNZMV');
     }
