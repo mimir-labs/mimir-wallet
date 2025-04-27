@@ -36,7 +36,7 @@ function Actions({
 
   return (
     <div className='flex gap-5'>
-      <div className='flex-1 flex items-center'>
+      <div className='flex-1 flex items-center pl-2'>
         <Checkbox
           size='sm'
           isSelected={isCheckAll || isCheckSome}

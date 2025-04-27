@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TransferToken } from '@/apps/transfer/types';
+import type { AccountAssetInfo } from '@/hooks/types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { useAssetBalances } from '@/hooks/useBalances';
+import { useAssetBalances, useNativeBalances } from '@/hooks/useBalances';
 import { useInput } from '@/hooks/useInput';
 import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -42,6 +43,7 @@ function InputToken({
   defaultAssetId,
   onChange
 }: Props) {
+  const [nativeBalances] = useNativeBalances(address);
   const [assets] = useAssetBalances(network, address);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,12 +52,20 @@ function InputToken({
   const [isOpen, toggleOpen] = useToggle(false);
   const [assetId, setAssetId] = useState<string>(defaultAssetId || 'native');
 
-  const options = assets.filter((item) =>
-    inputValue
-      ? item.name.toLowerCase().includes(inputValue.toLowerCase()) ||
-        item.symbol.toLowerCase().includes(inputValue.toLowerCase())
-      : true
-  );
+  const options = useMemo((): AccountAssetInfo[] => {
+    const _options: AccountAssetInfo[] = nativeBalances ? [nativeBalances] : [];
+
+    for (const item of assets) {
+      _options.push(item);
+    }
+
+    return _options.filter((item) =>
+      inputValue
+        ? item.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+          item.symbol.toLowerCase().includes(inputValue.toLowerCase())
+        : true
+    );
+  }, [nativeBalances, assets, inputValue]);
 
   const handleOpen = () => {
     toggleOpen(true);
@@ -66,20 +76,22 @@ function InputToken({
   };
 
   const token = useMemo(() => {
-    return assets.find((item) => item.assetId === assetId);
-  }, [assets, assetId]);
+    return options.find((item) => item.assetId === assetId);
+  }, [options, assetId]);
 
   useEffect(() => {
     if (token) {
       onChange(token);
-    } else if (assets.length > 0) {
-      onChange(assets[0]);
-      setAssetId(assets[0].assetId);
+    } else if (options.length > 0) {
+      onChange(options[0]);
+      setAssetId((assetId) => {
+        return assetId || options[0].assetId;
+      });
     }
-  }, [onChange, token, assets]);
+  }, [onChange, token, options]);
 
   const element =
-    !assets || assets.length === 0 ? (
+    !options || options.length === 0 ? (
       <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
         <Spinner size='sm' />
         {isIconOnly || isOpen ? null : <p className='text-foreground/50'>Fetching Assets...</p>}

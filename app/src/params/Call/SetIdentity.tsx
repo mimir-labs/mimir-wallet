@@ -15,9 +15,9 @@ import { dataToUtf8 } from '@/utils';
 import { Avatar, Box } from '@mui/material';
 import React, { useMemo } from 'react';
 
+import { findAction } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
 
-import { findAction } from '../utils';
 import FunctionArgs from './FunctionArgs';
 
 function Item({ icon, value }: { icon: string; value: string }) {

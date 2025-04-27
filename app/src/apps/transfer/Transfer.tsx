@@ -151,12 +151,7 @@ function Transfer({
                   <Skeleton className='w-[50px] h-[14px] rounded-small' />
                 ) : (
                   <span className='opacity-50'>
-                    Balance:{' '}
-                    <FormatBalance
-                      format={format}
-                      value={sendingBalances}
-                      assetId={token?.isNative ? undefined : token?.assetId}
-                    />
+                    Balance: <FormatBalance format={format} value={sendingBalances} />
                   </span>
                 )}
               </div>

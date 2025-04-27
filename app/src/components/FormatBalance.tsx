@@ -4,7 +4,6 @@
 import type { Compact } from '@polkadot/types';
 import type { BN } from '@polkadot/util';
 
-import { useAssetInfo } from '@/hooks/useAssets';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo } from 'react';
 
@@ -15,14 +14,12 @@ interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanEle
   label?: React.ReactNode;
   value?: Compact<any> | BN | bigint | string | number | null;
   withCurrency?: boolean;
-  assetId?: string;
 }
 
-function FormatBalance({ format, label, value, withCurrency, assetId, ...props }: Props): React.ReactElement<Props> {
-  const { api, network } = useApi();
-  const [assetInfo] = useAssetInfo(network, assetId);
-  const decimals = format?.[0] ?? (assetId ? assetInfo?.decimals : api.registry.chainDecimals[0]);
-  const currency = format?.[1] ?? (assetId ? assetInfo?.symbol : api.registry.chainTokens[0]);
+function FormatBalance({ format, label, value, withCurrency, ...props }: Props): React.ReactElement<Props> {
+  const { api } = useApi();
+  const decimals = format?.[0] ?? api.registry.chainDecimals[0];
+  const currency = format?.[1] ?? api.registry.chainTokens[0];
   const [major, rest, unit] = useMemo(() => {
     const _value = formatUnits(BigInt(value?.toString() || 0), decimals || 0);
 
@@ -31,7 +28,7 @@ function FormatBalance({ format, label, value, withCurrency, assetId, ...props }
 
   // labelPost here looks messy, however we ensure we have one less text node
   return (
-    <span className='inline-flex items-center gap-[5px]' {...props}>
+    <span className='inline-flex items-center gap-1' {...props}>
       {label}
       <span>
         {major}

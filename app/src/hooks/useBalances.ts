@@ -9,12 +9,13 @@ import type {
   AcalaPrimitivesCurrencyCurrencyId,
   PalletAssetsAssetAccount
 } from '@polkadot/types/lookup';
-import type { AccountAssetInfo, AccountBalance, AssetInfo, OrmlTokensAccountData, TokenInfo } from './types';
+import type { AccountAssetInfo, AssetInfo, OrmlTokensAccountData } from './types';
 
 import { findToken } from '@/config';
 import { formatUnits } from '@/utils';
 import { BN_ZERO, isHex } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
+import { isEqual } from 'lodash-es';
 import { useMemo } from 'react';
 
 import { addressToHex, useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
@@ -23,8 +24,12 @@ import { useQueries, useQuery } from '@mimir-wallet/service';
 import { useAssetsByAddress, useAssetsByAddressAll } from './useAssets';
 import { useTokenInfo, useTokenInfoAll } from './useTokenInfo';
 
-async function getBalances({ queryKey }: { queryKey: [ApiPromise | null | undefined, string | undefined | null] }) {
-  const [api, address] = queryKey;
+async function getBalances({
+  queryKey
+}: {
+  queryKey: [api: ApiPromise | null | undefined, address: string | undefined | null, network: string];
+}): Promise<AccountAssetInfo<true>> {
+  const [api, address, network] = queryKey;
 
   if (!api) {
     throw new Error('Api is required');
@@ -34,7 +39,19 @@ async function getBalances({ queryKey }: { queryKey: [ApiPromise | null | undefi
     throw new Error('Address is required');
   }
 
+  const symbol = api.registry.chainTokens[0].toString();
+  const decimals = api.registry.chainDecimals[0];
+  const genesisHash = api.genesisHash.toHex();
+
   return Promise.all([api.query.system.account(address)]).then(([account]) => ({
+    network: network,
+    name: symbol,
+    symbol: symbol,
+    decimals: decimals,
+    account: address.toString(),
+    icon: findToken(genesisHash).Icon,
+    isNative: true,
+    assetId: 'native',
     total: BigInt(account.data.free.add(account.data.reserved).toString()),
     reserved: BigInt(account.data.reserved.toString()),
     locked: BigInt(account.data.frozen.toString()),
@@ -43,32 +60,91 @@ async function getBalances({ queryKey }: { queryKey: [ApiPromise | null | undefi
       account.data.free
         .sub(account.data.frozen.gt(account.data.reserved) ? account.data.frozen.sub(account.data.reserved) : BN_ZERO)
         .toString()
-    )
+    ),
+    price: 0,
+    change24h: 0
   }));
 }
 
 export function useNativeBalances(
-  address?: AccountId | AccountId32 | string | null,
-  defaultNetwork?: string
-): [AccountBalance | undefined, boolean, boolean] {
-  const { allApis, network } = useApi();
-  const api: ValidApiState | undefined = allApis[defaultNetwork || network];
+  address?: AccountId | AccountId32 | string | null
+): [AccountAssetInfo<true> | undefined, boolean, boolean] {
+  const { api, isApiReady, network } = useApi();
+  const [tokenInfo] = useTokenInfo(network);
 
-  const queryHash = blake2AsHex(
-    `${api?.genesisHash}-native-balances-${address ? addressToHex(address.toString()) : ''}`
-  );
+  const addressHex = address ? addressToHex(address.toString()) : '';
+  const queryHash = useMemo(() => blake2AsHex(`${network}-native-balances-${addressHex}`), [network, addressHex]);
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [api?.api, address?.toString()] as const,
+    queryKey: [api, address?.toString(), network] as const,
     queryHash,
-    refetchInterval: 12_000,
-    refetchOnMount: false,
-    refetchOnWindowFocus: true,
     queryFn: getBalances,
-    enabled: !!api && api.isApiReady && !!address
+    enabled: !!api && isApiReady && !!address,
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
+    }
   });
 
-  return [data, isFetched, isFetching];
+  return [
+    useMemo(() => {
+      if (!data) {
+        return undefined;
+      }
+
+      return {
+        ...data,
+        price: parseFloat(tokenInfo?.detail?.[data.symbol]?.price || '0'),
+        change24h: parseFloat(tokenInfo?.detail?.[data.symbol]?.price_change || '0')
+      };
+    }, [data, tokenInfo]),
+    isFetched,
+    isFetching
+  ];
+}
+
+export function useNativeBalancesAll(address?: string) {
+  const { allApis } = useApi();
+  const [allTokenInfo] = useTokenInfoAll();
+  const addressHex = address ? addressToHex(address.toString()) : '';
+
+  const queries = useQueries({
+    queries: Object.entries(allApis).map(([network, api]) => {
+      const queryHash = blake2AsHex(`${network}-native-balances-${addressHex}`);
+
+      return {
+        queryKey: [api.api, address?.toString(), network] as [
+          api: ApiPromise,
+          address: string | undefined,
+          network: string
+        ],
+        queryHash,
+        enabled: !!address && !!api && api.isApiReady,
+        queryFn: getBalances
+      };
+    })
+  });
+
+  return useMemo(() => {
+    return queries.map((item) => {
+      const data = item.data;
+
+      const tokenInfo = data ? allTokenInfo?.[data.network] : undefined;
+
+      return {
+        isFetched: item.isFetched,
+        isFetching: item.isFetching,
+        isError: item.isError,
+        refetch: item.refetch,
+        data: data
+          ? ({
+              ...data,
+              price: parseFloat(tokenInfo?.detail?.[data.symbol]?.price || '0'),
+              change24h: parseFloat(tokenInfo?.detail?.[data.symbol]?.price_change || '0')
+            } as AccountAssetInfo<true>)
+          : undefined
+      };
+    });
+  }, [queries, allTokenInfo]);
 }
 
 async function _fetchAssetBalances({
@@ -188,126 +264,94 @@ export function useAssetBalances(
   const api: ValidApiState | undefined = allApis[network];
   const [assets] = useAssetsByAddress(network, address?.toString());
   const [tokenInfo] = useTokenInfo(network);
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
   const queryHash = useMemo(
     () =>
       blake2AsHex(
-        `${network}-${api?.genesisHash}-assets-balances-${address ? addressToHex(address.toString()) : ''}-${
+        `${network}-assets-balances-${addressHex}-${
           assets
             ? assets
                 .map((item) => item.assetId)
                 .sort()
                 .join(',')
             : ''
-        }-${tokenInfo ? tokenInfo.token.join(',') : ''}`
+        }`
       ),
-    [address, api?.genesisHash, assets, network, tokenInfo]
+    [addressHex, assets, network]
   );
+  const [nativeBalances] = useNativeBalances(address);
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [network, api?.api, address, assets, tokenInfo] as const,
+    queryKey: [network, api?.api, address, assets] as const,
     queryHash,
     refetchInterval: 12000,
     refetchOnMount: false,
     refetchOnWindowFocus: true,
     enabled: !!address && !!api && api.isApiReady && !!assets,
     queryFn: async ({
-      queryKey: [network, api, address, assets, tokenInfo]
+      queryKey: [network, api, address, assets]
     }: {
       queryKey: [
         network: string,
         api: ApiPromise | null | undefined,
         address?: AccountId | AccountId32 | string | null,
-        assets?: AssetInfo[],
-        tokenInfo?: TokenInfo
+        assets?: AssetInfo[]
       ];
     }): Promise<AccountAssetInfo[]> => {
-      if (!api || !address) {
-        return [];
+      if (!api || !assets || !address) {
+        throw new Error('Api, assets and address are required');
       }
 
-      const nativeBalances = await getBalances({ queryKey: [api, address.toString()] });
-      const nativeData = {
-        network: network,
-        name: api.registry.chainTokens[0].toString(),
-        symbol: api.registry.chainTokens[0].toString(),
-        decimals: api.registry.chainDecimals[0],
-        icon: findToken(api.genesisHash.toHex()).Icon,
-        isNative: true,
-        assetId: 'native',
-        total: BigInt(nativeBalances?.total.toString() ?? '0'),
-        locked: BigInt(nativeBalances?.locked.toString() ?? '0'),
-        reserved: BigInt(nativeBalances?.reserved.toString() ?? '0'),
-        transferrable: BigInt(nativeBalances?.transferrable.toString() ?? '0'),
-        account: address.toString(),
-        price: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price || '0'),
-        change24h: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price_change || '0')
-      } as AccountAssetInfo;
+      const data = await _fetchAssetBalances({ queryKey: [api, network, assets, address.toString()] });
 
-      if (!assets || assets.length === 0) {
-        return [nativeData];
-      }
-
-      try {
-        const data = await _fetchAssetBalances({ queryKey: [api, network, assets, address.toString()] });
-
-        return [
-          {
-            network: network,
-            name: api.runtimeChain.toString(),
-            symbol: api.registry.chainTokens[0].toString(),
-            decimals: api.registry.chainDecimals[0],
-            icon: findToken(api.genesisHash.toHex()).Icon,
-            isNative: true,
-            assetId: 'native',
-            total: BigInt(nativeBalances?.total.toString() ?? '0'),
-            locked: BigInt(nativeBalances?.locked.toString() ?? '0'),
-            reserved: BigInt(nativeBalances?.reserved.toString() ?? '0'),
-            transferrable: BigInt(nativeBalances?.transferrable.toString() ?? '0'),
-            account: address.toString(),
-            price: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price || '0'),
-            change24h: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price_change || '0')
-          } as AccountAssetInfo,
-          ...(data ?? [])
-        ];
-      } catch (error) {
-        console.error(`error when fetching asset balances: ${network}`, error);
-
-        return [nativeData];
-      }
+      return data;
     }
   });
 
-  return [data ?? [], isFetched, isFetching];
+  return [
+    useMemo(
+      () =>
+        (
+          data?.map((item) => ({
+            ...item,
+            price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
+            change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
+          })) || []
+        ).concat(nativeBalances || []),
+      [data, tokenInfo, nativeBalances]
+    ),
+    isFetched,
+    isFetching
+  ];
 }
 
 export function useAssetBalancesAll(address?: string) {
   const { allApis } = useApi();
   const [allTokenInfo] = useTokenInfoAll();
   const [allAssets] = useAssetsByAddressAll(address);
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
 
-  return useQueries({
+  const queries = useQueries({
     queries: Object.entries(allApis).map(([network, api]) => {
       const assets = allAssets?.[network];
 
-      const tokenInfo = allTokenInfo?.[network];
       const queryHash = blake2AsHex(
-        `${network}-${api?.genesisHash}-assets-balances-${address ? addressToHex(address.toString()) : ''}-${
+        `${network}-assets-balances-${addressHex}-${
           assets
             ? assets
                 .map((item) => item.assetId)
                 .sort()
                 .join(',')
             : ''
-        }-${tokenInfo ? tokenInfo.token.join(',') : ''}`
+        }`
       );
 
       return {
-        queryKey: [network, api.api, address, assets, tokenInfo] as [
+        queryKey: [network, api.api, address, assets] as [
           network: string,
           api: ApiPromise,
           address: string | undefined,
-          assets: AssetInfo[] | undefined,
-          tokenInfo: TokenInfo | undefined
+          assets: AssetInfo[] | undefined
         ],
         queryHash,
         refetchInterval: 60 * 1000,
@@ -315,59 +359,43 @@ export function useAssetBalancesAll(address?: string) {
         refetchOnWindowFocus: true,
         enabled: !!address && !!api && api.isApiReady && !!assets,
         queryFn: async ({
-          queryKey: [network, api, address, assets, tokenInfo]
+          queryKey: [network, api, address, assets]
         }: {
-          queryKey: [
-            network: string,
-            api: ApiPromise,
-            address: string | undefined,
-            assets: AssetInfo[] | undefined,
-            tokenInfo: TokenInfo | undefined
-          ];
+          queryKey: [network: string, api: ApiPromise, address: string | undefined, assets: AssetInfo[] | undefined];
         }): Promise<AccountAssetInfo[]> => {
-          if (!address) {
-            throw new Error('Address is required');
+          if (!address || !assets) {
+            throw new Error('Address and assets are required');
           }
 
-          const nativeBalances = await getBalances({ queryKey: [api, address] });
+          const data = await _fetchAssetBalances({ queryKey: [api, network, assets, address] });
 
-          const nativeData: AccountAssetInfo = {
-            network: network,
-            name: api.registry.chainTokens[0].toString(),
-            symbol: api.registry.chainTokens[0].toString(),
-            decimals: api.registry.chainDecimals[0],
-            icon: findToken(api.genesisHash.toHex()).Icon,
-            isNative: true,
-            assetId: 'native',
-            total: nativeBalances?.total ?? 0n,
-            locked: nativeBalances?.locked ?? 0n,
-            reserved: nativeBalances?.reserved ?? 0n,
-            transferrable: nativeBalances?.transferrable ?? 0n,
-            account: address.toString(),
-            price: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price || '0'),
-            change24h: parseFloat(tokenInfo?.detail?.[api.registry.chainTokens[0].toString()]?.price_change || '0')
-          };
-
-          if (!assets || assets.length === 0) {
-            return [nativeData];
-          }
-
-          try {
-            const data = await _fetchAssetBalances({ queryKey: [api, network, assets, address] });
-
-            return [nativeData, ...(data ?? [])];
-          } catch (error) {
-            console.error('error when fetching asset balances', error);
-
-            return [nativeData];
-          }
+          return data;
         }
       };
     })
   });
+
+  return useMemo(() => {
+    return queries.map((item) => {
+      const data = item.data;
+
+      return {
+        isFetched: item.isFetched,
+        isFetching: item.isFetching,
+        isError: item.isError,
+        refetch: item.refetch,
+        data: data?.map((item) => ({
+          ...item,
+          price: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price || '0'),
+          change24h: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price_change || '0')
+        }))
+      };
+    });
+  }, [queries, allTokenInfo]);
 }
 
 export function useBalanceTotalUsd(address?: string) {
+  const nativeBalances = useNativeBalancesAll(address);
   const assets = useAssetBalancesAll(address);
 
   return useMemo(() => {
@@ -386,6 +414,16 @@ export function useBalanceTotalUsd(address?: string) {
       }
     }
 
+    for (const item of nativeBalances) {
+      if (item.data) {
+        const currentTotal = parseFloat(formatUnits(item.data.total, item.data.decimals)) * item.data.price;
+
+        total += currentTotal;
+
+        lastTotal += currentTotal / (1 + item.data.change24h);
+      }
+    }
+
     return [total, lastTotal ? (total - lastTotal) / lastTotal : 0];
-  }, [assets]);
+  }, [assets, nativeBalances]);
 }

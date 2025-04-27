@@ -56,6 +56,9 @@ function Content({ address }: { address: string }) {
   }, [allApis, transactionCounts]);
   const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<string[]>([]);
   const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<string[]>([]);
+  const selectedHistoryNetwork = useMemo(() => {
+    return validHistoryNetworks.find(({ network }) => selectedHistoryNetworks.includes(network));
+  }, [validHistoryNetworks, selectedHistoryNetworks]);
 
   const [type, setType] = useQueryParam<string>('status', 'pending');
   const [txId] = useQueryParam<string>('tx_id');
@@ -188,10 +191,10 @@ function Content({ address }: { address: string }) {
                   variant='bordered'
                   color='default'
                   className='border-divider-300 h-8'
-                  startContent={<Avatar src={validHistoryNetworks[0].chain.icon} className='w-4 h-4 bg-transparent' />}
+                  startContent={<Avatar src={selectedHistoryNetwork?.chain.icon} className='w-4 h-4 bg-transparent' />}
                   endContent={<ArrowDown className='w-4 h-4' />}
                 >
-                  {validHistoryNetworks[0].chain.name}({validHistoryNetworks[0].counts})
+                  {selectedHistoryNetwork?.chain.name}({selectedHistoryNetwork?.counts})
                 </Button>
               </PopoverTrigger>
               <PopoverContent className='w-[200px] rounded-medium p-1'>

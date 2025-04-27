@@ -42,6 +42,8 @@ function OmniApiRoot({
       : allApis[networkOrGenesisHash];
   }, [allApis, networkOrGenesisHash]);
 
+  console.log(networkValues, networkOrGenesisHash);
+
   if (!networkValues || !networkValues.api) {
     return null;
   }

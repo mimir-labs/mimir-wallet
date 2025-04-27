@@ -260,18 +260,11 @@ export type AssetInfo<T extends boolean = boolean> = {
       readonly assetId: 'native';
     });
 
-export interface AccountBalance {
+export type AccountAssetInfo<T extends boolean = boolean> = AssetInfo<T> & {
   total: bigint;
   locked: bigint;
   reserved: bigint;
   free: bigint;
-  transferrable: bigint;
-}
-
-export type AccountAssetInfo = AssetInfo & {
-  total: bigint;
-  locked: bigint;
-  reserved: bigint;
   transferrable: bigint;
   account: string;
 };

@@ -11,10 +11,11 @@ import { Box, Button, IconButton, Stack, SvgIcon } from '@mui/material';
 import { isArray } from '@polkadot/util';
 import React, { useMemo, useState } from 'react';
 
+import { findAction } from '@mimir-wallet/polkadot-core';
+
 import CallDisplayDetail from '../CallDisplay/CallDisplayDetail';
 import CallDisplayDetailMinor from '../CallDisplay/CallDisplayDetailMinor';
 import CallDisplaySection from '../CallDisplay/CallDisplaySection';
-import { findAction } from '../utils';
 import FunctionArgs from './FunctionArgs';
 
 function Item({

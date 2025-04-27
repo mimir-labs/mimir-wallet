@@ -17,7 +17,7 @@ import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Alert, Button, Checkbox, Divider, Spinner } from '@mimir-wallet/ui';
+import { Alert, Button, Checkbox, Spinner } from '@mimir-wallet/ui';
 
 import BatchItem from './BatchItem';
 
@@ -89,7 +89,7 @@ Timestamp: ${time}`;
   };
 
   return (
-    <div className='flex flex-col gap-5 h-full'>
+    <div className='flex-1 flex flex-col gap-5 h-full overflow-hidden'>
       {isFetched && !txs?.length && <Empty label='No batch found' height='300px' />}
 
       {!isFetched && isFetching && <Spinner variant='wave' />}
@@ -145,9 +145,8 @@ Timestamp: ${time}`;
         )}
       </div>
 
-      <Divider />
       <div className='flex gap-5'>
-        <div className='flex-1 flex items-center'>
+        <div className='flex-1 flex items-center pl-2'>
           <Checkbox
             size='sm'
             isSelected={isCheckAll || isCheckSome}

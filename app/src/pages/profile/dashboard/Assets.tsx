@@ -6,7 +6,7 @@ import type { SortDescriptor } from '@react-types/shared';
 
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
-import { useAssetBalancesAll } from '@/hooks/useBalances';
+import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo, useState } from 'react';
@@ -28,6 +28,7 @@ import {
 } from '@mimir-wallet/ui';
 
 function Assets({ address }: { address: string }) {
+  const nativeBalances = useNativeBalancesAll(address);
   const assets = useAssetBalancesAll(address);
   const { networks } = useNetworks();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
@@ -44,6 +45,16 @@ function Assets({ address }: { address: string }) {
       if (item.isFetched) {
         if (item.data) {
           _list.push(...item.data);
+        }
+      } else {
+        done = false;
+      }
+    }
+
+    for (const item of nativeBalances) {
+      if (item.isFetched) {
+        if (item.data && item.data.total > 0n) {
+          _list.push(item.data);
         }
       } else {
         done = false;
@@ -100,7 +111,7 @@ function Assets({ address }: { address: string }) {
         }),
       done
     ];
-  }, [assets, sortDescriptor.column, sortDescriptor.direction]);
+  }, [assets, nativeBalances, sortDescriptor.column, sortDescriptor.direction]);
 
   return (
     <Table

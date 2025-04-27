@@ -5,7 +5,8 @@ import type { CallProps } from '../types';
 
 import React, { useMemo } from 'react';
 
-import { findAction } from '../utils';
+import { findAction } from '@mimir-wallet/polkadot-core';
+
 import BatchCall from './BatchCall';
 import CancelAsMulti from './CancelAsMulti';
 import FunctionArgs from './FunctionArgs';

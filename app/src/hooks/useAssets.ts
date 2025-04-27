@@ -23,10 +23,6 @@ function _extraAsset(
     name: string;
     symbol: string;
     decimals: number;
-    icon: string | null;
-    price: number;
-    isVerified: boolean;
-    isInitialized: false;
   }[],
   tokenInfo?: TokenInfo
 ): AssetInfo[] {
@@ -40,7 +36,7 @@ function _extraAsset(
       name: item.name,
       symbol: item.symbol,
       decimals: item.decimals,
-      icon: asset?.Icon || item.icon || undefined,
+      icon: asset?.Icon || undefined,
       price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
       change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
     };

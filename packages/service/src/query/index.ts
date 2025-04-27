@@ -14,5 +14,6 @@ export {
   useMutation,
   useMutationState,
   useQueryErrorResetBoundary,
-  type QueriesOptions
+  type QueriesOptions,
+  type UseQueryResult
 } from '@tanstack/react-query';

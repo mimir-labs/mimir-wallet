@@ -11,11 +11,11 @@ import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Link } from '@mimir-wallet/ui';
+import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
+import { Avatar, Button, Divider, Link } from '@mimir-wallet/ui';
 
 import Actions from './Actions';
 import BatchItemDrag from './BatchItemDrag';
@@ -24,7 +24,6 @@ import Restore from './Restore';
 
 function Content({
   address,
-  network,
   txs,
   addTx,
   deleteTx,
@@ -32,7 +31,6 @@ function Content({
   onClose
 }: {
   address: string;
-  network: string;
   txs: BatchTxItem[];
   addTx: (txs: BatchTxItem[], alert?: boolean) => void;
   deleteTx: (ids: (number | string)[]) => void;
@@ -67,7 +65,7 @@ function Content({
 
   return (
     <>
-      <div className='flex-1 overflow-y-auto space-y-2.5 scrollbar-hide'>
+      <div className='flex-1 flex flex-col gap-2.5 scrollbar-hide overflow-y-auto'>
         <p>Next Batch</p>
         <div ref={containerRef} style={{ touchAction: 'pan-y' }}>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -79,7 +77,6 @@ function Content({
                     {...item}
                     index={index}
                     from={address}
-                    network={network}
                     selected={selected}
                     onSelected={(state: boolean) => {
                       setSelected((values) => (state ? [...values, item.id] : values.filter((v) => item.id !== v)));
@@ -114,13 +111,11 @@ function Content({
           fullWidth
           radius='md'
           startContent={<IconAdd className='w-4 h-4' />}
-          className='text-foreground'
+          className='text-foreground flex-shrink-0'
         >
           Add New Transfer
         </Button>
       </div>
-
-      <Divider />
 
       <Actions
         address={address}
@@ -150,61 +145,65 @@ function Batch({
 }) {
   const [, toggleOpen] = useToggle(false);
   const [isRestore, toggleRestore] = useToggle(false);
+  const { networks } = useNetworks();
 
   const [txs, addTx, deleteTx, setTxs] = useBatchTxs(network, address);
 
+  const networkChain = useMemo(() => networks.find((n) => n.key === network), [networks, network]);
+
   return (
-    <div className='w-[50vw] max-w-[560px] min-w-[320px] h-full'>
-      <div className='flex flex-col gap-5 h-full'>
-        <div className='flex items-center gap-2 justify-between text-xl font-bold'>
-          <span className='flex-1'>{isRestore ? 'Restore Cache Transactions' : 'Batch'}</span>
-
-          {isRestore ? (
-            <>
-              <Button key='close-restore' isIconOnly color='default' variant='light' onPress={toggleRestore}>
-                <IconClose className='w-5 h-5' />
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button key='open-restore' variant='ghost' onPress={toggleRestore}>
-                Restore
-              </Button>
-
-              <InputNetwork
-                isIconOnly
-                placeholder=' '
-                className='max-w-[60px] text-small'
-                contentClassName='min-h-[32px] h-[32px]'
-                radius='full'
-                network={network}
-                setNetwork={setNetwork}
-              />
-            </>
-          )}
-        </div>
-        <Divider />
+    <div className='w-[50vw] max-w-[560px] min-w-[320px] flex flex-col gap-5 h-full'>
+      <div className='flex items-center gap-2 justify-between text-xl font-bold'>
+        {isRestore ? (
+          <span className='flex-1 inline-flex items-center gap-2'>
+            <Avatar
+              disableAnimation
+              style={{ width: 20, height: 20, background: 'transparent' }}
+              src={networkChain?.icon}
+            />
+            Restore Cache Transactions
+          </span>
+        ) : (
+          <span className='flex-1'>Batch</span>
+        )}
 
         {isRestore ? (
-          <SubApiRoot network={network}>
-            <Restore onClose={toggleRestore} />
-          </SubApiRoot>
-        ) : txs.length === 0 ? (
-          <EmptyBatch onAdd={toggleOpen} onClose={onClose} onHandleRestore={toggleRestore} />
+          <>
+            <Button key='close-restore' isIconOnly color='default' variant='light' onPress={toggleRestore}>
+              <IconClose className='w-5 h-5' />
+            </Button>
+          </>
         ) : (
-          <SubApiRoot network={network}>
-            <Content
-              address={address}
+          <>
+            <Button key='open-restore' variant='ghost' onPress={toggleRestore}>
+              Restore
+            </Button>
+
+            <InputNetwork
+              isIconOnly
+              placeholder=' '
+              className='max-w-[60px] text-small'
+              contentClassName='min-h-[32px] h-[32px]'
+              radius='full'
               network={network}
-              txs={txs}
-              addTx={addTx}
-              deleteTx={deleteTx}
-              setTxs={setTxs}
-              onClose={onClose}
+              setNetwork={setNetwork}
             />
-          </SubApiRoot>
+          </>
         )}
       </div>
+      <Divider />
+
+      {isRestore ? (
+        <SubApiRoot network={network}>
+          <Restore onClose={toggleRestore} />
+        </SubApiRoot>
+      ) : txs.length === 0 ? (
+        <EmptyBatch onAdd={toggleOpen} onClose={onClose} onHandleRestore={toggleRestore} />
+      ) : (
+        <SubApiRoot network={network}>
+          <Content address={address} txs={txs} addTx={addTx} deleteTx={deleteTx} setTxs={setTxs} onClose={onClose} />
+        </SubApiRoot>
+      )}
     </div>
   );
 }
