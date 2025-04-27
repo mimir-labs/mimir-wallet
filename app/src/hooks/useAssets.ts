@@ -11,7 +11,7 @@ import { type BN, BN_ZERO, isHex } from '@polkadot/util';
 import { isEqual } from 'lodash-es';
 import { useMemo } from 'react';
 
-import { useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
 
 import { useTokenInfo, useTokenInfoAll } from './useTokenInfo';
@@ -76,9 +76,10 @@ export function useAssetsByAddress(
   address?: string | null
 ): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean] {
   const [tokenInfo] = useTokenInfo(network);
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
   const { data, isFetched, isFetching } = useQuery<AssetInfo[] | undefined>({
-    queryHash: service.getClientUrl(`chains/${network}/balances/${address}`),
-    queryKey: address ? [service.getClientUrl(`chains/${network}/balances/${address}`)] : [null],
+    queryHash: service.getClientUrl(`chains/${network}/balances/${addressHex}`),
+    queryKey: addressHex ? [service.getClientUrl(`chains/${network}/balances/${addressHex}`)] : [null],
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -126,9 +127,10 @@ export function useAssetsByAddressAll(
   address?: string | null
 ): [data: Record<string, AssetInfo[]> | undefined, isFetched: boolean, isFetching: boolean] {
   const [tokenInfo] = useTokenInfoAll();
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
   const { data, isFetched, isFetching } = useQuery<Record<string, AssetInfo[]>>({
-    queryKey: address ? [service.getClientUrl(`balances/all/${address}`)] : [null],
-    queryHash: service.getClientUrl(`balances/all/${address}`),
+    queryKey: addressHex ? [service.getClientUrl(`balances/all/${addressHex}`)] : [null],
+    queryHash: service.getClientUrl(`balances/all/${addressHex}`),
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
