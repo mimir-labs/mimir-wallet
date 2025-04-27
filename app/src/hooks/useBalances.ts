@@ -16,7 +16,7 @@ import { formatUnits } from '@/utils';
 import { BN_ZERO, isHex } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { isEqual } from 'lodash-es';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { addressToHex, useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
 import { useQueries, useQuery } from '@mimir-wallet/service';
@@ -102,10 +102,19 @@ export function useNativeBalances(
   ];
 }
 
-export function useNativeBalancesAll(address?: string) {
+type UseNativeBalancesAll = {
+  data: AccountAssetInfo<true> | undefined;
+  isFetched: boolean;
+  isFetching: boolean;
+  isError: boolean;
+  refetch: () => void;
+};
+
+export function useNativeBalancesAll(address?: string): UseNativeBalancesAll[] {
   const { allApis } = useApi();
   const [allTokenInfo] = useTokenInfoAll();
   const addressHex = address ? addressToHex(address.toString()) : '';
+  const [list, setList] = useState<UseNativeBalancesAll[]>([]);
 
   const queries = useQueries({
     queries: Object.entries(allApis).map(([network, api]) => {
@@ -118,33 +127,42 @@ export function useNativeBalancesAll(address?: string) {
           network: string
         ],
         queryHash,
+        refetchInterval: 12_000,
+        refetchOnMount: false,
+        refetchOnWindowFocus: true,
         enabled: !!address && !!api && api.isApiReady,
         queryFn: getBalances
       };
     })
   });
 
-  return useMemo(() => {
-    return queries.map((item) => {
-      const data = item.data;
+  useEffect(() => {
+    setList((prev) => {
+      const newValue = queries.map((item) => {
+        const data = item.data;
 
-      const tokenInfo = data ? allTokenInfo?.[data.network] : undefined;
+        const tokenInfo = data ? allTokenInfo?.[data.network] : undefined;
 
-      return {
-        isFetched: item.isFetched,
-        isFetching: item.isFetching,
-        isError: item.isError,
-        refetch: item.refetch,
-        data: data
-          ? ({
-              ...data,
-              price: parseFloat(tokenInfo?.detail?.[data.symbol]?.price || '0'),
-              change24h: parseFloat(tokenInfo?.detail?.[data.symbol]?.price_change || '0')
-            } as AccountAssetInfo<true>)
-          : undefined
-      };
+        return {
+          isFetched: item.isFetched,
+          isFetching: item.isFetching,
+          isError: item.isError,
+          refetch: item.refetch,
+          data: data
+            ? ({
+                ...data,
+                price: parseFloat(tokenInfo?.detail?.[data.symbol]?.price || '0'),
+                change24h: parseFloat(tokenInfo?.detail?.[data.symbol]?.price_change || '0')
+              } as AccountAssetInfo<true>)
+            : undefined
+        };
+      });
+
+      return isEqual(prev, newValue) ? prev : newValue;
     });
-  }, [queries, allTokenInfo]);
+  }, [allTokenInfo, queries]);
+
+  return list;
 }
 
 async function _fetchAssetBalances({
@@ -279,7 +297,6 @@ export function useAssetBalances(
       ),
     [addressHex, assets, network]
   );
-  const [nativeBalances] = useNativeBalances(address);
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: [network, api?.api, address, assets] as const,
@@ -311,25 +328,32 @@ export function useAssetBalances(
   return [
     useMemo(
       () =>
-        (
-          data?.map((item) => ({
-            ...item,
-            price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
-            change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
-          })) || []
-        ).concat(nativeBalances || []),
-      [data, tokenInfo, nativeBalances]
+        data?.map((item) => ({
+          ...item,
+          price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
+          change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
+        })) || [],
+      [data, tokenInfo]
     ),
     isFetched,
     isFetching
   ];
 }
 
-export function useAssetBalancesAll(address?: string) {
+type UseAssetBalancesAll = {
+  data: AccountAssetInfo[] | undefined;
+  isFetched: boolean;
+  isFetching: boolean;
+  isError: boolean;
+  refetch: () => void;
+};
+
+export function useAssetBalancesAll(address?: string): UseAssetBalancesAll[] {
   const { allApis } = useApi();
   const [allTokenInfo] = useTokenInfoAll();
   const [allAssets] = useAssetsByAddressAll(address);
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const [list, setList] = useState<UseAssetBalancesAll[]>([]);
 
   const queries = useQueries({
     queries: Object.entries(allApis).map(([network, api]) => {
@@ -354,7 +378,7 @@ export function useAssetBalancesAll(address?: string) {
           assets: AssetInfo[] | undefined
         ],
         queryHash,
-        refetchInterval: 60 * 1000,
+        refetchInterval: 12_000,
         refetchOnMount: false,
         refetchOnWindowFocus: true,
         enabled: !!address && !!api && api.isApiReady && !!assets,
@@ -375,23 +399,29 @@ export function useAssetBalancesAll(address?: string) {
     })
   });
 
-  return useMemo(() => {
-    return queries.map((item) => {
-      const data = item.data;
+  useEffect(() => {
+    setList((prev) => {
+      const newValue = queries.map((item) => {
+        const data = item.data;
 
-      return {
-        isFetched: item.isFetched,
-        isFetching: item.isFetching,
-        isError: item.isError,
-        refetch: item.refetch,
-        data: data?.map((item) => ({
-          ...item,
-          price: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price || '0'),
-          change24h: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price_change || '0')
-        }))
-      };
+        return {
+          isFetched: item.isFetched,
+          isFetching: item.isFetching,
+          isError: item.isError,
+          refetch: item.refetch,
+          data: data?.map((item) => ({
+            ...item,
+            price: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price || '0'),
+            change24h: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price_change || '0')
+          }))
+        };
+      });
+
+      return isEqual(prev, newValue) ? prev : newValue;
     });
   }, [queries, allTokenInfo]);
+
+  return list;
 }
 
 export function useBalanceTotalUsd(address?: string) {
