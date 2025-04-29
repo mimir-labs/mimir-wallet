@@ -43,6 +43,7 @@ function TxSubmit({
   appName,
   iconUrl,
   relatedBatches,
+  alert,
   filterPaths: propsFilterPaths,
   onReject,
   onClose,
@@ -101,8 +102,8 @@ function TxSubmit({
   useCloseWhenPathChange(onClose);
 
   return (
-    <div className='w-full p-4 sm:p-5'>
-      <div className='flex items-center justify-between mb-5'>
+    <div className='w-full p-4 sm:p-5 flex flex-col gap-5 h-[calc(100dvh-60px)]'>
+      <div className='flex items-center justify-between'>
         <h4>Submit Transaction</h4>
         <Button
           isIconOnly
@@ -117,7 +118,9 @@ function TxSubmit({
         </Button>
       </div>
 
-      <div className='w-full h-[calc(100dvh-160px)] p-0 md:p-5 flex flex-col md:flex-row gap-5 overflow-y-auto bg-transparent md:bg-content1 rounded-large shadow-none md:shadow-medium'>
+      {alert && <Alert color='warning' title={alert} />}
+
+      <div className='flex-1 w-full p-0 md:p-5 flex flex-col md:flex-row gap-5 overflow-y-auto bg-transparent md:bg-content1 rounded-large shadow-none md:shadow-medium'>
         <div className='w-full md:w-[60%] p-4 md:p-0 space-y-5 shadow-medium md:shadow-none bg-content1 md:bg-transparent rounded-large'>
           <Sender address={accountData.address} />
 

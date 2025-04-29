@@ -56,7 +56,7 @@ function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionPropo
       />
       <div>
         <h4 className='font-bold text-xl text-center'>{proposal.params.proposer.metadata.name}</h4>
-        <p className='text-small'>
+        <p className='text-small text-center'>
           <Link isExternal href={proposal.params.proposer.metadata.url}>
             {proposal.params.proposer.metadata.url}
           </Link>
