@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { GlobalStyle } from '@/components';
+import { WalletConnectProvider } from '@/features/wallet-connect';
 import { ThemeProvider } from '@/theme';
 import { StyledEngineProvider } from '@mui/material';
 import { useHref, useNavigate } from 'react-router-dom';
@@ -34,8 +35,10 @@ function Root({ children }: { children: React.ReactNode }) {
         <ThemeProvider>
           <QueryProvider>
             <AccountConsumer>
-              <GlobalStyle />
-              {children}
+              <WalletConnectProvider>
+                <GlobalStyle />
+                {children}
+              </WalletConnectProvider>
             </AccountConsumer>
           </QueryProvider>
         </ThemeProvider>

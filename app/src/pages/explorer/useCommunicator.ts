@@ -30,7 +30,7 @@ export function useCommunicator(
   const state: State = {
     genesisHash,
     extrinsicSign: async (payload: SignerPayloadJSON, id: string) => {
-      console.log(payload);
+      console.log('payload', payload);
       const data = await promise;
 
       if (data && data.type === 'pure') {
@@ -78,8 +78,6 @@ export function useCommunicator(
     },
     getAccounts: () => {
       if (!current) return [];
-
-      console.log(current);
 
       return [
         {

@@ -57,14 +57,13 @@ function BatchButton() {
     <>
       <Badge
         size='sm'
+        isInvisible={!txs.length}
         placement='bottom-right'
         content={txs.length}
         shape='circle'
         color='primary'
         classNames={{
-          badge: 'bottom-0 right-0 translate-x-0 -translate-y-0 pointer-events-none'.concat(
-            txs.length ? ' opacity-100' : ' opacity-0'
-          )
+          badge: 'bottom-0.5 right-1 translate-x-0 -translate-y-0 pointer-events-none'
         }}
       >
         <Tooltip content='Batch' closeDelay={0}>

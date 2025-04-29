@@ -78,7 +78,6 @@ function TxSubmit({
   const hasPermission = isLocalAccount(accountData.address);
 
   const handleAddBatch = useCallback(() => {
-    console.log(call.toHex());
     addTx([
       {
         calldata: call.toHex(),

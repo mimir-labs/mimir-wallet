@@ -90,7 +90,7 @@ function BaseContainer({
               <Outlet />
             </div>
             <p className='z-0 absolute bottom-0 left-0 right-0 font-bold text-foreground/50 text-center'>
-              Version: {process.env.VERSION}
+              Version: {import.meta.env.VERSION}
             </p>
           </div>
 

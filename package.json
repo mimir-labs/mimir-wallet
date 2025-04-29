@@ -79,6 +79,10 @@
     "@react-aria/visually-hidden": "^3.8.22",
     "@react-stately/overlays": "^3.6.15",
     "@react-stately/toggle": "^3.8.3",
+    "@walletconnect/auth-client": "2.1.2",
+    "@walletconnect/core": "2.15.1",
+    "@walletconnect/types": "2.15.1",
+    "@walletconnect/utils": "2.15.1",
     "bn.js": "^5.2.1",
     "typescript": "5.6.3"
   }

@@ -1,6 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+export const LS_NAMESPACE = 'Mimir__';
+
 export const SWITCH_ACCOUNT_REMIND_KEY = 'switch_account_remind';
 
 /** @deprecated Use CURRENT_ADDRESS_HEX_KEY instead */
@@ -36,3 +38,5 @@ export const BATCH_TX_V2_PREFIX = 'batch_tx_v2:';
 export const TEMPLATE_PREFIX = 'template:';
 
 export const OMNI_CHAIN_UPGRADE_TIP_KEY = 'omni_chain_upgrade_tip';
+
+export const WALLET_CONNECT_PROJECT_ID = 'db2a617b03addd5e1e485d0a677c1ef4';
