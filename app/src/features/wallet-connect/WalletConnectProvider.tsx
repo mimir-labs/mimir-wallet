@@ -12,7 +12,6 @@ import { getSdkError } from '@walletconnect/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Link } from '@mimir-wallet/ui';
 
 import { SESSION_ADD_EVENT } from './constants';
 import { WalletConnectContext } from './context';
@@ -76,13 +75,9 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
             iconUrl: session?.peer.metadata.icons?.[0],
             appName: session?.peer.metadata.name,
             alert: (
-              <span>
+              <span className='font-normal'>
                 When using WalletConnect, the app may show a failed message, but the transaction might still succeed.
-                Please check the result in Mimir’s{' '}
-                <Link href='/transactions' isExternal>
-                  Pending page
-                </Link>{' '}
-                for accuracy.
+                Please check the result in Mimir’s <b>Pending page</b> for accuracy.
               </span>
             ),
             onSignature: (signer, signature, signedTransaction, payload) => {

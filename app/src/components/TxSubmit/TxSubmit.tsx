@@ -118,7 +118,7 @@ function TxSubmit({
         </Button>
       </div>
 
-      {alert && <Alert color='warning' title={alert} />}
+      {alert && <Alert className='flex-grow-0' color='warning' title={alert} />}
 
       <div className='flex-1 w-full p-0 md:p-5 flex flex-col md:flex-row gap-5 overflow-y-auto bg-transparent md:bg-content1 rounded-large shadow-none md:shadow-medium'>
         <div className='w-full md:w-[60%] p-4 md:p-0 space-y-5 shadow-medium md:shadow-none bg-content1 md:bg-transparent rounded-large'>
