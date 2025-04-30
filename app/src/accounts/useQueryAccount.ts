@@ -21,6 +21,8 @@ function transformAccount(chainSS58: number, account: AccountData): AccountData 
 
   return {
     ...account,
+    // hide name for display
+    name: undefined,
     address: encodeAddress(account.address, chainSS58),
     delegatees: account.delegatees.map((delegatee) => transformAccount(chainSS58, delegatee)) as (AccountData &
       DelegateeProp)[],

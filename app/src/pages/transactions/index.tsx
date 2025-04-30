@@ -56,6 +56,9 @@ function Content({ address }: { address: string }) {
   }, [allApis, transactionCounts]);
   const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<string[]>([]);
   const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<string[]>([]);
+  const selectedPendingNetwork = useMemo(() => {
+    return validPendingNetworks.find(({ network }) => selectedPendingNetworks.includes(network));
+  }, [validPendingNetworks, selectedPendingNetworks]);
   const selectedHistoryNetwork = useMemo(() => {
     return validHistoryNetworks.find(({ network }) => selectedHistoryNetworks.includes(network));
   }, [validHistoryNetworks, selectedHistoryNetworks]);
@@ -119,10 +122,10 @@ function Content({ address }: { address: string }) {
                   variant='bordered'
                   color='default'
                   className='border-divider-300 h-8'
-                  startContent={<Avatar src={validPendingNetworks[0].chain.icon} className='w-4 h-4 bg-transparent' />}
+                  startContent={<Avatar src={selectedPendingNetwork?.chain.icon} className='w-4 h-4 bg-transparent' />}
                   endContent={<ArrowDown className='w-4 h-4' />}
                 >
-                  {validPendingNetworks[0].chain.name} and other {validPendingNetworks.length - 1}
+                  {selectedPendingNetwork?.chain.name} and other {validPendingNetworks.length - 1}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className='w-[200px] rounded-medium p-1'>

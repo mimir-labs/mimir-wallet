@@ -7,6 +7,7 @@ export class FetchError extends Error {
   constructor(message: string, statusCode: number) {
     super(message);
     this.statusCode = statusCode;
+    console.log(this.message);
   }
 }
 
