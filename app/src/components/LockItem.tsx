@@ -13,7 +13,6 @@ import IconUnLock from '@/assets/svg/icon-unlock.svg?react';
 import { useNativeBalances } from '@/hooks/useBalances';
 import { useToggle } from '@/hooks/useToggle';
 import { formatUnits } from '@/utils';
-import { Stack } from '@mui/system';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo, useRef } from 'react';
 
@@ -33,7 +32,7 @@ interface Props {
 }
 
 function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
-  const { api } = useApi();
+  const { api, chainSS58, network } = useApi();
   const [allBalances] = useNativeBalances(address.toString());
   const [open, toggleOpen] = useToggle();
   const onEnoughtStateRef = useRef(onEnoughtState);
@@ -43,8 +42,8 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   const isEnought = useMemo(() => {
     if (allBalances) {
       return (
-        allBalances.transferrable.gte(new BN(value.toString()).add(api.consts.balances.existentialDeposit)) &&
-        allBalances.free.gte(allBalances.locked.add(new BN(value.toString())))
+        allBalances.transferrable >= BigInt(value.toString()) + api.consts.balances.existentialDeposit.toBigInt() &&
+        allBalances.free >= allBalances.locked + BigInt(value.toString())
       );
     }
 
@@ -52,8 +51,8 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   }, [allBalances, api, value]);
 
   useEffect(() => {
-    onEnoughtStateRef.current?.(encodeAddress(address.toString()), isEnought);
-  }, [address, isEnought]);
+    onEnoughtStateRef.current?.(encodeAddress(address.toString(), chainSS58), isEnought);
+  }, [address, isEnought, chainSS58]);
 
   const icon = <div>{isUnLock ? <IconUnLock className='text-primary' /> : <IconLock className='text-primary' />}</div>;
 
@@ -61,6 +60,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
     <>
       {value && address && (
         <Fund
+          defaultNetwork={network}
           defaultValue={formatUnits(value, api.registry.chainDecimals[0])}
           onClose={toggleOpen}
           open={open}
@@ -84,7 +84,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 
             {!isUnLock &&
               (isEnought === 'pending' ? (
-                <Spinner size='sm' variant='spinner' />
+                <Spinner size='sm' />
               ) : isEnought ? (
                 <IconSuccess className='text-success' />
               ) : (
@@ -105,7 +105,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 }
 
 export const LockContainer = React.memo(({ children }: { children: React.ReactNode }) => {
-  return <Stack spacing={1}>{children}</Stack>;
+  return <div className='space-y-2.5'>{children}</div>;
 });
 
 export default React.memo(LockItem);

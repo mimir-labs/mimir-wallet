@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { AccountId, Address } from '@polkadot/types/interfaces';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { TxEvents } from '@mimir-wallet/polkadot-core';
@@ -13,8 +12,9 @@ import { create } from 'zustand';
 
 export interface TxQueue {
   id?: number;
-  accountId?: AccountId | Address | string;
-  call: IMethod;
+  accountId: string;
+  call: IMethod | string;
+  network: string;
   filterPaths?: FilterPath[];
   transaction?: Transaction;
   onlySign?: boolean;
@@ -22,6 +22,7 @@ export interface TxQueue {
   iconUrl?: string;
   appName?: string;
   relatedBatches?: number[];
+  alert?: React.ReactNode;
   onReject?: () => void;
   onClose?: () => void;
   onError?: (error: unknown) => void;

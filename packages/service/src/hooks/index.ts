@@ -2,3 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export * from './useStore.js';
+export * from './useClientQuery.js';

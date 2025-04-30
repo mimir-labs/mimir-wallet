@@ -8,12 +8,11 @@ import IconDiscord from '@/assets/svg/icon-discord.svg?react';
 import IconGithub from '@/assets/svg/icon-github.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import IconX from '@/assets/svg/icon-x.svg?react';
-import { SvgIcon } from '@mui/material';
-import { isArray } from '@polkadot/util';
 import React from 'react';
 
-import { allEndpoints } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
+
+import SupportedChains from './SupportedChains';
 
 interface Props {
   open: boolean;
@@ -22,28 +21,13 @@ interface Props {
   onOpen: () => void;
 }
 
-function SupportedChains({ supported }: { supported: string[] | true }) {
-  return (
-    <div className='absolute right-0 top-0 flex items-center'>
-      <p className='mr-2.5'>Supported on</p>
-      {isArray(supported)
-        ? supported.map((network) => (
-            <Avatar
-              key={network}
-              src={allEndpoints.find((item) => item.key === network)?.icon}
-              className='w-[16px] h-[16px] -ml-1 bg-background-default border-1 border-white'
-            />
-          ))
-        : 'All Chains'}
-    </div>
-  );
-}
-
 function Contents({ dapp }: { dapp: DappOption }) {
   return (
     <ModalBody>
       <div className='space-y-2.5 relative overflow-hidden'>
-        <SupportedChains supported={dapp.supportedChains} />
+        <div className='absolute right-0 top-0 flex items-center'>
+          Supported On <SupportedChains app={dapp} />
+        </div>
         <Avatar radius='md' src={dapp.icon} className='w-[64px] h-[64px]' />
         <h3>{dapp.name}</h3>
         <div className='flex items-center gap-2.5'>
@@ -55,27 +39,27 @@ function Contents({ dapp }: { dapp: DappOption }) {
           <Divider orientation='vertical' className='h-[12px]' />
           {dapp.website && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.website} size='sm' target='_blank'>
-              <SvgIcon component={IconWebsite} inheritViewBox />
+              <IconWebsite className='w-4 h-4' />
             </Button>
           )}
           {dapp.github && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.github} size='sm' target='_blank'>
-              <SvgIcon component={IconGithub} inheritViewBox />
+              <IconGithub className='w-4 h-4' />
             </Button>
           )}
           {dapp.discord && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.discord} size='sm' target='_blank'>
-              <SvgIcon component={IconDiscord} inheritViewBox />
+              <IconDiscord className='w-4 h-4' />
             </Button>
           )}
           {dapp.twitter && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.twitter} size='sm' target='_blank'>
-              <SvgIcon component={IconX} inheritViewBox />
+              <IconX className='w-4 h-4' />
             </Button>
           )}
           {dapp.matrix && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.matrix} size='sm' target='_blank'>
-              <SvgIcon component={IconMatrix} inheritViewBox />
+              <IconMatrix className='w-4 h-4' />
             </Button>
           )}
         </div>

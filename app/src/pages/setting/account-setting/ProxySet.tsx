@@ -1,26 +1,26 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData } from '@/hooks/types';
-import type { Vec } from '@polkadot/types';
-import type { PalletProxyProxyDefinition } from '@polkadot/types/lookup';
-
 import { useAccount } from '@/accounts/useAccount';
-import { useAddressMeta } from '@/accounts/useAddressMeta';
+import { useQueryAccount } from '@/accounts/useQueryAccount';
 import IconClock from '@/assets/svg/icon-clock.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
-import { Address, AddressCell, FormatBalance, TxButton } from '@/components';
+import { Address, AddressCell, Empty, FormatBalance, InputNetwork, TxButton } from '@/components';
 import { findToken } from '@/config';
+import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useNativeBalances } from '@/hooks/useBalances';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { useProxies } from '@/hooks/useProxies';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { Alert, AlertTitle, Avatar, Box, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Stack, Typography } from '@mui/material';
 import { BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import {
+  Alert,
   Button,
   Chip,
   Divider,
@@ -30,104 +30,125 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Spinner,
   Tooltip
 } from '@mimir-wallet/ui';
 
-function ProxySet({
-  account,
+function Content({
   address,
-  proxies
+  network,
+  setNetwork
 }: {
-  account: AccountData;
   address: string;
-  proxies: Vec<PalletProxyProxyDefinition>;
+  network: string;
+  setNetwork: (network: string) => void;
 }) {
   const { api } = useApi();
   const { isLocalAccount } = useAccount();
   const { addQueue } = useTxQueue();
-  const { meta } = useAddressMeta(address);
   const [isOpen, toggleOpen] = useToggle(false);
   const [isAlertOpen, toggleAlertOpen] = useToggle(false);
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
   const [allBalances] = useNativeBalances(address);
+  const [proxies, isFetched, isFetching] = useProxies(address);
+  const [account] = useQueryAccount(address);
 
   const isReadOnly = useMemo(() => !isLocalAccount(address), [address, isLocalAccount]);
 
   return (
     <>
       <Stack spacing={2}>
+        <InputNetwork network={network} setNetwork={setNetwork} />
+
         <Box sx={{ borderRadius: 1, padding: 1, bgcolor: 'secondary.main' }}>
           <Typography fontWeight={700}>Proxy Account</Typography>
           <Stack spacing={1} sx={{ marginTop: 1 }}>
-            {proxies.map((proxy, index) => (
-              <Box
-                key={index}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  bgcolor: 'white',
-                  borderRadius: 1,
-                  padding: 0.5,
-                  gap: 0.5
-                }}
-              >
-                <Box sx={{ flex: '1' }}>
-                  <AddressCell shorten value={proxy.delegate.toString()} />
+            {isFetched &&
+              proxies &&
+              proxies[0].map((proxy, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    bgcolor: 'white',
+                    borderRadius: 1,
+                    padding: 0.5,
+                    gap: 0.5
+                  }}
+                >
+                  <Box sx={{ flex: '1' }}>
+                    <AddressCell shorten value={proxy.delegate.toString()} />
+                  </Box>
+                  {proxy.delay.gt(BN_ZERO) ? (
+                    <Tooltip content={`Delay Blocks: ${[proxy.delay]}`}>
+                      <IconClock className='w-4 h-4 opacity-70' />
+                    </Tooltip>
+                  ) : null}
+                  <Chip color='secondary'>{proxy.proxyType.toString()}</Chip>
+                  {!isReadOnly && (
+                    <TxButton
+                      isIconOnly
+                      color='danger'
+                      size='sm'
+                      variant='light'
+                      className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
+                      accountId={address}
+                      website='mimir://internal/setup'
+                      overrideAction={
+                        proxies[0].length === 1 && account?.type === 'pure'
+                          ? toggleAlertOpen
+                          : () => {
+                              addQueue({
+                                accountId: address,
+                                call:
+                                  proxies[0].length === 1
+                                    ? api.tx.proxy.removeProxies()
+                                    : api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType, proxy.delay),
+                                website: 'mimir://internal/setup',
+                                network
+                              });
+                            }
+                      }
+                    >
+                      <IconDelete className='w-4 h-4' />
+                    </TxButton>
+                  )}
                 </Box>
-                {proxy.delay.gt(BN_ZERO) ? (
-                  <Tooltip content={`Delay Blocks: ${[proxy.delay]}`}>
-                    <IconClock className='w-4 h-4 opacity-70' />
-                  </Tooltip>
-                ) : null}
-                <Chip color='secondary'>{proxy.proxyType.toString()}</Chip>
-                {!isReadOnly && (
-                  <TxButton
-                    isIconOnly
-                    color='danger'
-                    size='sm'
-                    variant='light'
-                    className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
-                    accountId={address}
-                    website='mimir://internal/setup'
-                    overrideAction={
-                      proxies.length === 1 && meta.isPure
-                        ? toggleAlertOpen
-                        : () => {
-                            addQueue({
-                              accountId: address,
-                              call:
-                                proxies.length === 1
-                                  ? api.tx.proxy.removeProxies()
-                                  : api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType, proxy.delay),
-                              website: 'mimir://internal/setup'
-                            });
-                          }
-                    }
-                  >
-                    <IconDelete className='w-4 h-4' />
-                  </TxButton>
-                )}
-              </Box>
-            ))}
+              ))}
+
+            {isFetched && proxies?.[0]?.length === 0 && <Empty height={200} label='No proxies' />}
+
+            {!isFetched && isFetching && <Spinner />}
           </Stack>
         </Box>
 
         <Divider />
 
-        <Alert icon={<IconInfo />} severity='warning' sx={{ '.MuiAlert-message': { overflow: 'visible' } }}>
-          <AlertTitle>Notice</AlertTitle>
-          <ul>
-            <li>Only All authority can delete proxy.</li>
-            <li>Deleting a Proxy will refund the fees, while adding a Proxy requires an additional deposit fee.</li>
-          </ul>
-        </Alert>
+        <Alert
+          hideIconWrapper
+          color='warning'
+          description={
+            <ul>
+              <li>Only All authority can delete proxy.</li>
+              <li>Deleting a Proxy will refund the fees, while adding a Proxy requires an additional deposit fee.</li>
+            </ul>
+          }
+          classNames={{
+            title: 'font-bold text-small',
+            description: 'text-tiny'
+          }}
+          icon={<IconInfo />}
+          title='Notice'
+          variant='flat'
+        />
 
         <Button as={Link} color='primary' fullWidth href='/add-proxy'>
           Add New Proxy
         </Button>
 
-        {meta.isPure ? (
+        {account?.type === 'pure' ? (
           <Button fullWidth color='danger' onPress={toggleOpen}>
             Delete Account
           </Button>
@@ -144,7 +165,7 @@ function ProxySet({
         )}
       </Stack>
 
-      {account.type === 'pure' && (
+      {account && account.type === 'pure' && (
         <Modal size='xl' isOpen={isOpen} onClose={toggleOpen}>
           <ModalContent>
             <ModalHeader>Attention</ModalHeader>
@@ -198,7 +219,7 @@ function ProxySet({
         </Modal>
       )}
 
-      {account.type === 'pure' && (
+      {account && account.type === 'pure' && (
         <Modal size='xl' isOpen={isAlertOpen} onClose={toggleAlertOpen}>
           <ModalContent>
             <ModalHeader>Attention</ModalHeader>
@@ -217,6 +238,28 @@ function ProxySet({
         </Modal>
       )}
     </>
+  );
+}
+
+function ProxySet({ address }: { address: string }) {
+  const supportedNetworks = useAddressSupportedNetworks(address);
+  const [network, setNetwork] = useInputNetwork(
+    undefined,
+    supportedNetworks?.map((item) => item.key)
+  );
+
+  return (
+    <SubApiRoot
+      network={network}
+      supportedNetworks={supportedNetworks?.map((item) => item.key)}
+      Fallback={({ apiState: { chain } }) => (
+        <div className='w-[500px] max-w-full mx-auto my-0 py-10 flex items-center justify-center bg-content1 rounded-large'>
+          <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
+        </div>
+      )}
+    >
+      <Content address={address} network={network} setNetwork={setNetwork} />
+    </SubApiRoot>
   );
 }
 

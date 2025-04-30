@@ -6,9 +6,10 @@ import type { Transaction } from '@/hooks/types';
 import ArrowRight from '@/assets/svg/ArrowRight.svg?react';
 import { AppName } from '@/components';
 import { CallDisplaySection } from '@/params';
-import { Grid2 as Grid, IconButton, SvgIcon } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { Button } from '@mimir-wallet/ui';
 
 function AppCell({ transaction }: { transaction: Transaction }) {
   return <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />;
@@ -20,16 +21,9 @@ function ActionTextCell({ section, method }: { section?: string; method?: string
 
 function ActionsCell() {
   return (
-    <IconButton color='primary'>
-      <SvgIcon
-        component={ArrowRight}
-        inheritViewBox
-        sx={{
-          fontSize: '0.6rem',
-          color: 'primary.main'
-        }}
-      />
-    </IconButton>
+    <Button color='primary' size='sm' variant='light' isIconOnly onPress={(e) => e.continuePropagation()}>
+      <ArrowRight className='w-4 h-4 text-primary' />
+    </Button>
   );
 }
 
@@ -37,37 +31,20 @@ function TxItems({ transaction }: { transaction: Transaction }) {
   const navigate = useNavigate();
 
   return (
-    <Grid
-      container
-      sx={{
-        borderRadius: 1,
-        overflow: 'hidden',
-        bgcolor: 'secondary.main',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        paddingX: 1,
-        fontWeight: 600,
-        '.MuiGrid2-root': {
-          display: 'flex',
-          alignItems: 'center',
-          height: 40
-        }
-      }}
-      columns={7}
-      spacing={1}
+    <div
+      className='grid grid-cols-7 rounded-medium overflow-hidden bg-secondary cursor-pointer px-2.5 font-semibold [&_div]:flex [&_div]:items-center [&_div]:h-10'
       onClick={() => navigate(`/transactions/${transaction.id}`)}
     >
-      <Grid size={3}>
+      <div className='col-span-3'>
         <AppCell transaction={transaction} />
-      </Grid>
-      <Grid size={3} sx={{ justifyContent: 'center' }}>
+      </div>
+      <div className='col-span-3 flex justify-center'>
         <ActionTextCell section={transaction.section} method={transaction.method} />
-      </Grid>
-      <Grid size='grow' sx={{ flexDirection: 'row-reverse' }}>
+      </div>
+      <div className='col-span-1 flex justify-end'>
         <ActionsCell />
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 }
 

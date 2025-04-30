@@ -4,7 +4,7 @@
 import { useAccount } from '@/accounts/useAccount';
 import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
 import { isAddress } from '@polkadot/util-crypto';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { addressEq, decodeAddress, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
@@ -24,24 +24,33 @@ function Content({
   onClose?: () => void;
 }) {
   const { addAddress, addresses } = useAccount();
-  const { network } = useApi();
+  const { chainSS58 } = useApi();
   const [name, setName] = useState<string>('');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
   const [info] = useDeriveAccountInfo(address);
   const { display, displayParent } = info || {};
 
-  const _onChangeAddress = useCallback((addressInput: string) => {
-    let address = '';
-
-    try {
-      const publicKey = decodeAddress(addressInput);
-
-      address = encodeAddress(publicKey);
-      setAddress(address);
-    } catch {
-      setAddress(addressInput);
+  useEffect(() => {
+    if (display) {
+      setName(`${displayParent || display}${displayParent ? `/${display}` : ''}`);
     }
-  }, []);
+  }, [display, displayParent]);
+
+  const _onChangeAddress = useCallback(
+    (addressInput: string) => {
+      let address = '';
+
+      try {
+        const publicKey = decodeAddress(addressInput);
+
+        address = encodeAddress(publicKey, chainSS58);
+        setAddress(address);
+      } catch {
+        setAddress(addressInput);
+      }
+    },
+    [chainSS58]
+  );
 
   const exists = useMemo(
     () =>
@@ -59,27 +68,25 @@ function Content({
         throw new Error('not a valid address');
       }
 
-      addAddress(address, display ? display : name.trim(), [network], watchlist);
+      addAddress(address, display ? display : name.trim(), watchlist);
       onAdded?.(address);
       onClose?.();
     } catch (error) {
       toastError(error);
     }
-  }, [address, addAddress, display, name, network, watchlist, onAdded, onClose]);
+  }, [address, addAddress, display, name, watchlist, onAdded, onClose]);
 
   return (
     <>
       <ModalBody>
         <div className='space-y-5'>
-          {display ? (
-            <Input
-              label='Identity'
-              disabled
-              value={`${displayParent || display}${displayParent ? `/${display}` : ''}`}
-            />
-          ) : (
-            <Input label='Name' onChange={setName} placeholder='input name for contact' value={name} />
-          )}
+          <Input
+            label='Name'
+            disabled={!!display}
+            onChange={setName}
+            placeholder='input name for contact'
+            value={name}
+          />
           <Input
             error={exists ? new Error('Already in related account') : null}
             label='Address'

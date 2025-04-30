@@ -3,7 +3,6 @@
 
 import type { MutableRefObject } from 'react';
 
-import { Box } from '@mui/material';
 import React from 'react';
 
 type AppIframeProps = {
@@ -20,15 +19,14 @@ const IFRAME_SANDBOX_ALLOWED_FEATURES =
 
 function AppIframe({ allowedFeaturesList = 'camera', appUrl, iframeRef, onLoad, title }: AppIframeProps) {
   return (
-    <Box
+    <iframe
       allow={allowedFeaturesList}
-      component='iframe'
       id={`iframe-${appUrl}`}
       onLoad={onLoad}
       ref={iframeRef}
       sandbox={IFRAME_SANDBOX_ALLOWED_FEATURES}
       src={appUrl}
-      sx={{
+      style={{
         height: '100%',
         width: '100%',
         overflow: 'auto',
@@ -36,6 +34,7 @@ function AppIframe({ allowedFeaturesList = 'camera', appUrl, iframeRef, onLoad, 
         border: 'none'
       }}
       title={title}
+      onClick={console.log}
     />
   );
 }

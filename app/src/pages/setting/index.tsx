@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tab, Tabs } from '@mimir-wallet/ui';
 
 import AccountSetting from './account-setting';
-import NetworkSetting from './network';
+import GeneralSetting from './general-setting';
 
 function Setting({ type }: { type: 'general' | 'account' }) {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ function Setting({ type }: { type: 'general' | 'account' }) {
           <AccountSetting />
         </Tab>
         <Tab key='general' title='General Setting'>
-          <NetworkSetting />
+          <GeneralSetting />
         </Tab>
       </Tabs>
 

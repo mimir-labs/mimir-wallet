@@ -3,21 +3,20 @@
 
 import { DappCell } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
-import { Grid2 as Grid } from '@mui/material';
 
 function PageDapp() {
   const { addFavorite, dapps, isFavorite, removeFavorite } = useDapps();
 
   return (
-    <Grid columns={{ xs: 12 }} container spacing={2.5}>
+    <div className='grid grid-cols-12 gap-6'>
       {dapps.map((dapp, index) => {
         return (
-          <Grid key={index} size={{ lg: 4, md: 6, xs: 12 }}>
+          <div className='col-span-12 md:col-span-6 lg:col-span-4' key={index}>
             <DappCell addFavorite={addFavorite} dapp={dapp} isFavorite={isFavorite} removeFavorite={removeFavorite} />
-          </Grid>
+          </div>
         );
       })}
-    </Grid>
+    </div>
   );
 }
 

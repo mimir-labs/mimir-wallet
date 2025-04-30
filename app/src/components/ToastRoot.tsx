@@ -1,15 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Portal } from '@mui/material';
+import { createPortal } from 'react-dom';
 import { type IconProps, Icons, ToastContainer } from 'react-toastify';
-import { injectStyle } from 'react-toastify/dist/inject-style';
 
 import FailedAnimation from './animation/Failed';
 import NoticeAnimation from './animation/Notice';
 import SuccessAnimation from './animation/Success';
-
-injectStyle();
 
 const icon = (props: IconProps) => {
   if (props.type === 'info') {
@@ -34,22 +31,21 @@ const icon = (props: IconProps) => {
 };
 
 function ToastRoot() {
-  return (
-    <Portal>
-      <ToastContainer
-        autoClose={5000}
-        closeOnClick
-        draggable
-        hideProgressBar={false}
-        icon={icon}
-        newestOnTop={false}
-        pauseOnFocusLoss
-        pauseOnHover
-        position='top-right'
-        rtl={false}
-        theme='light'
-      />
-    </Portal>
+  return createPortal(
+    <ToastContainer
+      autoClose={5000}
+      closeOnClick
+      draggable
+      hideProgressBar={false}
+      icon={icon}
+      newestOnTop={false}
+      pauseOnFocusLoss
+      pauseOnHover
+      position='top-right'
+      rtl={false}
+      theme='light'
+    />,
+    document.body
   );
 }
 

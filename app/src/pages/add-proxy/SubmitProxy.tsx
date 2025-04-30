@@ -6,7 +6,6 @@ import type { ProxyArgs } from './types';
 import { Address, AddressRow, TxButton } from '@/components';
 import { toastSuccess } from '@/components/utils';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { Box } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import { useAsyncFn, useToggle } from 'react-use';
 
@@ -50,21 +49,13 @@ function ConfirmDialog({
         <ModalBody className='gap-4'>
           <p>Indirect Controllers</p>
           {list.map((address) => (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: 1,
-                borderRadius: 1,
-                border: '1px solid',
-                borderColor: 'grey.300'
-              }}
+            <div
+              className='flex justify-between items-center p-2.5 rounded-medium border-1 border-divider-300'
               key={address}
             >
               <AddressRow withAddress={false} withName value={address} />
               <Address shorten value={address} />
-            </Box>
+            </div>
           ))}
         </ModalBody>
         <Divider />
@@ -93,7 +84,7 @@ function SubmitProxy({
   proxyArgs: ProxyArgs[];
   setProxyArgs: React.Dispatch<React.SetStateAction<ProxyArgs[]>>;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const [alertOpen, toggleAlertOpen] = useToggle(false);
   const { addQueue } = useTxQueue();
   const [detacted, setDetacted] = useState<string[]>([]);
@@ -116,6 +107,7 @@ function SubmitProxy({
       call,
       accountId: proxied,
       website: 'mimir://internal/setup',
+      network,
       onResults: (result) => {
         setProxyArgs([]);
         const events = result.events.filter((item) => api.events.proxy.ProxyAdded.is(item.event));
@@ -140,7 +132,7 @@ function SubmitProxy({
         }
       }
     });
-  }, [addQueue, api, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
+  }, [addQueue, api, network, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
 
   const handleClickAction = useAsyncFn(async () => {
     const detacted: Set<string> = new Set();
@@ -149,7 +141,7 @@ function SubmitProxy({
       const result = await api.query.proxy.proxies(delegate);
 
       for (const item of result[0]) {
-        if (item.proxyType.type === 'Any' || item.proxyType.type === 'NonTransfer') {
+        if (item.proxyType.type === 'Any' || (item.proxyType.type as string) === 'NonTransfer') {
           detacted.add(item.delegate.toString());
         }
       }

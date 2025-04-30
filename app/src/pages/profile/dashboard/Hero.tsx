@@ -3,39 +3,67 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
-import StatescanImg from '@/assets/images/statescan.svg';
-import SubscanImg from '@/assets/images/subscan.svg';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
+import IconLink from '@/assets/svg/icon-link.svg?react';
 import IconProxy from '@/assets/svg/icon-proxy-fill.svg?react';
 import IconQrcode from '@/assets/svg/icon-qr.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@/assets/svg/icon-set.svg?react';
-import { Address, AddressName, CopyButton, Fund, IdentityIcon, QrcodeAddress } from '@/components';
+import { Address, AddressName, CopyAddress, Fund, IdentityIcon } from '@/components';
+import { toastSuccess } from '@/components/utils';
+import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
+import { useAddressExplorer } from '@/hooks/useAddressExplorer';
+import { useCopyAddress } from '@/hooks/useCopyAddress';
+import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useQrAddress } from '@/hooks/useQrAddress';
 import { formatDisplay } from '@/utils';
 import { Avatar, Box, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { chainLinks, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Link, Tooltip } from '@mimir-wallet/ui';
 
-function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string; changes: number }) {
-  const { chain } = useApi();
+function SubsquareLink({ network, address }: { network: string; address: string }) {
+  const isSupported = SubsquareApp.supportedChains.includes(network);
+
+  if (!isSupported) {
+    return null;
+  }
+
+  const url = SubsquareApp.urlSearch?.(network) || new URL(SubsquareApp.url);
+
+  url.pathname = `/user/${address}`;
+
+  return (
+    <Tooltip content='Subsquare' closeDelay={0}>
+      <Link href={`/explorer/${encodeURIComponent(url.toString())}`}>
+        <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
+      </Link>
+    </Tooltip>
+  );
+}
+
+function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string | number; changes: number }) {
+  const { network, chainSS58 } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [open, toggleOpen] = useToggle(false);
-  const [qrOpen, toggleQrOpen] = useToggle(false);
   const [account] = useQueryAccount(address);
   const { breakpoints } = useTheme();
   const downSm = useMediaQuery(breakpoints.down('sm'));
+  const { open: openQr } = useQrAddress();
+  const { open: openExplorer } = useAddressExplorer();
+  const { open: openCopy } = useCopyAddress();
+  const [, copy] = useCopyClipboard();
 
   const showWatchOnlyButton = useMemo(
     () => !(isLocalAccount(address) || isLocalAddress(address, true)),
     [address, isLocalAccount, isLocalAddress]
   );
   const days = account ? Math.ceil((Date.now() - account.createdAt) / (ONE_DAY * 1000)) : '--';
-  const formatUsd = formatDisplay(totalUsd);
+  const formatUsd = formatDisplay(totalUsd.toString());
 
   const buttons = (
     <div className='w-full sm:w-auto grid md:flex grid-cols-2 item-center gap-2'>
@@ -140,15 +168,33 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
                 color: 'text.primary',
                 lineHeight: 1.1
               }}
+              onClick={() => {
+                copy(encodeAddress(address, chainSS58));
+                openCopy(address);
+                toastSuccess('Address copied');
+              }}
             >
               <Address value={address} shorten={downSm} />
-              <CopyButton value={address} color='primary' className='opacity-50' />
+              <CopyAddress address={address} color='primary' className='opacity-50' />
+              <Tooltip content='Explorer' closeDelay={0}>
+                <Button
+                  isIconOnly
+                  className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
+                  color='primary'
+                  variant='light'
+                  size='sm'
+                  onPress={() => openExplorer(address)}
+                >
+                  <IconLink className='w-4 h-4 opacity-50' />
+                </Button>
+              </Tooltip>
+
               <Button
                 isIconOnly
                 color='primary'
                 size='sm'
                 variant='light'
-                onPress={toggleQrOpen}
+                onPress={() => openQr(address)}
                 className='opacity-50 min-w-[26px] w-[26px] h-[26px] text-medium'
               >
                 <IconQrcode className='w-[16px] h-[16px]' />
@@ -157,22 +203,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
               <span>Mimir Secured {days} Days</span>
-              <Tooltip content={window.currentChain.statescan ? 'Statescan' : 'Subscan'} closeDelay={0}>
-                <Link target='_blank' href={chainLinks.accountExplorerLink(address)} rel='noreferrer'>
-                  <Avatar
-                    style={{ width: 16, height: 16 }}
-                    src={window.currentChain.statescan ? StatescanImg : SubscanImg}
-                    alt='subscan'
-                  />
-                </Link>
-              </Tooltip>
-              {chain.subsquareUrl && (
-                <Tooltip content='Subsquare' closeDelay={0}>
-                  <Link href={`/explorer/${encodeURIComponent(`${chain.subsquareUrl}user/${encodeAddress(address)}`)}`}>
-                    <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
-                  </Link>
-                </Tooltip>
-              )}
+              <SubsquareLink network={network} address={address} />
             </Box>
 
             <Divider sx={{ display: { sm: 'block', xs: 'none' }, maxWidth: 250, minWidth: 200 }} />
@@ -206,9 +237,10 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               component='span'
               sx={{
                 marginRight: 0.5,
-                color: changes >= 0 ? 'success.main' : 'error.main'
+                color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'text.secondary'
               }}
             >
+              {changes > 0 ? '+' : ''}
               {(changes * 100).toFixed(2)}%
             </Box>
             <span style={{ fontWeight: 400 }}>Last 24 Hours</span>
@@ -219,7 +251,6 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
       </Paper>
 
       <Fund onClose={toggleOpen} open={open} receipt={address} />
-      <QrcodeAddress open={qrOpen} onClose={toggleQrOpen} value={address} />
     </>
   );
 }

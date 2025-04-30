@@ -3,17 +3,15 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { Bytes, Data, Option, Vec } from '@polkadot/types';
-import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { PalletIdentityJudgement, PalletIdentityRegistration } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
 
 import { dataToUtf8 } from '@/utils';
 import { blake2AsHex } from '@polkadot/util-crypto';
+import { useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useIdentityApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
-
-import { createNamedHook } from './createNamedHook';
 
 function extractOther(additional: Vec<ITuple<[Data, Data]>>) {
   return additional.reduce<Record<string, string>>((other, [_key, _value]) => {
@@ -108,19 +106,25 @@ async function getIdentityInfo({
   };
 }
 
-function useDeriveAccountInfoImpl(value?: AccountId | AccountIndex | Address | Uint8Array | string | null) {
-  const { identityApi } = useApi();
-  const queryHash = blake2AsHex(`${identityApi?.genesisHash.toHex()}-identity-info-${value?.toString()}`);
+export function useDeriveAccountInfo(value?: string | null) {
+  const identityApi = useIdentityApi();
+
+  const address = value ? value.toString() : '';
+  const addressHex = address ? addressToHex(address) : '0x';
+  const enabled =
+    !!identityApi && !!identityApi.isApiReady && !!identityApi.api?.query?.identity?.identityOf && !!address;
+  const queryHash = useMemo(
+    () => blake2AsHex(`${identityApi?.network}-identity-info-${addressHex}-${enabled.valueOf()}`),
+    [addressHex, enabled, identityApi?.network]
+  );
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [identityApi, value?.toString()] as const,
+    queryKey: [identityApi?.api, address] as const,
     queryHash,
     refetchInterval: 12000,
     queryFn: getIdentityInfo,
-    enabled: !!identityApi && !!identityApi.query?.identity?.identityOf && !!value
+    enabled: enabled
   });
 
   return [data, isFetched, isFetching] as const;
 }
-
-export const useDeriveAccountInfo = createNamedHook('useDeriveAccountInfo', useDeriveAccountInfoImpl);

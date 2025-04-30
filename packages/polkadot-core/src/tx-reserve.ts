@@ -3,10 +3,8 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { Option, u128, Vec } from '@polkadot/types';
+import type { Option } from '@polkadot/types';
 import type { Call, Multisig } from '@polkadot/types/interfaces';
-import type { PalletProxyAnnouncement, PalletProxyProxyDefinition } from '@polkadot/types/lookup';
-import type { ITuple } from '@polkadot/types/types';
 import type { BN } from '@polkadot/util';
 
 import { blake2AsU8a, encodeMultiAddress } from '@polkadot/util-crypto';
@@ -84,11 +82,9 @@ export async function txReserve(
     }
   } else if (api.tx.proxy?.announce.is(call)) {
     const real = call.args[0].toString();
-    const [announcements, proxies] = await api.queryMulti<
-      [ITuple<[Vec<PalletProxyAnnouncement>, u128]>, ITuple<[Vec<PalletProxyProxyDefinition>, u128]>]
-    >([
-      [api.query.proxy.announcements, address],
-      [api.query.proxy.proxies, real]
+    const [announcements, proxies] = await Promise.all([
+      api.query.proxy.announcements(address),
+      api.query.proxy.proxies(real)
     ]);
 
     _increaseValue(

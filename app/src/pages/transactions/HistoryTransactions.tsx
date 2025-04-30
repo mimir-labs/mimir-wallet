@@ -1,8 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData } from '@/hooks/types';
-
 import { Empty } from '@/components';
 import { useHistoryTransactions } from '@/hooks/useTransactions';
 import { TxCell } from '@/transactions';
@@ -13,9 +11,22 @@ import { skeleton } from './skeleton';
 
 const limit = 20;
 
-function HistoryTransactions({ account, txId }: { account: AccountData; txId?: string }) {
+function HistoryTransactions({
+  isFetched: propsIsFetched,
+  isFetching: propsIsFetching,
+  network,
+  address,
+  txId
+}: {
+  isFetched: boolean;
+  isFetching: boolean;
+  network?: string;
+  address: string;
+  txId?: string;
+}) {
   const [data, isFetched, isFetching, hasNexPage, , fetchNextPage] = useHistoryTransactions(
-    account.address,
+    network,
+    address,
     limit,
     txId
   );
@@ -24,7 +35,7 @@ function HistoryTransactions({ account, txId }: { account: AccountData; txId?: s
     return <Empty height='80dvh' />;
   }
 
-  if (!isFetched && isFetching) {
+  if ((!isFetched && isFetching) || (!propsIsFetched && propsIsFetching)) {
     return skeleton;
   }
 
@@ -38,7 +49,7 @@ function HistoryTransactions({ account, txId }: { account: AccountData; txId?: s
     >
       {data.map((item) => (
         <div key={item.id} className='mb-5'>
-          <TxCell key={item.id} account={account} transaction={item} />
+          <TxCell key={item.id} address={address} transaction={item} />
         </div>
       ))}
     </InfiniteScroll>

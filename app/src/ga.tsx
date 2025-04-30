@@ -14,3 +14,14 @@ export function initGa() {
     }
   }
 }
+
+export const gaActions = {
+  omniSolochain: (mode: string) => {
+    ReactGA.event({
+      category: 'TopBar',
+      action: 'OmniSoloSwitch',
+      label: `Switch to ${mode}`,
+      transport: 'beacon'
+    });
+  }
+};

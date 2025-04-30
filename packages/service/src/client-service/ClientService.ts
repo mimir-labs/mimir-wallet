@@ -7,95 +7,101 @@ import { fetcher } from '../fetcher.js';
 import { jsonHeader } from './defaults.js';
 
 export class ClientService {
-  constructor(
-    private readonly clientGateway: string,
-    private readonly networkService: string
-  ) {}
+  constructor(private readonly clientGateway: string) {}
 
-  static create(clientGateway: string, networkService: string) {
-    return new ClientService(clientGateway, networkService);
-  }
-
-  public getNetworkUrl(path: string) {
-    const url = new URL(path, this.networkService);
-
-    return url.toString();
+  static create(clientGateway: string) {
+    return new ClientService(clientGateway);
   }
 
   public getClientUrl(path: string) {
-    const url = new URL(path, this.clientGateway);
+    const url = new URL('/v1/' + (path.startsWith('/') ? path.slice(1) : path), this.clientGateway);
 
     return url.toString();
   }
 
-  public getMetadata(): Promise<Record<string, HexString>> {
-    return fetcher(this.getNetworkUrl('metadata'), {
+  public getMetadata(chain: string): Promise<Record<string, HexString>> {
+    return fetcher(this.getClientUrl(`chains/${chain}/metadata`), {
       method: 'GET',
       headers: jsonHeader
     });
   }
 
-  public createMultisig(who: HexString[], threshold: number, name?: string | null, isValid = true) {
-    return fetcher(this.getNetworkUrl('multisig'), {
+  public createMultisig(chain: string, who: HexString[], threshold: number, name?: string | null) {
+    return fetcher(this.getClientUrl(`chains/${chain}/create-multisig`), {
       method: 'POST',
-      body: JSON.stringify({ who, threshold, name, isValid }),
+      body: JSON.stringify({ who, threshold, name }),
       headers: jsonHeader
     });
   }
 
-  public getFullAccount(address: string) {
-    return fetcher(this.getNetworkUrl(`accounts/full/${address}`), {
+  public getDetails(chain: string, address: string) {
+    return fetcher(this.getClientUrl(`chains/${chain}/${address}/details`), {
       method: 'GET',
       headers: jsonHeader
     });
   }
 
-  public updateCalldata(calldata: HexString) {
-    return fetcher(this.getNetworkUrl('calldata'), {
+  public getOmniChainDetails(address: string) {
+    return fetcher(this.getClientUrl(`omni-chain/${address}/details`), {
+      method: 'GET',
+      headers: jsonHeader
+    });
+  }
+
+  public updateCalldata(chain: string, calldata: HexString) {
+    return fetcher(this.getClientUrl(`chains/${chain}/calldata`), {
       method: 'POST',
       body: JSON.stringify({ calldata }),
       headers: jsonHeader
     });
   }
 
+  public getCalldata(chain: string, hash: HexString) {
+    return fetcher(this.getClientUrl(`chains/${chain}/calldata/${hash}`), {
+      method: 'GET',
+      headers: jsonHeader
+    });
+  }
+
   public prepareMultisig(
+    chain: string,
     creator: HexString,
     extrinsicHash: HexString,
     name: string,
     threshold?: number | null,
     who?: HexString[] | null
   ) {
-    return fetcher(this.getNetworkUrl('multisig/prepare'), {
+    return fetcher(this.getClientUrl(`chains/${chain}/prepare-pure`), {
       method: 'POST',
       body: JSON.stringify({ creator, extrinsicHash, who, threshold, name }),
       headers: jsonHeader
     });
   }
 
-  public updatePrepareMultisig(extrinsicHash: HexString, name: string, threshold: number, who: HexString[]) {
-    return fetcher(this.getNetworkUrl('multisig/prepare'), {
-      method: 'PATCH',
-      body: JSON.stringify({ extrinsicHash, who, threshold, name }),
-      headers: jsonHeader
-    });
-  }
-
-  public updateAccountName(address: HexString, name: string) {
-    return fetcher(this.getNetworkUrl(`multisig/${address}`), {
+  public updateAccountName(chain: string, address: HexString, name: string) {
+    return fetcher(this.getClientUrl(`chains/${chain}/${address}/update-name`), {
       method: 'PATCH',
       body: JSON.stringify({ name }),
       headers: jsonHeader
     });
   }
 
-  public getMultisigs(addresses: string[]) {
-    return fetcher(this.getNetworkUrl(`multisigs/?${addresses.map((address) => `addresses=${address}`).join('&')}`), {
+  public ownedBy(chain: string, addresses: string[]) {
+    return fetcher(this.getClientUrl(`chains/${chain}/owned-by?addresses=${addresses.join(',')}`), {
+      method: 'GET',
+      headers: jsonHeader
+    });
+  }
+
+  public omniChainOwnedBy(addresses: string[]) {
+    return fetcher(this.getClientUrl(`omni-chain/owned-by?addresses=${addresses.join(',')}`), {
       method: 'GET',
       headers: jsonHeader
     });
   }
 
   public uploadWebsite(
+    network: string,
     extrinsicHash: HexString,
     website?: string | null,
     appName?: string | null,
@@ -103,7 +109,7 @@ export class ClientService {
     note?: string | null,
     relatedBatches?: number[]
   ): Promise<boolean> {
-    return fetcher(this.getNetworkUrl('website'), {
+    return fetcher(this.getClientUrl(`chains/${network}/website`), {
       method: 'POST',
       body: JSON.stringify({ extrinsicHash, website, appName, iconUrl, note, relatedBatches }),
       headers: jsonHeader
@@ -111,6 +117,7 @@ export class ClientService {
   }
 
   public utm(
+    chain: string,
     address: HexString,
     utm: {
       utm_source: string;
@@ -118,38 +125,45 @@ export class ClientService {
       utm_campaign?: string | null;
     }
   ) {
-    return fetcher(this.getNetworkUrl(`utm/${address}`), {
+    return fetcher(this.getClientUrl(`chains/${chain}/${address}/utm`), {
       method: 'POST',
       body: JSON.stringify(utm),
       headers: jsonHeader
     });
   }
 
-  public safetyCheck(method: HexString) {
-    return fetcher(this.getNetworkUrl('safety-check'), {
+  public safetyCheck(chain: string, method: HexString) {
+    return fetcher(this.getClientUrl(`chains/${chain}/safety-check`), {
       method: 'POST',
       body: JSON.stringify({ method }),
       headers: jsonHeader
     });
   }
 
-  public getAccount(address: string) {
-    return fetcher(this.getNetworkUrl(`accounts/full/${address}`), {
-      method: 'GET',
-      headers: jsonHeader
-    });
-  }
-
-  public addProposer(address: string, proposer: string, signature: string, signer: string, time: string) {
-    return fetcher(this.getNetworkUrl(`accounts/${address}/proposer/add`), {
+  public addProposer(
+    chain: string,
+    address: string,
+    proposer: string,
+    signature: string,
+    signer: string,
+    time: string
+  ) {
+    return fetcher(this.getClientUrl(`chains/${chain}/${address}/add-proposer`), {
       method: 'POST',
       body: JSON.stringify({ proposer, signature, signer, time }),
       headers: jsonHeader
     });
   }
 
-  public removeProposer(address: string, proposer: string, signature: string, signer: string, time: string) {
-    return fetcher(this.getNetworkUrl(`accounts/${address}/proposer/remove`), {
+  public removeProposer(
+    chain: string,
+    address: string,
+    proposer: string,
+    signature: string,
+    signer: string,
+    time: string
+  ) {
+    return fetcher(this.getClientUrl(`chains/${chain}/${address}/remove-proposer`), {
       method: 'PUT',
       body: JSON.stringify({ proposer, signature, signer, time }),
       headers: jsonHeader
@@ -157,6 +171,7 @@ export class ClientService {
   }
 
   public submitPropose(
+    network: string,
     address: string,
     call: HexString,
     signer: string,
@@ -167,23 +182,23 @@ export class ClientService {
     note?: string,
     website?: string
   ) {
-    return fetcher(this.getNetworkUrl(`tx/propose/${address}`), {
+    return fetcher(this.getClientUrl(`chains/${network}/${address}/transactions/propose`), {
       method: 'POST',
       body: JSON.stringify({ call, signer, signature, time, appName, iconUrl, note, website }),
       headers: jsonHeader
     });
   }
 
-  public removePropose(proposeId: number, signer: string, signature: string, time: string) {
-    return fetcher(this.getNetworkUrl(`tx/propose/${proposeId}/remove`), {
+  public removePropose(network: string, proposeId: number, signer: string, signature: string, time: string) {
+    return fetcher(this.getClientUrl(`chains/${network}/transactions/propose/${proposeId}/remove`), {
       method: 'PUT',
       body: JSON.stringify({ signer, signature, time }),
       headers: jsonHeader
     });
   }
 
-  public restoreBatch(chain: string, address: string) {
-    return fetcher(this.getClientUrl(`/v1/chains/${chain}/${address}/transactions/batch`), {
+  public getAllAssets(network: string) {
+    return fetcher(this.getClientUrl(`chains/${network}/all-assets`), {
       method: 'GET',
       headers: jsonHeader
     });
@@ -197,7 +212,7 @@ export class ClientService {
     signer: string,
     timestamp: string | number
   ) {
-    return fetcher(this.getClientUrl(`/v1/chains/${chain}/${address}/transactions/batch/remove`), {
+    return fetcher(this.getClientUrl(`chains/${chain}/${address}/transactions/batch/remove`), {
       method: 'POST',
       body: JSON.stringify({ ids, signature, signer, timestamp }),
       headers: jsonHeader

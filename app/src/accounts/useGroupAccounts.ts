@@ -15,14 +15,14 @@ import { useAccount } from './useAccount';
 import { groupAccounts, type GroupName } from './utils';
 
 export function useGroupAccounts(filter?: (account: AccountData) => boolean): Record<GroupName, string[]> {
-  const { accounts, hideAccountHex } = useAccount();
+  const { accounts, hideAccountHex, metas } = useAccount();
 
   const allAddress = useMemo(
     () => accounts.filter((a): a is AccountData => (filter ? filter(a) : true)),
     [accounts, filter]
   );
 
-  return useMemo(() => groupAccounts(allAddress, hideAccountHex), [allAddress, hideAccountHex]);
+  return useMemo(() => groupAccounts(allAddress, hideAccountHex, metas), [allAddress, hideAccountHex, metas]);
 }
 
 export function useAllAccounts(others?: string[]): string[] {
@@ -31,18 +31,10 @@ export function useAllAccounts(others?: string[]): string[] {
   return useMemo(() => accounts.map((item) => item.address).concat(others || []), [accounts, others]);
 }
 
-export function useUnConfirmMultisigs(): [AccountData[], confirm: (addresses: string[]) => void] {
+export function useUnConfirmMultisigs(): [confirm: (addresses: string[]) => void] {
   const [detected, setDetected] = useLocalStore<HexString[]>(DETECTED_ACCOUNT_KEY, []);
-  const { accounts } = useAccount();
 
   return [
-    useMemo(
-      () =>
-        accounts.filter((account) => {
-          return !(account.source || detected.includes(u8aToHex(decodeAddress(account.address))));
-        }),
-      [accounts, detected]
-    ),
     useCallback(
       (addresses) => {
         const newValue = Array.from(

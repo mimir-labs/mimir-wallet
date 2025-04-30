@@ -27,4 +27,17 @@
   input::placeholder {
     @apply text-foreground/50;
   }
+
+  body {
+    @apply leading-[1.2];
+  }
+
+  :root {
+    --toastify-text-color-light: #151F34;
+    --toastify-color-info: #2700FF;
+    --toastify-color-success: #00DBA6;
+    --toastify-color-warning: #FF8D07;
+    --toastify-color-error: #FF5310;
+  }
+
 }

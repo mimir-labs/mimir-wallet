@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import AccountConsumer from '@/accounts/Consumer';
 import { useAccount } from '@/accounts/useAccount';
 import { ConnectWalletModal, ToastRoot, TxSubmit, TxToast } from '@/components';
 import { useFollowAccounts } from '@/hooks/useFollowAccounts';
@@ -14,10 +13,14 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 
+import CopyAddressModal from './address/CopyAddressModal';
+import ExplorerAddressModal from './address/ExplorerAddressModal';
+import QrAddressModal from './address/QrAddressModal';
 import RightSideBar from './sidebar/RightSideBar';
 import SideBar from './sidebar/SideBar';
 import AddAddressBook from './AddAddressBook';
 import Initializing from './Initializing';
+import OmniChainUpgradeTip from './OmniChainUpgradeTip';
 import SubscribeTx from './SubscribeTx';
 import ToggleAlert from './ToggleAlert';
 import TopBar from './topbar';
@@ -52,9 +55,9 @@ function BaseContainer({
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
       <ToastRoot />
       <TxToast />
-      <AccountConsumer />
       <WalletConsumer />
       <AddAddressBook />
+      <OmniChainUpgradeTip />
 
       <TopBar />
 
@@ -63,6 +66,9 @@ function BaseContainer({
           <ToggleAlert address={current} setAlertOpen={setAlertOpen} />
           <SubscribeTx address={current} />
           <ViewCallData />
+          <CopyAddressModal />
+          <QrAddressModal />
+          <ExplorerAddressModal />
         </>
       )}
 
@@ -84,7 +90,7 @@ function BaseContainer({
               <Outlet />
             </div>
             <p className='z-0 absolute bottom-0 left-0 right-0 font-bold text-foreground/50 text-center'>
-              Version: {process.env.VERSION}
+              Version: {import.meta.env.VERSION}
             </p>
           </div>
 
@@ -102,7 +108,9 @@ function BaseContainer({
           <RightSideBar offsetTop={alertOpen ? 38 : 0} />
         </div>
       ) : (
-        <Initializing />
+        <div>
+          <Initializing />
+        </div>
       )}
     </>
   );

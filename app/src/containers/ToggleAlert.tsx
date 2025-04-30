@@ -4,19 +4,12 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
-import { FormatBalance, Fund } from '@/components';
-import { formatUnits } from '@/utils';
-import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
 
 function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {
-  const { api } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const [existing, setExisting] = useState(true);
-  const [fundOpen, toggleFundOpen] = useToggle(false);
   const [forceHide, setForceHide] = useState(false);
 
   const hasThisAccount = useMemo(
@@ -24,21 +17,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
     [address, isLocalAccount, isLocalAddress]
   );
 
-  useEffect(() => {
-    const unSubPromise: Promise<() => void> = api.derive.balances.all(address, (allBalances) => {
-      const existing = allBalances.freeBalance
-        .add(allBalances.reservedBalance)
-        .gte(api.consts.balances.existentialDeposit);
-
-      setExisting(existing);
-    });
-
-    return () => {
-      unSubPromise?.then((unsub) => unsub());
-    };
-  }, [address, api]);
-
-  const alertOpen = !forceHide && !(hasThisAccount && existing);
+  const alertOpen = !forceHide && !hasThisAccount;
 
   useEffect(() => {
     setAlertOpen(alertOpen);
@@ -46,69 +25,37 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
 
   return alertOpen ? (
     <>
-      <Box
+      <div
         onClick={
           hasThisAccount
-            ? !existing
-              ? () => toggleFundOpen(true)
-              : undefined
+            ? undefined
             : () => {
                 addAddressBook(address, true);
               }
         }
-        sx={{
-          zIndex: 50,
-          cursor: 'pointer',
-          position: 'sticky',
-          top: 56,
-          width: '100%',
-          paddingLeft: { sm: 2, xs: 1 },
-          paddingY: 0.5,
-          display: 'flex',
-          alignItems: 'center',
-          height: 38,
-          gap: { sm: 1, xs: 0.5 },
-          bgcolor: 'primary.main',
-          color: 'primary.contrastText'
-        }}
+        className='z-50 cursor-pointer sticky top-[56px] w-full pl-2.5 sm:pl-5 py-1 flex items-center h-[38px] gap-1 sm:gap-2.5 bg-primary text-primary-foreground'
       >
-        <SvgIcon component={IconInfo} inheritViewBox />
-        {hasThisAccount && !existing && (
-          <Typography sx={{ flex: '1' }}>
-            To prevent this account from being purged, please transfer{' '}
-            <FormatBalance value={api.consts.balances.existentialDeposit} />
-            {api.registry.chainTokens[0].toString()} to keep the account alive.
-          </Typography>
-        )}
+        <IconInfo className='w-4 h-4' />
 
         {!hasThisAccount && (
-          <Typography sx={{ flex: '1' }}>
+          <p className='flex-1'>
             You are not a member of this account, currently in Watch-only mode.
-            <Box component='span' sx={{ cursor: 'pointer', ':hover': { textDecorationLine: 'underline' } }}>
-              {'Add to watch list>>'}
-            </Box>
-          </Typography>
+            <span className='cursor-pointer hover:underline'>{'Add to watch list>>'}</span>
+          </p>
         )}
 
-        <IconButton
-          color='inherit'
-          size='small'
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
+        <Button
+          isIconOnly
+          color='default'
+          size='sm'
+          variant='light'
+          onPress={() => {
             setForceHide(true);
           }}
         >
-          <SvgIcon component={IconClose} inheritViewBox />
-        </IconButton>
-      </Box>
-
-      <Fund
-        defaultValue={formatUnits(api.consts.balances.existentialDeposit, api.registry.chainDecimals[0])}
-        onClose={toggleFundOpen}
-        open={fundOpen}
-        receipt={address}
-      />
+          <IconClose className='w-4 h-4' />
+        </Button>
+      </div>
     </>
   ) : null;
 }

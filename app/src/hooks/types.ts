@@ -3,7 +3,6 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { Bytes, Option, Struct, u8, u128 } from '@polkadot/types';
-import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
 
 export type CallParam = any;
@@ -35,16 +34,6 @@ export type DelegateeProp = {
   proxyType: string;
   proxyNetwork: HexString;
   proxyDelay: number;
-};
-
-export type AccountDataExtra = {
-  cryptoType?: string;
-  source?: string;
-  isProxied?: boolean;
-  isProxy?: boolean;
-  proxyType?: string;
-  proxyNetwork?: HexString;
-  proxyDelay?: number;
 };
 
 export type AccountDataType = {
@@ -99,6 +88,7 @@ export enum TransactionType {
 }
 
 type BaseTransaction = {
+  network: string;
   id: number;
   address: string;
   callHash: HexString;
@@ -174,26 +164,32 @@ export type Transaction = UnknownTransaction | MultisigTransaction | ProxyTransa
 export type HistoryTransaction = Transaction & { uuid: string };
 
 export interface TokenInfo {
-  asset_type: string;
-  available_balance: string;
-  bonded_locked_balance: string;
-  democracy_locked_balance: string;
-  display_name: string;
-  election_locked_balance: string;
-  free_balance: string;
-  inflation: string;
-  locked_balance: string;
-  nominator_bonded: string;
-  price: string;
-  price_change: string;
-  reserved_balance: string;
-  symbol: string;
-  token_decimals: number;
-  total_issuance: string;
-  unbonded_locked_balance: string;
-  unique_id: string;
-  validator_bonded: string;
-  vesting_balance: string;
+  detail: Record<
+    string,
+    {
+      asset_type: string;
+      available_balance: string;
+      bonded_locked_balance: string;
+      democracy_locked_balance: string;
+      display_name: string;
+      election_locked_balance: string;
+      free_balance: string;
+      inflation: string;
+      locked_balance: string;
+      nominator_bonded: string;
+      price: string;
+      price_change: string;
+      reserved_balance: string;
+      symbol: string;
+      token_decimals: number;
+      total_issuance: string;
+      unbonded_locked_balance: string;
+      unique_id: string;
+      validator_bonded: string;
+      vesting_balance: string;
+    }
+  >;
+  token: string[];
 }
 
 export type NewTxMessage = {
@@ -247,9 +243,12 @@ export interface PushMessageData {
 }
 
 export type AssetInfo<T extends boolean = boolean> = {
+  readonly network: string;
   readonly name: string;
   readonly symbol: string;
   readonly decimals: number;
+  readonly price: number;
+  readonly change24h: number;
   readonly icon?: string;
 } & (T extends false
   ? {
@@ -261,19 +260,12 @@ export type AssetInfo<T extends boolean = boolean> = {
       readonly assetId: 'native';
     });
 
-export interface AccountBalance {
-  total: BN;
-  locked: BN;
-  reserved: BN;
-  free: BN;
-  transferrable: BN;
-}
-
-export type AccountAssetInfo = AssetInfo & {
-  total: BN;
-  locked: BN;
-  reserved: BN;
-  transferrable: BN;
+export type AccountAssetInfo<T extends boolean = boolean> = AssetInfo<T> & {
+  total: bigint;
+  locked: bigint;
+  reserved: bigint;
+  free: bigint;
+  transferrable: bigint;
   account: string;
 };
 
@@ -283,20 +275,75 @@ export interface SafetyLevel {
   message: string;
 }
 
-export interface AddressMeta {
+type BaseAddressMeta = {
   name?: string;
-  cryptoType?: string;
   isMimir?: boolean;
-  isPure?: boolean;
-  isProxied?: boolean;
-  isProxy?: boolean;
-  isInjected?: boolean;
-  isMultisig?: boolean;
-  multipleMultisig?: boolean;
-  source?: string;
+  isPure?: undefined;
+  isProxied?: undefined;
+  isProxy?: undefined;
+  isInjected?: undefined;
+  isMultisig?: undefined;
   threshold?: number;
   who?: string[];
-}
+  createdBlock?: string;
+  createdBlockHash?: HexString;
+  createdExtrinsicHash?: HexString;
+  createdExtrinsicIndex?: number;
+  creator?: HexString;
+  disambiguationIndex?: number;
+  pureCreatedAt?: HexString;
+  multipleMultisig?: boolean;
+  proxyType?: string;
+  network?: HexString;
+  delay?: number;
+  cryptoType?: string;
+  source?: string;
+};
+
+type MultisigAddressMeta = Omit<BaseAddressMeta, 'isMultisig'> & {
+  isMultisig: true;
+  threshold: number;
+  who: string[];
+};
+
+type PureAddressMeta = Omit<BaseAddressMeta, 'isPure'> & {
+  isPure: true;
+  createdBlock: string;
+  createdBlockHash: HexString;
+  createdExtrinsicHash: HexString;
+  createdExtrinsicIndex: number;
+  creator: HexString;
+  disambiguationIndex: number;
+  pureCreatedAt: HexString;
+};
+
+type ProxiedAddressMeta = Omit<BaseAddressMeta, 'isProxied'> & {
+  isProxied: true;
+  multipleMultisig: boolean;
+};
+
+type ProxyAddressMeta = Omit<BaseAddressMeta, 'isProxy'> & {
+  isProxy: true;
+  proxyType: string;
+  network: HexString;
+  delay: number;
+};
+
+type InjectedAddressMeta = Omit<BaseAddressMeta, 'isInjected'> & {
+  isInjected: true;
+  cryptoType: string;
+  source: string;
+};
+
+type EmptyAddressMeta = BaseAddressMeta;
+
+export type AddressMeta =
+  | MultisigAddressMeta
+  | PureAddressMeta
+  | ProxiedAddressMeta
+  | ProxyAddressMeta
+  | InjectedAddressMeta
+  | EmptyAddressMeta;
 
 type MultisigFilterPath = {
   id: string;
@@ -356,4 +403,11 @@ export interface OrmlTokensAccountData extends Struct {
   readonly free: u128;
   readonly reserved: u128;
   readonly frozen: u128;
+}
+
+export interface AssetMetadata extends Struct {
+  readonly name: Bytes;
+  readonly symbol: Bytes;
+  readonly decimals: u8;
+  readonly minimalBalance: u128;
 }

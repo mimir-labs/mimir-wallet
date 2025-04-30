@@ -1,92 +1,48 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HexString } from '@polkadot/util/types';
-import type { AccountData, AccountDataExtra } from '../hooks/types';
-
-import { service } from '@/utils';
+import type { AccountData } from '../hooks/types';
 
 import { encodeAddress } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 
-export function extraAccounts(
-  genesisHash: HexString,
-  walletAccounts: { address: string; name?: string; type?: string; source: string }[],
-  data: AccountData[]
-): (AccountDataExtra & AccountData)[] {
-  const accountMap: Record<string, AccountDataExtra & AccountData> = {};
-
-  const proxied: string[] = [];
-  const proxy: string[] = [];
-
-  for (const item of data) {
-    const account: AccountData = {
-      ...item,
-      address: encodeAddress(item.address),
-      delegatees: item.delegatees
-        .filter((delegatee: any) => delegatee.proxyNetwork === genesisHash)
-        .map((delegatee: any) => {
-          const address = encodeAddress(delegatee.address);
-
-          proxy.push(address);
-
-          return { ...delegatee, address };
-        })
-    };
-
-    if (account.delegatees.length > 0) {
-      proxied.push(account.address);
-    }
-
-    // exclude pure on other networks
-    if (account.type === 'pure') {
-      if (account.network === genesisHash && account.delegatees.length > 0) {
-        accountMap[account.address] = account;
-      }
-
-      continue;
-    }
-
-    if (account.type === 'multisig') {
-      accountMap[account.address] = {
-        ...account,
-        members: account.members.map((member) => ({ ...member, address: encodeAddress(member.address) }))
-      };
-
-      continue;
-    }
-
-    // exclude the account have no delegatee
-    if (account.delegatees.length > 0) {
-      accountMap[account.address] = account;
-    }
-  }
-
-  // add wallet account;
-  for (const item of walletAccounts) {
-    accountMap[item.address] = {
-      ...accountMap[item.address],
-      address: item.address,
-      type: 'account',
-      name: item.name,
-      source: item.source,
-      cryptoType: item.type
-    };
-  }
-
-  return Object.values(accountMap).map((item): AccountDataExtra & AccountData => ({
+function transformAccount(chainSS58: number, data: AccountData) {
+  data.address = encodeAddress(data.address, chainSS58);
+  data.proposers = data.proposers?.map((item) => ({
     ...item,
-    isProxied: proxied.includes(item.address),
-    isProxy: proxy.includes(item.address)
+    proposer: encodeAddress(item.proposer, chainSS58),
+    creator: encodeAddress(item.creator, chainSS58)
   }));
+
+  for (const delegatee of data.delegatees) {
+    transformAccount(chainSS58, delegatee);
+  }
+
+  if (data.type === 'multisig') {
+    for (const member of data.members) {
+      transformAccount(chainSS58, member);
+    }
+  }
 }
 
 export async function sync(
-  genesisHash: HexString,
-  walletAccounts: { address: string; name?: string; type?: string; source: string }[],
-  cb: (values: (AccountDataExtra & AccountData)[]) => void
+  isOmni: boolean,
+  network: string,
+  chainSS58: number,
+  walletAccounts: string[],
+  cb: (values: AccountData[]) => void
 ): Promise<void> {
-  const data = await service.getMultisigs(walletAccounts.map((item) => item.address));
-  const accounts = extraAccounts(genesisHash, walletAccounts, data);
+  if (walletAccounts.length === 0) {
+    cb([]);
 
-  cb(accounts);
+    return;
+  }
+
+  const data = await (isOmni ? service.omniChainOwnedBy(walletAccounts) : service.ownedBy(network, walletAccounts));
+
+  data.forEach((item: AccountData) => {
+    transformAccount(chainSS58, item);
+  });
+
+  cb(data);
 }

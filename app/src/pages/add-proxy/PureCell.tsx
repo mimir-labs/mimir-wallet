@@ -1,22 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Typography } from '@mui/material';
-
 function PureCell() {
   return (
-    <Box sx={{ width: '100%', border: '1px solid transparent' }}>
-      <Typography marginBottom={1} fontWeight={700}>
-        Proxied Account
-      </Typography>
-      <Box
-        sx={{
-          bgcolor: 'secondary.main',
-          borderRadius: 1,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          padding: 1,
+    <div className='w-full border-1 border-transparent'>
+      <p className='mb-2.5 font-bold'>Proxied Account</p>
+      <div
+        className='bg-secondary rounded-medium flex items-center gap-2.5 p-2.5'
+        style={{
           height: 56.8,
           fontWeight: 700
         }}
@@ -41,8 +32,8 @@ function PureCell() {
           />
         </svg>
         Pure Proxy
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 

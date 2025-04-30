@@ -3,10 +3,10 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { service } from '@/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { useQuery } from '@mimir-wallet/service';
+import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { service, useQuery } from '@mimir-wallet/service';
 
 import { useBatchTxs } from './useBatchTxs';
 
@@ -34,11 +34,12 @@ export function useBatchSync(
   isFetching: boolean,
   refetch: () => void
 ] {
+  const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
   const { data, isFetched, isFetching, refetch } = useQuery<SyncBatchItem[]>({
-    queryHash: service.getClientUrl(`/v1/chains/${network}/${address}/transactions/batch`),
-    queryKey: [address ? service.getClientUrl(`/v1/chains/${network}/${address}/transactions/batch`) : null]
+    queryHash: service.getClientUrl(`/chains/${network}/${addressHex}/transactions/batch`),
+    queryKey: [address ? service.getClientUrl(`/chains/${network}/${addressHex}/transactions/batch`) : null]
   });
-  const [txs, addTx] = useBatchTxs(address);
+  const [txs, addTx] = useBatchTxs(network, addressHex);
   const syncedIds = useMemo(() => {
     return txs.map((item) => item.relatedBatch).filter((item) => typeof item === 'number');
   }, [txs]);
@@ -53,14 +54,14 @@ export function useBatchSync(
 
   const restore = useCallback(
     (values: number[]) => {
-      if (!list.length || !address) return;
+      if (!list.length || !addressHex) return;
 
       addTx(
         list.filter((item) => values.includes(item.id)).map((item) => ({ calldata: item.call, relatedBatch: item.id })),
         false
       );
     },
-    [addTx, address, list]
+    [addTx, addressHex, list]
   );
 
   return [list, restoreList, restore, isFetched, isFetching, refetch];

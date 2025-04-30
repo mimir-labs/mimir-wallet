@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MimirLoading } from '@/components';
-import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { Link } from '@mimir-wallet/ui';
@@ -17,8 +16,8 @@ function Initializing() {
   }, []);
 
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)',
         position: 'absolute',
         left: 0,
@@ -33,7 +32,7 @@ function Initializing() {
     >
       <MimirLoading />
       {showCustomize && <Link href='/setting'>Go to Customize RPC</Link>}
-    </Box>
+    </div>
   );
 }
 

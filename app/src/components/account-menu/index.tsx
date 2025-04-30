@@ -11,12 +11,12 @@ import IconGlobal from '@/assets/svg/icon-global.svg?react';
 import IconUnion from '@/assets/svg/icon-union.svg?react';
 import IconUser from '@/assets/svg/icon-user.svg?react';
 import IconWatch from '@/assets/svg/icon-watch.svg?react';
-import { service } from '@/utils';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { isAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { addressEq } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 import { Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader } from '@mimir-wallet/ui';
 
 import AccountCell from './AccountCell';
@@ -39,17 +39,17 @@ function filterAddress(keywords: string) {
 
 function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   const [keywords, setKeywords] = useState('');
-  const { current, setCurrent, addresses, addAddressBook, accounts, hideAccountHex } = useAccount();
+  const { current, setCurrent, addresses, addAddressBook, accounts, hideAccountHex, metas } = useAccount();
   const [isSearching, setIsSearching] = useState(false);
   const [searchAccount, setSearchAccount] = useState<AccountData>();
-  const [grouped, setGrouped] = useState<Record<GroupName, string[]>>(groupAccounts(accounts, hideAccountHex));
-  const { breakpoints } = useTheme();
-  const downMd = useMediaQuery(breakpoints.down('md'));
+
+  const [grouped, setGrouped] = useState<Record<GroupName, string[]>>(groupAccounts(accounts, hideAccountHex, metas));
+  const upMd = useMediaQuery('md');
 
   useEffect(() => {
     if (!keywords) {
       setSearchAccount(undefined);
-      setGrouped(groupAccounts(accounts, hideAccountHex));
+      setGrouped(groupAccounts(accounts, hideAccountHex, metas));
 
       return;
     }
@@ -58,12 +58,13 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
       setGrouped(
         groupAccounts(
           accounts.filter((account) => addressEq(account.address, keywords)),
-          hideAccountHex
+          hideAccountHex,
+          metas
         )
       );
       setIsSearching(true);
       service
-        .getAccount(keywords)
+        .getOmniChainDetails(keywords)
         .then((data) => {
           setSearchAccount(data);
         })
@@ -72,13 +73,13 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
         });
     } else {
       setSearchAccount(undefined);
-      setGrouped(groupAccounts(accounts.filter(filterAddress(keywords)), hideAccountHex));
+      setGrouped(groupAccounts(accounts.filter(filterAddress(keywords)), hideAccountHex, metas));
     }
-  }, [accounts, hideAccountHex, keywords]);
+  }, [accounts, hideAccountHex, keywords, metas]);
 
   const onSelect = useCallback(
     (address: string) => {
-      if (current === address) return;
+      if (addressEq(current, address)) return;
 
       setCurrent(address);
 
@@ -91,8 +92,8 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
   return (
     <Drawer
-      hideCloseButton={!downMd}
-      radius={downMd ? 'lg' : 'none'}
+      hideCloseButton={upMd}
+      radius={!upMd ? 'lg' : 'none'}
       onClose={onClose}
       isOpen={open}
       placement={anchor}
@@ -199,24 +200,6 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
                 value={address}
               />
             ))}
-
-            {grouped.hide.length > 0 && (
-              <>
-                <Divider />
-
-                <div className='flex items-center gap-1'>Hidden Accounts</div>
-
-                {grouped.hide.map((account) => (
-                  <AccountCell
-                    isHide
-                    key={`hide-account-${account}`}
-                    onClose={onClose}
-                    onSelect={onSelect}
-                    value={account}
-                  />
-                ))}
-              </>
-            )}
           </div>
         </DrawerBody>
 

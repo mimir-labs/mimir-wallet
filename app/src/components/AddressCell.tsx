@@ -9,17 +9,18 @@ import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { addressEq, encodeAddress } from '@mimir-wallet/polkadot-core';
-import { Button, Chip } from '@mimir-wallet/ui';
+import { addressEq, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { Avatar, Button, Chip } from '@mimir-wallet/ui';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
-import CopyButton from './CopyButton';
+import CopyAddress from './CopyAddress';
 import IdentityIcon from './IdentityIcon';
 
 interface Props {
   defaultName?: string;
   value?: AccountId | AccountIndex | Address | Uint8Array | string | null;
+  className?: string;
   iconSize?: number;
   shorten?: boolean;
   showType?: boolean;
@@ -34,6 +35,7 @@ function AddressCell({
   defaultName,
   icons,
   namePost,
+  className,
   shorten = true,
   showType = false,
   value,
@@ -42,16 +44,25 @@ function AddressCell({
   withCopy = false,
   withAddressBook = false
 }: Props) {
-  const address = useMemo(() => encodeAddress(value), [value]);
-  const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
+  const { chainSS58 } = useApi();
+  const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
+  const { meta: { isMultisig, isProxied, isPure, pureCreatedAt } = {} } = useAddressMeta(address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
+  const { networks } = useNetworks();
+
+  const pureNetwork = isPure && pureCreatedAt && networks.find((network) => network.genesisHash === pureCreatedAt);
 
   return (
-    <div className='AddressCell flex-1 flex items-center gap-[5px]' style={{ width }}>
+    <div className={`AddressCell flex-1 flex items-center gap-[5px] ${className}`} style={{ width }}>
       <IdentityIcon className='AddressCell-Icon' size={iconSize} value={address} />
       <div className='AddressCell-Content space-y-[2px]'>
         <div className='flex items-center gap-1'>
-          <span className='AddressCell-Name inline-flex max-w-[100px] overflow-hidden text-ellipsis whitespace-nowrap font-bold'>
+          <span
+            className='AddressCell-Name inline-flex overflow-hidden text-ellipsis whitespace-nowrap font-bold'
+            style={{
+              maxWidth: shorten ? 100 : 260
+            }}
+          >
             <AddressName defaultName={defaultName} value={value} />
           </span>
           {namePost}
@@ -70,9 +81,10 @@ function AddressCell({
             </>
           )}
         </div>
-        <span className='AddressCell-Address text-foreground/50 h-[18px] flex items-center text-tiny'>
+        <span className='AddressCell-Address text-foreground/50 h-[16px] flex items-center text-tiny whitespace-nowrap'>
+          {pureNetwork?.icon ? <Avatar style={{ marginRight: 4 }} src={pureNetwork.icon} className='w-3 h-3' /> : null}
           <AddressComp shorten={shorten} value={address} />
-          {withCopy && <CopyButton size='sm' value={address} className='opacity-50' />}
+          {withCopy && <CopyAddress size='sm' address={address} className='opacity-50' />}
           {icons}
           {withAddressBook &&
             address &&

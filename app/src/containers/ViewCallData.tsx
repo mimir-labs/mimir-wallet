@@ -8,12 +8,18 @@ import CallDataView from '@/features/call-data-view';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useEffect } from 'react';
 
+import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+
 function ViewCallData() {
   const { openRightSidebar, closeRightSidebar } = useMimirLayout();
 
   useEffect(() => {
-    const onView = (callData: HexString) => {
-      openRightSidebar(<CallDataView calldata={callData} onClose={closeRightSidebar} />);
+    const onView = (network: string, callData: HexString) => {
+      openRightSidebar(
+        <SubApiRoot network={network}>
+          <CallDataView calldata={callData} onClose={closeRightSidebar} />
+        </SubApiRoot>
+      );
     };
 
     events.on('call_data_view', onView);

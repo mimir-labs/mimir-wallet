@@ -1,8 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box } from '@mui/material';
-
 import { Button, Link } from '@mimir-wallet/ui';
 
 function EmptyBatch({
@@ -14,16 +12,7 @@ function EmptyBatch({
   onHandleRestore?: () => void;
 }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 2,
-        height: '100%'
-      }}
-    >
+    <div className='flex flex-col justify-center items-center gap-5 h-full'>
       <svg width='106' height='103' viewBox='0 0 106 103' fill='none'>
         <rect opacity='0.21' x='67.2568' y='0.853516' width='34' height='34' fill='#5F45FF' />
         <path
@@ -57,7 +46,7 @@ function EmptyBatch({
       <Button onPress={onHandleRestore} color='primary' variant='ghost'>
         Restore
       </Button>
-    </Box>
+    </div>
   );
 }
 

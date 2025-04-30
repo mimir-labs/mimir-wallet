@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
-import { Button } from '@mui/material';
 import React from 'react';
+
+import { Button } from '@mimir-wallet/ui';
 
 function AddAddress() {
   const { addAddressBook } = useAccount();
 
   return (
-    <Button onClick={() => addAddressBook()} variant='outlined'>
+    <Button onPress={() => addAddressBook()} variant='ghost'>
       Add New Contact
     </Button>
   );

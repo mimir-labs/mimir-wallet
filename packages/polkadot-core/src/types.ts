@@ -11,6 +11,9 @@ export type SubtractProps<T, K> = OmitProps<T, keyof K>;
 export type Endpoint = {
   key: string;
   name: string;
+  relayChain?: string;
+  isRelayChain?: boolean;
+  isTestnet?: boolean;
   wsUrl: Record<string, string>;
   httpUrl?: string;
   icon: string;
@@ -18,60 +21,42 @@ export type Endpoint = {
   ss58Format: number;
   genesisHash: HexString;
   socketUrl: string;
-  serviceUrl: string;
-  statescan?: boolean;
   explorerUrl?: string;
-  proposalApi?: string;
+  statescanUrl?: string;
   subsquareUrl?: string;
   identityNetwork?: string;
 };
 
-export interface BareProps {
-  className?: string;
-}
+export type Network = Endpoint & {
+  enabled: boolean;
+};
 
 export interface ApiState {
-  chainSS58: number;
   isApiReady: boolean;
   tokenSymbol: string;
   genesisHash: HexString;
 }
 
 export interface ApiProps extends ApiState {
-  api: ApiPromise;
+  api?: ApiPromise | null;
   apiError: string | null;
   isApiInitialized: boolean;
   network: string;
   chain: Endpoint;
-  metadata: Record<string, HexString>;
-  identityApi: ApiPromise | null;
 }
 
-export interface OnChangeCbObs {
-  next: (value?: any) => any;
+export interface ApiContextProps extends ValidApiState, Omit<ApiProps, 'api'> {
+  chainSS58: number;
+  ss58Chain: string;
+  setSs58Chain: (chain: string) => void;
+  allApis: Record<string, ValidApiState>;
+  setNetwork: (network: string) => void;
 }
 
-export type OnChangeCbFn = (value?: any) => any;
-export type OnChangeCb = OnChangeCbObs | OnChangeCbFn;
-
-export interface ChangeProps {
-  callOnResult?: OnChangeCb;
-}
-
-export interface CallState {
-  callResult?: unknown;
-  callUpdated?: boolean;
-  callUpdatedAt?: number;
-}
-
-export type CallProps = ApiProps & CallState;
-
-export interface BaseProps<T> extends BareProps, CallProps, ChangeProps {
-  children?: React.ReactNode;
-  label?: string;
-  render?: (value?: T) => React.ReactNode;
-}
-
-export type Formatter = (value?: any) => string;
-
-export type Environment = 'web' | 'app';
+export type ValidApiState = ApiState & {
+  api: ApiPromise;
+  chain: Endpoint;
+  apiError: string | null;
+  isApiInitialized: boolean;
+  network: string;
+};

@@ -4,26 +4,22 @@
 import type { Compact } from '@polkadot/types';
 import type { BN } from '@polkadot/util';
 
-import { useAssetInfo } from '@/hooks/useAssets';
 import { formatDisplay, formatUnits } from '@/utils';
-import { Box, type BoxProps } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 
-interface Props extends BoxProps {
+interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
   format?: [decimals: number, symbol: string];
   label?: React.ReactNode;
-  value?: Compact<any> | BN | string | number | null;
+  value?: Compact<any> | BN | bigint | string | number | null;
   withCurrency?: boolean;
-  assetId?: string;
 }
 
-function FormatBalance({ format, label, value, withCurrency, assetId, ...props }: Props): React.ReactElement<Props> {
+function FormatBalance({ format, label, value, withCurrency, ...props }: Props): React.ReactElement<Props> {
   const { api } = useApi();
-  const [assetInfo] = useAssetInfo(assetId);
-  const decimals = format?.[0] ?? (assetId ? assetInfo?.decimals : api.registry.chainDecimals[0]);
-  const currency = format?.[1] ?? (assetId ? assetInfo?.symbol : api.registry.chainTokens[0]);
+  const decimals = format?.[0] ?? api.registry.chainDecimals[0];
+  const currency = format?.[1] ?? api.registry.chainTokens[0];
   const [major, rest, unit] = useMemo(() => {
     const _value = formatUnits(BigInt(value?.toString() || 0), decimals || 0);
 
@@ -32,15 +28,15 @@ function FormatBalance({ format, label, value, withCurrency, assetId, ...props }
 
   // labelPost here looks messy, however we ensure we have one less text node
   return (
-    <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }} {...props}>
+    <span className='inline-flex items-center gap-1' {...props}>
       {label}
-      <Box component='span'>
+      <span>
         {major}
-        {rest ? <Box component='span'>.{rest}</Box> : null}
+        {rest ? <span>.{rest}</span> : null}
         {unit || ''}
-      </Box>
-      <Box component='span'>{withCurrency ? ` ${currency}` : ''}</Box>
-    </Box>
+      </span>
+      <span>{withCurrency ? ` ${currency}` : ''}</span>
+    </span>
   );
 }
 

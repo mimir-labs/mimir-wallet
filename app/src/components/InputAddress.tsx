@@ -5,16 +5,18 @@ import type { AccountData } from '@/hooks/types';
 import type { InputAddressProps } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconWarning from '@/assets/svg/icon-warning-fill.svg?react';
 import { useInputAddress } from '@/hooks/useInputAddress';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { isAddress } from '@polkadot/util-crypto';
 import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { encodeAddress } from '@mimir-wallet/polkadot-core';
-import { Avatar, FreeSoloPopover, Listbox, ListboxItem } from '@mimir-wallet/ui';
+import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { Avatar, Chip, FreeSoloPopover, Listbox, ListboxItem, usePress } from '@mimir-wallet/ui';
 
 import Address from './Address';
 import AddressCell from './AddressCell';
@@ -85,6 +87,7 @@ function InputAddress({
   helper
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
+  const { networks } = useNetworks();
   const { accounts, addresses, isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [value, setValue] = useState<string>(
     isAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : ''
@@ -95,8 +98,10 @@ function InputAddress({
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [isOpen, toggleOpen] = useToggle(false);
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
+  const upSm = useMediaQuery('sm');
+  const { meta: { isMultisig, isProxied, isPure, pureCreatedAt } = {} } = useAddressMeta(value);
+
+  const pureNetwork = isPure && pureCreatedAt && networks.find((network) => network.genesisHash === pureCreatedAt);
 
   const options = useMemo(
     (): string[] => createOptions(accounts, addresses, isSign, inputValue, filtered, excluded),
@@ -113,7 +118,7 @@ function InputAddress({
     const key = value || '';
 
     if (isAddress(key)) {
-      onChange?.(encodeAddress(key));
+      onChange?.(key);
     }
   }, [value, onChange]);
 
@@ -135,6 +140,16 @@ function InputAddress({
     if (!isSign && isValidAddress) handleSelect(inputValue);
   };
 
+  const { pressProps } = usePress({
+    onPress: handleOpen
+  });
+
+  const { pressProps: addAddressBookPressProps } = usePress({
+    onPress: () => {
+      addAddressBook(value);
+    }
+  });
+
   const element = (
     <div className='address-cell inline-flex items-center gap-x-2.5 flex-grow-0'>
       {value ? (
@@ -144,11 +159,26 @@ function InputAddress({
       )}
       {isOpen ? null : value ? (
         <div className='address-cell-content flex flex-col gap-y-1'>
-          <div className='inline font-bold text-sm leading-[16px] h-[16px] max-h-[16px] truncate max-w-[90px]'>
+          <div className='inline font-bold text-sm leading-[16px] h-[16px] max-h-[16px] truncate'>
             <AddressName value={value} />
+            {isMultisig && (
+              <Chip color='secondary' size='sm'>
+                Multisig
+              </Chip>
+            )}
+            {(isPure || isProxied) && (
+              <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
+                {isPure ? 'Pure' : 'Proxied'}
+              </Chip>
+            )}
           </div>
-          <div className='inline-flex items-center gap-1 text-tiny leading-[14px] h-[14px] max-h-[14px] font-normal opacity-50'>
-            <Address value={value} shorten={downSm ? true : shorten} />
+          <div className='inline-flex items-center gap-1 text-tiny leading-[14px] h-[14px] max-h-[14px] font-normal'>
+            {pureNetwork?.icon ? (
+              <Avatar style={{ marginRight: 4 }} src={pureNetwork.icon} className='w-3 h-3' />
+            ) : null}
+            <span className='text-foreground/50'>
+              <Address value={value} shorten={upSm ? shorten : true} />
+            </span>
           </div>
         </div>
       ) : (
@@ -166,6 +196,7 @@ function InputAddress({
       triggerRef={wrapperRef}
       placement='bottom-start'
       style={{ width: wrapperRef.current?.clientWidth }}
+      classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <Listbox color='secondary' emptyContent='no addresses' className='max-h-[250px] overflow-y-auto text-foreground'>
         {options.map((item) => (
@@ -174,7 +205,7 @@ function InputAddress({
             onPress={() => handleSelect(item)}
             className='text-foreground data-[hover=true]:text-foreground'
           >
-            <AddressCell value={item} shorten={downSm ? true : shorten} />
+            <AddressCell value={item} shorten={upSm ? shorten : true} />
           </ListboxItem>
         ))}
       </Listbox>
@@ -193,7 +224,7 @@ function InputAddress({
 
         <div
           ref={wrapperRef}
-          className='InputAddressContent group relative w-full inline-flex tap-highlight-transparent px-2 border-medium min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-14 py-2 shadow-none border-default-200 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent'
+          className='InputAddressContent group relative w-full inline-flex tap-highlight-transparent px-2 border-medium min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-14 py-2 shadow-none border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent'
         >
           {element}
           <input
@@ -203,7 +234,13 @@ function InputAddress({
             value={inputValue}
             placeholder={placeholder}
             onChange={setInputValue}
-            onClick={handleOpen}
+            {...pressProps}
+          />
+
+          <ArrowDown
+            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2'
+            style={{ color: 'inherit' }}
+            {...pressProps}
           />
         </div>
 
@@ -211,12 +248,7 @@ function InputAddress({
           <span className='flex items-center gap-1 text-small'>
             <IconWarning className='text-warning' />
             This is an unknown address. You can&nbsp;
-            <span
-              className='cursor-pointer text-primary'
-              onClick={() => {
-                addAddressBook(value);
-              }}
-            >
+            <span className='cursor-pointer text-primary' {...addAddressBookPressProps}>
               add it to your address book
             </span>
           </span>

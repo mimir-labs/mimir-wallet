@@ -22,6 +22,7 @@
   "types": "build/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
+    "./augment": "./augment.d.ts",
     ".": {
       "import": {
         "@mimir-wallet/source": "./src/index.ts",
@@ -45,19 +46,21 @@
     "zustand": ">=5"
   },
   "dependencies": {
-    "@polkadot/api": "^15.8.1",
-    "@polkadot/api-derive": "^15.8.1",
-    "@polkadot/apps-config": "^0.151.1",
-    "@polkadot/types": "^15.8.1",
-    "@polkadot/types-known": "^15.8.1",
+    "@acala-network/types": "^6.2.0",
+    "@polkadot/api": "^15.9.2",
+    "@polkadot/api-derive": "^15.9.2",
+    "@polkadot/apps-config": "^0.153.1",
+    "@polkadot/types": "^15.9.2",
+    "@polkadot/types-known": "^15.9.2",
     "@polkadot/ui-shared": "^3.12.2",
-    "@polkadot/util": "^13.4.3",
-    "@polkadot/util-crypto": "^13.4.3"
+    "@polkadot/util": "^13.4.4",
+    "@polkadot/util-crypto": "^13.4.4",
+    "idb": "^8.0.2"
   },
   "devDependencies": {
     "@mimir-wallet/service": "workspace:^",
-    "@polkadot/extension-base": "^0.58.5",
-    "@polkadot/extension-inject": "^0.58.5",
+    "@polkadot/extension-base": "^0.58.7",
+    "@polkadot/extension-inject": "^0.58.7",
     "npm-run-all2": "^7.0.2",
     "typescript": "^5.8.2"
   }

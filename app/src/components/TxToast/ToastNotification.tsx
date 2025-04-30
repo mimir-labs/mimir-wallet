@@ -3,7 +3,6 @@
 
 import type { TxEvents } from '@mimir-wallet/polkadot-core';
 
-import { Box, Typography } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 import { toast, type ToastOptions } from 'react-toastify';
 
@@ -16,10 +15,10 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'inblock') {
     return [
       () => (
-        <Box marginLeft={1.5}>
-          <Typography fontWeight={700}>Waiting</Typography>
-          <Typography fontSize={12}>Transaction is inblock</Typography>
-        </Box>
+        <div className='ml-2'>
+          <p className='font-bold'>Waiting</p>
+          <p className='text-tiny'>Transaction is inblock</p>
+        </div>
       ),
       { icon: <WaitingAnimation />, autoClose: false }
     ];
@@ -28,10 +27,10 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'finalized') {
     return [
       () => (
-        <Box marginLeft={1.5}>
-          <Typography fontWeight={700}>Success</Typography>
-          <Typography fontSize={12}>Transaction finalized</Typography>
-        </Box>
+        <div className='ml-2'>
+          <p className='font-bold'>Success</p>
+          <p className='text-tiny'>Transaction finalized</p>
+        </div>
       ),
       {
         type: 'success',
@@ -44,10 +43,10 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'signed') {
     return [
       () => (
-        <Box marginLeft={1.5}>
-          <Typography fontWeight={700}>Waiting</Typography>
-          <Typography fontSize={12}>Broadcasting transaction</Typography>
-        </Box>
+        <div className='ml-2'>
+          <p className='font-bold'>Waiting</p>
+          <p className='text-tiny'>Broadcasting transaction</p>
+        </div>
       ),
       { icon: <WaitingAnimation />, autoClose: false }
     ];
@@ -56,10 +55,10 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'success') {
     return [
       () => (
-        <Box marginLeft={1.5}>
-          <Typography fontWeight={700}>Success</Typography>
-          <Typography fontSize={12}>{events.message || 'Operation success'}</Typography>
-        </Box>
+        <div className='ml-2'>
+          <p className='font-bold'>Success</p>
+          <p className='text-tiny'>{events.message || 'Operation success'}</p>
+        </div>
       ),
       {
         type: 'success',
@@ -72,12 +71,12 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'error') {
     return [
       () => (
-        <Box marginLeft={1.5}>
-          <Typography fontWeight={700}>Failed</Typography>
-          <Typography fontSize={12}>
+        <div className='ml-2'>
+          <p className='font-bold'>Failed</p>
+          <p className='text-tiny'>
             <TxError error={events.error} />
-          </Typography>
-        </Box>
+          </p>
+        </div>
       ),
       {
         type: 'error',
@@ -89,10 +88,10 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
 
   return [
     () => (
-      <Box marginLeft={1.5}>
-        <Typography fontWeight={700}>Waiting</Typography>
-        <Typography fontSize={12}>Waiting for sign</Typography>
-      </Box>
+      <div className='ml-2'>
+        <p className='font-bold'>Waiting</p>
+        <p className='text-tiny'>Waiting for sign</p>
+      </div>
     ),
     { icon: <WaitingAnimation />, autoClose: false }
   ];

@@ -4,13 +4,14 @@
 import type { State } from '@/communicator/types';
 import type { SignerPayloadJSON } from '@polkadot/types/types';
 
+import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { useSelectedAccount } from '@/accounts/useSelectedAccount';
+import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { IframeCommunicator } from '@/communicator';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 
 export function useCommunicator(
   iframeRef: MutableRefObject<HTMLIFrameElement | null>,
@@ -19,28 +20,51 @@ export function useCommunicator(
   appName?: string
 ): IframeCommunicator | null {
   const [communicator, setCommunicator] = useState<IframeCommunicator | null>(null);
-  const { api, genesisHash } = useApi();
+  const { genesisHash, chainSS58, network: currentNetwork } = useApi();
+  const { networks, enableNetwork, mode } = useNetworks();
   const { addQueue } = useTxQueue();
-  const selected = useSelectedAccount();
-  const { meta } = useAddressMeta(selected);
+  const { current } = useAccount();
+  const { meta } = useAddressMeta(current);
+  const [, , , , promise] = useQueryAccountOmniChain(current);
 
   const state: State = {
     genesisHash,
-    extrinsicSign: (payload: SignerPayloadJSON, id: string) => {
-      if (payload.genesisHash && payload.genesisHash !== api.genesisHash.toHex()) {
-        throw new Error(`Extrinsic genesisHash error, only supported ${api.runtimeChain.toString()}`);
+    extrinsicSign: async (payload: SignerPayloadJSON, id: string) => {
+      console.log('payload', payload);
+      const data = await promise;
+
+      if (data && data.type === 'pure') {
+        if (payload.genesisHash !== data.network) {
+          throw new Error(`Network not supported for this account, only ${data.network} is supported`);
+        }
       }
 
-      const call = api.registry.createType('Call', payload.method);
+      let network: string | undefined;
 
-      const website = new URL(url);
+      if (mode === 'omni') {
+        network = networks.find((item) => item.genesisHash === payload.genesisHash)?.key;
+
+        if (!network) {
+          throw new Error(`Network not supported`);
+        }
+      } else {
+        if (payload.genesisHash !== genesisHash) {
+          throw new Error(`Network not supported`);
+        }
+
+        network = currentNetwork;
+      }
 
       return new Promise((resolve, reject) => {
+        if (mode === 'omni') enableNetwork(network);
+
+        const website = new URL(url);
         const { withSignedTransaction } = payload;
 
         addQueue({
-          call: api.tx[call.section][call.method](...call.args),
-          accountId: encodeAddress(payload.address),
+          call: payload.method,
+          accountId: encodeAddress(payload.address, chainSS58),
+          network,
           onlySign: true,
           website: website.origin,
           iconUrl,
@@ -53,11 +77,11 @@ export function useCommunicator(
       });
     },
     getAccounts: () => {
-      if (!selected) return [];
+      if (!current) return [];
 
       return [
         {
-          address: selected,
+          address: current,
           name: meta?.name,
           type: (meta?.cryptoType || 'ed25519') as 'ed25519' // for polkadot-api
         }

@@ -1,34 +1,50 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData } from '@/hooks/types';
-
 import { Empty } from '@/components';
-import { usePendingTransactions } from '@/hooks/useTransactions';
+import { useMultichainPendingTransactions } from '@/hooks/useTransactions';
 import { TxCell } from '@/transactions';
 import { Stack } from '@mui/material';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { skeleton } from './skeleton';
 
-function PendingTransactions({ account, txId }: { account: AccountData; txId?: string }) {
-  const [transactions, isFetched, isFetching] = usePendingTransactions(account.address, txId);
+function PendingTransactions({
+  isFetched,
+  isFetching,
+  networks,
+  address,
+  txId
+}: {
+  isFetched: boolean;
+  isFetching: boolean;
+  networks: string[];
+  address: string;
+  txId?: string;
+}) {
+  const data = useMultichainPendingTransactions(networks, address, txId);
 
-  const showSkeleton = isFetching && !isFetched;
+  const transactions = useMemo(
+    () =>
+      data
+        .map((item) => item.data)
+        .flat()
+        .sort((a, b) => b.createdAt - a.createdAt),
+    [data]
+  );
 
-  if (showSkeleton || !account) {
-    return skeleton;
-  }
+  const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching && !item.isFetched);
 
-  if (transactions.length === 0) {
+  if (!showSkeleton && transactions.length === 0) {
     return <Empty height='80dvh' />;
   }
 
   return (
     <Stack spacing={2}>
       {transactions.map((transaction, index) => (
-        <TxCell defaultOpen={index === 0} key={transaction.id} account={account} transaction={transaction} />
+        <TxCell defaultOpen={index === 0} key={transaction.id} address={address} transaction={transaction} />
       ))}
+      {showSkeleton ? skeleton : null}
     </Stack>
   );
 }

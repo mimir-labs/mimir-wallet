@@ -4,10 +4,10 @@
 import type { AddressMeta } from '@/hooks/types';
 
 import { toastError } from '@/components/utils';
-import { service } from '@/utils';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
 
@@ -19,8 +19,10 @@ interface UseAddressMeta {
 }
 
 export function useAddressMeta(value?: string | null): UseAddressMeta {
+  const { network } = useApi();
   const { metas, addAddress, setAccountName } = useAccount();
-  const _meta = metas[value || ''];
+  const addressHex = useMemo(() => (value ? addressToHex(value) : '0x'), [value]);
+  const _meta = metas[addressHex];
 
   const [meta, setMeta] = useState<AddressMeta>(_meta || {});
   const [name, setName] = useState<string>(meta.name || '');
@@ -43,7 +45,7 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
 
       try {
         if (!isAddressBook) {
-          await service.updateAccountName(addressToHex(value), name);
+          await service.updateAccountName(network, addressToHex(value), name);
           setAccountName(value, name);
           cb?.(name);
         } else {
@@ -54,12 +56,12 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
         toastError(error);
       }
     },
-    [addAddress, meta.name, name, setAccountName, value]
+    [addAddress, meta.name, name, network, setAccountName, value]
   );
 
   return {
-    meta,
-    name,
+    meta: meta,
+    name: name,
     setName: setName,
     saveName: saveName
   };

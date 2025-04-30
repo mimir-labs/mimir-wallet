@@ -10,8 +10,6 @@ import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
-import { Paper, SvgIcon, useTheme } from '@mui/material';
-import { Box } from '@mui/system';
 import React, { createContext, useEffect } from 'react';
 import {
   Controls,
@@ -46,33 +44,18 @@ type NodeData = {
 const context = createContext<State>({} as State);
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
-  const { palette } = useTheme();
-
   const { transaction } = data;
 
-  const color = transaction
-    ? transaction.status < TransactionStatus.Success
-      ? palette.warning.main
-      : transaction.status === TransactionStatus.Success
-        ? palette.success.main
-        : palette.error.main
-    : palette.grey[300];
-
-  const icon = transaction ? (
-    <SvgIcon
-      component={
-        transaction.status < TransactionStatus.Success
-          ? IconWaiting
-          : transaction.status === TransactionStatus.Success
-            ? IconSuccess
-            : transaction.status === TransactionStatus.Cancelled
-              ? IconCancel
-              : IconFail
-      }
-      inheritViewBox
-      sx={{ fontSize: '1rem', color }}
-    />
-  ) : null;
+  const icon =
+    transaction.status < TransactionStatus.Success ? (
+      <IconWaiting className='text-warning w-4 h-4' />
+    ) : transaction.status === TransactionStatus.Success ? (
+      <IconSuccess className='text-success w-4 h-4' />
+    ) : transaction.status === TransactionStatus.Cancelled ? (
+      <IconCancel className='text-danger w-4 h-4' />
+    ) : (
+      <IconFail className='text-danger w-4 h-4' />
+    );
 
   return (
     <>
@@ -80,31 +63,23 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
-          style={{ width: 0, height: 0, background: palette.grey[300] }}
+          style={{ width: 0, height: 0 }}
+          className='bg-divider-300'
           type='source'
         />
       )}
-      <Box>
-        <Paper
-          sx={{
-            width: 220,
-            padding: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingX: 1,
-            paddingY: 0.3
-          }}
-        >
+      <div>
+        <div className='w-[220px] flex items-center justify-between px-2.5 py-[3px] bg-content1 rounded-medium shadow-medium'>
           <AddressCell value={data.transaction.address} withCopy withAddressBook />
           {icon}
-        </Paper>
-      </Box>
+        </div>
+      </div>
       {!data.isTop && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Right}
-          style={{ width: 0, height: 0, background: palette.grey[300] }}
+          style={{ width: 0, height: 0 }}
+          className='bg-divider-300'
           type='target'
         />
       )}

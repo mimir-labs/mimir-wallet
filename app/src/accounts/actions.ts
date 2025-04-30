@@ -1,65 +1,43 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AddressMeta } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { HIDE_ACCOUNT_PREFIX } from '@/constants';
+import { HIDE_ACCOUNT_HEX_KEY } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
 import { useWallet } from '@/wallet/useWallet';
 import { u8aToHex } from '@polkadot/util';
 import { isEqual } from 'lodash-es';
 
-import { addressEq, addressToHex, decodeAddress, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, decodeAddress } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { sync } from './sync';
 
-export async function resync() {
-  const { genesisHash } = useApi.getState();
+export async function resync(isOmni: boolean, network: string, chainSS58: number) {
   const { walletAccounts } = useWallet.getState();
 
-  await sync(genesisHash, walletAccounts, (values) => {
-    useAddressStore.setState((state) => ({
-      accounts: isEqual(values, state.accounts) ? state.accounts : values,
-      isMultisigSyned: true
-    }));
-  });
-}
-
-export function isLocalAccount(address: string) {
-  const { accounts } = useAddressStore.getState();
-
-  return accounts.some((item) => addressEq(item.address, address));
-}
-
-export function isLocalAddress(address: string, watchlist?: boolean) {
-  const { addresses } = useAddressStore.getState();
-
-  return addresses.some((item) => (watchlist ? !!item.watchlist : true) && addressEq(item.address, address));
-}
-
-export function appendMeta(meta: Record<string, AddressMeta>) {
-  useAddressStore.setState((state) => ({
-    metas: Object.entries(meta).reduce(
-      (result, item) => {
-        result[item[0]] = { ...result[item[0]], ...item[1] };
-
-        return result;
-      },
-      { ...state.metas }
-    )
-  }));
+  await sync(
+    isOmni,
+    network,
+    chainSS58,
+    walletAccounts.map((item) => item.address),
+    (values) => {
+      useAddressStore.setState((state) => ({
+        accounts: isEqual(values, state.accounts) ? state.accounts : values,
+        isMultisigSyned: true
+      }));
+    }
+  );
 }
 
 export function showAccount(address: string) {
   const { hideAccountHex } = useAddressStore.getState();
-  const { chain } = useApi.getState();
   const addressHex = u8aToHex(decodeAddress(address));
 
   const filteredHex = hideAccountHex.filter((item) => item !== addressHex);
 
-  store.set(`${HIDE_ACCOUNT_PREFIX}${chain.key}`, filteredHex);
+  store.set(HIDE_ACCOUNT_HEX_KEY, filteredHex);
 
   useAddressStore.setState({
     hideAccountHex: filteredHex
@@ -68,12 +46,11 @@ export function showAccount(address: string) {
 
 export function hideAccount(address: string) {
   const { hideAccountHex } = useAddressStore.getState();
-  const { chain } = useApi.getState();
   const addressHex = u8aToHex(decodeAddress(address));
 
   const newHideAccountHex = Array.from(new Set<HexString>([...hideAccountHex, addressHex]));
 
-  store.set(`${HIDE_ACCOUNT_PREFIX}${chain.key}`, newHideAccountHex);
+  store.set(HIDE_ACCOUNT_HEX_KEY, newHideAccountHex);
 
   useAddressStore.setState({
     hideAccountHex: newHideAccountHex
@@ -89,16 +66,14 @@ export function setAccountName(address: string, name: string) {
   });
 }
 
-export function setName(address: string, name: string, networks?: string[], watchlist?: boolean) {
+export function setName(address: string, name: string, watchlist?: boolean) {
   const stored = store.get(`address:${addressToHex(address)}`) as any;
 
-  console.log('setName', address, name, networks, watchlist);
   store.set(`address:${addressToHex(address)}`, {
-    address: encodeAddress(address),
+    address: address,
     meta: {
       name,
-      watchlist: stored?.meta?.watchlist ?? watchlist,
-      networks: Array.from(new Set([...(stored?.meta?.networks || []), ...(networks || [])]))
+      watchlist: stored?.meta?.watchlist ?? watchlist
     }
   });
 }

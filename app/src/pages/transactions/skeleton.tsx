@@ -5,7 +5,7 @@ import { Paper, Skeleton, Stack } from '@mui/material';
 
 export const skeleton = (
   <Stack spacing={2}>
-    {Array.from({ length: 5 }).map((_, index) => (
+    {Array.from({ length: 3 }).map((_, index) => (
       <Paper component={Stack} spacing={2} key={index} sx={{ padding: { sm: 2, xs: 1.5 }, borderRadius: 2 }}>
         <Skeleton variant='rectangular' height={118} />
         <Skeleton variant='rectangular' height={20} />
