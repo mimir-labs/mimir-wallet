@@ -5,6 +5,9 @@ import 'react-toastify/ReactToastify.css';
 import './style.css';
 import '@mimir-wallet/polkadot-core/augment';
 
+import type {} from '@acala-network/types';
+import type {} from '@polkadot/api-augment';
+
 import moment from 'moment';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
