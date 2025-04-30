@@ -1,10 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import 'react-toastify/ReactToastify.css';
 import './style.css';
-
-import type {} from '@acala-network/types';
-import type {} from '@polkadot/api-augment';
+import '@mimir-wallet/polkadot-core/augment';
 
 import moment from 'moment';
 import { createRoot } from 'react-dom/client';

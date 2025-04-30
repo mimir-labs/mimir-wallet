@@ -4,6 +4,7 @@
 import type { IMethod, Registry } from '@polkadot/types/types';
 
 import { AddressRow, FormatBalance } from '@/components';
+import { findToken } from '@/config';
 import { useAssetInfo } from '@/hooks/useAssets';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
 import { dataToUtf8 } from '@/utils';
@@ -12,7 +13,7 @@ import React, { useMemo } from 'react';
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Skeleton } from '@mimir-wallet/ui';
 
-function TransactionDetail({
+function TransferDetail({
   from: propsFrom,
   registry,
   call
@@ -21,7 +22,7 @@ function TransactionDetail({
   registry: Registry;
   call: IMethod | null;
 }) {
-  const { network } = useApi();
+  const { network, genesisHash } = useApi();
   const results = useParseTransfer(registry, propsFrom, call);
   const [assetInfo] = useAssetInfo(network, results?.[0]);
 
@@ -36,9 +37,7 @@ function TransactionDetail({
       'All'
     ) : (
       <div className='flex items-center gap-1'>
-        <Avatar alt='Token' src={assetInfo?.icon} style={{ width: 20, height: 20, background: 'transparent' }}>
-          T
-        </Avatar>
+        <Avatar alt='Token' src={findToken(genesisHash).Icon} style={{ width: 20, height: 20 }} />
         <p>
           -<FormatBalance value={value} withCurrency />
         </p>
@@ -51,9 +50,12 @@ function TransactionDetail({
       `All ${assetInfo.symbol}`
     ) : (
       <div className='flex items-center gap-1'>
-        <Avatar alt='Token' src={assetInfo.icon} style={{ width: 20, height: 20, background: 'transparent' }}>
-          T
-        </Avatar>
+        <Avatar
+          alt='Token'
+          fallback={assetInfo.symbol.slice(0, 1)}
+          src={assetInfo.icon}
+          style={{ width: 20, height: 20 }}
+        />
         <p>
           -<FormatBalance value={value} withCurrency format={[assetInfo.decimals, assetInfo.symbol]} />
         </p>
@@ -86,15 +88,15 @@ function CallDisplayDetail({
       `${calllFunction.section}.${calllFunction.method}`
     )
   ) {
-    comp = <TransactionDetail registry={registry} call={call} />;
+    comp = <TransferDetail registry={registry} call={call} />;
   } else if (
     ['assets.transfer', 'assets.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
   ) {
-    comp = <TransactionDetail registry={registry} call={call} />;
+    comp = <TransferDetail registry={registry} call={call} />;
   } else if (
     ['tokens.transfer', 'tokens.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
   ) {
-    comp = <TransactionDetail registry={registry} call={call} />;
+    comp = <TransferDetail registry={registry} call={call} />;
   } else if (
     ['utility.batch', 'utility.forceBatch', 'utility.batchAll'].includes(
       `${calllFunction.section}.${calllFunction.method}`

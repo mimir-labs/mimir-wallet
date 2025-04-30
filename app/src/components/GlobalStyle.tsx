@@ -10,7 +10,7 @@ function GlobalStyle() {
     <>
       <CssBaseline />
       <GlobalStyles
-        styles={({ palette }) => ({
+        styles={() => ({
           'body,html': {
             lineHeight: 1.1
           },
@@ -23,17 +23,6 @@ function GlobalStyle() {
           ul: {
             paddingLeft: 0,
             margin: 0
-          },
-          ':root': {
-            '--toastify-text-color-light': `${palette.text.primary} !important`,
-            '--toastify-color-info': `${palette.info.main} !important`,
-            '--toastify-color-success': `${palette.success.main} !important`,
-            '--toastify-color-warning': `${palette.warning.main} !important`,
-            '--toastify-color-error': `${palette.error.main} !important`
-          },
-          '.Toastify__toast-icon': {
-            width: 'auto',
-            minWidth: 'auto'
           }
         })}
       />
