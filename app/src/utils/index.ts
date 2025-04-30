@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export * from './common';
+export * from './exception';
 export * from './utf8';
 export * from './check';
 export * from './time';

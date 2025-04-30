@@ -22,6 +22,7 @@
   "types": "build/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
+    "./augment": "./augment.d.ts",
     ".": {
       "import": {
         "@mimir-wallet/source": "./src/index.ts",

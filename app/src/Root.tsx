@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { GlobalStyle } from '@/components';
+import { WalletConnectProvider } from '@/features/wallet-connect';
 import { ThemeProvider } from '@/theme';
 import { StyledEngineProvider } from '@mui/material';
 import { useHref, useNavigate } from 'react-router-dom';
@@ -18,7 +19,6 @@ import AccountConsumer from './accounts/Consumer';
  * - Material-UI's StyledEngineProvider for CSS injection order
  * - Custom ThemeProvider for consistent styling
  * - React Query configuration for data fetching and caching
- * - Global toast notifications
  * - Global styles
  *
  * The QueryClient is configured with:
@@ -34,8 +34,10 @@ function Root({ children }: { children: React.ReactNode }) {
         <ThemeProvider>
           <QueryProvider>
             <AccountConsumer>
-              <GlobalStyle />
-              {children}
+              <WalletConnectProvider>
+                <GlobalStyle />
+                {children}
+              </WalletConnectProvider>
             </AccountConsumer>
           </QueryProvider>
         </ThemeProvider>

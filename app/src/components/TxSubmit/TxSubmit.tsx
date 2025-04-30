@@ -18,6 +18,9 @@ import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Checkbox, Divider } from '@mimir-wallet/ui';
 
 import Input from '../Input';
+import Chopsticks from './analytics/Chopsticks';
+import DryRun from './analytics/DryRun';
+import SafetyCheck from './analytics/SafetyCheck';
 import { useBuildTx } from './hooks/useBuildTx';
 import { useCloseWhenPathChange } from './hooks/useCloseWhenPathChange';
 import { useHighlightTab } from './hooks/useHighlightTab';
@@ -26,7 +29,6 @@ import AddressChain from './AddressChain';
 import AppInfo from './AppInfo';
 import Call from './Call';
 import ProposeTx from './ProposeTx';
-import SafetyCheck from './SafetyCheck';
 import Sender from './Sender';
 import SendTx from './SendTx';
 
@@ -43,6 +45,7 @@ function TxSubmit({
   appName,
   iconUrl,
   relatedBatches,
+  alert,
   filterPaths: propsFilterPaths,
   onReject,
   onClose,
@@ -78,7 +81,6 @@ function TxSubmit({
   const hasPermission = isLocalAccount(accountData.address);
 
   const handleAddBatch = useCallback(() => {
-    console.log(call.toHex());
     addTx([
       {
         calldata: call.toHex(),
@@ -102,8 +104,8 @@ function TxSubmit({
   useCloseWhenPathChange(onClose);
 
   return (
-    <div className='w-full p-4 sm:p-5'>
-      <div className='flex items-center justify-between mb-5'>
+    <div className='w-full p-4 sm:p-5 flex flex-col gap-5 h-[calc(100dvh-60px)]'>
+      <div className='flex items-center justify-between'>
         <h4>Submit Transaction</h4>
         <Button
           isIconOnly
@@ -118,7 +120,9 @@ function TxSubmit({
         </Button>
       </div>
 
-      <div className='w-full h-[calc(100dvh-160px)] p-0 md:p-5 flex flex-col md:flex-row gap-5 overflow-y-auto bg-transparent md:bg-content1 rounded-large shadow-none md:shadow-medium'>
+      {alert && <Alert className='flex-grow-0' color='warning' title={alert} />}
+
+      <div className='flex-1 w-full p-0 md:p-5 flex flex-col md:flex-row gap-5 overflow-y-auto bg-transparent md:bg-content1 rounded-large shadow-none md:shadow-medium'>
         <div className='w-full md:w-[60%] p-4 md:p-0 space-y-5 shadow-medium md:shadow-none bg-content1 md:bg-transparent rounded-large'>
           <Sender address={accountData.address} />
 
@@ -130,13 +134,13 @@ function TxSubmit({
 
           <Call account={accountData.address} method={call} transaction={transaction} />
 
-          <SafetyCheck
-            isTxBundleLoading={buildTx.isLoading}
-            call={call}
-            account={accountData.address}
-            txError={buildTx.error}
-            safetyCheck={safetyCheck}
-          />
+          {!api.call.dryRunApi.dryRunCall ? (
+            <Chopsticks call={call} account={accountData.address} />
+          ) : (
+            <DryRun call={call} account={accountData.address} />
+          )}
+
+          <SafetyCheck isTxBundleLoading={buildTx.isLoading} txError={buildTx.error} safetyCheck={safetyCheck} />
         </div>
 
         <div className='sticky top-0 self-start w-full md:w-[40%] h-auto p-4 sm:p-5 shadow-medium rounded-large bg-content1 space-y-5'>

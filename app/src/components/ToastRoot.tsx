@@ -3,13 +3,10 @@
 
 import { createPortal } from 'react-dom';
 import { type IconProps, Icons, ToastContainer } from 'react-toastify';
-import { injectStyle } from 'react-toastify/dist/inject-style';
 
 import FailedAnimation from './animation/Failed';
 import NoticeAnimation from './animation/Notice';
 import SuccessAnimation from './animation/Success';
-
-injectStyle();
 
 const icon = (props: IconProps) => {
   if (props.type === 'info') {

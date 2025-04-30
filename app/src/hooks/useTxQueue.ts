@@ -22,6 +22,7 @@ export interface TxQueue {
   iconUrl?: string;
   appName?: string;
   relatedBatches?: number[];
+  alert?: React.ReactNode;
   onReject?: () => void;
   onClose?: () => void;
   onError?: (error: unknown) => void;
