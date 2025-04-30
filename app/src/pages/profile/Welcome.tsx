@@ -6,32 +6,20 @@ import type { AccountData } from '@/hooks/types';
 import { useAccount } from '@/accounts/useAccount';
 import { useUnConfirmMultisigs } from '@/accounts/useGroupAccounts';
 import { useSelectedAccountCallback } from '@/accounts/useSelectedAccount';
-import IconAdd from '@/assets/svg/icon-add.svg?react';
 // import IconSend from '@/assets/svg/icon-send-fill.svg?react';
-import { AddressCell, CreateMultisigDialog } from '@/components';
+import { CreateMultisigDialog, InputAddress } from '@/components';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useToggle } from '@/hooks/useToggle';
 import { useWallet } from '@/wallet/useWallet';
-import {
-  Box,
-  Button,
-  Divider,
-  MenuItem,
-  Select,
-  Stack,
-  SvgIcon,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Link } from '@mimir-wallet/ui';
+import { Button, Divider, Link } from '@mimir-wallet/ui';
 
 function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onCreateMultisig: () => void }) {
   const selectAccount = useSelectedAccountCallback();
-  const [selected, setSelected] = useState<string>(accounts[0].address);
-  const [, confirm] = useUnConfirmMultisigs();
+  const [selected, setSelected] = useState<string>(accounts[0]?.address ?? '');
+  const [confirm] = useUnConfirmMultisigs();
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -41,32 +29,29 @@ function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onC
   };
 
   return (
-    <Stack spacing={1} sx={{ width: { xs: '100%', sm: 400 } }}>
-      <Select fullWidth variant='outlined' value={selected} onChange={(e) => setSelected(e.target.value)}>
-        {accounts.map((item) => (
-          <MenuItem value={item.address} key={item.address}>
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <AddressCell value={item.address} withCopy showType />
-            </Box>
-          </MenuItem>
-        ))}
-      </Select>
-      <Button color='primary' fullWidth onClick={handleClick}>
+    <div className='space-y-2.5 w-full sm:w-[400px]'>
+      <InputAddress
+        filtered={accounts.map((item) => item.address)}
+        value={selected}
+        onChange={(value) => setSelected(value)}
+      />
+
+      <Button color='primary' fullWidth onPress={handleClick}>
         Login
       </Button>
 
       <Divider />
 
-      <Button color='primary' variant='outlined' fullWidth onClick={onCreateMultisig}>
+      <Button color='primary' variant='ghost' fullWidth onPress={onCreateMultisig}>
         Create Multisig Account
       </Button>
-      <Button component={Link} href='/create-pure' color='primary' variant='outlined' fullWidth>
+      <Button as={Link} href='/create-pure' color='primary' variant='ghost' fullWidth>
         Create Pure Proxy
       </Button>
-      <Button onClick={handleClick} variant='text' color='primary'>
+      <Button onPress={handleClick} variant='light' color='primary'>
         {'Skip>'}
       </Button>
-    </Stack>
+    </div>
   );
 }
 
@@ -74,75 +59,38 @@ function Welcome() {
   const { connectedWallets, openWallet } = useWallet();
   const { accounts } = useAccount();
   const [createMultisigOpen, toggleCreateMultisigOpen] = useToggle();
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
+  const upSm = useMediaQuery('sm');
 
   const isConnected = Object.keys(connectedWallets).length > 0;
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: { xs: 2, sm: 4, md: 6, lg: 8 },
-          height: '100%'
-        }}
-      >
-        <Box sx={{ width: { xs: 185, sm: 309 }, overflow: 'hidden', borderRadius: { xs: 1.8, sm: 3 } }}>
+      <div className='flex flex-col sm:flex-row justify-center items-center gap-5 sm:gap-10 md:gap-14 lg:gap-20 h-full'>
+        <div className='w-[185px] sm:w-[309px] overflow-hidden rounded-[18px] sm:rounded-[30px]'>
           <video muted playsInline autoPlay loop src='/ux.mp4' controls={false} width='100%' />
-        </Box>
-        <Stack spacing={2} width={{ xs: '100%', sm: 'auto' }}>
-          <Typography
-            variant='h1'
-            sx={{ fontWeight: 700, fontSize: { xs: '20px', sm: '30px', md: '40px' }, lineHeight: 1.1 }}
-          >
-            Manage your assets{downSm ? '' : <br />} like a pro
-          </Typography>
-          <Typography sx={{ fontSize: '1rem', lineHeight: '19px', letterSpacing: '0.16px' }}>
+        </div>
+        <div className='space-y-5 w-full sm:w-auto'>
+          <h1 style={{ fontWeight: 700, lineHeight: 1.1 }} className='text-[20px] sm:text-[30px] md:text-[40px]'>
+            Manage your assets{!upSm ? '' : <br />} like a pro
+          </h1>
+          <p className='text-medium' style={{ lineHeight: '19px', letterSpacing: '0.16px' }}>
             · Multisig Accounts
             <br />· Proxy Accounts
             <br />· Batch Transactions
             <br />· Account Structure Overview
-          </Typography>
+          </p>
           {isConnected ? (
-            accounts.length === 0 ? (
-              <>
-                <Button
-                  startIcon={<SvgIcon inheritViewBox component={IconAdd} sx={{ color: 'white' }} />}
-                  sx={{ width: { xs: 'auto', sm: 210 } }}
-                  color='primary'
-                  onClick={toggleCreateMultisigOpen}
-                >
-                  Create Multisig Account
-                </Button>
-                <Button
-                  component={Link}
-                  to='/create-pure'
-                  startIcon={<SvgIcon inheritViewBox component={IconAdd} sx={{ color: 'white' }} />}
-                  sx={{ width: { xs: 'auto', sm: 210 } }}
-                  color='primary'
-                >
-                  Create Pure Proxy
-                </Button>
-              </>
-            ) : (
-              <>
-                <Typography fontWeight={800} fontSize={{ xs: '1rem', sm: '1.25rem' }}>
-                  Detected Account
-                </Typography>
-                <Detected accounts={accounts} onCreateMultisig={toggleCreateMultisigOpen} />
-              </>
-            )
+            <>
+              <p className='font-extrabold text-medium sm:text-large'>Detected Account</p>
+              <Detected accounts={accounts} onCreateMultisig={toggleCreateMultisigOpen} />
+            </>
           ) : (
-            <Button sx={{ width: { xs: 'auto', sm: 210 } }} color='primary' onClick={openWallet}>
+            <Button color='primary' onPress={openWallet}>
               Connect Wallet
             </Button>
           )}
-        </Stack>
-      </Box>
+        </div>
+      </div>
 
       <CreateMultisigDialog open={createMultisigOpen} onClose={toggleCreateMultisigOpen} />
     </>

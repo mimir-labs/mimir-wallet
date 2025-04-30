@@ -9,15 +9,15 @@ import IconEmail from '@/assets/images/email.svg';
 import IconGithub from '@/assets/images/github.svg';
 import IconMatrix from '@/assets/images/matrix.svg';
 import IconTwitter from '@/assets/images/x.svg';
-import { Address, CopyButton, IdentityIcon } from '@/components';
+import { Address, CopyAddress, IdentityIcon } from '@/components';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { dataToUtf8 } from '@/utils';
 import { Avatar, Box } from '@mui/material';
 import React, { useMemo } from 'react';
 
+import { findAction } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
 
-import { findAction } from '../utils';
 import FunctionArgs from './FunctionArgs';
 
 function Item({ icon, value }: { icon: string; value: string }) {
@@ -58,7 +58,7 @@ function IdentityDisplay({
         {address && (
           <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>
             <Address value={address} shorten />
-            <CopyButton value={address} />
+            <CopyAddress address={address} />
           </span>
         )}
       </Box>

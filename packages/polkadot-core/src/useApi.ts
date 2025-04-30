@@ -1,19 +1,23 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ApiProps } from './types.js';
+import type { ApiContextProps } from './types.js';
 
-import { create } from 'zustand';
+import { useContext } from 'react';
 
-export const useApi = create<ApiProps>()(
-  () =>
-    ({
-      isApiConnected: false,
-      isApiInitialized: false,
-      apiError: null,
-      isApiReady: false,
-      tokenSymbol: '',
-      metadata: {},
-      identityApi: null
-    }) as unknown as ApiProps
-);
+import { ApiContext, SubApiContext } from './context.js';
+
+export function useApi(): ApiContextProps & { isSub: boolean } {
+  const subValue = useContext(SubApiContext);
+  const value = useContext(ApiContext);
+
+  if (subValue) {
+    return { ...subValue, chainSS58: value.chainSS58, isSub: true };
+  }
+
+  return {
+    ...value,
+    chainSS58: value.chainSS58,
+    isSub: false
+  };
+}

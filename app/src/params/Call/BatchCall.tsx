@@ -7,14 +7,15 @@ import type { CallProps } from '../types';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { ellipsisMixin } from '@/components/utils';
 import { Call as CallComp } from '@/params';
-import { Box, Button, Grid2 as Grid, IconButton, Stack, SvgIcon } from '@mui/material';
+import { Box, Button, IconButton, Stack, SvgIcon } from '@mui/material';
 import { isArray } from '@polkadot/util';
 import React, { useMemo, useState } from 'react';
+
+import { findAction } from '@mimir-wallet/polkadot-core';
 
 import CallDisplayDetail from '../CallDisplay/CallDisplayDetail';
 import CallDisplayDetailMinor from '../CallDisplay/CallDisplayDetailMinor';
 import CallDisplaySection from '../CallDisplay/CallDisplaySection';
-import { findAction } from '../utils';
 import FunctionArgs from './FunctionArgs';
 
 function Item({
@@ -33,33 +34,21 @@ function Item({
   const action = useMemo(() => (call ? findAction(registry, call) : null), [registry, call]);
 
   const Top = (
-    <Grid
-      container
-      columns={{ lg: 12, md: 9, sm: 12, xs: 9 }}
-      sx={{ cursor: 'pointer', height: 40, paddingX: { sm: 1.2, xs: 0.8 }, fontSize: '0.75rem' }}
+    <div
+      className='cursor-pointer h-10 px-2 sm:px-3 text-tiny grid grid-cols-9 sm:grid-cols-12 md:grid-cols-9 lg:grid-cols-12 gap-1'
       onClick={toggleOpen}
-      spacing={0.4}
     >
-      <Grid size={1} sx={{ display: 'flex', alignItems: 'center' }}>
-        {index}
-      </Grid>
-      <Grid size={4} sx={{ display: 'flex', alignItems: 'center', ...ellipsisMixin() }}>
+      <div className='flex col-span-1 items-center'>{index}</div>
+      <div style={ellipsisMixin()} className='flex col-span-4 items-center'>
         <CallDisplaySection section={action?.[0]} method={action?.[1]} />
-      </Grid>
-      <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+      </div>
+      <div className='flex col-span-3 items-center'>
         <CallDisplayDetail registry={registry} call={call} />
-      </Grid>
-      <Grid
-        size={3}
-        sx={{
-          display: { lg: 'flex !important', md: 'none !important', sm: 'flex !important', xs: 'none !important' },
-          alignItems: 'center'
-        }}
-      >
+      </div>
+      <div className='hidden sm:flex md:hidden lg:flex col-span-3 items-center'>
         <CallDisplayDetailMinor registry={registry} call={call} />
-      </Grid>
-
-      <Grid size={1} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
+      </div>
+      <div className='flex col-span-1 items-center justify-end'>
         <IconButton
           size='small'
           sx={{ justifySelf: 'end', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', fontSize: '0.75rem' }}
@@ -67,8 +56,8 @@ function Item({
         >
           <SvgIcon inheritViewBox component={ArrowDown} />
         </IconButton>
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 
   return (

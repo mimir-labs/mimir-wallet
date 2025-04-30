@@ -6,51 +6,69 @@ import type { HexString } from '@polkadot/util/types';
 
 import { isAddress } from '@polkadot/util-crypto';
 
-import { encodeAddress, statics } from './defaults.js';
+import { encodeAddress } from './defaults.js';
 
 function accountExplorerLink(
+  chain: { explorerUrl?: string; statescanUrl?: string; ss58Format: number },
   value?: AccountId | AccountIndex | Address | HexString | Uint8Array | string | null
 ): string | undefined {
-  const _value = encodeAddress(value);
+  const _value = encodeAddress(value, chain.ss58Format);
 
   if (_value && isAddress(_value)) {
-    const explorerUrl = statics.chain.explorerUrl;
-    const isStatescan = statics.chain.statescan;
+    const explorerUrl = chain.explorerUrl;
 
     if (explorerUrl) {
-      return isStatescan ? `${explorerUrl}/#/accounts/${_value}` : `${explorerUrl}account/${_value}`;
+      const url = new URL(explorerUrl);
+
+      url.pathname = `/account/${_value}`;
+
+      return url.toString();
+    }
+
+    const statescanUrl = chain.statescanUrl;
+
+    if (statescanUrl) {
+      const url = new URL(statescanUrl);
+
+      url.hash = `/accounts/${_value}`;
+
+      return url.toString();
     }
   }
 
   return undefined;
 }
 
-function extrinsicExplorerLink(value?: string | { toString: () => string }): string | undefined {
+function extrinsicExplorerLink(
+  chain: { explorerUrl?: string; statescanUrl?: string },
+  value?: string | { toString: () => string }
+): string | undefined {
   const _value = value?.toString();
 
-  const explorerUrl = statics.chain.explorerUrl;
-  const isStatescan = statics.chain.statescan;
+  const explorerUrl = chain.explorerUrl;
 
   if (explorerUrl) {
-    return isStatescan ? `${explorerUrl}/#/extrinsics/${_value}` : `${explorerUrl}extrinsic/${_value}`;
+    const url = new URL(explorerUrl);
+
+    url.pathname = `/extrinsic/${_value}`;
+
+    return url.toString();
+  }
+
+  const statescanUrl = chain.statescanUrl;
+
+  if (statescanUrl) {
+    const url = new URL(statescanUrl);
+
+    url.hash = `/extrinsics/${_value}`;
+
+    return url.toString();
   }
 
   return undefined;
 }
 
-function subsquareUrl(path?: string): string | undefined {
-  const baseUrl = statics.chain.subsquareUrl;
-
-  return baseUrl ? `${baseUrl}${path || ''}` : undefined;
-}
-
-function proposalApi(): string | undefined {
-  return statics.chain.proposalApi;
-}
-
 export const chainLinks = {
   accountExplorerLink,
-  extrinsicExplorerLink,
-  subsquareUrl,
-  proposalApi
+  extrinsicExplorerLink
 };

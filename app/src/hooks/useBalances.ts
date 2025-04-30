@@ -4,123 +4,456 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { Option } from '@polkadot/types';
 import type { AccountId, AccountId32 } from '@polkadot/types/interfaces';
-import type { PalletAssetsAssetAccount } from '@polkadot/types/lookup';
-import type { AccountAssetInfo, AccountBalance, AssetInfo, OrmlTokensAccountData } from './types';
+import type {
+  AcalaPrimitivesCurrencyAssetIds,
+  AcalaPrimitivesCurrencyCurrencyId,
+  PalletAssetsAssetAccount
+} from '@polkadot/types/lookup';
+import type { AccountAssetInfo, AssetInfo, OrmlTokensAccountData } from './types';
 
+import { findToken } from '@/config';
+import { formatUnits } from '@/utils';
 import { BN_ZERO, isHex } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
+import { isEqual } from 'lodash-es';
+import { useEffect, useMemo, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
+import { addressToHex, useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
+import { useQueries, useQuery } from '@mimir-wallet/service';
 
-import { useAssets } from './useAssets';
+import { useAssetsByAddress, useAssetsByAddressAll } from './useAssets';
+import { useTokenInfo, useTokenInfoAll } from './useTokenInfo';
 
-async function getBalances({ queryKey }: { queryKey: [ApiPromise, string | undefined | null] }) {
-  const [api, address] = queryKey;
+async function getBalances({
+  queryKey
+}: {
+  queryKey: [api: ApiPromise | null | undefined, address: string | undefined | null, network: string];
+}): Promise<AccountAssetInfo<true>> {
+  const [api, address, network] = queryKey;
+
+  if (!api) {
+    throw new Error('Api is required');
+  }
 
   if (!address) {
     throw new Error('Address is required');
   }
 
+  const symbol = api.registry.chainTokens[0].toString();
+  const decimals = api.registry.chainDecimals[0];
+  const genesisHash = api.genesisHash.toHex();
+
   return Promise.all([api.query.system.account(address)]).then(([account]) => ({
-    total: account.data.free.add(account.data.reserved),
-    reserved: account.data.reserved,
-    locked: account.data.frozen,
-    free: account.data.free,
-    transferrable: account.data.free
-      .add(account.data.reserved)
-      .sub(account.data.reserved.gt(account.data.frozen) ? account.data.reserved : account.data.frozen)
+    network: network,
+    name: symbol,
+    symbol: symbol,
+    decimals: decimals,
+    account: address.toString(),
+    icon: findToken(genesisHash).Icon,
+    isNative: true,
+    assetId: 'native',
+    total: BigInt(account.data.free.add(account.data.reserved).toString()),
+    reserved: BigInt(account.data.reserved.toString()),
+    locked: BigInt(account.data.frozen.toString()),
+    free: BigInt(account.data.free.toString()),
+    transferrable: BigInt(
+      account.data.free
+        .sub(account.data.frozen.gt(account.data.reserved) ? account.data.frozen.sub(account.data.reserved) : BN_ZERO)
+        .toString()
+    ),
+    price: 0,
+    change24h: 0
   }));
 }
 
 export function useNativeBalances(
   address?: AccountId | AccountId32 | string | null
-): [AccountBalance | undefined, boolean, boolean] {
-  const { api, isApiReady } = useApi();
-  const queryHash = blake2AsHex(`${api.genesisHash.toHex()}-native-balances-${address?.toString()}`);
+): [AccountAssetInfo<true> | undefined, boolean, boolean] {
+  const { api, isApiReady, network } = useApi();
+  const [tokenInfo] = useTokenInfo(network);
+
+  const addressHex = address ? addressToHex(address.toString()) : '';
+  const queryHash = useMemo(() => blake2AsHex(`${network}-native-balances-${addressHex}`), [network, addressHex]);
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [api, address?.toString()] as const,
+    queryKey: [api, address?.toString(), network] as const,
     queryHash,
-    refetchInterval: 12000,
     queryFn: getBalances,
-    enabled: isApiReady && !!address
+    enabled: !!api && isApiReady && !!address,
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
+    }
   });
 
-  return [data, isFetched, isFetching];
+  return [
+    useMemo(() => {
+      if (!data) {
+        return undefined;
+      }
+
+      return {
+        ...data,
+        price: parseFloat(tokenInfo?.detail?.[data.symbol]?.price || '0'),
+        change24h: parseFloat(tokenInfo?.detail?.[data.symbol]?.price_change || '0')
+      };
+    }, [data, tokenInfo]),
+    isFetched,
+    isFetching
+  ];
 }
 
-async function getAssetBalances({
+type UseNativeBalancesAll = {
+  data: AccountAssetInfo<true> | undefined;
+  isFetched: boolean;
+  isFetching: boolean;
+  isError: boolean;
+  refetch: () => void;
+};
+
+export function useNativeBalancesAll(address?: string): UseNativeBalancesAll[] {
+  const { allApis } = useApi();
+  const [allTokenInfo] = useTokenInfoAll();
+  const addressHex = address ? addressToHex(address.toString()) : '';
+  const [list, setList] = useState<UseNativeBalancesAll[]>([]);
+
+  const queries = useQueries({
+    queries: Object.entries(allApis).map(([network, api]) => {
+      const queryHash = blake2AsHex(`${network}-native-balances-${addressHex}`);
+
+      return {
+        queryKey: [api.api, address?.toString(), network] as [
+          api: ApiPromise,
+          address: string | undefined,
+          network: string
+        ],
+        queryHash,
+        refetchInterval: 12_000,
+        refetchOnMount: false,
+        refetchOnWindowFocus: true,
+        enabled: !!address && !!api && api.isApiReady,
+        queryFn: getBalances
+      };
+    })
+  });
+
+  useEffect(() => {
+    setList((prev) => {
+      const newValue = queries.map((item) => {
+        const data = item.data;
+
+        const tokenInfo = data ? allTokenInfo?.[data.network] : undefined;
+
+        return {
+          isFetched: item.isFetched,
+          isFetching: item.isFetching,
+          isError: item.isError,
+          refetch: item.refetch,
+          data: data
+            ? ({
+                ...data,
+                price: parseFloat(tokenInfo?.detail?.[data.symbol]?.price || '0'),
+                change24h: parseFloat(tokenInfo?.detail?.[data.symbol]?.price_change || '0')
+              } as AccountAssetInfo<true>)
+            : undefined
+        };
+      });
+
+      return isEqual(prev, newValue) ? prev : newValue;
+    });
+  }, [allTokenInfo, queries]);
+
+  return list;
+}
+
+async function _fetchAssetBalances({
   queryKey
 }: {
-  queryKey: [ApiPromise, allAssets: AssetInfo[], string | undefined | null];
+  queryKey: [api: ApiPromise, network: string, assets: AssetInfo[], address: string | undefined | null];
 }): Promise<AccountAssetInfo[]> {
-  const [api, allAssets, address] = queryKey;
+  const [api, network, assets, address] = queryKey;
 
-  if (address && allAssets.length > 0 && (api.query.assets || api.query.tokens)) {
+  if (address && assets.length > 0) {
     if (api.query.assets) {
-      return api
-        .queryMulti?.<Option<PalletAssetsAssetAccount>[]>(
-          allAssets.map((item) => {
-            return isHex(item.assetId)
-              ? [api.query.foreignAssets.account, [item.assetId, address.toString()]]
-              : [api.query.assets.account, [item.assetId, address.toString()]];
-          })
+      return Promise.all(
+        assets.map(
+          (item): Promise<Option<PalletAssetsAssetAccount>> =>
+            isHex(item.assetId)
+              ? (api.query.foreignAssets.account(item.assetId, address.toString()) as Promise<
+                  Option<PalletAssetsAssetAccount>
+                >)
+              : api.query.assets.account(item.assetId, address.toString())
         )
-        .then((results) => {
-          return results
-            .map((result, index) => ({
-              ...allAssets[index],
-              total: result.isSome ? result.unwrap().balance : BN_ZERO,
-              free: result.isSome ? result.unwrap().balance : BN_ZERO,
-              locked: BN_ZERO,
-              reserved: BN_ZERO,
-              transferrable: result.isSome ? result.unwrap().balance : BN_ZERO,
-              account: address.toString()
-            }))
-            .filter((result, index) => result.free.gt(BN_ZERO) || !!allAssets[index].icon);
-        });
+      ).then((results) => {
+        return results
+          .map((result, index) => ({
+            ...assets[index],
+            total: result.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,
+            free: result.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,
+            locked: 0n,
+            reserved: 0n,
+            transferrable: result.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,
+            account: address.toString()
+          }))
+          .filter((result) => result.total > 0n);
+      });
     }
 
     if (api.query.tokens) {
-      return api
-        .queryMulti?.<
-          OrmlTokensAccountData[]
-        >(allAssets.map((item) => [api.query.tokens.accounts, [address.toString(), item.assetId]]))
-        .then((results) => {
+      if (network === 'acala' || network === 'karura') {
+        return Promise.all(
+          assets
+            .map((item) => {
+              const assetId: AcalaPrimitivesCurrencyAssetIds = api.registry.createType(
+                'AcalaPrimitivesCurrencyAssetIds',
+                item.assetId
+              );
+
+              if (assetId.isErc20) {
+                return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
+                  Erc20: assetId.asErc20.toHex()
+                });
+              } else if (assetId.isForeignAssetId) {
+                return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
+                  ForeignAsset: assetId.asForeignAssetId.toNumber()
+                });
+              } else if (assetId.isStableAssetId) {
+                return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
+                  StableAssetPoolToken: assetId.asStableAssetId.toNumber()
+                });
+              } else if (assetId.isNativeAssetId) {
+                const nativeAssetId: AcalaPrimitivesCurrencyCurrencyId = api.registry.createType(
+                  'AcalaPrimitivesCurrencyCurrencyId',
+                  assetId.asNativeAssetId
+                );
+
+                return nativeAssetId;
+              } else {
+                return null;
+              }
+            })
+            .filter((item) => !!item)
+            .map(
+              (currencyId) =>
+                api.query.tokens.accounts(address.toString(), currencyId) as Promise<OrmlTokensAccountData>
+            )
+        ).then((results) => {
           return results
             .map((result, index) => ({
-              ...allAssets[index],
-              total: result.free.add(result.reserved),
-              free: result.free,
-              locked: result.frozen,
-              reserved: result.reserved,
-              transferrable: result.free.add(result.reserved).sub(result.frozen),
+              ...assets[index],
+              total: BigInt(result.free.add(result.reserved).toString()),
+              free: BigInt(result.free.toString()),
+              locked: BigInt(result.frozen.toString()),
+              reserved: BigInt(result.reserved.toString()),
+              transferrable: BigInt(result.free.add(result.reserved).sub(result.frozen).toString()),
               account: address.toString()
             }))
-            .filter((result, index) => result.free.add(result.reserved).gt(BN_ZERO) || !!allAssets[index].icon);
+            .filter((result) => result.total > 0n);
         });
+      }
+
+      return Promise.all(
+        assets.map(
+          (item) => api.query.tokens.accounts(address.toString(), item.assetId) as Promise<OrmlTokensAccountData>
+        )
+      ).then((results) => {
+        return results
+          .map((result, index) => ({
+            ...assets[index],
+            total: BigInt(result.free.add(result.reserved).toString()),
+            free: BigInt(result.free.toString()),
+            locked: BigInt(result.frozen.toString()),
+            reserved: BigInt(result.reserved.toString()),
+            transferrable: BigInt(result.free.add(result.reserved).sub(result.frozen).toString()),
+            account: address.toString()
+          }))
+          .filter((result) => result.total > 0n);
+      });
     }
   }
 
-  return Promise.resolve([]);
+  return [];
 }
 
-export function useAssetBalances(address?: AccountId | AccountId32 | string | null): AccountAssetInfo[] {
-  const { api, isApiReady } = useApi();
-  const allAssets = useAssets();
-
-  const queryHash = blake2AsHex(
-    `${api.genesisHash.toHex()}-${allAssets.map((item) => item.assetId).join('-')}-${address?.toString()}`
+export function useAssetBalances(
+  network: string,
+  address?: AccountId | AccountId32 | string | null
+): [data: AccountAssetInfo[], isFetched: boolean, isFetching: boolean] {
+  const { allApis } = useApi();
+  const api: ValidApiState | undefined = allApis[network];
+  const [assets] = useAssetsByAddress(network, address?.toString());
+  const [tokenInfo] = useTokenInfo(network);
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const queryHash = useMemo(
+    () =>
+      blake2AsHex(
+        `${network}-assets-balances-${addressHex}-${
+          assets
+            ? assets
+                .map((item) => item.assetId)
+                .sort()
+                .join(',')
+            : ''
+        }`
+      ),
+    [addressHex, assets, network]
   );
 
-  const { data } = useQuery({
-    queryKey: [api, allAssets, address?.toString()] as const,
+  const { data, isFetched, isFetching } = useQuery({
+    queryKey: [network, api?.api, address, assets] as const,
     queryHash,
     refetchInterval: 12000,
-    queryFn: getAssetBalances,
-    enabled: isApiReady && !!address
+    refetchOnMount: false,
+    refetchOnWindowFocus: true,
+    enabled: !!address && !!api && api.isApiReady && !!assets,
+    queryFn: async ({
+      queryKey: [network, api, address, assets]
+    }: {
+      queryKey: [
+        network: string,
+        api: ApiPromise | null | undefined,
+        address?: AccountId | AccountId32 | string | null,
+        assets?: AssetInfo[]
+      ];
+    }): Promise<AccountAssetInfo[]> => {
+      if (!api || !assets || !address) {
+        throw new Error('Api, assets and address are required');
+      }
+
+      const data = await _fetchAssetBalances({ queryKey: [api, network, assets, address.toString()] });
+
+      return data;
+    }
   });
 
-  return data ?? [];
+  return [
+    useMemo(
+      () =>
+        data?.map((item) => ({
+          ...item,
+          price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
+          change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
+        })) || [],
+      [data, tokenInfo]
+    ),
+    isFetched,
+    isFetching
+  ];
+}
+
+type UseAssetBalancesAll = {
+  data: AccountAssetInfo[] | undefined;
+  isFetched: boolean;
+  isFetching: boolean;
+  isError: boolean;
+  refetch: () => void;
+};
+
+export function useAssetBalancesAll(address?: string): UseAssetBalancesAll[] {
+  const { allApis } = useApi();
+  const [allTokenInfo] = useTokenInfoAll();
+  const [allAssets] = useAssetsByAddressAll(address);
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const [list, setList] = useState<UseAssetBalancesAll[]>([]);
+
+  const queries = useQueries({
+    queries: Object.entries(allApis).map(([network, api]) => {
+      const assets = allAssets?.[network];
+
+      const queryHash = blake2AsHex(
+        `${network}-assets-balances-${addressHex}-${
+          assets
+            ? assets
+                .map((item) => item.assetId)
+                .sort()
+                .join(',')
+            : ''
+        }`
+      );
+
+      return {
+        queryKey: [network, api.api, address, assets] as [
+          network: string,
+          api: ApiPromise,
+          address: string | undefined,
+          assets: AssetInfo[] | undefined
+        ],
+        queryHash,
+        refetchInterval: 12_000,
+        refetchOnMount: false,
+        refetchOnWindowFocus: true,
+        enabled: !!address && !!api && api.isApiReady && !!assets,
+        queryFn: async ({
+          queryKey: [network, api, address, assets]
+        }: {
+          queryKey: [network: string, api: ApiPromise, address: string | undefined, assets: AssetInfo[] | undefined];
+        }): Promise<AccountAssetInfo[]> => {
+          if (!address || !assets) {
+            throw new Error('Address and assets are required');
+          }
+
+          const data = await _fetchAssetBalances({ queryKey: [api, network, assets, address] });
+
+          return data;
+        }
+      };
+    })
+  });
+
+  useEffect(() => {
+    setList((prev) => {
+      const newValue = queries.map((item) => {
+        const data = item.data;
+
+        return {
+          isFetched: item.isFetched,
+          isFetching: item.isFetching,
+          isError: item.isError,
+          refetch: item.refetch,
+          data: data?.map((item) => ({
+            ...item,
+            price: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price || '0'),
+            change24h: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price_change || '0')
+          }))
+        };
+      });
+
+      return isEqual(prev, newValue) ? prev : newValue;
+    });
+  }, [queries, allTokenInfo]);
+
+  return list;
+}
+
+export function useBalanceTotalUsd(address?: string) {
+  const nativeBalances = useNativeBalancesAll(address);
+  const assets = useAssetBalancesAll(address);
+
+  return useMemo(() => {
+    let lastTotal = 0;
+    let total = 0;
+
+    for (const item of assets) {
+      if (item.data) {
+        for (const asset of item.data) {
+          const currentTotal = parseFloat(formatUnits(asset.total, asset.decimals)) * asset.price;
+
+          total += currentTotal;
+
+          lastTotal += currentTotal / (1 + asset.change24h);
+        }
+      }
+    }
+
+    for (const item of nativeBalances) {
+      if (item.data) {
+        const currentTotal = parseFloat(formatUnits(item.data.total, item.data.decimals)) * item.data.price;
+
+        total += currentTotal;
+
+        lastTotal += currentTotal / (1 + item.data.change24h);
+      }
+    }
+
+    return [total, lastTotal ? (total - lastTotal) / lastTotal : 0];
+  }, [assets, nativeBalances]);
 }

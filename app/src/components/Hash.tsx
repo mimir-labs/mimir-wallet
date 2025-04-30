@@ -4,10 +4,11 @@
 import type { HexString } from '@polkadot/util/types';
 
 import IconLink from '@/assets/svg/icon-link.svg?react';
-import { IconButton, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import React from 'react';
 
-import { chainLinks } from '@mimir-wallet/polkadot-core';
+import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Link } from '@mimir-wallet/ui';
 
 import CopyButton from './CopyButton';
 
@@ -18,28 +19,34 @@ interface Props {
 }
 
 function Hash({ value, withCopy, withExplorer }: Props) {
+  const { chain } = useApi();
   const stringValue = value?.toString();
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
+  const upSm = useMediaQuery('sm');
 
-  const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(stringValue) : undefined;
+  const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(chain, stringValue) : undefined;
 
-  const C = explorerLink ? 'a' : 'span';
+  const C = explorerLink ? Link : 'span';
 
   return (
     <C
-      data-link={explorerLink}
-      className='flex gap-1 items-center no-underline text-inherit data-[link="true"]:hover:underline'
+      data-link={!!explorerLink}
+      className='flex gap-1 items-center no-underline text-inherit text-[length:inherit] data-[link="true"]:hover:underline'
       href={explorerLink}
       target='_blank'
     >
       <>
-        {downSm ? `${stringValue?.slice(0, 8)}...${stringValue?.slice(-8)}` : stringValue}
+        {upSm ? stringValue : `${stringValue?.slice(0, 8)}...${stringValue?.slice(-8)}`}
         {withCopy && <CopyButton size='sm' value={stringValue} />}
         {explorerLink && (
-          <IconButton color='inherit' size='small' sx={{ padding: 0 }}>
-            <SvgIcon component={IconLink} inheritViewBox />
-          </IconButton>
+          <Button
+            color='default'
+            isIconOnly
+            size='sm'
+            variant='light'
+            className='w-5 h-5 min-w-[0px] min-h-[0px] opacity-50'
+          >
+            <IconLink className='w-4 h-4' />
+          </Button>
         )}
       </>
     </C>

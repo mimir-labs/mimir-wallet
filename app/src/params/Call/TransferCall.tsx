@@ -3,13 +3,15 @@
 
 import type { CallProps } from '../types';
 
-import { Address, AddressName, CopyButton, FormatBalance, IdentityIcon } from '@/components';
+import { Address, AddressName, CopyAddress, FormatBalance, IdentityIcon } from '@/components';
 import { ellipsisMixin } from '@/components/utils';
 import { useAssetInfo } from '@/hooks/useAssets';
+import { useParseTransfer } from '@/hooks/useParseTransfer';
 import { alpha, Box, lighten, Skeleton } from '@mui/material';
-import React, { useMemo } from 'react';
+import React from 'react';
 
-import { findAction } from '../utils';
+import { useApi } from '@mimir-wallet/polkadot-core';
+
 import FunctionArgs from './FunctionArgs';
 
 function AddressDisplay({ reverse, address }: { reverse: boolean; address?: string }) {
@@ -47,7 +49,7 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
           <Box component='span' sx={{ ...ellipsisMixin(150) }}>
             <AddressName value={address} />
           </Box>
-          <CopyButton size='sm' value={address} color='default' />
+          {address && <CopyAddress address={address} size='sm' color='default' />}
         </Box>
         <Box sx={{ fontSize: '10px', color: 'text.secondary', lineHeight: '12px' }}>
           <Address shorten value={address} />
@@ -58,84 +60,10 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
 }
 
 function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProps) {
-  const action = useMemo(() => findAction(registry, call), [registry, call]);
+  const { network } = useApi();
+  const results = useParseTransfer(registry, propFrom, call);
 
-  const results = useMemo(() => {
-    let assetId: string | null = null;
-    let from: string | undefined = propFrom;
-    let to: string;
-    let value: string;
-    let isAll = false;
-
-    if (!action) {
-      return null;
-    }
-
-    const [section, method] = action;
-
-    if (section !== 'balances' && section !== 'assets' && section !== 'tokens') {
-      return null;
-    }
-
-    if (section === 'balances') {
-      if (method === 'forceTransfer') {
-        from = call.args[0].toString();
-        to = call.args[1].toString();
-        value = call.args[2].toString();
-      } else if (method === 'transferAll') {
-        to = call.args[0].toString();
-        value = '0';
-        isAll = true;
-      } else if (method === 'transferAllowDeath' || method === 'transferKeepAlive') {
-        to = call.args[0].toString();
-        value = call.args[1].toString();
-      } else {
-        return null;
-      }
-    } else if (section === 'assets') {
-      if (method === 'forceTransfer') {
-        assetId = call.args[0].toString();
-        from = call.args[1].toString();
-        to = call.args[2].toString();
-        value = call.args[3].toString();
-      } else if (method === 'transfer' || method === 'transferKeepAlive') {
-        assetId = call.args[0].toString();
-        to = call.args[1].toString();
-        value = call.args[2].toString();
-      } else if (method === 'transferAll') {
-        assetId = call.args[1].toString();
-        to = call.args[0].toString();
-        value = '0';
-        isAll = true;
-      } else {
-        return null;
-      }
-    } else if (section === 'tokens') {
-      if (method === 'transfer' || method === 'transferKeepAlive') {
-        assetId = call.args[1].toString();
-        to = call.args[0].toString();
-        value = call.args[2].toString();
-      } else if (method === 'forceTransfer') {
-        to = call.args[1].toString();
-        from = call.args[0].toString();
-        assetId = call.args[2].toString();
-        value = call.args[3].toString();
-      } else if (method === 'transferAll') {
-        to = call.args[0].toString();
-        assetId = call.args[1].toString();
-        value = '0';
-        isAll = true;
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
-
-    return [assetId, from, to, value, isAll] as const;
-  }, [action, call.args, propFrom]);
-
-  const [assetInfo] = useAssetInfo(results?.[0]);
+  const [assetInfo] = useAssetInfo(network, results?.[0]);
 
   if (!results) return <FunctionArgs from={propFrom} registry={registry} call={call} jsonFallback={jsonFallback} />;
 

@@ -4,8 +4,9 @@
 import IconArrow from '@/assets/svg/icon-arrow.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import { AddressCell } from '@/components';
-import { Box, IconButton, SvgIcon, Typography } from '@mui/material';
 import React from 'react';
+
+import { Button } from '@mimir-wallet/ui';
 
 function ProxyInfo({
   delay,
@@ -21,62 +22,25 @@ function ProxyInfo({
   onDelete?: () => void;
 }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        padding: 1,
-        gap: 0.5,
-        bgcolor: 'secondary.main',
-        borderRadius: 1
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          color: 'text.secondary',
-          fontSize: '0.75rem'
-        }}
-      >
-        <Typography flex={1} fontSize='inherit'>
-          Review Window:{' '}
-          <Box component='b' color='text.primary' fontWeight={700} marginRight={1}>
-            {delay}
-          </Box>
-          Authorize:{' '}
-          <Box component='b' color='text.primary' fontWeight={700}>
-            {proxyType}
-          </Box>
-        </Typography>
+    <div className='flex flex-col p-2.5 gap-1 bg-secondary rounded-medium'>
+      <div className='flex items-center gap-2.5 text-foreground/65 text-tiny'>
+        <p className='flex-1'>
+          Review Window: <b className='text-foreground mr-2.5'>{delay}</b>
+          Authorize: <b className='text-foreground'>{proxyType}</b>
+        </p>
         {onDelete && (
-          <IconButton color='error' size='small' sx={{ fontSize: 'inherit' }} onClick={onDelete}>
-            <SvgIcon component={IconDelete} inheritViewBox />
-          </IconButton>
+          <Button isIconOnly color='danger' size='sm' variant='light' onPress={onDelete}>
+            <IconDelete />
+          </Button>
         )}
-      </Box>
+      </div>
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { sm: 'row', xs: 'column' },
-          gap: 1,
-          alignItems: 'center',
-          '&>.AddressCell': { width: '100%', bgcolor: 'background.paper', paddingY: 0.5, paddingX: 1, borderRadius: 1 }
-        }}
-      >
+      <div className='flex flex-col sm:flex-row gap-2.5 items-center [&>.AddressCell]:w-full [&>.AddressCell]:bg-content1 [&>.AddressCell]:py-1 [&>.AddressCell]:px-2.5 [&>.AddressCell]:rounded-medium'>
         <AddressCell withCopy value={proxied} withAddressBook />
-        <SvgIcon
-          component={IconArrow}
-          fontSize='small'
-          inheritViewBox
-          color='primary'
-          sx={{ transform: { sm: 'none', xs: 'rotate(90deg)' } }}
-        />
+        <IconArrow className='w-3.5 h-3.5 text-primary rotate-90 sm:transform-none' />
         <AddressCell withCopy value={delegate} withAddressBook />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 

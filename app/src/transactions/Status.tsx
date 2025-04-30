@@ -10,10 +10,9 @@ import IconMember from '@/assets/svg/icon-member-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
 import { TransactionStatus } from '@/hooks/types';
-import { Box, Button, SvgIcon } from '@mui/material';
 import { useMemo } from 'react';
 
-import { Spinner } from '@mimir-wallet/ui';
+import { Button, Spinner } from '@mimir-wallet/ui';
 
 import { useAnnouncementStatus } from './hooks/useAnnouncementStatus';
 
@@ -21,36 +20,24 @@ export function AnnouncementStatus({ account, transaction }: { account: AccountD
   const [status, isFetching] = useAnnouncementStatus(transaction, account);
 
   if (isFetching) {
-    return <Spinner size='sm' variant='spinner' />;
+    return <Spinner size='sm' />;
   }
 
+  const SvgIcon =
+    status === 'indexing' || status === 'reviewing'
+      ? IconWaiting
+      : status === 'executable' || status === 'success'
+        ? IconSuccess
+        : IconFailed;
+
   return (
-    <Box
-      sx={{
-        wordBreak: 'break-word',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0.5,
-        whiteSpace: 'nowrap',
-        color:
-          status === 'indexing' || status === 'reviewing'
-            ? 'warning.main'
-            : status === 'executable' || status === 'success'
-              ? 'success.main'
-              : 'error.main'
-      }}
+    <div
+      data-pending={status === 'indexing' || status === 'reviewing'}
+      data-success={status === 'executable' || status === 'success'}
+      data-failed={!['indexing', 'reviewing', 'executable', 'success'].includes(status)}
+      className='break-words flex items-center gap-[5px] whitespace-nowrap data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger'
     >
-      <SvgIcon
-        color='inherit'
-        component={
-          status === 'indexing' || status === 'reviewing'
-            ? IconWaiting
-            : status === 'executable' || status === 'success'
-              ? IconSuccess
-              : IconFailed
-        }
-        inheritViewBox
-      />
+      <SvgIcon color='inherit' />
       {status === 'indexing'
         ? 'Indexing'
         : status === 'reviewing'
@@ -66,7 +53,7 @@ export function AnnouncementStatus({ account, transaction }: { account: AccountD
                   : status === 'removed'
                     ? 'Removed'
                     : 'Proxy Removed'}
-    </Box>
+    </div>
   );
 }
 
@@ -77,53 +64,36 @@ export function MultisigStatus({ transaction, onClick }: { transaction: Transact
   }, [transaction.children]);
 
   return (
-    <Box sx={{ flex: '1' }}>
-      <Button
-        onClick={onClick}
-        size='small'
-        startIcon={<SvgIcon component={IconMember} inheritViewBox />}
-        variant='outlined'
-      >
+    <div className='flex-1'>
+      <Button onPress={onClick} size='sm' startContent={<IconMember />} variant='ghost'>
         {approvals}/{meta.threshold}
       </Button>
-    </Box>
+    </div>
   );
 }
 
 export function Status({ transaction }: { transaction: Transaction }) {
   const status = transaction.status;
 
+  const SvgIcon =
+    status < TransactionStatus.Success
+      ? IconWaiting
+      : status === TransactionStatus.Success
+        ? IconSuccess
+        : status === TransactionStatus.Failed
+          ? IconFailed
+          : status === TransactionStatus.Cancelled
+            ? IconCancel
+            : IconFailed;
+
   return (
-    <Box
-      sx={{
-        wordBreak: 'break-word',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0.5,
-        whiteSpace: 'nowrap',
-        color:
-          status < TransactionStatus.Success
-            ? 'warning.main'
-            : status === TransactionStatus.Success
-              ? 'success.main'
-              : 'error.main'
-      }}
+    <div
+      data-pending={status < TransactionStatus.Success}
+      data-success={status === TransactionStatus.Success}
+      data-failed={status > TransactionStatus.Success}
+      className='break-words flex items-center gap-[5px] whitespace-nowrap data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger'
     >
-      <SvgIcon
-        color='inherit'
-        component={
-          status < TransactionStatus.Success
-            ? IconWaiting
-            : status === TransactionStatus.Success
-              ? IconSuccess
-              : status === TransactionStatus.Failed
-                ? IconFailed
-                : status === TransactionStatus.Cancelled
-                  ? IconCancel
-                  : IconFailed
-        }
-        inheritViewBox
-      />
+      <SvgIcon color='inherit' />
       {status < TransactionStatus.Success
         ? 'Pending'
         : status === TransactionStatus.Success
@@ -137,6 +107,6 @@ export function Status({ transaction }: { transaction: Transaction }) {
                 : status === TransactionStatus.AnnounceReject
                   ? 'AnnounceReject'
                   : 'AnnounceRemoved'}
-    </Box>
+    </div>
   );
 }

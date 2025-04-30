@@ -5,11 +5,11 @@ import type { IMethod } from '@polkadot/types/types';
 
 import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
-import { service } from '@/utils';
 import { accountSource } from '@/wallet/useWallet';
 import React, { useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 import { Button } from '@mimir-wallet/ui';
 
 import { toastError } from '../utils';
@@ -33,7 +33,7 @@ function ProposeTx({
   note?: string;
   onProposed?: () => void;
 }) {
-  const { genesisHash } = useApi();
+  const { genesisHash, network } = useApi();
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
@@ -81,6 +81,7 @@ Call Data: ${call.toHex()}`;
       });
 
       await service.submitPropose(
+        network,
         account,
         call.toHex(),
         proposer,

@@ -15,7 +15,7 @@ const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.met
 
 export default defineConfig(({ mode }) => ({
   define: {
-    'process.env.VERSION': JSON.stringify(packageJson.version)
+    'import.meta.env.VERSION': JSON.stringify(packageJson.version)
   },
   server: {
     host: '0.0.0.0'

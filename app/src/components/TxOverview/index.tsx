@@ -21,8 +21,6 @@ import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { filterPathId } from '@/hooks/useFilterPaths';
 import { useAccountSource } from '@/wallet/useWallet';
-import { Paper, useTheme } from '@mui/material';
-import { Box } from '@mui/system';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import React, { createContext, useContext, useEffect } from 'react';
 import {
@@ -37,7 +35,7 @@ import {
   useNodesState
 } from 'reactflow';
 
-import { addressEq } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex } from '@mimir-wallet/polkadot-core';
 
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
@@ -69,19 +67,10 @@ type NodeData = {
 const context = createContext<State>({} as State);
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
-  const { palette } = useTheme();
   const { api, transaction: topTransaction, onApprove } = useContext(context);
   const source = useAccountSource(data.account.address);
 
   const { call, transaction } = data;
-
-  const color = transaction
-    ? transaction.status < TransactionStatus.Success
-      ? palette.warning.main
-      : transaction.status === TransactionStatus.Success
-        ? palette.success.main
-        : palette.error.main
-    : palette.grey[300];
 
   const Icon = transaction
     ? transaction.status < TransactionStatus.Success
@@ -92,7 +81,19 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
           ? IconCancel
           : IconFail
     : null;
-  const icon = Icon ? <Icon className='w-4 h-4' style={{ color }} /> : null;
+  const icon = Icon ? (
+    <Icon
+      data-success={transaction && transaction.status === TransactionStatus.Success}
+      data-failed={
+        transaction &&
+        transaction.status > TransactionStatus.Success &&
+        transaction.status !== TransactionStatus.Cancelled
+      }
+      data-cancelled={transaction && transaction.status === TransactionStatus.Cancelled}
+      data-pending={transaction && transaction.status < TransactionStatus.Success}
+      className='w-4 h-4 data-[success=true]:text-success data-[failed=true]:text-danger data-[cancelled=true]:text-danger data-[pending=true]:text-warning'
+    />
+  ) : null;
 
   return (
     <>
@@ -100,29 +101,24 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
-          style={{ width: 0, height: 0, background: palette.grey[300] }}
+          style={{ width: 0, height: 0 }}
+          className='bg-divider-300'
           type='source'
         />
       )}
-      <Box>
-        <Paper
-          sx={{
-            width: 220,
-            padding: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingX: 1,
-            paddingY: 0.3,
+      <div>
+        <div
+          className='w-[220px] p-2.5 flex items-center justify-between px-2.5 py-[3px] bg-content1 shadow-medium rounded-medium'
+          style={{
             borderBottomLeftRadius: data.approvalForThisPath && call && source ? 0 : undefined,
             borderBottomRightRadius: data.approvalForThisPath && call && source ? 0 : undefined
           }}
         >
           <AddressCell value={data.account.address} withCopy />
           {icon}
-        </Paper>
+        </div>
         {topTransaction && data.approvalForThisPath && call && source && (
-          <Box sx={{ display: 'flex' }}>
+          <div className='flex'>
             <TxButton
               color='success'
               fullWidth
@@ -138,14 +134,15 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
             >
               Approve
             </TxButton>
-          </Box>
+          </div>
         )}
-      </Box>
+      </div>
       {!data.isTop && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Right}
-          style={{ width: 0, height: 0, background: palette.grey[300] }}
+          style={{ width: 0, height: 0 }}
+          className='bg-divider-300'
           type='target'
         />
       )}
@@ -279,10 +276,10 @@ function makeNodes(
 
     const nodeId = node.parentId
       ? blake2AsHex(
-          `${node.parentId}-${node.from === 'delegate' ? `${node.value.proxyDelay}.${node.value.proxyType}.${node.value.proxyNetwork}` : node.from === 'member' ? 'member' : ''}-${node.value.address}`,
+          `${node.parentId}-${node.from === 'delegate' ? `${node.value.proxyDelay}.${node.value.proxyType}.${node.value.proxyNetwork}` : node.from === 'member' ? 'member' : ''}-${addressToHex(node.value.address)}`,
           64
         )
-      : blake2AsHex(node.value.address, 64);
+      : blake2AsHex(addressToHex(node.value.address), 64);
 
     if (!node.parent) {
       nodes.push(createNode(nodeId, node.value, true, path.slice(), approvalForThisPath, transaction));

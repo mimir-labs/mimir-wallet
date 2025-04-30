@@ -5,7 +5,6 @@ import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { AddressRow } from '@/components';
-import { Box, Paper, Stack, Typography } from '@mui/material';
 import { hexToU8a } from '@polkadot/util';
 import React from 'react';
 
@@ -22,28 +21,15 @@ interface Props {
 
 function AccountSelect({ accounts, disabled, onClick, title, type }: Props) {
   return (
-    <Box display='flex' flex='1' flexDirection='column'>
-      <Typography fontWeight={700}>{title}</Typography>
-      <Paper
-        component={Stack}
-        spacing={1}
-        sx={{ overflowY: 'auto', maxHeight: 200, marginTop: 0.5, padding: 1, flex: 1 }}
-        variant='outlined'
-      >
+    <div className='flex flex-1 flex-col'>
+      <p>
+        <b>{title}</b>
+      </p>
+      <div className='space-y-2.5 overflow-y-auto max-h-[200px] mt-1 p-2.5 flex-1 border-1 border-secondary rounded-medium bg-content1'>
         {accounts.map((account, index) => (
-          <Box
+          <div
             key={index}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              borderRadius: 0.5,
-              padding: 0.5,
-              bgcolor: 'secondary.main',
-              '& > .AddressRow': {
-                flex: '1'
-              }
-            }}
+            className='flex items-center justify-between rounded-small p-1 bg-secondary [&>.AddressRow]:flex-1'
           >
             <AddressRow iconSize={24} value={account} />
             {addressEq(hexToU8a('0x0', 256), account) && (
@@ -65,10 +51,10 @@ function AccountSelect({ accounts, disabled, onClick, title, type }: Props) {
             >
               {type === 'add' ? <IconAdd className='w-4 h-4' /> : <IconDelete className='w-4 h-4' />}
             </Button>
-          </Box>
+          </div>
         ))}
-      </Paper>
-    </Box>
+      </div>
+    </div>
   );
 }
 

@@ -4,7 +4,6 @@
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import IconClose from '@/assets/svg/icon-close.svg?react';
 import { Empty } from '@/components';
 import { toastError } from '@/components/utils';
 import { walletConfig } from '@/config';
@@ -12,13 +11,13 @@ import { CONNECT_ORIGIN } from '@/constants';
 import { useBatchSync } from '@/hooks/useBatchSync';
 import { useProposersAndMembersFilter } from '@/hooks/useProposeFilter';
 import { CallDisplaySection } from '@/params';
-import { service } from '@/utils';
 import { accountSource } from '@/wallet/useWallet';
 import { useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Checkbox, Divider, Spinner } from '@mimir-wallet/ui';
+import { service } from '@mimir-wallet/service';
+import { Alert, Button, Checkbox, Spinner } from '@mimir-wallet/ui';
 
 import BatchItem from './BatchItem';
 
@@ -90,24 +89,10 @@ Timestamp: ${time}`;
   };
 
   return (
-    <div className='flex flex-col gap-5 h-full'>
-      <div className='flex items-center justify-between text-xl font-bold'>
-        Restore Cache Transactions
-        <Button isIconOnly color='default' variant='light' onPress={onClose}>
-          <IconClose className='w-5 h-5' />
-        </Button>
-      </div>
-      <Divider />
-
-      <Alert
-        className='flex-grow-0'
-        color='warning'
-        title='Your transactions will be delete after transactions been restore.'
-      />
-
-      {!isFetched && isFetching && <Spinner variant='dots' />}
-
+    <div className='flex-1 flex flex-col gap-5 h-full overflow-hidden'>
       {isFetched && !txs?.length && <Empty label='No batch found' height='300px' />}
+
+      {!isFetched && isFetching && <Spinner variant='wave' />}
 
       <div className='flex-1 overflow-y-auto space-y-2.5 scrollbar-hide'>
         {current && !!txs?.length && (
@@ -160,9 +145,8 @@ Timestamp: ${time}`;
         )}
       </div>
 
-      <Divider />
       <div className='flex gap-5'>
-        <div className='flex-1 flex items-center'>
+        <div className='flex-1 flex items-center pl-2'>
           <Checkbox
             size='sm'
             isSelected={isCheckAll || isCheckSome}

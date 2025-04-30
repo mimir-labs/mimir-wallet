@@ -13,9 +13,9 @@ const Alert = forwardRef(({ ...props }: AlertProps, ref) => {
       hideIconWrapper
       classNames={{
         ...props.classNames,
-        base: ['', props.classNames?.base || ''],
+        base: ['rounded-medium', props.classNames?.base || ''],
         iconWrapper: ['w-6 h-6', props.classNames?.iconWrapper || ''],
-        title: ['min-h-6 flex items-center', props.classNames?.title || ''],
+        title: ['min-h-6 flex items-center font-bold', props.classNames?.title || ''],
         mainWrapper: ['min-h-6', props.classNames?.mainWrapper || '']
       }}
     />

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AppName } from '@/components';
-import { Box, Typography } from '@mui/material';
 import React from 'react';
 
 function AppInfo({
@@ -19,12 +18,12 @@ function AppInfo({
   }
 
   return (
-    <Box>
-      <Typography fontWeight={700}>App</Typography>
-      <Box sx={{ display: 'flex', bgcolor: 'secondary.main', borderRadius: 0.5, padding: 1, marginTop: 0.8 }}>
+    <div>
+      <span className='font-bold'>App</span>
+      <div className='flex bg-secondary rounded-small p-2.5 mt-2'>
         <AppName website={website} iconUrl={iconUrl} appName={appName} />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 

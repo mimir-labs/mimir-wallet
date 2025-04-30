@@ -5,11 +5,13 @@ import BatchIcon from '@/assets/images/batch.svg';
 import Failed from '@/assets/images/failed.svg';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import TemplateIcon from '@/assets/svg/template.svg';
-import { isArray } from '@polkadot/util';
 
 import { allEndpoints } from '@mimir-wallet/polkadot-core';
 
-export interface DappOption {
+export interface DappOption<
+  SupportedChains extends true | string[] = true | string[],
+  urlSearch extends (network: string) => URL = (network: string) => URL
+> {
   // (1 - 500) is internal app
   // (500 - 999) is internal feature
   // (1000 - ...) is external app
@@ -18,7 +20,7 @@ export interface DappOption {
   name: string;
   description: string;
   url: string;
-  supportedChains: true | string[];
+  supportedChains: SupportedChains;
   destChain?: Record<string, string>;
   tags?: string[];
   website?: string;
@@ -28,10 +30,10 @@ export interface DappOption {
   matrix?: string;
   isDrawer?: boolean;
   Component?: () => Promise<React.ComponentType>; // only for mimir://dapp/*
-  urlSearch?: (network: string) => URL;
+  urlSearch?: urlSearch;
 }
 
-export const PolkadotJsApp = {
+export const PolkadotJsApp: DappOption<true, (network: string) => URL> = {
   id: 1000,
   icon: '/dapp-icons/apps.svg',
   name: 'Apps',
@@ -52,7 +54,7 @@ export const PolkadotJsApp = {
   }
 };
 
-export const DotConsoleApp = {
+export const DotConsoleApp: DappOption<string[], (network: string) => URL> = {
   id: 1010,
   icon: '/dapp-icons/dot-console.svg',
   name: 'ĐÓTConsole',
@@ -101,7 +103,67 @@ export const DotConsoleApp = {
   }
 };
 
-export const dapps: DappOption[] = [
+export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
+  id: 1002,
+  icon: '/dapp-icons/subsquare.svg',
+  name: 'Subsquare',
+  description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
+  url: 'https://polkadot.subsquare.io/',
+  supportedChains: [
+    'polkadot',
+    'assethub-polkadot',
+    'kusama',
+    'assethub-kusama',
+    'acala',
+    'phala',
+    'collectives-polkadot',
+    'bifrost-polkadot',
+    'hydration',
+    'bifrost-kusama',
+    'karura',
+    'westend',
+    'assethub-westend',
+    'paseo',
+    'assethub-paseo',
+    'crust',
+    'vara',
+    'zkverify-testnet'
+  ],
+  tags: ['Governance'],
+  website: 'https://www.subsquare.io/',
+  twitter: 'https://twitter.com/OpensquareN',
+  github: 'https://github.com/opensquare-network',
+  urlSearch(network: string) {
+    const url = {
+      polkadot: 'https://polkadot.subsquare.io/',
+      'assethub-polkadot': 'https://polkadot.subsquare.io/assethub',
+      kusama: 'https://kusama.subsquare.io/',
+      'assethub-kusama': 'https://kusama.subsquare.io/assethub',
+      acala: 'https://acala.subsquare.io/',
+      phala: 'https://phala.subsquare.io/',
+      'collectives-polkadot': 'https://collectives.subsquare.io/',
+      'bifrost-polkadot': 'https://bifrost.subsquare.io/',
+      hydration: 'https://hydration.subsquare.io/',
+      'bifrost-kusama': 'https://bifrost-kusama.subsquare.io/',
+      karura: 'https://karura.subsquare.io/',
+      westend: 'https://westend.subsquare.io/',
+      'assethub-westend': 'https://westend.subsquare.io/assethub',
+      paseo: 'https://paseo.subsquare.io/',
+      'assethub-paseo': 'https://paseo.subsquare.io/assethub',
+      crust: 'https://crust.subsquare.io/',
+      vara: 'https://vara.subsquare.io/',
+      'zkverify-testnet': 'https://zkverify-testnet.subsquare.io/'
+    }[network];
+
+    if (!url) {
+      return new URL(this.url);
+    }
+
+    return new URL(url);
+  }
+};
+
+export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
   {
     id: 1,
     icon: '/dapp-icons/transfer.png',
@@ -202,30 +264,7 @@ export const dapps: DappOption[] = [
     supportedChains: true
   },
   PolkadotJsApp,
-  {
-    id: 1002,
-    icon: '/dapp-icons/subsquare.svg',
-    name: 'Subsquare(Polkadot)',
-    description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
-    url: 'https://polkadot.subsquare.io/',
-    supportedChains: ['polkadot'],
-    tags: ['Governance'],
-    website: 'https://www.subsquare.io/',
-    twitter: 'https://twitter.com/OpensquareN',
-    github: 'https://github.com/opensquare-network'
-  },
-  {
-    id: 1003,
-    icon: '/dapp-icons/subsquare.svg',
-    name: 'Subsquare(Kusama)',
-    description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
-    url: 'https://kusama.subsquare.io/',
-    supportedChains: ['kusama'],
-    tags: ['Governance'],
-    website: 'https://www.subsquare.io/',
-    twitter: 'https://twitter.com/OpensquareN',
-    github: 'https://github.com/opensquare-network'
-  },
+  SubsquareApp,
   {
     id: 1004,
     icon: '/dapp-icons/staking.png',
@@ -244,7 +283,7 @@ export const dapps: DappOption[] = [
     name: 'Bifrost App',
     description:
       'The Bifrost App integrates operations such as cross-chain transfers, swaps, and Yield Farming, providing vital liquidity and asset management services for the Polkadot ecosystem. This makes Bifrost an indispensable part of the Polkadot ecosystem.',
-    url: 'https://bifrost.app/',
+    url: 'https://app.bifrost.io/',
     supportedChains: ['polkadot', 'bifrost-polkadot', 'kusama', 'bifrost-kusama', 'assethub-polkadot'],
     tags: ['Defi'],
     website: 'https://bifrost.finance/',
@@ -298,16 +337,6 @@ export const dapps: DappOption[] = [
       'coretime-kusama',
       'people-kusama'
     ],
-    destChain: {
-      polkadot: 'people-polkadot',
-      'assethub-polkadot': 'people-polkadot',
-      'coretime-polkadot': 'people-polkadot',
-      'collectives-polkadot': 'people-polkadot',
-      // kusama
-      kusama: 'people-kusama',
-      'assethub-kusama': 'people-kusama',
-      'coretime-kusama': 'people-kusama'
-    },
     tags: ['Identity'],
     matrix: 'https://matrix.to/#/#polkaidentity:matrix.org'
   },
@@ -324,7 +353,3 @@ export const dapps: DappOption[] = [
   },
   DotConsoleApp
 ];
-
-export function findSupportedDapps(network: string): DappOption[] {
-  return dapps.filter((item) => (isArray(item.supportedChains) ? item.supportedChains.includes(network) : true));
-}

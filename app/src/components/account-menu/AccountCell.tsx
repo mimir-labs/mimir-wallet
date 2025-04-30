@@ -4,16 +4,14 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconMore from '@/assets/svg/icon-more.svg?react';
-import { findToken } from '@/config';
-import { useNativeBalances } from '@/hooks/useBalances';
+import { useBalanceTotalUsd } from '@/hooks/useBalances';
+import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Link, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@mimir-wallet/ui';
+import { Button, Link, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
 
 import AddressCell from '../AddressCell';
-import FormatBalance from '../FormatBalance';
 
 function AccountCell({
   onClose,
@@ -21,25 +19,22 @@ function AccountCell({
   watchlist,
   selected,
   withAdd = false,
-  isHide = false,
   value
 }: {
   onClose?: () => void;
   selected?: boolean;
-  value?: string;
+  value: string;
   withAdd?: boolean;
   watchlist?: boolean;
-  isHide?: boolean;
   onSelect?: (address: string) => void;
 }) {
-  const { genesisHash } = useApi();
-  const { isLocalAccount, deleteAddress, showAccount, hideAccount, addAddressBook } = useAccount();
-  const [balances, isFetched] = useNativeBalances(value);
-  const icon = useMemo(() => findToken(genesisHash).Icon, [genesisHash]);
+  const { isLocalAccount, deleteAddress, hideAccount, addAddressBook } = useAccount();
+  const [totalUsd] = useBalanceTotalUsd(value);
   const source = useAccountSource(value);
+  const formatUsd = formatDisplay(totalUsd.toString());
 
   const handleClick = useCallback(() => {
-    value && onSelect?.(value);
+    onSelect?.(value);
   }, [onSelect, value]);
 
   return (
@@ -53,23 +48,14 @@ function AccountCell({
       className='justify-between px-1 sm:px-2.5 py-1 text-foreground h-[50px] rounded-medium data-[selected=true]:bg-secondary'
     >
       <AddressCell shorten showType value={value} withCopy withAddressBook />
-      {isFetched ? (
-        <div className='flex items-center gap-1 text-tiny font-bold'>
-          <FormatBalance value={balances?.total} />
-          <Avatar classNames={{ base: 'bg-transparent' }} alt='Token' src={icon} className='w-[16px] h-[16px]' />
-        </div>
-      ) : (
-        <Skeleton className='w-[40px]' />
-      )}
+      <div className='text-tiny font-bold'>
+        $ {formatUsd[0]}
+        {formatUsd[1] ? `.${formatUsd[1]}` : ''}
+        {formatUsd[2] || ''}
+      </div>
 
       {withAdd && (
-        <Button
-          isIconOnly
-          color='default'
-          size='sm'
-          variant='light'
-          onPress={() => addAddressBook(encodeAddress(value), true)}
-        >
+        <Button isIconOnly color='default' size='sm' variant='light' onPress={() => addAddressBook(value, true)}>
           <IconAdd />
         </Button>
       )}
@@ -93,10 +79,10 @@ function AccountCell({
                     color='primary'
                     className='justify-start text-foreground'
                     onPress={() => {
-                      isHide ? showAccount(value) : hideAccount(value);
+                      hideAccount(value);
                     }}
                   >
-                    {isHide ? 'Show' : 'Hide'}
+                    Hide
                   </Button>
                 ),
                 <Button

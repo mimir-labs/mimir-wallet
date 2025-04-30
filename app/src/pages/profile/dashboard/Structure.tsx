@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
-import IconClose from '@/assets/svg/icon-close.svg?react';
-import { AddressOverview } from '@/components';
-import { Box, Button, IconButton, Paper, SvgIcon, useMediaQuery, useTheme } from '@mui/material';
+import { AddressOverview, InputNetwork } from '@/components';
+import { useMediaQuery, useTheme } from '@mui/material';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 
-import { Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import { useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
-function Relation({ address }: { address: string }) {
+function Relation({ address, setNetwork }: { address: string; setNetwork: (network: string) => void }) {
+  const { network } = useApi();
   const [account] = useQueryAccount(address);
   const ref = useRef<HTMLDivElement>(null);
   const { breakpoints } = useTheme();
@@ -19,45 +20,35 @@ function Relation({ address }: { address: string }) {
 
   return (
     <>
-      <Paper
+      <div
         ref={ref}
-        sx={{
-          position: 'relative',
-          width: '100%',
-          minHeight: 360,
-          height: { sm: 'calc(100dvh - 400px)', xs: 'calc(100dvh - 500px)' },
-          borderRadius: 2
-        }}
+        className='relative w-full min-h-[360px] h-[calc(100dvh-400px)] xs:h-[calc(100dvh-500px)] rounded-medium shadow-medium bg-content1'
       >
-        <Button
-          variant='text'
-          sx={{ display: { sm: 'none', xs: 'inline-flex' }, zIndex: 1, position: 'absolute' }}
-          onClick={toggleOpen}
-        >
+        <Button variant='light' className='z-[1] absolute inline-flex sm:hidden' onPress={toggleOpen}>
           Overview
         </Button>
+        <div className='z-[1] w-[200px] absolute right-4 top-4'>
+          <InputNetwork network={network} setNetwork={setNetwork} />
+        </div>
         <AddressOverview
           key={account?.address || 'none'}
           account={account}
           showControls={!downSm}
           showMiniMap={!downSm}
         />
-      </Paper>
+      </div>
       <Modal size='full' isOpen={isOpen} onClose={toggleOpen}>
         <ModalContent>
-          <IconButton
-            color='inherit'
-            sx={{ zIndex: 1, position: 'absolute', right: 16, top: 16 }}
-            onClick={() => {
-              toggleOpen(false);
-            }}
-          >
-            <SvgIcon component={IconClose} inheritViewBox />
-          </IconButton>
+          <ModalHeader>Overview</ModalHeader>
           <ModalBody>
-            <Box sx={{ width: '100%', height: '100%' }}>
-              <AddressOverview key={account?.address || 'none'} account={account} showControls showMiniMap={false} />
-            </Box>
+            <div className='w-full h-full'>
+              <AddressOverview
+                key={`${account?.address}.${network}`}
+                account={account}
+                showControls
+                showMiniMap={false}
+              />
+            </div>
           </ModalBody>
         </ModalContent>
       </Modal>

@@ -3,7 +3,6 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { Empty } from '@/components';
-import { Box, Stack } from '@mui/material';
 
 import AddAddress from './AddAddress';
 import AddressItem from './AddressItem';
@@ -15,13 +14,13 @@ function PageAddressBook() {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}>
+      <div className='flex justify-between gap-2.5'>
         <AddAddress />
-        <Box sx={{ flex: '1' }} />
+        <div className='flex-1' />
         <Import />
         <Export />
-      </Box>
-      <Stack marginTop={2} spacing={2}>
+      </div>
+      <div className='mt-5 space-y-5'>
         {addresses.length > 0 ? (
           addresses.map((address) => {
             return <AddressItem address={address.address} key={address.address} />;
@@ -29,7 +28,7 @@ function PageAddressBook() {
         ) : (
           <Empty height='80dvh' label='no address book' />
         )}
-      </Stack>
+      </div>
     </>
   );
 }

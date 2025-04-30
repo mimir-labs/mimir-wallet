@@ -40,7 +40,7 @@ function CallDisplayDetailMinor({ registry, call }: { registry: Registry; call?:
   ) {
     comp = (
       <div className='flex items-center gap-1'>
-        <AddressRow shorten withName withAddress={false} withCopy iconSize={20} value={call.args[1].toString()} />
+        <AddressRow shorten withName withAddress={false} withCopy iconSize={20} value={call.args[0].toString()} />
       </div>
     );
   } else if (['proxy.proxy'].includes(`${calllFunction.section}.${calllFunction.method}`)) {

@@ -4,7 +4,6 @@
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
 import IconIdentity from '@/assets/svg/icon-identity.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
-import { Box, SvgIcon } from '@mui/material';
 import React from 'react';
 
 function CallDisplaySection({ section, method }: { section?: string; method?: string }) {
@@ -18,10 +17,10 @@ function CallDisplaySection({ section, method }: { section?: string; method?: st
     ].includes(`${section}.${method}`)
   ) {
     return (
-      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-        <SvgIcon color='primary' component={IconSend} inheritViewBox />
+      <div className='flex gap-1 items-center'>
+        <IconSend className='w-4 h-4 text-primary' />
         Transfer
-      </Box>
+      </div>
     );
   }
 
@@ -37,28 +36,28 @@ function CallDisplaySection({ section, method }: { section?: string; method?: st
     ].includes(`${section}.${method}`)
   ) {
     return (
-      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-        <SvgIcon color='primary' component={IconSend} inheritViewBox />
+      <div className='flex gap-1 items-center'>
+        <IconSend className='w-4 h-4 text-primary' />
         Assets Transfer
-      </Box>
+      </div>
     );
   }
 
   if (['identity.setIdentity'].includes(`${section}.${method}`)) {
     return (
-      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-        <SvgIcon color='primary' component={IconIdentity} inheritViewBox />
+      <div className='flex gap-1 items-center'>
+        <IconIdentity className='w-4 h-4 text-primary' />
         Identity
-      </Box>
+      </div>
     );
   }
 
   if (['multisig.cancelAsMulti'].includes(`${section}.${method}`)) {
     return (
-      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-        <SvgIcon color='error' component={IconCancel} inheritViewBox />
+      <div className='flex gap-1 items-center'>
+        <IconCancel className='w-4 h-4 text-danger' />
         Cancel
-      </Box>
+      </div>
     );
   }
 

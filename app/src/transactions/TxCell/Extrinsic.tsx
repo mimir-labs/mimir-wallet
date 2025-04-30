@@ -8,22 +8,20 @@ import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { AppName, Bytes, Hash } from '@/components';
 import { events } from '@/events';
 import { useToggle } from '@/hooks/useToggle';
-import { Box, Button, Divider, Grid2 as Grid, Stack, SvgIcon } from '@mui/material';
+import { Box, Button, Divider, Stack, SvgIcon } from '@mui/material';
 import moment from 'moment';
 import React from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 import Target from './Target';
 
 export function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
-    <Grid container spacing={1} columns={10} sx={{ fontSize: '0.875rem' }}>
-      <Grid sx={{ display: 'flex', alignItems: 'center', fontWeight: 700, fontSize: '0.75rem' }} size={2}>
-        {title}
-      </Grid>
-      <Grid sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary', fontSize: '0.75rem' }} size={8}>
-        {content}
-      </Grid>
-    </Grid>
+    <div className='grid grid-cols-10 gap-2.5 w-full text-tiny'>
+      <div className='flex col-span-2 items-center font-bold'>{title}</div>
+      <div className='flex col-span-8 items-center font-bold text-foreground/65'>{content}</div>
+    </div>
   );
 }
 
@@ -36,6 +34,7 @@ function Extrinsic({
   transaction: Transaction;
   call?: IMethod | null;
 }) {
+  const { network } = useApi();
   const [isOpen, toggleOpen] = useToggle(defaultOpen);
 
   const txCallHex = transaction.call;
@@ -89,7 +88,7 @@ function Extrinsic({
                         <SvgIcon sx={{ fontSize: '0.75rem !important' }} inheritViewBox component={IconTemplate} />
                       }
                       sx={{ paddingX: 1, paddingY: 0.3, fontSize: '0.75rem' }}
-                      onClick={() => events.emit('template_add', txCallHex)}
+                      onClick={() => events.emit('template_add', network, txCallHex)}
                     >
                       + Template
                     </Button>

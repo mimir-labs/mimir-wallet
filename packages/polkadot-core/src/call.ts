@@ -32,7 +32,10 @@ export function findTargetCall(
   if (api.tx.multisig.asMulti.is(call)) {
     return findTargetCall(
       api,
-      encodeAddress(createKeyMulti(call.args[1].map((item) => item.toString()).concat(address), call.args[0])),
+      encodeAddress(
+        createKeyMulti(call.args[1].map((item) => item.toString()).concat(address), call.args[0]),
+        api.registry.chainSS58!
+      ),
       api.registry.createType('Call', call.args[3].toU8a())
     );
   }
@@ -40,7 +43,10 @@ export function findTargetCall(
   if (api.tx.multisig.asMultiThreshold1.is(call)) {
     return findTargetCall(
       api,
-      encodeAddress(createKeyMulti(call.args[0].map((item) => item.toString()).concat(address), 1)),
+      encodeAddress(
+        createKeyMulti(call.args[0].map((item) => item.toString()).concat(address), 1),
+        api.registry.chainSS58!
+      ),
       api.registry.createType('Call', call.args[1].toU8a())
     );
   }

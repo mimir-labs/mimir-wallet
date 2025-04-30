@@ -10,6 +10,7 @@ import type { State } from './types';
 import { assert } from '@polkadot/util';
 
 import { allEndpoints } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 
 declare module '@polkadot/extension-base/background/types' {
   export interface RequestSignatures {
@@ -105,7 +106,7 @@ export abstract class Communicator {
 
     assert(endpoint, 'not support get call for current chain');
 
-    const { data } = await fetch(`${endpoint.serviceUrl}calldata/${hash}`).then((res) => res.json());
+    const { data } = await service.getCalldata(endpoint.key, hash);
 
     return data;
   }

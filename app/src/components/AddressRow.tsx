@@ -5,11 +5,11 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 
 import React, { useMemo } from 'react';
 
-import { encodeAddress } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
-import CopyButton from './CopyButton';
+import CopyAddress from './CopyAddress';
 import IdentityIcon from './IdentityIcon';
 
 interface Props {
@@ -31,7 +31,8 @@ function AddressRow({
   withCopy = false,
   withName = true
 }: Props) {
-  const address = useMemo(() => encodeAddress(value), [value]);
+  const { chainSS58 } = useApi();
+  const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
   return (
     <div className='AddressRow inline-flex items-center gap-[5px]'>
@@ -46,7 +47,7 @@ function AddressRow({
           <AddressComp shorten={shorten} value={address} />
         </span>
       )}
-      {withCopy && <CopyButton value={address} className='opacity-50' />}
+      {withCopy && <CopyAddress address={address} className='opacity-50' />}
     </div>
   );
 }

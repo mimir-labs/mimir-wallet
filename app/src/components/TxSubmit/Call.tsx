@@ -5,26 +5,14 @@ import type { Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { events } from '@/events';
 import { useToggle } from '@/hooks/useToggle';
 import { Call as CallComp } from '@/params';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
-  Divider,
-  Grid2 as Grid,
-  Stack,
-  SvgIcon,
-  Typography
-} from '@mui/material';
 import moment from 'moment';
 import { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Divider } from '@mimir-wallet/ui';
 
 import Bytes from '../Bytes';
 import Hash from '../Hash';
@@ -47,14 +35,10 @@ function extractState(value: IMethod): Extracted {
 
 function Item({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <Grid container spacing={1} size={10} sx={{ fontSize: '0.75rem' }}>
-      <Grid sx={{ display: 'flex', alignItems: 'center', fontWeight: 700 }} size={3}>
-        {label}
-      </Grid>
-      <Grid sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }} size={7}>
-        {value}
-      </Grid>
-    </Grid>
+    <div className='grid grid-cols-10 gap-2.5 w-full text-tiny'>
+      <div className='flex col-span-2 items-center font-bold'>{label}</div>
+      <div className='flex col-span-8 items-center font-bold text-foreground/65'>{value}</div>
+    </div>
   );
 }
 
@@ -67,30 +51,29 @@ function Call({
   method: IMethod;
   transaction?: Transaction | null;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
 
   // TODO: check if the call is a multisig, if so, use the blake2 of the call data as the call hash
   const { callData, callHash, callName } = useMemo(() => extractState(method), [method]);
   const [isOpen, toggleOpen] = useToggle(true);
 
   const details = (
-    <Stack spacing={0.4} sx={{ bgcolor: 'secondary.main', borderRadius: 1, padding: 1 }}>
+    <div className='space-y-1 bg-secondary rounded-medium p-2.5'>
       <Item label='Call Hash' value={<Hash value={callHash} withCopy />} />
       <Item
         label='Call Data'
         value={
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <div className='flex items-center'>
             <Bytes value={callData} />
             <Button
-              sx={{ fontSize: '0.75rem', fontWeight: 400 }}
-              size='small'
+              size='sm'
               color='primary'
-              variant='text'
-              onClick={() => events.emit('call_data_view', callData)}
+              variant='light'
+              onPress={() => events.emit('call_data_view', network, callData)}
             >
               View Detail
             </Button>
-          </Box>
+          </div>
         }
       />
 
@@ -114,48 +97,23 @@ function Call({
       {transaction?.cancelExtrinsicHash && (
         <Item label='Cancel Extrinsic' value={<Hash value={transaction.cancelExtrinsicHash} withCopy withExplorer />} />
       )}
-    </Stack>
+    </div>
   );
 
   return (
-    <Box>
-      <Typography fontWeight={700}>Transaction details</Typography>
-      <Accordion
-        defaultExpanded
-        variant='outlined'
-        sx={{ padding: 0, marginTop: 1, bgcolor: 'transparent', border: 'none' }}
-      >
-        <AccordionSummary
-          expandIcon={<SvgIcon component={ArrowDown} inheritViewBox color='inherit' />}
-          sx={{ bgcolor: 'transparent', height: 'auto', color: 'primary.main' }}
-        >
-          {callName}
-        </AccordionSummary>
+    <div className='space-y-3'>
+      <div className='font-bold'>Transaction details</div>
+      <div className='font-bold text-primary'>{callName}</div>
+      <div className='space-y-4 rounded-medium border-1 border-secondary p-2.5'>
+        <CallComp from={account} registry={api.registry} call={method} jsonFallback />
+        <Divider />
 
-        <AccordionDetails
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1,
-            padding: 1,
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 1
-          }}
-        >
-          <CallComp from={account} registry={api.registry} call={method} jsonFallback />
-          <Divider />
-
-          <Box
-            onClick={toggleOpen}
-            sx={{ cursor: 'pointer', color: 'primary.main', fontWeight: 700, fontSize: '0.875rem' }}
-          >
-            {isOpen ? 'Hide Details' : 'View Details'}
-          </Box>
-          {isOpen ? details : null}
-        </AccordionDetails>
-      </Accordion>
-    </Box>
+        <div onClick={toggleOpen} className='cursor-pointer text-primary font-bold text-small'>
+          {isOpen ? 'Hide Details' : 'View Details'}
+        </div>
+        {isOpen ? details : null}
+      </div>
+    </div>
   );
 }
 
