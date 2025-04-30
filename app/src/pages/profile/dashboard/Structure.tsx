@@ -27,7 +27,7 @@ function Relation({ address, setNetwork }: { address: string; setNetwork: (netwo
         <Button variant='light' className='z-[1] absolute inline-flex sm:hidden' onPress={toggleOpen}>
           Overview
         </Button>
-        <div className='z-[1] w-[200px] absolute right-4 top-4'>
+        <div className='z-[1] w-[200px] absolute right-4 top-4 bg-content1'>
           <InputNetwork network={network} setNetwork={setNetwork} />
         </div>
         <AddressOverview
