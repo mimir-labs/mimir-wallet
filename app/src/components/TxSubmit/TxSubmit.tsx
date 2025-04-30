@@ -18,6 +18,9 @@ import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Checkbox, Divider } from '@mimir-wallet/ui';
 
 import Input from '../Input';
+import Chopsticks from './analytics/Chopsticks';
+import DryRun from './analytics/DryRun';
+import SafetyCheck from './analytics/SafetyCheck';
 import { useBuildTx } from './hooks/useBuildTx';
 import { useCloseWhenPathChange } from './hooks/useCloseWhenPathChange';
 import { useHighlightTab } from './hooks/useHighlightTab';
@@ -26,7 +29,6 @@ import AddressChain from './AddressChain';
 import AppInfo from './AppInfo';
 import Call from './Call';
 import ProposeTx from './ProposeTx';
-import SafetyCheck from './SafetyCheck';
 import Sender from './Sender';
 import SendTx from './SendTx';
 
@@ -132,13 +134,13 @@ function TxSubmit({
 
           <Call account={accountData.address} method={call} transaction={transaction} />
 
-          <SafetyCheck
-            isTxBundleLoading={buildTx.isLoading}
-            call={call}
-            account={accountData.address}
-            txError={buildTx.error}
-            safetyCheck={safetyCheck}
-          />
+          {!api.call.dryRunApi.dryRunCall ? (
+            <Chopsticks call={call} account={accountData.address} />
+          ) : (
+            <DryRun call={call} account={accountData.address} />
+          )}
+
+          <SafetyCheck isTxBundleLoading={buildTx.isLoading} txError={buildTx.error} safetyCheck={safetyCheck} />
         </div>
 
         <div className='sticky top-0 self-start w-full md:w-[40%] h-auto p-4 sm:p-5 shadow-medium rounded-large bg-content1 space-y-5'>

@@ -8,9 +8,13 @@ export * from './callFilter.js';
 export * from './call.js';
 
 export * from './simulate/index.js';
+export * from './dry-run/index.js';
 export * from './tx-events.js';
 export * from './tx-reserve.js';
 export * from './tx.js';
+export * from './dispatch-error.js';
+export * from './dry-run/index.js';
+
 export { chainLinks } from './chain-links.js';
 
 export { useApi } from './useApi.js';

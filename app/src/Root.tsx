@@ -19,7 +19,6 @@ import AccountConsumer from './accounts/Consumer';
  * - Material-UI's StyledEngineProvider for CSS injection order
  * - Custom ThemeProvider for consistent styling
  * - React Query configuration for data fetching and caching
- * - Global toast notifications
  * - Global styles
  *
  * The QueryClient is configured with:

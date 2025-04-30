@@ -14,7 +14,9 @@ function getMessage(value: unknown): React.ReactNode {
 }
 
 export function toastSuccess(message: any) {
-  return toast.success(message);
+  return toast.success(message, {
+    autoClose: 1000000
+  });
 }
 
 export function toastError(error: any) {

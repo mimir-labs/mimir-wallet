@@ -5,15 +5,7 @@ import type { ApiPromise } from '@polkadot/api';
 import type { SignerOptions, SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Injected } from '@polkadot/extension-inject/types';
 import type { Null, Result } from '@polkadot/types';
-import type {
-  DispatchError,
-  Extrinsic,
-  ExtrinsicEra,
-  Hash,
-  Header,
-  Index,
-  SignerPayload
-} from '@polkadot/types/interfaces';
+import type { Extrinsic, ExtrinsicEra, Hash, Header, Index, SignerPayload } from '@polkadot/types/interfaces';
 import type {
   SpRuntimeDispatchError,
   SpRuntimeTransactionValidityTransactionValidityError
@@ -21,65 +13,17 @@ import type {
 import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-// import { walletConfig } from '@/config';
-// import { CONNECT_ORIGIN } from '@/constants';
 import { getSpecTypes } from '@polkadot/types-known';
 import { assert, formatBalance, isBn, isFunction, isHex, isNumber, objectSpread, u8aToHex } from '@polkadot/util';
 import { base64Encode } from '@polkadot/util-crypto';
 
+import { assetDispatchError } from './dispatch-error.js';
 import { TxEvents } from './tx-events.js';
 
 type Options = {
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
   checkProxy?: boolean;
 };
-
-export class TxDispatchError extends Error {}
-export class TxModuleError extends Error {
-  public section: string;
-
-  public method: string;
-
-  public docs: string[];
-
-  constructor(message: string, section: string, method: string, docs: string[]) {
-    super(message);
-    this.section = section;
-    this.method = method;
-    this.docs = docs;
-  }
-
-  public get shortMessage(): string {
-    return `${this.section}.${this.method}: ${this.docs.join('\n')}`;
-  }
-}
-
-function _assetDispatchError(api: ApiPromise, dispatch: DispatchError | SpRuntimeDispatchError): Error {
-  if (dispatch.isModule) {
-    const error = api.registry.findMetaError(dispatch.asModule);
-
-    return new TxModuleError(
-      `Cause by ${error.section}.${error.method}: ${error.docs.join('\n')}`,
-      error.section,
-      error.method,
-      error.docs
-    );
-  }
-
-  if (dispatch.isToken) {
-    return new TxDispatchError(`Token Error: ${dispatch.asToken.type}`);
-  }
-
-  if (dispatch.isArithmetic) {
-    return new TxDispatchError(`Arithmetic Error: ${dispatch.asArithmetic.type}`);
-  }
-
-  if (dispatch.isTransactional) {
-    return new TxDispatchError(`Transactional Error: ${dispatch.asTransactional.type}`);
-  }
-
-  return new TxDispatchError(`Dispatch Error: ${dispatch.type}`);
-}
 
 async function extractParams(
   api: ApiPromise,
@@ -135,7 +79,7 @@ async function extractParams(
 export function checkSubmittableResult(api: ApiPromise, result: ISubmittableResult, checkProxy = false) {
   if (result.isError) {
     if (result.dispatchError) {
-      throw _assetDispatchError(api, result.dispatchError);
+      throw assetDispatchError(api, result.dispatchError);
     }
 
     if (result.internalError) {
@@ -148,7 +92,7 @@ export function checkSubmittableResult(api: ApiPromise, result: ISubmittableResu
       if (!api.events.proxy.ProxyExecuted.is(event)) continue;
 
       if (event.data.result.isErr) {
-        throw _assetDispatchError(api, event.data.result.asErr);
+        throw assetDispatchError(api, event.data.result.asErr);
       }
     }
   }
@@ -318,7 +262,7 @@ export function signAndSend(
         }
 
         if (result.asOk.isErr) {
-          throw _assetDispatchError(api, result.asOk.asErr);
+          throw assetDispatchError(api, result.asOk.asErr);
         }
       }
 
