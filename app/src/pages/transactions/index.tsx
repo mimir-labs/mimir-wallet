@@ -157,19 +157,10 @@ function Content({ address }: { address: string }) {
                       }}
                       selectedIcon={(props) => (
                         <Checkbox
-                          className='p-0'
+                          className='p-0 pointer-events-none'
                           size='sm'
                           isSelected={props.isSelected}
                           isDisabled={props.isDisabled}
-                          onValueChange={(isSelected) => {
-                            if (isSelected) {
-                              setSelectedHistoryNetworks((prev) => Array.from(new Set([...prev, network])));
-                            } else {
-                              setSelectedHistoryNetworks((prev) =>
-                                prev.length === 1 ? prev : prev.filter((n) => n !== network)
-                              );
-                            }
-                          }}
                         />
                       )}
                     >
