@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.0.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v1.31.0...polkadot-core-v2.0.0) (2025-05-06)
+
+
+### Features
+
+* Add dry run API support for transaction simulation ([#207](https://github.com/mimir-labs/mimir-wallet/issues/207)) ([3a649ca](https://github.com/mimir-labs/mimir-wallet/commit/3a649ca17a642753c4002e24d1844ec4f2662059))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.0.0
+
 ## [1.31.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v1.30.0...polkadot-core-v1.31.0) (2025-04-24)
 
 

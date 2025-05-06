@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.0.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.31.0...mimir-wallet-app-v2.0.0) (2025-05-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* implement omni-chain support with multi-network balances and transactions ([#198](https://github.com/mimir-labs/mimir-wallet/issues/198))
+
+### Features
+
+* Add dry run API support for transaction simulation ([#207](https://github.com/mimir-labs/mimir-wallet/issues/207)) ([3a649ca](https://github.com/mimir-labs/mimir-wallet/commit/3a649ca17a642753c4002e24d1844ec4f2662059))
+* implement omni-chain support with multi-network balances and transactions ([#198](https://github.com/mimir-labs/mimir-wallet/issues/198)) ([5aa5bbb](https://github.com/mimir-labs/mimir-wallet/commit/5aa5bbb03d6990a334260f19a94527965b0faad3))
+* implement WalletConnect integration for seamless dApp connections ([#206](https://github.com/mimir-labs/mimir-wallet/issues/206)) ([ca126d5](https://github.com/mimir-labs/mimir-wallet/commit/ca126d508adae57e7a343183ef54856e23e01c62))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.0.0
+    * @mimir-wallet/service bumped to 2.0.0
+    * @mimir-wallet/ui bumped to 2.0.0
+
 ## [1.31.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.30.0...mimir-wallet-app-v1.31.0) (2025-04-24)
 
 
