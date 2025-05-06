@@ -125,7 +125,13 @@ function Content({ address }: { address: string }) {
                   startContent={<Avatar src={selectedPendingNetwork?.chain.icon} className='w-4 h-4 bg-transparent' />}
                   endContent={<ArrowDown className='w-4 h-4' />}
                 >
-                  {selectedPendingNetwork?.chain.name} and other {validPendingNetworks.length - 1}
+                  {selectedPendingNetworks.length > 1 ? (
+                    <>
+                      {selectedPendingNetwork?.chain.name} and other {selectedPendingNetworks.length - 1}
+                    </>
+                  ) : (
+                    selectedPendingNetwork?.chain.name
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className='w-[200px] rounded-medium p-1'>
@@ -151,19 +157,10 @@ function Content({ address }: { address: string }) {
                       }}
                       selectedIcon={(props) => (
                         <Checkbox
-                          className='p-0'
+                          className='p-0 pointer-events-none'
                           size='sm'
                           isSelected={props.isSelected}
                           isDisabled={props.isDisabled}
-                          onValueChange={(isSelected) => {
-                            if (isSelected) {
-                              setSelectedHistoryNetworks((prev) => Array.from(new Set([...prev, network])));
-                            } else {
-                              setSelectedHistoryNetworks((prev) =>
-                                prev.length === 1 ? prev : prev.filter((n) => n !== network)
-                              );
-                            }
-                          }}
                         />
                       )}
                     >

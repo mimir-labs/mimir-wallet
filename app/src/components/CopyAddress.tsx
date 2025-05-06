@@ -17,7 +17,7 @@ const CopyAddress = forwardRef<HTMLButtonElement, Props>(function CopyAddress({ 
   const { open } = useCopyAddress();
 
   const handleClick = useCallback(() => {
-    toastSuccess('Address copied!');
+    toastSuccess('Address copied!', address);
     open(address);
   }, [open, address]);
 

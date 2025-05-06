@@ -13,10 +13,20 @@ function getMessage(value: unknown): React.ReactNode {
   return <TxError error={value} />;
 }
 
-export function toastSuccess(message: any) {
-  return toast.success(message, {
-    autoClose: 1000000
-  });
+export function toastSuccess(message: any, description?: string) {
+  return toast.success(
+    description ? (
+      <div className='flex flex-col gap-1'>
+        <b>{message}</b>
+        {description}
+      </div>
+    ) : (
+      message
+    ),
+    {
+      autoClose: 1000000
+    }
+  );
 }
 
 export function toastError(error: any) {

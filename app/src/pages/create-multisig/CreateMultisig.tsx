@@ -181,14 +181,14 @@ function CreateMultisig({
 
               <Alert
                 color='warning'
-                classNames={{ title: 'mb-1 font-bold text-medium' }}
+                classNames={{ title: 'font-bold text-medium', description: 'text-foreground/50 text-tiny' }}
                 icon={<IconInfo />}
                 title='Notice'
                 description={
                   flexible ? (
-                    <ul>
+                    <ul style={{ listStyle: 'outside' }}>
                       <li>
-                        Only on{' '}
+                        This account only exists on{' '}
                         <img
                           style={{ display: 'inline', verticalAlign: 'middle' }}
                           width={16}
@@ -200,7 +200,7 @@ function CreateMultisig({
                       <li>Initiating a transaction is required.</li>
                     </ul>
                   ) : (
-                    <ul>
+                    <ul style={{ listStyle: 'outside' }}>
                       <li>All chains supported.</li>
                       <li>Unchangeable members and thresholds.</li>
                       <li>No gas fee for creation.</li>
