@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v1.31.0...service-v2.0.0) (2025-05-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* implement omni-chain support with multi-network balances and transactions ([#198](https://github.com/mimir-labs/mimir-wallet/issues/198))
+
+### Features
+
+* Add dry run API support for transaction simulation ([#207](https://github.com/mimir-labs/mimir-wallet/issues/207)) ([3a649ca](https://github.com/mimir-labs/mimir-wallet/commit/3a649ca17a642753c4002e24d1844ec4f2662059))
+* implement omni-chain support with multi-network balances and transactions ([#198](https://github.com/mimir-labs/mimir-wallet/issues/198)) ([5aa5bbb](https://github.com/mimir-labs/mimir-wallet/commit/5aa5bbb03d6990a334260f19a94527965b0faad3))
+
 ## [1.31.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v1.30.0...service-v1.31.0) (2025-04-24)
 
 
