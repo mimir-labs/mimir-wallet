@@ -125,7 +125,13 @@ function Content({ address }: { address: string }) {
                   startContent={<Avatar src={selectedPendingNetwork?.chain.icon} className='w-4 h-4 bg-transparent' />}
                   endContent={<ArrowDown className='w-4 h-4' />}
                 >
-                  {selectedPendingNetwork?.chain.name} and other {validPendingNetworks.length - 1}
+                  {selectedPendingNetworks.length > 1 ? (
+                    <>
+                      {selectedPendingNetwork?.chain.name} and other {selectedPendingNetworks.length - 1}
+                    </>
+                  ) : (
+                    selectedPendingNetwork?.chain.name
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className='w-[200px] rounded-medium p-1'>

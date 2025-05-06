@@ -22,7 +22,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
   const { pressProps } = usePress({
     onPress: () => {
       copy(encodeAddress(address, endpoint.ss58Format));
-      toastSuccess('Address copied');
+      toastSuccess('Address copied', encodeAddress(address, endpoint.ss58Format));
     }
   });
 

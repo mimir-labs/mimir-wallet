@@ -171,7 +171,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               onClick={() => {
                 copy(encodeAddress(address, chainSS58));
                 openCopy(address);
-                toastSuccess('Address copied');
+                toastSuccess('Address copied', encodeAddress(address, chainSS58));
               }}
             >
               <Address value={address} shorten={downSm} />

@@ -235,9 +235,15 @@ function OmniChainSelect() {
             onPress={() => setIsOpen(!isOpen)}
           >
             <span className='hidden sm:block'>
-              {isApiReady ? `${enabledNetworks.length} Networks` : 'Connecting...'}
+              {isApiReady
+                ? enabledNetworks.length > 1
+                  ? `${enabledNetworks.length} Networks`
+                  : `${enabledNetworks.at(0)?.name}`
+                : 'Connecting...'}
             </span>
-            <span className='block sm:hidden'>{isApiReady ? `${enabledNetworks.length}` : 'Connecting...'}</span>
+            <span className='block sm:hidden'>
+              {isApiReady ? (enabledNetworks.length > 1 ? `${enabledNetworks.length}` : '') : 'Connecting...'}
+            </span>
           </Button>
         </div>
       </PopoverTrigger>

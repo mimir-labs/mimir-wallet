@@ -255,18 +255,12 @@ function AddProxy({
 
             {!!(proxyArgs.length + (existsProxies.length || 0)) && <Divider />}
 
-            <Alert
-              color='warning'
-              classNames={{
-                base: 'items-start'
-              }}
-              title={
-                <ul className='leading-[20px]'>
-                  <li>A deposit is required for proxy creation.</li>
-                  <li>Only accounts with full authority (ANY) can delete a proxy.</li>
-                </ul>
-              }
-            />
+            <Alert color='warning'>
+              <ul>
+                <li>A deposit is required for proxy creation.</li>
+                <li>Only accounts with full authority (ANY) can delete a proxy.</li>
+              </ul>
+            </Alert>
 
             {pure ? (
               <SubmitPure proxy={proxy} name={name} reviewWindow={reviewWindow} custom={custom} proxyType={proxyType} />

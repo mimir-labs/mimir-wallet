@@ -149,19 +149,21 @@ function MemberSet({
           hideIconWrapper
           color='warning'
           description={
-            <ul style={{ listStyle: 'outside' }}>
-              <li className='flex items-center'>
-                You are trying to modify memebers on&nbsp;
-                <Avatar src={chain.icon} className='w-4 h-4 bg-transparent' />
-                &nbsp;
-                {chain.name}.
+            <ul className='list-outside list-disc'>
+              <li>
+                <span className='inline-flex items-center'>
+                  You are trying to modify memebers on&nbsp;
+                  <Avatar src={chain.icon} className='w-4 h-4 bg-transparent' />
+                  &nbsp;
+                  {chain.name}.
+                </span>
               </li>
               {/* <li>You can use this proxy on Assethub due to Remote Proxy</li> */}
             </ul>
           }
           classNames={{
             title: 'font-bold text-small',
-            description: 'text-tiny'
+            description: 'text-foreground/50 text-tiny'
           }}
           icon={<IconInfo />}
           title='Notice'
