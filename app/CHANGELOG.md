@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.0.0...mimir-wallet-app-v2.0.1) (2025-05-07)
+
+
+### Bug Fixes
+
+* resolve transaction error caused by dryRun issue ([#211](https://github.com/mimir-labs/mimir-wallet/issues/211)) ([9d96ed6](https://github.com/mimir-labs/mimir-wallet/commit/9d96ed6776d79b08af5aa0d81d7306633f219d80))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.0.1
+    * @mimir-wallet/service bumped to 2.0.1
+    * @mimir-wallet/ui bumped to 2.0.1
+
 ## [2.0.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v1.31.0...mimir-wallet-app-v2.0.0) (2025-05-06)
 
 
