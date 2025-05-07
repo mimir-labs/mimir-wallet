@@ -134,7 +134,7 @@ function TxSubmit({
 
           <Call account={accountData.address} method={call} transaction={transaction} />
 
-          {!api.call.dryRunApi.dryRunCall ? (
+          {!api.call.dryRunApi?.dryRunCall ? (
             <Chopsticks call={call} account={accountData.address} />
           ) : (
             <DryRun call={call} account={accountData.address} />
