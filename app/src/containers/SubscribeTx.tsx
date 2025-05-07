@@ -6,12 +6,11 @@ import type { HexString } from '@polkadot/util/types';
 import { Address } from '@/components';
 import { toastError, toastSuccess } from '@/components/utils';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
-import { subscribe, unsubscribe } from '@/socket';
 import { formatTransactionId } from '@/transactions';
-import { u8aToHex } from '@polkadot/util';
-import { decodeAddress } from '@polkadot/util-crypto';
 import { useEffect } from 'react';
 
+import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { useTransactionSocket } from '@mimir-wallet/service';
 import { Link } from '@mimir-wallet/ui';
 
 type TxMessage = {
@@ -29,9 +28,10 @@ type TxMessage = {
 };
 
 function SubscribeTx({ address }: { address: string }) {
-  useEffect(() => {
-    const topic = `tx:${u8aToHex(decodeAddress(address))}`;
+  const { subscribe, unsubscribe } = useTransactionSocket();
+  const addressHex = addressToHex(address);
 
+  useEffect(() => {
     const handler = (message: TxMessage) => {
       if (message.status > TransactionStatus.Pending) {
         (message.status === TransactionStatus.Success ? toastSuccess : toastError)(
@@ -74,13 +74,12 @@ function SubscribeTx({ address }: { address: string }) {
       }
     };
 
-    const unsub = subscribe(topic, handler);
+    subscribe(addressHex, handler);
 
     return () => {
-      unsub();
-      unsubscribe(topic);
+      unsubscribe(addressHex);
     };
-  }, [address]);
+  }, [addressHex, subscribe, unsubscribe]);
 
   return null;
 }

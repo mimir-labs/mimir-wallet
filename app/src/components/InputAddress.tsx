@@ -159,7 +159,7 @@ function InputAddress({
       )}
       {isOpen ? null : value ? (
         <div className='address-cell-content flex flex-col gap-y-1'>
-          <div className='inline font-bold text-sm leading-[16px] h-[16px] max-h-[16px] truncate'>
+          <div className='inline-flex items-center gap-1 font-bold text-sm leading-[16px] h-[16px] max-h-[16px] truncate'>
             <AddressName value={value} />
             {isMultisig && (
               <Chip color='secondary' size='sm'>
