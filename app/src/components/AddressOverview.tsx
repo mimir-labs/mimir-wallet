@@ -106,21 +106,23 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
     };
   }
 
-  function makeEdge(
-    parentId: string,
-    nodeId: string,
-    label = '',
-    delay?: number,
-    color = '#d9d9d9',
-    labelBgColor = '#fff'
-  ): Edge {
-    return {
-      id: `${parentId}-${label}.${delay || 0}>${nodeId}`,
-      source: parentId,
-      target: nodeId,
-      type: 'AddressEdge',
-      data: { label, delay, color, labelBgColor }
-    };
+  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9') {
+    const id = `${parentId}->${nodeId}`;
+    const exists = edges.find((edge) => edge.id === id);
+
+    if (exists) {
+      if (label && !exists.data.tips.some((tip: any) => tip.label === label && tip.delay === delay)) {
+        exists.data.tips.push({ label, delay });
+      }
+    } else {
+      edges.push({
+        id,
+        source: parentId,
+        target: nodeId,
+        type: 'AddressEdge',
+        data: { color, tips: label ? [{ label, delay }] : [] }
+      });
+    }
   }
 
   type NodeInfo =
@@ -145,10 +147,7 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
 
   function dfs(node: NodeInfo, deep = 0) {
     const nodeId = node.parentId
-      ? blake2AsHex(
-          `${node.parentId}-${node.from === 'delegate' ? `${node.value.proxyDelay}.${node.value.proxyType}.${node.value.proxyNetwork}` : node.from === 'member' ? 'member' : ''}-${addressToHex(node.value.address)}`,
-          64
-        )
+      ? blake2AsHex(`${node.parentId}-[${node.from}]->${addressToHex(node.value.address)}`, 64)
       : blake2AsHex(addressToHex(node.value.address), 64);
 
     if (!node.parentId) {
@@ -173,15 +172,12 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
           node.from === 'delegate' ? node.value.proxyDelay : undefined
         )
       );
-      edges.push(
-        makeEdge(
-          node.parentId,
-          nodeId,
-          node.from === 'delegate' ? node.value.proxyType : '',
-          node.from === 'delegate' ? node.value.proxyDelay : undefined,
-          node.from === 'delegate' ? '#B700FF' : '#AEAEAE',
-          node.from === 'delegate' ? '#B700FF' : '#AEAEAE'
-        )
+      makeEdge(
+        node.parentId,
+        nodeId,
+        node.from === 'delegate' ? node.value.proxyType : '',
+        node.from === 'delegate' ? node.value.proxyDelay : undefined,
+        node.from === 'delegate' ? '#B700FF' : '#AEAEAE'
       );
     }
 

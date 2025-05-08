@@ -14,7 +14,10 @@ function AddressEdge({
   targetY,
   targetPosition,
   data
-}: EdgeProps<{ label?: string; color?: string; labelBgColor?: string; delay?: number }>) {
+}: EdgeProps<{
+  tips?: { label?: string; delay?: number }[];
+  color?: string;
+}>) {
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
@@ -29,28 +32,25 @@ function AddressEdge({
     <>
       <BaseEdge id={id} path={edgePath} style={{ stroke: data?.color }} />
 
-      {data && (
+      {data && data.tips && data.tips.length > 0 && (
         <EdgeLabelRenderer>
           <div
+            className='flex flex-col gap-[2px] p-[2px] rounded-medium min-w-[40px] text-[10px] font-bold'
             style={{
-              display: data.label ? 'flex' : 'none',
-              alignItems: 'center',
               position: 'absolute',
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               background: '#ffcc00',
-              minWidth: 40,
-              height: 16,
-              padding: '2px',
-              borderRadius: '8px',
-              fontSize: 10,
-              fontWeight: 700,
-              backgroundColor: data.labelBgColor,
-              color: 'white',
-              gap: '2px'
+              height: data.tips.length * 18 + 2,
+              backgroundColor: data.color,
+              color: data.color
             }}
           >
-            {!!data.delay && <IconClock className='w-3 h-3' />}
-            <div className='flex-1 text-center'>{data.label}</div>
+            {data.tips.map((tip) => (
+              <div key={tip.label} className='flex items-center h-[16px] p-[2px] gap-[2px] bg-white rounded-full'>
+                {!!tip.delay && <IconClock className='w-3 h-3' />}
+                <div className='flex-1 text-center'>{tip.label}</div>
+              </div>
+            ))}
           </div>
         </EdgeLabelRenderer>
       )}
