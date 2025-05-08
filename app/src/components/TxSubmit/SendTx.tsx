@@ -55,10 +55,14 @@ function SendTx({
   const { api, network } = useApi();
   const [loading, setLoading] = useState(false);
   const { txBundle, isLoading, error, hashSet, reserve, unreserve, delay } = buildTx;
-  const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
+  const [enoughtState, setEnoughtState] = useState<Record<string, boolean | 'pending'>>({});
   const source = useAccountSource(txBundle?.signer);
 
   const isEnought = Object.keys(reserve).reduce<boolean>((result, item) => result && !!enoughtState[item], true);
+  const isEnoughtPending = Object.keys(reserve).reduce<boolean>(
+    (result, item) => result || enoughtState[item] === 'pending',
+    false
+  );
 
   const onConfirm = async () => {
     let events: TxEvents = new TxEvents();
@@ -139,13 +143,13 @@ function SendTx({
           {Object.entries(delay).map(([address, delay], index) => (
             <div key={`delay-${address}-${index}`} className='flex items-center justify-between gap-[5px] sm:gap-2.5'>
               <div className='flex items-center gap-[5px] sm:gap-2.5'>
-                <IconClock className='text-primary opacity-50' />
+                <IconClock className='text-primary opacity-50 w-4 h-4' />
                 <p>Review window</p>
                 <Tooltip
                   content='This transaction needs to be executed manually after review window ends.'
                   closeDelay={0}
                 >
-                  <IconQuestion className='text-primary' />
+                  <IconQuestion className='text-primary/40' />
                 </Tooltip>
               </div>
 
@@ -153,7 +157,7 @@ function SendTx({
             </div>
           ))}
 
-          {Object.keys(delay).length > 0 && <Divider />}
+          {Object.keys(delay).length > 0 && <Divider className='bg-primary/5' />}
 
           {Object.entries(reserve).map(([address, { value }], index) => (
             <LockItem
@@ -170,9 +174,7 @@ function SendTx({
                   will be reserved for initiate transaction.
                 </>
               }
-              onEnoughtState={(address, isEnought) =>
-                setEnoughtState((state) => ({ ...state, [address]: isEnought === true }))
-              }
+              onEnoughtState={(address, isEnought) => setEnoughtState((state) => ({ ...state, [address]: isEnought }))}
             />
           ))}
           {Object.entries(unreserve).map(([address, { value }], index) => (
@@ -195,7 +197,13 @@ function SendTx({
         </LockContainer>
       )}
 
-      {error ? <Alert color='danger' title={<p className='break-all'>{error.message}</p>} /> : null}
+      {error ? <Alert color='danger' title={<span className='break-all'>{error.message}</span>} /> : null}
+
+      {!isEnought && !isEnoughtPending ? <Alert color='danger' title='Insufficient funds' /> : null}
+
+      {Object.keys(delay).length > 0 ? (
+        <Alert color='warning' title='This transaction can be executed after review window' />
+      ) : null}
 
       <Button
         fullWidth

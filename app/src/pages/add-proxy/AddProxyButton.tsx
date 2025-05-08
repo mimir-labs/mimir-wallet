@@ -7,7 +7,7 @@ import { toastWarn } from '@/components/utils';
 import React from 'react';
 import { useAsyncFn } from 'react-use';
 
-import { addressEq, isSuperset, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 function AddProxyButton({
@@ -42,40 +42,22 @@ function AddProxyButton({
       return;
     }
 
-    let exists = proxyArgs.find((item) => item.delegate === proxy && item.proxyType === proxyType);
+    const exists = proxyArgs.find((item) => item.delegate === proxy && item.proxyType === proxyType);
 
     if (exists) {
       toastWarn('Already added');
-
-      return;
-    }
-
-    exists = proxyArgs.find((item) => item.delegate === proxy && isSuperset(item.proxyType, proxyType));
-
-    if (exists) {
-      toastWarn('Already has higher permission proxy');
 
       return;
     }
 
     const result = await api.query.proxy.proxies(proxied);
 
-    let onChainExists = result[0].find(
+    const onChainExists = result[0].find(
       (item) => item.delegate.toString() === proxy && item.proxyType.type === proxyType
     );
 
     if (onChainExists) {
       toastWarn('Already added');
-
-      return;
-    }
-
-    onChainExists = result[0].find(
-      (item) => item.delegate.toString() === proxy && isSuperset(item.proxyType.type, proxyType)
-    );
-
-    if (onChainExists) {
-      toastWarn('Already has higher permission proxy');
 
       return;
     }

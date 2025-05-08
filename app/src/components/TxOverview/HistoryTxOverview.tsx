@@ -111,21 +111,23 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
     };
   }
 
-  function makeEdge(
-    parentId: string,
-    nodeId: string,
-    label = '',
-    delay?: number,
-    color = '#d9d9d9',
-    labelBgColor = '#fff'
-  ): Edge {
-    return {
-      id: `${parentId}->${nodeId}`,
-      source: parentId,
-      target: nodeId,
-      type: 'AddressEdge',
-      data: { label, delay, color, labelBgColor }
-    };
+  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9') {
+    const id = `${parentId}->${nodeId}`;
+    const exists = edges.find((edge) => edge.id === id);
+
+    if (exists) {
+      if (label && !exists.data.tips.some((tip: any) => tip.label === label && tip.delay === delay)) {
+        exists.data.tips.push({ label, delay });
+      }
+    } else {
+      edges.push({
+        id,
+        source: parentId,
+        target: nodeId,
+        type: 'AddressEdge',
+        data: { color, tips: label ? [{ label, delay }] : [] }
+      });
+    }
   }
 
   type NodeType = {
@@ -140,27 +142,20 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
       nodes.push(createNode(nodeId, node.value, true));
     } else {
       nodes.push(createNode(nodeId, node.value, false));
-      edges.push(
-        makeEdge(
-          node.parent.id.toString(),
-          nodeId,
-          node.parent.type === TransactionType.Proxy
-            ? 'Proxy'
-            : node.parent.type === TransactionType.Announce
-              ? 'Announce'
-              : '',
-          undefined,
-          node.parent.type === TransactionType.Proxy
+      makeEdge(
+        node.parent.id.toString(),
+        nodeId,
+        node.parent.type === TransactionType.Proxy
+          ? 'Proxy'
+          : node.parent.type === TransactionType.Announce
+            ? 'Announce'
+            : '',
+        undefined,
+        node.parent.type === TransactionType.Proxy
+          ? '#B700FF'
+          : node.parent.type === TransactionType.Announce
             ? '#B700FF'
-            : node.parent.type === TransactionType.Announce
-              ? '#B700FF'
-              : '',
-          node.parent.type === TransactionType.Proxy
-            ? '#B700FF'
-            : node.parent.type === TransactionType.Announce
-              ? '#B700FF'
-              : ''
-        )
+            : ''
       );
     }
 
