@@ -7,7 +7,7 @@ import { ThemeProvider } from '@/theme';
 import { StyledEngineProvider } from '@mui/material';
 import { useHref, useNavigate } from 'react-router-dom';
 
-import { QueryProvider } from '@mimir-wallet/service';
+import { QueryProvider, TransactionSocketProvider } from '@mimir-wallet/service';
 import { HeroUIProvider } from '@mimir-wallet/ui';
 
 import AccountConsumer from './accounts/Consumer';
@@ -35,8 +35,10 @@ function Root({ children }: { children: React.ReactNode }) {
           <QueryProvider>
             <AccountConsumer>
               <WalletConnectProvider>
-                <GlobalStyle />
-                {children}
+                <TransactionSocketProvider>
+                  <GlobalStyle />
+                  {children}
+                </TransactionSocketProvider>
               </WalletConnectProvider>
             </AccountConsumer>
           </QueryProvider>

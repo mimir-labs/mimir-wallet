@@ -9,3 +9,5 @@ const isDevEnv =
 export const API_CLIENT_GATEWAY = isDevEnv
   ? 'https://mimir-client.mimir.global/v1'
   : 'https://mimir-client.mimir.global/v1';
+
+export const API_CLIENT_WS_GATEWAY = isDevEnv ? 'wss://mimir-client.mimir.global' : 'wss://mimir-client.mimir.global';

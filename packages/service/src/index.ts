@@ -9,7 +9,7 @@ export * from './store/index.js';
 export * from './hooks/index.js';
 export * from './query/index.js';
 export { fetcher, type FetchError, type NetworkError } from './fetcher.js';
-
+export * from './socket/index.js';
 export let service: ClientService;
 
 export function initService(clientGateway: string) {

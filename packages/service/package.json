@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.67.3",
-    "eventemitter3": "^5.0.1"
+    "eventemitter3": "^5.0.1",
+    "socket.io-client": "^4.8.1"
   }
 }

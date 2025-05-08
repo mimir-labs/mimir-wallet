@@ -20,7 +20,6 @@ import { initializeWallet } from './wallet/initialize';
 import App from './App';
 import { initGa } from './ga';
 import { initMimir } from './initMimir';
-import { initializeSocket } from './socket';
 import { upgradeAddresBook } from './upgrade';
 
 // Set default date-time format for the entire application
@@ -52,10 +51,6 @@ initializeWallet();
 // Initialize account management and synchronization
 // This sets up account tracking, multisig handling, and proxy relationships
 initializeAccount(chain, address);
-
-// Establish WebSocket connection for real-time updates
-// This enables live updates for transactions, account changes, and other events
-initializeSocket(chain);
 
 // Render the main App component with initial configuration
 root.render(
