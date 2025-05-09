@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.1.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.0.1...mimir-wallet-app-v2.1.0) (2025-05-09)
+
+
+### Features
+
+* add transaction subscription functionality ([#213](https://github.com/mimir-labs/mimir-wallet/issues/213)) ([f9f3cf4](https://github.com/mimir-labs/mimir-wallet/commit/f9f3cf4d40fb4259b89d6364536b6ed24df6b7f0))
+* Add walletconnect in dapp page ([#217](https://github.com/mimir-labs/mimir-wallet/issues/217)) ([0c01e06](https://github.com/mimir-labs/mimir-wallet/commit/0c01e063b0613c3a5ae99100638039909d76e1ef))
+* allow adding lower permission proxies when higher permission proxies exist ([#215](https://github.com/mimir-labs/mimir-wallet/issues/215)) ([43ae1ea](https://github.com/mimir-labs/mimir-wallet/commit/43ae1eaa98f299b1fdc731eeed7d796d174bf821))
+* implement success UI for multisig account creation ([#216](https://github.com/mimir-labs/mimir-wallet/issues/216)) ([4ac2f5f](https://github.com/mimir-labs/mimir-wallet/commit/4ac2f5ffa75ea9b22fd8191638c6b8f04fa43826))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.1.0
+    * @mimir-wallet/service bumped to 2.1.0
+    * @mimir-wallet/ui bumped to 2.1.0
+
 ## [2.0.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.0.0...mimir-wallet-app-v2.0.1) (2025-05-07)
 
 

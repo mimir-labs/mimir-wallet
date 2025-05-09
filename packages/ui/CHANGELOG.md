@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.0.1...ui-v2.1.0) (2025-05-09)
+
+
+### Features
+
+* add transaction subscription functionality ([#213](https://github.com/mimir-labs/mimir-wallet/issues/213)) ([f9f3cf4](https://github.com/mimir-labs/mimir-wallet/commit/f9f3cf4d40fb4259b89d6364536b6ed24df6b7f0))
+* allow adding lower permission proxies when higher permission proxies exist ([#215](https://github.com/mimir-labs/mimir-wallet/issues/215)) ([43ae1ea](https://github.com/mimir-labs/mimir-wallet/commit/43ae1eaa98f299b1fdc731eeed7d796d174bf821))
+
 ## [2.0.1](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.0.0...ui-v2.0.1) (2025-05-07)
 
 

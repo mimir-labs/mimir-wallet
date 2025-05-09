@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.0.1...service-v2.1.0) (2025-05-09)
+
+
+### Features
+
+* add transaction subscription functionality ([#213](https://github.com/mimir-labs/mimir-wallet/issues/213)) ([f9f3cf4](https://github.com/mimir-labs/mimir-wallet/commit/f9f3cf4d40fb4259b89d6364536b6ed24df6b7f0))
+
 ## [2.0.1](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.0.0...service-v2.0.1) (2025-05-07)
 
 
