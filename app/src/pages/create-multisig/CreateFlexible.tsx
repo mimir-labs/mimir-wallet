@@ -6,7 +6,6 @@ import type { EventRecord } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 import type { PrepareFlexible } from './types';
 
-import { useSelectedAccountCallback } from '@/accounts/useSelectedAccount';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@/components';
 import { utm } from '@/config';
@@ -19,11 +18,12 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Stack, Typ
 import { u8aEq, u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { addressToHex, signAndSend, useApi } from '@mimir-wallet/polkadot-core';
 import { service, store } from '@mimir-wallet/service';
 import { Button, Tooltip } from '@mimir-wallet/ui';
+
+import CreateSuccess from './CreateSuccess';
 
 interface Props {
   prepare: PrepareFlexible;
@@ -68,14 +68,13 @@ function CreateFlexible({
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
   const [blockNumber, setBlockNumber] = useState<number | null | undefined>(_blockNumber);
   const [extrinsicIndex, setExtrinsicIndex] = useState<number | null | undefined>(_extrinsicIndex);
-  const navigate = useNavigate();
-  const selectAccount = useSelectedAccountCallback();
   const [loadingFirst, setLoadingFirst] = useState(false);
   const [loadingSecond, setLoadingSecond] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
   const source = useAccountSource(signer);
   const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
   const isEnought = signer ? !!enoughtState[signer] : false;
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const reservedAmount = useMemo(
     () => api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2)),
@@ -119,13 +118,11 @@ function CreateFlexible({
           await sleep(3_000);
         }
 
-        selectAccount(pure);
-
-        navigate('/');
+        setIsSuccess(true);
       });
       events.once('error', () => setLoadingSecond(false));
     },
-    [api, selectAccount, network, navigate]
+    [api, network]
   );
 
   const createPure = useCallback(() => {
@@ -208,140 +205,144 @@ function CreateFlexible({
   );
 
   return (
-    <Stack spacing={1.5}>
-      <Typography variant='h3'>Create Flexible Multisig</Typography>
-      <Typography>Please complete both steps to avoid unnecessary asset loss.</Typography>
-      <Divider sx={{ marginY: 1.5 }} />
-      <Accordion expanded={false}>
-        <AccordionSummary>
-          <div className='flex items-center gap-2'>
-            <ItemStep>1</ItemStep>
-            <div className='flex items-center gap-2 justify-between'>
-              {pure ? (
-                <>
-                  <Box color='primary.main' component='span'>
-                    <Address shorten value={pure} />
-                  </Box>
-                  &nbsp; Created!
-                </>
-              ) : (
-                <>Create Flexible Multisig Account</>
-              )}
-              <div className='flex gap-1 items-center text-small'>
-                <img src={chain.icon} style={{ width: 20, height: 20 }} />
-                {chain.name}
+    <>
+      <Stack spacing={1.5}>
+        <Typography variant='h3'>Create Flexible Multisig</Typography>
+        <Typography>Please complete both steps to avoid unnecessary asset loss.</Typography>
+        <Divider sx={{ marginY: 1.5 }} />
+        <Accordion expanded={false}>
+          <AccordionSummary>
+            <div className='flex items-center gap-2'>
+              <ItemStep>1</ItemStep>
+              <div className='flex items-center gap-2 justify-between'>
+                {pure ? (
+                  <>
+                    <Box color='primary.main' component='span'>
+                      <Address shorten value={pure} />
+                    </Box>
+                    &nbsp; Created!
+                  </>
+                ) : (
+                  <>Create Flexible Multisig Account</>
+                )}
+                <div className='flex gap-1 items-center text-small'>
+                  <img src={chain.icon} style={{ width: 20, height: 20 }} />
+                  {chain.name}
+                </div>
               </div>
             </div>
-          </div>
-        </AccordionSummary>
-      </Accordion>
-      <Accordion expanded>
-        <AccordionSummary>
-          <div className='flex items-center gap-2'>
-            <ItemStep disabled={!pure}>2</ItemStep>
-            Set Members ({threshold}/{who.length})
-            <Tooltip
-              classNames={{ content: 'max-w-[320px]' }}
-              content={
-                <span>
-                  Flexible Multisig is a Pure Proxy. In <b>‘set members’</b> step, you add the multisig account as its
-                  proxy and remove the creator's proxy, making the multi-signature its only controller. Then transfer
-                  some funds to keep Flexible alive.
-                </span>
+          </AccordionSummary>
+        </Accordion>
+        <Accordion expanded>
+          <AccordionSummary>
+            <div className='flex items-center gap-2'>
+              <ItemStep disabled={!pure}>2</ItemStep>
+              Set Members ({threshold}/{who.length})
+              <Tooltip
+                classNames={{ content: 'max-w-[320px]' }}
+                content={
+                  <span>
+                    Flexible Multisig is a Pure Proxy. In <b>‘set members’</b> step, you add the multisig account as its
+                    proxy and remove the creator's proxy, making the multi-signature its only controller. Then transfer
+                    some funds to keep Flexible alive.
+                  </span>
+                }
+                closeDelay={0}
+              >
+                <IconQuestion />
+              </Tooltip>
+            </div>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={1}>
+              {who.map((address) => (
+                <Box key={address} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography fontSize='0.75rem' fontWeight={700}>
+                    <AddressRow value={address} />
+                  </Typography>
+                  <Typography color='text.secondary' fontSize='0.75rem'>
+                    <Address shorten value={address} />
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
+        <Divider sx={{ marginY: 1.5 }} />
+        <Typography fontWeight={700}>Transaction Initiator</Typography>
+        <InputAddress
+          disabled={!!pure}
+          filtered={creator ? [creator] : who.filter((address) => !!accountSource(address))}
+          isSign
+          onChange={setSigner}
+          value={signer}
+        />
+
+        {signer && (
+          <LockContainer>
+            <LockItem
+              address={signer}
+              tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.'
+              value={reservedAmount}
+              onEnoughtState={(address, isEnought) =>
+                setEnoughtState((state) => ({ ...state, [address]: isEnought === true }))
               }
-              closeDelay={0}
+            />
+          </LockContainer>
+        )}
+
+        <Divider sx={{ marginY: 1.5 }} />
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {pure ? (
+            <Button
+              color='danger'
+              isDisabled={loadingFirst || loadingSecond}
+              fullWidth
+              isLoading={loadingCancel}
+              onPress={() => {
+                if (pure && signer && blockNumber && extrinsicIndex) {
+                  killPure(pure, signer, blockNumber, extrinsicIndex);
+                }
+              }}
+              variant='ghost'
             >
-              <IconQuestion />
-            </Tooltip>
-          </div>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Stack spacing={1}>
-            {who.map((address) => (
-              <Box key={address} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography fontSize='0.75rem' fontWeight={700}>
-                  <AddressRow value={address} />
-                </Typography>
-                <Typography color='text.secondary' fontSize='0.75rem'>
-                  <Address shorten value={address} />
-                </Typography>
-              </Box>
-            ))}
-          </Stack>
-        </AccordionDetails>
-      </Accordion>
-      <Divider sx={{ marginY: 1.5 }} />
-      <Typography fontWeight={700}>Transaction Initiator</Typography>
-      <InputAddress
-        disabled={!!pure}
-        filtered={creator ? [creator] : who.filter((address) => !!accountSource(address))}
-        isSign
-        onChange={setSigner}
-        value={signer}
-      />
+              Delete Account
+            </Button>
+          ) : (
+            <Button fullWidth onPress={onCancel} color='primary' variant='ghost'>
+              Cancel
+            </Button>
+          )}
+          {pure ? (
+            <Button
+              isDisabled={!(signer && pure) || loadingCancel || !source}
+              fullWidth
+              color='primary'
+              isLoading={loadingSecond}
+              onPress={() => {
+                if (pure && who && signer && source) {
+                  createMembers(pure, who, signer, source, threshold);
+                }
+              }}
+            >
+              Set Members
+            </Button>
+          ) : (
+            <Button
+              isDisabled={!(signer && isEnought)}
+              fullWidth
+              color='primary'
+              isLoading={loadingFirst}
+              onPress={createPure}
+            >
+              Create
+            </Button>
+          )}
+        </Box>
+      </Stack>
 
-      {signer && (
-        <LockContainer>
-          <LockItem
-            address={signer}
-            tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.'
-            value={reservedAmount}
-            onEnoughtState={(address, isEnought) =>
-              setEnoughtState((state) => ({ ...state, [address]: isEnought === true }))
-            }
-          />
-        </LockContainer>
-      )}
-
-      <Divider sx={{ marginY: 1.5 }} />
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        {pure ? (
-          <Button
-            color='danger'
-            isDisabled={loadingFirst || loadingSecond}
-            fullWidth
-            isLoading={loadingCancel}
-            onPress={() => {
-              if (pure && signer && blockNumber && extrinsicIndex) {
-                killPure(pure, signer, blockNumber, extrinsicIndex);
-              }
-            }}
-            variant='ghost'
-          >
-            Delete Account
-          </Button>
-        ) : (
-          <Button fullWidth onPress={onCancel} color='primary' variant='ghost'>
-            Cancel
-          </Button>
-        )}
-        {pure ? (
-          <Button
-            isDisabled={!(signer && pure) || loadingCancel || !source}
-            fullWidth
-            color='primary'
-            isLoading={loadingSecond}
-            onPress={() => {
-              if (pure && who && signer && source) {
-                createMembers(pure, who, signer, source, threshold);
-              }
-            }}
-          >
-            Set Members
-          </Button>
-        ) : (
-          <Button
-            isDisabled={!(signer && isEnought)}
-            fullWidth
-            color='primary'
-            isLoading={loadingFirst}
-            onPress={createPure}
-          >
-            Create
-          </Button>
-        )}
-      </Box>
-    </Stack>
+      {pure && <CreateSuccess isOpen={isSuccess} onClose={() => setIsSuccess(false)} address={pure} />}
+    </>
   );
 }
 
