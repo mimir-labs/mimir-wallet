@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.1.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.0.1...polkadot-core-v2.1.0) (2025-05-09)
+
+
+### Features
+
+* add transaction subscription functionality ([#213](https://github.com/mimir-labs/mimir-wallet/issues/213)) ([f9f3cf4](https://github.com/mimir-labs/mimir-wallet/commit/f9f3cf4d40fb4259b89d6364536b6ed24df6b7f0))
+* Add walletconnect in dapp page ([#217](https://github.com/mimir-labs/mimir-wallet/issues/217)) ([0c01e06](https://github.com/mimir-labs/mimir-wallet/commit/0c01e063b0613c3a5ae99100638039909d76e1ef))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.1.0
+
 ## [2.0.1](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.0.0...polkadot-core-v2.0.1) (2025-05-07)
 
 
