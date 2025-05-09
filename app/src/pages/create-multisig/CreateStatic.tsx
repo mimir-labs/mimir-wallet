@@ -4,19 +4,19 @@
 import type { HexString } from '@polkadot/util/types';
 
 import { useAccount } from '@/accounts/useAccount';
-import { useSelectedAccountCallback } from '@/accounts/useSelectedAccount';
 import { toastError } from '@/components/utils';
 import { utm } from '@/config';
 import { DETECTED_ACCOUNT_KEY } from '@/constants';
-import { useToggle } from '@/hooks/useToggle';
 import { u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useToggle } from 'react-use';
 
 import { addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { service, store } from '@mimir-wallet/service';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+
+import CreateSuccess from './CreateSuccess';
 
 interface Props {
   name?: string;
@@ -49,13 +49,14 @@ async function createMultisig(
 }
 
 function CreateStatic({ checkField, name, signatories, threshold }: Props) {
-  const [open, toggleOpen] = useToggle();
-  const navigate = useNavigate();
+  const [open, toggleOpen] = useToggle(false);
   const [isLoading, setIsLoading] = useState(false);
-  const selectAccount = useSelectedAccountCallback();
   const { addAddress, resync } = useAccount();
   const { network, chainSS58 } = useApi();
   const { mode } = useNetworks();
+
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [address, setAddress] = useState<string | null>(null);
 
   const handleCreate = useCallback(async () => {
     if (!(name && checkField())) return;
@@ -71,16 +72,17 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
 
       const encodedAddress = encodeAddress(address, chainSS58);
 
-      selectAccount(encodedAddress);
       addAddress(encodedAddress, name);
 
-      navigate('/');
+      setAddress(encodedAddress);
+      toggleOpen(false);
+      setIsSuccess(true);
     } catch (error) {
       toastError(error);
     }
 
     setIsLoading(false);
-  }, [name, checkField, network, signatories, threshold, resync, mode, chainSS58, selectAccount, addAddress, navigate]);
+  }, [name, checkField, network, signatories, threshold, resync, mode, chainSS58, addAddress, toggleOpen]);
 
   return (
     <>
@@ -103,6 +105,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      {address && <CreateSuccess isOpen={isSuccess} onClose={() => setIsSuccess(false)} address={address} />}
       <Button
         isDisabled={!name}
         fullWidth
