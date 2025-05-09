@@ -13,7 +13,7 @@ import { enableWallet } from '@/wallet/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { signAndSend, SubApiRoot, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from '@mimir-wallet/ui';
+import { Alert, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
 import Input from './Input';
@@ -35,6 +35,7 @@ function Content({
   setValue,
   value,
   network,
+  error,
   setNetwork
 }: {
   sending?: string;
@@ -44,6 +45,7 @@ function Content({
   receipt?: string;
   network: string;
   setNetwork: React.Dispatch<string>;
+  error: string | null;
 }) {
   const [balances] = useNativeBalances(sending);
   const { injected } = useGroupAccounts();
@@ -70,6 +72,8 @@ function Content({
         <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
 
         <Input label='Amount' onChange={setValue} value={value} />
+
+        {error && <Alert color='danger' title={error} />}
       </div>
     </ModalBody>
   );
@@ -79,16 +83,19 @@ function Action({
   onClose,
   receipt,
   sending,
-  value
+  value,
+  setError
 }: {
   receipt?: string;
   value?: string;
   sending?: string;
+  setError: (error: string) => void;
   onClose: () => void;
 }) {
   const { api } = useApi();
   const [loading, setLoading] = useState(false);
   const source = useAccountSource(sending);
+
   const handleClick = useCallback(() => {
     if (receipt && sending && value) {
       setLoading(true);
@@ -105,12 +112,13 @@ function Action({
           setLoading(false);
           onClose();
         });
-        events.on('error', () => {
+        events.on('error', (error: any) => {
           setLoading(false);
+          setError(error.message || 'Unknown error');
         });
       }
     }
-  }, [source, api, onClose, receipt, sending, value]);
+  }, [receipt, sending, value, source, api, onClose, setError]);
 
   return (
     <ModalFooter>
@@ -128,6 +136,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const [sending, setSending] = useState<string>();
   const { enableNetwork } = useNetworks();
   const [[value], setValue] = useInputNumber(defaultValue?.toString() || '0', false, 0);
+  const [error, setError] = useState<string | null>(null);
   const supportedNetworks = useAddressSupportedNetworks(receipt);
   const [network, setNetwork] = useInputNetwork(
     defaultNetwork,
@@ -167,8 +176,9 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
             value={value}
             network={network}
             setNetwork={setNetwork}
+            error={error}
           />
-          <Action onClose={onClose} receipt={receipt} sending={sending} value={value} />
+          <Action onClose={onClose} receipt={receipt} sending={sending} value={value} setError={setError} />
         </ModalContent>
       </Modal>
     </SubApiRoot>

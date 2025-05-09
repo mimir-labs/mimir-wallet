@@ -77,14 +77,12 @@ async function extractParams(
 }
 
 export function checkSubmittableResult(api: ApiPromise, result: ISubmittableResult, checkProxy = false) {
-  if (result.isError) {
-    if (result.dispatchError) {
-      throw assetDispatchError(api, result.dispatchError);
-    }
+  if (result.dispatchError) {
+    throw assetDispatchError(api, result.dispatchError);
+  }
 
-    if (result.internalError) {
-      throw result.internalError;
-    }
+  if (result.internalError) {
+    throw result.internalError;
   }
 
   if (checkProxy) {
