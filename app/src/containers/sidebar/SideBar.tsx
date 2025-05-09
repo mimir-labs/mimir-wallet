@@ -12,14 +12,13 @@ import IconQr from '@/assets/svg/icon-qr.svg?react';
 import IconSetting from '@/assets/svg/icon-set.svg?react';
 import IconTransaction from '@/assets/svg/icon-transaction.svg?react';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
-import { AccountMenu, AddressCell, CopyAddress, CreateMultisigDialog, WalletIcon } from '@/components';
+import { AccountMenu, AddressCell, CopyAddress, WalletIcon } from '@/components';
 import { walletConfig } from '@/config';
 import { useAddressExplorer } from '@/hooks/useAddressExplorer';
 import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useQrAddress } from '@/hooks/useQrAddress';
-import { useToggle } from '@/hooks/useToggle';
 import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 import { formatDisplay } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
@@ -85,7 +84,6 @@ function NavLink({
 function TopContent() {
   const selected = useSelectedAccount();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [createMultisigOpen, toggleCreateMultisigOpen] = useToggle();
   const { connectedWallets, openWallet } = useWallet();
   const [totalUsd] = useBalanceTotalUsd(selected);
   const formatUsd = formatDisplay(totalUsd.toString());
@@ -169,12 +167,13 @@ function TopContent() {
           </div>
         ) : (
           <Button
+            as={Link}
             size='lg'
             fullWidth
             radius='md'
             color='primary'
             className='h-[48px]'
-            onPress={toggleCreateMultisigOpen}
+            href='/create-multisig'
           >
             Create Multisig
           </Button>
@@ -196,7 +195,6 @@ function TopContent() {
       )}
 
       <AccountMenu anchor={upMd ? 'left' : 'right'} onClose={handleAccountClose} open={!!anchorEl} />
-      <CreateMultisigDialog open={createMultisigOpen} onClose={toggleCreateMultisigOpen} />
     </>
   );
 }

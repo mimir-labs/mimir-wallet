@@ -99,7 +99,7 @@ function App() {
               },
               {
                 path: '/create-multisig-one',
-                element: <PageCreateMultisig threshold1 />
+                element: <PageCreateMultisig />
               },
               {
                 path: '/create-pure',

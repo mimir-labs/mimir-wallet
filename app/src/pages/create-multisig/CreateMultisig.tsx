@@ -31,19 +31,13 @@ function checkError(
       : hasSoloAccount
         ? null
         : new Error('You need add at least one local account'),
-    isThresholdValid ? null : new Error(`Threshold must great than 2 and less equal than ${signatories.length}`)
+    isThresholdValid
+      ? null
+      : new Error(`Threshold must great or equal than 1 and less or equal than ${signatories.length}`)
   ];
 }
 
-function CreateMultisig({
-  threshold1,
-  network,
-  setNetwork
-}: {
-  threshold1?: boolean;
-  network: string;
-  setNetwork: (network: string) => void;
-}) {
+function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: (network: string) => void }) {
   const navigate = useNavigate();
   const { chainSS58, chain } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
@@ -54,7 +48,7 @@ function CreateMultisig({
   });
   const [flexible, setFlexible] = useState(false);
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
-    useSelectMultisig(undefined, undefined, threshold1);
+    useSelectMultisig();
   const [addressError, setAddressError] = useState<Error | null>(null);
   const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
 
@@ -114,18 +108,14 @@ function CreateMultisig({
           ) : (
             <div className='space-y-4'>
               <div className='flex justify-between'>
-                <h3 className='text-medium'>{threshold1 ? 'Create 1/N Multisig' : 'Create Multisig'}</h3>
+                <h3 className='text-medium'>Create Multisig</h3>
                 {/* <Button variant='outlined'>Import</Button> */}
               </div>
               <Divider />
               <Input label='Name' onChange={setName} placeholder='input multisig account name' value={name} />
               <Input
                 endButton={
-                  <Button
-                    isDisabled={threshold1 ? signatories.length === 1 : false}
-                    onPress={handleAdd}
-                    variant='solid'
-                  >
+                  <Button onPress={handleAdd} variant='solid'>
                     Add
                   </Button>
                 }
@@ -146,21 +136,23 @@ function CreateMultisig({
                 placeholder='input address'
                 value={address}
               />
-              <div className='bg-secondary rounded-medium p-2.5'>
-                <div className='flex flex-col justify-between gap-2.5'>
-                  <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
-                  <AccountSelect accounts={signatories} onClick={unselect} title='Members' type='delete' />
-                </div>
-                {threshold1 && (
-                  <div className='flex items-center gap-1 mt-2.5 text-foreground/50 text-tiny leading-[14px] h-[14px] max-h-[14px] font-normal'>
-                    <IconInfo />
-                    All members can initiate transactions.
-                  </div>
-                )}
-                {memberError && <div className='mt-2.5 text-danger'>{memberError.message}</div>}
+
+              <div className='bg-secondary p-2.5 rounded-medium space-y-2.5'>
+                <AccountSelect scroll accounts={unselected} onClick={select} title='Addresss book' type='add' />
+
+                {memberError && <div className='text-danger'>{memberError.message}</div>}
               </div>
+
+              <div className='bg-secondary p-2.5 rounded-medium space-y-2.5'>
+                <AccountSelect scroll={false} accounts={signatories} onClick={unselect} title='Members' type='delete' />
+
+                <div className='flex items-center gap-1 text-foreground/50 text-tiny leading-[14px] h-[14px] max-h-[14px] font-normal'>
+                  <IconInfo />
+                  All members can initiate transactions.
+                </div>
+              </div>
+
               <Input
-                disabled={threshold1}
                 defaultValue={String(threshold)}
                 error={thresholdError}
                 label='Threshold'

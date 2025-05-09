@@ -4,15 +4,11 @@
 import IconAddFill from '@/assets/svg/icon-add-fill.svg?react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToggle } from 'react-use';
 
-import { Button, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
-
-import CreateMultisigDialog from '../CreateMultisigDialog';
+import { Button, Link, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
 
 function CreateMultisig({ onClose }: { onClose?: () => void }) {
   const navigate = useNavigate();
-  const [open, toggleOpen] = useToggle(false);
   const ref = useRef<HTMLButtonElement>(null);
   const [width, setWidth] = useState<number>();
   const [isOpen, setIsOpen] = useState(false);
@@ -37,14 +33,15 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
         </PopoverTrigger>
         <PopoverContent className='p-2.5 space-y-2.5 items-stretch'>
           <Button
+            as={Link}
             key='hide-0'
             disableRipple
             radius='sm'
             variant='light'
             color='primary'
             className='text-foreground'
+            href='/create-multisig'
             onPress={() => {
-              toggleOpen(true);
               setIsOpen(false);
             }}
           >
@@ -82,13 +79,6 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
           </Button>
         </PopoverContent>
       </Popover>
-
-      <CreateMultisigDialog
-        open={open}
-        onClose={() => {
-          toggleOpen(false);
-        }}
-      />
     </>
   );
 }

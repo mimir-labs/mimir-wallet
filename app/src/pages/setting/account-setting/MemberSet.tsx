@@ -6,7 +6,7 @@ import type { MultisigAccountData, PureAccountData } from '@/hooks/types';
 import { useAccount } from '@/accounts/useAccount';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Input, TxButton } from '@/components';
-import { Box, FormHelperText, Paper, Stack } from '@mui/material';
+import { Box, FormHelperText, Stack } from '@mui/material';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress, isAddress as isAddressUtil } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
@@ -119,25 +119,19 @@ function MemberSet({
           placeholder='input address'
           value={address}
         />
-        <Paper elevation={0} sx={{ bgcolor: 'secondary.main', padding: 1 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: 2,
-              flexDirection: { xs: 'column', sm: 'row' }
-            }}
-          >
-            <AccountSelect accounts={unselected} onClick={select} title='Addresss book' type='add' />
-            <AccountSelect
-              accounts={signatories}
-              onClick={unselect}
-              title={`Multisig Members(${signatories.length})`}
-              type='delete'
-            />
-          </Box>
-          {memberError && <FormHelperText sx={{ color: 'error.main' }}>{memberError.message}</FormHelperText>}
-        </Paper>
+        <div className='bg-secondary p-2.5 rounded-medium'>
+          <AccountSelect scroll accounts={unselected} onClick={select} title='Addresss book' type='add' />
+        </div>
+        <div className='bg-secondary p-2.5 rounded-medium'>
+          <AccountSelect
+            scroll={false}
+            accounts={signatories}
+            onClick={unselect}
+            title={`Multisig Members(${signatories.length})`}
+            type='delete'
+          />
+        </div>
+        {memberError && <FormHelperText sx={{ color: 'error.main' }}>{memberError.message}</FormHelperText>}
         <Input
           defaultValue={String(threshold)}
           error={thresholdError}

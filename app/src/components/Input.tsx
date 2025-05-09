@@ -45,12 +45,11 @@ function Input({
         placeholder={placeholder || ' '}
         type={type}
         autoFocus={autoFocus}
-        color={color}
+        color={error ? 'danger' : color}
         isDisabled={disabled}
         label={label}
         fullWidth={fullWidth}
-        errorMessage={error?.message}
-        description={helper}
+        description={error ? <span className='text-danger'>{error.message}</span> : helper}
         variant='bordered'
         labelPlacement='outside'
         size='md'
