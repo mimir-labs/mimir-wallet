@@ -121,7 +121,7 @@ function AddProxy({
             </div>
             <Divider />
 
-            <div className='flex flex-col sm:flex-row gap-2.5 items-center sm:items-start'>
+            <div className='flex flex-col gap-2.5 items-center'>
               {pure ? (
                 <PureCell />
               ) : (
@@ -134,10 +134,7 @@ function AddProxy({
                   isSign={!!pure}
                 />
               )}
-              <IconArrow
-                className='w-4 h-4 text-primary cursor-pointer rotate-90 sm translate-y-[48px]'
-                onClick={pure ? undefined : swap}
-              />
+              <IconArrow className='w-4 h-4 text-primary cursor-pointer rotate-90' onClick={pure ? undefined : swap} />
               <InputAddress
                 excluded={!pure && proxied ? [proxied] : []}
                 shorten

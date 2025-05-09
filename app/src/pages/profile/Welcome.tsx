@@ -7,16 +7,15 @@ import { useAccount } from '@/accounts/useAccount';
 import { useUnConfirmMultisigs } from '@/accounts/useGroupAccounts';
 import { useSelectedAccountCallback } from '@/accounts/useSelectedAccount';
 // import IconSend from '@/assets/svg/icon-send-fill.svg?react';
-import { CreateMultisigDialog, InputAddress } from '@/components';
+import { InputAddress } from '@/components';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useToggle } from '@/hooks/useToggle';
 import { useWallet } from '@/wallet/useWallet';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, Divider, Link } from '@mimir-wallet/ui';
 
-function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onCreateMultisig: () => void }) {
+function Detected({ accounts }: { accounts: AccountData[] }) {
   const selectAccount = useSelectedAccountCallback();
   const [selected, setSelected] = useState<string>(accounts[0]?.address ?? '');
   const [confirm] = useUnConfirmMultisigs();
@@ -42,7 +41,7 @@ function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onC
 
       <Divider />
 
-      <Button color='primary' variant='ghost' fullWidth onPress={onCreateMultisig}>
+      <Button as={Link} href='/create-multisig' color='primary' variant='ghost' fullWidth>
         Create Multisig Account
       </Button>
       <Button as={Link} href='/create-pure' color='primary' variant='ghost' fullWidth>
@@ -58,7 +57,6 @@ function Detected({ accounts, onCreateMultisig }: { accounts: AccountData[]; onC
 function Welcome() {
   const { connectedWallets, openWallet } = useWallet();
   const { accounts } = useAccount();
-  const [createMultisigOpen, toggleCreateMultisigOpen] = useToggle();
   const upSm = useMediaQuery('sm');
 
   const isConnected = Object.keys(connectedWallets).length > 0;
@@ -82,7 +80,7 @@ function Welcome() {
           {isConnected ? (
             <>
               <p className='font-extrabold text-medium sm:text-large'>Detected Account</p>
-              <Detected accounts={accounts} onCreateMultisig={toggleCreateMultisigOpen} />
+              <Detected accounts={accounts} />
             </>
           ) : (
             <Button color='primary' onPress={openWallet}>
@@ -91,8 +89,6 @@ function Welcome() {
           )}
         </div>
       </div>
-
-      <CreateMultisigDialog open={createMultisigOpen} onClose={toggleCreateMultisigOpen} />
     </>
   );
 }

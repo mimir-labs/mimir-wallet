@@ -16,20 +16,26 @@ interface Props {
   type: 'add' | 'delete';
   disabled?: boolean;
   accounts: string[];
+  scroll?: boolean;
   onClick: (value: string) => void;
 }
 
-function AccountSelect({ accounts, disabled, onClick, title, type }: Props) {
+function AccountSelect({ accounts, disabled, onClick, title, type, scroll = true }: Props) {
   return (
     <div className='flex flex-1 flex-col'>
       <p>
         <b>{title}</b>
       </p>
-      <div className='space-y-2.5 overflow-y-auto max-h-[200px] mt-1 p-2.5 flex-1 border-1 border-secondary rounded-medium bg-content1'>
+      <div
+        style={{
+          maxHeight: scroll ? '200px' : 'none'
+        }}
+        className='space-y-2.5 overflow-y-auto mt-1 p-2.5 flex-1 border-1 border-secondary rounded-medium bg-content1 scroll-smooth focus:scroll-auto snap-y scroll-pt-2'
+      >
         {accounts.map((account, index) => (
           <div
             key={index}
-            className='flex items-center justify-between rounded-small p-1 bg-secondary [&>.AddressRow]:flex-1'
+            className='flex items-center justify-between rounded-small p-1 bg-secondary [&>.AddressRow]:flex-1 snap-start'
           >
             <AddressRow iconSize={24} value={account} />
             {addressEq(hexToU8a('0x0', 256), account) && (

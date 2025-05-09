@@ -21,22 +21,18 @@ interface UseSelectMultisig {
   unselect: (value: string) => void;
 }
 
-export function useSelectMultisig(
-  defaultSignatories?: string[],
-  defaultThreshold?: number,
-  threshold1?: boolean
-): UseSelectMultisig {
+export function useSelectMultisig(): UseSelectMultisig {
   const { accounts, addresses } = useAccount();
   const { chainSS58 } = useApi();
   const all = useMemo(
     () =>
-      (threshold1 ? [encodeAddress(hexToU8a('0x0', 256), chainSS58)] : []).concat(
+      [encodeAddress(hexToU8a('0x0', 256), chainSS58)].concat(
         accounts.map((item) => item.address).concat(addresses.map((item) => item.address))
       ),
-    [accounts, addresses, threshold1, chainSS58]
+    [accounts, addresses, chainSS58]
   );
-  const [signatories, setSignatories] = useState<string[]>(defaultSignatories || []);
-  const [threshold, setThreshold] = useState<number>(defaultThreshold || (threshold1 ? 1 : 2));
+  const [signatories, setSignatories] = useState<string[]>([]);
+  const [threshold, setThreshold] = useState<number>(2);
 
   const unselected = useMemo(
     () => Array.from(new Set(all.filter((account) => !signatories.includes(account)))),
@@ -44,7 +40,7 @@ export function useSelectMultisig(
   );
 
   const hasSoloAccount = useMemo(() => !!signatories.find((address) => !!accountSource(address)), [signatories]);
-  const isThresholdValid = Number(threshold) >= (threshold1 ? 1 : 2) && Number(threshold) <= signatories.length;
+  const isThresholdValid = Number(threshold) >= 1 && Number(threshold) <= signatories.length;
 
   const select = useCallback((value: string) => {
     setSignatories((accounts) => (accounts.includes(value) ? accounts : accounts.concat(value)));
