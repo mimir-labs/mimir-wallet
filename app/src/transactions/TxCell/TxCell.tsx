@@ -33,7 +33,7 @@ function TxCell({ withDetails, defaultOpen, address, transaction }: Props) {
   const [account] = useQueryAccount(address);
 
   return (
-    <div className='space-y-3 p-3 sm:p-4 rounded-large bg-content1 shadow-medium'>
+    <div className='space-y-3 p-3 sm:p-4 rounded-large bg-content1 border-1 border-secondary shadow-small'>
       <div className='flex items-center justify-between gap-2.5 flex-1'>
         <div className='flex items-center gap-2.5 flex-1'>
           <div
@@ -56,7 +56,11 @@ function TxCell({ withDetails, defaultOpen, address, transaction }: Props) {
             : moment(transaction.updatedAt).format()}
         </p>
 
-        <Tooltip content={isCopied ? 'Copied' : 'Copy the transaction URL'} closeDelay={0}>
+        <Tooltip
+          isOpen={isCopied ? true : undefined}
+          content={isCopied ? 'Copied' : 'Copy the transaction URL'}
+          closeDelay={0}
+        >
           <Button
             isIconOnly
             color='primary'

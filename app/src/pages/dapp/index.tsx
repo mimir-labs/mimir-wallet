@@ -13,12 +13,16 @@ function PageDapp() {
     <div className='flex flex-col gap-5'>
       <WalletConnectExample />
 
-      <div className='grid grid-cols-12 gap-6'>
-        {dapps.map((dapp, index) => {
+      <div className='grid grid-cols-[repeat(auto-fit,_minmax(258px,_1fr))] gap-6'>
+        {dapps.map((dapp) => {
           return (
-            <div className='col-span-12 md:col-span-6 lg:col-span-4' key={index}>
-              <DappCell addFavorite={addFavorite} dapp={dapp} isFavorite={isFavorite} removeFavorite={removeFavorite} />
-            </div>
+            <DappCell
+              key={dapp.id}
+              addFavorite={addFavorite}
+              dapp={dapp}
+              isFavorite={isFavorite}
+              removeFavorite={removeFavorite}
+            />
           );
         })}
       </div>

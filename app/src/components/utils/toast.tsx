@@ -18,21 +18,18 @@ export function toastSuccess(message: any, description?: string) {
     description ? (
       <div className='flex flex-col gap-1'>
         <b>{message}</b>
-        {description}
+        <span className='text-tiny'>{description}</span>
       </div>
     ) : (
-      message
-    ),
-    {
-      autoClose: 1000000
-    }
+      <div className='flex items-center min-h-[30px]'>{message}</div>
+    )
   );
 }
 
 export function toastError(error: any) {
-  return toast.error(getMessage(error));
+  return toast.error(<div className='flex items-center min-h-[30px]'>{getMessage(error)}</div>);
 }
 
 export function toastWarn(error: any) {
-  return toast.warn(getMessage(error));
+  return toast.warn(<div className='flex items-center min-h-[30px]'>{getMessage(error)}</div>);
 }

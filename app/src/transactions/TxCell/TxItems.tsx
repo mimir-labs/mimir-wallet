@@ -10,10 +10,11 @@ import { type AccountData, type Transaction, TransactionStatus, TransactionType 
 import { useToggle } from '@/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
+import moment from 'moment';
 import React, { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Link } from '@mimir-wallet/ui';
+import { Button, Link, Tooltip } from '@mimir-wallet/ui';
 
 import Progress from '../Progress';
 import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
@@ -37,7 +38,11 @@ function TimeCell({ time }: { time?: number }) {
 
   time ||= now;
 
-  return now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`;
+  return (
+    <Tooltip content={moment(time).format()}>
+      {now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`}
+    </Tooltip>
+  );
 }
 
 function ActionsCell({ withDetails, detailOpen }: { withDetails?: boolean; detailOpen: boolean }) {

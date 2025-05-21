@@ -66,7 +66,7 @@ function BatchButton() {
           badge: 'bottom-0.5 right-1 translate-x-0 -translate-y-0 pointer-events-none'
         }}
       >
-        <Tooltip content='Batch' closeDelay={0}>
+        <Tooltip content='Batch Transactions' closeDelay={0}>
           <Button
             isIconOnly
             ref={anchorEl}

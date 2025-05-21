@@ -54,7 +54,7 @@ function TemplateList({
       <Divider />
 
       <div className='space-y-2.5 h-full overflow-auto scrollbar-hide'>
-        <p>Saved</p>
+        {template.length > 0 && <p>Saved</p>}
         {template.length > 0 ? (
           template.map(({ name, call }, index) => (
             <TemplateItem

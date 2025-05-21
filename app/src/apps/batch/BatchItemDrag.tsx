@@ -15,7 +15,7 @@ import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Checkbox } from '@mimir-wallet/ui';
+import { Button, Checkbox, Tooltip } from '@mimir-wallet/ui';
 
 export type Props = BatchTxItem & {
   from: string;
@@ -87,12 +87,16 @@ function BatchItemDrag({
 
         <div className='col-span-1 flex justify-between items-center'>
           <div className='flex items-center gap-1'>
-            <Button isIconOnly variant='light' onPress={onCopy} size='sm' color='primary'>
-              <IconCopy style={{ width: 14, height: 14 }} />
-            </Button>
-            <Button isIconOnly variant='light' onPress={onDelete} size='sm' color='danger'>
-              <IconDelete style={{ width: 16, height: 16 }} />
-            </Button>
+            <Tooltip content='Copy'>
+              <Button isIconOnly variant='light' onPress={onCopy} size='sm' color='primary'>
+                <IconCopy style={{ width: 14, height: 14 }} />
+              </Button>
+            </Tooltip>
+            <Tooltip content='Delete'>
+              <Button isIconOnly variant='light' onPress={onDelete} size='sm' color='danger'>
+                <IconDelete style={{ width: 16, height: 16 }} />
+              </Button>
+            </Tooltip>
           </div>
           <Button
             isIconOnly

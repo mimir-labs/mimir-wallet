@@ -46,6 +46,7 @@
     "zustand": ">=5"
   },
   "dependencies": {
+    "@acala-network/chopsticks-core": "^1.0.1",
     "@acala-network/types": "^6.2.0",
     "@polkadot/api": "^15.9.2",
     "@polkadot/api-derive": "^15.9.2",
@@ -55,7 +56,8 @@
     "@polkadot/ui-shared": "^3.12.2",
     "@polkadot/util": "^13.4.4",
     "@polkadot/util-crypto": "^13.4.4",
-    "idb": "^8.0.2"
+    "idb": "^8.0.2",
+    "jsondiffpatch": "^0.6.0"
   },
   "devDependencies": {
     "@mimir-wallet/service": "workspace:^",

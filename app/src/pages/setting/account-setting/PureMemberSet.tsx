@@ -3,13 +3,12 @@
 
 import type { PureAccountData } from '@/hooks/types';
 
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { usePendingTransactions } from '@/hooks/useTransactions';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Box, Paper, Tab, Typography } from '@mui/material';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 
 import MemberSet from './MemberSet';
 
@@ -17,7 +16,6 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
   const { network } = useApi();
   const multisigDelegatees = account.delegatees.filter((item) => item.type === 'multisig');
   const [txs] = usePendingTransactions(network, account.address);
-  const [tab, setTab] = useState('0');
   const navigate = useNavigate();
 
   if (multisigDelegatees.length === 0) {
@@ -25,45 +23,49 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
   }
 
   return (
-    <Box>
-      <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
+    <div>
+      <h6 className='inline-flex items-center gap-1 text-small text-foreground/50 mb-2.5'>
         Multisig Information
-      </Typography>
-      <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
+        <Tooltip
+          closeDelay={0}
+          classNames={{ content: 'max-w-[300px]' }}
+          content='For Pure Proxy, each controllable multisig account is listed as a member set.'
+        >
+          <IconQuestion className='text-primary' />
+        </Tooltip>
+      </h6>
+      <div className='p-4 sm:p-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
         {txs.length > 0 && (
-          <Box
-            color='primary.main'
+          <div
+            className='text-primary cursor-pointer mb-5 font-bold'
             onClick={() => {
               navigate('/transactions');
             }}
-            sx={{ cursor: 'pointer', marginBottom: 2, fontWeight: 700 }}
           >
             Please process {txs.length} Pending Transaction first
-          </Box>
+          </div>
         )}
 
         {multisigDelegatees.length > 1 ? (
           <>
-            <TabContext value={tab}>
-              <Box>
-                <TabList onChange={(_, value) => setTab(value)} variant='scrollable' scrollButtons='auto'>
-                  {multisigDelegatees.map((_, index) => (
-                    <Tab sx={{ padding: 1 }} label={`Members Set${index + 1}`} value={String(index)} key={index} />
-                  ))}
-                </TabList>
-              </Box>
+            <Tabs
+              className='mb-2.5'
+              classNames={{ tabList: 'p-0 rounded-none', tab: 'px-2 h-10', cursor: 'w-full' }}
+              variant='underlined'
+              color='primary'
+            >
               {multisigDelegatees.map((item, index) => (
-                <TabPanel key={index} value={String(index)} sx={{ padding: 0, marginTop: 2 }}>
+                <Tab title={`Members Set${index + 1}`} value={String(index)} key={index}>
                   <MemberSet account={item} pureAccount={account} disabled={!!txs.length} />
-                </TabPanel>
+                </Tab>
               ))}
-            </TabContext>
+            </Tabs>
           </>
         ) : (
           <MemberSet account={multisigDelegatees[0]} pureAccount={account} disabled={!!txs.length} />
         )}
-      </Paper>
-    </Box>
+      </div>
+    </div>
   );
 }
 

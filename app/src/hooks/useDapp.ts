@@ -9,7 +9,6 @@ import { useLocalStore } from '@mimir-wallet/service';
 
 interface UseDapps {
   dapps: DappOption[];
-  favorites: DappOption[];
   isFavorite: (id: number) => boolean;
   addFavorite: (id: number) => void;
   removeFavorite: (id: number) => void;
@@ -41,10 +40,12 @@ export function useDapp(website?: string | null): DappOption | undefined {
 export function useDapps(): UseDapps {
   const [favoriteIds, setFavoriteIds] = useLocalStore<number[]>(FAVORITE_DAPP_KEY, []);
 
-  const validDapps = useMemo(() => dapps.filter((item) => !item.url.startsWith('mimir://internal')), []);
-  const favorites = useMemo(
-    () => validDapps.filter((item) => favoriteIds.includes(item.id)),
-    [validDapps, favoriteIds]
+  const validDapps = useMemo(
+    () =>
+      dapps
+        .filter((item) => !item.url.startsWith('mimir://internal'))
+        .sort((a, b) => favoriteIds.indexOf(b.id) - favoriteIds.indexOf(a.id)),
+    [favoriteIds]
   );
 
   const addFavorite = useCallback(
@@ -66,11 +67,10 @@ export function useDapps(): UseDapps {
   return useMemo(
     () => ({
       dapps: validDapps,
-      favorites,
       addFavorite,
       removeFavorite,
       isFavorite
     }),
-    [addFavorite, favorites, isFavorite, removeFavorite, validDapps]
+    [addFavorite, isFavorite, removeFavorite, validDapps]
   );
 }

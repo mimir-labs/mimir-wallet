@@ -8,11 +8,11 @@ import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { AppName, Bytes, Hash } from '@/components';
 import { events } from '@/events';
 import { useToggle } from '@/hooks/useToggle';
-import { Box, Button, Divider, Stack, SvgIcon } from '@mui/material';
 import moment from 'moment';
 import React from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import Target from './Target';
 
@@ -41,7 +41,7 @@ function Extrinsic({
 
   return (
     <>
-      <Stack flex='1' spacing={1}>
+      <div className='flex-1 space-y-2.5'>
         <Target address={transaction.address} call={call} />
 
         <Divider />
@@ -65,12 +65,9 @@ function Extrinsic({
           />
         )}
 
-        <Box
-          sx={{ fontWeight: 700, color: 'primary.main', cursor: 'pointer', textDecoration: 'none' }}
-          onClick={toggleOpen}
-        >
+        <div className='font-bold text-primary cursor-pointer no-underline' onClick={toggleOpen}>
           {isOpen ? 'Hide' : 'View'} Details
-        </Box>
+        </div>
 
         {isOpen && (
           <>
@@ -79,20 +76,20 @@ function Extrinsic({
               <Item
                 title='Call Data'
                 content={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <div className='flex items-center gap-[5px]'>
                     <Bytes value={txCallHex} />
-                    <Button
-                      variant='outlined'
-                      size='small'
-                      endIcon={
-                        <SvgIcon sx={{ fontSize: '0.75rem !important' }} inheritViewBox component={IconTemplate} />
-                      }
-                      sx={{ paddingX: 1, paddingY: 0.3, fontSize: '0.75rem' }}
-                      onClick={() => events.emit('template_add', network, txCallHex)}
-                    >
-                      + Template
-                    </Button>
-                  </Box>
+                    <Tooltip content='Add to Template' color='foreground'>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        endContent={<IconTemplate className='w-3.5 h-3.5' />}
+                        className='px-2.5 h-5 text-tiny'
+                        onPress={() => events.emit('template_add', network, txCallHex)}
+                      >
+                        + Template
+                      </Button>
+                    </Tooltip>
+                  </div>
                 }
               />
             )}
@@ -109,7 +106,7 @@ function Extrinsic({
             )}
           </>
         )}
-      </Stack>
+      </div>
     </>
   );
 }

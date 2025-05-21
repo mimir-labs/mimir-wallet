@@ -2,12 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'react-toastify/ReactToastify.css';
+import '@xyflow/react/dist/style.css';
 import './style.css';
 import '@mimir-wallet/polkadot-core/augment';
 
 import type {} from '@acala-network/types';
 import type {} from '@polkadot/api-augment';
 
+import {
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip
+} from 'chart.js';
 import moment from 'moment';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
@@ -25,6 +38,20 @@ import { upgradeAddresBook } from './upgrade';
 // Set default date-time format for the entire application
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
 
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement
+);
 // Create React root container for application mounting
 const root = createRoot(document.getElementById('root') as HTMLElement);
 

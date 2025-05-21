@@ -1,30 +1,44 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TransferToken } from './types';
+
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { useInputNumber } from '@/hooks/useInputNumber';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useToggle } from 'react-use';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Spinner } from '@mimir-wallet/ui';
+import { Button, Spinner } from '@mimir-wallet/ui';
 
-import Transfer from './Transfer';
+import TransferAction from './TransferAction';
+import TransferContent from './TransferContent';
 
 function PageTransfer() {
   const selected = useSelectedAccount();
+  const navigate = useNavigate();
   const [fromParam] = useQueryParam<string>('from');
   const [assetId] = useQueryParam<string>('assetId');
   const [assetNetwork] = useQueryParam<string>('asset_network');
+  const [toParam] = useQueryParam<string>('to');
+
   const [sending, setSending] = useState<string>(fromParam || selected || '');
-  const { meta } = useAddressMeta(sending);
+  const [recipient, setRecipient] = useState<string>(toParam || '');
   const supportedNetworks = useAddressSupportedNetworks(sending);
   const [network, setNetwork] = useInputNetwork(
     assetNetwork,
     supportedNetworks?.map((item) => item.key)
   );
+  const [keepAlive, toggleKeepAlive] = useToggle(true);
+  const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
+  const [token, setToken] = useState<TransferToken>();
+
+  const { meta } = useAddressMeta(sending);
 
   return (
     <SubApiRoot
@@ -36,14 +50,44 @@ function PageTransfer() {
         </div>
       )}
     >
-      <Transfer
-        isPure={!!meta.isPure}
-        sending={sending}
-        setSending={setSending}
-        defaultAssetId={assetId}
-        network={network}
-        setNetwork={setNetwork}
-      />
+      <div className='w-full max-w-[500px] mx-auto p-4 sm:p-5'>
+        <Button onPress={() => navigate(-1)} variant='ghost'>
+          {'<'} Back
+        </Button>
+        <div className='p-4 sm:p-6 rounded-large border-1 border-secondary shadow-medium mt-4 bg-content1'>
+          <div className='space-y-5'>
+            <h3>Transfer</h3>
+            <TransferContent
+              amount={amount}
+              isAmountValid={isAmountValid}
+              keepAlive={keepAlive}
+              isPure={!!meta.isPure}
+              token={token}
+              sending={sending}
+              recipient={recipient}
+              defaultAssetId={assetId}
+              network={network}
+              setSending={setSending}
+              setNetwork={setNetwork}
+              setRecipient={setRecipient}
+              setAmount={setAmount}
+              toggleKeepAlive={toggleKeepAlive}
+              setToken={setToken}
+            />
+            <TransferAction
+              network={network}
+              token={token}
+              amount={amount}
+              isAmountValid={isAmountValid}
+              keepAlive={keepAlive}
+              sending={sending}
+              recipient={recipient}
+            >
+              Review
+            </TransferAction>
+          </div>
+        </div>
+      </div>
     </SubApiRoot>
   );
 }

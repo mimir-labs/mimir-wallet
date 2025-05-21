@@ -4,7 +4,6 @@
 import { Empty } from '@/components';
 import { useMultichainPendingTransactions } from '@/hooks/useTransactions';
 import { TxCell } from '@/transactions';
-import { Stack } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { skeleton } from './skeleton';
@@ -40,12 +39,12 @@ function PendingTransactions({
   }
 
   return (
-    <Stack spacing={2}>
+    <div className='space-y-5'>
       {transactions.map((transaction, index) => (
         <TxCell defaultOpen={index === 0} key={transaction.id} address={address} transaction={transaction} />
       ))}
       {showSkeleton ? skeleton : null}
-    </Stack>
+    </div>
   );
 }
 

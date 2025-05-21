@@ -15,7 +15,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'inblock') {
     return [
       () => (
-        <div className='ml-2'>
+        <div className='flex flex-col gap-1'>
           <p className='font-bold'>Waiting</p>
           <p className='text-tiny'>Transaction is inblock</p>
         </div>
@@ -27,7 +27,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'finalized') {
     return [
       () => (
-        <div className='ml-2'>
+        <div className='flex flex-col gap-1'>
           <p className='font-bold'>Success</p>
           <p className='text-tiny'>Transaction finalized</p>
         </div>
@@ -43,7 +43,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'signed') {
     return [
       () => (
-        <div className='ml-2'>
+        <div className='flex flex-col gap-1'>
           <p className='font-bold'>Waiting</p>
           <p className='text-tiny'>Broadcasting transaction</p>
         </div>
@@ -55,7 +55,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'success') {
     return [
       () => (
-        <div className='ml-2'>
+        <div className='flex flex-col gap-1'>
           <p className='font-bold'>Success</p>
           <p className='text-tiny'>{events.message || 'Operation success'}</p>
         </div>
@@ -71,7 +71,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
   if (events.status === 'error') {
     return [
       () => (
-        <div className='ml-2'>
+        <div className='flex flex-col gap-1'>
           <p className='font-bold'>Failed</p>
           <p className='text-tiny'>
             <TxError error={events.error} />
@@ -88,7 +88,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
 
   return [
     () => (
-      <div className='ml-2'>
+      <div className='flex flex-col gap-1'>
         <p className='font-bold'>Waiting</p>
         <p className='text-tiny'>Waiting for sign</p>
       </div>

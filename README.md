@@ -48,7 +48,7 @@ Mimir Wallet is a state-of-the-art multisig wallet solution designed specificall
 - **Technical Excellence**
   - Progressive Web App (PWA)
   - Real-time WebSocket updates
-  - Responsive Material UI design
+  - Responsive UI design
   - TypeScript type safety
   - Modular architecture
 
@@ -107,7 +107,7 @@ yarn preview    # Preview production build locally
 - **Frontend Framework**
   - React 18
   - TypeScript 5
-  - Material UI v6
+  - Hero UI v2
 
 - **Build Tools**
   - Vite

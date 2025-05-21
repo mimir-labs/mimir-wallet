@@ -5,6 +5,7 @@ import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork'
 import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useQueryParam } from '@/hooks/useQueryParams';
+import { useMultiChainStats } from '@/hooks/useQueryStats';
 import { useRef } from 'react';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
@@ -12,16 +13,16 @@ import { Link, Tab, Tabs } from '@mimir-wallet/ui';
 
 import Assets from './Assets';
 import Hero from './Hero';
-// import PendingTx from './PendingTx';
 import Structure from './Structure';
+import TransactionStats from './TransactionStats';
 
 function Dashboard({ address }: { address: string }) {
   const { genesisHash } = useApi();
   const [tab, setTab] = useQueryParam('tab', 'asset', { replace: true });
   const tabsRef = useRef([
     { tab: 'asset', label: 'Asset' },
-    { tab: 'structure', label: 'Structure' }
-    // { tab: 'transaction', label: 'Transaction' }
+    { tab: 'structure', label: 'Structure' },
+    { tab: 'transaction', label: 'Transaction' }
   ]);
   const [totalUsd, changes] = useBalanceTotalUsd(address);
   const supportedNetworks = useAddressSupportedNetworks(address);
@@ -29,6 +30,7 @@ function Dashboard({ address }: { address: string }) {
     undefined,
     supportedNetworks?.map((item) => item.key)
   );
+  const [stats] = useMultiChainStats(address);
 
   return (
     <div className='w-full space-y-5'>
@@ -59,7 +61,7 @@ function Dashboard({ address }: { address: string }) {
                 <Structure address={address} setNetwork={setNetwork} />
               </SubApiRoot>
             )}
-            {/* {tab === 'transaction' && <PendingTx address={address} />} */}
+            {tab === 'transaction' && <TransactionStats chains={Object.keys(stats)} address={address} />}
           </Tab>
         ))}
       </Tabs>

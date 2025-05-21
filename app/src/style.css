@@ -39,5 +39,84 @@
     --toastify-color-warning: #FF8D07;
     --toastify-color-error: #FF5310;
   }
+}
 
+@layer utilities {
+  @keyframes blink-bg {
+    0% {
+      background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
+    }
+    50% {
+      background: hsl(var(--heroui-primary-100));
+    }
+    100% {
+      background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
+    }
+  }
+
+  .animate-blink-bg {
+    animation: blink-bg 1s 3;
+  }
+}
+
+/* custom styles */
+html {
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  -webkit-tap-highlight-color: transparent;
+  tab-size: 4;
+}
+
+body {
+  background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
+  font-size: 0.875rem;
+  line-height: 1.1;
+  color: hsl(var(--heroui-foreground));
+}
+
+html,body,#root {
+  min-height: 100dvh;
+}
+
+ul {
+  padding-left: 0;
+  margin: 0;
+}
+
+.Toastify__toast {
+  border-radius: var(--heroui-radius-large);
+  box-shadow: var(--heroui-box-shadow-large);
+}
+
+.Toastify__toast-body {
+  align-items: start;
+}
+
+.Toastify__toast-body * {
+  user-select: none;
+}
+
+.Toastify__toast-icon {
+  width: 30px;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  background: #fff;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d9d9d9;
+}
+::-webkit-scrollbar-corner {
+  background: #d9d9d9;
 }

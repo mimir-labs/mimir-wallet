@@ -30,7 +30,7 @@ export {
   allEndpoints
 } from './config.js';
 
-export { addressEq, addressToHex, findAction } from './utils.js';
+export * from './utils.js';
 
 export { default as ApiRoot } from './ApiRoot.js';
 export { default as SubApiRoot } from './SubApiRoot.js';

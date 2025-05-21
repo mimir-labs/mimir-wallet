@@ -22,7 +22,7 @@ export async function dryRun(
 
   const result: Result<XcmRuntimeApisDryRunCallDryRunEffects, XcmRuntimeApisDryRunError> = await (api.call.dryRunApi
     .dryRunCall.meta.params.length === 2
-    ? api.call.dryRunApi.dryRunCall(
+    ? (api.call.dryRunApi.dryRunCall as any)(
         {
           system: {
             Signed: address

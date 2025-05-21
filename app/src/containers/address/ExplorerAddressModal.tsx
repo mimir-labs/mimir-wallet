@@ -6,12 +6,14 @@ import SubscanImg from '@/assets/images/subscan.svg';
 import { Address } from '@/components';
 import { useAddressExplorer } from '@/hooks/useAddressExplorer';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
+import { useEffectOnce } from 'react-use';
 
-import { chainLinks, type Network, useNetworks } from '@mimir-wallet/polkadot-core';
+import { chainLinks, type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { Avatar, Divider, Drawer, DrawerBody, DrawerContent, Link, Modal, Tooltip, usePress } from '@mimir-wallet/ui';
 
 function Item({ endpoint, address }: { endpoint: Network; address: string }) {
+  const { ss58Chain } = useApi();
   const { pressProps } = usePress({
     onPress: () => {
       if (endpoint.explorerUrl) {
@@ -33,13 +35,26 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       }
     }
   });
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffectOnce(() => {
+    if (ss58Chain === endpoint.key) {
+      // scroll to the top of the page
+      ref.current?.scrollIntoView?.({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  });
 
   return (
     <div
+      data-selected={ss58Chain === endpoint.key}
+      ref={ref}
       style={{
         background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
       }}
-      className='cursor-pointer p-2 sm:p-2.5 rounded-medium flex items-center gap-1 sm:gap-2'
+      className='cursor-pointer p-2 sm:p-2.5 rounded-medium flex items-center gap-1 sm:gap-2 data-[selected=true]:animate-blink-bg'
       {...pressProps}
     >
       <Avatar

@@ -66,7 +66,6 @@ function Content({
   return (
     <>
       <div className='flex-1 flex flex-col gap-2.5 scrollbar-hide overflow-y-auto'>
-        <p>Next Batch</p>
         <div ref={containerRef} style={{ touchAction: 'pan-y' }}>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={txs.map((item) => item.id)} strategy={verticalListSortingStrategy}>

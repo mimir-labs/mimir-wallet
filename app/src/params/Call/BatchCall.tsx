@@ -7,11 +7,11 @@ import type { CallProps } from '../types';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { ellipsisMixin } from '@/components/utils';
 import { Call as CallComp } from '@/params';
-import { Box, Button, IconButton, Stack, SvgIcon } from '@mui/material';
 import { isArray } from '@polkadot/util';
 import React, { useMemo, useState } from 'react';
 
 import { findAction } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
 
 import CallDisplayDetail from '../CallDisplay/CallDisplayDetail';
 import CallDisplayDetailMinor from '../CallDisplay/CallDisplayDetailMinor';
@@ -49,42 +49,30 @@ function Item({
         <CallDisplayDetailMinor registry={registry} call={call} />
       </div>
       <div className='flex col-span-1 items-center justify-end'>
-        <IconButton
-          size='small'
-          sx={{ justifySelf: 'end', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', fontSize: '0.75rem' }}
+        <Button
+          isIconOnly
+          size='sm'
+          data-state={isOpen ? 'open' : 'closed'}
+          className='justify-self-end rotate-0 data-[state=open]:rotate-180 text-tiny transition-transform'
           color='primary'
+          variant='light'
+          onPress={(e) => e.continuePropagation()}
         >
-          <SvgIcon inheritViewBox component={ArrowDown} />
-        </IconButton>
+          <ArrowDown className='w-4 h-4' />
+        </Button>
       </div>
     </div>
   );
 
   return (
-    <Box
-      sx={{
-        borderRadius: 1,
-        overflow: 'hidden',
-        bgcolor: 'secondary.main'
-      }}
-    >
+    <div className='rounded-medium overflow-hidden bg-secondary'>
       {Top}
       {isOpen && (
-        <Stack
-          spacing={{ sm: 1.2, xs: 0.8 }}
-          sx={{
-            marginBottom: { sm: 1.2, xs: 0.8 },
-            marginLeft: { sm: 1.2, xs: 0.8 },
-            marginRight: { sm: 1.2, xs: 0.8 },
-            bgcolor: 'white',
-            borderRadius: 1,
-            padding: { sm: 1.2, xs: 0.8 }
-          }}
-        >
+        <div className='space-y-2 sm:space-y-3 mb-2 sm:mb-3 ml-2 sm:ml-3 mr-2 sm:mr-3 bg-content1 rounded-medium p-2 sm:p-3'>
           <CallComp from={from} registry={registry} call={call} jsonFallback={jsonFallback} />
-        </Stack>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
 
@@ -98,23 +86,15 @@ function BatchCall({ from, registry, call, jsonFallback, ...props }: CallProps) 
   }
 
   return (
-    <Stack spacing={1} width='100%'>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          fontWeight: 700,
-          fontSize: '0.875rem'
-        }}
-      >
+    <div className='w-full space-y-2.5'>
+      <div className='flex items-center justify-between font-bold text-small'>
         Actions
-        <Box>
+        <div>
           <Button
             color='primary'
-            size='small'
-            variant='text'
-            onClick={() =>
+            size='sm'
+            variant='light'
+            onPress={() =>
               setOpen(
                 Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
                   result[index] = true;
@@ -128,9 +108,9 @@ function BatchCall({ from, registry, call, jsonFallback, ...props }: CallProps) 
           </Button>
           <Button
             color='primary'
-            size='small'
-            variant='text'
-            onClick={() =>
+            size='sm'
+            variant='light'
+            onPress={() =>
               setOpen(
                 Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
                   result[index] = false;
@@ -142,8 +122,8 @@ function BatchCall({ from, registry, call, jsonFallback, ...props }: CallProps) 
           >
             Collapse all
           </Button>
-        </Box>
-      </Box>
+        </div>
+      </div>
       {calls.map((call, index) => (
         <Item
           from={from}
@@ -161,7 +141,7 @@ function BatchCall({ from, registry, call, jsonFallback, ...props }: CallProps) 
           }
         />
       ))}
-    </Stack>
+    </div>
   );
 }
 

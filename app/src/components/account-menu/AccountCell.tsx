@@ -5,10 +5,13 @@ import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconMore from '@/assets/svg/icon-more.svg?react';
 import { useBalanceTotalUsd } from '@/hooks/useBalances';
+import { usePinAccounts } from '@/hooks/usePinAccounts';
+import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
+import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { Button, Link, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
 
 import AddressCell from '../AddressCell';
@@ -32,6 +35,14 @@ function AccountCell({
   const [totalUsd] = useBalanceTotalUsd(value);
   const source = useAccountSource(value);
   const formatUsd = formatDisplay(totalUsd.toString());
+  const { pinnedAccounts, addPinnedAccount, removePinnedAccount } = usePinAccounts();
+
+  const [transactionCounts] = useMultiChainTransactionCounts(value);
+  const totalCounts = useMemo(
+    () => Object.values(transactionCounts).reduce((acc, curr) => acc + curr.pending, 0),
+    [transactionCounts]
+  );
+  const isPinned = useMemo(() => pinnedAccounts.includes(addressToHex(value)), [pinnedAccounts, value]);
 
   const handleClick = useCallback(() => {
     onSelect?.(value);
@@ -47,7 +58,22 @@ function AccountCell({
       data-selected={selected}
       className='justify-between px-1 sm:px-2.5 py-1 text-foreground h-[50px] rounded-medium data-[selected=true]:bg-secondary'
     >
-      <AddressCell shorten showType value={value} withCopy withAddressBook />
+      <AddressCell
+        withIconBorder
+        shorten
+        showType
+        value={value}
+        withCopy
+        withAddressBook
+        addressCopyDisabled
+        nameEndContent={
+          totalCounts ? (
+            <div className='bg-[#FF8C00] text-[10px] w-4 h-4 rounded-full text-white flex items-center justify-center'>
+              {totalCounts}
+            </div>
+          ) : null
+        }
+      />
       <div className='text-tiny font-bold'>
         $ {formatUsd[0]}
         {formatUsd[1] ? `.${formatUsd[1]}` : ''}
@@ -97,6 +123,23 @@ function AccountCell({
                   href={`/account-setting?address=${value}`}
                 >
                   Setting
+                </Button>,
+                <Button
+                  key='pin-0'
+                  disableRipple
+                  radius='sm'
+                  variant='light'
+                  color='primary'
+                  className='justify-start text-foreground'
+                  onPress={() => {
+                    if (isPinned) {
+                      removePinnedAccount(value);
+                    } else {
+                      addPinnedAccount(value);
+                    }
+                  }}
+                >
+                  {isPinned ? 'Unpin' : 'Pin'}
                 </Button>
               ]}
 

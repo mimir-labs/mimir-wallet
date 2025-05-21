@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX } from '@/constants';
-import { encodeAddress, isAddress } from '@polkadot/util-crypto';
+import { encodeAddress } from '@polkadot/util-crypto';
 
-import { addressToHex, allEndpoints, CURRENT_NETWORK_KEY } from '@mimir-wallet/polkadot-core';
+import { addressToHex, allEndpoints, CURRENT_NETWORK_KEY, isPolkadotAddress } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 export function initMimir(omni: boolean) {
@@ -35,9 +35,9 @@ export function initMimir(omni: boolean) {
     ? (store.get(CURRENT_ADDRESS_HEX_KEY) as string)
     : (store.get(`${CURRENT_ADDRESS_PREFIX}${network}`) as string);
 
-  if (urlAddress && isAddress(urlAddress)) {
+  if (urlAddress && isPolkadotAddress(urlAddress)) {
     address = encodeAddress(urlAddress, chain.ss58Format);
-  } else if (localAddress && isAddress(localAddress)) {
+  } else if (localAddress && isPolkadotAddress(localAddress)) {
     address = encodeAddress(localAddress, chain.ss58Format);
   }
 

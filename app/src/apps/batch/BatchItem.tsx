@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BatchTxItem } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
@@ -11,15 +10,6 @@ import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
-
-export type BatchItemType = BatchTxItem & {
-  from: string;
-  index: number;
-  selected: (number | string)[];
-  onSelected: (state: boolean) => void;
-  onDelete: () => void;
-  onCopy: () => void;
-};
 
 interface Props {
   children: React.ReactNode;

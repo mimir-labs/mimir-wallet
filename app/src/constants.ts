@@ -37,6 +37,8 @@ export const BATCH_TX_PREFIX = 'batch_tx:';
 export const BATCH_TX_V2_PREFIX = 'batch_tx_v2:';
 export const TEMPLATE_PREFIX = 'template:';
 
-export const OMNI_CHAIN_UPGRADE_TIP_KEY = 'omni_chain_upgrade_tip';
+export const NEW_FEATURE_TIP_KEY = 'new_feature_tip';
 
 export const WALLET_CONNECT_PROJECT_ID = 'db2a617b03addd5e1e485d0a677c1ef4';
+
+export const PINNED_ACCOUNTS_KEY = 'pinned_accounts';

@@ -51,7 +51,7 @@ function Extrinsic({
   }, [api.registry, callData]);
 
   return (
-    <div className='w-full max-w-[500px] mx-auto mt-3 p-5 rounded-large bg-content1 shadow-medium'>
+    <div className='w-full max-w-[500px] mx-auto mt-3 p-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
       <div className='space-y-5'>
         <h3>Submit Extrinsic</h3>
 

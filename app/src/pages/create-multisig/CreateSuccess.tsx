@@ -3,7 +3,7 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
-import { AddressCell, CongratsAnimation } from '@/components';
+import { AddressCell } from '@/components';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, Divider, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
@@ -24,12 +24,15 @@ function CreateSuccess({ isOpen, onClose, address }: Props) {
     <Modal size='md' isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         <ModalBody className='flex flex-col items-center gap-5 py-10'>
-          <CongratsAnimation />
+          <div className='bg-primary rounded-[30px] flex items-center justify-center w-[120px] h-[120px]'>
+            <img src='/images/congrats.png' className='w-20' />
+          </div>
+
           <h4 className='font-extrabold text-xl'>Your Account was successfully created!</h4>
 
           <Divider />
 
-          <div className='flex self-stretch items-center gap-2.5'>
+          <div className='flex self-stretch items-center gap-2.5 bg-secondary rounded-medium p-2.5'>
             <div className='w-[8px] h-[8px] rounded-full bg-success' />
             <AddressCell withCopy shorten={false} value={address} />
           </div>

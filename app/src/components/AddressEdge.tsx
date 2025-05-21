@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import IconClock from '@/assets/svg/icon-clock.svg?react';
+import { BaseEdge, type Edge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath } from '@xyflow/react';
 import React from 'react';
-import { BaseEdge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath } from 'reactflow';
 
 function AddressEdge({
   id,
@@ -14,11 +14,13 @@ function AddressEdge({
   targetY,
   targetPosition,
   data
-}: EdgeProps<{
-  tips?: { label?: string; delay?: number }[];
-  color?: string;
-}>) {
-  const [edgePath, labelX, labelY] = getSmoothStepPath({
+}: EdgeProps<
+  Edge<{
+    tips?: { label?: string; delay?: number }[];
+    color?: string;
+  }>
+>) {
+  const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
@@ -38,7 +40,7 @@ function AddressEdge({
             className='flex flex-col gap-[2px] p-[2px] rounded-medium min-w-[40px] text-[10px] font-bold'
             style={{
               position: 'absolute',
-              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+              transform: `translate(-50%, -50%) translate(${targetX + 60}px, ${targetY}px)`,
               background: '#ffcc00',
               height: data.tips.length * 18 + 2,
               backgroundColor: data.color,

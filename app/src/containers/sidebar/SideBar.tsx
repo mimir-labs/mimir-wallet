@@ -45,9 +45,11 @@ function NavLink({
   label,
   onClick,
   to,
+  extraNavs = [],
   endContent
 }: {
   to: string;
+  extraNavs?: string[];
   Icon: React.ComponentType<any>;
   label: React.ReactNode;
   endContent?: React.ReactNode;
@@ -55,11 +57,15 @@ function NavLink({
 }) {
   const location = useLocation();
 
-  const matched = useMemo(() => matchPath(to, location.pathname), [location.pathname, to]);
+  const matched = useMemo(
+    () =>
+      !!matchPath(to, location.pathname) || extraNavs.map((nav) => !!matchPath(nav, location.pathname)).some(Boolean),
+    [extraNavs, location.pathname, to]
+  );
 
   return (
     <Button
-      data-active={!!matched}
+      data-active={matched}
       as={Link}
       fullWidth
       onPress={onClick}
@@ -67,11 +73,11 @@ function NavLink({
       radius='md'
       startContent={<Icon className='w-5 h-5' />}
       className='h-[50px] justify-start gap-x-2.5 items-center px-[15px] py-[20px] text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary'
-      href={to}
+      href={matched ? undefined : to}
       variant='light'
     >
       <p
-        data-active={!!matched}
+        data-active={matched}
         className='text-medium font-semibold text-foreground/50 data-[active=true]:text-foreground'
       >
         {label}
@@ -106,15 +112,18 @@ function TopContent() {
     <>
       {isConnected ? (
         selected ? (
-          <div className='p-2.5 space-y-2.5 border-1 border-secondary rounded-medium'>
-            <div className='flex items-center gap-2.5 cursor-pointer w-full' onClick={handleAccountOpen}>
-              <AddressCell value={selected} />
+          <div className='border-1 border-secondary rounded-medium'>
+            <div
+              className='flex items-center gap-2.5 p-2.5  cursor-pointer w-full rounded-tl-medium rounded-tr-medium bg-transparent hover:bg-secondary transition-background'
+              onClick={handleAccountOpen}
+            >
+              <AddressCell value={selected} addressCopyDisabled />
               <ArrowRight className='text-primary' />
             </div>
 
             <Divider />
 
-            <p className='text-tiny text-foreground/65'>
+            <p className='p-2.5 text-tiny text-foreground/65'>
               $ {formatUsd[0]}
               {formatUsd[1] ? `.${formatUsd[1]}` : ''}
               {formatUsd[2] || ''}
@@ -122,7 +131,7 @@ function TopContent() {
 
             <Divider />
 
-            <div className='flex items-center'>
+            <div className='flex items-center p-2.5'>
               <Tooltip content='QR Code' closeDelay={0}>
                 <Button
                   isIconOnly
@@ -220,7 +229,7 @@ function WalletContent() {
 
   return (
     <div
-      className='grid grid-cols-5 gap-2.5 cursor-pointer w-full bg-content1'
+      className='grid grid-cols-5 gap-2.5 cursor-pointer w-full pt-2.5 bg-content1 border-t-1 border-t-secondary'
       onClick={() => {
         openWallet();
         closeSidebar();
@@ -282,7 +291,13 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
         to='/transactions'
       />
       <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
-      <NavLink Icon={IconSetting} label='Setting' onClick={closeSidebar} to='/setting' />
+      <NavLink
+        Icon={IconSetting}
+        label='Setting'
+        onClick={closeSidebar}
+        to='/setting'
+        extraNavs={['/account-setting']}
+      />
     </div>
   );
 
@@ -302,7 +317,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
               <h3>Menu</h3>
             </DrawerHeader>
             <DrawerBody className='scrollbar-hide py-4 px-4'>{element}</DrawerBody>
-            <DrawerFooter className='px-4'>
+            <DrawerFooter className='px-4 pt-0'>
               <WalletContent />
             </DrawerFooter>
           </DrawerContent>
@@ -317,7 +332,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
           }}
         >
           <div className='flex-1 overflow-y-auto px-4 py-5'>{element}</div>
-          <div className='px-5 py-2.5'>
+          <div className='px-5 pb-2.5'>
             <WalletContent />
           </div>
 

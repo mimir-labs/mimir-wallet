@@ -4,6 +4,7 @@
 import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@/constants';
 
+import { addressEq } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { useWallet } from './useWallet';
@@ -25,7 +26,16 @@ export async function connectWallet(name: string) {
       // Persist connected wallets to storage
       store.set(CONNECTED_WALLETS_KEY, newValue);
 
-      return { ...state, connectedWallets: newValue, walletAccounts: [...state.walletAccounts, ...walletAccounts] };
+      // Deduplicate wallet accounts by address
+      const uniqueWalletAccounts = [...state.walletAccounts, ...walletAccounts].filter(
+        (account, index, self) => index === self.findIndex((t) => addressEq(t.address, account.address))
+      );
+
+      return {
+        ...state,
+        connectedWallets: newValue,
+        walletAccounts: uniqueWalletAccounts
+      };
     });
   }
 }

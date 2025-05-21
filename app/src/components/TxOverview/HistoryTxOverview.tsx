@@ -10,7 +10,6 @@ import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
-import React, { createContext, useEffect } from 'react';
 import {
   Controls,
   type Edge,
@@ -21,7 +20,8 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState
-} from 'reactflow';
+} from '@xyflow/react';
+import React, { createContext, useEffect } from 'react';
 
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
@@ -41,9 +41,14 @@ type NodeData = {
   transaction: Transaction;
 };
 
+type EdgeData = {
+  color: string;
+  tips: { label: string; delay?: number }[];
+};
+
 const context = createContext<State>({} as State);
 
-const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
+const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
   const { transaction } = data;
 
   const icon =
@@ -69,7 +74,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
         />
       )}
       <div>
-        <div className='w-[220px] flex items-center justify-between px-2.5 py-[3px] bg-content1 rounded-medium shadow-medium'>
+        <div className='w-[220px] flex items-center justify-between px-2.5 py-[3px] bg-content1 rounded-medium border-1 border-divider-300'>
           <AddressCell value={data.transaction.address} withCopy withAddressBook />
           {icon}
         </div>
@@ -95,7 +100,7 @@ const edgeTypes = {
   AddressEdge
 };
 
-function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], edges: Edge[] = []) {
+function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], edges: Edge<EdgeData>[] = []) {
   function createNode(id: string, transaction: Transaction, isTop: boolean): Node<NodeData> {
     return {
       id,
@@ -116,8 +121,8 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
     const exists = edges.find((edge) => edge.id === id);
 
     if (exists) {
-      if (label && !exists.data.tips.some((tip: any) => tip.label === label && tip.delay === delay)) {
-        exists.data.tips.push({ label, delay });
+      if (label && !exists.data?.tips.some((tip) => tip.label === label && tip.delay === delay)) {
+        exists.data?.tips.push({ label, delay });
       }
     } else {
       edges.push({
@@ -168,12 +173,12 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
 }
 
 function TxOverview({ transaction, ...props }: Props) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>([]);
 
   useEffect(() => {
     const initialNodes: Node<NodeData>[] = [];
-    const initialEdges: Edge[] = [];
+    const initialEdges: Edge<EdgeData>[] = [];
 
     makeNodes(transaction, initialNodes, initialEdges);
     const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 270, 70);
@@ -201,7 +206,7 @@ function TxOverview({ transaction, ...props }: Props) {
         onNodesChange={onNodesChange}
         zoomOnScroll
       >
-        <Controls />
+        <Controls showInteractive={false} />
       </ReactFlow>
     </context.Provider>
   );

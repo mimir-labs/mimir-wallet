@@ -4,9 +4,9 @@
 import type { Transaction } from '@/hooks/types';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 import { TxCell, TxProgress } from '@/transactions';
-import { Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useParams } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
@@ -23,13 +23,13 @@ function SmPage({ transaction }: { transaction: Transaction }) {
   }
 
   return (
-    <Stack spacing={1.5}>
+    <div className='space-y-4'>
       <Summary transaction={transaction} />
 
       <Details transaction={transaction} />
 
       <TxProgress account={account} transaction={transaction} className='rounded-large bg-content1' />
-    </Stack>
+    </div>
   );
 }
 
@@ -37,8 +37,7 @@ function PageTransactionDetails() {
   const { network } = useApi();
   const { id } = useParams<{ id: string }>();
   const [transaction, isFetched, isFetching] = useTransactionDetail(network, id);
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
+  const upSm = useMediaQuery('sm');
 
   if (isFetching && !isFetched) {
     return <Spinner size='lg' variant='wave' />;
@@ -48,7 +47,7 @@ function PageTransactionDetails() {
     return null;
   }
 
-  if (downSm) {
+  if (!upSm) {
     return <SmPage transaction={transaction} />;
   }
 

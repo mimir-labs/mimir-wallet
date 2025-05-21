@@ -19,6 +19,7 @@ interface UseSelectMultisig {
   setThreshold: React.Dispatch<React.SetStateAction<number>>;
   select: (value: string) => void;
   unselect: (value: string) => void;
+  unselectAll: () => void;
 }
 
 export function useSelectMultisig(): UseSelectMultisig {
@@ -58,6 +59,7 @@ export function useSelectMultisig(): UseSelectMultisig {
     setThreshold,
     hasSoloAccount,
     select,
-    unselect
+    unselect,
+    unselectAll: () => setSignatories([])
   };
 }

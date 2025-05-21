@@ -4,12 +4,12 @@
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { useInput } from '@/hooks/useInput';
 import { AnimatePresence } from 'framer-motion';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
 import { type Endpoint, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, FreeSoloPopover, Listbox, ListboxItem, Spinner } from '@mimir-wallet/ui';
+import { Avatar, FreeSoloPopover, Listbox, ListboxItem, Spinner, usePress } from '@mimir-wallet/ui';
 
 interface Props {
   isIconOnly?: boolean;
@@ -43,6 +43,7 @@ function OmniChainInputNetwork({
   const popoverRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useInput('');
   const [isOpen, toggleOpen] = useToggle(false);
+  const [isFocused, setIsFocused] = useState(false);
   const options = Object.entries(allApis)
     .map(([network, { chain, isApiReady, genesisHash }]) => ({
       genesisHash,
@@ -62,10 +63,14 @@ function OmniChainInputNetwork({
     toggleOpen(false);
   };
 
+  const { pressProps } = usePress({
+    onPress: isOpen ? handleClose : handleOpen
+  });
+
   const element = chain ? (
     <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
       <Avatar alt={chain.name} src={chain.icon} style={{ width: 20, height: 20, background: 'transparent' }}></Avatar>
-      {isIconOnly || isOpen ? null : <p>{chain.name}</p>}
+      {isIconOnly || (isOpen && isFocused) ? null : <p>{chain.name}</p>}
     </div>
   ) : null;
 
@@ -147,18 +152,21 @@ function OmniChainInputNetwork({
             <input
               ref={inputRef}
               className='absolute top-0 right-0 bottom-0 left-0 outline-none border-none pl-9 bg-transparent'
-              style={{ opacity: !isOpen ? 0 : 1 }}
+              style={{ opacity: isFocused && isOpen ? 1 : 0 }}
               value={inputValue}
               placeholder={placeholder}
               onChange={setInputValue}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
               onClick={handleOpen}
             />
           )}
 
           <ArrowDown
-            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2'
+            data-open={isOpen}
+            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2 data-[open=true]:rotate-180 transition-transform duration-150'
             style={{ color: 'inherit' }}
-            onClick={handleOpen}
+            {...pressProps}
           />
         </div>
 

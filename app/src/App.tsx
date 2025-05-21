@@ -119,7 +119,7 @@ function App() {
           },
           {
             // Welcome page for new users
-            element: <BaseContainer auth={false} withSideBar withPadding />,
+            element: <BaseContainer auth={false} withSideBar withPadding={false} hideSideBar hideTopBar />,
             children: [
               {
                 path: '/welcome',

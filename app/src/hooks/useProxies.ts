@@ -1,9 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { isAddress } from '@polkadot/util-crypto';
-
-import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, isPolkadotAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 export function useProxies(address?: string | null) {
@@ -12,7 +10,7 @@ export function useProxies(address?: string | null) {
   const { data, isFetched, isFetching } = useQuery({
     queryHash: `${network}-${address ? addressToHex(address) : '0x'}-proxies`,
     queryKey: [address],
-    enabled: !!address && isAddress(address) && isApiReady,
+    enabled: !!address && isPolkadotAddress(address) && isApiReady,
     queryFn: ({ queryKey: [address] }: { queryKey: [string | null | undefined] }) => {
       if (!address) {
         throw new Error('Address is required');

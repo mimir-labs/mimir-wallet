@@ -4,8 +4,10 @@
 import type { AccountAssetInfo } from '@/hooks/types';
 import type { SortDescriptor } from '@react-types/shared';
 
+import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
+import { StakingApp } from '@/config';
 import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
@@ -117,7 +119,7 @@ function Assets({ address }: { address: string }) {
     <Table
       classNames={{
         wrapper: 'rounded-medium sm:rounded-large p-0 sm:p-3',
-        th: 'bg-transparent text-tiny px-2',
+        th: 'bg-transparent text-tiny px-2 text-foreground/50',
         td: 'text-small px-2',
         loadingWrapper: 'relative h-10 table-cell px-2'
       }}
@@ -148,7 +150,7 @@ function Assets({ address }: { address: string }) {
         isLoading={!done}
         loadingContent={
           <>
-            <Skeleton disableAnimation className='h-10 w-full rounded-md' />
+            <Skeleton disableAnimation className='h-10 w-full rounded-medium' />
             <Spinner size='sm' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
           </>
         }
@@ -244,17 +246,32 @@ function Assets({ address }: { address: string }) {
                   </span>
                 </Tooltip>
               </TableCell>
-              <TableCell className='z-[1] sticky sm:relative right-0  bg-content1' align='right'>
-                <Button
-                  as={Link}
-                  isIconOnly={!upSm}
-                  endContent={upSm ? <IconSend /> : undefined}
-                  href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
-                  variant={upSm ? 'ghost' : 'light'}
-                  size={upSm ? 'sm' : 'md'}
-                >
-                  {upSm ? 'Transfer' : <IconSend className='w-5 h-5' />}
-                </Button>
+              <TableCell className='z-[1] sticky sm:relative right-0  bg-content1'>
+                <div className='inline-flex flex-row-reverse items-center max-w-[180px] gap-0 sm:gap-2.5'>
+                  {isNative && network === 'polkadot' && (
+                    <Button
+                      as={Link}
+                      isIconOnly={!upSm}
+                      endContent={upSm ? <IconAdd className='w-[14px] h-[14px]' /> : undefined}
+                      href={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}
+                      variant={upSm ? 'ghost' : 'light'}
+                      size='sm'
+                    >
+                      {upSm ? 'Staking' : <IconAdd className='w-[14px] h-[14px]' />}
+                    </Button>
+                  )}
+
+                  <Button
+                    as={Link}
+                    isIconOnly={!upSm}
+                    endContent={upSm ? <IconSend className='w-[14px] h-[14px]' /> : undefined}
+                    href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
+                    variant={upSm ? 'ghost' : 'light'}
+                    size='sm'
+                  >
+                    {upSm ? 'Transfer' : <IconSend className='w-[14px] h-[14px]' />}
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           );

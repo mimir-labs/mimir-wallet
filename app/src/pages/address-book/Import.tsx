@@ -4,10 +4,10 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconDownload from '@/assets/svg/icon-download.svg?react';
 import { toastError, toastSuccess } from '@/components/utils';
-import { isAddress } from '@polkadot/util-crypto';
 import { parse } from 'papaparse';
 import { useRef } from 'react';
 
+import { isPolkadotAddress } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 function Import() {
@@ -48,7 +48,7 @@ function Import() {
                   item[header] = row[index];
                 });
 
-                if (item.address && item.name && isAddress(item.address)) {
+                if (item.address && item.name && isPolkadotAddress(item.address)) {
                   return [item.address, item.name];
                 }
 

@@ -3,7 +3,7 @@
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { AddressOverview, InputNetwork } from '@/components';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 
@@ -14,8 +14,7 @@ function Relation({ address, setNetwork }: { address: string; setNetwork: (netwo
   const { network } = useApi();
   const [account] = useQueryAccount(address);
   const ref = useRef<HTMLDivElement>(null);
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
+  const upSm = useMediaQuery('sm');
   const [isOpen, toggleOpen] = useToggle(false);
 
   return (
@@ -30,18 +29,13 @@ function Relation({ address, setNetwork }: { address: string; setNetwork: (netwo
         <div className='z-[1] w-[200px] absolute right-4 top-4 bg-content1'>
           <InputNetwork network={network} setNetwork={setNetwork} />
         </div>
-        <AddressOverview
-          key={account?.address || 'none'}
-          account={account}
-          showControls={!downSm}
-          showMiniMap={!downSm}
-        />
+        <AddressOverview key={account?.address || 'none'} account={account} showControls={upSm} showMiniMap={upSm} />
       </div>
       <Modal size='full' isOpen={isOpen} onClose={toggleOpen}>
         <ModalContent>
           <ModalHeader>Overview</ModalHeader>
           <ModalBody>
-            <div className='w-full h-full'>
+            <div className='w-full h-full bg-secondary'>
               <AddressOverview
                 key={`${account?.address}.${network}`}
                 account={account}

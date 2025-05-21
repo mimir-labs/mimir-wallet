@@ -1,8 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { isAddress } from '@polkadot/util-crypto';
 import { useCallback, useState } from 'react';
+
+import { isPolkadotAddress } from '@mimir-wallet/polkadot-core';
 
 export function useInputAddress(
   defaultAddress?: string
@@ -12,14 +13,14 @@ export function useInputAddress(
 ] {
   const [value, setValue] = useState<[string, boolean]>([
     defaultAddress || '',
-    defaultAddress ? isAddress(defaultAddress) : false
+    defaultAddress ? isPolkadotAddress(defaultAddress) : false
   ]);
 
   const onChange = useCallback((_value: string | React.ChangeEvent<HTMLInputElement>) => {
     if (typeof _value === 'string') {
-      setValue([_value, _value ? isAddress(_value) : true]);
+      setValue([_value, _value ? isPolkadotAddress(_value) : true]);
     } else {
-      setValue([_value.target.value, _value.target.value ? isAddress(_value.target.value) : true]);
+      setValue([_value.target.value, _value.target.value ? isPolkadotAddress(_value.target.value) : true]);
     }
   }, []);
 
