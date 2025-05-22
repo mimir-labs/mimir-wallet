@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.2.0...service-v2.2.1) (2025-05-22)
+
+
+### Miscellaneous Chores
+
+* **service:** Synchronize main group versions
+
 ## [2.2.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.1.0...service-v2.2.0) (2025-05-22)
 
 
