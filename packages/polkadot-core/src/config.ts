@@ -161,13 +161,13 @@ export const polkadotEndpoints: Endpoint[] = [
     name: 'Hydration',
     relayChain: 'polkadot',
     wsUrl: {
-      'Galactic Council': 'wss://rpc.hydradx.cloud',
       IBP1: 'wss://hydration.ibp.network',
       Dwellir: 'wss://hydration-rpc.n.dwellir.com',
+      'Galactic Council': 'wss://rpc.hydradx.cloud',
       Helikon: 'wss://rpc.helikon.io/hydradx',
       IBP2: 'wss://hydration.dotters.network'
     },
-    httpUrl: 'https://rpc.hydradx.cloud',
+    httpUrl: 'https://hydration.ibp.network',
     genesisHash: '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d',
     ss58Format: 63,
     socketUrl: 'wss://hydration-api.mimir.global/',

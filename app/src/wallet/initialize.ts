@@ -7,6 +7,7 @@ import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@/constants';
 import { documentReadyPromise } from '@/utils/document';
 
+import { addressEq } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { useWallet } from './useWallet';
@@ -44,7 +45,9 @@ export async function initializeWallet() {
   // Update store with initialized wallet data
   useWallet.setState({
     isWalletReady: true,
-    walletAccounts: data,
+    walletAccounts: data.filter(
+      (account, index, self) => !self.some((t, i) => i < index && addressEq(t.address, account.address))
+    ),
     wallets: window.injectedWeb3 || {}
   });
 }

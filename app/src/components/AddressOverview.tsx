@@ -169,7 +169,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
             zIndex: 1,
             width: 5,
             height: 18,
-            left: 0,
+            left: 2.5,
             borderRadius: '10px',
             background:
               isPure || isProxied
@@ -190,7 +190,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
             zIndex: 1,
             width: 5,
             height: 18,
-            right: 0,
+            right: 2.5,
             borderRadius: '10px',
             background:
               data.type === 'proxy'
