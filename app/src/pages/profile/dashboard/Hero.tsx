@@ -12,19 +12,17 @@ import IconQrcode from '@/assets/svg/icon-qr.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@/assets/svg/icon-set.svg?react';
 import { Address, AddressName, CopyAddress, Fund, IdentityIcon } from '@/components';
-import { toastSuccess } from '@/components/utils';
 import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
 import { useAddressExplorer } from '@/hooks/useAddressExplorer';
-import { useCopyAddress } from '@/hooks/useCopyAddress';
-import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { formatDisplay } from '@/utils';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Link, Tooltip } from '@mimir-wallet/ui';
 
 function SubsquareLink({ network, address }: { network: string; address: string }) {
@@ -48,15 +46,14 @@ function SubsquareLink({ network, address }: { network: string; address: string 
 }
 
 function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string | number; changes: number }) {
-  const { network, chainSS58 } = useApi();
+  const { network } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [open, toggleOpen] = useToggle(false);
   const [account] = useQueryAccount(address);
   const upSm = useMediaQuery('sm');
   const { open: openQr } = useQrAddress();
   const { open: openExplorer } = useAddressExplorer();
-  const { open: openCopy } = useCopyAddress();
-  const [, copy] = useCopyClipboard();
+  const copyAddress = useCopyAddressToClipboard(address);
 
   const showAddWatchlistButton = useMemo(
     () => !isLocalAccount(address) && !isLocalAddress(address, true),
@@ -147,9 +144,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
             <div
               className='flex items-center gap-1 font-bold text-foreground leading-[1.1]'
               onClick={() => {
-                copy(encodeAddress(address, chainSS58));
-                openCopy(address);
-                toastSuccess('Address copied', encodeAddress(address, chainSS58));
+                copyAddress();
               }}
             >
               <Address value={address} shorten={!upSm} />

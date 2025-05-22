@@ -85,7 +85,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
 
         <div className='text-foreground/50 h-[16px] flex items-center text-tiny whitespace-nowrap'>
           {addressNetworks.map((network) => (
-            <Avatar style={{ marginRight: 4 }} src={network.icon} className='w-3 h-3' />
+            <Avatar key={network.genesisHash} style={{ marginRight: 4 }} src={network.icon} className='w-3 h-3' />
           ))}
           <span>
             <Address shorten value={data.account.address} />

@@ -10,6 +10,7 @@ import { CONNECT_ORIGIN } from '@/constants';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { useAccountSource, useWallet } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
+import { GenericExtrinsic } from '@polkadot/types';
 import React, { useCallback, useState } from 'react';
 
 import { signAndSend, useApi } from '@mimir-wallet/polkadot-core';
@@ -81,8 +82,13 @@ function TxButton({
       if (source) {
         setLoading(true);
 
-        const events = signAndSend(api, api.tx(api.createType('Call', call.toU8a())), address, () =>
-          enableWallet(source, CONNECT_ORIGIN)
+        const events = signAndSend(
+          api,
+          api.tx(
+            api.registry.createType('Call', call instanceof GenericExtrinsic ? call.method.toU8a() : call.toU8a())
+          ),
+          address,
+          () => enableWallet(source, CONNECT_ORIGIN)
         );
 
         events.on('inblock', () => {

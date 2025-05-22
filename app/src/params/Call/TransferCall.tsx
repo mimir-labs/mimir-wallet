@@ -4,28 +4,22 @@
 import type { CallProps } from '../types';
 
 import { Address, AddressName, CopyAddress, FormatBalance, IdentityIcon } from '@/components';
-import { toastSuccess } from '@/components/utils';
 import { useAssetInfo } from '@/hooks/useAssets';
-import { useCopyAddress } from '@/hooks/useCopyAddress';
-import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
 import React from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Skeleton, usePress } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
 
 function AddressDisplay({ reverse, address }: { reverse: boolean; address?: string }) {
-  const { chainSS58 } = useApi();
-  const { open: openCopy } = useCopyAddress();
-  const [, copy] = useCopyClipboard();
+  const copyAddress = useCopyAddressToClipboard(address);
   const { pressProps } = usePress({
     onPress: address
       ? () => {
-          copy(encodeAddress(address, chainSS58));
-          openCopy(address);
-          toastSuccess('Address copied', encodeAddress(address, chainSS58));
+          copyAddress();
         }
       : undefined
   });

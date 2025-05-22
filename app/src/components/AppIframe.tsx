@@ -34,7 +34,6 @@ function AppIframe({ allowedFeaturesList = 'camera', appUrl, iframeRef, onLoad, 
         border: 'none'
       }}
       title={title}
-      onClick={console.log}
     />
   );
 }

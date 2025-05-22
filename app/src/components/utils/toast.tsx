@@ -13,7 +13,7 @@ function getMessage(value: unknown): React.ReactNode {
   return <TxError error={value} />;
 }
 
-export function toastSuccess(message: any, description?: string) {
+export function toastSuccess(message: any, description?: React.ReactNode) {
   return toast.success(
     description ? (
       <div className='flex flex-col gap-1'>

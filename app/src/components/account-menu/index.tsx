@@ -78,7 +78,6 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
     return result;
   }, [pinnedAccounts, hideAccountHex, metas, keywords, chainSS58]);
 
-  console.log(visiblePinnedAccounts);
   const keywordsIsPolkadotAddress = !!keywords && isPolkadotAddress(keywords);
 
   const { pressProps } = usePress({

@@ -63,9 +63,7 @@ function BaseContainer({
       <WalletConsumer />
       <AddAddressBook />
       <OmniChainUpgradeTip />
-
       {hideTopBar ? null : <TopBar />}
-
       {isApiReady && isWalletReady && isMultisigSyned && current && (
         <>
           {hideTopBar ? null : <ToggleAlert address={current} setAlertOpen={setAlertOpen} />}

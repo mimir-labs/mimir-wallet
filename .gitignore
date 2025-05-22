@@ -33,3 +33,6 @@ packages/**/.turbo
 
 # typescript
 *.tsbuildinfo
+
+# for cursor ide
+.cursor

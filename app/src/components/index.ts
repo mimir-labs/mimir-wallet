@@ -24,6 +24,7 @@ export { default as CopyButton } from './CopyButton';
 export { default as DappCell } from './DappCell';
 export { default as EditAddressDialog } from './EditAddressDialog';
 export { default as Empty } from './Empty';
+export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as FormatBalance } from './FormatBalance';
 export { default as Fund } from './Fund';
 export { default as Hash } from './Hash';

@@ -8,16 +8,13 @@ import IconLink from '@/assets/svg/icon-link.svg?react';
 import IconQr from '@/assets/svg/icon-qr.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { AddressCell, AddressRow, CopyAddress, EditAddressDialog } from '@/components';
-import { toastSuccess } from '@/components/utils';
 import { useAddressExplorer } from '@/hooks/useAddressExplorer';
-import { useCopyAddress } from '@/hooks/useCopyAddress';
-import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { useToggle } from '@/hooks/useToggle';
 import React from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import {
   Button,
   Divider,
@@ -83,18 +80,14 @@ function Icons({ address }: { address: string }) {
 }
 
 function AddressItem({ address }: { address: string }) {
-  const { chainSS58 } = useApi();
   const [open, toggleOpen] = useToggle();
   const { meta } = useAddressMeta(address);
   const upSm = useMediaQuery('sm');
   const upMd = useMediaQuery('md');
-  const { open: openCopy } = useCopyAddress();
-  const [, copy] = useCopyClipboard();
+  const copyAddress = useCopyAddressToClipboard(address);
   const { pressProps } = usePress({
     onPress: () => {
-      copy(encodeAddress(address, chainSS58));
-      openCopy(address);
-      toastSuccess('Address copied', encodeAddress(address, chainSS58));
+      copyAddress();
     }
   });
 

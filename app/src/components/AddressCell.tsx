@@ -6,8 +6,7 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
-import { useCopyAddress } from '@/hooks/useCopyAddress';
-import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
@@ -18,7 +17,6 @@ import AddressComp from './Address';
 import AddressName from './AddressName';
 import CopyAddress from './CopyAddress';
 import IdentityIcon from './IdentityIcon';
-import { toastSuccess } from './utils';
 
 interface Props {
   defaultName?: string;
@@ -56,17 +54,14 @@ function AddressCell({
   const { meta: { isMultisig, isProxied, isPure, proxyNetworks, pureCreatedAt } = {} } = useAddressMeta(address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const { networks } = useNetworks();
-  const { open: openCopy } = useCopyAddress();
-  const [, copy] = useCopyClipboard();
+  const copyAddress = useCopyAddressToClipboard(address);
   const { pressProps } = usePress({
     onPressStart: (e) => {
       e.continuePropagation();
     },
     onPress: (e) => {
       e.continuePropagation();
-      openCopy(address);
-      copy(address);
-      toastSuccess('Address copied!', address);
+      copyAddress();
     }
   });
 
@@ -112,7 +107,7 @@ function AddressCell({
 
         <span className='AddressCell-Address text-foreground/50 h-[16px] flex items-center text-tiny whitespace-nowrap'>
           {addressNetworks.map((network) => (
-            <Avatar style={{ marginRight: 4 }} src={network.icon} className='w-3 h-3' />
+            <Avatar key={network.genesisHash} style={{ marginRight: 4 }} src={network.icon} className='w-3 h-3' />
           ))}
           <span {...(addressCopyDisabled ? {} : pressProps)}>
             <AddressComp shorten={shorten} value={address} />

@@ -6,16 +6,13 @@ import type { Circle } from '@polkadot/ui-shared/icons/types';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { walletConfig } from '@/config';
-import { useCopyAddress } from '@/hooks/useCopyAddress';
-import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { polkadotIcon } from '@polkadot/ui-shared';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
 import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { usePress } from '@mimir-wallet/ui';
-
-import { toastSuccess } from './utils';
 
 interface Props {
   className?: string;
@@ -33,13 +30,10 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
   const { chainSS58 } = useApi();
   const address = encodeAddress(value, prefix ?? chainSS58);
   const { meta } = useAddressMeta(value?.toString());
-  const { open: openCopy } = useCopyAddress();
-  const [, copy] = useCopyClipboard();
+  const copyAddress = useCopyAddressToClipboard(address);
   const { pressProps } = usePress({
     onPress: () => {
-      openCopy(address);
-      copy(address);
-      toastSuccess('Address copied!', address);
+      copyAddress();
     }
   });
 
