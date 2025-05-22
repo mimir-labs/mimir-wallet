@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.1.0...ui-v2.2.0) (2025-05-22)
+
+
+### Features
+
+* Improve UI display and user experience ([#218](https://github.com/mimir-labs/mimir-wallet/issues/218)) ([13de26d](https://github.com/mimir-labs/mimir-wallet/commit/13de26d1abeac6ffe94fccfc297a16a35d8262c4))
+
 ## [2.1.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.0.1...ui-v2.1.0) (2025-05-09)
 
 
