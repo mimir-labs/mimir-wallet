@@ -3,16 +3,19 @@
 
 import type { DappOption } from '@/config';
 
+import IconMatrix from '@/assets/images/matrix.svg?react';
+import IconDiscord from '@/assets/svg/icon-discord.svg?react';
+import IconGithub from '@/assets/svg/icon-github.svg?react';
 import IconStar from '@/assets/svg/icon-star.svg?react';
-import { ellipsisLinesMixin } from '@/components/utils';
+import IconWebsite from '@/assets/svg/icon-website.svg?react';
+import IconX from '@/assets/svg/icon-x.svg?react';
 import { useToggle } from '@/hooks/useToggle';
 import React, { createElement, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Drawer, DrawerBody, DrawerContent } from '@mimir-wallet/ui';
+import { Button, Drawer, DrawerBody, DrawerContent, Link, Tooltip, useHover, usePress } from '@mimir-wallet/ui';
 
-import DappDetails from './DappDetails';
 import SupportedChains from './SupportedChains';
 
 interface Props {
@@ -25,7 +28,6 @@ interface Props {
 function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
   const { network } = useApi();
   const navigate = useNavigate();
-  const [detailsOpen, toggleOpen, setDetailsOpen] = useToggle();
   const [isDrawerOpen, toggleDrawerOpen, setDrawerOpen] = useToggle();
   const [element, setElement] = useState<JSX.Element>();
   const _isFavorite = useMemo(() => isFavorite(dapp.id), [dapp.id, isFavorite]);
@@ -37,9 +39,7 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
     }
   }, [_isFavorite, addFavorite, dapp.id, removeFavorite]);
 
-  const openApp = useCallback(() => {
-    setDetailsOpen(false);
-
+  const openDapp = useCallback(() => {
     if (!dapp.isDrawer) {
       const url = dapp.urlSearch?.(network) || dapp.url;
 
@@ -54,12 +54,17 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
         );
       });
     }
-  }, [dapp, network, navigate, setDetailsOpen, setDrawerOpen]);
+  }, [dapp, network, navigate, setDrawerOpen]);
+
+  const { pressProps } = usePress({
+    onPress: openDapp
+  });
+  const { isHovered, hoverProps } = useHover({
+    onHoverChange: () => {}
+  });
 
   return (
-    <>
-      <DappDetails dapp={dapp} onClose={toggleOpen} open={detailsOpen} onOpen={openApp} />
-
+    <div {...hoverProps}>
       {dapp.isDrawer && (
         <Drawer hideCloseButton placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
           <DrawerContent className='max-w-full w-auto py-5'>
@@ -68,38 +73,82 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
         </Drawer>
       )}
 
-      <div className='cursor-pointer block p-5 rounded-large bg-content1 shadow-medium' onClick={openApp}>
-        <div className='space-y-5'>
-          <div>
-            <div className='flex justify-between items-center gap-2'>
-              <h4 className='flex-1 text-lg font-bold'>{dapp.name}</h4>
-              <SupportedChains app={dapp} />
+      <div
+        data-hovered={isHovered}
+        className='relative cursor-pointer p-5 rounded-large bg-content1 border-1 border-secondary shadow-medium aspect-square transition-transform duration-300 data-[hovered=true]:scale-x-[-1]'
+        {...pressProps}
+      >
+        <Tooltip content={_isFavorite ? 'Unpin' : 'Pin'}>
+          <Button
+            data-hovered={isHovered}
+            isIconOnly
+            color='primary'
+            onPress={toggleFavorite}
+            className='z-10 bg-primary/10 absolute top-2.5 right-2.5 data-[hovered=true]:right-auto data-[hovered=true]:left-2.5'
+          >
+            <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
+          </Button>
+        </Tooltip>
+
+        {isHovered ? (
+          <div
+            data-hovered={isHovered}
+            className='flex flex-col justify-center items-center gap-5 h-full data-[hovered=true]:scale-x-[-1]'
+          >
+            <div className='flex items-center gap-2.5'>
+              {dapp.website && (
+                <Button isIconOnly color='secondary' as={Link} href={dapp.website} size='sm' target='_blank'>
+                  <IconWebsite className='w-4 h-4' />
+                </Button>
+              )}
+              {dapp.github && (
+                <Button isIconOnly color='secondary' as={Link} href={dapp.github} size='sm' target='_blank'>
+                  <IconGithub className='w-4 h-4' />
+                </Button>
+              )}
+              {dapp.discord && (
+                <Button isIconOnly color='secondary' as={Link} href={dapp.discord} size='sm' target='_blank'>
+                  <IconDiscord className='w-4 h-4' />
+                </Button>
+              )}
+              {dapp.twitter && (
+                <Button isIconOnly color='secondary' as={Link} href={dapp.twitter} size='sm' target='_blank'>
+                  <IconX className='w-4 h-4' />
+                </Button>
+              )}
+              {dapp.matrix && (
+                <Button isIconOnly color='secondary' as={Link} href={dapp.matrix} size='sm' target='_blank'>
+                  <IconMatrix className='w-4 h-4' />
+                </Button>
+              )}
             </div>
-            <p
-              className='mt-1.5 leading-[14px] h-[42px] text-tiny text-foreground/65 text-ellipsis'
-              style={
-                {
-                  ...ellipsisLinesMixin(3)
-                } as any
-              }
-            >
-              {dapp.description}
-            </p>
+
+            <p className='text-center'>{dapp.description}</p>
+
+            <Button size='lg' fullWidth className='w-[90%]' onPress={openDapp}>
+              Open Dapp
+            </Button>
           </div>
-          <div className='flex items-center gap-2.5'>
-            <div className='flex-1'>
-              <Avatar radius='none' src={dapp.icon} className='w-[32px] h-[32px] bg-transparent' />
+        ) : (
+          <div className='flex flex-col justify-center items-center gap-5 h-full'>
+            <img src={dapp.icon} className='w-[64px] h-[64px] bg-transparent' />
+            <h3 className='text-lg font-bold'>{dapp.name}</h3>
+
+            <div className='flex items-center gap-2.5'>
+              {dapp.tags?.map((tag, index) => (
+                <Button color='secondary' key={index} size='sm'>
+                  {tag}
+                </Button>
+              ))}
             </div>
-            <Button onPress={toggleOpen} variant='ghost'>
-              Details
-            </Button>
-            <Button isIconOnly color='primary' onPress={toggleFavorite} className='bg-primary/10'>
-              <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
-            </Button>
+
+            <div className='flex justify-between items-center gap-2 text-tiny'>
+              <span className='text-foreground/50'>Supported on</span> <SupportedChains app={dapp} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 

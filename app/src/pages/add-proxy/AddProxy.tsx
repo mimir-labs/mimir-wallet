@@ -9,8 +9,8 @@ import type { HexString } from '@polkadot/util/types';
 import type { ProxyArgs } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
-import IconArrow from '@/assets/svg/icon-arrow.svg?react';
-import { Input, InputAddress, InputNetwork } from '@/components';
+import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
+import { Input, InputAddress, InputNetwork, Label } from '@/components';
 import { ONE_DAY, ONE_HOUR } from '@/constants';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useCall } from '@/hooks/useCall';
@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Divider, Select, SelectItem, Switch } from '@mimir-wallet/ui';
+import { Alert, Button, Divider, Select, SelectItem, Switch, Tooltip } from '@mimir-wallet/ui';
 
 import AddProxyButton from './AddProxyButton';
 import ProxyInfo from './ProxyInfo';
@@ -63,9 +63,14 @@ function AddProxy({
   const [proxyType, setProxyType] = useState<string>(proxyTypes?.[0]?.text || 'Any');
   const [name, setName] = useInput('');
   const [advanced, toggleAdvanced] = useToggle(false);
-  const [reviewWindow, setReviewWindow] = useState<number>(0);
   const [custom, setCustom] = useState<string>('');
   const blockInterval = useBlockInterval().toNumber();
+  const reviewWindows = {
+    [(ONE_DAY * 1000) / blockInterval]: '1 Day',
+    [(ONE_DAY * 7 * 1000) / blockInterval]: '1 Week',
+    [-1]: 'Custom'
+  };
+  const [reviewWindow, setReviewWindow] = useState<number>(0);
   const [proxyArgs, setProxyArgs] = useState<ProxyArgs[]>([]);
   const [proxy, setProxy] = useState<string | undefined>(pure ? current : filteredProxy[0]);
   const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(pure ? undefined : api.query.proxy.proxies, [
@@ -99,13 +104,6 @@ function AddProxy({
       ? `${((Number(custom) * blockInterval) / (ONE_DAY * 1000)).toFixed(2)} Days`
       : `${((Number(custom) * blockInterval) / (ONE_HOUR * 1000)).toFixed(2)} Hours`;
 
-  const reviewWindows = {
-    0: 'None',
-    [(ONE_DAY * 1000) / blockInterval]: '1 Day',
-    [(ONE_DAY * 7 * 1000) / blockInterval]: '1 Week',
-    [-1]: 'Custom'
-  };
-
   return (
     <>
       <div className='w-[500px] max-w-full mx-auto my-0'>
@@ -114,36 +112,43 @@ function AddProxy({
             {'<'} Back
           </Button>
         </div>
-        <div className='p-4 sm:p-5 rounded-large mt-2.5 bg-content1 shadow-medium'>
+        <div className='p-4 sm:p-5 rounded-large mt-2.5 bg-content1 border-1 border-secondary shadow-medium'>
           <div className='space-y-5'>
             <div className='flex justify-between'>
               <h3>{pure ? 'Create New Pure Proxy' : 'Add Proxy'}</h3>
             </div>
             <Divider />
 
-            <div className='flex flex-col sm:flex-row gap-2.5 items-center sm:items-start'>
+            <div className='flex flex-col gap-2.5 items-center'>
               {pure ? (
                 <PureCell />
               ) : (
                 <InputAddress
-                  shorten
+                  shorten={false}
                   disabled={!!proxyArgs.length}
                   value={proxied}
                   onChange={setProxied}
-                  label='Proxied Account'
+                  label={
+                    <Label tooltip='Account authorizes one or more proxy accounts to act on its behalf.'>
+                      Proxied Account
+                    </Label>
+                  }
                   isSign={!!pure}
                 />
               )}
-              <IconArrow
-                className='w-4 h-4 text-primary cursor-pointer rotate-90 sm translate-y-[48px]'
-                onClick={pure ? undefined : swap}
-              />
+              <Tooltip content='Switch'>
+                <Button isIconOnly variant='light' onPress={swap} isDisabled={pure || proxyArgs.length > 0}>
+                  <IconTransfer className='w-4 h-4 rotate-90' />
+                </Button>
+              </Tooltip>
               <InputAddress
                 excluded={!pure && proxied ? [proxied] : []}
-                shorten
+                shorten={false}
                 value={proxy}
                 onChange={setProxy}
-                label='Proxy Account'
+                label={
+                  <Label tooltip='Can perform specific actions on behalf of proxied account.'>Proxy Account</Label>
+                }
                 filtered={filteredProxy}
               />
             </div>
@@ -154,7 +159,7 @@ function AddProxy({
 
             <div className='flex'>
               <Select
-                label='Authorize'
+                label={<Label tooltip='Determines what actions the proxy can perform.'>Authorize</Label>}
                 placeholder='Authorize'
                 variant='bordered'
                 labelPlacement='outside'
@@ -180,7 +185,6 @@ function AddProxy({
                 isSelected={advanced}
                 onValueChange={(checked) => {
                   toggleAdvanced(checked);
-                  setReviewWindow(0);
                 }}
               />
             </div>
@@ -189,7 +193,11 @@ function AddProxy({
               <>
                 <div className='flex'>
                   <Select
-                    label='Review Window'
+                    label={
+                      <Label tooltip='Wait for a specified number of blocks (the delay period) before executing it.'>
+                        Review Window
+                      </Label>
+                    }
                     labelPlacement='outside'
                     placeholder='Review Window'
                     variant='bordered'
@@ -268,7 +276,7 @@ function AddProxy({
               <SubmitProxy proxied={proxied} proxyArgs={proxyArgs} setProxyArgs={setProxyArgs} />
             )}
 
-            {!pure && (
+            {!pure && existsProxies.length > 0 && (
               <div style={{ filter: 'grayscale(30%)' }}>
                 <p className='mb-2.5 font-bold text-foreground/65'>Existing Proxy</p>
 

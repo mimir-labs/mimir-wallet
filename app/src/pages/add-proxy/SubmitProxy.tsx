@@ -165,7 +165,7 @@ function SubmitProxy({
         overrideAction={handleClickAction[1]}
         isLoading={handleClickAction[0].loading}
       >
-        Submit
+        Confirm
       </TxButton>
 
       <ConfirmDialog open={alertOpen} list={detacted} onClose={toggleAlertOpen} onSubmit={handleSubmit} />

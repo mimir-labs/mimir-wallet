@@ -22,7 +22,6 @@ import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { filterPathId } from '@/hooks/useFilterPaths';
 import { useAccountSource } from '@/wallet/useWallet';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import React, { createContext, useContext, useEffect } from 'react';
 import {
   Controls,
   type Edge,
@@ -33,7 +32,8 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState
-} from 'reactflow';
+} from '@xyflow/react';
+import React, { createContext, useContext, useEffect } from 'react';
 
 import { addressEq, addressToHex } from '@mimir-wallet/polkadot-core';
 
@@ -64,9 +64,14 @@ type NodeData = {
   approvalForThisPath: boolean;
 };
 
+type EdgeData = {
+  color: string;
+  tips: { label: string; delay?: number }[];
+};
+
 const context = createContext<State>({} as State);
 
-const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
+const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
   const { api, transaction: topTransaction, onApprove } = useContext(context);
   const source = useAccountSource(data.account.address);
 
@@ -94,10 +99,23 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
       className='w-4 h-4 data-[success=true]:text-success data-[failed=true]:text-danger data-[cancelled=true]:text-danger data-[pending=true]:text-warning'
     />
   ) : null;
+  const borderColor = transaction
+    ? transaction.status < TransactionStatus.Success
+      ? source
+        ? 'hsl(var(--heroui-primary-50))'
+        : 'hsl(var(--heroui-divider-300))'
+      : transaction.status === TransactionStatus.Success
+        ? 'hsl(var(--heroui-success))'
+        : transaction.status === TransactionStatus.Cancelled
+          ? 'hsl(var(--heroui-danger))'
+          : 'hsl(var(--heroui-danger))'
+    : source
+      ? 'hsl(var(--heroui-primary-50))'
+      : 'hsl(var(--heroui-divider-300))';
 
   return (
     <>
-      {(data.account.type === 'multisig' || !!data.account.delegatees.length) && (
+      {!data.isLeaf && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
@@ -106,25 +124,26 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) =>
           type='source'
         />
       )}
-      <div>
-        <div
-          className='w-[220px] p-2.5 flex items-center justify-between px-2.5 py-[3px] bg-content1 shadow-medium rounded-medium'
-          style={{
-            borderBottomLeftRadius: data.approvalForThisPath && call && source ? 0 : undefined,
-            borderBottomRightRadius: data.approvalForThisPath && call && source ? 0 : undefined
-          }}
-        >
+      <div
+        className='bg-content1 rounded-medium'
+        style={{
+          border: '1px solid hsl(var(--heroui-divider-300))',
+          borderColor,
+          backgroundColor: source ? 'hsl(var(--heroui-secondary))' : undefined,
+          boxShadow: source ? 'var(--heroui-box-shadow-small)' : undefined
+        }}
+      >
+        <div className='w-[220px] p-2.5 flex items-center justify-between px-2.5 py-[3px]'>
           <AddressCell value={data.account.address} withCopy />
           {icon}
         </div>
         {topTransaction && data.approvalForThisPath && call && source && (
           <div className='flex'>
             <TxButton
-              color='success'
+              color='primary'
               fullWidth
-              variant='light'
-              radius='none'
-              className='bg-success/10 h-[32px]'
+              variant='solid'
+              radius='md'
               startContent={<IconSuccessOutlined />}
               accountId={topTransaction.address}
               filterPaths={data.path}
@@ -163,7 +182,7 @@ function makeNodes(
   topTransaction: Transaction,
   call?: IMethod | HexString | null,
   nodes: Node<NodeData>[] = [],
-  edges: Edge[] = []
+  edges: Edge<EdgeData>[] = []
 ) {
   function createNode(
     id: string,
@@ -197,8 +216,8 @@ function makeNodes(
     const exists = edges.find((edge) => edge.id === id);
 
     if (exists) {
-      if (label && !exists.data.tips.some((tip: any) => tip.label === label && tip.delay === delay)) {
-        exists.data.tips.push({ label, delay });
+      if (label && !exists.data?.tips.some((tip) => tip.label === label && tip.delay === delay)) {
+        exists.data?.tips.push({ label, delay });
       }
     } else {
       edges.push({
@@ -397,12 +416,12 @@ function makeNodes(
 }
 
 function TxOverview({ account, call, transaction, api, onApprove }: Props) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>([]);
 
   useEffect(() => {
     const initialNodes: Node<NodeData>[] = [];
-    const initialEdges: Edge[] = [];
+    const initialEdges: Edge<EdgeData>[] = [];
 
     makeNodes(account, transaction, call, initialNodes, initialEdges);
     const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 270, 70);
@@ -430,7 +449,7 @@ function TxOverview({ account, call, transaction, api, onApprove }: Props) {
         onNodesChange={onNodesChange}
         zoomOnScroll
       >
-        <Controls />
+        <Controls showInteractive={false} />
       </ReactFlow>
     </context.Provider>
   );

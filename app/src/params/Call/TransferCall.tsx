@@ -4,58 +4,43 @@
 import type { CallProps } from '../types';
 
 import { Address, AddressName, CopyAddress, FormatBalance, IdentityIcon } from '@/components';
-import { ellipsisMixin } from '@/components/utils';
 import { useAssetInfo } from '@/hooks/useAssets';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
-import { alpha, Box, lighten, Skeleton } from '@mui/material';
 import React from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { Skeleton, usePress } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
 
 function AddressDisplay({ reverse, address }: { reverse: boolean; address?: string }) {
+  const copyAddress = useCopyAddressToClipboard(address);
+  const { pressProps } = usePress({
+    onPress: address
+      ? () => {
+          copyAddress();
+        }
+      : undefined
+  });
+
   return (
-    <Box
+    <div
       data-reverse={reverse}
-      sx={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        columnGap: { sm: 1, xs: 0.5 },
-        flexGrow: 0,
-        flexDirection: reverse ? 'row-reverse' : 'row',
-        textAlign: reverse ? 'right' : 'left'
-      }}
+      className='group address-cell inline-flex items-center sm:gap-x-2.5 gap-x-1 flex-grow-0 data-[reverse=true]:flex-row-reverse data-[reverse=true]:text-right'
+      {...pressProps}
     >
       <IdentityIcon size={24} value={address} />
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            display: 'inline-flex',
-            flexDirection: reverse ? 'row-reverse' : 'row',
-            alignItems: 'center',
-            fontWeight: 700,
-            fontSize: '0.875rem',
-            lineHeight: '16px',
-            height: '16px',
-            maxHeight: '16px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            maxWidth: '120px',
-            gap: 0.4
-          }}
-        >
-          <Box component='span' sx={{ ...ellipsisMixin(150) }}>
-            <AddressName value={address} />
-          </Box>
+      <div className='flex flex-col'>
+        <div className='inline-flex items-center font-bold sm:text-sm leading-[16px] h-[16px] max-h-[16px] truncate max-w-[120px] gap-1 group-data-[reverse=true]:flex-row-reverse'>
+          <AddressName value={address} />
           {address && <CopyAddress address={address} size='sm' color='default' />}
-        </Box>
-        <Box sx={{ fontSize: '10px', color: 'text.secondary', lineHeight: '12px' }}>
+        </div>
+        <div className='text-foreground/50 text-tiny leading-[12px]'>
           <Address shorten value={address} />
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -70,63 +55,15 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
   const [assetId, from, to, value, isAll] = results;
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: { md: 3, sm: 2, xs: 1 }
-      }}
-    >
+    <div className='w-full flex items-center justify-between gap-2.5 sm:gap-5 md:gap-7'>
       <AddressDisplay reverse={false} address={from} />
-      <Box
-        sx={({ palette }) => ({
-          position: 'relative',
-          flex: '1',
-          display: 'flex',
-          alignItems: 'center',
-          color: palette.text.secondary
-        })}
-      >
-        <Box
-          sx={({ palette }) => ({
-            width: 6,
-            height: 6,
-            borderRadius: '3px',
-            bgcolor: alpha(palette.text.primary, 0.5)
-          })}
-        />
-        <Box
-          sx={({ palette }) => ({
-            flex: '1',
-            borderTop: '1px dashed',
-            borderColor: alpha(palette.text.primary, 0.5)
-          })}
-        />
+      <div className='relative flex-1 flex items-center text-foreground/50'>
+        <div className='w-1.5 h-1.5 rounded-[3px] bg-foreground/50' />
+        <div className='flex-1 border-t-1 border-dashed border-foreground/50' />
         <svg width='6' height='8' xmlns='http://www.w3.org/2000/svg' style={{ color: 'inherit' }}>
           <polygon points='0,0 6,4 0,8' fill='currentColor' />
         </svg>
-        <Box
-          sx={({ palette }) => ({
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            display: 'flex',
-            alignItems: 'center',
-            paddingX: 1.2,
-            paddingY: 0.4,
-            gap: 0.4,
-            fontWeight: 700,
-            fontSize: '0.875rem',
-            lineHeight: 1,
-            bgcolor: lighten(palette.text.primary, 0.95),
-            border: '1px solid',
-            borderColor: lighten(palette.primary.main, 0.95),
-            borderRadius: 9999
-          })}
-        >
+        <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 rounded-full border-1 border-primary/5 bg-secondary px-3 py-1 text-foreground text-small font-bold leading-[1]'>
           {assetId !== null ? (
             assetInfo ? (
               isAll ? (
@@ -135,17 +72,17 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
                 <FormatBalance value={value} withCurrency format={[assetInfo.decimals, assetInfo.symbol]} />
               )
             ) : (
-              <Skeleton variant='text' sx={{ width: 50 }} />
+              <Skeleton style={{ width: 50 }} />
             )
           ) : isAll ? (
             'All'
           ) : (
             <FormatBalance value={value} withCurrency />
           )}
-        </Box>
-      </Box>
+        </div>
+      </div>
       <AddressDisplay reverse address={to} />
-    </Box>
+    </div>
   );
 }
 

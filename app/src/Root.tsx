@@ -1,10 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { GlobalStyle } from '@/components';
 import { WalletConnectProvider } from '@/features/wallet-connect';
-import { ThemeProvider } from '@/theme';
-import { StyledEngineProvider } from '@mui/material';
 import { useHref, useNavigate } from 'react-router-dom';
 
 import { QueryProvider, TransactionSocketProvider } from '@mimir-wallet/service';
@@ -16,7 +13,6 @@ import AccountConsumer from './accounts/Consumer';
  * Root Component
  *
  * This component provides the foundational providers and configuration for the application:
- * - Material-UI's StyledEngineProvider for CSS injection order
  * - Custom ThemeProvider for consistent styling
  * - React Query configuration for data fetching and caching
  * - Global styles
@@ -30,20 +26,13 @@ function Root({ children }: { children: React.ReactNode }) {
 
   return (
     <HeroUIProvider navigate={navigate} useHref={useHref}>
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider>
-          <QueryProvider>
-            <AccountConsumer>
-              <WalletConnectProvider>
-                <TransactionSocketProvider>
-                  <GlobalStyle />
-                  {children}
-                </TransactionSocketProvider>
-              </WalletConnectProvider>
-            </AccountConsumer>
-          </QueryProvider>
-        </ThemeProvider>
-      </StyledEngineProvider>
+      <QueryProvider>
+        <AccountConsumer>
+          <WalletConnectProvider>
+            <TransactionSocketProvider>{children}</TransactionSocketProvider>
+          </WalletConnectProvider>
+        </AccountConsumer>
+      </QueryProvider>
     </HeroUIProvider>
   );
 }

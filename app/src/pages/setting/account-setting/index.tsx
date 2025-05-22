@@ -4,14 +4,12 @@
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
-import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { Input } from '@/components';
+import { Input, Label } from '@/components';
 import { toastSuccess } from '@/components/utils';
-import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Tooltip } from '@mimir-wallet/ui';
+import { Button } from '@mimir-wallet/ui';
 
 import MemberSet from './MemberSet';
 import ProposerSet from './ProposerSet';
@@ -25,12 +23,10 @@ function AccountSetting() {
   const [account, , , refetch] = useQueryAccountOmniChain(address);
 
   return (
-    <Stack spacing={2} sx={{ width: 500, maxWidth: '100%', margin: '0 auto' }}>
-      <Box>
-        <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
-          Name
-        </Typography>
-        <Paper component={Stack} sx={{ padding: 2, borderRadius: 2 }} spacing={1}>
+    <div className='space-y-5 w-[500px] max-w-full mx-auto my-0'>
+      <div>
+        <h6 className='text-small text-foreground/50 mb-2.5'>Name</h6>
+        <div className='space-y-2.5 p-4 sm:p-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
           <Input
             label='Name'
             onChange={(value) => {
@@ -44,13 +40,13 @@ function AccountSetting() {
             value={name}
             error={error}
           />
-          <Typography fontSize='0.75rem' color='textSecondary' marginTop={1}>
-            All members will see this name
-          </Typography>
+          <p className='text-tiny text-foreground/50 mt-2.5'>All members will see this name</p>
           <Button
-            disabled={!(address && isLocalAccount(address))}
+            isDisabled={!(address && isLocalAccount(address))}
             fullWidth
-            onClick={() => {
+            variant='solid'
+            color='primary'
+            onPress={() => {
               if (!name) {
                 setError(new Error('Please input wallet name'));
               } else {
@@ -60,18 +56,20 @@ function AccountSetting() {
           >
             Save
           </Button>
-        </Paper>
-      </Box>
+        </div>
+      </div>
 
       {account?.type === 'multisig' ? (
-        <Box>
-          <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
-            Multisig Information
-          </Typography>
-          <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
+        <div>
+          <h6 className='inline-flex items-center gap-1 text-small text-foreground/50 mb-2.5'>
+            <Label tooltip='For Pure Proxy, each controllable multisig account is listed as a member set.'>
+              Multisig Information
+            </Label>
+          </h6>
+          <div className='space-y-2.5 p-4 sm:p-5 rounded-large bg-content1 border-1 border-secondary shadow-medium'>
             <MemberSet account={account} disabled />
-          </Paper>
-        </Box>
+          </div>
+        </div>
       ) : account?.type === 'pure' ? (
         <SubApiRoot network={account.network} supportedNetworks={[account.network]}>
           <PureMemberSet account={account} />
@@ -80,10 +78,10 @@ function AccountSetting() {
 
       {address ? (
         <div>
-          <Typography fontWeight={700} color='textSecondary' marginBottom={0.5}>
-            Proxy Information
-          </Typography>
-          <div className='p-5 rounded-large mt-2.5 shadow-medium bg-content1'>
+          <h6 className='inline-flex items-center gap-1 text-small text-foreground/50 mb-2.5'>
+            <Label tooltip='The following accounts will be granted control over this account.'>Proxy Information</Label>
+          </h6>
+          <div className='p-5 rounded-large border-1 border-secondary shadow-medium bg-content1'>
             <ProxySet address={address} />
           </div>
         </div>
@@ -91,22 +89,17 @@ function AccountSetting() {
 
       {account && (
         <div>
-          <h6 className='text-foreground/50 mb-2.5 flex items-center gap-1'>
-            Proposer
-            <Tooltip
-              closeDelay={0}
-              classNames={{ content: 'max-w-[300px]' }}
-              content='Proposers can suggest transactions but cannot approve or execute them. Signers should review and approve transactions first.'
-            >
-              <IconQuestion className='text-primary' />
-            </Tooltip>
+          <h6 className='text-small text-foreground/50 mb-2.5 flex items-center gap-1'>
+            <Label tooltip='Proposers can suggest transactions but cannot approve or execute them. Signers should review and approve transactions first.'>
+              Proposer
+            </Label>
           </h6>
-          <Paper sx={{ padding: 2, borderRadius: 2, marginTop: 1 }}>
+          <div className='space-y-2.5 p-4 sm:p-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
             <ProposerSet account={account} refetch={refetch} />
-          </Paper>
+          </div>
         </div>
       )}
-    </Stack>
+    </div>
   );
 }
 

@@ -4,9 +4,8 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 
-import { isAddress } from '@polkadot/util-crypto';
-
 import { encodeAddress } from './defaults.js';
+import { isPolkadotAddress } from './utils.js';
 
 function accountExplorerLink(
   chain: { explorerUrl?: string; statescanUrl?: string; ss58Format: number },
@@ -14,7 +13,7 @@ function accountExplorerLink(
 ): string | undefined {
   const _value = encodeAddress(value, chain.ss58Format);
 
-  if (_value && isAddress(_value)) {
+  if (_value && isPolkadotAddress(_value)) {
     const explorerUrl = chain.explorerUrl;
 
     if (explorerUrl) {

@@ -101,6 +101,7 @@ type BaseTransaction = {
   createdBlockHash?: HexString;
   createdExtrinsicIndex?: number;
   createdExtrinsicHash?: HexString;
+  exector?: HexString;
   executedBlock?: string;
   executedBlockHash?: HexString;
   executedExtrinsicIndex?: number;
@@ -295,9 +296,29 @@ type BaseAddressMeta = {
   multipleMultisig?: boolean;
   proxyType?: string;
   network?: HexString;
+  proxyNetworks?: HexString[];
   delay?: number;
   cryptoType?: string;
   source?: string;
+};
+
+type ProxiedAddressMeta = Omit<BaseAddressMeta, 'isProxied'> & {
+  isProxied: true;
+  multipleMultisig: boolean;
+  proxyNetworks: HexString[];
+};
+
+type ProxyAddressMeta = Omit<BaseAddressMeta, 'isProxy'> & {
+  isProxy: true;
+  proxyType: string;
+  network: HexString;
+  delay: number;
+};
+
+type InjectedAddressMeta = Omit<BaseAddressMeta, 'isInjected'> & {
+  isInjected: true;
+  cryptoType: string;
+  source: string;
 };
 
 type MultisigAddressMeta = Omit<BaseAddressMeta, 'isMultisig'> & {
@@ -317,33 +338,13 @@ type PureAddressMeta = Omit<BaseAddressMeta, 'isPure'> & {
   pureCreatedAt: HexString;
 };
 
-type ProxiedAddressMeta = Omit<BaseAddressMeta, 'isProxied'> & {
-  isProxied: true;
-  multipleMultisig: boolean;
-};
-
-type ProxyAddressMeta = Omit<BaseAddressMeta, 'isProxy'> & {
-  isProxy: true;
-  proxyType: string;
-  network: HexString;
-  delay: number;
-};
-
-type InjectedAddressMeta = Omit<BaseAddressMeta, 'isInjected'> & {
-  isInjected: true;
-  cryptoType: string;
-  source: string;
-};
-
-type EmptyAddressMeta = BaseAddressMeta;
-
 export type AddressMeta =
   | MultisigAddressMeta
   | PureAddressMeta
   | ProxiedAddressMeta
   | ProxyAddressMeta
   | InjectedAddressMeta
-  | EmptyAddressMeta;
+  | BaseAddressMeta;
 
 type MultisigFilterPath = {
   id: string;

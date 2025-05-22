@@ -6,11 +6,14 @@ import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
+import { CONNECT_ORIGIN } from '@/constants';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { useWallet } from '@/wallet/useWallet';
-import React, { useCallback } from 'react';
+import { useAccountSource, useWallet } from '@/wallet/useWallet';
+import { enableWallet } from '@/wallet/utils';
+import { GenericExtrinsic } from '@polkadot/types';
+import React, { useCallback, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { signAndSend, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, type ButtonProps } from '@mimir-wallet/ui';
 
 import { toastError } from './utils';
@@ -56,18 +59,19 @@ function TxButton({
   isDisabled,
   disabled,
   onDone,
+  onError,
   overrideAction,
   ...props
 }: Props) {
-  const { network } = useApi();
+  const { api, network } = useApi();
   const { addQueue } = useTxQueue();
   const { walletAccounts } = useWallet();
-
+  const address = accountId || transaction?.address || walletAccounts.at(0)?.address;
+  const source = useAccountSource(address);
+  const [loading, setLoading] = useState(false);
   const handlePress = useCallback(() => {
     if (getCall) {
       const call = getCall();
-
-      const address = accountId || transaction?.address || walletAccounts[0].address;
 
       if (!address) {
         toastError('Please select an account');
@@ -75,41 +79,65 @@ function TxButton({
         return;
       }
 
-      addQueue({
-        accountId: address,
-        transaction: transaction || undefined,
-        call,
-        website,
-        appName,
-        iconUrl,
-        filterPaths,
-        relatedBatches,
-        onResults: (result) => onResults?.(result),
-        beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
-        network
-      });
+      if (source) {
+        setLoading(true);
+
+        const events = signAndSend(
+          api,
+          api.tx(
+            api.registry.createType('Call', call instanceof GenericExtrinsic ? call.method.toU8a() : call.toU8a())
+          ),
+          address,
+          () => enableWallet(source, CONNECT_ORIGIN)
+        );
+
+        events.on('inblock', () => {
+          setLoading(false);
+        });
+        events.on('error', (error: any) => {
+          setLoading(false);
+          onError?.(error);
+        });
+      } else {
+        addQueue({
+          accountId: address,
+          transaction: transaction || undefined,
+          call,
+          website,
+          appName,
+          iconUrl,
+          filterPaths,
+          relatedBatches,
+          onResults: (result) => onResults?.(result),
+          beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
+          network,
+          onError
+        });
+      }
     }
 
     onDone?.();
   }, [
     getCall,
     onDone,
-    accountId,
-    transaction,
-    walletAccounts,
+    address,
+    source,
     addQueue,
+    transaction,
     website,
     appName,
     iconUrl,
     filterPaths,
     relatedBatches,
     network,
+    onError,
+    api,
     onResults,
     beforeSend
   ]);
 
   return (
-    <Button {...props} isDisabled={isDisabled || disabled} onPress={overrideAction || handlePress}>
+    <Button {...props} isLoading={loading} isDisabled={isDisabled || disabled} onPress={overrideAction || handlePress}>
       {children}
     </Button>
   );

@@ -1,23 +1,35 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData } from '@/hooks/types';
+import type { AccountData, AddressMeta } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { groupAccounts, type GroupName } from '@/accounts/utils';
+import ArrowDownIcon from '@/assets/svg/ArrowDown.svg?react';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconExtension from '@/assets/svg/icon-extension.svg?react';
 import IconGlobal from '@/assets/svg/icon-global.svg?react';
+import IconPin from '@/assets/svg/icon-pin.svg?react';
 import IconUnion from '@/assets/svg/icon-union.svg?react';
 import IconUser from '@/assets/svg/icon-user.svg?react';
 import IconWatch from '@/assets/svg/icon-watch.svg?react';
+import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { isAddress } from '@polkadot/util-crypto';
+import { usePinAccounts } from '@/hooks/usePinAccounts';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { addressEq } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, encodeAddress, isPolkadotAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader } from '@mimir-wallet/ui';
+import {
+  Button,
+  Divider,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  usePress
+} from '@mimir-wallet/ui';
 
 import AccountCell from './AccountCell';
 import CreateMultisig from './CreateMultisig';
@@ -29,36 +41,67 @@ interface Props {
   onClose?: () => void;
 }
 
-function filterAddress(keywords: string) {
-  return (account: AccountData): boolean =>
-    keywords
-      ? account.address.toLowerCase().includes(keywords.toLowerCase()) ||
-        (account.name ? account.name.toLowerCase().includes(keywords.toLowerCase()) : false)
-      : true;
+function filterKeywords(address: string, keywords: string, metas: Record<string, AddressMeta>) {
+  const addressHex = addressToHex(address);
+
+  const meta = metas[addressHex];
+  const identity = useIdentityStore.getState()[addressHex];
+
+  return (
+    address.toLowerCase().includes(keywords.toLowerCase()) ||
+    (meta?.name ? meta?.name.toLowerCase().includes(keywords.toLowerCase()) : false) ||
+    (identity ? identity.toLowerCase().includes(keywords.toLowerCase()) : false)
+  );
 }
 
 function AccountMenu({ anchor = 'left', onClose, open }: Props) {
-  const [keywords, setKeywords] = useState('');
+  const [keywords, setKeywords] = useState<string>('');
+  const { chainSS58 } = useApi();
   const { current, setCurrent, addresses, addAddressBook, accounts, hideAccountHex, metas } = useAccount();
   const [isSearching, setIsSearching] = useState(false);
   const [searchAccount, setSearchAccount] = useState<AccountData>();
+  const [isMimirExpanded, setIsMimirExpanded] = useState(true);
+  const { pinnedAccounts } = usePinAccounts();
+  const visiblePinnedAccounts = useMemo(() => {
+    const result = [];
 
-  const [grouped, setGrouped] = useState<Record<GroupName, string[]>>(groupAccounts(accounts, hideAccountHex, metas));
+    for (const addressHex of pinnedAccounts) {
+      if (hideAccountHex.includes(addressHex)) continue;
+
+      const address = encodeAddress(addressHex, chainSS58);
+
+      if (filterKeywords(address, keywords, metas)) {
+        result.push(address);
+      }
+    }
+
+    return result;
+  }, [pinnedAccounts, hideAccountHex, metas, keywords, chainSS58]);
+
+  const keywordsIsPolkadotAddress = !!keywords && isPolkadotAddress(keywords);
+
+  const { pressProps } = usePress({
+    onPress: () => setIsMimirExpanded(!isMimirExpanded)
+  });
+
+  const [grouped, setGrouped] = useState<Record<GroupName, string[]>>(
+    groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas)
+  );
   const upMd = useMediaQuery('md');
 
   useEffect(() => {
     if (!keywords) {
       setSearchAccount(undefined);
-      setGrouped(groupAccounts(accounts, hideAccountHex, metas));
+      setGrouped(groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas));
 
       return;
     }
 
-    if (isAddress(keywords)) {
+    if (isPolkadotAddress(keywords)) {
       setGrouped(
         groupAccounts(
           accounts.filter((account) => addressEq(account.address, keywords)),
-          hideAccountHex,
+          hideAccountHex.concat(pinnedAccounts),
           metas
         )
       );
@@ -73,9 +116,9 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
         });
     } else {
       setSearchAccount(undefined);
-      setGrouped(groupAccounts(accounts.filter(filterAddress(keywords)), hideAccountHex, metas));
+      setGrouped(groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas, keywords));
     }
-  }, [accounts, hideAccountHex, keywords, metas]);
+  }, [accounts, hideAccountHex, keywords, metas, pinnedAccounts]);
 
   const onSelect = useCallback(
     (address: string) => {
@@ -88,7 +131,23 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
     [onClose, current, setCurrent]
   );
 
-  const watchlist = useMemo(() => addresses.filter(({ watchlist }) => !!watchlist), [addresses]);
+  const watchlist = useMemo(
+    () =>
+      addresses.filter(({ watchlist, address }) => {
+        if (!watchlist) return false;
+
+        if (pinnedAccounts.includes(addressToHex(address))) return false;
+
+        if (!keywords) return true;
+
+        if (isPolkadotAddress(keywords)) {
+          return addressEq(address, keywords);
+        }
+
+        return filterKeywords(address, keywords, metas);
+      }),
+    [addresses, keywords, metas, pinnedAccounts]
+  );
 
   return (
     <Drawer
@@ -128,11 +187,11 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
               </>
             )}
 
-            {current && (
+            {current && !keywordsIsPolkadotAddress && (
               <>
                 <div className='flex items-center gap-1'>
                   <IconUser className='opacity-60' />
-                  Current Account
+                  Current Wallet
                 </div>
 
                 <AccountCell key={`current-${current}`} onClose={onClose} value={current} selected />
@@ -141,21 +200,53 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
               </>
             )}
 
-            {grouped.mimir.length > 0 && (
+            {visiblePinnedAccounts.length > 0 && (
               <>
                 <div className='flex items-center gap-1'>
-                  <IconUnion className='opacity-60' />
-                  Mimir Wallet
+                  <IconPin className='opacity-60 w-4 h-4' />
+                  Pinned Wallet
                 </div>
-                {grouped.mimir.map((account) => (
+
+                {visiblePinnedAccounts.map((account) => (
                   <AccountCell
-                    key={`multisig-${account}`}
+                    key={`pinned-${account}`}
                     onClose={onClose}
                     onSelect={onSelect}
                     value={account}
-                    selected={account === current}
+                    selected={addressEq(account, current)}
                   />
                 ))}
+              </>
+            )}
+
+            {grouped.mimir.length > 0 && (
+              <>
+                <div className='cursor-pointer flex items-center gap-1' {...pressProps}>
+                  <IconUnion className='opacity-60' />
+                  <span className='flex-1'>Mimir Wallet</span>
+                  <Button
+                    isIconOnly
+                    color='default'
+                    size='sm'
+                    variant='light'
+                    data-expanded={isMimirExpanded}
+                    className='data-[expanded=true]:rotate-180'
+                    onPress={() => setIsMimirExpanded(!isMimirExpanded)}
+                  >
+                    <ArrowDownIcon />
+                  </Button>
+                </div>
+                {isMimirExpanded
+                  ? grouped.mimir.map((account) => (
+                      <AccountCell
+                        key={`multisig-${account}`}
+                        onClose={onClose}
+                        onSelect={onSelect}
+                        value={account}
+                        selected={addressEq(account, current)}
+                      />
+                    ))
+                  : null}
 
                 <Divider />
               </>
@@ -175,31 +266,34 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
               </>
             )}
 
-            <div className='flex items-center gap-1'>
-              <span className='flex-1 flex items-center gap-1'>
-                <IconWatch className='opacity-60' />
-                Watchlist
-              </span>
-              <Button
-                isIconOnly
-                color='default'
-                size='sm'
-                variant='light'
-                onPress={() => addAddressBook(undefined, true)}
-              >
-                <IconAdd />
-              </Button>
-            </div>
+            {!keywordsIsPolkadotAddress && (
+              <div className='flex items-center gap-1'>
+                <span className='flex-1 flex items-center gap-1'>
+                  <IconWatch className='opacity-60' />
+                  Watchlist
+                </span>
+                <Button
+                  isIconOnly
+                  color='default'
+                  size='sm'
+                  variant='light'
+                  onPress={() => addAddressBook(undefined, true)}
+                >
+                  <IconAdd />
+                </Button>
+              </div>
+            )}
 
-            {watchlist.map(({ address }) => (
-              <AccountCell
-                key={`extension-${address}`}
-                watchlist
-                onClose={onClose}
-                onSelect={onSelect}
-                value={address}
-              />
-            ))}
+            {!keywordsIsPolkadotAddress &&
+              watchlist.map(({ address }) => (
+                <AccountCell
+                  key={`extension-${address}`}
+                  watchlist
+                  onClose={onClose}
+                  onSelect={onSelect}
+                  value={address}
+                />
+              ))}
           </div>
         </DrawerBody>
 

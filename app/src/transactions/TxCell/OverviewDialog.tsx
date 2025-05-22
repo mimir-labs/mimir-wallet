@@ -22,18 +22,20 @@ function OverviewDialog({ account, transaction, onClose, open }: Props) {
     <Modal size='5xl' onClose={onClose} isOpen={open}>
       <ModalContent>
         <ModalHeader>Progress Overview</ModalHeader>
-        <ModalBody className='flex-auto h-[50dvh] bg-secondary border-medium'>
-          {open && transaction.status < TransactionStatus.Success ? (
-            <TxOverview
-              api={api}
-              account={account}
-              call={transaction.call}
-              transaction={transaction}
-              onApprove={onClose}
-            />
-          ) : (
-            <HistoryTxOverview transaction={transaction} />
-          )}
+        <ModalBody className='pb-5'>
+          <div className='h-[50dvh] flex-auto rounded-medium border-1 border-divider-300'>
+            {open && transaction.status < TransactionStatus.Success ? (
+              <TxOverview
+                api={api}
+                account={account}
+                call={transaction.call}
+                transaction={transaction}
+                onApprove={onClose}
+              />
+            ) : (
+              <HistoryTxOverview transaction={transaction} />
+            )}
+          </div>
         </ModalBody>
       </ModalContent>
     </Modal>

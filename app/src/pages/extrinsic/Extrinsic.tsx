@@ -4,7 +4,7 @@
 import type { Call } from '@polkadot/types/interfaces';
 import type { Registry } from '@polkadot/types/types';
 
-import { Input, InputAddress, InputNetwork, TxButton } from '@/components';
+import { ErrorBoundary, Input, InputAddress, InputNetwork, TxButton } from '@/components';
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInput } from '@/hooks/useInput';
@@ -51,7 +51,7 @@ function Extrinsic({
   }, [api.registry, callData]);
 
   return (
-    <div className='w-full max-w-[500px] mx-auto mt-3 p-5 rounded-large bg-content1 shadow-medium'>
+    <div className='w-full max-w-[500px] mx-auto mt-3 p-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
       <div className='space-y-5'>
         <h3>Submit Extrinsic</h3>
 
@@ -107,7 +107,9 @@ function Extrinsic({
             </div>
 
             <div className='rounded-medium border-1 border-divider-300 p-2.5'>
-              <CallComp registry={api.registry} from={sending} call={parsedCallData} jsonFallback />
+              <ErrorBoundary>
+                <CallComp registry={api.registry} from={sending} call={parsedCallData} jsonFallback />
+              </ErrorBoundary>
             </div>
 
             {showDetail && (

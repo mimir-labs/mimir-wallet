@@ -10,19 +10,19 @@ import SuccessAnimation from './animation/Success';
 
 const icon = (props: IconProps) => {
   if (props.type === 'info') {
-    return <NoticeAnimation />;
+    return <NoticeAnimation size={30} />;
   }
 
   if (props.type === 'default') {
-    return <NoticeAnimation />;
+    return <NoticeAnimation size={30} />;
   }
 
   if (props.type === 'success') {
-    return <SuccessAnimation />;
+    return <SuccessAnimation size={30} />;
   }
 
   if (props.type === 'error') {
-    return <FailedAnimation />;
+    return <FailedAnimation size={30} />;
   }
 
   const Icon = Icons.warning;
@@ -36,7 +36,7 @@ function ToastRoot() {
       autoClose={5000}
       closeOnClick
       draggable
-      hideProgressBar={false}
+      hideProgressBar
       icon={icon}
       newestOnTop={false}
       pauseOnFocusLoss

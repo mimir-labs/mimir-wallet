@@ -6,16 +6,17 @@ import type { InputAddressProps } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
+import { sortAccounts } from '@/accounts/utils';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconWarning from '@/assets/svg/icon-warning-fill.svg?react';
+import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { isAddress } from '@polkadot/util-crypto';
 import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, isPolkadotAddress, useNetworks } from '@mimir-wallet/polkadot-core';
 import { Avatar, Chip, FreeSoloPopover, Listbox, ListboxItem, usePress } from '@mimir-wallet/ui';
 
 import Address from './Address';
@@ -49,20 +50,24 @@ function createOptions(
   let options = Object.entries(all);
 
   if (filtered) {
-    options = options.filter((option) => filtered.includes(option[0]));
+    options = options.filter((option) => filtered.some((item) => addressEq(item, option[0])));
   }
 
   if (excluded) {
-    options = options.filter((option) => !excluded.includes(option[0]));
+    options = options.filter((option) => !excluded.some((item) => addressEq(item, option[0])));
   }
 
   if (!input) return options.map((item) => item[0]);
 
+  const identity = useIdentityStore.getState();
+
   return options
-    .filter(([address, name]) => {
+    .map(([address, name]) => [address, name, identity[addressToHex(address)]] as const)
+    .filter(([address, name, identity]) => {
       return (
         address.toLowerCase().includes(input.toLowerCase()) ||
-        (name ? name.toLowerCase().includes(input.toLowerCase()) : false)
+        (name ? name.toLowerCase().includes(input.toLowerCase()) : false) ||
+        (identity ? identity.toLowerCase().includes(input.toLowerCase()) : false)
       );
     })
     .map((item) => item[0]);
@@ -88,9 +93,9 @@ function InputAddress({
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
   const { networks } = useNetworks();
-  const { accounts, addresses, isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
+  const { accounts, addresses, isLocalAccount, isLocalAddress, addAddressBook, metas } = useAccount();
   const [value, setValue] = useState<string>(
-    isAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : ''
+    isPolkadotAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : ''
   );
   // const [inputValue, setInputValue] = useState<string>('');
   const [[inputValue, isValidAddress], setInputValue] = useInputAddress();
@@ -98,14 +103,15 @@ function InputAddress({
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [isOpen, toggleOpen] = useToggle(false);
+  const [isFocused, setIsFocused] = useState(false);
   const upSm = useMediaQuery('sm');
   const { meta: { isMultisig, isProxied, isPure, pureCreatedAt } = {} } = useAddressMeta(value);
 
   const pureNetwork = isPure && pureCreatedAt && networks.find((network) => network.genesisHash === pureCreatedAt);
 
   const options = useMemo(
-    (): string[] => createOptions(accounts, addresses, isSign, inputValue, filtered, excluded),
-    [accounts, addresses, excluded, filtered, inputValue, isSign]
+    (): string[] => sortAccounts(createOptions(accounts, addresses, isSign, inputValue, filtered, excluded), metas),
+    [accounts, addresses, excluded, filtered, inputValue, isSign, metas]
   );
 
   useEffect(() => {
@@ -117,13 +123,13 @@ function InputAddress({
   useEffect(() => {
     const key = value || '';
 
-    if (isAddress(key)) {
+    if (isPolkadotAddress(key)) {
       onChange?.(key);
     }
   }, [value, onChange]);
 
   const handleSelect = (item: string) => {
-    if (item && isAddress(item)) {
+    if (item && isPolkadotAddress(item)) {
       setValue(item);
     }
 
@@ -141,7 +147,7 @@ function InputAddress({
   };
 
   const { pressProps } = usePress({
-    onPress: handleOpen
+    onPress: isOpen ? handleClose : handleOpen
   });
 
   const { pressProps: addAddressBookPressProps } = usePress({
@@ -157,7 +163,7 @@ function InputAddress({
       ) : (
         <Avatar style={{ width: iconSize, height: iconSize }} />
       )}
-      {isOpen ? null : value ? (
+      {isOpen && isFocused ? null : value ? (
         <div className='address-cell-content flex flex-col gap-y-1'>
           <div className='inline-flex items-center gap-1 font-bold text-sm leading-[16px] h-[16px] max-h-[16px] truncate'>
             <AddressName value={value} />
@@ -177,7 +183,7 @@ function InputAddress({
               <Avatar style={{ marginRight: 4 }} src={pureNetwork.icon} className='w-3 h-3' />
             ) : null}
             <span className='text-foreground/50'>
-              <Address value={value} shorten={upSm ? shorten : true} />
+              <Address value={value} shorten={shorten ?? (upSm ? false : true)} />
             </span>
           </div>
         </div>
@@ -205,7 +211,7 @@ function InputAddress({
             onPress={() => handleSelect(item)}
             className='text-foreground data-[hover=true]:text-foreground'
           >
-            <AddressCell value={item} shorten={upSm ? shorten : true} />
+            <AddressCell addressCopyDisabled withCopy value={item} shorten={upSm ? shorten : true} />
           </ListboxItem>
         ))}
       </Listbox>
@@ -224,21 +230,24 @@ function InputAddress({
 
         <div
           ref={wrapperRef}
-          className='InputAddressContent group relative w-full inline-flex tap-highlight-transparent px-2 border-medium min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-14 py-2 shadow-none border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent'
+          className='InputAddressContent overflow-hidden group relative w-full inline-flex tap-highlight-transparent px-2 border-medium min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-14 py-2 shadow-none border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent'
         >
           {element}
           <input
             ref={inputRef}
             className='absolute rounded-medium top-0 right-0 bottom-0 left-0 outline-none border-none pl-12 bg-transparent'
-            style={{ opacity: !isOpen ? 0 : 1 }}
+            style={{ opacity: isFocused && isOpen ? 1 : 0 }}
             value={inputValue}
             placeholder={placeholder}
             onChange={setInputValue}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             {...pressProps}
           />
 
           <ArrowDown
-            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2'
+            data-open={isOpen}
+            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2 data-[open=true]:rotate-180 transition-transform duration-150'
             style={{ color: 'inherit' }}
             {...pressProps}
           />

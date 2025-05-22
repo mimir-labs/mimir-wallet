@@ -3,8 +3,10 @@
 
 import type { BN } from '@polkadot/util';
 import type React from 'react';
+import type { InputProps as BaseInputProps } from '@mimir-wallet/ui';
 
-export interface InputProps {
+export interface InputProps extends Omit<BaseInputProps, 'onChange'> {
+  className?: string;
   defaultValue?: string;
   value?: string;
   color?: 'danger' | 'primary' | 'secondary' | 'success' | 'warning';

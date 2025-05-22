@@ -4,7 +4,7 @@
 import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react';
 import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import path, { join } from 'node:path';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -50,7 +50,9 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
+          const baseDir = join(import.meta.dirname, '..');
+
+          if (id.startsWith(join(baseDir, 'node_modules'))) {
             const pkg = id.toString().split('node_modules/')[1].split('/')[0];
 
             if (pkg === '@polkadot' && id.includes('@polkadot/apps-config')) {
@@ -58,6 +60,10 @@ export default defineConfig(({ mode }) => ({
             }
 
             return pkg;
+          }
+
+          if (id.startsWith(join(baseDir, 'packages'))) {
+            return `mimir-package-${id.replace(join(baseDir, 'packages/'), '').split('/')[0]}`;
           }
         }
       }

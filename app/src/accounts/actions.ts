@@ -88,6 +88,10 @@ export function addAddressBook(
   onAdded?: (address: string) => void,
   onClose?: () => void
 ) {
+  if (address && addressEq(address, '0x0000000000000000000000000000000000000000000000000000000000000000')) {
+    return;
+  }
+
   useAddressStore.setState({
     addAddressDialog: {
       defaultAddress: address,

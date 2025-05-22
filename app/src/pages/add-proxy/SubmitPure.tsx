@@ -43,7 +43,7 @@ function SubmitPure({
           : undefined
       }
     >
-      Submit
+      Confirm
     </TxButton>
   );
 }

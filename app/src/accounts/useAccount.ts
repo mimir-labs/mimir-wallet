@@ -3,11 +3,10 @@
 
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
-import { isAddress } from '@polkadot/util-crypto';
 import { useCallback, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, isPolkadotAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { addAddressBook, deleteAddress, hideAccount, resync, setAccountName, setName, showAccount } from './actions';
@@ -21,7 +20,7 @@ export function useAccount() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const setCurrent = (address: string, confirm?: boolean) => {
-    if (address && isAddress(address)) {
+    if (address && isPolkadotAddress(address)) {
       if (confirm && !store.get(SWITCH_ACCOUNT_REMIND_KEY)) {
         useAddressStore.setState({ switchAddress: address });
 

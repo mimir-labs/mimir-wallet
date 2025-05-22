@@ -224,6 +224,7 @@ export function useMultiChainTransactionCounts(
   const { data, isFetched, isFetching } = useQuery<Record<string, { pending: number; history: number }>>({
     queryHash,
     queryKey,
+    refetchOnMount: false,
     structuralSharing: (
       prev: unknown | undefined,
       next: unknown

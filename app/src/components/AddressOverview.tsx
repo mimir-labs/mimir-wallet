@@ -3,9 +3,12 @@
 
 import type { AccountData, DelegateeProp, MultisigAccountData } from '@/hooks/types';
 
+import { useAccount } from '@/accounts/useAccount';
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
+import IconView from '@/assets/svg/icon-view.svg?react';
 import dagre from '@dagrejs/dagre';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import React, { useEffect } from 'react';
 import {
   Controls,
   type Edge,
@@ -17,12 +20,18 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState
-} from 'reactflow';
+} from '@xyflow/react';
+import React, { useEffect } from 'react';
 
-import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useNetworks } from '@mimir-wallet/polkadot-core';
+import { Avatar, Button, Chip } from '@mimir-wallet/ui';
 
+import Address from './Address';
 import AddressCell from './AddressCell';
 import AddressEdge from './AddressEdge';
+import AddressName from './AddressName';
+import CopyAddress from './CopyAddress';
+import IdentityIcon from './IdentityIcon';
 import { getLayoutedElements } from './utils';
 
 interface Props {
@@ -40,31 +49,156 @@ type NodeData = {
   proxyType?: string;
 };
 
+type EdgeData = {
+  color: string;
+  tips: { label: string; delay?: number }[];
+};
+
 const dagreGraph = new dagre.graphlib.Graph();
 
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-const AddressNode = React.memo(({ data, isConnectable }: NodeProps<NodeData>) => {
+const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
+  const { meta: { isProxied, isPure, proxyNetworks, pureCreatedAt, isMultisig } = {} } = useAddressMeta(
+    data.account.address
+  );
+  const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
+  const { networks } = useNetworks();
+
+  const addressNetworks = isPure
+    ? networks.filter((network) => network.genesisHash === pureCreatedAt)
+    : isProxied
+      ? proxyNetworks
+        ? networks.filter((network) => proxyNetworks.includes(network.genesisHash))
+        : []
+      : [];
+
+  const cell = data.isTop ? (
+    <div className='overflow-hidden relative w-[240px] p-2.5 bg-content1 rounded-medium border-1 border-primary/5 shadow-small'>
+      <div className='z-0 absolute top-0 left-0 w-full h-[30px] bg-secondary' />
+      <div className='z-10 flex flex-col items-center gap-[5px] w-full h-full'>
+        <IdentityIcon value={data.account.address} size={40} />
+
+        <h6>
+          <AddressName value={data.account.address} />
+        </h6>
+
+        <div className='text-foreground/50 h-[16px] flex items-center text-tiny whitespace-nowrap'>
+          {addressNetworks.map((network) => (
+            <Avatar key={network.genesisHash} style={{ marginRight: 4 }} src={network.icon} className='w-3 h-3' />
+          ))}
+          <span>
+            <Address shorten value={data.account.address} />
+          </span>
+          <CopyAddress size='sm' address={data.account.address} className='opacity-50' />
+
+          {!isLocalAccount(data.account.address) && !isLocalAddress(data.account.address) && (
+            <Button
+              isIconOnly
+              color='default'
+              onPress={() => {
+                addAddressBook(data.account.address);
+              }}
+              variant='light'
+              size='sm'
+              className='opacity-50 text-foreground/50 w-[18px] h-[18px]'
+            >
+              <IconAddressBook className='w-3 h-3' />
+            </Button>
+          )}
+
+          <Button
+            isIconOnly
+            variant='light'
+            color='default'
+            size='sm'
+            className='opacity-50 text-foreground/50 w-[18px] h-[18px]'
+            onPress={() => {
+              window.open(`${window.location.origin}?address=${data.account.address}&tab=structure`, '_blank');
+            }}
+          >
+            <IconView />
+          </Button>
+        </div>
+
+        <div className='flex items-center'>
+          {isMultisig && (
+            <Chip color='secondary' size='sm'>
+              Multisig
+            </Chip>
+          )}
+          {(isPure || isProxied) && (
+            <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
+              {isPure ? 'Pure' : 'Proxied'}
+            </Chip>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className='overflow-hidden relative w-[240px] p-2.5 bg-content1 rounded-medium border-1 border-primary/5 shadow-small'>
+      <AddressCell
+        value={data.account.address}
+        withAddressBook
+        withCopy
+        icons={
+          <Button
+            isIconOnly
+            variant='light'
+            color='default'
+            size='sm'
+            className='opacity-50 text-foreground/50 w-[18px] h-[18px]'
+            onPress={() => {
+              window.open(`${window.location.origin}?address=${data.account.address}&tab=structure`, '_blank');
+            }}
+          >
+            <IconView />
+          </Button>
+        }
+      />
+    </div>
+  );
+
   return (
     <>
       {(data.account.type === 'multisig' || !!data.account.delegatees.length) && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
-          style={{ width: 0, height: 0, top: 35 }}
-          className='bg-divider-300'
+          style={{
+            zIndex: 1,
+            width: 5,
+            height: 18,
+            left: 0,
+            borderRadius: '10px',
+            background:
+              isPure || isProxied
+                ? '#B700FF'
+                : isMultisig
+                  ? 'hsl(var(--heroui-primary))'
+                  : 'hsl(var(--heroui-divider-300))'
+          }}
           type='source'
         />
       )}
-      <div className='flex items-center w-[270px] p-2.5 rounded-medium bg-content1 shadow-medium'>
-        <AddressCell value={data.account.address} withCopy withAddressBook />
-      </div>
+      {cell}
       {!data.isTop && (
         <Handle
           isConnectable={isConnectable}
           position={Position.Right}
-          style={{ width: 0, height: 0 }}
-          className='bg-divider-300'
+          style={{
+            zIndex: 1,
+            width: 5,
+            height: 18,
+            right: 0,
+            borderRadius: '10px',
+            background:
+              data.type === 'proxy'
+                ? '#B700FF'
+                : data.type === 'multisig'
+                  ? 'hsl(var(--heroui-primary))'
+                  : 'hsl(var(--heroui-divider-300))'
+          }}
           type='target'
         />
       )}
@@ -80,7 +214,7 @@ const edgeTypes = {
   AddressEdge: AddressEdge
 };
 
-function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges: Edge[] = []) {
+function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges: Edge<EdgeData>[] = []) {
   function createNode(
     id: string,
     account: AccountData,
@@ -111,8 +245,8 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
     const exists = edges.find((edge) => edge.id === id);
 
     if (exists) {
-      if (label && !exists.data.tips.some((tip: any) => tip.label === label && tip.delay === delay)) {
-        exists.data.tips.push({ label, delay });
+      if (label && !exists.data?.tips.some((tip) => tip.label === label && tip.delay === delay)) {
+        exists.data?.tips.push({ label, delay });
       }
     } else {
       edges.push({
@@ -175,9 +309,13 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
       makeEdge(
         node.parentId,
         nodeId,
-        node.from === 'delegate' ? node.value.proxyType : '',
+        node.from === 'delegate' ? node.value.proxyType : node.from === 'member' ? 'multisig' : '',
         node.from === 'delegate' ? node.value.proxyDelay : undefined,
-        node.from === 'delegate' ? '#B700FF' : '#AEAEAE'
+        node.from === 'delegate'
+          ? '#B700FF'
+          : node.from === 'member'
+            ? 'hsl(var(--heroui-primary))'
+            : 'hsl(var(--heroui-divider-300))'
       );
     }
 
@@ -219,17 +357,17 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
 }
 
 function AddressOverview({ account, showControls, showMiniMap }: Props) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>([]);
 
   useEffect(() => {
     if (!account) return;
 
     const initialNodes: Node<NodeData>[] = [];
-    const initialEdges: Edge[] = [];
+    const initialEdges: Edge<EdgeData>[] = [];
 
     makeNodes(account, initialNodes, initialEdges);
-    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges);
+    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 400);
 
     setNodes(nodes);
     setEdges(edges);
@@ -244,7 +382,7 @@ function AddressOverview({ account, showControls, showMiniMap }: Props) {
         minZoom: 0.1,
         nodes
       }}
-      maxZoom={1.5}
+      maxZoom={2}
       minZoom={0}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
@@ -254,7 +392,7 @@ function AddressOverview({ account, showControls, showMiniMap }: Props) {
       zoomOnScroll
     >
       {showMiniMap && <MiniMap pannable zoomable />}
-      {showControls && <Controls />}
+      {showControls && <Controls showInteractive={false} />}
     </ReactFlow>
   );
 }

@@ -3,16 +3,15 @@
 
 import type { AccountData, ProposeTransaction, ProxyTransaction, Transaction } from '@/hooks/types';
 
-import { AddressCell } from '@/components';
+import { AddressCell, Empty } from '@/components';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { autoFormatTimeStr } from '@/utils';
-import { alpha, Box, Divider } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { addressEq } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
+import { Button, Divider } from '@mimir-wallet/ui';
 
 import Approve from './buttons/Approve';
 import Cancel from './buttons/Cancel';
@@ -47,28 +46,14 @@ function ProgressItem({
   return (
     <div className='flex flex-col gap-[5px] p-[5px] w-full bg-primary/5 rounded-md'>
       <AddressCell showType withCopy withAddressBook shorten value={address} />
-      <Box
-        sx={({ palette }) => ({
-          overflow: 'hidden',
-          borderRadius: '1px',
-          position: 'relative',
-          marginX: 3.5,
-          height: '2px',
-          bgcolor: alpha(palette.primary.main, 0.1)
-        })}
-      >
-        <Box
-          sx={{
-            borderRadius: '1px',
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            bgcolor: 'primary.main',
+      <div className='overflow-hidden rounded-[1px] relative mx-9 h-[2px] bg-primary/10'>
+        <div
+          className='rounded-[1px] absolute left-0 top-0 bottom-0 bg-primary'
+          style={{
             width: `${(counts / threshold) * 100}%`
           }}
         />
-      </Box>
+      </div>
     </div>
   );
 }
@@ -88,24 +73,28 @@ function MultisigContent({
 }) {
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className='flex items-center justify-between'>
         <p className='font-bold flex-1'>Confirmations</p>
         {button}
-      </Box>
+      </div>
 
       <Content>
-        {transaction.children.map((tx, index) => (
-          <ProgressItem
-            key={index}
-            account={
-              account.type === 'multisig'
-                ? account.members.find((item) => addressEq(item.address, tx.address))
-                : undefined
-            }
-            transaction={tx}
-            address={tx.address}
-          />
-        ))}
+        {transaction.children.length > 0 ? (
+          transaction.children.map((tx, index) => (
+            <ProgressItem
+              key={index}
+              account={
+                account.type === 'multisig'
+                  ? account.members.find((item) => addressEq(item.address, tx.address))
+                  : undefined
+              }
+              transaction={tx}
+              address={tx.address}
+            />
+          ))
+        ) : (
+          <Empty height={150} label='no approvals' />
+        )}
       </Content>
     </>
   );
@@ -133,10 +122,10 @@ function ProxyContent({
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className='flex items-center justify-between'>
         <p className='font-bold flex-1'>Proxy</p>
         {button}
-      </Box>
+      </div>
 
       <Content>
         {transaction.children.length > 0 ? (
@@ -150,7 +139,9 @@ function ProxyContent({
           ))
         ) : transaction.delegate ? (
           <ProgressItem address={transaction.delegate} />
-        ) : null}
+        ) : (
+          <Empty height={150} label='no delegatees' />
+        )}
       </Content>
     </>
   );
@@ -202,15 +193,15 @@ function AnnounceContent({
           />
         </div>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className='flex items-center justify-between'>
           <p className='flex-1'>{currentBlock >= endBlock ? 'Finished' : 'Reviewing'}</p>
           {leftTime ? (leftTimeFormat ? `${leftTimeFormat} left` : '') : ''}
-        </Box>
+        </div>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className='flex items-center justify-between'>
           <p className='font-bold flex-1'>Proxy</p>
           {button}
-        </Box>
+        </div>
       </div>
     ) : (
       <div className='flex items-center justify-between'>
@@ -235,7 +226,9 @@ function AnnounceContent({
           ))
         ) : transaction.delegate ? (
           <ProgressItem address={transaction.delegate} />
-        ) : null}
+        ) : (
+          <Empty height={150} label='no delegatees' />
+        )}
       </Content>
     </>
   );
@@ -245,9 +238,9 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
   const filterPaths = useFilterPaths(account, transaction);
 
   return (
-    <div className={'bg-primary/5 rounded-md min-w-[280px] p-5 space-y-2.5 '.concat(props.className || '')}>
+    <div className={'bg-primary/5 rounded-medium min-w-[280px] p-5 space-y-2.5 '.concat(props.className || '')}>
       <p className='font-bold text-primary'>Progress</p>
-      <Divider />
+      <Divider className='bg-primary/5' />
 
       {transaction.type === TransactionType.Multisig ? (
         <MultisigContent
@@ -289,17 +282,33 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
         <ProposeContent transaction={transaction} />
       ) : null}
 
-      <Divider />
+      {transaction.exector ? (
+        <>
+          <Divider className='bg-primary/5' />
+
+          <div className='font-bold'>Executor</div>
+
+          <Content>
+            <div className='flex flex-col gap-[5px] p-[5px] w-full bg-primary/5 rounded-md'>
+              <AddressCell showType withCopy withAddressBook shorten value={transaction.exector} />
+            </div>
+          </Content>
+        </>
+      ) : null}
 
       {transaction.status < TransactionStatus.Success && (
-        <div className='space-y-2.5'>
-          <Approve account={account} transaction={transaction} filterPaths={filterPaths} />
-          <ExecuteAnnounce account={account} transaction={transaction} />
-          <ViewPending transaction={transaction} filterPaths={filterPaths} />
-          <Cancel account={account} transaction={transaction} />
-          <RemoveOrDeny transaction={transaction} />
-          <RemovePropose account={account} transaction={transaction} />
-        </div>
+        <>
+          <Divider className='bg-primary/5' />
+
+          <div className='space-y-2.5'>
+            <Approve account={account} transaction={transaction} filterPaths={filterPaths} />
+            <ExecuteAnnounce account={account} transaction={transaction} />
+            <ViewPending transaction={transaction} filterPaths={filterPaths} />
+            <Cancel account={account} transaction={transaction} />
+            <RemoveOrDeny transaction={transaction} />
+            <RemovePropose account={account} transaction={transaction} />
+          </div>
+        </>
       )}
     </div>
   );

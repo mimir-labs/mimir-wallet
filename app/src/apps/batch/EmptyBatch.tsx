@@ -21,7 +21,7 @@ function EmptyBatch({
         />
         <circle opacity='0.21' cx='18.2568' cy='84.8008' r='18' fill='#5F45FF' />
       </svg>
-      <h6 className='text-medium font-bold'>Add a transaction to the Batch</h6>
+      <h6 className='text-medium font-bold'>Batch Transactions</h6>
       <p className='text-tiny'>Batch multiple actions into one</p>
       {/* <Button onClick={onAdd} color='primary'>
         Add New Transaction

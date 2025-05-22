@@ -4,6 +4,8 @@
 import IconArrow from '@/assets/svg/icon-arrow.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import { AddressCell } from '@/components';
+import { ONE_DAY, ONE_HOUR } from '@/constants';
+import { useBlockInterval } from '@/hooks/useBlockInterval';
 import React from 'react';
 
 import { Button } from '@mimir-wallet/ui';
@@ -21,11 +23,25 @@ function ProxyInfo({
   delegate: string;
   onDelete?: () => void;
 }) {
+  const blockInterval = useBlockInterval().toNumber();
+  const estimateTime =
+    Number(delay) * blockInterval > ONE_DAY * 1000
+      ? `${((Number(delay) * blockInterval) / (ONE_DAY * 1000)).toFixed(2)} Days`
+      : `${((Number(delay) * blockInterval) / (ONE_HOUR * 1000)).toFixed(2)} Hours`;
+
   return (
     <div className='flex flex-col p-2.5 gap-1 bg-secondary rounded-medium'>
       <div className='flex items-center gap-2.5 text-foreground/65 text-tiny'>
         <p className='flex-1'>
-          Review Window: <b className='text-foreground mr-2.5'>{delay}</b>
+          {delay > 0 && (
+            <>
+              Review Window:{' '}
+              <b className='text-foreground mr-2.5'>
+                {delay}
+                <span className='text-primary'> ≈ {estimateTime}</span>
+              </b>
+            </>
+          )}
           Authorize: <b className='text-foreground'>{proxyType}</b>
         </p>
         {onDelete && (

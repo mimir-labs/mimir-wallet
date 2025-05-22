@@ -7,12 +7,12 @@ import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 
 import CreateMultisig from './CreateMultisig';
 
-function PageCreateMultisig({ threshold1 }: { threshold1?: boolean }) {
+function PageCreateMultisig() {
   const [network, setNetwork] = useInputNetwork();
 
   return (
     <SubApiRoot network={network}>
-      <CreateMultisig threshold1={threshold1} network={network} setNetwork={setNetwork} />
+      <CreateMultisig network={network} setNetwork={setNetwork} />
     </SubApiRoot>
   );
 }

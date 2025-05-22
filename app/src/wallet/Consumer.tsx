@@ -8,7 +8,7 @@ import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
 import { useEffect } from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 import { useWallet } from './useWallet';
 
@@ -45,7 +45,10 @@ function WalletConsumer() {
           window.injectedWeb3[key].enable(CONNECT_ORIGIN).then((injected) => {
             return injected.accounts.subscribe((accounts) => {
               useWallet.setState(({ walletAccounts }) => ({
-                walletAccounts: combineWalletAccounts(walletAccounts, wallet, accounts, chainSS58),
+                // Deduplicate wallet accounts by address
+                walletAccounts: combineWalletAccounts(walletAccounts, wallet, accounts, chainSS58).filter(
+                  (account, index, self) => index === self.findIndex((t) => addressEq(t.address, account.address))
+                ),
                 wallets: window.injectedWeb3
               }));
             });

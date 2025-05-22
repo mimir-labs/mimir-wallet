@@ -12,7 +12,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
-import { Avatar, FreeSoloPopover, Listbox, ListboxItem, Spinner } from '@mimir-wallet/ui';
+import { Avatar, FreeSoloPopover, Listbox, ListboxItem, Spinner, usePress } from '@mimir-wallet/ui';
 
 import FormatBalance from './FormatBalance';
 
@@ -50,6 +50,7 @@ function InputToken({
   const popoverRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useInput('');
   const [isOpen, toggleOpen] = useToggle(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [assetId, setAssetId] = useState<string>(defaultAssetId || 'native');
 
   const options = useMemo((): AccountAssetInfo[] => {
@@ -74,6 +75,10 @@ function InputToken({
   const handleClose = () => {
     toggleOpen(false);
   };
+
+  const { pressProps } = usePress({
+    onPress: isOpen ? handleClose : handleOpen
+  });
 
   const token = useMemo(() => {
     return options.find((item) => item.assetId === assetId);
@@ -110,7 +115,7 @@ function InputToken({
         >
           {token.symbol}
         </Avatar>
-        {isIconOnly || isOpen ? null : (
+        {isIconOnly || (isOpen && isFocused) ? null : (
           <p>
             {token.name}&nbsp;<span className='text-foreground/50'>({token.symbol})</span>
           </p>
@@ -191,17 +196,20 @@ function InputToken({
           <input
             ref={inputRef}
             className='absolute top-0 right-0 bottom-0 left-0 outline-none border-none pl-9 bg-transparent'
-            style={{ opacity: !isOpen ? 0 : 1 }}
+            style={{ opacity: isFocused && isOpen ? 1 : 0 }}
             value={inputValue}
             placeholder={placeholder}
             onChange={setInputValue}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             onClick={handleOpen}
           />
 
           <ArrowDown
-            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2'
+            data-open={isOpen}
+            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2 data-[open=true]:rotate-180 transition-transform duration-150'
             style={{ color: 'inherit' }}
-            onClick={handleOpen}
+            {...pressProps}
           />
         </div>
 

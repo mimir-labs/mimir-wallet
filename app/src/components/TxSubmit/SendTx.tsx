@@ -22,6 +22,7 @@ import AddressName from '../AddressName';
 import FormatBalance from '../FormatBalance';
 import LockItem, { LockContainer } from '../LockItem';
 import { toastError } from '../utils';
+import { useDryRunResult } from './hooks/useDryRunResult';
 
 function SendTx({
   disabled,
@@ -57,6 +58,7 @@ function SendTx({
   const { txBundle, isLoading, error, hashSet, reserve, unreserve, delay } = buildTx;
   const [enoughtState, setEnoughtState] = useState<Record<string, boolean | 'pending'>>({});
   const source = useAccountSource(txBundle?.signer);
+  const { data: dryRunResult } = useDryRunResult(api, txBundle);
 
   const isEnought = Object.keys(reserve).reduce<boolean>((result, item) => result && !!enoughtState[item], true);
   const isEnoughtPending = Object.keys(reserve).reduce<boolean>(
@@ -205,13 +207,17 @@ function SendTx({
         <Alert color='warning' title='This transaction can be executed after review window' />
       ) : null}
 
+      {dryRunResult && !dryRunResult.success ? <Alert color='danger' title={dryRunResult.error.message} /> : null}
+
       <Button
         fullWidth
         variant='solid'
         color='primary'
         onPress={error ? undefined : onConfirm}
         isLoading={loading || isLoading}
-        isDisabled={!txBundle?.signer || !!error || !isEnought || disabled}
+        isDisabled={
+          !txBundle?.signer || !!error || !isEnought || disabled || (dryRunResult ? !dryRunResult.success : false)
+        }
       >
         Submit
       </Button>

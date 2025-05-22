@@ -46,11 +46,10 @@ function HistoryTransactions({
       hasMore={hasNexPage}
       loader={skeleton}
       endMessage={<h6 className='text-small text-center text-foreground/50'>no data more.</h6>}
+      className='!overflow-visible flex flex-col gap-5'
     >
       {data.map((item) => (
-        <div key={item.id} className='mb-5'>
-          <TxCell key={item.id} address={address} transaction={item} />
-        </div>
+        <TxCell key={item.id} address={address} transaction={item} />
       ))}
     </InfiniteScroll>
   );

@@ -24,16 +24,21 @@ import OmniChainUpgradeTip from './OmniChainUpgradeTip';
 import SubscribeTx from './SubscribeTx';
 import ToggleAlert from './ToggleAlert';
 import TopBar from './topbar';
+import Version from './Version';
 import ViewCallData from './ViewCallData';
 
 function BaseContainer({
   auth,
   skipConnect = false,
   withSideBar,
-  withPadding
+  withPadding,
+  hideSideBar,
+  hideTopBar
 }: {
   auth: boolean;
   skipConnect?: boolean;
+  hideSideBar?: boolean;
+  hideTopBar?: boolean;
   withSideBar: boolean;
   withPadding: boolean;
 }) {
@@ -58,12 +63,10 @@ function BaseContainer({
       <WalletConsumer />
       <AddAddressBook />
       <OmniChainUpgradeTip />
-
-      <TopBar />
-
+      {hideTopBar ? null : <TopBar />}
       {isApiReady && isWalletReady && isMultisigSyned && current && (
         <>
-          <ToggleAlert address={current} setAlertOpen={setAlertOpen} />
+          {hideTopBar ? null : <ToggleAlert address={current} setAlertOpen={setAlertOpen} />}
           <SubscribeTx address={current} />
           <ViewCallData />
           <CopyAddressModal />
@@ -76,8 +79,11 @@ function BaseContainer({
         <div
           data-alert-open={alertOpen}
           className='flex w-full min-h-[calc(100dvh-1px-56px)] data-[alert-open="true"]:min-h-[calc(100dvh-1px-38px-56px)]'
+          style={{
+            minHeight: hideSideBar ? '100dvh' : undefined
+          }}
         >
-          <SideBar offsetTop={alertOpen ? 38 : 0} withSideBar={withSideBar} />
+          {hideSideBar ? null : <SideBar offsetTop={alertOpen ? 38 : 0} withSideBar={withSideBar} />}
 
           <div
             className='relative w-full flex-col gap-6 flex-1 p-4 sm:p-5'
@@ -89,9 +95,11 @@ function BaseContainer({
             <div className='h-full flex-1 z-10'>
               <Outlet />
             </div>
-            <p className='z-0 absolute bottom-0 left-0 right-0 font-bold text-foreground/50 text-center'>
-              Version: {import.meta.env.VERSION}
-            </p>
+            {hideTopBar ? null : (
+              <div style={{ padding: withPadding ? 0 : '0 0 16px 16px' }}>
+                <Version />
+              </div>
+            )}
           </div>
 
           {queue.length > 0 ? (

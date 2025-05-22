@@ -13,7 +13,6 @@ import { useNativeBalances } from '@/hooks/useBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useProxies } from '@/hooks/useProxies';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { Avatar, Box, Stack, Typography } from '@mui/material';
 import { BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
 import { useToggle } from 'react-use';
@@ -21,6 +20,7 @@ import { useToggle } from 'react-use';
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import {
   Alert,
+  Avatar,
   Button,
   Chip,
   Divider,
@@ -57,30 +57,23 @@ function Content({
 
   return (
     <>
-      <Stack spacing={2}>
+      <div className='space-y-5'>
         <InputNetwork network={network} setNetwork={setNetwork} />
 
-        <Box sx={{ borderRadius: 1, padding: 1, bgcolor: 'secondary.main' }}>
-          <Typography fontWeight={700}>Proxy Account</Typography>
-          <Stack spacing={1} sx={{ marginTop: 1 }}>
+        <div className='rounded-medium p-2.5 bg-secondary'>
+          <div className='font-bold'>Proxy Account</div>
+
+          <div className='space-y-2.5 mt-2.5'>
             {isFetched &&
               proxies &&
               proxies[0].map((proxy, index) => (
-                <Box
+                <div
                   key={index}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    bgcolor: 'white',
-                    borderRadius: 1,
-                    padding: 0.5,
-                    gap: 0.5
-                  }}
+                  className='flex items-center justify-between bg-content1 rounded-medium p-[5px] gap-[5px]'
                 >
-                  <Box sx={{ flex: '1' }}>
+                  <div className='flex-1'>
                     <AddressCell shorten value={proxy.delegate.toString()} />
-                  </Box>
+                  </div>
                   {proxy.delay.gt(BN_ZERO) ? (
                     <Tooltip content={`Delay Blocks: ${[proxy.delay]}`}>
                       <IconClock className='w-4 h-4 opacity-70' />
@@ -115,14 +108,14 @@ function Content({
                       <IconDelete className='w-4 h-4' />
                     </TxButton>
                   )}
-                </Box>
+                </div>
               ))}
 
             {isFetched && proxies?.[0]?.length === 0 && <Empty height={200} label='No proxies' />}
 
             {!isFetched && isFetching && <Spinner />}
-          </Stack>
-        </Box>
+          </div>
+        </div>
 
         <Divider />
 
@@ -163,7 +156,7 @@ function Content({
             Delete All
           </TxButton>
         )}
-      </Stack>
+      </div>
 
       {account && account.type === 'pure' && (
         <Modal size='xl' isOpen={isOpen} onClose={toggleOpen}>
@@ -188,10 +181,14 @@ function Content({
 
               <div className='flex flex-row items-center gap-[5px]'>
                 <span>Balance:</span>
-                <Avatar alt={api.runtimeChain.toString()} src={token.Icon} sx={{ width: 14, height: 14 }} />
-                <Box component='span' sx={{ color: 'text.secondary' }}>
+                <Avatar
+                  alt={api.runtimeChain.toString()}
+                  src={token.Icon}
+                  style={{ width: 14, height: 14, backgroundColor: 'transparent' }}
+                />
+                <span className='text-foreground/50'>
                   <FormatBalance withCurrency value={allBalances?.total} />
-                </Box>
+                </span>
               </div>
             </ModalBody>
 

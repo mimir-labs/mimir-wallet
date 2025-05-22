@@ -8,13 +8,18 @@ import React from 'react';
 
 function CallName({ value }: ParamProps) {
   const call = value as Call;
-  const { method, section } = call.registry.findMetaCall(call.callIndex);
 
-  if (section && method) {
-    return `${section}.${method}`;
+  try {
+    const { method, section } = call.registry.findMetaCall(call.callIndex);
+
+    if (section && method) {
+      return `${section}.${method}`;
+    }
+
+    return null;
+  } catch {
+    return null;
   }
-
-  return null;
 }
 
 export default React.memo(CallName);

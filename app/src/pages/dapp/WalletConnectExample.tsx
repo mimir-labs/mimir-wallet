@@ -32,7 +32,7 @@ function WalletConnectExample() {
 
   return (
     <>
-      <div className='flex items-center justify-between sm:flex-row flex-col p-5 gap-3 rounded-large shadow-medium bg-background'>
+      <div className='w-full flex items-center justify-between sm:flex-row flex-col p-5 gap-3 rounded-large border-1 border-secondary shadow-medium bg-background'>
         <div className='flex-1 flex items-center gap-2.5'>
           <Avatar src='/images/wallet-connect.webp' style={{ width: 40, height: 40 }} className='flex-shrink-0' />
           <div>

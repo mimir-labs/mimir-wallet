@@ -14,14 +14,13 @@ import { addTxToast } from '@/hooks/useTxQueue';
 import { sleep } from '@/utils';
 import { accountSource, useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
-import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Stack, Typography } from '@mui/material';
 import { u8aEq, u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { addressToHex, signAndSend, useApi } from '@mimir-wallet/polkadot-core';
 import { service, store } from '@mimir-wallet/service';
-import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import CreateSuccess from './CreateSuccess';
 
@@ -206,70 +205,62 @@ function CreateFlexible({
 
   return (
     <>
-      <Stack spacing={1.5}>
-        <Typography variant='h3'>Create Flexible Multisig</Typography>
-        <Typography>Please complete both steps to avoid unnecessary asset loss.</Typography>
-        <Divider sx={{ marginY: 1.5 }} />
-        <Accordion expanded={false}>
-          <AccordionSummary>
-            <div className='flex items-center gap-2'>
-              <ItemStep>1</ItemStep>
-              <div className='flex items-center gap-2 justify-between'>
-                {pure ? (
-                  <>
-                    <Box color='primary.main' component='span'>
-                      <Address shorten value={pure} />
-                    </Box>
-                    &nbsp; Created!
-                  </>
-                ) : (
-                  <>Create Flexible Multisig Account</>
-                )}
-                <div className='flex gap-1 items-center text-small'>
-                  <img src={chain.icon} style={{ width: 20, height: 20 }} />
-                  {chain.name}
-                </div>
-              </div>
+      <div className='space-y-4'>
+        <h2>Create Flexible Multisig</h2>
+        <p>Please complete both steps to avoid unnecessary asset loss.</p>
+        <Divider />
+        <div className='flex items-center gap-2 p-2.5 rounded-large bg-secondary shadow-small'>
+          <ItemStep>1</ItemStep>
+          <div className='flex items-center gap-2 justify-between'>
+            {pure ? (
+              <>
+                <span className='text-primary'>
+                  <Address shorten value={pure} />
+                </span>
+                &nbsp; Created!
+              </>
+            ) : (
+              <>Create Flexible Multisig Account</>
+            )}
+            <div className='flex gap-1 items-center text-small'>
+              <img src={chain.icon} style={{ width: 20, height: 20 }} />
+              {chain.name}
             </div>
-          </AccordionSummary>
-        </Accordion>
-        <Accordion expanded>
-          <AccordionSummary>
-            <div className='flex items-center gap-2'>
-              <ItemStep disabled={!pure}>2</ItemStep>
-              Set Members ({threshold}/{who.length})
-              <Tooltip
-                classNames={{ content: 'max-w-[320px]' }}
-                content={
-                  <span>
-                    Flexible Multisig is a Pure Proxy. In <b>‘set members’</b> step, you add the multisig account as its
-                    proxy and remove the creator's proxy, making the multi-signature its only controller. Then transfer
-                    some funds to keep Flexible alive.
-                  </span>
-                }
-                closeDelay={0}
-              >
-                <IconQuestion />
-              </Tooltip>
+          </div>
+        </div>
+
+        <div className='p-2.5 space-y-2.5 rounded-large bg-secondary shadow-small'>
+          <div className='flex items-center gap-2'>
+            <ItemStep disabled={!pure}>2</ItemStep>
+            Set Members ({threshold}/{who.length})
+            <Tooltip
+              classNames={{ content: 'max-w-[320px]' }}
+              content={
+                <span>
+                  Flexible Multisig is a Pure Proxy. In <b>‘set members’</b> step, you add the multisig account as its
+                  proxy and remove the creator's proxy, making the multi-signature its only controller. Then transfer
+                  some funds to keep Flexible alive.
+                </span>
+              }
+              closeDelay={0}
+            >
+              <IconQuestion />
+            </Tooltip>
+          </div>
+
+          {who.map((address) => (
+            <div key={address} className='flex justify-between items-center'>
+              <p className='text-tiny font-bold'>
+                <AddressRow value={address} />
+              </p>
+              <p className='text-tiny text-foreground/50'>
+                <Address shorten value={address} />
+              </p>
             </div>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={1}>
-              {who.map((address) => (
-                <Box key={address} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography fontSize='0.75rem' fontWeight={700}>
-                    <AddressRow value={address} />
-                  </Typography>
-                  <Typography color='text.secondary' fontSize='0.75rem'>
-                    <Address shorten value={address} />
-                  </Typography>
-                </Box>
-              ))}
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-        <Divider sx={{ marginY: 1.5 }} />
-        <Typography fontWeight={700}>Transaction Initiator</Typography>
+          ))}
+        </div>
+        <Divider className='mt-5' />
+        <p className='font-bold'>Transaction Initiator</p>
         <InputAddress
           disabled={!!pure}
           filtered={creator ? [creator] : who.filter((address) => !!accountSource(address))}
@@ -291,8 +282,8 @@ function CreateFlexible({
           </LockContainer>
         )}
 
-        <Divider sx={{ marginY: 1.5 }} />
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Divider />
+        <div className='flex gap-2.5'>
           {pure ? (
             <Button
               color='danger'
@@ -338,8 +329,8 @@ function CreateFlexible({
               Create
             </Button>
           )}
-        </Box>
-      </Stack>
+        </div>
+      </div>
 
       {pure && <CreateSuccess isOpen={isSuccess} onClose={() => setIsSuccess(false)} address={pure} />}
     </>

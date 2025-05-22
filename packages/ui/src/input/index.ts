@@ -4,3 +4,4 @@
 import Input from './Input.js';
 
 export { Input };
+export type { InputProps } from '@heroui/input';

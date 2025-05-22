@@ -3,7 +3,8 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
-import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
+import SubId from '@/assets/images/subid.svg';
+import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
 import IconLink from '@/assets/svg/icon-link.svg?react';
 import IconProxy from '@/assets/svg/icon-proxy-fill.svg?react';
@@ -11,20 +12,18 @@ import IconQrcode from '@/assets/svg/icon-qr.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@/assets/svg/icon-set.svg?react';
 import { Address, AddressName, CopyAddress, Fund, IdentityIcon } from '@/components';
-import { toastSuccess } from '@/components/utils';
 import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
 import { useAddressExplorer } from '@/hooks/useAddressExplorer';
-import { useCopyAddress } from '@/hooks/useCopyAddress';
-import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { formatDisplay } from '@/utils';
-import { Avatar, Box, Divider, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Link, Tooltip } from '@mimir-wallet/ui';
+import { useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Divider, Link, Tooltip } from '@mimir-wallet/ui';
 
 function SubsquareLink({ network, address }: { network: string; address: string }) {
   const isSupported = SubsquareApp.supportedChains.includes(network);
@@ -40,28 +39,27 @@ function SubsquareLink({ network, address }: { network: string; address: string 
   return (
     <Tooltip content='Subsquare' closeDelay={0}>
       <Link href={`/explorer/${encodeURIComponent(url.toString())}`}>
-        <Avatar style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subscan' />
+        <img style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subsquare' />
       </Link>
     </Tooltip>
   );
 }
 
 function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string | number; changes: number }) {
-  const { network, chainSS58 } = useApi();
+  const { network } = useApi();
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [open, toggleOpen] = useToggle(false);
   const [account] = useQueryAccount(address);
-  const { breakpoints } = useTheme();
-  const downSm = useMediaQuery(breakpoints.down('sm'));
+  const upSm = useMediaQuery('sm');
   const { open: openQr } = useQrAddress();
   const { open: openExplorer } = useAddressExplorer();
-  const { open: openCopy } = useCopyAddress();
-  const [, copy] = useCopyClipboard();
+  const copyAddress = useCopyAddressToClipboard(address);
 
-  const showWatchOnlyButton = useMemo(
-    () => !(isLocalAccount(address) || isLocalAddress(address, true)),
+  const showAddWatchlistButton = useMemo(
+    () => !isLocalAccount(address) && !isLocalAddress(address, true),
     [address, isLocalAccount, isLocalAddress]
   );
+
   const days = account ? Math.ceil((Date.now() - account.createdAt) / (ONE_DAY * 1000)) : '--';
   const formatUsd = formatDisplay(totalUsd.toString());
 
@@ -78,18 +76,6 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
       >
         Transfer
       </Button>
-      {showWatchOnlyButton ? (
-        <Button
-          variant='ghost'
-          color='primary'
-          size='md'
-          className='h-[26px]'
-          endContent={<IconAdd className='w-4 h-4' />}
-          onPress={() => addAddressBook(address, true)}
-        >
-          Add to watchlist
-        </Button>
-      ) : null}
       <Button
         onPress={toggleOpen}
         variant='ghost'
@@ -127,54 +113,41 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
   return (
     <>
-      <Paper
-        sx={{
-          width: '100%',
-          padding: { sm: 2, xs: 1.5 },
-          display: 'flex',
-          flexDirection: { sm: 'row', xs: 'column' },
-          alignItems: { sx: 'end', xs: 'start' },
-          justifyContent: 'space-between',
-          gap: 2,
-          borderRadius: 2
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'start', gap: 2 }}>
-          <IdentityIcon value={address} size={downSm ? 50 : 80} />
+      <div className='w-full p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-start justify-between gap-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
+        <div className='flex items-start gap-5'>
+          <IdentityIcon value={address} size={upSm ? 80 : 50} />
 
-          <Stack spacing={{ sm: 1, xs: 0.5 }}>
-            <Typography
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                fontWeight: 800,
-                fontSize: { sm: '30px', xs: '26px' },
-                lineHeight: 1.1
-              }}
-            >
+          <div className='space-y-[5px] sm:space-y-2.5'>
+            <div className='flex items-center gap-2.5 font-extrabold text-[26px] sm:text-[30px] leading-[1.1]'>
               <AddressName value={address} />
-              <Button isIconOnly as={Link} size='lg' href={`/account-setting?address=${address}`} color='secondary'>
-                <IconSet className='w-[22px] h-[22px]' />
-              </Button>
-            </Typography>
+              {showAddWatchlistButton ? (
+                <Tooltip color='foreground' content='Add to watchlist' placement='bottom-start'>
+                  <Button isIconOnly size='lg' color='secondary' onPress={() => addAddressBook(address, true)}>
+                    <IconAddressBook className='w-[20px] h-[20px]' />
+                  </Button>
+                </Tooltip>
+              ) : null}
+              <Tooltip color='foreground' content='Setting' placement='bottom-start'>
+                <Button
+                  isIconOnly
+                  as={Link}
+                  size='lg'
+                  href={`/account-setting?address=${address}`}
+                  color='secondary'
+                  className='transition-transform rotate-0 duration-300 hover:rotate-180'
+                >
+                  <IconSet className='w-[20px] h-[20px]' />
+                </Button>
+              </Tooltip>
+            </div>
 
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.4,
-                fontWeight: 700,
-                color: 'text.primary',
-                lineHeight: 1.1
-              }}
+            <div
+              className='flex items-center gap-1 font-bold text-foreground leading-[1.1]'
               onClick={() => {
-                copy(encodeAddress(address, chainSS58));
-                openCopy(address);
-                toastSuccess('Address copied', encodeAddress(address, chainSS58));
+                copyAddress();
               }}
             >
-              <Address value={address} shorten={downSm} />
+              <Address value={address} shorten={!upSm} />
               <CopyAddress address={address} color='primary' className='opacity-50' />
               <Tooltip content='Explorer' closeDelay={0}>
                 <Button
@@ -199,56 +172,52 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
               >
                 <IconQrcode className='w-[16px] h-[16px]' />
               </Button>
-            </Box>
+            </div>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
+            <div className='flex items-center gap-1 text-foreground/50'>
               <span>Mimir Secured {days} Days</span>
               <SubsquareLink network={network} address={address} />
-            </Box>
+              <Tooltip content='Sub ID' closeDelay={0}>
+                <Link href={`https://sub.id/${address}`} isExternal>
+                  <img src={SubId} className='w-4 h-4' />
+                </Link>
+              </Tooltip>
+            </div>
 
-            <Divider sx={{ display: { sm: 'block', xs: 'none' }, maxWidth: 250, minWidth: 200 }} />
+            <Divider className='hidden sm:block' style={{ maxWidth: 250, minWidth: 200 }} />
 
-            {!downSm && buttons}
-          </Stack>
-        </Box>
+            {upSm && buttons}
+          </div>
+        </div>
 
-        <Box
-          sx={{
-            textAlign: { sm: 'right', xs: 'left' },
-            background: { sm: 'transparent', xs: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)' },
-            width: { sm: 'auto', xs: '100%' },
-            borderRadius: 2,
-            padding: { sm: 0, xs: 1 }
-          }}
+        <div
+          className='text-left sm:text-right w-full sm:w-auto p-2.5 sm:p-0 bg-[--self-background] sm:bg-transparent rounded-large'
+          style={
+            {
+              '--self-background': 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
+            } as any
+          }
         >
-          <Typography variant='h1' sx={{ fontWeight: 700, fontSize: '40px', lineHeight: 1 }}>
+          <h1 className='text-[40px] leading-[1]'>
             $ {formatUsd[0]}
             {formatUsd[1] ? `.${formatUsd[1]}` : ''}
             {formatUsd[2] || ''}
-          </Typography>
-          <Typography
-            sx={{
-              marginTop: 1,
-              fontWeight: 700,
-              fontSize: '1rem'
-            }}
-          >
-            <Box
-              component='span'
-              sx={{
-                marginRight: 0.5,
-                color: changes > 0 ? 'success.main' : changes < 0 ? 'error.main' : 'text.secondary'
-              }}
+          </h1>
+          <p className='mt-2.5 font-bold text-medium'>
+            <span
+              data-up={changes > 0}
+              data-down={changes < 0}
+              className='mr-[5px] data-[up]:text-success data-[down]:text-danger text-secondary'
             >
               {changes > 0 ? '+' : ''}
               {(changes * 100).toFixed(2)}%
-            </Box>
+            </span>
             <span style={{ fontWeight: 400 }}>Last 24 Hours</span>
-          </Typography>
-        </Box>
+          </p>
+        </div>
 
-        {downSm && buttons}
-      </Paper>
+        {!upSm && buttons}
+      </div>
 
       <Fund onClose={toggleOpen} open={open} receipt={address} />
     </>

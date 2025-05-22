@@ -35,7 +35,7 @@ function SubscribeTx({ address }: { address: string }) {
     const handler = (message: TxMessage) => {
       if (message.status > TransactionStatus.Pending) {
         (message.status === TransactionStatus.Success ? toastSuccess : toastError)(
-          <div className='ml-4 flex flex-col gap-1'>
+          <div className='flex flex-col gap-1'>
             <div className='font-bold'>Transaction</div>
             <p className='text-tiny'>
               Transaction {formatTransactionId(message.id)} Executed {TransactionStatus[message.status]}
@@ -47,7 +47,7 @@ function SubscribeTx({ address }: { address: string }) {
         );
       } else if (message.isNew) {
         toastSuccess(
-          <div className='ml-4 flex flex-col gap-1'>
+          <div className='flex flex-col gap-1'>
             <div className='font-bold'>Transaction</div>
             <p className='text-tiny'>
               New Transaction by <Address shorten value={message.triggerAddress} />
@@ -60,7 +60,7 @@ function SubscribeTx({ address }: { address: string }) {
       } else if (message.status === TransactionStatus.Pending) {
         if (message.type === TransactionType.Multisig) {
           toastSuccess(
-            <div className='ml-4 flex flex-col gap-1'>
+            <div className='flex flex-col gap-1'>
               <div className='font-bold'>Transaction</div>
               <p className='text-tiny'>
                 <Address shorten value={message.triggerAddress} /> approve Transaction {formatTransactionId(message.id)}

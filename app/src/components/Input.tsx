@@ -8,6 +8,7 @@ import { useCallback } from 'react';
 import { Input as BaseInput } from '@mimir-wallet/ui';
 
 function Input({
+  className = '',
   autoComplete,
   autoFocus,
   defaultValue,
@@ -25,7 +26,8 @@ function Input({
   startAdornment,
   tabIndex,
   type,
-  value
+  value,
+  ...props
 }: InputProps) {
   const _onChange = useCallback(
     (_value: string) => {
@@ -35,7 +37,10 @@ function Input({
   );
 
   return (
-    <div className='flex items-center gap-2 pt-[calc(theme(fontSize.small)_+_10px)]'>
+    <div
+      className={'flex items-center gap-2 pt-[calc(theme(fontSize.small)_+_10px)] '.concat(className)}
+      style={{ paddingTop: label ? undefined : 0 }}
+    >
       <BaseInput
         value={value}
         defaultValue={defaultValue}
@@ -46,10 +51,11 @@ function Input({
         type={type}
         autoFocus={autoFocus}
         color={color}
+        isInvalid={!!error}
+        errorMessage={error ? error.message : undefined}
         isDisabled={disabled}
         label={label}
         fullWidth={fullWidth}
-        errorMessage={error?.message}
         description={helper}
         variant='bordered'
         labelPlacement='outside'
@@ -57,6 +63,7 @@ function Input({
         startContent={startAdornment}
         endContent={endAdornment}
         onValueChange={_onChange}
+        {...props}
       />
       {endButton}
     </div>

@@ -31,7 +31,12 @@ export function assetDispatchError(api: ApiPromise, dispatch: DispatchError | Sp
   if (dispatch.isModule) {
     const error = api.registry.findMetaError(dispatch.asModule);
 
-    return new TxModuleError(`Cause by ${error.section}.${error.method}`, error.section, error.method, error.docs);
+    return new TxModuleError(
+      `Cause by ${error.section}.${error.method}: ${error.docs.join('\n')}`,
+      error.section,
+      error.method,
+      error.docs
+    );
   }
 
   if (dispatch.isToken) {

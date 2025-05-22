@@ -11,6 +11,7 @@ import { hexToU8a } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { Tooltip } from '@mimir-wallet/ui';
 
 interface Props {
   defaultName?: string;
@@ -32,14 +33,19 @@ function extractIdentity(
 
   const elem = (
     <span className='inline-flex items-center'>
-      <IconIdentity
-        width='1em'
-        height='1em'
-        style={{ marginRight: '0.2em' }}
-        data-is-bad={isBad}
-        data-is-good={isGood}
-        className='text-divider-300 data-[is-bad=true]:text-danger data-[is-good=true]:text-primary'
-      />
+      <Tooltip
+        color='foreground'
+        content={isGood ? 'Reasonable Identity' : isBad ? 'Bad Identity' : 'Unknown Identity'}
+      >
+        <IconIdentity
+          width='1em'
+          height='1em'
+          style={{ marginRight: '0.2em' }}
+          data-is-bad={isBad}
+          data-is-good={isGood}
+          className='text-divider-300 data-[is-bad=true]:text-danger data-[is-good=true]:text-primary'
+        />
+      </Tooltip>
       <span>{displayParent || displayName}</span>
       {displayParent && <span>/</span>}
       {displayParent && <span style={{ opacity: 0.5 }}>{displayName}</span>}

@@ -10,7 +10,7 @@ import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import IconX from '@/assets/svg/icon-x.svg?react';
 import React from 'react';
 
-import { Avatar, Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
+import { Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
 
 import SupportedChains from './SupportedChains';
 
@@ -28,7 +28,7 @@ function Contents({ dapp }: { dapp: DappOption }) {
         <div className='absolute right-0 top-0 flex items-center'>
           Supported On <SupportedChains app={dapp} />
         </div>
-        <Avatar radius='md' src={dapp.icon} className='w-[64px] h-[64px]' />
+        <img src={dapp.icon} className='w-[64px] h-[64px]' />
         <h3>{dapp.name}</h3>
         <div className='flex items-center gap-2.5'>
           {dapp.tags?.map((tag, index) => (

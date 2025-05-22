@@ -12,11 +12,10 @@ import IconTwitter from '@/assets/images/x.svg';
 import { Address, CopyAddress, IdentityIcon } from '@/components';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { dataToUtf8 } from '@/utils';
-import { Avatar, Box } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { findAction } from '@mimir-wallet/polkadot-core';
-import { Tooltip } from '@mimir-wallet/ui';
+import { Avatar, Tooltip } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
 
@@ -25,7 +24,7 @@ function Item({ icon, value }: { icon: string; value: string }) {
 
   return (
     <Tooltip content={copied ? 'Copied' : value} closeDelay={0}>
-      <Avatar src={icon} sx={{ cursor: 'copy', width: 32, height: 32 }} onClick={() => copy(value)} />
+      <Avatar src={icon} style={{ cursor: 'copy', width: 32, height: 32 }} onClick={() => copy(value)} />
     </Tooltip>
   );
 }
@@ -52,7 +51,7 @@ function IdentityDisplay({
 }) {
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+      <div className='flex items-center gap-2'>
         {address && <IdentityIcon size={34} value={address} />}
         <b>{display}</b>
         {address && (
@@ -61,14 +60,14 @@ function IdentityDisplay({
             <CopyAddress address={address} />
           </span>
         )}
-      </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: { sm: 2, xs: 1 } }}>
+      </div>
+      <div className='flex items-center gap-2.5 sm:gap-5'>
         {twitter && <Item icon={IconTwitter} value={twitter} />}
         {discord && <Item icon={IconDiscord} value={discord} />}
         {matrix && <Item icon={IconMatrix} value={matrix} />}
         {email && <Item icon={IconEmail} value={email} />}
         {github && <Item icon={IconGithub} value={github} />}
-      </Box>
+      </div>
     </>
   );
 }
@@ -123,17 +122,9 @@ function SetIdentity({ from, registry, call, jsonFallback }: CallProps) {
   if (!results) return <FunctionArgs from={from} registry={registry} call={call} jsonFallback={jsonFallback} />;
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: { md: 3, sm: 2, xs: 1 }
-      }}
-    >
+    <div className='w-full flex items-center justify-between gap-2.5 sm:gap-5 md:gap-7'>
       <IdentityDisplay {...results} address={from} />
-    </Box>
+    </div>
   );
 }
 

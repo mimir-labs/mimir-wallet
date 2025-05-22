@@ -6,20 +6,20 @@ import type { IMethod } from '@polkadot/types/types';
 
 import { AddressCell, Bytes, Hash } from '@/components';
 import { FunctionArgs } from '@/params';
-import { Alert, AlertTitle, Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import moment from 'moment';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
 import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
+import { Alert, Button, Divider } from '@mimir-wallet/ui';
 
 function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
-    <Stack spacing={0.5}>
-      <Typography fontWeight={700}>{title}</Typography>
+    <div className='space-y-[5px]'>
+      <div className='font-bold'>{title}</div>
 
-      <Box sx={{ padding: 1, bgcolor: 'secondary.main', borderRadius: 1 }}>{content}</Box>
-    </Stack>
+      <div className='p-2.5 bg-secondary rounded-medium'>{content}</div>
+    </div>
   );
 }
 
@@ -40,8 +40,7 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
       ) : null}
 
       {!call && (
-        <Alert severity='warning'>
-          <AlertTitle>Warning</AlertTitle>
+        <Alert title='Warning' color='warning'>
           This transaction wasn’t initiated from Mimir. Please confirm the security of this transaction.
         </Alert>
       )}
@@ -64,10 +63,8 @@ function Details({ transaction }: { transaction: Transaction }) {
   }, [api, transaction.call]);
 
   return (
-    <Paper component={Stack} spacing={1} sx={{ padding: 1.5, borderRadius: 2 }}>
-      <Typography variant='h6' color='primary'>
-        Detail
-      </Typography>
+    <div className='space-y-2.5 bg-content1 border-1 border-secondary shadow-medium p-4 rounded-large'>
+      <h6 className='text-primary'>Detail</h6>
       <Divider />
 
       <Item title='Created Time' content={moment(transaction.createdAt).format()} />
@@ -86,7 +83,7 @@ function Details({ transaction }: { transaction: Transaction }) {
       <Target address={transaction.address} call={call} />
 
       {!isOpen && (
-        <Button color='secondary' sx={{ borderRadius: 1 }} onClick={toggleOpen}>
+        <Button fullWidth color='secondary' radius='md' variant='solid' onPress={toggleOpen}>
           Detail
         </Button>
       )}
@@ -106,7 +103,7 @@ function Details({ transaction }: { transaction: Transaction }) {
           )}
         </>
       )}
-    </Paper>
+    </div>
   );
 }
 

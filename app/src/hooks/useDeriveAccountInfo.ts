@@ -5,10 +5,12 @@ import type { ApiPromise } from '@polkadot/api';
 import type { Bytes, Data, Option, Vec } from '@polkadot/types';
 import type { PalletIdentityJudgement, PalletIdentityRegistration } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
+import type { HexString } from '@polkadot/util/types';
 
 import { dataToUtf8 } from '@/utils';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { create } from 'zustand';
 
 import { addressToHex, useIdentityApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
@@ -106,6 +108,8 @@ async function getIdentityInfo({
   };
 }
 
+export const useIdentityStore = create<Record<HexString, string>>()(() => ({}));
+
 export function useDeriveAccountInfo(value?: string | null) {
   const identityApi = useIdentityApi();
 
@@ -122,9 +126,20 @@ export function useDeriveAccountInfo(value?: string | null) {
     queryKey: [identityApi?.api, address] as const,
     queryHash,
     refetchInterval: 12000,
+    refetchOnMount: false,
     queryFn: getIdentityInfo,
     enabled: enabled
   });
+
+  useEffect(() => {
+    if (data && data.display && value) {
+      const display = data.displayParent ? `${data.displayParent}/${data.display}` : data.display;
+
+      useIdentityStore.setState({
+        [addressHex]: display
+      });
+    }
+  }, [data, value, addressHex]);
 
   return [data, isFetched, isFetching] as const;
 }

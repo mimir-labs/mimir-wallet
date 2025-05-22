@@ -1,58 +1,170 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AddressMeta } from '@/hooks/types';
+import type { HexString } from '@polkadot/util/types';
+
+import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { AddressRow } from '@/components';
+import IconSearch from '@/assets/svg/icon-search.svg?react';
+import { AddressRow, Empty, Input } from '@/components';
+import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { hexToU8a } from '@polkadot/util';
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { addressEq } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip } from '@mimir-wallet/ui';
+import { addressEq, addressToHex, isPolkadotAddress } from '@mimir-wallet/polkadot-core';
+import { Button, Tooltip, usePress } from '@mimir-wallet/ui';
 
 interface Props {
+  withSearch?: boolean;
   title: string;
   type: 'add' | 'delete';
-  disabled?: boolean;
   accounts: string[];
+  ignoreAccounts?: string[];
+  scroll?: boolean;
   onClick: (value: string) => void;
 }
 
-function AccountSelect({ accounts, disabled, onClick, title, type }: Props) {
+function filterAccounts(signatories: string[], metas: Record<HexString, AddressMeta>, input: string) {
+  if (!input) return signatories;
+
+  if (isPolkadotAddress(input)) {
+    const accounts = signatories.filter((address) => addressEq(address, input));
+
+    if (accounts.length === 0) {
+      return [input];
+    }
+
+    return accounts;
+  }
+
+  const identities = useIdentityStore.getState();
+
+  return signatories.filter((address) => {
+    const meta = metas[addressToHex(address)];
+
+    const identity = identities[addressToHex(address)];
+
+    return (
+      address.toLowerCase().includes(input.toLowerCase()) ||
+      (meta?.name ? meta.name.toLowerCase().includes(input.toLowerCase()) : false) ||
+      (identity ? identity.toLowerCase().includes(input.toLowerCase()) : false)
+    );
+  });
+}
+
+function filterIgnoreAccounts(accounts: string[], ignoreAccounts: string[]) {
+  if (ignoreAccounts.length === 0) {
+    return accounts;
+  }
+
+  return accounts.filter((account) => !ignoreAccounts.some((value) => addressEq(value, account)));
+}
+
+function Item({
+  account,
+  disabled,
+  type,
+  onClick
+}: {
+  account: string;
+  disabled?: boolean;
+  type: 'add' | 'delete';
+  onClick: (value: string) => void;
+}) {
+  const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
+  const { pressProps } = usePress({
+    onPress: () => onClick(account)
+  });
+
+  const _handleAdd = useCallback(() => {
+    if (!(isLocalAddress(account) || isLocalAccount(account))) {
+      addAddressBook(account, false);
+    }
+  }, [account, addAddressBook, isLocalAccount, isLocalAddress]);
+
   return (
-    <div className='flex flex-1 flex-col'>
-      <p>
-        <b>{title}</b>
-      </p>
-      <div className='space-y-2.5 overflow-y-auto max-h-[200px] mt-1 p-2.5 flex-1 border-1 border-secondary rounded-medium bg-content1'>
-        {accounts.map((account, index) => (
-          <div
-            key={index}
-            className='flex items-center justify-between rounded-small p-1 bg-secondary [&>.AddressRow]:flex-1'
-          >
-            <AddressRow iconSize={24} value={account} />
-            {addressEq(hexToU8a('0x0', 256), account) && (
-              <Tooltip
-                classNames={{ content: 'max-w-[500px] break-all' }}
-                content='The SS58 address for 0x0000000000000000000000000000000000000000000000000000000000000000 which cannot be controlled.'
-              >
-                <IconQuestion />
-              </Tooltip>
-            )}
-            <Button
-              isIconOnly
-              isDisabled={disabled}
-              variant='light'
-              color={type === 'add' ? 'primary' : 'danger'}
-              onPress={() => onClick(account)}
-              size='sm'
-              className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
-            >
-              {type === 'add' ? <IconAdd className='w-4 h-4' /> : <IconDelete className='w-4 h-4' />}
-            </Button>
-          </div>
-        ))}
+    <div
+      className='cursor-pointer flex items-center justify-between rounded-small p-1 bg-secondary  snap-start'
+      {...pressProps}
+    >
+      <div>
+        <Tooltip content={account}>
+          <AddressRow iconSize={24} value={account} />
+        </Tooltip>
+      </div>
+      <div className='flex-1' />
+      {addressEq(hexToU8a('0x0', 256), account) && (
+        <Tooltip
+          classNames={{ content: 'max-w-[500px] break-all' }}
+          content='The SS58 address for 0x0000000000000000000000000000000000000000000000000000000000000000 which cannot be controlled.'
+        >
+          <IconQuestion />
+        </Tooltip>
+      )}
+      <Button
+        isIconOnly
+        isDisabled={disabled}
+        variant='light'
+        color={type === 'add' ? 'primary' : 'danger'}
+        onPress={() => {
+          _handleAdd();
+          onClick(account);
+        }}
+        size='sm'
+        className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
+      >
+        {type === 'add' ? <IconAdd className='w-4 h-4' /> : <IconDelete className='w-4 h-4' />}
+      </Button>
+    </div>
+  );
+}
+
+function AccountSelect({ withSearch, accounts, ignoreAccounts = [], onClick, title, type, scroll = true }: Props) {
+  const { metas } = useAccount();
+  const [keywords, setKeywords] = useState('');
+
+  const filtered = useMemo(
+    () => filterIgnoreAccounts(filterAccounts(accounts, metas, keywords), ignoreAccounts),
+    [accounts, ignoreAccounts, keywords, metas]
+  );
+
+  const handleSelect = useCallback(
+    (value: string) => {
+      onClick(value);
+      setKeywords('');
+    },
+    [onClick]
+  );
+
+  return (
+    <div className='flex flex-1 flex-col gap-3'>
+      <b>{title}</b>
+
+      <div className='relative space-y-2.5 overflow-y-auto mt-1 p-2.5 flex-1 border-1 border-divider-300 rounded-medium bg-content1'>
+        {withSearch && (
+          <Input
+            className='z-10 sticky top-0 bg-content1'
+            endAdornment={<IconSearch />}
+            onChange={setKeywords}
+            placeholder='search or input address'
+            value={keywords}
+          />
+        )}
+
+        <div
+          style={{
+            maxHeight: scroll ? '200px' : 'none'
+          }}
+          className='space-y-2.5 -mx-1.5 px-1.5 scroll-smooth focus:scroll-auto snap-y scroll-pt-2 overflow-y-auto'
+        >
+          {filtered.map((account, index) => (
+            <Item key={index} account={account} type={type} onClick={handleSelect} />
+          ))}
+          {filtered.length === 0 && <Empty height={160} label='empty' />}
+        </div>
       </div>
     </div>
   );

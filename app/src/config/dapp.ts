@@ -163,6 +163,19 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
   }
 };
 
+export const StakingApp: DappOption<true | string[], (network: string) => URL> = {
+  id: 1004,
+  icon: '/dapp-icons/staking.png',
+  name: 'Staking',
+  description:
+    'Polkadot Staking Dashboard is the easiest way to stake DOT, check validator stats, manage your nominations and join nomination pools.',
+  url: 'https://staking.mimir.global/',
+  supportedChains: ['polkadot', 'kusama'],
+  tags: ['Staking'],
+  website: 'https://staking.polkadot.network/',
+  github: 'https://github.com/paritytech/polkadot-staking-dashboard'
+};
+
 export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
   {
     id: 1,
@@ -265,18 +278,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
   },
   PolkadotJsApp,
   SubsquareApp,
-  {
-    id: 1004,
-    icon: '/dapp-icons/staking.png',
-    name: 'Staking',
-    description:
-      'Polkadot Staking Dashboard is the easiest way to stake DOT, check validator stats, manage your nominations and join nomination pools.',
-    url: 'https://staking.mimir.global/',
-    supportedChains: ['polkadot', 'kusama'],
-    tags: ['Staking'],
-    website: 'https://staking.polkadot.network/',
-    github: 'https://github.com/paritytech/polkadot-staking-dashboard'
-  },
+  StakingApp,
   {
     id: 1005,
     icon: '/dapp-icons/bifrost.png',

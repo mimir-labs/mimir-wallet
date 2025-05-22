@@ -2,9 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import dagre from '@dagrejs/dagre';
-import { type Edge, type Node, Position } from 'reactflow';
+import { type Edge, type Node, Position } from '@xyflow/react';
 
-export function getLayoutedElements(nodes: Node[], edges: Edge[], nodeWidth = 330, nodeHeight = 70, direction = 'RL') {
+export function getLayoutedElements(
+  nodes: Node<any>[],
+  edges: Edge<any>[],
+  nodeWidth = 330,
+  nodeHeight = 70,
+  direction = 'RL'
+): { nodes: Node<any>[]; edges: Edge<any>[] } {
   const dagreGraph = new dagre.graphlib.Graph();
 
   dagreGraph.setDefaultEdgeLabel(() => ({}));
