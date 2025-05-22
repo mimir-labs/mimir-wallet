@@ -18,7 +18,7 @@ export async function connectWallet(name: string) {
   const provider = window.injectedWeb3?.[walletConfig[name]?.key];
 
   if (provider) {
-    const walletAccounts = await loadWallet(await provider.enable(CONNECT_ORIGIN), CONNECT_ORIGIN);
+    const walletAccounts = await loadWallet(await provider.enable(CONNECT_ORIGIN), name);
 
     useWallet.setState((state) => {
       const newValue = [...state.connectedWallets, name];
@@ -28,7 +28,7 @@ export async function connectWallet(name: string) {
 
       // Deduplicate wallet accounts by address
       const uniqueWalletAccounts = [...state.walletAccounts, ...walletAccounts].filter(
-        (account, index, self) => index === self.findIndex((t) => addressEq(t.address, account.address))
+        (account, index, self) => !self.some((t, i) => i < index && addressEq(t.address, account.address))
       );
 
       return {

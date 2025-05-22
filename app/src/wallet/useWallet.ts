@@ -18,7 +18,6 @@ export const useWallet = create<WalletState>()((set) => ({
   wallets: {}, // Available injected wallets
   walletAccounts: [], // List of connected wallet accounts
   connectedWallets: (store.get(CONNECTED_WALLETS_KEY) as string[]) || [], // Names of currently connected wallets
-
   // UI control methods
   openWallet: () => set({ walletOpen: true }),
   closeWallet: () => set({ walletOpen: false })

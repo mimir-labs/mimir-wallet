@@ -47,7 +47,7 @@ function WalletConsumer() {
               useWallet.setState(({ walletAccounts }) => ({
                 // Deduplicate wallet accounts by address
                 walletAccounts: combineWalletAccounts(walletAccounts, wallet, accounts, chainSS58).filter(
-                  (account, index, self) => index === self.findIndex((t) => addressEq(t.address, account.address))
+                  (account, index, self) => !self.some((t, i) => i < index && addressEq(t.address, account.address))
                 ),
                 wallets: window.injectedWeb3
               }));
