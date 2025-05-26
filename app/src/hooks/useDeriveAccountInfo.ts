@@ -15,6 +15,23 @@ import { create } from 'zustand';
 import { addressToHex, useIdentityApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
+type AccountInfo = {
+  display: string | undefined;
+  displayParent: string | undefined;
+  discord: string | undefined;
+  email: string | undefined;
+  github: string | undefined;
+  image: string | undefined;
+  element: string | undefined;
+  judgements: PalletIdentityJudgement[] | undefined;
+  legal: string | undefined;
+  matrix: string | undefined;
+  other: Record<string, string> | undefined;
+  riot: string | undefined;
+  twitter: string | undefined;
+  web: string | undefined;
+};
+
 function extractOther(additional: Vec<ITuple<[Data, Data]>>) {
   return additional.reduce<Record<string, string>>((other, [_key, _value]) => {
     const key = dataToUtf8(_key);
@@ -28,6 +45,14 @@ function extractOther(additional: Vec<ITuple<[Data, Data]>>) {
   }, {});
 }
 
+function identityCompat(
+  identityOfOpt: Option<ITuple<[PalletIdentityRegistration, Option<Bytes>]>> | Option<PalletIdentityRegistration>
+): PalletIdentityRegistration {
+  const identity = identityOfOpt.unwrap();
+
+  return Array.isArray(identity) ? identity[0] : identity;
+}
+
 async function getIdentityInfo({
   queryKey: [api, value]
 }: {
@@ -37,9 +62,7 @@ async function getIdentityInfo({
     throw new Error('api or value is required');
   }
 
-  let identity = (await api.query.identity.identityOf(value)) as unknown as Option<
-    ITuple<[PalletIdentityRegistration, Option<Bytes>]>
-  >;
+  const identity = await api.query.identity.identityOf(value);
 
   let display: string | undefined;
   let displayParent: string | undefined;
@@ -56,26 +79,29 @@ async function getIdentityInfo({
   let twitter: string | undefined;
   let web: string | undefined;
 
+  let final: PalletIdentityRegistration | undefined;
+
   if (identity.isSome) {
-    display = dataToUtf8(identity.unwrap()[0].info.display);
+    final = identityCompat(identity);
+
+    display = dataToUtf8(final.info.display);
   } else {
     const superOf = await api.query.identity.superOf(value);
 
     if (superOf.isSome) {
       display = dataToUtf8(superOf.unwrap()[1]);
-      const superIdentity = (await api.query.identity.identityOf(superOf.unwrap()[0])) as unknown as Option<
-        ITuple<[PalletIdentityRegistration, Option<Bytes>]>
-      >;
+      const superIdentity = await api.query.identity.identityOf(superOf.unwrap()[0]);
 
-      identity = superIdentity;
-      displayParent = dataToUtf8(superIdentity.unwrap()[0].info.display);
+      final = identityCompat(superIdentity);
+
+      displayParent = dataToUtf8(final.info.display);
     }
   }
 
-  if (identity.isSome) {
-    const info = identity.unwrap()[0].info;
+  if (final) {
+    const info = final.info;
 
-    judgements = identity.unwrap()[0].judgements.map((item) => item[1]);
+    judgements = final.judgements.map((item) => item[1]);
 
     discord = dataToUtf8(info.getT('discord'));
     email = dataToUtf8(info.email);
@@ -110,7 +136,9 @@ async function getIdentityInfo({
 
 export const useIdentityStore = create<Record<HexString, string>>()(() => ({}));
 
-export function useDeriveAccountInfo(value?: string | null) {
+export function useDeriveAccountInfo(
+  value?: string | null
+): [data: AccountInfo | undefined, isFetched: boolean, isFetching: boolean, identityEnabled: boolean] {
   const identityApi = useIdentityApi();
 
   const address = value ? value.toString() : '';
@@ -141,5 +169,5 @@ export function useDeriveAccountInfo(value?: string | null) {
     }
   }, [data, value, addressHex]);
 
-  return [data, isFetched, isFetching] as const;
+  return [data, isFetched, isFetching, !!identityApi] as const;
 }

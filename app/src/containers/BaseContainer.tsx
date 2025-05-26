@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
-import { ConnectWalletModal, ToastRoot, TxSubmit, TxToast } from '@/components';
+import { ConnectWalletModal, Navigate, ToastRoot, TxSubmit, TxToast } from '@/components';
 import { useFollowAccounts } from '@/hooks/useFollowAccounts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import WalletConsumer from '@/wallet/Consumer';
 import { useWallet } from '@/wallet/useWallet';
 import { useState } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 

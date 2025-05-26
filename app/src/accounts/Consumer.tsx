@@ -158,7 +158,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
     const update = (value: AccountData[]) =>
       setSyncData((prevValue) => (isEqual(value, prevValue) ? prevValue : value));
 
-    if (isWalletReady) {
+    if (isWalletReady && sortedWalletAccounts) {
       // Initial sync when wallet is ready
       sync(mode === 'omni', network, chainSS58, sortedWalletAccounts.split(','), update);
 

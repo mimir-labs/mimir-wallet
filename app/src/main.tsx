@@ -23,6 +23,7 @@ import {
 } from 'chart.js';
 import moment from 'moment';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 
 import { ApiRoot, initializeApi, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -82,7 +83,9 @@ initializeAccount(chain, address);
 // Render the main App component with initial configuration
 root.render(
   <ApiRoot chain={chain}>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </ApiRoot>
 );
 

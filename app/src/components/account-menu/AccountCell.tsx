@@ -48,6 +48,8 @@ function AccountCell({
     onSelect?.(value);
   }, [onSelect, value]);
 
+  const isLocal = isLocalAccount(value);
+
   return (
     <Button
       fullWidth
@@ -66,6 +68,7 @@ function AccountCell({
         withCopy
         withAddressBook
         addressCopyDisabled
+        showNetworkProxied={isLocal}
         nameEndContent={
           totalCounts ? (
             <div className='bg-[#FF8C00] text-[10px] w-4 h-4 rounded-full text-white flex items-center justify-center'>
@@ -86,7 +89,7 @@ function AccountCell({
         </Button>
       )}
 
-      {value && (isLocalAccount(value) || watchlist) && (
+      {value && (isLocal || watchlist) && (
         <Popover radius='md'>
           <PopoverTrigger>
             <Button isIconOnly size='sm' variant='light' color='default'>
@@ -95,7 +98,7 @@ function AccountCell({
           </PopoverTrigger>
           <PopoverContent className='p-2.5 space-y-2.5 items-stretch'>
             {value &&
-              isLocalAccount(value) && [
+              isLocal && [
                 source ? null : (
                   <Button
                     key='hide-0'

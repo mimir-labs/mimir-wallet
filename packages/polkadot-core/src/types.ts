@@ -20,7 +20,6 @@ export type Endpoint = {
   tokenIcon: string;
   ss58Format: number;
   genesisHash: HexString;
-  socketUrl: string;
   explorerUrl?: string;
   statescanUrl?: string;
   subsquareUrl?: string;

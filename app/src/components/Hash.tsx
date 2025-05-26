@@ -35,7 +35,7 @@ function Hash({ value, withCopy, withExplorer }: Props) {
       target='_blank'
     >
       <>
-        {upSm ? stringValue : `${stringValue?.slice(0, 8)}...${stringValue?.slice(-8)}`}
+        {upSm ? stringValue : `${stringValue?.slice(0, 8)}…${stringValue?.slice(-8)}`}
         {withCopy && <CopyButton size='sm' value={stringValue} />}
         {explorerLink && (
           <Button

@@ -12,6 +12,7 @@ import { type Endpoint, useApi, useNetworks } from '@mimir-wallet/polkadot-core'
 import { Avatar, FreeSoloPopover, Listbox, ListboxItem, Spinner, usePress } from '@mimir-wallet/ui';
 
 interface Props {
+  showAllNetworks?: boolean;
   isIconOnly?: boolean;
   radius?: 'sm' | 'md' | 'lg' | 'full' | 'none';
   disabled?: boolean;
@@ -20,12 +21,12 @@ interface Props {
   placeholder?: string;
   label?: string;
   helper?: React.ReactNode;
-  supportedNetworks?: string[];
   network: string;
   setNetwork: (network: string) => void;
 }
 
 function OmniChainInputNetwork({
+  showAllNetworks,
   isIconOnly,
   radius = 'md',
   disabled,
@@ -38,22 +39,20 @@ function OmniChainInputNetwork({
   setNetwork
 }: Props) {
   const { allApis } = useApi();
+  const { networks } = useNetworks();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useInput('');
   const [isOpen, toggleOpen] = useToggle(false);
   const [isFocused, setIsFocused] = useState(false);
-  const options = Object.entries(allApis)
-    .map(([network, { chain, isApiReady, genesisHash }]) => ({
-      genesisHash,
-      network,
-      chain,
-      isApiReady
-    }))
-    .filter((item) => (inputValue ? item.chain.name.toLowerCase().includes(inputValue.toLowerCase()) : true));
+  const options = networks.filter((item) =>
+    showAllNetworks
+      ? true
+      : !!allApis[item.key] && (inputValue ? item.name.toLowerCase().includes(inputValue.toLowerCase()) : true)
+  );
 
-  const chain: Endpoint | undefined = allApis[network]?.chain;
+  const chain: Endpoint | undefined = networks.find((item) => item.key === network);
 
   const handleOpen = () => {
     toggleOpen(true);
@@ -86,31 +85,35 @@ function OmniChainInputNetwork({
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <Listbox color='secondary' emptyContent='no networks' className='max-h-[250px] overflow-y-auto text-foreground'>
-        {options.map(({ network, chain, isApiReady }) => (
-          <ListboxItem
-            key={network}
-            onPress={
-              isApiReady
-                ? () => {
-                    setNetwork(network);
-                    handleClose();
-                    setInputValue('');
-                  }
-                : undefined
-            }
-            className='h-10 text-foreground data-[hover=true]:text-foreground'
-            startContent={
-              <Avatar
-                alt={chain.name}
-                src={chain.icon}
-                style={{ width: 20, height: 20, background: 'transparent' }}
-              ></Avatar>
-            }
-            endContent={!isApiReady ? <Spinner size='sm' /> : null}
-          >
-            {chain.name}
-          </ListboxItem>
-        ))}
+        {options.map((item) => {
+          const isApiReady = !!allApis[item.key]?.isApiReady;
+
+          return (
+            <ListboxItem
+              key={item.key}
+              onPress={
+                (showAllNetworks ? true : isApiReady)
+                  ? () => {
+                      setNetwork(item.key);
+                      handleClose();
+                      setInputValue('');
+                    }
+                  : undefined
+              }
+              className='h-10 text-foreground data-[hover=true]:text-foreground'
+              startContent={
+                <Avatar
+                  alt={item.name}
+                  src={item.icon}
+                  style={{ width: 20, height: 20, background: 'transparent' }}
+                ></Avatar>
+              }
+              endContent={showAllNetworks ? null : !isApiReady ? <Spinner size='sm' /> : null}
+            >
+              {item.name}
+            </ListboxItem>
+          );
+        })}
       </Listbox>
     </FreeSoloPopover>
   ) : null;
