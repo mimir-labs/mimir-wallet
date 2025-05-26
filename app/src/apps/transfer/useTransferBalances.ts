@@ -27,7 +27,11 @@ async function _getNativeBalance(api: ApiPromise, address: string): Promise<BN> 
 }
 
 async function _getAssetBalance(api: ApiPromise, network: string, address: string, assetId: string): Promise<BN> {
-  if (api.query.assets || api.query.foreignAssets) {
+  if (api.query.assets) {
+    if (isHex(assetId) && !api.query.foreignAssets) {
+      return Promise.resolve(BN_ZERO);
+    }
+
     return isHex(assetId)
       ? api.query.foreignAssets.account(assetId, address).then((result) => {
           return (result as Option<PalletAssetsAssetAccount>).unwrapOrDefault().balance;

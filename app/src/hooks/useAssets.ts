@@ -169,6 +169,10 @@ async function fetchAssetInfo({
   }
 
   if (api.query.assets) {
+    if (isHex(assetId) && !api.query.foreignAssets) {
+      return Promise.resolve(undefined);
+    }
+
     return Promise.all(
       isHex(assetId)
         ? [

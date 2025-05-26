@@ -59,7 +59,7 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
   const { chainSS58 } = useApi();
   const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
-  const [identity] = useDeriveAccountInfo(address);
+  const [identity, isFetched, isFetching, identityEnabled] = useDeriveAccountInfo(address);
   const [chainName, setChainName] = useState<React.ReactNode>(null);
   const { meta } = useAddressMeta(address);
   const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
@@ -83,7 +83,11 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
     return <>ZeroAddress</>;
   }
 
-  return <>{chainName || meta?.name || defaultName || address.slice(0, 8).toUpperCase()}</>;
+  return (
+    <span data-loading={identityEnabled && !isFetched && !isFetching} className='data-[loading=true]:animate-pulse'>
+      {chainName || meta?.name || defaultName || address.slice(0, 8).toUpperCase()}
+    </span>
+  );
 }
 
 export default React.memo(AddressName);

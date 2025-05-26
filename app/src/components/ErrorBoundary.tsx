@@ -3,6 +3,7 @@
 
 import type { ReactNode } from 'react';
 
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { Component, ErrorInfo } from 'react';
 
 interface ErrorBoundaryProps {
@@ -44,6 +45,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   override render(): ReactNode {
     if (this.state.hasError) {
+      const error = this.state.error;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : '';
+      const errorName = error instanceof Error ? error.name : 'Unknown Error';
+
+      const componentStack = this.state.errorInfo?.componentStack;
+
       // You can render any custom fallback UI
       return (
         this.props.fallback || (
@@ -55,7 +63,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             {/* Header */}
             <div className='relative p-4 pb-6 border-b border-divider-300'>
               <h2 className='text-2xl font-bold text-foreground'>Something went wrong</h2>
-              <p className='mt-2 text-foreground/80'>The application encountered an unexpected error</p>
+              <p className='mt-2 text-foreground/80'>The application encountered an unexpected error({errorName})</p>
             </div>
 
             {/* Content */}
@@ -69,32 +77,40 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                   </div>
                   <div className='bg-content1 rounded-b-lg px-4 py-3'>
                     <div className='font-mono text-tiny text-danger whitespace-pre-wrap break-words'>
-                      {this.state.error?.toString()}
+                      {errorMessage}
                     </div>
                   </div>
                 </div>
 
-                {/* Stack Trace */}
-                {this.state.errorInfo && (
+                {/* Error stack */}
+                <details className='rounded-lg overflow-hidden group border border-divider-300' open>
+                  <summary className='bg-danger-50 px-4 py-3 flex items-center cursor-pointer'>
+                    <div className='w-1.5 h-1.5 bg-danger-500 rounded-full mr-2'></div>
+                    <h3 className='text-sm font-medium text-danger-700'>Stack Trace</h3>
+                    <div className='ml-auto'>
+                      <ArrowDown className='text-danger transform transition-transform group-open:rotate-180' />
+                    </div>
+                  </summary>
+                  <div className='bg-content1 rounded-b-lg'>
+                    <pre className='font-mono text-tiny text-danger p-4 overflow-x-auto whitespace-pre-wrap break-words max-h-64 overflow-y-auto'>
+                      {errorStack || 'Stack trace not available'}
+                    </pre>
+                  </div>
+                </details>
+
+                {/* Component Stack Trace */}
+                {componentStack && (
                   <details className='rounded-lg overflow-hidden group border border-divider-300' open>
                     <summary className='bg-danger-50 px-4 py-3 flex items-center cursor-pointer'>
                       <div className='w-1.5 h-1.5 bg-danger-500 rounded-full mr-2'></div>
-                      <h3 className='text-sm font-medium text-danger-700'>Stack Trace</h3>
+                      <h3 className='text-sm font-medium text-danger-700'>Component Stack Trace</h3>
                       <div className='ml-auto'>
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          className='h-4 w-4 text-danger transform transition-transform group-open:rotate-180'
-                          fill='none'
-                          viewBox='0 0 24 24'
-                          stroke='currentColor'
-                        >
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-                        </svg>
+                        <ArrowDown className='text-danger transform transition-transform group-open:rotate-180' />
                       </div>
                     </summary>
                     <div className='bg-content1 rounded-b-lg'>
                       <pre className='font-mono text-tiny text-danger p-4 overflow-x-auto whitespace-pre-wrap break-words max-h-64 overflow-y-auto'>
-                        {this.state.errorInfo.componentStack}
+                        {componentStack}
                       </pre>
                     </div>
                   </details>

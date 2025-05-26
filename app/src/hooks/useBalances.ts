@@ -176,15 +176,16 @@ async function _fetchAssetBalances({
     if (api.query.assets) {
       return Promise.all(
         assets.map(
-          (item): Promise<Option<PalletAssetsAssetAccount>> =>
+          (item): Promise<Option<PalletAssetsAssetAccount> | undefined | null> =>
             isHex(item.assetId)
-              ? (api.query.foreignAssets.account(item.assetId, address.toString()) as Promise<
-                  Option<PalletAssetsAssetAccount>
+              ? (api.query.foreignAssets?.account?.(item.assetId, address.toString()) as Promise<
+                  Option<PalletAssetsAssetAccount> | undefined | null
                 >)
               : api.query.assets.account(item.assetId, address.toString())
         )
       ).then((results) => {
         return results
+          .filter((item) => !!item)
           .map((result, index) => ({
             ...assets[index],
             total: result.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,

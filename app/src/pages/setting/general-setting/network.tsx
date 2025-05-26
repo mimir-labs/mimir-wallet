@@ -2,20 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { InputNetwork } from '@/components';
-import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { isValidWsUrl } from '@/utils';
 import { WsProvider } from '@polkadot/api';
 import { useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
-import { NETWORK_RPC_PREFIX, SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
+import { type Endpoint, NETWORK_RPC_PREFIX, useNetworks } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 import { Alert, Autocomplete, AutocompleteItem, Button, Divider } from '@mimir-wallet/ui';
 
-function Content({ network, setNetwork }: { network: string; setNetwork: (network: string) => void }) {
-  const { chain, genesisHash } = useApi();
+function Content({ chain }: { chain: Endpoint }) {
+  const { networks } = useNetworks();
   const [url, setUrl] = useState(
-    (store.get(`${NETWORK_RPC_PREFIX}${network}`) as string) || Object.values(chain.wsUrl)[0] || ''
+    (store.get(`${NETWORK_RPC_PREFIX}${chain.key}`) as string) || Object.values(networks[0].wsUrl)[0] || ''
   );
   const [error, setError] = useState<Error | undefined>(undefined);
 
@@ -32,19 +31,17 @@ function Content({ network, setNetwork }: { network: string; setNetwork: (networ
       return provider.send('chain_getBlockHash', [0]);
     });
 
-    if (rpcGenesisHash !== genesisHash) {
+    if (rpcGenesisHash !== chain.genesisHash) {
       setError(new Error('Genesis hash mismatch'));
 
       return;
     }
 
-    store.set(`${NETWORK_RPC_PREFIX}${network}`, url);
-  }, [url, genesisHash, network]);
+    store.set(`${NETWORK_RPC_PREFIX}${chain.key}`, url);
+  }, [url, chain.genesisHash, chain.key]);
 
   return (
-    <div className='flex flex-col gap-5 p-5 bg-content1 shadow-medium rounded-large'>
-      <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
-
+    <>
       <Autocomplete
         allowsCustomValue
         labelPlacement='outside'
@@ -75,17 +72,22 @@ function Content({ network, setNetwork }: { network: string; setNetwork: (networ
       <Button isDisabled={!url} fullWidth isLoading={state.loading} onPress={handleSave}>
         Save
       </Button>
-    </div>
+    </>
   );
 }
 
 function NetworkSetting() {
-  const [network, setNetwork] = useInputNetwork();
+  const { networks } = useNetworks();
+  const [network, setNetwork] = useState(networks[0].key);
+
+  const chain = networks.find((item) => item.key === network);
 
   return (
-    <SubApiRoot network={network}>
-      <Content key={network} network={network} setNetwork={setNetwork} />
-    </SubApiRoot>
+    <div className='flex flex-col gap-5 p-5 bg-content1 shadow-medium rounded-large'>
+      <InputNetwork showAllNetworks label='Select Network' network={network} setNetwork={setNetwork} />
+
+      {chain && <Content key={chain.key} chain={chain} />}
+    </div>
   );
 }
 

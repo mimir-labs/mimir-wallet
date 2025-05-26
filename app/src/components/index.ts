@@ -36,6 +36,7 @@ export { default as InputNumber } from './InputNumber';
 export { default as InputToken } from './InputToken';
 export { default as Label } from './Label';
 export { default as LockItem, LockContainer } from './LockItem';
+export { default as Navigate } from './Navigate';
 export { default as ToastRoot } from './ToastRoot';
 export { default as TxError } from './TxError';
 export { default as TxOverview } from './TxOverview';

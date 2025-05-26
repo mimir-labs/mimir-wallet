@@ -66,7 +66,7 @@ function defaultEndpointStats(): EndpointStats {
 function fetchWithRetry(
   url: string,
   options: RequestInit,
-  retries: number = 10,
+  retries: number = 3,
   delay: number = 1000
 ): Promise<Response> {
   return fetch(url, options)

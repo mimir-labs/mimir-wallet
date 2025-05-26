@@ -19,7 +19,7 @@ function Address({
   const { chainSS58 } = useApi();
   const format = useMemo(() => encodeAddress(value, ss58Format ?? chainSS58), [value, ss58Format, chainSS58]);
 
-  return shorten ? `${format?.slice(0, 6)}…${format?.slice(-6)}` : format;
+  return shorten ? `${format?.slice(0, 4)}…${format?.slice(-3)}` : format;
 }
 
 export default React.memo(Address);

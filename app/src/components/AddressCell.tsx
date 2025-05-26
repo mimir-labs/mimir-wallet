@@ -32,6 +32,7 @@ interface Props {
   nameEndContent?: React.ReactNode;
   icons?: React.ReactNode;
   withIconBorder?: boolean;
+  showNetworkProxied?: boolean;
 }
 
 function AddressCell({
@@ -47,7 +48,8 @@ function AddressCell({
   iconSize = 30,
   withCopy = false,
   withAddressBook = false,
-  withIconBorder = false
+  withIconBorder = false,
+  showNetworkProxied = false
 }: Props) {
   const { chainSS58 } = useApi();
   const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
@@ -67,7 +69,7 @@ function AddressCell({
 
   const addressNetworks = isPure
     ? networks.filter((network) => network.genesisHash === pureCreatedAt)
-    : isProxied
+    : showNetworkProxied && isProxied
       ? proxyNetworks
         ? networks.filter((network) => proxyNetworks.includes(network.genesisHash))
         : []

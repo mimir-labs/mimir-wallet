@@ -58,7 +58,11 @@ function TransferAction({
           : api.tx.balances.transferAllowDeath(recipient, parseUnits(amount, format[0])).method;
       }
 
-      if (api.tx.assets || api.tx.foreignAssets) {
+      if (api.tx.assets) {
+        if (isHex(token.assetId) && !api.tx.foreignAssets) {
+          throw new Error('Invalid asset id');
+        }
+
         return keepAlive
           ? api.tx[isHex(token.assetId) ? 'foreignAssets' : 'assets'].transferKeepAlive(
               token.assetId,
