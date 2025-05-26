@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.2.2](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.2.1...polkadot-core-v2.2.2) (2025-05-26)
+
+
+### Bug Fixes
+
+* improve user experience and fix bugs ([#222](https://github.com/mimir-labs/mimir-wallet/issues/222)) ([19457c5](https://github.com/mimir-labs/mimir-wallet/commit/19457c52d78dfbcf00c3ea9172b1e18492fbf885))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.2.2
+
 ## [2.2.1](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.2.0...polkadot-core-v2.2.1) (2025-05-22)
 
 
