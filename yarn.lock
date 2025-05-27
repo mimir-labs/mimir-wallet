@@ -10349,7 +10349,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"es-module-lexer@npm:^1.4.1, es-module-lexer@npm:^1.7.0":
+"es-module-lexer@npm:^1.7.0":
   version: 1.7.0
   resolution: "es-module-lexer@npm:1.7.0"
   checksum: 10c0/4c935affcbfeba7fb4533e1da10fa8568043df1e3574b869385980de9e2d475ddc36769891936dbb07036edb3c3786a8b78ccf44964cd130dedc1f2c984b6c7b
@@ -13535,7 +13535,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"magic-string@npm:^0.30.17, magic-string@npm:^0.30.3, magic-string@npm:^0.30.5":
+"magic-string@npm:^0.30.17, magic-string@npm:^0.30.3":
   version: 0.30.17
   resolution: "magic-string@npm:0.30.17"
   dependencies:
@@ -13792,7 +13792,6 @@ __metadata:
     start-server-and-test: "npm:^2.0.5"
     typescript: "npm:^5.6.3"
     vite: "npm:^6.3.5"
-    vite-plugin-chunk-split: "npm:^0.5.0"
     vite-plugin-node-polyfills: "npm:^0.23.0"
     vite-plugin-pwa: "npm:^1.0.0"
     vite-plugin-svgr: "npm:^4.3.0"
@@ -18474,19 +18473,6 @@ __metadata:
   bin:
     vite-node: vite-node.mjs
   checksum: 10c0/2fc71ddadd308b19b0d0dc09f5b9a108ea9bb640ec5fbd6179267994da8fd6c9d6a4c92098af7de73a0fa817055b518b28972452a2f19a1be754e79947e289d2
-  languageName: node
-  linkType: hard
-
-"vite-plugin-chunk-split@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "vite-plugin-chunk-split@npm:0.5.0"
-  dependencies:
-    es-module-lexer: "npm:^1.4.1"
-    import-meta-resolve: "npm:^4.0.0"
-    magic-string: "npm:^0.30.5"
-  peerDependencies:
-    vite: ^4 || ^5
-  checksum: 10c0/63cb3ca78b125c75a1ce61a04e75bd7df28599e8dd8931876620160cbc78d971c9952d21e1ff763f397cdd275f44a6db4553d7f6520f2deef9898136c4d85b64
   languageName: node
   linkType: hard
 

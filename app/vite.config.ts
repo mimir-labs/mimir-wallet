@@ -3,9 +3,8 @@
 
 import react from '@vitejs/plugin-react';
 import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import path, { join } from 'node:path';
 import { defineConfig } from 'vite';
-import { chunkSplitPlugin } from 'vite-plugin-chunk-split';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
 import svgr from 'vite-plugin-svgr';
@@ -46,53 +45,36 @@ export default defineConfig(({ mode }) => ({
       )
     }
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          const workspace = join(import.meta.dirname, '..');
+
+          if (id.includes('node_modules')) {
+            const pkg = id.toString().split('node_modules/')[1].split('/')[0];
+
+            if (pkg === 'react' || pkg === 'react-dom') {
+              return 'react';
+            }
+
+            if (pkg === '@polkadot' && id.includes('@polkadot/apps-config')) {
+              return 'polkadot-config';
+            }
+
+            return `vendor-${pkg}`;
+          }
+
+          if (id.includes(join(workspace, 'packages'))) {
+            return 'mimir-vendor';
+          }
+        }
+      }
+    }
+  },
   plugins: [
     tsconfigPaths(),
     react(),
-    chunkSplitPlugin({
-      strategy: 'default',
-      customSplitting: {
-        'react-vendor': ['react', 'react-dom'],
-        'react-router-vendor': [/react-router/],
-        'walletconnect-vendor': [/@walletconnect/],
-        'polkadot-vendor': [
-          '@polkadot/api',
-          '@polkadot/api-derive',
-          '@polkadot/types',
-          '@polkadot/util',
-          '@polkadot/util-crypto'
-        ],
-        'lodash-vendor': ['lodash-es', 'lodash'],
-        'polkadot-config-vendor': ['@polkadot/apps-config/api'],
-        'acala-vendor': [/@acala-network/],
-        'lottie-vendor': ['lottie-web'],
-        'chart-vendor': ['chart.js', 'react-chartjs-2'],
-        'xyflow-vendor': [/@xyflow/, '@dagrejs/dagre'],
-        'dnd-kit-vendor': [/@dnd/],
-        'moment-vendor': [/moment/],
-        'tanstack-vendor': [/@tanstack/],
-        'framer-motion-vendor': ['framer-motion'],
-        'react-aria-vendor': [/@react-aria/, /@react-stately/],
-        'heroui-vendor': [/@heroui/],
-        'misc-vendor': [
-          /papaparse/,
-          'qrcode-generator',
-          /qrcode/,
-          /@plutonication/,
-          /react-use/,
-          'react-toastify',
-          'react-json-view',
-          /react-infinite-scroll-component/,
-          'react-ga4',
-          'rxjs',
-          'search-query-parser',
-          'zustand'
-        ],
-        'mimir-polkadot-core-vendor': [/packages\/polkadot-core/],
-        'mimir-ui-vendor': [/packages\/ui/],
-        'mimir-service-vendor': [/packages\/service/]
-      }
-    }),
     svgr({ svgrOptions: { ref: true } }),
     ...(mode === 'test'
       ? []
