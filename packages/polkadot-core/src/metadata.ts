@@ -1,14 +1,16 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { openDB } from 'idb';
+import { deleteDB, openDB } from 'idb';
 
 function openMetadataDB() {
-  return openDB('chain_metadata', 1, {
+  return openDB('chain_metadata_v2', 1, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('metadata')) {
         db.createObjectStore('metadata', { keyPath: 'network' });
       }
+
+      deleteDB('chain_metadata');
     }
   });
 }

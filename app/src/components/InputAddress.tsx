@@ -16,7 +16,15 @@ import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { addressEq, addressToHex, isPolkadotAddress, useNetworks } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  addressToHex,
+  evm2Ss58,
+  isEthAddress,
+  isValidAddress as isValidAddressUtil,
+  useApi,
+  useNetworks
+} from '@mimir-wallet/polkadot-core';
 import { Avatar, Chip, FreeSoloPopover, Listbox, ListboxItem, usePress } from '@mimir-wallet/ui';
 
 import Address from './Address';
@@ -93,12 +101,16 @@ function InputAddress({
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
   const { networks } = useNetworks();
+  const {
+    chainSS58,
+    chain: { polkavm }
+  } = useApi();
   const { accounts, addresses, isLocalAccount, isLocalAddress, addAddressBook, metas } = useAccount();
   const [value, setValue] = useState<string>(
-    isPolkadotAddress(propsValue || defaultValue) ? propsValue || defaultValue || '' : ''
+    isValidAddressUtil(propsValue || defaultValue, polkavm) ? propsValue || defaultValue || '' : ''
   );
   // const [inputValue, setInputValue] = useState<string>('');
-  const [[inputValue, isValidAddress], setInputValue] = useInputAddress();
+  const [[inputValue, isValidAddress], setInputValue] = useInputAddress(undefined, polkavm);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -123,14 +135,14 @@ function InputAddress({
   useEffect(() => {
     const key = value || '';
 
-    if (isPolkadotAddress(key)) {
-      onChange?.(key);
+    if (isValidAddressUtil(key, polkavm)) {
+      onChange?.(isEthAddress(key) ? evm2Ss58(key, chainSS58) : key);
     }
-  }, [value, onChange]);
+  }, [value, onChange, polkavm, chainSS58]);
 
   const handleSelect = (item: string) => {
-    if (item && isPolkadotAddress(item)) {
-      setValue(item);
+    if (item && isValidAddressUtil(item, polkavm)) {
+      setValue(isEthAddress(item) ? evm2Ss58(item, chainSS58) : item);
     }
 
     setInputValue('');
@@ -143,7 +155,15 @@ function InputAddress({
 
   const handleClose = () => {
     toggleOpen(false);
-    if (!isSign && isValidAddress) handleSelect(inputValue);
+
+    if (!isSign && isValidAddress) {
+      if (isEthAddress(inputValue)) {
+        console.log('evm2Ss58', evm2Ss58(inputValue, chainSS58));
+        handleSelect(evm2Ss58(inputValue, chainSS58));
+      } else {
+        handleSelect(inputValue);
+      }
+    }
   };
 
   const { pressProps } = usePress({
