@@ -88,7 +88,9 @@ export default defineConfig(({ mode }) => ({
           'search-query-parser',
           'zustand'
         ],
-        'mimir-vendor': [/packages/]
+        'mimir-polkadot-core-vendor': [/packages\/polkadot-core/],
+        'mimir-ui-vendor': [/packages\/ui/],
+        'mimir-service-vendor': [/packages\/service/]
       }
     }),
     svgr({ svgrOptions: { ref: true } }),
