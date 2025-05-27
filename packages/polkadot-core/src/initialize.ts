@@ -175,7 +175,7 @@ export async function initializeApi(chain: Endpoint) {
   // Initialize main blockchain API connection
   return new Promise<void>((resolve) => {
     createApi(Object.values(chain.wsUrl), chain.key, chain.httpUrl)
-      .then(([api, registry]) => {
+      .then(([api]) => {
         // Set up event listeners for connection state
         api.on('error', onError);
 
@@ -196,11 +196,12 @@ export async function initializeApi(chain: Endpoint) {
                 }
               : state
           );
-          api.rpc.state.subscribeRuntimeVersion((runtimeVersion) => {
+          api.rpc.state.subscribeRuntimeVersion(async (runtimeVersion) => {
             const specVersion = runtimeVersion.specVersion.toString();
-            const metadata = registry.latestMetadata.toHex();
 
-            saveMetadata(chain.key, api.genesisHash.toHex(), specVersion, metadata);
+            api.getBlockRegistry(await api.rpc.chain.getBlockHash()).then(({ metadata }) => {
+              saveMetadata(chain.key, api.genesisHash.toHex(), specVersion, metadata.toHex());
+            });
           });
         });
 

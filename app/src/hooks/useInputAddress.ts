@@ -3,26 +3,30 @@
 
 import { useCallback, useState } from 'react';
 
-import { isPolkadotAddress } from '@mimir-wallet/polkadot-core';
+import { isValidAddress } from '@mimir-wallet/polkadot-core';
 
 export function useInputAddress(
-  defaultAddress?: string
+  defaultAddress?: string,
+  polkavm: boolean = false
 ): [
   [address: string, isValidAddress: boolean],
   setAddress: (value: string | React.ChangeEvent<HTMLInputElement>) => void
 ] {
   const [value, setValue] = useState<[string, boolean]>([
     defaultAddress || '',
-    defaultAddress ? isPolkadotAddress(defaultAddress) : false
+    defaultAddress ? isValidAddress(defaultAddress, polkavm) : false
   ]);
 
-  const onChange = useCallback((_value: string | React.ChangeEvent<HTMLInputElement>) => {
-    if (typeof _value === 'string') {
-      setValue([_value, _value ? isPolkadotAddress(_value) : true]);
-    } else {
-      setValue([_value.target.value, _value.target.value ? isPolkadotAddress(_value.target.value) : true]);
-    }
-  }, []);
+  const onChange = useCallback(
+    (_value: string | React.ChangeEvent<HTMLInputElement>) => {
+      if (typeof _value === 'string') {
+        setValue([_value, _value ? isValidAddress(_value, polkavm) : true]);
+      } else {
+        setValue([_value.target.value, _value.target.value ? isValidAddress(_value.target.value, polkavm) : true]);
+      }
+    },
+    [polkavm]
+  );
 
   return [value, onChange];
 }

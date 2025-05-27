@@ -516,7 +516,8 @@ export const westendEndpoints: Endpoint[] = [
     httpUrl: 'https://asset-hub-westend-rpc.dwellir.com',
     genesisHash: '0x67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9',
     explorerUrl: 'https://assethub-westend.subscan.io/',
-    statescanUrl: 'https://assethub-westend.statescan.io/'
+    statescanUrl: 'https://assethub-westend.statescan.io/',
+    polkavm: true
   },
   {
     key: 'assethub-next-westend',

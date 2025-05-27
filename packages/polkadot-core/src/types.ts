@@ -24,6 +24,7 @@ export type Endpoint = {
   statescanUrl?: string;
   subsquareUrl?: string;
   identityNetwork?: string;
+  polkavm?: boolean;
 };
 
 export type Network = Endpoint & {

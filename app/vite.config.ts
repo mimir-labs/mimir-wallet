@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react';
 import { readFileSync } from 'node:fs';
 import path, { join } from 'node:path';
@@ -50,27 +49,30 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          const baseDir = join(import.meta.dirname, '..');
+          const workspace = join(import.meta.dirname, '..');
 
-          if (id.startsWith(join(baseDir, 'node_modules'))) {
+          if (id.includes('node_modules')) {
             const pkg = id.toString().split('node_modules/')[1].split('/')[0];
+
+            if (pkg === 'react' || pkg === 'react-dom') {
+              return 'react';
+            }
 
             if (pkg === '@polkadot' && id.includes('@polkadot/apps-config')) {
               return 'polkadot-config';
             }
 
-            return pkg;
+            return `vendor-${pkg}`;
           }
 
-          if (id.startsWith(join(baseDir, 'packages'))) {
-            return `mimir-package-${id.replace(join(baseDir, 'packages/'), '').split('/')[0]}`;
+          if (id.includes(join(workspace, 'packages'))) {
+            return 'mimir-vendor';
           }
         }
       }
     }
   },
   plugins: [
-    legacy(),
     tsconfigPaths(),
     react(),
     svgr({ svgrOptions: { ref: true } }),
