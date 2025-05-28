@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.1](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.3.0...ui-v2.3.1) (2025-05-28)
+
+
+### Miscellaneous Chores
+
+* **ui:** Synchronize main group versions
+
 ## [2.3.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.2.2...ui-v2.3.0) (2025-05-27)
 
 
