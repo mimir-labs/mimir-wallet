@@ -158,7 +158,6 @@ function InputAddress({
 
     if (!isSign && isValidAddress) {
       if (isEthAddress(inputValue)) {
-        console.log('evm2Ss58', evm2Ss58(inputValue, chainSS58));
         handleSelect(evm2Ss58(inputValue, chainSS58));
       } else {
         handleSelect(inputValue);

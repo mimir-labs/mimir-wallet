@@ -2,19 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, Transaction } from '@/hooks/types';
-import type { Option } from '@polkadot/types';
-import type { PalletMultisigMultisig } from '@polkadot/types/lookup';
 
 import { useAccount } from '@/accounts/useAccount';
 import { TxButton } from '@/components';
 import { TransactionType } from '@/hooks/types';
-import { useCall } from '@/hooks/useCall';
 import React, { useMemo } from 'react';
 
-import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
 
 function Cancel({ account, transaction }: { account: AccountData; transaction: Transaction }) {
-  const { api } = useApi();
+  const { api, genesisHash, isApiReady } = useApi();
   const { isLocalAccount } = useAccount();
 
   const multisigTx = useMemo(() => {
@@ -33,10 +31,23 @@ function Cancel({ account, transaction }: { account: AccountData; transaction: T
     return null;
   }, [account, transaction]);
 
-  const multisigInfo = useCall<Option<PalletMultisigMultisig>>(multisigTx ? api.query.multisig.multisigs : undefined, [
-    multisigTx?.address,
-    multisigTx?.callHash
-  ]);
+  const { data: multisigInfo } = useQuery({
+    queryKey: [multisigTx?.address, multisigTx?.callHash] as const,
+    queryHash: `${genesisHash}.api.query.multisig.multisigs(${multisigTx?.address ? addressToHex(multisigTx.address) : ''},${
+      multisigTx?.callHash ? multisigTx.callHash : ''
+    })`,
+    enabled: isApiReady && !!multisigTx,
+    refetchOnMount: false,
+    queryFn: ({ queryKey }) => {
+      const [address, callHash] = queryKey;
+
+      if (!address || !callHash) {
+        throw new Error('Invalid multisig transaction');
+      }
+
+      return api.query.multisig.multisigs(address, callHash);
+    }
+  });
 
   const depositor = useMemo(
     () => (multisigInfo?.isSome ? multisigInfo.unwrap().depositor.toString() : null),

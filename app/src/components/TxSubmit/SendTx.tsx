@@ -14,7 +14,7 @@ import { useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
 import React, { useState } from 'react';
 
-import { sign, signAndSend, TxEvents, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, sign, signAndSend, TxEvents, useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Alert, Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
@@ -56,13 +56,16 @@ function SendTx({
   const { api, network } = useApi();
   const [loading, setLoading] = useState(false);
   const { txBundle, isLoading, error, hashSet, reserve, unreserve, delay } = buildTx;
-  const [enoughtState, setEnoughtState] = useState<Record<string, boolean | 'pending'>>({});
+  const [enoughtState, setEnoughtState] = useState<Record<HexString, boolean | 'pending'>>({});
   const source = useAccountSource(txBundle?.signer);
   const { data: dryRunResult } = useDryRunResult(api, txBundle);
 
-  const isEnought = Object.keys(reserve).reduce<boolean>((result, item) => result && !!enoughtState[item], true);
+  const isEnought = Object.keys(reserve).reduce<boolean>(
+    (result, item) => result && !!enoughtState[addressToHex(item)],
+    true
+  );
   const isEnoughtPending = Object.keys(reserve).reduce<boolean>(
-    (result, item) => result || enoughtState[item] === 'pending',
+    (result, item) => result || enoughtState[addressToHex(item)] === 'pending',
     false
   );
 
@@ -176,7 +179,9 @@ function SendTx({
                   will be reserved for initiate transaction.
                 </>
               }
-              onEnoughtState={(address, isEnought) => setEnoughtState((state) => ({ ...state, [address]: isEnought }))}
+              onEnoughtState={(address, isEnought) =>
+                setEnoughtState((state) => ({ ...state, [addressToHex(address)]: isEnought }))
+              }
             />
           ))}
           {Object.entries(unreserve).map(([address, { value }], index) => (

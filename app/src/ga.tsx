@@ -15,6 +15,11 @@ export function initGa() {
   }
 }
 
+// Format string to lowercase and only allow alphanumeric characters and underscores
+const formatString = (str: string) => {
+  return str.toLowerCase().replace(/[^a-z0-9_]/g, '');
+};
+
 export const gaActions = {
   omniSolochain: (mode: string) => {
     ReactGA.event({
@@ -23,5 +28,18 @@ export const gaActions = {
       label: `Switch to ${mode}`,
       transport: 'beacon'
     });
+  },
+  connectedWallet: (wallets: string[]) => {
+    ReactGA.event(
+      'connect_wallet',
+      wallets.reduce(
+        (acc, wallet) => {
+          acc[formatString(wallet)] = 'true';
+
+          return acc;
+        },
+        {} as Record<string, 'true'>
+      )
+    );
   }
 };
