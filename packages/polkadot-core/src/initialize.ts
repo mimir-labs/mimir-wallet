@@ -147,6 +147,8 @@ export async function initializeApi(chain: Endpoint) {
     chains: {
       ...state.chains,
       [chain.key]: {
+        isApiInitialized: false,
+        isApiReady: false,
         genesisHash: chain.genesisHash,
         network: chain.key,
         chain: chain

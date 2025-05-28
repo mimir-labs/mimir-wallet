@@ -382,7 +382,7 @@ export function useAssetBalancesAll(address?: string): UseAssetBalancesAll[] {
         refetchInterval: 12_000,
         refetchOnMount: false,
         refetchOnWindowFocus: true,
-        enabled: !!address && !!api && api.isApiReady && !!assets,
+        enabled: !!address && !!api && !!api.isApiReady && !!assets,
         queryFn: async ({
           queryKey: [network, api, address, assets]
         }: {
