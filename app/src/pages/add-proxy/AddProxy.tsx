@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData } from '@/hooks/types';
-import type { u128, Vec } from '@polkadot/types';
-import type { PalletProxyProxyDefinition } from '@polkadot/types/lookup';
-import type { ITuple } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { ProxyArgs } from './types';
 
@@ -13,14 +10,14 @@ import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { Input, InputAddress, InputNetwork, Label } from '@/components';
 import { ONE_DAY, ONE_HOUR } from '@/constants';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
-import { useCall } from '@/hooks/useCall';
 import { useInput } from '@/hooks/useInput';
 import { useProxyTypes } from '@/hooks/useProxyTypes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
 import { Alert, Button, Divider, Select, SelectItem, Switch, Tooltip } from '@mimir-wallet/ui';
 
 import AddProxyButton from './AddProxyButton';
@@ -48,7 +45,7 @@ function AddProxy({
   setNetwork: (network: string) => void;
   setProxied: (proxied: string | undefined) => void;
 }) {
-  const { api, genesisHash } = useApi();
+  const { api, genesisHash, isApiReady } = useApi();
   const navigate = useNavigate();
   const { accounts, addresses, current } = useAccount();
 
@@ -73,9 +70,20 @@ function AddProxy({
   const [reviewWindow, setReviewWindow] = useState<number>(0);
   const [proxyArgs, setProxyArgs] = useState<ProxyArgs[]>([]);
   const [proxy, setProxy] = useState<string | undefined>(pure ? current : filteredProxy[0]);
-  const proxies = useCall<ITuple<[Vec<PalletProxyProxyDefinition>, u128]>>(pure ? undefined : api.query.proxy.proxies, [
-    proxied
-  ]);
+  const { data: proxies } = useQuery({
+    queryKey: [proxied] as const,
+    queryHash: `${genesisHash}.api.query.proxy.proxies(${proxied ? addressToHex(proxied) : ''})`,
+    enabled: isApiReady && !!pure && !!proxied,
+    queryFn: ({ queryKey }) => {
+      const [address] = queryKey;
+
+      if (!address) {
+        throw new Error('Invalid proxy address');
+      }
+
+      return api.query.proxy.proxies(address);
+    }
+  });
 
   const swap = useCallback(() => {
     setProxied(proxy);

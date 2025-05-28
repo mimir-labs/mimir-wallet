@@ -53,7 +53,7 @@ export const polkadotEndpoints: Endpoint[] = [
       RadiumBlock: 'wss://statemint.public.curie.radiumblock.co/ws',
       Stakeworld: 'wss://dot-rpc.stakeworld.io/assethub'
     },
-    httpUrl: 'https://asset-hub-polkadot-rpc.dwellir.com',
+    httpUrl: 'https://polkadot-asset-hub-rpc.polkadot.io',
     genesisHash: '0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f',
     ss58Format: 0,
     explorerUrl: 'https://assethub-polkadot.subscan.io/',
@@ -73,7 +73,7 @@ export const polkadotEndpoints: Endpoint[] = [
       Parity: 'wss://polkadot-people-rpc.polkadot.io',
       RadiumBlock: 'wss://people-polkadot.public.curie.radiumblock.co/ws'
     },
-    httpUrl: 'https://sys.ibp.network/people-polkadot',
+    httpUrl: 'https://polkadot-people-rpc.polkadot.io',
     genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
     ss58Format: 0,
     explorerUrl: 'https://people-polkadot.subscan.io/',
@@ -312,7 +312,7 @@ export const kusamaEndpoints: Endpoint[] = [
       RadiumBlock: 'wss://statemine.public.curie.radiumblock.co/ws',
       Stakeworld: 'wss://ksm-rpc.stakeworld.io/assethub'
     },
-    httpUrl: 'https://statemine-rpc-tn.dwellir.com',
+    httpUrl: 'https://kusama-asset-hub-rpc.polkadot.io',
     genesisHash: '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a',
     ss58Format: 2,
     explorerUrl: 'https://assethub-kusama.subscan.io/',
@@ -387,7 +387,6 @@ export const kusamaEndpoints: Endpoint[] = [
       Dwellir: 'wss://amplitude-rpc.dwellir.com',
       PendulumChain: 'wss://rpc-amplitude.pendulumchain.tech'
     },
-    httpUrl: 'https://amplitude-rpc.dwellir.com',
     genesisHash: '0xcceae7f3b9947cdb67369c026ef78efa5f34a08fe5808d373c04421ecf4f1aaf',
     ss58Format: 57
   },
@@ -429,7 +428,7 @@ export const paseoEndpoints: Endpoint[] = [
       Amforc: 'wss://paseo.rpc.amforc.com',
       Zondax: 'wss://api2.zondax.ch/pas/node/rpc'
     },
-    httpUrl: 'https://paseo-rpc.dwellir.com',
+    httpUrl: 'https://rpc.ibp.network/paseo',
     genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
     explorerUrl: 'https://paseo.subscan.io/',
     statescanUrl: 'https://paseo.statescan.io/'
@@ -449,7 +448,7 @@ export const paseoEndpoints: Endpoint[] = [
       StakeWorld: 'wss://pas-rpc.stakeworld.io/assethub',
       TurboFlakes: 'wss://sys.turboflakes.io/asset-hub-paseo'
     },
-    httpUrl: 'https://asset-hub-paseo-rpc.dwellir.com',
+    httpUrl: 'https://asset-hub-paseo.dotters.network',
     genesisHash: '0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2',
     explorerUrl: 'https://assethub-paseo.subscan.io/',
     statescanUrl: 'https://assethub-paseo.statescan.io/'
@@ -492,7 +491,7 @@ export const westendEndpoints: Endpoint[] = [
       IBP2: 'wss://westend.dotters.network',
       RadiumBlock: 'wss://westend.public.curie.radiumblock.co/ws'
     },
-    httpUrl: 'https://westend-rpc.dwellir.com',
+    httpUrl: 'https://westend-rpc.polkadot.io',
     genesisHash: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e',
     explorerUrl: 'https://westend.subscan.io/',
     statescanUrl: 'https://westend.statescan.io/'
@@ -513,7 +512,7 @@ export const westendEndpoints: Endpoint[] = [
       IBP2: 'wss://asset-hub-westend.dotters.network',
       'Permanence DAO EU': 'wss://asset-hub-westend.rpc.permanence.io'
     },
-    httpUrl: 'https://asset-hub-westend-rpc.dwellir.com',
+    httpUrl: 'https://sys.ibp.network/asset-hub-westend',
     genesisHash: '0x67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9',
     explorerUrl: 'https://assethub-westend.subscan.io/',
     statescanUrl: 'https://assethub-westend.statescan.io/',
