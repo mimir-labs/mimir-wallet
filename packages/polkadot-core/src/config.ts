@@ -3,12 +3,7 @@
 
 import type { Endpoint } from './types.js';
 
-const isDevEnv =
-  import.meta.env.DEV ||
-  window.location.hostname.startsWith('dev.mimir.global') ||
-  window.location.hostname.startsWith('localhost');
-
-export const polkadotEndpoints: Endpoint[] = [
+const polkadotEndpoints: Endpoint[] = [
   {
     key: 'polkadot',
     icon: '/chain-icons/Polkadot.webp',
@@ -288,7 +283,7 @@ export const polkadotEndpoints: Endpoint[] = [
   }
 ];
 
-export const kusamaEndpoints: Endpoint[] = [
+const kusamaEndpoints: Endpoint[] = [
   {
     key: 'kusama',
     icon: '/chain-icons/Kusama.png',
@@ -429,7 +424,7 @@ export const kusamaEndpoints: Endpoint[] = [
   }
 ];
 
-export const paseoEndpoints: Endpoint[] = [
+const paseoEndpoints: Endpoint[] = [
   {
     key: 'paseo',
     icon: '/chain-icons/Paseo.png',
@@ -470,28 +465,10 @@ export const paseoEndpoints: Endpoint[] = [
     genesisHash: '0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2',
     explorerUrl: 'https://assethub-paseo.subscan.io/',
     statescanUrl: 'https://assethub-paseo.statescan.io/'
-  },
-  ...(isDevEnv
-    ? ([
-        {
-          key: 'xcavate-dev',
-          icon: '/chain-icons/xcavate.png',
-          tokenIcon: '/token-icons/XCAV.png',
-          name: 'Xcavate Devnet',
-          relayChain: 'paseo',
-          isTestnet: true,
-          wsUrl: {
-            'xcavate Devnet': 'wss://rpc2-paseo.xcavate.io'
-          },
-          httpUrl: 'https://rpc2-paseo.xcavate.io/',
-          genesisHash: '0xea979dc47498ad76dd4dedb153d4d029d8739dd6d2ff7ff969decc9a4ff5e005',
-          ss58Format: 42
-        }
-      ] as const)
-    : [])
+  }
 ];
 
-export const westendEndpoints: Endpoint[] = [
+const westendEndpoints: Endpoint[] = [
   {
     key: 'westend',
     icon: '/chain-icons/Westend.webp',
@@ -535,24 +512,10 @@ export const westendEndpoints: Endpoint[] = [
     explorerUrl: 'https://assethub-westend.subscan.io/',
     statescanUrl: 'https://assethub-westend.statescan.io/',
     polkavm: true
-  },
-  {
-    key: 'assethub-next-westend',
-    icon: '/chain-icons/assethub-westend.webp',
-    tokenIcon: '/token-icons/WND.webp',
-    name: 'AssetHub Next',
-    ss58Format: 42,
-    relayChain: 'westend',
-    isTestnet: true,
-    wsUrl: {
-      Parity: 'wss://westend-asset-hub-next-rpc.parity-chains-scw.parity.io'
-    },
-    genesisHash: '0x6ddaae15f85a6a5035da7c842ba7a8a90c06d1f53d410a08d19fe899d9d9c7c8',
-    explorerUrl: 'https://assethub-westend-next.subscan.io/'
   }
 ];
 
-export const solochainEndpoints: Endpoint[] = [
+const solochainEndpoints: Endpoint[] = [
   {
     key: 'vara',
     icon: '/chain-icons/vara.png',
@@ -641,8 +604,10 @@ export const solochainEndpoints: Endpoint[] = [
   }
 ];
 
-export const allEndpoints = polkadotEndpoints
-  .concat(kusamaEndpoints)
-  .concat(paseoEndpoints)
-  .concat(westendEndpoints)
-  .concat(solochainEndpoints);
+export const allEndpoints: Endpoint[] = import.meta.env.VITE_ENDPOINTS
+  ? JSON.parse(import.meta.env.VITE_ENDPOINTS)
+  : polkadotEndpoints
+      .concat(kusamaEndpoints)
+      .concat(paseoEndpoints)
+      .concat(westendEndpoints)
+      .concat(solochainEndpoints);

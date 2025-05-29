@@ -75,7 +75,7 @@ function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNo
 
     if (!storeSs58Chain) {
       ss58Format = mode === 'omni' ? 0 : networkValues.chain.ss58Format;
-      ss58Chain = mode === 'omni' ? 'polkadot' : networkValues.chain.key;
+      ss58Chain = mode === 'omni' ? networks[0].key : networkValues.chain.key;
     } else {
       const network =
         mode === 'omni'

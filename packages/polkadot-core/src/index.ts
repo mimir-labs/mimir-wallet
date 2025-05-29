@@ -21,14 +21,7 @@ export { useApi } from './useApi.js';
 export { useIdentityApi } from './useIdentityApi.js';
 export { useNetworks } from './useNetworks.js';
 
-export {
-  polkadotEndpoints,
-  kusamaEndpoints,
-  paseoEndpoints,
-  westendEndpoints,
-  solochainEndpoints,
-  allEndpoints
-} from './config.js';
+export { allEndpoints } from './config.js';
 
 export * from './utils.js';
 

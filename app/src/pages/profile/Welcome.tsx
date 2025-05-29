@@ -203,11 +203,10 @@ function Welcome() {
   const [keywords, setKeywords] = useState<string>('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchAccount, setSearchAccount] = useState<AccountData>();
-  const { enableNetwork } = useNetworks();
+  const { enableNetwork, networks } = useNetworks();
 
   useEffectOnce(() => {
-    enableNetwork('polkadot');
-    enableNetwork('people-polkadot');
+    enableNetwork(networks[0].key);
   });
 
   return (

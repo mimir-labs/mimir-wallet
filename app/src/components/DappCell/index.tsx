@@ -10,11 +10,20 @@ import IconStar from '@/assets/svg/icon-star.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import IconX from '@/assets/svg/icon-x.svg?react';
 import { useToggle } from '@/hooks/useToggle';
-import React, { createElement, useCallback, useMemo, useState } from 'react';
+import React, { createElement, useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Drawer, DrawerBody, DrawerContent, Link, Tooltip, useHover, usePress } from '@mimir-wallet/ui';
+import {
+  Button,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  Link,
+  Tooltip,
+  useInteractOutside,
+  usePress
+} from '@mimir-wallet/ui';
 
 import SupportedChains from './SupportedChains';
 
@@ -39,7 +48,9 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
     }
   }, [_isFavorite, addFavorite, dapp.id, removeFavorite]);
 
-  const openDapp = useCallback(() => {
+  const [isFocus, setFocus] = useState(false);
+
+  const openDapp = () => {
     if (!dapp.isDrawer) {
       const url = dapp.urlSearch?.(network) || dapp.url;
 
@@ -54,17 +65,29 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
         );
       });
     }
-  }, [dapp, network, navigate, setDrawerOpen]);
+  };
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  useInteractOutside({
+    ref,
+    onInteractOutside: () => {
+      setFocus(false);
+    }
+  });
 
   const { pressProps } = usePress({
-    onPress: openDapp
-  });
-  const { isHovered, hoverProps } = useHover({
-    onHoverChange: () => {}
+    onPress: () => {
+      if (isFocus) {
+        openDapp();
+      } else {
+        setFocus(true);
+      }
+    }
   });
 
   return (
-    <div {...hoverProps}>
+    <div ref={ref}>
       {dapp.isDrawer && (
         <Drawer hideCloseButton placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
           <DrawerContent className='max-w-full w-auto py-5'>
@@ -74,26 +97,26 @@ function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
       )}
 
       <div
-        data-hovered={isHovered}
-        className='relative cursor-pointer p-5 rounded-large bg-content1 border-1 border-secondary shadow-medium aspect-square transition-transform duration-300 data-[hovered=true]:scale-x-[-1]'
+        data-focus={isFocus}
+        className='relative cursor-pointer p-5 rounded-large bg-content1 border-1 border-secondary shadow-medium aspect-square transition-transform duration-300 data-[focus=true]:scale-x-[-1]'
         {...pressProps}
       >
         <Tooltip content={_isFavorite ? 'Unpin' : 'Pin'}>
           <Button
-            data-hovered={isHovered}
+            data-focus={isFocus}
             isIconOnly
             color='primary'
             onPress={toggleFavorite}
-            className='z-10 bg-primary/10 absolute top-2.5 right-2.5 data-[hovered=true]:right-auto data-[hovered=true]:left-2.5'
+            className='z-10 bg-primary/10 absolute top-2.5 right-2.5 data-[focus=true]:right-auto data-[focus=true]:left-2.5'
           >
             <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
           </Button>
         </Tooltip>
 
-        {isHovered ? (
+        {isFocus ? (
           <div
-            data-hovered={isHovered}
-            className='flex flex-col justify-center items-center gap-5 h-full data-[hovered=true]:scale-x-[-1]'
+            data-focus={isFocus}
+            className='flex flex-col justify-center items-center gap-5 h-full data-[focus=true]:scale-x-[-1]'
           >
             <div className='flex items-center gap-2.5'>
               {dapp.website && (

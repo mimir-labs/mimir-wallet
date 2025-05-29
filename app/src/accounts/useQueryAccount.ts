@@ -4,14 +4,19 @@
 import type { AccountData, DelegateeProp } from '@/hooks/types';
 
 import { isEqual } from 'lodash-es';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { useClientQuery, useQuery } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
 
-function transformAccount(chainSS58: number, account: AccountData): AccountData {
+function transformAccount(
+  chainSS58: number,
+  account: AccountData,
+  filterByGenesisHash: boolean = false,
+  genesisHash?: string
+): AccountData {
   const proposers = account.proposers?.map((item) => ({
     proposer: encodeAddress(item.proposer, chainSS58),
     creator: encodeAddress(item.creator, chainSS58),
@@ -24,11 +29,15 @@ function transformAccount(chainSS58: number, account: AccountData): AccountData 
     // hide name for display
     name: undefined,
     address: encodeAddress(account.address, chainSS58),
-    delegatees: account.delegatees.map((delegatee) => transformAccount(chainSS58, delegatee)) as (AccountData &
+    delegatees: account.delegatees
+      .filter((delegatee) => (filterByGenesisHash ? delegatee.proxyNetwork === genesisHash : true))
+      .map((delegatee) => transformAccount(chainSS58, delegatee, filterByGenesisHash, genesisHash)) as (AccountData &
       DelegateeProp)[],
     ...(account.type === 'multisig'
       ? {
-          members: account.members.map((member) => transformAccount(chainSS58, member))
+          members: account.members.map((member) =>
+            transformAccount(chainSS58, member, filterByGenesisHash, genesisHash)
+          )
         }
       : {}),
     proposers
@@ -38,31 +47,35 @@ function transformAccount(chainSS58: number, account: AccountData): AccountData 
 export function useQueryAccount(
   address?: string | null
 ): [AccountData | null | undefined, isFetched: boolean, isFetching: boolean, refetch: () => void] {
-  const { chainSS58, network } = useApi();
+  const { chainSS58, genesisHash } = useApi();
   const { updateMetas } = useAccount();
-  const { queryHash, queryKey } = useClientQuery(address ? `chains/${network}/${address}/details` : null);
+  const { queryHash, queryKey } = useClientQuery(address ? `omni-chain/${addressToHex(address)}/details` : null);
+
   const { data, isFetched, isFetching, refetch } = useQuery<AccountData | null>({
     initialData: null,
     queryHash,
     queryKey,
-    structuralSharing: (prev, next): AccountData | null => {
+    structuralSharing: (prev, next: any): AccountData | null => {
       if (!next) {
         return null;
       }
 
-      const nextData = transformAccount(chainSS58, next as AccountData);
-
-      return isEqual(prev, nextData) ? (prev as AccountData) : nextData;
+      return isEqual(prev, next) ? prev : next;
     }
   });
 
-  useEffect(() => {
-    if (data) {
-      updateMetas(data);
-    }
-  }, [data, updateMetas]);
+  const accountData = useMemo(
+    () => (data ? transformAccount(chainSS58, data, true, genesisHash) : null),
+    [data, chainSS58, genesisHash]
+  );
 
-  return [data, isFetched, isFetching, refetch];
+  useEffect(() => {
+    if (accountData) {
+      updateMetas(accountData);
+    }
+  }, [accountData, updateMetas]);
+
+  return [accountData, isFetched, isFetching, refetch];
 }
 
 export function useQueryAccountOmniChain(
@@ -76,28 +89,28 @@ export function useQueryAccountOmniChain(
 ] {
   const { chainSS58 } = useApi();
   const { updateMetas } = useAccount();
-  const { queryHash, queryKey } = useClientQuery(address ? `omni-chain/${address}/details` : null);
+  const { queryHash, queryKey } = useClientQuery(address ? `omni-chain/${addressToHex(address)}/details` : null);
 
   const { data, isFetched, isFetching, refetch, promise } = useQuery<AccountData | null>({
     initialData: null,
     queryHash,
     queryKey,
-    structuralSharing: (prev, next): AccountData | null => {
+    structuralSharing: (prev, next: any): AccountData | null => {
       if (!next) {
         return null;
       }
 
-      const nextData = transformAccount(chainSS58, next as AccountData);
-
-      return isEqual(prev, nextData) ? (prev as AccountData) : nextData;
+      return isEqual(prev, next) ? prev : next;
     }
   });
 
-  useEffect(() => {
-    if (data) {
-      updateMetas(data);
-    }
-  }, [data, updateMetas]);
+  const accountData = useMemo(() => (data ? transformAccount(chainSS58, data) : null), [data, chainSS58]);
 
-  return [data, isFetched, isFetching, refetch, promise];
+  useEffect(() => {
+    if (accountData) {
+      updateMetas(accountData);
+    }
+  }, [accountData, updateMetas]);
+
+  return [accountData, isFetched, isFetching, refetch, promise];
 }
