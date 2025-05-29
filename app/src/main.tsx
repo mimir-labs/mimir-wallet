@@ -6,9 +6,6 @@ import '@xyflow/react/dist/style.css';
 import './style.css';
 import '@mimir-wallet/polkadot-core/augment';
 
-import type {} from '@acala-network/types';
-import type {} from '@polkadot/api-augment';
-
 import {
   ArcElement,
   BarElement,
