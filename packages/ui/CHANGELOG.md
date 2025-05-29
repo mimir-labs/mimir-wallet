@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.4.0...ui-v2.5.0) (2025-05-29)
+
+
+### Features
+
+* remove assethub next westend network ([#232](https://github.com/mimir-labs/mimir-wallet/issues/232)) ([b297f96](https://github.com/mimir-labs/mimir-wallet/commit/b297f9631e551a51404e800f85f1ad3b49c7742a))
+
 ## [2.4.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.3.2...ui-v2.4.0) (2025-05-29)
 
 
