@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.4.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.3.2...polkadot-core-v2.4.0) (2025-05-29)
+
+
+### Features
+
+* Add astar network support ([#230](https://github.com/mimir-labs/mimir-wallet/issues/230)) ([74577f5](https://github.com/mimir-labs/mimir-wallet/commit/74577f560a1b97dae19f3166c0857bd674e45a2b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.4.0
+
 ## [2.3.2](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.3.1...polkadot-core-v2.3.2) (2025-05-28)
 
 
