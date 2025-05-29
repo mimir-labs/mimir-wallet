@@ -58,7 +58,7 @@ function SendTx({
   const { txBundle, isLoading, error, hashSet, reserve, unreserve, delay } = buildTx;
   const [enoughtState, setEnoughtState] = useState<Record<HexString, boolean | 'pending'>>({});
   const source = useAccountSource(txBundle?.signer);
-  const { data: dryRunResult } = useDryRunResult(api, txBundle);
+  const { data: dryRunResult } = useDryRunResult(txBundle);
 
   const isEnought = Object.keys(reserve).reduce<boolean>(
     (result, item) => result && !!enoughtState[addressToHex(item)],

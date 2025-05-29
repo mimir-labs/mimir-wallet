@@ -164,6 +164,8 @@ async function fetchAssetInfo({
 }): Promise<[AssetInfo<false>, BN] | undefined> {
   const [api, assetId, network, tokenInfo] = queryKey;
 
+  console.log(api, assetId, network, tokenInfo);
+
   if (!assetId) {
     return Promise.resolve(undefined);
   }
@@ -289,7 +291,7 @@ export function useAssetInfo(network: string, assetId?: string | null): [AssetIn
   const { allApis } = useApi();
   const api: ValidApiState | undefined = allApis[network];
   const [tokenInfo] = useTokenInfo(network);
-  const queryHash = `${network}-${api?.genesisHash}-asset-info-${assetId}-all`;
+  const queryHash = `${network}-asset-info-${assetId}`;
   const { data } = useQuery({
     queryKey: [api?.api, assetId, network, tokenInfo] as const,
     queryHash,

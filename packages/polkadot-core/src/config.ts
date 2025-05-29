@@ -267,6 +267,24 @@ export const polkadotEndpoints: Endpoint[] = [
     genesisHash: '0x7eb9354488318e7549c722669dcbdcdc526f1fef1420e7944667212f3601fdbd',
     ss58Format: 41,
     statescanUrl: 'https://polimec.statescan.io/'
+  },
+  {
+    key: 'astar',
+    icon: '/chain-icons/astar.webp',
+    tokenIcon: '/token-icons/ASTR.webp',
+    name: 'Astar',
+    relayChain: 'polkadot',
+    wsUrl: {
+      Astar: 'wss://rpc.astar.network',
+      'Automata 1RPC': 'wss://1rpc.io/astr',
+      Blast: 'wss://astar.public.blastapi.io',
+      Dwellir: 'wss://astar-rpc.dwellir.com',
+      OnFinality: 'wss://astar.api.onfinality.io/public-ws'
+    },
+    httpUrl: 'https://rpc.astar.network',
+    genesisHash: '0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6',
+    ss58Format: 5,
+    explorerUrl: 'https://astar.subscan.io/'
   }
 ];
 

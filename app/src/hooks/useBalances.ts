@@ -287,14 +287,10 @@ export function useAssetBalances(
   const queryHash = useMemo(
     () =>
       blake2AsHex(
-        `${network}-assets-balances-${addressHex}-${
-          assets
-            ? assets
-                .map((item) => item.assetId)
-                .sort()
-                .join(',')
-            : ''
-        }`
+        `${network}-assets-balances-${addressHex}-${assets
+          ?.map((item) => item.assetId)
+          .sort()
+          .join(',')}`
       ),
     [addressHex, assets, network]
   );
@@ -361,14 +357,10 @@ export function useAssetBalancesAll(address?: string): UseAssetBalancesAll[] {
       const assets = allAssets?.[network];
 
       const queryHash = blake2AsHex(
-        `${network}-assets-balances-${addressHex}-${
-          assets
-            ? assets
-                .map((item) => item.assetId)
-                .sort()
-                .join(',')
-            : ''
-        }`
+        `${network}-assets-balances-${addressHex}-${assets
+          ?.map((item) => item.assetId)
+          .sort()
+          .join(',')}`
       );
 
       return {
