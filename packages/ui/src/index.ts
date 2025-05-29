@@ -12,7 +12,7 @@ import { Divider } from '@heroui/divider';
 import { CircularProgress } from '@heroui/progress';
 import { ScrollShadow } from '@heroui/scroll-shadow';
 import { HeroUIProvider } from '@heroui/system';
-import { useHover, usePress } from '@react-aria/interactions';
+import { useFocus, useFocusable, useHover, useInteractOutside, usePress } from '@react-aria/interactions';
 import { chain, mergeProps } from '@react-aria/utils';
 
 export {
@@ -32,7 +32,10 @@ export {
   CircularProgress,
   Divider,
   usePress,
+  useFocus,
+  useFocusable,
   useHover,
+  useInteractOutside,
   chain,
   mergeProps
 };
