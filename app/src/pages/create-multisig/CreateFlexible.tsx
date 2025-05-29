@@ -97,7 +97,10 @@ function CreateFlexible({
 
       setLoadingSecond(true);
       const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
-        checkProxy: true
+        checkProxy: true,
+        beforeSend: async (extrinsic) => {
+          service.uploadWebsite(network, extrinsic.hash.toHex(), 'mimir://internal/create-flexible', 'Create Flexible');
+        }
       });
 
       addTxToast({ events });

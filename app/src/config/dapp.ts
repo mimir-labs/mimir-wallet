@@ -276,6 +276,14 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     url: 'mimir://internal/template',
     supportedChains: true
   },
+  {
+    id: 509,
+    icon: LogoCircle,
+    name: 'Create Flexible',
+    description: 'Create Flexible',
+    url: 'mimir://internal/create-flexible',
+    supportedChains: true
+  },
   PolkadotJsApp,
   SubsquareApp,
   StakingApp,
