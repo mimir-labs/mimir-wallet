@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.5.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.4.0...polkadot-core-v2.5.0) (2025-05-29)
+
+
+### Features
+
+* remove assethub next westend network ([#232](https://github.com/mimir-labs/mimir-wallet/issues/232)) ([b297f96](https://github.com/mimir-labs/mimir-wallet/commit/b297f9631e551a51404e800f85f1ad3b49c7742a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.5.0
+
 ## [2.4.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.3.2...polkadot-core-v2.4.0) (2025-05-29)
 
 
