@@ -21,6 +21,7 @@ import {
   addressToHex,
   evm2Ss58,
   isEthAddress,
+  isPolkadotEvmAddress,
   isValidAddress as isValidAddressUtil,
   useApi,
   useNetworks
@@ -237,6 +238,8 @@ function InputAddress({
     </FreeSoloPopover>
   ) : null;
 
+  const valueIsPolkadotEvmAddress = useMemo(() => isPolkadotEvmAddress(value), [value]);
+
   return (
     <>
       <div
@@ -272,14 +275,20 @@ function InputAddress({
           />
         </div>
 
-        {value && !isLocalAccount(value) && !isLocalAddress(value) && (
-          <span className='flex items-center gap-1 text-small'>
-            <IconWarning className='text-warning' />
-            This is an unknown address. You can&nbsp;
-            <span className='cursor-pointer text-primary' {...addAddressBookPressProps}>
-              add it to your address book
-            </span>
-          </span>
+        {valueIsPolkadotEvmAddress ? (
+          <div className='text-small mt-1'>🥚✨ Yep, ETH address transfers work — magic, right? 😎</div>
+        ) : (
+          value &&
+          !isLocalAccount(value) &&
+          !isLocalAddress(value) && (
+            <div className='flex items-center gap-1 text-small mt-1'>
+              <IconWarning className='text-warning' />
+              This is an unknown address. You can&nbsp;
+              <span className='cursor-pointer text-primary' {...addAddressBookPressProps}>
+                add it to your address book
+              </span>
+            </div>
+          )
         )}
 
         {withBalance && (

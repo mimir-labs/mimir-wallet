@@ -5,7 +5,7 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { toastSuccess } from '@/components/utils';
 import { create } from 'zustand';
 
-import { encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, isPolkadotEvmAddress, sub2Eth, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 
 import { useCopyClipboard } from './useCopyClipboard';
 
@@ -45,6 +45,13 @@ export function useCopyAddressToClipboard(address?: string) {
       encodedAddress = encodeAddress(_address, network.ss58Format);
     } else {
       encodedAddress = encodeAddress(_address, chainSS58);
+    }
+
+    if (isPolkadotEvmAddress(encodedAddress)) {
+      copy(sub2Eth(encodedAddress));
+      toastSuccess('Eth Address copied!', sub2Eth(encodedAddress));
+
+      return;
     }
 
     openCopy(encodedAddress);

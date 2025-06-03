@@ -10,7 +10,7 @@ import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
 import { hexToU8a } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, isPolkadotEvmAddress, sub2Eth, useApi } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
 
 interface Props {
@@ -79,13 +79,21 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
     }
   }, [address, identity]);
 
+  const fallbackName = useMemo(() => {
+    if (isPolkadotEvmAddress(address)) {
+      return sub2Eth(address)?.slice(0, 8).toUpperCase();
+    }
+
+    return address.slice(0, 8).toUpperCase();
+  }, [address]);
+
   if (isZeroAddress) {
     return <>ZeroAddress</>;
   }
 
   return (
     <span data-loading={identityEnabled && !isFetched && !isFetching} className='data-[loading=true]:animate-pulse'>
-      {chainName || meta?.name || defaultName || address.slice(0, 8).toUpperCase()}
+      {chainName || meta?.name || defaultName || fallbackName}
     </span>
   );
 }

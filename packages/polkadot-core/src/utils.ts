@@ -54,6 +54,18 @@ export function isPolkadotAddress(address?: string | null): boolean {
   }
 }
 
+export function isPolkadotEvmAddress(address?: string | null): boolean {
+  if (!isPolkadotAddress(address)) {
+    return false;
+  }
+
+  try {
+    return u8aToHex(decodeAddress(address).slice(20)) === '0xeeeeeeeeeeeeeeeeeeeeeeee';
+  } catch {
+    return false;
+  }
+}
+
 export function isEthAddress(address?: string | undefined | null): boolean {
   return address ? isEthereumAddress(address) : false;
 }
