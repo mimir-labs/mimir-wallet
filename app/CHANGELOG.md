@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.6.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.5.0...mimir-wallet-app-v2.6.0) (2025-06-03)
+
+
+### Features
+
+* Support eth address transfer on westend ([#234](https://github.com/mimir-labs/mimir-wallet/issues/234)) ([8333b36](https://github.com/mimir-labs/mimir-wallet/commit/8333b36dab3cc254213ff5fd78a023f64ff0adf1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.6.0
+    * @mimir-wallet/service bumped to 2.6.0
+    * @mimir-wallet/ui bumped to 2.6.0
+
 ## [2.5.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.4.0...mimir-wallet-app-v2.5.0) (2025-05-29)
 
 
