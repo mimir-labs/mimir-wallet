@@ -482,11 +482,27 @@ const paseoEndpoints: Endpoint[] = [
     statescanUrl: 'https://assethub-paseo.statescan.io/'
   },
   {
+    key: 'passethub',
+    icon: '/chain-icons/assethub-paseo.webp',
+    tokenIcon: '/token-icons/Paseo.png',
+    name: 'PAssetHub',
+    ss58Format: 0,
+    relayChain: 'paseo',
+    isTestnet: true,
+    wsUrl: {
+      Parity: 'wss://testnet-passet-hub.polkadot.io/'
+    },
+    httpUrl: 'https://testnet-passet-hub.polkadot.io',
+    genesisHash: '0xfd974cf9eaf028f5e44b9fdd1949ab039c6cf9cc54449b0b60d71b042e79aeb6',
+    polkavm: true
+  },
+  {
     key: 'xcavate-paseo',
     icon: '/chain-icons/xcavate.png',
     tokenIcon: '/token-icons/XCAV.png',
     name: 'Xcavate(Paseo)',
     relayChain: 'paseo',
+    isTestnet: true,
     wsUrl: {
       Xcavate: 'wss://rpc2-paseo.xcavate.io'
     },
@@ -603,32 +619,6 @@ const solochainEndpoints: Endpoint[] = [
     genesisHash: '0xd3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70',
     ss58Format: 42,
     explorerUrl: 'https://avail-turing.subscan.io/'
-  },
-  {
-    key: 'zkverify-testnet',
-    icon: '/chain-icons/zkverify.svg',
-    tokenIcon: '/token-icons/ACME.svg',
-    name: 'zkVerify Testnet',
-    isTestnet: true,
-    wsUrl: {
-      zkVerify: 'wss://testnet-rpc.zkverify.io'
-    },
-    genesisHash: '0xc00425dcaa0a1bc5bf1163a2d69d7abb2cc6180de78b4e10297b31a4d9cc928a',
-    ss58Format: 251,
-    explorerUrl: 'https://zkverify-testnet.subscan.io/'
-  },
-  {
-    key: '5ire',
-    icon: '/chain-icons/5ire.svg',
-    tokenIcon: '/token-icons/5IRE.webp',
-    name: '5ire',
-    wsUrl: {
-      '5ire': 'wss://rpc.5ire.network'
-    },
-    httpUrl: 'https://rpc.5ire.network/',
-    genesisHash: '0x8c24aac175a803c999b25e1cdd89fefcf2ce6af24e27aa9b773463a7fa88c385',
-    ss58Format: 42
-    // explorerUrl: 'https://5irescan.io/'
   }
 ];
 
