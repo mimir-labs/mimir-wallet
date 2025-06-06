@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.8.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.7.0...mimir-wallet-app-v2.8.0) (2025-06-06)
+
+
+### Miscellaneous Chores
+
+* **mimir-wallet-app:** Synchronize main group versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.8.0
+    * @mimir-wallet/service bumped to 2.8.0
+    * @mimir-wallet/ui bumped to 2.8.0
+
 ## [2.7.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.6.0...mimir-wallet-app-v2.7.0) (2025-06-06)
 
 

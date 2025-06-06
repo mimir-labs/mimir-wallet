@@ -16,7 +16,7 @@
   "sideEffects": true,
   "type": "module",
   "name": "@mimir-wallet/service",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "main": "build/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
