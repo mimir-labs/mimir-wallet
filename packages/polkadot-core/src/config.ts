@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { HexString } from '@polkadot/util/types';
 import type { Endpoint } from './types.js';
 
 const polkadotEndpoints: Endpoint[] = [
@@ -611,3 +612,14 @@ export const allEndpoints: Endpoint[] = import.meta.env.VITE_ENDPOINTS
       .concat(paseoEndpoints)
       .concat(westendEndpoints)
       .concat(solochainEndpoints);
+
+export const remoteProxyRelations: Record<HexString, HexString> = allEndpoints.reduce(
+  (acc, item) => {
+    if (item.remoteProxyTo) {
+      acc[item.genesisHash] = item.remoteProxyTo;
+    }
+
+    return acc;
+  },
+  {} as Record<HexString, HexString>
+);

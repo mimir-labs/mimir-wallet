@@ -10,7 +10,6 @@ export const HIDE_ACCOUNT_PREFIX = 'hide_address:';
 export const HIDE_ACCOUNT_HEX_KEY = 'hide_address_hex';
 
 export const FAVORITE_DAPP_KEY = 'favorite_dapp';
-export const DETECTED_ACCOUNT_KEY = 'detected_account';
 
 export const LAST_READ_MESSAGE_KEY = 'last_read_message';
 

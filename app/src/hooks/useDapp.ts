@@ -3,6 +3,7 @@
 
 import { type DappOption, dapps } from '@/config';
 import { FAVORITE_DAPP_KEY } from '@/constants';
+import { isSameTopDomain } from '@/utils';
 import { useCallback, useMemo } from 'react';
 
 import { useLocalStore } from '@mimir-wallet/service';
@@ -27,7 +28,7 @@ export function useDapp(website?: string | null): DappOption | undefined {
       const app = dapps.find((item) => {
         const appURL = new URL(item.url);
 
-        return websiteURL.hostname === appURL.hostname;
+        return websiteURL.hostname === appURL.hostname || isSameTopDomain(website, item.url);
       });
 
       return app;

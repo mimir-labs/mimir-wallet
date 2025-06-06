@@ -76,6 +76,20 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
       };
     }
 
+    for (const meta of Object.values(metas)) {
+      if (meta.isPure && meta.delegatees?.length === 1 && metas[addressToHex(meta.delegatees[0])]?.isMultisig) {
+        const { threshold, who } = metas[addressToHex(meta.delegatees[0])];
+
+        if (threshold) {
+          meta.threshold = threshold;
+        }
+
+        if (who && who.length > 0) {
+          meta.who = who;
+        }
+      }
+    }
+
     return newMetas;
   }, [addresses, metas]);
 

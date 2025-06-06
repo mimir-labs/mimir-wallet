@@ -114,18 +114,18 @@ function SendTx({
 
         addTxToast({ events });
 
-        events.on('signed', (_, extrinsic) => {
+        events.once('signed', (_, extrinsic) => {
           service.uploadWebsite(network, extrinsic.hash.toHex(), website, appName, iconUrl, note, relatedBatches);
         });
-        events.on('inblock', (result) => {
+        events.once('inblock', (result) => {
           onResults?.(result);
         });
-        events.on('error', (error) => {
+        events.once('error', (error) => {
           setLoading(false);
           onError?.(error);
         });
 
-        events.on('finalized', (result) => {
+        events.once('finalized', (result) => {
           setLoading(false);
           onFinalized?.(result);
           setTimeout(() => {

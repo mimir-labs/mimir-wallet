@@ -11,7 +11,7 @@ import { IframeCommunicator } from '@/communicator';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
-import { encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, remoteProxyRelations, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 
 export function useCommunicator(
   iframeRef: MutableRefObject<HTMLIFrameElement | null>,
@@ -34,7 +34,10 @@ export function useCommunicator(
       const data = await promise;
 
       if (data && data.type === 'pure') {
-        if (payload.genesisHash !== data.network) {
+        if (
+          payload.genesisHash !== data.network &&
+          !Object.values(remoteProxyRelations).includes(payload.genesisHash)
+        ) {
           throw new Error(`Network not supported for this account, only ${data.network} is supported`);
         }
       }

@@ -3,19 +3,22 @@
 
 import type { PrepareFlexible } from './types';
 
+import { useAccount } from '@/accounts/useAccount';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Address, AddressRow, Input, InputNetwork } from '@/components';
 import { useCacheMultisig } from '@/hooks/useCacheMultisig';
-import { useToggle } from '@/hooks/useToggle';
-import { useCallback, useState } from 'react';
+import { encodeMultiAddress } from '@polkadot/util-crypto';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToggle } from 'react-use';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { allEndpoints, encodeAddress, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Divider, Modal, ModalBody, ModalContent, Switch } from '@mimir-wallet/ui';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
 import CreateStatic from './CreateStatic';
+import StaticDisplay from './StaticDisplay';
 import { useSelectMultisig } from './useSelectMultisig';
 
 function checkError(
@@ -37,8 +40,9 @@ function checkError(
 
 function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: (network: string) => void }) {
   const navigate = useNavigate();
-  const { chainSS58, chain } = useApi();
+  const { chainSS58, chain, genesisHash } = useApi();
   const [name, setName] = useState<string>('');
+  const { hideAccount } = useAccount();
 
   const [flexible, setFlexible] = useState(false);
   const {
@@ -58,7 +62,8 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
   const [prepares] = useCacheMultisig();
   // flexible
   const [prepare, setPrepare] = useState<PrepareFlexible>();
-  const [open, toggleOpen] = useToggle();
+  const [open, toggleOpen] = useToggle(false);
+  const [staticDisplayOpen, toggleStaticDisplayOpen] = useToggle(false);
 
   const _onChangeThreshold = useCallback(
     (value: string) => {
@@ -78,6 +83,14 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
 
     return !(errors[0] || errors[1]);
   }, [hasSoloAccount, isThresholdValid, signatories]);
+
+  const remoteProxyChain = useMemo(
+    () =>
+      remoteProxyRelations[genesisHash]
+        ? allEndpoints.find((item) => item.genesisHash === remoteProxyRelations[genesisHash])
+        : null,
+    [genesisHash]
+  );
 
   return (
     <>
@@ -166,6 +179,19 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                         />{' '}
                         {chain.name}.
                       </li>
+                      {remoteProxyChain ? (
+                        <li>
+                          You can use this proxy on{' '}
+                          <img
+                            style={{ display: 'inline', verticalAlign: 'middle' }}
+                            width={16}
+                            height={16}
+                            src={remoteProxyChain.icon}
+                          />{' '}
+                          {remoteProxyChain.name} due to Remote Proxy
+                        </li>
+                      ) : null}
+
                       <li>Initiating a transaction is required.</li>
                     </ul>
                   ) : (
@@ -200,11 +226,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                         return;
                       }
 
-                      setPrepare({
-                        who: signatories,
-                        threshold,
-                        name
-                      });
+                      toggleStaticDisplayOpen(true);
                     }}
                     variant='solid'
                   >
@@ -218,6 +240,23 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
           )}
         </div>
       </div>
+
+      <StaticDisplay
+        isOpen={staticDisplayOpen}
+        onConfirm={(multisigName, hide) => {
+          toggleStaticDisplayOpen(false);
+          setPrepare({
+            who: signatories,
+            threshold,
+            name,
+            multisigName
+          });
+
+          if (hide) {
+            hideAccount(encodeMultiAddress(signatories, threshold));
+          }
+        }}
+      />
 
       <Modal onClose={toggleOpen} isOpen={open}>
         <ModalContent>
@@ -233,6 +272,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                       who: item.who.map((address) => encodeAddress(address, chainSS58)),
                       threshold: item.threshold,
                       name: item.name,
+                      multisigName: item.multisigName,
                       pure: item.pure ? encodeAddress(item.pure, chainSS58) : null,
                       blockNumber: item.blockNumber,
                       extrinsicIndex: item.extrinsicIndex

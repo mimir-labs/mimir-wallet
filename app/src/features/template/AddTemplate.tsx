@@ -74,7 +74,7 @@ function AddTemplate({
         placeholder='0x...'
         helper={
           isView ? null : (
-            <div className='text-primary'>
+            <div className='text-foreground/50'>
               You can edit it in the <DotConsoleLink network={network} /> and then click Import or directly paste the
               Encoded Call Data.
             </div>

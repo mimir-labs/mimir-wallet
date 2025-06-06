@@ -67,6 +67,7 @@ type NodeData = {
 type EdgeData = {
   color: string;
   tips: { label: string; delay?: number }[];
+  isDash?: boolean;
 };
 
 const context = createContext<State>({} as State);
@@ -211,7 +212,7 @@ function makeNodes(
     };
   }
 
-  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9') {
+  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9', isDash = false) {
     const id = `${parentId}->${nodeId}`;
     const exists = edges.find((edge) => edge.id === id);
 
@@ -225,7 +226,7 @@ function makeNodes(
         source: parentId,
         target: nodeId,
         type: 'AddressEdge',
-        data: { color, tips: label ? [{ label, delay }] : [] }
+        data: { color, tips: label ? [{ label, delay }] : [], isDash }
       });
     }
   }
@@ -260,7 +261,8 @@ function makeNodes(
         real: node.parent.address,
         proxyType: node.value.proxyType,
         delay: node.value.proxyDelay,
-        address: node.value.address
+        address: node.value.address,
+        genesisHash: node.value.proxyNetwork
       } as FilterPath;
 
       path.push({
@@ -308,7 +310,8 @@ function makeNodes(
         nodeId,
         node.from === 'delegate' ? node.value.proxyType : '',
         node.from === 'delegate' ? node.value.proxyDelay : undefined,
-        node.from === 'delegate' ? '#B700FF' : '#AEAEAE'
+        node.from === 'delegate' ? '#B700FF' : '#AEAEAE',
+        node.from === 'delegate' && node.value.isRemoteProxy ? true : false
       );
     }
 
@@ -350,7 +353,10 @@ function makeNodes(
               },
               path,
               transaction.children.find(
-                (item) => item.section === 'proxy' && item.method === 'proxy' && addressEq(item.address, child.address)
+                (item) =>
+                  ((item.section === 'proxy' && item.method === 'proxy') ||
+                    (item.section === 'remoteProxyRelayChain' && item.method === 'remoteProxyWithRegisteredProof')) &&
+                  addressEq(item.address, child.address)
               )
             );
           }

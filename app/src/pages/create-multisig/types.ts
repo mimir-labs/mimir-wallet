@@ -9,4 +9,5 @@ export type PrepareFlexible = {
   pure?: string | null;
   blockNumber?: number | null;
   extrinsicIndex?: number | null;
+  multisigName?: string | null;
 };
