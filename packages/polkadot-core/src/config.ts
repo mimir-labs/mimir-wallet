@@ -280,6 +280,21 @@ const polkadotEndpoints: Endpoint[] = [
     genesisHash: '0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6',
     ss58Format: 5,
     explorerUrl: 'https://astar.subscan.io/'
+  },
+  {
+    key: 'xcavate-polkadot',
+    icon: '/chain-icons/xcavate.png',
+    tokenIcon: '/token-icons/XCAV.png',
+    name: 'Xcavate',
+    relayChain: 'polkadot',
+    wsUrl: {
+      IBP1: 'wss://xcavate.ibp.network',
+      IBP2: 'wss://xcavate.dotters.network',
+      Xcavate: 'wss://rpc1-polkadot.xcavate.io'
+    },
+    httpUrl: 'https://xcavate.ibp.network',
+    genesisHash: '0xd17bc7f93d054d8aba31f24d5bb0ac462247c594e31beed479b1c04d2d0ba48f',
+    ss58Format: 5
   }
 ];
 
@@ -465,6 +480,19 @@ const paseoEndpoints: Endpoint[] = [
     genesisHash: '0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2',
     explorerUrl: 'https://assethub-paseo.subscan.io/',
     statescanUrl: 'https://assethub-paseo.statescan.io/'
+  },
+  {
+    key: 'xcavate-paseo',
+    icon: '/chain-icons/xcavate.png',
+    tokenIcon: '/token-icons/XCAV.png',
+    name: 'Xcavate(Paseo)',
+    relayChain: 'paseo',
+    wsUrl: {
+      Xcavate: 'wss://rpc2-paseo.xcavate.io'
+    },
+    httpUrl: 'https://rpc2-paseo.xcavate.io',
+    genesisHash: '0xac9dc5e0f7aeae019818f5859215044f80676e562cf934f6683d6424abdabbc8',
+    ss58Format: 5
   }
 ];
 
