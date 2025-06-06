@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.7.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.6.0...polkadot-core-v2.7.0) (2025-06-06)
+
+
+### Features
+
+* Add xcavate network support ([#237](https://github.com/mimir-labs/mimir-wallet/issues/237)) ([e14871f](https://github.com/mimir-labs/mimir-wallet/commit/e14871f5fe789eec4871e40a5a57bec82aa94286))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.7.0
+
 ## [2.6.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.5.0...polkadot-core-v2.6.0) (2025-06-03)
 
 
