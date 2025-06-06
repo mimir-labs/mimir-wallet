@@ -48,21 +48,21 @@
   "dependencies": {
     "@acala-network/chopsticks-core": "^1.0.1",
     "@acala-network/types": "^6.2.0",
-    "@polkadot/api": "^15.9.2",
-    "@polkadot/api-derive": "^15.9.2",
-    "@polkadot/apps-config": "^0.153.1",
-    "@polkadot/types": "^15.9.2",
-    "@polkadot/types-known": "^15.9.2",
-    "@polkadot/ui-shared": "^3.12.2",
-    "@polkadot/util": "^13.4.4",
-    "@polkadot/util-crypto": "^13.4.4",
+    "@polkadot/api": "^16.1.1",
+    "@polkadot/api-derive": "^16.1.1",
+    "@polkadot/apps-config": "^0.157.1",
+    "@polkadot/types": "^16.1.1",
+    "@polkadot/types-known": "^16.1.1",
+    "@polkadot/ui-shared": "^3.14.1",
+    "@polkadot/util": "^13.5.1",
+    "@polkadot/util-crypto": "^13.5.1",
     "idb": "^8.0.2",
     "jsondiffpatch": "^0.6.0"
   },
   "devDependencies": {
     "@mimir-wallet/service": "workspace:^",
-    "@polkadot/extension-base": "^0.58.7",
-    "@polkadot/extension-inject": "^0.58.7",
+    "@polkadot/extension-base": "^0.59.1",
+    "@polkadot/extension-inject": "^0.59.1",
     "npm-run-all2": "^7.0.2",
     "typescript": "^5.8.2"
   }

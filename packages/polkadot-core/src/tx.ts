@@ -18,6 +18,7 @@ import { assert, formatBalance, isBn, isFunction, isHex, isNumber, objectSpread,
 import { base64Encode } from '@polkadot/util-crypto';
 
 import { assetDispatchError } from './dispatch-error.js';
+import { buildRemoteProxy } from './remoteProxy.js';
 import { TxEvents } from './tx-events.js';
 
 type Options = {
@@ -155,14 +156,20 @@ export async function sign(
   const signingInfo = await api.derive.tx.signingInfo(signer, options.nonce, options.era);
   const eraOptions = makeEraOptions(api, options, signingInfo);
 
+  const callU8a = await buildRemoteProxy(api, extrinsic, signer);
+
+  const call = api.createType('Call', callU8a);
+
+  const finalExtrinsic = api.tx[call.section][call.method](...call.args);
+
   const { signer: accountSigner, withSignedTransaction } = await extractParams(api, signer, injected);
 
   const payload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
     objectSpread({}, eraOptions, {
       address: signer,
       blockNumber: signingInfo.header ? signingInfo.header.number : 0,
-      method: extrinsic.method,
-      version: extrinsic.version,
+      method: finalExtrinsic.method,
+      version: finalExtrinsic.version,
       withSignedTransaction
     })
   ]);
@@ -210,19 +217,19 @@ export async function sign(
       throw new Error(errMsg('call data'));
     }
 
-    extrinsic.addSignature(signer, signature, newSignerPayload.toPayload());
+    finalExtrinsic.addSignature(signer, signature, newSignerPayload.toPayload());
 
     return [
       signature,
       newSignerPayload.toPayload(),
-      extrinsic.hash,
+      finalExtrinsic.hash,
       isHex(signedTransaction) ? signedTransaction : u8aToHex(signedTransaction)
     ];
   }
 
-  extrinsic.addSignature(signer, signature, payload.toPayload());
+  finalExtrinsic.addSignature(signer, signature, payload.toPayload());
 
-  return [signature, payload.toPayload(), extrinsic.hash, extrinsic.toHex()];
+  return [signature, payload.toPayload(), finalExtrinsic.hash, finalExtrinsic.toHex()];
 }
 
 export function signAndSend(
@@ -234,8 +241,13 @@ export function signAndSend(
 ): TxEvents {
   const events = new TxEvents();
 
-  extractParams(api, signer, injected)
-    .then((params) => extrinsic.signAsync(signer, params))
+  buildRemoteProxy(api, extrinsic, signer)
+    .then(async (callU8a) => {
+      const call = api.createType('Call', callU8a);
+      const finalExtrinsic = api.tx[call.section][call.method](...call.args);
+
+      return extractParams(api, signer, injected).then((params) => finalExtrinsic.signAsync(signer, params));
+    })
     .then(async (extrinsic) => {
       events.emit('signed', extrinsic.signature, extrinsic);
 

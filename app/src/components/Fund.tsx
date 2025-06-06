@@ -3,7 +3,6 @@
 
 import type { AssetInfo } from '@/hooks/types';
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
 import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
@@ -39,8 +38,6 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const [[amount, isAmountValid], setAmount] = useInputNumber(defaultValue?.toString() || '', false, 0);
   const [token, setToken] = useState<AssetInfo<boolean>>();
   const [error, setError] = useState<string | null>(null);
-
-  const { meta } = useAddressMeta(sending);
 
   useEffect(() => {
     if (open) enableNetwork(network);
@@ -84,7 +81,6 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
                 amount={amount}
                 isAmountValid={isAmountValid}
                 keepAlive={keepAlive}
-                isPure={!!meta.isPure}
                 token={token}
                 sending={sending}
                 recipient={receipt}
@@ -114,7 +110,10 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
                 keepAlive={keepAlive}
                 sending={sending}
                 recipient={receipt}
-                onDone={() => setError(null)}
+                onDone={() => {
+                  setError(null);
+                  onClose();
+                }}
                 onError={(error: any) => {
                   setError(error.message || 'Something went wrong');
                 }}

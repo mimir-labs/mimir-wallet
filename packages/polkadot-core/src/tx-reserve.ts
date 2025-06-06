@@ -168,6 +168,15 @@ export async function txReserve(
     for (const item of call.args[0]) {
       await txReserve(api, api.registry.createType('Call', item.toU8a()), address, reserve, unreserve, delay);
     }
+  } else if (api.tx.remoteProxyRelayChain?.remoteProxyWithRegisteredProof?.is(call)) {
+    await txReserve(
+      api,
+      api.createType('Call', call.args[2].toU8a()),
+      call.args[0].toString(),
+      reserve,
+      unreserve,
+      delay
+    );
   }
 }
 

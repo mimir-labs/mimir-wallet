@@ -10,13 +10,12 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatUnits } from '@/utils';
 import React, { useEffect, useMemo } from 'react';
 
-import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { remoteProxyRelations, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { Alert, Avatar, Button, Skeleton, Switch } from '@mimir-wallet/ui';
 
 import { useTransferBalance } from './useTransferBalances';
 
 function TransferContent({
-  isPure,
   token,
   amount,
   isAmountValid,
@@ -37,7 +36,6 @@ function TransferContent({
   amount: string;
   token?: TransferToken;
   isAmountValid: boolean;
-  isPure: boolean;
   sending: string;
   recipient: string;
   network: string;
@@ -64,7 +62,16 @@ function TransferContent({
       : undefined;
 
   const isRecipientSupported = useMemo(() => {
-    return recipientAccount?.type === 'pure' ? recipientAccount.network === chain.genesisHash : true;
+    return recipientAccount?.type === 'pure'
+      ? recipientAccount.network === chain.genesisHash ||
+          chain.genesisHash === remoteProxyRelations[recipientAccount.network]
+      : true;
+  }, [recipientAccount, chain]);
+
+  const isRecipientRemoteProxy = useMemo(() => {
+    return recipientAccount?.type === 'pure'
+      ? chain.genesisHash === remoteProxyRelations[recipientAccount.network]
+      : false;
   }, [recipientAccount, chain]);
 
   const existentialDeposit = token?.isNative ? api.consts.balances.existentialDeposit : assetExistentialDeposit;
@@ -102,7 +109,7 @@ function TransferContent({
         />
       )}
 
-      <InputNetwork disabled={isPure} label='Select Network' network={network} setNetwork={setNetwork} />
+      <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
 
       <InputToken
         network={network}
@@ -165,6 +172,12 @@ function TransferContent({
             &nbsp;
             {recipientNetwork?.name}, please change to correct network.
           </div>
+        </Alert>
+      )}
+
+      {isRecipientRemoteProxy && (
+        <Alert color='success'>
+          <div>🥷✨Yep, remote proxy lets you borrow a ninja from another chain — smooth and stealthy! 🕶️</div>
         </Alert>
       )}
     </>

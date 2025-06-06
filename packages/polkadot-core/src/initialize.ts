@@ -99,7 +99,7 @@ function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: st
  * @param httpUrl - HTTP URL for the chain
  * @param onError - Error handler callback
  */
-async function createApi(
+export async function createApi(
   apiUrl: string | string[],
   network: string,
   httpUrl?: string

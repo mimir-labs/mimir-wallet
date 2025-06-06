@@ -8,7 +8,10 @@ import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { DryRunResult } from './types.js';
 
+import { isHex, isU8a } from '@polkadot/util';
+
 import { assetDispatchError } from '../dispatch-error.js';
+import { buildRemoteProxy } from '../remoteProxy.js';
 import { parseBalancesChange } from './parse-balances-change.js';
 
 export async function dryRun(
@@ -28,7 +31,7 @@ export async function dryRun(
             Signed: address
           }
         },
-        call
+        await buildRemoteProxy(api, isU8a(call) || isHex(call) ? api.createType('Call', call) : call, address)
       )
     : (api.call.dryRunApi.dryRunCall as any)(
         {
@@ -36,7 +39,7 @@ export async function dryRun(
             Signed: address
           }
         },
-        call,
+        await buildRemoteProxy(api, isU8a(call) || isHex(call) ? api.createType('Call', call) : call, address),
         4
       ));
 

@@ -61,6 +61,58 @@ async function asMulti(
       );
 }
 
+async function announce(
+  api: ApiPromise,
+  tx: SubmittableExtrinsic<'promise'>,
+  proxy: string,
+  delegate: string,
+  delay: number
+) {
+  const proxies = await api.query.proxy.proxies(proxy);
+  const exists = proxies[0].filter((item) => addressEq(item.delegate, delegate));
+
+  if (!exists.length) {
+    throw new Error('Proxy not found');
+  }
+
+  if (!exists.find((item) => item.delay.toNumber() === delay)) {
+    throw new Error('Proxy delay mismatch');
+  }
+
+  if (!api.tx.proxy?.announce) {
+    throw new Error(`${api.runtimeChain.toString()} does not support proxy announce`);
+  }
+
+  return api.tx.proxy.announce(proxy, tx.method.hash);
+}
+
+async function proxy(
+  api: ApiPromise,
+  tx: SubmittableExtrinsic<'promise'>,
+  proxy: string,
+  delegate: string,
+  proxyType: string,
+  call?: HexString | null
+) {
+  const proxies = await api.query.proxy.proxies(proxy);
+
+  const exists = proxies[0].find((item) => addressEq(item.delegate, delegate));
+
+  if (!exists) {
+    if (!api.tx.remoteProxyRelayChain) throw new Error(`Proxy not exists on account ${proxy}`);
+
+    return call
+      ? api.tx(api.registry.createType('Call', call))
+      : api.tx.remoteProxyRelayChain.remoteProxyWithRegisteredProof(proxy, proxyType, tx.method.toU8a());
+  }
+
+  if (call) {
+    return api.tx(api.registry.createType('Call', call));
+  } else {
+    return api.tx.proxy.proxy(proxy, proxyType as any, tx.method.toU8a());
+  }
+}
+
 export function buildTx(
   api: ApiPromise,
   call: IMethod,
@@ -104,23 +156,27 @@ export async function buildTx(
 
       if (item.delay) {
         calls.add(tx.method.toHex());
-        tx = api.tx.proxy.announce(item.real, tx.method.hash);
         _transaction = _transaction?.children.find(({ address }) => addressEq(address, item.address));
-      } else {
-        const delegate = _transaction?.delegate;
 
+        tx = await announce(api, tx, item.real, item.address, item.delay);
+      } else {
         _transaction = _transaction?.children.find(
-          ({ address }) => addressEq(address, delegate) && addressEq(address, item.address)
+          ({ address }) => addressEq(address, _transaction?.delegate) && addressEq(address, item.address)
         );
 
-        if (_transaction?.call) {
-          tx = api.tx(api.registry.createType('Call', _transaction.call));
-        } else {
-          tx = api.tx.proxy.proxy(item.real, item.proxyType as any, tx.method.toU8a());
-        }
+        tx = await proxy(
+          api,
+          tx,
+          item.real,
+          _transaction ? _transaction.address : item.address,
+          item.proxyType as any,
+          _transaction?.call
+        );
       }
     }
   }
 
-  return { tx, signer: path[path.length - 1].address };
+  const signer = path[path.length - 1].address;
+
+  return { tx, signer };
 }

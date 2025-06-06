@@ -1,19 +1,16 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HexString } from '@polkadot/util/types';
-
 import { useAccount } from '@/accounts/useAccount';
 import { toastError } from '@/components/utils';
 import { utm } from '@/config';
-import { DETECTED_ACCOUNT_KEY } from '@/constants';
 import { u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useCallback, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { service, store } from '@mimir-wallet/service';
+import { service } from '@mimir-wallet/service';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import CreateSuccess from './CreateSuccess';
@@ -38,11 +35,6 @@ async function createMultisig(
     signatories.map((value) => addressToHex(value)),
     threshold,
     name
-  );
-
-  store.set(
-    DETECTED_ACCOUNT_KEY,
-    Array.from(new Set([...((store.get(DETECTED_ACCOUNT_KEY) as HexString[]) || []), u8aToHex(address)]))
   );
 
   return address;

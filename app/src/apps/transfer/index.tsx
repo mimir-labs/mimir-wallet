@@ -3,7 +3,6 @@
 
 import type { TransferToken } from './types';
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
@@ -38,8 +37,6 @@ function PageTransfer() {
   const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
   const [token, setToken] = useState<TransferToken>();
 
-  const { meta } = useAddressMeta(sending);
-
   return (
     <SubApiRoot
       network={network}
@@ -61,7 +58,6 @@ function PageTransfer() {
               amount={amount}
               isAmountValid={isAmountValid}
               keepAlive={keepAlive}
-              isPure={!!meta.isPure}
               token={token}
               sending={sending}
               recipient={recipient}

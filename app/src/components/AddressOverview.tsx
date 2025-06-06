@@ -52,6 +52,7 @@ type NodeData = {
 type EdgeData = {
   color: string;
   tips: { label: string; delay?: number }[];
+  isDash?: boolean;
 };
 
 const dagreGraph = new dagre.graphlib.Graph();
@@ -240,7 +241,7 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
     };
   }
 
-  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9') {
+  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9', isDash = false) {
     const id = `${parentId}->${nodeId}`;
     const exists = edges.find((edge) => edge.id === id);
 
@@ -254,7 +255,7 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
         source: parentId,
         target: nodeId,
         type: 'AddressEdge',
-        data: { color, tips: label ? [{ label, delay }] : [] }
+        data: { color, tips: label ? [{ label, delay }] : [], isDash }
       });
     }
   }
@@ -315,7 +316,8 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
           ? '#B700FF'
           : node.from === 'member'
             ? 'hsl(var(--heroui-primary))'
-            : 'hsl(var(--heroui-divider-300))'
+            : 'hsl(var(--heroui-divider-300))',
+        node.from === 'delegate' && !!node.value.isRemoteProxy
       );
     }
 

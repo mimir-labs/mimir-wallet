@@ -22,6 +22,7 @@ export interface CacheMultisig {
   genesisHash: HexString;
   creator: HexString;
   who: HexString[];
+  multisigName?: string | null;
   threshold: number;
   name: string;
   pure: HexString | null;
@@ -34,6 +35,7 @@ export type DelegateeProp = {
   proxyType: string;
   proxyNetwork: HexString;
   proxyDelay: number;
+  isRemoteProxy?: boolean;
 };
 
 export type AccountDataType = {
@@ -153,6 +155,7 @@ export type ProxyTransaction = BaseTransaction & {
   createdExtrinsicIndex: number;
   createdExtrinsicHash: HexString;
   delegate?: HexString;
+  isRemoteProxy?: boolean;
 };
 
 export type ProposeTransaction = BaseTransaction & {
@@ -293,6 +296,7 @@ type BaseAddressMeta = {
   creator?: HexString;
   disambiguationIndex?: number;
   pureCreatedAt?: HexString;
+  delegatees?: string[];
   multipleMultisig?: boolean;
   proxyType?: string;
   network?: HexString;
@@ -304,6 +308,7 @@ type BaseAddressMeta = {
 
 type ProxiedAddressMeta = Omit<BaseAddressMeta, 'isProxied'> & {
   isProxied: true;
+  delegatees: string[];
   multipleMultisig: boolean;
   proxyNetworks: HexString[];
 };
@@ -360,6 +365,7 @@ type ProxyFilterPath = {
   type: 'proxy';
   real: string;
   proxyType: string;
+  genesisHash: HexString;
   delay?: number;
   address: string;
 };

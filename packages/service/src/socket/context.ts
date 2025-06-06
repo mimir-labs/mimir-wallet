@@ -16,5 +16,14 @@ export interface TransactionSocketContextValue {
    * Whether the socket is currently connected
    */
   isConnected: boolean;
+  /**
+   * Whether the socket is currently attempting to reconnect
+   */
+  isReconnecting: boolean;
+  /**
+   * Any connection error that occurred
+   */
+  error: Error | null;
 }
+
 export const TransactionSocketContext = createContext<TransactionSocketContextValue | null>(null);

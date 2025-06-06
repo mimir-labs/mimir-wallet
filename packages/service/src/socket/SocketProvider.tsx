@@ -10,15 +10,7 @@ import { API_CLIENT_WS_GATEWAY } from '../config.js';
 import { TransactionSocketContext } from './context.js';
 
 interface TransactionSocketProviderProps {
-  /**
-   * WebSocket server URL
-   * @default 'wss://mimir-client.mimir.global'
-   */
   url?: string;
-  /**
-   * Whether to automatically connect when the provider is mounted
-   * @default true
-   */
   autoConnect?: boolean;
   children: ReactNode;
 }
@@ -39,108 +31,189 @@ const TransactionSocketProvider = ({
     isReconnecting: false,
     error: null
   });
+
   const socketRef = useRef<Socket | null>(null);
-  const callbacksRef = useRef<Map<string, Set<(event: unknown) => void>>>(new Map());
-  const subscribedAddressesRef = useRef<Set<string>>(new Set());
+  const subscriptionsRef = useRef<Map<string, Set<(event: unknown) => void>>>(new Map());
+  const isConnectingRef = useRef<boolean>(false);
 
   const updateSocketState = useCallback((updates: Partial<SocketState>) => {
     setSocketState((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  const resubscribeAll = useCallback(() => {
-    if (!socketRef.current?.connected) return;
+  const processAllSubscriptions = useCallback(() => {
+    const socket = socketRef.current;
 
-    subscribedAddressesRef.current.forEach((address) => {
-      socketRef.current?.emit('subscribe', address);
+    if (!socket?.connected) return;
+
+    console.log('Processing all subscriptions...', subscriptionsRef.current.size);
+
+    subscriptionsRef.current.forEach((callbacks, address) => {
+      socket.emit('subscribe', address);
+
+      const eventName = `tx:${address}`;
+
+      socket.off(eventName);
+
+      socket.on(eventName, (event: unknown) => {
+        callbacks.forEach((callback) => {
+          try {
+            callback(event);
+          } catch (error) {
+            console.error(`Error in subscription callback for ${address}:`, error);
+          }
+        });
+      });
     });
   }, []);
 
   const connect = useCallback(() => {
-    if (socketRef.current?.connected) return;
+    if (socketRef.current?.connected || isConnectingRef.current) {
+      return;
+    }
 
-    socketRef.current = io(url, {
-      path: '/transaction-push',
-      transports: ['websocket'],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000
-    });
+    console.log('Establishing WebSocket connection...');
+    isConnectingRef.current = true;
 
-    socketRef.current.on('connect', () => {
-      updateSocketState({ isConnected: true, isReconnecting: false, error: null });
-      console.log('WebSocket connected');
-      resubscribeAll();
-    });
+    try {
+      const socket = io(url, {
+        path: '/transaction-push',
+        transports: ['websocket'],
+        reconnection: true,
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000
+      });
 
-    socketRef.current.on('disconnect', () => {
-      updateSocketState({ isConnected: false });
-      console.log('WebSocket disconnected');
-    });
+      socketRef.current = socket;
 
-    socketRef.current.on('reconnect_attempt', () => {
-      updateSocketState({ isReconnecting: true });
-      console.log('WebSocket reconnecting...');
-    });
+      socket.on('connect', () => {
+        console.log('WebSocket connected successfully');
+        isConnectingRef.current = false;
+        updateSocketState({
+          isConnected: true,
+          isReconnecting: false,
+          error: null
+        });
+        processAllSubscriptions();
+      });
 
-    socketRef.current.on('reconnect_failed', () => {
-      updateSocketState({ isReconnecting: false, error: new Error('Failed to reconnect') });
-      console.error('WebSocket reconnection failed');
-    });
+      socket.on('disconnect', (reason: string) => {
+        console.log('WebSocket disconnected:', reason);
+        updateSocketState({ isConnected: false });
+      });
 
-    socketRef.current.on('error', (error: Error) => {
-      updateSocketState({ error });
-      console.error('WebSocket error:', error);
-    });
-  }, [url, updateSocketState, resubscribeAll]);
+      socket.on('reconnect_attempt', (attemptNumber: number) => {
+        console.log(`WebSocket reconnecting... (attempt ${attemptNumber})`);
+        updateSocketState({ isReconnecting: true });
+      });
+
+      socket.on('reconnect', (attemptNumber: number) => {
+        console.log(`WebSocket reconnected successfully (after ${attemptNumber} attempts)`);
+        updateSocketState({
+          isConnected: true,
+          isReconnecting: false,
+          error: null
+        });
+        processAllSubscriptions();
+      });
+
+      socket.on('reconnect_failed', () => {
+        console.error('WebSocket reconnection failed after all attempts');
+        isConnectingRef.current = false;
+        updateSocketState({
+          isReconnecting: false,
+          error: new Error('Failed to reconnect after multiple attempts')
+        });
+      });
+
+      socket.on('connect_error', (error: Error) => {
+        console.error('WebSocket connection error:', error);
+        isConnectingRef.current = false;
+        updateSocketState({ error });
+      });
+
+      socket.on('error', (error: Error) => {
+        console.error('WebSocket error:', error);
+        updateSocketState({ error });
+      });
+    } catch (error) {
+      console.error('Failed to create socket connection:', error);
+      isConnectingRef.current = false;
+      updateSocketState({
+        error: error instanceof Error ? error : new Error('Unknown connection error')
+      });
+    }
+  }, [url, updateSocketState, processAllSubscriptions]);
 
   const disconnect = useCallback(() => {
-    if (socketRef.current) {
-      socketRef.current.disconnect();
+    const socket = socketRef.current;
+
+    if (socket) {
+      console.log('Disconnecting WebSocket...');
+      socket.disconnect();
       socketRef.current = null;
-      updateSocketState({ isConnected: false, isReconnecting: false, error: null });
+      isConnectingRef.current = false;
+      updateSocketState({
+        isConnected: false,
+        isReconnecting: false,
+        error: null
+      });
     }
   }, [updateSocketState]);
 
   const subscribe = useCallback(
     (address: string, callback: (event: unknown) => void) => {
-      if (!socketRef.current?.connected) {
-        console.warn('Socket is not connected. Attempting to connect...');
-        connect();
+      console.log(`Subscribing to address: ${address}`);
+
+      if (!subscriptionsRef.current.has(address)) {
+        subscriptionsRef.current.set(address, new Set());
       }
 
-      const eventName = `tx:${address}`;
+      subscriptionsRef.current.get(address)?.add(callback);
 
-      // Store callback
-      if (!callbacksRef.current.has(address)) {
-        callbacksRef.current.set(address, new Set());
+      const socket = socketRef.current;
+
+      if (socket?.connected) {
+        socket.emit('subscribe', address);
+
+        const eventName = `tx:${address}`;
+
+        if (!socket.hasListeners(eventName)) {
+          socket.on(eventName, (event: unknown) => {
+            const callbacks = subscriptionsRef.current.get(address);
+
+            callbacks?.forEach((cb) => {
+              try {
+                cb(event);
+              } catch (error) {
+                console.error(`Error in subscription callback for ${address}:`, error);
+              }
+            });
+          });
+        }
+      } else {
+        console.log(`Socket not connected, queuing subscription for ${address}`);
+
+        if (!isConnectingRef.current) {
+          connect();
+        }
       }
-
-      callbacksRef.current.get(address)?.add(callback);
-
-      // Store subscribed address
-      subscribedAddressesRef.current.add(address);
-
-      // Subscribe to event
-      socketRef.current?.emit('subscribe', address);
-      socketRef.current?.on(eventName, (event: unknown) => {
-        callbacksRef.current.get(address)?.forEach((cb) => cb(event));
-      });
     },
     [connect]
   );
 
   const unsubscribe = useCallback((address: string) => {
-    if (!socketRef.current?.connected) return;
+    console.log(`Unsubscribing from address: ${address}`);
 
-    const eventName = `tx:${address}`;
+    subscriptionsRef.current.delete(address);
 
-    // Remove all callbacks for this address
-    callbacksRef.current.delete(address);
-    subscribedAddressesRef.current.delete(address);
+    const socket = socketRef.current;
 
-    // Unsubscribe from event
-    socketRef.current.emit('unsubscribe', address);
-    socketRef.current.off(eventName);
+    if (socket?.connected) {
+      socket.emit('unsubscribe', address);
+      socket.off(`tx:${address}`);
+    }
   }, []);
 
   useEffect(() => {
@@ -150,10 +223,12 @@ const TransactionSocketProvider = ({
 
     return () => {
       disconnect();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      subscriptionsRef.current.clear();
     };
   }, [autoConnect, connect, disconnect]);
 
-  const value = {
+  const contextValue = {
     subscribe,
     unsubscribe,
     isConnected: socketState.isConnected,
@@ -161,7 +236,7 @@ const TransactionSocketProvider = ({
     error: socketState.error
   };
 
-  return <TransactionSocketContext.Provider value={value}>{children}</TransactionSocketContext.Provider>;
+  return <TransactionSocketContext.Provider value={contextValue}>{children}</TransactionSocketContext.Provider>;
 };
 
 export default TransactionSocketProvider;

@@ -25,6 +25,7 @@ export type Endpoint = {
   subsquareUrl?: string;
   identityNetwork?: string;
   polkavm?: boolean;
+  remoteProxyTo?: HexString;
 };
 
 export type Network = Endpoint & {

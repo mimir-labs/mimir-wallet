@@ -6,7 +6,7 @@ import type { AccountData, DelegateeProp } from '@/hooks/types';
 import { isEqual } from 'lodash-es';
 import { useEffect, useMemo } from 'react';
 
-import { addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, encodeAddress, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
 import { useClientQuery, useQuery } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
@@ -30,9 +30,17 @@ function transformAccount(
     name: undefined,
     address: encodeAddress(account.address, chainSS58),
     delegatees: account.delegatees
-      .filter((delegatee) => (filterByGenesisHash ? delegatee.proxyNetwork === genesisHash : true))
-      .map((delegatee) => transformAccount(chainSS58, delegatee, filterByGenesisHash, genesisHash)) as (AccountData &
-      DelegateeProp)[],
+      .filter((delegatee) => {
+        if (filterByGenesisHash) {
+          return delegatee.proxyNetwork === genesisHash || remoteProxyRelations[delegatee.proxyNetwork] === genesisHash;
+        }
+
+        return true;
+      })
+      .map((delegatee) => ({
+        ...transformAccount(chainSS58, delegatee, filterByGenesisHash, genesisHash),
+        isRemoteProxy: filterByGenesisHash ? delegatee.proxyNetwork !== genesisHash : false
+      })) as (AccountData & DelegateeProp)[],
     ...(account.type === 'multisig'
       ? {
           members: account.members.map((member) =>
