@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.8.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.7.0...polkadot-core-v2.8.0) (2025-06-06)
+
+
+### Features
+
+* Add PAssetHub network support ([#239](https://github.com/mimir-labs/mimir-wallet/issues/239)) ([c5488e1](https://github.com/mimir-labs/mimir-wallet/commit/c5488e14eeaa26db378358bed763f42b417164be))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.8.0
+
 ## [2.7.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.6.0...polkadot-core-v2.7.0) (2025-06-06)
 
 
