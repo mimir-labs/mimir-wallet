@@ -97,6 +97,7 @@ function TxButton({
         events.on('error', (error: any) => {
           setLoading(false);
           onError?.(error);
+          toastError(error);
         });
       } else {
         addQueue({
