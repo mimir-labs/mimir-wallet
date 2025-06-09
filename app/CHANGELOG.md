@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.8.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.8.0...mimir-wallet-app-v2.8.1) (2025-06-09)
+
+
+### Bug Fixes
+
+* show cancel button for non-pure accounts ([#241](https://github.com/mimir-labs/mimir-wallet/issues/241)) ([30fbd38](https://github.com/mimir-labs/mimir-wallet/commit/30fbd38f4dd8a22d5c28fd88382e5cd640737505))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.8.1
+    * @mimir-wallet/service bumped to 2.8.1
+    * @mimir-wallet/ui bumped to 2.8.1
+
 ## [2.8.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.7.0...mimir-wallet-app-v2.8.0) (2025-06-06)
 
 

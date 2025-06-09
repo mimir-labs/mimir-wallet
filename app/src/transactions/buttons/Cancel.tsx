@@ -11,7 +11,7 @@ import React, { useMemo } from 'react';
 import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
-function Cancel({ account, transaction }: { account: AccountData; transaction: Transaction }) {
+function Cancel({ transaction }: { account: AccountData; transaction: Transaction }) {
   const { api, genesisHash, isApiReady } = useApi();
   const { isLocalAccount } = useAccount();
 
@@ -21,15 +21,13 @@ function Cancel({ account, transaction }: { account: AccountData; transaction: T
     }
 
     if (transaction.type === TransactionType.Proxy) {
-      if (account.type === 'pure') {
-        const subTransaction = transaction.children.find((item) => item.type === TransactionType.Multisig);
+      const subTransaction = transaction.children.find((item) => item.type === TransactionType.Multisig);
 
-        return subTransaction || null;
-      }
+      return subTransaction || null;
     }
 
     return null;
-  }, [account, transaction]);
+  }, [transaction]);
 
   const { data: multisigInfo } = useQuery({
     queryKey: [multisigTx?.address, multisigTx?.callHash] as const,
