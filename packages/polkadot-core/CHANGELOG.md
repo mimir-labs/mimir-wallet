@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.9.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.8.1...polkadot-core-v2.9.0) (2025-06-12)
+
+
+### Features
+
+* Add remote proxy support ([#236](https://github.com/mimir-labs/mimir-wallet/issues/236)) ([91d4170](https://github.com/mimir-labs/mimir-wallet/commit/91d41705e25efd2b6e66553b03af59b833809a47))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.9.0
+
 ## [2.8.1](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.8.0...polkadot-core-v2.8.1) (2025-06-09)
 
 
