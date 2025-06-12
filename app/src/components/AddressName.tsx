@@ -32,7 +32,7 @@ function extractIdentity(
   const displayParent = _displayParent && (isGood ? _displayParent : _displayParent.replace(/[^\x20-\x7E]/g, ''));
 
   const elem = (
-    <span className='inline-flex items-center'>
+    <>
       <Tooltip
         color='foreground'
         content={isGood ? 'Reasonable Identity' : isBad ? 'Bad Identity' : 'Unknown Identity'}
@@ -43,13 +43,13 @@ function extractIdentity(
           style={{ marginRight: '0.2em' }}
           data-is-bad={isBad}
           data-is-good={isGood}
-          className='text-divider-300 data-[is-bad=true]:text-danger data-[is-good=true]:text-primary'
+          className='text-divider-300 data-[is-bad=true]:text-danger data-[is-good=true]:text-primary inline align-middle'
         />
       </Tooltip>
-      <span>{displayParent || displayName}</span>
-      {displayParent && <span>/</span>}
+      {displayParent || displayName}
+      {displayParent && <>/</>}
       {displayParent && <span style={{ opacity: 0.5 }}>{displayName}</span>}
-    </span>
+    </>
   );
 
   return elem;

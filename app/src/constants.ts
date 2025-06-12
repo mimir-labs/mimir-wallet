@@ -10,7 +10,6 @@ export const HIDE_ACCOUNT_PREFIX = 'hide_address:';
 export const HIDE_ACCOUNT_HEX_KEY = 'hide_address_hex';
 
 export const FAVORITE_DAPP_KEY = 'favorite_dapp';
-export const DETECTED_ACCOUNT_KEY = 'detected_account';
 
 export const LAST_READ_MESSAGE_KEY = 'last_read_message';
 
@@ -37,7 +36,7 @@ export const BATCH_TX_PREFIX = 'batch_tx:';
 export const BATCH_TX_V2_PREFIX = 'batch_tx_v2:';
 export const TEMPLATE_PREFIX = 'template:';
 
-export const NEW_FEATURE_TIP_KEY = 'new_feature_tip';
+export const NEW_FEATURE_TIP_KEY = 'new_feature_tip_v2';
 
 export const WALLET_CONNECT_PROJECT_ID = 'db2a617b03addd5e1e485d0a677c1ef4';
 

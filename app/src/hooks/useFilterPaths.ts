@@ -66,7 +66,8 @@ function findFilterPaths(
         real: node.parent.address,
         proxyType: node.value.proxyType,
         delay: node.value.proxyDelay,
-        address: node.value.address
+        address: node.value.address,
+        genesisHash: node.value.proxyNetwork
       } as FilterPath;
 
       path.push({
@@ -144,7 +145,10 @@ function findFilterPaths(
               { from: 'delegate', parent: node.value, value: child, approvalForThisPath },
               path,
               transaction.children.find(
-                (item) => item.section === 'proxy' && item.method === 'proxy' && addressEq(item.address, child.address)
+                (item) =>
+                  ((item.section === 'proxy' && item.method === 'proxy') ||
+                    (item.section === 'remoteProxyRelayChain' && item.method === 'remoteProxyWithRegisteredProof')) &&
+                  addressEq(item.address, child.address)
               )
             );
           }

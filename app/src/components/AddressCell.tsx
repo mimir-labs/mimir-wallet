@@ -7,6 +7,7 @@ import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
+import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
@@ -28,8 +29,8 @@ interface Props {
   showType?: boolean;
   withCopy?: boolean;
   withAddressBook?: boolean;
-  width?: number | string;
-  nameEndContent?: React.ReactNode;
+  withPendingTxCounts?: boolean;
+  style?: React.CSSProperties;
   icons?: React.ReactNode;
   withIconBorder?: boolean;
   showNetworkProxied?: boolean;
@@ -39,12 +40,12 @@ function AddressCell({
   defaultName,
   addressCopyDisabled,
   icons,
-  nameEndContent,
+  withPendingTxCounts,
   className,
   shorten = true,
   showType = false,
   value,
-  width,
+  style,
   iconSize = 30,
   withCopy = false,
   withAddressBook = false,
@@ -66,6 +67,11 @@ function AddressCell({
       copyAddress();
     }
   });
+  const [transactionCounts] = useMultiChainTransactionCounts(withPendingTxCounts ? address : undefined);
+  const totalCounts = useMemo(
+    () => Object.values(transactionCounts).reduce((acc, curr) => acc + curr.pending, 0),
+    [transactionCounts]
+  );
 
   const addressNetworks = isPure
     ? networks.filter((network) => network.genesisHash === pureCreatedAt)
@@ -75,46 +81,63 @@ function AddressCell({
         : []
       : [];
 
+  const showTypeWidth = useMemo(() => {
+    if (!showType && !withPendingTxCounts) return 0;
+    let width = 0;
+
+    if (isMultisig) width += 60; // Multisig chip width
+    if (isPure || isProxied) width += isPure ? 44 : 46; // Pure/Proxied chip width
+    if (withPendingTxCounts && totalCounts) width += 20; // Pending transaction count badge width
+
+    return width;
+  }, [showType, withPendingTxCounts, isMultisig, isPure, isProxied, totalCounts]);
+
   return (
-    <div className={`AddressCell flex-1 flex items-center gap-2.5 ${className}`} style={{ width }}>
+    <div className={`AddressCell flex-1 flex items-center gap-2.5 min-w-0 ${className}`} style={style}>
       <IdentityIcon className='AddressCell-Icon' size={iconSize} value={address} withBorder={withIconBorder} />
-      <div className='AddressCell-Content space-y-[2px]'>
-        <div className='flex items-center gap-1'>
+      <div className='AddressCell-Content flex flex-col gap-y-[2px] min-w-0 flex-1'>
+        <div className='flex items-center gap-1 min-w-0 overflow-hidden'>
           <span
-            className='AddressCell-Name inline-flex overflow-hidden text-ellipsis whitespace-nowrap font-bold'
+            className='AddressCell-Name min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-bold text-left'
             style={{
-              maxWidth: shorten ? 100 : 260
+              maxWidth: showType && (isMultisig || isPure || isProxied) ? `calc(100% - ${showTypeWidth}px)` : '100%'
             }}
           >
             <AddressName defaultName={defaultName} value={value} />
           </span>
 
-          {showType && (
-            <>
-              {isMultisig && (
-                <Chip color='secondary' size='sm'>
-                  Multisig
-                </Chip>
-              )}
-              {(isPure || isProxied) && (
-                <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
-                  {isPure ? 'Pure' : 'Proxied'}
-                </Chip>
-              )}
-            </>
+          {showType && isMultisig && (
+            <Chip color='secondary' size='sm'>
+              Multisig
+            </Chip>
           )}
 
-          {nameEndContent}
+          {showType && (isPure || isProxied) && (
+            <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
+              {isPure ? 'Pure' : 'Proxied'}
+            </Chip>
+          )}
+
+          {withPendingTxCounts && !!totalCounts && (
+            <div className='bg-[#FF8C00] text-[10px] w-4 h-4 rounded-full text-white flex items-center justify-center'>
+              {totalCounts}
+            </div>
+          )}
         </div>
 
-        <span className='AddressCell-Address text-foreground/50 h-[16px] flex items-center text-tiny whitespace-nowrap'>
+        <div className='AddressCell-Address text-foreground/50 h-[16px] flex items-center text-tiny min-w-0'>
           {addressNetworks.map((network) => (
-            <Avatar key={network.genesisHash} style={{ marginRight: 4 }} src={network.icon} className='w-3 h-3' />
+            <Avatar
+              key={network.genesisHash}
+              style={{ marginRight: 4 }}
+              src={network.icon}
+              className='w-3 h-3 flex-shrink-0'
+            />
           ))}
-          <span {...(addressCopyDisabled ? {} : pressProps)}>
+          <span {...(addressCopyDisabled ? {} : pressProps)} className='truncate min-w-0'>
             <AddressComp shorten={shorten} value={address} />
           </span>
-          {withCopy && <CopyAddress size='sm' address={address} className='opacity-50' />}
+          {withCopy && <CopyAddress size='sm' address={address} className='opacity-50 flex-shrink-0' />}
           {withAddressBook &&
             address &&
             !isLocalAccount(address) &&
@@ -128,13 +151,13 @@ function AddressCell({
                 }}
                 variant='light'
                 size='sm'
-                className='opacity-50 text-foreground/50 w-[18px] h-[18px]'
+                className='opacity-50 text-foreground/50 w-[18px] h-[18px] flex-shrink-0'
               >
                 <IconAddressBook className='w-3 h-3' />
               </Button>
             )}
-          {icons}
-        </span>
+          {icons && <div className='flex-shrink-0'>{icons}</div>}
+        </div>
       </div>
     </div>
   );

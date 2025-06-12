@@ -6,7 +6,6 @@ import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconMore from '@/assets/svg/icon-more.svg?react';
 import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { usePinAccounts } from '@/hooks/usePinAccounts';
-import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import React, { useCallback, useMemo } from 'react';
@@ -37,11 +36,6 @@ function AccountCell({
   const formatUsd = formatDisplay(totalUsd.toString());
   const { pinnedAccounts, addPinnedAccount, removePinnedAccount } = usePinAccounts();
 
-  const [transactionCounts] = useMultiChainTransactionCounts(value);
-  const totalCounts = useMemo(
-    () => Object.values(transactionCounts).reduce((acc, curr) => acc + curr.pending, 0),
-    [transactionCounts]
-  );
   const isPinned = useMemo(() => pinnedAccounts.includes(addressToHex(value)), [pinnedAccounts, value]);
 
   const handleClick = useCallback(() => {
@@ -61,6 +55,7 @@ function AccountCell({
       className='justify-between px-1 sm:px-2.5 py-1 text-foreground h-[50px] rounded-medium data-[selected=true]:bg-secondary'
     >
       <AddressCell
+        className='flex-1 min-w-0'
         withIconBorder
         shorten
         showType
@@ -69,15 +64,9 @@ function AccountCell({
         withAddressBook
         addressCopyDisabled
         showNetworkProxied={isLocal}
-        nameEndContent={
-          totalCounts ? (
-            <div className='bg-[#FF8C00] text-[10px] w-4 h-4 rounded-full text-white flex items-center justify-center'>
-              {totalCounts}
-            </div>
-          ) : null
-        }
+        withPendingTxCounts
       />
-      <div className='text-tiny font-bold'>
+      <div className='text-tiny font-bold whitespace-nowrap'>
         $ {formatUsd[0]}
         {formatUsd[1] ? `.${formatUsd[1]}` : ''}
         {formatUsd[2] || ''}

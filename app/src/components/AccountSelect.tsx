@@ -28,13 +28,15 @@ function AccountSelect() {
     <>
       <div
         onClick={handleAccountOpen}
-        className='cursor-pointer h-[32px] sm:h-[42px] border-secondary border-1 rounded-md px-1.5 sm:px-2 bg-secondary sm:bg-transparent gap-2 flex items-center'
+        className='cursor-pointer h-[32px] sm:h-[42px] border-secondary border-1 rounded-md px-1.5 sm:px-2 bg-secondary sm:bg-transparent gap-2 flex items-center max-w-[140px] sm:max-w-[300px]'
+        style={{ width: '-webkit-fill-available' }}
       >
         <AddressCell
           showType={upSm}
           className='[&_.AddressCell-Address]:text-tiny [&_.AddressCell-Address]:h-[14px]'
           iconSize={24}
           shorten
+          addressCopyDisabled
           value={selected}
         />
         <ArrowDown className='w-[14px] h-[14px] sm:w-[20px] sm:h-[20px]' />

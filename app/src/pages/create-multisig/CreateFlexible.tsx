@@ -3,23 +3,22 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { EventRecord } from '@polkadot/types/interfaces';
-import type { HexString } from '@polkadot/util/types';
 import type { PrepareFlexible } from './types';
 
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@/components';
 import { utm } from '@/config';
-import { CONNECT_ORIGIN, DETECTED_ACCOUNT_KEY } from '@/constants';
+import { CONNECT_ORIGIN } from '@/constants';
 import { addTxToast } from '@/hooks/useTxQueue';
 import { sleep } from '@/utils';
 import { accountSource, useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
-import { u8aEq, u8aToHex } from '@polkadot/util';
-import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
+import { u8aEq } from '@polkadot/util';
+import { encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { addressToHex, signAndSend, useApi } from '@mimir-wallet/polkadot-core';
-import { service, store } from '@mimir-wallet/service';
+import { service } from '@mimir-wallet/service';
 import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import CreateSuccess from './CreateSuccess';
@@ -57,6 +56,7 @@ function CreateFlexible({
     creator,
     extrinsicIndex: _extrinsicIndex,
     name,
+    multisigName,
     pure: pureAccount,
     threshold,
     who
@@ -105,7 +105,9 @@ function CreateFlexible({
 
       addTxToast({ events });
 
-      events.once('finalized', async () => {
+      events.once('inblock', async () => {
+        await sleep(3000);
+
         while (true) {
           try {
             const data = await service.getDetails(network, pure);
@@ -142,7 +144,8 @@ function CreateFlexible({
           extrinsic.hash.toHex(),
           name,
           threshold,
-          who.map((address) => addressToHex(address))
+          who.map((address) => addressToHex(address)),
+          multisigName || undefined
         );
       }
     });
@@ -165,20 +168,13 @@ function CreateFlexible({
       if (_pure) {
         createMembers(_pure, who, signer, source, threshold);
 
-        store.set(
-          DETECTED_ACCOUNT_KEY,
-          Array.from(
-            new Set([...((store.get(DETECTED_ACCOUNT_KEY) as HexString[]) || []), u8aToHex(decodeAddress(_pure))])
-          )
-        );
-
         utm && service.utm(network, addressToHex(_pure), utm);
       }
     });
     events.once('error', () => {
       setLoadingFirst(false);
     });
-  }, [signer, source, api, name, threshold, who, createMembers, network]);
+  }, [signer, source, api, name, network, threshold, who, multisigName, createMembers]);
 
   const killPure = useCallback(
     (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {

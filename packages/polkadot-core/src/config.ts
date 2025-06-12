@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { HexString } from '@polkadot/util/types';
 import type { Endpoint } from './types.js';
 
 const polkadotEndpoints: Endpoint[] = [
@@ -322,7 +323,8 @@ const kusamaEndpoints: Endpoint[] = [
     ss58Format: 2,
     explorerUrl: 'https://kusama.subscan.io/',
     statescanUrl: 'https://kusama.statescan.io/',
-    identityNetwork: 'people-kusama'
+    identityNetwork: 'people-kusama',
+    remoteProxyTo: '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a'
   },
   {
     key: 'assethub-kusama',
@@ -629,3 +631,14 @@ export const allEndpoints: Endpoint[] = import.meta.env.VITE_ENDPOINTS
       .concat(paseoEndpoints)
       .concat(westendEndpoints)
       .concat(solochainEndpoints);
+
+export const remoteProxyRelations: Record<HexString, HexString> = allEndpoints.reduce(
+  (acc, item) => {
+    if (item.remoteProxyTo) {
+      acc[item.genesisHash] = item.remoteProxyTo;
+    }
+
+    return acc;
+  },
+  {} as Record<HexString, HexString>
+);

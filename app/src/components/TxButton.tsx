@@ -88,10 +88,12 @@ function TxButton({
             api.registry.createType('Call', call instanceof GenericExtrinsic ? call.method.toU8a() : call.toU8a())
           ),
           address,
-          () => enableWallet(source, CONNECT_ORIGIN)
+          () => enableWallet(source, CONNECT_ORIGIN),
+          { beforeSend }
         );
 
         events.on('inblock', () => {
+          onDone?.();
           setLoading(false);
         });
         events.on('error', (error: any) => {
@@ -114,10 +116,9 @@ function TxButton({
           network,
           onError
         });
+        onDone?.();
       }
     }
-
-    onDone?.();
   }, [
     getCall,
     onDone,

@@ -46,7 +46,13 @@ function ProgressItem({
   return (
     <div className='flex flex-col gap-[5px] p-[5px] w-full bg-primary/5 rounded-md'>
       <AddressCell showType withCopy withAddressBook shorten value={address} />
-      <div className='overflow-hidden rounded-[1px] relative mx-9 h-[2px] bg-primary/10'>
+      <div
+        data-visible={
+          account?.type == 'multisig' ||
+          (account?.type === 'pure' && account.delegatees.length === 1 && account.delegatees[0].type === 'multisig')
+        }
+        className='overflow-hidden rounded-[1px] relative mx-9 h-[2px] bg-primary/10 data-[visible=false]:hidden'
+      >
         <div
           className='rounded-[1px] absolute left-0 top-0 bottom-0 bg-primary'
           style={{

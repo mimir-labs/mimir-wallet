@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { NETWORK_RPC_PREFIX, CURRENT_NETWORK_KEY, decodeAddress, encodeAddress } from './defaults.js';
-export { initializeApi } from './initialize.js';
+export { initializeApi, createApi } from './initialize.js';
 
 export * from './callFilter.js';
 export * from './call.js';
@@ -18,10 +18,11 @@ export * from './dry-run/index.js';
 export { chainLinks } from './chain-links.js';
 
 export { useApi } from './useApi.js';
+export { useAllApis } from './useApiStore.js';
 export { useIdentityApi } from './useIdentityApi.js';
 export { useNetworks } from './useNetworks.js';
 
-export { allEndpoints } from './config.js';
+export { allEndpoints, remoteProxyRelations } from './config.js';
 
 export * from './utils.js';
 

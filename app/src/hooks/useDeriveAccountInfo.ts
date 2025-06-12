@@ -143,6 +143,7 @@ export function useDeriveAccountInfo(
 
   const address = value ? value.toString() : '';
   const addressHex = address ? addressToHex(address) : '0x';
+
   const enabled =
     !!identityApi && !!identityApi.isApiReady && !!identityApi.api?.query?.identity?.identityOf && !!address;
   const queryHash = useMemo(

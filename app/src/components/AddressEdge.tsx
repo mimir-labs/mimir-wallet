@@ -18,6 +18,7 @@ function AddressEdge({
   Edge<{
     tips?: { label?: string; delay?: number }[];
     color?: string;
+    isDash?: boolean;
   }>
 >) {
   const [edgePath] = getSmoothStepPath({
@@ -32,7 +33,11 @@ function AddressEdge({
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} style={{ stroke: data?.color }} />
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        style={{ stroke: data?.color, strokeDasharray: data?.isDash ? '5 5' : undefined }}
+      />
 
       {data && data.tips && data.tips.length > 0 && (
         <EdgeLabelRenderer>

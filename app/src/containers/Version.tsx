@@ -13,6 +13,9 @@ function Version() {
       <Link color='primary' href='https://t.me/+t7vZ1kXV5h1kNGQ9' isExternal>
         Report Bug
       </Link>
+      <Link color='primary' href='https://docs.mimir.global' isExternal>
+        Docs
+      </Link>
     </div>
   );
 }

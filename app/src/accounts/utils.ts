@@ -41,8 +41,6 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
       isMimir: !!account.isMimir
     };
 
-    const multisigDelegatees = account.delegatees.filter((item) => item.type === 'multisig');
-
     metas[addressHex] = {
       ...existingMeta,
       ...baseMeta,
@@ -53,13 +51,7 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
       createdExtrinsicIndex: account.createdExtrinsicIndex,
       creator: account.creator,
       disambiguationIndex: account.disambiguationIndex,
-      pureCreatedAt: account.network,
-      ...(multisigDelegatees.length === 1
-        ? {
-            threshold: multisigDelegatees[0].threshold,
-            who: multisigDelegatees[0].members.map(({ address }) => address)
-          }
-        : {})
+      pureCreatedAt: account.network
     } as AddressMeta;
   }
 
@@ -75,6 +67,7 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
       ...baseMeta,
       ...{
         isProxied: true,
+        delegatees: account.delegatees.map(({ address }) => address),
         multipleMultisig: account.delegatees.filter((item) => item.type === 'multisig').length > 1,
         proxyNetworks: Array.from(new Set(account.delegatees.map((item) => item.proxyNetwork)))
       }

@@ -44,6 +44,7 @@ type NodeData = {
 type EdgeData = {
   color: string;
   tips: { label: string; delay?: number }[];
+  isDash?: boolean;
 };
 
 const context = createContext<State>({} as State);
@@ -116,7 +117,7 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
     };
   }
 
-  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9') {
+  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9', isDash = false) {
     const id = `${parentId}->${nodeId}`;
     const exists = edges.find((edge) => edge.id === id);
 
@@ -130,7 +131,7 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
         source: parentId,
         target: nodeId,
         type: 'AddressEdge',
-        data: { color, tips: label ? [{ label, delay }] : [] }
+        data: { color, tips: label ? [{ label, delay }] : [], isDash }
       });
     }
   }
@@ -160,7 +161,8 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
           ? '#B700FF'
           : node.parent.type === TransactionType.Announce
             ? '#B700FF'
-            : ''
+            : '',
+        node.parent.type === TransactionType.Proxy && node.parent.isRemoteProxy ? true : false
       );
     }
 

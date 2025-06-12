@@ -69,11 +69,12 @@ export class ClientService {
     extrinsicHash: HexString,
     name: string,
     threshold?: number | null,
-    who?: HexString[] | null
+    who?: HexString[] | null,
+    multisigName?: string
   ) {
     return fetcher(this.getClientUrl(`chains/${chain}/prepare-pure`), {
       method: 'POST',
-      body: JSON.stringify({ creator, extrinsicHash, who, threshold, name }),
+      body: JSON.stringify({ creator, extrinsicHash, who, threshold, name, multisigName }),
       headers: jsonHeader
     });
   }

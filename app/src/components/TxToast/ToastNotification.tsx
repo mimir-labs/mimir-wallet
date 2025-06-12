@@ -12,7 +12,12 @@ import WaitingAnimation from '../animation/Waiting';
 import TxError from '../TxError';
 
 function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions] {
-  if (events.status === 'inblock') {
+  if (
+    events.status === 'inblock' ||
+    events.status === 'finalized' ||
+    events.status === 'completed' ||
+    events.status === 'success'
+  ) {
     return [
       () => (
         <div className='flex flex-col gap-1'>
@@ -20,23 +25,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
           <p className='text-tiny'>Transaction is inblock</p>
         </div>
       ),
-      { icon: <WaitingAnimation />, autoClose: false }
-    ];
-  }
-
-  if (events.status === 'finalized') {
-    return [
-      () => (
-        <div className='flex flex-col gap-1'>
-          <p className='font-bold'>Success</p>
-          <p className='text-tiny'>Transaction finalized</p>
-        </div>
-      ),
-      {
-        type: 'success',
-        autoClose: 3000,
-        icon: <SuccessAnimation />
-      }
+      { type: 'success', icon: <SuccessAnimation />, autoClose: 3000 }
     ];
   }
 
@@ -49,22 +38,6 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
         </div>
       ),
       { icon: <WaitingAnimation />, autoClose: false }
-    ];
-  }
-
-  if (events.status === 'success') {
-    return [
-      () => (
-        <div className='flex flex-col gap-1'>
-          <p className='font-bold'>Success</p>
-          <p className='text-tiny'>{events.message || 'Operation success'}</p>
-        </div>
-      ),
-      {
-        type: 'success',
-        autoClose: 3000,
-        icon: <SuccessAnimation />
-      }
     ];
   }
 
@@ -130,15 +103,6 @@ function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: (
       });
     };
 
-    const onFinalized = () => {
-      const [content, options] = getToastContent(events);
-
-      toast.update(id, {
-        ...options,
-        render: content
-      });
-    };
-
     const onSuccess = () => {
       const [content, options] = getToastContent(events);
 
@@ -157,12 +121,7 @@ function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: (
       });
     };
 
-    events
-      .on('signed', onSign)
-      .on('inblock', onInblock)
-      .on('finalized', onFinalized)
-      .on('error', onError)
-      .on('success', onSuccess);
+    events.on('signed', onSign).on('inblock', onInblock).on('success', onSuccess).on('error', onError);
 
     toast.onChange((item) => {
       if (id === item.id && item.status === 'removed') {
@@ -173,7 +132,7 @@ function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: (
     return () => {
       events.off('signed', onSign);
       events.off('inblock', onInblock);
-      events.off('finalized', onFinalized);
+      events.off('success', onSuccess);
       events.off('error', onError);
     };
   }, [events, onRemove]);
