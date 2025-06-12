@@ -7,11 +7,11 @@ import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Input, TxButton } from '@/components';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Alert, Avatar } from '@mimir-wallet/ui';
+import { Alert, Avatar, Link } from '@mimir-wallet/ui';
 
 import AccountSelect from '../../create-multisig/AccountSelect';
 import { useSetMembers } from './useSetMembers';
@@ -40,7 +40,7 @@ function MemberSet({
   pureAccount?: PureAccountData;
   disabled?: boolean;
 }) {
-  const { api, chainSS58, network, chain } = useApi();
+  const { api, chainSS58, genesisHash, network, chain } = useApi();
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
     useSetMembers(
       account.members.map((item) => item.address),
@@ -61,6 +61,13 @@ function MemberSet({
       setThreshold(Number(value));
     },
     [setThreshold]
+  );
+  const remoteProxyChain = useMemo(
+    () =>
+      remoteProxyRelations[genesisHash]
+        ? allEndpoints.find((item) => item.genesisHash === remoteProxyRelations[genesisHash])
+        : null,
+    [genesisHash]
   );
 
   return (
@@ -118,7 +125,21 @@ function MemberSet({
                   {chain.name}.
                 </span>
               </li>
-              {/* <li>You can use this proxy on Assethub due to Remote Proxy</li> */}
+              {remoteProxyChain ? (
+                <li>
+                  You can use this proxy on{' '}
+                  <img
+                    style={{ display: 'inline', verticalAlign: 'middle' }}
+                    width={16}
+                    height={16}
+                    src={remoteProxyChain.icon}
+                  />{' '}
+                  {remoteProxyChain.name} due to{' '}
+                  <Link isExternal underline='always' href='https://blog.kchr.de/ecosystem-proxy/'>
+                    Remote Proxy
+                  </Link>
+                </li>
+              ) : null}
             </ul>
           }
           classNames={{

@@ -23,7 +23,12 @@ interface Props {
   helper?: React.ReactNode;
   network: string;
   setNetwork: (network: string) => void;
+  endContent?: Record<string, React.ReactNode>;
 }
+
+type Options = Endpoint & {
+  endContent?: React.ReactNode;
+};
 
 function OmniChainInputNetwork({
   showAllNetworks,
@@ -36,7 +41,8 @@ function OmniChainInputNetwork({
   placeholder = 'Select Network',
   helper,
   network,
-  setNetwork
+  setNetwork,
+  endContent
 }: Props) {
   const { allApis } = useApi();
   const { networks } = useNetworks();
@@ -46,13 +52,18 @@ function OmniChainInputNetwork({
   const [inputValue, setInputValue] = useInput('');
   const [isOpen, toggleOpen] = useToggle(false);
   const [isFocused, setIsFocused] = useState(false);
-  const options = networks.filter((item) =>
-    showAllNetworks
-      ? true
-      : !!allApis[item.key] && (inputValue ? item.name.toLowerCase().includes(inputValue.toLowerCase()) : true)
-  );
+  const options = networks
+    .filter((item) =>
+      showAllNetworks
+        ? true
+        : !!allApis[item.key] && (inputValue ? item.name.toLowerCase().includes(inputValue.toLowerCase()) : true)
+    )
+    .map((item) => ({
+      ...item,
+      endContent: endContent?.[item.key] || endContent?.[item.genesisHash]
+    }));
 
-  const chain: Endpoint | undefined = networks.find((item) => item.key === network);
+  const chain: Options | undefined = options.find((item) => item.key === network);
 
   const handleOpen = () => {
     toggleOpen(true);
@@ -69,7 +80,12 @@ function OmniChainInputNetwork({
   const element = chain ? (
     <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
       <Avatar alt={chain.name} src={chain.icon} style={{ width: 20, height: 20, background: 'transparent' }}></Avatar>
-      {isIconOnly || (isOpen && isFocused) ? null : <p>{chain.name}</p>}
+      {isIconOnly || (isOpen && isFocused) ? null : (
+        <>
+          <p>{chain.name}</p>
+          {chain.endContent}
+        </>
+      )}
     </div>
   ) : null;
 
@@ -108,7 +124,12 @@ function OmniChainInputNetwork({
                   style={{ width: 20, height: 20, background: 'transparent' }}
                 ></Avatar>
               }
-              endContent={showAllNetworks ? null : !isApiReady ? <Spinner size='sm' /> : null}
+              endContent={
+                <div className='flex items-center gap-2'>
+                  {item.endContent}
+                  {showAllNetworks ? null : !isApiReady ? <Spinner size='sm' /> : null}
+                </div>
+              }
             >
               {item.name}
             </ListboxItem>

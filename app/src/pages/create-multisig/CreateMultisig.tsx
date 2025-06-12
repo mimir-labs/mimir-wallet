@@ -4,6 +4,7 @@
 import type { PrepareFlexible } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
+import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Address, AddressRow, Input, InputNetwork } from '@/components';
 import { useCacheMultisig } from '@/hooks/useCacheMultisig';
@@ -13,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { allEndpoints, encodeAddress, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Divider, Modal, ModalBody, ModalContent, Switch } from '@mimir-wallet/ui';
+import { Alert, Button, Divider, Link, Modal, ModalBody, ModalContent, Switch } from '@mimir-wallet/ui';
 
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
@@ -57,6 +58,11 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
     unselectAll
   } = useSelectMultisig();
   const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
+  const multisigAddress = useMemo(
+    () => (signatories.length > 1 && threshold > 0 ? encodeMultiAddress(signatories, threshold) : undefined),
+    [signatories, threshold]
+  );
+  const { meta } = useAddressMeta(multisigAddress);
 
   // prepare multisigs
   const [prepares] = useCacheMultisig();
@@ -188,7 +194,10 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                             height={16}
                             src={remoteProxyChain.icon}
                           />{' '}
-                          {remoteProxyChain.name} due to Remote Proxy
+                          {remoteProxyChain.name} due to{' '}
+                          <Link isExternal underline='always' href='https://blog.kchr.de/ecosystem-proxy/'>
+                            Remote Proxy
+                          </Link>
                         </li>
                       ) : null}
 
@@ -226,7 +235,16 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                         return;
                       }
 
-                      toggleStaticDisplayOpen(true);
+                      if (!meta.name) {
+                        toggleStaticDisplayOpen(true);
+                      } else {
+                        setPrepare({
+                          who: signatories,
+                          threshold,
+                          name,
+                          multisigName: meta.name
+                        });
+                      }
                     }}
                     variant='solid'
                   >
@@ -243,6 +261,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
 
       <StaticDisplay
         isOpen={staticDisplayOpen}
+        onClose={toggleStaticDisplayOpen}
         onConfirm={(multisigName, hide) => {
           toggleStaticDisplayOpen(false);
           setPrepare({

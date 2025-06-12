@@ -3,6 +3,7 @@
 
 import type { TransferToken } from './types';
 
+import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { AddressCell, FormatBalance, Input, InputAddress, InputNetwork, InputToken } from '@/components';
 import { useAssetInfo } from '@/hooks/useAssets';
@@ -11,7 +12,7 @@ import { formatUnits } from '@/utils';
 import React, { useEffect, useMemo } from 'react';
 
 import { remoteProxyRelations, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Alert, Avatar, Button, Skeleton, Switch } from '@mimir-wallet/ui';
+import { Alert, Avatar, Button, Chip, Skeleton, Switch } from '@mimir-wallet/ui';
 
 import { useTransferBalance } from './useTransferBalances';
 
@@ -50,11 +51,13 @@ function TransferContent({
   setToken: (token: TransferToken) => void;
   setRecipient?: (recipient: string) => void;
 }) {
-  const { api, chain } = useApi();
+  const { api, chain, genesisHash } = useApi();
   const { networks } = useNetworks();
   const upSm = useMediaQuery('sm');
   const [format, sendingBalances, isSendingFetched] = useTransferBalance(token, sending);
   const [, assetExistentialDeposit] = useAssetInfo(network, token?.isNative ? null : token?.assetId);
+  const { meta: sendingMeta } = useAddressMeta(sending);
+  const { meta: recipientMeta } = useAddressMeta(recipient);
   const [recipientAccount] = useQueryAccountOmniChain(recipient);
   const recipientNetwork =
     recipientAccount?.type === 'pure'
@@ -66,12 +69,6 @@ function TransferContent({
       ? recipientAccount.network === chain.genesisHash ||
           chain.genesisHash === remoteProxyRelations[recipientAccount.network]
       : true;
-  }, [recipientAccount, chain]);
-
-  const isRecipientRemoteProxy = useMemo(() => {
-    return recipientAccount?.type === 'pure'
-      ? chain.genesisHash === remoteProxyRelations[recipientAccount.network]
-      : false;
   }, [recipientAccount, chain]);
 
   const existentialDeposit = token?.isNative ? api.consts.balances.existentialDeposit : assetExistentialDeposit;
@@ -109,7 +106,34 @@ function TransferContent({
         />
       )}
 
-      <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
+      <InputNetwork
+        label='Select Network'
+        network={network}
+        setNetwork={setNetwork}
+        endContent={
+          sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt]
+            ? {
+                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: (
+                  <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
+                    Remote Proxy
+                  </Chip>
+                )
+              }
+            : undefined
+        }
+        helper={
+          !!(
+            recipientMeta &&
+            recipientMeta.isPure &&
+            remoteProxyRelations[recipientMeta.pureCreatedAt] === genesisHash
+          ) ||
+          !!(sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt] === genesisHash) ? (
+            <div className='text-foreground'>
+              🥷✨Yep, remote proxy lets you borrow a ninja from another chain — smooth and stealthy! 🕶️
+            </div>
+          ) : null
+        }
+      />
 
       <InputToken
         network={network}
@@ -172,12 +196,6 @@ function TransferContent({
             &nbsp;
             {recipientNetwork?.name}, please change to correct network.
           </div>
-        </Alert>
-      )}
-
-      {isRecipientRemoteProxy && (
-        <Alert color='success'>
-          <div>🥷✨Yep, remote proxy lets you borrow a ninja from another chain — smooth and stealthy! 🕶️</div>
         </Alert>
       )}
     </>

@@ -78,7 +78,10 @@ function Extrinsic({
                 content={
                   <div className='flex items-center gap-[5px]'>
                     <Bytes value={txCallHex} />
-                    <Tooltip content='Add to Template' color='foreground'>
+                    <Tooltip
+                      content='For better repeatly submit this transaction you can add to Template'
+                      color='foreground'
+                    >
                       <Button
                         variant='ghost'
                         size='sm'

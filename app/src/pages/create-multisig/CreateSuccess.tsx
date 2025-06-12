@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
+import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { AddressCell } from '@/components';
 import { useNavigate } from 'react-router-dom';
@@ -17,11 +18,12 @@ interface Props {
 function CreateSuccess({ isOpen, onClose, address }: Props) {
   const navigate = useNavigate();
   const { setCurrent } = useAccount();
+  const { meta } = useAddressMeta(address);
 
   useQueryAccountOmniChain(address);
 
   return (
-    <Modal size='md' isOpen={isOpen} onClose={onClose}>
+    <Modal size='md' isOpen={isOpen} hideCloseButton closeButton={false}>
       <ModalContent>
         <ModalBody className='flex flex-col items-center gap-5 py-10'>
           <div className='bg-primary rounded-[30px] flex items-center justify-center w-[120px] h-[120px]'>
@@ -36,6 +38,13 @@ function CreateSuccess({ isOpen, onClose, address }: Props) {
             <div className='w-[8px] h-[8px] rounded-full bg-success' />
             <AddressCell withCopy shorten={false} value={address} />
           </div>
+
+          {meta.delegatees?.map((delegatee, index) => (
+            <div key={index} className='flex self-stretch items-center gap-2.5 bg-secondary rounded-medium p-2.5'>
+              <div className='w-[8px] h-[8px] rounded-full bg-success' />
+              <AddressCell withCopy shorten={false} value={delegatee} />
+            </div>
+          ))}
 
           <Divider />
 

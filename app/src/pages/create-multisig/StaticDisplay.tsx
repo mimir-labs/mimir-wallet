@@ -8,15 +8,16 @@ import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHead
 
 interface Props {
   isOpen: boolean;
+  onClose: () => void;
   onConfirm: (name: string, hide: boolean) => void;
 }
 
-function StaticDisplay({ isOpen, onConfirm }: Props) {
+function StaticDisplay({ isOpen, onClose, onConfirm }: Props) {
   const [name, setName] = useState('');
   const [hide, setHide] = useState(true);
 
   return (
-    <Modal size='md' hideCloseButton isOpen={isOpen}>
+    <Modal size='md' hideCloseButton isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         <ModalHeader>Static Multisig Display</ModalHeader>
 

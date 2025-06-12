@@ -5,7 +5,6 @@ import type { AccountData } from '@/hooks/types';
 import type { InputAddressProps } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
-import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { sortAccounts } from '@/accounts/utils';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconWarning from '@/assets/svg/icon-warning-fill.svg?react';
@@ -23,16 +22,12 @@ import {
   isEthAddress,
   isPolkadotEvmAddress,
   isValidAddress as isValidAddressUtil,
-  useApi,
-  useNetworks
+  useApi
 } from '@mimir-wallet/polkadot-core';
-import { Avatar, Chip, FreeSoloPopover, Listbox, ListboxItem, usePress } from '@mimir-wallet/ui';
+import { FreeSoloPopover, Listbox, ListboxItem, usePress } from '@mimir-wallet/ui';
 
-import Address from './Address';
 import AddressCell from './AddressCell';
-import AddressName from './AddressName';
 import FormatBalance from './FormatBalance';
-import IdentityIcon from './IdentityIcon';
 
 function createOptions(
   accounts: AccountData[],
@@ -101,7 +96,6 @@ function InputAddress({
   helper
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
-  const { networks } = useNetworks();
   const {
     chainSS58,
     chain: { polkavm }
@@ -118,9 +112,6 @@ function InputAddress({
   const [isOpen, toggleOpen] = useToggle(false);
   const [isFocused, setIsFocused] = useState(false);
   const upSm = useMediaQuery('sm');
-  const { meta: { isMultisig, isProxied, isPure, pureCreatedAt } = {} } = useAddressMeta(value);
-
-  const pureNetwork = isPure && pureCreatedAt && networks.find((network) => network.genesisHash === pureCreatedAt);
 
   const options = useMemo(
     (): string[] => sortAccounts(createOptions(accounts, addresses, isSign, inputValue, filtered, excluded), metas),
@@ -177,39 +168,11 @@ function InputAddress({
   });
 
   const element = (
-    <div className='address-cell inline-flex items-center gap-x-2.5 flex-grow-0'>
-      {value ? (
-        <IdentityIcon size={iconSize} value={value} />
-      ) : (
-        <Avatar style={{ width: iconSize, height: iconSize }} />
-      )}
-      {isOpen && isFocused ? null : value ? (
-        <div className='address-cell-content flex flex-col gap-y-1'>
-          <div className='inline-flex items-center gap-1 font-bold text-sm leading-[16px] h-[16px] max-h-[16px] truncate'>
-            <AddressName value={value} />
-            {isMultisig && (
-              <Chip color='secondary' size='sm'>
-                Multisig
-              </Chip>
-            )}
-            {(isPure || isProxied) && (
-              <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
-                {isPure ? 'Pure' : 'Proxied'}
-              </Chip>
-            )}
-          </div>
-          <div className='inline-flex items-center gap-1 text-tiny leading-[14px] h-[14px] max-h-[14px] font-normal'>
-            {pureNetwork?.icon ? (
-              <Avatar style={{ marginRight: 4 }} src={pureNetwork.icon} className='w-3 h-3' />
-            ) : null}
-            <span className='text-foreground/50'>
-              <Address value={value} shorten={shorten ?? (upSm ? false : true)} />
-            </span>
-          </div>
-        </div>
-      ) : (
-        <span className='text-foreground/50'>{placeholder}</span>
-      )}
+    <div
+      data-hide={isOpen && isFocused}
+      className='address-cell inline-flex items-center gap-x-2.5 flex-grow-0 [&[data-hide=true]_.AddressCell-Content]:hidden w-[calc(100%-20px)]'
+    >
+      <AddressCell iconSize={iconSize} value={value} shorten={shorten ?? (upSm ? false : true)} />
     </div>
   );
 
@@ -258,7 +221,7 @@ function InputAddress({
           <input
             ref={inputRef}
             className='absolute rounded-medium top-0 right-0 bottom-0 left-0 outline-none border-none pl-12 bg-transparent'
-            style={{ opacity: isFocused && isOpen ? 1 : 0 }}
+            style={{ opacity: (isFocused && isOpen) || !value ? 1 : 0 }}
             value={inputValue}
             placeholder={placeholder}
             onChange={setInputValue}

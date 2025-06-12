@@ -27,9 +27,35 @@ function OmniChainUpgradeTip() {
               panel: 'space-y-5'.concat(upSm ? ' border-l-1 border-l-secondary pl-3' : '')
             }}
           >
+            <Tab key='remoteProxy' title='Remote Proxy'>
+              <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
+                <video
+                  src='https://mimir-labs.github.io/mimir-assets/videos/Remoteproxy2.mp4'
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  controls={false}
+                  className='max-w-full h-auto pointer-events-none'
+                />
+              </div>
+              <p className='font-bold text-foreground'>
+                Instead of setting up proxy accounts on each parachain, remote-proxy module allows you to create it once
+                on the Relay Chain — then compatible parachains can automatically inherit that proxy. Now it supports{' '}
+                {'Kusama<>Kusama Assethub'}.
+              </p>
+            </Tab>
             <Tab key='omniUX' title='OmniUX'>
               <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
-                <img src='https://mimir-labs.github.io/mimir-assets/images/OmniUX.gif' />
+                <video
+                  src='https://mimir-labs.github.io/mimir-assets/videos/OmniUX.mp4'
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  controls={false}
+                  className='max-w-full h-auto pointer-events-none'
+                />
               </div>
               <p className='font-bold text-foreground'>
                 Seamless management of multi-sig accounts across multiple parachains, enabling a unified cross-chain
@@ -38,7 +64,15 @@ function OmniChainUpgradeTip() {
             </Tab>
             <Tab key='callTemplate' title='Call Template'>
               <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
-                <img src='https://mimir-labs.github.io/mimir-assets/images/Template.gif' />
+                <video
+                  src='https://mimir-labs.github.io/mimir-assets/videos/CallTemplate.mp4'
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  controls={false}
+                  className='max-w-full h-auto pointer-events-none'
+                />
               </div>
               <p className='font-bold text-foreground'>
                 Predefined transaction templates simplify common DAO & team operations, eliminating the need for manual
@@ -47,7 +81,15 @@ function OmniChainUpgradeTip() {
             </Tab>
             <Tab key='walletConnect' title='WalletConnect'>
               <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
-                <img src='https://mimir-labs.github.io/mimir-assets/images/WalletConnect.gif' />
+                <video
+                  src='https://mimir-labs.github.io/mimir-assets/videos/WalletConnect.mp4'
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  controls={false}
+                  className='max-w-full h-auto pointer-events-none'
+                />
               </div>
               <p className='font-bold text-foreground'>
                 Mimir integrates Wallet Connect, enabling direct multisig interaction with Dapps, allowing users to sign
@@ -56,7 +98,15 @@ function OmniChainUpgradeTip() {
             </Tab>
             <Tab key='quickSimulation' title='Quick Simulation'>
               <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
-                <img src='https://mimir-labs.github.io/mimir-assets/images/Simulation.gif' />
+                <video
+                  src='https://mimir-labs.github.io/mimir-assets/videos/QuickSimulation.mp4'
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  controls={false}
+                  className='max-w-full h-auto pointer-events-none'
+                />
               </div>
               <p className='font-bold text-foreground'>
                 Run a transaction simulation in 1–2 seconds and instantly display changes in account balances.

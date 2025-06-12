@@ -22,7 +22,7 @@ interface Props {
 function FilterPathCell({ filterPath }: { filterPath: FilterPath }) {
   return (
     <div className='w-full flex justify-between items-center gap-1'>
-      <AddressCell className='flex-1' value={filterPath.address} withCopy showType />
+      <AddressCell className='flex-1' value={filterPath.address} withCopy showType addressCopyDisabled />
       {filterPath.type !== 'origin' && (
         <Chip
           color={

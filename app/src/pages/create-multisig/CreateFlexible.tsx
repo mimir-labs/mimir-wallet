@@ -105,7 +105,9 @@ function CreateFlexible({
 
       addTxToast({ events });
 
-      events.once('finalized', async () => {
+      events.once('inblock', async () => {
+        await sleep(3000);
+
         while (true) {
           try {
             const data = await service.getDetails(network, pure);

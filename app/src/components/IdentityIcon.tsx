@@ -12,7 +12,7 @@ import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
 import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { usePress } from '@mimir-wallet/ui';
+import { Avatar, usePress } from '@mimir-wallet/ui';
 
 interface Props {
   className?: string;
@@ -46,6 +46,10 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
   const circles = useMemo(() => polkadotIcon(address, { isAlternative: false }), [address]);
 
   let element: React.ReactNode;
+
+  if (!value) {
+    return <Avatar style={{ width: size, height: size }} />;
+  }
 
   if (isZeroAddress) {
     element = (
