@@ -4,7 +4,7 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { Option } from '@polkadot/types';
 import type { PalletAssetsAssetDetails, PalletAssetsAssetMetadata } from '@polkadot/types/lookup';
-import type { AssetInfo, AssetMetadata, PalletAssetRegistryAssetDetails, TokenInfo } from './types';
+import type { AssetInfo, AssetMetadata, PalletAssetRegistryAssetDetails } from './types';
 
 import { assets, findAssets } from '@/config';
 import { type BN, BN_ZERO, isHex } from '@polkadot/util';
@@ -14,8 +14,6 @@ import { useMemo } from 'react';
 import { addressToHex, useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
 
-import { useTokenInfo, useTokenInfoAll } from './useTokenInfo';
-
 function _extraAsset(
   network: string,
   data: {
@@ -23,8 +21,9 @@ function _extraAsset(
     name: string;
     symbol: string;
     decimals: number;
-  }[],
-  tokenInfo?: TokenInfo
+    price?: number;
+    change24h?: number;
+  }[]
 ): AssetInfo[] {
   return data.map((item) => {
     const asset = assets.find(({ assetId }) => item.assetId === assetId);
@@ -37,14 +36,13 @@ function _extraAsset(
       symbol: item.symbol,
       decimals: item.decimals,
       icon: asset?.Icon || undefined,
-      price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
-      change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
+      price: item.price,
+      change24h: item.change24h
     };
   });
 }
 
 export function useAssets(network: string): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean] {
-  const [tokenInfo] = useTokenInfo(network);
   const { data, isFetched, isFetching } = useQuery<AssetInfo[]>({
     queryHash: service.getClientUrl(`chains/${network}/all-assets`),
     queryKey: [service.getClientUrl(`chains/${network}/all-assets`)],
@@ -60,11 +58,9 @@ export function useAssets(network: string): [data: AssetInfo[] | undefined, isFe
     useMemo(
       () =>
         data?.map((item) => ({
-          ...item,
-          price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
-          change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
+          ...item
         })),
-      [data, tokenInfo]
+      [data]
     ),
     isFetched,
     isFetching
@@ -75,7 +71,6 @@ export function useAssetsByAddress(
   network: string,
   address?: string | null
 ): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean] {
-  const [tokenInfo] = useTokenInfo(network);
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
   const { data, isFetched, isFetching } = useQuery<AssetInfo[] | undefined>({
     queryHash: service.getClientUrl(`chains/${network}/balances/${addressHex}`),
@@ -88,11 +83,7 @@ export function useAssetsByAddress(
     }
   });
 
-  return [
-    useMemo(() => (data ? _extraAsset(network, data as any, tokenInfo) : undefined), [data, network, tokenInfo]),
-    isFetched,
-    isFetching
-  ];
+  return [useMemo(() => (data ? _extraAsset(network, data) : undefined), [data, network]), isFetched, isFetching];
 }
 
 export function useAssetsAll(): [
@@ -100,7 +91,6 @@ export function useAssetsAll(): [
   isFetched: boolean,
   isFetching: boolean
 ] {
-  const [tokenInfo] = useTokenInfoAll();
   const { data, isFetched, isFetching } = useQuery<Record<string, AssetInfo[]>>({
     queryKey: [service.getClientUrl(`assets/all`)],
     queryHash: service.getClientUrl(`assets/all`),
@@ -113,7 +103,7 @@ export function useAssetsAll(): [
       }
 
       const nextData = Object.fromEntries(
-        Object.entries(next).map(([network, assets]) => [network, _extraAsset(network, assets, tokenInfo?.[network])])
+        Object.entries(next).map(([network, assets]) => [network, _extraAsset(network, assets)])
       );
 
       return isEqual(prev, nextData) ? (prev as Record<string, AssetInfo[]>) : nextData;
@@ -126,7 +116,6 @@ export function useAssetsAll(): [
 export function useAssetsByAddressAll(
   address?: string | null
 ): [data: Record<string, AssetInfo[]> | undefined, isFetched: boolean, isFetching: boolean] {
-  const [tokenInfo] = useTokenInfoAll();
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
   const { data, isFetched, isFetching } = useQuery<Record<string, AssetInfo[]>>({
     queryKey: addressHex ? [service.getClientUrl(`balances/all/${addressHex}`)] : [null],
@@ -143,14 +132,9 @@ export function useAssetsByAddressAll(
     useMemo(
       () =>
         data
-          ? Object.fromEntries(
-              Object.entries(data).map(([network, assets]) => [
-                network,
-                _extraAsset(network, assets as any, tokenInfo?.[network])
-              ])
-            )
+          ? Object.fromEntries(Object.entries(data).map(([network, assets]) => [network, _extraAsset(network, assets)]))
           : undefined,
-      [data, tokenInfo]
+      [data]
     ),
     isFetched,
     isFetching
@@ -160,11 +144,9 @@ export function useAssetsByAddressAll(
 async function fetchAssetInfo({
   queryKey
 }: {
-  queryKey: [api: ApiPromise, assetId: string | undefined | null, network: string, tokenInfo?: TokenInfo];
+  queryKey: [api: ApiPromise, assetId: string | undefined | null, network: string];
 }): Promise<[AssetInfo<false>, BN] | undefined> {
-  const [api, assetId, network, tokenInfo] = queryKey;
-
-  console.log(api, assetId, network, tokenInfo);
+  const [api, assetId, network] = queryKey;
 
   if (!assetId) {
     return Promise.resolve(undefined);
@@ -194,8 +176,8 @@ async function fetchAssetInfo({
           decimals: metadata.decimals.toNumber(),
           existentialDeposit: metadata.deposit.toBigInt(),
           icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
-          price: parseFloat(tokenInfo?.detail?.[metadata.symbol.toUtf8()]?.price || '0'),
-          change24h: parseFloat(tokenInfo?.detail?.[metadata.symbol.toUtf8()]?.price_change || '0')
+          price: 0,
+          change24h: 0
         },
         asset.unwrapOrDefault().minBalance
       ];
@@ -220,8 +202,8 @@ async function fetchAssetInfo({
               symbol: symbol.unwrap().toUtf8(),
               decimals: decimals.unwrap().toNumber(),
               icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
-              price: parseFloat(tokenInfo?.detail?.[symbol.unwrap().toUtf8()]?.price || '0'),
-              change24h: parseFloat(tokenInfo?.detail?.[symbol.unwrap().toUtf8()]?.price_change || '0')
+              price: 0,
+              change24h: 0
             },
             existentialDeposit
           ];
@@ -247,8 +229,8 @@ async function fetchAssetInfo({
             symbol: symbol.toUtf8(),
             decimals: decimals.toNumber(),
             icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
-            price: parseFloat(tokenInfo?.detail?.[symbol.toUtf8()]?.price || '0'),
-            change24h: parseFloat(tokenInfo?.detail?.[symbol.toUtf8()]?.price_change || '0')
+            price: 0,
+            change24h: 0
           },
           minimalBalance
         ];
@@ -273,8 +255,8 @@ async function fetchAssetInfo({
             symbol: symbol.toUtf8(),
             decimals: decimals.toNumber(),
             icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
-            price: parseFloat(tokenInfo?.detail?.[symbol.toUtf8()]?.price || '0'),
-            change24h: parseFloat(tokenInfo?.detail?.[symbol.toUtf8()]?.price_change || '0')
+            price: 0,
+            change24h: 0
           },
           minimalBalance
         ];
@@ -290,10 +272,9 @@ async function fetchAssetInfo({
 export function useAssetInfo(network: string, assetId?: string | null): [AssetInfo<false> | undefined, BN] {
   const { allApis } = useApi();
   const api: ValidApiState | undefined = allApis[network];
-  const [tokenInfo] = useTokenInfo(network);
   const queryHash = `${network}-asset-info-${assetId}`;
   const { data } = useQuery({
-    queryKey: [api?.api, assetId, network, tokenInfo] as const,
+    queryKey: [api?.api, assetId, network] as const,
     queryHash,
     queryFn: fetchAssetInfo,
     refetchInterval: 60_000,

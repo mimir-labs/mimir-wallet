@@ -7,7 +7,7 @@ import { events } from '@/events';
 import { isEqual } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import {
   API_CLIENT_GATEWAY,
   fetcher,
@@ -218,7 +218,8 @@ export function useTransactionDetail(
 export function useMultiChainTransactionCounts(
   address?: string | null
 ): [data: Record<string, { pending: number; history: number }>, isFetched: boolean, isFetching: boolean] {
-  const { queryHash, queryKey } = useClientQuery(address ? `transactions/counts/${address}` : null);
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const { queryHash, queryKey } = useClientQuery(addressHex ? `transactions/counts/${addressHex}` : null);
   const { allApis } = useApi();
 
   const { data, isFetched, isFetching } = useQuery<Record<string, { pending: number; history: number }>>({

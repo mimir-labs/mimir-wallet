@@ -251,8 +251,8 @@ export type AssetInfo<T extends boolean = boolean> = {
   readonly name: string;
   readonly symbol: string;
   readonly decimals: number;
-  readonly price: number;
-  readonly change24h: number;
+  readonly price?: number;
+  readonly change24h?: number;
   readonly icon?: string;
 } & (T extends false
   ? {

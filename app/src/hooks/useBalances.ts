@@ -282,7 +282,6 @@ export function useAssetBalances(
   const { allApis } = useApi();
   const api: ValidApiState | undefined = allApis[network];
   const [assets] = useAssetsByAddress(network, address?.toString());
-  const [tokenInfo] = useTokenInfo(network);
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
   const queryHash = useMemo(
     () =>
@@ -322,19 +321,7 @@ export function useAssetBalances(
     }
   });
 
-  return [
-    useMemo(
-      () =>
-        data?.map((item) => ({
-          ...item,
-          price: parseFloat(tokenInfo?.detail?.[item.symbol]?.price || '0'),
-          change24h: parseFloat(tokenInfo?.detail?.[item.symbol]?.price_change || '0')
-        })) || [],
-      [data, tokenInfo]
-    ),
-    isFetched,
-    isFetching
-  ];
+  return [useMemo(() => data || [], [data]), isFetched, isFetching];
 }
 
 type UseAssetBalancesAll = {
@@ -347,7 +334,6 @@ type UseAssetBalancesAll = {
 
 export function useAssetBalancesAll(address?: string): UseAssetBalancesAll[] {
   const { allApis } = useApi();
-  const [allTokenInfo] = useTokenInfoAll();
   const [allAssets] = useAssetsByAddressAll(address);
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
   const [list, setList] = useState<UseAssetBalancesAll[]>([]);
@@ -402,17 +388,13 @@ export function useAssetBalancesAll(address?: string): UseAssetBalancesAll[] {
           isFetching: item.isFetching,
           isError: item.isError,
           refetch: item.refetch,
-          data: data?.map((item) => ({
-            ...item,
-            price: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price || '0'),
-            change24h: parseFloat(allTokenInfo?.[item.network]?.detail?.[item.symbol]?.price_change || '0')
-          }))
+          data: data
         };
       });
 
       return isEqual(prev, newValue) ? prev : newValue;
     });
-  }, [queries, allTokenInfo]);
+  }, [queries]);
 
   return list;
 }
@@ -428,22 +410,22 @@ export function useBalanceTotalUsd(address?: string) {
     for (const item of assets) {
       if (item.data) {
         for (const asset of item.data) {
-          const currentTotal = parseFloat(formatUnits(asset.total, asset.decimals)) * asset.price;
+          const currentTotal = parseFloat(formatUnits(asset.total, asset.decimals)) * (asset.price || 0);
 
           total += currentTotal;
 
-          lastTotal += currentTotal / (1 + asset.change24h);
+          lastTotal += currentTotal / (1 + (asset.change24h || 0));
         }
       }
     }
 
     for (const item of nativeBalances) {
       if (item.data) {
-        const currentTotal = parseFloat(formatUnits(item.data.total, item.data.decimals)) * item.data.price;
+        const currentTotal = parseFloat(formatUnits(item.data.total, item.data.decimals)) * (item.data.price || 0);
 
         total += currentTotal;
 
-        lastTotal += currentTotal / (1 + item.data.change24h);
+        lastTotal += currentTotal / (1 + (item.data.change24h || 0));
       }
     }
 
