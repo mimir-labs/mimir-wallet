@@ -68,27 +68,27 @@ function Assets({ address }: { address: string }) {
         .filter((item) => item.total > 0n)
         .sort((a, b) => {
           if (sortDescriptor.column === 'balanceUsd') {
-            const bTotal = (b.total * BigInt((b.price * 1e18).toFixed(0))) / 10n ** BigInt(b.decimals);
-            const aTotal = (a.total * BigInt((a.price * 1e18).toFixed(0))) / 10n ** BigInt(a.decimals);
+            const bTotal = (b.total * BigInt((b.price || 0 * 1e18).toFixed(0))) / 10n ** BigInt(b.decimals);
+            const aTotal = (a.total * BigInt((a.price || 0 * 1e18).toFixed(0))) / 10n ** BigInt(a.decimals);
 
             return sortDescriptor.direction === 'descending' ? (bTotal > aTotal ? 1 : -1) : bTotal > aTotal ? -1 : 1;
           }
 
           if (sortDescriptor.column === 'price') {
-            const bPrice = b.price;
-            const aPrice = a.price;
+            const bPrice = b.price || 0;
+            const aPrice = a.price || 0;
 
             return sortDescriptor.direction === 'descending' ? (bPrice > aPrice ? 1 : -1) : bPrice > aPrice ? -1 : 1;
           }
 
           if (sortDescriptor.column === 'change24h') {
             const bChange24h = b.price
-              ? b.change24h
+              ? b.change24h || 0
               : sortDescriptor.direction === 'descending'
                 ? -Number.MAX_SAFE_INTEGER
                 : Number.MAX_SAFE_INTEGER;
             const aChange24h = a.price
-              ? a.change24h
+              ? a.change24h || 0
               : sortDescriptor.direction === 'descending'
                 ? -Number.MAX_SAFE_INTEGER
                 : Number.MAX_SAFE_INTEGER;
@@ -166,7 +166,7 @@ function Assets({ address }: { address: string }) {
           const transferrable = item.transferrable;
           const locked = item.locked;
           const reserved = item.reserved;
-          const price = item.price;
+          const price = item.price || 0;
           const decimals = item.decimals;
           const change24h = item.change24h;
           const format: [number, string] = [decimals, symbol];
@@ -207,11 +207,11 @@ function Assets({ address }: { address: string }) {
               </TableCell>
               <TableCell>{price}</TableCell>
               <TableCell
-                data-up={change24h > 0}
-                data-down={change24h < 0}
+                data-up={change24h && change24h > 0}
+                data-down={change24h && change24h < 0}
                 className='text-foreground/50 data-[up=true]:text-success data-[down=true]:text-danger'
               >
-                {change24h > 0 ? '+' : ''}
+                {change24h && change24h > 0 ? '+' : ''}
                 {change24h ? (change24h * 100).toFixed(2) : '0'}%
               </TableCell>
               <TableCell>

@@ -3,13 +3,14 @@
 
 import { useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
 import { useClientQuery, useQuery } from '@mimir-wallet/service';
 
 export function useMultiChainStats(
   address?: string | null
 ): [data: Record<string, boolean>, isFetched: boolean, isFetching: boolean] {
-  const { queryHash, queryKey } = useClientQuery(address ? `stats/${address}` : null);
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const { queryHash, queryKey } = useClientQuery(addressHex ? `stats/${addressHex}` : null);
   const { allApis } = useApi();
 
   const { data, isFetched, isFetching } = useQuery<Record<string, boolean>>({
@@ -28,7 +29,8 @@ export function useMultiChainStats(
 }
 
 export function useQueryStats(chain: string, address?: string | null) {
-  const { queryHash, queryKey } = useClientQuery(address ? `chains/${chain}/${address}/stats` : null);
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const { queryHash, queryKey } = useClientQuery(addressHex ? `chains/${chain}/${addressHex}/stats` : null);
 
   const { data, isFetched, isFetching } = useQuery<{
     total: number;
