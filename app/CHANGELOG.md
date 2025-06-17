@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.10.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.9.0...mimir-wallet-app-v2.10.0) (2025-06-17)
+
+
+### Features
+
+* Update asset price source ([#244](https://github.com/mimir-labs/mimir-wallet/issues/244)) ([d250934](https://github.com/mimir-labs/mimir-wallet/commit/d250934a1d3a4330b984a1658a2f540494991d2d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.10.0
+    * @mimir-wallet/service bumped to 2.10.0
+    * @mimir-wallet/ui bumped to 2.10.0
+
 ## [2.9.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.8.1...mimir-wallet-app-v2.9.0) (2025-06-12)
 
 
