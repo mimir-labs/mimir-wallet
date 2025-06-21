@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.11.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.10.0...mimir-wallet-app-v2.11.0) (2025-06-21)
+
+
+### Features
+
+* Upgrade polkadotjs to 16.2.2 to support ExtrinsicV5 ([#247](https://github.com/mimir-labs/mimir-wallet/issues/247)) ([420894f](https://github.com/mimir-labs/mimir-wallet/commit/420894fba030f10db557e92f98db99a732e657ba))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.11.0
+    * @mimir-wallet/service bumped to 2.11.0
+    * @mimir-wallet/ui bumped to 2.11.0
+
 ## [2.10.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.9.0...mimir-wallet-app-v2.10.0) (2025-06-17)
 
 
