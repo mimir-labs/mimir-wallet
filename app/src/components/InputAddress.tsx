@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData } from '@/hooks/types';
+import type { AccountData, AddressMeta } from '@/hooks/types';
 import type { InputAddressProps } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
@@ -33,12 +33,13 @@ function createOptions(
   accounts: AccountData[],
   addresses: { address: string; name: string }[],
   isSign: boolean,
+  metas: Record<string, AddressMeta>,
   input?: string,
   filtered?: string[],
   excluded?: string[]
 ): string[] {
   const all = accounts.reduce<Record<string, string | null | undefined>>((result, item) => {
-    result[item.address] = item.name;
+    result[item.address] = item.name || metas[addressToHex(item.address)]?.name;
 
     return result;
   }, {});
@@ -114,7 +115,8 @@ function InputAddress({
   const upSm = useMediaQuery('sm');
 
   const options = useMemo(
-    (): string[] => sortAccounts(createOptions(accounts, addresses, isSign, inputValue, filtered, excluded), metas),
+    (): string[] =>
+      sortAccounts(createOptions(accounts, addresses, isSign, metas, inputValue, filtered, excluded), metas),
     [accounts, addresses, excluded, filtered, inputValue, isSign, metas]
   );
 

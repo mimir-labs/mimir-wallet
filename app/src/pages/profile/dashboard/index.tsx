@@ -27,11 +27,7 @@ function Dashboard({ address }: { address: string }) {
     { tab: 'transaction', label: 'Transaction' }
   ]);
   const [totalUsd, changes] = useBalanceTotalUsd(address);
-  const supportedNetworks = useAddressSupportedNetworks(address);
-  const [network, setNetwork] = useInputNetwork(
-    undefined,
-    supportedNetworks?.map((item) => item.key)
-  );
+  const [network, setNetwork] = useInputNetwork(undefined);
   const [stats] = useMultiChainStats(address);
 
   return (
@@ -72,7 +68,7 @@ function Dashboard({ address }: { address: string }) {
           <Tab key={item.tab} title={item.label}>
             {tab === 'asset' && <Assets address={address} />}
             {tab === 'structure' && (
-              <SubApiRoot network={network} supportedNetworks={supportedNetworks?.map((item) => item.key)}>
+              <SubApiRoot network={network}>
                 <Structure address={address} setNetwork={setNetwork} />
               </SubApiRoot>
             )}
