@@ -58,7 +58,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       <div className='flex-1 text-foreground/50 text-tiny'>
         <Address value={address} shorten={!upSm} ss58Format={endpoint.ss58Format} />
       </div>
-      <CopyButton size='sm' className='w-6 h-6 opacity-30' value={address} />
+      <CopyButton size='sm' className='w-6 h-6 opacity-30' value={encodeAddress(address, endpoint.ss58Format)} />
       <Button isIconOnly size='sm' color='default' variant='light' onPress={() => openQr(address)}>
         <IconQrcode className='w-[16px] h-[16px] opacity-30' />
       </Button>

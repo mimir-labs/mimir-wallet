@@ -168,6 +168,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
           position={Position.Left}
           style={{
             zIndex: 1,
+            top: 29,
             width: 5,
             height: 18,
             left: 2.5,
@@ -189,6 +190,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
           position={Position.Right}
           style={{
             zIndex: 1,
+            top: 29,
             width: 5,
             height: 18,
             right: 2.5,
