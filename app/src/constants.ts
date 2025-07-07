@@ -41,3 +41,5 @@ export const NEW_FEATURE_TIP_KEY = 'new_feature_tip_v2';
 export const WALLET_CONNECT_PROJECT_ID = 'db2a617b03addd5e1e485d0a677c1ef4';
 
 export const PINNED_ACCOUNTS_KEY = 'pinned_accounts';
+
+export const CUSTOM_APP_KEY = `${LS_NAMESPACE}custom_app`;

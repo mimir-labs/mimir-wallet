@@ -1,31 +1,40 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { DappCell } from '@/components';
-import { useDapps } from '@/hooks/useDapp';
+import { useQueryParam } from '@/hooks/useQueryParams';
 
+import { Tab, Tabs } from '@mimir-wallet/ui';
+
+import AppList from './AppList';
+import CustomApps from './CustomApps';
 import WalletConnectExample from './WalletConnectExample';
 
 function PageDapp() {
-  const { addFavorite, dapps, isFavorite, removeFavorite } = useDapps();
+  const [tab, setTab] = useQueryParam<string>('tab', 'apps');
 
   return (
     <div className='flex flex-col gap-5'>
       <WalletConnectExample />
 
-      <div className='grid grid-cols-[repeat(auto-fit,_minmax(258px,_1fr))] gap-6'>
-        {dapps.map((dapp) => {
-          return (
-            <DappCell
-              key={dapp.id}
-              addFavorite={addFavorite}
-              dapp={dapp}
-              isFavorite={isFavorite}
-              removeFavorite={removeFavorite}
-            />
-          );
-        })}
-      </div>
+      <Tabs
+        color='primary'
+        variant='solid'
+        aria-label='Tabs'
+        selectedKey={tab}
+        onSelectionChange={(key) => setTab(key.toString())}
+        classNames={{
+          tabList: ['bg-white', 'shadow-medium', 'rounded-large', 'p-2.5'],
+          tabContent: ['text-primary/50', 'font-bold'],
+          cursor: ['rounded-medium']
+        }}
+      >
+        <Tab key='apps' title='Apps'>
+          <AppList />
+        </Tab>
+        <Tab key='custom' title='Custom Apps'>
+          <CustomApps />
+        </Tab>
+      </Tabs>
     </div>
   );
 }

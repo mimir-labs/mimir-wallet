@@ -1,8 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { type DappOption, dapps } from '@/config';
-import { FAVORITE_DAPP_KEY } from '@/constants';
+import { type CustomDappOption, type DappOption, dapps } from '@/config';
+import { CUSTOM_APP_KEY, FAVORITE_DAPP_KEY } from '@/constants';
 import { isSameTopDomain } from '@/utils';
 import { useCallback, useMemo } from 'react';
 
@@ -10,9 +10,12 @@ import { useLocalStore } from '@mimir-wallet/service';
 
 interface UseDapps {
   dapps: DappOption[];
-  isFavorite: (id: number) => boolean;
-  addFavorite: (id: number) => void;
-  removeFavorite: (id: number) => void;
+  customApps: CustomDappOption[];
+  isFavorite: (id: number | string) => boolean;
+  addFavorite: (id: number | string) => void;
+  removeFavorite: (id: number | string) => void;
+  addCustom: (app: CustomDappOption) => void;
+  removeCustom: (id: string | number) => void;
 }
 
 export function useDapp(website?: string | null): DappOption | undefined {
@@ -39,7 +42,30 @@ export function useDapp(website?: string | null): DappOption | undefined {
 }
 
 export function useDapps(): UseDapps {
-  const [favoriteIds, setFavoriteIds] = useLocalStore<number[]>(FAVORITE_DAPP_KEY, []);
+  const [favoriteIds, setFavoriteIds] = useLocalStore<(number | string)[]>(FAVORITE_DAPP_KEY, []);
+  const [customApps, setCustomApps] = useLocalStore<CustomDappOption[]>(CUSTOM_APP_KEY, []);
+
+  const addCustom = useCallback(
+    (app: CustomDappOption) => {
+      setCustomApps((v) => {
+        if (v.some((item) => item.id === app.id)) {
+          return v;
+        } else {
+          return [...v, app];
+        }
+      });
+    },
+    [setCustomApps]
+  );
+
+  const removeCustom = useCallback(
+    (id: string | number) => {
+      setCustomApps((v) => {
+        return v.filter((item) => item.id !== id);
+      });
+    },
+    [setCustomApps]
+  );
 
   const validDapps = useMemo(
     () =>
@@ -50,28 +76,31 @@ export function useDapps(): UseDapps {
   );
 
   const addFavorite = useCallback(
-    (id: number) => {
+    (id: number | string) => {
       setFavoriteIds((ids) => Array.from([...ids, id]));
     },
     [setFavoriteIds]
   );
 
   const removeFavorite = useCallback(
-    (id: number) => {
+    (id: number | string) => {
       setFavoriteIds((ids) => ids.filter((_id) => _id !== id));
     },
     [setFavoriteIds]
   );
 
-  const isFavorite = useCallback((id: number) => favoriteIds.includes(id), [favoriteIds]);
+  const isFavorite = useCallback((id: number | string) => favoriteIds.includes(id), [favoriteIds]);
 
   return useMemo(
     () => ({
       dapps: validDapps,
+      customApps,
       addFavorite,
       removeFavorite,
-      isFavorite
+      isFavorite,
+      addCustom,
+      removeCustom
     }),
-    [addFavorite, isFavorite, removeFavorite, validDapps]
+    [addCustom, addFavorite, customApps, isFavorite, removeCustom, removeFavorite, validDapps]
   );
 }
