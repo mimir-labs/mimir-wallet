@@ -621,6 +621,19 @@ const solochainEndpoints: Endpoint[] = [
     genesisHash: '0xd3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70',
     ss58Format: 42,
     explorerUrl: 'https://avail-turing.subscan.io/'
+  },
+  {
+    key: 'zkverify-testnet',
+    icon: '/chain-icons/zkverify.svg',
+    tokenIcon: '/token-icons/VFY.svg',
+    name: 'zkVerify Volta',
+    isTestnet: true,
+    wsUrl: {
+      zkVerify: 'wss://volta-rpc.zkverify.io/'
+    },
+    genesisHash: '0xff7fe5a610f15fe7a0c52f94f86313fb7db7d3786e7f8acf2b66c11d5be7c242',
+    ss58Format: 251,
+    explorerUrl: 'https://zkverify-testnet.subscan.io/'
   }
 ];
 
