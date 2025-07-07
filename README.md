@@ -387,8 +387,6 @@ This project is licensed under the **Apache License 2.0** - see the [LICENSE](LI
 - 🐦 **Twitter**: [@Mimir_global](https://twitter.com/Mimir_global)
 
 ### Development Resources
-- 📋 **Changelog**: [CHANGELOG.md](./CHANGELOG.md)
-- 🤝 **Contributing**: [CONTRIBUTING.md](./CONTRIBUTING.md)
 - 📦 **Releases**: [GitHub Releases](https://github.com/mimir-labs/mimir-wallet/releases)
 
 ---
