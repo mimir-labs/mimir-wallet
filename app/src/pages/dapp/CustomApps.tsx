@@ -28,7 +28,7 @@ function CustomApps() {
           <div>
             <h6 className='font-bold text-medium'>Add New Customized App</h6>
             <p className='mt-1 text-tiny text-foreground text-opacity-50'>
-              You can add apps not listed but support Safe SDK.
+              You can add apps not listed but support Mimir SDK.
             </p>
           </div>
         </div>

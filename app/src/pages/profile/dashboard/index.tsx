@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import IconClose from '@/assets/svg/icon-close.svg?react';
-import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useQueryParam } from '@/hooks/useQueryParams';
