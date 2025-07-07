@@ -8,6 +8,14 @@ import TemplateIcon from '@/assets/svg/template.svg';
 
 import { allEndpoints } from '@mimir-wallet/polkadot-core';
 
+export interface CustomDappOption {
+  id: string;
+  icon?: string;
+  name: string;
+  description: string;
+  url: string;
+}
+
 export interface DappOption<
   SupportedChains extends true | string[] = true | string[],
   urlSearch extends (network: string) => URL = (network: string) => URL
@@ -15,7 +23,7 @@ export interface DappOption<
   // (1 - 500) is internal app
   // (500 - 999) is internal feature
   // (1000 - ...) is external app
-  id: number;
+  id: number | string;
   icon: string;
   name: string;
   description: string;

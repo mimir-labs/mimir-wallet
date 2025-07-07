@@ -1,9 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { FilterPath, Transaction } from '@/hooks/types';
-import type { IMethod } from '@polkadot/types/types';
-import type { HexString } from '@polkadot/util/types';
+import type { Transaction } from '@/hooks/types';
 
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
 import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
@@ -27,11 +25,7 @@ import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
 import { getLayoutedElements } from '../utils';
 
-interface State {
-  onApprove?: (call: IMethod | HexString, path: FilterPath[]) => void;
-}
-
-interface Props extends State {
+interface Props {
   transaction: Transaction;
 }
 
@@ -47,7 +41,7 @@ type EdgeData = {
   isDash?: boolean;
 };
 
-const context = createContext<State>({} as State);
+const context = createContext({});
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
   const { transaction } = data;

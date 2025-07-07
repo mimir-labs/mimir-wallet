@@ -27,14 +27,13 @@ import {
 
 import SupportedChains from './SupportedChains';
 
-interface Props {
-  addFavorite: (id: number) => void;
-  removeFavorite: (id: number) => void;
-  isFavorite: (id: number) => boolean;
-  dapp: DappOption;
+interface Props extends DappOption {
+  addFavorite: (id: number | string) => void;
+  removeFavorite: (id: number | string) => void;
+  isFavorite: (id: number | string) => boolean;
 }
 
-function DappCell({ addFavorite, dapp, isFavorite, removeFavorite }: Props) {
+function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
   const { network } = useApi();
   const navigate = useNavigate();
   const [isDrawerOpen, toggleDrawerOpen, setDrawerOpen] = useToggle();

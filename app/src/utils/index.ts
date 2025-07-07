@@ -9,3 +9,4 @@ export * from './time';
 export * from './units';
 export * from './url';
 export * from './document';
+export * from './proxy';

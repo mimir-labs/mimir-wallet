@@ -111,7 +111,7 @@ export default defineConfig(({ mode }) => ({
         ]),
     nodePolyfills({
       // To add only specific polyfills, add them here. If no option is passed, adds all polyfills
-      include: ['crypto']
+      include: ['crypto', 'path']
     })
   ]
 }));
