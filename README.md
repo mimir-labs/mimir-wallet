@@ -377,15 +377,14 @@ This project is licensed under the **Apache License 2.0** - see the [LICENSE](LI
 ## 🔗 Links & Resources
 
 ### Official Links
-- 🌐 **Website**: [app.mimir.global](https://app.mimir.global)
+- 🌐 **Website**: [mimir.global](https://www.mimir.global)
 - 📖 **Documentation**: [docs.mimir.global](https://docs.mimir.global)
 - 📱 **GitHub**: [mimir-labs/mimir-wallet](https://github.com/mimir-labs/mimir-wallet)
 - 🐛 **Issues**: [Bug Reports & Feature Requests](https://github.com/mimir-labs/mimir-wallet/issues)
 
 ### Community & Support
-- 💬 **Discord**: [Join our community](https://discord.gg/mimir)
-- 🐦 **Twitter**: [@MimirLabs](https://twitter.com/MimirLabs)
-- 📧 **Email**: [contact@mimir.global](mailto:contact@mimir.global)
+- 💬 **Telegram**: [Join our community](https://t.me/+t7vZ1kXV5h1kNGQ9)
+- 🐦 **Twitter**: [@Mimir_global](https://twitter.com/Mimir_global)
 
 ### Development Resources
 - 📋 **Changelog**: [CHANGELOG.md](./CHANGELOG.md)
