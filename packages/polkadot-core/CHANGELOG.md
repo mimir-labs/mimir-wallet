@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.12.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.11.0...polkadot-core-v2.12.0) (2025-07-08)
+
+
+### Features
+
+* Add zkVerify testnet supported ([#251](https://github.com/mimir-labs/mimir-wallet/issues/251)) ([bc59e4b](https://github.com/mimir-labs/mimir-wallet/commit/bc59e4b7e94a742bd3773afe7bc47eae70c72aa6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.12.0
+
 ## [2.11.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.10.0...polkadot-core-v2.11.0) (2025-06-21)
 
 

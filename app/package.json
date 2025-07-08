@@ -15,7 +15,7 @@
   },
   "sideEffects": true,
   "type": "module",
-  "version": "2.11.0",
+  "version": "2.12.0",
   "workspaces": [
     "app",
     "packages/*"

@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.12.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.11.0...mimir-wallet-app-v2.12.0) (2025-07-08)
+
+
+### Features
+
+* Add zkVerify testnet supported ([#251](https://github.com/mimir-labs/mimir-wallet/issues/251)) ([bc59e4b](https://github.com/mimir-labs/mimir-wallet/commit/bc59e4b7e94a742bd3773afe7bc47eae70c72aa6))
+* **dapp:** implement custom dapp management system ([#249](https://github.com/mimir-labs/mimir-wallet/issues/249)) ([70d97c4](https://github.com/mimir-labs/mimir-wallet/commit/70d97c42b3bd28810171de70bf0c0c4f1c04a0f0))
+
+
+### Bug Fixes
+
+* fix dapp page layout style ([#253](https://github.com/mimir-labs/mimir-wallet/issues/253)) ([177c3ce](https://github.com/mimir-labs/mimir-wallet/commit/177c3ce0dc4806988b2dd6804a9d310b6a77e405))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.12.0
+    * @mimir-wallet/service bumped to 2.12.0
+    * @mimir-wallet/ui bumped to 2.12.0
+
 ## [2.11.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.10.0...mimir-wallet-app-v2.11.0) (2025-06-21)
 
 
