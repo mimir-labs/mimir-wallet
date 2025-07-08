@@ -8,7 +8,7 @@ function AppList() {
   const { addFavorite, dapps, isFavorite, removeFavorite } = useDapps();
 
   return (
-    <div className='grid grid-cols-[repeat(auto-fit,_minmax(258px,320px))] gap-6'>
+    <div className='grid grid-cols-[repeat(auto-fill,_minmax(258px,1fr))] gap-6'>
       {dapps.map((dapp) => {
         return (
           <DappCell
