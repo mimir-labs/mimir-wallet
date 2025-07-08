@@ -154,15 +154,17 @@ function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
         ) : (
           <div className='flex flex-col justify-center items-center gap-5 h-full'>
             <img src={dapp.icon} className='w-[64px] h-[64px] bg-transparent' />
-            <h3 className='text-lg font-bold'>{dapp.name}</h3>
+            <h3 className='text-2xl font-bold text-center'>{dapp.name}</h3>
 
-            <div className='flex items-center gap-2.5'>
-              {dapp.tags?.map((tag, index) => (
-                <Button color='secondary' key={index} size='sm'>
-                  {tag}
-                </Button>
-              ))}
-            </div>
+            {dapp.tags && dapp.tags.length > 0 && (
+              <div className='flex items-center gap-2.5'>
+                {dapp.tags.map((tag, index) => (
+                  <Button color='secondary' key={index} size='sm'>
+                    {tag}
+                  </Button>
+                ))}
+              </div>
+            )}
 
             <div className='flex justify-between items-center gap-2 text-tiny'>
               <span className='text-foreground/50'>Supported on</span> <SupportedChains app={dapp} />
