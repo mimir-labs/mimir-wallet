@@ -90,7 +90,7 @@ function ExecuteAnnounce({ account, transaction }: { account: AccountData; trans
         overrideAction={transaction.call ? handleExecute : toggleOpen}
         isLoading={loading}
       >
-        Execute
+        Execute announcement
       </TxButton>
 
       <Modal size='2xl' onClose={toggleOpen} isOpen={isOpen}>
