@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.13.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.12.0...polkadot-core-v2.13.0) (2025-07-10)
+
+
+### Features
+
+* Fee payment with any sufficient asset on AssetHub ([#254](https://github.com/mimir-labs/mimir-wallet/issues/254)) ([711c138](https://github.com/mimir-labs/mimir-wallet/commit/711c13818f1de8abad8966bb0d3de26ed3743568))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.13.0
+
 ## [2.12.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.11.0...polkadot-core-v2.12.0) (2025-07-08)
 
 

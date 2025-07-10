@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.13.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.12.0...mimir-wallet-app-v2.13.0) (2025-07-10)
+
+
+### Features
+
+* Fee payment with any sufficient asset on AssetHub ([#254](https://github.com/mimir-labs/mimir-wallet/issues/254)) ([711c138](https://github.com/mimir-labs/mimir-wallet/commit/711c13818f1de8abad8966bb0d3de26ed3743568))
+* **transactions:** refactor approval flow with enhanced multisig execution ([#256](https://github.com/mimir-labs/mimir-wallet/issues/256)) ([8c46a43](https://github.com/mimir-labs/mimir-wallet/commit/8c46a4355759b065ced1db5af1dc13e4a9179747))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.13.0
+    * @mimir-wallet/service bumped to 2.13.0
+    * @mimir-wallet/ui bumped to 2.13.0
+
 ## [2.12.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.11.0...mimir-wallet-app-v2.12.0) (2025-07-08)
 
 
