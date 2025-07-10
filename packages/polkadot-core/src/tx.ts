@@ -18,12 +18,14 @@ import { assert, formatBalance, isBn, isFunction, isHex, isNumber, objectSpread,
 import { base64Encode } from '@polkadot/util-crypto';
 
 import { assetDispatchError } from './dispatch-error.js';
+import { getFeeAssetLocation } from './location.js';
 import { buildRemoteProxy } from './remoteProxy.js';
 import { TxEvents } from './tx-events.js';
 
 type Options = {
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
   checkProxy?: boolean;
+  assetId?: string;
 };
 
 async function extractParams(
@@ -150,7 +152,8 @@ export async function sign(
   api: ApiPromise,
   extrinsic: SubmittableExtrinsic<'promise'>,
   signer: string,
-  injected: Injected | (() => Promise<Injected>)
+  injected: Injected | (() => Promise<Injected>),
+  { assetId }: { assetId?: string } = {}
 ): Promise<[signature: HexString, payload: SignerPayloadJSON, txHash: Hash, signedTransaction: HexString]> {
   const options = optionsOrNonce();
   const signingInfo = await api.derive.tx.signingInfo(signer, options.nonce, options.era);
@@ -170,7 +173,8 @@ export async function sign(
       blockNumber: signingInfo.header ? signingInfo.header.number : 0,
       method: finalExtrinsic.method,
       version: finalExtrinsic.version,
-      withSignedTransaction
+      withSignedTransaction,
+      assetId: getFeeAssetLocation(api, assetId)
     })
   ]);
 
@@ -237,7 +241,7 @@ export function signAndSend(
   extrinsic: SubmittableExtrinsic<'promise'>,
   signer: string,
   injected: Injected | (() => Promise<Injected>),
-  { beforeSend, checkProxy }: Options = {}
+  { beforeSend, checkProxy, assetId }: Options = {}
 ): TxEvents {
   const events = new TxEvents();
 
@@ -246,7 +250,9 @@ export function signAndSend(
       const call = api.createType('Call', callU8a);
       const finalExtrinsic = api.tx[call.section][call.method](...call.args);
 
-      return extractParams(api, signer, injected).then((params) => finalExtrinsic.signAsync(signer, params));
+      return extractParams(api, signer, injected).then((params) =>
+        finalExtrinsic.signAsync(signer, { ...params, assetId: getFeeAssetLocation(api, assetId) })
+      );
     })
     .then(async (extrinsic) => {
       events.emit('signed', extrinsic.signature, extrinsic);

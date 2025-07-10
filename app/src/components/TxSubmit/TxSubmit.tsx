@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, FilterPath } from '@/hooks/types';
+import type { AccountData, AssetInfo, FilterPath } from '@/hooks/types';
 import type { TxSubmitProps } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
@@ -9,14 +9,18 @@ import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { events } from '@/events';
+import { useAssetConversion } from '@/hooks/useAssetConversion';
+import { useAssetBalance, useNativeBalances } from '@/hooks/useBalances';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
+import { useGasFeeEstimate } from '@/hooks/useGasFeeEstimate';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, Button, Checkbox, Divider } from '@mimir-wallet/ui';
 
+import CustomGasFeeSelect from '../CustomGasFeeSelect';
 import Input from '../Input';
 import Chopsticks from './analytics/Chopsticks';
 import DryRun from './analytics/DryRun';
@@ -75,6 +79,50 @@ function TxSubmit({
     [addressChain]
   );
   const buildTx = useBuildTx(call, addressChain, transaction);
+
+  // Gas fee calculation state
+  const nativeGasFee = useGasFeeEstimate(buildTx.txBundle?.tx || null, buildTx.txBundle?.signer);
+  const [selectedFeeAsset, setSelectedFeeAsset] = useState<AssetInfo | null>(null);
+  const convertedFee = useAssetConversion(nativeGasFee, selectedFeeAsset);
+
+  const gasFeeInfo = useMemo(() => {
+    if (convertedFee === undefined || convertedFee === null || !selectedFeeAsset) {
+      return null;
+    }
+
+    return {
+      amount: convertedFee,
+      symbol: selectedFeeAsset.symbol,
+      decimals: selectedFeeAsset.decimals
+    };
+  }, [convertedFee, selectedFeeAsset]);
+
+  const [assetBalance] = useAssetBalance(
+    network,
+    buildTx.txBundle?.signer,
+    selectedFeeAsset?.isNative ? undefined : selectedFeeAsset?.assetId
+  );
+  const [nativeBalance] = useNativeBalances(buildTx.txBundle?.signer);
+
+  const gasFeeWarning = useMemo(() => {
+    if (!selectedFeeAsset) {
+      return false;
+    }
+
+    if (selectedFeeAsset.isNative) {
+      if (!nativeGasFee) {
+        return false;
+      }
+
+      return nativeBalance ? nativeBalance.transferrable <= nativeGasFee : false;
+    } else {
+      if (!convertedFee) {
+        return false;
+      }
+
+      return assetBalance ? assetBalance.transferrable <= convertedFee : false;
+    }
+  }, [assetBalance, convertedFee, nativeBalance, nativeGasFee, selectedFeeAsset]);
 
   const { isLocalAccount } = useAccount();
 
@@ -157,11 +205,25 @@ function TxSubmit({
 
               <Divider />
 
+              {buildTx.txBundle?.signer ? (
+                <CustomGasFeeSelect
+                  network={network}
+                  gasFeeInfo={gasFeeInfo}
+                  address={buildTx.txBundle.signer}
+                  onChange={(asset) => {
+                    setSelectedFeeAsset(asset);
+                  }}
+                />
+              ) : null}
+
               {safetyCheck && safetyCheck.severity === 'warning' && (
                 <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
                   I confirm recipient address exsits on the destination chain.
                 </Checkbox>
               )}
+
+              {gasFeeWarning && <Alert color='warning' title='The selected asset is not enough to pay the gas fee.' />}
+
               {!isPropose && (
                 <SendTx
                   disabled={
@@ -169,6 +231,7 @@ function TxSubmit({
                     safetyCheck.severity === 'error' ||
                     (safetyCheck.severity === 'warning' && !isConfirm)
                   }
+                  assetId={selectedFeeAsset?.assetId}
                   buildTx={buildTx}
                   note={note}
                   onlySign={onlySign}

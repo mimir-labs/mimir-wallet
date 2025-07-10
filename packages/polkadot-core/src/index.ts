@@ -14,6 +14,7 @@ export * from './tx-reserve.js';
 export * from './tx.js';
 export * from './dispatch-error.js';
 export * from './dry-run/index.js';
+export * from './location.js';
 
 export { chainLinks } from './chain-links.js';
 

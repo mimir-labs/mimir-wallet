@@ -63,6 +63,6 @@ export const assets: Asset[] = [
   }
 ];
 
-export function findAssets(network: string): Asset[] {
-  return assets.filter((item) => item.network === network);
+export function findAsset(network: string, assetId: string): Asset | undefined {
+  return assets.find((item) => item.network === network && item.assetId === assetId);
 }

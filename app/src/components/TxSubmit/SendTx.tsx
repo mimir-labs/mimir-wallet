@@ -29,6 +29,7 @@ function SendTx({
   buildTx,
   note,
   onlySign,
+  assetId,
   website,
   iconUrl,
   appName,
@@ -41,6 +42,7 @@ function SendTx({
 }: {
   disabled?: boolean;
   buildTx: BuildTx;
+  assetId?: string;
   website?: string | null;
   iconUrl?: string | null;
   appName?: string | null;
@@ -98,8 +100,14 @@ function SendTx({
       if (onlySign) {
         addTxToast({ events });
 
-        const [signature, payload, extrinsicHash, signedTransaction] = await sign(api, tx, signer, () =>
-          enableWallet(source, CONNECT_ORIGIN)
+        const [signature, payload, extrinsicHash, signedTransaction] = await sign(
+          api,
+          tx,
+          signer,
+          () => enableWallet(source, CONNECT_ORIGIN),
+          {
+            assetId: assetId === 'native' ? undefined : assetId
+          }
         );
 
         await service.uploadWebsite(network, extrinsicHash.toHex(), website, appName, iconUrl, note, relatedBatches);
@@ -109,7 +117,8 @@ function SendTx({
         setLoading(false);
       } else {
         events = signAndSend(api, tx, signer, () => enableWallet(source, CONNECT_ORIGIN), {
-          beforeSend
+          beforeSend,
+          assetId: assetId === 'native' ? undefined : assetId
         });
 
         addTxToast({ events });
