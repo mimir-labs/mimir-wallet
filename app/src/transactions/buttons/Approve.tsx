@@ -1,17 +1,67 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
-import { Hash, Input } from '@/components';
 import { toastError } from '@/components/utils';
 import { type AccountData, type FilterPath, type Transaction, TransactionType } from '@/hooks/types';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
+import { Button } from '@mimir-wallet/ui';
+
+import RecoverTx from './RecoverTx';
+
+function ExecuteMultisig({ transaction, account }: { account: AccountData; transaction: Transaction }) {
+  const { api, network } = useApi();
+  const [isOpen, toggleOpen] = useToggle(false);
+  const { addQueue } = useTxQueue();
+
+  const handleApprove = () => {
+    if (transaction.call) {
+      addQueue({
+        accountId: account.address,
+        call: transaction.call,
+        network
+      });
+    } else {
+      toggleOpen(true);
+    }
+  };
+
+  const handleRecover = (calldata: string) => {
+    const call = api.createType('Call', calldata);
+
+    if (
+      (transaction.type === TransactionType.Multisig ? blake2AsHex(call.toU8a()) : call.hash.toHex()) !==
+      transaction.callHash
+    ) {
+      toastError('Invalid call data');
+
+      return;
+    }
+
+    addQueue({
+      accountId: account.address,
+      call,
+      network
+    });
+
+    toggleOpen(false);
+  };
+
+  return (
+    <>
+      <Button fullWidth variant='solid' color='primary' onPress={handleApprove}>
+        Execute
+      </Button>
+
+      <RecoverTx transaction={transaction} isOpen={isOpen} onClose={toggleOpen} handleRecover={handleRecover} />
+    </>
+  );
+}
 
 function Approve({
   account,
@@ -22,31 +72,45 @@ function Approve({
   transaction: Transaction;
   filterPaths: FilterPath[][];
 }) {
-  const { api, network } = useApi();
+  const { api, genesisHash, isApiReady, network } = useApi();
   const [isOpen, toggleOpen] = useToggle(false);
-  const [calldata, setCalldata] = useState('');
   const { addQueue } = useTxQueue();
 
-  const error = useMemo(() => {
-    if (!calldata) {
-      return null;
+  const multisigTx = useMemo(() => {
+    if (transaction.type === TransactionType.Multisig) {
+      return transaction;
     }
 
-    try {
-      const call = api.createType('Call', calldata);
+    if (transaction.type === TransactionType.Proxy) {
+      const subTransaction = transaction.children.find((item) => item.type === TransactionType.Multisig);
 
-      if (
-        (transaction.type === TransactionType.Multisig ? blake2AsHex(call.toU8a()) : call.hash.toHex()) !==
-        transaction.callHash
-      ) {
-        return new Error('Call hash mismatch');
+      return subTransaction || null;
+    }
+
+    return null;
+  }, [transaction]);
+
+  const { data: multisigInfo } = useQuery({
+    queryKey: [multisigTx?.address, multisigTx?.callHash] as const,
+    queryHash: `${genesisHash}.api.query.multisig.multisigs(${multisigTx?.address ? addressToHex(multisigTx.address) : ''},${
+      multisigTx?.callHash ? multisigTx.callHash : ''
+    })`,
+    enabled: isApiReady && !!multisigTx,
+    refetchOnMount: false,
+    queryFn: ({ queryKey }) => {
+      const [address, callHash] = queryKey;
+
+      if (!address || !callHash) {
+        throw new Error('Invalid multisig transaction');
       }
 
-      return null;
-    } catch {
-      return new Error('Invalid call data');
+      return api.query.multisig.multisigs(address, callHash);
     }
-  }, [api, calldata, transaction.callHash, transaction.type]);
+  });
+
+  if (multisigTx && multisigInfo && multisigInfo.unwrapOrDefault().approvals.length >= multisigTx.threshold) {
+    return <ExecuteMultisig transaction={transaction} account={account} />;
+  }
 
   if (
     (transaction.type !== TransactionType.Multisig &&
@@ -70,11 +134,7 @@ function Approve({
     }
   };
 
-  const handleRecover = () => {
-    if (!calldata) {
-      return;
-    }
-
+  const handleRecover = (calldata: string) => {
     const call = api.createType('Call', calldata);
 
     if (
@@ -102,32 +162,7 @@ function Approve({
         Approve
       </Button>
 
-      <Modal size='2xl' onClose={toggleOpen} isOpen={isOpen}>
-        <ModalContent>
-          <ModalHeader>Call Data</ModalHeader>
-          <ModalBody className='gap-y-2.5'>
-            <p className='text-foreground/50 text-tiny leading-[16px]'>
-              <IconInfo className='w-4 h-4 mr-1 inline align-text-bottom' />
-              This transaction wasn’t initiated from Mimir. But you can copy Call Data from explorer to recover this
-              transaction
-            </p>
-            <Divider />
-            <div className='grid grid-cols-[60px_1fr] gap-y-2.5 gap-x-1.5 items-center'>
-              <b>Call Data</b>
-              <Input value={calldata} onChange={setCalldata} error={error} />
-              <b>Call Hash</b>
-              <p>
-                <Hash value={transaction.callHash} />
-              </p>
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <Button fullWidth variant='ghost' color='primary' isDisabled={!calldata} onPress={handleRecover}>
-              Recover
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <RecoverTx transaction={transaction} isOpen={isOpen} onClose={toggleOpen} handleRecover={handleRecover} />
     </>
   );
 }

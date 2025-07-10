@@ -39,7 +39,7 @@ interface Props extends Omit<ButtonProps, 'onPress' | 'onClick'> {
     payload: ExtrinsicPayloadValue
   ) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
-  getCall?: () => IMethod;
+  getCall?: () => IMethod | string;
   onDone?: () => void;
   overrideAction?: () => void;
 }
@@ -85,7 +85,10 @@ function TxButton({
         const events = signAndSend(
           api,
           api.tx(
-            api.registry.createType('Call', call instanceof GenericExtrinsic ? call.method.toU8a() : call.toU8a())
+            api.registry.createType(
+              'Call',
+              typeof call === 'string' ? call : call instanceof GenericExtrinsic ? call.method.toU8a() : call.toU8a()
+            )
           ),
           address,
           () => enableWallet(source, CONNECT_ORIGIN),
