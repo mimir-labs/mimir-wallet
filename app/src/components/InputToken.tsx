@@ -6,7 +6,6 @@ import type { AccountAssetInfo } from '@/hooks/types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { useAssetBalances, useNativeBalances } from '@/hooks/useBalances';
-import { useInput } from '@/hooks/useInput';
 import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
@@ -37,20 +36,16 @@ function InputToken({
   disabled,
   className,
   label,
-  placeholder = 'Select Token',
   helper,
   address,
   defaultAssetId,
   onChange
 }: Props) {
   const [nativeBalances] = useNativeBalances(address);
-  const [assets] = useAssetBalances(network, address);
+  const [assets, isFetched, isFetching] = useAssetBalances(network, address);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
-  const [inputValue, setInputValue] = useInput('');
   const [isOpen, toggleOpen] = useToggle(false);
-  const [isFocused, setIsFocused] = useState(false);
   const [assetId, setAssetId] = useState<string>(defaultAssetId || 'native');
 
   const options = useMemo((): AccountAssetInfo[] => {
@@ -60,13 +55,8 @@ function InputToken({
       _options.push(item);
     }
 
-    return _options.filter((item) =>
-      inputValue
-        ? item.name.toLowerCase().includes(inputValue.toLowerCase()) ||
-          item.symbol.toLowerCase().includes(inputValue.toLowerCase())
-        : true
-    );
-  }, [nativeBalances, assets, inputValue]);
+    return _options;
+  }, [nativeBalances, assets]);
 
   const handleOpen = () => {
     toggleOpen(true);
@@ -96,10 +86,10 @@ function InputToken({
   }, [onChange, token, options]);
 
   const element =
-    !options || options.length === 0 ? (
+    !isFetched && isFetching ? (
       <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
         <Spinner size='sm' />
-        {isIconOnly || isOpen ? null : <p className='text-foreground/50'>Fetching Assets...</p>}
+        {isIconOnly ? null : <p className='text-foreground/50'>Fetching Assets...</p>}
       </div>
     ) : token ? (
       <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
@@ -115,7 +105,7 @@ function InputToken({
         >
           {token.symbol}
         </Avatar>
-        {isIconOnly || (isOpen && isFocused) ? null : (
+        {isIconOnly ? null : (
           <p>
             {token.name}&nbsp;<span className='text-foreground/50'>({token.symbol})</span>
           </p>
@@ -141,7 +131,6 @@ function InputToken({
             onPress={() => {
               handleClose();
               setAssetId(assetId);
-              setInputValue('');
             }}
             className='h-10 text-foreground data-[hover=true]:text-foreground'
             startContent={
@@ -180,7 +169,7 @@ function InputToken({
         <div
           ref={wrapperRef}
           className={twMerge([
-            'group relative w-full inline-flex tap-highlight-transparent px-2 min-h-11 flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-11 py-2 shadow-none border-1 border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent',
+            'group cursor-pointer relative w-full inline-flex tap-highlight-transparent px-2 min-h-11 flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-11 py-2 shadow-none border-1 border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent',
             radius === 'full'
               ? 'rounded-full'
               : radius === 'lg'
@@ -191,19 +180,9 @@ function InputToken({
                     ? 'rounded-small'
                     : 'rounded-none'
           ])}
+          onClick={handleOpen}
         >
           {element}
-          <input
-            ref={inputRef}
-            className='absolute top-0 right-0 bottom-0 left-0 outline-none border-none pl-9 bg-transparent'
-            style={{ opacity: isFocused && isOpen ? 1 : 0 }}
-            value={inputValue}
-            placeholder={placeholder}
-            onChange={setInputValue}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            onClick={handleOpen}
-          />
 
           <ArrowDown
             data-open={isOpen}

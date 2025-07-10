@@ -219,7 +219,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
         {!upSm && buttons}
       </div>
 
-      <Fund onClose={toggleOpen} open={open} receipt={address} />
+      <Fund onClose={() => toggleOpen(false)} open={open} receipt={address} />
     </>
   );
 }

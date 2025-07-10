@@ -68,10 +68,10 @@ function Assets({ address }: { address: string }) {
         .filter((item) => item.total > 0n)
         .sort((a, b) => {
           if (sortDescriptor.column === 'balanceUsd') {
-            const bTotal = (b.total * BigInt((b.price || 0 * 1e18).toFixed(0))) / 10n ** BigInt(b.decimals);
-            const aTotal = (a.total * BigInt((a.price || 0 * 1e18).toFixed(0))) / 10n ** BigInt(a.decimals);
+            const bTotal = Number(formatUnits(b.total, b.decimals)) * (b.price || 0);
+            const aTotal = Number(formatUnits(a.total, a.decimals)) * (a.price || 0);
 
-            return sortDescriptor.direction === 'descending' ? (bTotal > aTotal ? 1 : -1) : bTotal > aTotal ? -1 : 1;
+            return sortDescriptor.direction === 'descending' ? bTotal - aTotal : aTotal - bTotal;
           }
 
           if (sortDescriptor.column === 'price') {

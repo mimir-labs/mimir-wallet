@@ -6,7 +6,7 @@ import type { Option } from '@polkadot/types';
 import type { PalletAssetsAssetDetails, PalletAssetsAssetMetadata } from '@polkadot/types/lookup';
 import type { AssetInfo, AssetMetadata, PalletAssetRegistryAssetDetails } from './types';
 
-import { assets, findAssets } from '@/config';
+import { findAsset } from '@/config';
 import { type BN, BN_ZERO, isHex } from '@polkadot/util';
 import { isEqual } from 'lodash-es';
 import { useMemo } from 'react';
@@ -26,7 +26,7 @@ function _extraAsset(
   }[]
 ): AssetInfo[] {
   return data.map((item) => {
-    const asset = assets.find(({ assetId }) => item.assetId === assetId);
+    const asset = findAsset(network, item.assetId);
 
     return {
       network: network,
@@ -58,9 +58,12 @@ export function useAssets(network: string): [data: AssetInfo[] | undefined, isFe
     useMemo(
       () =>
         data?.map((item) => ({
-          ...item
+          ...item,
+          icon: findAsset(network, item.assetId)?.Icon,
+          isNative: false,
+          network: network
         })),
-      [data]
+      [data, network]
     ),
     isFetched,
     isFetching
@@ -175,7 +178,7 @@ async function fetchAssetInfo({
           symbol: metadata.symbol.toUtf8(),
           decimals: metadata.decimals.toNumber(),
           existentialDeposit: metadata.deposit.toBigInt(),
-          icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
+          icon: findAsset(network, assetId)?.Icon,
           price: 0,
           change24h: 0
         },
@@ -201,7 +204,7 @@ async function fetchAssetInfo({
               name: name.unwrap().toUtf8(),
               symbol: symbol.unwrap().toUtf8(),
               decimals: decimals.unwrap().toNumber(),
-              icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
+              icon: findAsset(network, assetId)?.Icon,
               price: 0,
               change24h: 0
             },
@@ -228,7 +231,7 @@ async function fetchAssetInfo({
             name: name.toUtf8(),
             symbol: symbol.toUtf8(),
             decimals: decimals.toNumber(),
-            icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
+            icon: findAsset(network, assetId)?.Icon,
             price: 0,
             change24h: 0
           },
@@ -254,7 +257,7 @@ async function fetchAssetInfo({
             name: name.toUtf8(),
             symbol: symbol.toUtf8(),
             decimals: decimals.toNumber(),
-            icon: findAssets(network).find((item) => item.assetId === assetId)?.Icon,
+            icon: findAsset(network, assetId)?.Icon,
             price: 0,
             change24h: 0
           },

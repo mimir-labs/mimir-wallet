@@ -21,7 +21,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { addressToHex, useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
 import { useQueries, useQuery } from '@mimir-wallet/service';
 
-import { useAssetsByAddress, useAssetsByAddressAll } from './useAssets';
+import { useAssetInfo, useAssetsByAddress, useAssetsByAddressAll } from './useAssets';
 import { useTokenInfo, useTokenInfoAll } from './useTokenInfo';
 
 async function getBalances({
@@ -80,6 +80,10 @@ export function useNativeBalances(
     queryHash,
     queryFn: getBalances,
     enabled: !!api && isApiReady && !!address,
+    staleTime: 12_000,
+    refetchInterval: 12_000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }
@@ -275,6 +279,97 @@ async function _fetchAssetBalances({
   return [];
 }
 
+async function _fetchAssetBalance({
+  queryKey
+}: {
+  queryKey: [api: ApiPromise, network: string, asset: AssetInfo<false> | undefined, address: string | undefined | null];
+}): Promise<AccountAssetInfo<false>> {
+  const [api, network, asset, address] = queryKey;
+
+  if (!address || !asset) {
+    throw new Error('Address and asset are required');
+  }
+
+  if (api.query.assets) {
+    return (
+      isHex(asset.assetId)
+        ? (api.query.foreignAssets?.account?.(asset.assetId, address.toString()) as Promise<
+            Option<PalletAssetsAssetAccount> | undefined | null
+          >)
+        : api.query.assets.account(asset.assetId, address.toString())
+    ).then((result) => {
+      return {
+        ...asset,
+        total: result?.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,
+        free: result?.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,
+        locked: 0n,
+        reserved: 0n,
+        transferrable: result?.isSome ? BigInt(result.unwrap().balance.toString()) : 0n,
+        account: address.toString()
+      };
+    });
+  }
+
+  if (api.query.tokens) {
+    if (network === 'acala' || network === 'karura') {
+      const assetId: AcalaPrimitivesCurrencyAssetIds = api.registry.createType(
+        'AcalaPrimitivesCurrencyAssetIds',
+        asset.assetId
+      );
+
+      let currencyId: AcalaPrimitivesCurrencyCurrencyId;
+
+      if (assetId.isErc20) {
+        currencyId = api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
+          Erc20: assetId.asErc20.toHex()
+        });
+      } else if (assetId.isForeignAssetId) {
+        currencyId = api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
+          ForeignAsset: assetId.asForeignAssetId.toNumber()
+        });
+      } else if (assetId.isStableAssetId) {
+        currencyId = api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
+          StableAssetPoolToken: assetId.asStableAssetId.toNumber()
+        });
+      } else if (assetId.isNativeAssetId) {
+        currencyId = api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', assetId.asNativeAssetId);
+      } else {
+        throw new Error('Invalid asset id');
+      }
+
+      return (api.query.tokens.accounts(address.toString(), currencyId) as Promise<OrmlTokensAccountData>).then(
+        (result) => {
+          return {
+            ...asset,
+            total: BigInt(result.free.add(result.reserved).toString()),
+            free: BigInt(result.free.toString()),
+            locked: BigInt(result.frozen.toString()),
+            reserved: BigInt(result.reserved.toString()),
+            transferrable: BigInt(result.free.add(result.reserved).sub(result.frozen).toString()),
+            account: address.toString()
+          };
+        }
+      );
+    }
+
+    return (api.query.tokens.accounts(address.toString(), asset.assetId) as Promise<OrmlTokensAccountData>).then(
+      (result) => {
+        return {
+          ...asset,
+          total: BigInt(result.free.add(result.reserved).toString()),
+          free: BigInt(result.free.toString()),
+          locked: BigInt(result.frozen.toString()),
+          reserved: BigInt(result.reserved.toString()),
+          transferrable: BigInt(result.free.add(result.reserved).sub(result.frozen).toString()),
+          account: address.toString()
+        };
+      }
+    );
+  }
+
+  throw new Error('Invalid network');
+}
+
 export function useAssetBalances(
   network: string,
   address?: AccountId | AccountId32 | string | null
@@ -297,9 +392,10 @@ export function useAssetBalances(
   const { data, isFetched, isFetching } = useQuery({
     queryKey: [network, api?.api, address, assets] as const,
     queryHash,
-    refetchInterval: 12000,
+    staleTime: 12_000,
+    refetchInterval: 12_000,
     refetchOnMount: false,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     enabled: !!address && !!api && api.isApiReady && !!assets,
     queryFn: async ({
       queryKey: [network, api, address, assets]
@@ -322,6 +418,32 @@ export function useAssetBalances(
   });
 
   return [useMemo(() => data || [], [data]), isFetched, isFetching];
+}
+
+export function useAssetBalance(
+  network: string,
+  address?: AccountId | AccountId32 | string | null,
+  assetId?: string | null
+): [data: AccountAssetInfo<false> | undefined, isFetched: boolean, isFetching: boolean] {
+  const { allApis } = useApi();
+  const api: ValidApiState | undefined = allApis[network];
+
+  const [assetInfo] = useAssetInfo(network, assetId);
+  const addressHex = address ? addressToHex(address.toString()) : '';
+  const queryHash = `${network}-asset-balance-${addressHex}-${assetInfo?.assetId}`;
+
+  const { data, isFetched, isFetching } = useQuery({
+    queryKey: [api?.api, network, assetInfo, addressHex] as const,
+    queryHash,
+    queryFn: _fetchAssetBalance,
+    staleTime: 12_000,
+    refetchInterval: 12_000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    enabled: !!api && !!api.isApiReady && !!api.api && !!assetInfo && !!addressHex
+  });
+
+  return [data, isFetched, isFetching];
 }
 
 type UseAssetBalancesAll = {
@@ -357,9 +479,10 @@ export function useAssetBalancesAll(address?: string): UseAssetBalancesAll[] {
           assets: AssetInfo[] | undefined
         ],
         queryHash,
+        staleTime: 12_000,
         refetchInterval: 12_000,
         refetchOnMount: false,
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false,
         enabled: !!address && !!api && !!api.isApiReady && !!assets,
         queryFn: async ({
           queryKey: [network, api, address, assets]

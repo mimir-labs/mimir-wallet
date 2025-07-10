@@ -6,8 +6,43 @@ import { extendVariants } from '@heroui/system';
 
 const CustomSelect = extendVariants(Select, {
   variants: {
+    radius: {
+      sm: {
+        label: 'w-full text-inherit',
+        innerWrapper: 'rounded-small'
+      },
+      md: {
+        label: 'w-full text-inherit',
+        innerWrapper: 'rounded-medium'
+      },
+      lg: {
+        label: 'w-full text-inherit',
+        innerWrapper: 'rounded-large'
+      }
+    },
+    color: {
+      default: {
+        innerWrapper: 'border-divider-300 data-[hover=true]:bg-foreground-50 data-[hover=true]:border-foreground'
+      },
+      primary: {
+        innerWrapper: 'border-divider-300 data-[hover=true]:bg-primary-50 data-[hover=true]:border-primary'
+      },
+      success: {
+        innerWrapper: 'border-divider-300 data-[hover=true]:bg-success-50 data-[hover=true]:border-success'
+      },
+      danger: {
+        innerWrapper: 'border-divider-300 data-[hover=true]:bg-danger-50 data-[hover=true]:border-danger'
+      },
+      warning: {
+        innerWrapper: 'border-divider-300 data-[hover=true]:bg-warning-50 data-[hover=true]:border-warning'
+      },
+      secondary: {
+        innerWrapper: 'border-divider-300 data-[hover=true]:bg-secondary-50 data-[hover=true]:border-secondary'
+      }
+    },
     variant: {
       bordered: {
+        base: 'data-[has-label=true]:mt-0',
         selectorIcon: 'w-5 h-5 -mr-2'
       }
     }

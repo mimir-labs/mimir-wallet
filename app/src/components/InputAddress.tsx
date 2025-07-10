@@ -114,11 +114,15 @@ function InputAddress({
   const [isFocused, setIsFocused] = useState(false);
   const upSm = useMediaQuery('sm');
 
-  const options = useMemo(
-    (): string[] =>
-      sortAccounts(createOptions(accounts, addresses, isSign, metas, inputValue, filtered, excluded), metas),
-    [accounts, addresses, excluded, filtered, inputValue, isSign, metas]
-  );
+  const options = useMemo((): string[] => {
+    const list = sortAccounts(createOptions(accounts, addresses, isSign, metas, inputValue, filtered, excluded), metas);
+
+    if (list.length === 0 && isValidAddressUtil(inputValue, polkavm)) {
+      list.push(isEthAddress(inputValue) ? evm2Ss58(inputValue, chainSS58) : inputValue);
+    }
+
+    return list;
+  }, [accounts, addresses, chainSS58, excluded, filtered, inputValue, isSign, metas, polkavm]);
 
   useEffect(() => {
     if (isControl.current && propsValue) {
@@ -131,6 +135,8 @@ function InputAddress({
 
     if (isValidAddressUtil(key, polkavm)) {
       onChange?.(isEthAddress(key) ? evm2Ss58(key, chainSS58) : key);
+    } else if (key === '') {
+      onChange?.('');
     }
   }, [value, onChange, polkavm, chainSS58]);
 
@@ -156,6 +162,8 @@ function InputAddress({
       } else {
         handleSelect(inputValue);
       }
+    } else if (!isSign) {
+      setValue('');
     }
   };
 
@@ -217,7 +225,8 @@ function InputAddress({
 
         <div
           ref={wrapperRef}
-          className='InputAddressContent overflow-hidden group relative w-full inline-flex tap-highlight-transparent px-2 border-medium min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-14 py-2 shadow-none border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent'
+          data-error={!isValidAddress && !!inputValue}
+          className='InputAddressContent overflow-hidden relative w-full inline-flex tap-highlight-transparent px-2 border-medium min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-14 py-2 shadow-none border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent'
         >
           {element}
           <input
@@ -239,6 +248,7 @@ function InputAddress({
             {...pressProps}
           />
         </div>
+        {!isValidAddress && !!inputValue && <div className='text-small mt-1 text-danger'>Invalid address</div>}
 
         {valueIsPolkadotEvmAddress ? (
           <div className='text-small mt-1'>🥚✨ Yep, ETH address transfers work — magic, right? 😎</div>

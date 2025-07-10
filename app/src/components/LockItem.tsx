@@ -10,10 +10,10 @@ import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconUnLock from '@/assets/svg/icon-unlock.svg?react';
 import { useNativeBalances } from '@/hooks/useBalances';
-import { useToggle } from '@/hooks/useToggle';
 import { formatUnits } from '@/utils';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo, useRef } from 'react';
+import { useToggle } from 'react-use';
 
 import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Spinner, Tooltip } from '@mimir-wallet/ui';
@@ -33,7 +33,7 @@ interface Props {
 function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   const { api, chainSS58, network } = useApi();
   const [allBalances] = useNativeBalances(address.toString());
-  const [open, toggleOpen] = useToggle();
+  const [open, toggleOpen] = useToggle(false);
   const onEnoughtStateRef = useRef(onEnoughtState);
 
   onEnoughtStateRef.current = onEnoughtState;
@@ -63,7 +63,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
         <Fund
           defaultNetwork={network}
           defaultValue={formatUnits(value, api.registry.chainDecimals[0])}
-          onClose={toggleOpen}
+          onClose={() => toggleOpen(false)}
           open={open}
           receipt={address.toString()}
         />
