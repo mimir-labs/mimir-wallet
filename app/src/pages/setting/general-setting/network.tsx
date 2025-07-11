@@ -37,6 +37,8 @@ function Content({ chain }: { chain: Endpoint }) {
       return;
     }
 
+    provider.disconnect();
+
     store.set(`${NETWORK_RPC_PREFIX}${chain.key}`, url);
   }, [url, chain.genesisHash, chain.key]);
 

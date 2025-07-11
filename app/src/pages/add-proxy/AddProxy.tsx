@@ -70,10 +70,11 @@ function AddProxy({
   const [reviewWindow, setReviewWindow] = useState<number>(0);
   const [proxyArgs, setProxyArgs] = useState<ProxyArgs[]>([]);
   const [proxy, setProxy] = useState<string | undefined>(pure ? current : filteredProxy[0]);
+
   const { data: proxies } = useQuery({
     queryKey: [proxied] as const,
     queryHash: `${genesisHash}.api.query.proxy.proxies(${proxied ? addressToHex(proxied) : ''})`,
-    enabled: isApiReady && !!pure && !!proxied,
+    enabled: !!isApiReady && !pure && !!proxied,
     queryFn: ({ queryKey }) => {
       const [address] = queryKey;
 

@@ -42,7 +42,6 @@ const CustomSelect = extendVariants(Select, {
     },
     variant: {
       bordered: {
-        base: 'data-[has-label=true]:mt-0',
         selectorIcon: 'w-5 h-5 -mr-2'
       }
     }

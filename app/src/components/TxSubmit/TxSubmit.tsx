@@ -191,7 +191,7 @@ function TxSubmit({
           <SafetyCheck isTxBundleLoading={buildTx.isLoading} txError={buildTx.error} safetyCheck={safetyCheck} />
         </div>
 
-        <div className='sticky top-0 self-start w-full md:w-[40%] h-auto p-4 sm:p-5 shadow-medium rounded-large bg-content1 space-y-5'>
+        <div className='sticky top-0 self-start w-full flex flex-col md:w-[40%] h-auto p-4 sm:p-5 shadow-medium rounded-large bg-content1 gap-y-5'>
           {hasPermission && filterPaths.length > 0 && (
             <>
               <AddressChain
