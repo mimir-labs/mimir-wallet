@@ -99,7 +99,7 @@ function CustomGasFeeSelect({
   }
 
   return (
-    <div className={`pt-[calc(theme(fontSize.small)_+_10px)] ${className}`}>
+    <div className={`${className}`}>
       <Select
         label={label}
         placeholder={placeholder}
