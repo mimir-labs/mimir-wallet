@@ -41,9 +41,7 @@ const CustomInput = extendVariants(Input, {
       }
     },
     variant: {
-      bordered: {
-        base: 'data-[has-label=true]:mt-0'
-      }
+      bordered: {}
     }
   },
   defaultVariants: {
