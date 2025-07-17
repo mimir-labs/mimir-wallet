@@ -1,3 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@plugin '../hero.js';
+@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@source '../src/**/*.{js,ts,jsx,tsx,mdx}';
+@source '../../../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+

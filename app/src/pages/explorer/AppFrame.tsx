@@ -22,8 +22,8 @@ function AppFrame({ url, iconUrl, appName }: { url: string; iconUrl?: string; ap
   useCommunicator(iframeRef, appUrl, iconUrl, appName);
 
   return (
-    <div key={selected || 'none'} className='h-full relative'>
-      {loading && <Spinner size='lg' variant='wave' className='absolute left-0 top-0 right-0 bottom-0 m-auto' />}
+    <div key={selected || 'none'} className='relative h-full'>
+      {loading && <Spinner size='lg' variant='wave' className='absolute top-0 right-0 bottom-0 left-0 m-auto' />}
       {url && <AppIframe appUrl={appUrl} iframeRef={iframeRef} key={url} onLoad={() => setLoading(false)} />}
       {url && selected && <PendingTx address={selected} url={url} />}
     </div>

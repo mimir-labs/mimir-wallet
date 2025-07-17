@@ -1,47 +1,45 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin '@mimir-wallet/ui/hero';
+@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@source '../index.html';
+@source '../src/**/*.{js,ts,jsx,tsx,mdx}';
+@source '../../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
 
-@layer base {
-  p {
-    @apply text-inherit leading-inherit font-normal;
-  }
-  h1 {
-    @apply text-4xl font-bold leading-[1.2];
-  }
-  h2 {
-    @apply text-3xl font-bold leading-[1.2];
-  }
-  h3 {
-    @apply text-2xl font-bold leading-[1.2];
-  }
-  h4 {
-    @apply text-xl font-bold leading-[1.2];
-  }
-  h5 {
-    @apply text-large font-bold leading-[1.2];
-  }
-  h6 {
-    @apply text-medium font-bold leading-[1.2];
-  }
-  input::placeholder {
-    @apply text-foreground/50;
-  }
-
-  body {
-    @apply leading-[1.2];
-  }
-
-  :root {
-    --toastify-text-color-light: #151F34;
-    --toastify-color-info: #2700FF;
-    --toastify-color-success: #00DBA6;
-    --toastify-color-warning: #FF8D07;
-    --toastify-color-error: #FF5310;
-  }
+:root {
+  --toastify-text-color-light: #151F34;
+  --toastify-color-info: #2700FF;
+  --toastify-color-success: #00DBA6;
+  --toastify-color-warning: #FF8D07;
+  --toastify-color-error: #FF5310;
 }
 
-@layer utilities {
+@theme {
+  --text-6xl: 2.25rem;
+  --text-5xl: 2rem;
+  --text-4xl: 1.75rem;
+  --text-3xl: 1.5rem;
+  --text-2xl: 1.25rem;
+  --font-sans: "Sofia Sans Semi Condensed", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --animate-fade-out: fade-out 2s 1;
+  @keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  --animate-fade-in: fade-in 2s 1;
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  --animate-blink-bg: blink-bg 1s 3;
   @keyframes blink-bg {
     0% {
       background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
@@ -53,70 +51,100 @@
       background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
     }
   }
+}
 
-  .animate-blink-bg {
-    animation: blink-bg 1s 3;
+@layer base {
+  p {
+    @apply text-inherit leading-inherit font-normal;
   }
-}
+  h1 {
+    @apply text-4xl leading-[1.2] font-bold;
+  }
+  h2 {
+    @apply text-3xl leading-[1.2] font-bold;
+  }
+  h3 {
+    @apply text-2xl leading-[1.2] font-bold;
+  }
+  h4 {
+    @apply text-xl leading-[1.2] font-bold;
+  }
+  h5 {
+    @apply text-large leading-[1.2] font-bold;
+  }
+  h6 {
+    @apply text-medium leading-[1.2] font-bold;
+  }
 
-/* custom styles */
-html {
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: normal;
-  font-variation-settings: normal;
-  -webkit-tap-highlight-color: transparent;
-  tab-size: 4;
-}
+  input::placeholder {
+    @apply text-foreground-500;
+  }
 
-body {
-  background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
-  font-size: 0.875rem;
-  line-height: 1.1;
-  color: hsl(var(--heroui-foreground));
-}
+  button {
+    cursor: pointer;
+  }
 
-html,body,#root {
-  min-height: 100dvh;
-}
+  /* custom styles */
+  html {
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: normal;
+    font-variation-settings: normal;
+    -webkit-tap-highlight-color: transparent;
+    tab-size: 4;
+  }
 
-ul {
-  padding-left: 0;
-  margin: 0;
-}
+  body {
+    background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
+    font-size: 0.875rem;
+    line-height: 1.2;
+    color: hsl(var(--heroui-foreground));
+    font-family: var(--default-font-family);
+  }
 
-.Toastify__toast {
-  border-radius: var(--heroui-radius-large);
-  box-shadow: var(--heroui-box-shadow-large);
-}
+  html,body,#root {
+    min-height: 100dvh;
+  }
 
-.Toastify__toast-body {
-  align-items: start;
-}
+  ul {
+    padding-left: 0;
+    margin: 0;
+  }
 
-.Toastify__toast-body * {
-  user-select: none;
-}
+  .Toastify__toast {
+    border-radius: var(--heroui-radius-large);
+    box-shadow: var(--heroui-box-shadow-large);
+  }
 
-.Toastify__toast-icon {
-  width: 30px;
-}
+  .Toastify__toast-body {
+    align-items: start;
+  }
 
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-  background: #fff;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 5px;
-}
-::-webkit-scrollbar-thumb {
-  background: #d9d9d9;
-  border-radius: 5px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #d9d9d9;
-}
-::-webkit-scrollbar-corner {
-  background: #d9d9d9;
+  .Toastify__toast-body * {
+    user-select: none;
+  }
+
+  .Toastify__toast-icon {
+    width: 30px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    background: #fff;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #d9d9d9;
+  }
+  ::-webkit-scrollbar-corner {
+    background: #d9d9d9;
+  }
+
 }

@@ -80,7 +80,7 @@ Call Data: ${call.toHex()}`;
         type: 'bytes'
       });
 
-      await service.submitPropose(
+      await service.transaction.submitPropose(
         network,
         account,
         call.toHex(),

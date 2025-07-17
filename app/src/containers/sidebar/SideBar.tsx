@@ -71,14 +71,14 @@ function NavLink({
       onPress={onClick}
       size='lg'
       radius='md'
-      startContent={<Icon className='w-5 h-5' />}
-      className='h-[50px] justify-start gap-x-2.5 items-center px-[15px] py-[20px] text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary'
+      startContent={<Icon className='h-5 w-5' />}
+      className='text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary h-[50px] items-center justify-start gap-x-2.5 px-[15px] py-[20px]'
       href={matched ? undefined : to}
       variant='light'
     >
       <p
         data-active={matched}
-        className='text-medium font-semibold text-foreground/50 data-[active=true]:text-foreground'
+        className='text-medium text-foreground/50 data-[active=true]:text-foreground font-semibold'
       >
         {label}
       </p>
@@ -112,36 +112,36 @@ function TopContent() {
     <>
       {isConnected ? (
         selected ? (
-          <div className='border-1 border-secondary rounded-medium'>
+          <div className='border-secondary rounded-medium border-1'>
             <div
-              className='flex items-center gap-2.5 p-2.5  cursor-pointer w-full rounded-tl-medium rounded-tr-medium bg-transparent hover:bg-secondary transition-background'
+              className='rounded-tl-medium rounded-tr-medium hover:bg-secondary transition-background flex w-full cursor-pointer items-center gap-2.5 bg-transparent p-2.5'
               onClick={handleAccountOpen}
             >
               <AddressCell value={selected} addressCopyDisabled />
               <ArrowRight className='text-primary' />
             </div>
 
-            <Divider />
+            <Divider className='mx-2.5 w-auto' />
 
-            <p className='p-2.5 text-tiny text-foreground/65'>
+            <p className='text-tiny text-foreground/65 p-2.5'>
               $ {formatUsd[0]}
               {formatUsd[1] ? `.${formatUsd[1]}` : ''}
               {formatUsd[2] || ''}
             </p>
 
-            <Divider />
+            <Divider className='mx-2.5 w-auto' />
 
             <div className='flex items-center p-2.5'>
               <Tooltip content='QR Code' closeDelay={0}>
                 <Button
                   isIconOnly
-                  className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
+                  className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
                   color='primary'
                   variant='light'
                   onPress={() => openQr(selected)}
                   size='sm'
                 >
-                  <IconQr className='w-4 h-4' />
+                  <IconQr className='h-4 w-4' />
                 </Button>
               </Tooltip>
               <Tooltip content='Copy' closeDelay={0}>
@@ -150,26 +150,26 @@ function TopContent() {
               <Tooltip content='Explorer' closeDelay={0}>
                 <Button
                   isIconOnly
-                  className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
+                  className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
                   color='primary'
                   variant='light'
                   size='sm'
                   onPress={() => openExplorer(selected)}
                 >
-                  <IconLink className='w-4 h-4' />
+                  <IconLink className='h-4 w-4' />
                 </Button>
               </Tooltip>
               <Tooltip content='Transfer' closeDelay={0}>
                 <Button
                   isIconOnly
-                  className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
+                  className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
                   color='primary'
                   variant='light'
                   as={Link}
                   size='sm'
                   href={`/transfer?from=${selected}`}
                 >
-                  <IconTransfer className='w-4 h-4' />
+                  <IconTransfer className='h-4 w-4' />
                 </Button>
               </Tooltip>
             </div>
@@ -229,7 +229,7 @@ function WalletContent() {
 
   return (
     <div
-      className='grid grid-cols-5 gap-2.5 cursor-pointer w-full pt-2.5 bg-content1 border-t-1 border-t-secondary'
+      className='bg-content1 border-t-secondary grid w-full cursor-pointer grid-cols-5 gap-2.5 border-t-1 pt-2.5'
       onClick={() => {
         openWallet();
         closeSidebar();
@@ -282,7 +282,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
         label='Transactions'
         endContent={
           totalCounts ? (
-            <div className='flex justify-center items-center font-semibold text-small text-danger-foreground bg-danger aspect-1/1 w-5 leading-[1] rounded-full'>
+            <div className='text-small text-danger-foreground bg-danger flex aspect-1/1 w-5 items-center justify-center rounded-full leading-[1] font-semibold'>
               {totalCounts}
             </div>
           ) : null
@@ -316,7 +316,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
             <DrawerHeader className='md:hidden'>
               <h3>Menu</h3>
             </DrawerHeader>
-            <DrawerBody className='scrollbar-hide py-4 px-4'>{element}</DrawerBody>
+            <DrawerBody className='scrollbar-hide px-4 py-4'>{element}</DrawerBody>
             <DrawerFooter className='px-4 pt-0'>
               <WalletContent />
             </DrawerFooter>
@@ -325,7 +325,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
       ) : (
         <div
           data-open={isOpen}
-          className='z-[1] sticky flex-none flex flex-col w-[222px] -ml-[222px] data-[open=true]:ml-0 bg-content1 border-r-1 border-r-secondary transition-[margin-left] duration-150 ease-in-out'
+          className='bg-content1 border-r-secondary sticky z-[1] -ml-[222px] flex w-[222px] flex-none flex-col border-r-1 transition-[margin-left] duration-150 ease-in-out data-[open=true]:ml-0'
           style={{
             top: offsetTop + 56,
             height: `calc(100dvh - ${offsetTop}px - 1px - 56px)`

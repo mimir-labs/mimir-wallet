@@ -14,7 +14,7 @@ import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-ki
 import { useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
+import { SubApiRoot, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Divider, Link } from '@mimir-wallet/ui';
 
 import Actions from './Actions';
@@ -37,6 +37,7 @@ function Content({
   setTxs: (txs: BatchTxItem[]) => void;
   onClose?: () => void;
 }) {
+  const { api } = useApi();
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [relatedBatches, setRelatedBatches] = useState<number[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +66,7 @@ function Content({
 
   return (
     <>
-      <div className='flex-1 flex flex-col gap-2.5 scrollbar-hide overflow-y-auto'>
+      <div className='scrollbar-hide flex flex-1 flex-col gap-2.5 overflow-y-auto'>
         <div ref={containerRef} style={{ touchAction: 'pan-y' }}>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={txs.map((item) => item.id)} strategy={verticalListSortingStrategy}>
@@ -77,6 +78,7 @@ function Content({
                     index={index}
                     from={address}
                     selected={selected}
+                    registry={api.registry}
                     onSelected={(state: boolean) => {
                       setSelected((values) => (state ? [...values, item.id] : values.filter((v) => item.id !== v)));
                       setRelatedBatches((values) =>
@@ -109,7 +111,7 @@ function Content({
           color='secondary'
           fullWidth
           radius='md'
-          startContent={<IconAdd className='w-4 h-4' />}
+          startContent={<IconAdd className='h-4 w-4' />}
           className='text-foreground flex-shrink-0'
         >
           Add New Transfer
@@ -151,10 +153,10 @@ function Batch({
   const networkChain = useMemo(() => networks.find((n) => n.key === network), [networks, network]);
 
   return (
-    <div className='w-[50vw] max-w-[560px] min-w-[320px] flex flex-col gap-5 h-full'>
-      <div className='flex items-center gap-2 justify-between text-xl font-bold'>
+    <div className='flex h-full w-[50vw] max-w-[560px] min-w-[320px] flex-col gap-5'>
+      <div className='flex items-center justify-between gap-2 text-xl font-bold'>
         {isRestore ? (
-          <span className='flex-1 inline-flex items-center gap-2'>
+          <span className='inline-flex flex-1 items-center gap-2'>
             <Avatar
               disableAnimation
               style={{ width: 20, height: 20, background: 'transparent' }}
@@ -169,7 +171,7 @@ function Batch({
         {isRestore ? (
           <>
             <Button key='close-restore' isIconOnly color='default' variant='light' onPress={toggleRestore}>
-              <IconClose className='w-5 h-5' />
+              <IconClose className='h-5 w-5' />
             </Button>
           </>
         ) : (
@@ -181,7 +183,7 @@ function Batch({
             <InputNetwork
               isIconOnly
               placeholder=' '
-              className='max-w-[60px] text-small'
+              className='text-small max-w-[60px]'
               contentClassName='min-h-[32px] h-[32px]'
               radius='full'
               network={network}

@@ -44,17 +44,17 @@ function ProgressItem({
   );
 
   return (
-    <div className='flex flex-col gap-[5px] p-[5px] w-full bg-primary/5 rounded-md'>
+    <div className='bg-primary/5 flex w-full flex-col gap-[5px] rounded-md p-[5px]'>
       <AddressCell showType withCopy withAddressBook shorten value={address} />
       <div
         data-visible={
           account?.type == 'multisig' ||
           (account?.type === 'pure' && account.delegatees.length === 1 && account.delegatees[0].type === 'multisig')
         }
-        className='overflow-hidden rounded-[1px] relative mx-9 h-[2px] bg-primary/10 data-[visible=false]:hidden'
+        className='bg-primary/10 relative mx-9 h-[2px] overflow-hidden rounded-[1px] data-[visible=false]:hidden'
       >
         <div
-          className='rounded-[1px] absolute left-0 top-0 bottom-0 bg-primary'
+          className='bg-primary absolute top-0 bottom-0 left-0 rounded-[1px]'
           style={{
             width: `${(counts / threshold) * 100}%`
           }}
@@ -80,7 +80,7 @@ function MultisigContent({
   return (
     <>
       <div className='flex items-center justify-between'>
-        <p className='font-bold flex-1'>Confirmations</p>
+        <p className='flex-1 font-bold'>Confirmations</p>
         {button}
       </div>
 
@@ -129,7 +129,7 @@ function ProxyContent({
   return (
     <>
       <div className='flex items-center justify-between'>
-        <p className='font-bold flex-1'>Proxy</p>
+        <p className='flex-1 font-bold'>Proxy</p>
         {button}
       </div>
 
@@ -159,7 +159,7 @@ function ProposeContent({ transaction }: { transaction: ProposeTransaction }) {
       <div className='flex items-center justify-between font-bold'>Proposer</div>
 
       <Content>
-        <div className='flex flex-col gap-[5px] p-[5px] w-full bg-primary/5 rounded-md'>
+        <div className='bg-primary/5 flex w-full flex-col gap-[5px] rounded-md p-[5px]'>
           <AddressCell showType withCopy withAddressBook shorten value={transaction.proposer} />
         </div>
       </Content>
@@ -187,12 +187,12 @@ function AnnounceContent({
     transaction.status === TransactionStatus.Pending ? (
       <div className='space-y-2.5'>
         <div className='flex items-center justify-between'>
-          <p className='font-bold flex-1'>Review Time</p>
+          <p className='flex-1 font-bold'>Review Time</p>
         </div>
-        <div className='overflow-hidden rounded-[2px] relative h-[4px] bg-primary/10'>
+        <div className='bg-primary/10 relative h-[4px] overflow-hidden rounded-[2px]'>
           <div
             data-left={!!leftTime}
-            className='rounded-[2px] absolute left-0 top-0 bottom-0 data-[left=true]:bg-primary data-[left=false]:bg-success'
+            className='data-[left=true]:bg-primary data-[left=false]:bg-success absolute top-0 bottom-0 left-0 rounded-[2px]'
             style={{
               width: `${(currentBlock > endBlock ? 1 : (currentBlock - startBlock) / (endBlock - startBlock)) * 100}%`
             }}
@@ -205,13 +205,13 @@ function AnnounceContent({
         </div>
 
         <div className='flex items-center justify-between'>
-          <p className='font-bold flex-1'>Proxy</p>
+          <p className='flex-1 font-bold'>Proxy</p>
           {button}
         </div>
       </div>
     ) : (
       <div className='flex items-center justify-between'>
-        <p className='font-bold flex-1'>Proxy</p>
+        <p className='flex-1 font-bold'>Proxy</p>
         {button}
       </div>
     );
@@ -244,8 +244,8 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
   const filterPaths = useFilterPaths(account, transaction);
 
   return (
-    <div className={'bg-primary/5 rounded-medium min-w-[280px] p-5 space-y-2.5 '.concat(props.className || '')}>
-      <p className='font-bold text-primary'>Progress</p>
+    <div className={'bg-primary/5 rounded-medium min-w-[280px] space-y-2.5 p-5'.concat(props.className || '')}>
+      <p className='text-primary font-bold'>Progress</p>
       <Divider className='bg-primary/5' />
 
       {transaction.type === TransactionType.Multisig ? (
@@ -295,7 +295,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           <div className='font-bold'>Executor</div>
 
           <Content>
-            <div className='flex flex-col gap-[5px] p-[5px] w-full bg-primary/5 rounded-md'>
+            <div className='bg-primary/5 flex w-full flex-col gap-[5px] rounded-md p-[5px]'>
               <AddressCell showType withCopy withAddressBook shorten value={transaction.exector} />
             </div>
           </Content>

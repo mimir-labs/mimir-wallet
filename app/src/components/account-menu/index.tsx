@@ -106,7 +106,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
         )
       );
       setIsSearching(true);
-      service
+      service.account
         .getOmniChainDetails(keywords)
         .then((data) => {
           setSearchAccount(data);
@@ -161,16 +161,16 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
     >
       <DrawerContent className='max-w-[320px] sm:max-w-[400px]'>
         <DrawerHeader className='flex-col'>
-          <h3 className='flex sm:none justify-between items-center mb-2.5'>Menu</h3>
+          <h3 className='sm:none mb-2.5 flex items-center justify-between'>Menu</h3>
 
           <Search onChange={setKeywords} isSearching={isSearching} value={keywords} />
         </DrawerHeader>
 
         <DrawerBody className='scrollbar-hide'>
-          <div className='space-y-2.5 w-full text-tiny sm:text-small'>
+          <div className='text-tiny sm:text-small w-full space-y-2.5'>
             {searchAccount && (
               <>
-                <div className='flex-1 flex items-center gap-1'>
+                <div className='flex flex-1 items-center gap-1'>
                   <IconGlobal className='opacity-60' />
                   Searched Account
                 </div>
@@ -203,7 +203,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
             {visiblePinnedAccounts.length > 0 && (
               <>
                 <div className='flex items-center gap-1'>
-                  <IconPin className='opacity-60 w-4 h-4' />
+                  <IconPin className='h-4 w-4 opacity-60' />
                   Pinned Wallet
                 </div>
 
@@ -221,7 +221,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
             {grouped.mimir.length > 0 && (
               <>
-                <div className='cursor-pointer flex items-center gap-1' {...pressProps}>
+                <div className='flex cursor-pointer items-center gap-1' {...pressProps}>
                   <IconUnion className='opacity-60' />
                   <span className='flex-1'>Mimir Wallet</span>
                   <Button
@@ -268,7 +268,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
             {!keywordsIsPolkadotAddress && (
               <div className='flex items-center gap-1'>
-                <span className='flex-1 flex items-center gap-1'>
+                <span className='flex flex-1 items-center gap-1'>
                   <IconWatch className='opacity-60' />
                   Watchlist
                 </span>

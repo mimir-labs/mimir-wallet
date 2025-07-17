@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BatchTxItem } from '@/hooks/types';
+import type { Registry } from '@polkadot/types/types';
 
 import Drag from '@/assets/images/drag.svg';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
@@ -14,13 +15,13 @@ import { CSS } from '@dnd-kit/utilities';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox, Tooltip } from '@mimir-wallet/ui';
 
 export type Props = BatchTxItem & {
   from: string;
   index: number;
   selected: (number | string)[];
+  registry: Registry;
   onSelected: (state: boolean) => void;
   onDelete: () => void;
   onCopy: () => void;
@@ -33,20 +34,28 @@ function BatchItemDrag({
   iconUrl,
   appName,
   id,
+  registry,
   index,
   selected,
   onSelected,
   onDelete,
   onCopy
 }: Props) {
-  const { api } = useApi();
   const [isOpen, toggleOpen] = useToggle(false);
 
   const call = useMemo(() => {
-    return api.createType('Call', calldata);
-  }, [api, calldata]);
+    try {
+      return registry.createType('Call', calldata);
+    } catch {
+      return null;
+    }
+  }, [registry, calldata]);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+  if (!call) {
+    return null;
+  }
 
   const style = {
     transform: CSS.Transform.toString(transform ? { ...transform, scaleY: transform.scaleX } : null),
@@ -63,7 +72,7 @@ function BatchItemDrag({
       data-dragging={isDragging}
       className='bg-secondary data-[dragging=true]:bg-primary-50 rounded-medium overflow-hidden'
     >
-      <div className='grid grid-cols-6 cursor-pointer h-[44px] px-2 sm:px-3 text-small' onClick={toggleOpen}>
+      <div className='text-small grid h-[44px] cursor-pointer grid-cols-6 px-2 sm:px-3' onClick={toggleOpen}>
         <div className='col-span-1 flex items-center' onClick={(e) => e.stopPropagation()}>
           <img {...listeners} src={Drag} style={{ cursor: 'grab', padding: 10, marginLeft: -10, userSelect: 'none' }} />
           <Checkbox
@@ -82,14 +91,14 @@ function BatchItemDrag({
         </div>
 
         <div className='col-span-2 flex items-center'>
-          <CallDisplayDetail fallbackWithName registry={api.registry} call={call} />
+          <CallDisplayDetail fallbackWithName registry={registry} call={call} />
         </div>
 
-        <div className='col-span-1 flex justify-between items-center'>
+        <div className='col-span-1 flex items-center justify-between'>
           <div className='flex items-center gap-1'>
             <Tooltip content='Copy'>
               <Button isIconOnly variant='light' onPress={onCopy} size='sm' color='primary'>
-                <IconCopy style={{ width: 14, height: 14 }} />
+                <IconCopy style={{ width: '1em', height: '1em' }} />
               </Button>
             </Tooltip>
             <Tooltip content='Delete'>
@@ -113,8 +122,8 @@ function BatchItemDrag({
       </div>
 
       {isOpen ? (
-        <div className='flex flex-col justify-between gap-2 sm:gap-3 p-2 sm:p-3 ml-2 sm:ml-3 mb-2 sm:mb-3 mr-2 sm:mr-3 bg-content1 rounded-medium overflow-hidden'>
-          <Call jsonFallback from={from} call={call} registry={api.registry} />
+        <div className='bg-content1 rounded-medium mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
+          <Call jsonFallback from={from} call={call} registry={registry} />
         </div>
       ) : null}
     </div>

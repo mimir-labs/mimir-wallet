@@ -25,7 +25,7 @@ const EMPTY_SIMULATION = {
 
 function ChangeItem({ amount, children }: { amount: bigint; children: React.ReactNode }) {
   return (
-    <div className='flex justify-between items-center gap-2.5 bg-secondary rounded-medium p-2.5 mt-2'>
+    <div className='bg-secondary rounded-medium mt-2 flex items-center justify-between gap-2.5 p-2.5'>
       <b className='text-small'>{amount > 0n ? 'Receive' : 'Send'}</b>
       {amount > 0 ? (
         <svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8' fill='none'>
@@ -154,7 +154,7 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
             Simulation
             {simulation.isDone ? (
               <Button isIconOnly variant='light' size='sm' onPress={handleSimulate}>
-                <IconArrowClockWise className='w-4 h-4' />
+                <IconArrowClockWise className='h-4 w-4' />
               </Button>
             ) : null}
           </span>
@@ -162,17 +162,17 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
         img={<b>polkadot-sdk</b>}
       >
         {simulation.isDone ? (
-          <div className='flex gap-1 items-center'>
+          <div className='flex items-center gap-1'>
             {simulation.success ? (
-              <IconSuccess className='text-success w-4 h-4' />
+              <IconSuccess className='text-success h-4 w-4' />
             ) : (
-              <IconFailed className='text-danger w-4 h-4' />
+              <IconFailed className='text-danger h-4 w-4' />
             )}
 
             <p
               data-success={simulation.success}
               data-error={simulation.error}
-              className='font-bold data-[success=true]:text-success data-[error]:text-danger'
+              className='data-[success=true]:text-success data-[error]:text-danger font-bold'
             >
               {simulation.success ? 'Success' : simulation.error || 'Unknown Error'}
             </p>

@@ -85,7 +85,7 @@ function NetworkSetting() {
   const chain = networks.find((item) => item.key === network);
 
   return (
-    <div className='flex flex-col gap-5 p-5 bg-content1 shadow-medium rounded-large'>
+    <div className='bg-content1 shadow-medium rounded-large flex flex-col gap-5 p-5'>
       <InputNetwork showAllNetworks label='Select Network' network={network} setNetwork={setNetwork} />
 
       {chain && <Content key={chain.key} chain={chain} />}

@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
@@ -45,22 +46,24 @@ function TemplateItem({
   call,
   onDelete,
   onEditName,
-  onView
+  onView,
+  registry
 }: {
   name: string;
   call: HexString;
+  registry: Registry;
   onDelete: () => void;
   onEditName: (name: string) => void;
   onView: (name: string, call: HexString) => void;
 }) {
-  const { api, network } = useApi();
+  const { network } = useApi();
   const [section, setSection] = useState<string | undefined>(undefined);
   const [method, setMethod] = useState<string | undefined>(undefined);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
 
   useEffect(() => {
-    const result = decodeCallSection(api.registry, call);
+    const result = decodeCallSection(registry, call);
 
     if (!result) return;
 
@@ -68,11 +71,11 @@ function TemplateItem({
 
     setSection(section);
     setMethod(method);
-  }, [api.registry, call]);
+  }, [registry, call]);
 
   return (
-    <div className='pl-2 sm:pl-3 h-[40px] rounded-medium bg-secondary grid grid-cols-12 gap-2'>
-      <div className='flex items-center col-span-4'>
+    <div className='rounded-medium bg-secondary grid h-[40px] grid-cols-12 gap-2 pl-2 sm:pl-3'>
+      <div className='col-span-4 flex items-center'>
         {isEditing ? (
           <input
             autoFocus
@@ -81,7 +84,7 @@ function TemplateItem({
               setIsEditing(false);
             }}
             onChange={(e) => setEditName(e.target.value)}
-            className='flex-auto flex-shrink-0 border-none outline-none p-0 bg-transparent w-0 font-inherit'
+            className='font-inherit w-0 flex-auto flex-shrink-0 border-none bg-transparent p-0 outline-none'
             defaultValue={name}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -105,11 +108,11 @@ function TemplateItem({
         </Button>
       </div>
 
-      <div className='flex items-center justify-between col-span-8'>
+      <div className='col-span-8 flex items-center justify-between'>
         <div className='flex items-center'>
           <Link as='button' color='foreground' onPress={() => onView(name, call)}>
             <Tooltip content={`${section}.${method}`} closeDelay={0} color='foreground'>
-              <span className='text-ellipsis max-w-[110px] sm:max-w-[130px] overflow-hidden underline'>
+              <span className='max-w-[110px] overflow-hidden text-ellipsis underline sm:max-w-[130px]'>
                 {section}.{method}
               </span>
             </Tooltip>

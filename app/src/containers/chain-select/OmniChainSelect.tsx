@@ -71,7 +71,7 @@ function GroupedEndpoints({
 
   return (
     <div>
-      <div className='flex items-center justify-between text-primary capitalize pl-2.5 mb-2.5 font-bold text-medium'>
+      <div className='text-primary text-medium mb-2.5 flex items-center justify-between pl-2.5 font-bold capitalize'>
         {group}
 
         <Switch
@@ -86,50 +86,49 @@ function GroupedEndpoints({
           }}
         />
       </div>
-      <div className='grid grid-cols-1 sm:grid-cols-2 gap-2.5'>
-        {endpoints.map((endpoint) => (
-          <Button
-            key={endpoint.key}
-            fullWidth
-            variant='light'
-            radius='sm'
-            color='secondary'
-            size='lg'
-            className='justify-start text-foreground shadow-none text-left p-2.5 h-[52px] font-bold rounded-medium'
-            style={{
-              background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
-            }}
-            startContent={<Status network={endpoint} />}
-            endContent={
-              <div className='flex items-center gap-2'>
-                {peopleNetworks.includes(endpoint.key) && (
-                  <Tooltip
-                    classNames={{ content: 'max-w-[320px]' }}
-                    content='To correctly display your identity, People chain is connected.'
-                    closeDelay={0}
-                  >
-                    <IconQuestion />
-                  </Tooltip>
-                )}
+      <div className='grid grid-cols-1 gap-2.5 sm:grid-cols-2'>
+        {endpoints.map((endpoint) => {
+          return (
+            <Button
+              key={endpoint.key}
+              fullWidth
+              variant='light'
+              radius='sm'
+              color='secondary'
+              size='lg'
+              className='text-foreground rounded-medium bg-divider-300/30 h-[52px] justify-start p-2.5 text-left font-bold shadow-none'
+              startContent={<Status network={endpoint} />}
+              endContent={
+                <div className='flex items-center gap-2'>
+                  {peopleNetworks.includes(endpoint.key) && (
+                    <Tooltip
+                      classNames={{ content: 'max-w-[320px]' }}
+                      content='To correctly display your identity, People chain is connected.'
+                      closeDelay={0}
+                    >
+                      <IconQuestion />
+                    </Tooltip>
+                  )}
 
-                <Switch
-                  size='sm'
-                  isSelected={endpoint.enabled}
-                  onValueChange={(state) => {
-                    if (state) {
-                      enableNetworks([endpoint.key]);
-                    } else {
-                      disableNetworks([endpoint.key]);
-                    }
-                  }}
-                />
-              </div>
-            }
-            onPress={endpoint.enabled ? () => disableNetworks([endpoint.key]) : () => enableNetworks([endpoint.key])}
-          >
-            <span className='flex-1'>{endpoint.name}</span>
-          </Button>
-        ))}
+                  <Switch
+                    size='sm'
+                    isSelected={endpoint.enabled}
+                    onValueChange={(state) => {
+                      if (state) {
+                        enableNetworks([endpoint.key]);
+                      } else {
+                        disableNetworks([endpoint.key]);
+                      }
+                    }}
+                  />
+                </div>
+              }
+              onPress={endpoint.enabled ? () => disableNetworks([endpoint.key]) : () => enableNetworks([endpoint.key])}
+            >
+              <span className='flex-1'>{endpoint.name}</span>
+            </Button>
+          );
+        })}
       </div>
     </div>
   );
@@ -141,7 +140,7 @@ function OmniChainSelect() {
 
   const enabledNetworks = useMemo(() => networks.filter((network) => network.enabled), [networks]);
   const groupedEndpoints = useMemo(() => {
-    const groupedEndpoints = networks.reduce(
+    const list = networks.reduce(
       (acc, network) => {
         if (network.isRelayChain) {
           acc[network.key] = [network, ...(acc[network.key] || [])];
@@ -156,7 +155,7 @@ function OmniChainSelect() {
       {} as Record<string, Network[]>
     );
 
-    return groupedEndpoints;
+    return list;
   }, [networks]);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -179,17 +178,17 @@ function OmniChainSelect() {
                           src={enabledNetworks[0].icon}
                         />
                         <Avatar
-                          className='bg-transparent select-none ml-[-10px]'
+                          className='ml-[-10px] bg-transparent select-none'
                           style={{ width: 20, height: 20 }}
                           src={enabledNetworks[1].icon}
                         />
                         <Avatar
-                          className='bg-transparent select-none ml-[-10px]'
+                          className='ml-[-10px] bg-transparent select-none'
                           style={{ width: 20, height: 20 }}
                           src={enabledNetworks[2].icon}
                         />
                         <Avatar
-                          className='bg-transparent select-none ml-[-10px] bg-primary border-1 border-divider-300'
+                          className='bg-primary border-divider-300 ml-[-10px] border-1 select-none'
                           style={{ width: 20, height: 20 }}
                           showFallback
                           fallback={
@@ -230,7 +229,7 @@ function OmniChainSelect() {
             endContent={isApiReady ? <ArrowDown className='hidden sm:block' /> : null}
             color='default'
             variant='bordered'
-            className='border-secondary h-[32px] sm:h-[42px] px-2.5 sm:px-3 text-primary sm:text-foreground gap-1 sm:gap-2 bg-secondary sm:bg-transparent'
+            className='border-secondary text-primary sm:text-foreground bg-secondary h-[32px] gap-1 px-2.5 sm:h-[42px] sm:gap-2 sm:bg-transparent sm:px-3'
             radius='md'
             onPress={() => setIsOpen(!isOpen)}
           >
@@ -248,8 +247,8 @@ function OmniChainSelect() {
         </div>
       </PopoverTrigger>
       <PopoverContent className='p-2.5'>
-        <ScrollShadow hideScrollBar isEnabled={false} className='max-h-[80dvh] max-w-[90vw] w-[610px]'>
-          <div className='flex flex-row-reverse mb-5'>
+        <ScrollShadow hideScrollBar isEnabled={false} className='max-h-[80dvh] w-[610px] max-w-[90vw]'>
+          <div className='mb-5 flex flex-row-reverse'>
             <Button as={Link} href='/setting' variant='ghost' color='primary' onPress={() => setIsOpen(false)}>
               Customize RPC
             </Button>

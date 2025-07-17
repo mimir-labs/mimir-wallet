@@ -38,7 +38,12 @@ function SubmitPure({
       beforeSend={
         proxy
           ? async (extrinsic) => {
-              await service.prepareMultisig(network, u8aToHex(decodeAddress(proxy)), extrinsic.hash.toHex(), name);
+              await service.multisig.prepareMultisig(
+                network,
+                u8aToHex(decodeAddress(proxy)),
+                extrinsic.hash.toHex(),
+                name
+              );
             }
           : undefined
       }

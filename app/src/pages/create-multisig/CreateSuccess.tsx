@@ -26,22 +26,22 @@ function CreateSuccess({ isOpen, onClose, address }: Props) {
     <Modal size='md' isOpen={isOpen} hideCloseButton closeButton={false}>
       <ModalContent>
         <ModalBody className='flex flex-col items-center gap-5 py-10'>
-          <div className='bg-primary rounded-[30px] flex items-center justify-center w-[120px] h-[120px]'>
+          <div className='bg-primary flex h-[120px] w-[120px] items-center justify-center rounded-[30px]'>
             <img src='/images/congrats.png' className='w-20' />
           </div>
 
-          <h4 className='font-extrabold text-xl'>Your Account was successfully created!</h4>
+          <h4 className='text-xl font-extrabold'>Your Account was successfully created!</h4>
 
           <Divider />
 
-          <div className='flex self-stretch items-center gap-2.5 bg-secondary rounded-medium p-2.5'>
-            <div className='w-[8px] h-[8px] rounded-full bg-success' />
+          <div className='bg-secondary rounded-medium flex items-center gap-2.5 self-stretch p-2.5'>
+            <div className='bg-success h-[8px] w-[8px] rounded-full' />
             <AddressCell withCopy shorten={false} value={address} />
           </div>
 
           {meta.delegatees?.map((delegatee, index) => (
-            <div key={index} className='flex self-stretch items-center gap-2.5 bg-secondary rounded-medium p-2.5'>
-              <div className='w-[8px] h-[8px] rounded-full bg-success' />
+            <div key={index} className='bg-secondary rounded-medium flex items-center gap-2.5 self-stretch p-2.5'>
+              <div className='bg-success h-[8px] w-[8px] rounded-full' />
               <AddressCell withCopy shorten={false} value={delegatee} />
             </div>
           ))}

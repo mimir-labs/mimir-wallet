@@ -152,7 +152,7 @@ function TxSubmit({
   useCloseWhenPathChange(onClose);
 
   return (
-    <div className='w-full p-4 sm:p-5 flex flex-col gap-5 h-[calc(100dvh-60px)]'>
+    <div className='flex h-[calc(100dvh-60px)] w-full flex-col gap-5 p-4 sm:p-5'>
       <div className='flex items-center justify-between'>
         <h4>Submit Transaction</h4>
         <Button
@@ -164,14 +164,14 @@ function TxSubmit({
             onReject?.();
           }}
         >
-          <IconClose className='w-4 h-4' />
+          <IconClose className='h-4 w-4' />
         </Button>
       </div>
 
       {alert && <Alert className='flex-grow-0' color='warning' title={alert} />}
 
-      <div className='flex-1 w-full p-0 md:p-5 flex flex-col md:flex-row gap-5 overflow-y-auto bg-transparent md:bg-content1 rounded-large shadow-none md:shadow-medium'>
-        <div className='w-full md:w-[60%] p-4 md:p-0 space-y-5 shadow-medium md:shadow-none bg-content1 md:bg-transparent rounded-large'>
+      <div className='md:bg-content1 rounded-large md:shadow-medium flex w-full flex-1 flex-col gap-5 overflow-y-auto bg-transparent p-0 shadow-none md:flex-row md:p-5'>
+        <div className='shadow-medium bg-content1 rounded-large w-full space-y-5 p-4 md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
           <Sender address={accountData.address} />
 
           <AppInfo
@@ -191,7 +191,7 @@ function TxSubmit({
           <SafetyCheck isTxBundleLoading={buildTx.isLoading} txError={buildTx.error} safetyCheck={safetyCheck} />
         </div>
 
-        <div className='sticky top-0 self-start w-full flex flex-col md:w-[40%] h-auto p-4 sm:p-5 shadow-medium rounded-large bg-content1 gap-y-5'>
+        <div className='shadow-medium rounded-large bg-content1 sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start p-4 sm:p-5 md:w-[40%]'>
           {hasPermission && filterPaths.length > 0 && (
             <>
               <AddressChain

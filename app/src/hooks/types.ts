@@ -127,6 +127,7 @@ type BaseTransaction = {
   members?: string[];
   delegate?: string;
   proposer?: string;
+  isDiscarded?: boolean;
   children: Transaction[];
 };
 

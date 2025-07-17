@@ -30,7 +30,7 @@ function Hash({ value, withCopy, withExplorer }: Props) {
   return (
     <C
       data-link={!!explorerLink}
-      className='flex gap-1 items-center no-underline text-inherit text-[length:inherit] data-[link="true"]:hover:underline'
+      className='flex items-center gap-1 text-[length:inherit] text-inherit no-underline data-[link="true"]:hover:underline'
       href={explorerLink}
       target='_blank'
     >
@@ -43,9 +43,9 @@ function Hash({ value, withCopy, withExplorer }: Props) {
             isIconOnly
             size='sm'
             variant='light'
-            className='w-5 h-5 min-w-[0px] min-h-[0px] opacity-50'
+            className='h-5 min-h-[0px] w-5 min-w-[0px] opacity-50'
           >
-            <IconLink className='w-4 h-4' />
+            <IconLink className='h-4 w-4' />
           </Button>
         )}
       </>

@@ -26,6 +26,7 @@ export { useNetworks } from './useNetworks.js';
 export { allEndpoints, remoteProxyRelations } from './config.js';
 
 export * from './utils.js';
+export * from './registry.js';
 
 export { default as ApiRoot } from './ApiRoot.js';
 export { default as SubApiRoot } from './SubApiRoot.js';

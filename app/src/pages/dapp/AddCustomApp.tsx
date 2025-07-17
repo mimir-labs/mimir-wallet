@@ -104,15 +104,15 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           {error && <Alert color='danger' title={error?.message} />}
 
           {findApp && (
-            <div className='p-5 flex items-center gap-5 shadow-medium border-1 border-secondary rounded-medium'>
-              <Avatar src={findApp.icon} className='flex-shrink-0 w-[50px] h-[50px] bg-transparent' radius='none' />
+            <div className='shadow-medium border-secondary rounded-medium flex items-center gap-5 border-1 p-5'>
+              <Avatar src={findApp.icon} className='h-[50px] w-[50px] flex-shrink-0 bg-transparent' radius='none' />
               <div>
                 <div className='flex items-center gap-2'>
                   <div
                     ref={editRef}
                     suppressContentEditableWarning
                     contentEditable
-                    className='font-bold text-medium outline-none'
+                    className='text-medium font-bold outline-none'
                     onInput={(e) => setFindApp({ ...findApp, name: e.currentTarget.textContent || '' })}
                   >
                     {edit}
@@ -129,7 +129,7 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                     <IconEdit />
                   </Button>
                 </div>
-                <p className='mt-[5px] text-tiny text-foreground/50'>{findApp.description}</p>
+                <p className='text-tiny text-foreground/50 mt-[5px]'>{findApp.description}</p>
               </div>
             </div>
           )}

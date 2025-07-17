@@ -63,53 +63,53 @@ class ErrorPage extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     const componentStack = this.state.errorInfo?.componentStack;
 
     return (
-      <div className='fixed inset-0 w-full h-full bg-gradient-to-b from-background to-background/95 flex flex-col items-center justify-center p-6 z-50 overflow-auto'>
-        <div className='w-full max-w-3xl mx-auto'>
-          <div className='text-center mb-8'>
-            <div className='inline-flex items-center justify-center w-24 h-24 rounded-full bg-danger/10 mb-6'>
-              <IconFailedFill className='w-12 h-12 text-danger' />
+      <div className='from-background to-background/95 fixed inset-0 z-50 flex h-full w-full flex-col items-center justify-center overflow-auto bg-gradient-to-b p-6'>
+        <div className='mx-auto w-full max-w-3xl'>
+          <div className='mb-8 text-center'>
+            <div className='bg-danger/10 mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full'>
+              <IconFailedFill className='text-danger h-12 w-12' />
             </div>
-            <h1 className='text-4xl font-bold text-foreground mb-3'>Something went wrong</h1>
-            <h2 className='text-xl font-medium text-foreground/80 mb-4'>{errorName}</h2>
-            <p className='mt-3 text-foreground/60 max-w-xl mx-auto bg-foreground/5 p-4 rounded-medium border border-foreground/10'>
+            <h1 className='text-foreground mb-3 text-4xl font-bold'>Something went wrong</h1>
+            <h2 className='text-foreground/80 mb-4 text-xl font-medium'>{errorName}</h2>
+            <p className='text-foreground/60 bg-foreground/5 rounded-medium border-foreground/10 mx-auto mt-3 max-w-xl border p-4'>
               {errorMessage}
             </p>
           </div>
 
-          <div className='bg-background border border-foreground/10 rounded-large shadow-medium overflow-hidden'>
+          <div className='bg-background border-foreground/10 rounded-large shadow-medium overflow-hidden border'>
             <div className='p-6'>
-              <h3 className='text-lg font-semibold mb-4 flex items-center text-foreground/80'>
-                <span className='flex items-center justify-center w-8 h-8 rounded-full bg-foreground/5 mr-3'>
-                  <IconFailedFill className='w-4 h-4 text-danger' />
+              <h3 className='text-foreground/80 mb-4 flex items-center text-lg font-semibold'>
+                <span className='bg-foreground/5 mr-3 flex h-8 w-8 items-center justify-center rounded-full'>
+                  <IconFailedFill className='text-danger h-4 w-4' />
                 </span>
                 Error Details
               </h3>
 
-              <details className='mt-4 group' open>
-                <summary className='cursor-pointer select-none font-medium text-sm hover:opacity-80 transition-opacity p-3 bg-foreground/5 rounded-medium flex items-center justify-between'>
+              <details className='group mt-4' open>
+                <summary className='bg-foreground/5 rounded-medium flex cursor-pointer items-center justify-between p-3 text-sm font-medium transition-opacity select-none hover:opacity-80'>
                   <span className='inline-flex items-center'>Show stack trace</span>
-                  <ArrowDown className='w-4 h-4 transform transition-transform group-open:rotate-180' />
+                  <ArrowDown className='h-4 w-4 transform transition-transform group-open:rotate-180' />
                 </summary>
-                <div className='mt-3 overflow-auto max-h-80 font-mono p-4 bg-foreground/5 rounded-medium whitespace-pre-wrap text-sm break-all border border-foreground/10'>
+                <div className='bg-foreground/5 rounded-medium border-foreground/10 mt-3 max-h-80 overflow-auto border p-4 font-mono text-sm break-all whitespace-pre-wrap'>
                   {errorStack || 'Stack trace not available'}
                 </div>
               </details>
 
               {componentStack && (
-                <details className='mt-4 group' open>
-                  <summary className='cursor-pointer select-none font-medium text-sm hover:opacity-80 transition-opacity p-3 bg-foreground/5 rounded-medium flex items-center justify-between'>
+                <details className='group mt-4' open>
+                  <summary className='bg-foreground/5 rounded-medium flex cursor-pointer items-center justify-between p-3 text-sm font-medium transition-opacity select-none hover:opacity-80'>
                     <span className='inline-flex items-center'>Show component stack</span>
-                    <ArrowDown className='w-4 h-4 transform transition-transform group-open:rotate-180' />
+                    <ArrowDown className='h-4 w-4 transform transition-transform group-open:rotate-180' />
                   </summary>
-                  <div className='mt-3 overflow-auto max-h-80 font-mono p-4 bg-foreground/5 rounded-medium whitespace-pre-wrap text-sm break-all border border-foreground/10'>
+                  <div className='bg-foreground/5 rounded-medium border-foreground/10 mt-3 max-h-80 overflow-auto border p-4 font-mono text-sm break-all whitespace-pre-wrap'>
                     {componentStack}
                   </div>
                 </details>
               )}
 
-              <div className='mt-8 flex flex-col sm:flex-row justify-center gap-4'>
+              <div className='mt-8 flex flex-col justify-center gap-4 sm:flex-row'>
                 <Button color='primary' size='lg' variant='bordered' onPress={() => (window.location.href = '/')}>
-                  <IconHome className='w-5 h-5' />
+                  <IconHome className='h-5 w-5' />
                   Go Home
                 </Button>
                 <Button
@@ -118,14 +118,14 @@ class ErrorPage extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                   variant='solid'
                   onPress={() => window.location.replace(window.location.href)}
                 >
-                  <IconRefresh className='w-5 h-5' />
+                  <IconRefresh className='h-5 w-5' />
                   Refresh Page
                 </Button>
               </div>
             </div>
 
-            <div className='bg-foreground/5 p-5 text-center border-t border-foreground/10'>
-              <p className='text-sm text-foreground/60'>
+            <div className='bg-foreground/5 border-foreground/10 border-t p-5 text-center'>
+              <p className='text-foreground/60 text-sm'>
                 If this error persists, please contact support or try again later.
               </p>
             </div>

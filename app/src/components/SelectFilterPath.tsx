@@ -21,7 +21,7 @@ interface Props {
 
 function FilterPathCell({ filterPath }: { filterPath: FilterPath }) {
   return (
-    <div className='w-full flex justify-between items-center gap-1'>
+    <div className='flex w-full items-center justify-between gap-1'>
       <AddressCell className='flex-1' value={filterPath.address} withCopy showType addressCopyDisabled />
       {filterPath.type !== 'origin' && (
         <Chip
@@ -36,7 +36,7 @@ function FilterPathCell({ filterPath }: { filterPath: FilterPath }) {
           }
           size='sm'
           data-type={filterPath.type}
-          className='data-[type=proxy]:bg-[#B700FF]/5 data-[type=proxy]:text-[#B700FF] data-[type=proposer]:bg-[#00A19C]/5 data-[type=proposer]:text-[#00A19C]'
+          className='data-[type=proposer]:bg-[#00A19C]/5 data-[type=proposer]:text-[#00A19C] data-[type=proxy]:bg-[#B700FF]/5 data-[type=proxy]:text-[#B700FF]'
         >
           {filterPath.type === 'multisig'
             ? 'AsMulti'
@@ -51,7 +51,7 @@ function FilterPathCell({ filterPath }: { filterPath: FilterPath }) {
         <Chip color='secondary' size='sm'>
           {
             <div className='flex items-center gap-1'>
-              {!!filterPath.delay && <IconClock className='w-3 h-3' />}
+              {!!filterPath.delay && <IconClock className='h-3 w-3' />}
               {filterPath.proxyType}
             </div>
           }
@@ -91,7 +91,7 @@ function SelectFilterPath({ label, filterPaths, value, onChange }: Props) {
       style={{ width: wrapperRef.current?.clientWidth }}
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
-      <Listbox color='secondary' emptyContent='no addresses' className='max-h-[250px] overflow-y-auto text-foreground'>
+      <Listbox color='secondary' emptyContent='no addresses' className='text-foreground max-h-[250px] overflow-y-auto'>
         {filterPaths.map((item) => (
           <ListboxItem
             key={item.id}
@@ -108,11 +108,11 @@ function SelectFilterPath({ label, filterPaths, value, onChange }: Props) {
   return (
     <>
       <div className='w-full space-y-2 data-[disabled=true]:pointer-events-none'>
-        {label && <div className='font-bold text-small'>{label}</div>}
+        {label && <div className='text-small font-bold'>{label}</div>}
 
         <div
           ref={wrapperRef}
-          className='cursor-pointer relative w-full inline-flex tap-highlight-transparent px-2 border-medium min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-14 py-2 shadow-none border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent'
+          className='tap-highlight-transparent border-medium rounded-medium border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none'
           onClick={handleOpen}
         >
           <FilterPathCell filterPath={value} />

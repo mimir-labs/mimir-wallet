@@ -52,7 +52,7 @@ function SoloChainSelect() {
             color='primary'
             variant='bordered'
             radius='md'
-            className='border-secondary font-bold h-[32px] sm:h-[42px] bg-secondary sm:bg-transparent'
+            className='border-secondary bg-secondary h-[32px] font-bold sm:h-[42px] sm:bg-transparent'
           >
             <div className='hidden sm:block'>{!isApiReady ? 'Connecting...' : endpoint?.name}</div>
             <div className='block sm:hidden'>
@@ -69,10 +69,10 @@ function SoloChainSelect() {
             <div className='space-y-2.5'>
               {Object.keys(groupedEndpoints).map((group) => (
                 <div key={`group-${group}`}>
-                  <h6 color='primary.main' className='text-primary capitalize pl-2.5 mb-[5px] sm:mb-2.5'>
+                  <h6 color='primary.main' className='text-primary mb-[5px] pl-2.5 capitalize sm:mb-2.5'>
                     {group}
                   </h6>
-                  <div className='grid grid-cols-2 sm:grid-cols-3 gap-[5px] sm:gap-2.5'>
+                  <div className='grid grid-cols-2 gap-[5px] sm:grid-cols-3 sm:gap-2.5'>
                     {groupedEndpoints[group].map((endpoint) => (
                       <Button
                         key={endpoint.key}
@@ -81,7 +81,7 @@ function SoloChainSelect() {
                         radius='sm'
                         color='secondary'
                         data-selected={network === endpoint.key}
-                        className='justify-start text-foreground font-normal shadow-none text-left px-2.5 data-[selected=true]:bg-secondary data-[hover=true]:bg-secondary'
+                        className='text-foreground data-[selected=true]:bg-secondary data-[hover=true]:bg-secondary justify-start px-2.5 text-left font-normal shadow-none'
                         onPress={() => {
                           if ((account && account.type === 'pure') || !current) {
                             window.location.href = `${window.location.origin}?network=${endpoint.key}`;
@@ -90,7 +90,7 @@ function SoloChainSelect() {
                           }
                         }}
                       >
-                        <img src={endpoint.icon} className='w-5 rounded-small mr-2.5' />
+                        <img src={endpoint.icon} className='rounded-small mr-2.5 w-5' />
                         {endpoint.name}
                       </Button>
                     ))}

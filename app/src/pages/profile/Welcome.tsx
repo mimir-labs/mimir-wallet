@@ -60,7 +60,7 @@ function AccountItem({ address }: { address: string }) {
 
   return (
     <div
-      className='cursor-pointer px-2.5 py-[5px] rounded-medium border-1 border-primary/5 bg-secondary flex items-center justify-between'
+      className='rounded-medium border-primary/5 bg-secondary flex cursor-pointer items-center justify-between border-1 px-2.5 py-[5px]'
       key={`multisig-searched`}
       {...pressProps}
     >
@@ -108,7 +108,7 @@ function Accounts({
         )
       );
       setIsSearching(true);
-      service
+      service.account
         .getOmniChainDetails(keywords)
         .then((data) => {
           setSearchAccount(data);
@@ -124,7 +124,7 @@ function Accounts({
 
   if (!isConnected) {
     return (
-      <div className='w-full p-5 bg-content1 shadow-medium rounded-large space-y-4'>
+      <div className='bg-content1 shadow-medium rounded-large w-full space-y-4 p-5'>
         <h3 className='font-extrabold'>Your Account</h3>
 
         <Divider />
@@ -137,9 +137,9 @@ function Accounts({
   }
 
   return (
-    <div className='w-full p-5 bg-content1 shadow-medium rounded-large space-y-4'>
+    <div className='bg-content1 shadow-medium rounded-large w-full space-y-4 p-5'>
       <div className='flex items-center justify-between gap-2.5'>
-        <h3 className='font-extrabold flex-1'>Your Account</h3>
+        <h3 className='flex-1 font-extrabold'>Your Account</h3>
         <Button as={Link} size='sm' href='/create-multisig' color='primary' variant='ghost'>
           Create Multisig
         </Button>
@@ -182,11 +182,11 @@ function ExampleAccount() {
   const [exampleAccounts, setExampleAccounts] = useState<string[]>(nextExampleAccount());
 
   return (
-    <div className='w-full p-5 bg-content1 shadow-medium rounded-large space-y-4'>
+    <div className='bg-content1 shadow-medium rounded-large w-full space-y-4 p-5'>
       <div className='flex items-center'>
         <h3 className='font-extrabold'>Example Account</h3>
         <Button isIconOnly color='default' variant='light' onPress={() => setExampleAccounts(nextExampleAccount())}>
-          <IconArrowClockWise className='w-4 h-4' />
+          <IconArrowClockWise className='h-4 w-4' />
         </Button>
       </div>
 
@@ -211,7 +211,7 @@ function Welcome() {
 
   return (
     <div
-      className='h-[100dvh] relative overflow-y-auto'
+      className='relative h-[100dvh] overflow-y-auto'
       style={{
         backgroundImage: 'url(/images/welcome-bg.svg)',
         backgroundSize: '115% 115%',
@@ -220,19 +220,19 @@ function Welcome() {
       }}
     >
       <div
-        className='sticky top-0 left-0 right-0 z-10'
+        className='sticky top-0 right-0 left-0 z-10'
         style={{
           height: 22,
           background: 'linear-gradient(90deg, #2700FF 0%, #0094FF 100%)'
         }}
       />
 
-      <div className='flex flex-col justify-center items-center gap-5 my-10 mx-auto w-full max-w-[520px]'>
+      <div className='mx-auto my-10 flex w-full max-w-[520px] flex-col items-center justify-center gap-5'>
         <img className='hidden sm:block' alt='Mimir' src={Logo} style={{ width: 137 }} />
 
         <div className='text-center'>
           <h3 className='text-[26px]'>Start your ultimate </h3>
-          <h1 className='text-[40px] font-[900] text-primary'>OMNI multisig journey</h1>
+          <h1 className='text-primary text-[40px] font-[900]'>OMNI multisig journey</h1>
         </div>
 
         <Input
@@ -243,7 +243,7 @@ function Welcome() {
             inputWrapper: 'bg-content1 shadow-medium'
           }}
           radius='full'
-          endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider-300 w-4 h-4' />}
+          endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider-300 h-4 w-4' />}
           onChange={setKeywords}
           placeholder='Please input address'
           value={keywords}

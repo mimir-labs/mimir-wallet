@@ -102,16 +102,19 @@ function Content({ address }: { address: string }) {
 
   return (
     <div className='space-y-5'>
-      <div className='flex items-center justify-between'>
-        <Tabs
-          color='primary'
-          aria-label='Transaction'
-          selectedKey={type}
-          onSelectionChange={(key) => setType(key.toString())}
-        >
-          <Tab key='pending' title='Pending' />
-          <Tab key='history' title='History' />
-        </Tabs>
+      <div className='flex items-center justify-between gap-2'>
+        <div className='flex-1'>
+          <Tabs
+            color='primary'
+            aria-label='Transaction'
+            selectedKey={type}
+            onSelectionChange={(key) => setType(key.toString())}
+          >
+            <Tab key='pending' title='Pending' />
+            <Tab key='history' title='History' />
+          </Tabs>
+        </div>
+
         {type === 'pending' &&
           validPendingNetworks.length > 0 &&
           (validPendingNetworks.length > 1 ? (
@@ -122,8 +125,8 @@ function Content({ address }: { address: string }) {
                   variant='bordered'
                   color='default'
                   className='border-divider-300 h-8'
-                  startContent={<Avatar src={selectedPendingNetwork?.chain.icon} className='w-4 h-4 bg-transparent' />}
-                  endContent={<ArrowDown className='w-4 h-4' />}
+                  startContent={<Avatar src={selectedPendingNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />}
+                  endContent={<ArrowDown className='h-4 w-4' />}
                 >
                   {selectedPendingNetworks.length > 1 ? (
                     <>
@@ -134,7 +137,7 @@ function Content({ address }: { address: string }) {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className='w-[200px] rounded-medium p-1'>
+              <PopoverContent className='rounded-medium w-[200px] p-1'>
                 <Listbox
                   disallowEmptySelection
                   selectedKeys={selectedPendingNetworks}
@@ -150,14 +153,14 @@ function Content({ address }: { address: string }) {
                   {validPendingNetworks.map(({ network, chain, counts }) => (
                     <ListboxItem
                       key={network}
-                      startContent={<Avatar src={chain.icon} className='w-4 h-4 bg-transparent' />}
-                      className='h-8 data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground'
+                      startContent={<Avatar src={chain.icon} className='h-4 w-4 bg-transparent' />}
+                      className='data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground h-8'
                       classNames={{
                         selectedIcon: 'w-auto h-auto'
                       }}
                       selectedIcon={(props) => (
                         <Checkbox
-                          className='p-0 pointer-events-none'
+                          className='pointer-events-none p-0'
                           size='sm'
                           isSelected={props.isSelected}
                           isDisabled={props.isDisabled}
@@ -176,7 +179,7 @@ function Content({ address }: { address: string }) {
               variant='bordered'
               color='default'
               className='border-divider-300 h-8'
-              startContent={<Avatar src={validPendingNetworks[0].chain.icon} className='w-4 h-4 bg-transparent' />}
+              startContent={<Avatar src={validPendingNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />}
             >
               {validPendingNetworks[0].chain.name}({validPendingNetworks[0].counts})
             </Button>
@@ -191,13 +194,13 @@ function Content({ address }: { address: string }) {
                   variant='bordered'
                   color='default'
                   className='border-divider-300 h-8'
-                  startContent={<Avatar src={selectedHistoryNetwork?.chain.icon} className='w-4 h-4 bg-transparent' />}
-                  endContent={<ArrowDown className='w-4 h-4' />}
+                  startContent={<Avatar src={selectedHistoryNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />}
+                  endContent={<ArrowDown className='h-4 w-4' />}
                 >
                   {selectedHistoryNetwork?.chain.name}({selectedHistoryNetwork?.counts})
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className='w-[200px] rounded-medium p-1'>
+              <PopoverContent className='rounded-medium w-[200px] p-1'>
                 <Listbox
                   disallowEmptySelection
                   selectedKeys={selectedHistoryNetworks}
@@ -213,8 +216,8 @@ function Content({ address }: { address: string }) {
                   {validHistoryNetworks.map(({ network, chain, counts }) => (
                     <ListboxItem
                       key={network}
-                      className='h-8 data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground'
-                      startContent={<Avatar src={chain.icon} className='w-4 h-4 bg-transparent' />}
+                      className='data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground h-8'
+                      startContent={<Avatar src={chain.icon} className='h-4 w-4 bg-transparent' />}
                     >
                       {chain.name}({counts})
                     </ListboxItem>
@@ -228,7 +231,7 @@ function Content({ address }: { address: string }) {
               variant='bordered'
               color='default'
               className='border-divider-300 h-8'
-              startContent={<Avatar src={validHistoryNetworks[0].chain.icon} className='w-4 h-4 bg-transparent' />}
+              startContent={<Avatar src={validHistoryNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />}
             >
               {validHistoryNetworks[0].chain.name}({validHistoryNetworks[0].counts})
             </Button>

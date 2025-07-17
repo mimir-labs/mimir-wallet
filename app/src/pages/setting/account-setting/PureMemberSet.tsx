@@ -24,7 +24,7 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
 
   return (
     <div>
-      <h6 className='inline-flex items-center gap-1 text-small text-foreground/50 mb-2.5'>
+      <h6 className='text-small text-foreground/50 mb-2.5 inline-flex items-center gap-1'>
         Multisig Information
         <Tooltip
           closeDelay={0}
@@ -34,10 +34,10 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
           <IconQuestion className='text-primary' />
         </Tooltip>
       </h6>
-      <div className='p-4 sm:p-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
+      <div className='rounded-large border-secondary bg-content1 shadow-medium border-1 p-4 sm:p-5'>
         {txs.length > 0 && (
           <div
-            className='text-primary cursor-pointer mb-5 font-bold'
+            className='text-primary mb-5 cursor-pointer font-bold'
             onClick={() => {
               navigate('/transactions');
             }}

@@ -47,7 +47,7 @@ function BatchButton() {
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <div className='flex items-center gap-2.5 p-5'>
-        <IconBatch className='w-[32px] h-[32px] text-primary' />
+        <IconBatch className='text-primary h-[32px] w-[32px]' />
         <span>New transaction has been added to Batch</span>
       </div>
     </FreeSoloPopover>
@@ -70,13 +70,13 @@ function BatchButton() {
           <Button
             isIconOnly
             ref={anchorEl}
-            className='border-secondary w-[32px] h-[32px] sm:w-[42px] sm:h-[42px] bg-secondary sm:bg-transparent'
+            className='border-secondary bg-secondary h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent'
             color='primary'
             variant='ghost'
             radius='md'
             onPress={toggleDrawerOpen}
           >
-            <IconBatch className='w-[16px] h-[16px] sm:w-[22px] sm:h-[22px]' />
+            <IconBatch className='h-[16px] w-[16px] sm:h-[22px] sm:w-[22px]' />
           </Button>
         </Tooltip>
       </Badge>
@@ -91,7 +91,7 @@ function BatchButton() {
         isOpen={isDrawerOpen}
         onClose={toggleDrawerOpen}
       >
-        <DrawerContent className='max-w-full w-auto py-5'>
+        <DrawerContent className='w-auto max-w-full py-5'>
           <DrawerBody>
             <Batch onClose={() => toggleDrawerOpen(false)} />
           </DrawerBody>

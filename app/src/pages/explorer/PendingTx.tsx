@@ -25,17 +25,17 @@ function PendingTx({ address, url }: Props) {
     <>
       <div
         data-expanded={expanded}
-        className='pointer-events-none fixed w-full h-full left-0 right-0 top-0 bottom-0 bg-black/15 opacity-0 data-[expanded=true]:opacity-100 transition-opacity'
+        className='pointer-events-none fixed top-0 right-0 bottom-0 left-0 h-full w-full bg-black/15 opacity-0 transition-opacity data-[expanded=true]:opacity-100'
         onClick={toggleExpand}
         style={{ pointerEvents: expanded ? 'auto' : 'none' }}
       />
 
       <div
         data-expanded={expanded}
-        className='fixed bottom-0 left-0 right-0 w-full h-[calc(50vh+60px)] bg-secondary translate-y-[50vh] transition-all data-[expanded=true]:translate-y-0'
+        className='bg-secondary fixed right-0 bottom-0 left-0 h-[calc(50vh+60px)] w-full translate-y-[50vh] transition-all data-[expanded=true]:translate-y-0'
       >
-        <div className='cursor-pointer flex items-center justify-between h-[60px] px-6' onClick={toggleExpand}>
-          <h6 data-expanded={expanded} className='font-bold text-medium text-secondary-foreground'>
+        <div className='flex h-[60px] cursor-pointer items-center justify-between px-6' onClick={toggleExpand}>
+          <h6 data-expanded={expanded} className='text-medium text-secondary-foreground font-bold'>
             {counts} Pending Transactions
           </h6>
           <Button
@@ -51,7 +51,7 @@ function PendingTx({ address, url }: Props) {
           </Button>
         </div>
 
-        <div className='h-[50vh] p-5 overflow-y-auto space-y-5'>
+        <div className='h-[50vh] space-y-5 overflow-y-auto p-5'>
           {txs.length > 0 ? (
             txs.map((item) => <TxCell address={address} defaultOpen={false} key={item.id} transaction={item} />)
           ) : (

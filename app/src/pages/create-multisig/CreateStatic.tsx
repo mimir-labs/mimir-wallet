@@ -30,7 +30,7 @@ async function createMultisig(
 ): Promise<Uint8Array> {
   const address = createKeyMulti(signatories, threshold);
 
-  await service.createMultisig(
+  await service.multisig.createMultisig(
     network,
     signatories.map((value) => addressToHex(value)),
     threshold,
@@ -60,7 +60,7 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
 
       await resync(mode === 'omni', network, chainSS58);
 
-      utm && (await service.utm(network, u8aToHex(address), utm));
+      utm && (await service.account.utm(network, u8aToHex(address), utm));
 
       const encodedAddress = encodeAddress(address, chainSS58);
 

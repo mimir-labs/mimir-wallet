@@ -100,7 +100,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
 
   return (
     <>
-      <div className='w-full max-w-[500px] mx-auto'>
+      <div className='mx-auto w-full max-w-[500px]'>
         <div className='flex items-center justify-between'>
           <Button onPress={prepare ? _onFlexibleCancel : () => navigate(-1)} variant='ghost'>
             {'<'} Back
@@ -111,7 +111,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
             </Button>
           )}
         </div>
-        <div className='p-4 sm:p-5 rounded-large mt-2.5 bg-content1 border-1 border-secondary shadow-medium'>
+        <div className='rounded-large bg-content1 border-secondary shadow-medium mt-2.5 border-1 p-4 sm:p-5'>
           {prepare ? (
             <CreateFlexible onCancel={_onFlexibleCancel} prepare={prepare} />
           ) : (
@@ -123,7 +123,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
               <Divider />
               <Input label='Name' onChange={setName} placeholder='input multisig account name' value={name} />
 
-              <div className='bg-secondary p-2.5 rounded-medium space-y-2.5'>
+              <div className='bg-secondary rounded-medium space-y-2.5 p-2.5'>
                 <AccountSelect
                   withSearch
                   scroll
@@ -137,11 +137,11 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                 {memberError && <div className='text-danger'>{memberError.message}</div>}
               </div>
 
-              <div className='bg-secondary p-2.5 rounded-medium space-y-2.5'>
+              <div className='bg-secondary rounded-medium space-y-2.5 p-2.5'>
                 <AccountSelect scroll={false} accounts={signatories} onClick={unselect} title='Members' type='delete' />
 
                 {threshold === 1 ? (
-                  <div className='flex items-center gap-1 text-foreground/50 text-tiny leading-[14px] h-[14px] max-h-[14px] font-normal'>
+                  <div className='text-foreground/50 text-tiny flex h-[14px] max-h-[14px] items-center gap-1 leading-[14px] font-normal'>
                     <IconInfo />
                     All members can initiate transactions.
                   </div>
@@ -160,7 +160,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                   <div className='font-bold'>Add Pure Proxy</div>
                   <Switch isSelected={flexible} onValueChange={(checked) => setFlexible(checked)} />
                 </div>
-                <p className='text-foreground/50 text-tiny font-normal mt-1'>
+                <p className='text-foreground/50 text-tiny mt-1 font-normal'>
                   Flexible Multisig allows you to change members and thresholds
                 </p>
               </div>
@@ -299,7 +299,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                     toggleOpen();
                   }
                 }}
-                className='flex items-center justify-between text-primary'
+                className='text-primary flex items-center justify-between'
               >
                 <AddressRow defaultName={item.name} withAddress withName value={item.pure} />
                 <p>

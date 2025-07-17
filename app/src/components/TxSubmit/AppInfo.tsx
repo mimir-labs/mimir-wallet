@@ -20,7 +20,7 @@ function AppInfo({
   return (
     <div>
       <span className='font-bold'>App</span>
-      <div className='flex bg-secondary rounded-small p-2.5 mt-2'>
+      <div className='bg-secondary rounded-small mt-2 flex p-2.5'>
         <AppName website={website} iconUrl={iconUrl} appName={appName} />
       </div>
     </div>

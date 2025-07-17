@@ -115,20 +115,20 @@ function AddProxy({
 
   return (
     <>
-      <div className='w-[500px] max-w-full mx-auto my-0'>
+      <div className='mx-auto my-0 w-[500px] max-w-full'>
         <div className='flex items-center justify-between'>
           <Button onPress={() => navigate(-1)} variant='ghost'>
             {'<'} Back
           </Button>
         </div>
-        <div className='p-4 sm:p-5 rounded-large mt-2.5 bg-content1 border-1 border-secondary shadow-medium'>
+        <div className='rounded-large bg-content1 border-secondary shadow-medium mt-2.5 border-1 p-4 sm:p-5'>
           <div className='space-y-5'>
             <div className='flex justify-between'>
               <h3>{pure ? 'Create New Pure Proxy' : 'Add Proxy'}</h3>
             </div>
             <Divider />
 
-            <div className='flex flex-col gap-2.5 items-center'>
+            <div className='flex flex-col items-center gap-2.5'>
               {pure ? (
                 <PureCell />
               ) : (
@@ -147,7 +147,7 @@ function AddProxy({
               )}
               <Tooltip content='Switch'>
                 <Button isIconOnly variant='light' onPress={swap} isDisabled={pure || proxyArgs.length > 0}>
-                  <IconTransfer className='w-4 h-4 rotate-90' />
+                  <IconTransfer className='h-4 w-4 rotate-90' />
                 </Button>
               </Tooltip>
               <InputAddress
@@ -287,7 +287,7 @@ function AddProxy({
 
             {!pure && existsProxies.length > 0 && (
               <div style={{ filter: 'grayscale(30%)' }}>
-                <p className='mb-2.5 font-bold text-foreground/65'>Existing Proxy</p>
+                <p className='text-foreground/65 mb-2.5 font-bold'>Existing Proxy</p>
 
                 {existsProxies.map((proxy, index) => (
                   <ProxyInfo

@@ -17,8 +17,8 @@ function CallDisplaySection({ section, method }: { section?: string; method?: st
     ].includes(`${section}.${method}`)
   ) {
     return (
-      <div className='flex gap-1 items-center'>
-        <IconSend className='w-4 h-4 text-primary' />
+      <div className='flex items-center gap-1'>
+        <IconSend className='text-primary h-4 w-4' />
         Transfer
       </div>
     );
@@ -36,8 +36,8 @@ function CallDisplaySection({ section, method }: { section?: string; method?: st
     ].includes(`${section}.${method}`)
   ) {
     return (
-      <div className='flex gap-1 items-center'>
-        <IconSend className='w-4 h-4 text-primary' />
+      <div className='flex items-center gap-1'>
+        <IconSend className='text-primary h-4 w-4' />
         Assets Transfer
       </div>
     );
@@ -45,8 +45,8 @@ function CallDisplaySection({ section, method }: { section?: string; method?: st
 
   if (['identity.setIdentity'].includes(`${section}.${method}`)) {
     return (
-      <div className='flex gap-1 items-center'>
-        <IconIdentity className='w-4 h-4 text-primary' />
+      <div className='flex items-center gap-1'>
+        <IconIdentity className='text-primary h-4 w-4' />
         Identity
       </div>
     );
@@ -54,8 +54,8 @@ function CallDisplaySection({ section, method }: { section?: string; method?: st
 
   if (['multisig.cancelAsMulti'].includes(`${section}.${method}`)) {
     return (
-      <div className='flex gap-1 items-center'>
-        <IconCancel className='w-4 h-4 text-danger' />
+      <div className='flex items-center gap-1'>
+        <IconCancel className='text-danger h-4 w-4' />
         Cancel
       </div>
     );

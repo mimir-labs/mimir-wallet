@@ -69,7 +69,7 @@ export function useSafetyCheck(call: IMethod) {
         message: 'This transaction is safe to execute.'
       });
     } else {
-      service.safetyCheck(network, call.toHex()).then((level) => {
+      service.chain.safetyCheck(network, call.toHex()).then((level) => {
         if (level.severity === 'none') {
           setConfirm(true);
         }

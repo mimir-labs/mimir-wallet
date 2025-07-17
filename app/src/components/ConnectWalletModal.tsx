@@ -21,10 +21,10 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
   return (
     <div
       data-connected={connectedWallets.includes(id)}
-      className='flex items-center justify-start gap-1 rounded-medium border-1 border-secondary p-2.5 bg-transparent data-[connected=true]:bg-secondary'
+      className='rounded-medium border-secondary data-[connected=true]:bg-secondary flex items-center justify-start gap-1 border-1 bg-transparent p-2.5'
     >
       <WalletIcon disabled={!isInstalled} id={id} style={{ width: 20, height: 20 }} />
-      <div className='flex-1 text-medium'>{name}</div>
+      <div className='text-medium flex-1'>{name}</div>
       {isInstalled ? (
         connectedWallets.includes(id) ? (
           <Button className='h-7' color='danger' onPress={() => disconnectWallet(id)} variant='flat'>
@@ -87,7 +87,7 @@ function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => v
         <ModalContent>
           <ModalHeader className='justify-center'>Connect Wallet</ModalHeader>
           <ModalBody>
-            <div className='grid grid-cols-2 sm:grid-cols-2 gap-x-5 gap-y-2.5'>
+            <div className='grid grid-cols-2 gap-x-5 gap-y-2.5 sm:grid-cols-2'>
               {sortedWalletConfig.map(([id, config]) => (
                 <WalletCell key={id} downloadUrl={config.downloadUrl} id={id} name={config.name} />
               ))}

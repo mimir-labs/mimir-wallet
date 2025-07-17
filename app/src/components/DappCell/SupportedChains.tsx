@@ -27,11 +27,12 @@ function SupportedChains({ app }: { app: DappOption }) {
       color='foreground'
       content={supportedNetworks.map((network) => network.name).join(', ')}
       closeDelay={0}
+      disableAnimation
     >
       <AvatarGroup max={3} renderCount={(count) => <p className='text-tiny text-foreground/50 !ms-1'>+{count}</p>}>
         {supportedNetworks.map((network, index) => (
           <Avatar
-            classNames={{ base: 'data-[hover=true]:transform-none' }}
+            classNames={{ base: 'data-[hover=true]:translate-none' }}
             style={{ width: 20, height: 20, backgroundColor: 'transparent', marginInlineStart: index ? -4 : 0 }}
             key={network.key}
             src={network.icon}

@@ -38,7 +38,9 @@ export async function sync(
     return;
   }
 
-  const data = await (isOmni ? service.omniChainOwnedBy(walletAccounts) : service.ownedBy(network, walletAccounts));
+  const data = await (isOmni
+    ? service.account.omniChainOwnedBy(walletAccounts)
+    : service.account.ownedBy(network, walletAccounts));
 
   data.forEach((item: AccountData) => {
     transformAccount(chainSS58, item);

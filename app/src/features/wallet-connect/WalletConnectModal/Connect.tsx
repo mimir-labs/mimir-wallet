@@ -21,7 +21,7 @@ function ConnectSession({ session }: { session: SessionTypes.Struct }) {
   const [showFallback, setShowFallback] = useState(false);
 
   return (
-    <div className='w-full flex items-center gap-2.5 p-2.5 border-1 border-[#d9d9d9]/50 rounded-medium'>
+    <div className='rounded-medium flex w-full items-center gap-2.5 border-1 border-[#d9d9d9]/50 p-2.5'>
       <Avatar
         showFallback={showFallback}
         fallback={<Avatar src='/images/wallet-connect.webp' alt='wallet connect' style={{ width: 30, height: 30 }} />}
@@ -31,7 +31,7 @@ function ConnectSession({ session }: { session: SessionTypes.Struct }) {
           setShowFallback(true);
         }}
       />
-      <p className='flex-1 text-small'>{session.peer.metadata.name}</p>
+      <p className='text-small flex-1'>{session.peer.metadata.name}</p>
       <Button radius='full' color='warning' size='sm' onPress={() => disconnect(session)} isLoading={state.loading}>
         Disconnect
       </Button>
@@ -70,9 +70,9 @@ function Connect({ sessions }: { sessions: SessionTypes.Struct[] }) {
   );
 
   return (
-    <div className='flex flex-col gap-5 items-center'>
+    <div className='flex flex-col items-center gap-5'>
       <Avatar src='/images/wallet-connect.webp' alt='wallet connect' style={{ width: 150, height: 150 }} />
-      <h4 className='font-bold text-xl'>Wallet Connect</h4>
+      <h4 className='text-xl font-bold'>Wallet Connect</h4>
       <Input
         value={uri}
         onChange={onInput}

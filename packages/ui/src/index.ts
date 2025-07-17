@@ -8,7 +8,6 @@ import { Autocomplete, AutocompleteItem } from '@heroui/autocomplete';
 import { Avatar, AvatarGroup } from '@heroui/avatar';
 import { Badge } from '@heroui/badge';
 import { Card, CardBody, CardFooter, CardHeader } from '@heroui/card';
-import { Divider } from '@heroui/divider';
 import { CircularProgress } from '@heroui/progress';
 import { ScrollShadow } from '@heroui/scroll-shadow';
 import { HeroUIProvider } from '@heroui/system';
@@ -30,7 +29,6 @@ export {
   HeroUIProvider,
   ScrollShadow,
   CircularProgress,
-  Divider,
   usePress,
   useFocus,
   useFocusable,
@@ -45,6 +43,7 @@ export { Checkbox, CheckboxGroup, CheckboxIcon } from './checkbox/index.js';
 export { default as Chip } from './chip/index.js';
 export { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from './modal/index.js';
 export { default as Alert } from './alert/index.js';
+export { Divider } from './divider/index.js';
 export { Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader } from './drawer/index.js';
 export { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from './dropdown/index.js';
 export { Input, type InputProps } from './input/index.js';

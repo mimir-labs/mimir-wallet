@@ -82,7 +82,7 @@ function MemberSet({
           pointerEvents: !pureAccount || disabled ? 'none' : undefined
         }}
       >
-        <div className='bg-secondary p-2.5 rounded-medium'>
+        <div className='bg-secondary rounded-medium p-2.5'>
           <AccountSelect
             withSearch
             scroll
@@ -94,7 +94,7 @@ function MemberSet({
           />
         </div>
 
-        <div className='bg-secondary p-2.5 rounded-medium'>
+        <div className='bg-secondary rounded-medium p-2.5'>
           <AccountSelect
             scroll={false}
             accounts={signatories}
@@ -120,7 +120,7 @@ function MemberSet({
               <li>
                 <span className='inline-flex items-center'>
                   You are trying to modify memebers on&nbsp;
-                  <Avatar src={chain.icon} className='w-4 h-4 bg-transparent' />
+                  <Avatar src={chain.icon} className='h-4 w-4 bg-transparent' />
                   &nbsp;
                   {chain.name}.
                 </span>
@@ -174,7 +174,7 @@ function MemberSet({
           }}
           website='mimir://internal/setup'
           beforeSend={() =>
-            service.createMultisig(
+            service.multisig.createMultisig(
               network,
               signatories.map((address) => u8aToHex(decodeAddress(address))),
               threshold,

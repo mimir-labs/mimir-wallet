@@ -48,24 +48,24 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
       <div className='font-bold'>Transaction Simulation</div>
       <Cell title='Simulation' img={<img src='/images/chopsticks.webp' alt='chopticks' className='h-[24px]' />}>
         {simulation.isDone ? (
-          <div className='flex gap-1 items-center'>
+          <div className='flex items-center gap-1'>
             {simulation.success ? (
-              <IconSuccess className='text-success w-4 h-4' />
+              <IconSuccess className='text-success h-4 w-4' />
             ) : (
-              <IconFailed className='text-danger w-4 h-4' />
+              <IconFailed className='text-danger h-4 w-4' />
             )}
 
             <div className='relative'>
               <p
                 data-success={simulation.success}
                 data-error={simulation.error}
-                className='font-bold data-[success=true]:text-success data-[error]:text-danger'
+                className='data-[success=true]:text-success data-[error]:text-danger font-bold'
               >
                 {simulation.success ? 'Success' : simulation.error || 'Unknown Error'}
               </p>
 
               <Button
-                className='absolute top-full right-0 p-0 min-w-0'
+                className='absolute top-full right-0 min-w-0 p-0'
                 variant='light'
                 onPress={() => {
                   const newWindow = window.open();

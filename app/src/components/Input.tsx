@@ -37,7 +37,7 @@ function Input({
   );
 
   return (
-    <div className={'flex items-center gap-2 '.concat(className)} style={{ paddingTop: label ? undefined : 0 }}>
+    <div className={'flex items-center gap-2'.concat(className)} style={{ paddingTop: label ? undefined : 0 }}>
       <BaseInput
         value={value}
         defaultValue={defaultValue}

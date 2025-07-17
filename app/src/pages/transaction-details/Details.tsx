@@ -18,7 +18,7 @@ function Item({ content, title }: { title?: React.ReactNode; content?: React.Rea
     <div className='space-y-[5px]'>
       <div className='font-bold'>{title}</div>
 
-      <div className='p-2.5 bg-secondary rounded-medium'>{content}</div>
+      <div className='bg-secondary rounded-medium p-2.5'>{content}</div>
     </div>
   );
 }
@@ -63,7 +63,7 @@ function Details({ transaction }: { transaction: Transaction }) {
   }, [api, transaction.call]);
 
   return (
-    <div className='space-y-2.5 bg-content1 border-1 border-secondary shadow-medium p-4 rounded-large'>
+    <div className='bg-content1 border-secondary shadow-medium rounded-large space-y-2.5 border-1 p-4'>
       <h6 className='text-primary'>Detail</h6>
       <Divider />
 

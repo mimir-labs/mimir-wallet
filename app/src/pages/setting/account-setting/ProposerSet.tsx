@@ -94,7 +94,7 @@ Genesis Hash: ${genesisHash}`;
         type: 'bytes'
       });
 
-      await service[type === 'add' ? 'addProposer' : 'removeProposer'](
+      await service.account[type === 'add' ? 'addProposer' : 'removeProposer'](
         network,
         account.address,
         proposer,

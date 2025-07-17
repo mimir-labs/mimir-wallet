@@ -35,40 +35,40 @@ function Item({
 
   const Top = (
     <div
-      className='cursor-pointer h-10 px-2 sm:px-3 text-tiny grid grid-cols-9 sm:grid-cols-12 md:grid-cols-9 lg:grid-cols-12 gap-1'
+      className='text-tiny grid h-10 cursor-pointer grid-cols-9 gap-1 px-2 sm:grid-cols-12 sm:px-3 md:grid-cols-9 lg:grid-cols-12'
       onClick={toggleOpen}
     >
-      <div className='flex col-span-1 items-center'>{index}</div>
-      <div style={ellipsisMixin()} className='flex col-span-4 items-center'>
+      <div className='col-span-1 flex items-center'>{index}</div>
+      <div style={ellipsisMixin()} className='col-span-4 flex items-center'>
         <CallDisplaySection section={action?.[0]} method={action?.[1]} />
       </div>
-      <div className='flex col-span-3 items-center'>
+      <div className='col-span-3 flex items-center'>
         <CallDisplayDetail registry={registry} call={call} />
       </div>
-      <div className='hidden sm:flex md:hidden lg:flex col-span-3 items-center'>
+      <div className='col-span-3 hidden items-center sm:flex md:hidden lg:flex'>
         <CallDisplayDetailMinor registry={registry} call={call} />
       </div>
-      <div className='flex col-span-1 items-center justify-end'>
+      <div className='col-span-1 flex items-center justify-end'>
         <Button
           isIconOnly
           size='sm'
           data-state={isOpen ? 'open' : 'closed'}
-          className='justify-self-end rotate-0 data-[state=open]:rotate-180 text-tiny transition-transform'
+          className='text-tiny rotate-0 justify-self-end transition-transform data-[state=open]:rotate-180'
           color='primary'
           variant='light'
           onPress={(e) => e.continuePropagation()}
         >
-          <ArrowDown className='w-4 h-4' />
+          <ArrowDown className='h-4 w-4' />
         </Button>
       </div>
     </div>
   );
 
   return (
-    <div className='rounded-medium overflow-hidden bg-secondary'>
+    <div className='rounded-medium bg-secondary overflow-hidden'>
       {Top}
       {isOpen && (
-        <div className='space-y-2 sm:space-y-3 mb-2 sm:mb-3 ml-2 sm:ml-3 mr-2 sm:mr-3 bg-content1 rounded-medium p-2 sm:p-3'>
+        <div className='bg-content1 rounded-medium mr-2 mb-2 ml-2 space-y-2 p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:space-y-3 sm:p-3'>
           <CallComp from={from} registry={registry} call={call} jsonFallback={jsonFallback} />
         </div>
       )}
@@ -87,7 +87,7 @@ function BatchCall({ from, registry, call, jsonFallback, ...props }: CallProps) 
 
   return (
     <div className='w-full space-y-2.5'>
-      <div className='flex items-center justify-between font-bold text-small'>
+      <div className='text-small flex items-center justify-between font-bold'>
         Actions
         <div>
           <Button

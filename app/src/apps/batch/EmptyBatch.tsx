@@ -12,7 +12,7 @@ function EmptyBatch({
   onHandleRestore?: () => void;
 }) {
   return (
-    <div className='flex flex-col justify-center items-center gap-5 h-full'>
+    <div className='flex h-full flex-col items-center justify-center gap-5'>
       <svg width='106' height='103' viewBox='0 0 106 103' fill='none'>
         <rect opacity='0.21' x='67.2568' y='0.853516' width='34' height='34' fill='#5F45FF' />
         <path

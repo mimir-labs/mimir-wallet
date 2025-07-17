@@ -27,12 +27,12 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
   return (
     <div
       data-reverse={reverse}
-      className='group address-cell inline-flex items-center sm:gap-x-2.5 gap-x-1 flex-grow-0 data-[reverse=true]:flex-row-reverse data-[reverse=true]:text-right'
+      className='group address-cell inline-flex flex-grow-0 items-center gap-x-1 data-[reverse=true]:flex-row-reverse data-[reverse=true]:text-right sm:gap-x-2.5'
       {...pressProps}
     >
       <IdentityIcon size={24} value={address} />
       <div className='flex flex-col'>
-        <div className='inline-flex items-center font-bold sm:text-sm leading-[16px] h-[16px] max-h-[16px] truncate max-w-[120px] gap-1 group-data-[reverse=true]:flex-row-reverse'>
+        <div className='inline-flex h-[16px] max-h-[16px] max-w-[120px] items-center gap-1 truncate leading-[16px] font-bold group-data-[reverse=true]:flex-row-reverse sm:text-sm'>
           <AddressName value={address} />
           {address && <CopyAddress address={address} size='sm' color='default' />}
         </div>
@@ -55,15 +55,15 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
   const [assetId, from, to, value, isAll] = results;
 
   return (
-    <div className='w-full flex items-center justify-between gap-2.5 sm:gap-5 md:gap-7'>
+    <div className='flex w-full items-center justify-between gap-2.5 sm:gap-5 md:gap-7'>
       <AddressDisplay reverse={false} address={from} />
-      <div className='relative flex-1 flex items-center text-foreground/50'>
-        <div className='w-1.5 h-1.5 rounded-[3px] bg-foreground/50' />
-        <div className='flex-1 border-t-1 border-dashed border-foreground/50' />
+      <div className='text-foreground/50 relative flex flex-1 items-center'>
+        <div className='bg-foreground/50 h-1.5 w-1.5 rounded-[3px]' />
+        <div className='border-foreground/50 flex-1 border-t-1 border-dashed' />
         <svg width='6' height='8' xmlns='http://www.w3.org/2000/svg' style={{ color: 'inherit' }}>
           <polygon points='0,0 6,4 0,8' fill='currentColor' />
         </svg>
-        <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 rounded-full border-1 border-primary/5 bg-secondary px-3 py-1 text-foreground text-small font-bold leading-[1]'>
+        <div className='border-primary/5 bg-secondary text-foreground text-small absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border-1 px-3 py-1 leading-[1] font-bold'>
           {assetId !== null ? (
             assetInfo ? (
               isAll ? (

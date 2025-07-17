@@ -55,44 +55,44 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       // You can render any custom fallback UI
       return (
         this.props.fallback || (
-          <div className='w-full max-w-3xl relative bg-content1 rounded-large shadow-small overflow-hidden border border-divider-300'>
+          <div className='bg-content1 rounded-large shadow-small border-divider-300 relative w-full max-w-3xl overflow-hidden border'>
             {/* Abstract graphic design element */}
-            <div className='absolute top-0 right-0 w-64 h-64 bg-danger-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl'></div>
-            <div className='absolute bottom-0 left-0 w-48 h-48 bg-danger-500/10 rounded-full translate-y-1/3 -translate-x-1/3 blur-3xl'></div>
+            <div className='bg-danger-500/10 absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl'></div>
+            <div className='bg-danger-500/10 absolute bottom-0 left-0 h-48 w-48 -translate-x-1/3 translate-y-1/3 rounded-full blur-3xl'></div>
 
             {/* Header */}
-            <div className='relative p-4 pb-6 border-b border-divider-300'>
-              <h2 className='text-2xl font-bold text-foreground'>Something went wrong</h2>
-              <p className='mt-2 text-foreground/80'>The application encountered an unexpected error({errorName})</p>
+            <div className='border-divider-300 relative border-b p-4 pb-6'>
+              <h2 className='text-foreground text-2xl font-bold'>Something went wrong</h2>
+              <p className='text-foreground/80 mt-2'>The application encountered an unexpected error({errorName})</p>
             </div>
 
             {/* Content */}
-            <div className='p-4 relative'>
+            <div className='relative p-4'>
               <div className='space-y-4'>
                 {/* Error Message */}
-                <div className='rounded-lg overflow-hidden border border-divider-300'>
-                  <div className='bg-danger-50 px-4 py-3 flex items-center'>
-                    <div className='w-1.5 h-1.5 bg-danger-500 rounded-full mr-2'></div>
-                    <h3 className='text-sm font-medium text-danger-700'>Error Message</h3>
+                <div className='border-divider-300 overflow-hidden rounded-lg border'>
+                  <div className='bg-danger-50 flex items-center px-4 py-3'>
+                    <div className='bg-danger-500 mr-2 h-1.5 w-1.5 rounded-full'></div>
+                    <h3 className='text-danger-700 text-sm font-medium'>Error Message</h3>
                   </div>
                   <div className='bg-content1 rounded-b-lg px-4 py-3'>
-                    <div className='font-mono text-tiny text-danger whitespace-pre-wrap break-words'>
+                    <div className='text-tiny text-danger font-mono break-words whitespace-pre-wrap'>
                       {errorMessage}
                     </div>
                   </div>
                 </div>
 
                 {/* Error stack */}
-                <details className='rounded-lg overflow-hidden group border border-divider-300' open>
-                  <summary className='bg-danger-50 px-4 py-3 flex items-center cursor-pointer'>
-                    <div className='w-1.5 h-1.5 bg-danger-500 rounded-full mr-2'></div>
-                    <h3 className='text-sm font-medium text-danger-700'>Stack Trace</h3>
+                <details className='group border-divider-300 overflow-hidden rounded-lg border' open>
+                  <summary className='bg-danger-50 flex cursor-pointer items-center px-4 py-3'>
+                    <div className='bg-danger-500 mr-2 h-1.5 w-1.5 rounded-full'></div>
+                    <h3 className='text-danger-700 text-sm font-medium'>Stack Trace</h3>
                     <div className='ml-auto'>
                       <ArrowDown className='text-danger transform transition-transform group-open:rotate-180' />
                     </div>
                   </summary>
                   <div className='bg-content1 rounded-b-lg'>
-                    <pre className='font-mono text-tiny text-danger p-4 overflow-x-auto whitespace-pre-wrap break-words max-h-64 overflow-y-auto'>
+                    <pre className='text-tiny text-danger max-h-64 overflow-x-auto overflow-y-auto p-4 font-mono break-words whitespace-pre-wrap'>
                       {errorStack || 'Stack trace not available'}
                     </pre>
                   </div>
@@ -100,16 +100,16 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
                 {/* Component Stack Trace */}
                 {componentStack && (
-                  <details className='rounded-lg overflow-hidden group border border-divider-300' open>
-                    <summary className='bg-danger-50 px-4 py-3 flex items-center cursor-pointer'>
-                      <div className='w-1.5 h-1.5 bg-danger-500 rounded-full mr-2'></div>
-                      <h3 className='text-sm font-medium text-danger-700'>Component Stack Trace</h3>
+                  <details className='group border-divider-300 overflow-hidden rounded-lg border' open>
+                    <summary className='bg-danger-50 flex cursor-pointer items-center px-4 py-3'>
+                      <div className='bg-danger-500 mr-2 h-1.5 w-1.5 rounded-full'></div>
+                      <h3 className='text-danger-700 text-sm font-medium'>Component Stack Trace</h3>
                       <div className='ml-auto'>
                         <ArrowDown className='text-danger transform transition-transform group-open:rotate-180' />
                       </div>
                     </summary>
                     <div className='bg-content1 rounded-b-lg'>
-                      <pre className='font-mono text-tiny text-danger p-4 overflow-x-auto whitespace-pre-wrap break-words max-h-64 overflow-y-auto'>
+                      <pre className='text-tiny text-danger max-h-64 overflow-x-auto overflow-y-auto p-4 font-mono break-words whitespace-pre-wrap'>
                         {componentStack}
                       </pre>
                     </div>

@@ -80,7 +80,6 @@ export const DotConsoleApp: DappOption<string[], (network: string) => URL> = {
     'people-kusama',
     'paseo',
     'assethub-paseo',
-    'westend',
     'assethub-westend'
   ],
   tags: ['Utility', 'Tool'],
@@ -99,7 +98,6 @@ export const DotConsoleApp: DappOption<string[], (network: string) => URL> = {
       'people-kusama': 'kusama-people',
       paseo: 'paseo',
       'assethub-paseo': 'paseo-asset-hub',
-      westend: 'westend',
       'assethub-westend': 'westend-asset-hub'
     }[network];
 
@@ -129,7 +127,6 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
     'hydration',
     'bifrost-kusama',
     'karura',
-    'westend',
     'assethub-westend',
     'paseo',
     'assethub-paseo',
@@ -154,7 +151,6 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
       hydration: 'https://hydration.subsquare.io/',
       'bifrost-kusama': 'https://bifrost-kusama.subsquare.io/',
       karura: 'https://karura.subsquare.io/',
-      westend: 'https://westend.subsquare.io/',
       'assethub-westend': 'https://westend.subsquare.io/assethub',
       paseo: 'https://paseo.subsquare.io/',
       'assethub-paseo': 'https://paseo.subsquare.io/assethub',

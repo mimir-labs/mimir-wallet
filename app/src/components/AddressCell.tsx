@@ -11,11 +11,12 @@ import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { addressEq, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Chip, usePress } from '@mimir-wallet/ui';
+import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Chip, usePress } from '@mimir-wallet/ui';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
+import AddressNetworks from './AddressNetworks';
 import CopyAddress from './CopyAddress';
 import IdentityIcon from './IdentityIcon';
 
@@ -54,9 +55,8 @@ function AddressCell({
 }: Props) {
   const { chainSS58 } = useApi();
   const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
-  const { meta: { isMultisig, isProxied, isPure, proxyNetworks, pureCreatedAt } = {} } = useAddressMeta(address);
+  const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const { networks } = useNetworks();
   const copyAddress = useCopyAddressToClipboard(address);
   const { pressProps } = usePress({
     onPressStart: (e) => {
@@ -73,14 +73,6 @@ function AddressCell({
     [transactionCounts]
   );
 
-  const addressNetworks = isPure
-    ? networks.filter((network) => network.genesisHash === pureCreatedAt)
-    : showNetworkProxied && isProxied
-      ? proxyNetworks
-        ? networks.filter((network) => proxyNetworks.includes(network.genesisHash))
-        : []
-      : [];
-
   const showTypeWidth = useMemo(() => {
     if (!showType && !withPendingTxCounts) return 0;
     let width = 0;
@@ -93,12 +85,12 @@ function AddressCell({
   }, [showType, withPendingTxCounts, isMultisig, isPure, isProxied, totalCounts]);
 
   return (
-    <div className={`AddressCell flex-1 flex items-center gap-2.5 min-w-0 ${className}`} style={style}>
+    <div className={`AddressCell flex min-w-0 flex-1 items-center gap-2.5 ${className}`} style={style}>
       <IdentityIcon className='AddressCell-Icon' size={iconSize} value={address} withBorder={withIconBorder} />
-      <div className='AddressCell-Content flex flex-col gap-y-[2px] min-w-0 flex-1'>
-        <div className='flex items-center gap-1 min-w-0 overflow-hidden'>
+      <div className='AddressCell-Content flex min-w-0 flex-1 flex-col gap-y-[2px]'>
+        <div className='flex min-w-0 items-center gap-1 overflow-hidden'>
           <span
-            className='AddressCell-Name min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-bold text-left'
+            className='AddressCell-Name min-w-0 overflow-hidden text-left font-bold text-ellipsis whitespace-nowrap'
             style={{
               maxWidth: showType && (isMultisig || isPure || isProxied) ? `calc(100% - ${showTypeWidth}px)` : '100%'
             }}
@@ -119,25 +111,22 @@ function AddressCell({
           )}
 
           {withPendingTxCounts && !!totalCounts && (
-            <div className='bg-[#FF8C00] text-[10px] w-4 h-4 rounded-full text-white flex items-center justify-center'>
+            <div className='flex h-4 w-4 items-center justify-center rounded-full bg-[#FF8C00] text-[10px] text-white'>
               {totalCounts}
             </div>
           )}
         </div>
 
-        <div className='AddressCell-Address text-foreground/50 h-[16px] flex items-center text-tiny min-w-0'>
-          {addressNetworks.map((network) => (
-            <Avatar
-              key={network.genesisHash}
-              style={{ marginRight: 4 }}
-              src={network.icon}
-              className='w-3 h-3 flex-shrink-0'
-            />
-          ))}
-          <span {...(addressCopyDisabled ? {} : pressProps)} className='truncate min-w-0'>
+        <div className='AddressCell-Address text-foreground/50 text-tiny flex h-[16px] min-w-0 items-center'>
+          {showNetworkProxied && (
+            <div className='mr-1 flex items-center gap-1'>
+              <AddressNetworks address={address} avatarSize={12} />
+            </div>
+          )}
+          <span {...(addressCopyDisabled ? {} : pressProps)} className='min-w-0 truncate'>
             <AddressComp shorten={shorten} value={address} />
           </span>
-          {withCopy && <CopyAddress size='sm' address={address} className='opacity-50 flex-shrink-0' />}
+          {withCopy && <CopyAddress size='sm' address={address} className='flex-shrink-0 opacity-50' />}
           {withAddressBook &&
             address &&
             !isLocalAccount(address) &&
@@ -151,9 +140,9 @@ function AddressCell({
                 }}
                 variant='light'
                 size='sm'
-                className='opacity-50 text-foreground/50 w-[18px] h-[18px] flex-shrink-0'
+                className='text-foreground/50 h-[18px] w-[18px] flex-shrink-0 opacity-50'
               >
-                <IconAddressBook className='w-3 h-3' />
+                <IconAddressBook className='h-3 w-3' />
               </Button>
             )}
           {icons && <div className='flex-shrink-0'>{icons}</div>}

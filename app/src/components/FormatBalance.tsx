@@ -14,9 +14,10 @@ interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanEle
   label?: React.ReactNode;
   value?: Compact<any> | BN | bigint | string | number | null;
   withCurrency?: boolean;
+  icon?: React.ReactNode;
 }
 
-function FormatBalance({ format, label, value, withCurrency, ...props }: Props): React.ReactElement<Props> {
+function FormatBalance({ format, label, value, withCurrency, icon, ...props }: Props): React.ReactElement<Props> {
   const { api } = useApi();
   const decimals = format?.[0] ?? api.registry.chainDecimals[0];
   const currency = format?.[1] ?? api.registry.chainTokens[0];
@@ -35,6 +36,7 @@ function FormatBalance({ format, label, value, withCurrency, ...props }: Props):
         {rest ? <span>.{rest}</span> : null}
         {unit || ''}
       </span>
+      {icon}
       <span>{withCurrency ? ` ${currency}` : ''}</span>
     </span>
   );

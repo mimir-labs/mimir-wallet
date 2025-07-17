@@ -15,7 +15,7 @@ function Sender({ address }: { address: string }) {
   return (
     <div>
       <p className='font-bold'>Sending From</p>
-      <div className='flex bg-secondary rounded-small p-2.5 mt-2'>
+      <div className='bg-secondary rounded-small mt-2 flex p-2.5'>
         <AddressCell value={address} withCopy shorten={!upMd} />
         <div className='flex items-center gap-1'>
           <Avatar src={chain.icon} alt={chain.name} style={{ width: 20, height: 20, background: 'transparent' }} />

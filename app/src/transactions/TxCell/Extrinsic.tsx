@@ -18,9 +18,9 @@ import Target from './Target';
 
 export function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
-    <div className='grid grid-cols-10 gap-2.5 w-full text-tiny'>
-      <div className='flex col-span-2 items-center font-bold'>{title}</div>
-      <div className='flex col-span-8 items-center font-bold text-foreground/65'>{content}</div>
+    <div className='text-tiny grid w-full grid-cols-10 gap-2.5'>
+      <div className='col-span-2 flex items-center font-bold'>{title}</div>
+      <div className='text-foreground/65 col-span-8 flex items-center font-bold'>{content}</div>
     </div>
   );
 }
@@ -65,7 +65,7 @@ function Extrinsic({
           />
         )}
 
-        <div className='font-bold text-primary cursor-pointer no-underline' onClick={toggleOpen}>
+        <div className='text-primary cursor-pointer font-bold no-underline' onClick={toggleOpen}>
           {isOpen ? 'Hide' : 'View'} Details
         </div>
 
@@ -85,8 +85,8 @@ function Extrinsic({
                       <Button
                         variant='ghost'
                         size='sm'
-                        endContent={<IconTemplate className='w-3.5 h-3.5' />}
-                        className='px-2.5 h-5 text-tiny'
+                        endContent={<IconTemplate className='h-3.5 w-3.5' />}
+                        className='text-tiny h-5 px-2.5'
                         onPress={() => events.emit('template_add', network, txCallHex)}
                       >
                         + Template

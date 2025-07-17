@@ -23,13 +23,14 @@ import {
 } from '@xyflow/react';
 import React, { useEffect } from 'react';
 
-import { addressToHex, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Chip } from '@mimir-wallet/ui';
+import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { Button, Chip } from '@mimir-wallet/ui';
 
 import Address from './Address';
 import AddressCell from './AddressCell';
 import AddressEdge from './AddressEdge';
 import AddressName from './AddressName';
+import AddressNetworks from './AddressNetworks';
 import CopyAddress from './CopyAddress';
 import IdentityIcon from './IdentityIcon';
 import { getLayoutedElements } from './utils';
@@ -60,34 +61,23 @@ const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
-  const { meta: { isProxied, isPure, proxyNetworks, pureCreatedAt, isMultisig } = {} } = useAddressMeta(
-    data.account.address
-  );
+  const { meta: { isProxied, isPure, isMultisig } = {} } = useAddressMeta(data.account.address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const { networks } = useNetworks();
-
-  const addressNetworks = isPure
-    ? networks.filter((network) => network.genesisHash === pureCreatedAt)
-    : isProxied
-      ? proxyNetworks
-        ? networks.filter((network) => proxyNetworks.includes(network.genesisHash))
-        : []
-      : [];
 
   const cell = data.isTop ? (
-    <div className='overflow-hidden relative w-[240px] p-2.5 bg-content1 rounded-medium border-1 border-primary/5 shadow-small'>
-      <div className='z-0 absolute top-0 left-0 w-full h-[30px] bg-secondary' />
-      <div className='z-10 flex flex-col items-center gap-[5px] w-full h-full'>
+    <div className='bg-content1 rounded-medium border-primary/5 shadow-small relative w-[240px] overflow-hidden border-1 p-2.5'>
+      <div className='bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full' />
+      <div className='z-10 flex h-full w-full flex-col items-center gap-[5px]'>
         <IdentityIcon value={data.account.address} size={40} />
 
         <h6>
           <AddressName value={data.account.address} />
         </h6>
 
-        <div className='text-foreground/50 h-[16px] flex items-center text-tiny whitespace-nowrap'>
-          {addressNetworks.map((network) => (
-            <Avatar key={network.genesisHash} style={{ marginRight: 4 }} src={network.icon} className='w-3 h-3' />
-          ))}
+        <div className='text-foreground/50 text-tiny flex h-[16px] items-center whitespace-nowrap'>
+          <div className='mr-1 flex items-center gap-1'>
+            <AddressNetworks address={data.account.address} avatarSize={12} />
+          </div>
           <span>
             <Address shorten value={data.account.address} />
           </span>
@@ -102,9 +92,9 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
               }}
               variant='light'
               size='sm'
-              className='opacity-50 text-foreground/50 w-[18px] h-[18px]'
+              className='text-foreground/50 h-[18px] w-[18px] opacity-50'
             >
-              <IconAddressBook className='w-3 h-3' />
+              <IconAddressBook className='h-3 w-3' />
             </Button>
           )}
 
@@ -113,7 +103,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
             variant='light'
             color='default'
             size='sm'
-            className='opacity-50 text-foreground/50 w-[18px] h-[18px]'
+            className='text-foreground/50 h-[18px] w-[18px] opacity-50'
             onPress={() => {
               window.open(`${window.location.origin}?address=${data.account.address}&tab=structure`, '_blank');
             }}
@@ -137,7 +127,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
       </div>
     </div>
   ) : (
-    <div className='overflow-hidden relative w-[240px] p-2.5 bg-content1 rounded-medium border-1 border-primary/5 shadow-small'>
+    <div className='bg-content1 rounded-medium border-primary/5 shadow-small relative w-[240px] overflow-hidden border-1 p-2.5'>
       <AddressCell
         value={data.account.address}
         withAddressBook
@@ -148,7 +138,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
             variant='light'
             color='default'
             size='sm'
-            className='opacity-50 text-foreground/50 w-[18px] h-[18px]'
+            className='text-foreground/50 h-[18px] w-[18px] opacity-50'
             onPress={() => {
               window.open(`${window.location.origin}?address=${data.account.address}&tab=structure`, '_blank');
             }}

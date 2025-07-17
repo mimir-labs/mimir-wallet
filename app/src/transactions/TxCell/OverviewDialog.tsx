@@ -23,7 +23,7 @@ function OverviewDialog({ account, transaction, onClose, open }: Props) {
       <ModalContent>
         <ModalHeader>Progress Overview</ModalHeader>
         <ModalBody className='pb-5'>
-          <div className='h-[50dvh] flex-auto rounded-medium border-1 border-divider-300'>
+          <div className='rounded-medium border-divider-300 h-[50dvh] flex-auto border-1'>
             {open && transaction.status < TransactionStatus.Success ? (
               <TxOverview
                 api={api}

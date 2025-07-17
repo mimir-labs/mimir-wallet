@@ -290,7 +290,7 @@ The package includes a Tailwind plugin for HeroUI:
 // tailwind.config.js
 module.exports = {
   plugins: [
-    require('@mimir-wallet/ui/hero-plugin')
+    require('@mimir-wallet/ui/hero')
   ]
 };
 ```
@@ -338,7 +338,7 @@ const customButton = button({
 │   ├── table/               # Table components
 │   ├── tabs/                # Tab components
 │   └── styles.css           # Global styles
-└── hero-plugin.js           # Tailwind plugin
+└── hero.js           # Tailwind plugin
 ```
 
 ## Best Practices

@@ -32,8 +32,8 @@ function WalletConnectExample() {
 
   return (
     <>
-      <div className='w-full flex items-center justify-between sm:flex-row flex-col p-5 gap-3 rounded-large border-1 border-secondary shadow-medium bg-background'>
-        <div className='flex-1 flex items-center gap-2.5'>
+      <div className='rounded-large border-secondary shadow-medium bg-background flex w-full flex-col items-center justify-between gap-3 border-1 p-5 sm:flex-row'>
+        <div className='flex flex-1 items-center gap-2.5'>
           <Avatar src='/images/wallet-connect.webp' style={{ width: 40, height: 40 }} className='flex-shrink-0' />
           <div>
             <div className='flex items-center gap-1.5'>
@@ -41,12 +41,12 @@ function WalletConnectExample() {
               {apps.map((app) => (
                 <Tooltip color='foreground' content={app.name} key={app.name}>
                   <Link href={app.url} isExternal>
-                    <img alt={app.name} src={app.icon} className='w-4 h-4 rounded-full' />
+                    <img alt={app.name} src={app.icon} className='h-4 w-4 rounded-full' />
                   </Link>
                 </Tooltip>
               ))}
             </div>
-            <p className='mt-1 text-tiny text-divider-300'>
+            <p className='text-tiny text-divider-300 mt-1'>
               Connect to any other Dapp supports wallet connect. And also you can connect to Mimir.
             </p>
           </div>
@@ -54,13 +54,13 @@ function WalletConnectExample() {
         <Button
           color='primary'
           endContent={
-            <div className='w-4 h-4 rounded-full bg-primary-foreground p-0.5 text-primary'>
+            <div className='bg-primary-foreground text-primary h-4 w-4 rounded-full p-0.5'>
               <IconWalletConnect style={{ width: 12, height: 12 }} />
             </div>
           }
           radius='full'
           onClick={toggleOpen}
-          className='sm:w-auto w-full'
+          className='w-full sm:w-auto'
         >
           Connect to Dapp
         </Button>

@@ -52,10 +52,10 @@ function AccountCell({
       color='secondary'
       size='md'
       data-selected={selected}
-      className='justify-between px-1 sm:px-2.5 py-1 text-foreground h-[50px] rounded-medium data-[selected=true]:bg-secondary'
+      className='text-foreground rounded-medium data-[selected=true]:bg-secondary h-[50px] justify-between px-1 py-1 sm:px-2.5'
     >
       <AddressCell
-        className='flex-1 min-w-0'
+        className='min-w-0 flex-1'
         withIconBorder
         shorten
         showType
@@ -63,7 +63,7 @@ function AccountCell({
         withCopy
         withAddressBook
         addressCopyDisabled
-        showNetworkProxied={isLocal}
+        showNetworkProxied
         withPendingTxCounts
       />
       <div className='text-tiny font-bold whitespace-nowrap'>
@@ -82,10 +82,10 @@ function AccountCell({
         <Popover radius='md'>
           <PopoverTrigger>
             <Button isIconOnly size='sm' variant='light' color='default'>
-              <IconMore className='w-4 h-4' />
+              <IconMore className='h-4 w-4' />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className='p-2.5 space-y-2.5 items-stretch'>
+          <PopoverContent className='items-stretch space-y-2.5 p-2.5'>
             {value &&
               isLocal && [
                 source ? null : (
@@ -95,7 +95,7 @@ function AccountCell({
                     radius='sm'
                     variant='light'
                     color='primary'
-                    className='justify-start text-foreground'
+                    className='text-foreground justify-start'
                     onPress={() => {
                       hideAccount(value);
                     }}
@@ -110,7 +110,7 @@ function AccountCell({
                   radius='sm'
                   variant='light'
                   color='primary'
-                  className='justify-start text-foreground'
+                  className='text-foreground justify-start'
                   onPress={onClose}
                   href={`/account-setting?address=${value}`}
                 >
@@ -122,7 +122,7 @@ function AccountCell({
                   radius='sm'
                   variant='light'
                   color='primary'
-                  className='justify-start text-foreground'
+                  className='text-foreground justify-start'
                   onPress={() => {
                     if (isPinned) {
                       removePinnedAccount(value);
@@ -142,7 +142,7 @@ function AccountCell({
                 radius='sm'
                 variant='light'
                 color='primary'
-                className='justify-start text-foreground'
+                className='text-foreground justify-start'
                 onPress={() => deleteAddress(value)}
               >
                 Delete
