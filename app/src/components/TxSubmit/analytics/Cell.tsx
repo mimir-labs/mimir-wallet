@@ -5,7 +5,7 @@ import React from 'react';
 
 function Cell({ title, children, img }: { img: React.ReactNode; title: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className='flex justify-between items-center gap-2.5 bg-secondary rounded-medium p-2.5 mt-2'>
+    <div className='bg-secondary rounded-medium mt-2 flex items-center justify-between gap-2.5 p-2.5'>
       <div className='flex-1'>
         <div className='font-bold'>{title}</div>
         <div className='flex items-center gap-2.5'>

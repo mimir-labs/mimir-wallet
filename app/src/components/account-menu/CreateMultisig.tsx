@@ -31,7 +31,7 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
             Create New
           </Button>
         </PopoverTrigger>
-        <PopoverContent className='p-2.5 space-y-2.5 items-stretch'>
+        <PopoverContent className='items-stretch space-y-2.5 p-2.5'>
           <Button
             as={Link}
             key='hide-0'

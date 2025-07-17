@@ -97,7 +97,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
       }
       data-cancelled={transaction && transaction.status === TransactionStatus.Cancelled}
       data-pending={transaction && transaction.status < TransactionStatus.Success}
-      className='w-4 h-4 data-[success=true]:text-success data-[failed=true]:text-danger data-[cancelled=true]:text-danger data-[pending=true]:text-warning'
+      className='data-[success=true]:text-success data-[failed=true]:text-danger data-[cancelled=true]:text-danger data-[pending=true]:text-warning h-4 w-4'
     />
   ) : null;
   const borderColor = transaction
@@ -134,7 +134,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
           boxShadow: source ? 'var(--heroui-box-shadow-small)' : undefined
         }}
       >
-        <div className='w-[220px] p-2.5 flex items-center justify-between px-2.5 py-[3px]'>
+        <div className='flex w-[220px] items-center justify-between p-2.5 px-2.5 py-[3px]'>
           <AddressCell value={data.account.address} withCopy />
           {icon}
         </div>

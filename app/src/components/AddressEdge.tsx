@@ -42,7 +42,7 @@ function AddressEdge({
       {data && data.tips && data.tips.length > 0 && (
         <EdgeLabelRenderer>
           <div
-            className='flex flex-col gap-[2px] p-[2px] rounded-medium min-w-[40px] text-[10px] font-bold'
+            className='rounded-medium flex min-w-[40px] flex-col gap-[2px] p-[2px] text-[10px] font-bold'
             style={{
               position: 'absolute',
               transform: `translate(-50%, -50%) translate(${targetX + 60}px, ${targetY}px)`,
@@ -53,8 +53,8 @@ function AddressEdge({
             }}
           >
             {data.tips.map((tip) => (
-              <div key={tip.label} className='flex items-center h-[16px] p-[2px] gap-[2px] bg-white rounded-full'>
-                {!!tip.delay && <IconClock className='w-3 h-3' />}
+              <div key={tip.label} className='flex h-[16px] items-center gap-[2px] rounded-full bg-white p-[2px]'>
+                {!!tip.delay && <IconClock className='h-3 w-3' />}
                 <div className='flex-1 text-center'>{tip.label}</div>
               </div>
             ))}

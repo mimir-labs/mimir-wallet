@@ -22,10 +22,18 @@ const CustomSelect = extendVariants(Select, {
     },
     color: {
       default: {
-        innerWrapper: 'border-divider-300 data-[hover=true]:bg-foreground-50 data-[hover=true]:border-foreground'
+        trigger: 'data-[hover=true]:bg-primary-50 data-[focus=true]:bg-primary-50 data-[open=true]:bg-primary-50',
+        innerWrapper:
+          'border-divider-300 data-[hover=true]:border-primary data-[focus=true]:border-primary data-[open=true]:border-primary',
+        listbox: 'data-[hover=true]:bg-primary-50',
+        popoverContent: 'data-[hover=true]:bg-primary-50'
       },
       primary: {
-        innerWrapper: 'border-divider-300 data-[hover=true]:bg-primary-50 data-[hover=true]:border-primary'
+        trigger: 'data-[hover=true]:bg-primary-50 data-[focus=true]:bg-primary-50 data-[open=true]:bg-primary-50',
+        innerWrapper:
+          'border-divider-300 data-[hover=true]:border-primary data-[focus=true]:border-primary data-[open=true]:border-primary',
+        listbox: 'data-[hover=true]:bg-primary-50',
+        popoverContent: 'data-[hover=true]:bg-primary-50'
       },
       success: {
         innerWrapper: 'border-divider-300 data-[hover=true]:bg-success-50 data-[hover=true]:border-success'
@@ -47,6 +55,7 @@ const CustomSelect = extendVariants(Select, {
     }
   },
   defaultVariants: {
+    color: 'default',
     selectorIcon: (
       <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'>
         <path

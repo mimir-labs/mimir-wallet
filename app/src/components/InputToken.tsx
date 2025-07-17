@@ -87,16 +87,16 @@ function InputToken({
 
   const element =
     !isFetched && isFetching ? (
-      <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
+      <div data-disabled={disabled} className='data-[disabled=true]:text-foreground/50 flex items-center gap-2.5'>
         <Spinner size='sm' />
         {isIconOnly ? null : <p className='text-foreground/50'>Fetching Assets...</p>}
       </div>
     ) : token ? (
-      <div data-disabled={disabled} className='flex items-center gap-2.5 data-[disabled=true]:text-foreground/50'>
+      <div data-disabled={disabled} className='data-[disabled=true]:text-foreground/50 flex items-center gap-2.5'>
         <Avatar
           alt={token.name}
           fallback={
-            <div className='bg-divider-300 w-[20px] h-[20px] flex items-center justify-center rounded-full text-content1 font-bold text-medium'>
+            <div className='bg-divider-300 text-content1 text-medium flex h-[20px] w-[20px] items-center justify-center rounded-full font-bold'>
               {token.symbol.slice(0, 1)}
             </div>
           }
@@ -124,7 +124,7 @@ function InputToken({
       style={{ width: wrapperRef.current?.clientWidth }}
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
-      <Listbox color='secondary' emptyContent='no networks' className='max-h-[250px] overflow-y-auto text-foreground'>
+      <Listbox color='secondary' emptyContent='no networks' className='text-foreground max-h-[250px] overflow-y-auto'>
         {options.map(({ icon, name, symbol, assetId, transferrable, decimals }) => (
           <ListboxItem
             key={assetId}
@@ -132,12 +132,12 @@ function InputToken({
               handleClose();
               setAssetId(assetId);
             }}
-            className='h-10 text-foreground data-[hover=true]:text-foreground'
+            className='text-foreground data-[hover=true]:text-foreground h-10'
             startContent={
               <Avatar
                 alt={name}
                 fallback={
-                  <div className='bg-divider-300 w-[20px] h-[20px] flex items-center justify-center rounded-full text-content1 font-bold text-medium'>
+                  <div className='bg-divider-300 text-content1 text-medium flex h-[20px] w-[20px] items-center justify-center rounded-full font-bold'>
                     {symbol.slice(0, 1)}
                   </div>
                 }
@@ -164,12 +164,12 @@ function InputToken({
           ` ${className || ''}`
         )}
       >
-        {label && <div className='font-bold text-small'>{label}</div>}
+        {label && <div className='text-small font-bold'>{label}</div>}
 
         <div
           ref={wrapperRef}
           className={twMerge([
-            'group cursor-pointer relative w-full inline-flex tap-highlight-transparent px-2 min-h-11 flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-11 py-2 shadow-none border-1 border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent',
+            'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-11 min-h-11 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none',
             radius === 'full'
               ? 'rounded-full'
               : radius === 'lg'
@@ -186,7 +186,7 @@ function InputToken({
 
           <ArrowDown
             data-open={isOpen}
-            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2 data-[open=true]:rotate-180 transition-transform duration-150'
+            className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
             style={{ color: 'inherit' }}
             {...pressProps}
           />

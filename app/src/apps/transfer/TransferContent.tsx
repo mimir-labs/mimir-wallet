@@ -150,7 +150,7 @@ function TransferContent({
           <div className='flex items-center justify-between'>
             Amount
             {!isSendingFetched ? (
-              <Skeleton className='w-[50px] h-[14px] rounded-small' />
+              <Skeleton className='rounded-small h-[14px] w-[50px]' />
             ) : (
               <span className='opacity-50'>
                 Balance: <FormatBalance format={format} value={sendingBalances} />
@@ -165,7 +165,7 @@ function TransferContent({
           <Button
             size='sm'
             variant='ghost'
-            className='rounded-small p-1.5 py-[1px] min-w-0'
+            className='rounded-small min-w-0 p-1.5 py-[1px]'
             onPress={() => {
               setAmount(
                 keepAlive

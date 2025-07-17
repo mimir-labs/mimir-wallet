@@ -23,14 +23,14 @@ function PendingTransactions({
 }) {
   const data = useMultichainPendingTransactions(networks, address, txId);
 
-  const transactions = useMemo(
-    () =>
-      data
-        .map((item) => item.data)
-        .flat()
-        .sort((a, b) => b.createdAt - a.createdAt),
-    [data]
-  );
+  const transactions = useMemo(() => {
+    const list = data
+      .map((item) => item.data)
+      .flat()
+      .sort((a, b) => b.createdAt - a.createdAt);
+
+    return list;
+  }, [data]);
 
   const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching && !item.isFetched);
 

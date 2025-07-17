@@ -24,11 +24,11 @@ interface Props {
 function Contents({ dapp }: { dapp: DappOption }) {
   return (
     <ModalBody>
-      <div className='space-y-2.5 relative overflow-hidden'>
-        <div className='absolute right-0 top-0 flex items-center'>
+      <div className='relative space-y-2.5 overflow-hidden'>
+        <div className='absolute top-0 right-0 flex items-center'>
           Supported On <SupportedChains app={dapp} />
         </div>
-        <img src={dapp.icon} className='w-[64px] h-[64px]' />
+        <img src={dapp.icon} className='h-[64px] w-[64px]' />
         <h3>{dapp.name}</h3>
         <div className='flex items-center gap-2.5'>
           {dapp.tags?.map((tag, index) => (
@@ -39,27 +39,27 @@ function Contents({ dapp }: { dapp: DappOption }) {
           <Divider orientation='vertical' className='h-[12px]' />
           {dapp.website && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.website} size='sm' target='_blank'>
-              <IconWebsite className='w-4 h-4' />
+              <IconWebsite className='h-4 w-4' />
             </Button>
           )}
           {dapp.github && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.github} size='sm' target='_blank'>
-              <IconGithub className='w-4 h-4' />
+              <IconGithub className='h-4 w-4' />
             </Button>
           )}
           {dapp.discord && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.discord} size='sm' target='_blank'>
-              <IconDiscord className='w-4 h-4' />
+              <IconDiscord className='h-4 w-4' />
             </Button>
           )}
           {dapp.twitter && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.twitter} size='sm' target='_blank'>
-              <IconX className='w-4 h-4' />
+              <IconX className='h-4 w-4' />
             </Button>
           )}
           {dapp.matrix && (
             <Button isIconOnly color='secondary' as={Link} href={dapp.matrix} size='sm' target='_blank'>
-              <IconMatrix className='w-4 h-4' />
+              <IconMatrix className='h-4 w-4' />
             </Button>
           )}
         </div>

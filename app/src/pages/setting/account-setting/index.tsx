@@ -23,10 +23,10 @@ function AccountSetting() {
   const [account, , , refetch] = useQueryAccountOmniChain(address);
 
   return (
-    <div className='space-y-5 w-[500px] max-w-full mx-auto my-0'>
+    <div className='mx-auto my-0 w-[500px] max-w-full space-y-5'>
       <div>
         <h6 className='text-small text-foreground/50 mb-2.5'>Name</h6>
-        <div className='space-y-2.5 p-4 sm:p-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
+        <div className='rounded-large border-secondary bg-content1 shadow-medium space-y-2.5 border-1 p-4 sm:p-5'>
           <Input
             label='Name'
             onChange={(value) => {
@@ -61,12 +61,12 @@ function AccountSetting() {
 
       {account?.type === 'multisig' ? (
         <div>
-          <h6 className='inline-flex items-center gap-1 text-small text-foreground/50 mb-2.5'>
+          <h6 className='text-small text-foreground/50 mb-2.5 inline-flex items-center gap-1'>
             <Label tooltip='For Pure Proxy, each controllable multisig account is listed as a member set.'>
               Multisig Information
             </Label>
           </h6>
-          <div className='space-y-2.5 p-4 sm:p-5 rounded-large bg-content1 border-1 border-secondary shadow-medium'>
+          <div className='rounded-large bg-content1 border-secondary shadow-medium space-y-2.5 border-1 p-4 sm:p-5'>
             <MemberSet account={account} disabled />
           </div>
         </div>
@@ -78,10 +78,10 @@ function AccountSetting() {
 
       {address ? (
         <div>
-          <h6 className='inline-flex items-center gap-1 text-small text-foreground/50 mb-2.5'>
+          <h6 className='text-small text-foreground/50 mb-2.5 inline-flex items-center gap-1'>
             <Label tooltip='The following accounts will be granted control over this account.'>Proxy Information</Label>
           </h6>
-          <div className='p-5 rounded-large border-1 border-secondary shadow-medium bg-content1'>
+          <div className='rounded-large border-secondary shadow-medium bg-content1 border-1 p-5'>
             <ProxySet address={address} />
           </div>
         </div>
@@ -94,7 +94,7 @@ function AccountSetting() {
               Proposer
             </Label>
           </h6>
-          <div className='space-y-2.5 p-4 sm:p-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
+          <div className='rounded-large border-secondary bg-content1 shadow-medium space-y-2.5 border-1 p-4 sm:p-5'>
             <ProposerSet account={account} refetch={refetch} />
           </div>
         </div>

@@ -42,7 +42,7 @@ function ItemStep({ children, disabled = false }: { disabled?: boolean; children
   return (
     <div
       data-disabled={disabled}
-      className='flex items-center justify-center w-10 h-10 rounded-full text-small font-extrabold text-white data-[disabled=true]:bg-primary/5 bg-primary'
+      className='text-small data-[disabled=true]:bg-primary/5 bg-primary flex h-10 w-10 items-center justify-center rounded-full font-extrabold text-white'
     >
       {children}
     </div>
@@ -99,7 +99,12 @@ function CreateFlexible({
       const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
         checkProxy: true,
         beforeSend: async (extrinsic) => {
-          service.uploadWebsite(network, extrinsic.hash.toHex(), 'mimir://internal/create-flexible', 'Create Flexible');
+          service.transaction.uploadWebsite(
+            network,
+            extrinsic.hash.toHex(),
+            'mimir://internal/create-flexible',
+            'Create Flexible'
+          );
         }
       });
 
@@ -110,7 +115,7 @@ function CreateFlexible({
 
         while (true) {
           try {
-            const data = await service.getDetails(network, pure);
+            const data = await service.account.getDetails(network, pure);
 
             if (data) {
               break;
@@ -138,7 +143,7 @@ function CreateFlexible({
       beforeSend: async (extrinsic) => {
         if (!name) throw new Error('Please provide account name');
 
-        await service.prepareMultisig(
+        await service.multisig.prepareMultisig(
           network,
           addressToHex(extrinsic.signer.toString()),
           extrinsic.hash.toHex(),
@@ -168,7 +173,7 @@ function CreateFlexible({
       if (_pure) {
         createMembers(_pure, who, signer, source, threshold);
 
-        utm && service.utm(network, addressToHex(_pure), utm);
+        utm && service.account.utm(network, addressToHex(_pure), utm);
       }
     });
     events.once('error', () => {
@@ -208,9 +213,9 @@ function CreateFlexible({
         <h2>Create Flexible Multisig</h2>
         <p>Please complete both steps to avoid unnecessary asset loss.</p>
         <Divider />
-        <div className='flex items-center gap-2 p-2.5 rounded-large bg-secondary shadow-small'>
+        <div className='rounded-large bg-secondary shadow-small flex items-center gap-2 p-2.5'>
           <ItemStep>1</ItemStep>
-          <div className='flex items-center gap-2 justify-between'>
+          <div className='flex items-center justify-between gap-2'>
             {pure ? (
               <>
                 <span className='text-primary'>
@@ -221,14 +226,14 @@ function CreateFlexible({
             ) : (
               <>Create Flexible Multisig Account</>
             )}
-            <div className='flex gap-1 items-center text-small'>
+            <div className='text-small flex items-center gap-1'>
               <img src={chain.icon} style={{ width: 20, height: 20 }} />
               {chain.name}
             </div>
           </div>
         </div>
 
-        <div className='p-2.5 space-y-2.5 rounded-large bg-secondary shadow-small'>
+        <div className='rounded-large bg-secondary shadow-small space-y-2.5 p-2.5'>
           <div className='flex items-center gap-2'>
             <ItemStep disabled={!pure}>2</ItemStep>
             Set Members ({threshold}/{who.length})
@@ -248,7 +253,7 @@ function CreateFlexible({
           </div>
 
           {who.map((address) => (
-            <div key={address} className='flex justify-between items-center'>
+            <div key={address} className='flex items-center justify-between'>
               <p className='text-tiny font-bold'>
                 <AddressRow value={address} />
               </p>

@@ -22,7 +22,7 @@ function ActionTextCell({ section, method }: { section?: string; method?: string
 function ActionsCell() {
   return (
     <Button color='primary' size='sm' variant='light' isIconOnly onPress={(e) => e.continuePropagation()}>
-      <ArrowRight className='w-4 h-4 text-primary' />
+      <ArrowRight className='text-primary h-4 w-4' />
     </Button>
   );
 }
@@ -32,7 +32,7 @@ function TxItems({ transaction }: { transaction: Transaction }) {
 
   return (
     <div
-      className='grid grid-cols-7 rounded-medium overflow-hidden bg-secondary cursor-pointer px-2.5 font-semibold [&_div]:flex [&_div]:items-center [&_div]:h-10'
+      className='rounded-medium bg-secondary grid cursor-pointer grid-cols-7 overflow-hidden px-2.5 font-semibold [&_div]:flex [&_div]:h-10 [&_div]:items-center'
       onClick={() => navigate(`/transactions/${transaction.id}`)}
     >
       <div className='col-span-3'>

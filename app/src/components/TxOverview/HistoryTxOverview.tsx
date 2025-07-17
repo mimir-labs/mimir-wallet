@@ -48,13 +48,13 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
 
   const icon =
     transaction.status < TransactionStatus.Success ? (
-      <IconWaiting className='text-warning w-4 h-4' />
+      <IconWaiting className='text-warning h-4 w-4' />
     ) : transaction.status === TransactionStatus.Success ? (
-      <IconSuccess className='text-success w-4 h-4' />
+      <IconSuccess className='text-success h-4 w-4' />
     ) : transaction.status === TransactionStatus.Cancelled ? (
-      <IconCancel className='text-danger w-4 h-4' />
+      <IconCancel className='text-danger h-4 w-4' />
     ) : (
-      <IconFail className='text-danger w-4 h-4' />
+      <IconFail className='text-danger h-4 w-4' />
     );
 
   return (
@@ -69,7 +69,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
         />
       )}
       <div>
-        <div className='w-[220px] flex items-center justify-between px-2.5 py-[3px] bg-content1 rounded-medium border-1 border-divider-300'>
+        <div className='bg-content1 rounded-medium border-divider-300 flex w-[220px] items-center justify-between border-1 px-2.5 py-[3px]'>
           <AddressCell value={data.transaction.address} withCopy withAddressBook />
           {icon}
         </div>

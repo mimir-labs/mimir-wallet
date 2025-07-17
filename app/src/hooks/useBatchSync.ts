@@ -35,9 +35,12 @@ export function useBatchSync(
   refetch: () => void
 ] {
   const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
-  const { data, isFetched, isFetching, refetch } = useQuery<SyncBatchItem[]>({
-    queryHash: service.getClientUrl(`/chains/${network}/${addressHex}/transactions/batch`),
-    queryKey: [address ? service.getClientUrl(`/chains/${network}/${addressHex}/transactions/batch`) : null]
+  const { data, isFetched, isFetching, refetch } = useQuery({
+    queryHash: `batch-sync-${network}-${addressHex}`,
+    queryKey: [network, addressHex] as const,
+    queryFn: ({ queryKey: [chain, addr] }): Promise<SyncBatchItem[]> =>
+      service.transaction.getBatchTransactions(chain as string, addr as string),
+    enabled: !!addressHex
   });
   const [txs, addTx] = useBatchTxs(network, addressHex);
   const syncedIds = useMemo(() => {

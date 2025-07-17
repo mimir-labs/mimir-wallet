@@ -106,7 +106,7 @@ export abstract class Communicator {
 
     assert(endpoint, 'not support get call for current chain');
 
-    const { data } = await service.getCalldata(endpoint.key, hash);
+    const { data } = await service.chain.getCalldata(endpoint.key, hash);
 
     return data;
   }

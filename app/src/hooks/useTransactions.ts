@@ -8,14 +8,7 @@ import { isEqual } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
 
 import { addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import {
-  API_CLIENT_GATEWAY,
-  fetcher,
-  useClientQuery,
-  useInfiniteQuery,
-  useQueries,
-  useQuery
-} from '@mimir-wallet/service';
+import { API_CLIENT_GATEWAY, fetcher, service, useInfiniteQuery, useQueries, useQuery } from '@mimir-wallet/service';
 
 function transformTransaction(chainSS58: number, transaction: Transaction): Transaction {
   const tx = { ...transaction };
@@ -50,22 +43,15 @@ export function usePendingTransactions(
   txId?: string
 ): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
   const { chainSS58 } = useApi();
-  const { queryHash, queryKey } = useClientQuery(
-    address
-      ? txId
-        ? `chains/${network}/${address}/transactions/pending?tx_id=${txId}`
-        : `chains/${network}/${address}/transactions/pending`
-      : null
-  );
 
-  const { data, isFetched, isFetching, refetch } = useQuery<Transaction[]>({
-    initialData: [],
-    queryHash,
-    queryKey,
-    structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
-      const nextData = (next as Transaction[]).map((item) => transformTransaction(chainSS58, item));
-
-      return isEqual(prev, nextData) ? (prev as Transaction[]) || [] : nextData;
+  const { data, isFetched, isFetching, refetch } = useQuery({
+    queryKey: [network, address, txId] as const,
+    queryHash: `pending-transactions-${network}-${address}-${txId || 'all'}`,
+    enabled: !!address,
+    queryFn: ({ queryKey: [network, address, txId] }): Promise<Transaction[]> =>
+      service.transaction.getPendingTransactions(network, address!, txId),
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
     }
   });
 
@@ -77,7 +63,11 @@ export function usePendingTransactions(
     };
   }, [refetch]);
 
-  return [data, isFetched, isFetching];
+  return [
+    useMemo(() => data?.map((item) => transformTransaction(chainSS58, item)) || [], [chainSS58, data]),
+    isFetched,
+    isFetching
+  ];
 }
 
 export function useMultichainPendingTransactions(networks: string[], address?: string | null, txId?: string) {
@@ -197,14 +187,15 @@ export function useHistoryTransactions(
 export function useTransactionDetail(
   network: string,
   id?: string
-): [transactions: Transaction | null, isFetched: boolean, isFetching: boolean] {
+): [transactions: Transaction | undefined, isFetched: boolean, isFetching: boolean] {
   const { chainSS58 } = useApi();
-  const { queryHash, queryKey } = useClientQuery(id ? `chains/${network}/transactions/details/${id}` : null);
 
-  const { data, isFetched, isFetching } = useQuery<Transaction | null>({
-    initialData: null,
-    queryHash,
-    queryKey,
+  const { data, isFetched, isFetching } = useQuery({
+    queryKey: [network, id] as const,
+    queryHash: `transaction-detail-${network}-${id}`,
+    enabled: !!id,
+    queryFn: ({ queryKey: [network, id] }): Promise<Transaction> =>
+      service.transaction.getTransactionDetail(network, id!),
     structuralSharing: (prev: unknown | undefined, next: unknown): Transaction | null => {
       const nextData = next ? transformTransaction(chainSS58, next as Transaction) : null;
 
@@ -219,13 +210,15 @@ export function useMultiChainTransactionCounts(
   address?: string | null
 ): [data: Record<string, { pending: number; history: number }>, isFetched: boolean, isFetching: boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
-  const { queryHash, queryKey } = useClientQuery(addressHex ? `transactions/counts/${addressHex}` : null);
   const { allApis } = useApi();
 
-  const { data, isFetched, isFetching } = useQuery<Record<string, { pending: number; history: number }>>({
-    queryHash,
-    queryKey,
+  const { data, isFetched, isFetching } = useQuery({
+    queryKey: [addressHex] as const,
+    queryHash: `transaction-counts-${addressHex}`,
     refetchOnMount: false,
+    enabled: !!addressHex,
+    queryFn: ({ queryKey: [addressHex] }): Promise<Record<string, { pending: number; history: number }>> =>
+      service.transaction.getTransactionCounts(addressHex),
     structuralSharing: (
       prev: unknown | undefined,
       next: unknown

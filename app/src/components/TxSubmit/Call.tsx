@@ -35,9 +35,9 @@ function extractState(value: IMethod): Extracted {
 
 function Item({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className='grid grid-cols-10 gap-2.5 w-full text-tiny'>
-      <div className='flex col-span-2 items-center font-bold'>{label}</div>
-      <div className='flex col-span-8 items-center font-bold text-foreground/65'>{value}</div>
+    <div className='text-tiny grid w-full grid-cols-10 gap-2.5'>
+      <div className='col-span-2 flex items-center font-bold'>{label}</div>
+      <div className='text-foreground/65 col-span-8 flex items-center font-bold'>{value}</div>
     </div>
   );
 }
@@ -58,7 +58,7 @@ function Call({
   const [isOpen, toggleOpen] = useToggle(true);
 
   const details = (
-    <div className='space-y-1 bg-secondary rounded-medium p-2.5'>
+    <div className='bg-secondary rounded-medium space-y-1 p-2.5'>
       <Item label='Call Hash' value={<Hash value={callHash} withCopy />} />
       <Item
         label='Call Data'
@@ -103,12 +103,12 @@ function Call({
   return (
     <div className='space-y-3'>
       <div className='font-bold'>Transaction details</div>
-      <div className='font-bold text-primary'>{callName}</div>
-      <div className='space-y-4 rounded-medium border-1 border-secondary p-2.5'>
+      <div className='text-primary font-bold'>{callName}</div>
+      <div className='rounded-medium border-secondary space-y-4 border-1 p-2.5'>
         <CallComp from={account} registry={api.registry} call={method} jsonFallback />
         <Divider />
 
-        <div onClick={toggleOpen} className='cursor-pointer text-primary font-bold text-small'>
+        <div onClick={toggleOpen} className='text-primary text-small cursor-pointer font-bold'>
           {isOpen ? 'Hide Details' : 'View Details'}
         </div>
         {isOpen ? details : null}

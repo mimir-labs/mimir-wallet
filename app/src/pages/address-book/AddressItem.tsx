@@ -37,21 +37,21 @@ function Icons({ address }: { address: string }) {
   return (
     <>
       <Tooltip content='Copy Address'>
-        <CopyAddress address={address} color='primary' className='opacity-100 min-w-6 min-h-6' />
+        <CopyAddress address={address} color='primary' className='min-h-6 min-w-6 opacity-100' />
       </Tooltip>
       <Tooltip content='QR Code'>
         <Button isIconOnly color='primary' size='sm' variant='light' onPress={() => openQr(address)}>
-          <IconQr className='w-4 h-4' />
+          <IconQr className='h-4 w-4' />
         </Button>
       </Tooltip>
       <Tooltip content='Open Explorer'>
         <Button isIconOnly color='primary' variant='light' size='sm' onPress={() => openExplorer(address)}>
-          <IconLink className='w-4 h-4' />
+          <IconLink className='h-4 w-4' />
         </Button>
       </Tooltip>
       <Tooltip content='Delete Address'>
         <Button isIconOnly color='primary' size='sm' variant='light' onPress={toggleDeleteOpen}>
-          <IconDelete className='w-4 h-4' />
+          <IconDelete className='h-4 w-4' />
         </Button>
       </Tooltip>
 
@@ -94,9 +94,9 @@ function AddressItem({ address }: { address: string }) {
   return (
     <>
       {!upSm && (
-        <div className='rounded-large p-4 border-1 border-secondary shadow-medium bg-content1 [&_.AddressCell-Content]:ml-2.5 [&_.AddressCell-Name]:text-large [&_.AddressCell-Address]:!mt-2.5 [&_.AddressCell-Address]:text-small'>
+        <div className='rounded-large border-secondary shadow-medium bg-content1 [&_.AddressCell-Name]:text-large [&_.AddressCell-Address]:text-small border-1 p-4 [&_.AddressCell-Address]:!mt-2.5 [&_.AddressCell-Content]:ml-2.5'>
           <AddressCell iconSize={50} icons={<Icons address={address} />} shorten value={address} withCopy={false} />
-          <div className='flex gap-2.5 mt-5'>
+          <div className='mt-5 flex gap-2.5'>
             <Button onPress={toggleOpen} variant='ghost' className='ml-16'>
               Edit
             </Button>
@@ -107,11 +107,11 @@ function AddressItem({ address }: { address: string }) {
         </div>
       )}
       {upSm && (
-        <div className='relative flex items-center gap-10 rounded-large p-6 bg-content1 shadow-medium'>
-          <div className='flex-[1] flex items-center gap-2.5'>
+        <div className='rounded-large bg-content1 shadow-medium relative flex items-center gap-10 p-6'>
+          <div className='flex flex-[1] items-center gap-2.5'>
             <p className='text-large font-bold'>{meta?.name}</p>
           </div>
-          <div className='flex-[3] flex items-center'>
+          <div className='flex flex-[3] items-center'>
             <span {...pressProps}>
               <AddressRow shorten={!upMd} value={address} withAddress withName={false} />
             </span>

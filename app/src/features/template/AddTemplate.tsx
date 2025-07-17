@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Call } from '@polkadot/types/interfaces';
+import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import IconArrowLeft from '@/assets/svg/icon-arrow-left.svg?react';
@@ -20,6 +21,7 @@ import { useSavedTemplate } from './useSavedTemplate';
 
 function AddTemplate({
   isView = false,
+  registry,
   onBack,
   defaultCallData,
   defaultName,
@@ -28,10 +30,11 @@ function AddTemplate({
   isView?: boolean;
   defaultCallData?: HexString;
   defaultName?: string;
+  registry: Registry;
   onBack: () => void;
   setNetwork?: (network: string) => void;
 }) {
-  const { network, api } = useApi();
+  const { network } = useApi();
   const { addTemplate } = useSavedTemplate(network);
   const [name, setName] = useInput(defaultName || '');
   const [callData, setCallData] = useInput(defaultCallData || '');
@@ -39,11 +42,11 @@ function AddTemplate({
   const [callDataError, setCallDataError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const [call, error] = decodeCallData(api.registry, callData);
+    const [call, error] = decodeCallData(registry, callData);
 
     setParsedCallData(call);
     setCallDataError(error);
-  }, [api.registry, callData]);
+  }, [registry, callData]);
 
   const onAdd = () => {
     if (!(name && callData) || !!callDataError || !parsedCallData) return;
@@ -85,7 +88,7 @@ function AddTemplate({
       />
 
       {callDataError && (
-        <div className='bg-secondary p-2.5 rounded-medium break-all'>
+        <div className='bg-secondary rounded-medium p-2.5 break-all'>
           <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-tiny'>
             {callDataError.message}
           </p>

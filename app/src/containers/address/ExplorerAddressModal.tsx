@@ -54,16 +54,16 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       style={{
         background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
       }}
-      className='cursor-pointer p-2 sm:p-2.5 rounded-medium flex items-center gap-1 sm:gap-2 data-[selected=true]:animate-blink-bg'
+      className='rounded-medium data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 p-2 sm:gap-2 sm:p-2.5'
       {...pressProps}
     >
       <Avatar
         src={endpoint.icon}
-        className='w-[20px] sm:w-[30px] h-[20px] sm:h-[30px]'
+        className='h-[20px] w-[20px] sm:h-[30px] sm:w-[30px]'
         style={{ backgroundColor: 'transparent' }}
       />
       <b className='text-small sm:text-medium'>{endpoint.name}</b>
-      <div className='flex-1 text-foreground/50 text-tiny'>
+      <div className='text-foreground/50 text-tiny flex-1'>
         <Address value={address} shorten ss58Format={endpoint.ss58Format} />
       </div>
       {endpoint.explorerUrl && (
@@ -105,8 +105,8 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
 function GroupedNetwork({ address, group, endpoints }: { address: string; group: string; endpoints: Network[] }) {
   return (
     <div>
-      <div className='text-primary capitalize mb-2.5 font-bold text-medium'>{group}</div>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-2.5'>
+      <div className='text-primary text-medium mb-2.5 font-bold capitalize'>{group}</div>
+      <div className='grid grid-cols-1 gap-2.5 md:grid-cols-2'>
         {endpoints.map((endpoint) => (
           <Item key={endpoint.key} endpoint={endpoint} address={address} />
         ))}
@@ -154,7 +154,7 @@ function ExplorerAddressModal() {
       onClose={close}
     >
       <DrawerContent>
-        <DrawerBody className='p-5 scrollbar-hide'>
+        <DrawerBody className='scrollbar-hide p-5'>
           {Object.keys(groupedEndpoints).map((group, index) => (
             <>
               <GroupedNetwork

@@ -35,7 +35,7 @@ function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...pro
               onPress={() => setValue(maxValue.toString())}
               size='sm'
               variant='ghost'
-              className='py-[2px] rounded-[5px]'
+              className='rounded-[5px] py-[2px]'
             >
               Max
             </Button>

@@ -50,7 +50,7 @@ function ConfirmDialog({
           <p>Indirect Controllers</p>
           {list.map((address) => (
             <div
-              className='flex justify-between items-center p-2.5 rounded-medium border-1 border-divider-300'
+              className='rounded-medium border-divider-300 flex items-center justify-between border-1 p-2.5'
               key={address}
             >
               <AddressRow withAddress={false} withName value={address} />
@@ -60,7 +60,7 @@ function ConfirmDialog({
         </ModalBody>
         <Divider />
         <ModalFooter>
-          <div className='flex flex-col gap-4 w-full'>
+          <div className='flex w-full flex-col gap-4'>
             <Checkbox size='sm' isSelected={checked} onValueChange={toggleChecked}>
               I Understand
             </Checkbox>

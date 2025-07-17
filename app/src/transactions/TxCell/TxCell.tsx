@@ -33,16 +33,16 @@ function TxCell({ withDetails, defaultOpen, address, transaction }: Props) {
   const [account] = useQueryAccount(address);
 
   return (
-    <div className='space-y-3 p-3 sm:p-4 rounded-large bg-content1 border-1 border-secondary shadow-small'>
-      <div className='flex items-center justify-between gap-2.5 flex-1'>
-        <div className='flex items-center gap-2.5 flex-1'>
+    <div className='rounded-large bg-content1 border-secondary shadow-small space-y-3 border-1 p-3 sm:p-4'>
+      <div className='flex flex-1 items-center justify-between gap-2.5'>
+        <div className='flex flex-1 items-center gap-2.5'>
           <div
             data-pending={status < TransactionStatus.Success}
             data-success={status === TransactionStatus.Success}
             data-failed={status > TransactionStatus.Success}
-            className='w-2 h-2 rounded-medium data-[pending=true]:bg-warning data-[success=true]:bg-success data-[failed=true]:bg-danger'
+            className='rounded-medium data-[pending=true]:bg-warning data-[success=true]:bg-success data-[failed=true]:bg-danger h-2 w-2'
           />
-          <Avatar src={chain.icon} className='w-5 h-5 bg-transparent' />
+          <Avatar src={chain.icon} className='h-5 w-5 bg-transparent' />
           {transaction.type === TransactionType.Propose ? (
             <h4 className='text-primary'>Propose {transaction.id}</h4>
           ) : (
@@ -76,7 +76,7 @@ function TxCell({ withDetails, defaultOpen, address, transaction }: Props) {
               );
             }}
           >
-            <IconShare className='w-4 h-4' />
+            <IconShare className='h-4 w-4' />
           </Button>
         </Tooltip>
       </div>
@@ -88,7 +88,7 @@ function TxCell({ withDetails, defaultOpen, address, transaction }: Props) {
           <TxItemsSmall transaction={transaction} />
         )
       ) : (
-        <div className='flex justify-center items-center h-[100px]'>
+        <div className='flex h-[100px] items-center justify-center'>
           <Spinner size='lg' variant='wave' />
         </div>
       )}

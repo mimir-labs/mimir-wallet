@@ -116,7 +116,7 @@ function Chart({
 
   const timeChart =
     txDaily && txDaily.length > 0 ? (
-      <div className='mx-auto w-full h-[40dvh] sm:h-[600px] max-w-full max-h-full'>
+      <div className='mx-auto h-[40dvh] max-h-full w-full max-w-full sm:h-[600px]'>
         <Bar data={chartData} options={options} />
       </div>
     ) : (
@@ -125,7 +125,7 @@ function Chart({
 
   const categoryChart =
     callOverview && callOverview.length > 0 ? (
-      <div className='mx-auto w-full h-[600px] aspect-1/1 max-w-full max-h-full'>
+      <div className='mx-auto aspect-square h-[600px] max-h-full w-full max-w-full'>
         <Doughnut data={categoryChartData} options={doughnutOptions} />
       </div>
     ) : (
@@ -134,14 +134,14 @@ function Chart({
 
   return (
     <Card className='col-span-2'>
-      <CardBody className='gap-5 sm:p-5 p-3'>
-        <p className='font-bold text-medium text-foreground'>Transaction Statistic</p>
+      <CardBody className='gap-5 p-3 sm:p-5'>
+        <p className='text-medium text-foreground font-bold'>Transaction Statistic</p>
         <Tabs color='primary'>
           <Tab key='category' title='By Category'>
-            {upSm ? <div className='sm:p-5 p-3 bg-secondary rounded-large'>{categoryChart}</div> : categoryChart}
+            {upSm ? <div className='bg-secondary rounded-large p-3 sm:p-5'>{categoryChart}</div> : categoryChart}
           </Tab>
           <Tab key='time' title='By Time'>
-            {upSm ? <div className='sm:p-5 p-3 bg-secondary rounded-large'>{timeChart}</div> : timeChart}
+            {upSm ? <div className='bg-secondary rounded-large p-3 sm:p-5'>{timeChart}</div> : timeChart}
           </Tab>
         </Tabs>
       </CardBody>
@@ -175,16 +175,16 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
 
   return (
     <SubApiRoot network={selectedChain}>
-      <div className='grid grid-cols-2 sm:gap-5 gap-2.5'>
+      <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
         <div className='col-span-2 flex gap-5'>
           <Card className='flex-1'>
-            <CardBody className='sm:flex-row flex-col sm:px-12 px-4 sm:py-5 py-3 justify-between sm:items-center items-stretch sm:gap-10 gap-3'>
-              <div className='flex-grow flex items-center justify-between'>
-                <div className='flex items-center gap-2.5 sm:text-medium text-small text-foreground'>
+            <CardBody className='flex-col items-stretch justify-between gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:px-12 sm:py-5'>
+              <div className='flex flex-grow items-center justify-between'>
+                <div className='sm:text-medium text-small text-foreground flex items-center gap-2.5'>
                   <IconSafe className='text-primary' />
                   Multisig Transaction Executed
                 </div>
-                <b className='font-extrabold sm:text-[36px] sm:leading-[43px] text-[24px] leading-[30px]'>
+                <b className='text-[24px] leading-[30px] font-extrabold sm:text-[36px] sm:leading-[43px]'>
                   {data?.total}
                 </b>
               </div>
@@ -196,14 +196,14 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
                 radius='md'
                 variant='bordered'
                 color='default'
-                className='border-divider-300 bg-content1 rounded-large w-auto min-w-[160px] h-full'
-                startContent={<Avatar src={selectedHistoryNetwork?.icon} className='w-4 h-4 bg-transparent' />}
-                endContent={<ArrowDown className='w-4 h-4' />}
+                className='border-divider-300 bg-content1 rounded-large h-full w-auto min-w-[160px]'
+                startContent={<Avatar src={selectedHistoryNetwork?.icon} className='h-4 w-4 bg-transparent' />}
+                endContent={<ArrowDown className='h-4 w-4' />}
               >
                 {selectedHistoryNetwork?.name}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className='w-[200px] rounded-medium p-1'>
+            <PopoverContent className='rounded-medium w-[200px] p-1'>
               <Listbox
                 disallowEmptySelection
                 selectedKeys={[selectedChain]}
@@ -218,8 +218,8 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
                   return (
                     <ListboxItem
                       key={chain}
-                      className='h-8 data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground'
-                      startContent={<Avatar src={network?.icon} className='w-4 h-4 bg-transparent' />}
+                      className='data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground h-8'
+                      startContent={<Avatar src={network?.icon} className='h-4 w-4 bg-transparent' />}
                     >
                       {network?.name}
                     </ListboxItem>
@@ -230,9 +230,9 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
           </Popover>
         </div>
 
-        <Card className='sm:col-span-1 col-span-2'>
-          <CardBody className='gap-5 sm:p-5 p-3'>
-            <p className='font-bold text-medium text-foreground'>Transaction Category</p>
+        <Card className='col-span-2 sm:col-span-1'>
+          <CardBody className='gap-5 p-3 sm:p-5'>
+            <p className='text-medium text-foreground font-bold'>Transaction Category</p>
             <Table
               removeWrapper
               classNames={{
@@ -258,9 +258,9 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
           </CardBody>
         </Card>
 
-        <Card className='sm:col-span-1 col-span-2'>
-          <CardBody className='gap-5 sm:p-5 p-3'>
-            <p className='font-bold text-medium text-foreground'>Recipients</p>
+        <Card className='col-span-2 sm:col-span-1'>
+          <CardBody className='gap-5 p-3 sm:p-5'>
+            <p className='text-medium text-foreground font-bold'>Recipients</p>
             <Table
               removeWrapper
               classNames={{

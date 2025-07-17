@@ -43,9 +43,10 @@ function _extraAsset(
 }
 
 export function useAssets(network: string): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean] {
-  const { data, isFetched, isFetching } = useQuery<AssetInfo[]>({
-    queryHash: service.getClientUrl(`chains/${network}/all-assets`),
-    queryKey: [service.getClientUrl(`chains/${network}/all-assets`)],
+  const { data, isFetched, isFetching } = useQuery({
+    queryHash: `assets-${network}`,
+    queryKey: [network] as const,
+    queryFn: ({ queryKey: [chain] }): Promise<AssetInfo[]> => service.asset.getAllAssets(chain),
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -75,12 +76,17 @@ export function useAssetsByAddress(
   address?: string | null
 ): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
-  const { data, isFetched, isFetching } = useQuery<AssetInfo[] | undefined>({
-    queryHash: service.getClientUrl(`chains/${network}/balances/${addressHex}`),
-    queryKey: addressHex ? [service.getClientUrl(`chains/${network}/balances/${addressHex}`)] : [null],
+  const { data, isFetched, isFetching } = useQuery({
+    queryHash: `assets-by-address-${network}-${addressHex}`,
+    queryKey: [network, addressHex] as const,
+    queryFn: addressHex
+      ? ({ queryKey: [chain, addr] }): Promise<AssetInfo[]> =>
+          service.asset.getAssetsByAddress(chain as string, addr as string)
+      : undefined,
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+    enabled: !!addressHex,
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }
@@ -95,34 +101,41 @@ export function useAssetsAll(): [
   isFetching: boolean
 ] {
   const { data, isFetched, isFetching } = useQuery<Record<string, AssetInfo[]>>({
-    queryKey: [service.getClientUrl(`assets/all`)],
-    queryHash: service.getClientUrl(`assets/all`),
+    queryKey: ['assets-all'] as const,
+    queryHash: 'assets-all',
+    queryFn: (): Promise<Record<string, AssetInfo[]>> => service.asset.getAssetsAll(),
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    structuralSharing: (prev, next): Record<string, AssetInfo[]> | undefined => {
-      if (!next) {
-        return undefined;
-      }
-
-      const nextData = Object.fromEntries(
-        Object.entries(next).map(([network, assets]) => [network, _extraAsset(network, assets)])
-      );
-
-      return isEqual(prev, nextData) ? (prev as Record<string, AssetInfo[]>) : nextData;
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
     }
   });
 
-  return [data, isFetched, isFetching];
+  return [
+    useMemo(
+      () =>
+        data
+          ? Object.fromEntries(Object.entries(data).map(([network, assets]) => [network, _extraAsset(network, assets)]))
+          : undefined,
+      [data]
+    ),
+    isFetched,
+    isFetching
+  ];
 }
 
 export function useAssetsByAddressAll(
   address?: string | null
 ): [data: Record<string, AssetInfo[]> | undefined, isFetched: boolean, isFetching: boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
-  const { data, isFetched, isFetching } = useQuery<Record<string, AssetInfo[]>>({
-    queryKey: addressHex ? [service.getClientUrl(`balances/all/${addressHex}`)] : [null],
-    queryHash: service.getClientUrl(`balances/all/${addressHex}`),
+  const { data, isFetched, isFetching } = useQuery({
+    queryKey: [addressHex] as const,
+    queryHash: `balances-all-${addressHex}`,
+    queryFn: addressHex
+      ? ({ queryKey: [addr] }): Promise<Record<string, AssetInfo[]>> =>
+          service.asset.getAssetsByAddressAll(addr as string)
+      : undefined,
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,

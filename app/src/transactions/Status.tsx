@@ -35,7 +35,7 @@ export function AnnouncementStatus({ account, transaction }: { account: AccountD
       data-pending={status === 'indexing' || status === 'reviewing'}
       data-success={status === 'executable' || status === 'success'}
       data-failed={!['indexing', 'reviewing', 'executable', 'success'].includes(status)}
-      className='break-words flex items-center gap-[5px] whitespace-nowrap data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger'
+      className='data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger flex items-center gap-[5px] break-words whitespace-nowrap'
     >
       <SvgIcon color='inherit' />
       {status === 'indexing'
@@ -91,7 +91,7 @@ export function Status({ transaction }: { transaction: Transaction }) {
       data-pending={status < TransactionStatus.Success}
       data-success={status === TransactionStatus.Success}
       data-failed={status > TransactionStatus.Success}
-      className='break-words flex items-center gap-[5px] whitespace-nowrap data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger'
+      className='data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger flex items-center gap-[5px] break-words whitespace-nowrap'
     >
       <SvgIcon color='inherit' />
       {status < TransactionStatus.Success

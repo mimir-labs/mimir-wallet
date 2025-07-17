@@ -45,7 +45,7 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
 
       try {
         if (!isAddressBook) {
-          await service.updateAccountName(network, addressToHex(value), name);
+          await service.account.updateAccountName(network, addressToHex(value), name);
           setAccountName(value, name);
           cb?.(name);
         } else {

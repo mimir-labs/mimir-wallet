@@ -21,12 +21,12 @@ function Relation({ address, setNetwork }: { address: string; setNetwork: (netwo
     <>
       <div
         ref={ref}
-        className='relative w-full min-h-[360px] h-[calc(100dvh-400px)] xs:h-[calc(100dvh-500px)] rounded-medium shadow-medium bg-content1'
+        className='xs:h-[calc(100dvh-500px)] rounded-medium shadow-medium bg-content1 relative h-[calc(100dvh-400px)] min-h-[360px] w-full'
       >
-        <Button variant='light' className='z-[1] absolute inline-flex sm:hidden' onPress={toggleOpen}>
+        <Button variant='light' className='absolute z-[1] inline-flex sm:hidden' onPress={toggleOpen}>
           Overview
         </Button>
-        <div className='z-[1] w-[200px] absolute right-4 top-4 bg-content1'>
+        <div className='bg-content1 absolute top-4 right-4 z-[1] w-[200px]'>
           <InputNetwork network={network} setNetwork={setNetwork} />
         </div>
         <AddressOverview key={account?.address || 'none'} account={account} showControls={upSm} showMiniMap={upSm} />
@@ -35,7 +35,7 @@ function Relation({ address, setNetwork }: { address: string; setNetwork: (netwo
         <ModalContent>
           <ModalHeader>Overview</ModalHeader>
           <ModalBody>
-            <div className='w-full h-full bg-secondary'>
+            <div className='bg-secondary h-full w-full'>
               <AddressOverview
                 key={`${account?.address}.${network}`}
                 account={account}

@@ -12,7 +12,7 @@ function Label({ children, tooltip }: { children: React.ReactNode; tooltip?: str
   }
 
   return (
-    <span className='inline-flex gap-[5px] items-center'>
+    <span className='inline-flex items-center gap-[5px]'>
       {children}
       <Tooltip closeDelay={0} classNames={{ content: 'max-w-[300px]' }} content={tooltip}>
         <IconQuestion className='text-primary' />

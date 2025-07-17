@@ -15,7 +15,7 @@ import { Button, Spinner } from '@mimir-wallet/ui';
 
 function Cell({ title, children, img }: { img: React.ReactNode; title: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className='flex justify-between items-center gap-2.5 bg-secondary rounded-medium p-2.5 mt-2'>
+    <div className='bg-secondary rounded-medium mt-2 flex items-center justify-between gap-2.5 p-2.5'>
       <div className='flex-1'>
         <div className='font-bold'>{title}</div>
         <div className='flex items-center gap-2.5'>
@@ -76,24 +76,24 @@ function SafetyCheck({
       <div className='font-bold'>Transaction Check</div>
       <Cell title='Simulation' img={<img src='/images/chopsticks.webp' alt='chopticks' className='h-[24px]' />}>
         {simulation.isDone ? (
-          <div className='flex gap-1 items-center'>
+          <div className='flex items-center gap-1'>
             {simulation.success ? (
-              <IconSuccess className='text-success w-4 h-4' />
+              <IconSuccess className='text-success h-4 w-4' />
             ) : (
-              <IconFailed className='text-danger w-4 h-4' />
+              <IconFailed className='text-danger h-4 w-4' />
             )}
 
             <div className='relative'>
               <p
                 data-success={simulation.success}
                 data-error={simulation.error}
-                className='font-bold data-[success=true]:text-success data-[error]:text-danger'
+                className='data-[success=true]:text-success data-[error]:text-danger font-bold'
               >
                 {simulation.success ? 'Success' : simulation.error || 'Unknown Error'}
               </p>
 
               <Button
-                className='absolute top-full right-0 p-0 min-w-0'
+                className='absolute top-full right-0 min-w-0 p-0'
                 variant='light'
                 onPress={() => {
                   const newWindow = window.open();
@@ -120,15 +120,15 @@ function SafetyCheck({
           {!safetyCheck && <Spinner size='sm' />}
           {safetyCheck && (
             <>
-              {safetyCheck.severity === 'none' && <IconSuccess className='text-success w-4 h-4' />}
-              {safetyCheck.severity === 'error' && <IconFailed className='text-danger w-4 h-4' />}
-              {safetyCheck.severity === 'warning' && <IconInfo className='text-warning w-4 h-4' />}
+              {safetyCheck.severity === 'none' && <IconSuccess className='text-success h-4 w-4' />}
+              {safetyCheck.severity === 'error' && <IconFailed className='text-danger h-4 w-4' />}
+              {safetyCheck.severity === 'warning' && <IconInfo className='text-warning h-4 w-4' />}
 
               <p
                 data-success={safetyCheck.severity === 'none'}
                 data-error={safetyCheck.severity === 'error'}
                 data-warning={safetyCheck.severity === 'warning'}
-                className='font-bold data-[success=true]:text-success data-[error]:text-danger data-[warning]:text-warning'
+                className='data-[success=true]:text-success data-[error]:text-danger data-[warning]:text-warning font-bold'
               >
                 {safetyCheck?.message}
               </p>
@@ -141,15 +141,15 @@ function SafetyCheck({
         {!isTxBundleLoading && (
           <>
             {!txError ? (
-              <IconSuccess className='text-success w-4 h-4' />
+              <IconSuccess className='text-success h-4 w-4' />
             ) : (
-              <IconFailed className='text-danger w-4 h-4' />
+              <IconFailed className='text-danger h-4 w-4' />
             )}
 
             <p
               data-success={!txError}
               data-error={!!txError}
-              className='font-bold data-[success=true]:text-success data-[error=true]:text-danger'
+              className='data-[success=true]:text-success data-[error=true]:text-danger font-bold'
             >
               {!txError ? 'Permission Granted' : 'Perimission Denied'}
             </p>

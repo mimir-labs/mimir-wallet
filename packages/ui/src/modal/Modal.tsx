@@ -7,15 +7,15 @@ import { extendVariants } from '@heroui/system';
 const CustomModal = extendVariants(Modal, {
   variants: {
     size: {
-      xs: { body: 'py-4 px-4 sm:px-5' },
-      sm: { body: 'py-4 px-4 sm:px-5' },
-      md: { body: 'py-4 px-4 sm:px-5' },
-      lg: { body: 'py-4 px-4 sm:px-5' },
-      xl: { body: 'py-4 px-4 sm:px-5' },
-      '2xl': { body: 'py-4 px-4 sm:px-5' },
-      '3xl': { body: 'py-4 px-4 sm:px-5' },
-      '4xl': { body: 'py-4 px-4 sm:px-5' },
-      full: { body: 'py-4 px-4 sm:px-5' }
+      xs: { header: 'py-4 px-4 sm:px-5', footer: 'py-4 px-4 sm:px-5', body: 'py-4 px-4 sm:px-5' },
+      sm: { header: 'py-4 px-4 sm:px-5', footer: 'py-4 px-4 sm:px-5', body: 'py-4 px-4 sm:px-5' },
+      md: { header: 'py-4 px-4 sm:px-5', footer: 'py-4 px-4 sm:px-5', body: 'py-4 px-4 sm:px-5' },
+      lg: { header: 'py-4 px-4 sm:px-5', footer: 'py-4 px-4 sm:px-5', body: 'py-4 px-4 sm:px-5' },
+      xl: { header: 'py-4 px-4 sm:px-5', footer: 'py-4 px-4 sm:px-5', body: 'py-4 px-4 sm:px-5' },
+      '2xl': { header: 'py-4 px-4 sm:px-5', footer: 'py-4 px-4 sm:px-5', body: 'py-4 px-4 sm:px-5' },
+      '3xl': { header: 'py-4 px-4 sm:px-5', footer: 'py-4 px-4 sm:px-5', body: 'py-4 px-4 sm:px-5' },
+      '4xl': { header: 'py-4 px-4 sm:px-5', footer: 'py-4 px-4 sm:px-5', body: 'py-4 px-4 sm:px-5' },
+      full: { header: 'py-4 px-4 sm:px-5', footer: 'py-4 px-4 sm:px-5', body: 'py-4 px-4 sm:px-5' }
     }
   },
   defaultVariants: {

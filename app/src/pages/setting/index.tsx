@@ -12,7 +12,7 @@ function Setting({ type }: { type: 'general' | 'account' }) {
   const navigate = useNavigate();
 
   return (
-    <div className='max-w-full w-[500px] mx-auto flex flex-col gap-5 items-stretch'>
+    <div className='mx-auto flex w-[500px] max-w-full flex-col items-stretch gap-5'>
       <Tabs
         color='primary'
         aria-label='Setting'

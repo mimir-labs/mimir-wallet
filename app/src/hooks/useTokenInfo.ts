@@ -5,16 +5,16 @@ import type { TokenInfo } from './types';
 
 import { isEqual } from 'lodash-es';
 
-import { service, useClientQuery, useQuery } from '@mimir-wallet/service';
+import { service, useQuery } from '@mimir-wallet/service';
 
 export function useTokenInfo(network: string): [tokenInfo: TokenInfo | undefined, isLoading: boolean] {
-  const { queryHash, queryKey } = useClientQuery(`chains/${network}/token`);
-  const { data, isFetching } = useQuery<TokenInfo>({
+  const { data, isFetching } = useQuery({
     refetchInterval: 60_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    queryHash,
-    queryKey,
+    queryKey: [network] as const,
+    queryHash: `token-info-${network}`,
+    queryFn: ({ queryKey: [chain] }): Promise<TokenInfo> => service.asset.getTokenInfo(chain),
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }
@@ -28,8 +28,9 @@ export function useTokenInfoAll(): [tokenInfo: Record<string, TokenInfo> | undef
     refetchInterval: 60_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    queryKey: [service.getClientUrl(`token/all`)],
-    queryHash: service.getClientUrl(`token/all`),
+    queryKey: ['token-all'] as const,
+    queryHash: 'token-info-all',
+    queryFn: (): Promise<Record<string, TokenInfo>> => service.asset.getTokenInfoAll(),
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }

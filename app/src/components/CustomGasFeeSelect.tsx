@@ -92,7 +92,7 @@ function CustomGasFeeSelect({
       <div className={className}>
         <div className='flex flex-col gap-2'>
           <label className='text-small font-medium'>{label}</label>
-          <Skeleton className='h-14 w-full rounded-medium' />
+          <Skeleton className='rounded-medium h-14 w-full' />
         </div>
       </div>
     );
@@ -122,7 +122,7 @@ function CustomGasFeeSelect({
           }
 
           return (
-            <div className='flex items-center justify-between w-full'>
+            <div className='flex w-full items-center justify-between'>
               <div className='flex items-center gap-3'>
                 <Avatar
                   alt={selectedAsset.symbol}
@@ -146,7 +146,7 @@ function CustomGasFeeSelect({
             textValue={asset.symbol}
             color='secondary'
           >
-            <div className='flex items-center gap-3 w-full'>
+            <div className='flex w-full items-center gap-3'>
               <Avatar
                 alt={asset.symbol}
                 fallback={asset.symbol.slice(0, 1)}
@@ -161,14 +161,14 @@ function CustomGasFeeSelect({
       </Select>
 
       {gasFeeInfo ? (
-        <div className='text-right text-small text-foreground leading-[20px] mt-[5px]'>
+        <div className='text-small text-foreground mt-[5px] text-right leading-[20px]'>
           <b>Required: </b>
           <span>
             <FormatBalance value={gasFeeInfo.amount} withCurrency format={[gasFeeInfo.decimals, gasFeeInfo.symbol]} />
           </span>
         </div>
       ) : (
-        <Skeleton className='h-[16px] w-16 ml-auto mt-[5px]' />
+        <Skeleton className='mt-[5px] ml-auto h-[16px] w-16' />
       )}
     </div>
   );

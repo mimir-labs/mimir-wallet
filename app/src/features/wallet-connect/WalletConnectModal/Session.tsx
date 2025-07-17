@@ -40,7 +40,7 @@ function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionPropo
   }, [account, onClose, proposal]);
 
   return (
-    <div className='flex flex-col gap-5 items-center'>
+    <div className='flex flex-col items-center gap-5'>
       <Avatar
         showFallback={showFallback}
         fallback={<Avatar src='/images/wallet-connect.webp' alt='wallet connect' style={{ width: 80, height: 80 }} />}
@@ -55,7 +55,7 @@ function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionPropo
         style={{ width: 80, height: 80 }}
       />
       <div>
-        <h4 className='font-bold text-xl text-center'>{proposal.params.proposer.metadata.name}</h4>
+        <h4 className='text-center text-xl font-bold'>{proposal.params.proposer.metadata.name}</h4>
         <p className='text-small text-center'>
           <Link isExternal href={proposal.params.proposer.metadata.url}>
             {proposal.params.proposer.metadata.url}
@@ -67,7 +67,7 @@ function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionPropo
       </p>
 
       {current ? (
-        <div className='rounded-medium bg-secondary p-2.5 w-full'>
+        <div className='rounded-medium bg-secondary w-full p-2.5'>
           <AddressCell shorten={false} value={current} iconSize={30} />
         </div>
       ) : (

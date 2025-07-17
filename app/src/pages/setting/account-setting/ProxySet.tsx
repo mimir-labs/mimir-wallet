@@ -60,23 +60,23 @@ function Content({
       <div className='space-y-5'>
         <InputNetwork network={network} setNetwork={setNetwork} />
 
-        <div className='rounded-medium p-2.5 bg-secondary'>
+        <div className='rounded-medium bg-secondary p-2.5'>
           <div className='font-bold'>Proxy Account</div>
 
-          <div className='space-y-2.5 mt-2.5'>
+          <div className='mt-2.5 space-y-2.5'>
             {isFetched &&
               proxies &&
               proxies[0].map((proxy, index) => (
                 <div
                   key={index}
-                  className='flex items-center justify-between bg-content1 rounded-medium p-[5px] gap-[5px]'
+                  className='bg-content1 rounded-medium flex items-center justify-between gap-[5px] p-[5px]'
                 >
                   <div className='flex-1'>
                     <AddressCell shorten value={proxy.delegate.toString()} />
                   </div>
                   {proxy.delay.gt(BN_ZERO) ? (
                     <Tooltip content={`Delay Blocks: ${[proxy.delay]}`}>
-                      <IconClock className='w-4 h-4 opacity-70' />
+                      <IconClock className='h-4 w-4 opacity-70' />
                     </Tooltip>
                   ) : null}
                   <Chip color='secondary'>{proxy.proxyType.toString()}</Chip>
@@ -86,7 +86,7 @@ function Content({
                       color='danger'
                       size='sm'
                       variant='light'
-                      className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
+                      className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
                       accountId={address}
                       website='mimir://internal/setup'
                       overrideAction={
@@ -105,7 +105,7 @@ function Content({
                             }
                       }
                     >
-                      <IconDelete className='w-4 h-4' />
+                      <IconDelete className='h-4 w-4' />
                     </TxButton>
                   )}
                 </div>
@@ -184,7 +184,14 @@ function Content({
                 <Avatar
                   alt={api.runtimeChain.toString()}
                   src={token.Icon}
-                  style={{ width: 14, height: 14, backgroundColor: 'transparent' }}
+                  draggable={false}
+                  style={{
+                    width: '1em',
+                    height: '1em',
+                    verticalAlign: 'middle',
+                    backgroundColor: 'transparent',
+                    userSelect: 'none'
+                  }}
                 />
                 <span className='text-foreground/50'>
                   <FormatBalance withCurrency value={allBalances?.total} />
@@ -250,7 +257,7 @@ function ProxySet({ address }: { address: string }) {
       network={network}
       supportedNetworks={supportedNetworks?.map((item) => item.key)}
       Fallback={({ apiState: { chain } }) => (
-        <div className='w-[500px] max-w-full mx-auto my-0 py-10 flex items-center justify-center bg-content1 rounded-large'>
+        <div className='bg-content1 rounded-large mx-auto my-0 flex w-[500px] max-w-full items-center justify-center py-10'>
           <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
         </div>
       )}

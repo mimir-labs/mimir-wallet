@@ -28,7 +28,7 @@ function OmniChainUpgradeTip() {
             }}
           >
             <Tab key='remoteProxy' title='Remote Proxy'>
-              <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
+              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/Remoteproxy2.mp4'
                   autoPlay
@@ -36,17 +36,17 @@ function OmniChainUpgradeTip() {
                   muted
                   playsInline
                   controls={false}
-                  className='max-w-full h-auto pointer-events-none'
+                  className='pointer-events-none h-auto max-w-full'
                 />
               </div>
-              <p className='font-bold text-foreground'>
+              <p className='text-foreground font-bold'>
                 Instead of setting up proxy accounts on each parachain, remote-proxy module allows you to create it once
                 on the Relay Chain — then compatible parachains can automatically inherit that proxy. Now it supports{' '}
                 {'Kusama<>Kusama Assethub'}.
               </p>
             </Tab>
             <Tab key='omniUX' title='OmniUX'>
-              <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
+              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/OmniUX.mp4'
                   autoPlay
@@ -54,16 +54,16 @@ function OmniChainUpgradeTip() {
                   muted
                   playsInline
                   controls={false}
-                  className='max-w-full h-auto pointer-events-none'
+                  className='pointer-events-none h-auto max-w-full'
                 />
               </div>
-              <p className='font-bold text-foreground'>
+              <p className='text-foreground font-bold'>
                 Seamless management of multi-sig accounts across multiple parachains, enabling a unified cross-chain
                 experience.
               </p>
             </Tab>
             <Tab key='callTemplate' title='Call Template'>
-              <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
+              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/CallTemplate.mp4'
                   autoPlay
@@ -71,16 +71,16 @@ function OmniChainUpgradeTip() {
                   muted
                   playsInline
                   controls={false}
-                  className='max-w-full h-auto pointer-events-none'
+                  className='pointer-events-none h-auto max-w-full'
                 />
               </div>
-              <p className='font-bold text-foreground'>
+              <p className='text-foreground font-bold'>
                 Predefined transaction templates simplify common DAO & team operations, eliminating the need for manual
                 data input each time.
               </p>
             </Tab>
             <Tab key='walletConnect' title='WalletConnect'>
-              <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
+              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/WalletConnect.mp4'
                   autoPlay
@@ -88,16 +88,16 @@ function OmniChainUpgradeTip() {
                   muted
                   playsInline
                   controls={false}
-                  className='max-w-full h-auto pointer-events-none'
+                  className='pointer-events-none h-auto max-w-full'
                 />
               </div>
-              <p className='font-bold text-foreground'>
+              <p className='text-foreground font-bold'>
                 Mimir integrates Wallet Connect, enabling direct multisig interaction with Dapps, allowing users to sign
                 and approve transactions seamlessly.
               </p>
             </Tab>
             <Tab key='quickSimulation' title='Quick Simulation'>
-              <div className='flex items-center justify-center rounded-medium bg-secondary p-5'>
+              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/QuickSimulation.mp4'
                   autoPlay
@@ -105,10 +105,10 @@ function OmniChainUpgradeTip() {
                   muted
                   playsInline
                   controls={false}
-                  className='max-w-full h-auto pointer-events-none'
+                  className='pointer-events-none h-auto max-w-full'
                 />
               </div>
-              <p className='font-bold text-foreground'>
+              <p className='text-foreground font-bold'>
                 Run a transaction simulation in 1–2 seconds and instantly display changes in account balances.
               </p>
             </Tab>

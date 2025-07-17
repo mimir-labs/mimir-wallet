@@ -55,6 +55,8 @@ function BaseContainer({
     return <Navigate to='/welcome' replace />;
   }
 
+  const alertHeight = alertOpen ? 38 : 0;
+
   return (
     <>
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
@@ -77,22 +79,21 @@ function BaseContainer({
 
       {skipConnect || (isApiReady && isWalletReady && isMultisigSyned) ? (
         <div
-          data-alert-open={alertOpen}
-          className='flex w-full min-h-[calc(100dvh-1px-56px)] data-[alert-open="true"]:min-h-[calc(100dvh-1px-38px-56px)]'
+          className='flex w-full'
           style={{
-            minHeight: hideSideBar ? '100dvh' : undefined
+            minHeight: hideSideBar ? '100dvh' : `calc(100dvh - 1px - ${alertHeight}px - 56px)`
           }}
         >
-          {hideSideBar ? null : <SideBar offsetTop={alertOpen ? 38 : 0} withSideBar={withSideBar} />}
+          {hideSideBar ? null : <SideBar offsetTop={alertHeight} withSideBar={withSideBar} />}
 
           <div
-            className='relative w-full flex-col gap-6 flex-1 p-4 sm:p-5'
+            className='relative w-full flex-1 flex-col gap-6 p-4 sm:p-5'
             style={{
               display: queue.length > 0 ? 'none' : 'flex',
               padding: withPadding ? undefined : 0
             }}
           >
-            <div className='h-full flex-1 z-10'>
+            <div className='z-10 h-full flex-1'>
               <Outlet />
             </div>
             {hideTopBar ? null : (
@@ -104,7 +105,7 @@ function BaseContainer({
 
           {queue.length > 0 ? (
             <div
-              className='z-50 flex-auto relative'
+              className='relative z-50 flex-auto'
               style={{
                 background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
               }}
@@ -113,7 +114,7 @@ function BaseContainer({
             </div>
           ) : null}
 
-          <RightSideBar offsetTop={alertOpen ? 38 : 0} />
+          <RightSideBar offsetTop={alertHeight} />
         </div>
       ) : (
         <div>

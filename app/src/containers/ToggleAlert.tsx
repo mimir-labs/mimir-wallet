@@ -33,9 +33,9 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
                 addAddressBook(address, true);
               }
         }
-        className='z-50 cursor-pointer sticky top-[56px] w-full pl-2.5 sm:pl-5 py-1 flex items-center h-[38px] gap-1 sm:gap-2.5 bg-primary text-primary-foreground'
+        className='bg-primary text-primary-foreground sticky top-[56px] z-50 flex h-[38px] w-full cursor-pointer items-center gap-1 py-1 pl-2.5 sm:gap-2.5 sm:pl-5'
       >
-        <IconInfo className='w-4 h-4' />
+        <IconInfo className='h-4 w-4' />
 
         {!hasThisAccount && (
           <p className='flex-1'>
@@ -53,7 +53,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
             setForceHide(true);
           }}
         >
-          <IconClose className='w-4 h-4' />
+          <IconClose className='h-4 w-4' />
         </Button>
       </div>
     </>

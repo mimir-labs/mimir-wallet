@@ -19,13 +19,13 @@ function CustomApps() {
       <div className='grid grid-cols-[repeat(auto-fill,_minmax(258px,1fr))] gap-6'>
         <div
           key='add-custom-app'
-          className='relative cursor-pointer p-5 rounded-large bg-content1 border-1 border-secondary shadow-medium aspect-square flex flex-col justify-center items-center gap-5'
+          className='rounded-large bg-content1 border-secondary shadow-medium relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-5 border-1 p-5'
           onClick={toggleOpen}
         >
-          <Button className='w-16 h-16' variant='light' isIconOnly size='lg' radius='full' onPress={toggleOpen}>
-            <IconAdd className='text-primary w-16 h-16' />
+          <Button className='h-16 w-16' variant='light' isIconOnly size='lg' radius='full' onPress={toggleOpen}>
+            <IconAdd className='text-primary h-16 w-16' />
           </Button>
-          <h3 className='text-2xl font-bold text-center'>Add New Customized App</h3>
+          <h3 className='text-center text-2xl font-bold'>Add New Customized App</h3>
           <p className='text-tiny text-foreground/50 text-center'>You can add apps not listed but support Mimir SDK.</p>
         </div>
 

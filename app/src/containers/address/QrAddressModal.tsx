@@ -40,15 +40,15 @@ function Content({
     <div>
       <InputNetwork network={network} setNetwork={setNetwork} />
       <div className='relative'>
-        <div className='flex items-center justify-center my-0 mx-auto w-[300px] h-[300px]' ref={container} />
+        <div className='mx-auto my-0 flex h-[300px] w-[300px] items-center justify-center' ref={container} />
         <Avatar
-          className='absolute left-0 right-0 top-0 bottom-0 m-auto bg-content1'
+          className='bg-content1 absolute top-0 right-0 bottom-0 left-0 m-auto'
           src={chain.icon}
           style={{ width: 50, height: 50 }}
         />
       </div>
 
-      <p className='mt-2.5 break-all text-center'>
+      <p className='mt-2.5 text-center break-all'>
         {ss58FormatValue}
         <CopyButton value={ss58FormatValue} />
       </p>

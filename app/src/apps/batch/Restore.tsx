@@ -22,7 +22,7 @@ import { Alert, Button, Checkbox, Spinner } from '@mimir-wallet/ui';
 import BatchItem from './BatchItem';
 
 function Restore({ onClose }: { onClose: () => void }) {
-  const { network } = useApi();
+  const { network, api } = useApi();
   const { current } = useAccount();
   const [isOpen, toggleOpen] = useToggle(true);
   const [selected, setSelected] = useState<number[]>([]);
@@ -78,7 +78,7 @@ Timestamp: ${time}`;
         type: 'bytes'
       });
 
-      await service.removeBatch(network, current, selected, result.signature, signer, time);
+      await service.transaction.removeBatch(network, current, selected, result.signature, signer, time);
       setSelected([]);
       refetch();
     } catch (error) {
@@ -89,18 +89,18 @@ Timestamp: ${time}`;
   };
 
   return (
-    <div className='flex-1 flex flex-col gap-5 h-full overflow-hidden'>
+    <div className='flex h-full flex-1 flex-col gap-5 overflow-hidden'>
       {isFetched && !txs?.length && <Empty label='No batch found' height='300px' />}
 
       {!isFetched && isFetching && <Spinner variant='wave' />}
 
-      <div className='flex-1 overflow-y-auto space-y-2.5 scrollbar-hide'>
+      <div className='scrollbar-hide flex-1 space-y-2.5 overflow-y-auto'>
         {current && !!txs?.length && (
           <>
             <Alert className='flex-grow-0' color='success' title={`${txs.length} Transactions Founded`} />
 
             {txs?.map((item) => (
-              <BatchItem key={item.id} from={current} calldata={item.call}>
+              <BatchItem key={item.id} from={current} calldata={item.call} registry={api.registry}>
                 <div className='col-span-1 flex items-center'>
                   <Checkbox
                     size='sm'
@@ -122,9 +122,9 @@ Timestamp: ${time}`;
 
         {current && !!restoreList?.length && (
           <>
-            <div onClick={toggleOpen} className='cursor-pointer flex items-center justify-between'>
+            <div onClick={toggleOpen} className='flex cursor-pointer items-center justify-between'>
               Restored
-              <ArrowDown data-open={isOpen} className='w-5 h-5 data-[open=true]:rotate-180' />
+              <ArrowDown data-open={isOpen} className='h-5 w-5 data-[open=true]:rotate-180' />
             </div>
 
             {isOpen &&
@@ -134,6 +134,7 @@ Timestamp: ${time}`;
                   from={current}
                   calldata={item.call}
                   bgcolor='linear-gradient(180deg, #F9F9FC 0%, #E5EBF9 100%)'
+                  registry={api.registry}
                 >
                   <div className='col-span-1 flex items-center'>{item.id}</div>
                   <div className='col-span-2 flex items-center'>
@@ -146,7 +147,7 @@ Timestamp: ${time}`;
       </div>
 
       <div className='flex gap-5'>
-        <div className='flex-1 flex items-center pl-2'>
+        <div className='flex flex-1 items-center pl-2'>
           <Checkbox
             size='sm'
             isSelected={isCheckAll || isCheckSome}

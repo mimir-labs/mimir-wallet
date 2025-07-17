@@ -46,21 +46,21 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       style={{
         background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
       }}
-      className='cursor-pointer p-2 sm:p-2.5 rounded-medium flex items-center gap-1 sm:gap-2 data-[selected=true]:animate-blink-bg'
+      className='rounded-medium data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 p-2 sm:gap-2 sm:p-2.5'
       {...pressProps}
     >
       <Avatar
         src={endpoint.icon}
-        className='w-[20px] sm:w-[30px] h-[20px] sm:h-[30px]'
+        className='h-[20px] w-[20px] sm:h-[30px] sm:w-[30px]'
         style={{ backgroundColor: 'transparent' }}
       />
       <b className='text-small sm:text-medium'>{endpoint.name}</b>
-      <div className='flex-1 text-foreground/50 text-tiny'>
+      <div className='text-foreground/50 text-tiny flex-1'>
         <Address value={address} shorten={!upSm} ss58Format={endpoint.ss58Format} />
       </div>
-      <CopyButton size='sm' className='w-6 h-6 opacity-30' value={encodeAddress(address, endpoint.ss58Format)} />
+      <CopyButton size='sm' className='h-6 w-6 opacity-30' value={encodeAddress(address, endpoint.ss58Format)} />
       <Button isIconOnly size='sm' color='default' variant='light' onPress={() => openQr(address)}>
-        <IconQrcode className='w-[16px] h-[16px] opacity-30' />
+        <IconQrcode className='h-[16px] w-[16px] opacity-30' />
       </Button>
       <Button isIconOnly size='sm' color='default' variant='light' onPress={() => setSs58Chain(endpoint.key)}>
         <IconStar
@@ -75,7 +75,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
 function GroupedNetwork({ address, group, endpoints }: { address: string; group: string; endpoints: Network[] }) {
   return (
     <div>
-      <div className='text-primary capitalize mb-2.5 font-bold text-medium'>{group}</div>
+      <div className='text-primary text-medium mb-2.5 font-bold capitalize'>{group}</div>
       <div className='space-y-2.5'>
         {endpoints.map((endpoint) => (
           <Item key={endpoint.key} endpoint={endpoint} address={address} />
@@ -141,7 +141,7 @@ function CopyAddressModal() {
 
     content = (
       <div>
-        <div className='text-primary capitalize mb-2.5 font-bold text-medium'>{network?.name}</div>
+        <div className='text-primary text-medium mb-2.5 font-bold capitalize'>{network?.name}</div>
         <div className='space-y-2.5'>
           <Item endpoint={network} address={address} />
         </div>
@@ -166,7 +166,7 @@ function CopyAddressModal() {
       onClose={close}
     >
       <DrawerContent>
-        <DrawerBody className='p-5 scrollbar-hide'>{content}</DrawerBody>
+        <DrawerBody className='scrollbar-hide p-5'>{content}</DrawerBody>
       </DrawerContent>
     </BaseComp>
   );

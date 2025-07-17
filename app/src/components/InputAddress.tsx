@@ -180,7 +180,7 @@ function InputAddress({
   const element = (
     <div
       data-hide={isOpen && isFocused}
-      className='address-cell inline-flex items-center gap-x-2.5 flex-grow-0 [&[data-hide=true]_.AddressCell-Content]:hidden w-[calc(100%-20px)]'
+      className='address-cell inline-flex w-[calc(100%-20px)] flex-grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden'
     >
       <AddressCell iconSize={iconSize} value={value} shorten={shorten ?? (upSm ? false : true)} />
     </div>
@@ -197,7 +197,7 @@ function InputAddress({
       style={{ width: wrapperRef.current?.clientWidth }}
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
-      <Listbox color='secondary' emptyContent='no addresses' className='max-h-[250px] overflow-y-auto text-foreground'>
+      <Listbox color='secondary' emptyContent='no addresses' className='text-foreground max-h-[250px] overflow-y-auto'>
         {options.map((item) => (
           <ListboxItem
             key={item}
@@ -221,17 +221,17 @@ function InputAddress({
           ` ${className || ''}`
         )}
       >
-        {label && <div className='font-bold text-small'>{label}</div>}
+        {label && <div className='text-small font-bold'>{label}</div>}
 
         <div
           ref={wrapperRef}
           data-error={!isValidAddress && !!inputValue}
-          className='InputAddressContent overflow-hidden relative w-full inline-flex tap-highlight-transparent px-2 border-medium min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-all !duration-150 motion-reduce:transition-none h-14 py-2 shadow-none border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary data-[focus=true]:bg-transparent'
+          className='InputAddressContent tap-highlight-transparent border-medium rounded-medium border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none'
         >
           {element}
           <input
             ref={inputRef}
-            className='absolute rounded-medium top-0 right-0 bottom-0 left-0 outline-none border-none pl-12 bg-transparent'
+            className='rounded-medium absolute top-0 right-0 bottom-0 left-0 border-none bg-transparent pl-12 outline-none'
             style={{ opacity: (isFocused && isOpen) || !value ? 1 : 0 }}
             value={inputValue}
             placeholder={placeholder}
@@ -243,12 +243,12 @@ function InputAddress({
 
           <ArrowDown
             data-open={isOpen}
-            className='cursor-pointer absolute right-1 top-1/2 -translate-y-1/2 data-[open=true]:rotate-180 transition-transform duration-150'
+            className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
             style={{ color: 'inherit' }}
             {...pressProps}
           />
         </div>
-        {!isValidAddress && !!inputValue && <div className='text-small mt-1 text-danger'>Invalid address</div>}
+        {!isValidAddress && !!inputValue && <div className='text-small text-danger mt-1'>Invalid address</div>}
 
         {valueIsPolkadotEvmAddress ? (
           <div className='text-small mt-1'>🥚✨ Yep, ETH address transfers work — magic, right? 😎</div>
@@ -256,10 +256,10 @@ function InputAddress({
           value &&
           !isLocalAccount(value) &&
           !isLocalAddress(value) && (
-            <div className='flex items-center gap-1 text-small mt-1'>
+            <div className='text-small mt-1 flex items-center gap-1'>
               <IconWarning className='text-warning' />
               This is an unknown address. You can&nbsp;
-              <span className='cursor-pointer text-primary' {...addAddressBookPressProps}>
+              <span className='text-primary cursor-pointer' {...addAddressBookPressProps}>
                 add it to your address book
               </span>
             </div>

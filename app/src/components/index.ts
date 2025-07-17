@@ -13,6 +13,7 @@ export { default as AddAddressDialog } from './AddAddressDialog';
 export { default as Address } from './Address';
 export { default as AddressCell } from './AddressCell';
 export { default as AddressName } from './AddressName';
+export { default as AddressNetworks } from './AddressNetworks';
 export { default as AddressOverview } from './AddressOverview';
 export { default as AddressRow } from './AddressRow';
 export { default as AppIframe } from './AppIframe';

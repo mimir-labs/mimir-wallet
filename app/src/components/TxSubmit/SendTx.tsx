@@ -94,7 +94,7 @@ function SendTx({
 
     try {
       for await (const item of hashSet) {
-        await service.updateCalldata(network, item);
+        await service.chain.updateCalldata(network, item);
       }
 
       if (onlySign) {
@@ -110,7 +110,15 @@ function SendTx({
           }
         );
 
-        await service.uploadWebsite(network, extrinsicHash.toHex(), website, appName, iconUrl, note, relatedBatches);
+        await service.transaction.uploadWebsite(
+          network,
+          extrinsicHash.toHex(),
+          website,
+          appName,
+          iconUrl,
+          note,
+          relatedBatches
+        );
 
         onSignature?.(signer, signature, signedTransaction, payload);
         events.emit('success', 'Sign success');
@@ -124,7 +132,15 @@ function SendTx({
         addTxToast({ events });
 
         events.once('signed', (_, extrinsic) => {
-          service.uploadWebsite(network, extrinsic.hash.toHex(), website, appName, iconUrl, note, relatedBatches);
+          service.transaction.uploadWebsite(
+            network,
+            extrinsic.hash.toHex(),
+            website,
+            appName,
+            iconUrl,
+            note,
+            relatedBatches
+          );
         });
         events.once('inblock', (result) => {
           onResults?.(result);
@@ -157,7 +173,7 @@ function SendTx({
           {Object.entries(delay).map(([address, delay], index) => (
             <div key={`delay-${address}-${index}`} className='flex items-center justify-between gap-[5px] sm:gap-2.5'>
               <div className='flex items-center gap-[5px] sm:gap-2.5'>
-                <IconClock className='text-primary opacity-50 w-4 h-4' />
+                <IconClock className='text-primary h-4 w-4 opacity-50' />
                 <p>Review window</p>
                 <Tooltip
                   content='This transaction needs to be executed manually after review window ends.'

@@ -76,7 +76,7 @@ Genesis Hash: ${genesisHash}`;
         type: 'bytes'
       });
 
-      await service.removePropose(network, transaction.id, signer, result.signature, time);
+      await service.transaction.removePropose(network, transaction.id, signer, result.signature, time);
       onRemove();
       events.emit('refetch_pending_tx');
     } catch (error) {

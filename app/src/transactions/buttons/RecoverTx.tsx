@@ -51,12 +51,12 @@ function RecoverTx({
         <ModalHeader>Call Data</ModalHeader>
         <ModalBody className='gap-y-2.5'>
           <p className='text-foreground/50 text-tiny leading-[16px]'>
-            <IconInfo className='w-4 h-4 mr-1 inline align-text-bottom' />
+            <IconInfo className='mr-1 inline h-4 w-4 align-middle' />
             This transaction wasn’t initiated from Mimir. But you can copy Call Data from explorer to recover this
             transaction
           </p>
           <Divider />
-          <div className='grid grid-cols-[60px_1fr] gap-y-2.5 gap-x-1.5 items-center'>
+          <div className='grid grid-cols-[60px_1fr] items-center gap-x-1.5 gap-y-2.5'>
             <b>Call Data</b>
             <Input value={calldata} onChange={setCalldata} error={error} />
             <b>Call Hash</b>

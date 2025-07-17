@@ -10,8 +10,7 @@ const Skeleton = forwardRef(({ className, disableAnimation = false, ...props }: 
       style={
         {
           '--heroui-content3': 'var(--heroui-secondary)',
-          '--heroui-content4': 'var(--heroui-primary)',
-          '--heroui-content4-opacity': '0.05'
+          '--heroui-content4': 'var(--heroui-primary-50)'
         } as any
       }
       className={`before:border-t-0 ${className || ''}`}

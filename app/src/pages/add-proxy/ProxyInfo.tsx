@@ -30,8 +30,8 @@ function ProxyInfo({
       : `${((Number(delay) * blockInterval) / (ONE_HOUR * 1000)).toFixed(2)} Hours`;
 
   return (
-    <div className='flex flex-col p-2.5 gap-1 bg-secondary rounded-medium'>
-      <div className='flex items-center gap-2.5 text-foreground/65 text-tiny'>
+    <div className='bg-secondary rounded-medium flex flex-col gap-1 p-2.5'>
+      <div className='text-foreground/65 text-tiny flex items-center gap-2.5'>
         <p className='flex-1'>
           {delay > 0 && (
             <>
@@ -51,9 +51,9 @@ function ProxyInfo({
         )}
       </div>
 
-      <div className='flex flex-col sm:flex-row gap-2.5 items-center [&>.AddressCell]:w-full [&>.AddressCell]:bg-content1 [&>.AddressCell]:py-1 [&>.AddressCell]:px-2.5 [&>.AddressCell]:rounded-medium'>
+      <div className='[&>.AddressCell]:bg-content1 [&>.AddressCell]:rounded-medium flex flex-col items-center gap-2.5 sm:flex-row [&>.AddressCell]:w-full [&>.AddressCell]:px-2.5 [&>.AddressCell]:py-1'>
         <AddressCell withCopy value={proxied} withAddressBook />
-        <IconArrow className='w-3.5 h-3.5 text-primary rotate-90 sm:transform-none' />
+        <IconArrow className='text-primary h-3.5 w-3.5 rotate-90 sm:transform-none' />
         <AddressCell withCopy value={delegate} withAddressBook />
       </div>
     </div>

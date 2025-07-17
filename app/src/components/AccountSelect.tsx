@@ -28,7 +28,7 @@ function AccountSelect() {
     <>
       <div
         onClick={handleAccountOpen}
-        className='cursor-pointer h-[32px] sm:h-[42px] border-secondary border-1 rounded-md px-1.5 sm:px-2 bg-secondary sm:bg-transparent gap-2 flex items-center max-w-[140px] sm:max-w-[300px]'
+        className='border-secondary bg-secondary flex h-[32px] max-w-[140px] cursor-pointer items-center gap-2 rounded-md border-1 px-1.5 sm:h-[42px] sm:max-w-[300px] sm:bg-transparent sm:px-2'
         style={{ width: '-webkit-fill-available' }}
       >
         <AddressCell
@@ -39,7 +39,7 @@ function AccountSelect() {
           addressCopyDisabled
           value={selected}
         />
-        <ArrowDown className='w-[14px] h-[14px] sm:w-[20px] sm:h-[20px]' />
+        <ArrowDown className='h-[14px] w-[14px] sm:h-[20px] sm:w-[20px]' />
       </div>
       <AccountMenu anchor='right' onClose={handleAccountClose} open={!!anchorEl} />
     </>

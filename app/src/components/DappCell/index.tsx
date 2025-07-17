@@ -89,7 +89,7 @@ function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
     <div ref={ref}>
       {dapp.isDrawer && (
         <Drawer hideCloseButton placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
-          <DrawerContent className='max-w-full w-auto py-5'>
+          <DrawerContent className='w-auto max-w-full py-5'>
             <DrawerBody>{element}</DrawerBody>
           </DrawerContent>
         </Drawer>
@@ -97,7 +97,7 @@ function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
 
       <div
         data-focus={isFocus}
-        className='relative cursor-pointer p-5 rounded-large bg-content1 border-1 border-secondary shadow-medium aspect-square transition-transform duration-300 data-[focus=true]:scale-x-[-1]'
+        className='rounded-large bg-content1 border-secondary shadow-medium relative aspect-square cursor-pointer border-1 p-5 transition-transform duration-300 data-[focus=true]:scale-x-[-1]'
         {...pressProps}
       >
         <Tooltip content={_isFavorite ? 'Unpin' : 'Pin'}>
@@ -106,7 +106,7 @@ function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
             isIconOnly
             color='primary'
             onPress={toggleFavorite}
-            className='z-10 bg-primary/10 absolute top-2.5 right-2.5 data-[focus=true]:right-auto data-[focus=true]:left-2.5'
+            className='bg-primary/10 absolute top-2.5 right-2.5 z-10 data-[focus=true]:right-auto data-[focus=true]:left-2.5'
           >
             <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
           </Button>
@@ -115,32 +115,32 @@ function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
         {isFocus ? (
           <div
             data-focus={isFocus}
-            className='flex flex-col justify-center items-center gap-5 h-full data-[focus=true]:scale-x-[-1]'
+            className='flex h-full flex-col items-center justify-center gap-5 data-[focus=true]:scale-x-[-1]'
           >
             <div className='flex items-center gap-2.5'>
               {dapp.website && (
                 <Button isIconOnly color='secondary' as={Link} href={dapp.website} size='sm' target='_blank'>
-                  <IconWebsite className='w-4 h-4' />
+                  <IconWebsite className='h-4 w-4' />
                 </Button>
               )}
               {dapp.github && (
                 <Button isIconOnly color='secondary' as={Link} href={dapp.github} size='sm' target='_blank'>
-                  <IconGithub className='w-4 h-4' />
+                  <IconGithub className='h-4 w-4' />
                 </Button>
               )}
               {dapp.discord && (
                 <Button isIconOnly color='secondary' as={Link} href={dapp.discord} size='sm' target='_blank'>
-                  <IconDiscord className='w-4 h-4' />
+                  <IconDiscord className='h-4 w-4' />
                 </Button>
               )}
               {dapp.twitter && (
                 <Button isIconOnly color='secondary' as={Link} href={dapp.twitter} size='sm' target='_blank'>
-                  <IconX className='w-4 h-4' />
+                  <IconX className='h-4 w-4' />
                 </Button>
               )}
               {dapp.matrix && (
                 <Button isIconOnly color='secondary' as={Link} href={dapp.matrix} size='sm' target='_blank'>
-                  <IconMatrix className='w-4 h-4' />
+                  <IconMatrix className='h-4 w-4' />
                 </Button>
               )}
             </div>
@@ -152,9 +152,9 @@ function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
             </Button>
           </div>
         ) : (
-          <div className='flex flex-col justify-center items-center gap-5 h-full'>
-            <img src={dapp.icon} className='w-[64px] h-[64px] bg-transparent' />
-            <h3 className='text-2xl font-bold text-center'>{dapp.name}</h3>
+          <div className='flex h-full flex-col items-center justify-center gap-5'>
+            <img src={dapp.icon} className='h-[64px] w-[64px] bg-transparent' />
+            <h3 className='text-center text-2xl font-bold'>{dapp.name}</h3>
 
             {dapp.tags && dapp.tags.length > 0 && (
               <div className='flex items-center gap-2.5'>
@@ -166,7 +166,7 @@ function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
               </div>
             )}
 
-            <div className='flex justify-between items-center gap-2 text-tiny'>
+            <div className='text-tiny flex items-center justify-between gap-2'>
               <span className='text-foreground/50'>Supported on</span> <SupportedChains app={dapp} />
             </div>
           </div>

@@ -21,15 +21,15 @@ export function toastSuccess(message: any, description?: React.ReactNode) {
         <span className='text-tiny'>{description}</span>
       </div>
     ) : (
-      <div className='flex items-center min-h-[30px]'>{message}</div>
+      <div className='flex min-h-[30px] items-center'>{message}</div>
     )
   );
 }
 
 export function toastError(error: any) {
-  return toast.error(<div className='flex items-center min-h-[30px]'>{getMessage(error)}</div>);
+  return toast.error(<div className='flex min-h-[30px] items-center'>{getMessage(error)}</div>);
 }
 
 export function toastWarn(error: any) {
-  return toast.warn(<div className='flex items-center min-h-[30px]'>{getMessage(error)}</div>);
+  return toast.warn(<div className='flex min-h-[30px] items-center'>{getMessage(error)}</div>);
 }

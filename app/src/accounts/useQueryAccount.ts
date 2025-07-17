@@ -7,7 +7,7 @@ import { isEqual } from 'lodash-es';
 import { useEffect, useMemo } from 'react';
 
 import { addressToHex, encodeAddress, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { useClientQuery, useQuery } from '@mimir-wallet/service';
+import { service, useQuery } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
 
@@ -57,17 +57,18 @@ export function useQueryAccount(
 ): [AccountData | null | undefined, isFetched: boolean, isFetching: boolean, refetch: () => void] {
   const { chainSS58, genesisHash } = useApi();
   const { updateMetas } = useAccount();
-  const { queryHash, queryKey } = useClientQuery(address ? `omni-chain/${addressToHex(address)}/details` : null);
 
-  const { data, isFetched, isFetching, refetch } = useQuery<AccountData | null>({
-    initialData: null,
-    queryHash,
-    queryKey,
-    structuralSharing: (prev, next: any): AccountData | null => {
-      if (!next) {
-        return null;
-      }
-
+  const addressHex: string = address ? addressToHex(address) : '';
+  const { data, isFetched, isFetching, refetch } = useQuery({
+    queryKey: [addressHex] as const,
+    queryHash: `omni-chain-${addressHex}`,
+    staleTime: 6_000,
+    refetchInterval: 60_000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    enabled: !!addressHex,
+    queryFn: ({ queryKey: [address] }) => service.account.getOmniChainDetails(address),
+    structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }
   });
@@ -97,17 +98,17 @@ export function useQueryAccountOmniChain(
 ] {
   const { chainSS58 } = useApi();
   const { updateMetas } = useAccount();
-  const { queryHash, queryKey } = useClientQuery(address ? `omni-chain/${addressToHex(address)}/details` : null);
 
-  const { data, isFetched, isFetching, refetch, promise } = useQuery<AccountData | null>({
-    initialData: null,
-    queryHash,
-    queryKey,
-    structuralSharing: (prev, next: any): AccountData | null => {
-      if (!next) {
-        return null;
-      }
-
+  const addressHex: string = address ? addressToHex(address) : '';
+  const { data, isFetched, isFetching, refetch, promise } = useQuery({
+    queryKey: [addressHex] as const,
+    queryHash: `omni-chain-${addressHex}`,
+    staleTime: 6_000,
+    refetchInterval: 60_000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: ({ queryKey: [address] }) => service.account.getOmniChainDetails(address),
+    structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }
   });

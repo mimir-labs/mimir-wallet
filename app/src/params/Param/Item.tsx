@@ -13,17 +13,17 @@ function Item({ content, name, type = 'horizontal' }: Props) {
   if (type === 'vertical') {
     return (
       <div className='space-y-1'>
-        <label className='font-bold text-small'>{name}</label>
+        <label className='text-small font-bold'>{name}</label>
 
-        <div className='p-2.5 bg-secondary rounded-medium'>{content}</div>
+        <div className='bg-secondary rounded-medium p-2.5'>{content}</div>
       </div>
     );
   }
 
   return (
-    <div className='grid grid-cols-10 gap-2.5 w-full text-tiny'>
-      <div className='flex col-span-2 items-center font-bold'>{name}</div>
-      <div className='flex col-span-8 items-center font-bold text-foreground/65'>{content}</div>
+    <div className='text-tiny grid w-full grid-cols-10 gap-2.5'>
+      <div className='col-span-2 flex items-center font-bold'>{name}</div>
+      <div className='text-foreground/65 col-span-8 flex items-center font-bold'>{content}</div>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { events } from '@/events';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useEffect, useState } from 'react';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 
 import AddTemplate from './AddTemplate';
 import TemplateList from './TemplateList';
@@ -25,6 +25,7 @@ function Content({
   network,
   setNetwork
 }: Props & { network: string; setNetwork: (network: string) => void }) {
+  const { api } = useApi();
   const [isAdd, setIsAdd] = useState(defaultAdded);
   const [isView, setIsView] = useState(false);
   const [viewTemplate, setViewTemplate] = useState<HexString | undefined>(undefined);
@@ -51,6 +52,7 @@ function Content({
         defaultCallData={defaultCallData}
         onBack={() => setIsAdd(false)}
         setNetwork={setNetwork}
+        registry={api.registry}
       />
     );
 
@@ -60,6 +62,7 @@ function Content({
         key={network}
         isView
         defaultCallData={viewTemplate}
+        registry={api.registry}
         defaultName={viewTemplateName}
         onBack={() => setIsView(false)}
       />
@@ -76,6 +79,7 @@ function Content({
         setIsView(true);
       }}
       setNetwork={setNetwork}
+      registry={api.registry}
     />
   );
 }

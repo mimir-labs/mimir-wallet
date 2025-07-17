@@ -51,7 +51,7 @@ function Extrinsic({
   }, [api.registry, callData]);
 
   return (
-    <div className='w-full max-w-[500px] mx-auto mt-3 p-5 rounded-large border-1 border-secondary bg-content1 shadow-medium'>
+    <div className='rounded-large border-secondary bg-content1 shadow-medium mx-auto mt-3 w-full max-w-[500px] border-1 p-5'>
       <div className='space-y-5'>
         <h3>Submit Extrinsic</h3>
 
@@ -88,7 +88,7 @@ function Extrinsic({
         />
 
         {callDataError && (
-          <div className='bg-secondary p-2.5 rounded-medium break-all'>
+          <div className='bg-secondary rounded-medium p-2.5 break-all'>
             <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-tiny'>
               {callDataError.message}
             </p>
@@ -97,7 +97,7 @@ function Extrinsic({
 
         {parsedCallData && (
           <div className='space-y-[5px]'>
-            <div className='flex justify-between items-center'>
+            <div className='flex items-center justify-between'>
               <p className='font-bold'>
                 {parsedCallData.section}.{parsedCallData.method}
               </p>
@@ -106,7 +106,7 @@ function Extrinsic({
               </Link>
             </div>
 
-            <div className='rounded-medium border-1 border-divider-300 p-2.5'>
+            <div className='rounded-medium border-divider-300 border-1 p-2.5'>
               <ErrorBoundary>
                 <CallComp registry={api.registry} from={sending} call={parsedCallData} jsonFallback />
               </ErrorBoundary>

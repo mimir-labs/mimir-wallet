@@ -5,8 +5,7 @@ import { heroui } from '@heroui/theme';
 
 export default heroui({
   layout: {
-    spacingUnit: 4,
-    dividerWeight: 1,
+    dividerWeight: '1px',
     radius: {
       small: '5px',
       medium: '10px',
@@ -32,13 +31,7 @@ export default heroui({
       tiny: '1.2',
       small: '1.2',
       medium: '1.2',
-      large: '1.2',
-      xl: '1.2',
-      '2xl': '1.2',
-      '3xl': '1.2',
-      '4xl': '1.2',
-      '5xl': '1.2',
-      '6xl': '1.2'
+      large: '1.2'
     }
   },
   themes: {

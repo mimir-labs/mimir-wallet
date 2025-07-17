@@ -47,12 +47,12 @@ function TimeCell({ time }: { time?: number }) {
 
 function ActionsCell({ withDetails, detailOpen }: { withDetails?: boolean; detailOpen: boolean }) {
   return (
-    <div className='w-full flex justify-between items-center'>
+    <div className='flex w-full items-center justify-between'>
       <div />
       {withDetails ? (
         <Button isIconOnly color='primary' variant='light' onPress={(e) => e.continuePropagation()}>
           <ArrowDown
-            className={`transition-transform duration-200 text-primary transform-origin-center ${
+            className={`text-primary transform-origin-center transition-transform duration-200 ${
               detailOpen ? 'rotate-180' : 'rotate-0'
             }`}
             fontSize='0.6rem'
@@ -94,9 +94,9 @@ function TxItems({
 
   return (
     <>
-      <div className='transition-all duration-200 rounded-medium overflow-hidden bg-secondary'>
+      <div className='rounded-medium bg-secondary overflow-hidden transition-all duration-200'>
         <div
-          className='cursor-pointer grid grid-cols-10 md:grid-cols-12 lg:grid-cols-[repeat(15,_minmax(0,_1fr))] px-2.5 sm:px-4 md:px-5 gap-2.5 font-semibold [&>div]:flex [&>div]:items-center [&>div]:h-10'
+          className='grid cursor-pointer grid-cols-10 gap-2.5 px-2.5 font-semibold sm:px-4 md:grid-cols-12 md:px-5 lg:grid-cols-[repeat(15,_minmax(0,_1fr))] [&>div]:flex [&>div]:h-10 [&>div]:items-center'
           onClick={toggleDetailOpen}
         >
           <div className='col-span-2'>
@@ -131,7 +131,7 @@ function TxItems({
           </div>
         </div>
         {withDetails && detailOpen && (
-          <div className='flex gap-3 md:gap-4 p-3 md:p-4 flex-row rounded-medium bg-content1 mx-3 md:mx-4 mb-3 md:mb-4'>
+          <div className='rounded-medium bg-content1 mx-3 mb-3 flex flex-row gap-3 p-3 md:mx-4 md:mb-4 md:gap-4 md:p-4'>
             <Extrinsic defaultOpen={detailOpen} transaction={transaction} call={call} />
             <Progress openOverview={toggleOverviewOpen} account={account} transaction={transaction} />
           </div>

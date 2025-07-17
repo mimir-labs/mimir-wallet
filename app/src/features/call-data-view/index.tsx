@@ -37,7 +37,7 @@ function CallDataViewer({ calldata, onClose }: { calldata: string; onClose: () =
       <Input label='Call Data' placeholder='0x...' disabled value={calldata} />
 
       {callDataError && (
-        <div className='bg-secondary p-2.5 rounded-medium break-all'>
+        <div className='bg-secondary rounded-medium p-2.5 break-all'>
           <div
             style={{
               fontFamily: 'Geist Mono'

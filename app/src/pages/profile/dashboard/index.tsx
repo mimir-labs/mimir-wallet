@@ -37,8 +37,8 @@ function Dashboard({ address }: { address: string }) {
       ].includes(genesisHash) &&
         showBanner && (
           <div className='relative w-full'>
-            <Link href='https://wave.bifrost.io' target='_blank' rel='noreferrer' className='w-full block'>
-              <img className='w-full rounded-medium' src='/images/bifrost.webp' alt='Bifrost banner' />
+            <Link href='https://wave.bifrost.io' target='_blank' rel='noreferrer' className='block w-full'>
+              <img className='rounded-medium w-full' src='/images/bifrost.webp' alt='Bifrost banner' />
             </Link>
             <Button
               isIconOnly

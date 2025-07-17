@@ -87,7 +87,7 @@ function Item({
 
   return (
     <div
-      className='cursor-pointer flex items-center justify-between rounded-small p-1 bg-secondary  snap-start'
+      className='rounded-small bg-secondary flex cursor-pointer snap-start items-center justify-between p-1'
       {...pressProps}
     >
       <div>
@@ -114,9 +114,9 @@ function Item({
           onClick(account);
         }}
         size='sm'
-        className='w-[26px] h-[26px] min-w-[0px] min-h-[0px]'
+        className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
       >
-        {type === 'add' ? <IconAdd className='w-4 h-4' /> : <IconDelete className='w-4 h-4' />}
+        {type === 'add' ? <IconAdd className='h-4 w-4' /> : <IconDelete className='h-4 w-4' />}
       </Button>
     </div>
   );
@@ -143,10 +143,10 @@ function AccountSelect({ withSearch, accounts, ignoreAccounts = [], onClick, tit
     <div className='flex flex-1 flex-col gap-3'>
       <b>{title}</b>
 
-      <div className='relative space-y-2.5 overflow-y-auto mt-1 p-2.5 flex-1 border-1 border-divider-300 rounded-medium bg-content1'>
+      <div className='border-divider-300 rounded-medium bg-content1 relative mt-1 flex-1 space-y-2.5 overflow-y-auto border-1 p-2.5'>
         {withSearch && (
           <Input
-            className='z-10 sticky top-0 bg-content1'
+            className='bg-content1 sticky top-0 z-10'
             endAdornment={<IconSearch />}
             onChange={setKeywords}
             placeholder='search or input address'
@@ -158,7 +158,7 @@ function AccountSelect({ withSearch, accounts, ignoreAccounts = [], onClick, tit
           style={{
             maxHeight: scroll ? '200px' : 'none'
           }}
-          className='space-y-2.5 -mx-1.5 px-1.5 scroll-smooth focus:scroll-auto snap-y scroll-pt-2 overflow-y-auto'
+          className='-mx-1.5 snap-y scroll-pt-2 space-y-2.5 overflow-y-auto scroll-smooth px-1.5 focus:scroll-auto'
         >
           {filtered.map((account, index) => (
             <Item key={index} account={account} type={type} onClick={handleSelect} />

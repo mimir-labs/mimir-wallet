@@ -45,8 +45,8 @@ function HistoryTransactions({
       next={fetchNextPage}
       hasMore={hasNexPage}
       loader={skeleton}
-      endMessage={<h6 className='text-small text-center text-foreground/50'>no data more.</h6>}
-      className='!overflow-visible flex flex-col gap-5'
+      endMessage={<h6 className='text-small text-foreground/50 text-center'>no data more.</h6>}
+      className='flex flex-col gap-5 !overflow-visible'
     >
       {data.map((item) => (
         <TxCell key={item.id} address={address} transaction={item} />

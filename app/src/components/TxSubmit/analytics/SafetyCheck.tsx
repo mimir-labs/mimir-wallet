@@ -31,15 +31,15 @@ function SafetyCheck({
           {!safetyCheck && <Spinner size='sm' />}
           {safetyCheck && (
             <>
-              {safetyCheck.severity === 'none' && <IconSuccess className='text-success w-4 h-4' />}
-              {safetyCheck.severity === 'error' && <IconFailed className='text-danger w-4 h-4' />}
-              {safetyCheck.severity === 'warning' && <IconInfo className='text-warning w-4 h-4' />}
+              {safetyCheck.severity === 'none' && <IconSuccess className='text-success h-4 w-4' />}
+              {safetyCheck.severity === 'error' && <IconFailed className='text-danger h-4 w-4' />}
+              {safetyCheck.severity === 'warning' && <IconInfo className='text-warning h-4 w-4' />}
 
               <p
                 data-success={safetyCheck.severity === 'none'}
                 data-error={safetyCheck.severity === 'error'}
                 data-warning={safetyCheck.severity === 'warning'}
-                className='font-bold data-[success=true]:text-success data-[error]:text-danger data-[warning]:text-warning'
+                className='data-[success=true]:text-success data-[error]:text-danger data-[warning]:text-warning font-bold'
               >
                 {safetyCheck?.message}
               </p>
@@ -52,15 +52,15 @@ function SafetyCheck({
         {!isTxBundleLoading && (
           <>
             {!txError ? (
-              <IconSuccess className='text-success w-4 h-4' />
+              <IconSuccess className='text-success h-4 w-4' />
             ) : (
-              <IconFailed className='text-danger w-4 h-4' />
+              <IconFailed className='text-danger h-4 w-4' />
             )}
 
             <p
               data-success={!txError}
               data-error={!!txError}
-              className='font-bold data-[success=true]:text-success data-[error=true]:text-danger'
+              className='data-[success=true]:text-success data-[error=true]:text-danger font-bold'
             >
               {!txError ? 'Permission Granted' : 'Perimission Denied'}
             </p>

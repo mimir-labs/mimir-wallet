@@ -122,7 +122,7 @@ function SetIdentity({ from, registry, call, jsonFallback }: CallProps) {
   if (!results) return <FunctionArgs from={from} registry={registry} call={call} jsonFallback={jsonFallback} />;
 
   return (
-    <div className='w-full flex items-center justify-between gap-2.5 sm:gap-5 md:gap-7'>
+    <div className='flex w-full items-center justify-between gap-2.5 sm:gap-5 md:gap-7'>
       <IdentityDisplay {...results} address={from} />
     </div>
   );
