@@ -62,6 +62,7 @@ export type PureAccountData = AccountDataType & {
   creator: HexString;
   disambiguationIndex: number;
   network: HexString;
+  migrationNetwork?: HexString;
 };
 
 type BaseAccountData = AccountDataType & {
@@ -298,6 +299,7 @@ type BaseAddressMeta = {
   creator?: HexString;
   disambiguationIndex?: number;
   pureCreatedAt?: HexString;
+  migrationNetwork?: HexString;
   delegatees?: string[];
   multipleMultisig?: boolean;
   proxyType?: string;
@@ -343,6 +345,7 @@ type PureAddressMeta = Omit<BaseAddressMeta, 'isPure'> & {
   creator: HexString;
   disambiguationIndex: number;
   pureCreatedAt: HexString;
+  migrationNetwork?: HexString;
 };
 
 export type AddressMeta =

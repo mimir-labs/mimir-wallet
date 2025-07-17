@@ -13,6 +13,7 @@ import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import TemplateItem from './TemplateItem';
+import TemplateMigrationAlert from './TemplateMigrationAlert';
 import { useSavedTemplate } from './useSavedTemplate';
 
 function TemplateList({
@@ -30,6 +31,11 @@ function TemplateList({
 }) {
   const { network } = useApi();
   const { template, removeTemplate, editTemplateName } = useSavedTemplate(network);
+
+  const handleMigrationComplete = () => {
+    // Refresh templates after migration is complete
+    // The template list will automatically update via the useSavedTemplate hook
+  };
 
   return (
     <div className='h-full space-y-5'>
@@ -53,6 +59,8 @@ function TemplateList({
       </div>
 
       <InputNetwork network={network} setNetwork={setNetwork} />
+
+      <TemplateMigrationAlert chain={network} templates={template} onMigrationComplete={handleMigrationComplete} />
 
       <Divider />
 

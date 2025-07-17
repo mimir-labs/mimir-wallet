@@ -19,6 +19,7 @@ import { Avatar, Button, Divider, Link } from '@mimir-wallet/ui';
 
 import Actions from './Actions';
 import BatchItemDrag from './BatchItemDrag';
+import BatchMigrationAlert from './BatchMigrationAlert';
 import EmptyBatch from './EmptyBatch';
 import Restore from './Restore';
 
@@ -37,7 +38,7 @@ function Content({
   setTxs: (txs: BatchTxItem[]) => void;
   onClose?: () => void;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [relatedBatches, setRelatedBatches] = useState<number[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,9 +65,21 @@ function Content({
     }
   };
 
+  const handleMigrationComplete = () => {
+    // Refresh batch after migration is complete
+    // The batch list will automatically update via the useBatchTxs hook
+  };
+
   return (
     <>
       <div className='scrollbar-hide flex flex-1 flex-col gap-2.5 overflow-y-auto'>
+        <BatchMigrationAlert
+          chain={network}
+          txs={txs}
+          address={address}
+          onMigrationComplete={handleMigrationComplete}
+        />
+
         <div ref={containerRef} style={{ touchAction: 'pan-y' }}>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={txs.map((item) => item.id)} strategy={verticalListSortingStrategy}>
