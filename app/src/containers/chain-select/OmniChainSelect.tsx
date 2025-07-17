@@ -4,6 +4,7 @@
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
+import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
 import { useMemo, useState } from 'react';
 
 import { type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -52,11 +53,13 @@ function Status({ network }: { network: Network }) {
 function GroupedEndpoints({
   group,
   endpoints,
+  completedMigrationNetworks,
   enableNetworks,
   disableNetworks
 }: {
   group: string;
   endpoints: Network[];
+  completedMigrationNetworks: string[];
   enableNetworks: (networks: string[]) => void;
   disableNetworks: (networks: string[]) => void;
 }) {
@@ -88,17 +91,20 @@ function GroupedEndpoints({
       </div>
       <div className='grid grid-cols-1 gap-2.5 sm:grid-cols-2'>
         {endpoints.map((endpoint) => {
+          const isCompletedMigration = completedMigrationNetworks.includes(endpoint.key);
+
           return (
             <Button
               key={endpoint.key}
+              data-completed-migration={isCompletedMigration}
               fullWidth
               variant='light'
               radius='sm'
               color='secondary'
               size='lg'
-              className='text-foreground rounded-medium h-[52px] justify-start p-2.5 text-left font-bold shadow-none'
+              className='text-foreground rounded-medium bg-divider-300/30 data-[completed-migration="true"]:text-opacity-30 data-[completed-migration="true"]:hover:bg-divider-300/30 h-[52px] justify-start p-2.5 text-left font-bold shadow-none'
               style={{
-                background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
+                background: !isCompletedMigration ? 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)' : undefined
               }}
               startContent={<Status network={endpoint} />}
               endContent={
@@ -110,6 +116,15 @@ function GroupedEndpoints({
                       closeDelay={0}
                     >
                       <IconQuestion />
+                    </Tooltip>
+                  )}
+
+                  {isCompletedMigration && (
+                    <Tooltip
+                      classNames={{ content: 'max-w-[300px]' }}
+                      content='Due to the Assethub Migration, this network is no longer the primary one for regular users. Please connect to Assethub instead.'
+                    >
+                      <IconQuestion className='text-primary' />
                     </Tooltip>
                   )}
 
@@ -140,6 +155,11 @@ function GroupedEndpoints({
 function OmniChainSelect() {
   const { isApiReady } = useApi();
   const { networks, enableNetwork, disableNetwork } = useNetworks();
+  const { data: migrationNetworks } = useMigrationNetworks();
+
+  const completedMigrationNetworks = useMemo(() => {
+    return migrationNetworks?.filter((network) => network.status === 'completed').map((network) => network.chain) || [];
+  }, [migrationNetworks]);
 
   const enabledNetworks = useMemo(() => networks.filter((network) => network.enabled), [networks]);
   const groupedEndpoints = useMemo(() => {
@@ -158,8 +178,23 @@ function OmniChainSelect() {
       {} as Record<string, Network[]>
     );
 
+    // Sort networks within each group to put completed migration networks at the end
+    Object.keys(list).forEach((groupKey) => {
+      list[groupKey] = list[groupKey].sort((a, b) => {
+        const aIsCompleted = completedMigrationNetworks.includes(a.key);
+        const bIsCompleted = completedMigrationNetworks.includes(b.key);
+
+        // If one is completed and the other is not, put completed at the end
+        if (aIsCompleted && !bIsCompleted) return 1;
+        if (!aIsCompleted && bIsCompleted) return -1;
+
+        // If both are completed or both are not completed, maintain original order
+        return 0;
+      });
+    });
+
     return list;
-  }, [networks]);
+  }, [networks, completedMigrationNetworks]);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -262,6 +297,7 @@ function OmniChainSelect() {
                 key={`group-${group}`}
                 group={group}
                 endpoints={groupedEndpoints[group]}
+                completedMigrationNetworks={completedMigrationNetworks}
                 enableNetworks={(networks) => networks.forEach((network) => enableNetwork(network))}
                 disableNetworks={(networks) => networks.forEach((network) => disableNetwork(network))}
               />

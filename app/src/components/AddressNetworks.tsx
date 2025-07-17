@@ -141,6 +141,14 @@ function AddressNetworks({ address, avatarSize = 20, showTooltip = true }: Addre
     return networks.filter((network) => genesisHashes.includes(network.genesisHash));
   }, [meta.proxyNetworks, meta.pureCreatedAt, networks]);
 
+  const migrationNetwork = useMemo(() => {
+    if (meta.pureCreatedAt && meta.migrationNetwork) {
+      return networks.find((network) => network.genesisHash === meta.migrationNetwork);
+    }
+
+    return undefined;
+  }, [meta.migrationNetwork, meta.pureCreatedAt, networks]);
+
   // Return array of Avatar components for proxy networks
   return proxyNetworks.map((network) => {
     return (
@@ -150,6 +158,8 @@ function AddressNetworks({ address, avatarSize = 20, showTooltip = true }: Addre
         icon={network.icon}
         name={network.name}
         showTooltip={showTooltip}
+        migrationIcon={migrationNetwork?.icon}
+        migrationName={migrationNetwork?.name}
       />
     );
   });

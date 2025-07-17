@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
 import { AnimatePresence } from 'framer-motion';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
 import { type Endpoint, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, FreeSoloPopover, Listbox, ListboxItem, Spinner, usePress } from '@mimir-wallet/ui';
+import { Avatar, Chip, FreeSoloPopover, Listbox, ListboxItem, Spinner, usePress } from '@mimir-wallet/ui';
 
 interface Props {
   showAllNetworks?: boolean;
@@ -53,6 +54,10 @@ function OmniChainInputNetwork({
       ...item,
       endContent: endContent?.[item.key] || endContent?.[item.genesisHash]
     }));
+  const { data: migrationNetworks } = useMigrationNetworks();
+  const completedMigrationNetworks = migrationNetworks
+    ?.filter((item) => item.status === 'completed')
+    .map((item) => item.chain);
 
   const chain: Options | undefined = options.find((item) => item.key === network);
 
@@ -94,6 +99,7 @@ function OmniChainInputNetwork({
       <Listbox color='secondary' emptyContent='no networks' className='text-foreground max-h-[250px] overflow-y-auto'>
         {options.map((item) => {
           const isApiReady = !!allApis[item.key]?.isApiReady;
+          const isMigrationCompleted = !!completedMigrationNetworks?.includes(item.key);
 
           return (
             <ListboxItem
@@ -117,6 +123,11 @@ function OmniChainInputNetwork({
               endContent={
                 <div className='flex items-center gap-2'>
                   {item.endContent}
+                  {isMigrationCompleted && (
+                    <Chip color='secondary' size='sm'>
+                      Migrated
+                    </Chip>
+                  )}
                   {showAllNetworks ? null : !isApiReady ? <Spinner size='sm' /> : null}
                 </div>
               }

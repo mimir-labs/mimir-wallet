@@ -3,6 +3,7 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { ConnectWalletModal, Navigate, ToastRoot, TxSubmit, TxToast } from '@/components';
+import { MigrationAlert } from '@/features/assethub-migration';
 import { useFollowAccounts } from '@/hooks/useFollowAccounts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
@@ -47,6 +48,7 @@ function BaseContainer({
   const { current, isMultisigSyned } = useAccount();
   const { queue } = useTxQueue();
   const [alertOpen, setAlertOpen] = useState<boolean>(true);
+  const [, setAlertCounts] = useState<number>(0);
 
   useFollowAccounts();
   usePageTitle();
@@ -69,6 +71,7 @@ function BaseContainer({
       {isApiReady && isWalletReady && isMultisigSyned && current && (
         <>
           {hideTopBar ? null : <ToggleAlert address={current} setAlertOpen={setAlertOpen} />}
+          <MigrationAlert onMigrationCounts={setAlertCounts} />
           <SubscribeTx address={current} />
           <ViewCallData />
           <CopyAddressModal />
