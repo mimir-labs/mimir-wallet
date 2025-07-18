@@ -7,6 +7,7 @@ import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Address, AddressRow, Input, InputNetwork } from '@/components';
+import { MigrationTip } from '@/features/assethub-migration';
 import { useCacheMultisig } from '@/hooks/useCacheMultisig';
 import { encodeMultiAddress } from '@polkadot/util-crypto';
 import { useCallback, useMemo, useState } from 'react';
@@ -166,6 +167,8 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
               </div>
 
               {flexible && <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />}
+
+              {flexible && <MigrationTip type='create-multisig' chain={network} />}
 
               <Alert
                 color='warning'
