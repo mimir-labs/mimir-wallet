@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.14.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.13.1...mimir-wallet-app-v2.14.0) (2025-07-21)
+
+
+### Features
+
+* **dapp:** Add bounties app developed by the PAPI team ([#262](https://github.com/mimir-labs/mimir-wallet/issues/262)) ([a9cea1b](https://github.com/mimir-labs/mimir-wallet/commit/a9cea1b9877bb8e265db759f438728e0ffaca493))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.14.0
+    * @mimir-wallet/service bumped to 2.14.0
+    * @mimir-wallet/ui bumped to 2.14.0
+
 ## [2.13.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.13.0...mimir-wallet-app-v2.13.1) (2025-07-16)
 
 
