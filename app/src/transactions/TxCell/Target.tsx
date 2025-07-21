@@ -31,7 +31,7 @@ function CallInfo({ call }: { call: IMethod }) {
             + Template
           </Button>
         </Tooltip>
-        <Tooltip content='For better repeatly submit this transaction you can add to Batch' color='foreground'>
+        <Tooltip content='Submit exact same transactions' color='foreground'>
           <Button variant='ghost' size='sm' endContent={<IconBatch />}>
             + Batch
           </Button>

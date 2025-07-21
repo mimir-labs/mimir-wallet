@@ -29,8 +29,9 @@ const FunctionArgs = forwardRef<HTMLDivElement | null, CallProps>(({ registry, c
 
   return done ? (
     <div ref={ref} className={mergeClasses('', className)}>
-      {args
-        ? args.map(([name, type], index) => (
+      {args ? (
+        args.length > 0 ? (
+          args.map(([name, type], index) => (
             <Item
               type={displayType}
               key={index}
@@ -40,7 +41,10 @@ const FunctionArgs = forwardRef<HTMLDivElement | null, CallProps>(({ registry, c
               name={name}
             />
           ))
-        : null}
+        ) : (
+          <span className='font-bold'>No parameter</span>
+        )
+      ) : null}
     </div>
   ) : null;
 });

@@ -22,7 +22,7 @@ export function useAssetConversion(
       const [nativeGasFee, targetAsset] = queryKey;
 
       if (!nativeGasFee || !targetAsset) {
-        throw new Error('Extrinsic is not defined');
+        throw new Error('assets is not defined');
       }
 
       if (targetAsset.isNative) {

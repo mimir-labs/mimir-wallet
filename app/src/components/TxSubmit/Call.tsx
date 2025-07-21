@@ -94,13 +94,13 @@ function TransactionInfo({
 
         {transaction?.createdExtrinsicHash && (
           <Item
-            title='Created Extrinsic'
+            title='Created Transaction'
             content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
           />
         )}
         {transaction?.executedExtrinsicHash && (
           <Item
-            title='Executed Extrinsic'
+            title='Executed Transaction'
             content={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
           />
         )}
