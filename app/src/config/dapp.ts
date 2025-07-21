@@ -365,5 +365,16 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     website: 'https://bountymanager.io/',
     github: 'https://github.com/galaniprojects/Polkadot-Bounty-Manager'
   },
-  DotConsoleApp
+  DotConsoleApp,
+  {
+    id: 1011,
+    icon: '/dapp-icons/papi.svg',
+    name: 'Bounties',
+    description: 'Quickly perform batch management of bounty-related actions — developed by the PAPI team.',
+    url: 'https://bounties.usepapi.app/',
+    supportedChains: ['polkadot', 'kusama'],
+    tags: ['Bounty', 'Tool'],
+    website: 'https://bounties.usepapi.app/',
+    github: 'https://github.com/polkadot-api/bounties'
+  }
 ];
