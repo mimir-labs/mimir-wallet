@@ -85,7 +85,7 @@ function Extrinsic({
           <Divider />
 
           <details className='group'>
-            <summary className='hover:text-primary flex cursor-pointer list-none items-center justify-between font-bold no-underline transition-colors'>
+            <summary className='hover:text-primary flex cursor-pointer list-none items-center font-bold no-underline transition-colors select-none'>
               <span className='group-open:hidden'>View Details</span>
               <span className='hidden group-open:block'>Hide Details</span>
               <ArrowDown className='transform transition-transform group-open:rotate-180' />

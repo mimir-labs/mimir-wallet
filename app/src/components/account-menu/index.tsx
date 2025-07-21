@@ -209,7 +209,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
                 </div>
 
                 {visiblePinnedAccounts.map((account) => (
-                  <VirtualAccountCell
+                  <AccountCell
                     key={`pinned-${account}`}
                     onClose={onClose}
                     onSelect={onSelect}
