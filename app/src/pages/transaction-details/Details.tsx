@@ -36,7 +36,7 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
       <Item title='From' content={<AddressCell iconSize={40} withCopy value={from} />} />
 
       {targetCall ? (
-        <FunctionArgs displayType='vertical' from={from} registry={api.registry} call={targetCall} jsonFallback />
+        <FunctionArgs displayType='vertical' from={from} registry={api.registry} call={targetCall} />
       ) : null}
 
       {!call && (

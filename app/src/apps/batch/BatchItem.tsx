@@ -60,7 +60,7 @@ function BatchItem({ children, actions, from, calldata, bgcolor, registry }: Pro
 
       {isOpen ? (
         <div className='bg-content1 rounded-medium mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
-          <Call jsonFallback from={from} call={call} registry={registry} />
+          <Call showFallback from={from} call={call} registry={registry} />
         </div>
       ) : null}
     </div>

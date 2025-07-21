@@ -207,23 +207,21 @@ async function fetchAssetInfo({
           metadata as Option<PalletAssetRegistryAssetDetails>
         ).unwrap();
 
-        if (name.isSome && symbol.isSome && decimals.isSome) {
-          return [
-            {
-              network: network,
-              genesisHash: api.genesisHash.toHex(),
-              isNative: false,
-              assetId: assetId.toString(),
-              name: name.unwrap().toUtf8(),
-              symbol: symbol.unwrap().toUtf8(),
-              decimals: decimals.unwrap().toNumber(),
-              icon: findAsset(network, assetId)?.Icon,
-              price: 0,
-              change24h: 0
-            },
-            existentialDeposit
-          ];
-        }
+        return [
+          {
+            network: network,
+            genesisHash: api.genesisHash.toHex(),
+            isNative: false,
+            assetId: assetId.toString(),
+            name: name.unwrapOrDefault().toUtf8(),
+            symbol: symbol.unwrapOrDefault().toUtf8(),
+            decimals: decimals.unwrapOrDefault().toNumber(),
+            icon: findAsset(network, assetId)?.Icon,
+            price: 0,
+            change24h: 0
+          },
+          existentialDeposit
+        ];
       }
 
       return undefined;

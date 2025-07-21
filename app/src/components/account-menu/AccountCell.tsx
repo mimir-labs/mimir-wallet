@@ -8,10 +8,10 @@ import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { usePinAccounts } from '@/hooks/usePinAccounts';
 import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { Button, Link, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
+import { Button, Link, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@mimir-wallet/ui';
 
 import AddressCell from '../AddressCell';
 
@@ -33,7 +33,23 @@ function AccountCell({
   const { isLocalAccount, deleteAddress, hideAccount, addAddressBook } = useAccount();
   const [totalUsd] = useBalanceTotalUsd(value);
   const source = useAccountSource(value);
-  const formatUsd = formatDisplay(totalUsd.toString());
+  const [formatUsd, setFormatUsd] = useState<React.ReactNode>(<Skeleton className='rounded-small h-4 w-16' />);
+
+  useEffect(() => {
+    if (!totalUsd) {
+      setFormatUsd(<div className='text-tiny font-bold whitespace-nowrap'>$ 0</div>);
+    } else {
+      const formatUsd = formatDisplay(totalUsd.toString());
+
+      setFormatUsd(
+        <div className='text-tiny font-bold whitespace-nowrap'>
+          $ {formatUsd[0]}
+          {formatUsd[1] ? `.${formatUsd[1]}` : ''}
+          {formatUsd[2] || ''}
+        </div>
+      );
+    }
+  }, [totalUsd]);
   const { pinnedAccounts, addPinnedAccount, removePinnedAccount } = usePinAccounts();
 
   const isPinned = useMemo(() => pinnedAccounts.includes(addressToHex(value)), [pinnedAccounts, value]);
@@ -66,11 +82,7 @@ function AccountCell({
         showNetworkProxied
         withPendingTxCounts
       />
-      <div className='text-tiny font-bold whitespace-nowrap'>
-        $ {formatUsd[0]}
-        {formatUsd[1] ? `.${formatUsd[1]}` : ''}
-        {formatUsd[2] || ''}
-      </div>
+      {formatUsd}
 
       {withAdd && (
         <Button isIconOnly color='default' size='sm' variant='light' onPress={() => addAddressBook(value, true)}>

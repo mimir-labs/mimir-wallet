@@ -17,7 +17,15 @@ interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanEle
   icon?: React.ReactNode;
 }
 
-function FormatBalance({ format, label, value, withCurrency, icon, ...props }: Props): React.ReactElement<Props> {
+function FormatBalance({
+  format,
+  label,
+  value,
+  withCurrency,
+  icon,
+  className = '',
+  ...props
+}: Props): React.ReactElement<Props> {
   const { api } = useApi();
   const decimals = format?.[0] ?? api.registry.chainDecimals[0];
   const currency = format?.[1] ?? api.registry.chainTokens[0];
@@ -29,7 +37,7 @@ function FormatBalance({ format, label, value, withCurrency, icon, ...props }: P
 
   // labelPost here looks messy, however we ensure we have one less text node
   return (
-    <span className='inline-flex items-center gap-1' {...props}>
+    <span className={`inline-flex items-center gap-1 ${className}`} {...props}>
       {label}
       <span>
         {major}

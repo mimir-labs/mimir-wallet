@@ -4,15 +4,15 @@
 import type { Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
-import IconTemplate from '@/assets/svg/icon-template.svg?react';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { AppName, Bytes, Hash } from '@/components';
 import { events } from '@/events';
-import { useToggle } from '@/hooks/useToggle';
+import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import moment from 'moment';
 import React from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
+import { chainLinks, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { Button, Divider, Link } from '@mimir-wallet/ui';
 
 import Target from './Target';
 
@@ -25,77 +25,66 @@ export function Item({ content, title }: { title?: React.ReactNode; content?: Re
   );
 }
 
-function Extrinsic({
-  defaultOpen,
-  transaction,
-  call
-}: {
-  defaultOpen?: boolean;
-  transaction: Transaction;
-  call?: IMethod | null;
-}) {
-  const { network } = useApi();
-  const [isOpen, toggleOpen] = useToggle(defaultOpen);
-
+function Extrinsic({ transaction, call }: { defaultOpen?: boolean; transaction: Transaction; call?: IMethod | null }) {
+  const { network, chain, chainSS58 } = useApi();
+  const [isCopied, copy] = useCopyClipboard();
   const txCallHex = transaction.call;
 
   return (
     <>
-      <div className='flex-1 space-y-2.5'>
+      <div className='aaaaa flex flex-1 flex-col gap-2.5'>
         <Target address={transaction.address} call={call} />
 
         <Divider />
 
-        <Item
-          title='App'
-          content={
-            <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />
-          }
-        />
-        {transaction.createdExtrinsicHash && (
-          <Item
-            title='Created Extrinsic'
-            content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
-          />
-        )}
-        {transaction.executedExtrinsicHash && (
-          <Item
-            title='Executed Extrinsic'
-            content={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
-          />
-        )}
+        <details className='group'>
+          <summary className='hover:text-primary flex cursor-pointer list-none items-center justify-between font-bold no-underline transition-colors'>
+            <span className='group-open:hidden'>View Details</span>
+            <span className='hidden group-open:block'>Hide Details</span>
+            <ArrowDown className='transform transition-transform group-open:rotate-180' />
+          </summary>
 
-        <div className='text-primary cursor-pointer font-bold no-underline' onClick={toggleOpen}>
-          {isOpen ? 'Hide' : 'View'} Details
-        </div>
-
-        {isOpen && (
-          <>
+          <div className='border-divider-300 rounded-medium mt-[5px] flex flex-col gap-2.5 border-1 p-2.5'>
             <Item title='Call Hash' content={<Hash value={transaction.callHash} withCopy />} />
+
             {txCallHex && (
               <Item
                 title='Call Data'
                 content={
                   <div className='flex items-center gap-[5px]'>
                     <Bytes value={txCallHex} />
-                    <Tooltip
-                      content='For better repeatly submit this transaction you can add to Template'
-                      color='foreground'
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='text-tiny h-5 px-2.5'
+                      onPress={() => events.emit('call_data_view', network, txCallHex)}
                     >
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        endContent={<IconTemplate className='h-3.5 w-3.5' />}
-                        className='text-tiny h-5 px-2.5'
-                        onPress={() => events.emit('template_add', network, txCallHex)}
-                      >
-                        + Template
-                      </Button>
-                    </Tooltip>
+                      Verify
+                    </Button>
                   </div>
                 }
               />
             )}
+
+            <Item
+              title='App'
+              content={
+                <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />
+              }
+            />
+            {transaction.createdExtrinsicHash && (
+              <Item
+                title='Created Extrinsic'
+                content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
+              />
+            )}
+            {transaction.executedExtrinsicHash && (
+              <Item
+                title='Executed Extrinsic'
+                content={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
+              />
+            )}
+
             {transaction.note && <Item title='Note' content={transaction.note} />}
             {transaction.createdBlock && <Item title='Created Block' content={transaction.createdBlock} />}
             <Item title='Created Time' content={moment(transaction.createdAt).format()} />
@@ -107,8 +96,37 @@ function Extrinsic({
                 content={<Hash value={transaction.cancelExtrinsicHash} withCopy withExplorer />}
               />
             )}
-          </>
-        )}
+          </div>
+        </details>
+
+        <div className='flex gap-2.5 pt-2.5'>
+          <Button
+            as={Link}
+            variant='ghost'
+            isExternal
+            href={
+              transaction.executedExtrinsicHash
+                ? chainLinks.extrinsicExplorerLink(chain, transaction.executedExtrinsicHash)
+                : chainLinks.extrinsicExplorerLink(chain, transaction.createdExtrinsicHash)
+            }
+          >
+            View in explorer
+          </Button>
+          <Button
+            variant='ghost'
+            onPress={() => {
+              const url = new URL(window.location.href);
+
+              url.searchParams.set('tx_id', transaction.id.toString());
+
+              copy(
+                `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chainSS58)}`
+              );
+            }}
+          >
+            {isCopied ? 'Copied' : 'Share'}
+          </Button>
+        </div>
       </div>
     </>
   );

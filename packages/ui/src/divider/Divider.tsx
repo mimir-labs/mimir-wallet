@@ -7,8 +7,8 @@ import { extendVariants } from '@heroui/system';
 const CustomDivider = extendVariants(Divider, {
   variants: {
     orientation: {
-      horizontal: 'w-full h-divider bg-secondary',
-      vertical: 'h-full w-divider bg-secondary'
+      horizontal: 'w-full h-divider bg-secondary [&+hr]:hidden',
+      vertical: 'h-full w-divider bg-secondary [&+hr]:hidden'
     }
   },
   defaultVariants: {

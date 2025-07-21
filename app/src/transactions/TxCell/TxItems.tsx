@@ -5,7 +5,7 @@ import type { ApiPromise } from '@polkadot/api';
 import type { IMethod } from '@polkadot/types/types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { AppName } from '@/components';
+import { AppName, TxOverviewDialog } from '@/components';
 import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@/hooks/types';
 import { useToggle } from '@/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@/params';
@@ -19,7 +19,6 @@ import { Button, Link, Tooltip } from '@mimir-wallet/ui';
 import Progress from '../Progress';
 import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
 import Extrinsic from './Extrinsic';
-import OverviewDialog from './OverviewDialog';
 
 function AppCell({ transaction }: { transaction: Transaction }) {
   return <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />;
@@ -132,12 +131,12 @@ function TxItems({
         </div>
         {withDetails && detailOpen && (
           <div className='rounded-medium bg-content1 mx-3 mb-3 flex flex-row gap-3 p-3 md:mx-4 md:mb-4 md:gap-4 md:p-4'>
-            <Extrinsic defaultOpen={detailOpen} transaction={transaction} call={call} />
+            <Extrinsic transaction={transaction} call={call} />
             <Progress openOverview={toggleOverviewOpen} account={account} transaction={transaction} />
           </div>
         )}
       </div>
-      <OverviewDialog account={account} transaction={transaction} onClose={toggleOverviewOpen} open={overviewOpen} />
+      <TxOverviewDialog account={account} transaction={transaction} onClose={toggleOverviewOpen} open={overviewOpen} />
     </>
   );
 }

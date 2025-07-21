@@ -41,7 +41,7 @@ export { default as LockItem, LockContainer } from './LockItem';
 export { default as Navigate } from './Navigate';
 export { default as ToastRoot } from './ToastRoot';
 export { default as TxError } from './TxError';
-export { default as TxOverview } from './TxOverview';
+export * from './TxOverview';
 export { default as HistoryTxOverview } from './TxOverview/HistoryTxOverview';
 export { default as TxToast } from './TxToast';
 export { default as TxButton } from './TxButton';

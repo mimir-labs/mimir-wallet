@@ -1,25 +1,24 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Call } from '@polkadot/types/interfaces';
-import type { ParamProps } from './types';
+import type { IMethod } from '@polkadot/types/types';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
-function CallName({ value }: ParamProps) {
-  const call = value as Call;
+function CallName({ value }: { value: IMethod }) {
+  return useMemo(() => {
+    try {
+      const { method, section } = value.registry.findMetaCall(value.callIndex);
 
-  try {
-    const { method, section } = call.registry.findMetaCall(call.callIndex);
+      if (section && method) {
+        return `${section}.${method}`;
+      }
 
-    if (section && method) {
-      return `${section}.${method}`;
+      return 'Unknown';
+    } catch {
+      return 'Unknown';
     }
-
-    return null;
-  } catch {
-    return null;
-  }
+  }, [value.callIndex, value.registry]);
 }
 
 export default React.memo(CallName);

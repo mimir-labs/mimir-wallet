@@ -3,7 +3,7 @@
 
 import IconClock from '@/assets/svg/icon-clock.svg?react';
 import { BaseEdge, type Edge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath } from '@xyflow/react';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 function AddressEdge({
   id,
@@ -31,29 +31,42 @@ function AddressEdge({
     borderRadius: 10
   });
 
+  // Memoize edge style to prevent recreation
+  const edgeStyle = useMemo(
+    () => ({
+      stroke: data?.color,
+      strokeDasharray: data?.isDash ? '5 5' : undefined
+    }),
+    [data?.color, data?.isDash]
+  );
+
+  // Memoize label styles
+  const labelStyle = useMemo(
+    () => ({
+      position: 'absolute' as const,
+      transform: `translate(-50%, -50%) translate(${targetX + 60}px, ${targetY}px)`,
+      height: data?.tips ? data.tips.length * 18 + 2 : 0,
+      backgroundColor: data?.color || '#ffcc00',
+      color: data?.color || '#ffcc00'
+    }),
+    [targetX, targetY, data?.tips, data?.color]
+  );
+
   return (
     <>
-      <BaseEdge
-        id={id}
-        path={edgePath}
-        style={{ stroke: data?.color, strokeDasharray: data?.isDash ? '5 5' : undefined }}
-      />
+      <BaseEdge id={id} path={edgePath} style={edgeStyle} />
 
       {data && data.tips && data.tips.length > 0 && (
         <EdgeLabelRenderer>
           <div
             className='rounded-medium flex min-w-[40px] flex-col gap-[2px] p-[2px] text-[10px] font-bold'
-            style={{
-              position: 'absolute',
-              transform: `translate(-50%, -50%) translate(${targetX + 60}px, ${targetY}px)`,
-              background: '#ffcc00',
-              height: data.tips.length * 18 + 2,
-              backgroundColor: data.color,
-              color: data.color
-            }}
+            style={labelStyle}
           >
-            {data.tips.map((tip) => (
-              <div key={tip.label} className='flex h-[16px] items-center gap-[2px] rounded-full bg-white p-[2px]'>
+            {data.tips.map((tip, index) => (
+              <div
+                key={`${tip.label}-${index}`}
+                className='flex h-[16px] items-center gap-[2px] rounded-full bg-white p-[2px]'
+              >
                 {!!tip.delay && <IconClock className='h-3 w-3' />}
                 <div className='flex-1 text-center'>{tip.label}</div>
               </div>
