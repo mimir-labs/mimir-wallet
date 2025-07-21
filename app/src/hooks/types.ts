@@ -128,6 +128,7 @@ type BaseTransaction = {
   delegate?: string;
   proposer?: string;
   isDiscarded?: boolean;
+  isLargeCall?: boolean;
   children: Transaction[];
 };
 

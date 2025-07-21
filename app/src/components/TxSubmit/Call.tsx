@@ -50,9 +50,11 @@ function CallInfo({ callName, call }: { callName: string; call: IMethod }) {
         <ArrowDown className='transform transition-transform group-open:rotate-180' />
       </summary>
 
-      <div className='rounded-medium bg-secondary mt-[5px] flex w-full shrink-0 flex-col gap-2.5 p-2.5'>
-        <FunctionArgs registry={call.registry} call={call} />
-      </div>
+      <FunctionArgs
+        className='rounded-medium bg-secondary mt-[5px] flex w-full shrink-0 flex-col gap-2.5 p-2.5'
+        registry={call.registry}
+        call={call}
+      />
     </details>
   );
 }

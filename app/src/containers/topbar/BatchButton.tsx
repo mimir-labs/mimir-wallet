@@ -63,6 +63,7 @@ function BatchButton() {
         shape='circle'
         color='primary'
         classNames={{
+          base: 'flex-[0_0_auto]',
           badge: 'bottom-0.5 right-1 translate-x-0 -translate-y-0 pointer-events-none'
         }}
       >

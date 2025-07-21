@@ -3,7 +3,7 @@
 
 export { AccountService } from './AccountService.js';
 export { AssetService } from './AssetService.js';
-export { BaseService } from './BaseService.js';
+export { BaseService, type ApiVersion, type BaseServiceOptions } from './BaseService.js';
 export { ChainService } from './ChainService.js';
 export { MultisigService } from './MultisigService.js';
 export { TransactionService } from './TransactionService.js';

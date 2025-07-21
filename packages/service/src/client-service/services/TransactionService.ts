@@ -81,4 +81,26 @@ export class TransactionService extends BaseService {
       relatedBatches
     });
   }
+
+  public getHistoryTransactions(chain: string, address: string, txId?: string, nextCursor?: string, limit?: number) {
+    const path = `chains/${chain}/${address}/transactions/history`;
+    const params: Record<string, string> = {};
+
+    if (txId) params.tx_id = txId;
+    if (limit) params.limit = limit.toString();
+    if (nextCursor) params.next_cursor = nextCursor;
+
+    return this.get(path, Object.keys(params).length > 0 ? params : undefined);
+  }
+
+  public getHistoryTransactionsV2(chain: string, address: string, txId?: string, nextCursor?: string, limit?: number) {
+    const path = `chains/${chain}/${address}/transactions/history`;
+    const params: Record<string, string> = {};
+
+    if (txId) params.tx_id = txId;
+    if (limit) params.limit = limit.toString();
+    if (nextCursor) params.next_cursor = nextCursor;
+
+    return this.get(path, Object.keys(params).length > 0 ? params : undefined, 'v2');
+  }
 }

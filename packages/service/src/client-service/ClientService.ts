@@ -1,7 +1,17 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountService, AssetService, ChainService, MultisigService, TransactionService } from './services/index.js';
+import {
+  AccountService,
+  ApiVersion,
+  AssetService,
+  BaseServiceOptions,
+  ChainService,
+  MultisigService,
+  TransactionService
+} from './services/index.js';
+
+export type ClientServiceOptions = BaseServiceOptions;
 
 export class ClientService {
   public readonly account: AccountService;
@@ -9,21 +19,28 @@ export class ClientService {
   public readonly chain: ChainService;
   public readonly multisig: MultisigService;
   public readonly transaction: TransactionService;
+  private readonly version: ApiVersion;
 
-  constructor(private readonly clientGateway: string) {
-    this.account = new AccountService(clientGateway);
-    this.asset = new AssetService(clientGateway);
-    this.chain = new ChainService(clientGateway);
-    this.multisig = new MultisigService(clientGateway);
-    this.transaction = new TransactionService(clientGateway);
+  constructor(
+    private readonly clientGateway: string,
+    options: ClientServiceOptions = {}
+  ) {
+    this.version = options.version || 'v1';
+
+    this.account = new AccountService(clientGateway, options);
+    this.asset = new AssetService(clientGateway, options);
+    this.chain = new ChainService(clientGateway, options);
+    this.multisig = new MultisigService(clientGateway, options);
+    this.transaction = new TransactionService(clientGateway, options);
   }
 
-  static create(clientGateway: string) {
-    return new ClientService(clientGateway);
+  static create(clientGateway: string, options?: ClientServiceOptions) {
+    return new ClientService(clientGateway, options);
   }
 
-  public getClientUrl(path: string) {
-    const url = new URL('/v1/' + (path.startsWith('/') ? path.slice(1) : path), this.clientGateway);
+  public getClientUrl(path: string, version?: ApiVersion) {
+    const apiVersion = version || this.version;
+    const url = new URL(`/${apiVersion}/` + (path.startsWith('/') ? path.slice(1) : path), this.clientGateway);
 
     return url.toString();
   }

@@ -70,12 +70,18 @@ function TxItems({
   withDetails = true,
   defaultOpen,
   account,
-  transaction
+  transaction,
+  hasLargeCalls = false,
+  shouldLoadDetails = false,
+  onLoadDetails
 }: {
   withDetails?: boolean;
   defaultOpen?: boolean;
   account: AccountData;
   transaction: Transaction;
+  hasLargeCalls?: boolean;
+  shouldLoadDetails?: boolean;
+  onLoadDetails?: () => void;
 }) {
   const { api } = useApi();
   const [detailOpen, toggleDetailOpen] = useToggle(defaultOpen);
@@ -131,7 +137,13 @@ function TxItems({
         </div>
         {withDetails && detailOpen && (
           <div className='rounded-medium bg-content1 mx-3 mb-3 flex flex-row gap-3 p-3 md:mx-4 md:mb-4 md:gap-4 md:p-4'>
-            <Extrinsic transaction={transaction} call={call} />
+            <Extrinsic
+              transaction={transaction}
+              call={call}
+              hasLargeCalls={hasLargeCalls}
+              shouldLoadDetails={shouldLoadDetails}
+              onLoadDetails={onLoadDetails}
+            />
             <Progress openOverview={toggleOverviewOpen} account={account} transaction={transaction} />
           </div>
         )}

@@ -30,7 +30,7 @@ function WalletConnect() {
   const { isReady, sessions } = useContext(WalletConnectContext);
   const [isOpen, toggleOpen] = useToggle(false);
 
-  const buttonClassName = 'border-secondary w-[32px] h-[32px] sm:w-[42px] sm:h-[42px] bg-secondary sm:bg-transparent';
+  const buttonClassName = 'border-secondary  w-[32px] h-[32px] sm:w-[42px] sm:h-[42px] bg-secondary sm:bg-transparent';
 
   if (!isReady)
     return (
@@ -50,6 +50,7 @@ function WalletConnect() {
         placement='bottom-right'
         size='sm'
         classNames={{
+          base: 'flex-[0_0_auto]',
           badge: (sessions.length === 1 ? ['bg-transparent p-0 border-none'] : []).concat([
             'bottom-0.5 right-1 translate-x-0 -translate-y-0 pointer-events-none'
           ])

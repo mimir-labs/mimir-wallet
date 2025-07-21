@@ -8,6 +8,7 @@ import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { AppName, Bytes, Hash } from '@/components';
 import { events } from '@/events';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useTransactionDetail } from '@/hooks/useTransactions';
 import moment from 'moment';
 import React from 'react';
 
@@ -25,108 +26,155 @@ export function Item({ content, title }: { title?: React.ReactNode; content?: Re
   );
 }
 
-function Extrinsic({ transaction, call }: { defaultOpen?: boolean; transaction: Transaction; call?: IMethod | null }) {
-  const { network, chain, chainSS58 } = useApi();
+function Extrinsic({
+  transaction,
+  call,
+  hasLargeCalls = false,
+  shouldLoadDetails = false,
+  onLoadDetails
+}: {
+  defaultOpen?: boolean;
+  transaction: Transaction;
+  call?: IMethod | null;
+  hasLargeCalls?: boolean;
+  shouldLoadDetails?: boolean;
+  onLoadDetails?: () => void;
+}) {
+  const { network, chain, chainSS58, api } = useApi();
   const [isCopied, copy] = useCopyClipboard();
-  const txCallHex = transaction.call;
+
+  // Get the loading state for the button
+  const [, isFetched, isFetching] = useTransactionDetail(
+    network,
+    shouldLoadDetails ? transaction.id.toString() : undefined
+  );
+
+  const displayCall =
+    transaction.call && !call
+      ? (() => {
+          try {
+            return api.registry.createTypeUnsafe('Call', [transaction.call]) as IMethod;
+          } catch {
+            return null;
+          }
+        })()
+      : call;
 
   return (
     <>
       <div className='aaaaa flex flex-1 flex-col gap-2.5'>
-        <Target address={transaction.address} call={call} />
+        <>
+          <Target address={transaction.address} call={displayCall} />
 
-        <Divider />
+          {hasLargeCalls && (!shouldLoadDetails || (!isFetched && isFetching)) && (
+            <div className='flex flex-col gap-[5px]'>
+              <p className='font-bold'>Call Data</p>
+              <Button
+                className='font-bold'
+                color='secondary'
+                radius='md'
+                isLoading={isFetching || shouldLoadDetails}
+                onPress={onLoadDetails}
+                isDisabled={shouldLoadDetails}
+              >
+                Load Big Call Data
+              </Button>
+            </div>
+          )}
 
-        <details className='group'>
-          <summary className='hover:text-primary flex cursor-pointer list-none items-center justify-between font-bold no-underline transition-colors'>
-            <span className='group-open:hidden'>View Details</span>
-            <span className='hidden group-open:block'>Hide Details</span>
-            <ArrowDown className='transform transition-transform group-open:rotate-180' />
-          </summary>
+          <Divider />
 
-          <div className='border-divider-300 rounded-medium mt-[5px] flex flex-col gap-2.5 border-1 p-2.5'>
-            <Item title='Call Hash' content={<Hash value={transaction.callHash} withCopy />} />
+          <details className='group'>
+            <summary className='hover:text-primary flex cursor-pointer list-none items-center justify-between font-bold no-underline transition-colors'>
+              <span className='group-open:hidden'>View Details</span>
+              <span className='hidden group-open:block'>Hide Details</span>
+              <ArrowDown className='transform transition-transform group-open:rotate-180' />
+            </summary>
 
-            {txCallHex && (
+            <div className='border-divider-300 rounded-medium mt-[5px] flex flex-col gap-2.5 border-1 p-2.5'>
+              <Item title='Call Hash' content={<Hash value={transaction.callHash} withCopy />} />
+
+              {transaction.call && (
+                <Item
+                  title='Call Data'
+                  content={
+                    <div className='flex items-center gap-[5px]'>
+                      <Bytes value={transaction.call} />
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='text-tiny h-5 px-2.5'
+                        onPress={() => events.emit('call_data_view', network, transaction.call!)}
+                      >
+                        Verify
+                      </Button>
+                    </div>
+                  }
+                />
+              )}
+
               <Item
-                title='Call Data'
+                title='App'
                 content={
-                  <div className='flex items-center gap-[5px]'>
-                    <Bytes value={txCallHex} />
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='text-tiny h-5 px-2.5'
-                      onPress={() => events.emit('call_data_view', network, txCallHex)}
-                    >
-                      Verify
-                    </Button>
-                  </div>
+                  <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />
                 }
               />
-            )}
+              {transaction.createdExtrinsicHash && (
+                <Item
+                  title='Created Extrinsic'
+                  content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
+                />
+              )}
+              {transaction.executedExtrinsicHash && (
+                <Item
+                  title='Executed Extrinsic'
+                  content={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
+                />
+              )}
 
-            <Item
-              title='App'
-              content={
-                <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />
+              {transaction.note && <Item title='Note' content={transaction.note} />}
+              {transaction.createdBlock && <Item title='Created Block' content={transaction.createdBlock} />}
+              <Item title='Created Time' content={moment(transaction.createdAt).format()} />
+              {transaction.executedBlock && <Item title='Executed Block' content={transaction.executedBlock} />}
+              {transaction.cancelBlock && <Item title='Cancel Block' content={transaction.cancelBlock} />}
+              {transaction.cancelExtrinsicHash && (
+                <Item
+                  title='Cancel Extrinsic'
+                  content={<Hash value={transaction.cancelExtrinsicHash} withCopy withExplorer />}
+                />
+              )}
+            </div>
+          </details>
+
+          <div className='flex gap-2.5 pt-2.5'>
+            <Button
+              as={Link}
+              variant='ghost'
+              isExternal
+              href={
+                transaction.executedExtrinsicHash
+                  ? chainLinks.extrinsicExplorerLink(chain, transaction.executedExtrinsicHash)
+                  : chainLinks.extrinsicExplorerLink(chain, transaction.createdExtrinsicHash)
               }
-            />
-            {transaction.createdExtrinsicHash && (
-              <Item
-                title='Created Extrinsic'
-                content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
-              />
-            )}
-            {transaction.executedExtrinsicHash && (
-              <Item
-                title='Executed Extrinsic'
-                content={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
-              />
-            )}
+            >
+              View in explorer
+            </Button>
+            <Button
+              variant='ghost'
+              onPress={() => {
+                const url = new URL(window.location.href);
 
-            {transaction.note && <Item title='Note' content={transaction.note} />}
-            {transaction.createdBlock && <Item title='Created Block' content={transaction.createdBlock} />}
-            <Item title='Created Time' content={moment(transaction.createdAt).format()} />
-            {transaction.executedBlock && <Item title='Executed Block' content={transaction.executedBlock} />}
-            {transaction.cancelBlock && <Item title='Cancel Block' content={transaction.cancelBlock} />}
-            {transaction.cancelExtrinsicHash && (
-              <Item
-                title='Cancel Extrinsic'
-                content={<Hash value={transaction.cancelExtrinsicHash} withCopy withExplorer />}
-              />
-            )}
+                url.searchParams.set('tx_id', transaction.id.toString());
+
+                copy(
+                  `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chainSS58)}`
+                );
+              }}
+            >
+              {isCopied ? 'Copied' : 'Share'}
+            </Button>
           </div>
-        </details>
-
-        <div className='flex gap-2.5 pt-2.5'>
-          <Button
-            as={Link}
-            variant='ghost'
-            isExternal
-            href={
-              transaction.executedExtrinsicHash
-                ? chainLinks.extrinsicExplorerLink(chain, transaction.executedExtrinsicHash)
-                : chainLinks.extrinsicExplorerLink(chain, transaction.createdExtrinsicHash)
-            }
-          >
-            View in explorer
-          </Button>
-          <Button
-            variant='ghost'
-            onPress={() => {
-              const url = new URL(window.location.href);
-
-              url.searchParams.set('tx_id', transaction.id.toString());
-
-              copy(
-                `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chainSS58)}`
-              );
-            }}
-          >
-            {isCopied ? 'Copied' : 'Share'}
-          </Button>
-        </div>
+        </>
       </div>
     </>
   );

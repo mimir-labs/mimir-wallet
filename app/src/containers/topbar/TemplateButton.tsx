@@ -51,7 +51,7 @@ function TemplateButton({
     <Tooltip content='Template' closeDelay={0}>
       <Button
         isIconOnly
-        className='border-secondary bg-secondary h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent'
+        className='border-secondary bg-secondary h-[32px] w-[32px] flex-[0_0_auto] sm:h-[42px] sm:w-[42px] sm:bg-transparent'
         color='primary'
         variant='ghost'
         radius='md'
