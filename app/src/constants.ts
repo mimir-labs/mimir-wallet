@@ -43,3 +43,17 @@ export const WALLET_CONNECT_PROJECT_ID = 'db2a617b03addd5e1e485d0a677c1ef4';
 export const PINNED_ACCOUNTS_KEY = 'pinned_accounts';
 
 export const CUSTOM_APP_KEY = `${LS_NAMESPACE}custom_app`;
+
+export const MIGRATION_ALERT_DISMISSED_PREFIX = `${LS_NAMESPACE}migration-alert-dismissed:`;
+
+export const MIGRATION_BATCH_ALERT_DISMISSED_PREFIX = `${LS_NAMESPACE}migration-batch-alert-dismissed:`;
+
+export const MIGRATION_TEMPLATE_ALERT_DISMISSED_PREFIX = `${LS_NAMESPACE}migration-template-alert-dismissed:`;
+
+export const MIGRATION_ASSETS_ALERT_DISMISSED_PREFIX = `${LS_NAMESPACE}migration-assets-alert-dismissed:`;
+
+export const MIGRATION_PURE_ALERT_DISMISSED_PREFIX = `${LS_NAMESPACE}migration-pure-alert-dismissed:`;
+
+export const MIGRATION_DOCS_URL = 'https://docs.mimir.global/asset-hub-migration';
+
+export const MIGRATION_NOTICE_DOCS_URL = 'https://docs.mimir.global/notice/asset-hub-migration';
