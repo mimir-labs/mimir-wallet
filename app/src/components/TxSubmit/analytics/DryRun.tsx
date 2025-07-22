@@ -3,18 +3,14 @@
 
 import type { IMethod } from '@polkadot/types/types';
 
-import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
-import IconFailed from '@/assets/svg/icon-failed-fill.svg?react';
-import IconSuccess from '@/assets/svg/icon-success.svg?react';
-import FormatBalance from '@/components/FormatBalance';
+import { FormatBalance } from '@/components';
+import CopyButton from '@/components/CopyButton';
 import { findToken } from '@/config';
 import { useAssetInfo } from '@/hooks/useAssets';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { addressEq, dryRun, useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Spinner } from '@mimir-wallet/ui';
-
-import Cell from './Cell';
 
 const EMPTY_SIMULATION = {
   isDone: false,
@@ -23,30 +19,38 @@ const EMPTY_SIMULATION = {
   isLoading: false
 };
 
-function ChangeItem({ amount, children }: { amount: bigint; children: React.ReactNode }) {
-  return (
-    <div className='bg-secondary rounded-medium mt-2 flex items-center justify-between gap-2.5 p-2.5'>
-      <b className='text-small'>{amount > 0n ? 'Receive' : 'Send'}</b>
-      {amount > 0 ? (
-        <svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8' fill='none'>
-          <path
-            d='M8 0.981688C8 0.722177 7.89674 0.473331 7.71301 0.290062V0.283207C7.33 -0.0944014 6.71473 -0.0944014 6.33173 0.283207L1.95485 4.66691V2.13879C1.95279 1.60074 1.51603 1.16565 0.97798 1.16565C0.439927 1.16565 0.00317049 1.60074 0.00111198 2.13879V7.02313C0.00111198 7.56264 0.438474 8 0.977987 8H5.86233C6.40038 7.99794 6.83547 7.56119 6.83547 7.02313C6.83547 6.48508 6.40038 6.04833 5.86233 6.04627H3.33614L7.71301 1.67331C7.89674 1.49004 8 1.2412 8 0.981688Z'
-            fill='currentColor'
-            className='text-success'
-          />
-        </svg>
-      ) : (
-        <svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8' fill='none'>
-          <path
-            d='M0 7.01831C0 7.27782 0.103259 7.52667 0.286993 7.70994V7.71679C0.669997 8.0944 1.28527 8.0944 1.66827 7.71679L6.04515 3.33309V5.86121C6.04721 6.39926 6.48397 6.83435 7.02202 6.83435C7.56007 6.83435 7.99683 6.39926 7.99889 5.86121V0.976874C7.99889 0.437361 7.56153 0 7.02201 0H2.13767C1.59962 0.00205917 1.16453 0.438814 1.16453 0.976866C1.16453 1.51492 1.59962 1.95167 2.13767 1.95373H4.66386L0.286993 6.32669C0.103259 6.50996 0 6.7588 0 7.01831Z'
-            fill='#FF5310'
-            className='text-danger'
-          />
-        </svg>
-      )}
+// Operation Item Component matching Figma design
+function OperationItem({
+  type,
+  amount,
+  assetId
+}: {
+  type: 'Receive' | 'Send' | 'Lock' | 'Unlock';
+  amount: bigint;
+  assetId: string;
+}) {
+  const getActionEmoji = () => {
+    switch (type) {
+      case 'Receive':
+        return <span className='text-success'> ↙</span>;
+      case 'Send':
+        return <span className='text-danger'> ↗</span>;
+      case 'Lock':
+        return ' 🔒';
+      case 'Unlock':
+        return ' 🔓';
+      default:
+        return '';
+    }
+  };
 
-      <div className='flex-1' />
-      {children}
+  return (
+    <div className='bg-secondary rounded-small text-tiny flex items-center justify-between p-[5px]'>
+      <div className='text-foreground'>
+        {type}
+        {getActionEmoji()}
+      </div>
+      {assetId === 'native' ? <NativeToken amount={amount} /> : <AssetToken assetId={assetId} amount={amount} />}
     </div>
   );
 }
@@ -58,12 +62,15 @@ function NativeToken({ amount }: { amount: bigint }) {
   const icon = findToken(genesisHash).Icon;
 
   return (
-    <div className='flex items-center gap-1.5'>
-      <Avatar alt={symbol} style={{ width: 18, height: 18 }} src={icon} />
-      <b>
-        <FormatBalance withCurrency value={amount > 0n ? amount : -amount} format={[decimals, symbol]} />
-      </b>
-    </div>
+    <span>
+      <FormatBalance
+        className='gap-[5px]'
+        icon={<Avatar alt={symbol} style={{ width: 16, height: 16 }} src={icon} />}
+        withCurrency
+        value={amount > 0n ? amount : -amount}
+        format={[decimals, symbol]}
+      />
+    </span>
   );
 }
 
@@ -76,25 +83,25 @@ function AssetToken({ assetId, amount }: { assetId: string; amount: bigint }) {
   }
 
   return (
-    <div className='flex items-center gap-1.5'>
-      <Avatar
-        alt={assetInfo?.symbol}
-        fallback={assetInfo?.symbol.slice(0, 1)}
-        style={{ width: 18, height: 18 }}
-        src={assetInfo?.icon}
+    <span>
+      <FormatBalance
+        icon={
+          <Avatar
+            alt={assetInfo?.symbol}
+            fallback={assetInfo?.symbol.slice(0, 1)}
+            style={{ width: 16, height: 16 }}
+            src={assetInfo?.icon}
+          />
+        }
+        withCurrency
+        value={amount > 0n ? amount : -amount}
+        format={[assetInfo.decimals, assetInfo.symbol]}
       />
-      <b>
-        <FormatBalance
-          withCurrency
-          value={amount > 0n ? amount : -amount}
-          format={[assetInfo.decimals, assetInfo.symbol]}
-        />
-      </b>
-    </div>
+    </span>
   );
 }
 
-function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
+function DryRun({ call, account }: { call: IMethod; account?: string }) {
   const [simulation, setSimulation] = useState<{
     isDone: boolean;
     success: boolean;
@@ -103,6 +110,7 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
   }>(EMPTY_SIMULATION);
   const [balancesChanges, setBalancesChanges] = useState<Record<'native' | string, bigint>>({});
   const { api } = useApi();
+  const [rawEvents, setRawEvents] = useState<any>();
 
   const handleSimulate = useCallback(() => {
     if (account && call) {
@@ -111,6 +119,8 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
 
       dryRun(api, call, account)
         .then((result) => {
+          setRawEvents(result.rawEvents);
+
           if (result.success) {
             setBalancesChanges(
               result.balancesChanges.reduce(
@@ -145,52 +155,113 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
     }
   }, [handleSimulate, simulation]);
 
-  return (
-    <div>
-      <div className='font-bold'>Transaction Simulation</div>
-      <Cell
-        title={
-          <span className='inline-flex items-center gap-1'>
-            Simulation
-            {simulation.isDone ? (
-              <Button isIconOnly variant='light' size='sm' onPress={handleSimulate}>
-                <IconArrowClockWise className='h-4 w-4' />
-              </Button>
-            ) : null}
-          </span>
-        }
-        img={<b>polkadot-sdk</b>}
-      >
-        {simulation.isDone ? (
-          <div className='flex items-center gap-1'>
-            {simulation.success ? (
-              <IconSuccess className='text-success h-4 w-4' />
-            ) : (
-              <IconFailed className='text-danger h-4 w-4' />
-            )}
+  // Loading State
+  if (simulation.isLoading) {
+    return (
+      <div className='bg-secondary rounded-medium flex items-center justify-between p-2.5'>
+        <div className='flex items-center gap-2'>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            width='24'
+            height='25'
+            viewBox='0 0 24 25'
+            fill='none'
+            className='animate-hourglass-flip text-warning'
+          >
+            <path
+              d='M18.75 7.59125V4.25C18.75 3.85218 18.592 3.47064 18.3107 3.18934C18.0294 2.90804 17.6478 2.75 17.25 2.75H6.75C6.35218 2.75 5.97064 2.90804 5.68934 3.18934C5.40804 3.47064 5.25 3.85218 5.25 4.25V7.625C5.25051 7.85778 5.30495 8.08727 5.40905 8.29548C5.51315 8.50368 5.66408 8.68493 5.85 8.825L10.7503 12.5L5.85 16.175C5.66408 16.3151 5.51315 16.4963 5.40905 16.7045C5.30495 16.9127 5.25051 17.1422 5.25 17.375V20.75C5.25 21.1478 5.40804 21.5294 5.68934 21.8107C5.97064 22.092 6.35218 22.25 6.75 22.25H17.25C17.6478 22.25 18.0294 22.092 18.3107 21.8107C18.592 21.5294 18.75 21.1478 18.75 20.75V17.4088C18.7495 17.1769 18.6955 16.9482 18.5922 16.7406C18.489 16.533 18.3393 16.3519 18.1547 16.2116L13.2441 12.5L18.1547 8.78844C18.3393 8.64807 18.489 8.46703 18.5922 8.2594C18.6955 8.05177 18.7495 7.82313 18.75 7.59125ZM17.25 4.25V6.5H6.75V4.25H17.25ZM17.25 20.75H6.75V17.375L12 13.4375L17.25 17.4078V20.75Z'
+              fill='currentColor'
+            />
+          </svg>
+          <b className='animate-dots'>Simulating</b>
+        </div>
+      </div>
+    );
+  }
 
-            <p
-              data-success={simulation.success}
-              data-error={simulation.error}
-              className='data-[success=true]:text-success data-[error]:text-danger font-bold'
+  // Error State
+  if (simulation.isDone && !simulation.success) {
+    return (
+      <div className='border-divider-300 rounded-medium flex items-center justify-between gap-2.5 border p-2.5'>
+        <div className='flex items-center gap-2.5'>
+          <div className='flex h-6 w-6 items-center justify-center'>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='18'
+              height='18'
+              viewBox='0 0 18 18'
+              fill='none'
+              className='text-danger'
             >
-              {simulation.success ? 'Success' : simulation.error || 'Unknown Error'}
-            </p>
+              <path
+                d='M16.5 0H1.5C1.10218 0 0.720644 0.158035 0.43934 0.43934C0.158035 0.720644 0 1.10218 0 1.5V16.5C0 16.8978 0.158035 17.2794 0.43934 17.5607C0.720644 17.842 1.10218 18 1.5 18H16.5C16.8978 18 17.2794 17.842 17.5607 17.5607C17.842 17.2794 18 16.8978 18 16.5V1.5C18 1.10218 17.842 0.720644 17.5607 0.43934C17.2794 0.158035 16.8978 0 16.5 0ZM12.5306 11.4694C12.6003 11.5391 12.6556 11.6218 12.6933 11.7128C12.731 11.8039 12.7504 11.9015 12.7504 12C12.7504 12.0985 12.731 12.1961 12.6933 12.2872C12.6556 12.3782 12.6003 12.4609 12.5306 12.5306C12.4609 12.6003 12.3782 12.6556 12.2872 12.6933C12.1961 12.731 12.0985 12.7504 12 12.7504C11.9015 12.7504 11.8039 12.731 11.7128 12.6933C11.6218 12.6556 11.5391 12.6003 11.4694 12.5306L9 10.0603L6.53063 12.5306C6.46094 12.6003 6.37822 12.6556 6.28717 12.6933C6.19613 12.731 6.09855 12.7504 6 12.7504C5.90145 12.7504 5.80387 12.731 5.71283 12.6933C5.62178 12.6556 5.53906 12.6003 5.46937 12.5306C5.39969 12.4609 5.34442 12.3782 5.3067 12.2872C5.26899 12.1961 5.24958 12.0985 5.24958 12C5.24958 11.9015 5.26899 11.8039 5.3067 11.7128C5.34442 11.6218 5.39969 11.5391 5.46937 11.4694L7.93969 9L5.46937 6.53063C5.32864 6.38989 5.24958 6.19902 5.24958 6C5.24958 5.80098 5.32864 5.61011 5.46937 5.46937C5.61011 5.32864 5.80098 5.24958 6 5.24958C6.19902 5.24958 6.38989 5.32864 6.53063 5.46937L9 7.93969L11.4694 5.46937C11.5391 5.39969 11.6218 5.34442 11.7128 5.3067C11.8039 5.26899 11.9015 5.24958 12 5.24958C12.0985 5.24958 12.1961 5.26899 12.2872 5.3067C12.3782 5.34442 12.4609 5.39969 12.5306 5.46937C12.6003 5.53906 12.6556 5.62178 12.6933 5.71283C12.731 5.80387 12.7504 5.90145 12.7504 6C12.7504 6.09855 12.731 6.19613 12.6933 6.28717C12.6556 6.37822 12.6003 6.46094 12.5306 6.53063L10.0603 9L12.5306 11.4694Z'
+                fill='currentColor'
+              />
+            </svg>
           </div>
-        ) : (
-          <Button variant='ghost' isLoading={simulation.isLoading} onPress={handleSimulate}>
-            Simulate
-          </Button>
-        )}
-      </Cell>
+          <b>Simulation Result: Failed!</b>
+        </div>
+        <span className='text-danger'>Error: {simulation.error || 'Unknown Error'}</span>
+      </div>
+    );
+  }
 
-      {Object.entries(balancesChanges).map(([assetId, amount]) => (
-        <ChangeItem key={assetId} amount={amount}>
-          {assetId === 'native' ? <NativeToken amount={amount} /> : <AssetToken assetId={assetId} amount={amount} />}
-        </ChangeItem>
-      ))}
+  // Success State
+  if (simulation.isDone && simulation.success) {
+    return (
+      <div className='border-divider-300 rounded-medium flex items-start justify-between gap-2.5 border p-2.5'>
+        {/* Header with left-right layout */}
+        <div className='flex flex-1 items-center gap-2.5'>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            width='24'
+            height='24'
+            viewBox='0 0 24 24'
+            fill='none'
+            className='text-success'
+          >
+            <path
+              d='M12 2.25C10.0716 2.25 8.18657 2.82183 6.58319 3.89317C4.97982 4.96451 3.73013 6.48726 2.99218 8.26884C2.25422 10.0504 2.06114 12.0108 2.43735 13.9021C2.81355 15.7934 3.74215 17.5307 5.10571 18.8943C6.46928 20.2579 8.20656 21.1865 10.0979 21.5627C11.9892 21.9389 13.9496 21.7458 15.7312 21.0078C17.5127 20.2699 19.0355 19.0202 20.1068 17.4168C21.1782 15.8134 21.75 13.9284 21.75 12C21.7473 9.41498 20.7192 6.93661 18.8913 5.10872C17.0634 3.28084 14.585 2.25273 12 2.25ZM16.2806 10.2806L11.0306 15.5306C10.961 15.6004 10.8783 15.6557 10.7872 15.6934C10.6962 15.7312 10.5986 15.7506 10.5 15.7506C10.4014 15.7506 10.3038 15.7312 10.2128 15.6934C10.1218 15.6557 10.039 15.6004 9.96938 15.5306L7.71938 13.2806C7.57865 13.1399 7.49959 12.949 7.49959 12.75C7.49959 12.551 7.57865 12.3601 7.71938 12.2194C7.86011 12.0786 8.05098 11.9996 8.25 11.9996C8.44903 11.9996 8.6399 12.0786 8.78063 12.2194L10.5 13.9397L15.2194 9.21937C15.2891 9.14969 15.3718 9.09442 15.4628 9.0567C15.5539 9.01899 15.6515 8.99958 15.75 8.99958C15.8486 8.99958 15.9461 9.01899 16.0372 9.0567C16.1282 9.09442 16.2109 9.14969 16.2806 9.21937C16.3503 9.28906 16.4056 9.37178 16.4433 9.46283C16.481 9.55387 16.5004 9.65145 16.5004 9.75C16.5004 9.84855 16.481 9.94613 16.4433 10.0372C16.4056 10.1282 16.3503 10.2109 16.2806 10.2806Z'
+              fill='currentColor'
+            />
+          </svg>
+          <b>Simulation Result Success!</b>
+        </div>
+
+        {/* Operations List */}
+        <div className='flex flex-1 flex-col gap-2.5'>
+          {Object.entries(balancesChanges).map(([assetId, amount]) => {
+            return (
+              <OperationItem key={assetId} type={amount > 0n ? 'Receive' : 'Send'} amount={amount} assetId={assetId} />
+            );
+          })}
+
+          {rawEvents && (
+            <CopyButton
+              mode='text'
+              value={JSON.stringify(rawEvents, null, 2)}
+              size='sm'
+              variant='light'
+              color='primary'
+              className='text-tiny self-end'
+            >
+              Copy All Event
+            </CopyButton>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Initial State
+  return (
+    <div className='bg-secondary rounded-medium flex items-center justify-between p-2.5'>
+      <b>Ready to simulate</b>
+      <Button size='sm' variant='ghost' onPress={handleSimulate}>
+        Simulate
+      </Button>
     </div>
   );
 }
 
-export default React.memo(SafetyCheck);
+export default React.memo(DryRun);

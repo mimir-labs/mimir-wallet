@@ -7,8 +7,6 @@ import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import IconView from '@/assets/svg/icon-view.svg?react';
-import dagre from '@dagrejs/dagre';
-import { blake2AsHex } from '@polkadot/util-crypto';
 import {
   Controls,
   type Edge,
@@ -21,7 +19,7 @@ import {
   useEdgesState,
   useNodesState
 } from '@xyflow/react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { Button, Chip } from '@mimir-wallet/ui';
@@ -55,10 +53,6 @@ type EdgeData = {
   tips: { label: string; delay?: number }[];
   isDash?: boolean;
 };
-
-const dagreGraph = new dagre.graphlib.Graph();
-
-dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
   const { meta: { isProxied, isPure, isMultisig } = {} } = useAddressMeta(data.account.address);
@@ -199,13 +193,14 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
   );
 });
 
-const nodeTypes = {
+// Define node and edge types outside component to prevent recreation
+const NODE_TYPES = {
   AddressNode
-};
+} as const;
 
-const edgeTypes = {
-  AddressEdge: AddressEdge
-};
+const EDGE_TYPES = {
+  AddressEdge
+} as const;
 
 function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges: Edge<EdgeData>[] = []) {
   function createNode(
@@ -223,7 +218,7 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
       data: {
         account,
         isTop,
-        isLeaf: account.type !== 'multisig' && account.delegatees.length === 0,
+        isLeaf: true, // Will be updated after traversal based on actual edges
         type,
         proxyType,
         delay
@@ -273,9 +268,10 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
       };
 
   function dfs(node: NodeInfo, deep = 0) {
+    // Use a simpler ID generation for better performance
     const nodeId = node.parentId
-      ? blake2AsHex(`${node.parentId}-[${node.from}]->${addressToHex(node.value.address)}`, 64)
-      : blake2AsHex(addressToHex(node.value.address), 64);
+      ? `${node.parentId}-${node.from}-${addressToHex(node.value.address)}`
+      : addressToHex(node.value.address);
 
     if (!node.parentId) {
       nodes.push(
@@ -348,14 +344,35 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
     value: topAccount,
     parentId: null
   });
+
+  // Update isLeaf based on actual edges
+  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+
+  edges.forEach((edge) => {
+    const sourceNode = nodeMap.get(edge.source);
+
+    if (sourceNode) {
+      sourceNode.data.isLeaf = false;
+    }
+  });
 }
 
 function AddressOverview({ account, showControls, showMiniMap }: Props) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>([]);
+  // Memoize fitView options
+  const fitViewOptions = useMemo(
+    () => ({
+      maxZoom: 1.5,
+      minZoom: 0.1
+    }),
+    []
+  );
 
-  useEffect(() => {
-    if (!account) return;
+  // Memoize the graph computation with performance monitoring
+  const { layoutedNodes, layoutedEdges } = useMemo(() => {
+    if (!account) return { layoutedNodes: [], layoutedEdges: [] };
+
+    // Performance monitoring in development
+    const startTime = process.env.NODE_ENV === 'development' ? performance.now() : 0;
 
     const initialNodes: Node<NodeData>[] = [];
     const initialEdges: Edge<EdgeData>[] = [];
@@ -363,27 +380,42 @@ function AddressOverview({ account, showControls, showMiniMap }: Props) {
     makeNodes(account, initialNodes, initialEdges);
     const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 400);
 
-    setNodes(nodes);
-    setEdges(edges);
-  }, [account, setEdges, setNodes]);
+    // Log performance in development
+    if (process.env.NODE_ENV === 'development') {
+      const endTime = performance.now();
+
+      console.log(
+        `[AddressOverview] Graph computation took ${(endTime - startTime).toFixed(2)}ms for ${nodes.length} nodes and ${edges.length} edges`
+      );
+    }
+
+    return { layoutedNodes: nodes, layoutedEdges: edges };
+  }, [account]);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>(layoutedNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>(layoutedEdges);
+
+  // Update nodes and edges when layout changes
+  useEffect(() => {
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+  }, [layoutedNodes, layoutedEdges, setNodes, setEdges]);
 
   return (
     <ReactFlow
       edges={edges}
       fitView
-      fitViewOptions={{
-        maxZoom: 1.5,
-        minZoom: 0.1,
-        nodes
-      }}
+      fitViewOptions={fitViewOptions}
       maxZoom={2}
       minZoom={0}
-      nodeTypes={nodeTypes}
-      edgeTypes={edgeTypes}
+      nodeTypes={NODE_TYPES}
+      edgeTypes={EDGE_TYPES}
       nodes={nodes}
       onEdgesChange={onEdgesChange}
       onNodesChange={onNodesChange}
       zoomOnScroll
+      // Remove attribution for cleaner UI
+      proOptions={{ hideAttribution: true }}
     >
       {showMiniMap && <MiniMap pannable zoomable />}
       {showControls && <Controls showInteractive={false} />}

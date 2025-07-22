@@ -51,9 +51,48 @@
       background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
     }
   }
+  --animate-hourglass-flip: hourglassFlip 1.5s ease-in-out infinite;
+  @keyframes hourglassFlip {
+    0% {
+      transform: rotate(0deg);
+    }
+    15% {
+      transform: rotate(180deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
+    65% {
+      transform: rotate(360deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  --animate-dots: dots 1.5s ease-in-out infinite;
 }
 
 @layer base {
+  .animate-dots::after {
+    content: '';
+    animation: dots 1.5s ease-in-out infinite;
+  }
+
+  @keyframes dots {
+    0%, 20% {
+      content: '';
+    }
+    25%, 45% {
+      content: '.';
+    }
+    50%, 70% {
+      content: '..';
+    }
+    75%, 100% {
+      content: '...';
+    }
+  }
+
   p {
     @apply text-inherit leading-inherit font-normal;
   }
@@ -81,7 +120,7 @@
   }
 
   button {
-    cursor: pointer;
+    @apply cursor-pointer disabled:cursor-not-allowed;
   }
 
   /* custom styles */
@@ -146,5 +185,4 @@
   ::-webkit-scrollbar-corner {
     background: #d9d9d9;
   }
-
 }

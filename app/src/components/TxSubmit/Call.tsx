@@ -5,14 +5,14 @@ import type { Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { events } from '@/events';
-import { useToggle } from '@/hooks/useToggle';
-import { Call as CallComp } from '@/params';
+import { Call as CallComp, FunctionArgs } from '@/params';
 import moment from 'moment';
 import { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
+import { Divider, Link } from '@mimir-wallet/ui';
 
 import Bytes from '../Bytes';
 import Hash from '../Hash';
@@ -33,12 +33,83 @@ function extractState(value: IMethod): Extracted {
   };
 }
 
-function Item({ label, value }: { label: string; value: React.ReactNode }) {
+function Item({ title, content }: { title: string; content: React.ReactNode }) {
   return (
     <div className='text-tiny grid w-full grid-cols-10 gap-2.5'>
-      <div className='col-span-2 flex items-center font-bold'>{label}</div>
-      <div className='text-foreground/65 col-span-8 flex items-center font-bold'>{value}</div>
+      <div className='col-span-2 flex items-center font-bold'>{title}</div>
+      <div className='text-foreground/65 col-span-8 flex items-center font-bold'>{content}</div>
     </div>
+  );
+}
+
+function CallInfo({ callName, call }: { callName: string; call: IMethod }) {
+  return (
+    <details className='group' open>
+      <summary className='hover:text-primary flex cursor-pointer list-none items-center justify-between no-underline transition-colors'>
+        <b className='flex-1'>{callName}</b>
+        <ArrowDown className='transform transition-transform group-open:rotate-180' />
+      </summary>
+
+      <FunctionArgs
+        className='rounded-medium bg-secondary mt-[5px] flex w-full shrink-0 flex-col gap-2.5 p-2.5'
+        registry={call.registry}
+        call={call}
+      />
+    </details>
+  );
+}
+
+function TransactionInfo({
+  network,
+  transaction,
+  callHash,
+  callData
+}: {
+  network: string;
+  transaction?: Transaction | null;
+  callHash: HexString;
+  callData: HexString;
+}) {
+  return (
+    <details className='group' open>
+      <summary className='hover:text-primary flex cursor-pointer list-none items-center justify-between font-bold no-underline transition-colors'>
+        <span className='group-open:hidden'>View Details</span>
+        <span className='hidden group-open:block'>Hide Details</span>
+        <ArrowDown className='transform transition-transform group-open:rotate-180' />
+      </summary>
+
+      <div className='border-divider-300 rounded-medium mt-[5px] flex flex-col gap-2.5 border-1 p-2.5'>
+        <Item title='Call Hash' content={<Hash value={callHash} withCopy />} />
+        <Item
+          title='Call Data'
+          content={
+            <div className='flex items-center'>
+              <Bytes value={callData} />
+              <Link as='button' onPress={() => events.emit('call_data_view', network, callData)}>
+                View Detail
+              </Link>
+            </div>
+          }
+        />
+
+        {transaction?.createdExtrinsicHash && (
+          <Item
+            title='Created Transaction'
+            content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
+          />
+        )}
+        {transaction?.executedExtrinsicHash && (
+          <Item
+            title='Executed Transaction'
+            content={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
+          />
+        )}
+
+        {transaction?.note && <Item title='Note' content={transaction.note} />}
+        {transaction?.createdBlock && <Item title='Created Block' content={transaction.createdBlock} />}
+        {transaction?.createdAt && <Item title='Created Time' content={moment(transaction.createdAt).format()} />}
+      </div>
+    </details>
   );
 }
 
@@ -55,65 +126,17 @@ function Call({
 
   // TODO: check if the call is a multisig, if so, use the blake2 of the call data as the call hash
   const { callData, callHash, callName } = useMemo(() => extractState(method), [method]);
-  const [isOpen, toggleOpen] = useToggle(true);
-
-  const details = (
-    <div className='bg-secondary rounded-medium space-y-1 p-2.5'>
-      <Item label='Call Hash' value={<Hash value={callHash} withCopy />} />
-      <Item
-        label='Call Data'
-        value={
-          <div className='flex items-center'>
-            <Bytes value={callData} />
-            <Button
-              size='sm'
-              color='primary'
-              variant='light'
-              onPress={() => events.emit('call_data_view', network, callData)}
-            >
-              View Detail
-            </Button>
-          </div>
-        }
-      />
-
-      {transaction?.note && <Item label='Call Data' value={transaction.note} />}
-      {transaction?.createdBlock && <Item label='Created Block' value={transaction.createdBlock} />}
-      {transaction?.createdExtrinsicHash && (
-        <Item
-          label='Created Extrinsic'
-          value={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
-        />
-      )}
-      {transaction?.createdAt && <Item label='Created Time' value={moment(transaction.createdAt).format()} />}
-      {transaction?.executedBlock && <Item label='Executed Block' value={transaction.executedBlock} />}
-      {transaction?.executedExtrinsicHash && (
-        <Item
-          label='Executed Extrinsic'
-          value={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
-        />
-      )}
-      {transaction?.cancelBlock && <Item label='Cancel Block' value={transaction.cancelBlock} />}
-      {transaction?.cancelExtrinsicHash && (
-        <Item label='Cancel Extrinsic' value={<Hash value={transaction.cancelExtrinsicHash} withCopy withExplorer />} />
-      )}
-    </div>
-  );
+  const callElement = <CallComp from={account} registry={api.registry} call={method} />;
 
   return (
-    <div className='space-y-3'>
-      <div className='font-bold'>Transaction details</div>
-      <div className='text-primary font-bold'>{callName}</div>
-      <div className='rounded-medium border-secondary space-y-4 border-1 p-2.5'>
-        <CallComp from={account} registry={api.registry} call={method} jsonFallback />
-        <Divider />
+    <>
+      {callElement}
 
-        <div onClick={toggleOpen} className='text-primary text-small cursor-pointer font-bold'>
-          {isOpen ? 'Hide Details' : 'View Details'}
-        </div>
-        {isOpen ? details : null}
-      </div>
-    </div>
+      <Divider />
+
+      <CallInfo callName={callName} call={method} />
+      <TransactionInfo transaction={transaction} network={network} callData={callData} callHash={callHash} />
+    </>
   );
 }
 

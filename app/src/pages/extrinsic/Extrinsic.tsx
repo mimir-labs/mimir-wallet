@@ -108,7 +108,7 @@ function Extrinsic({
 
             <div className='rounded-medium border-divider-300 border-1 p-2.5'>
               <ErrorBoundary>
-                <CallComp registry={api.registry} from={sending} call={parsedCallData} jsonFallback />
+                <CallComp showFallback registry={api.registry} from={sending} call={parsedCallData} />
               </ErrorBoundary>
             </div>
 

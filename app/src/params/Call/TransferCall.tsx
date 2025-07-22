@@ -1,20 +1,21 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { CallProps } from '../types';
+import type { CallProps } from './types';
 
 import { Address, AddressName, CopyAddress, FormatBalance, IdentityIcon } from '@/components';
 import { useAssetInfo } from '@/hooks/useAssets';
 import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Skeleton, usePress } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
+import { mergeClasses } from './utils';
 
-function AddressDisplay({ reverse, address }: { reverse: boolean; address?: string }) {
+const AddressDisplay = React.memo(({ reverse, address }: { reverse: boolean; address?: string }) => {
   const copyAddress = useCopyAddressToClipboard(address);
   const { pressProps } = usePress({
     onPress: address
@@ -32,7 +33,7 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
     >
       <IdentityIcon size={24} value={address} />
       <div className='flex flex-col'>
-        <div className='inline-flex h-[16px] max-h-[16px] max-w-[120px] items-center gap-1 truncate leading-[16px] font-bold group-data-[reverse=true]:flex-row-reverse sm:text-sm'>
+        <div className='inline-flex h-[16px] max-h-[16px] items-center gap-1 truncate leading-[16px] font-bold group-data-[reverse=true]:flex-row-reverse sm:text-sm'>
           <AddressName value={address} />
           {address && <CopyAddress address={address} size='sm' color='default' />}
         </div>
@@ -42,20 +43,31 @@ function AddressDisplay({ reverse, address }: { reverse: boolean; address?: stri
       </div>
     </div>
   );
-}
+});
 
-function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProps) {
+const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
+  const {
+    from: propFrom,
+    registry,
+    call,
+    className,
+    showFallback,
+    fallbackComponent: FallbackComponent = FunctionArgs
+  } = props;
   const { network } = useApi();
   const results = useParseTransfer(registry, propFrom, call);
 
   const [assetInfo] = useAssetInfo(network, results?.[0]);
 
-  if (!results) return <FunctionArgs from={propFrom} registry={registry} call={call} jsonFallback={jsonFallback} />;
+  if (!results) return showFallback ? <FallbackComponent ref={ref} {...props} /> : null;
 
   const [assetId, from, to, value, isAll] = results;
 
   return (
-    <div className='flex w-full items-center justify-between gap-2.5 sm:gap-5 md:gap-7'>
+    <div
+      ref={ref}
+      className={mergeClasses('flex w-full items-center justify-between gap-2.5 sm:gap-5 md:gap-7', className)}
+    >
       <AddressDisplay reverse={false} address={from} />
       <div className='text-foreground/50 relative flex flex-1 items-center'>
         <div className='bg-foreground/50 h-1.5 w-1.5 rounded-[3px]' />
@@ -84,6 +96,8 @@ function TransferCall({ from: propFrom, registry, call, jsonFallback }: CallProp
       <AddressDisplay reverse address={to} />
     </div>
   );
-}
+});
+
+TransferCall.displayName = 'TransferCall';
 
 export default React.memo(TransferCall);

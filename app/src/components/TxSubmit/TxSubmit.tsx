@@ -30,11 +30,12 @@ import { useCloseWhenPathChange } from './hooks/useCloseWhenPathChange';
 import { useHighlightTab } from './hooks/useHighlightTab';
 import { useSafetyCheck } from './hooks/useSafetyCheck';
 import AddressChain from './AddressChain';
-import AppInfo from './AppInfo';
 import Call from './Call';
+import Confirmations from './Confirmations';
+import LockInfo from './LockInfo';
 import ProposeTx from './ProposeTx';
-import Sender from './Sender';
 import SendTx from './SendTx';
+import TxInfo from './TxInfo';
 
 interface Props extends Omit<TxSubmitProps, 'accountId'> {
   accountData: AccountData;
@@ -171,14 +172,15 @@ function TxSubmit({
       {alert && <Alert className='flex-grow-0' color='warning' title={alert} />}
 
       <div className='md:bg-content1 rounded-large md:shadow-medium flex w-full flex-1 flex-col gap-5 overflow-y-auto bg-transparent p-0 shadow-none md:flex-row md:p-5'>
-        <div className='shadow-medium bg-content1 rounded-large w-full space-y-5 p-4 md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
-          <Sender address={accountData.address} />
-
-          <AppInfo
+        <div className='shadow-medium bg-content1 rounded-large flex w-full flex-col gap-5 p-4 md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
+          <TxInfo
+            address={accountData.address}
             website={transaction?.website || website}
             iconUrl={transaction?.iconUrl || iconUrl}
             appName={transaction?.appName || appName}
           />
+
+          <Divider />
 
           <Call account={accountData.address} method={call} transaction={transaction} />
 
@@ -188,12 +190,23 @@ function TxSubmit({
             <DryRun call={call} account={accountData.address} />
           )}
 
-          <SafetyCheck isTxBundleLoading={buildTx.isLoading} txError={buildTx.error} safetyCheck={safetyCheck} />
+          <SafetyCheck safetyCheck={safetyCheck} />
         </div>
 
         <div className='shadow-medium rounded-large bg-content1 sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start p-4 sm:p-5 md:w-[40%]'>
+          {!hasPermission ? (
+            <Alert
+              color='danger'
+              title="You are currently not a member of this Account and won't be able to submit this transaction."
+            />
+          ) : filterPaths.length === 0 ? (
+            <Alert color='danger' title={`This account doesn’t exist on ${chain.name}`} />
+          ) : null}
+
           {hasPermission && filterPaths.length > 0 && (
             <>
+              {transaction && <Confirmations account={accountData} transaction={transaction} />}
+
               <AddressChain
                 deep={0}
                 filterPaths={filterPaths}
@@ -203,7 +216,11 @@ function TxSubmit({
 
               <Input label='Note(Optional)' onChange={setNote} value={note} placeholder='Please note' />
 
-              <Divider />
+              {safetyCheck && safetyCheck.severity === 'warning' && (
+                <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
+                  I confirm recipient address exsits on the destination chain.
+                </Checkbox>
+              )}
 
               {buildTx.txBundle?.signer ? (
                 <CustomGasFeeSelect
@@ -216,12 +233,6 @@ function TxSubmit({
                 />
               ) : null}
 
-              {safetyCheck && safetyCheck.severity === 'warning' && (
-                <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
-                  I confirm recipient address exsits on the destination chain.
-                </Checkbox>
-              )}
-
               {gasFeeWarning && <Alert color='warning' title='The selected asset is not enough to pay the gas fee.' />}
 
               {!isPropose && (
@@ -229,7 +240,8 @@ function TxSubmit({
                   disabled={
                     !safetyCheck ||
                     safetyCheck.severity === 'error' ||
-                    (safetyCheck.severity === 'warning' && !isConfirm)
+                    (safetyCheck.severity === 'warning' && !isConfirm) ||
+                    !!buildTx.error
                   }
                   assetId={selectedFeeAsset?.assetId}
                   buildTx={buildTx}
@@ -290,17 +302,10 @@ function TxSubmit({
                   Add To Template
                 </Button>
               )}
+
+              <LockInfo buildTx={buildTx} />
             </>
           )}
-
-          {!hasPermission ? (
-            <Alert
-              color='danger'
-              title="You are currently not a member of this Account and won't be able to submit this transaction."
-            />
-          ) : filterPaths.length === 0 ? (
-            <Alert color='danger' title={`This account doesn’t exist on ${chain.name}`} />
-          ) : null}
         </div>
       </div>
     </div>

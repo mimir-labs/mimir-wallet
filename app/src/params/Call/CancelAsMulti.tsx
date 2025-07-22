@@ -2,51 +2,53 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountId32 } from '@polkadot/types/interfaces';
-import type { CallProps } from '../types';
+import type { CallProps } from './types';
 
 import { getTypeDef, type Vec } from '@polkadot/types';
 import { createKeyMulti } from '@polkadot/util-crypto';
-import React, { useMemo } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 
 import Param from '../Param';
 import Item from '../Param/Item';
-import FunctionArgs from './FunctionArgs';
+import { mergeClasses } from './utils';
 
-function CancelAsMulti({ registry, call, displayType, from, ...props }: CallProps) {
-  const multisig = useMemo(() => {
-    if (!from) {
-      return null;
-    }
+const CancelAsMulti = forwardRef<HTMLDivElement | null, CallProps>(
+  ({ registry, call, displayType, from, className }, ref) => {
+    const multisig = useMemo(() => {
+      if (!from) {
+        return null;
+      }
 
-    const threshold = Number(call.args[0].toString());
-    const who = (call.args[1] as Vec<AccountId32>).map((account) => account.toString()).concat(from);
+      const threshold = Number(call.args[0].toString());
+      const who = (call.args[1] as Vec<AccountId32>).map((account) => account.toString()).concat(from);
 
-    const multisig = registry.createType('AccountId', createKeyMulti(who, threshold));
+      const multisig = registry.createType('AccountId', createKeyMulti(who, threshold));
 
-    return [multisig, getTypeDef(multisig.toRawType())] as const;
-  }, [call, from, registry]);
+      return [multisig, getTypeDef(multisig.toRawType())] as const;
+    }, [call, from, registry]);
 
-  return (
-    <>
-      {multisig && (
-        <Item
-          type={displayType}
-          content={
-            <Param
-              displayType={displayType}
-              name='Multisig'
-              registry={registry}
-              type={multisig[1]}
-              value={multisig[0]}
-            />
-          }
-          name='Multisig'
-        />
-      )}
+    return (
+      <div ref={ref} className={mergeClasses('flex flex-col gap-2.5', className)}>
+        {multisig && (
+          <Item
+            type={displayType}
+            content={
+              <Param
+                displayType={displayType}
+                name='Multisig'
+                registry={registry}
+                type={multisig[1]}
+                value={multisig[0]}
+              />
+            }
+            name='Multisig'
+          />
+        )}
+      </div>
+    );
+  }
+);
 
-      <FunctionArgs registry={registry} call={call} {...props} />
-    </>
-  );
-}
+CancelAsMulti.displayName = 'CancelAsMulti';
 
 export default React.memo(CancelAsMulti);

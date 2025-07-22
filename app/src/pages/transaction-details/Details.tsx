@@ -36,7 +36,7 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
       <Item title='From' content={<AddressCell iconSize={40} withCopy value={from} />} />
 
       {targetCall ? (
-        <FunctionArgs displayType='vertical' from={from} registry={api.registry} call={targetCall} jsonFallback />
+        <FunctionArgs displayType='vertical' from={from} registry={api.registry} call={targetCall} />
       ) : null}
 
       {!call && (
@@ -70,12 +70,12 @@ function Details({ transaction }: { transaction: Transaction }) {
       <Item title='Created Time' content={moment(transaction.createdAt).format()} />
       {transaction.note && <Item title='Note' content={transaction.note} />}
       <Item
-        title='Created Extrinsic'
+        title='Created Transaction'
         content={<Hash value={transaction.createdExtrinsicHash} withCopy withExplorer />}
       />
       {transaction.executedExtrinsicHash && (
         <Item
-          title='Executed Extrinsic'
+          title='Executed Transaction'
           content={<Hash value={transaction.executedExtrinsicHash} withCopy withExplorer />}
         />
       )}
@@ -97,7 +97,7 @@ function Details({ transaction }: { transaction: Transaction }) {
           {transaction.cancelBlock && <Item title='Cancel Block' content={transaction.cancelBlock} />}
           {transaction.cancelExtrinsicHash && (
             <Item
-              title='Cancel Extrinsic'
+              title='Cancel Transaction'
               content={<Hash value={transaction.cancelExtrinsicHash} withCopy withExplorer />}
             />
           )}

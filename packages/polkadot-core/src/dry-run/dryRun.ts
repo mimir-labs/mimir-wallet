@@ -53,6 +53,7 @@ export async function dryRun(
     if (executionResult.isOk) {
       return {
         success: true,
+        rawEvents: ok.emittedEvents.toHuman(),
         balancesChanges: parseBalancesChange(ok.emittedEvents)
       };
     } else {
@@ -60,6 +61,7 @@ export async function dryRun(
 
       return {
         success: false,
+        rawEvents: ok.emittedEvents.toHuman(),
         error: assetDispatchError(api, err.error)
       };
     }

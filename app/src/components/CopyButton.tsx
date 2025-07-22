@@ -10,9 +10,13 @@ import { Button, type ButtonProps, type PressEvent } from '@mimir-wallet/ui';
 
 interface Props extends ButtonProps {
   value?: string;
+  mode?: 'icon' | 'text';
 }
 
-const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton({ value, ...props }, ref) {
+const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton(
+  { value, mode = 'icon', children, ...props },
+  ref
+) {
   const [copied, copy] = useCopyClipboard();
 
   const handleClick = useCallback(
@@ -23,22 +27,33 @@ const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton({ va
     [copy, value, props]
   );
 
+  const isIconMode = mode === 'icon';
+
   return (
     <Button
-      isIconOnly
+      isIconOnly={isIconMode}
       size={props.size || 'sm'}
       color={props.color || 'default'}
-      radius={props.radius || 'full'}
+      radius={isIconMode ? props.radius || 'full' : props.radius}
       variant={props.variant || 'light'}
       {...props}
       onPress={handleClick}
-      onClick={(e) => {
-        e.preventDefault();
-      }}
       ref={ref}
-      className={'h-5 min-h-[0px] w-5 min-w-[0px] opacity-50'.concat(props.className || '')}
+      className={
+        isIconMode ? 'h-5 min-h-[0px] w-5 min-w-[0px] opacity-50'.concat(props.className || '') : props.className
+      }
     >
-      {copied ? <IconSuccess className='h-4 w-4' /> : <IconCopy className='h-4 w-4' />}
+      {isIconMode ? (
+        copied ? (
+          <IconSuccess className='h-4 w-4' />
+        ) : (
+          <IconCopy className='h-4 w-4' />
+        )
+      ) : copied ? (
+        'Copied!'
+      ) : (
+        children
+      )}
     </Button>
   );
 });

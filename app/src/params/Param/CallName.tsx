@@ -1,25 +1,58 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Call } from '@polkadot/types/interfaces';
-import type { ParamProps } from './types';
+import type { IMethod } from '@polkadot/types/types';
 
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useToggle } from 'react-use';
 
-function CallName({ value }: ParamProps) {
-  const call = value as Call;
+import { Divider, Link, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
-  try {
-    const { method, section } = call.registry.findMetaCall(call.callIndex);
+import Call from '../Call';
 
-    if (section && method) {
-      return `${section}.${method}`;
+function CallDialog({ action, value, onClose }: { action: string; value: IMethod; onClose: () => void }) {
+  return (
+    <Modal size='lg' isOpen onClose={onClose}>
+      <ModalContent>
+        <ModalHeader>{action}</ModalHeader>
+        <ModalBody className='gap-4 pt-0'>
+          <Divider />
+          <Call call={value} registry={value.registry} showFallback />
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+function CallName({ value }: { value: IMethod }) {
+  const [isOpen, toggleOpen] = useToggle(false);
+  const action = useMemo(() => {
+    try {
+      const { method, section } = value.registry.findMetaCall(value.callIndex);
+
+      if (section && method) {
+        return `${section}.${method}`;
+      }
+
+      return null;
+    } catch {
+      return null;
     }
+  }, [value.callIndex, value.registry]);
 
-    return null;
-  } catch {
-    return null;
+  if (action) {
+    return (
+      <>
+        <Link onPress={toggleOpen} as='button'>
+          {action}
+        </Link>
+
+        {isOpen && <CallDialog action={action} value={value} onClose={() => toggleOpen(false)} />}
+      </>
+    );
   }
+
+  return 'Unknown';
 }
 
 export default React.memo(CallName);

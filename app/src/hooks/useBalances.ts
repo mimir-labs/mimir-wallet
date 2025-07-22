@@ -525,8 +525,10 @@ export function useAssetBalancesAll(address?: string): UseAssetBalancesAll[] {
 export function useBalanceTotalUsd(address?: string) {
   const nativeBalances = useNativeBalancesAll(address);
   const assets = useAssetBalancesAll(address);
+  const [total, setTotal] = useState(0);
+  const [changes, setChanges] = useState(0);
 
-  return useMemo(() => {
+  useEffect(() => {
     let lastTotal = 0;
     let total = 0;
 
@@ -552,6 +554,9 @@ export function useBalanceTotalUsd(address?: string) {
       }
     }
 
-    return [total, lastTotal ? (total - lastTotal) / lastTotal : 0];
+    setTotal(total);
+    setChanges(lastTotal ? (total - lastTotal) / lastTotal : 0);
   }, [assets, nativeBalances]);
+
+  return [total, changes];
 }

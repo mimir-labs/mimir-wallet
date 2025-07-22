@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Call } from '@polkadot/types/interfaces';
-import type { CallProps } from '../types';
+import type { CallProps } from './types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { ellipsisMixin } from '@/components/utils';
-import { Call as CallComp } from '@/params';
+import { Call as CallComp, FunctionArgs } from '@/params';
 import { isArray } from '@polkadot/util';
-import React, { useMemo, useState } from 'react';
+import React, { forwardRef, useMemo, useState } from 'react';
 
 import { findAction } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
@@ -16,14 +16,13 @@ import { Button } from '@mimir-wallet/ui';
 import CallDisplayDetail from '../CallDisplay/CallDisplayDetail';
 import CallDisplayDetailMinor from '../CallDisplay/CallDisplayDetailMinor';
 import CallDisplaySection from '../CallDisplay/CallDisplaySection';
-import FunctionArgs from './FunctionArgs';
+import { mergeClasses } from './utils';
 
 function Item({
   from,
   call,
   index,
   registry,
-  jsonFallback,
   isOpen,
   toggleOpen
 }: {
@@ -69,24 +68,25 @@ function Item({
       {Top}
       {isOpen && (
         <div className='bg-content1 rounded-medium mr-2 mb-2 ml-2 space-y-2 p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:space-y-3 sm:p-3'>
-          <CallComp from={from} registry={registry} call={call} jsonFallback={jsonFallback} />
+          <CallComp showFallback fallbackComponent={FunctionArgs} from={from} registry={registry} call={call} />
         </div>
       )}
     </div>
   );
 }
 
-function BatchCall({ from, registry, call, jsonFallback, ...props }: CallProps) {
+const BatchCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
+  const { from, registry, call, className, showFallback, fallbackComponent: FallbackComponent = FunctionArgs } = props;
   const [isOpen, setOpen] = useState<Record<number, boolean>>({});
 
   const calls: Call[] | null = isArray(call.args?.[0]) ? (call.args[0] as Call[]) : null;
 
   if (!calls) {
-    return <FunctionArgs from={from} registry={registry} call={call} jsonFallback={jsonFallback} {...props} />;
+    return showFallback ? <FallbackComponent ref={ref} {...props} /> : null;
   }
 
   return (
-    <div className='w-full space-y-2.5'>
+    <div className={mergeClasses('w-full space-y-2.5', className)} ref={ref}>
       <div className='text-small flex items-center justify-between font-bold'>
         Actions
         <div>
@@ -132,17 +132,19 @@ function BatchCall({ from, registry, call, jsonFallback, ...props }: CallProps) 
           isOpen={!!isOpen[index]}
           call={call}
           registry={registry}
-          jsonFallback={jsonFallback}
           toggleOpen={() =>
             setOpen((values) => ({
               ...values,
               [index]: !values[index]
             }))
           }
+          fallbackComponent={FallbackComponent}
         />
       ))}
     </div>
   );
-}
+});
+
+BatchCall.displayName = 'BatchCall';
 
 export default React.memo(BatchCall);

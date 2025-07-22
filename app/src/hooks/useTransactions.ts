@@ -77,7 +77,7 @@ export function useMultichainPendingTransactions(networks: string[], address?: s
     queries: networks.map((network) => ({
       initialData: [],
       queryKey: [network, address, txId] as [network: string, address?: string | null, txId?: string],
-      queryHash: `${API_CLIENT_GATEWAY}/chains/${network}/${address}/transactions/pending?tx_id=${txId}`,
+      queryHash: `multichain-pending-transactions-${network}-${address}-${txId || 'all'}`,
       structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
         const nextTransactions = (next as Transaction[]).map((item) => transformTransaction(chainSS58, item));
 
@@ -120,7 +120,7 @@ export function useHistoryTransactions(
 
   const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
     initialPageParam: null,
-    queryHash: `${API_CLIENT_GATEWAY}/chains/${network}/${address}/transactions/history?tx_id=${txId}&limit=${limit}`,
+    queryHash: `history-transactions-v2-${network}-${address}-${txId || 'all'}-${limit}`,
     queryKey: [network, address, txId, limit] as [
       network?: string,
       address?: string | null,
@@ -144,14 +144,12 @@ export function useHistoryTransactions(
         throw new Error('Address is required');
       }
 
-      const data = await fetcher(
-        pageParam
-          ? txId
-            ? `${API_CLIENT_GATEWAY}/chains/${network}/${address}/transactions/history?tx_id=${txId}&limit=${limit}&next_cursor=${pageParam}`
-            : `${API_CLIENT_GATEWAY}/chains/${network}/${address}/transactions/history?limit=${limit}&next_cursor=${pageParam}`
-          : txId
-            ? `${API_CLIENT_GATEWAY}/chains/${network}/${address}/transactions/history?tx_id=${txId}&limit=${limit}`
-            : `${API_CLIENT_GATEWAY}/chains/${network}/${address}/transactions/history?limit=${limit}`
+      const data = await service.transaction.getHistoryTransactionsV2(
+        network,
+        address,
+        txId,
+        pageParam ? String(pageParam) : undefined,
+        limit
       );
 
       return data.map((item: any) => ({ ...item, network }));

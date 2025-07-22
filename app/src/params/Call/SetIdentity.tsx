@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { PalletIdentityLegacyIdentityInfo } from '@polkadot/types/lookup';
-import type { CallProps } from '../types';
+import type { CallProps } from './types';
 
 import IconDiscord from '@/assets/images/discord.svg';
 import IconEmail from '@/assets/images/email.svg';
@@ -12,14 +12,15 @@ import IconTwitter from '@/assets/images/x.svg';
 import { Address, CopyAddress, IdentityIcon } from '@/components';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { dataToUtf8 } from '@/utils';
-import React, { useMemo } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 
 import { findAction } from '@mimir-wallet/polkadot-core';
 import { Avatar, Tooltip } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
+import { mergeClasses } from './utils';
 
-function Item({ icon, value }: { icon: string; value: string }) {
+const Item = React.memo(({ icon, value }: { icon: string; value: string }) => {
   const [copied, copy] = useCopyClipboard();
 
   return (
@@ -27,52 +28,55 @@ function Item({ icon, value }: { icon: string; value: string }) {
       <Avatar src={icon} style={{ cursor: 'copy', width: 32, height: 32 }} onClick={() => copy(value)} />
     </Tooltip>
   );
-}
+});
 
-function IdentityDisplay({
-  address,
-  display,
-  discord,
-  email,
-  github,
-  matrix,
-  twitter
-}: {
-  address?: string;
-  display: string | undefined;
-  discord: string | undefined;
-  email: string | undefined;
-  github: string | undefined;
-  legal: string | undefined;
-  matrix: string | undefined;
-  riot: string | undefined;
-  twitter: string | undefined;
-  web: string | undefined;
-}) {
-  return (
-    <>
-      <div className='flex items-center gap-2'>
-        {address && <IdentityIcon size={34} value={address} />}
-        <b>{display}</b>
-        {address && (
-          <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>
-            <Address value={address} shorten />
-            <CopyAddress address={address} />
-          </span>
-        )}
-      </div>
-      <div className='flex items-center gap-2.5 sm:gap-5'>
-        {twitter && <Item icon={IconTwitter} value={twitter} />}
-        {discord && <Item icon={IconDiscord} value={discord} />}
-        {matrix && <Item icon={IconMatrix} value={matrix} />}
-        {email && <Item icon={IconEmail} value={email} />}
-        {github && <Item icon={IconGithub} value={github} />}
-      </div>
-    </>
-  );
-}
+const IdentityDisplay = React.memo(
+  ({
+    address,
+    display,
+    discord,
+    email,
+    github,
+    matrix,
+    twitter
+  }: {
+    address?: string;
+    display: string | undefined;
+    discord: string | undefined;
+    email: string | undefined;
+    github: string | undefined;
+    legal: string | undefined;
+    matrix: string | undefined;
+    riot: string | undefined;
+    twitter: string | undefined;
+    web: string | undefined;
+  }) => {
+    return (
+      <>
+        <div className='flex items-center gap-2'>
+          {address && <IdentityIcon size={34} value={address} />}
+          <b>{display}</b>
+          {address && (
+            <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>
+              <Address value={address} shorten />
+              <CopyAddress address={address} />
+            </span>
+          )}
+        </div>
+        <div className='flex items-center gap-2.5 sm:gap-5'>
+          {twitter && <Item icon={IconTwitter} value={twitter} />}
+          {discord && <Item icon={IconDiscord} value={discord} />}
+          {matrix && <Item icon={IconMatrix} value={matrix} />}
+          {email && <Item icon={IconEmail} value={email} />}
+          {github && <Item icon={IconGithub} value={github} />}
+        </div>
+      </>
+    );
+  }
+);
 
-function SetIdentity({ from, registry, call, jsonFallback }: CallProps) {
+const SetIdentity = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
+  const { from, registry, call, className, showFallback, fallbackComponent: FallbackComponent = FunctionArgs } = props;
   const action = useMemo(() => findAction(registry, call), [registry, call]);
 
   const results = useMemo(() => {
@@ -119,13 +123,18 @@ function SetIdentity({ from, registry, call, jsonFallback }: CallProps) {
     return { display, discord, email, github, legal, matrix, riot, twitter, web } as const;
   }, [action, call]);
 
-  if (!results) return <FunctionArgs from={from} registry={registry} call={call} jsonFallback={jsonFallback} />;
+  if (!results) return showFallback ? <FallbackComponent ref={ref} {...props} /> : null;
 
   return (
-    <div className='flex w-full items-center justify-between gap-2.5 sm:gap-5 md:gap-7'>
+    <div
+      ref={ref}
+      className={mergeClasses('flex w-full items-center justify-between gap-2.5 sm:gap-5 md:gap-7', className)}
+    >
       <IdentityDisplay {...results} address={from} />
     </div>
   );
-}
+});
+
+SetIdentity.displayName = 'SetIdentity';
 
 export default React.memo(SetIdentity);

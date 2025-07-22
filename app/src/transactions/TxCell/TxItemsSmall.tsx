@@ -9,6 +9,7 @@ import { CallDisplaySection } from '@/params';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 function AppCell({ transaction }: { transaction: Transaction }) {
@@ -29,11 +30,15 @@ function ActionsCell() {
 
 function TxItems({ transaction }: { transaction: Transaction }) {
   const navigate = useNavigate();
+  const { setNetwork } = useApi();
 
   return (
     <div
       className='rounded-medium bg-secondary grid cursor-pointer grid-cols-7 overflow-hidden px-2.5 font-semibold [&_div]:flex [&_div]:h-10 [&_div]:items-center'
-      onClick={() => navigate(`/transactions/${transaction.id}`)}
+      onClick={() => {
+        setNetwork(transaction.network);
+        navigate(`/transactions/${transaction.id}`);
+      }}
     >
       <div className='col-span-3'>
         <AppCell transaction={transaction} />

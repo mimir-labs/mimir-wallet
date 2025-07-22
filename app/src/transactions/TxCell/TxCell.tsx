@@ -8,8 +8,9 @@ import IconShare from '@/assets/svg/icon-share.svg?react';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useTransactionDetail } from '@/hooks/useTransactions';
 import moment from 'moment';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Divider, Spinner, Tooltip } from '@mimir-wallet/ui';
@@ -25,12 +26,25 @@ interface Props {
   transaction: Transaction;
 }
 
-function TxCell({ withDetails, defaultOpen, address, transaction }: Props) {
-  const { status } = transaction;
+function TxCell({ withDetails, defaultOpen, address, transaction: propsTransaction }: Props) {
   const upSm = useMediaQuery('sm');
   const [isCopied, copy] = useCopyClipboard();
   const { network, chain, chainSS58, isApiReady } = useApi();
   const [account] = useQueryAccount(address);
+
+  // State for loading full transaction details
+  const [shouldLoadDetails, setShouldLoadDetails] = useState(false);
+  const [fullTransaction] = useTransactionDetail(
+    network,
+    shouldLoadDetails ? propsTransaction.id.toString() : undefined
+  );
+
+  // Use full transaction if loaded, otherwise use original
+  const transaction = fullTransaction || propsTransaction;
+  const { status } = transaction;
+
+  // Check if transaction has large calls
+  const hasLargeCalls = !!transaction.isLargeCall;
 
   return (
     <div className='rounded-large bg-content1 border-secondary shadow-small space-y-3 border-1 p-3 sm:p-4'>
@@ -83,7 +97,15 @@ function TxCell({ withDetails, defaultOpen, address, transaction }: Props) {
       <Divider orientation='horizontal' />
       {isApiReady && account ? (
         upSm ? (
-          <TxItems withDetails={withDetails} defaultOpen={defaultOpen} account={account} transaction={transaction} />
+          <TxItems
+            withDetails={withDetails}
+            defaultOpen={defaultOpen}
+            account={account}
+            transaction={transaction}
+            hasLargeCalls={hasLargeCalls}
+            shouldLoadDetails={shouldLoadDetails}
+            onLoadDetails={() => setShouldLoadDetails(true)}
+          />
         ) : (
           <TxItemsSmall transaction={transaction} />
         )

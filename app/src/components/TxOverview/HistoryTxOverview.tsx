@@ -19,7 +19,7 @@ import {
   useEdgesState,
   useNodesState
 } from '@xyflow/react';
-import React, { createContext, useEffect } from 'react';
+import React, { createContext, useEffect, useMemo } from 'react';
 
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
@@ -63,7 +63,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
         <Handle
           isConnectable={isConnectable}
           position={Position.Left}
-          style={{ width: 0, height: 0 }}
+          style={{ zIndex: 1, top: 22, left: 0, width: 0, height: 0 }}
           className='bg-divider-300'
           type='source'
         />
@@ -78,7 +78,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
         <Handle
           isConnectable={isConnectable}
           position={Position.Right}
-          style={{ width: 0, height: 0 }}
+          style={{ zIndex: 1, top: 22, right: 0, width: 0, height: 0 }}
           className='bg-divider-300'
           type='target'
         />
@@ -87,13 +87,14 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
   );
 });
 
-const nodeTypes = {
+// Define node and edge types outside component to prevent recreation
+const NODE_TYPES = {
   AddressNode
-};
+} as const;
 
-const edgeTypes = {
+const EDGE_TYPES = {
   AddressEdge
-};
+} as const;
 
 function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], edges: Edge<EdgeData>[] = []) {
   function createNode(id: string, transaction: Transaction, isTop: boolean): Node<NodeData> {
@@ -103,7 +104,7 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
       type: 'AddressNode',
       data: {
         isTop,
-        isLeaf: transaction.children.length === 0,
+        isLeaf: true, // Will be updated after traversal based on actual edges
         transaction
       },
       position: { x: 0, y: 0 },
@@ -166,41 +167,80 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
   }
 
   dfs({ parent: null, value: topTransaction });
+
+  // Update isLeaf based on actual edges
+  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+
+  edges.forEach((edge) => {
+    const sourceNode = nodeMap.get(edge.source);
+
+    if (sourceNode) {
+      sourceNode.data.isLeaf = false;
+    }
+  });
 }
 
-function TxOverview({ transaction, ...props }: Props) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>([]);
+function HistoryTxOverview({ transaction, ...props }: Props) {
+  // Memoize the context value
+  const contextValue = useMemo(() => props, [props]);
 
-  useEffect(() => {
+  // Memoize fitView options
+  const fitViewOptions = useMemo(
+    () => ({
+      maxZoom: 1.5,
+      minZoom: 0.1
+    }),
+    []
+  );
+
+  // Memoize the graph computation with performance monitoring
+  const { layoutedNodes, layoutedEdges } = useMemo(() => {
+    // Performance monitoring in development
+    const startTime = process.env.NODE_ENV === 'development' ? performance.now() : 0;
+
     const initialNodes: Node<NodeData>[] = [];
     const initialEdges: Edge<EdgeData>[] = [];
 
     makeNodes(transaction, initialNodes, initialEdges);
-    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 270, 70);
+    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 330, 70);
 
-    setNodes(nodes);
-    setEdges(edges);
-  }, [setEdges, setNodes, transaction]);
+    // Log performance in development
+    if (process.env.NODE_ENV === 'development') {
+      const endTime = performance.now();
+
+      console.log(
+        `[HistoryTxOverview] Graph computation took ${(endTime - startTime).toFixed(2)}ms for ${nodes.length} nodes and ${edges.length} edges`
+      );
+    }
+
+    return { layoutedNodes: nodes, layoutedEdges: edges };
+  }, [transaction]);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>(layoutedNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>(layoutedEdges);
+
+  // Update nodes and edges when layout changes
+  useEffect(() => {
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+  }, [layoutedNodes, layoutedEdges, setNodes, setEdges]);
 
   return (
-    <context.Provider value={props}>
+    <context.Provider value={contextValue}>
       <ReactFlow
         edges={edges}
         fitView
-        fitViewOptions={{
-          maxZoom: 1.5,
-          minZoom: 0.1,
-          nodes
-        }}
+        fitViewOptions={fitViewOptions}
         maxZoom={1.5}
         minZoom={0.1}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+        nodeTypes={NODE_TYPES}
+        edgeTypes={EDGE_TYPES}
         nodes={nodes}
         onEdgesChange={onEdgesChange}
         onNodesChange={onNodesChange}
         zoomOnScroll
+        // Remove attribution for cleaner UI
+        proOptions={{ hideAttribution: true }}
       >
         <Controls showInteractive={false} />
       </ReactFlow>
@@ -208,4 +248,4 @@ function TxOverview({ transaction, ...props }: Props) {
   );
 }
 
-export default React.memo(TxOverview);
+export default React.memo(HistoryTxOverview);

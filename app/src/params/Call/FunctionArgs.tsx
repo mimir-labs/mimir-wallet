@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TypeDef } from '@polkadot/types/types';
-import type { CallProps } from '../types';
+import type { CallProps } from './types';
 
-import JsonView from '@/components/JsonView';
 import { getTypeDef } from '@polkadot/types';
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 
 import Param from '../Param';
 import Item from '../Param/Item';
+import { mergeClasses } from './utils';
 
-function FunctionArgs({ registry, call, jsonFallback, displayType }: CallProps) {
+const FunctionArgs = forwardRef<HTMLDivElement | null, CallProps>(({ registry, call, displayType, className }, ref) => {
   const [args, setArgs] = useState<[string, TypeDef][]>();
   const [done, setDone] = useState(false);
 
@@ -28,23 +28,30 @@ function FunctionArgs({ registry, call, jsonFallback, displayType }: CallProps) 
   }, [registry, call]);
 
   return done ? (
-    <>
+    <div
+      ref={ref}
+      className={mergeClasses('rounded-medium bg-secondary flex w-full shrink-0 flex-col gap-2.5 p-2.5', className)}
+    >
       {args ? (
-        args.map(([name, type], index) => (
-          <Item
-            type={displayType}
-            key={index}
-            content={
-              <Param displayType={displayType} name={name} registry={registry} type={type} value={call.args[index]} />
-            }
-            name={name}
-          />
-        ))
-      ) : jsonFallback ? (
-        <JsonView data={call.toHuman()} />
+        args.length > 0 ? (
+          args.map(([name, type], index) => (
+            <Item
+              type={displayType}
+              key={index}
+              content={
+                <Param displayType={displayType} name={name} registry={registry} type={type} value={call.args[index]} />
+              }
+              name={name}
+            />
+          ))
+        ) : (
+          <span className='font-bold'>No parameter</span>
+        )
       ) : null}
-    </>
+    </div>
   ) : null;
-}
+});
+
+FunctionArgs.displayName = 'FunctionArgs';
 
 export default React.memo(FunctionArgs);

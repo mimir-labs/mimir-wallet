@@ -34,6 +34,7 @@ import {
 import AccountCell from './AccountCell';
 import CreateMultisig from './CreateMultisig';
 import Search from './Search';
+import VirtualAccountCell from './VirtualAccountCell';
 
 interface Props {
   open: boolean;
@@ -238,7 +239,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
                 </div>
                 {isMimirExpanded
                   ? grouped.mimir.map((account) => (
-                      <AccountCell
+                      <VirtualAccountCell
                         key={`multisig-${account}`}
                         onClose={onClose}
                         onSelect={onSelect}
@@ -259,7 +260,12 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
                   Extension Wallet
                 </div>
                 {grouped.injected.map((account) => (
-                  <AccountCell key={`extension-${account}`} onClose={onClose} onSelect={onSelect} value={account} />
+                  <VirtualAccountCell
+                    key={`extension-${account}`}
+                    onClose={onClose}
+                    onSelect={onSelect}
+                    value={account}
+                  />
                 ))}
 
                 <Divider />
@@ -286,8 +292,8 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
             {!keywordsIsPolkadotAddress &&
               watchlist.map(({ address }) => (
-                <AccountCell
-                  key={`extension-${address}`}
+                <VirtualAccountCell
+                  key={`watchlist-${address}`}
                   watchlist
                   onClose={onClose}
                   onSelect={onSelect}
