@@ -13,56 +13,30 @@ import { Spinner } from '@mimir-wallet/ui';
 
 import Cell from './Cell';
 
-function SafetyCheck({
-  isTxBundleLoading,
-  txError,
-  safetyCheck
-}: {
-  isTxBundleLoading: boolean;
-  txError?: Error | null;
-  safetyCheck?: SafetyLevel;
-}) {
+function SafetyCheck({ safetyCheck }: { safetyCheck?: SafetyLevel }) {
+  if (safetyCheck && safetyCheck.severity === 'none') {
+    return null;
+  }
+
   return (
     <div>
       <div className='font-bold'>Safety Check</div>
 
-      {safetyCheck && safetyCheck.severity === 'none' ? null : (
-        <Cell title='Cross-chain Check' img={<img src={Logo} alt='mimir' className='h-[14px]' />}>
-          {!safetyCheck && <Spinner size='sm' />}
-          {safetyCheck && (
-            <>
-              {safetyCheck.severity === 'none' && <IconSuccess className='text-success h-4 w-4' />}
-              {safetyCheck.severity === 'error' && <IconFailed className='text-danger h-4 w-4' />}
-              {safetyCheck.severity === 'warning' && <IconInfo className='text-warning h-4 w-4' />}
-
-              <p
-                data-success={safetyCheck.severity === 'none'}
-                data-error={safetyCheck.severity === 'error'}
-                data-warning={safetyCheck.severity === 'warning'}
-                className='data-[success=true]:text-success data-[error]:text-danger data-[warning]:text-warning font-bold'
-              >
-                {safetyCheck?.message}
-              </p>
-            </>
-          )}
-        </Cell>
-      )}
-      <Cell title='Authority Check' img={<img src={Logo} alt='mimir' className='h-[14px]' />}>
-        {isTxBundleLoading && <Spinner size='sm' />}
-        {!isTxBundleLoading && (
+      <Cell title='Cross-chain Check' img={<img src={Logo} alt='mimir' className='h-[14px]' />}>
+        {!safetyCheck && <Spinner size='sm' />}
+        {safetyCheck && (
           <>
-            {!txError ? (
-              <IconSuccess className='text-success h-4 w-4' />
-            ) : (
-              <IconFailed className='text-danger h-4 w-4' />
-            )}
+            {safetyCheck.severity === 'none' && <IconSuccess className='text-success h-4 w-4' />}
+            {safetyCheck.severity === 'error' && <IconFailed className='text-danger h-4 w-4' />}
+            {safetyCheck.severity === 'warning' && <IconInfo className='text-warning h-4 w-4' />}
 
             <p
-              data-success={!txError}
-              data-error={!!txError}
-              className='data-[success=true]:text-success data-[error=true]:text-danger font-bold'
+              data-success={safetyCheck.severity === 'none'}
+              data-error={safetyCheck.severity === 'error'}
+              data-warning={safetyCheck.severity === 'warning'}
+              className='data-[success=true]:text-success data-[error]:text-danger data-[warning]:text-warning font-bold'
             >
-              {!txError ? 'Permission Granted' : 'Perimission Denied'}
+              {safetyCheck?.message}
             </p>
           </>
         )}

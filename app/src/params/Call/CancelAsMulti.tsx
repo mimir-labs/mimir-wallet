@@ -10,11 +10,10 @@ import React, { forwardRef, useMemo } from 'react';
 
 import Param from '../Param';
 import Item from '../Param/Item';
-import FunctionArgs from './FunctionArgs';
 import { mergeClasses } from './utils';
 
 const CancelAsMulti = forwardRef<HTMLDivElement | null, CallProps>(
-  ({ registry, call, displayType, from, showFallback, className, fallbackComponent }, ref) => {
+  ({ registry, call, displayType, from, className }, ref) => {
     const multisig = useMemo(() => {
       if (!from) {
         return null;
@@ -29,7 +28,7 @@ const CancelAsMulti = forwardRef<HTMLDivElement | null, CallProps>(
     }, [call, from, registry]);
 
     return (
-      <div ref={ref} className={mergeClasses('', className)}>
+      <div ref={ref} className={mergeClasses('flex flex-col gap-2.5', className)}>
         {multisig && (
           <Item
             type={displayType}
@@ -45,14 +44,6 @@ const CancelAsMulti = forwardRef<HTMLDivElement | null, CallProps>(
             name='Multisig'
           />
         )}
-
-        <FunctionArgs
-          registry={registry}
-          call={call}
-          displayType={displayType}
-          showFallback={showFallback}
-          fallbackComponent={fallbackComponent}
-        />
       </div>
     );
   }

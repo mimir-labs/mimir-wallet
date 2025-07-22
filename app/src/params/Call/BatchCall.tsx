@@ -6,7 +6,7 @@ import type { CallProps } from './types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { ellipsisMixin } from '@/components/utils';
-import { Call as CallComp } from '@/params';
+import { Call as CallComp, FunctionArgs } from '@/params';
 import { isArray } from '@polkadot/util';
 import React, { forwardRef, useMemo, useState } from 'react';
 
@@ -24,8 +24,7 @@ function Item({
   index,
   registry,
   isOpen,
-  toggleOpen,
-  showFallback
+  toggleOpen
 }: {
   index: number;
   isOpen: boolean;
@@ -69,84 +68,82 @@ function Item({
       {Top}
       {isOpen && (
         <div className='bg-content1 rounded-medium mr-2 mb-2 ml-2 space-y-2 p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:space-y-3 sm:p-3'>
-          <CallComp showFallback={showFallback} from={from} registry={registry} call={call} />
+          <CallComp showFallback fallbackComponent={FunctionArgs} from={from} registry={registry} call={call} />
         </div>
       )}
     </div>
   );
 }
 
-const BatchCall = forwardRef<HTMLDivElement | null, CallProps>(
-  ({ from, registry, call, showFallback, className, fallbackComponent }, ref) => {
-    const [isOpen, setOpen] = useState<Record<number, boolean>>({});
+const BatchCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
+  const { from, registry, call, className, showFallback, fallbackComponent: FallbackComponent = FunctionArgs } = props;
+  const [isOpen, setOpen] = useState<Record<number, boolean>>({});
 
-    const calls: Call[] | null = isArray(call.args?.[0]) ? (call.args[0] as Call[]) : null;
+  const calls: Call[] | null = isArray(call.args?.[0]) ? (call.args[0] as Call[]) : null;
 
-    if (!calls) {
-      return null;
-    }
-
-    return (
-      <div className={mergeClasses('w-full space-y-2.5', className)} ref={ref}>
-        <div className='text-small flex items-center justify-between font-bold'>
-          Actions
-          <div>
-            <Button
-              color='primary'
-              size='sm'
-              variant='light'
-              onPress={() =>
-                setOpen(
-                  Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
-                    result[index] = true;
-
-                    return result;
-                  }, {})
-                )
-              }
-            >
-              Expand all
-            </Button>
-            <Button
-              color='primary'
-              size='sm'
-              variant='light'
-              onPress={() =>
-                setOpen(
-                  Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
-                    result[index] = false;
-
-                    return result;
-                  }, {})
-                )
-              }
-            >
-              Collapse all
-            </Button>
-          </div>
-        </div>
-        {calls.map((call, index) => (
-          <Item
-            from={from}
-            index={index + 1}
-            key={index}
-            isOpen={!!isOpen[index]}
-            call={call}
-            registry={registry}
-            toggleOpen={() =>
-              setOpen((values) => ({
-                ...values,
-                [index]: !values[index]
-              }))
-            }
-            showFallback={showFallback}
-            fallbackComponent={fallbackComponent}
-          />
-        ))}
-      </div>
-    );
+  if (!calls) {
+    return showFallback ? <FallbackComponent ref={ref} {...props} /> : null;
   }
-);
+
+  return (
+    <div className={mergeClasses('w-full space-y-2.5', className)} ref={ref}>
+      <div className='text-small flex items-center justify-between font-bold'>
+        Actions
+        <div>
+          <Button
+            color='primary'
+            size='sm'
+            variant='light'
+            onPress={() =>
+              setOpen(
+                Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
+                  result[index] = true;
+
+                  return result;
+                }, {})
+              )
+            }
+          >
+            Expand all
+          </Button>
+          <Button
+            color='primary'
+            size='sm'
+            variant='light'
+            onPress={() =>
+              setOpen(
+                Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
+                  result[index] = false;
+
+                  return result;
+                }, {})
+              )
+            }
+          >
+            Collapse all
+          </Button>
+        </div>
+      </div>
+      {calls.map((call, index) => (
+        <Item
+          from={from}
+          index={index + 1}
+          key={index}
+          isOpen={!!isOpen[index]}
+          call={call}
+          registry={registry}
+          toggleOpen={() =>
+            setOpen((values) => ({
+              ...values,
+              [index]: !values[index]
+            }))
+          }
+          fallbackComponent={FallbackComponent}
+        />
+      ))}
+    </div>
+  );
+});
 
 BatchCall.displayName = 'BatchCall';
 

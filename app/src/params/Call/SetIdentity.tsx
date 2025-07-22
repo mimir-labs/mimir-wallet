@@ -17,6 +17,7 @@ import React, { forwardRef, useMemo } from 'react';
 import { findAction } from '@mimir-wallet/polkadot-core';
 import { Avatar, Tooltip } from '@mimir-wallet/ui';
 
+import FunctionArgs from './FunctionArgs';
 import { mergeClasses } from './utils';
 
 const Item = React.memo(({ icon, value }: { icon: string; value: string }) => {
@@ -74,7 +75,8 @@ const IdentityDisplay = React.memo(
   }
 );
 
-const SetIdentity = forwardRef<HTMLDivElement | null, CallProps>(({ from, registry, call, className }, ref) => {
+const SetIdentity = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
+  const { from, registry, call, className, showFallback, fallbackComponent: FallbackComponent = FunctionArgs } = props;
   const action = useMemo(() => findAction(registry, call), [registry, call]);
 
   const results = useMemo(() => {
@@ -121,7 +123,7 @@ const SetIdentity = forwardRef<HTMLDivElement | null, CallProps>(({ from, regist
     return { display, discord, email, github, legal, matrix, riot, twitter, web } as const;
   }, [action, call]);
 
-  if (!results) return null;
+  if (!results) return showFallback ? <FallbackComponent ref={ref} {...props} /> : null;
 
   return (
     <div

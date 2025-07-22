@@ -32,6 +32,7 @@ import { useSafetyCheck } from './hooks/useSafetyCheck';
 import AddressChain from './AddressChain';
 import Call from './Call';
 import Confirmations from './Confirmations';
+import LockInfo from './LockInfo';
 import ProposeTx from './ProposeTx';
 import SendTx from './SendTx';
 import TxInfo from './TxInfo';
@@ -189,7 +190,7 @@ function TxSubmit({
             <DryRun call={call} account={accountData.address} />
           )}
 
-          <SafetyCheck isTxBundleLoading={buildTx.isLoading} txError={buildTx.error} safetyCheck={safetyCheck} />
+          <SafetyCheck safetyCheck={safetyCheck} />
         </div>
 
         <div className='shadow-medium rounded-large bg-content1 sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start p-4 sm:p-5 md:w-[40%]'>
@@ -206,6 +207,12 @@ function TxSubmit({
 
               <Input label='Note(Optional)' onChange={setNote} value={note} placeholder='Please note' />
 
+              {safetyCheck && safetyCheck.severity === 'warning' && (
+                <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
+                  I confirm recipient address exsits on the destination chain.
+                </Checkbox>
+              )}
+
               {buildTx.txBundle?.signer ? (
                 <CustomGasFeeSelect
                   network={network}
@@ -216,12 +223,6 @@ function TxSubmit({
                   }}
                 />
               ) : null}
-
-              {safetyCheck && safetyCheck.severity === 'warning' && (
-                <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
-                  I confirm recipient address exsits on the destination chain.
-                </Checkbox>
-              )}
 
               {gasFeeWarning && <Alert color='warning' title='The selected asset is not enough to pay the gas fee.' />}
 
@@ -239,7 +240,8 @@ function TxSubmit({
                   disabled={
                     !safetyCheck ||
                     safetyCheck.severity === 'error' ||
-                    (safetyCheck.severity === 'warning' && !isConfirm)
+                    (safetyCheck.severity === 'warning' && !isConfirm) ||
+                    !!buildTx.error
                   }
                   assetId={selectedFeeAsset?.assetId}
                   buildTx={buildTx}
@@ -300,6 +302,8 @@ function TxSubmit({
                   Add To Template
                 </Button>
               )}
+
+              <LockInfo buildTx={buildTx} />
             </>
           )}
         </div>

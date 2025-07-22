@@ -13,7 +13,5 @@ export interface CallProps {
   registry: Registry;
   showFallback?: boolean;
   className?: string;
-  fallbackComponent?: React.MemoExoticComponent<
-    React.ForwardRefExoticComponent<CallProps & React.RefAttributes<HTMLDivElement | null>>
-  >;
+  fallbackComponent?: React.ComponentType<CallProps>;
 }
