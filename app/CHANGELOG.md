@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.16.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.15.0...mimir-wallet-app-v2.16.0) (2025-07-22)
+
+
+### Features
+
+* Add polkassembly app supported ([#265](https://github.com/mimir-labs/mimir-wallet/issues/265)) ([4bd4f58](https://github.com/mimir-labs/mimir-wallet/commit/4bd4f58ae7bb5a12072f7afdd757cf8662015c64))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.16.0
+    * @mimir-wallet/service bumped to 2.16.0
+    * @mimir-wallet/ui bumped to 2.16.0
+
 ## [2.15.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.14.0...mimir-wallet-app-v2.15.0) (2025-07-22)
 
 
