@@ -167,6 +167,54 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
   }
 };
 
+export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
+  id: 1012,
+  icon: '/dapp-icons/polkassembly.png',
+  name: 'Polkassembly',
+  description: 'The premier platform for governance and collaboration in the Polkadot ecosystem.',
+  url: 'https://polkadot.polkassembly.io/',
+  supportedChains: [
+    'polkadot',
+    'kusama',
+    'acala',
+    'phala',
+    'collectives-polkadot',
+    'hydration',
+    'karura',
+    'paseo',
+    'crust',
+    'vara',
+    'polimec',
+    'pendulum'
+  ],
+  tags: ['Governance'],
+  website: 'https://polkassembly.io/',
+  twitter: 'https://x.com/polk_gov',
+  github: 'https://github.com/polkassembly/polkassembly',
+  urlSearch(network: string) {
+    const url = {
+      polkadot: 'https://polkadot.polkassembly.io/',
+      kusama: 'https://kusama.polkassembly.io/',
+      acala: 'https://acala.polkassembly.io/',
+      phala: 'https://phala.polkassembly.io/',
+      'collectives-polkadot': 'https://collectives.polkassembly.io/',
+      hydration: 'https://hydradx.polkassembly.io/',
+      karura: 'https://karura.polkassembly.io/',
+      paseo: 'https://paseo.polkassembly.io/',
+      crust: 'https://crust.polkassembly.io/',
+      vara: 'https://vara.polkassembly.io/',
+      polimec: 'https://polimec.polkassembly.io/',
+      pendulum: 'https://pendulum.polkassembly.io/'
+    }[network];
+
+    if (!url) {
+      return new URL(this.url);
+    }
+
+    return new URL(url);
+  }
+};
+
 export const StakingApp: DappOption<true | string[], (network: string) => URL> = {
   id: 1004,
   icon: '/dapp-icons/staking.png',
@@ -376,5 +424,6 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     tags: ['Bounty', 'Tool'],
     website: 'https://bounties.usepapi.app/',
     github: 'https://github.com/polkadot-api/bounties'
-  }
+  },
+  PolkassemblyApp
 ];
