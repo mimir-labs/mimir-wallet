@@ -6,7 +6,6 @@ export { default as FunctionArgs } from './Call/FunctionArgs';
 export { default as TransferCall } from './Call/TransferCall';
 
 export { default as Param } from './Param';
-export { default as CallName } from './Param/CallName';
 
 export { default as CallDisplayDetail } from './CallDisplay/CallDisplayDetail';
 export { default as CallDisplayDetailMinor } from './CallDisplay/CallDisplayDetailMinor';

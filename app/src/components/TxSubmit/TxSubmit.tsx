@@ -194,6 +194,15 @@ function TxSubmit({
         </div>
 
         <div className='shadow-medium rounded-large bg-content1 sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start p-4 sm:p-5 md:w-[40%]'>
+          {!hasPermission ? (
+            <Alert
+              color='danger'
+              title="You are currently not a member of this Account and won't be able to submit this transaction."
+            />
+          ) : filterPaths.length === 0 ? (
+            <Alert color='danger' title={`This account doesn’t exist on ${chain.name}`} />
+          ) : null}
+
           {hasPermission && filterPaths.length > 0 && (
             <>
               {transaction && <Confirmations account={accountData} transaction={transaction} />}
@@ -225,15 +234,6 @@ function TxSubmit({
               ) : null}
 
               {gasFeeWarning && <Alert color='warning' title='The selected asset is not enough to pay the gas fee.' />}
-
-              {!hasPermission ? (
-                <Alert
-                  color='danger'
-                  title="You are currently not a member of this Account and won't be able to submit this transaction."
-                />
-              ) : filterPaths.length === 0 ? (
-                <Alert color='danger' title={`This account doesn’t exist on ${chain.name}`} />
-              ) : null}
 
               {!isPropose && (
                 <SendTx

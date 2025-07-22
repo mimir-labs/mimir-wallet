@@ -18,6 +18,12 @@ const CustomButton = extendVariants(Button, {
     isDisabled: {
       true: 'pointer-events-auto bg-divider-300 text-white border-none'
     },
+    disabled: {
+      true: 'pointer-events-none'
+    },
+    isLoading: {
+      true: 'pointer-events-none'
+    },
     color: {
       default: 'text-inherit'
     }

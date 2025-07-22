@@ -96,7 +96,10 @@ function GroupedEndpoints({
               radius='sm'
               color='secondary'
               size='lg'
-              className='text-foreground rounded-medium bg-divider-300/30 h-[52px] justify-start p-2.5 text-left font-bold shadow-none'
+              className='text-foreground rounded-medium h-[52px] justify-start p-2.5 text-left font-bold shadow-none'
+              style={{
+                background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
+              }}
               startContent={<Status network={endpoint} />}
               endContent={
                 <div className='flex items-center gap-2'>

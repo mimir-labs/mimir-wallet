@@ -28,7 +28,10 @@ const FunctionArgs = forwardRef<HTMLDivElement | null, CallProps>(({ registry, c
   }, [registry, call]);
 
   return done ? (
-    <div ref={ref} className={mergeClasses('flex flex-col gap-2.5', className)}>
+    <div
+      ref={ref}
+      className={mergeClasses('rounded-medium bg-secondary flex w-full shrink-0 flex-col gap-2.5 p-2.5', className)}
+    >
       {args ? (
         args.length > 0 ? (
           args.map(([name, type], index) => (

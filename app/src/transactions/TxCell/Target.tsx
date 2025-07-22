@@ -6,7 +6,7 @@ import type { IMethod } from '@polkadot/types/types';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { events } from '@/events';
-import { Call as CallComp, CallName, FunctionArgs } from '@/params';
+import { Call as CallComp, FunctionArgs } from '@/params';
 import React, { useMemo, useRef } from 'react';
 
 import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
@@ -15,12 +15,24 @@ import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 function CallInfo({ call }: { call: IMethod }) {
   const { network } = useApi();
 
+  const action = useMemo(() => {
+    try {
+      const { method, section } = call.registry.findMetaCall(call.callIndex);
+
+      if (section && method) {
+        return `${section}.${method}`;
+      }
+
+      return 'Unknown';
+    } catch {
+      return 'Unknown';
+    }
+  }, [call.callIndex, call.registry]);
+
   return (
     <div className='flex w-full flex-col items-start justify-start gap-[5px]'>
       <div className='flex w-full shrink-0 flex-row items-center justify-start gap-2.5'>
-        <b className='flex-1'>
-          <CallName value={call} />
-        </b>
+        <b className='flex-1'>{action}</b>
         <Tooltip content='For better repeatly submit this transaction you can add to Template' color='foreground'>
           <Button
             variant='ghost'
