@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.15.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.14.0...polkadot-core-v2.15.0) (2025-07-22)
+
+
+### Features
+
+* **ui:** enhance transaction components and improve user experience ([#261](https://github.com/mimir-labs/mimir-wallet/issues/261)) ([efd6aea](https://github.com/mimir-labs/mimir-wallet/commit/efd6aea05d7bf46853ec058dde786a4cab08cdb1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.15.0
+
 ## [2.14.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.13.1...polkadot-core-v2.14.0) (2025-07-21)
 
 
