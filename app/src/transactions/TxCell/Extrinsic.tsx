@@ -62,7 +62,7 @@ function Extrinsic({
 
   return (
     <>
-      <div className='aaaaa flex flex-1 flex-col gap-2.5'>
+      <div className='flex flex-1 flex-col gap-2.5'>
         <>
           <Target address={transaction.address} call={displayCall} />
 

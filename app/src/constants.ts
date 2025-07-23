@@ -43,3 +43,7 @@ export const WALLET_CONNECT_PROJECT_ID = 'db2a617b03addd5e1e485d0a677c1ef4';
 export const PINNED_ACCOUNTS_KEY = 'pinned_accounts';
 
 export const CUSTOM_APP_KEY = `${LS_NAMESPACE}custom_app`;
+
+export const SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY = `${LS_NAMESPACE}show_all_networks_in_copy_modal`;
+
+export const REMOTE_PROXY_DOC_URL = 'https://wiki.polkadot.network/learn/learn-proxies-pure/';

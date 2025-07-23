@@ -163,7 +163,7 @@ export async function txReserve(
   } else if (api.tx.proxy?.killPure?.is(call)) {
     const address = call.args[0].toString();
 
-    _increaseValue(unreserve, address, api.consts.proxy.proxyDepositBase);
+    _increaseValue(unreserve, address, api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor));
   } else if (api.tx.utility.batch.is(call) || api.tx.utility.forceBatch.is(call) || api.tx.utility.batchAll.is(call)) {
     for (const item of call.args[0]) {
       await txReserve(api, api.registry.createType('Call', item.toU8a()), address, reserve, unreserve, delay);

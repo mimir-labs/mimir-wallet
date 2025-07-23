@@ -55,6 +55,7 @@ export type MultisigAccountData = AccountDataType & {
 
 export type PureAccountData = AccountDataType & {
   type: 'pure';
+  isUnknownPure?: boolean;
   createdBlock: string;
   createdBlockHash: HexString;
   createdExtrinsicHash: HexString;

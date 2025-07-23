@@ -14,7 +14,7 @@ export class AccountService extends BaseService {
     return this.get(`omni-chain/${address}/details`);
   }
 
-  public updateAccountName(chain: string, address: HexString, name: string) {
+  public updateAccountName(chain: string, address: string, name: string) {
     return this.patch(`chains/${chain}/${address}/update-name`, { name });
   }
 

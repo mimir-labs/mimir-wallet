@@ -29,6 +29,7 @@ export interface InputProps extends Omit<BaseInputProps, 'onChange'> {
 
 export interface InputAddressProps {
   className?: string;
+  wrapperClassName?: string;
   format?: [decimals: number, unit: string];
   iconSize?: number;
   defaultValue?: string;
@@ -37,13 +38,17 @@ export interface InputAddressProps {
   label?: React.ReactNode;
   placeholder?: string;
   onChange?: (value: string) => void;
+  onSelect?: (value: string) => void | boolean; // return false to prevent onChange
   withBalance?: boolean;
   balance?: BN | bigint | string | number | null;
   isSign?: boolean;
   filtered?: string[];
   excluded?: string[];
   shorten?: boolean;
+  addressType?: 'row' | 'cell';
   helper?: React.ReactNode;
+  endContent?: React.ReactNode;
+  withAddButton?: boolean;
 }
 
 export interface InputNumberProps extends Omit<InputProps, 'defaultValue' | 'value' | 'onChange'> {

@@ -4,8 +4,9 @@
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconQrcode from '@/assets/svg/icon-qr.svg?react';
 import IconStar from '@/assets/svg/icon-star.svg?react';
-import { Address, CopyButton } from '@/components';
+import { Address, CopyButton, ExplorerLink } from '@/components';
 import { toastSuccess } from '@/components/utils';
+import { SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY } from '@/constants';
 import { useCopyAddress } from '@/hooks/useCopyAddress';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -14,7 +15,19 @@ import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 
 import { encodeAddress, type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Divider, Drawer, DrawerBody, DrawerContent, Modal, usePress } from '@mimir-wallet/ui';
+import { useLocalStore } from '@mimir-wallet/service';
+import {
+  Avatar,
+  Button,
+  Divider,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  Modal,
+  Switch,
+  usePress
+} from '@mimir-wallet/ui';
 
 function Item({ endpoint, address }: { endpoint: Network; address: string }) {
   const [, copy] = useCopyClipboard();
@@ -58,6 +71,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       <div className='text-foreground/50 text-tiny flex-1'>
         <Address value={address} shorten={!upSm} ss58Format={endpoint.ss58Format} />
       </div>
+      <ExplorerLink chain={endpoint} address={address} showAll={false} />
       <CopyButton size='sm' className='h-6 w-6 opacity-30' value={encodeAddress(address, endpoint.ss58Format)} />
       <Button isIconOnly size='sm' color='default' variant='light' onPress={() => openQr(address)}>
         <IconQrcode className='h-[16px] w-[16px] opacity-30' />
@@ -92,23 +106,26 @@ function CopyAddressModal() {
   const upMd = useMediaQuery('md');
   const [groupedEndpoints, setGroupedEndpoints] = useState<Record<string, Network[]>>({});
   const { meta } = useAddressMeta(address);
+  const [showAll, setShowAll] = useLocalStore(SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY, false);
 
   useEffect(() => {
-    if (!isOpen) {
-      const groupedEndpoints = networks.reduce(
-        (acc, network) => {
-          if (network.isRelayChain) {
-            acc[network.key] = [network, ...(acc[network.key] || [])];
-          } else if (network.relayChain) {
-            acc[network.relayChain] = [...(acc[network.relayChain] || []), network];
-          } else {
-            acc['solochain'] = [...(acc['solochain'] || []), network];
-          }
+    if (isOpen) {
+      const groupedEndpoints = networks
+        .filter((item) => (showAll ? true : !!item.enabled))
+        .reduce(
+          (acc, network) => {
+            if (network.isRelayChain) {
+              acc[network.key] = [network, ...(acc[network.key] || [])];
+            } else if (network.relayChain) {
+              acc[network.relayChain] = [...(acc[network.relayChain] || []), network];
+            } else {
+              acc['solochain'] = [...(acc['solochain'] || []), network];
+            }
 
-          return acc;
-        },
-        {} as Record<string, Network[]>
-      );
+            return acc;
+          },
+          {} as Record<string, Network[]>
+        );
 
       const polkadotNetworks = groupedEndpoints['polkadot'] || [];
       const selectedNetwork = polkadotNetworks.find((network) => network.key === ss58Chain);
@@ -122,7 +139,7 @@ function CopyAddressModal() {
 
       setGroupedEndpoints(groupedEndpoints);
     }
-  }, [isOpen, networks, ss58Chain]);
+  }, [isOpen, networks, showAll, ss58Chain]);
 
   if (!isOpen || !address) {
     return null;
@@ -150,9 +167,9 @@ function CopyAddressModal() {
   } else {
     content = Object.keys(groupedEndpoints).map((group, index) => (
       <>
-        <GroupedNetwork key={`group-${group}`} address={address} group={group} endpoints={groupedEndpoints[group]} />
-
         {index > 0 && <Divider />}
+
+        <GroupedNetwork key={`group-${group}`} address={address} group={group} endpoints={groupedEndpoints[group]} />
       </>
     ));
   }
@@ -167,6 +184,19 @@ function CopyAddressModal() {
     >
       <DrawerContent>
         <DrawerBody className='scrollbar-hide p-5'>{content}</DrawerBody>
+        <DrawerFooter>
+          <Switch
+            className='w-full max-w-full flex-row-reverse justify-between'
+            size='sm'
+            classNames={{
+              label: 'm-0'
+            }}
+            isSelected={showAll}
+            onValueChange={setShowAll}
+          >
+            Show All Networks
+          </Switch>
+        </DrawerFooter>
       </DrawerContent>
     </BaseComp>
   );
