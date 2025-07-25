@@ -149,6 +149,17 @@
     margin: 0;
   }
 
+  input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   .Toastify__toast {
     border-radius: var(--heroui-radius-large);
     box-shadow: var(--heroui-box-shadow-large);
