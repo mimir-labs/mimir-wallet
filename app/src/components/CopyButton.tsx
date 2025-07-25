@@ -14,7 +14,7 @@ interface Props extends ButtonProps {
 }
 
 const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton(
-  { value, mode = 'icon', children, ...props },
+  { value, mode = 'icon', children, className = '', ...props },
   ref
 ) {
   const [copied, copy] = useCopyClipboard();
@@ -39,9 +39,7 @@ const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton(
       {...props}
       onPress={handleClick}
       ref={ref}
-      className={
-        isIconMode ? 'h-5 min-h-[0px] w-5 min-w-[0px] opacity-50'.concat(props.className || '') : props.className
-      }
+      className={isIconMode ? 'h-5 min-h-[0px] w-5 min-w-[0px] opacity-50'.concat(` ${className}`) : className}
     >
       {isIconMode ? (
         copied ? (

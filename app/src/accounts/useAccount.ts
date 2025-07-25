@@ -1,9 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AddressMeta } from '@/hooks/types';
+
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
-import { useCallback, useContext } from 'react';
+import { merge } from 'lodash-es';
+import { createContext, useCallback, useContext, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { addressEq, encodeAddress, isPolkadotAddress, useApi } from '@mimir-wallet/polkadot-core';
@@ -12,9 +15,21 @@ import { store } from '@mimir-wallet/service';
 import { addAddressBook, deleteAddress, hideAccount, resync, setAccountName, setName, showAccount } from './actions';
 import { AccountContext } from './context';
 
+export const AddressMetaContext = createContext<Record<`0x${string}`, AddressMeta>>({});
+
 export function useAccount() {
   const { chainSS58 } = useApi();
   const { metas, updateMetas } = useContext(AccountContext);
+  const overrideMetas = useContext(AddressMetaContext);
+
+  const finalMetas = useMemo(() => {
+    if (!overrideMetas || Object.keys(overrideMetas).length === 0) {
+      return metas;
+    }
+
+    // Deep merge metas with overrideMetas, where overrideMetas takes precedence
+    return merge({}, metas, overrideMetas);
+  }, [metas, overrideMetas]);
 
   const { accounts, current, addresses, hideAccountHex, isMultisigSyned, switchAddress } = useAddressStore();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -83,7 +98,7 @@ export function useAccount() {
     setCurrent: setCurrent,
     showAccount: showAccount,
     // context
-    metas: metas,
+    metas: finalMetas,
     updateMetas: updateMetas
   };
 }

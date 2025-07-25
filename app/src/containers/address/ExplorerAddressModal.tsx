@@ -1,16 +1,14 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import StatescanImg from '@/assets/images/statescan.svg';
-import SubscanImg from '@/assets/images/subscan.svg';
-import { Address } from '@/components';
+import { Address, ExplorerLink } from '@/components';
 import { useAddressExplorer } from '@/hooks/useAddressExplorer';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMemo, useRef } from 'react';
 import { useEffectOnce } from 'react-use';
 
 import { chainLinks, type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Divider, Drawer, DrawerBody, DrawerContent, Link, Modal, Tooltip, usePress } from '@mimir-wallet/ui';
+import { Avatar, Divider, Drawer, DrawerBody, DrawerContent, Modal, usePress } from '@mimir-wallet/ui';
 
 function Item({ endpoint, address }: { endpoint: Network; address: string }) {
   const { ss58Chain } = useApi();
@@ -66,38 +64,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       <div className='text-foreground/50 text-tiny flex-1'>
         <Address value={address} shorten ss58Format={endpoint.ss58Format} />
       </div>
-      {endpoint.explorerUrl && (
-        <Tooltip content={'Subscan'} closeDelay={0}>
-          <Link
-            target='_blank'
-            href={chainLinks.accountExplorerLink(
-              { ss58Format: endpoint.ss58Format, explorerUrl: endpoint.explorerUrl },
-              address
-            )}
-            rel='noreferrer'
-          >
-            <Avatar style={{ width: 20, height: 20, backgroundColor: 'transparent' }} src={SubscanImg} alt='subscan' />
-          </Link>
-        </Tooltip>
-      )}
-      {endpoint.statescanUrl && (
-        <Tooltip content={'Statescan'} closeDelay={0}>
-          <Link
-            target='_blank'
-            href={chainLinks.accountExplorerLink(
-              { ss58Format: endpoint.ss58Format, statescanUrl: endpoint.statescanUrl },
-              address
-            )}
-            rel='noreferrer'
-          >
-            <Avatar
-              style={{ width: 20, height: 20, backgroundColor: 'transparent' }}
-              src={StatescanImg}
-              alt='subscan'
-            />
-          </Link>
-        </Tooltip>
-      )}
+      <ExplorerLink showAll chain={endpoint} address={address} />
     </div>
   );
 }

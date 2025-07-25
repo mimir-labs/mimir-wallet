@@ -95,7 +95,7 @@ export async function txReserve(
         : api.consts.proxy.announcementDepositFactor
     );
 
-    const proxy = proxies[0].find((item) => addressEq(item.delegate, address) && item.delay.gtn(0));
+    const proxy = proxies[0].find((item) => addressEq(item.delegate.toString(), address) && item.delay.gtn(0));
 
     if (proxy) {
       delay[real] = proxy.delay;
@@ -163,7 +163,7 @@ export async function txReserve(
   } else if (api.tx.proxy?.killPure?.is(call)) {
     const address = call.args[0].toString();
 
-    _increaseValue(unreserve, address, api.consts.proxy.proxyDepositBase);
+    _increaseValue(unreserve, address, api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor));
   } else if (api.tx.utility.batch.is(call) || api.tx.utility.forceBatch.is(call) || api.tx.utility.batchAll.is(call)) {
     for (const item of call.args[0]) {
       await txReserve(api, api.registry.createType('Call', item.toU8a()), address, reserve, unreserve, delay);

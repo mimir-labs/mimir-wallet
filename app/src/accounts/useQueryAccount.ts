@@ -11,7 +11,7 @@ import { service, useQuery } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
 
-function transformAccount(
+export function transformAccount(
   chainSS58: number,
   account: AccountData,
   filterByGenesisHash: boolean = false,
@@ -104,10 +104,11 @@ export function useQueryAccountOmniChain(
     queryKey: [addressHex] as const,
     queryHash: `omni-chain-${addressHex}`,
     staleTime: 6_000,
-    refetchInterval: 60_000,
-    refetchOnMount: false,
+    refetchInterval: 6_000,
+    refetchOnMount: true,
     refetchOnWindowFocus: false,
     queryFn: ({ queryKey: [address] }) => service.account.getOmniChainDetails(address),
+    enabled: !!addressHex,
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }

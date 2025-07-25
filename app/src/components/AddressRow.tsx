@@ -13,6 +13,7 @@ import CopyAddress from './CopyAddress';
 import IdentityIcon from './IdentityIcon';
 
 interface Props {
+  className?: string;
   defaultName?: string;
   value?: AccountId | AccountIndex | Address | Uint8Array | string | null;
   shorten?: boolean;
@@ -24,26 +25,36 @@ interface Props {
 
 const AddressRow = forwardRef<HTMLDivElement, Props>(
   (
-    { defaultName, shorten, value, iconSize, withAddress = false, withCopy = false, withName = true, ...props }: Props,
+    {
+      defaultName,
+      className,
+      shorten,
+      value,
+      iconSize,
+      withAddress = false,
+      withCopy = false,
+      withName = true,
+      ...props
+    }: Props,
     ref
   ) => {
     const { chainSS58 } = useApi();
     const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
     return (
-      <div className='AddressRow inline-flex items-center gap-[5px]' ref={ref} {...props}>
+      <div className={`AddressRow flex items-center gap-[5px] ${className || ''}`} ref={ref} {...props}>
         <IdentityIcon className='AddressRow-Icon' size={iconSize} value={address} />
-        {withName && (
-          <span style={{ fontWeight: withName && withAddress ? 700 : undefined }}>
-            <AddressName defaultName={defaultName} value={address} />
+        <div className='AddressRow-Content flex items-center gap-[5px]'>
+          {withName && (
+            <span data-bold={withName && withAddress} className='AddressRow-Name data-[bold="true"]:font-bold'>
+              <AddressName defaultName={defaultName} value={address} />
+            </span>
+          )}
+          <span className='AddressRow-Address flex items-center gap-[5px] text-[0.875em]'>
+            {withAddress && <AddressComp shorten={shorten} value={address} />}
+            {withCopy && <CopyAddress address={address} className='opacity-50' />}
           </span>
-        )}
-        {withAddress && (
-          <span>
-            <AddressComp shorten={shorten} value={address} />
-          </span>
-        )}
-        {withCopy && <CopyAddress address={address} className='opacity-50' />}
+        </div>
       </div>
     );
   }

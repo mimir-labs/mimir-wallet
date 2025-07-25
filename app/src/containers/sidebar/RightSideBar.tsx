@@ -44,7 +44,7 @@ function RightSideBar({ offsetTop = 0 }: { offsetTop?: number }) {
         </Drawer>
       ) : (
         <div
-          className='bg-content1 border-l-divider border-l-1 transition-[margin-right] duration-150 ease-in-out'
+          className='bg-content1 border-l-secondary border-l-1 transition-[margin-right] duration-150 ease-in-out'
           style={{
             position: 'sticky',
             top: offsetTop + 56,

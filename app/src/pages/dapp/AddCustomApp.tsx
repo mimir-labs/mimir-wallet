@@ -7,8 +7,7 @@ import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { Input } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
 import { useDebounceFn } from '@/hooks/useDebounceFn';
-import { isValidURL } from '@/utils';
-import { fetchAppMetadata } from '@/utils/proxy';
+import { fetchAppMetadata, isValidURL } from '@/utils';
 import React, { useCallback, useRef, useState } from 'react';
 
 import {

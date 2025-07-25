@@ -61,7 +61,7 @@ function ExecuteAnnounce({ account, transaction }: { account: AccountData; trans
 
       const proxies = await api.query.proxy.proxies(transaction.address);
 
-      const proxyDefine = proxies[0].find((item) => addressEq(item.delegate, delegate));
+      const proxyDefine = proxies[0].find((item) => addressEq(item.delegate.toString(), delegate));
 
       if (!proxyDefine) {
         toastError(`can not find delegate(${delegate})`);
