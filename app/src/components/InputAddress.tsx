@@ -7,10 +7,12 @@ import type { InputAddressProps } from './types';
 import { useAccount } from '@/accounts/useAccount';
 import { sortAccounts } from '@/accounts/utils';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconWarning from '@/assets/svg/icon-warning-fill.svg?react';
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import clsx from 'clsx';
 import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
@@ -20,6 +22,7 @@ import {
   addressToHex,
   evm2Ss58,
   isEthAddress,
+  isPolkadotAddress,
   isPolkadotEvmAddress,
   isValidAddress as isValidAddressUtil,
   useApi
@@ -27,6 +30,7 @@ import {
 import { FreeSoloPopover, Listbox, ListboxItem, usePress } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
+import AddressRow from './AddressRow';
 import FormatBalance from './FormatBalance';
 
 function createOptions(
@@ -66,6 +70,10 @@ function createOptions(
 
   const identity = useIdentityStore.getState();
 
+  if (isPolkadotAddress(input)) {
+    return options.filter(([address]) => addressEq(address, input)).map((item) => item[0]);
+  }
+
   return options
     .map(([address, name]) => [address, name, identity[addressToHex(address)]] as const)
     .filter(([address, name, identity]) => {
@@ -80,6 +88,7 @@ function createOptions(
 
 function InputAddress({
   className,
+  wrapperClassName,
   balance,
   iconSize = 30,
   defaultValue,
@@ -90,11 +99,15 @@ function InputAddress({
   isSign = false,
   label,
   onChange,
+  onSelect,
   placeholder = 'Address e.g. 5G789...',
   shorten = false,
   value: propsValue,
   withBalance,
-  helper
+  helper,
+  addressType = 'cell',
+  endContent,
+  withAddButton
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
   const {
@@ -113,20 +126,21 @@ function InputAddress({
   const [isOpen, toggleOpen] = useToggle(false);
   const [isFocused, setIsFocused] = useState(false);
   const upSm = useMediaQuery('sm');
+  const [options, setOptions] = useState<string[]>([]);
 
-  const options = useMemo((): string[] => {
+  useEffect(() => {
     const list = sortAccounts(createOptions(accounts, addresses, isSign, metas, inputValue, filtered, excluded), metas);
 
     if (list.length === 0 && isValidAddressUtil(inputValue, polkavm)) {
       list.push(isEthAddress(inputValue) ? evm2Ss58(inputValue, chainSS58) : inputValue);
     }
 
-    return list;
+    return setOptions(list);
   }, [accounts, addresses, chainSS58, excluded, filtered, inputValue, isSign, metas, polkavm]);
 
   useEffect(() => {
-    if (isControl.current && propsValue) {
-      setValue(propsValue);
+    if (isControl.current) {
+      setValue(propsValue || '');
     }
   }, [propsValue]);
 
@@ -142,7 +156,9 @@ function InputAddress({
 
   const handleSelect = (item: string) => {
     if (item && isValidAddressUtil(item, polkavm)) {
-      setValue(isEthAddress(item) ? evm2Ss58(item, chainSS58) : item);
+      const _value = isEthAddress(item) ? evm2Ss58(item, chainSS58) : item;
+
+      setValue(_value);
     }
 
     setInputValue('');
@@ -180,9 +196,19 @@ function InputAddress({
   const element = (
     <div
       data-hide={isOpen && isFocused}
-      className='address-cell inline-flex w-[calc(100%-20px)] flex-grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden'
+      className='inline-flex w-[calc(100%-20px)] flex-grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden [&[data-hide=true]_.AddressRow-Content]:hidden'
     >
-      <AddressCell iconSize={iconSize} value={value} shorten={shorten ?? (upSm ? false : true)} />
+      {addressType === 'cell' ? (
+        <AddressCell iconSize={iconSize} value={value} shorten={shorten ?? (upSm ? false : true)} />
+      ) : (
+        <AddressRow
+          className='[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal'
+          iconSize={iconSize}
+          value={value}
+          shorten={false}
+          withAddress
+        />
+      )}
     </div>
   );
 
@@ -197,14 +223,43 @@ function InputAddress({
       style={{ width: wrapperRef.current?.clientWidth }}
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
-      <Listbox color='secondary' emptyContent='no addresses' className='text-foreground max-h-[250px] overflow-y-auto'>
+      <Listbox
+        color='secondary'
+        emptyContent='no addresses'
+        className='text-foreground max-h-[250px] overflow-y-auto'
+        classNames={addressType === 'cell' ? undefined : { list: 'gap-2.5' }}
+      >
         {options.map((item) => (
           <ListboxItem
             key={item}
-            onPress={() => handleSelect(item)}
-            className='text-foreground data-[hover=true]:text-foreground'
+            onPress={() => {
+              const shouldContinue = onSelect?.(item);
+
+              if (shouldContinue !== false) {
+                handleSelect(item);
+              } else {
+                setInputValue('');
+                toggleOpen(false);
+              }
+            }}
+            className={clsx(
+              'text-foreground data-[hover=true]:text-foreground',
+              addressType === 'cell' ? '' : 'bg-secondary p-[5px]'
+            )}
+            endContent={withAddButton ? <IconAdd className='text-primary' /> : undefined}
           >
-            <AddressCell addressCopyDisabled withCopy value={item} shorten={upSm ? shorten : true} />
+            {addressType === 'cell' ? (
+              <AddressCell addressCopyDisabled withCopy value={item} shorten={upSm ? shorten : true} />
+            ) : (
+              <AddressRow
+                className='[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal'
+                iconSize={iconSize}
+                value={item}
+                shorten={false}
+                withCopy
+                withAddress
+              />
+            )}
           </ListboxItem>
         ))}
       </Listbox>
@@ -217,36 +272,40 @@ function InputAddress({
     <>
       <div
         data-disabled={disabled}
-        className={'input-address-wrapper w-full space-y-2 data-[disabled=true]:pointer-events-none'.concat(
-          ` ${className || ''}`
-        )}
+        className={`input-address-wrapper w-full space-y-2 data-[disabled=true]:pointer-events-none ${className || ''}`}
       >
         {label && <div className='text-small font-bold'>{label}</div>}
 
-        <div
-          ref={wrapperRef}
-          data-error={!isValidAddress && !!inputValue}
-          className='InputAddressContent tap-highlight-transparent border-medium rounded-medium border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none'
-        >
-          {element}
-          <input
-            ref={inputRef}
-            className='rounded-medium absolute top-0 right-0 bottom-0 left-0 border-none bg-transparent pl-12 outline-none'
-            style={{ opacity: (isFocused && isOpen) || !value ? 1 : 0 }}
-            value={inputValue}
-            placeholder={placeholder}
-            onChange={setInputValue}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            {...pressProps}
-          />
+        <div className='input-address-base flex gap-2.5'>
+          <div
+            ref={wrapperRef}
+            data-error={!isValidAddress && !!inputValue}
+            className={`input-address-content tap-highlight-transparent border-medium rounded-medium border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none ${wrapperClassName || ''}`}
+          >
+            {element}
+            <input
+              ref={inputRef}
+              className='rounded-medium absolute top-0 right-0 bottom-0 left-0 border-none bg-transparent outline-none'
+              style={{
+                opacity: (isFocused && isOpen) || !value ? 1 : 0,
+                paddingLeft: iconSize + 8 + (addressType === 'cell' ? 10 : 5)
+              }}
+              value={inputValue}
+              placeholder={placeholder}
+              onChange={setInputValue}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              {...pressProps}
+            />
 
-          <ArrowDown
-            data-open={isOpen}
-            className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
-            style={{ color: 'inherit' }}
-            {...pressProps}
-          />
+            <ArrowDown
+              data-open={isOpen}
+              className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
+              style={{ color: 'inherit' }}
+              {...pressProps}
+            />
+          </div>
+          {endContent ? <div>{endContent}</div> : null}
         </div>
         {!isValidAddress && !!inputValue && <div className='text-small text-danger mt-1'>Invalid address</div>}
 

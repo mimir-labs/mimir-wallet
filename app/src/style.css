@@ -1,9 +1,9 @@
 @import "tailwindcss";
 @plugin '@mimir-wallet/ui/hero';
 @source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@source '../../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
 @source '../index.html';
 @source '../src/**/*.{js,ts,jsx,tsx,mdx}';
-@source '../../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
 
 :root {

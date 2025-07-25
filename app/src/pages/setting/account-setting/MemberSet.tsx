@@ -13,7 +13,7 @@ import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkad
 import { service } from '@mimir-wallet/service';
 import { Alert, Avatar, Link } from '@mimir-wallet/ui';
 
-import AccountSelect from '../../create-multisig/AccountSelect';
+import AccountSelect from '../../create-multisig/mobile/AccountSelect';
 import { useSetMembers } from './useSetMembers';
 
 function checkError(
