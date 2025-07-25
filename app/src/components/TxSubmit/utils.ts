@@ -69,7 +69,7 @@ async function announce(
   delay: number
 ) {
   const proxies = await api.query.proxy.proxies(proxy);
-  const exists = proxies[0].filter((item) => addressEq(item.delegate, delegate));
+  const exists = proxies[0].filter((item) => addressEq(item.delegate.toString(), delegate));
 
   if (!exists.length) {
     throw new Error('Proxy not found');
@@ -96,7 +96,7 @@ async function proxy(
 ) {
   const proxies = await api.query.proxy.proxies(proxy);
 
-  const exists = proxies[0].find((item) => addressEq(item.delegate, delegate));
+  const exists = proxies[0].find((item) => addressEq(item.delegate.toString(), delegate));
 
   if (!exists) {
     if (!api.tx.remoteProxyRelayChain) throw new Error(`Proxy not exists on account ${proxy}`);

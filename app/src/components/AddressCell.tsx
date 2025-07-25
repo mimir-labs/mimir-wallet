@@ -8,10 +8,9 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
-import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { Button, Chip, usePress } from '@mimir-wallet/ui';
 
 import AddressComp from './Address';
@@ -131,7 +130,7 @@ function AddressCell({
             address &&
             !isLocalAccount(address) &&
             !isLocalAddress(address) &&
-            !addressEq(hexToU8a('0x0', 256), address) && (
+            !addressEq(zeroAddress, address) && (
               <Button
                 isIconOnly
                 color='default'

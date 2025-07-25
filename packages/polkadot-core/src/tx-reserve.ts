@@ -95,7 +95,7 @@ export async function txReserve(
         : api.consts.proxy.announcementDepositFactor
     );
 
-    const proxy = proxies[0].find((item) => addressEq(item.delegate, address) && item.delay.gtn(0));
+    const proxy = proxies[0].find((item) => addressEq(item.delegate.toString(), address) && item.delay.gtn(0));
 
     if (proxy) {
       delay[real] = proxy.delay;

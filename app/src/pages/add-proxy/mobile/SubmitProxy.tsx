@@ -1,79 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ProxyArgs } from './types';
+import type { ProxyArgs } from '../types';
 
-import { Address, AddressRow, TxButton } from '@/components';
+import { Address, TxButton } from '@/components';
 import { toastSuccess } from '@/components/utils';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import React, { useCallback, useState } from 'react';
 import { useAsyncFn, useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import {
-  Button,
-  Checkbox,
-  Divider,
-  Link,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader
-} from '@mimir-wallet/ui';
+import { Link } from '@mimir-wallet/ui';
 
-function ConfirmDialog({
-  open,
-  list,
-  onClose,
-  onSubmit
-}: {
-  open: boolean;
-  list: string[];
-  onClose: () => void;
-  onSubmit: () => void;
-}) {
-  const [checked, toggleChecked] = useToggle(false);
-
-  return (
-    <Modal isOpen={open} onClose={onClose} size='2xl'>
-      <ModalContent>
-        <ModalHeader className='flex-col gap-4'>
-          Safety Alert
-          <p className='text-small'>
-            We have detected that, because your proxy account also has its own proxy, the following accounts can
-            indirectly control your account.
-          </p>
-        </ModalHeader>
-        <Divider />
-        <ModalBody className='gap-4'>
-          <p>Indirect Controllers</p>
-          {list.map((address) => (
-            <div
-              className='rounded-medium border-divider-300 flex items-center justify-between border-1 p-2.5'
-              key={address}
-            >
-              <AddressRow withAddress={false} withName value={address} />
-              <Address shorten value={address} />
-            </div>
-          ))}
-        </ModalBody>
-        <Divider />
-        <ModalFooter>
-          <div className='flex w-full flex-col gap-4'>
-            <Checkbox size='sm' isSelected={checked} onValueChange={toggleChecked}>
-              I Understand
-            </Checkbox>
-
-            <Button fullWidth color='primary' isDisabled={!checked} onPress={onSubmit}>
-              Confirm
-            </Button>
-          </div>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
-  );
-}
+import SafetyWarningModal from '../components/SafetyWarningModal';
+import { useProxySafetyCheck } from '../hooks/useProxySafetyCheck';
 
 function SubmitProxy({
   proxied,
@@ -87,7 +27,10 @@ function SubmitProxy({
   const { api, network } = useApi();
   const [alertOpen, toggleAlertOpen] = useToggle(false);
   const { addQueue } = useTxQueue();
-  const [detacted, setDetacted] = useState<string[]>([]);
+  const [detectedControllers, setDetectedControllers] = useState<string[]>([]);
+
+  // Use proxy safety check hook
+  const { checkSafety } = useProxySafetyCheck();
 
   const handleSubmit = useCallback(() => {
     if (!(proxyArgs.length && proxied)) {
@@ -135,25 +78,24 @@ function SubmitProxy({
   }, [addQueue, api, network, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
 
   const handleClickAction = useAsyncFn(async () => {
-    const detacted: Set<string> = new Set();
+    // Check all proxy delegates for safety issues
+    const allControllers: Set<string> = new Set();
 
     for (const { delegate } of proxyArgs) {
-      const result = await api.query.proxy.proxies(delegate);
+      const safetyResult = await checkSafety(delegate);
 
-      for (const item of result[0]) {
-        if (item.proxyType.type === 'Any' || (item.proxyType.type as string) === 'NonTransfer') {
-          detacted.add(item.delegate.toString());
-        }
+      if (safetyResult.hasWarnings) {
+        safetyResult.indirectControllers.forEach((controller) => allControllers.add(controller));
       }
     }
 
-    if (detacted.size > 0) {
-      setDetacted(Array.from(detacted));
+    if (allControllers.size > 0) {
+      setDetectedControllers(Array.from(allControllers));
       toggleAlertOpen(true);
     } else {
       handleSubmit();
     }
-  }, [api, handleSubmit, proxyArgs, toggleAlertOpen]);
+  }, [checkSafety, handleSubmit, proxyArgs, toggleAlertOpen]);
 
   return (
     <>
@@ -168,7 +110,12 @@ function SubmitProxy({
         Confirm
       </TxButton>
 
-      <ConfirmDialog open={alertOpen} list={detacted} onClose={toggleAlertOpen} onSubmit={handleSubmit} />
+      <SafetyWarningModal
+        isOpen={alertOpen}
+        onClose={() => toggleAlertOpen(false)}
+        onConfirm={handleSubmit}
+        indirectControllers={detectedControllers}
+      />
     </>
   );
 }

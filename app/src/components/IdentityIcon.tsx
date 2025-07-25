@@ -8,10 +8,9 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { walletConfig } from '@/config';
 import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { polkadotIcon } from '@polkadot/ui-shared';
-import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { Avatar, usePress } from '@mimir-wallet/ui';
 
 interface Props {
@@ -41,7 +40,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
 
   const extensionIcon = isInjected ? walletConfig[source || '']?.icon : undefined;
 
-  const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
+  const isZeroAddress = useMemo(() => addressEq(zeroAddress, address), [address]);
 
   const circles = useMemo(() => polkadotIcon(address, { isAlternative: false }), [address]);
 

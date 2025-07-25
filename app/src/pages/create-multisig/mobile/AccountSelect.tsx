@@ -11,10 +11,9 @@ import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconSearch from '@/assets/svg/icon-search.svg?react';
 import { AddressRow, Empty, Input } from '@/components';
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
-import { hexToU8a } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { addressEq, addressToHex, isPolkadotAddress } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, isPolkadotAddress, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip, usePress } from '@mimir-wallet/ui';
 
 interface Props {
@@ -96,7 +95,7 @@ function Item({
         </Tooltip>
       </div>
       <div className='flex-1' />
-      {addressEq(hexToU8a('0x0', 256), account) && (
+      {addressEq(zeroAddress, account) && (
         <Tooltip
           classNames={{ content: 'max-w-[500px] break-all' }}
           content='The SS58 address for 0x0000000000000000000000000000000000000000000000000000000000000000 which cannot be controlled.'
