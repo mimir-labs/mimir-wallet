@@ -4,7 +4,9 @@
 import type { PrepareFlexible } from '../types';
 
 import { useAccount } from '@/accounts/useAccount';
+import { StepIndicator } from '@/components';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { useWizardState } from '@/hooks/useWizardState';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
@@ -19,7 +21,6 @@ import CreateFlexible from '../mobile/CreateFlexible';
 import Step1Name from './Step1Name';
 import Step2Members from './Step2Members';
 import Step3Review from './Step3Review';
-import StepIndicator from './StepIndicator';
 
 interface MultisigData {
   name: string;
@@ -37,30 +38,26 @@ const STEPS = [
 function DesktopCreateMultisig() {
   const { addAddress } = useAccount();
   const [network, setNetwork] = useInputNetwork();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [multisigData, setMultisigData] = useState<MultisigData>({
-    name: '',
-    isPureProxy: false,
-    members: [],
-    threshold: 1
-  });
   const navigate = useNavigate();
   const [staticOpen, toggleStaticOpen] = useToggle(false);
   const [isSuccess, toggleSuccess] = useToggle(false);
   const [completedAddress, setCompletedAddress] = useState<string | null>(null);
   const [prepare, setPrepare] = useState<PrepareFlexible>();
 
-  const handleNext = () => {
-    if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
+  // Use useWizardState for managing wizard state
+  const [wizardState, wizardActions] = useWizardState<MultisigData>(
+    {
+      name: '',
+      isPureProxy: false,
+      members: [],
+      threshold: 1
+    },
+    STEPS,
+    1
+  );
 
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
+  const { currentStep, data: multisigData } = wizardState;
+  const { goToNext, goToPrevious, updateData } = wizardActions;
 
   const handleConfirm = async () => {
     if (multisigData.isPureProxy) {
@@ -73,10 +70,6 @@ function DesktopCreateMultisig() {
     } else {
       toggleStaticOpen(true);
     }
-  };
-
-  const updateData = (updates: Partial<MultisigData>) => {
-    setMultisigData((prev) => ({ ...prev, ...updates }));
   };
 
   return (
@@ -106,7 +99,7 @@ function DesktopCreateMultisig() {
                   onNameChange={(name) => updateData({ name })}
                   isPureProxy={multisigData.isPureProxy}
                   onPureProxyChange={(isPureProxy) => updateData({ isPureProxy })}
-                  onNext={handleNext}
+                  onNext={goToNext}
                   setNetwork={setNetwork}
                 />
               )}
@@ -116,8 +109,8 @@ function DesktopCreateMultisig() {
                   onMembersChange={(members) => updateData({ members })}
                   threshold={multisigData.threshold}
                   onThresholdChange={(threshold) => updateData({ threshold })}
-                  onNext={handleNext}
-                  onBack={handleBack}
+                  onNext={goToNext}
+                  onBack={goToPrevious}
                 />
               )}
               {currentStep === 3 && (
@@ -127,7 +120,7 @@ function DesktopCreateMultisig() {
                   threshold={multisigData.threshold}
                   isPureProxy={multisigData.isPureProxy}
                   network={network}
-                  onBack={handleBack}
+                  onBack={goToPrevious}
                   onConfirm={handleConfirm}
                 />
               )}
