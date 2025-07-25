@@ -3,6 +3,7 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { EventRecord } from '@polkadot/types/interfaces';
+import type { HexString } from '@polkadot/util/types';
 import type { PrepareFlexible } from '../types';
 
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
@@ -84,8 +85,8 @@ function CreateFlexible({
   const [loadingSecond, setLoadingSecond] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
   const source = useAccountSource(signer);
-  const [enoughtState, setEnoughtState] = useState<Record<string, boolean>>({});
-  const isEnought = signer ? !!enoughtState[signer] : false;
+  const [enoughtState, setEnoughtState] = useState<Record<HexString, boolean | 'pending'>>({});
+  const isEnought = signer ? !!enoughtState[addressToHex(signer)] : false;
   const [isOpen, toggleOpen] = useToggle(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -301,7 +302,7 @@ function CreateFlexible({
                   tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.'
                   value={reservedAmount}
                   onEnoughtState={(address, isEnought) =>
-                    setEnoughtState((state) => ({ ...state, [address]: isEnought === true }))
+                    setEnoughtState((state) => ({ ...state, [addressToHex(address)]: isEnought }))
                   }
                 />
               </LockContainer>
