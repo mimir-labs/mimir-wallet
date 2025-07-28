@@ -4,6 +4,7 @@
 interface ProxyControlsProps {
   className?: string;
   proxyType?: string;
+  tiny?: boolean;
   variant?: 'controls-only' | 'with-type';
 }
 
@@ -11,7 +12,7 @@ interface ProxyControlsProps {
  * Visual component to display proxy relationship controls indicator
  * Used to show the control relationship between proxy and proxied accounts
  */
-function ProxyControls({ proxyType, className = '', variant }: ProxyControlsProps) {
+function ProxyControls({ proxyType, className = '', tiny = false, variant }: ProxyControlsProps) {
   // Auto-detect variant based on proxyType presence
   const effectiveVariant = variant || (proxyType ? 'with-type' : 'controls-only');
 
@@ -47,7 +48,33 @@ function ProxyControls({ proxyType, className = '', variant }: ProxyControlsProp
   }
 
   // Two-part style - shows CONTROLS + proxy type
-  return (
+  return tiny ? (
+    <div
+      className={`bg-primary pointer-events-none relative flex h-[28px] min-w-[28px] items-center justify-center rounded-full p-[5px] ${className}`}
+    >
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        width='8'
+        height='23'
+        viewBox='0 0 8 23'
+        className='text-primary-foreground absolute inset-0 m-auto'
+      >
+        <path
+          d='M3.64645 21.9536C3.84171 22.1488 4.15829 22.1488 4.35355 21.9536L7.53553 18.7716C7.7308 18.5763 7.7308 18.2597 7.53553 18.0645C7.34027 17.8692 7.02369 17.8692 6.82843 18.0645L4 20.8929L1.17157 18.0645C0.976312 17.8692 0.659729 17.8692 0.464467 18.0645C0.269205 18.2597 0.269205 18.5763 0.464467 18.7716L3.64645 21.9536ZM4 0L3.5 1.74845e-08L3.5 21.6L4 21.6L4.5 21.6L4.5 -1.74845e-08L4 0Z'
+          fill='currentColor'
+        />
+      </svg>
+      <span
+        style={{
+          fontSize: '10px',
+          lineHeight: '7px'
+        }}
+        className='bg-primary text-primary-foreground text-tiny relative z-10 uppercase'
+      >
+        {proxyType}
+      </span>
+    </div>
+  ) : (
     <div
       className={`bg-primary pointer-events-none relative flex h-[17px] items-center justify-center rounded-full ${className}`}
     >

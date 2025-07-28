@@ -1,10 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { POLKADOT_PROXY_TYPES_WIKI_URL } from '@/constants';
 import { useProxyTypes } from '@/hooks/useProxyTypes';
 import { memo } from 'react';
 
-import { Select, SelectItem } from '@mimir-wallet/ui';
+import { Link, Select, SelectItem } from '@mimir-wallet/ui';
 
 import { proxyTypeDescriptions } from '../utils';
 
@@ -43,7 +44,10 @@ function ProxyPermissionSelector({
 
       {description && (
         <p className='text-foreground/50 text-tiny mb-2'>
-          {description} <button className='text-primary underline hover:no-underline'>Permission level details</button>
+          {description}{' '}
+          <Link isExternal underline='hover' href={POLKADOT_PROXY_TYPES_WIKI_URL}>
+            Permission level details
+          </Link>
         </p>
       )}
 

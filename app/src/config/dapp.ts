@@ -224,7 +224,7 @@ export const StakingApp: DappOption<true | string[], (network: string) => URL> =
   url: 'https://staking.mimir.global/',
   supportedChains: ['polkadot', 'kusama'],
   tags: ['Staking'],
-  website: 'https://staking.polkadot.network/',
+  website: 'https://polkadot.cloud',
   github: 'https://github.com/paritytech/polkadot-staking-dashboard'
 };
 

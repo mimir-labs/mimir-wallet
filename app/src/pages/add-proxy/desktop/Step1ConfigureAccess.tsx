@@ -4,13 +4,12 @@
 import { useAccount } from '@/accounts/useAccount';
 import PureIcon from '@/assets/images/pure-icon.svg';
 import { AddressName, EditableField, InputAddress, InputNetwork, ProxyControls } from '@/components';
-import { useEffect } from 'react';
 
-import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Switch } from '@mimir-wallet/ui';
+import { Alert, Button, Divider, Switch } from '@mimir-wallet/ui';
 
 import Tips from '../components/Tips';
 import { useProxyValidation } from '../hooks/useProxyValidation';
+import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
 
 interface Step1ConfigureAccessProps {
   network: string;
@@ -39,27 +38,17 @@ function Step1ConfigureAccess({
   onDataChange
 }: Step1ConfigureAccessProps) {
   const { current } = useAccount();
-  const { genesisHash } = useApi();
 
   // Use validation hook for account filtering and validation
-  const validationResult = useProxyValidation(
-    {
-      proxied,
-      proxy,
-      isPureProxy,
-      proxyType: 'Any', // Default value for validation
-      hasDelay: false,
-      delayType: 'hour',
-      customBlocks: '0'
-    },
-    genesisHash
-  );
-
-  useEffect(() => {
-    if (!isPureProxy && addressEq(proxied, proxy)) {
-      onDataChange({ proxy: undefined });
-    }
-  }, [proxied, proxy, isPureProxy, onDataChange]);
+  const validationResult = useProxyValidation({
+    proxied,
+    proxy,
+    isPureProxy,
+    proxyType: 'Any', // Default value for validation
+    hasDelay: false,
+    delayType: 'hour',
+    customBlocks: '0'
+  });
 
   return (
     <div className='flex flex-col gap-4'>
@@ -72,12 +61,10 @@ function Step1ConfigureAccess({
         <div className='relative flex flex-col items-center gap-[5px]'>
           {/* Proxy Account (Upper) */}
           <InputAddress
-            excluded={!isPureProxy && proxied ? [proxied] : []}
             shorten={false}
             value={proxy}
             onChange={(value) => onDataChange({ proxy: value })}
             placeholder='Select proxy account'
-            filtered={validationResult.filteredProxyAddresses}
           />
 
           <ProxyControls className='!absolute inset-x-auto inset-y-0 z-10 m-auto' />
@@ -88,13 +75,14 @@ function Step1ConfigureAccess({
               <img src={PureIcon} style={{ width: 30 }} />
               <EditableField
                 className='font-bold'
-                placeholder='Pure Proxy Account'
+                placeholder={DEFAULT_PURE_ACCOUNT_NAME}
                 value={pureProxyName || ''}
                 onChange={(value) => onDataChange({ pureProxyName: value })}
               />
             </div>
           ) : (
             <InputAddress
+              isSign
               shorten={false}
               value={proxied}
               onChange={(value) => onDataChange({ proxied: value })}
@@ -131,7 +119,10 @@ function Step1ConfigureAccess({
       <Divider />
 
       {/* Action Button */}
-      <div className='flex gap-2.5'>
+      <div className='flex flex-col gap-2.5'>
+        {validationResult.visibleErrors.map((error) => (
+          <Alert color='danger' title={error} />
+        ))}
         <Button
           fullWidth
           size='md'

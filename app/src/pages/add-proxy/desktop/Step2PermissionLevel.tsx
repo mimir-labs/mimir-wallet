@@ -10,6 +10,7 @@ import { Button, Divider, Switch } from '@mimir-wallet/ui';
 
 import DelayItem from '../components/DelayItem';
 import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
+import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
 
 interface Step2PermissionLevelProps {
   proxyType: string;
@@ -64,7 +65,7 @@ function Step2PermissionLevel({
           {isPureProxy ? (
             <div className='bg-secondary rounded-medium flex h-14 w-full items-center gap-2.5 px-2.5'>
               <img src={PureIcon} style={{ width: 30 }} />
-              <span className='text-foreground font-bold'>{pureProxyName || 'Pure Proxy Account'}</span>
+              <span className='text-foreground font-bold'>{pureProxyName || DEFAULT_PURE_ACCOUNT_NAME}</span>
             </div>
           ) : (
             <div className='bg-secondary rounded-medium w-full p-2.5'>

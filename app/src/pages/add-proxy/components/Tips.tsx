@@ -34,11 +34,13 @@ function Tips({ pure, proxied, proxy }: { pure?: boolean; proxied?: string; prox
         <div>
           <ul style={{ listStyle: 'outside', lineHeight: '14px' }}>
             {!pure && proxied && proxy ? (
-              <li className='flex items-center'>
-                This grants&nbsp;
-                <AddressName value={proxy} />
-                &nbsp;permission to act for&nbsp;
-                <AddressName value={proxied} />
+              <li>
+                <div className='flex items-center'>
+                  This grants&nbsp;
+                  <AddressName value={proxy} />
+                  &nbsp;permission to act for&nbsp;
+                  <AddressName value={proxied} />
+                </div>
               </li>
             ) : null}
             <li>

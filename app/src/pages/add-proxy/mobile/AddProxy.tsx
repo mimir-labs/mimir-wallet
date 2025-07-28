@@ -4,6 +4,7 @@
 import type { ProxyArgs } from '../types';
 
 import { useAccount } from '@/accounts/useAccount';
+import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { Input, InputAddress, InputNetwork, Label } from '@/components';
 import { ONE_DAY, ONE_HOUR } from '@/constants';
@@ -199,7 +200,16 @@ function AddProxy({
                     }}
                   >
                     {Object.entries(reviewWindows).map(([key, text]) => (
-                      <SelectItem key={key}>{text}</SelectItem>
+                      <SelectItem
+                        selectedIcon={(props) => {
+                          console.log(props);
+
+                          return <IconSuccess />;
+                        }}
+                        key={key}
+                      >
+                        {text}
+                      </SelectItem>
                     ))}
                   </Select>
                 </div>

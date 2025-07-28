@@ -16,7 +16,7 @@ import SafetyWarningModal from '../components/SafetyWarningModal';
 import { useDelayCalculation } from '../hooks/useDelayCalculation';
 import { useProxySafetyCheck } from '../hooks/useProxySafetyCheck';
 import { useProxyTransaction } from '../hooks/useProxyTransaction';
-import { proxyTypeDescriptions } from '../utils';
+import { DEFAULT_PURE_ACCOUNT_NAME, proxyTypeDescriptions } from '../utils';
 import ProxyAccountStructure from './ProxyAccountStructure';
 
 interface ProxyWizardData {
@@ -139,6 +139,7 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
         <ProxyAccountStructure
           proxy={wizardData.proxy}
           proxied={wizardData.proxied}
+          pureName={wizardData.pureProxyName}
           isPureProxy={wizardData.isPureProxy}
           proxyType={wizardData.proxyType}
           hasDelay={wizardData.hasDelay}
@@ -164,7 +165,7 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
           {wizardData.isPureProxy ? (
             <div className='bg-secondary rounded-medium flex h-14 w-full items-center gap-2.5 px-2.5'>
               <img src={PureIcon} style={{ width: 30 }} />
-              <span className='text-foreground font-bold'>{wizardData.pureProxyName || 'Pure Proxy Account'}</span>
+              <span className='text-foreground font-bold'>{wizardData.pureProxyName || DEFAULT_PURE_ACCOUNT_NAME}</span>
             </div>
           ) : (
             <div className='bg-secondary rounded-medium w-full p-2.5'>

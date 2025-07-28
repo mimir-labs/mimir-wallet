@@ -80,7 +80,6 @@ function TransferContent({
   return (
     <>
       <InputAddress
-        format={format}
         isSign
         filtered={filterSending}
         label='Sending From'
@@ -97,13 +96,7 @@ function TransferContent({
           </div>
         </div>
       ) : (
-        <InputAddress
-          format={format}
-          label='Recipient'
-          onChange={setRecipient}
-          placeholder='Recipient'
-          value={recipient}
-        />
+        <InputAddress label='Recipient' onChange={setRecipient} placeholder='Recipient' value={recipient} />
       )}
 
       <InputNetwork

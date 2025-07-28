@@ -44,3 +44,5 @@ export function filterAccountsByNetwork(accounts: AccountData[], genesisHash: He
     .filter((account) => (account.type === 'pure' ? account.network === genesisHash : true))
     .map((item) => item.address);
 }
+
+export const DEFAULT_PURE_ACCOUNT_NAME = 'Pure Proxy Account';

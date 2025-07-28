@@ -8,7 +8,7 @@ import { useAccount } from '@/accounts/useAccount';
 import { sortAccounts } from '@/accounts/utils';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
-import IconWarning from '@/assets/svg/icon-warning-fill.svg?react';
+import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -25,13 +25,13 @@ import {
   isPolkadotAddress,
   isPolkadotEvmAddress,
   isValidAddress as isValidAddressUtil,
-  useApi
+  useApi,
+  zeroAddress
 } from '@mimir-wallet/polkadot-core';
-import { FreeSoloPopover, Listbox, ListboxItem, usePress } from '@mimir-wallet/ui';
+import { FreeSoloPopover, Listbox, ListboxItem, Tooltip, usePress } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
 import AddressRow from './AddressRow';
-import FormatBalance from './FormatBalance';
 
 function createOptions(
   accounts: AccountData[],
@@ -137,13 +137,11 @@ function createOptions(
 function InputAddress({
   className,
   wrapperClassName,
-  balance,
   iconSize = 30,
   defaultValue,
   disabled,
   filtered,
   excluded,
-  format,
   isSign = false,
   label,
   onChange,
@@ -151,11 +149,11 @@ function InputAddress({
   placeholder = 'Address e.g. 5G789...',
   shorten = false,
   value: propsValue,
-  withBalance,
   helper,
   addressType = 'cell',
   endContent,
-  withAddButton
+  withAddButton,
+  withZeroAddress = false
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
   const {
@@ -186,8 +184,12 @@ function InputAddress({
       list.push(isEthAddress(inputValue) ? evm2Ss58(inputValue, chainSS58) : inputValue);
     }
 
+    if (withZeroAddress && !inputValue) {
+      list.unshift(zeroAddress);
+    }
+
     return setOptions(list);
-  }, [accounts, addresses, chainSS58, excluded, filtered, inputValue, isSign, metas, polkavm]);
+  }, [accounts, addresses, chainSS58, excluded, filtered, inputValue, isSign, metas, polkavm, withZeroAddress]);
 
   useEffect(() => {
     if (isControl.current) {
@@ -286,6 +288,8 @@ function InputAddress({
         {options.map((item) => (
           <ListboxItem
             key={item}
+            showDivider={item === zeroAddress}
+            data-divider={item === zeroAddress}
             onPress={() => {
               const shouldContinue = onSelect?.(item);
 
@@ -297,7 +301,7 @@ function InputAddress({
               }
             }}
             className={clsx(
-              'text-foreground data-[hover=true]:text-foreground',
+              'text-foreground data-[hover=true]:text-foreground after:bg-secondary after:-bottom-2.5 data-[divider=true]:mb-2.5',
               addressType === 'cell' ? '' : 'bg-secondary p-[5px]'
             )}
             endContent={withAddButton ? <IconAdd className='text-primary' /> : undefined}
@@ -352,6 +356,15 @@ function InputAddress({
               {...pressProps}
             />
 
+            {value && !isLocalAccount(value) && !isLocalAddress(value) ? (
+              <Tooltip color='foreground' content='Add to address book'>
+                <IconAddressBook
+                  className='text-divider-300 hover:text-primary absolute top-1/2 right-8 -translate-y-1/2 cursor-pointer transition-colors'
+                  {...addAddressBookPressProps}
+                />
+              </Tooltip>
+            ) : null}
+
             <ArrowDown
               data-open={isOpen}
               className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
@@ -365,26 +378,7 @@ function InputAddress({
 
         {valueIsPolkadotEvmAddress ? (
           <div className='text-small mt-1'>🥚✨ Yep, ETH address transfers work — magic, right? 😎</div>
-        ) : (
-          value &&
-          !isLocalAccount(value) &&
-          !isLocalAddress(value) && (
-            <div className='text-small mt-1 flex items-center gap-1'>
-              <IconWarning className='text-warning' />
-              This is an unknown address. You can&nbsp;
-              <span className='text-primary cursor-pointer' {...addAddressBookPressProps}>
-                add it to your address book
-              </span>
-            </div>
-          )
-        )}
-
-        {withBalance && (
-          <span className='text-tiny text-foreground/50'>
-            Balance:
-            <FormatBalance format={format} value={balance} />
-          </span>
-        )}
+        ) : null}
 
         {helper && <div className='text-tiny text-foreground/50'>{helper}</div>}
       </div>

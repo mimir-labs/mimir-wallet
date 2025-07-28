@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
 
+import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
+
 interface SuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -129,6 +131,7 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
             </div>
 
             <ProxyControls
+              tiny
               proxyType={transactionResult?.context?.proxyType || 'Any'}
               className='!absolute inset-x-auto inset-y-0 z-10 m-auto'
             />
@@ -138,7 +141,7 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
               <div className='bg-secondary rounded-medium flex h-14 w-full items-center gap-2.5 px-2.5'>
                 <img src={PureIcon} style={{ width: 30 }} />
                 <span className='text-foreground font-bold'>
-                  {transactionResult.context.pureProxyName || 'Pure Proxy Account'}
+                  {transactionResult.context.pureProxyName || DEFAULT_PURE_ACCOUNT_NAME}
                 </span>
               </div>
             ) : (

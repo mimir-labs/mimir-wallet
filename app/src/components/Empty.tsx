@@ -10,12 +10,12 @@ interface Props {
 }
 
 function Empty({ height, label, className = '' }: Props) {
-  const cn = 'flex flex-col items-center justify-center gap-5';
+  const cn = 'flex flex-col items-center justify-center gap-5 font-bold text-large text-foreground';
 
   return (
     <div className={`${cn} ${className}`} style={{ height }}>
       <img alt='null' src={NullImg} width={100} />
-      <h4>{label || 'No data here.'}</h4>
+      <span>{label || 'No data here.'}</span>
     </div>
   );
 }

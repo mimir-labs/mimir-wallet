@@ -15,15 +15,25 @@ import { useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
+import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
+
 interface ProxyAccountStructureProps {
   proxy: string;
   proxied?: string;
+  pureName?: string;
   isPureProxy: boolean;
   proxyType: string;
   hasDelay: boolean;
 }
 
-function ProxyAccountStructure({ proxy, proxied, isPureProxy, proxyType, hasDelay }: ProxyAccountStructureProps) {
+function ProxyAccountStructure({
+  proxy,
+  proxied,
+  pureName,
+  isPureProxy,
+  proxyType,
+  hasDelay
+}: ProxyAccountStructureProps) {
   const { genesisHash, chainSS58 } = useApi();
   const [proxyAccount, setProxyAccount] = React.useState<AccountData>();
   const [fullAccount, setFullAccount] = React.useState<AccountData>();
@@ -45,7 +55,7 @@ function ProxyAccountStructure({ proxy, proxied, isPureProxy, proxyType, hasDela
       setProxyAccount({
         type: 'pure',
         isUnknownPure: true,
-        name: 'test',
+        name: pureName || DEFAULT_PURE_ACCOUNT_NAME,
         address: zeroAddress,
         createdAt: 0,
         delegatees: [
@@ -80,7 +90,7 @@ function ProxyAccountStructure({ proxy, proxied, isPureProxy, proxyType, hasDela
         createdAt: 0
       });
     }
-  }, [genesisHash, hasDelay, isPureProxy, proxied, proxy, proxyType]);
+  }, [genesisHash, hasDelay, isPureProxy, proxied, proxy, proxyType, pureName]);
 
   const fetchFullStructure = async () => {
     setIsFetching(true);
@@ -94,7 +104,7 @@ function ProxyAccountStructure({ proxy, proxied, isPureProxy, proxyType, hasDela
         setFullAccount({
           type: 'pure',
           isUnknownPure: true,
-          name: 'test',
+          name: pureName || DEFAULT_PURE_ACCOUNT_NAME,
           address: zeroAddress,
           createdAt: 0,
           delegatees: [

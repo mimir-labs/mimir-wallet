@@ -1,10 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData } from '@/hooks/types';
-import type { HexString } from '@polkadot/util/types';
-
-import { useAccount } from '@/accounts/useAccount';
 import { useMemo } from 'react';
 
 import { addressEq } from '@mimir-wallet/polkadot-core';
@@ -23,31 +19,17 @@ interface ValidationResult {
   isValid: boolean;
   canProceed: boolean;
   errors: string[];
-  filteredProxyAddresses: string[];
-  filteredProxiedAddresses: string[];
+  visibleErrors: string[];
 }
 
 /**
  * Hook for validating proxy configuration and filtering available addresses
  * Handles validation logic for proxy setup wizard
  */
-export function useProxyValidation(config: ProxyConfiguration, genesisHash: HexString): ValidationResult {
-  const { accounts, addresses } = useAccount();
-
-  // Filter accounts by network for proxied accounts
-  const filteredProxiedAddresses = useMemo(() => {
-    return accounts
-      .filter((account: AccountData) => (account.type === 'pure' ? account.network === genesisHash : true))
-      .map((item) => item.address);
-  }, [accounts, genesisHash]);
-
-  // Filter addresses for proxy accounts (includes both accounts and address book)
-  const filteredProxyAddresses = useMemo(() => {
-    return filteredProxiedAddresses.concat(addresses.map((item) => item.address));
-  }, [filteredProxiedAddresses, addresses]);
-
+export function useProxyValidation(config: ProxyConfiguration): ValidationResult {
   const validationResult = useMemo(() => {
     const errors: string[] = [];
+    const visibleErrors: string[] = [];
 
     // Basic validation
     if (!config.isPureProxy && !config.proxied) {
@@ -60,7 +42,8 @@ export function useProxyValidation(config: ProxyConfiguration, genesisHash: HexS
 
     // Prevent self-proxy for regular proxy
     if (!config.isPureProxy && config.proxied && config.proxy && addressEq(config.proxied, config.proxy)) {
-      errors.push('Proxy account cannot be the same as proxied account');
+      errors.push('Unable to create proxy management for the same account.');
+      visibleErrors.push('Unable to create proxy management for the same account.');
     }
 
     // Validate custom delay blocks
@@ -79,19 +62,9 @@ export function useProxyValidation(config: ProxyConfiguration, genesisHash: HexS
       isValid: errors.length === 0,
       canProceed: canProceed && errors.length === 0,
       errors,
-      filteredProxyAddresses,
-      filteredProxiedAddresses
+      visibleErrors
     };
-  }, [
-    config.isPureProxy,
-    config.proxied,
-    config.proxy,
-    config.hasDelay,
-    config.delayType,
-    config.customBlocks,
-    filteredProxyAddresses,
-    filteredProxiedAddresses
-  ]);
+  }, [config.isPureProxy, config.proxied, config.proxy, config.hasDelay, config.delayType, config.customBlocks]);
 
   return validationResult;
 }
