@@ -46,4 +46,6 @@ export const CUSTOM_APP_KEY = `${LS_NAMESPACE}custom_app`;
 
 export const SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY = `${LS_NAMESPACE}show_all_networks_in_copy_modal`;
 
-export const REMOTE_PROXY_DOC_URL = 'https://wiki.polkadot.network/learn/learn-proxies-pure/';
+export const REMOTE_PROXY_DOC_URL = 'https://blog.kchr.de/ecosystem-proxy/';
+export const POLKADOT_PROXY_WIKI_URL = 'https://wiki.polkadot.com/learn/learn-proxies/';
+export const POLKADOT_PROXY_TYPES_WIKI_URL = 'https://wiki.polkadot.com/learn/learn-proxies/#proxy-types';

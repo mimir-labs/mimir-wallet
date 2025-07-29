@@ -7,10 +7,16 @@ import type { PalletIdentityJudgement } from '@polkadot/types/lookup';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconIdentity from '@/assets/svg/identity.svg?react';
 import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
-import { hexToU8a } from '@polkadot/util';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { addressEq, encodeAddress, isPolkadotEvmAddress, sub2Eth, useApi } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  encodeAddress,
+  isPolkadotEvmAddress,
+  sub2Eth,
+  useApi,
+  zeroAddress
+} from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
 
 interface Props {
@@ -62,7 +68,7 @@ function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
   const [identity, isFetched, isFetching, identityEnabled] = useDeriveAccountInfo(address);
   const [chainName, setChainName] = useState<React.ReactNode>(null);
   const { meta } = useAddressMeta(address);
-  const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
+  const isZeroAddress = useMemo(() => addressEq(zeroAddress, address), [address]);
 
   // set the actual nickname, local name, accountId
   useEffect((): void => {

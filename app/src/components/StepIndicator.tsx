@@ -1,9 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
+import { memo } from 'react';
 
-interface StepData {
+export interface StepData {
   number: number;
   label: string;
 }
@@ -11,17 +11,19 @@ interface StepData {
 interface StepIndicatorProps {
   steps: StepData[];
   currentStep: number;
+  className?: string;
+  variant?: 'default' | 'compact';
 }
 
-function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
+function StepIndicator({ currentStep, steps, className = '', variant = 'default' }: StepIndicatorProps) {
   return (
-    <div className='flex w-full items-center gap-4'>
+    <div className={`flex w-full items-center gap-4 ${className}`}>
       {steps.map((step) => {
         const isActive = currentStep === step.number;
         const isCompleted = currentStep > step.number;
 
         return (
-          <div key={step.number} className={`bg-secondary flex h-10 flex-1 items-center rounded-full`}>
+          <div key={step.number} className='bg-secondary flex h-10 flex-1 items-center rounded-full'>
             <div className='flex h-10 items-center gap-2.5 pr-2.5'>
               <div
                 className={`flex h-10 w-10 flex-[0_0_auto] items-center justify-center rounded-full text-base font-bold ${
@@ -30,11 +32,9 @@ function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
                     : 'text-primary-foreground bg-primary/5'
                 }`}
               >
-                {step.number}
+                {isCompleted && variant === 'default' ? '✓' : step.number}
               </div>
-              <span className={`text-sm font-bold ${isActive || isCompleted ? 'text-foreground' : 'text-foreground'}`}>
-                {step.label}
-              </span>
+              <span className={`text-foreground text-sm font-bold`}>{step.label}</span>
             </div>
           </div>
         );
@@ -43,4 +43,4 @@ function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
   );
 }
 
-export default StepIndicator;
+export default memo(StepIndicator);

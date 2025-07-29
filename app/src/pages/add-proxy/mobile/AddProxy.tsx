@@ -1,11 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData } from '@/hooks/types';
-import type { HexString } from '@polkadot/util/types';
-import type { ProxyArgs } from './types';
+import type { ProxyArgs } from '../types';
 
 import { useAccount } from '@/accounts/useAccount';
+import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { Input, InputAddress, InputNetwork, Label } from '@/components';
 import { ONE_DAY, ONE_HOUR } from '@/constants';
@@ -20,17 +19,13 @@ import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { Alert, Button, Divider, Select, SelectItem, Switch, Tooltip } from '@mimir-wallet/ui';
 
+import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
+import { filterAccountsByNetwork } from '../utils';
 import AddProxyButton from './AddProxyButton';
 import ProxyInfo from './ProxyInfo';
 import PureCell from './PureCell';
 import SubmitProxy from './SubmitProxy';
 import SubmitPure from './SubmitPure';
-
-function filterAddresses(accounts: AccountData[], genesisHash: HexString) {
-  return accounts
-    .filter((account) => (account.type === 'pure' ? account.network === genesisHash : true))
-    .map((item) => item.address);
-}
 
 function AddProxy({
   pure,
@@ -51,7 +46,7 @@ function AddProxy({
 
   // filter accounts by network
   const [, filteredProxy] = useMemo(() => {
-    const filteredProxied = filterAddresses(accounts, genesisHash);
+    const filteredProxied = filterAccountsByNetwork(accounts, genesisHash);
     const filteredProxy = filteredProxied.concat(addresses.map((item) => item.address));
 
     return [filteredProxied, filteredProxy];
@@ -166,27 +161,13 @@ function AddProxy({
 
             {pure && <Input label='Name' value={name} onChange={setName} />}
 
-            <div className='flex'>
-              <Select
-                label={<Label tooltip='Determines what actions the proxy can perform.'>Authorize</Label>}
-                placeholder='Authorize'
-                variant='bordered'
-                labelPlacement='outside'
-                selectionMode='single'
-                selectedKeys={[proxyType]}
-                onSelectionChange={(e) => {
-                  if (e.currentKey) {
-                    setProxyType(e.currentKey.toString());
-                  }
-                }}
-              >
-                {proxyTypes.map(({ text }) => (
-                  <SelectItem textValue={text} key={text}>
-                    {text}
-                  </SelectItem>
-                ))}
-              </Select>
-            </div>
+            <ProxyPermissionSelector
+              value={proxyType}
+              onChange={setProxyType}
+              label='Authorize'
+              description='Determines what actions the proxy can perform.'
+              variant='bordered'
+            />
 
             <div className='flex items-center justify-between'>
               <div className='font-bold'>Advanced Setting</div>
@@ -219,7 +200,16 @@ function AddProxy({
                     }}
                   >
                     {Object.entries(reviewWindows).map(([key, text]) => (
-                      <SelectItem key={key}>{text}</SelectItem>
+                      <SelectItem
+                        selectedIcon={(props) => {
+                          console.log(props);
+
+                          return <IconSuccess />;
+                        }}
+                        key={key}
+                      >
+                        {text}
+                      </SelectItem>
                     ))}
                   </Select>
                 </div>

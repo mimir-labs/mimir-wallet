@@ -1,8 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useAccount } from '@/accounts/useAccount';
 import DeleteIcon from '@/assets/svg/icon-delete.svg?react';
-import { InputAddress } from '@/components';
+import { Empty, InputAddress } from '@/components';
 import AddressRow from '@/components/AddressRow';
 import { useState } from 'react';
 
@@ -18,12 +19,17 @@ interface Step2MembersProps {
 }
 
 function Step2Members({ members, onBack, onMembersChange, onNext, onThresholdChange, threshold }: Step2MembersProps) {
+  const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [selectedAccount, setSelectedAccount] = useState<string>('');
 
   const handleAddMember = () => {
     if (selectedAccount && !members.find((m) => m === selectedAccount)) {
       onMembersChange([...members, selectedAccount]);
       setSelectedAccount('');
+
+      if (!isLocalAccount(selectedAccount) && !isLocalAddress(selectedAccount)) {
+        addAddressBook(selectedAccount, false);
+      }
     }
   };
 
@@ -39,6 +45,10 @@ function Step2Members({ members, onBack, onMembersChange, onNext, onThresholdCha
   const handleSelect = (address: string) => {
     if (address && !members.find((m) => m === address)) {
       onMembersChange([...members, address]);
+
+      if (!isLocalAccount(address) && !isLocalAddress(address)) {
+        addAddressBook(address, false);
+      }
     }
 
     return false;
@@ -58,6 +68,7 @@ function Step2Members({ members, onBack, onMembersChange, onNext, onThresholdCha
         onSelect={handleSelect}
         excluded={members}
         placeholder='Select account'
+        withZeroAddress
         endContent={
           <Button
             className='h-10 min-w-[53px]'
@@ -72,33 +83,33 @@ function Step2Members({ members, onBack, onMembersChange, onNext, onThresholdCha
       />
 
       {/* Multisig Signers List */}
-      {members.length > 0 && (
-        <div className='flex flex-col gap-1'>
-          <label className='text-foreground text-sm font-bold'>Multisig Signers</label>
-          <div className='rounded-medium border-divider-300 border p-2.5'>
-            <div className='flex flex-col gap-2.5'>
-              {members.map((member) => (
-                <div key={member} className='rounded-small bg-secondary flex items-center gap-1 px-1 py-1'>
-                  <AddressRow
-                    className='[&_.AddressRow-Address]:text-[#949494]'
-                    value={member}
-                    withAddress
-                    withName
-                    iconSize={20}
-                  />
-                  <div className='flex-1' />
-                  <button
-                    onClick={() => handleRemoveMember(member)}
-                    className='text-danger p-1 transition-opacity hover:opacity-80'
-                  >
-                    <DeleteIcon />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
+      <div className='flex flex-col gap-1'>
+        <label className='text-foreground text-sm font-bold'>Multisig Signers</label>
+        <div className='rounded-medium border-divider-300 flex flex-col gap-2.5 border p-2.5'>
+          {members.length > 0 ? (
+            members.map((member) => (
+              <div key={member} className='rounded-small bg-secondary flex items-center gap-1 px-1 py-1'>
+                <AddressRow
+                  className='[&_.AddressRow-Address]:text-[#949494]'
+                  value={member}
+                  withAddress
+                  withName
+                  iconSize={20}
+                />
+                <div className='flex-1' />
+                <button
+                  onClick={() => handleRemoveMember(member)}
+                  className='text-danger p-1 transition-opacity hover:opacity-80'
+                >
+                  <DeleteIcon />
+                </button>
+              </div>
+            ))
+          ) : (
+            <Empty height={100} variant='select-account' />
+          )}
         </div>
-      )}
+      </div>
 
       {/* Set Approval Threshold */}
       <div className='flex flex-col gap-1'>

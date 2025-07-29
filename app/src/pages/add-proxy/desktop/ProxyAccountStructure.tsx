@@ -1,15 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AccountData, AddressMeta } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { AddressMetaContext } from '@/accounts/useAccount';
 import { transformAccount } from '@/accounts/useQueryAccount';
 import { AddressOverview } from '@/components';
 import { toastError } from '@/components/utils';
-import { type AccountData, AddressMeta, type MultisigAccountData } from '@/hooks/types';
-import { u8aToHex } from '@polkadot/util';
-import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useEffect, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -17,43 +15,57 @@ import { useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
-interface AccountStructureProps {
-  name: string;
-  members: string[];
-  threshold: number;
+import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
+
+interface ProxyAccountStructureProps {
+  proxy: string;
+  proxied?: string;
+  pureName?: string;
   isPureProxy: boolean;
+  proxyType: string;
+  hasDelay: boolean;
 }
 
-function AccountStructure({ members, name, threshold, isPureProxy }: AccountStructureProps) {
+function ProxyAccountStructure({
+  proxy,
+  proxied,
+  pureName,
+  isPureProxy,
+  proxyType,
+  hasDelay
+}: ProxyAccountStructureProps) {
   const { genesisHash, chainSS58 } = useApi();
-  const [multisigAccount, setMultisigAccount] = React.useState<AccountData>();
+  const [proxyAccount, setProxyAccount] = React.useState<AccountData>();
   const [fullAccount, setFullAccount] = React.useState<AccountData>();
   const [isFetching, setIsFetching] = React.useState(false);
-  const [overrideMetas, setOverrideMetas] = useState<Record<HexString, AddressMeta>>({});
+  const [overrideMetas] = useState<Record<HexString, AddressMeta>>({});
   const [isOpen, toggleOpen] = useToggle(false);
 
+  // Create account structure similar to AccountStructure
   useEffect(() => {
-    const multisigAddress = encodeMultiAddress(members, threshold);
-    const multisigAddressHex = u8aToHex(decodeAddress(multisigAddress));
-
-    const multisigAccount: MultisigAccountData = {
-      type: 'multisig',
-      name: name,
-      members: members.map((member) => ({ type: 'account', address: member, delegatees: [], createdAt: 0 })),
-      address: encodeMultiAddress(members, threshold),
-      threshold: threshold,
+    const delegatee: AccountData = {
+      type: 'account',
+      name: '',
+      address: proxy,
       createdAt: 0,
       delegatees: []
     };
 
     if (isPureProxy) {
-      setMultisigAccount({
+      setProxyAccount({
         type: 'pure',
         isUnknownPure: true,
-        name: name,
+        name: pureName || DEFAULT_PURE_ACCOUNT_NAME,
         address: zeroAddress,
         createdAt: 0,
-        delegatees: [{ ...multisigAccount, proxyDelay: 0, proxyNetwork: genesisHash, proxyType: 'Any' }],
+        delegatees: [
+          {
+            ...delegatee,
+            proxyDelay: hasDelay ? 1 : 0, //mock,
+            proxyNetwork: genesisHash,
+            proxyType
+          }
+        ],
         createdBlock: '0',
         createdBlockHash: '0x',
         createdExtrinsicHash: '0x',
@@ -62,50 +74,47 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
         disambiguationIndex: 0,
         network: genesisHash
       });
-    } else {
-      setMultisigAccount(multisigAccount);
+    } else if (proxied) {
+      setProxyAccount({
+        type: 'account',
+        name: '',
+        address: proxied,
+        delegatees: [
+          {
+            ...delegatee,
+            proxyDelay: hasDelay ? 1 : 0, //mock,
+            proxyNetwork: genesisHash,
+            proxyType
+          }
+        ],
+        createdAt: 0
+      });
     }
-
-    setOverrideMetas({
-      [multisigAddressHex]: {
-        isMultisig: true,
-        name: name,
-        threshold: threshold,
-        who: members
-      }
-    });
-  }, [genesisHash, isPureProxy, members, name, threshold]);
+  }, [genesisHash, hasDelay, isPureProxy, proxied, proxy, proxyType, pureName]);
 
   const fetchFullStructure = async () => {
     setIsFetching(true);
 
     try {
-      const memberAccounts = await Promise.all(
-        members.map((item) =>
-          service.account
-            .getOmniChainDetails(item)
-            .then((account) => transformAccount(chainSS58, account, true, genesisHash))
-        )
-      );
-
-      const multisigAccount: AccountData = {
-        type: 'multisig',
-        name: name,
-        members: memberAccounts,
-        address: encodeMultiAddress(members, threshold),
-        threshold: threshold,
-        createdAt: 0,
-        delegatees: []
-      };
+      const proxyAccount = await service.account
+        .getOmniChainDetails(proxy)
+        .then((account) => transformAccount(chainSS58, account, true, genesisHash));
 
       if (isPureProxy) {
         setFullAccount({
           type: 'pure',
           isUnknownPure: true,
-          name: name,
+          name: pureName || DEFAULT_PURE_ACCOUNT_NAME,
           address: zeroAddress,
           createdAt: 0,
-          delegatees: [{ ...multisigAccount, proxyDelay: 0, proxyNetwork: genesisHash, proxyType: 'Any' }],
+          delegatees: [
+            {
+              ...proxyAccount,
+              proxyDelay: hasDelay ? 1 : 0, //mock,
+              proxyNetwork: genesisHash,
+              proxyType
+            }
+          ],
           createdBlock: '0',
           createdBlockHash: '0x',
           createdExtrinsicHash: '0x',
@@ -114,8 +123,21 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
           disambiguationIndex: 0,
           network: genesisHash
         });
-      } else {
-        setFullAccount(multisigAccount);
+      } else if (proxied) {
+        setFullAccount({
+          type: 'account',
+          name: '',
+          address: proxied,
+          delegatees: [
+            {
+              ...proxyAccount,
+              proxyDelay: hasDelay ? 1 : 0, //mock,
+              proxyNetwork: genesisHash,
+              proxyType
+            }
+          ],
+          createdAt: 0
+        });
       }
 
       toggleOpen(true);
@@ -145,7 +167,7 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
         {/* Simple visualization - can be enhanced with actual diagram */}
         <AddressMetaContext.Provider value={overrideMetas}>
           <div className='flex h-full items-center justify-center'>
-            {multisigAccount ? <AddressOverview showAddressNodeOperations={false} account={multisigAccount} /> : null}
+            {proxyAccount ? <AddressOverview showAddressNodeOperations={false} account={proxyAccount} /> : null}
           </div>
         </AddressMetaContext.Provider>
       </div>
@@ -166,4 +188,4 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
   );
 }
 
-export default AccountStructure;
+export default React.memo(ProxyAccountStructure);

@@ -5,7 +5,7 @@ import type { Call as ICall } from '@polkadot/types/interfaces';
 import type { IMethod, Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { hexToU8a, isHex, isU8a, u8aEq, u8aToHex, u8aToU8a } from '@polkadot/util';
+import { hexToU8a, isHex, u8aToHex, u8aToU8a } from '@polkadot/util';
 import {
   decodeAddress,
   encodeAddress,
@@ -15,18 +15,35 @@ import {
   validateAddress
 } from '@polkadot/util-crypto';
 
-export function addressToHex(address: string): HexString {
-  return u8aToHex(decodeAddress(address));
+// Cache for address to hex performance
+const addressHexCache = new Map<string | HexString, HexString>();
+
+export const zeroAddress = u8aToHex(hexToU8a('0x0', 256));
+
+// Optimize address hex with caching
+export function addressToHex(address: string | HexString): HexString {
+  const cached = addressHexCache.get(address);
+
+  if (cached) return cached;
+  const hex = u8aToHex(decodeAddress(address));
+
+  addressHexCache.set(address, hex);
+
+  return hex;
 }
 
-export function addressEq(
-  a?: string | HexString | Uint8Array | { toString: () => string } | null,
-  b?: string | HexString | Uint8Array | { toString: () => string } | null
-): boolean {
+export function addressEq(a?: string | HexString | null, b?: string | HexString | null): boolean {
   if (!(a && b)) return false;
 
+  if (a === b) {
+    return true;
+  }
+
   try {
-    return u8aEq(isU8a(a) ? a : decodeAddress(a.toString()), isU8a(b) ? b : decodeAddress(b.toString()));
+    const aHex = addressToHex(a);
+    const bHex = addressToHex(b);
+
+    return aHex === bHex;
   } catch {
     return false;
   }

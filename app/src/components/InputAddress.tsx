@@ -8,13 +8,13 @@ import { useAccount } from '@/accounts/useAccount';
 import { sortAccounts } from '@/accounts/utils';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
-import IconWarning from '@/assets/svg/icon-warning-fill.svg?react';
+import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import clsx from 'clsx';
 import { AnimatePresence } from 'framer-motion';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import {
@@ -25,13 +25,13 @@ import {
   isPolkadotAddress,
   isPolkadotEvmAddress,
   isValidAddress as isValidAddressUtil,
-  useApi
+  useApi,
+  zeroAddress
 } from '@mimir-wallet/polkadot-core';
-import { FreeSoloPopover, Listbox, ListboxItem, usePress } from '@mimir-wallet/ui';
+import { FreeSoloPopover, Listbox, ListboxItem, Tooltip, usePress } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
 import AddressRow from './AddressRow';
-import FormatBalance from './FormatBalance';
 
 function createOptions(
   accounts: AccountData[],
@@ -42,60 +42,106 @@ function createOptions(
   filtered?: string[],
   excluded?: string[]
 ): string[] {
-  const all = accounts.reduce<Record<string, string | null | undefined>>((result, item) => {
-    result[item.address] = item.name || metas[addressToHex(item.address)]?.name;
-
-    return result;
-  }, {});
-
-  if (!isSign) {
-    addresses.reduce<Record<string, string | null | undefined>>((result, item) => {
-      result[item.address] = item.name;
-
-      return result;
-    }, all);
-  }
-
-  let options = Object.entries(all);
-
-  if (filtered) {
-    options = options.filter((option) => filtered.some((item) => addressEq(item, option[0])));
-  }
-
-  if (excluded) {
-    options = options.filter((option) => !excluded.some((item) => addressEq(item, option[0])));
-  }
-
-  if (!input) return options.map((item) => item[0]);
-
+  const list: Set<string> = new Set();
   const identity = useIdentityStore.getState();
 
-  if (isPolkadotAddress(input)) {
-    return options.filter(([address]) => addressEq(address, input)).map((item) => item[0]);
+  // Process accounts
+  for (const item of accounts) {
+    const address = item.address;
+    const addressHex = addressToHex(address);
+    let flag = true;
+
+    if (excluded && excluded.length > 0) {
+      flag = flag && !excluded.some((item) => addressEq(item, address));
+    }
+
+    if (!flag) continue;
+
+    if (filtered && filtered.length > 0) {
+      flag = flag && filtered.some((item) => addressEq(item, address));
+    }
+
+    if (!flag) continue;
+
+    if (input) {
+      if (isPolkadotAddress(input)) {
+        flag = flag && addressEq(input, address);
+
+        if (!flag) continue;
+      } else {
+        const addressLowerCase = address.toLowerCase();
+        const inputLowerCase = input.toLowerCase();
+        const nameLowerCase = (item.name || metas[addressHex].name)?.toLowerCase();
+        const identityValue = identity[addressHex]?.toLowerCase();
+
+        flag =
+          flag &&
+          (addressLowerCase.includes(inputLowerCase) ||
+            (!!nameLowerCase && nameLowerCase.includes(inputLowerCase)) ||
+            (!!identityValue && identityValue.includes(inputLowerCase)));
+
+        if (!flag) continue;
+      }
+    }
+
+    list.add(addressHex);
   }
 
-  return options
-    .map(([address, name]) => [address, name, identity[addressToHex(address)]] as const)
-    .filter(([address, name, identity]) => {
-      return (
-        address.toLowerCase().includes(input.toLowerCase()) ||
-        (name ? name.toLowerCase().includes(input.toLowerCase()) : false) ||
-        (identity ? identity.toLowerCase().includes(input.toLowerCase()) : false)
-      );
-    })
-    .map((item) => item[0]);
+  if (!isSign) {
+    // Process additional addresses if not in sign mode
+    for (const item of addresses) {
+      const address = item.address;
+      const addressHex = addressToHex(address);
+      let flag = true;
+
+      if (excluded && excluded.length > 0) {
+        flag = flag && !excluded.some((item) => addressEq(item, address));
+      }
+
+      if (!flag) continue;
+
+      if (filtered && filtered.length > 0) {
+        flag = flag && filtered.some((item) => addressEq(item, address));
+      }
+
+      if (!flag) continue;
+
+      if (input) {
+        if (isPolkadotAddress(input)) {
+          flag = flag && addressEq(input, address);
+
+          if (!flag) continue;
+        } else {
+          const addressLowerCase = address.toLowerCase();
+          const inputLowerCase = input.toLowerCase();
+          const nameLowerCase = (item.name || metas[addressHex].name)?.toLowerCase();
+          const identityValue = identity[addressHex]?.toLowerCase();
+
+          flag =
+            flag &&
+            (addressLowerCase.includes(inputLowerCase) ||
+              (!!nameLowerCase && nameLowerCase.includes(inputLowerCase)) ||
+              (!!identityValue && identityValue.includes(inputLowerCase)));
+
+          if (!flag) continue;
+        }
+      }
+
+      list.add(addressHex);
+    }
+  }
+
+  return Array.from(list);
 }
 
 function InputAddress({
   className,
   wrapperClassName,
-  balance,
   iconSize = 30,
   defaultValue,
   disabled,
   filtered,
   excluded,
-  format,
   isSign = false,
   label,
   onChange,
@@ -103,11 +149,11 @@ function InputAddress({
   placeholder = 'Address e.g. 5G789...',
   shorten = false,
   value: propsValue,
-  withBalance,
   helper,
   addressType = 'cell',
   endContent,
-  withAddButton
+  withAddButton,
+  withZeroAddress = false
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
   const {
@@ -127,6 +173,9 @@ function InputAddress({
   const [isFocused, setIsFocused] = useState(false);
   const upSm = useMediaQuery('sm');
   const [options, setOptions] = useState<string[]>([]);
+  const onChangeRef = useRef(onChange);
+
+  onChangeRef.current = onChange;
 
   useEffect(() => {
     const list = sortAccounts(createOptions(accounts, addresses, isSign, metas, inputValue, filtered, excluded), metas);
@@ -135,8 +184,12 @@ function InputAddress({
       list.push(isEthAddress(inputValue) ? evm2Ss58(inputValue, chainSS58) : inputValue);
     }
 
+    if (withZeroAddress && !inputValue) {
+      list.unshift(zeroAddress);
+    }
+
     return setOptions(list);
-  }, [accounts, addresses, chainSS58, excluded, filtered, inputValue, isSign, metas, polkavm]);
+  }, [accounts, addresses, chainSS58, excluded, filtered, inputValue, isSign, metas, polkavm, withZeroAddress]);
 
   useEffect(() => {
     if (isControl.current) {
@@ -148,28 +201,31 @@ function InputAddress({
     const key = value || '';
 
     if (isValidAddressUtil(key, polkavm)) {
-      onChange?.(isEthAddress(key) ? evm2Ss58(key, chainSS58) : key);
+      onChangeRef.current?.(isEthAddress(key) ? evm2Ss58(key, chainSS58) : key);
     } else if (key === '') {
-      onChange?.('');
+      onChangeRef.current?.('');
     }
-  }, [value, onChange, polkavm, chainSS58]);
+  }, [value, polkavm, chainSS58]);
 
-  const handleSelect = (item: string) => {
-    if (item && isValidAddressUtil(item, polkavm)) {
-      const _value = isEthAddress(item) ? evm2Ss58(item, chainSS58) : item;
+  const handleSelect = useCallback(
+    (item: string) => {
+      if (item && isValidAddressUtil(item, polkavm)) {
+        const _value = isEthAddress(item) ? evm2Ss58(item, chainSS58) : item;
 
-      setValue(_value);
-    }
+        setValue(_value);
+      }
 
-    setInputValue('');
-    toggleOpen(false);
-  };
+      setInputValue('');
+      toggleOpen(false);
+    },
+    [chainSS58, polkavm, setInputValue, toggleOpen]
+  );
 
-  const handleOpen = () => {
+  const handleOpen = useCallback(() => {
     toggleOpen(true);
-  };
+  }, [toggleOpen]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     toggleOpen(false);
 
     if (!isSign && isValidAddress) {
@@ -181,7 +237,7 @@ function InputAddress({
     } else if (!isSign) {
       setValue('');
     }
-  };
+  }, [chainSS58, handleSelect, inputValue, isSign, isValidAddress, toggleOpen]);
 
   const { pressProps } = usePress({
     onPress: isOpen ? handleClose : handleOpen
@@ -232,6 +288,8 @@ function InputAddress({
         {options.map((item) => (
           <ListboxItem
             key={item}
+            showDivider={item === zeroAddress}
+            data-divider={item === zeroAddress}
             onPress={() => {
               const shouldContinue = onSelect?.(item);
 
@@ -243,7 +301,7 @@ function InputAddress({
               }
             }}
             className={clsx(
-              'text-foreground data-[hover=true]:text-foreground',
+              'text-foreground data-[hover=true]:text-foreground after:bg-secondary after:-bottom-2.5 data-[divider=true]:mb-2.5',
               addressType === 'cell' ? '' : 'bg-secondary p-[5px]'
             )}
             endContent={withAddButton ? <IconAdd className='text-primary' /> : undefined}
@@ -298,6 +356,15 @@ function InputAddress({
               {...pressProps}
             />
 
+            {value && !isLocalAccount(value) && !isLocalAddress(value) ? (
+              <Tooltip color='foreground' content='Add to address book'>
+                <IconAddressBook
+                  className='text-divider-300 hover:text-primary absolute top-1/2 right-8 -translate-y-1/2 cursor-pointer transition-colors'
+                  {...addAddressBookPressProps}
+                />
+              </Tooltip>
+            ) : null}
+
             <ArrowDown
               data-open={isOpen}
               className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
@@ -311,26 +378,7 @@ function InputAddress({
 
         {valueIsPolkadotEvmAddress ? (
           <div className='text-small mt-1'>🥚✨ Yep, ETH address transfers work — magic, right? 😎</div>
-        ) : (
-          value &&
-          !isLocalAccount(value) &&
-          !isLocalAddress(value) && (
-            <div className='text-small mt-1 flex items-center gap-1'>
-              <IconWarning className='text-warning' />
-              This is an unknown address. You can&nbsp;
-              <span className='text-primary cursor-pointer' {...addAddressBookPressProps}>
-                add it to your address book
-              </span>
-            </div>
-          )
-        )}
-
-        {withBalance && (
-          <span className='text-tiny text-foreground/50'>
-            Balance:
-            <FormatBalance format={format} value={balance} />
-          </span>
-        )}
+        ) : null}
 
         {helper && <div className='text-tiny text-foreground/50'>{helper}</div>}
       </div>

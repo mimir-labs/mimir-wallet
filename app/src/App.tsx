@@ -88,7 +88,7 @@ const routes = [
           },
           {
             path: '/create-pure',
-            element: <PageAddProxy pure />
+            element: <PageAddProxy pure={true} />
           }
         ]
       },

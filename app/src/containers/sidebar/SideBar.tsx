@@ -72,16 +72,11 @@ function NavLink({
       size='lg'
       radius='md'
       startContent={<Icon className='h-5 w-5' />}
-      className='text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary h-[50px] items-center justify-start gap-x-2.5 px-[15px] py-[20px]'
+      className='group text-foreground/50 text-medium hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary h-[50px] items-center justify-start gap-x-2.5 px-[15px] py-[20px] font-semibold'
       href={matched ? undefined : to}
       variant='light'
     >
-      <p
-        data-active={matched}
-        className='text-medium text-foreground/50 data-[active=true]:text-foreground font-semibold'
-      >
-        {label}
-      </p>
+      {label}
       {endContent}
     </Button>
   );

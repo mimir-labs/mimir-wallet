@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ProxyArgs } from './types';
+import type { ProxyArgs } from '../types';
 
 import { toastWarn } from '@/components/utils';
 import React from 'react';

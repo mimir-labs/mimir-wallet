@@ -4,7 +4,7 @@
 import type { NodeData } from './context';
 
 import { useAccount } from '@/accounts/useAccount';
-import { useAddressMeta } from '@/accounts/useAddressMeta';
+import PureIcon from '@/assets/images/pure-icon.svg';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import IconView from '@/assets/svg/icon-view.svg?react';
 import { Handle, type Node, type NodeProps, Position } from '@xyflow/react';
@@ -21,9 +21,11 @@ import IdentityIcon from '../IdentityIcon';
 import { context } from './context';
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
-  const { meta: { isProxied, isPure, isMultisig } = {} } = useAddressMeta(data.account.address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const { showAddressNodeOperations = true } = useContext(context);
+  const isPure = data.account.type === 'pure';
+  const isProxied = data.account.delegatees.length > 0;
+  const isMultisig = data.account.type === 'multisig';
 
   let cell: JSX.Element;
 
@@ -32,11 +34,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
       <div className='bg-content1 rounded-medium border-primary/5 shadow-small relative w-[240px] overflow-hidden border-1 p-2.5'>
         <div className='bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full' />
         <div className='z-10 flex h-full w-full flex-col items-center gap-[5px]'>
-          <Avatar
-            style={{ width: 40, height: 40 }}
-            fallback='Pure'
-            className='text-medium bg-[#B700FF] font-bold text-white'
-          />
+          <Avatar src={PureIcon} style={{ width: 40 }} />
 
           <h6>{data.account.name || 'Pending'}</h6>
         </div>
@@ -44,11 +42,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
     ) : (
       <div className='bg-content1 rounded-medium border-primary/5 shadow-small relative w-[240px] overflow-hidden border-1 p-2.5'>
         <div className={`flex min-w-0 flex-1 items-center gap-2.5`}>
-          <Avatar
-            style={{ width: 30, height: 30 }}
-            fallback='Pure'
-            className='text-medium bg-[#B700FF] font-bold text-white'
-          />
+          <Avatar src={PureIcon} style={{ width: 30 }} />
           <div className='flex min-w-0 flex-1 flex-col gap-y-[2px]'>
             <div className='flex min-w-0 items-center gap-1'>
               <span className='min-w-0 overflow-hidden text-left font-bold'>{data.account.name || 'Pending'}</span>
