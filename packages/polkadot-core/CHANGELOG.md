@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.17.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.16.0...polkadot-core-v2.17.0) (2025-07-29)
+
+
+### Features
+
+* **ui:** refactor add proxy UX with responsive design and step wizard ([#268](https://github.com/mimir-labs/mimir-wallet/issues/268)) ([af683b2](https://github.com/mimir-labs/mimir-wallet/commit/af683b276cd9f4559a5b711615800bbc81312084))
+* **ui:** refactor create multisig UX with responsive design and step wizard ([#267](https://github.com/mimir-labs/mimir-wallet/issues/267)) ([e66378f](https://github.com/mimir-labs/mimir-wallet/commit/e66378fd1fc800075c0aa33caae5e4992bb83b79))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.17.0
+
 ## [2.16.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.15.0...polkadot-core-v2.16.0) (2025-07-22)
 
 
