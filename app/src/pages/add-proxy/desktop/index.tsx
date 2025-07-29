@@ -21,8 +21,8 @@ import SuccessModal from './SuccessModal';
 
 interface ProxyWizardData {
   // Step 1: Configure Access
-  proxied: string | undefined;
-  proxy: string | undefined;
+  proxied: string;
+  proxy: string;
   isPureProxy: boolean;
   pureProxyName?: string;
 
@@ -48,8 +48,8 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
 
   // Wizard state using the new hook
   const initialData: ProxyWizardData = {
-    proxied: current,
-    proxy: undefined,
+    proxied: current || '',
+    proxy: '',
     isPureProxy: !!pure,
     pureProxyName: '',
     proxyType: 'Any',

@@ -106,7 +106,7 @@ function Step2Members({ members, onBack, onMembersChange, onNext, onThresholdCha
               </div>
             ))
           ) : (
-            <Empty className='text-foreground/50 text-small !gap-2.5' height={140} label='Please select signer' />
+            <Empty height={100} variant='select-account' />
           )}
         </div>
       </div>

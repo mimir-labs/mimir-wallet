@@ -119,8 +119,8 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
             <img src='/images/congrats.png' className='w-20' />
           </div>
 
-          <div className='mb-6 text-center'>
-            <h2 className='text-foreground mb-2 text-xl font-bold'>{getTitle()}</h2>
+          <div className='text-center'>
+            <h2 className='text-foreground text-xl font-bold'>{getTitle()}</h2>
           </div>
 
           {/* Account Relationship Display */}

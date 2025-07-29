@@ -67,7 +67,16 @@ function Step1ConfigureAccess({
             placeholder='Select proxy account'
           />
 
-          <ProxyControls className='!absolute inset-x-auto inset-y-0 z-10 m-auto' />
+          <ProxyControls
+            className='!absolute inset-x-auto inset-y-0 z-10 m-auto'
+            onSwitch={() => {
+              // Switch proxy and proxied accounts
+              onDataChange({
+                proxy: proxied,
+                proxied: proxy
+              });
+            }}
+          />
 
           {/* Proxied Account (Lower) */}
           {isPureProxy ? (
