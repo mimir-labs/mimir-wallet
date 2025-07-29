@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.16.0...service-v2.17.0) (2025-07-29)
+
+
+### Features
+
+* **ui:** refactor create multisig UX with responsive design and step wizard ([#267](https://github.com/mimir-labs/mimir-wallet/issues/267)) ([e66378f](https://github.com/mimir-labs/mimir-wallet/commit/e66378fd1fc800075c0aa33caae5e4992bb83b79))
+
 ## [2.16.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.15.0...service-v2.16.0) (2025-07-22)
 
 
