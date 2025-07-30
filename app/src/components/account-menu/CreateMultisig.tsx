@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import IconAddFill from '@/assets/svg/icon-add-fill.svg?react';
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, Link, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
+import { Button, Link, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
 
 function CreateMultisig({ onClose }: { onClose?: () => void }) {
   const navigate = useNavigate();
@@ -61,6 +62,9 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
             }}
           >
             Add Proxy
+            <Tooltip color='foreground' content='Can be controlled by one or more proxy accounts to act on its behalf.'>
+              <IconQuestion className='text-primary' />
+            </Tooltip>
           </Button>
           <Button
             key='hide-0'
@@ -76,6 +80,12 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
             }}
           >
             Create Pure Proxy
+            <Tooltip
+              color='foreground'
+              content='Pure proxies are new keyless accounts that are created by a primary account.'
+            >
+              <IconQuestion className='text-primary' />
+            </Tooltip>
           </Button>
         </PopoverContent>
       </Popover>

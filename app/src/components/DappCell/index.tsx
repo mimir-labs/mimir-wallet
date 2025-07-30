@@ -86,9 +86,16 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
     }
   });
 
+  const { pressProps: smPresssProps } = usePress({
+    onPress: openDapp
+  });
+
   const content =
     size === 'sm' ? (
-      <div className='rounded-large bg-content1 border-secondary shadow-medium hover:bg-secondary transition-background relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] border-1 p-5'>
+      <div
+        className='rounded-large bg-content1 border-secondary shadow-medium hover:bg-secondary transition-background relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] border-1 p-5'
+        {...smPresssProps}
+      >
         <img src={dapp.icon} alt={dapp.name} className='h-12 w-12' />
 
         <h6>{dapp.name}</h6>

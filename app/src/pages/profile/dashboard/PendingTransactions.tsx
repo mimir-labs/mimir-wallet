@@ -120,7 +120,7 @@ function PendingTransactions({ address }: { address: string }) {
       shadow='md'
       classNames={{
         base: 'py-0',
-        wrapper: 'rounded-large p-3 h-[260px] py-0',
+        wrapper: 'rounded-large p-3 h-auto sm:h-[260px] py-0',
         thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
         th: 'bg-transparent text-tiny h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
         td: 'text-small px-2',
