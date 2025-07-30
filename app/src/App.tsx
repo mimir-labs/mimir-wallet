@@ -6,6 +6,8 @@ import { Outlet, useRoutes } from 'react-router-dom';
 import BaseContainer from './containers/BaseContainer';
 import PageAddProxy from './pages/add-proxy';
 import PageAddressBook from './pages/address-book';
+import PageAnalytic from './pages/analytic';
+import PageAssets from './pages/assets';
 import PageCreateMultisig from './pages/create-multisig';
 import PageDapp from './pages/dapp';
 import ErrorPage from './pages/error-page';
@@ -41,6 +43,10 @@ const routes = [
             element: <PageDapp />
           },
           {
+            path: '/assets',
+            element: <PageAssets />
+          },
+          {
             path: '/transactions',
             element: <PageTransactions />
           },
@@ -51,6 +57,10 @@ const routes = [
           {
             path: '/address-book',
             element: <PageAddressBook />
+          },
+          {
+            path: '/analytic',
+            element: <PageAnalytic />
           },
           {
             path: '/account-setting',

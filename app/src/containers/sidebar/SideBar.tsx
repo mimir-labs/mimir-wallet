@@ -5,6 +5,8 @@ import { useAccount } from '@/accounts/useAccount';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import ArrowRight from '@/assets/svg/ArrowRight.svg?react';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
+import IconAnalytic from '@/assets/svg/icon-analytic.svg?react';
+import IconAssets from '@/assets/svg/icon-assets.svg?react';
 import IconDapp from '@/assets/svg/icon-dapp.svg?react';
 import IconHome from '@/assets/svg/icon-home.svg?react';
 import IconLink from '@/assets/svg/icon-link.svg?react';
@@ -272,6 +274,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
 
       <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
       <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
+      <NavLink Icon={IconAssets} label='Assets' onClick={closeSidebar} to='/assets' />
       <NavLink
         Icon={IconTransaction}
         label='Transactions'
@@ -286,6 +289,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
         to='/transactions'
       />
       <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
+      <NavLink Icon={IconAnalytic} label='Analytic' onClick={closeSidebar} to='/analytic' />
       <NavLink
         Icon={IconSetting}
         label='Setting'
