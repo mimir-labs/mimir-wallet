@@ -1,15 +1,14 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AssetInfo } from '@/hooks/types';
-
 import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
+import { useAssets } from '@/hooks/useAssets';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useWallet } from '@/wallet/useWallet';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -36,7 +35,9 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   );
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber(defaultValue?.toString() || '', false, 0);
-  const [token, setToken] = useState<AssetInfo<boolean>>();
+  const [assetId, setAssetId] = useState('');
+  const [assets] = useAssets(network);
+  const token = useMemo(() => assets?.find((item) => item.assetId === assetId), [assetId, assets]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
       // reset
       setError(null);
       setAmount('');
-      setToken(undefined);
+      setAssetId('');
       toggleKeepAlive(true);
     }
   }, [enableNetwork, network, open, setAmount, toggleKeepAlive]);
@@ -89,7 +90,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
                 setNetwork={setNetwork}
                 setAmount={setAmount}
                 toggleKeepAlive={toggleKeepAlive}
-                setToken={setToken}
+                setToken={setAssetId}
               />
             )}
 

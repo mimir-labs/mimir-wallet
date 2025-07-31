@@ -22,7 +22,7 @@ function TransferContent({
   isAmountValid,
   sending,
   recipient,
-  defaultAssetId,
+  assetId,
   network,
   keepAlive,
   disabledRecipient,
@@ -42,13 +42,13 @@ function TransferContent({
   network: string;
   keepAlive: boolean;
   disabledRecipient?: boolean;
-  defaultAssetId?: string;
+  assetId?: string;
   filterSending?: string[];
   setSending: (sending: string) => void;
   setNetwork: (network: string) => void;
   setAmount: (amount: string) => void;
   toggleKeepAlive: (keepAlive: boolean) => void;
-  setToken: (token: TransferToken) => void;
+  setToken: (token: string) => void;
   setRecipient?: (recipient: string) => void;
 }) {
   const { api, chain, genesisHash } = useApi();
@@ -128,13 +128,7 @@ function TransferContent({
         }
       />
 
-      <InputToken
-        network={network}
-        label='Select an asset'
-        address={sending}
-        onChange={setToken}
-        defaultAssetId={defaultAssetId}
-      />
+      <InputToken network={network} label='Select an asset' address={sending} onChange={setToken} assetId={assetId} />
 
       <Input
         error={isAmountValid ? null : new Error('Invalid number')}
