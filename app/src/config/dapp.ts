@@ -257,6 +257,19 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     isDrawer: true
   },
   {
+    id: 3,
+    name: 'Multi Transfer',
+    description: 'Transfer different tokens to several addresses, developed by Mimir.',
+    url: 'mimir://app/multi-transfer',
+    icon: '/dapp-icons/multi-transfer.webp',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Assets', 'Transfer', 'MultiTransfer'],
+    Component: () => import('@/apps/multi-transfer').then((res) => res.default)
+  },
+  {
     id: 500,
     icon: LogoCircle,
     name: 'Setup',

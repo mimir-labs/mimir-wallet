@@ -1,19 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TransferToken } from './types';
-
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
+import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
+import { useAssets } from '@/hooks/useAssets';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useQueryParam } from '@/hooks/useQueryParams';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Spinner } from '@mimir-wallet/ui';
+import { Button, Link, Spinner } from '@mimir-wallet/ui';
 
 import TransferAction from './TransferAction';
 import TransferContent from './TransferContent';
@@ -22,7 +22,7 @@ function PageTransfer() {
   const selected = useSelectedAccount();
   const navigate = useNavigate();
   const [fromParam] = useQueryParam<string>('from');
-  const [assetId] = useQueryParam<string>('assetId');
+  const [assetId, setAssetId] = useQueryParam<string>('assetId', 'native');
   const [assetNetwork] = useQueryParam<string>('asset_network');
   const [toParam] = useQueryParam<string>('to');
 
@@ -35,7 +35,8 @@ function PageTransfer() {
   );
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
-  const [token, setToken] = useState<TransferToken>();
+  const [assets] = useAssets(network);
+  const token = useMemo(() => assets?.find((item) => item.assetId === assetId), [assetId, assets]);
 
   return (
     <SubApiRoot
@@ -52,8 +53,20 @@ function PageTransfer() {
           {'<'} Back
         </Button>
         <div className='rounded-large border-secondary shadow-medium bg-content1 mt-4 border-1 p-4 sm:p-6'>
-          <div className='space-y-5'>
-            <h3>Transfer</h3>
+          <div className='flex flex-col gap-5'>
+            <div className='flex items-center justify-between'>
+              <h3>Transfer</h3>
+
+              <Button
+                as={Link}
+                href={`/explorer/${encodeURIComponent('mimir://app/multi-transfer')}`}
+                color='primary'
+                variant='light'
+                startContent={<IconMultiTransfer />}
+              >
+                Multi-Transfer
+              </Button>
+            </div>
             <TransferContent
               amount={amount}
               isAmountValid={isAmountValid}
@@ -61,14 +74,14 @@ function PageTransfer() {
               token={token}
               sending={sending}
               recipient={recipient}
-              defaultAssetId={assetId}
+              assetId={assetId}
               network={network}
               setSending={setSending}
               setNetwork={setNetwork}
               setRecipient={setRecipient}
               setAmount={setAmount}
               toggleKeepAlive={toggleKeepAlive}
-              setToken={setToken}
+              setToken={setAssetId}
             />
             <TransferAction
               network={network}
