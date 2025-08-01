@@ -138,7 +138,7 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
             parseCsv(
               file[0],
               (parsedData, invalidAssets) => {
-                setData(parsedData);
+                setData((data) => data.concat(parsedData));
                 setInvalidAssetIds(invalidAssets || []);
               },
               assetsToValidate,

@@ -18,7 +18,7 @@ function MultiTransfer() {
   const { current } = useAccount();
   const [network, setNetwork] = useInputNetwork();
   const [sending, setSending] = useState(current || '');
-  const [data, setData] = useState<MultiTransferData[]>([]);
+  const [data, setData] = useState<MultiTransferData[]>([['', '', '']]);
 
   return (
     <SubApiRoot

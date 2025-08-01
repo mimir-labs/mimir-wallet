@@ -228,16 +228,18 @@ function InputAddress({
   const handleClose = useCallback(() => {
     toggleOpen(false);
 
-    if (!isSign && isValidAddress) {
-      if (isEthAddress(inputValue)) {
-        handleSelect(evm2Ss58(inputValue, chainSS58));
-      } else {
-        handleSelect(inputValue);
+    if (!value) {
+      if (!isSign && isValidAddress) {
+        if (isEthAddress(inputValue)) {
+          handleSelect(evm2Ss58(inputValue, chainSS58));
+        } else {
+          handleSelect(inputValue);
+        }
+      } else if (!isSign) {
+        setValue('');
       }
-    } else if (!isSign) {
-      setValue('');
     }
-  }, [chainSS58, handleSelect, inputValue, isSign, isValidAddress, toggleOpen]);
+  }, [chainSS58, handleSelect, inputValue, isSign, isValidAddress, toggleOpen, value]);
 
   const { pressProps } = usePress({
     onPress: isOpen ? handleClose : handleOpen

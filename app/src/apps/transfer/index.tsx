@@ -22,7 +22,7 @@ function PageTransfer() {
   const selected = useSelectedAccount();
   const navigate = useNavigate();
   const [fromParam] = useQueryParam<string>('from');
-  const [assetId, setAssetId] = useQueryParam<string>('assetId', '');
+  const [assetId, setAssetId] = useQueryParam<string>('assetId', 'native');
   const [assetNetwork] = useQueryParam<string>('asset_network');
   const [toParam] = useQueryParam<string>('to');
 

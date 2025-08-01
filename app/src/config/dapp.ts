@@ -259,7 +259,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
   {
     id: 3,
     name: 'Multi Transfer',
-    description: 'Swiftly complete asset transfers with other users, developed by Mimir.',
+    description: 'Transfer different tokens to several addresses, developed by Mimir.',
     url: 'mimir://app/multi-transfer',
     icon: '/dapp-icons/multi-transfer.webp',
     supportedChains: true,

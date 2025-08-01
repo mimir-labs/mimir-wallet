@@ -54,7 +54,7 @@ function InputToken({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [isOpen, toggleOpen] = useToggle(false);
-  const [value, setValue] = useState<string>(assetId || defaultAssetId || 'native');
+  const [value, setValue] = useState<string>(assetId || defaultAssetId || '');
   const onChangeRef = useRef(onChange);
 
   onChangeRef.current = onChange;
