@@ -113,7 +113,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
   return (
     <>
-      <div className='rounded-large border-secondary bg-content1 shadow-medium flex w-full flex-col items-start justify-between gap-5 border-1 p-4 sm:flex-row sm:items-start sm:p-5'>
+      <div className='rounded-large border-secondary bg-content1 shadow-medium flex w-full flex-col items-start justify-between gap-5 border-1 p-4 sm:flex-row sm:items-center sm:p-5'>
         <div className='flex items-start gap-5'>
           <IdentityIcon value={address} size={upSm ? 80 : 50} />
 

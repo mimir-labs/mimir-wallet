@@ -40,7 +40,7 @@ function DashboardV2({ address }: { address: string }) {
         <div className='col-span-2 lg:col-span-1'>
           <Title
             endContent={
-              <Button as={Link} href='/assets' variant='ghost' size='sm'>
+              <Button as={Link} href='/assets' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
                 Detail
               </Button>
             }
@@ -54,7 +54,7 @@ function DashboardV2({ address }: { address: string }) {
         <div className='col-span-2 lg:col-span-1'>
           <Title
             endContent={
-              <Button as={Link} href='/transactions' variant='ghost' size='sm'>
+              <Button as={Link} href='/transactions' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
                 Detail
               </Button>
             }
@@ -76,7 +76,7 @@ function DashboardV2({ address }: { address: string }) {
         <div className='col-span-2'>
           <Title
             endContent={
-              <Button as={Link} href='/dapp' variant='ghost' size='sm'>
+              <Button as={Link} href='/dapp' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
                 Detail
               </Button>
             }

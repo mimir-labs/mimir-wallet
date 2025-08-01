@@ -252,6 +252,17 @@ function Assets() {
                 </TableCell>
                 <TableCell className='bg-content1 sticky right-0 z-[1] sm:relative'>
                   <div className='inline-flex max-w-[180px] flex-row-reverse items-center gap-0 sm:gap-2.5'>
+                    <Button
+                      as={Link}
+                      isIconOnly={!upSm}
+                      endContent={upSm ? <IconSend className='h-[14px] w-[14px]' /> : undefined}
+                      href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
+                      variant={upSm ? 'ghost' : 'light'}
+                      size='sm'
+                    >
+                      {upSm ? 'Transfer' : <IconSend className='h-[14px] w-[14px]' />}
+                    </Button>
+
                     {isNative && network === 'polkadot' && (
                       <Button
                         as={Link}
@@ -264,17 +275,6 @@ function Assets() {
                         {upSm ? 'Staking' : <IconAdd className='h-[14px] w-[14px]' />}
                       </Button>
                     )}
-
-                    <Button
-                      as={Link}
-                      isIconOnly={!upSm}
-                      endContent={upSm ? <IconSend className='h-[14px] w-[14px]' /> : undefined}
-                      href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
-                      variant={upSm ? 'ghost' : 'light'}
-                      size='sm'
-                    >
-                      {upSm ? 'Transfer' : <IconSend className='h-[14px] w-[14px]' />}
-                    </Button>
                   </div>
                 </TableCell>
               </TableRow>

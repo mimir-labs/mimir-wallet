@@ -42,7 +42,7 @@ function AnnouncementStatus({ account, transaction }: { account: AccountData; tr
   }
 
   if (status === 'indexing') return 'Indexing';
-  if (status === 'reviewing') return 'Under Reviewing';
+  if (status === 'reviewing') return 'Reviewing';
   if (status === 'executable') return 'Executable';
 
   return null;

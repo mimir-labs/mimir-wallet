@@ -44,6 +44,7 @@ function BatchButton() {
       ref={popoverRef}
       triggerRef={anchorEl}
       placement='bottom-start'
+      style={{ zIndex: 50 }}
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <div className='flex items-center gap-2.5 p-5'>

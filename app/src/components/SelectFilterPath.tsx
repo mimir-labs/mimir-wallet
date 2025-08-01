@@ -88,7 +88,7 @@ function SelectFilterPath({ label, filterPaths, value, onChange }: Props) {
       ref={popoverRef}
       triggerRef={wrapperRef}
       placement='bottom-start'
-      style={{ width: wrapperRef.current?.clientWidth }}
+      style={{ width: wrapperRef.current?.clientWidth, zIndex: 50 }}
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <Listbox color='secondary' emptyContent='no addresses' className='text-foreground max-h-[250px] overflow-y-auto'>
