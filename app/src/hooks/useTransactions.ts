@@ -7,7 +7,7 @@ import { events } from '@/events';
 import { isEqual } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
 
-import { addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, encodeAddress, type Endpoint, useApi } from '@mimir-wallet/polkadot-core';
 import { API_CLIENT_GATEWAY, fetcher, service, useInfiniteQuery, useQueries, useQuery } from '@mimir-wallet/service';
 
 function transformTransaction(chainSS58: number, transaction: Transaction): Transaction {
@@ -242,4 +242,39 @@ export function useMultiChainTransactionCounts(
     isFetched,
     isFetching
   ];
+}
+
+export function useValidTransactionNetworks(address?: string | null) {
+  const { allApis } = useApi();
+  const [transactionCounts, isFetched, isFetching] = useMultiChainTransactionCounts(address);
+
+  const [validPendingNetworks, validHistoryNetworks] = useMemo(() => {
+    const validPendingNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
+    const validHistoryNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
+
+    Object.entries(transactionCounts || {}).forEach(([network, counts]) => {
+      if (counts.pending > 0 && allApis[network]?.chain) {
+        validPendingNetworks.push({
+          network,
+          counts: counts.pending,
+          chain: allApis[network]?.chain
+        });
+      }
+
+      if (counts.history > 0 && allApis[network]?.chain) {
+        validHistoryNetworks.push({
+          network,
+          counts: counts.history,
+          chain: allApis[network]?.chain
+        });
+      }
+    });
+
+    return [
+      validPendingNetworks.sort((a, b) => b.counts - a.counts),
+      validHistoryNetworks.sort((a, b) => b.counts - a.counts)
+    ];
+  }, [allApis, transactionCounts]);
+
+  return [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] as const;
 }

@@ -5,11 +5,12 @@
 // SPDX-License-Identifier: Apache-2.0
 import type { ChartData } from 'chart.js';
 
+import { useAccount } from '@/accounts/useAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconSafe from '@/assets/svg/icon-safe.svg?react';
 import { AddressRow, Empty, FormatBalance } from '@/components';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useQueryStats } from '@/hooks/useQueryStats';
+import { useMultiChainStats, useQueryStats } from '@/hooks/useQueryStats';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
@@ -26,6 +27,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Skeleton,
   Tab,
   Table,
   TableBody,
@@ -308,12 +310,26 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
   );
 }
 
-function TransactionStats({ chains, address }: { chains: string[]; address: string }) {
-  if (chains.length === 0) {
+function Analytic() {
+  const { current: address } = useAccount();
+  const [stats, isFetched, isFetching] = useMultiChainStats(address);
+  const chains = Object.keys(stats);
+
+  if (!isFetched && isFetching)
+    return (
+      <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
+        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-2 h-[80px]' />
+        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-1 h-[300px]' />
+        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-1 h-[300px]' />
+        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-2 h-[500px]' />
+      </div>
+    );
+
+  if (chains.length === 0 || !address) {
     return <Empty height={200} label='no data here.' />;
   }
 
   return <Transaction chains={chains} address={address} />;
 }
 
-export default TransactionStats;
+export default Analytic;

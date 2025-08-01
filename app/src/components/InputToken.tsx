@@ -133,7 +133,7 @@ function InputToken({
       ref={popoverRef}
       triggerRef={wrapperRef}
       placement='bottom-start'
-      style={{ width: wrapperRef.current?.clientWidth, minWidth: 240 }}
+      style={{ width: wrapperRef.current?.clientWidth, zIndex: 50, minWidth: 240 }}
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <Listbox color='secondary' emptyContent='no tokens' className='text-foreground max-h-[250px] overflow-y-auto'>

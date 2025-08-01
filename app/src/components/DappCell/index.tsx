@@ -28,12 +28,13 @@ import {
 import SupportedChains from './SupportedChains';
 
 interface Props extends DappOption {
+  size?: 'sm' | 'md';
   addFavorite: (id: number | string) => void;
   removeFavorite: (id: number | string) => void;
   isFavorite: (id: number | string) => boolean;
 }
 
-function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
+function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dapp }: Props) {
   const { network } = useApi();
   const navigate = useNavigate();
   const [isDrawerOpen, toggleDrawerOpen, setDrawerOpen] = useToggle();
@@ -85,16 +86,32 @@ function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
     }
   });
 
-  return (
-    <div ref={ref}>
-      {dapp.isDrawer && (
-        <Drawer hideCloseButton placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
-          <DrawerContent className='w-auto max-w-full py-5'>
-            <DrawerBody>{element}</DrawerBody>
-          </DrawerContent>
-        </Drawer>
-      )}
+  const { pressProps: smPresssProps } = usePress({
+    onPress: openDapp
+  });
 
+  const content =
+    size === 'sm' ? (
+      <div
+        className='rounded-large bg-content1 border-secondary shadow-medium hover:bg-secondary transition-background relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] border-1 p-5'
+        {...smPresssProps}
+      >
+        <img src={dapp.icon} alt={dapp.name} className='h-12 w-12' />
+
+        <h6>{dapp.name}</h6>
+
+        <Tooltip content={_isFavorite ? 'Unpin' : 'Pin'}>
+          <Button
+            isIconOnly
+            color='primary'
+            onPress={toggleFavorite}
+            className='bg-primary/10 absolute top-2.5 right-2.5 z-10'
+          >
+            <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
+          </Button>
+        </Tooltip>
+      </div>
+    ) : (
       <div
         data-focus={isFocus}
         className='rounded-large bg-content1 border-secondary shadow-medium relative aspect-square cursor-pointer border-1 p-5 transition-transform duration-300 data-[focus=true]:scale-x-[-1]'
@@ -172,6 +189,19 @@ function DappCell({ addFavorite, isFavorite, removeFavorite, ...dapp }: Props) {
           </div>
         )}
       </div>
+    );
+
+  return (
+    <div ref={ref}>
+      {dapp.isDrawer && (
+        <Drawer hideCloseButton placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
+          <DrawerContent className='w-auto max-w-full py-5'>
+            <DrawerBody>{element}</DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      )}
+
+      {content}
     </div>
   );
 }

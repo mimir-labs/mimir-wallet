@@ -88,7 +88,7 @@ function OmniChainInputNetwork({
       ref={popoverRef}
       triggerRef={wrapperRef}
       placement='bottom-start'
-      style={{ minWidth: wrapperRef.current?.clientWidth }}
+      style={{ minWidth: wrapperRef.current?.clientWidth, zIndex: 50 }}
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <Listbox color='secondary' emptyContent='no networks' className='text-foreground max-h-[250px] overflow-y-auto'>

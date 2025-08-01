@@ -278,7 +278,7 @@ function InputAddress({
       ref={popoverRef}
       triggerRef={wrapperRef}
       placement='bottom-start'
-      style={{ width: wrapperRef.current?.clientWidth }}
+      style={{ width: wrapperRef.current?.clientWidth, zIndex: 50 }}
       classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
     >
       <Listbox

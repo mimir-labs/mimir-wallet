@@ -132,6 +132,10 @@
     tab-size: 4;
   }
 
+  * {
+    scroll-behavior: smooth;
+  }
+
   body {
     background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
     font-size: 0.875rem;
@@ -180,7 +184,7 @@
   ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
-    background: #fff;
+    background: transparent;
   }
   ::-webkit-scrollbar-track {
     background: transparent;

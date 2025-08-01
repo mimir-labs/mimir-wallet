@@ -56,7 +56,7 @@ function AppName({
   }, [app, appName, iconSize, iconUrl, website]);
 
   return (
-    <span className='inline-flex max-w-full items-center gap-[5px]'>
+    <span className='flex max-w-full items-center gap-[5px]'>
       <div className='flex flex-shrink-0'>{icon}</div>
       {!hiddenName && <span className='flex-grow overflow-hidden text-ellipsis whitespace-nowrap'>{name}</span>}
     </span>

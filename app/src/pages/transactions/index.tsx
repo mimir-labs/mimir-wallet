@@ -4,10 +4,9 @@
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { useQueryParam } from '@/hooks/useQueryParams';
-import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
+import { useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { useEffect, useMemo, useState } from 'react';
 
-import { type Endpoint, useApi } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
@@ -25,35 +24,7 @@ import HistoryTransactions from './HistoryTransactions';
 import PendingTransactions from './PendingTransactions';
 
 function Content({ address }: { address: string }) {
-  const { allApis } = useApi();
-  const [transactionCounts, isFetched, isFetching] = useMultiChainTransactionCounts(address);
-  const [validPendingNetworks, validHistoryNetworks] = useMemo(() => {
-    const validPendingNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
-    const validHistoryNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
-
-    Object.entries(transactionCounts || {}).forEach(([network, counts]) => {
-      if (counts.pending > 0 && allApis[network]?.chain) {
-        validPendingNetworks.push({
-          network,
-          counts: counts.pending,
-          chain: allApis[network]?.chain
-        });
-      }
-
-      if (counts.history > 0 && allApis[network]?.chain) {
-        validHistoryNetworks.push({
-          network,
-          counts: counts.history,
-          chain: allApis[network]?.chain
-        });
-      }
-    });
-
-    return [
-      validPendingNetworks.sort((a, b) => b.counts - a.counts),
-      validHistoryNetworks.sort((a, b) => b.counts - a.counts)
-    ];
-  }, [allApis, transactionCounts]);
+  const [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] = useValidTransactionNetworks(address);
   const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<string[]>([]);
   const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<string[]>([]);
   const selectedPendingNetwork = useMemo(() => {

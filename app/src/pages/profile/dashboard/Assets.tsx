@@ -4,20 +4,14 @@
 import type { AccountAssetInfo } from '@/hooks/types';
 import type { SortDescriptor } from '@react-types/shared';
 
-import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
-import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
-import { StakingApp } from '@/config';
 import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo, useState } from 'react';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
-  Button,
-  Link,
   Skeleton,
   Spinner,
   Table,
@@ -37,7 +31,6 @@ function Assets({ address }: { address: string }) {
     column: 'balanceUsd',
     direction: 'descending'
   });
-  const upSm = useMediaQuery('sm');
 
   const [list, done] = useMemo(() => {
     const _list: AccountAssetInfo[] = [];
@@ -116,170 +109,125 @@ function Assets({ address }: { address: string }) {
   }, [assets, nativeBalances, sortDescriptor.column, sortDescriptor.direction]);
 
   return (
-    <div className='flex flex-col gap-2.5'>
-      <Table
-        classNames={{
-          wrapper: 'rounded-medium sm:rounded-large p-0 sm:p-3',
-          th: 'bg-transparent text-tiny px-2 text-foreground/50',
-          td: 'text-small px-2',
-          loadingWrapper: 'relative h-10 table-cell px-2'
-        }}
-        sortDescriptor={sortDescriptor}
-        onSortChange={setSortDescriptor}
+    <Table
+      isHeaderSticky
+      shadow='md'
+      classNames={{
+        base: 'py-0',
+        wrapper: 'rounded-large p-3 h-auto sm:h-[260px] py-0',
+        thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
+        th: 'bg-transparent text-tiny h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
+        td: 'text-small px-2',
+        loadingWrapper: 'relative h-10 table-cell px-2'
+      }}
+      sortDescriptor={sortDescriptor}
+      onSortChange={setSortDescriptor}
+    >
+      <TableHeader>
+        <TableColumn>Token</TableColumn>
+        <TableColumn key='total' allowsSorting>
+          Amount
+        </TableColumn>
+        <TableColumn key='balanceUsd' allowsSorting>
+          USD Value
+        </TableColumn>
+      </TableHeader>
+
+      <TableBody
+        items={list}
+        isLoading={!done}
+        loadingContent={
+          <>
+            <Skeleton disableAnimation className='rounded-medium h-10 w-full' />
+            <Spinner size='sm' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+          </>
+        }
+        emptyContent={done ? <Empty className='text-foreground' height='150px' label='No assets' /> : null}
       >
-        <TableHeader>
-          <TableColumn className='bg-content1 sticky left-0 sm:relative'>Token</TableColumn>
-          <TableColumn key='price' allowsSorting>
-            Price
-          </TableColumn>
-          <TableColumn key='change24h' allowsSorting>
-            24h Change
-          </TableColumn>
-          <TableColumn key='balanceUsd' allowsSorting>
-            USD Value
-          </TableColumn>
-          <TableColumn key='total' allowsSorting>
-            Amount
-          </TableColumn>
-          <TableColumn className='bg-content1 sticky right-0 sm:relative' align='end'>
-            <span className='hidden sm:inline'>Operation</span>
-          </TableColumn>
-        </TableHeader>
+        {(item) => {
+          const isNative = item.isNative;
+          const assetId = item.assetId;
+          const icon = item.icon;
+          const symbol = item.symbol;
+          const total = item.total;
+          const transferrable = item.transferrable;
+          const locked = item.locked;
+          const reserved = item.reserved;
+          const price = item.price || 0;
+          const decimals = item.decimals;
+          const format: [number, string] = [decimals, symbol];
+          const chainIcon = networks.find((network) => network.key === item.network)?.icon;
+          const balanceUsd = formatDisplay(
+            formatUnits((total * BigInt((price * 1e8).toFixed(0))) / BigInt(1e8), decimals)
+          );
 
-        <TableBody
-          items={list}
-          isLoading={!done}
-          loadingContent={
-            <>
-              <Skeleton disableAnimation className='rounded-medium h-10 w-full' />
-              <Spinner size='sm' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
-            </>
-          }
-          emptyContent={done ? <Empty className='text-foreground' height='150px' label='No assets' /> : null}
-        >
-          {(item) => {
-            const isNative = item.isNative;
-            const assetId = item.assetId;
-            const icon = item.icon;
-            const network = item.network;
-            const symbol = item.symbol;
-            const total = item.total;
-            const transferrable = item.transferrable;
-            const locked = item.locked;
-            const reserved = item.reserved;
-            const price = item.price || 0;
-            const decimals = item.decimals;
-            const change24h = item.change24h;
-            const format: [number, string] = [decimals, symbol];
-            const chainIcon = networks.find((network) => network.key === item.network)?.icon;
-            const balanceUsd = formatDisplay(
-              formatUnits((total * BigInt((price * 1e8).toFixed(0))) / BigInt(1e8), decimals)
-            );
-
-            return (
-              <TableRow key={`asset-balance-${item.assetId}-${item.network}`}>
-                <TableCell className='bg-content1 sticky left-0 z-[1] sm:relative'>
-                  <div className='flex items-center gap-1'>
-                    <div className='relative'>
-                      <Avatar
-                        alt='Token'
-                        fallback={
-                          <div className='bg-divider-300 text-content1 flex h-[30px] w-[30px] items-center justify-center rounded-full text-lg font-bold'>
-                            {symbol.slice(0, 1)}
-                          </div>
-                        }
-                        src={icon}
-                        style={{ width: 30, height: 30 }}
-                        className='bg-content1'
-                      />
-                      <Avatar
-                        alt='Chain'
-                        src={chainIcon}
-                        className='absolute right-0 bottom-0 h-[14px] w-[14px] border-black bg-transparent'
-                      />
-                    </div>
-
-                    <div className='flex flex-col items-start gap-0 sm:flex-row sm:items-center sm:gap-1'>
-                      <span>{symbol}</span>
-
-                      {!isNative && <small className='sm:text-tiny text-foreground/50 text-[10px]'>{assetId}</small>}
-                    </div>
+          return (
+            <TableRow key={`asset-balance-${item.assetId}-${item.network}`}>
+              <TableCell>
+                <div className='flex items-center gap-1'>
+                  <div className='relative'>
+                    <Avatar
+                      alt='Token'
+                      fallback={
+                        <div className='bg-divider-300 text-content1 flex h-[30px] w-[30px] items-center justify-center rounded-full text-lg font-bold'>
+                          {symbol.slice(0, 1)}
+                        </div>
+                      }
+                      src={icon}
+                      style={{ width: 30, height: 30 }}
+                      className='bg-content1'
+                    />
+                    <Avatar
+                      alt='Chain'
+                      src={chainIcon}
+                      className='absolute right-0 bottom-0 h-[14px] w-[14px] border-black bg-transparent'
+                    />
                   </div>
-                </TableCell>
-                <TableCell>{price}</TableCell>
-                <TableCell
-                  data-up={change24h && change24h > 0}
-                  data-down={change24h && change24h < 0}
-                  className='text-foreground/50 data-[up=true]:text-success data-[down=true]:text-danger'
-                >
-                  {change24h && change24h > 0 ? '+' : ''}
-                  {change24h ? (change24h * 100).toFixed(2) : '0'}%
-                </TableCell>
-                <TableCell>
-                  ${balanceUsd[0]}
-                  {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
-                  {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
-                </TableCell>
-                <TableCell>
-                  <Tooltip
-                    shadow='lg'
-                    placement='bottom'
-                    classNames={{ content: 'border-secondary border-1 p-2.5 min-w-[163px]' }}
-                    content={
-                      <div className='w-full space-y-2.5 [&_div]:flex [&_div]:items-center [&_div]:justify-between [&_div]:gap-x-4'>
-                        <div>
-                          <span>Transferable</span>
-                          <FormatBalance format={format} value={transferrable} />
-                        </div>
-                        <div>
-                          <span>Reserved</span>
-                          <FormatBalance format={format} value={reserved} />
-                        </div>
-                        <div>
-                          <span>Locked</span>
-                          <FormatBalance format={format} value={locked} />
-                        </div>
+
+                  <div className='flex flex-col items-start gap-0'>
+                    <span>{symbol}</span>
+
+                    {!isNative && <small className='text-foreground/50 text-[10px]'>{assetId}</small>}
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <Tooltip
+                  shadow='lg'
+                  placement='bottom'
+                  classNames={{ content: 'border-secondary border-1 p-2.5 min-w-[163px]' }}
+                  content={
+                    <div className='w-full space-y-2.5 [&_div]:flex [&_div]:items-center [&_div]:justify-between [&_div]:gap-x-4'>
+                      <div>
+                        <span>Transferable</span>
+                        <FormatBalance format={format} value={transferrable} />
                       </div>
-                    }
-                  >
-                    <span>
-                      <FormatBalance format={format} value={total} />
-                    </span>
-                  </Tooltip>
-                </TableCell>
-                <TableCell className='bg-content1 sticky right-0 z-[1] sm:relative'>
-                  <div className='inline-flex max-w-[180px] flex-row-reverse items-center gap-0 sm:gap-2.5'>
-                    {isNative && network === 'polkadot' && (
-                      <Button
-                        as={Link}
-                        isIconOnly={!upSm}
-                        endContent={upSm ? <IconAdd className='h-[14px] w-[14px]' /> : undefined}
-                        href={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}
-                        variant={upSm ? 'ghost' : 'light'}
-                        size='sm'
-                      >
-                        {upSm ? 'Staking' : <IconAdd className='h-[14px] w-[14px]' />}
-                      </Button>
-                    )}
-
-                    <Button
-                      as={Link}
-                      isIconOnly={!upSm}
-                      endContent={upSm ? <IconSend className='h-[14px] w-[14px]' /> : undefined}
-                      href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
-                      variant={upSm ? 'ghost' : 'light'}
-                      size='sm'
-                    >
-                      {upSm ? 'Transfer' : <IconSend className='h-[14px] w-[14px]' />}
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          }}
-        </TableBody>
-      </Table>
-    </div>
+                      <div>
+                        <span>Reserved</span>
+                        <FormatBalance format={format} value={reserved} />
+                      </div>
+                      <div>
+                        <span>Locked</span>
+                        <FormatBalance format={format} value={locked} />
+                      </div>
+                    </div>
+                  }
+                >
+                  <span>
+                    <FormatBalance format={format} value={total} />
+                  </span>
+                </Tooltip>
+              </TableCell>
+              <TableCell>
+                ${balanceUsd[0]}
+                {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
+                {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
+              </TableCell>
+            </TableRow>
+          );
+        }}
+      </TableBody>
+    </Table>
   );
 }
 
