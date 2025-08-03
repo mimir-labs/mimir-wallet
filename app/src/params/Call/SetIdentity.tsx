@@ -57,7 +57,7 @@ const IdentityDisplay = React.memo(
           {address && <IdentityIcon size={34} value={address} />}
           <b>{display}</b>
           {address && (
-            <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>
+            <span className='flex items-center' style={{ opacity: 0.5, fontSize: '0.75rem' }}>
               <Address value={address} shorten />
               <CopyAddress address={address} />
             </span>

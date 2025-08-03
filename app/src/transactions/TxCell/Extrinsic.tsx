@@ -82,7 +82,7 @@ function Extrinsic({
             </div>
           )}
 
-          <Divider />
+          <Divider className='first:hidden' />
 
           <details className='group'>
             <summary className='hover:text-primary flex cursor-pointer list-none items-center font-bold no-underline transition-colors select-none'>

@@ -9,6 +9,7 @@ import { findAction } from '@mimir-wallet/polkadot-core';
 
 import BatchCall from './BatchCall';
 import CancelAsMulti from './CancelAsMulti';
+import ConvictionVotingCall from './ConvictionVotingCall';
 import FunctionArgs from './FunctionArgs';
 import SetIdentity from './SetIdentity';
 import TransferCall from './TransferCall';
@@ -37,14 +38,19 @@ const componentDef: ComponentConfig[] = [
     matchType: 'exact'
   },
   {
+    component: ConvictionVotingCall,
+    actions: ['convictionVoting.'],
+    matchType: 'prefix'
+  },
+  {
     component: TransferCall,
     actions: ['balances.', 'assets.', 'tokens.'],
     matchType: 'prefix'
   },
   {
     component: SetIdentity,
-    actions: ['identity.'],
-    matchType: 'prefix'
+    actions: ['identity.setIdentity'],
+    matchType: 'exact'
   }
 ];
 
