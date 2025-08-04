@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.18.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.17.0...ui-v2.18.0) (2025-08-04)
+
+
+### Features
+
+* refactor home UI and add assets,analytic pages ([#270](https://github.com/mimir-labs/mimir-wallet/issues/270)) ([576a998](https://github.com/mimir-labs/mimir-wallet/commit/576a99815de88f8fceeebbeafa668c1a587f26d7))
+
 ## [2.17.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.16.0...ui-v2.17.0) (2025-07-29)
 
 
