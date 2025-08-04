@@ -4,14 +4,20 @@
 import type { AccountAssetInfo } from '@/hooks/types';
 import type { SortDescriptor } from '@react-types/shared';
 
+import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
+import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
+import { StakingApp } from '@/config';
 import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo, useState } from 'react';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
+  Button,
+  Link,
   Skeleton,
   Spinner,
   Table,
@@ -31,6 +37,7 @@ function Assets({ address }: { address: string }) {
     column: 'balanceUsd',
     direction: 'descending'
   });
+  const upSm = useMediaQuery('sm');
 
   const [list, done] = useMemo(() => {
     const _list: AccountAssetInfo[] = [];
@@ -160,9 +167,13 @@ function Assets({ address }: { address: string }) {
           const balanceUsd = formatDisplay(
             formatUnits((total * BigInt((price * 1e8).toFixed(0))) / BigInt(1e8), decimals)
           );
+          const network = item.network;
 
           return (
-            <TableRow key={`asset-balance-${item.assetId}-${item.network}`}>
+            <TableRow
+              key={`asset-balance-${item.assetId}-${item.network}`}
+              className='[&:hover>td]:bg-secondary [&:hover_.operation]:flex'
+            >
               <TableCell>
                 <div className='flex items-center gap-1'>
                   <div className='relative'>
@@ -218,10 +229,40 @@ function Assets({ address }: { address: string }) {
                   </span>
                 </Tooltip>
               </TableCell>
-              <TableCell>
-                ${balanceUsd[0]}
-                {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
-                {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
+              <TableCell className='w-[180px]'>
+                <div className='flex items-center justify-between gap-2.5'>
+                  <span className='text-nowrap'>
+                    ${balanceUsd[0]}
+                    {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
+                    {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
+                  </span>
+
+                  <div className='operation hidden flex-row-reverse items-center gap-0 sm:gap-2.5'>
+                    <Button
+                      as={Link}
+                      isIconOnly={!upSm}
+                      endContent={upSm ? <IconSend className='h-[14px] w-[14px]' /> : undefined}
+                      href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
+                      variant={upSm ? 'ghost' : 'light'}
+                      size='sm'
+                    >
+                      {upSm ? 'Transfer' : <IconSend className='h-[14px] w-[14px]' />}
+                    </Button>
+
+                    {isNative && network === 'polkadot' && (
+                      <Button
+                        as={Link}
+                        isIconOnly={!upSm}
+                        endContent={upSm ? <IconAdd className='h-[14px] w-[14px]' /> : undefined}
+                        href={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}
+                        variant={upSm ? 'ghost' : 'light'}
+                        size='sm'
+                      >
+                        {upSm ? 'Staking' : <IconAdd className='h-[14px] w-[14px]' />}
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </TableCell>
             </TableRow>
           );

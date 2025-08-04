@@ -41,7 +41,7 @@ function DashboardV2({ address }: { address: string }) {
           <Title
             endContent={
               <Button as={Link} href='/assets' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                Detail
+                View All
               </Button>
             }
           >
@@ -55,7 +55,7 @@ function DashboardV2({ address }: { address: string }) {
           <Title
             endContent={
               <Button as={Link} href='/transactions' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                Detail
+                View All
               </Button>
             }
           >
@@ -77,7 +77,7 @@ function DashboardV2({ address }: { address: string }) {
           <Title
             endContent={
               <Button as={Link} href='/dapp' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                Detail
+                View All
               </Button>
             }
           >

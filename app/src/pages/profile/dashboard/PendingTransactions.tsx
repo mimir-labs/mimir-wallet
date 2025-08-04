@@ -16,20 +16,23 @@ import { CallDisplayDetail } from '@/params';
 import { formatTransactionId } from '@/transactions';
 import { useAnnouncementStatus } from '@/transactions/hooks/useAnnouncementStatus';
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
 
 function CallDetail({ value }: { value?: string | null }) {
-  const { api } = useApi();
+  const { api, isApiReady } = useApi();
 
   const call = useMemo(() => {
+    if (!isApiReady) return null;
+
     try {
       return api.registry.createType('Call', value);
     } catch {
       return null;
     }
-  }, [api.registry, value]);
+  }, [api.registry, isApiReady, value]);
 
   return <CallDisplayDetail fallbackWithName registry={api.registry} call={call} />;
 }
@@ -85,6 +88,8 @@ function PendingTransactions({ address }: { address: string }) {
     validPendingNetworks.map((item) => item.network),
     address
   );
+  const { setNetwork } = useApi();
+  const navigate = useNavigate();
 
   const transactions = useMemo(() => {
     return data
@@ -130,15 +135,22 @@ function PendingTransactions({ address }: { address: string }) {
       <TableHeader>
         <TableColumn key='id'>Transaction ID</TableColumn>
         <TableColumn key='call'>Call</TableColumn>
-        <TableColumn align='end' key='confimation'>
-          Confirmation
+        <TableColumn align='end' key='status'>
+          Status
         </TableColumn>
       </TableHeader>
 
       <TableBody items={transactions}>
         {(item) => {
           return (
-            <TableRow key={item.id}>
+            <TableRow
+              key={item.id}
+              className='[&:hover>td]:bg-secondary border-secondary cursor-pointer border-b-1 [&>td]:h-[45px]'
+              onClick={() => {
+                setNetwork(item.network);
+                navigate(`/transactions/${item.id}?network=${item.network}&address=${address}`);
+              }}
+            >
               <TableCell>
                 <div className='flex items-center gap-[5px]'>
                   <AppName

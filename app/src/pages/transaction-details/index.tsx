@@ -5,11 +5,12 @@ import type { Transaction } from '@/hooks/types';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useQueryParam } from '@/hooks/useQueryParams';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 import { TxCell, TxProgress } from '@/transactions';
 import { useParams } from 'react-router-dom';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
 
 import Details from './Details';
@@ -37,6 +38,7 @@ function PageTransactionDetails() {
   const { network } = useApi();
   const { id } = useParams<{ id: string }>();
   const [transaction, isFetched, isFetching] = useTransactionDetail(network, id);
+  const [urlNetwork] = useQueryParam<string>('network');
   const upSm = useMediaQuery('sm');
 
   if (isFetching && !isFetched) {
@@ -47,11 +49,15 @@ function PageTransactionDetails() {
     return null;
   }
 
-  if (!upSm) {
-    return <SmPage transaction={transaction} />;
-  }
-
-  return <TxCell defaultOpen address={transaction.address} transaction={transaction} />;
+  return (
+    <SubApiRoot network={urlNetwork || network}>
+      {upSm ? (
+        <TxCell defaultOpen address={transaction.address} transaction={transaction} />
+      ) : (
+        <SmPage transaction={transaction} />
+      )}
+    </SubApiRoot>
+  );
 }
 
 export default PageTransactionDetails;

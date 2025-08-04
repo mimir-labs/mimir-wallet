@@ -15,7 +15,7 @@ function FavoriteDapps() {
   if (favoriteDapps.length === 0) {
     return (
       <div className='rounded-large shadow-medium bg-content1 w-full'>
-        <Empty variant='favorite-dapps' height='200px' />
+        <Empty variant='favorite-dapps' height='190px' />
       </div>
     );
   }
