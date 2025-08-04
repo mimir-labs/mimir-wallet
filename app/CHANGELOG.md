@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.18.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.17.0...mimir-wallet-app-v2.18.0) (2025-08-04)
+
+
+### Features
+
+* Add conviction voting display ([#273](https://github.com/mimir-labs/mimir-wallet/issues/273)) ([56ceb3f](https://github.com/mimir-labs/mimir-wallet/commit/56ceb3fb69972eaf367f201d5728e99a2585cec8))
+* Add multi-transfer app ([#271](https://github.com/mimir-labs/mimir-wallet/issues/271)) ([cc1866a](https://github.com/mimir-labs/mimir-wallet/commit/cc1866a4ae9ac1d776e2a4eb19f464ba6cebb706))
+* Add tooltip for favorite dapp items ([#275](https://github.com/mimir-labs/mimir-wallet/issues/275)) ([eca268a](https://github.com/mimir-labs/mimir-wallet/commit/eca268aee745edc700bdd236b362aa48ee30c430))
+* refactor home UI and add assets,analytic pages ([#270](https://github.com/mimir-labs/mimir-wallet/issues/270)) ([576a998](https://github.com/mimir-labs/mimir-wallet/commit/576a99815de88f8fceeebbeafa668c1a587f26d7))
+
+
+### Bug Fixes
+
+* Fix some ui issues ([#274](https://github.com/mimir-labs/mimir-wallet/issues/274)) ([c8ada56](https://github.com/mimir-labs/mimir-wallet/commit/c8ada5691a14dda94fc5479d010bdec1a8daafdf))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.18.0
+    * @mimir-wallet/service bumped to 2.18.0
+    * @mimir-wallet/ui bumped to 2.18.0
+
 ## [2.17.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.16.0...mimir-wallet-app-v2.17.0) (2025-07-29)
 
 
