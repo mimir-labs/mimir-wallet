@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import BatchIcon from '@/assets/images/batch.svg';
 import Failed from '@/assets/images/failed.svg';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import TemplateIcon from '@/assets/svg/template.svg';
@@ -247,7 +246,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Batch',
     description: 'Batch multiple actions into one.',
     url: 'mimir://app/batch',
-    icon: BatchIcon,
+    icon: '/dapp-icons/batch.webp',
     supportedChains: true,
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
