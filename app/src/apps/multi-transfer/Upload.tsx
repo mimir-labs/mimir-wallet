@@ -99,7 +99,7 @@ function Upload({ onUpload, accept = '*', multiple = false, maxSize = 10 }: File
             <svg width='36' height='44' viewBox='0 0 36 44' fill='none'>
               <path
                 d='M26 0L36 11V41.8176C35.9989 43.0232 35.1101 44 34.014 44H1.986C0.893103 43.9916 0.00870777 43.0197 0 41.8176V2.18249C0 0.976851 0.890017 0 1.986 0H26ZM16 19.8H9.99999V24.2H16V30.8H20V24.2H26V19.8H20V13.2H16V19.8Z'
-                fill='#5F45FF'
+                fill='#2700FF'
               />
             </svg>
           </div>

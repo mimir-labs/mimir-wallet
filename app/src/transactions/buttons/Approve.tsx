@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import IconSuccess from '@/assets/svg/icon-success-outlined.svg?react';
 import { toastError } from '@/components/utils';
 import { type AccountData, type FilterPath, type Transaction, TransactionType } from '@/hooks/types';
 import { useTxQueue } from '@/hooks/useTxQueue';
@@ -10,7 +11,7 @@ import { useToggle } from 'react-use';
 
 import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
-import { Button } from '@mimir-wallet/ui';
+import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import RecoverTx from './RecoverTx';
 
@@ -64,10 +65,12 @@ function ExecuteMultisig({ transaction, account }: { account: AccountData; trans
 }
 
 function Approve({
+  isIcon = false,
   account,
   transaction,
   filterPaths
 }: {
+  isIcon?: boolean;
   account: AccountData;
   transaction: Transaction;
   filterPaths: FilterPath[][];
@@ -158,9 +161,17 @@ function Approve({
 
   return (
     <>
-      <Button fullWidth variant='solid' color='primary' onPress={handleApprove}>
-        Approve
-      </Button>
+      {isIcon ? (
+        <Tooltip content='Approve'>
+          <Button size='sm' isIconOnly variant='light' color='success' onPress={handleApprove}>
+            <IconSuccess />
+          </Button>
+        </Tooltip>
+      ) : (
+        <Button fullWidth variant='solid' color='primary' onPress={handleApprove}>
+          Approve
+        </Button>
+      )}
 
       <RecoverTx transaction={transaction} isOpen={isOpen} onClose={toggleOpen} handleRecover={handleRecover} />
     </>

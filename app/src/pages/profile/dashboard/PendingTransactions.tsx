@@ -11,25 +11,35 @@ import {
   TransactionStatus,
   TransactionType
 } from '@/hooks/types';
+import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useMultichainPendingTransactions, useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { CallDisplayDetail } from '@/params';
-import { formatTransactionId } from '@/transactions';
+import {
+  ApproveButton,
+  CancelButton,
+  ExecuteAnnounceButton,
+  formatTransactionId,
+  RemoveOrDenyButton
+} from '@/transactions';
 import { useAnnouncementStatus } from '@/transactions/hooks/useAnnouncementStatus';
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
 
 function CallDetail({ value }: { value?: string | null }) {
-  const { api } = useApi();
+  const { api, isApiReady } = useApi();
 
   const call = useMemo(() => {
+    if (!isApiReady) return null;
+
     try {
       return api.registry.createType('Call', value);
     } catch {
       return null;
     }
-  }, [api.registry, value]);
+  }, [api.registry, isApiReady, value]);
 
   return <CallDisplayDetail fallbackWithName registry={api.registry} call={call} />;
 }
@@ -75,6 +85,20 @@ function Status({ transaction, address }: { transaction: Transaction; address: s
   return 'Pending';
 }
 
+function Operation({ transaction, address }: { transaction: Transaction; address: string }) {
+  const [account] = useQueryAccount(address);
+  const filterPaths = useFilterPaths(account, transaction);
+
+  return (
+    <>
+      {account ? <ApproveButton isIcon filterPaths={filterPaths} account={account} transaction={transaction} /> : null}
+      {account ? <ExecuteAnnounceButton isIcon account={account} transaction={transaction} /> : null}
+      <CancelButton isIcon transaction={transaction} />
+      <RemoveOrDenyButton isIcon transaction={transaction} />
+    </>
+  );
+}
+
 function NetworkWrapper({ network, children }: { network: string; children: React.ReactNode }) {
   return <SubApiRoot network={network}>{children}</SubApiRoot>;
 }
@@ -85,6 +109,8 @@ function PendingTransactions({ address }: { address: string }) {
     validPendingNetworks.map((item) => item.network),
     address
   );
+  const { setNetwork } = useApi();
+  const navigate = useNavigate();
 
   const transactions = useMemo(() => {
     return data
@@ -120,7 +146,8 @@ function PendingTransactions({ address }: { address: string }) {
       shadow='md'
       classNames={{
         base: 'py-0 group',
-        wrapper: 'rounded-large p-3 h-auto sm:h-[260px] py-0 scroll-hover-show',
+        wrapper:
+          'rounded-large p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1',
         thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
         th: 'bg-transparent text-tiny h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
         td: 'text-small px-2',
@@ -128,19 +155,30 @@ function PendingTransactions({ address }: { address: string }) {
       }}
     >
       <TableHeader>
-        <TableColumn key='id'>Transaction ID</TableColumn>
-        <TableColumn key='call'>Call</TableColumn>
-        <TableColumn align='end' key='confimation'>
-          Confirmation
+        <TableColumn className='w-[140px]' key='id'>
+          Transaction ID
+        </TableColumn>
+        <TableColumn className='w-[240px]' key='call'>
+          Call
+        </TableColumn>
+        <TableColumn className='w-[180px]' align='end' key='status'>
+          Status
         </TableColumn>
       </TableHeader>
 
       <TableBody items={transactions}>
         {(item) => {
           return (
-            <TableRow key={item.id}>
+            <TableRow
+              key={item.id}
+              className='[&:hover>td]:bg-secondary border-secondary [&>td]:first:rounded-l-medium [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px]'
+              onClick={() => {
+                setNetwork(item.network);
+                navigate(`/transactions/${item.id}?network=${item.network}&address=${address}`);
+              }}
+            >
               <TableCell>
-                <div className='flex items-center gap-[5px]'>
+                <div className='flex items-center gap-[5px] text-nowrap'>
                   <AppName
                     website={item.website}
                     iconSize={16}
@@ -160,9 +198,14 @@ function PendingTransactions({ address }: { address: string }) {
                   <CallDetail value={item.call} />
                 </NetworkWrapper>
               </TableCell>
-              <TableCell>
+              <TableCell className='w-[180px]'>
                 <NetworkWrapper network={item.network}>
-                  <Status address={address} transaction={item} />
+                  <span className='status'>
+                    <Status address={address} transaction={item} />
+                  </span>
+                  <div className='operation hidden flex-row-reverse items-center gap-[5px]'>
+                    <Operation address={address} transaction={item} />
+                  </div>
                 </NetworkWrapper>
               </TableCell>
             </TableRow>

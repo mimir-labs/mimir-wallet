@@ -29,19 +29,35 @@ function DashboardV2({ address }: { address: string }) {
 
   return (
     <div className='w-full'>
-      {/* Hero Section */}
-      <div className='mb-5'>
-        <Hero address={address} totalUsd={totalUsd} changes={changes} />
-      </div>
-
       {/* Main Content Grid */}
-      <div className='grid grid-cols-2 gap-5'>
+      <div className='grid grid-cols-8 gap-5'>
+        {/* Hero Section */}
+        <div className='col-span-8 lg:col-span-5'>
+          <Title>Overview</Title>
+
+          <Hero address={address} totalUsd={totalUsd} changes={changes} />
+        </div>
+
+        {/* Favorite Dapps */}
+        <div className='col-span-8 lg:col-span-3'>
+          <Title
+            endContent={
+              <Button as={Link} href='/dapp' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
+                View All
+              </Button>
+            }
+          >
+            Favorite Dapps
+          </Title>
+          <FavoriteDapps />
+        </div>
+
         {/* Assets */}
-        <div className='col-span-2 lg:col-span-1'>
+        <div className='col-span-8 lg:col-span-4'>
           <Title
             endContent={
               <Button as={Link} href='/assets' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                Detail
+                View All
               </Button>
             }
           >
@@ -51,11 +67,11 @@ function DashboardV2({ address }: { address: string }) {
         </div>
 
         {/* Pending Transactions */}
-        <div className='col-span-2 lg:col-span-1'>
+        <div className='col-span-8 lg:col-span-4'>
           <Title
             endContent={
               <Button as={Link} href='/transactions' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                Detail
+                View All
               </Button>
             }
           >
@@ -65,25 +81,11 @@ function DashboardV2({ address }: { address: string }) {
         </div>
 
         {/* Account Structure */}
-        <div className='col-span-2'>
+        <div className='col-span-8'>
           <Title>Account Strucuture</Title>
           <SubApiRoot network={network}>
             <AccountStructure address={address} setNetwork={setNetwork} />
           </SubApiRoot>
-        </div>
-
-        {/* Favorite Dapps */}
-        <div className='col-span-2'>
-          <Title
-            endContent={
-              <Button as={Link} href='/dapp' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                Detail
-              </Button>
-            }
-          >
-            Favorite Dapps
-          </Title>
-          <FavoriteDapps />
         </div>
       </div>
     </div>

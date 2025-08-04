@@ -5,6 +5,8 @@ import type { Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import IconLink from '@/assets/svg/icon-link.svg?react';
+import IconShare from '@/assets/svg/icon-share.svg?react';
 import { AppName, Bytes, Hash } from '@/components';
 import { events } from '@/events';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
@@ -151,6 +153,7 @@ function Extrinsic({
               as={Link}
               variant='ghost'
               isExternal
+              startContent={<IconLink className='h-4 w-4' />}
               href={
                 transaction.executedExtrinsicHash
                   ? chainLinks.extrinsicExplorerLink(chain, transaction.executedExtrinsicHash)
@@ -161,6 +164,7 @@ function Extrinsic({
             </Button>
             <Button
               variant='ghost'
+              startContent={<IconShare className='h-4 w-4' />}
               onPress={() => {
                 const url = new URL(window.location.href);
 

@@ -9,7 +9,7 @@ import { useMemo } from 'react';
 import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
-export type AnnouncementStatus =
+type AnnouncementStatus =
   | 'reviewing'
   | 'indexing'
   | 'executable'

@@ -4,7 +4,10 @@
 import type { AccountAssetInfo } from '@/hooks/types';
 import type { SortDescriptor } from '@react-types/shared';
 
+import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
+import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
+import { StakingApp } from '@/config';
 import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo, useState } from 'react';
@@ -12,6 +15,8 @@ import React, { useMemo, useState } from 'react';
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
+  Button,
+  Link,
   Skeleton,
   Spinner,
   Table,
@@ -114,7 +119,8 @@ function Assets({ address }: { address: string }) {
       shadow='md'
       classNames={{
         base: 'py-0 group',
-        wrapper: 'rounded-large p-3 h-auto sm:h-[260px] py-0 scroll-hover-show',
+        wrapper:
+          'rounded-large p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1',
         thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
         th: 'bg-transparent text-tiny h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
         td: 'text-small px-2',
@@ -124,11 +130,11 @@ function Assets({ address }: { address: string }) {
       onSortChange={setSortDescriptor}
     >
       <TableHeader>
-        <TableColumn>Token</TableColumn>
-        <TableColumn key='total' allowsSorting>
+        <TableColumn className='w-[160px]'>Token</TableColumn>
+        <TableColumn key='total' allowsSorting className='w-[160px]'>
           Amount
         </TableColumn>
-        <TableColumn key='balanceUsd' allowsSorting>
+        <TableColumn key='balanceUsd' allowsSorting className='w-[160px]'>
           USD Value
         </TableColumn>
       </TableHeader>
@@ -160,9 +166,13 @@ function Assets({ address }: { address: string }) {
           const balanceUsd = formatDisplay(
             formatUnits((total * BigInt((price * 1e8).toFixed(0))) / BigInt(1e8), decimals)
           );
+          const network = item.network;
 
           return (
-            <TableRow key={`asset-balance-${item.assetId}-${item.network}`}>
+            <TableRow
+              key={`asset-balance-${item.assetId}-${item.network}`}
+              className='[&:hover>td]:bg-secondary [&>td]:first:rounded-l-medium [&>td]:last:rounded-r-medium [&:hover_.operation]:flex'
+            >
               <TableCell>
                 <div className='flex items-center gap-1'>
                   <div className='relative'>
@@ -219,9 +229,41 @@ function Assets({ address }: { address: string }) {
                 </Tooltip>
               </TableCell>
               <TableCell>
-                ${balanceUsd[0]}
-                {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
-                {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
+                <div className='flex items-center justify-between gap-[5px]'>
+                  <span className='text-nowrap'>
+                    ${balanceUsd[0]}
+                    {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
+                    {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
+                  </span>
+
+                  <div className='operation hidden flex-row-reverse items-center gap-0 sm:gap-[5px]'>
+                    <Tooltip content='Transfer'>
+                      <Button
+                        as={Link}
+                        isIconOnly
+                        href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
+                        variant='light'
+                        size='sm'
+                      >
+                        <IconSend className='h-[14px] w-[14px]' />
+                      </Button>
+                    </Tooltip>
+
+                    {isNative && network === 'polkadot' && (
+                      <Tooltip content='Stake'>
+                        <Button
+                          as={Link}
+                          isIconOnly
+                          href={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}
+                          variant='light'
+                          size='sm'
+                        >
+                          <IconAdd className='h-[14px] w-[14px]' />
+                        </Button>
+                      </Tooltip>
+                    )}
+                  </div>
+                </div>
               </TableCell>
             </TableRow>
           );

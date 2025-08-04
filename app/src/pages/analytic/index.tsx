@@ -49,6 +49,43 @@ const options = {
     title: {
       display: false,
       text: 'Transactions'
+    },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      padding: 12,
+      cornerRadius: 8
+    }
+  },
+  scales: {
+    x: {
+      grid: {
+        display: false
+      },
+      ticks: {
+        color: '#666',
+        font: {
+          size: 12
+        }
+      }
+    },
+    y: {
+      grid: {
+        color: 'rgba(0, 0, 0, 0.06)',
+        drawBorder: false
+      },
+      border: {
+        display: false
+      },
+      ticks: {
+        stepSize: 1,
+        precision: 0,
+        color: '#666',
+        font: {
+          size: 12
+        },
+        padding: 10
+      },
+      beginAtZero: true
     }
   }
 };
@@ -97,13 +134,16 @@ function Chart({
       labels: txDaily?.map((item) => dayjs(Number(item.time)).format('YYYY-MM-DD')) || [],
       datasets: [
         {
-          label: 'Counts',
+          label: 'Transactions',
           data: txDaily?.map((item) => item.counts) || [],
-          backgroundColor: '#5F45FF'
+          backgroundColor: 'rgba(39, 0, 255, 0.8)',
+          hoverBackgroundColor: 'rgba(39, 0, 255, 1)',
+          borderRadius: 8,
+          borderSkipped: false,
+          barThickness: 'flex',
+          maxBarThickness: 60
         }
-      ],
-      barPercentage: 0.8, // 控制 bar 的宽度，范围 0-1
-      categoryPercentage: 0.9 // 控制 bar 之间的间距，范围 0-1
+      ]
     }),
     [txDaily]
   );
