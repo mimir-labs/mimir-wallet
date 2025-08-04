@@ -11,9 +11,16 @@ import {
   TransactionStatus,
   TransactionType
 } from '@/hooks/types';
+import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useMultichainPendingTransactions, useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { CallDisplayDetail } from '@/params';
-import { formatTransactionId } from '@/transactions';
+import {
+  ApproveButton,
+  CancelButton,
+  ExecuteAnnounceButton,
+  formatTransactionId,
+  RemoveOrDenyButton
+} from '@/transactions';
 import { useAnnouncementStatus } from '@/transactions/hooks/useAnnouncementStatus';
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -78,6 +85,20 @@ function Status({ transaction, address }: { transaction: Transaction; address: s
   return 'Pending';
 }
 
+function Operation({ transaction, address }: { transaction: Transaction; address: string }) {
+  const [account] = useQueryAccount(address);
+  const filterPaths = useFilterPaths(account, transaction);
+
+  return (
+    <>
+      {account ? <ApproveButton isIcon filterPaths={filterPaths} account={account} transaction={transaction} /> : null}
+      {account ? <ExecuteAnnounceButton isIcon account={account} transaction={transaction} /> : null}
+      <CancelButton isIcon transaction={transaction} />
+      <RemoveOrDenyButton isIcon transaction={transaction} />
+    </>
+  );
+}
+
 function NetworkWrapper({ network, children }: { network: string; children: React.ReactNode }) {
   return <SubApiRoot network={network}>{children}</SubApiRoot>;
 }
@@ -125,7 +146,8 @@ function PendingTransactions({ address }: { address: string }) {
       shadow='md'
       classNames={{
         base: 'py-0 group',
-        wrapper: 'rounded-large p-3 h-auto sm:h-[260px] py-0 scroll-hover-show',
+        wrapper:
+          'rounded-large p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1',
         thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
         th: 'bg-transparent text-tiny h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
         td: 'text-small px-2',
@@ -133,9 +155,13 @@ function PendingTransactions({ address }: { address: string }) {
       }}
     >
       <TableHeader>
-        <TableColumn key='id'>Transaction ID</TableColumn>
-        <TableColumn key='call'>Call</TableColumn>
-        <TableColumn align='end' key='status'>
+        <TableColumn className='w-[140px]' key='id'>
+          Transaction ID
+        </TableColumn>
+        <TableColumn className='w-[240px]' key='call'>
+          Call
+        </TableColumn>
+        <TableColumn className='w-[180px]' align='end' key='status'>
           Status
         </TableColumn>
       </TableHeader>
@@ -145,7 +171,7 @@ function PendingTransactions({ address }: { address: string }) {
           return (
             <TableRow
               key={item.id}
-              className='[&:hover>td]:bg-secondary border-secondary cursor-pointer border-b-1 [&>td]:h-[45px]'
+              className='[&:hover>td]:bg-secondary border-secondary [&>td]:first:rounded-l-medium [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px]'
               onClick={() => {
                 setNetwork(item.network);
                 navigate(`/transactions/${item.id}?network=${item.network}&address=${address}`);
@@ -172,9 +198,14 @@ function PendingTransactions({ address }: { address: string }) {
                   <CallDetail value={item.call} />
                 </NetworkWrapper>
               </TableCell>
-              <TableCell>
+              <TableCell className='w-[180px]'>
                 <NetworkWrapper network={item.network}>
-                  <Status address={address} transaction={item} />
+                  <span className='status'>
+                    <Status address={address} transaction={item} />
+                  </span>
+                  <div className='operation hidden flex-row-reverse items-center gap-[5px]'>
+                    <Operation address={address} transaction={item} />
+                  </div>
                 </NetworkWrapper>
               </TableCell>
             </TableRow>

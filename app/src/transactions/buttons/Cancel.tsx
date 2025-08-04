@@ -1,17 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, Transaction } from '@/hooks/types';
+import type { Transaction } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
+import IconFailed from '@/assets/svg/icon-failed-outlined.svg?react';
 import { TxButton } from '@/components';
 import { TransactionType } from '@/hooks/types';
 import React, { useMemo } from 'react';
 
 import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
+import { Tooltip } from '@mimir-wallet/ui';
 
-function Cancel({ transaction }: { account: AccountData; transaction: Transaction }) {
+function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction: Transaction }) {
   const { api, genesisHash, isApiReady } = useApi();
   const { isLocalAccount } = useAccount();
 
@@ -57,24 +59,28 @@ function Cancel({ transaction }: { account: AccountData; transaction: Transactio
   }
 
   return (
-    <TxButton
-      fullWidth
-      variant='ghost'
-      color='danger'
-      isDisabled={!transaction.call}
-      accountId={depositor}
-      website='mimir://internal/cancel'
-      getCall={() =>
-        api.tx.multisig.cancelAsMulti(
-          multisigTx.threshold,
-          multisigTx.members.filter((item) => !addressEq(item, depositor)),
-          multisigInfo?.unwrap().when,
-          multisigTx.callHash
-        )
-      }
-    >
-      Cancel
-    </TxButton>
+    <Tooltip content={isIcon ? 'Cancel' : null}>
+      <TxButton
+        isIconOnly={isIcon}
+        fullWidth={!isIcon}
+        variant={isIcon ? 'light' : 'ghost'}
+        size={isIcon ? 'sm' : 'md'}
+        color='danger'
+        isDisabled={!transaction.call}
+        accountId={depositor}
+        website='mimir://internal/cancel'
+        getCall={() =>
+          api.tx.multisig.cancelAsMulti(
+            multisigTx.threshold,
+            multisigTx.members.filter((item) => !addressEq(item, depositor)),
+            multisigInfo?.unwrap().when,
+            multisigTx.callHash
+          )
+        }
+      >
+        {isIcon ? <IconFailed /> : 'Cancel'}
+      </TxButton>
+    </Tooltip>
   );
 }
 

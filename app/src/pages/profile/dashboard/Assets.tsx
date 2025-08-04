@@ -9,7 +9,6 @@ import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
 import { StakingApp } from '@/config';
 import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo, useState } from 'react';
 
@@ -37,7 +36,6 @@ function Assets({ address }: { address: string }) {
     column: 'balanceUsd',
     direction: 'descending'
   });
-  const upSm = useMediaQuery('sm');
 
   const [list, done] = useMemo(() => {
     const _list: AccountAssetInfo[] = [];
@@ -121,7 +119,8 @@ function Assets({ address }: { address: string }) {
       shadow='md'
       classNames={{
         base: 'py-0 group',
-        wrapper: 'rounded-large p-3 h-auto sm:h-[260px] py-0 scroll-hover-show',
+        wrapper:
+          'rounded-large p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1',
         thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
         th: 'bg-transparent text-tiny h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
         td: 'text-small px-2',
@@ -131,11 +130,11 @@ function Assets({ address }: { address: string }) {
       onSortChange={setSortDescriptor}
     >
       <TableHeader>
-        <TableColumn>Token</TableColumn>
-        <TableColumn key='total' allowsSorting>
+        <TableColumn className='w-[160px]'>Token</TableColumn>
+        <TableColumn key='total' allowsSorting className='w-[160px]'>
           Amount
         </TableColumn>
-        <TableColumn key='balanceUsd' allowsSorting>
+        <TableColumn key='balanceUsd' allowsSorting className='w-[160px]'>
           USD Value
         </TableColumn>
       </TableHeader>
@@ -172,7 +171,7 @@ function Assets({ address }: { address: string }) {
           return (
             <TableRow
               key={`asset-balance-${item.assetId}-${item.network}`}
-              className='[&:hover>td]:bg-secondary [&:hover_.operation]:flex'
+              className='[&:hover>td]:bg-secondary [&>td]:first:rounded-l-medium [&>td]:last:rounded-r-medium [&:hover_.operation]:flex'
             >
               <TableCell>
                 <div className='flex items-center gap-1'>
@@ -229,37 +228,39 @@ function Assets({ address }: { address: string }) {
                   </span>
                 </Tooltip>
               </TableCell>
-              <TableCell className='w-[180px]'>
-                <div className='flex items-center justify-between gap-2.5'>
+              <TableCell>
+                <div className='flex items-center justify-between gap-[5px]'>
                   <span className='text-nowrap'>
                     ${balanceUsd[0]}
                     {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
                     {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
                   </span>
 
-                  <div className='operation hidden flex-row-reverse items-center gap-0 sm:gap-2.5'>
-                    <Button
-                      as={Link}
-                      isIconOnly={!upSm}
-                      endContent={upSm ? <IconSend className='h-[14px] w-[14px]' /> : undefined}
-                      href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
-                      variant={upSm ? 'ghost' : 'light'}
-                      size='sm'
-                    >
-                      {upSm ? 'Transfer' : <IconSend className='h-[14px] w-[14px]' />}
-                    </Button>
-
-                    {isNative && network === 'polkadot' && (
+                  <div className='operation hidden flex-row-reverse items-center gap-0 sm:gap-[5px]'>
+                    <Tooltip content='Transfer'>
                       <Button
                         as={Link}
-                        isIconOnly={!upSm}
-                        endContent={upSm ? <IconAdd className='h-[14px] w-[14px]' /> : undefined}
-                        href={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}
-                        variant={upSm ? 'ghost' : 'light'}
+                        isIconOnly
+                        href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
+                        variant='light'
                         size='sm'
                       >
-                        {upSm ? 'Staking' : <IconAdd className='h-[14px] w-[14px]' />}
+                        <IconSend className='h-[14px] w-[14px]' />
                       </Button>
+                    </Tooltip>
+
+                    {isNative && network === 'polkadot' && (
+                      <Tooltip content='Stake'>
+                        <Button
+                          as={Link}
+                          isIconOnly
+                          href={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}
+                          variant='light'
+                          size='sm'
+                        >
+                          <IconAdd className='h-[14px] w-[14px]' />
+                        </Button>
+                      </Tooltip>
                     )}
                   </div>
                 </div>

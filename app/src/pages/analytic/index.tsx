@@ -99,11 +99,11 @@ function Chart({
         {
           label: 'Counts',
           data: txDaily?.map((item) => item.counts) || [],
-          backgroundColor: '#5F45FF'
+          backgroundColor: '#2700FF'
         }
       ],
-      barPercentage: 0.8, // 控制 bar 的宽度，范围 0-1
-      categoryPercentage: 0.9 // 控制 bar 之间的间距，范围 0-1
+      barPercentage: 0.8,
+      categoryPercentage: 0.9
     }),
     [txDaily]
   );

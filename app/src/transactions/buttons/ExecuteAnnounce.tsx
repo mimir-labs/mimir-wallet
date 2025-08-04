@@ -3,6 +3,7 @@
 
 import type { AccountData, Transaction } from '@/hooks/types';
 
+import IconSuccess from '@/assets/svg/icon-success-outlined.svg?react';
 import { Input, TxButton } from '@/components';
 import { toastError } from '@/components/utils';
 import { TransactionType } from '@/hooks/types';
@@ -12,11 +13,19 @@ import React, { useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
 
 import { useAnnouncementStatus } from '../hooks/useAnnouncementStatus';
 
-function ExecuteAnnounce({ account, transaction }: { account: AccountData; transaction: Transaction }) {
+function ExecuteAnnounce({
+  isIcon = false,
+  account,
+  transaction
+}: {
+  isIcon?: boolean;
+  account: AccountData;
+  transaction: Transaction;
+}) {
   const { api, network } = useApi();
   const { addQueue } = useTxQueue();
   const { walletAccounts } = useWallet();
@@ -83,15 +92,19 @@ function ExecuteAnnounce({ account, transaction }: { account: AccountData; trans
 
   return (
     <>
-      <TxButton
-        fullWidth
-        variant='solid'
-        color='primary'
-        overrideAction={transaction.call ? handleExecute : toggleOpen}
-        isLoading={loading}
-      >
-        Execute announcement
-      </TxButton>
+      <Tooltip content={isIcon ? 'Execute' : null}>
+        <TxButton
+          isIconOnly={isIcon}
+          fullWidth={!isIcon}
+          variant={isIcon ? 'light' : 'solid'}
+          color={isIcon ? 'success' : 'primary'}
+          size={isIcon ? 'sm' : 'md'}
+          overrideAction={transaction.call ? handleExecute : toggleOpen}
+          isLoading={loading}
+        >
+          {isIcon ? <IconSuccess /> : 'Execute announcement'}
+        </TxButton>
+      </Tooltip>
 
       <Modal size='2xl' onClose={toggleOpen} isOpen={isOpen}>
         <ModalContent>

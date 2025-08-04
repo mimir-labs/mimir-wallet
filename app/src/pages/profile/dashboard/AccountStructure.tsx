@@ -21,7 +21,7 @@ function Relation({ address, setNetwork }: { address: string; setNetwork: (netwo
     <>
       <div
         ref={ref}
-        className='xs:h-[calc(100dvh-500px)] rounded-large shadow-medium bg-content1 relative h-[300px] min-h-[360px] w-full'
+        className='xs:h-[calc(100dvh-500px)] rounded-large shadow-medium bg-content1 border-secondary relative h-[300px] min-h-[360px] w-full border-1'
       >
         <Button variant='light' className='absolute z-[1] inline-flex sm:hidden' onPress={toggleOpen}>
           Overview

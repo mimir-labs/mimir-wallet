@@ -310,7 +310,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
             <Approve account={account} transaction={transaction} filterPaths={filterPaths} />
             <ExecuteAnnounce account={account} transaction={transaction} />
             <ViewPending transaction={transaction} filterPaths={filterPaths} />
-            <Cancel account={account} transaction={transaction} />
+            <Cancel transaction={transaction} />
             <RemoveOrDeny transaction={transaction} />
             <RemovePropose account={account} transaction={transaction} />
           </div>
