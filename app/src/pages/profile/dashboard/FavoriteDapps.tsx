@@ -3,7 +3,6 @@
 
 import type { DappOption } from '@/config';
 
-import IconFailed from '@/assets/svg/icon-failed-fill.svg?react';
 import { Empty } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
 import React, { createElement, useMemo, useState } from 'react';
@@ -11,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Drawer, DrawerBody, DrawerContent, usePress } from '@mimir-wallet/ui';
+import { Avatar, Button, Drawer, DrawerBody, DrawerContent, Tooltip, usePress } from '@mimir-wallet/ui';
 
 function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (id: string | number) => void }) {
   const { network } = useApi();
@@ -51,25 +50,43 @@ function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (i
         </Drawer>
       )}
 
-      <Button
-        isIconOnly
-        radius='md'
-        className='relative aspect-square h-auto min-h-0 w-full p-[5px] hover:bg-transparent [&:hover>.close-btn]:block'
-        variant='light'
-        onPress={openDapp}
-      >
-        <Avatar
-          className='aspect-square'
-          radius='full'
-          style={{ width: '100%', height: 'auto', background: 'transparent' }}
-          src={dapp.icon}
-          alt={dapp.name}
-        />
-        <IconFailed
-          className='close-btn absolute top-[2px] right-[2px] z-10 hidden opacity-50 transition-opacity hover:opacity-100'
-          {...pressProps}
-        />
-      </Button>
+      <Tooltip content={dapp.name}>
+        <Button
+          isIconOnly
+          radius='md'
+          className='relative aspect-square h-auto min-h-0 w-full p-[5px] hover:bg-transparent [&:hover>.close-btn]:block'
+          variant='light'
+          onPress={openDapp}
+        >
+          <Avatar
+            className='aspect-square'
+            radius='full'
+            style={{ width: '100%', height: 'auto', background: 'transparent' }}
+            src={dapp.icon}
+            alt={dapp.name}
+          />
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            width='20'
+            height='20'
+            viewBox='0 0 20 20'
+            fill='none'
+            className='close-btn text-primary absolute top-[2px] right-[2px] z-10 hidden rounded-full opacity-50 transition-opacity hover:opacity-100'
+            {...pressProps}
+          >
+            <path
+              d='M10 1C14.9706 1 19 5.02944 19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1Z'
+              fill='currentColor'
+              stroke='white'
+              stroke-width='2'
+            />
+            <path
+              d='M10 8.56143L12.25 6.30158C12.6519 5.8979 13.3017 5.89971 13.7014 6.30562C14.1011 6.71153 14.0993 7.36784 13.6974 7.77151L11.4554 10.0233L13.6509 12.2285C14.0528 12.6322 14.0546 13.2885 13.6549 13.6944L13.6409 13.7084C13.2402 14.1003 12.6007 14.0974 12.2035 13.6984L10 11.4852L7.79649 13.6984C7.39458 14.1021 6.74476 14.1003 6.34506 13.6944C5.94537 13.2885 5.94716 12.6322 6.34907 12.2285L8.54454 10.0233L6.30261 7.77151C5.9007 7.36784 5.89891 6.71153 6.2986 6.30562L6.31264 6.29163C6.71337 5.89972 7.35279 5.90259 7.75003 6.30158L10 8.56143Z'
+              fill='white'
+            />
+          </svg>
+        </Button>
+      </Tooltip>
     </>
   );
 }
