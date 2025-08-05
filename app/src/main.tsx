@@ -92,7 +92,7 @@ if (import.meta.env.PROD) {
   // Register Service Worker for PWA functionality
   // This enables offline capabilities and app-like features
   registerSW();
-}
 
-// Initialize analytics (GA4 and PostHog) using vanilla JavaScript
-initAnalytics();
+  // Initialize analytics (GA4 and PostHog) using vanilla JavaScript
+  initAnalytics();
+}
