@@ -29,8 +29,8 @@ import { API_CLIENT_GATEWAY, initService } from '@mimir-wallet/service';
 
 import { initializeAccount } from './accounts/initialize';
 import { initializeWallet } from './wallet/initialize';
+import { initAnalytics } from './analytics';
 import App from './App';
-import { initGa } from './ga';
 import { initMimir } from './initMimir';
 import { upgradeAddresBook } from './upgrade';
 
@@ -93,7 +93,6 @@ if (import.meta.env.PROD) {
   // This enables offline capabilities and app-like features
   registerSW();
 
-  // Initialize Google Analytics tracking
-  // This sets up usage tracking for production environment
-  initGa();
+  // Initialize analytics (GA4 and PostHog) using vanilla JavaScript
+  initAnalytics();
 }

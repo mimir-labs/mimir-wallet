@@ -1,12 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { analyticsActions } from '@/analytics';
 import Logo from '@/assets/images/logo.png';
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import IconMenu from '@/assets/svg/icon-menu.svg?react';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import { AccountSelect } from '@/components';
-import { gaActions } from '@/ga';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useLocation } from 'react-router-dom';
 
@@ -46,7 +46,7 @@ function TopBar() {
           className='h-[18px]'
           onPress={() => {
             setNetworkMode(mode === 'solo' ? 'omni' : 'solo', () => window.location.reload());
-            gaActions.omniSolochain(mode === 'solo' ? 'omni' : 'solo');
+            analyticsActions.omniSolochain(mode === 'solo' ? 'omni' : 'solo');
           }}
         >
           <b className='uppercase'>{mode}</b>
