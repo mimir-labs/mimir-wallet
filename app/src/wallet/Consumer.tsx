@@ -4,9 +4,9 @@
 import type { InjectedAccount } from '@polkadot/extension-inject/types';
 import type { WalletAccount } from './types';
 
+import { analyticsActions } from '@/analytics';
 import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
-import { gaActions } from '@/ga';
 import { useEffect } from 'react';
 
 import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
@@ -38,7 +38,7 @@ function WalletConsumer() {
   useEffect(() => {
     const unsubscribes: Promise<() => void>[] = [];
 
-    gaActions.connectedWallet(connectedWallets);
+    analyticsActions.connectedWallet(connectedWallets);
 
     for (const wallet of connectedWallets) {
       const key = walletConfig[wallet]?.key;
