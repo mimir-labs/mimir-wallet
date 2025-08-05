@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.19.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.18.0...mimir-wallet-app-v2.19.0) (2025-08-05)
+
+
+### Features
+
+* add posthog integration ([#276](https://github.com/mimir-labs/mimir-wallet/issues/276)) ([07a6eb6](https://github.com/mimir-labs/mimir-wallet/commit/07a6eb6b780148a44be8ffd5c4dea3f8375f4586))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.19.0
+    * @mimir-wallet/service bumped to 2.19.0
+    * @mimir-wallet/ui bumped to 2.19.0
+
 ## [2.18.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.17.0...mimir-wallet-app-v2.18.0) (2025-08-04)
 
 
