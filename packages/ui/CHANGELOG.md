@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.20.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.19.0...ui-v2.20.0) (2025-08-07)
+
+
+### Features
+
+* Add sonner to replace react-toastify ([#280](https://github.com/mimir-labs/mimir-wallet/issues/280)) ([a56de1b](https://github.com/mimir-labs/mimir-wallet/commit/a56de1b5dc915982d10aee9b8efbc5f038d2eedc))
+* migrate some ui components to shadcn ([#278](https://github.com/mimir-labs/mimir-wallet/issues/278)) ([043f857](https://github.com/mimir-labs/mimir-wallet/commit/043f857a392fc016d69e1344532dda779e08267b))
+
 ## [2.19.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.18.0...ui-v2.19.0) (2025-08-05)
 
 
