@@ -11,7 +11,7 @@ import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import React, { useState } from 'react';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { Alert, Divider, Tooltip } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import AddressName from '../AddressName';
 import FormatBalance from '../FormatBalance';
@@ -40,10 +40,7 @@ function LockInfo({ buildTx }: { buildTx: BuildTx }) {
               <div className='flex items-center gap-[5px] sm:gap-2.5'>
                 <IconClock className='text-primary h-4 w-4 opacity-50' />
                 <p>Review window</p>
-                <Tooltip
-                  content='This transaction needs to be executed manually after review window ends.'
-                  closeDelay={0}
-                >
+                <Tooltip content='This transaction needs to be executed manually after review window ends.'>
                   <IconQuestion className='text-primary/40' />
                 </Tooltip>
               </div>
@@ -94,7 +91,11 @@ function LockInfo({ buildTx }: { buildTx: BuildTx }) {
         </LockContainer>
       )}
 
-      {!isEnought && !isEnoughtPending ? <Alert color='danger' title='Insufficient funds' /> : null}
+      {!isEnought && !isEnoughtPending ? (
+        <Alert variant='destructive'>
+          <AlertTitle>Insufficient funds</AlertTitle>
+        </Alert>
+      ) : null}
     </>
   );
 }

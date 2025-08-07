@@ -26,7 +26,7 @@ function TxOverviewDialog({ account, showButton, transaction, onClose, open }: P
       <ModalContent>
         <ModalHeader>Progress Overview</ModalHeader>
         <ModalBody className='pb-5'>
-          <div className='rounded-medium border-divider-300 h-[50dvh] flex-auto border-1'>
+          <div className='border-divider-300 h-[50dvh] flex-auto rounded-[10px] border-1'>
             {open && transaction.status < TransactionStatus.Success ? (
               <PendingTxOverview
                 api={api}

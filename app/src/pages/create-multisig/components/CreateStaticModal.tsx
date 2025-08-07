@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 
 import { addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 interface Props {
   name: string;
@@ -78,10 +78,11 @@ function CreateStaticModal({ name, signatories, threshold, isOpen, onClose, onSu
           </ul>
         </ModalBody>
         <ModalFooter>
-          <Button fullWidth onPress={onClose} variant='ghost'>
+          <Button fullWidth onClick={onClose} variant='ghost'>
             Cancel
           </Button>
-          <Button fullWidth isLoading={isLoading} onPress={handleCreate}>
+          <Button fullWidth onClick={handleCreate}>
+            {isLoading ? buttonSpinner : null}
             Create
           </Button>
         </ModalFooter>

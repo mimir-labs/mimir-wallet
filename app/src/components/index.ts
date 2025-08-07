@@ -42,6 +42,7 @@ export { default as Label } from './Label';
 export { default as LockItem, LockContainer } from './LockItem';
 export { default as Navigate } from './Navigate';
 export { default as ProxyControls } from './ProxyControls';
+export { default as SelectFilterPath } from './SelectFilterPath';
 export { default as StepIndicator } from './StepIndicator';
 export { default as ToastRoot } from './ToastRoot';
 export { default as TxError } from './TxError';

@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Card, CardBody, CardHeader, Divider } from '@mimir-wallet/ui';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
 
 import CreateStaticModal from '../components/CreateStaticModal';
 import CreateSuccess from '../components/CreateSuccess';
@@ -79,19 +79,21 @@ function DesktopCreateMultisig() {
       ) : (
         <div className='mx-auto flex w-full max-w-[800px] flex-col gap-5'>
           <div className='flex items-center justify-between'>
-            <Button onPress={() => navigate(-1)} variant='ghost'>
+            <Button onClick={() => navigate(-1)} variant='ghost'>
               {'<'} Back
             </Button>
             <Prepare onSelect={setPrepare} />
           </div>
 
           <Card className='shadow-small mx-auto w-full max-w-[800px]'>
-            <CardHeader className='flex flex-col gap-4 p-5'>
-              <h1 className='text-foreground text-xl font-extrabold'>Create Multisig</h1>
-              <Divider className='bg-secondary' />
-              <StepIndicator steps={STEPS} currentStep={currentStep} />
+            <CardHeader className='gap-4'>
+              <CardTitle className='text-foreground text-center text-xl font-extrabold'>Create Multisig</CardTitle>
+              <Divider />
+              <CardDescription>
+                <StepIndicator steps={STEPS} currentStep={currentStep} />
+              </CardDescription>
             </CardHeader>
-            <CardBody className='p-5 pt-0'>
+            <CardContent>
               {currentStep === 1 && (
                 <Step1Name
                   network={network}
@@ -124,7 +126,7 @@ function DesktopCreateMultisig() {
                   onConfirm={handleConfirm}
                 />
               )}
-            </CardBody>
+            </CardContent>
           </Card>
         </div>
       )}

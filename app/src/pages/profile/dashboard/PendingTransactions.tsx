@@ -123,7 +123,7 @@ function PendingTransactions({ address }: { address: string }) {
 
   if (showSkeleton) {
     return (
-      <div className='rounded-large shadow-medium bg-content1 flex h-[260px] flex-col gap-5 p-5'>
+      <div className='bg-content1 shadow-medium flex h-[260px] flex-col gap-5 rounded-[20px] p-5'>
         <Skeleton className='h-[40px] w-full rounded-lg' />
         <Skeleton className='h-[40px] w-full rounded-lg' />
         <Skeleton className='h-[40px] w-full rounded-lg' />
@@ -134,7 +134,7 @@ function PendingTransactions({ address }: { address: string }) {
 
   if (!transactions.length) {
     return (
-      <div className='rounded-large shadow-medium bg-content1 flex h-[260px] flex-col items-center justify-center gap-5 p-5'>
+      <div className='bg-content1 shadow-medium flex h-[260px] flex-col items-center justify-center gap-5 rounded-[20px] p-5'>
         <Empty variant='pending-transaction' height='200px' />
       </div>
     );
@@ -143,14 +143,13 @@ function PendingTransactions({ address }: { address: string }) {
   return (
     <Table
       isHeaderSticky
-      shadow='md'
       classNames={{
         base: 'py-0 group',
         wrapper:
-          'rounded-large p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1',
+          'rounded-[20px] p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1',
         thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
-        th: 'bg-transparent text-tiny h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
-        td: 'text-small px-2',
+        th: 'bg-transparent text-xs h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
+        td: 'text-sm px-2',
         loadingWrapper: 'relative h-10 table-cell px-2'
       }}
     >
@@ -171,7 +170,7 @@ function PendingTransactions({ address }: { address: string }) {
           return (
             <TableRow
               key={item.id}
-              className='[&:hover>td]:bg-secondary border-secondary [&>td]:first:rounded-l-medium [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px]'
+              className='[&:hover>td]:bg-secondary border-secondary [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px]'
               onClick={() => {
                 setNetwork(item.network);
                 navigate(`/transactions/${item.id}?network=${item.network}&address=${address}`);

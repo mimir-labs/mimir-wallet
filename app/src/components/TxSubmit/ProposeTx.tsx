@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button } from '@mimir-wallet/ui';
+import { Button, buttonSpinner } from '@mimir-wallet/ui';
 
 import { toastError } from '../utils';
 
@@ -106,10 +106,10 @@ Call Data: ${call.toHex()}`;
         fullWidth
         variant='solid'
         color='primary'
-        onPress={handleClick}
-        isLoading={loading}
-        isDisabled={!account || !proposer}
+        onClick={handleClick}
+        disabled={loading || !account || !proposer}
       >
+        {loading ? buttonSpinner : null}
         Propose
       </Button>
     </>

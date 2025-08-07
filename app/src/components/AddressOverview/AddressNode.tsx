@@ -31,7 +31,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
 
   if (data.account.type === 'pure' && data.account.isUnknownPure) {
     cell = data.isTop ? (
-      <div className='bg-content1 rounded-medium border-primary/5 shadow-small relative w-[240px] overflow-hidden border-1 p-2.5'>
+      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
         <div className='bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full' />
         <div className='z-10 flex h-full w-full flex-col items-center gap-[5px]'>
           <Avatar src={PureIcon} style={{ width: 40 }} />
@@ -40,7 +40,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
         </div>
       </div>
     ) : (
-      <div className='bg-content1 rounded-medium border-primary/5 shadow-small relative w-[240px] overflow-hidden border-1 p-2.5'>
+      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
         <div className={`flex min-w-0 flex-1 items-center gap-2.5`}>
           <Avatar src={PureIcon} style={{ width: 30 }} />
           <div className='flex min-w-0 flex-1 flex-col gap-y-[2px]'>
@@ -48,14 +48,14 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
               <span className='min-w-0 overflow-hidden text-left font-bold'>{data.account.name || 'Pending'}</span>
             </div>
 
-            <div className='text-foreground/50 text-tiny flex h-[16px] min-w-0 items-center'>...</div>
+            <div className='text-foreground/50 flex h-[16px] min-w-0 items-center text-xs'>...</div>
           </div>
         </div>
       </div>
     );
   } else {
     cell = data.isTop ? (
-      <div className='bg-content1 rounded-medium border-primary/5 shadow-small relative w-[240px] overflow-hidden border-1 p-2.5'>
+      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
         <div className='bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full' />
         <div className='z-10 flex h-full w-full flex-col items-center gap-[5px]'>
           <IdentityIcon value={data.account.address} size={40} />
@@ -64,7 +64,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
             <AddressName value={data.account.address} />
           </h6>
 
-          <div className='text-foreground/50 text-tiny flex h-[16px] items-center whitespace-nowrap'>
+          <div className='text-foreground/50 flex h-[16px] items-center text-xs whitespace-nowrap'>
             <div className='mr-1 flex items-center gap-1'>
               <AddressNetworks address={data.account.address} avatarSize={12} />
             </div>
@@ -78,8 +78,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
                 {!isLocalAccount(data.account.address) && !isLocalAddress(data.account.address) && (
                   <Button
                     isIconOnly
-                    color='default'
-                    onPress={() => {
+                    onClick={() => {
                       addAddressBook(data.account.address);
                     }}
                     variant='light'
@@ -93,10 +92,9 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
                 <Button
                   isIconOnly
                   variant='light'
-                  color='default'
                   size='sm'
                   className='text-foreground/50 h-[18px] w-[18px] opacity-50'
-                  onPress={() => {
+                  onClick={() => {
                     window.open(`${window.location.origin}?address=${data.account.address}&tab=structure`, '_blank');
                   }}
                 >
@@ -121,7 +119,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
         </div>
       </div>
     ) : (
-      <div className='bg-content1 rounded-medium border-primary/5 shadow-small relative w-[240px] overflow-hidden border-1 p-2.5'>
+      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
         <AddressCell
           value={data.account.address}
           withAddressBook={showAddressNodeOperations}
@@ -131,10 +129,9 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
               <Button
                 isIconOnly
                 variant='light'
-                color='default'
                 size='sm'
                 className='text-foreground/50 h-[18px] w-[18px] opacity-50'
-                onPress={() => {
+                onClick={() => {
                   window.open(`${window.location.origin}?address=${data.account.address}&tab=structure`, '_blank');
                 }}
               >

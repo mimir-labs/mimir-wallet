@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @plugin '@mimir-wallet/ui/hero';
 @source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @source '../../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
@@ -15,6 +16,10 @@
 }
 
 @theme {
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.145 0 0);
+  --color-input: #D9D9D9;
+  --color-card: #FFF;
   --text-6xl: 2.25rem;
   --text-5xl: 2rem;
   --text-4xl: 1.75rem;
@@ -109,10 +114,10 @@
     @apply text-xl leading-[1.2] font-bold;
   }
   h5 {
-    @apply text-large leading-[1.2] font-bold;
+    @apply text-lg leading-[1.2] font-bold;
   }
   h6 {
-    @apply text-medium leading-[1.2] font-bold;
+    @apply text-base leading-[1.2] font-bold;
   }
 
   input::placeholder {
@@ -120,7 +125,13 @@
   }
 
   button {
-    @apply cursor-pointer disabled:cursor-not-allowed;
+    @apply cursor-pointer disabled:pointer-events-none;
+    touch-action: manipulation;
+  }
+
+  /* Optimize mobile touch response for interactive elements */
+  a, button, input, select, textarea, [role="button"], [role="menuitem"] {
+    touch-action: manipulation;
   }
 
   /* custom styles */
@@ -164,21 +175,8 @@
     margin: 0;
   }
 
-  .Toastify__toast {
-    border-radius: var(--heroui-radius-large);
-    box-shadow: var(--heroui-box-shadow-large);
-  }
-
-  .Toastify__toast-body {
-    align-items: start;
-  }
-
-  .Toastify__toast-body * {
-    user-select: none;
-  }
-
-  .Toastify__toast-icon {
-    width: 30px;
+  a {
+    @apply text-primary text-[length:inherit] no-underline hover:opacity-90 active:opacity-80;
   }
 
   ::-webkit-scrollbar {
@@ -201,4 +199,21 @@
   .scroll-hover-show {
     @apply [&::-webkit-scrollbar]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[#d9d9d9] group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-[#d9d9d9];
   }
+}
+
+.Toastify__toast {
+  border-radius: var(--heroui-radius-large);
+  box-shadow: var(--heroui-box-shadow-large);
+}
+
+.Toastify__toast-body {
+  align-items: start;
+}
+
+.Toastify__toast-body * {
+  user-select: none;
+}
+
+.Toastify__toast-icon {
+  width: 30px;
 }

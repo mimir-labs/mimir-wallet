@@ -13,7 +13,7 @@ import React, { useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
+import { buttonSpinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
 
 import { useAnnouncementStatus } from '../hooks/useAnnouncementStatus';
 
@@ -100,8 +100,9 @@ function ExecuteAnnounce({
           color={isIcon ? 'success' : 'primary'}
           size={isIcon ? 'sm' : 'md'}
           overrideAction={transaction.call ? handleExecute : toggleOpen}
-          isLoading={loading}
+          disabled={loading}
         >
+          {loading ? buttonSpinner : null}
           {isIcon ? <IconSuccess /> : 'Execute announcement'}
         </TxButton>
       </Tooltip>

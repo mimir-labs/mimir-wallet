@@ -13,7 +13,7 @@ import { isHex } from '@polkadot/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Chip, Divider } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button, Chip, Divider } from '@mimir-wallet/ui';
 
 import { parseCsv } from './parse';
 import Upload from './Upload';
@@ -161,7 +161,7 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
             color='primary'
             radius='full'
             variant='light'
-            onPress={() => setData((data) => [...data, ['', '', '']])}
+            onClick={() => setData((data) => [...data, ['', '', '']])}
           >
             <IconAdd className='h-4 w-4' />
           </Button>
@@ -208,7 +208,7 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
                 isIconOnly
                 color='danger'
                 variant='light'
-                onPress={() => setData((data) => data.filter((_, i) => i !== index))}
+                onClick={() => setData((data) => data.filter((_, i) => i !== index))}
               >
                 <IconDelete className='h-4 w-4' />
               </Button>
@@ -219,7 +219,9 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
 
       {/* Asset validation alert */}
       {invalidAssetIds.length > 0 && (
-        <Alert color='danger' title={`Token not found. (ID= ${invalidAssetIds.join(', ')})`} />
+        <Alert variant='destructive'>
+          <AlertTitle>Token not found. (ID= {invalidAssetIds.join(', ')})</AlertTitle>
+        </Alert>
       )}
 
       <Divider />
@@ -228,7 +230,7 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
       <TxButton
         fullWidth
         color={isDataValid ? 'primary' : 'danger'}
-        isDisabled={!isDataValid}
+        disabled={!isDataValid}
         accountId={sending}
         website='mimir://app/multi-transfer'
         getCall={getBatchCalls}

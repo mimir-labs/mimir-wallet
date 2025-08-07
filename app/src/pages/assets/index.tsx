@@ -13,12 +13,12 @@ import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
-  Link,
   Skeleton,
   Spinner,
   Table,
@@ -122,9 +122,9 @@ function Assets() {
       <h4>Assets</h4>
       <Table
         classNames={{
-          wrapper: 'rounded-medium sm:rounded-large p-0 sm:p-3',
-          th: 'bg-transparent text-tiny px-2 text-foreground/50',
-          td: 'text-small px-2',
+          wrapper: 'rounded-[10px] sm:rounded-[20px] p-0 sm:p-3',
+          th: 'bg-transparent text-xs px-2 text-foreground/50',
+          td: 'text-sm px-2',
           loadingWrapper: 'relative h-10 table-cell px-2'
         }}
         sortDescriptor={sortDescriptor}
@@ -151,10 +151,9 @@ function Assets() {
 
         <TableBody
           items={list}
-          isLoading={!done}
           loadingContent={
             <>
-              <Skeleton disableAnimation className='rounded-medium h-10 w-full' />
+              <Skeleton className='h-10 w-full rounded-[10px]' />
               <Spinner size='sm' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
             </>
           }
@@ -205,7 +204,7 @@ function Assets() {
                     <div className='flex flex-col items-start gap-0 sm:flex-row sm:items-center sm:gap-1'>
                       <span>{symbol}</span>
 
-                      {!isNative && <small className='sm:text-tiny text-foreground/50 text-[10px]'>{assetId}</small>}
+                      {!isNative && <small className='text-foreground/50 text-[10px] sm:text-xs'>{assetId}</small>}
                     </div>
                   </div>
                 </TableCell>
@@ -225,8 +224,6 @@ function Assets() {
                 </TableCell>
                 <TableCell>
                   <Tooltip
-                    shadow='lg'
-                    placement='bottom'
                     classNames={{ content: 'border-secondary border-1 p-2.5 min-w-[163px]' }}
                     content={
                       <div className='w-full space-y-2.5 [&_div]:flex [&_div]:items-center [&_div]:justify-between [&_div]:gap-x-4'>
@@ -252,27 +249,33 @@ function Assets() {
                 </TableCell>
                 <TableCell className='bg-content1 sticky right-0 z-[1] sm:relative'>
                   <div className='inline-flex max-w-[180px] flex-row-reverse items-center gap-0 sm:gap-2.5'>
-                    <Button
-                      as={Link}
-                      isIconOnly={!upSm}
-                      endContent={upSm ? <IconSend className='h-[14px] w-[14px]' /> : undefined}
-                      href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
-                      variant={upSm ? 'ghost' : 'light'}
-                      size='sm'
-                    >
-                      {upSm ? 'Transfer' : <IconSend className='h-[14px] w-[14px]' />}
+                    <Button asChild variant={upSm ? 'ghost' : 'light'} size='sm'>
+                      <Link
+                        to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
+                      >
+                        {upSm ? (
+                          <>
+                            Transfer
+                            <IconSend className='h-[14px] w-[14px]' />
+                          </>
+                        ) : (
+                          <IconSend className='h-[14px] w-[14px]' />
+                        )}
+                      </Link>
                     </Button>
 
                     {isNative && network === 'polkadot' && (
-                      <Button
-                        as={Link}
-                        isIconOnly={!upSm}
-                        endContent={upSm ? <IconAdd className='h-[14px] w-[14px]' /> : undefined}
-                        href={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}
-                        variant={upSm ? 'ghost' : 'light'}
-                        size='sm'
-                      >
-                        {upSm ? 'Staking' : <IconAdd className='h-[14px] w-[14px]' />}
+                      <Button asChild variant={upSm ? 'ghost' : 'light'} size='sm'>
+                        <Link to={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}>
+                          {upSm ? (
+                            <>
+                              Staking
+                              <IconAdd className='h-[14px] w-[14px]' />
+                            </>
+                          ) : (
+                            <IconAdd className='h-[14px] w-[14px]' />
+                          )}
+                        </Link>
                       </Button>
                     )}
                   </div>

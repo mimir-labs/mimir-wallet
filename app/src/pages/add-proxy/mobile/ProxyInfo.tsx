@@ -30,8 +30,8 @@ function ProxyInfo({
       : `${((Number(delay) * blockInterval) / (ONE_HOUR * 1000)).toFixed(2)} Hours`;
 
   return (
-    <div className='bg-secondary rounded-medium flex flex-col gap-1 p-2.5'>
-      <div className='text-foreground/65 text-tiny flex items-center gap-2.5'>
+    <div className='bg-secondary flex flex-col gap-1 rounded-[10px] p-2.5'>
+      <div className='text-foreground/65 flex items-center gap-2.5 text-xs'>
         <p className='flex-1'>
           {delay > 0 && (
             <>
@@ -45,13 +45,13 @@ function ProxyInfo({
           Authorize: <b className='text-foreground'>{proxyType}</b>
         </p>
         {onDelete && (
-          <Button isIconOnly color='danger' size='sm' variant='light' onPress={onDelete}>
+          <Button isIconOnly color='danger' size='sm' variant='light' onClick={onDelete}>
             <IconDelete />
           </Button>
         )}
       </div>
 
-      <div className='[&>.AddressCell]:bg-content1 [&>.AddressCell]:rounded-medium flex flex-col items-center gap-2.5 sm:flex-row [&>.AddressCell]:w-full [&>.AddressCell]:px-2.5 [&>.AddressCell]:py-1'>
+      <div className='[&>.AddressCell]:bg-content1 flex flex-col items-center gap-2.5 sm:flex-row [&>.AddressCell]:w-full [&>.AddressCell]:rounded-[10px] [&>.AddressCell]:px-2.5 [&>.AddressCell]:py-1'>
         <AddressCell withCopy value={proxied} withAddressBook />
         <IconArrow className='text-primary h-3.5 w-3.5 rotate-90 sm:transform-none' />
         <AddressCell withCopy value={delegate} withAddressBook />

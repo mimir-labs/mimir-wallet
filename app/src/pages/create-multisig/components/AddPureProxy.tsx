@@ -18,7 +18,7 @@ function AddPureProxy({
         <p className='text-foreground text-sm font-bold'>Add Pure Proxy</p>
         <p className='text-foreground/50 text-xs'>This allows you to change signers and thresholds</p>
       </div>
-      <Switch isDisabled={isDisabled} size='sm' isSelected={isPureProxy} onValueChange={onPureProxyChange} />
+      <Switch disabled={isDisabled} size='sm' isSelected={isPureProxy} onValueChange={onPureProxyChange} />
     </div>
   );
 }

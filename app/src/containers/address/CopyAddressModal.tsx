@@ -21,12 +21,13 @@ import {
   Button,
   Divider,
   Drawer,
-  DrawerBody,
   DrawerContent,
   DrawerFooter,
   Modal,
-  Switch,
-  usePress
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  Switch
 } from '@mimir-wallet/ui';
 
 function Item({ endpoint, address }: { endpoint: Network; address: string }) {
@@ -34,12 +35,6 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
   const upSm = useMediaQuery('sm');
   const { ss58Chain, setSs58Chain } = useApi();
   const { open: openQr } = useQrAddress();
-  const { pressProps } = usePress({
-    onPress: () => {
-      copy(encodeAddress(address, endpoint.ss58Format));
-      toastSuccess('Address copied', encodeAddress(address, endpoint.ss58Format));
-    }
-  });
   const ref = useRef<HTMLDivElement>(null);
 
   useEffectOnce(() => {
@@ -59,24 +54,28 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       style={{
         background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
       }}
-      className='rounded-medium data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 p-2 sm:gap-2 sm:p-2.5'
-      {...pressProps}
+      className='data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 rounded-[10px] p-2 sm:gap-2 sm:p-2.5'
+      onClick={(e) => {
+        e.stopPropagation();
+        copy(encodeAddress(address, endpoint.ss58Format));
+        toastSuccess('Address copied', encodeAddress(address, endpoint.ss58Format));
+      }}
     >
       <Avatar
         src={endpoint.icon}
         className='h-[20px] w-[20px] sm:h-[30px] sm:w-[30px]'
         style={{ backgroundColor: 'transparent' }}
       />
-      <b className='text-small sm:text-medium'>{endpoint.name}</b>
-      <div className='text-foreground/50 text-tiny flex-1'>
+      <b className='text-sm sm:text-base'>{endpoint.name}</b>
+      <div className='text-foreground/50 flex-1 text-xs'>
         <Address value={address} shorten={!upSm} ss58Format={endpoint.ss58Format} />
       </div>
       <ExplorerLink chain={endpoint} address={address} showAll={false} />
       <CopyButton size='sm' className='h-6 w-6 opacity-30' value={encodeAddress(address, endpoint.ss58Format)} />
-      <Button isIconOnly size='sm' color='default' variant='light' onPress={() => openQr(address)}>
+      <Button isIconOnly size='sm' className='text-inherit' variant='light' onClick={() => openQr(address)}>
         <IconQrcode className='h-[16px] w-[16px] opacity-30' />
       </Button>
-      <Button isIconOnly size='sm' color='default' variant='light' onPress={() => setSs58Chain(endpoint.key)}>
+      <Button isIconOnly size='sm' className='text-inherit' variant='light' onClick={() => setSs58Chain(endpoint.key)}>
         <IconStar
           data-selected={ss58Chain === endpoint.key}
           className='data-[selected=true]:text-primary opacity-30 data-[selected=true]:opacity-100'
@@ -89,7 +88,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
 function GroupedNetwork({ address, group, endpoints }: { address: string; group: string; endpoints: Network[] }) {
   return (
     <div>
-      <div className='text-primary text-medium mb-2.5 font-bold capitalize'>{group}</div>
+      <div className='text-primary mb-2.5 text-base font-bold capitalize'>{group}</div>
       <div className='space-y-2.5'>
         {endpoints.map((endpoint) => (
           <Item key={endpoint.key} endpoint={endpoint} address={address} />
@@ -145,8 +144,6 @@ function CopyAddressModal() {
     return null;
   }
 
-  const BaseComp = upMd ? Drawer : Modal;
-
   let content: ReactNode;
 
   if (meta.isPure) {
@@ -158,7 +155,7 @@ function CopyAddressModal() {
 
     content = (
       <div>
-        <div className='text-primary text-medium mb-2.5 font-bold capitalize'>{network?.name}</div>
+        <div className='text-primary mb-2.5 text-base font-bold capitalize'>{network?.name}</div>
         <div className='space-y-2.5'>
           <Item endpoint={network} address={address} />
         </div>
@@ -174,17 +171,34 @@ function CopyAddressModal() {
     ));
   }
 
+  if (upMd) {
+    return (
+      <Drawer open={isOpen} onClose={close} direction='right'>
+        <DrawerContent>
+          <div className='overflow-y-auto p-4'>{content}</div>
+          <DrawerFooter>
+            <Switch
+              className='w-full max-w-full flex-row-reverse justify-between'
+              size='sm'
+              classNames={{
+                label: 'm-0'
+              }}
+              isSelected={showAll}
+              onValueChange={setShowAll}
+            >
+              Show All Networks
+            </Switch>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
-    <BaseComp
-      {...(upMd
-        ? ({ placement: 'right', size: '2xl', scrollBehavior: 'inside' } as any)
-        : ({ placement: 'bottom', scrollBehavior: 'inside', size: 'xl' } as any))}
-      isOpen={isOpen}
-      onClose={close}
-    >
-      <DrawerContent>
-        <DrawerBody className='scrollbar-hide p-5'>{content}</DrawerBody>
-        <DrawerFooter>
+    <Modal onClose={close} isOpen={isOpen}>
+      <ModalContent>
+        <ModalBody>{content}</ModalBody>
+        <ModalFooter>
           <Switch
             className='w-full max-w-full flex-row-reverse justify-between'
             size='sm'
@@ -196,9 +210,9 @@ function CopyAddressModal() {
           >
             Show All Networks
           </Switch>
-        </DrawerFooter>
-      </DrawerContent>
-    </BaseComp>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
 

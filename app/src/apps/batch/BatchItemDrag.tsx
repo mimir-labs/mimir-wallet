@@ -70,9 +70,9 @@ function BatchItemDrag({
       {...attributes}
       data-open={isOpen}
       data-dragging={isDragging}
-      className='bg-secondary data-[dragging=true]:bg-primary-50 rounded-medium overflow-hidden'
+      className='bg-secondary data-[dragging=true]:bg-primary-50 overflow-hidden rounded-[10px]'
     >
-      <div className='text-small grid h-[44px] cursor-pointer grid-cols-6 px-2 sm:px-3' onClick={toggleOpen}>
+      <div className='grid h-[44px] cursor-pointer grid-cols-6 px-2 text-sm sm:px-3' onClick={toggleOpen}>
         <div className='col-span-1 flex items-center' onClick={(e) => e.stopPropagation()}>
           <img {...listeners} src={Drag} style={{ cursor: 'grab', padding: 10, marginLeft: -10, userSelect: 'none' }} />
           <Checkbox
@@ -97,12 +97,12 @@ function BatchItemDrag({
         <div className='col-span-1 flex items-center justify-between'>
           <div className='flex items-center gap-1'>
             <Tooltip content='Copy'>
-              <Button isIconOnly variant='light' onPress={onCopy} size='sm' color='primary'>
+              <Button isIconOnly variant='light' onClick={onCopy} size='sm' color='primary'>
                 <IconCopy style={{ width: '1em', height: '1em' }} />
               </Button>
             </Tooltip>
             <Tooltip content='Delete'>
-              <Button isIconOnly variant='light' onPress={onDelete} size='sm' color='danger'>
+              <Button isIconOnly variant='light' onClick={onDelete} size='sm' color='danger'>
                 <IconDelete style={{ width: 16, height: 16 }} />
               </Button>
             </Tooltip>
@@ -114,7 +114,7 @@ function BatchItemDrag({
             color='primary'
             data-open={isOpen}
             className='rotate-0 data-[open=true]:rotate-180'
-            onPress={toggleOpen}
+            onClick={toggleOpen}
           >
             <ArrowDown style={{ width: 16, height: 16 }} />
           </Button>
@@ -122,7 +122,7 @@ function BatchItemDrag({
       </div>
 
       {isOpen ? (
-        <div className='bg-content1 rounded-medium mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
+        <div className='bg-content1 mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
           <Call showFallback from={from} call={call} registry={registry} />
         </div>
       ) : null}

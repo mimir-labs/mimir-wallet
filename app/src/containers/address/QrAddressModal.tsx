@@ -67,7 +67,7 @@ function QrcodeAddressModal() {
   return (
     <Modal hideCloseButton onClose={close} isOpen={isOpen} size='sm'>
       <ModalContent>
-        <ModalBody className='py-5'>
+        <ModalBody>
           <SubApiRoot network={network}>
             <Content value={address} network={network} setNetwork={setNetwork} />
           </SubApiRoot>

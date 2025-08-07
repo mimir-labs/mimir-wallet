@@ -55,7 +55,7 @@ function Step2PermissionLevel({
         <label className='text-foreground text-sm font-bold'>Configure Proxy Access</label>
         <div className='relative flex flex-col items-center gap-[5px]'>
           {/* Proxy Account (Upper) */}
-          <div className='bg-secondary rounded-medium w-full p-2.5'>
+          <div className='bg-secondary w-full rounded-[10px] p-2.5'>
             <AddressCell shorten={false} value={proxy} />
           </div>
 
@@ -63,12 +63,12 @@ function Step2PermissionLevel({
 
           {/* Proxied Account (Lower) */}
           {isPureProxy ? (
-            <div className='bg-secondary rounded-medium flex h-14 w-full items-center gap-2.5 px-2.5'>
+            <div className='bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5'>
               <img src={PureIcon} style={{ width: 30 }} />
               <span className='text-foreground font-bold'>{pureProxyName || DEFAULT_PURE_ACCOUNT_NAME}</span>
             </div>
           ) : (
-            <div className='bg-secondary rounded-medium w-full p-2.5'>
+            <div className='bg-secondary w-full rounded-[10px] p-2.5'>
               <AddressCell value={proxied} />
             </div>
           )}
@@ -81,7 +81,6 @@ function Step2PermissionLevel({
         onChange={(value) => onDataChange({ proxyType: value })}
         label='Permission Level'
         description='What functions an account execute on behalf of another.'
-        variant='bordered'
       />
 
       {/* Time Delay */}
@@ -90,7 +89,7 @@ function Step2PermissionLevel({
           <label className='text-foreground text-sm font-bold'>{hasDelay ? 'Delay' : 'Time Delay'}</label>
           <Switch size='sm' isSelected={hasDelay} onValueChange={(checked) => onDataChange({ hasDelay: checked })} />
         </div>
-        <p className='text-foreground/50 text-tiny'>
+        <p className='text-foreground/50 text-xs'>
           {hasDelay
             ? 'The proxy will announce its intended action and will wait for the number of blocks defined in the delay time before executing it.'
             : 'Require waiting period before transactions execute for extra security.'}
@@ -120,10 +119,10 @@ function Step2PermissionLevel({
 
       {/* Action Buttons */}
       <div className='flex gap-2.5'>
-        <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onPress={onBack}>
+        <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
           Back
         </Button>
-        <Button fullWidth size='md' color='primary' radius='full' onPress={onNext}>
+        <Button fullWidth size='md' color='primary' radius='full' onClick={onNext}>
           Next
         </Button>
       </div>

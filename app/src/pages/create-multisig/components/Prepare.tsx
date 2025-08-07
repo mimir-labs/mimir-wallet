@@ -22,7 +22,8 @@ function Prepare({ onSelect }: { onSelect: (data: PrepareFlexible) => void }) {
   return (
     <>
       {prepares.length > 0 && (
-        <Button color='primary' onPress={toggleOpen} startContent={<IconInfo />} variant='light'>
+        <Button color='primary' onClick={toggleOpen} variant='light'>
+          <IconInfo />
           {prepares.length} unfinished creation
         </Button>
       )}
@@ -34,7 +35,7 @@ function Prepare({ onSelect }: { onSelect: (data: PrepareFlexible) => void }) {
               <Button
                 color='secondary'
                 key={index}
-                onPress={() => {
+                onClick={() => {
                   if (item.pure) {
                     onSelect({
                       creator: item.creator,

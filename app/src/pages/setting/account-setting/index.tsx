@@ -25,8 +25,8 @@ function AccountSetting() {
   return (
     <div className='mx-auto my-0 w-[500px] max-w-full space-y-5'>
       <div>
-        <h6 className='text-small text-foreground/50 mb-2.5'>Name</h6>
-        <div className='rounded-large border-secondary bg-content1 shadow-medium space-y-2.5 border-1 p-4 sm:p-5'>
+        <h6 className='text-foreground/50 mb-2.5 text-sm'>Name</h6>
+        <div className='border-secondary bg-content1 shadow-medium space-y-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
           <Input
             label='Name'
             onChange={(value) => {
@@ -40,13 +40,13 @@ function AccountSetting() {
             value={name}
             error={error}
           />
-          <p className='text-tiny text-foreground/50 mt-2.5'>All members will see this name</p>
+          <p className='text-foreground/50 mt-2.5 text-xs'>All members will see this name</p>
           <Button
-            isDisabled={!(address && isLocalAccount(address))}
+            disabled={!(address && isLocalAccount(address))}
             fullWidth
             variant='solid'
             color='primary'
-            onPress={() => {
+            onClick={() => {
               if (!name) {
                 setError(new Error('Please input wallet name'));
               } else {
@@ -61,12 +61,12 @@ function AccountSetting() {
 
       {account?.type === 'multisig' ? (
         <div>
-          <h6 className='text-small text-foreground/50 mb-2.5 inline-flex items-center gap-1'>
+          <h6 className='text-foreground/50 mb-2.5 inline-flex items-center gap-1 text-sm'>
             <Label tooltip='For Pure Proxy, each controllable multisig account is listed as a member set.'>
               Multisig Information
             </Label>
           </h6>
-          <div className='rounded-large bg-content1 border-secondary shadow-medium space-y-2.5 border-1 p-4 sm:p-5'>
+          <div className='bg-content1 border-secondary shadow-medium space-y-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
             <MemberSet account={account} disabled />
           </div>
         </div>
@@ -78,10 +78,10 @@ function AccountSetting() {
 
       {address ? (
         <div>
-          <h6 className='text-small text-foreground/50 mb-2.5 inline-flex items-center gap-1'>
+          <h6 className='text-foreground/50 mb-2.5 inline-flex items-center gap-1 text-sm'>
             <Label tooltip='The following accounts will be granted control over this account.'>Proxy Information</Label>
           </h6>
-          <div className='rounded-large border-secondary shadow-medium bg-content1 border-1 p-5'>
+          <div className='border-secondary bg-content1 shadow-medium rounded-[20px] border-1 p-5'>
             <ProxySet address={address} />
           </div>
         </div>
@@ -89,12 +89,12 @@ function AccountSetting() {
 
       {account && (
         <div>
-          <h6 className='text-small text-foreground/50 mb-2.5 flex items-center gap-1'>
+          <h6 className='text-foreground/50 mb-2.5 flex items-center gap-1 text-sm'>
             <Label tooltip='Proposers can suggest transactions but cannot approve or execute them. Signers should review and approve transactions first.'>
               Proposer
             </Label>
           </h6>
-          <div className='rounded-large border-secondary bg-content1 shadow-medium space-y-2.5 border-1 p-4 sm:p-5'>
+          <div className='border-secondary bg-content1 shadow-medium space-y-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
             <ProposerSet account={account} refetch={refetch} />
           </div>
         </div>

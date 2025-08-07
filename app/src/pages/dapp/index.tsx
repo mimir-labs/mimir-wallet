@@ -23,9 +23,9 @@ function PageDapp() {
         selectedKey={tab}
         onSelectionChange={(key) => setTab(key.toString())}
         classNames={{
-          tabList: ['bg-white', 'shadow-medium', 'rounded-large', 'p-2.5'],
+          tabList: ['bg-white', 'shadow-medium', 'rounded-[20px]', 'p-2.5'],
           tabContent: ['text-primary/50', 'font-bold'],
-          cursor: ['rounded-medium']
+          cursor: ['rounded-[10px]']
         }}
       >
         <Tab key='apps' title='Apps'>

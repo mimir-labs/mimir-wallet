@@ -10,34 +10,34 @@ import { useParseTransfer } from '@/hooks/useParseTransfer';
 import React, { forwardRef } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Skeleton, usePress } from '@mimir-wallet/ui';
+import { Skeleton } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
 import { mergeClasses } from './utils';
 
 const AddressDisplay = React.memo(({ reverse, address }: { reverse: boolean; address?: string }) => {
   const copyAddress = useCopyAddressToClipboard(address);
-  const { pressProps } = usePress({
-    onPress: address
-      ? () => {
-          copyAddress();
-        }
-      : undefined
-  });
 
   return (
     <div
       data-reverse={reverse}
       className='group address-cell inline-flex flex-grow-0 items-center gap-x-1 data-[reverse=true]:flex-row-reverse data-[reverse=true]:text-right sm:gap-x-2.5'
-      {...pressProps}
+      onClick={
+        address
+          ? (e) => {
+              e.stopPropagation();
+              copyAddress();
+            }
+          : undefined
+      }
     >
       <IdentityIcon size={24} value={address} />
       <div className='flex flex-col'>
         <div className='inline-flex h-[16px] max-h-[16px] items-center gap-1 truncate leading-[16px] font-bold group-data-[reverse=true]:flex-row-reverse sm:text-sm'>
           <AddressName value={address} />
-          {address && <CopyAddress address={address} size='sm' color='default' />}
+          {address && <CopyAddress address={address} size='sm' />}
         </div>
-        <div className='text-foreground/50 text-tiny leading-[12px]'>
+        <div className='text-foreground/50 text-xs leading-[12px]'>
           <Address shorten value={address} />
         </div>
       </div>
@@ -75,7 +75,7 @@ const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) =
         <svg width='6' height='8' xmlns='http://www.w3.org/2000/svg' style={{ color: 'inherit' }}>
           <polygon points='0,0 6,4 0,8' fill='currentColor' />
         </svg>
-        <div className='border-primary/5 bg-secondary text-foreground text-small absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border-1 px-3 py-1 leading-[1] font-bold'>
+        <div className='border-primary/5 bg-secondary text-foreground absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border-1 px-3 py-1 text-sm leading-[1] font-bold'>
           {assetId !== null ? (
             assetInfo ? (
               isAll ? (

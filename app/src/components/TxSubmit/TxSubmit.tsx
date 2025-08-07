@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Checkbox, Divider } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button, Checkbox, Divider } from '@mimir-wallet/ui';
 
 import CustomGasFeeSelect from '../CustomGasFeeSelect';
 import Input from '../Input';
@@ -159,8 +159,8 @@ function TxSubmit({
         <Button
           isIconOnly
           variant='light'
-          color='default'
-          onPress={() => {
+          className='text-inherit'
+          onClick={() => {
             onClose?.();
             onReject?.();
           }}
@@ -169,10 +169,14 @@ function TxSubmit({
         </Button>
       </div>
 
-      {alert && <Alert className='flex-grow-0' color='warning' title={alert} />}
+      {alert && (
+        <Alert className='flex-grow-0'>
+          <AlertTitle>{alert}</AlertTitle>
+        </Alert>
+      )}
 
-      <div className='md:bg-content1 rounded-large md:shadow-medium flex w-full flex-1 flex-col gap-5 overflow-y-auto bg-transparent p-0 shadow-none md:flex-row md:p-5'>
-        <div className='shadow-medium bg-content1 rounded-large flex w-full flex-col gap-5 p-4 md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
+      <div className='md:bg-content1 md:shadow-medium flex w-full flex-1 flex-col gap-5 overflow-y-auto rounded-[20px] bg-transparent p-0 shadow-none md:flex-row md:p-5'>
+        <div className='bg-content1 shadow-medium flex w-full flex-col gap-5 rounded-[20px] p-4 md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
           <TxInfo
             address={accountData.address}
             website={transaction?.website || website}
@@ -193,14 +197,17 @@ function TxSubmit({
           <SafetyCheck safetyCheck={safetyCheck} />
         </div>
 
-        <div className='shadow-medium rounded-large bg-content1 sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start p-4 sm:p-5 md:w-[40%]'>
+        <div className='bg-content1 shadow-medium sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start rounded-[20px] p-4 sm:p-5 md:w-[40%]'>
           {!hasPermission ? (
-            <Alert
-              color='danger'
-              title="You are currently not a member of this Account and won't be able to submit this transaction."
-            />
+            <Alert variant='destructive'>
+              <AlertTitle>
+                You are currently not a member of this Account and won't be able to submit this transaction.
+              </AlertTitle>
+            </Alert>
           ) : filterPaths.length === 0 ? (
-            <Alert color='danger' title={`This account doesn’t exist on ${chain.name}`} />
+            <Alert variant='destructive'>
+              <AlertTitle>This account doesn't exist on {chain.name}</AlertTitle>
+            </Alert>
           ) : null}
 
           {hasPermission && filterPaths.length > 0 && (
@@ -233,7 +240,11 @@ function TxSubmit({
                 />
               ) : null}
 
-              {gasFeeWarning && <Alert color='warning' title='The selected asset is not enough to pay the gas fee.' />}
+              {gasFeeWarning && (
+                <Alert variant='warning'>
+                  <AlertTitle>The selected asset is not enough to pay the gas fee.</AlertTitle>
+                </Alert>
+              )}
 
               {!isPropose && (
                 <SendTx
@@ -286,19 +297,15 @@ function TxSubmit({
               )}
 
               {!transaction && addressEq(current, accountData.address) && (
-                <Button fullWidth onPress={handleAddBatch} color='primary' variant='ghost' startContent={<IconBatch />}>
+                <Button fullWidth onClick={handleAddBatch} color='primary' variant='ghost'>
+                  <IconBatch />
                   Add To Batch
                 </Button>
               )}
 
               {!transaction && (
-                <Button
-                  fullWidth
-                  onPress={handleAddTemplate}
-                  color='primary'
-                  variant='ghost'
-                  startContent={<IconTemplate />}
-                >
+                <Button fullWidth onClick={handleAddTemplate} color='primary' variant='ghost'>
+                  <IconTemplate />
                   Add To Template
                 </Button>
               )}

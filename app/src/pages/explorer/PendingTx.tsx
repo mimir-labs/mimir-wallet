@@ -35,7 +35,7 @@ function PendingTx({ address, url }: Props) {
         className='bg-secondary fixed right-0 bottom-0 left-0 h-[calc(50vh+60px)] w-full translate-y-[50vh] transition-all data-[expanded=true]:translate-y-0'
       >
         <div className='flex h-[60px] cursor-pointer items-center justify-between px-6' onClick={toggleExpand}>
-          <h6 data-expanded={expanded} className='text-medium text-secondary-foreground font-bold'>
+          <h6 data-expanded={expanded} className='text-secondary-foreground text-base font-bold'>
             {counts} Pending Transactions
           </h6>
           <Button
@@ -45,7 +45,7 @@ function PendingTx({ address, url }: Props) {
             color='secondary'
             radius='full'
             className='bg-primary/5 data-[expanded=true]:rotate-180'
-            onPress={toggleExpand}
+            onClick={toggleExpand}
           >
             <ExpandArrow />
           </Button>

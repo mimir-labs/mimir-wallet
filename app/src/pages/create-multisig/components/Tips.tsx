@@ -1,13 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { FormatBalance } from '@/components';
 import { REMOTE_PROXY_DOC_URL } from '@/constants';
 import { useMemo } from 'react';
 
 import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Link } from '@mimir-wallet/ui';
+import { Alert, AlertDescription, AlertTitle } from '@mimir-wallet/ui';
 
 function Tips({ flexible }: { flexible: boolean }) {
   const { chain, genesisHash, api } = useApi();
@@ -25,13 +24,10 @@ function Tips({ flexible }: { flexible: boolean }) {
   );
 
   return (
-    <Alert
-      color='warning'
-      classNames={{ title: 'font-bold text-medium text-foreground', description: 'text-foreground/50 text-tiny' }}
-      icon={<IconInfo />}
-      title='Notice'
-      description={
-        flexible ? (
+    <Alert variant='warning'>
+      <AlertTitle className='text-foreground text-base/4 font-bold'>Notice</AlertTitle>
+      <AlertDescription className='text-foreground/50 text-xs'>
+        {flexible ? (
           <ul style={{ listStyle: 'outside', lineHeight: '14px' }}>
             <li>
               This pure proxy can be ONlY used on{' '}
@@ -47,9 +43,9 @@ function Tips({ flexible }: { flexible: boolean }) {
                     src={remoteProxyChain.icon}
                   />{' '}
                   {remoteProxyChain.name} (via{' '}
-                  <Link className='text-primary/50' isExternal href={REMOTE_PROXY_DOC_URL}>
+                  <a className='text-primary/50' href={REMOTE_PROXY_DOC_URL} target='_blank' rel='noopener noreferrer'>
                     Remote Proxy
-                  </Link>
+                  </a>
                   ).
                 </>
               ) : (
@@ -71,9 +67,9 @@ function Tips({ flexible }: { flexible: boolean }) {
             <li>This multisig could be used on Polkadot, Kusama and ALL Substrate chains.</li>
             <li>Once created, the multisig Signers and threshold can NOT be modified.</li>
           </ul>
-        )
-      }
-    />
+        )}
+      </AlertDescription>
+    </Alert>
   );
 }
 

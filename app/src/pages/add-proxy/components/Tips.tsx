@@ -1,13 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { AddressName, FormatBalance } from '@/components';
 import { POLKADOT_PROXY_WIKI_URL, REMOTE_PROXY_DOC_URL } from '@/constants';
 import { useMemo } from 'react';
 
 import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Link } from '@mimir-wallet/ui';
+import { Alert, AlertDescription, AlertTitle } from '@mimir-wallet/ui';
 
 function Tips({ pure, proxied, proxy }: { pure?: boolean; proxied?: string; proxy?: string }) {
   const { chain, genesisHash, api } = useApi();
@@ -25,12 +24,9 @@ function Tips({ pure, proxied, proxy }: { pure?: boolean; proxied?: string; prox
   );
 
   return (
-    <Alert
-      color='warning'
-      classNames={{ title: 'font-bold text-medium text-foreground', description: 'text-foreground/50 text-tiny' }}
-      icon={<IconInfo />}
-      title='Notice'
-      description={
+    <Alert variant='warning'>
+      <AlertTitle className='text-foreground text-base/4 font-bold'>Notice</AlertTitle>
+      <AlertDescription className='text-foreground/50 text-xs'>
         <div>
           <ul style={{ listStyle: 'outside', lineHeight: '14px' }}>
             {!pure && proxied && proxy ? (
@@ -57,9 +53,9 @@ function Tips({ pure, proxied, proxy }: { pure?: boolean; proxied?: string; prox
                     src={remoteProxyChain.icon}
                   />{' '}
                   {remoteProxyChain.name} (via{' '}
-                  <Link className='text-primary/50' isExternal href={REMOTE_PROXY_DOC_URL}>
+                  <a className='text-primary/50' href={REMOTE_PROXY_DOC_URL} target='_blank' rel='noopener noreferrer'>
                     Remote Proxy
-                  </Link>
+                  </a>
                   ).
                 </>
               ) : (
@@ -76,12 +72,17 @@ function Tips({ pure, proxied, proxy }: { pure?: boolean; proxied?: string; prox
               deposit will be locked for proxy creation until proxy removal.
             </li>
           </ul>
-          <Link className='mt-2.5 flex -translate-x-[24px]' isExternal href={POLKADOT_PROXY_WIKI_URL}>
+          <a
+            className='mt-2.5 flex -translate-x-[18px]'
+            href={POLKADOT_PROXY_WIKI_URL}
+            target='_blank'
+            rel='noopener noreferrer'
+          >
             View Detail {'>'}
-          </Link>
+          </a>
         </div>
-      }
-    />
+      </AlertDescription>
+    </Alert>
   );
 }
 

@@ -11,14 +11,14 @@ import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
 import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Divider } from '@mimir-wallet/ui';
+import { Alert, AlertDescription, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 
 function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
     <div className='space-y-[5px]'>
       <div className='font-bold'>{title}</div>
 
-      <div className='bg-secondary rounded-medium p-2.5'>{content}</div>
+      <div className='bg-secondary rounded-[10px] p-2.5'>{content}</div>
     </div>
   );
 }
@@ -40,8 +40,11 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
       ) : null}
 
       {!call && (
-        <Alert title='Warning' color='warning'>
-          This transaction wasn’t initiated from Mimir. Please confirm the security of this transaction.
+        <Alert variant='warning'>
+          <AlertTitle>Warning</AlertTitle>
+          <AlertDescription>
+            This transaction wasn't initiated from Mimir. Please confirm the security of this transaction.
+          </AlertDescription>
         </Alert>
       )}
     </>
@@ -63,7 +66,7 @@ function Details({ transaction }: { transaction: Transaction }) {
   }, [api, transaction.call]);
 
   return (
-    <div className='bg-content1 border-secondary shadow-medium rounded-large space-y-2.5 border-1 p-4'>
+    <div className='bg-content1 border-secondary shadow-medium space-y-2.5 rounded-[20px] border-1 p-4'>
       <h6 className='text-primary'>Detail</h6>
       <Divider />
 
@@ -83,7 +86,7 @@ function Details({ transaction }: { transaction: Transaction }) {
       <Target address={transaction.address} call={call} />
 
       {!isOpen && (
-        <Button fullWidth color='secondary' radius='md' variant='solid' onPress={toggleOpen}>
+        <Button fullWidth color='secondary' radius='md' variant='solid' onClick={toggleOpen}>
           Detail
         </Button>
       )}

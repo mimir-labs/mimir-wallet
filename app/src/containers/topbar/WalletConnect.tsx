@@ -34,7 +34,7 @@ function WalletConnect() {
 
   if (!isReady)
     return (
-      <Tooltip placement='bottom' color='default' closeDelay={0} content='Connecting to WalletConnect...'>
+      <Tooltip color='default' content='Connecting to WalletConnect...'>
         <Button className={buttonClassName} color='primary' variant='ghost' radius='md'>
           <Spinner size='sm' color='current' />
         </Button>
@@ -56,16 +56,15 @@ function WalletConnect() {
           ])
         }}
       >
-        <Tooltip placement='bottom' color='default' closeDelay={0} content='WalletConnect'>
+        <Tooltip color='default' content='WalletConnect'>
           <Button
-            isLoading={!isReady}
-            isDisabled={!isReady}
+            disabled={!isReady}
             isIconOnly
             className={buttonClassName}
             color='primary'
             variant='ghost'
             radius='md'
-            onPress={toggleOpen}
+            onClick={toggleOpen}
           >
             <IconWalletConnect />
           </Button>

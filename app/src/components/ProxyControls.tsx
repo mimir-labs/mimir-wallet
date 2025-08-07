@@ -1,8 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { usePress } from '@mimir-wallet/ui';
-
 interface ProxyControlsProps {
   className?: string;
   proxyType?: string;
@@ -19,16 +17,15 @@ function ProxyControls({ proxyType, className = '', tiny = false, variant, onSwi
   // Auto-detect variant based on proxyType presence
   const effectiveVariant = variant || (proxyType ? 'with-type' : 'controls-only');
 
-  const { pressProps } = usePress({
-    onPress: onSwitch
-  });
-
   // Controls only style - shows blue CONTROLS badge with arrow
   if (effectiveVariant === 'controls-only') {
     return (
       <div
         className={`group bg-primary relative flex h-[28px] cursor-pointer items-center justify-center rounded-full p-[5px] transition-all ${className}`}
-        {...pressProps}
+        onClick={(e) => {
+          e.stopPropagation();
+          onSwitch?.();
+        }}
       >
         <svg
           xmlns='http://www.w3.org/2000/svg'
@@ -47,7 +44,7 @@ function ProxyControls({ proxyType, className = '', tiny = false, variant, onSwi
             fontSize: '10px',
             lineHeight: '7px'
           }}
-          className='bg-primary text-primary-foreground text-tiny relative z-10 uppercase group-hover:hidden'
+          className='bg-primary text-primary-foreground relative z-10 text-xs uppercase group-hover:hidden'
         >
           Controls
         </span>
@@ -56,7 +53,7 @@ function ProxyControls({ proxyType, className = '', tiny = false, variant, onSwi
             fontSize: '10px',
             lineHeight: '7px'
           }}
-          className='bg-primary text-primary-foreground text-tiny relative z-10 hidden uppercase group-hover:inline'
+          className='bg-primary text-primary-foreground relative z-10 hidden text-xs uppercase group-hover:inline'
         >
           Switch
         </span>
@@ -86,7 +83,7 @@ function ProxyControls({ proxyType, className = '', tiny = false, variant, onSwi
           fontSize: '10px',
           lineHeight: '7px'
         }}
-        className='bg-primary text-primary-foreground text-tiny relative z-10 uppercase'
+        className='bg-primary text-primary-foreground relative z-10 text-xs uppercase'
       >
         {proxyType}
       </span>
@@ -100,7 +97,7 @@ function ProxyControls({ proxyType, className = '', tiny = false, variant, onSwi
           fontSize: '10px',
           lineHeight: '7px'
         }}
-        className='bg-primary text-primary-foreground text-tiny relative z-10 px-2.5 uppercase'
+        className='bg-primary text-primary-foreground relative z-10 px-2.5 text-xs uppercase'
       >
         Controls
       </span>

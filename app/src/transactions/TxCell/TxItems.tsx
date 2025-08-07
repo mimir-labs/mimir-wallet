@@ -12,9 +12,10 @@ import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
 import moment from 'moment';
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Link, Tooltip } from '@mimir-wallet/ui';
+import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import Progress from '../Progress';
 import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
@@ -49,7 +50,7 @@ function ActionsCell({ withDetails, detailOpen }: { withDetails?: boolean; detai
     <div className='flex w-full items-center justify-between'>
       <div />
       {withDetails ? (
-        <Button isIconOnly color='primary' variant='light' onPress={(e) => e.continuePropagation()}>
+        <Button continuePropagation isIconOnly color='primary' variant='light'>
           <ArrowDown
             className={`text-primary transform-origin-center transition-transform duration-200 ${
               detailOpen ? 'rotate-180' : 'rotate-0'
@@ -58,8 +59,8 @@ function ActionsCell({ withDetails, detailOpen }: { withDetails?: boolean; detai
           />
         </Button>
       ) : (
-        <Button as={Link} href='/transactions' variant='light'>
-          View More
+        <Button asChild variant='light'>
+          <Link to='/transactions'>View More</Link>
         </Button>
       )}
     </div>
@@ -99,7 +100,7 @@ function TxItems({
 
   return (
     <>
-      <div className='rounded-medium bg-secondary overflow-hidden transition-all duration-200'>
+      <div className='bg-secondary overflow-hidden rounded-[10px] transition-all duration-200'>
         <div
           className='grid cursor-pointer grid-cols-10 gap-2.5 px-2.5 font-semibold sm:px-4 md:grid-cols-12 md:px-5 lg:grid-cols-[repeat(15,_minmax(0,_1fr))] [&>div]:flex [&>div]:h-10 [&>div]:items-center'
           onClick={toggleDetailOpen}
@@ -136,7 +137,7 @@ function TxItems({
           </div>
         </div>
         {withDetails && detailOpen && (
-          <div className='rounded-medium bg-content1 mx-3 mb-3 flex flex-row gap-3 p-3 md:mx-4 md:mb-4 md:gap-4 md:p-4'>
+          <div className='bg-content1 mx-3 mb-3 flex flex-row gap-3 rounded-[10px] p-3 md:mx-4 md:mb-4 md:gap-4 md:p-4'>
             <Extrinsic
               transaction={transaction}
               call={call}

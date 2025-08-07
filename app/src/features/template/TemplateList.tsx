@@ -35,19 +35,17 @@ function TemplateList({
     <div className='h-full space-y-5'>
       <div className='flex items-center gap-1'>
         <h4>Call Template</h4>
-        <Tooltip
-          content='Save frequently used on-chain operation templates for repeated use in the future.'
-          closeDelay={0}
-        >
+        <Tooltip content='Save frequently used on-chain operation templates for repeated use in the future.'>
           <IconQuestion />
         </Tooltip>
 
         <div className='flex-1' />
 
-        <Button variant='ghost' color='primary' endContent={<IconAdd className='h-4 w-4' />} onPress={onAdd}>
+        <Button variant='ghost' color='primary' onClick={onAdd}>
           Add
+          <IconAdd className='h-4 w-4' />
         </Button>
-        <Button isIconOnly color='primary' variant='ghost' onPress={onClose}>
+        <Button isIconOnly color='primary' variant='ghost' onClick={onClose}>
           <IconClose />
         </Button>
       </div>

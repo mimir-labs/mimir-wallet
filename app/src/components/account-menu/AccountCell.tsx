@@ -9,9 +9,10 @@ import { usePinAccounts } from '@/hooks/usePinAccounts';
 import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { Button, Link, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@mimir-wallet/ui';
+import { Button, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@mimir-wallet/ui';
 
 import AddressCell from '../AddressCell';
 
@@ -33,16 +34,16 @@ function AccountCell({
   const { isLocalAccount, deleteAddress, hideAccount, addAddressBook } = useAccount();
   const [totalUsd] = useBalanceTotalUsd(value);
   const source = useAccountSource(value);
-  const [formatUsd, setFormatUsd] = useState<React.ReactNode>(<Skeleton className='rounded-small h-4 w-16' />);
+  const [formatUsd, setFormatUsd] = useState<React.ReactNode>(<Skeleton className='h-4 w-16 rounded-[5px]' />);
 
   useEffect(() => {
     if (!totalUsd) {
-      setFormatUsd(<div className='text-tiny font-bold whitespace-nowrap'>$ 0</div>);
+      setFormatUsd(<div className='text-xs font-bold whitespace-nowrap'>$ 0</div>);
     } else {
       const formatUsd = formatDisplay(totalUsd.toString());
 
       setFormatUsd(
-        <div className='text-tiny font-bold whitespace-nowrap'>
+        <div className='text-xs font-bold whitespace-nowrap'>
           $ {formatUsd[0]}
           {formatUsd[1] ? `.${formatUsd[1]}` : ''}
           {formatUsd[2] || ''}
@@ -63,12 +64,12 @@ function AccountCell({
   return (
     <Button
       fullWidth
-      onPress={handleClick}
+      onClick={handleClick}
       variant='bordered'
       color='secondary'
       size='md'
       data-selected={selected}
-      className='text-foreground rounded-medium data-[selected=true]:bg-secondary h-[50px] justify-between px-1 py-1 sm:px-2.5'
+      className='text-foreground data-[selected=true]:bg-secondary h-[50px] justify-between rounded-[10px] px-1 py-1 sm:px-2.5'
     >
       <AddressCell
         className='min-w-0 flex-1'
@@ -85,30 +86,35 @@ function AccountCell({
       {formatUsd}
 
       {withAdd && (
-        <Button isIconOnly color='default' size='sm' variant='light' onPress={() => addAddressBook(value, true)}>
+        <Button
+          isIconOnly
+          className='text-inherit'
+          size='sm'
+          variant='light'
+          onClick={() => addAddressBook(value, true)}
+        >
           <IconAdd />
         </Button>
       )}
 
       {value && (isLocal || watchlist) && (
-        <Popover radius='md'>
-          <PopoverTrigger>
-            <Button isIconOnly size='sm' variant='light' color='default'>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button isIconOnly size='sm' variant='light' className='text-inherit'>
               <IconMore className='h-4 w-4' />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className='items-stretch space-y-2.5 p-2.5'>
+          <PopoverContent className='flex flex-col items-stretch gap-y-2.5 p-2.5'>
             {value &&
               isLocal && [
                 source ? null : (
                   <Button
                     key='hide-0'
-                    disableRipple
                     radius='sm'
                     variant='light'
                     color='primary'
                     className='text-foreground justify-start'
-                    onPress={() => {
+                    onClick={() => {
                       hideAccount(value);
                     }}
                   >
@@ -117,25 +123,22 @@ function AccountCell({
                 ),
                 <Button
                   key='setting-1'
-                  as={Link}
-                  disableRipple
+                  asChild
                   radius='sm'
                   variant='light'
                   color='primary'
                   className='text-foreground justify-start'
-                  onPress={onClose}
-                  href={`/account-setting?address=${value}`}
+                  onClick={onClose}
                 >
-                  Setting
+                  <Link to={`/account-setting?address=${value}`}>Setting</Link>
                 </Button>,
                 <Button
                   key='pin-0'
-                  disableRipple
                   radius='sm'
                   variant='light'
                   color='primary'
                   className='text-foreground justify-start'
-                  onPress={() => {
+                  onClick={() => {
                     if (isPinned) {
                       removePinnedAccount(value);
                     } else {
@@ -150,12 +153,11 @@ function AccountCell({
             {value && watchlist && (
               <Button
                 key='delete-2'
-                disableRipple
                 radius='sm'
                 variant='light'
                 color='primary'
                 className='text-foreground justify-start'
-                onPress={() => deleteAddress(value)}
+                onClick={() => deleteAddress(value)}
               >
                 Delete
               </Button>

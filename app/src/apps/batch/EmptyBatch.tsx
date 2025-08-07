@@ -1,7 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, Link } from '@mimir-wallet/ui';
+import { Link } from 'react-router-dom';
+
+import { Button } from '@mimir-wallet/ui';
 
 function EmptyBatch({
   onClose,
@@ -21,29 +23,22 @@ function EmptyBatch({
         />
         <circle opacity='0.21' cx='18.2568' cy='84.8008' r='18' fill='#2700FF' />
       </svg>
-      <h6 className='text-medium font-bold'>Batch Transactions</h6>
-      <p className='text-tiny'>Batch multiple actions into one</p>
+      <h6 className='text-base font-bold'>Batch Transactions</h6>
+      <p className='text-xs'>Batch multiple actions into one</p>
       {/* <Button onClick={onAdd} color='primary'>
         Add New Transaction
       </Button> */}
-      <Button
-        as={Link}
-        onPress={onClose}
-        href={`/explorer/${encodeURIComponent('mimir://app/transfer')}`}
-        color='primary'
-      >
-        Add New Transfer
+      <Button asChild color='primary'>
+        <Link to={`/explorer/${encodeURIComponent('mimir://app/transfer')}`} onClick={onClose}>
+          Add New Transfer
+        </Link>
       </Button>
-      <Button
-        as={Link}
-        onPress={onClose}
-        href={`/explorer/${encodeURIComponent('https://apps.mimir.global')}`}
-        color='primary'
-        variant='ghost'
-      >
-        Go to PolkadotJS
+      <Button asChild color='primary' variant='ghost'>
+        <Link to={`/explorer/${encodeURIComponent('https://apps.mimir.global')}`} onClick={onClose}>
+          Go to PolkadotJS
+        </Link>
       </Button>
-      <Button onPress={onHandleRestore} color='primary' variant='ghost'>
+      <Button onClick={onHandleRestore} color='primary' variant='ghost'>
         Restore
       </Button>
     </div>

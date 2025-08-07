@@ -14,10 +14,11 @@ import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
 import { formatDisplay } from '@/utils';
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Link, Tooltip } from '@mimir-wallet/ui';
+import { Button, Tooltip } from '@mimir-wallet/ui';
 
 function SubsquareLink({ network, address }: { network: string; address: string }) {
   const isSupported = SubsquareApp.supportedChains.includes(network);
@@ -31,8 +32,8 @@ function SubsquareLink({ network, address }: { network: string; address: string 
   url.pathname = `/user/${address}`;
 
   return (
-    <Tooltip content='Subsquare' closeDelay={0}>
-      <Link href={`/explorer/${encodeURIComponent(url.toString())}`}>
+    <Tooltip content='Subsquare'>
+      <Link to={`/explorer/${encodeURIComponent(url.toString())}`}>
         <img style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subsquare' />
       </Link>
     </Tooltip>
@@ -54,61 +55,40 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
   );
   const buttons = (
     <div className='item-center grid w-full grid-cols-2 gap-2 pt-2.5 sm:w-auto md:flex'>
-      <Button
-        as={Link}
-        href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}`}
-        variant='solid'
-        color='primary'
-        size='md'
-        endContent={<IconSend />}
-        className='h-[26px]'
-      >
-        Transfer
+      <Button asChild variant='solid' color='primary' size='md' className='h-[26px]'>
+        <Link to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}`}>
+          Transfer
+          <IconSend />
+        </Link>
       </Button>
-      <Button
-        onPress={toggleOpen}
-        variant='ghost'
-        color='primary'
-        size='md'
-        endContent={<IconCancel />}
-        className='h-[26px]'
-      >
+      <Button onClick={toggleOpen} variant='ghost' color='primary' size='md' className='h-[26px]'>
         Fund
+        <IconCancel />
       </Button>
-      <Button
-        as={Link}
-        href='/add-proxy'
-        variant='ghost'
-        color='primary'
-        size='md'
-        endContent={<IconProxy />}
-        className='h-[26px]'
-      >
-        Proxy
+      <Button asChild variant='ghost' color='primary' size='md' className='h-[26px]'>
+        <Link to='/add-proxy'>
+          Proxy
+          <IconProxy />
+        </Link>
       </Button>
-      <Button
-        as={Link}
-        href='/extrinsic'
-        variant='ghost'
-        color='primary'
-        size='md'
-        endContent={<IconProxy />}
-        className='h-[26px]'
-      >
-        Extrinsic
+      <Button asChild variant='ghost' color='primary' size='md' className='h-[26px]'>
+        <Link to='/extrinsic'>
+          Extrinsic
+          <IconProxy />
+        </Link>
       </Button>
       {showAddWatchlistButton ? (
         <Button
           variant='ghost'
           color='primary'
           size='md'
-          endContent={<IconWatch />}
           className='h-[26px]'
-          onPress={() => {
+          onClick={() => {
             addAddressBook(address, true);
           }}
         >
           Add To watchlist
+          <IconWatch />
         </Button>
       ) : null}
     </div>
@@ -116,17 +96,18 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
   return (
     <>
-      <div className='rounded-large border-secondary bg-content1 shadow-medium relative flex h-auto w-full flex-col items-start justify-between gap-[5px] border-1 p-4 sm:p-5 md:h-[210px]'>
+      <div className='border-secondary bg-content1 shadow-medium relative flex h-auto w-full flex-col items-start justify-between gap-[5px] rounded-[20px] border-1 p-4 sm:p-5 md:h-[210px]'>
         <Button
-          className='absolute top-4 right-4 rotate-0 transition-transform duration-300 hover:rotate-180'
-          as={Link}
+          className='absolute top-4 right-4 flex rotate-0 !transition-transform !duration-300 hover:rotate-180'
+          asChild
           isIconOnly
           variant='solid'
           color='secondary'
-          href='/account-setting'
           size='lg'
         >
-          <IconSet />
+          <Link to='/account-setting'>
+            <IconSet />
+          </Link>
         </Button>
 
         <h1 className='text-[50px] leading-[1.2]'>
@@ -135,7 +116,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
           {formatUsd[2] || ''}
         </h1>
 
-        <p className='text-medium font-bold'>
+        <p className='text-base font-bold'>
           <span
             data-up={changes > 0}
             data-down={changes < 0}
@@ -151,10 +132,10 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
         <div className='flex items-center gap-[5px]'>
           <SubsquareLink network={network} address={address} />
-          <Tooltip content='Sub ID' closeDelay={0}>
-            <Link href={`https://sub.id/${address}`} isExternal>
+          <Tooltip content='Sub ID'>
+            <a href={`https://sub.id/${address}`} target='_blank' rel='noopener noreferrer'>
               <img src={SubId} className='h-4 w-4' />
-            </Link>
+            </a>
           </Tooltip>
         </div>
 

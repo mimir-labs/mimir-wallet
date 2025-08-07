@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Card, CardBody, CardHeader, Divider, Spinner } from '@mimir-wallet/ui';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider, Spinner } from '@mimir-wallet/ui';
 
 import Step1ConfigureAccess from './Step1ConfigureAccess';
 import Step2PermissionLevel from './Step2PermissionLevel';
@@ -76,25 +76,29 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
     <SubApiRoot
       network={network}
       Fallback={() => (
-        <div className='bg-content1 rounded-large mx-auto my-0 flex w-[800px] max-w-full items-center justify-center py-10'>
+        <div className='bg-content1 mx-auto my-0 flex w-[800px] max-w-full items-center justify-center rounded-[20px] py-10'>
           <Spinner size='lg' variant='wave' label='Connecting to the network...' />
         </div>
       )}
     >
       <div className='mx-auto flex w-full max-w-[800px] flex-col gap-5'>
         <div className='flex items-center justify-between'>
-          <Button onPress={() => navigate(-1)} variant='ghost'>
+          <Button onClick={() => navigate(-1)} variant='ghost'>
             {'<'} Back
           </Button>
         </div>
 
         <Card className='shadow-small mx-auto w-full max-w-[800px]'>
-          <CardHeader className='flex flex-col gap-4 p-5'>
-            <h1 className='text-foreground text-xl font-extrabold'>Proxy Authorization Setup</h1>
-            <Divider className='bg-secondary' />
-            <StepIndicator steps={STEPS} currentStep={wizardState.currentStep} />
+          <CardHeader className='gap-4'>
+            <CardTitle className='text-foreground text-center text-xl font-extrabold'>
+              Proxy Authorization Setup
+            </CardTitle>
+            <Divider />
+            <CardDescription>
+              <StepIndicator steps={STEPS} currentStep={wizardState.currentStep} />
+            </CardDescription>
           </CardHeader>
-          <CardBody className='p-5 pt-0'>
+          <CardContent>
             {wizardState.currentStep === 1 && (
               <Step1ConfigureAccess
                 network={network}
@@ -130,7 +134,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
                 onConfirm={handleConfirm}
               />
             )}
-          </CardBody>
+          </CardContent>
         </Card>
       </div>
 

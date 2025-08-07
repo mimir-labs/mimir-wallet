@@ -24,28 +24,25 @@ function MultiTransfer() {
     <SubApiRoot
       network={network}
       Fallback={({ apiState: { chain } }) => (
-        <div className='bg-content1 rounded-large mx-auto mt-16 flex w-[500px] max-w-full items-center justify-center py-10'>
+        <div className='bg-content1 mx-auto mt-16 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
           <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
         </div>
       )}
     >
       <div className='mx-auto w-full max-w-[900px] p-4 sm:p-5'>
-        <Button onPress={() => navigate(-1)} variant='ghost'>
+        <Button onClick={() => navigate(-1)} variant='ghost'>
           {'<'} Back
         </Button>
-        <div className='rounded-large border-secondary shadow-medium bg-content1 mt-4 flex flex-col gap-5 border-1 p-4 sm:p-5'>
+        <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-4 sm:p-5'>
           <div className='flex flex-col gap-5'>
             <div className='flex items-center justify-between'>
               <h3>Multi Transfer</h3>
 
-              <Button
-                as={Link}
-                to={`/explorer/${encodeURIComponent('mimir://app/transfer')}`}
-                color='primary'
-                variant='light'
-                startContent={<IconTransfer />}
-              >
-                Solo-Transfer
+              <Button asChild color='primary' variant='light'>
+                <Link to={`/explorer/${encodeURIComponent('mimir://app/transfer')}`}>
+                  <IconTransfer />
+                  Solo-Transfer
+                </Link>
               </Button>
             </div>
           </div>

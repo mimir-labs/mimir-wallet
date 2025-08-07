@@ -14,7 +14,7 @@ import React, { useState } from 'react';
 
 import { sign, signAndSend, TxEvents, useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Alert, Button } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button, buttonSpinner } from '@mimir-wallet/ui';
 
 import { toastError } from '../utils';
 import { useDryRunResult } from './hooks/useDryRunResult';
@@ -153,22 +153,41 @@ function SendTx({
 
   return (
     <>
-      {error ? <Alert color='danger' title={<span className='break-all'>{error.message}</span>} /> : null}
-
-      {Object.keys(delay).length > 0 ? (
-        <Alert color='warning' title='This transaction can be executed after review window' />
+      {error ? (
+        <Alert variant='destructive'>
+          <AlertTitle>
+            <span className='break-all'>{error.message}</span>
+          </AlertTitle>
+        </Alert>
       ) : null}
 
-      {dryRunResult && !dryRunResult.success ? <Alert color='danger' title={dryRunResult.error.message} /> : null}
+      {Object.keys(delay).length > 0 ? (
+        <Alert variant='warning'>
+          <AlertTitle>This transaction can be executed after review window</AlertTitle>
+        </Alert>
+      ) : null}
+
+      {dryRunResult && !dryRunResult.success ? (
+        <Alert variant='destructive'>
+          <AlertTitle>{dryRunResult.error.message}</AlertTitle>
+        </Alert>
+      ) : null}
 
       <Button
         fullWidth
         variant='solid'
         color='primary'
-        onPress={error ? undefined : onConfirm}
-        isLoading={loading || isLoading}
-        isDisabled={!txBundle?.signer || !!error || disabled || (dryRunResult ? !dryRunResult.success : false)}
+        onClick={error ? undefined : onConfirm}
+        disabled={
+          loading ||
+          isLoading ||
+          !txBundle?.signer ||
+          !!error ||
+          disabled ||
+          (dryRunResult ? !dryRunResult.success : false)
+        }
       >
+        {loading || isLoading ? buttonSpinner : null}
         Submit
       </Button>
     </>

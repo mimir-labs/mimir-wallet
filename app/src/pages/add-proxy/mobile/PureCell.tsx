@@ -8,7 +8,7 @@ function PureCell() {
     <div className='w-full border-1 border-transparent'>
       <p className='mb-2.5 font-bold'>Proxied Account</p>
       <div
-        className='bg-secondary rounded-medium flex items-center gap-2.5 p-2.5'
+        className='bg-secondary flex items-center gap-2.5 rounded-[10px] p-2.5'
         style={{
           height: 56.8,
           fontWeight: 700

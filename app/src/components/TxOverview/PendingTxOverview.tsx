@@ -126,7 +126,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
         />
       )}
       <div
-        className='bg-content1 rounded-medium'
+        className='bg-content1 rounded-[10px]'
         style={{
           border: '1px solid hsl(var(--heroui-divider-300))',
           borderColor,

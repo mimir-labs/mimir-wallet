@@ -4,11 +4,10 @@
 import type { FilterPath } from '@/hooks/types';
 
 import IconClock from '@/assets/svg/icon-clock.svg?react';
-import { AnimatePresence } from 'framer-motion';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 
-import { Chip, FreeSoloPopover, Listbox, ListboxItem } from '@mimir-wallet/ui';
+import { Chip, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
 
 import AddressCell from './AddressCell';
 
@@ -63,7 +62,6 @@ function FilterPathCell({ filterPath }: { filterPath: FilterPath }) {
 
 function SelectFilterPath({ label, filterPaths, value, onChange }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
   const [isOpen, toggleOpen] = useToggle(false);
 
   const handleSelect = (item: FilterPath) => {
@@ -76,51 +74,44 @@ function SelectFilterPath({ label, filterPaths, value, onChange }: Props) {
     toggleOpen(true);
   };
 
-  const handleClose = () => {
-    toggleOpen(false);
-  };
-
-  const popoverContent = isOpen ? (
-    <FreeSoloPopover
-      isOpen
-      disableDialogFocus
-      onClose={handleClose}
-      ref={popoverRef}
-      triggerRef={wrapperRef}
-      placement='bottom-start'
-      style={{ width: wrapperRef.current?.clientWidth, zIndex: 50 }}
-      classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
-    >
-      <Listbox color='secondary' emptyContent='no addresses' className='text-foreground max-h-[250px] overflow-y-auto'>
-        {filterPaths.map((item) => (
-          <ListboxItem
-            key={item.id}
-            onPress={() => handleSelect(item)}
-            className='text-foreground data-[hover=true]:text-foreground'
-          >
-            <FilterPathCell filterPath={item} />
-          </ListboxItem>
-        ))}
-      </Listbox>
-    </FreeSoloPopover>
-  ) : null;
-
   return (
-    <>
-      <div className='w-full space-y-2 data-[disabled=true]:pointer-events-none'>
-        {label && <div className='text-small font-bold'>{label}</div>}
+    <div className='w-full space-y-2 data-[disabled=true]:pointer-events-none'>
+      {label && <div className='text-sm font-bold'>{label}</div>}
 
-        <div
-          ref={wrapperRef}
-          className='tap-highlight-transparent border-medium rounded-medium border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none'
-          onClick={handleOpen}
+      <Popover open={isOpen} onOpenChange={toggleOpen}>
+        <PopoverTrigger asChild>
+          <div
+            ref={wrapperRef}
+            className='tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 rounded-[10px] border-1 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none'
+            onClick={handleOpen}
+          >
+            <FilterPathCell filterPath={value} />
+          </div>
+        </PopoverTrigger>
+        <PopoverContent
+          style={{ width: wrapperRef.current?.clientWidth }}
+          className='border-divider-300 border-1 p-[5px]'
         >
-          <FilterPathCell filterPath={value} />
-        </div>
-      </div>
-
-      <AnimatePresence>{popoverContent}</AnimatePresence>
-    </>
+          {filterPaths.length > 0 ? (
+            <div className='text-foreground max-h-[250px] overflow-y-auto'>
+              <ul className='flex list-none flex-col'>
+                {filterPaths.map((item) => (
+                  <li
+                    key={item.id}
+                    onClick={() => handleSelect(item)}
+                    className='text-foreground transition-background hover:bg-secondary flex cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5'
+                  >
+                    <FilterPathCell filterPath={item} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className='text-foreground/50 text-center'>no addresses</div>
+          )}
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }
 

@@ -6,17 +6,7 @@ import { useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import {
-  Button,
-  Divider,
-  Link,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Switch
-} from '@mimir-wallet/ui';
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@mimir-wallet/ui';
 
 import AccountCard from './AccountCard';
 
@@ -45,13 +35,14 @@ function AccountVisibility({ isOpen, onConfirm, pureAddress, multisigAddress }: 
           <p className='text-foreground text-sm'>
             The proxy is your everyday account. The Multisig stays in the background for security and is safe to
             hide.&nbsp;
-            <Link
-              isExternal
+            <a
               href='https://docs.mimir.global/basic/accounts#id-2.1-account-visibility'
-              underline='hover'
+              className='hover:underline'
+              target='_blank'
+              rel='noopener noreferrer'
             >
               Details&gt;&gt;
-            </Link>
+            </a>
           </p>
 
           <Divider className='bg-primary/5' />
@@ -91,7 +82,7 @@ function AccountVisibility({ isOpen, onConfirm, pureAddress, multisigAddress }: 
             variant='solid'
             radius='full'
             className='bg-primary text-primary-foreground h-8'
-            onPress={() => {
+            onClick={() => {
               service.account.updateAccountName(network, pureAddress, pureName);
               service.account.updateAccountName(network, multisigAddress, multisigName);
               setAccountName(pureAddress, pureName);

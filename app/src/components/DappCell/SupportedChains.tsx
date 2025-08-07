@@ -26,10 +26,8 @@ function SupportedChains({ app }: { app: DappOption }) {
       classNames={{ content: 'max-w-[300px]' }}
       color='foreground'
       content={supportedNetworks.map((network) => network.name).join(', ')}
-      closeDelay={0}
-      disableAnimation
     >
-      <AvatarGroup max={3} renderCount={(count) => <p className='text-tiny text-foreground/50 !ms-1'>+{count}</p>}>
+      <AvatarGroup max={3} renderCount={(count) => <p className='text-foreground/50 !ms-1 text-xs'>+{count}</p>}>
         {supportedNetworks.map((network, index) => (
           <Avatar
             classNames={{ base: 'data-[hover=true]:translate-none' }}

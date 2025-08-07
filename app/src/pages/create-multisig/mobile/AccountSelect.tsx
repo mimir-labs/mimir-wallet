@@ -14,7 +14,7 @@ import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { addressEq, addressToHex, isPolkadotAddress, zeroAddress } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip, usePress } from '@mimir-wallet/ui';
+import { Button, Tooltip } from '@mimir-wallet/ui';
 
 interface Props {
   withSearch?: boolean;
@@ -74,9 +74,6 @@ function Item({
   onClick: (value: string) => void;
 }) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const { pressProps } = usePress({
-    onPress: () => onClick(account)
-  });
 
   const _handleAdd = useCallback(() => {
     if (!(isLocalAddress(account) || isLocalAccount(account))) {
@@ -86,8 +83,11 @@ function Item({
 
   return (
     <div
-      className='rounded-small bg-secondary flex cursor-pointer snap-start items-center justify-between p-1'
-      {...pressProps}
+      className='bg-secondary flex cursor-pointer snap-start items-center justify-between rounded-[5px] p-1'
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick(account);
+      }}
     >
       <div>
         <Tooltip content={account}>
@@ -105,10 +105,10 @@ function Item({
       )}
       <Button
         isIconOnly
-        isDisabled={disabled}
+        disabled={disabled}
         variant='light'
         color={type === 'add' ? 'primary' : 'danger'}
-        onPress={() => {
+        onClick={() => {
           _handleAdd();
           onClick(account);
         }}
@@ -142,7 +142,7 @@ function AccountSelect({ withSearch, accounts, ignoreAccounts = [], onClick, tit
     <div className='flex flex-1 flex-col gap-3'>
       <b>{title}</b>
 
-      <div className='border-divider-300 rounded-medium bg-content1 relative mt-1 flex-1 space-y-2.5 overflow-y-auto border-1 p-2.5'>
+      <div className='border-divider-300 bg-content1 relative mt-1 flex-1 space-y-2.5 overflow-y-auto rounded-[10px] border-1 p-2.5'>
         {withSearch && (
           <Input
             className='bg-content1 sticky top-0 z-10'

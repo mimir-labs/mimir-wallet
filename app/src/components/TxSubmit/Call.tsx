@@ -12,7 +12,7 @@ import moment from 'moment';
 import { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Divider, Link } from '@mimir-wallet/ui';
+import { Divider } from '@mimir-wallet/ui';
 
 import Bytes from '../Bytes';
 import Hash from '../Hash';
@@ -35,7 +35,7 @@ function extractState(value: IMethod): Extracted {
 
 function Item({ title, content }: { title: string; content: React.ReactNode }) {
   return (
-    <div className='text-tiny grid w-full grid-cols-10 gap-2.5'>
+    <div className='grid w-full grid-cols-10 gap-2.5 text-xs'>
       <div className='col-span-2 flex items-center font-bold'>{title}</div>
       <div className='text-foreground/65 col-span-8 flex items-center font-bold'>{content}</div>
     </div>
@@ -51,7 +51,7 @@ function CallInfo({ callName, call }: { callName: string; call: IMethod }) {
       </summary>
 
       <FunctionArgs
-        className='rounded-medium bg-secondary mt-[5px] flex w-full shrink-0 flex-col gap-2.5 p-2.5'
+        className='bg-secondary mt-[5px] flex w-full shrink-0 flex-col gap-2.5 rounded-[10px] p-2.5'
         registry={call.registry}
         call={call}
       />
@@ -78,16 +78,14 @@ function TransactionInfo({
         <ArrowDown className='transform transition-transform group-open:rotate-180' />
       </summary>
 
-      <div className='border-divider-300 rounded-medium mt-[5px] flex flex-col gap-2.5 border-1 p-2.5'>
+      <div className='border-divider-300 mt-[5px] flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5'>
         <Item title='Call Hash' content={<Hash value={callHash} withCopy />} />
         <Item
           title='Call Data'
           content={
             <div className='flex items-center'>
               <Bytes value={callData} />
-              <Link as='button' onPress={() => events.emit('call_data_view', network, callData)}>
-                View Detail
-              </Link>
+              <button onClick={() => events.emit('call_data_view', network, callData)}>View Detail</button>
             </div>
           }
         />

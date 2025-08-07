@@ -94,16 +94,10 @@ function Content({
         />
       </ModalBody>
       <ModalFooter>
-        <Button color='primary' fullWidth onPress={onClose} variant='ghost'>
+        <Button color='primary' fullWidth onClick={onClose} variant='ghost'>
           Cancel
         </Button>
-        <Button
-          color='primary'
-          isDisabled={!(name || display) || !address}
-          fullWidth
-          onPress={_onCommit}
-          variant='solid'
-        >
+        <Button color='primary' disabled={!(name || display) || !address} fullWidth onClick={_onCommit} variant='solid'>
           Save
         </Button>
       </ModalFooter>

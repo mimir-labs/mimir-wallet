@@ -7,7 +7,7 @@ import IconLink from '@/assets/svg/icon-link.svg?react';
 import React from 'react';
 
 import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Link } from '@mimir-wallet/ui';
+import { Button } from '@mimir-wallet/ui';
 
 import CopyButton from './CopyButton';
 
@@ -23,25 +23,25 @@ function Hash({ value, withCopy, withExplorer }: Props) {
 
   const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(chain, stringValue) : undefined;
 
-  const C = explorerLink ? Link : 'span';
+  const C = explorerLink ? 'a' : 'span';
 
   return (
     <C
       data-link={!!explorerLink}
       className='flex items-center gap-1 text-[length:inherit] text-inherit no-underline data-[link="true"]:hover:underline'
       href={explorerLink}
-      target='_blank'
+      target={explorerLink ? '_blank' : undefined}
+      rel={explorerLink ? 'noopener noreferrer' : undefined}
     >
       <>
         {`${stringValue?.slice(0, 8)}…${stringValue?.slice(-8)}`}
         {withCopy && <CopyButton size='sm' value={stringValue} />}
         {explorerLink && (
           <Button
-            color='default'
             isIconOnly
             size='sm'
             variant='light'
-            className='h-5 min-h-[0px] w-5 min-w-[0px] opacity-50'
+            className='h-5 min-h-[0px] w-5 min-w-[0px] text-inherit opacity-50'
           >
             <IconLink className='h-4 w-4' />
           </Button>

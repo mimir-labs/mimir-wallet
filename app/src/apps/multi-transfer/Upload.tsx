@@ -77,7 +77,7 @@ function Upload({ onUpload, accept = '*', multiple = false, maxSize = 10 }: File
   );
 
   return (
-    <div className='bg-secondary rounded-medium mx-auto w-full px-2.5 py-3'>
+    <div className='bg-secondary mx-auto w-full rounded-[10px] px-2.5 py-3'>
       <div
         data-dragging={isDragging}
         className='data-[dragging=true]:border-primary relative cursor-pointer space-y-5 rounded-lg border-2 border-dashed border-transparent p-8 transition-all duration-300 ease-in-out'
@@ -106,14 +106,9 @@ function Upload({ onUpload, accept = '*', multiple = false, maxSize = 10 }: File
 
           <p className='text-foreground mb-2 text-lg font-semibold'>Drag files here or click to upload</p>
 
-          <Button
-            endContent={<IconDownload />}
-            variant='bordered'
-            size='sm'
-            color='primary'
-            onPress={generateExampleCsv}
-          >
+          <Button variant='bordered' size='sm' color='primary' onClick={generateExampleCsv}>
             Download example csv
+            <IconDownload />
           </Button>
         </div>
       </div>

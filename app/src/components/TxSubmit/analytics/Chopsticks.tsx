@@ -8,7 +8,7 @@ import IconSuccess from '@/assets/svg/icon-success.svg?react';
 import React, { useState } from 'react';
 
 import { simulate, useApi } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
+import { Button, buttonSpinner } from '@mimir-wallet/ui';
 
 import Cell from './Cell';
 
@@ -67,7 +67,7 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
               <Button
                 className='absolute top-full right-0 min-w-0 p-0'
                 variant='light'
-                onPress={() => {
+                onClick={() => {
                   const newWindow = window.open();
 
                   newWindow?.document.open();
@@ -81,7 +81,8 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
             </div>
           </div>
         ) : (
-          <Button variant='ghost' isLoading={simulation.isLoading} onPress={handleSimulate}>
+          <Button variant='ghost' disabled={simulation.isLoading} onClick={handleSimulate}>
+            {simulation.isLoading ? buttonSpinner : undefined}
             {simulation.isLoading ? '~30s' : 'Simulate'}
           </Button>
         )}

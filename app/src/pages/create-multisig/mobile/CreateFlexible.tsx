@@ -54,7 +54,7 @@ function ItemStep({
     <div className='bg-primary/5 flex w-full items-center gap-2.5 rounded-full'>
       <div
         data-disabled={disabled}
-        className='text-small data-[disabled=true]:bg-primary/5 bg-primary flex h-10 w-10 items-center justify-center rounded-full font-extrabold text-white'
+        className='data-[disabled=true]:bg-primary/5 bg-primary flex h-10 w-10 items-center justify-center rounded-full text-sm font-extrabold text-white'
       >
         {step}
       </div>
@@ -222,16 +222,16 @@ function CreateFlexible({
   return (
     <>
       <div className='mx-auto flex w-full max-w-[500px] flex-col gap-5'>
-        <Button className='self-start' onPress={onCancel} variant='ghost'>
+        <Button className='self-start' onClick={onCancel} variant='ghost'>
           {'<'} Back
         </Button>
 
-        <div className='rounded-large bg-content1 border-secondary shadow-medium border-1 p-4 sm:p-5'>
+        <div className='bg-content1 border-secondary shadow-medium rounded-[20px] border-1 p-4 sm:p-5'>
           <div className='space-y-4'>
             <h2>Add Pure Proxy</h2>
             <p>Please complete both steps to avoid unnecessary asset loss.</p>
             <Divider />
-            <div className='rounded-large bg-secondary shadow-small flex items-center gap-2 p-2.5'>
+            <div className='bg-secondary shadow-small flex items-center gap-2 rounded-[20px] p-2.5'>
               <ItemStep step={1}>
                 <div className='flex items-center justify-between gap-2'>
                   {pure ? (
@@ -244,7 +244,7 @@ function CreateFlexible({
                   ) : (
                     <b>Add Pure Proxy</b>
                   )}
-                  <div className='text-small flex items-center gap-1'>
+                  <div className='flex items-center gap-1 text-sm'>
                     <img src={chain.icon} style={{ width: 20, height: 20 }} />
                     {chain.name}
                   </div>
@@ -252,7 +252,7 @@ function CreateFlexible({
               </ItemStep>
             </div>
 
-            <div className='rounded-large bg-secondary shadow-small space-y-2.5 p-2.5'>
+            <div className='bg-secondary shadow-small space-y-2.5 rounded-[20px] p-2.5'>
               <div className='flex items-center gap-2'>
                 <ItemStep disabled={!pure} step={2}>
                   <b>
@@ -267,7 +267,6 @@ function CreateFlexible({
                         transfer some funds to keep Flexible alive.
                       </span>
                     }
-                    closeDelay={0}
                   >
                     <IconQuestion className='text-primary/50' />
                   </Tooltip>
@@ -276,10 +275,10 @@ function CreateFlexible({
 
               {who.map((address) => (
                 <div key={address} className='flex items-center justify-between'>
-                  <p className='text-tiny font-bold'>
+                  <p className='text-xs font-bold'>
                     <AddressRow value={address} />
                   </p>
-                  <p className='text-tiny text-foreground/50'>
+                  <p className='text-foreground/50 text-xs'>
                     <Address shorten value={address} />
                   </p>
                 </div>
@@ -313,10 +312,9 @@ function CreateFlexible({
               {pure ? (
                 <Button
                   color='danger'
-                  isDisabled={loadingFirst || loadingSecond}
+                  disabled={loadingFirst || loadingSecond}
                   fullWidth
-                  isLoading={loadingCancel}
-                  onPress={() => {
+                  onClick={() => {
                     if (pure && signer && blockNumber && extrinsicIndex) {
                       killPure(pure, signer, blockNumber, extrinsicIndex);
                     }
@@ -326,17 +324,16 @@ function CreateFlexible({
                   Delete Account
                 </Button>
               ) : (
-                <Button fullWidth onPress={onCancel} color='primary' variant='ghost'>
+                <Button fullWidth onClick={onCancel} color='primary' variant='ghost'>
                   Cancel
                 </Button>
               )}
               {pure ? (
                 <Button
-                  isDisabled={!(signer && pure) || loadingCancel || !source}
+                  disabled={!(signer && pure) || loadingCancel || !source}
                   fullWidth
                   color='primary'
-                  isLoading={loadingSecond}
-                  onPress={() => {
+                  onClick={() => {
                     if (pure && who && signer && source) {
                       createMembers(pure, who, signer, source, threshold);
                     }
@@ -345,13 +342,7 @@ function CreateFlexible({
                   Set Signers
                 </Button>
               ) : (
-                <Button
-                  isDisabled={!(signer && isEnought)}
-                  fullWidth
-                  color='primary'
-                  isLoading={loadingFirst}
-                  onPress={createPure}
-                >
+                <Button disabled={!(signer && isEnought)} fullWidth color='primary' onClick={createPure}>
                   Create
                 </Button>
               )}

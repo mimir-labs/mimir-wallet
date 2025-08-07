@@ -14,19 +14,9 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { useToggle } from '@/hooks/useToggle';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-import {
-  Button,
-  Divider,
-  Link,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Tooltip,
-  usePress
-} from '@mimir-wallet/ui';
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
 
 function Icons({ address }: { address: string }) {
   const [deleteOpen, toggleDeleteOpen] = useToggle();
@@ -40,17 +30,17 @@ function Icons({ address }: { address: string }) {
         <CopyAddress address={address} color='primary' className='min-h-6 min-w-6 opacity-100' />
       </Tooltip>
       <Tooltip content='QR Code'>
-        <Button isIconOnly color='primary' size='sm' variant='light' onPress={() => openQr(address)}>
+        <Button isIconOnly color='primary' size='sm' variant='light' onClick={() => openQr(address)}>
           <IconQr className='h-4 w-4' />
         </Button>
       </Tooltip>
       <Tooltip content='Open Explorer'>
-        <Button isIconOnly color='primary' variant='light' size='sm' onPress={() => openExplorer(address)}>
+        <Button isIconOnly color='primary' variant='light' size='sm' onClick={() => openExplorer(address)}>
           <IconLink className='h-4 w-4' />
         </Button>
       </Tooltip>
       <Tooltip content='Delete Address'>
-        <Button isIconOnly color='primary' size='sm' variant='light' onPress={toggleDeleteOpen}>
+        <Button isIconOnly color='primary' size='sm' variant='light' onClick={toggleDeleteOpen}>
           <IconDelete className='h-4 w-4' />
         </Button>
       </Tooltip>
@@ -66,10 +56,10 @@ function Icons({ address }: { address: string }) {
           </ModalBody>
           <Divider />
           <ModalFooter>
-            <Button fullWidth onPress={toggleDeleteOpen} color='danger' variant='ghost'>
+            <Button fullWidth onClick={toggleDeleteOpen} color='danger' variant='ghost'>
               Cancel
             </Button>
-            <Button fullWidth onPress={() => deleteAddress(address)} color='danger'>
+            <Button fullWidth onClick={() => deleteAddress(address)} color='danger'>
               Delete
             </Button>
           </ModalFooter>
@@ -85,45 +75,51 @@ function AddressItem({ address }: { address: string }) {
   const upSm = useMediaQuery('sm');
   const upMd = useMediaQuery('md');
   const copyAddress = useCopyAddressToClipboard(address);
-  const { pressProps } = usePress({
-    onPress: () => {
-      copyAddress();
-    }
-  });
 
   return (
     <>
       {!upSm && (
-        <div className='rounded-large border-secondary shadow-medium bg-content1 [&_.AddressCell-Name]:text-large [&_.AddressCell-Address]:text-small border-1 p-4 [&_.AddressCell-Address]:!mt-2.5 [&_.AddressCell-Content]:ml-2.5'>
+        <div className='border-secondary bg-content1 shadow-medium rounded-[20px] border-1 p-4 [&_.AddressCell-Address]:!mt-2.5 [&_.AddressCell-Address]:text-sm [&_.AddressCell-Content]:ml-2.5 [&_.AddressCell-Name]:text-lg'>
           <AddressCell iconSize={50} icons={<Icons address={address} />} shorten value={address} withCopy={false} />
           <div className='mt-5 flex gap-2.5'>
-            <Button onPress={toggleOpen} variant='ghost' className='ml-16'>
+            <Button onClick={toggleOpen} variant='ghost' className='ml-16'>
               Edit
             </Button>
-            <Button as={Link} variant='solid' endContent={<IconSend />} href={`/transfer?to=${address}`}>
-              Send
+            <Button asChild variant='solid'>
+              <Link to={`/transfer?to=${address}`}>
+                Send
+                <IconSend />
+              </Link>
             </Button>
           </div>
         </div>
       )}
       {upSm && (
-        <div className='rounded-large bg-content1 shadow-medium relative flex items-center gap-10 p-6'>
+        <div className='bg-content1 shadow-medium relative flex items-center gap-10 rounded-[20px] p-6'>
           <div className='flex flex-[1] items-center gap-2.5'>
-            <p className='text-large font-bold'>{meta?.name}</p>
+            <p className='text-lg font-bold'>{meta?.name}</p>
           </div>
           <div className='flex flex-[3] items-center'>
-            <span {...pressProps}>
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                copyAddress();
+              }}
+            >
               <AddressRow shorten={!upMd} value={address} withAddress withName={false} />
             </span>
             <div className='w-1' />
             <Icons address={address} />
           </div>
           <div className='flex gap-2.5'>
-            <Button onPress={toggleOpen} variant='ghost'>
+            <Button onClick={toggleOpen} variant='ghost'>
               Edit
             </Button>
-            <Button as={Link} variant='solid' endContent={<IconSend />} href={`/transfer?to=${address}`}>
-              Send
+            <Button asChild variant='solid'>
+              <Link to={`/transfer?to=${address}`}>
+                Send
+                <IconSend />
+              </Link>
             </Button>
           </div>
         </div>

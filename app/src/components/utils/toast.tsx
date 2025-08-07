@@ -18,7 +18,7 @@ export function toastSuccess(message: any, description?: React.ReactNode) {
     description ? (
       <div className='flex flex-col gap-1'>
         <b>{message}</b>
-        <span className='text-tiny'>{description}</span>
+        <span className='text-xs'>{description}</span>
       </div>
     ) : (
       <div className='flex min-h-[30px] items-center'>{message}</div>

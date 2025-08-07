@@ -11,12 +11,12 @@ import { StakingApp } from '@/config';
 import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
-  Link,
   Skeleton,
   Spinner,
   Table,
@@ -116,14 +116,13 @@ function Assets({ address }: { address: string }) {
   return (
     <Table
       isHeaderSticky
-      shadow='md'
       classNames={{
         base: 'py-0 group',
         wrapper:
-          'rounded-large p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1',
+          'rounded-[20px] p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1',
         thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
-        th: 'bg-transparent text-tiny h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
-        td: 'text-small px-2',
+        th: 'bg-transparent text-xs h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
+        td: 'text-sm px-2',
         loadingWrapper: 'relative h-10 table-cell px-2'
       }}
       sortDescriptor={sortDescriptor}
@@ -141,10 +140,9 @@ function Assets({ address }: { address: string }) {
 
       <TableBody
         items={list}
-        isLoading={!done}
         loadingContent={
           <>
-            <Skeleton disableAnimation className='rounded-medium h-10 w-full' />
+            <Skeleton className='h-10 w-full rounded-[10px]' />
             <Spinner size='sm' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
           </>
         }
@@ -171,7 +169,7 @@ function Assets({ address }: { address: string }) {
           return (
             <TableRow
               key={`asset-balance-${item.assetId}-${item.network}`}
-              className='[&:hover>td]:bg-secondary [&>td]:first:rounded-l-medium [&>td]:last:rounded-r-medium [&:hover_.operation]:flex'
+              className='[&:hover>td]:bg-secondary [&:hover_.operation]:flex [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]'
             >
               <TableCell>
                 <div className='flex items-center gap-1'>
@@ -203,8 +201,6 @@ function Assets({ address }: { address: string }) {
               </TableCell>
               <TableCell>
                 <Tooltip
-                  shadow='lg'
-                  placement='bottom'
                   classNames={{ content: 'border-secondary border-1 p-2.5 min-w-[163px]' }}
                   content={
                     <div className='w-full space-y-2.5 [&_div]:flex [&_div]:items-center [&_div]:justify-between [&_div]:gap-x-4'>
@@ -238,27 +234,21 @@ function Assets({ address }: { address: string }) {
 
                   <div className='operation hidden flex-row-reverse items-center gap-0 sm:gap-[5px]'>
                     <Tooltip content='Transfer'>
-                      <Button
-                        as={Link}
-                        isIconOnly
-                        href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
-                        variant='light'
-                        size='sm'
-                      >
-                        <IconSend className='h-[14px] w-[14px]' />
+                      <Button asChild isIconOnly variant='light' size='sm'>
+                        <Link
+                          to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
+                        >
+                          <IconSend className='h-[14px] w-[14px]' />
+                        </Link>
                       </Button>
                     </Tooltip>
 
                     {isNative && network === 'polkadot' && (
                       <Tooltip content='Stake'>
-                        <Button
-                          as={Link}
-                          isIconOnly
-                          href={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}
-                          variant='light'
-                          size='sm'
-                        >
-                          <IconAdd className='h-[14px] w-[14px]' />
+                        <Button asChild isIconOnly variant='light' size='sm'>
+                          <Link to={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}>
+                            <IconAdd className='h-[14px] w-[14px]' />
+                          </Link>
                         </Button>
                       </Tooltip>
                     )}

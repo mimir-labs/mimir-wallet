@@ -14,19 +14,17 @@ import { useMultiChainStats, useQueryStats } from '@/hooks/useQueryStats';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
+import { Link } from 'react-router-dom';
 
 import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
-  Card,
-  CardBody,
-  Link,
-  Listbox,
-  ListboxItem,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   Skeleton,
   Tab,
   Table,
@@ -175,19 +173,17 @@ function Chart({
     );
 
   return (
-    <Card className='col-span-2'>
-      <CardBody className='gap-5 p-3 sm:p-5'>
-        <p className='text-medium text-foreground font-bold'>Transaction Statistic</p>
-        <Tabs color='primary'>
-          <Tab key='category' title='By Category'>
-            {upSm ? <div className='bg-secondary rounded-large p-3 sm:p-5'>{categoryChart}</div> : categoryChart}
-          </Tab>
-          <Tab key='time' title='By Time'>
-            {upSm ? <div className='bg-secondary rounded-large p-3 sm:p-5'>{timeChart}</div> : timeChart}
-          </Tab>
-        </Tabs>
-      </CardBody>
-    </Card>
+    <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:p-5'>
+      <p className='text-foreground text-base font-bold'>Transaction Statistic</p>
+      <Tabs color='primary'>
+        <Tab key='category' title='By Category'>
+          {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{categoryChart}</div> : categoryChart}
+        </Tab>
+        <Tab key='time' title='By Time'>
+          {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{timeChart}</div> : timeChart}
+        </Tab>
+      </Tabs>
+    </div>
   );
 }
 
@@ -219,130 +215,111 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
     <SubApiRoot network={selectedChain}>
       <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
         <div className='col-span-2 flex gap-5'>
-          <Card className='flex-1'>
-            <CardBody className='flex-col items-stretch justify-between gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:px-12 sm:py-5'>
-              <div className='flex flex-grow items-center justify-between'>
-                <div className='sm:text-medium text-small text-foreground flex items-center gap-2.5'>
-                  <IconSafe className='text-primary' />
-                  Multisig Transaction Executed
-                </div>
-                <b className='text-[24px] leading-[30px] font-extrabold sm:text-[36px] sm:leading-[43px]'>
-                  {data?.total}
-                </b>
+          <div className='bg-background shadow-medium col-span-2 flex w-full flex-col items-stretch justify-between gap-3 rounded-[20px] p-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:p-5 sm:px-12 sm:py-5'>
+            <div className='flex flex-grow items-center justify-between'>
+              <div className='text-foreground flex items-center gap-2.5 text-sm sm:text-base'>
+                <IconSafe className='text-primary' />
+                Multisig Transaction Executed
               </div>
-            </CardBody>
-          </Card>
-          <Popover placement='bottom-start'>
-            <PopoverTrigger>
+              <b className='text-[24px] leading-[30px] font-extrabold sm:text-[36px] sm:leading-[43px]'>
+                {data?.total}
+              </b>
+            </div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
                 radius='md'
                 variant='bordered'
-                color='default'
-                className='border-divider-300 bg-content1 rounded-large h-full w-auto min-w-[160px]'
-                startContent={<Avatar src={selectedHistoryNetwork?.icon} className='h-4 w-4 bg-transparent' />}
-                endContent={<ArrowDown className='h-4 w-4' />}
+                className='shadow-medium bg-content1 h-full w-auto min-w-[160px] rounded-[20px] border-transparent text-inherit'
               >
+                <Avatar src={selectedHistoryNetwork?.icon} className='h-4 w-4 bg-transparent' />
                 {selectedHistoryNetwork?.name}
+                <ArrowDown className='h-4 w-4' />
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className='rounded-medium w-[200px] p-1'>
-              <Listbox
-                disallowEmptySelection
-                selectedKeys={[selectedChain]}
-                selectionMode={'single'}
-                variant='flat'
-                onSelectionChange={(keys) => setSelectedChain(Array.from(keys).map((key) => key.toString())[0])}
-                color='primary'
-              >
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side='bottom' align='end' className='w-[200px] border-none p-2'>
+              <DropdownMenuRadioGroup value={selectedChain} onValueChange={(value) => setSelectedChain(value)}>
                 {chains.map((chain) => {
                   const network = networks.find(({ key }) => key === chain);
 
                   return (
-                    <ListboxItem
-                      key={chain}
-                      className='data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground h-8'
-                      startContent={<Avatar src={network?.icon} className='h-4 w-4 bg-transparent' />}
-                    >
+                    <DropdownMenuRadioItem key={chain} value={chain} className='h-8'>
+                      <Avatar src={network?.icon} className='h-4 w-4 bg-transparent' />
                       {network?.name}
-                    </ListboxItem>
+                    </DropdownMenuRadioItem>
                   );
                 })}
-              </Listbox>
-            </PopoverContent>
-          </Popover>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        <Card className='col-span-2 sm:col-span-1'>
-          <CardBody className='gap-5 p-3 sm:p-5'>
-            <p className='text-medium text-foreground font-bold'>Transaction Category</p>
-            <Table
-              removeWrapper
-              classNames={{
-                th: ['bg-transparent', 'text-tiny', 'text-foreground/50'],
-                td: ['text-foreground']
-              }}
-            >
-              <TableHeader>
-                <TableColumn>Order</TableColumn>
-                <TableColumn>Call</TableColumn>
-                <TableColumn>Transaction Count</TableColumn>
-              </TableHeader>
-              <TableBody items={callOverview} emptyContent={<Empty label='No items' height={150} />}>
-                {(item) => (
-                  <TableRow key={item.order}>
-                    <TableCell>{item.order}</TableCell>
-                    <TableCell>{item.action}</TableCell>
-                    <TableCell>{item.count}</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardBody>
-        </Card>
+        <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:col-span-1 sm:p-5'>
+          <p className='text-foreground text-base font-bold'>Transaction Category</p>
+          <Table
+            removeWrapper
+            classNames={{
+              th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
+              td: ['text-foreground']
+            }}
+          >
+            <TableHeader>
+              <TableColumn>Order</TableColumn>
+              <TableColumn>Call</TableColumn>
+              <TableColumn>Transaction Count</TableColumn>
+            </TableHeader>
+            <TableBody items={callOverview} emptyContent={<Empty label='No items' height={150} />}>
+              {(item) => (
+                <TableRow key={item.order}>
+                  <TableCell>{item.order}</TableCell>
+                  <TableCell>{item.action}</TableCell>
+                  <TableCell>{item.count}</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-        <Card className='col-span-2 sm:col-span-1'>
-          <CardBody className='gap-5 p-3 sm:p-5'>
-            <p className='text-medium text-foreground font-bold'>Recipients</p>
-            <Table
-              removeWrapper
-              classNames={{
-                th: ['bg-transparent', 'text-tiny', 'text-foreground/50'],
-                td: ['text-foreground']
-              }}
-            >
-              <TableHeader>
-                <TableColumn>Order</TableColumn>
-                <TableColumn>Address</TableColumn>
-                <TableColumn>Amount</TableColumn>
-                <TableColumn align='end'>Operation</TableColumn>
-              </TableHeader>
-              <TableBody items={transferBook} emptyContent={<Empty label='No items' height={150} />}>
-                {(item) => (
-                  <TableRow key={item.to}>
-                    <TableCell>{item.order}</TableCell>
-                    <TableCell className='whitespace-nowrap'>
-                      <AddressRow value={item.to} />
-                    </TableCell>
-                    <TableCell>
-                      <FormatBalance value={item.amount} withCurrency />
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Button
-                        as={Link}
-                        variant='bordered'
-                        color='primary'
-                        size='sm'
-                        href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?asset_network=${selectedChain}&to=${item.to}`}
+        <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:col-span-1 sm:p-5'>
+          <p className='text-foreground text-base font-bold'>Recipients</p>
+          <Table
+            removeWrapper
+            classNames={{
+              th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
+              td: ['text-foreground']
+            }}
+          >
+            <TableHeader>
+              <TableColumn>Order</TableColumn>
+              <TableColumn>Address</TableColumn>
+              <TableColumn>Amount</TableColumn>
+              <TableColumn align='end'>Operation</TableColumn>
+            </TableHeader>
+            <TableBody items={transferBook} emptyContent={<Empty label='No items' height={150} />}>
+              {(item) => (
+                <TableRow key={item.to}>
+                  <TableCell>{item.order}</TableCell>
+                  <TableCell className='whitespace-nowrap'>
+                    <AddressRow value={item.to} />
+                  </TableCell>
+                  <TableCell>
+                    <FormatBalance value={item.amount} withCurrency />
+                  </TableCell>
+                  <TableCell align='right'>
+                    <Button asChild variant='bordered' color='primary' size='sm'>
+                      <Link
+                        to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?asset_network=${selectedChain}&to=${item.to}`}
                       >
                         Transfer
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardBody>
-        </Card>
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
         <Chart txDaily={data?.transactionCounts} callOverview={data?.callOverview} />
       </div>
@@ -358,10 +335,10 @@ function Analytic() {
   if (!isFetched && isFetching)
     return (
       <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
-        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-2 h-[80px]' />
-        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-1 h-[300px]' />
-        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-1 h-[300px]' />
-        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-2 h-[500px]' />
+        <Skeleton className='bg-content1 shadow-medium col-span-2 h-[80px] rounded-[20px]' />
+        <Skeleton className='bg-content1 shadow-medium col-span-1 h-[300px] rounded-[20px]' />
+        <Skeleton className='bg-content1 shadow-medium col-span-1 h-[300px] rounded-[20px]' />
+        <Skeleton className='bg-content1 shadow-medium col-span-2 h-[500px] rounded-[20px]' />
       </div>
     );
 

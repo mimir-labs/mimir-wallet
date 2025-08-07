@@ -90,7 +90,7 @@ function TransferAction({
     <TxButton
       fullWidth
       color={isInsufficientBalance ? 'danger' : 'primary'}
-      isDisabled={!(amount && recipient && token)}
+      disabled={!(amount && recipient && token)}
       accountId={sending}
       website='mimir://app/transfer'
       getCall={getCall}

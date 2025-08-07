@@ -7,10 +7,10 @@ import { Address, TxButton } from '@/components';
 import { toastSuccess } from '@/components/utils';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import React, { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAsyncFn, useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Link } from '@mimir-wallet/ui';
 
 import SafetyWarningModal from '../components/SafetyWarningModal';
 import { useProxySafetyCheck } from '../hooks/useProxySafetyCheck';
@@ -61,13 +61,10 @@ function SubmitProxy({
               <p>
                 <b>Proxy Added</b>
               </p>
-              <p className='text-tiny'>
+              <p className='text-xs'>
                 <Address value={proxied} shorten /> added {proxyArgs.length} new proxy
               </p>
-              <Link
-                className='text-tiny text-primary no-underline'
-                href={`/?address=${proxied.toString()}&tab=structure`}
-              >
+              <Link className='text-primary text-xs no-underline' to={`/?address=${proxied.toString()}&tab=structure`}>
                 Account Structure{'>'}
               </Link>
             </div>
@@ -102,10 +99,9 @@ function SubmitProxy({
       <TxButton
         fullWidth
         color='primary'
-        isDisabled={!(proxyArgs.length && proxied)}
+        disabled={!(proxyArgs.length && proxied)}
         accountId={proxied}
         overrideAction={handleClickAction[1]}
-        isLoading={handleClickAction[0].loading}
       >
         Confirm
       </TxButton>

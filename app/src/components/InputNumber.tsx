@@ -32,7 +32,7 @@ function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...pro
           {props.endAdornment}
           {withMax && maxValue && (
             <Button
-              onPress={() => setValue(maxValue.toString())}
+              onClick={() => setValue(maxValue.toString())}
               size='sm'
               variant='ghost'
               className='rounded-[5px] py-[2px]'

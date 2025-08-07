@@ -79,7 +79,7 @@ function SafetyWarningModal({
             <span className='text-lg'>{getSeverityIcon()}</span>
             <span className='text-foreground text-lg font-bold'>{title}</span>
           </div>
-          {description && <p className='text-foreground/80 text-small max-w-none'>{description}</p>}
+          {description && <p className='text-foreground/80 max-w-none text-sm'>{description}</p>}
         </ModalHeader>
 
         <Divider />
@@ -88,10 +88,10 @@ function SafetyWarningModal({
           {indirectControllers.length > 0 && (
             <>
               <div className='flex flex-col gap-2'>
-                <h4 className='text-foreground text-medium font-semibold'>
+                <h4 className='text-foreground text-base font-semibold'>
                   Indirect Controllers ({indirectControllers.length})
                 </h4>
-                <p className='text-foreground/60 text-small'>
+                <p className='text-foreground/60 text-sm'>
                   These accounts can control your proxy account and therefore indirectly control your funds:
                 </p>
               </div>
@@ -100,7 +100,7 @@ function SafetyWarningModal({
                 {indirectControllers.map((address, index) => (
                   <div
                     key={address}
-                    className='rounded-medium border-divider bg-content2 flex items-center justify-between border-1 p-3'
+                    className='border-divider bg-content2 flex items-center justify-between rounded-[10px] border-1 p-3'
                   >
                     <div className='flex items-center gap-3'>
                       <div className='bg-warning text-warning-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold'>
@@ -113,8 +113,8 @@ function SafetyWarningModal({
                 ))}
               </div>
 
-              <div className='bg-warning/10 border-warning/20 rounded-medium border-1 p-3'>
-                <p className='text-warning-600 text-small'>
+              <div className='bg-warning/10 border-warning/20 rounded-[10px] border-1 p-3'>
+                <p className='text-warning-600 text-sm'>
                   <strong>Security Risk:</strong> These accounts can execute transactions on your behalf. Only proceed
                   if you trust all listed controllers.
                 </p>
@@ -128,14 +128,14 @@ function SafetyWarningModal({
         <ModalFooter>
           <div className='flex w-full flex-col gap-4'>
             <Checkbox size='sm' isSelected={acknowledged} onValueChange={toggleAcknowledged}>
-              <span className='text-small'>{confirmText} and accept the security risks</span>
+              <span className='text-sm'>{confirmText} and accept the security risks</span>
             </Checkbox>
 
             <div className='flex gap-2'>
-              <Button fullWidth variant='ghost' color={getSeverityColor()} onPress={handleClose}>
+              <Button fullWidth variant='ghost' color={getSeverityColor()} onClick={handleClose}>
                 Cancel
               </Button>
-              <Button fullWidth color={getSeverityColor()} isDisabled={!acknowledged} onPress={handleConfirm}>
+              <Button fullWidth color={getSeverityColor()} disabled={!acknowledged} onClick={handleConfirm}>
                 Continue
               </Button>
             </div>

@@ -59,14 +59,14 @@ function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction
   }
 
   return (
-    <Tooltip content={isIcon ? 'Cancel' : null}>
+    <Tooltip content={isIcon ? 'Cancel' : undefined}>
       <TxButton
         isIconOnly={isIcon}
         fullWidth={!isIcon}
         variant={isIcon ? 'light' : 'ghost'}
         size={isIcon ? 'sm' : 'md'}
         color='danger'
-        isDisabled={!transaction.call}
+        disabled={!transaction.call}
         accountId={depositor}
         website='mimir://internal/cancel'
         getCall={() =>

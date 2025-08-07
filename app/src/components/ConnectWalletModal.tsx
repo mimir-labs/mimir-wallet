@@ -7,7 +7,7 @@ import { useWallet } from '@/wallet/useWallet';
 import { AccessCredentials, initializePlutonicationDAppClientWithModal } from '@plutonication/plutonication';
 import React, { useMemo } from 'react';
 
-import { Button, Link, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
 import { toastError } from './utils';
 import WalletIcon from './WalletIcon';
@@ -21,24 +21,24 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
   return (
     <div
       data-connected={connectedWallets.includes(id)}
-      className='rounded-medium border-secondary data-[connected=true]:bg-secondary flex items-center justify-start gap-1 border-1 bg-transparent p-2.5'
+      className='border-secondary data-[connected=true]:bg-secondary flex items-center justify-start gap-1 rounded-[10px] border-1 bg-transparent p-2.5'
     >
       <WalletIcon disabled={!isInstalled} id={id} style={{ width: 20, height: 20 }} />
-      <div className='text-medium flex-1'>{name}</div>
+      <div className='flex-1 text-base'>{name}</div>
       {isInstalled ? (
         connectedWallets.includes(id) ? (
-          <Button className='h-7' color='danger' onPress={() => disconnectWallet(id)} variant='flat'>
+          <Button className='h-7' color='danger' onClick={() => disconnectWallet(id)} variant='flat'>
             Disconnect
           </Button>
         ) : (
-          <Button className='h-7' onPress={() => connectWallet(id).catch(toastError)} variant='ghost'>
+          <Button className='h-7' onClick={() => connectWallet(id).catch(toastError)} variant='ghost'>
             Connect
           </Button>
         )
       ) : id === 'plutonication' ? (
         <Button
           className='h-7'
-          onPress={async () => {
+          onClick={async () => {
             const accessCredentials = new AccessCredentials(
               'wss://plutonication.com/',
               'Mimir',
@@ -55,8 +55,10 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
           Connect
         </Button>
       ) : (
-        <Button as={Link} href={downloadUrl} target='_blank' variant='light'>
-          Download
+        <Button asChild variant='light'>
+          <a href={downloadUrl} target='_blank' rel='noopener noreferrer'>
+            Download
+          </a>
         </Button>
       )}
     </div>
