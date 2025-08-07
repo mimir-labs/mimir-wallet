@@ -1,24 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Autocomplete, AutocompleteItem } from '@heroui/autocomplete';
 import { Avatar, AvatarGroup } from '@heroui/avatar';
 import { Badge } from '@heroui/badge';
-import { Card, CardBody, CardFooter, CardHeader } from '@heroui/card';
 import { HeroUIProvider } from '@heroui/system';
 
-export {
-  Autocomplete,
-  AutocompleteItem,
-  Avatar,
-  AvatarGroup,
-  Badge,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  HeroUIProvider
-};
+export { Avatar, AvatarGroup, Badge, HeroUIProvider };
 
 export { Checkbox, CheckboxGroup, CheckboxIcon } from './checkbox/index.js';
 export { default as Chip } from './chip/index.js';

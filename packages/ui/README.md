@@ -117,25 +117,25 @@ function App() {
 ### ShadCN Component Usage
 
 ```typescript
-import { 
-  Button, 
-  Input, 
-  Dialog, 
-  Alert, 
+import {
+  Button,
+  Input,
+  Dialog,
+  Alert,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  cn 
+  cn
 } from '@mimir-wallet/ui';
 
 // Modern Button with CVA variants
-<Button 
-  variant="ghost" 
-  size="sm" 
-  color="primary" 
+<Button
+  variant="ghost"
+  size="sm"
+  color="primary"
   radius="full"
   className={cn("custom-styles")}
 >
@@ -143,7 +143,7 @@ import {
 </Button>
 
 // Enhanced Input with better validation
-<Input 
+<Input
   placeholder="Enter amount"
   type="number"
   className="w-full"
@@ -202,7 +202,7 @@ import {
 ### HeroUI Component Usage
 
 ```typescript
-import { Card, Table, Avatar, Tabs } from '@mimir-wallet/ui';
+import { Card, CardHeader, CardTitle, CardContent, Table, Avatar, Tabs } from '@mimir-wallet/ui';
 
 // Mature data display components
 <Table>
@@ -217,13 +217,16 @@ import { Card, Table, Avatar, Tabs } from '@mimir-wallet/ui';
 
 // Specialized blockchain components
 <Card>
-  <CardBody className="flex items-center gap-3">
+  <CardHeader>
+    <CardTitle>Title</CardTitle>
+  </CardHeader>
+  <CardContent>
     <Avatar src={account.avatar} name={account.name} />
     <div>
       <h4>{account.name}</h4>
       <p className="text-sm">{account.address}</p>
     </div>
-  </CardBody>
+  </CardContent>
 </Card>
 ```
 

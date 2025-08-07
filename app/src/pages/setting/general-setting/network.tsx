@@ -9,7 +9,15 @@ import { useAsyncFn } from 'react-use';
 
 import { type Endpoint, NETWORK_RPC_PREFIX, useNetworks } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
-import { Alert, AlertTitle, Autocomplete, AutocompleteItem, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertTitle,
+  Autocomplete,
+  type AutocompleteOption,
+  Button,
+  buttonSpinner,
+  Divider
+} from '@mimir-wallet/ui';
 
 function Content({ chain }: { chain: Endpoint }) {
   const { networks } = useNetworks();
@@ -42,31 +50,47 @@ function Content({ chain }: { chain: Endpoint }) {
     store.set(`${NETWORK_RPC_PREFIX}${chain.key}`, url);
   }, [url, chain.genesisHash, chain.key]);
 
+  // Convert wsUrl entries to autocomplete options
+  const rpcOptions: AutocompleteOption[] = Object.entries(chain.wsUrl).map(([name, wsUrl]) => ({
+    value: wsUrl,
+    label: name,
+    url: wsUrl,
+    name
+  }));
+
   return (
     <>
-      <Autocomplete
-        allowsCustomValue
-        labelPlacement='outside'
-        defaultInputValue={url}
-        defaultItems={Object.entries(chain.wsUrl)}
-        label='Network RPC'
-        placeholder='Please select or input rpc url ws:// or wss://'
-        variant='bordered'
-        inputValue={url}
-        onInputChange={(value) => {
-          if (isValidWsUrl(value)) {
+      <div className='flex flex-col gap-2'>
+        <label className='text-sm font-medium'>Network RPC</label>
+        <Autocomplete
+          options={rpcOptions}
+          value={url}
+          onValueChange={(value) => {
             setUrl(value);
-          } else if (chain.wsUrl?.[value]) {
-            setUrl(chain.wsUrl[value]);
-          }
-        }}
-      >
-        {(item) => (
-          <AutocompleteItem startContent={item[1]} key={item[1]} classNames={{ title: 'text-right' }}>
-            {item[0]}
-          </AutocompleteItem>
-        )}
-      </Autocomplete>
+            setError(undefined);
+          }}
+          inputValue={url}
+          onInputChange={(value) => {
+            setUrl(value);
+            setError(undefined);
+          }}
+          placeholder='Please select or input rpc url ws:// or wss://'
+          allowCustomValue
+          onCustomValue={(value) => {
+            if (isValidWsUrl(value)) {
+              setUrl(value);
+            } else {
+              setError(new Error('Invalid URL, expect ws:// or wss://'));
+            }
+          }}
+          renderOption={(option) => (
+            <div className='flex w-full items-center justify-between'>
+              <span className='text-sm'>{option.url}</span>
+              <span className='text-muted-foreground text-right text-xs'>{option.name}</span>
+            </div>
+          )}
+        />
+      </div>
       {error && (
         <Alert variant='destructive'>
           <AlertTitle>{error.message}</AlertTitle>

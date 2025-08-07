@@ -102,7 +102,7 @@ function TopContent() {
         selected ? (
           <div className='border-secondary rounded-[10px] border-1'>
             <div
-              className='rounded-tl-medium rounded-tr-medium hover:bg-secondary transition-background flex w-full cursor-pointer items-center gap-2.5 bg-transparent p-2.5'
+              className='hover:bg-secondary transition-background flex w-full cursor-pointer items-center gap-2.5 rounded-t-[10px] bg-transparent p-2.5'
               onClick={handleAccountOpen}
             >
               <AddressCell value={selected} addressCopyDisabled />
@@ -288,7 +288,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
     <>
       {!upMd || !withSideBar ? (
         <Drawer direction={upMd ? 'left' : 'right'} onClose={closeSidebar} open={sidebarOpen}>
-          <DrawerContent className='max-w-[280px] rounded-l-[20px]'>
+          <DrawerContent className='max-w-[280px] data-[vaul-drawer-direction=left]:rounded-r-[20px] data-[vaul-drawer-direction=right]:rounded-l-[20px]'>
             <DrawerHeader className='md:hidden'>
               <h3>Menu</h3>
             </DrawerHeader>

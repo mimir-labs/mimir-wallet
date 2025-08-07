@@ -170,7 +170,7 @@ function PendingTransactions({ address }: { address: string }) {
           return (
             <TableRow
               key={item.id}
-              className='[&:hover>td]:bg-secondary border-secondary [&>td]:first:rounded-l-medium [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px]'
+              className='[&:hover>td]:bg-secondary border-secondary [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px]'
               onClick={() => {
                 setNetwork(item.network);
                 navigate(`/transactions/${item.id}?network=${item.network}&address=${address}`);

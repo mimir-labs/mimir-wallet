@@ -169,7 +169,7 @@ function Assets({ address }: { address: string }) {
           return (
             <TableRow
               key={`asset-balance-${item.assetId}-${item.network}`}
-              className='[&:hover>td]:bg-secondary [&>td]:first:rounded-l-medium [&>td]:last:rounded-r-medium [&:hover_.operation]:flex'
+              className='[&:hover>td]:bg-secondary [&:hover_.operation]:flex [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]'
             >
               <TableCell>
                 <div className='flex items-center gap-1'>

@@ -19,6 +19,7 @@
   --color-popover: oklch(1 0 0);
   --color-popover-foreground: oklch(0.145 0 0);
   --color-input: #D9D9D9;
+  --color-card: #FFF;
   --text-6xl: 2.25rem;
   --text-5xl: 2rem;
   --text-4xl: 1.75rem;

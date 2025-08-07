@@ -49,10 +49,8 @@
     "react-router-dom": ">=6.0.0"
   },
   "dependencies": {
-    "@heroui/autocomplete": "^2.3.25",
     "@heroui/avatar": "^2.2.19",
     "@heroui/badge": "^2.2.15",
-    "@heroui/card": "^2.2.22",
     "@heroui/checkbox": "^2.3.23",
     "@heroui/chip": "^2.2.19",
     "@heroui/divider": "^2.2.16",

@@ -20,8 +20,6 @@ import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
-  Card,
-  CardBody,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -175,19 +173,17 @@ function Chart({
     );
 
   return (
-    <Card className='col-span-2'>
-      <CardBody className='gap-5 p-3 sm:p-5'>
-        <p className='text-foreground text-base font-bold'>Transaction Statistic</p>
-        <Tabs color='primary'>
-          <Tab key='category' title='By Category'>
-            {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{categoryChart}</div> : categoryChart}
-          </Tab>
-          <Tab key='time' title='By Time'>
-            {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{timeChart}</div> : timeChart}
-          </Tab>
-        </Tabs>
-      </CardBody>
-    </Card>
+    <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:p-5'>
+      <p className='text-foreground text-base font-bold'>Transaction Statistic</p>
+      <Tabs color='primary'>
+        <Tab key='category' title='By Category'>
+          {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{categoryChart}</div> : categoryChart}
+        </Tab>
+        <Tab key='time' title='By Time'>
+          {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{timeChart}</div> : timeChart}
+        </Tab>
+      </Tabs>
+    </div>
   );
 }
 
@@ -219,19 +215,17 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
     <SubApiRoot network={selectedChain}>
       <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
         <div className='col-span-2 flex gap-5'>
-          <Card className='flex-1'>
-            <CardBody className='flex-col items-stretch justify-between gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:px-12 sm:py-5'>
-              <div className='flex flex-grow items-center justify-between'>
-                <div className='text-foreground flex items-center gap-2.5 text-sm sm:text-base'>
-                  <IconSafe className='text-primary' />
-                  Multisig Transaction Executed
-                </div>
-                <b className='text-[24px] leading-[30px] font-extrabold sm:text-[36px] sm:leading-[43px]'>
-                  {data?.total}
-                </b>
+          <div className='bg-background shadow-medium col-span-2 flex w-full flex-col items-stretch justify-between gap-3 rounded-[20px] p-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:p-5 sm:px-12 sm:py-5'>
+            <div className='flex flex-grow items-center justify-between'>
+              <div className='text-foreground flex items-center gap-2.5 text-sm sm:text-base'>
+                <IconSafe className='text-primary' />
+                Multisig Transaction Executed
               </div>
-            </CardBody>
-          </Card>
+              <b className='text-[24px] leading-[30px] font-extrabold sm:text-[36px] sm:leading-[43px]'>
+                {data?.total}
+              </b>
+            </div>
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -261,75 +255,71 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
           </DropdownMenu>
         </div>
 
-        <Card className='col-span-2 sm:col-span-1'>
-          <CardBody className='gap-5 p-3 sm:p-5'>
-            <p className='text-foreground text-base font-bold'>Transaction Category</p>
-            <Table
-              removeWrapper
-              classNames={{
-                th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
-                td: ['text-foreground']
-              }}
-            >
-              <TableHeader>
-                <TableColumn>Order</TableColumn>
-                <TableColumn>Call</TableColumn>
-                <TableColumn>Transaction Count</TableColumn>
-              </TableHeader>
-              <TableBody items={callOverview} emptyContent={<Empty label='No items' height={150} />}>
-                {(item) => (
-                  <TableRow key={item.order}>
-                    <TableCell>{item.order}</TableCell>
-                    <TableCell>{item.action}</TableCell>
-                    <TableCell>{item.count}</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardBody>
-        </Card>
+        <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:col-span-1 sm:p-5'>
+          <p className='text-foreground text-base font-bold'>Transaction Category</p>
+          <Table
+            removeWrapper
+            classNames={{
+              th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
+              td: ['text-foreground']
+            }}
+          >
+            <TableHeader>
+              <TableColumn>Order</TableColumn>
+              <TableColumn>Call</TableColumn>
+              <TableColumn>Transaction Count</TableColumn>
+            </TableHeader>
+            <TableBody items={callOverview} emptyContent={<Empty label='No items' height={150} />}>
+              {(item) => (
+                <TableRow key={item.order}>
+                  <TableCell>{item.order}</TableCell>
+                  <TableCell>{item.action}</TableCell>
+                  <TableCell>{item.count}</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-        <Card className='col-span-2 sm:col-span-1'>
-          <CardBody className='gap-5 p-3 sm:p-5'>
-            <p className='text-foreground text-base font-bold'>Recipients</p>
-            <Table
-              removeWrapper
-              classNames={{
-                th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
-                td: ['text-foreground']
-              }}
-            >
-              <TableHeader>
-                <TableColumn>Order</TableColumn>
-                <TableColumn>Address</TableColumn>
-                <TableColumn>Amount</TableColumn>
-                <TableColumn align='end'>Operation</TableColumn>
-              </TableHeader>
-              <TableBody items={transferBook} emptyContent={<Empty label='No items' height={150} />}>
-                {(item) => (
-                  <TableRow key={item.to}>
-                    <TableCell>{item.order}</TableCell>
-                    <TableCell className='whitespace-nowrap'>
-                      <AddressRow value={item.to} />
-                    </TableCell>
-                    <TableCell>
-                      <FormatBalance value={item.amount} withCurrency />
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Button asChild variant='bordered' color='primary' size='sm'>
-                        <Link
-                          to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?asset_network=${selectedChain}&to=${item.to}`}
-                        >
-                          Transfer
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardBody>
-        </Card>
+        <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:col-span-1 sm:p-5'>
+          <p className='text-foreground text-base font-bold'>Recipients</p>
+          <Table
+            removeWrapper
+            classNames={{
+              th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
+              td: ['text-foreground']
+            }}
+          >
+            <TableHeader>
+              <TableColumn>Order</TableColumn>
+              <TableColumn>Address</TableColumn>
+              <TableColumn>Amount</TableColumn>
+              <TableColumn align='end'>Operation</TableColumn>
+            </TableHeader>
+            <TableBody items={transferBook} emptyContent={<Empty label='No items' height={150} />}>
+              {(item) => (
+                <TableRow key={item.to}>
+                  <TableCell>{item.order}</TableCell>
+                  <TableCell className='whitespace-nowrap'>
+                    <AddressRow value={item.to} />
+                  </TableCell>
+                  <TableCell>
+                    <FormatBalance value={item.amount} withCurrency />
+                  </TableCell>
+                  <TableCell align='right'>
+                    <Button asChild variant='bordered' color='primary' size='sm'>
+                      <Link
+                        to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?asset_network=${selectedChain}&to=${item.to}`}
+                      >
+                        Transfer
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
         <Chart txDaily={data?.transactionCounts} callOverview={data?.callOverview} />
       </div>
