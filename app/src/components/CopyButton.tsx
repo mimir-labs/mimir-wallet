@@ -6,7 +6,7 @@ import IconSuccess from '@/assets/svg/icon-success.svg?react';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import React, { forwardRef, useCallback } from 'react';
 
-import { Button, type ButtonProps, type PressEvent } from '@mimir-wallet/ui';
+import { Button, type ButtonProps } from '@mimir-wallet/ui';
 
 interface Props extends ButtonProps {
   value?: string;
@@ -20,9 +20,11 @@ const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton(
   const [copied, copy] = useCopyClipboard();
 
   const handleClick = useCallback(
-    (e: PressEvent) => {
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
       copy(value?.toString() || '');
-      props.onPress?.(e);
+      props.onClick?.(e);
     },
     [copy, value, props]
   );
@@ -33,13 +35,15 @@ const CopyButton = forwardRef<HTMLButtonElement, Props>(function CopyButton(
     <Button
       isIconOnly={isIconMode}
       size={props.size || 'sm'}
-      color={props.color || 'default'}
+      color={props.color}
       radius={isIconMode ? props.radius || 'full' : props.radius}
       variant={props.variant || 'light'}
       {...props}
-      onPress={handleClick}
+      onClick={handleClick}
       ref={ref}
-      className={isIconMode ? 'h-5 min-h-[0px] w-5 min-w-[0px] opacity-50'.concat(` ${className}`) : className}
+      className={
+        isIconMode ? 'h-5 min-h-[0px] w-5 min-w-[0px] text-inherit opacity-50'.concat(` ${className}`) : className
+      }
     >
       {isIconMode ? (
         copied ? (

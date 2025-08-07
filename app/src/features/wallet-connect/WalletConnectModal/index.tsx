@@ -3,7 +3,7 @@
 
 import React, { useContext } from 'react';
 
-import { Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import { Modal, ModalBody, ModalContent, ModalHeader, VisuallyHidden } from '@mimir-wallet/ui';
 
 import { WalletConnectContext } from '../context';
 import Connect from './Connect';
@@ -15,7 +15,10 @@ function WalletConnectModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContent>
-        <ModalBody className='p-5'>
+        <VisuallyHidden asChild>
+          <ModalHeader>Wallet Connect</ModalHeader>
+        </VisuallyHidden>
+        <ModalBody className='py-5'>
           {sessionProposal ? <Session proposal={sessionProposal} onClose={onClose} /> : <Connect sessions={sessions} />}
         </ModalBody>
       </ModalContent>

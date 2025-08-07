@@ -12,6 +12,7 @@ import React, { useCallback, useRef, useState } from 'react';
 
 import {
   Alert,
+  AlertTitle,
   Avatar,
   Button,
   Divider,
@@ -94,16 +95,18 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           <Input
             label='Url'
             placeholder='eg. https://app.uniswap.org'
-            variant='bordered'
-            labelPlacement='outside'
             onChange={onInput}
-            endContent={isLoading ? <Spinner size='sm' /> : null}
+            endAdornment={isLoading ? <Spinner size='sm' /> : null}
           />
 
-          {error && <Alert color='danger' title={error?.message} />}
+          {error && (
+            <Alert variant='destructive'>
+              <AlertTitle>{error?.message}</AlertTitle>
+            </Alert>
+          )}
 
           {findApp && (
-            <div className='shadow-medium border-secondary rounded-medium flex items-center gap-5 border-1 p-5'>
+            <div className='border-secondary shadow-medium flex items-center gap-5 rounded-[10px] border-1 p-5'>
               <Avatar src={findApp.icon} className='h-[50px] w-[50px] flex-shrink-0 bg-transparent' radius='none' />
               <div>
                 <div className='flex items-center gap-2'>
@@ -111,7 +114,7 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                     ref={editRef}
                     suppressContentEditableWarning
                     contentEditable
-                    className='text-medium font-bold outline-none'
+                    className='text-base font-bold outline-none'
                     onInput={(e) => setFindApp({ ...findApp, name: e.currentTarget.textContent || '' })}
                   >
                     {edit}
@@ -121,14 +124,14 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                     isIconOnly
                     variant='light'
                     className='text-foreground/50'
-                    onPress={() => {
+                    onClick={() => {
                       editRef.current?.focus();
                     }}
                   >
                     <IconEdit />
                   </Button>
                 </div>
-                <p className='text-tiny text-foreground/50 mt-[5px]'>{findApp.description}</p>
+                <p className='text-foreground/50 mt-[5px] text-xs'>{findApp.description}</p>
               </div>
             </div>
           )}
@@ -140,7 +143,7 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             fullWidth
             color='primary'
             radius='full'
-            onPress={
+            onClick={
               findApp
                 ? () => {
                     addCustom(findApp);

@@ -55,7 +55,7 @@ function ExecuteMultisig({ transaction, account }: { account: AccountData; trans
 
   return (
     <>
-      <Button fullWidth variant='solid' color='primary' onPress={handleApprove}>
+      <Button fullWidth variant='solid' color='primary' onClick={handleApprove}>
         Execute
       </Button>
 
@@ -163,12 +163,12 @@ function Approve({
     <>
       {isIcon ? (
         <Tooltip content='Approve'>
-          <Button size='sm' isIconOnly variant='light' color='success' onPress={handleApprove}>
+          <Button size='sm' isIconOnly variant='light' color='success' onClick={handleApprove}>
             <IconSuccess />
           </Button>
         </Tooltip>
       ) : (
-        <Button fullWidth variant='solid' color='primary' onPress={handleApprove}>
+        <Button fullWidth variant='solid' color='primary' onClick={handleApprove}>
           Approve
         </Button>
       )}

@@ -45,7 +45,7 @@ function ViewPending({ transaction, filterPaths }: { transaction: Transaction; f
       fullWidth
       color='primary'
       variant='ghost'
-      onPress={() => {
+      onClick={() => {
         setCurrent(subPendingTx.address);
       }}
     >

@@ -8,10 +8,10 @@ import IconMenu from '@/assets/svg/icon-menu.svg?react';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import { AccountSelect } from '@/components';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Button, Link } from '@mimir-wallet/ui';
+import { Button } from '@mimir-wallet/ui';
 
 import ChainSelect from '../chain-select';
 import BatchButton from './BatchButton';
@@ -34,22 +34,22 @@ function TopBar() {
       }}
     >
       <div className='flex items-center gap-2'>
-        <Link href='/'>
+        <Link to='/'>
           <img className='hidden sm:block' alt='Mimir' src={Logo} style={{ width: 87 }} />
           <img className='block sm:hidden' alt='Mimir' src={LogoCircle} style={{ width: 32 }} />
         </Link>
         <Button
-          endContent={<IconArrowClockWise />}
           variant='solid'
           color='primary'
           size='sm'
           className='h-[18px]'
-          onPress={() => {
+          onClick={() => {
             setNetworkMode(mode === 'solo' ? 'omni' : 'solo', () => window.location.reload());
             analyticsActions.omniSolochain(mode === 'solo' ? 'omni' : 'solo');
           }}
         >
           <b className='uppercase'>{mode}</b>
+          <IconArrowClockWise />
         </Button>
       </div>
 
@@ -63,10 +63,9 @@ function TopBar() {
 
         <Button
           isIconOnly
-          color='default'
           variant='light'
-          onPress={sidebarOpen ? closeSidebar : openSidebar}
-          className='flex md:hidden'
+          onClick={sidebarOpen ? closeSidebar : openSidebar}
+          className='flex text-inherit md:hidden'
         >
           <IconMenu />
         </Button>

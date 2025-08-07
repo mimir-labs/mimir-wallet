@@ -34,7 +34,7 @@ function Item({
 
   const Top = (
     <div
-      className='text-tiny grid h-10 cursor-pointer grid-cols-9 gap-1 px-2 sm:grid-cols-12 sm:px-3 md:grid-cols-9 lg:grid-cols-12'
+      className='grid h-10 cursor-pointer grid-cols-9 gap-1 px-2 text-xs sm:grid-cols-12 sm:px-3 md:grid-cols-9 lg:grid-cols-12'
       onClick={toggleOpen}
     >
       <div className='col-span-1 flex items-center'>{index}</div>
@@ -52,10 +52,10 @@ function Item({
           isIconOnly
           size='sm'
           data-state={isOpen ? 'open' : 'closed'}
-          className='text-tiny rotate-0 justify-self-end transition-transform data-[state=open]:rotate-180'
+          className='rotate-0 justify-self-end text-xs transition-transform data-[state=open]:rotate-180'
           color='primary'
           variant='light'
-          onPress={(e) => e.continuePropagation()}
+          continuePropagation
         >
           <ArrowDown className='h-4 w-4' />
         </Button>
@@ -64,10 +64,10 @@ function Item({
   );
 
   return (
-    <div className='rounded-medium bg-secondary overflow-hidden'>
+    <div className='bg-secondary overflow-hidden rounded-[10px]'>
       {Top}
       {isOpen && (
-        <div className='bg-content1 rounded-medium mr-2 mb-2 ml-2 space-y-2 p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:space-y-3 sm:p-3'>
+        <div className='bg-content1 mr-2 mb-2 ml-2 space-y-2 rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:space-y-3 sm:p-3'>
           <CallComp showFallback fallbackComponent={FunctionArgs} from={from} registry={registry} call={call} />
         </div>
       )}
@@ -87,14 +87,14 @@ const BatchCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
 
   return (
     <div className={mergeClasses('w-full space-y-2.5', className)} ref={ref}>
-      <div className='text-small flex items-center justify-between font-bold'>
+      <div className='flex items-center justify-between text-sm font-bold'>
         Actions
         <div>
           <Button
             color='primary'
             size='sm'
             variant='light'
-            onPress={() =>
+            onClick={() =>
               setOpen(
                 Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
                   result[index] = true;
@@ -110,7 +110,7 @@ const BatchCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
             color='primary'
             size='sm'
             variant='light'
-            onPress={() =>
+            onClick={() =>
               setOpen(
                 Array.from({ length: calls.length }).reduce<Record<number, boolean>>((result, _, index) => {
                   result[index] = false;

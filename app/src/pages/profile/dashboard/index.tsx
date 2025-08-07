@@ -4,9 +4,10 @@
 import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Link } from '@mimir-wallet/ui';
+import { Button } from '@mimir-wallet/ui';
 
 import AccountStructure from './AccountStructure';
 import Assets from './Assets';
@@ -42,8 +43,8 @@ function DashboardV2({ address }: { address: string }) {
         <div className='col-span-8 lg:col-span-3'>
           <Title
             endContent={
-              <Button as={Link} href='/dapp' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                View All
+              <Button asChild variant='ghost' size='sm' className='h-[23px] px-[15px]'>
+                <Link to='/dapp'>View All</Link>
               </Button>
             }
           >
@@ -56,8 +57,8 @@ function DashboardV2({ address }: { address: string }) {
         <div className='col-span-8 lg:col-span-4'>
           <Title
             endContent={
-              <Button as={Link} href='/assets' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                View All
+              <Button asChild variant='ghost' size='sm' className='h-[23px] px-[15px]'>
+                <Link to='/assets'>View All</Link>
               </Button>
             }
           >
@@ -70,8 +71,8 @@ function DashboardV2({ address }: { address: string }) {
         <div className='col-span-8 lg:col-span-4'>
           <Title
             endContent={
-              <Button as={Link} href='/transactions' variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                View All
+              <Button asChild variant='ghost' size='sm' className='h-[23px] px-[15px]'>
+                <Link to='/transactions'>View All</Link>
               </Button>
             }
           >

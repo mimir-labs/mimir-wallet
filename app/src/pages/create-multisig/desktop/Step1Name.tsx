@@ -35,7 +35,7 @@ function Step1Name({
         placeholder='Enter multisig name'
         value={name}
         onChange={onNameChange}
-        description={
+        helper={
           <p className='text-foreground/50 text-xs'>
             This name will be visible to all Signers and can be changed anytime.
           </p>
@@ -55,7 +55,7 @@ function Step1Name({
 
       {/* Action Buttons */}
       <div className='flex gap-2.5'>
-        <Button fullWidth size='md' color='primary' radius='full' onPress={onNext} isDisabled={!name.trim()}>
+        <Button fullWidth size='md' color='primary' radius='full' onClick={onNext} disabled={!name.trim()}>
           Next
         </Button>
       </div>

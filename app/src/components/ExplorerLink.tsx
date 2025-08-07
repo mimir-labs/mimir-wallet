@@ -6,7 +6,7 @@ import SubscanImg from '@/assets/images/subscan.svg';
 import { useMemo } from 'react';
 
 import { chainLinks, type Endpoint } from '@mimir-wallet/polkadot-core';
-import { Avatar, Link, Tooltip } from '@mimir-wallet/ui';
+import { Avatar, Tooltip } from '@mimir-wallet/ui';
 
 interface ExplorerLinkProps {
   address: string;
@@ -74,14 +74,14 @@ function ExplorerLink({ address, showAll = false, className, chain, iconSize = 2
   return (
     <div className={`flex items-center gap-1 sm:gap-2 ${className || ''}`}>
       {displayItems.map((item) => (
-        <Tooltip key={item.type} content={item.tooltip} closeDelay={0}>
-          <Link target='_blank' href={item.url} rel='noreferrer'>
+        <Tooltip key={item.type} content={item.tooltip}>
+          <a target='_blank' href={item.url} rel='noopener noreferrer'>
             <Avatar
               style={{ width: iconSize, height: iconSize, backgroundColor: 'transparent' }}
               src={item.icon}
               alt={item.type}
             />
-          </Link>
+          </a>
         </Tooltip>
       ))}
     </div>

@@ -4,61 +4,46 @@
 import IconAddFill from '@/assets/svg/icon-add-fill.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { Button, Link, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
+import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
 
 function CreateMultisig({ onClose }: { onClose?: () => void }) {
   const navigate = useNavigate();
   const ref = useRef<HTMLButtonElement>(null);
   const [width, setWidth] = useState<number>();
-  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    setWidth(ref.current?.clientWidth ? ref.current.clientWidth * 0.97 : undefined);
+    setWidth(ref.current?.clientWidth);
   }, []);
 
   return (
     <>
-      <Popover
-        radius='md'
-        placement='top-start'
-        style={{ width }}
-        isOpen={isOpen}
-        onOpenChange={(open) => setIsOpen(open)}
-      >
-        <PopoverTrigger>
-          <Button className='h-12' fullWidth startContent={<IconAddFill />} radius='md' ref={ref}>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button className='h-12' fullWidth radius='md' ref={ref}>
+            <IconAddFill />
             Create New
           </Button>
         </PopoverTrigger>
-        <PopoverContent className='items-stretch space-y-2.5 p-2.5'>
-          <Button
-            as={Link}
-            key='hide-0'
-            disableRipple
-            radius='sm'
-            variant='light'
-            color='primary'
-            className='text-foreground'
-            href='/create-multisig'
-            onPress={() => {
-              setIsOpen(false);
-            }}
-          >
-            Create Multisig
+        <PopoverContent
+          side='top'
+          align='start'
+          className='flex flex-col items-stretch space-y-2.5 p-2.5'
+          style={{ width }}
+        >
+          <Button asChild key='Multisig' radius='sm' variant='light' color='primary' className='text-foreground'>
+            <Link to='/create-multisig'>Create Multisig</Link>
           </Button>
           <Button
-            key='hide-0'
-            disableRipple
+            key='Proxy'
             radius='sm'
             variant='light'
             color='primary'
             className='text-foreground'
-            onPress={() => {
+            onClick={() => {
               navigate('/add-proxy');
               onClose?.();
-              setIsOpen(false);
             }}
           >
             Add Proxy
@@ -67,16 +52,14 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
             </Tooltip>
           </Button>
           <Button
-            key='hide-0'
-            disableRipple
+            key='Pure'
             radius='sm'
             variant='light'
             color='primary'
             className='text-foreground'
-            onPress={() => {
+            onClick={() => {
               navigate('/create-pure');
               onClose?.();
-              setIsOpen(false);
             }}
           >
             Create Pure Proxy

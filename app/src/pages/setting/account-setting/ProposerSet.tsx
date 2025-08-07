@@ -17,6 +17,7 @@ import { useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import {
   Button,
+  buttonSpinner,
   Divider,
   Modal,
   ModalBody,
@@ -105,6 +106,7 @@ Genesis Hash: ${genesisHash}`;
       refetch();
       onClose();
     } catch (error) {
+      console.error(error);
       toastError(error);
     } finally {
       setLoading(false);
@@ -116,7 +118,7 @@ Genesis Hash: ${genesisHash}`;
       <ModalContent>
         <ModalHeader>Set New Proposer</ModalHeader>
         <Divider />
-        <ModalBody className='space-y-5'>
+        <ModalBody className='gap-y-5'>
           <InputAddress
             label={type === 'add' ? 'Proposer' : 'Proposer to delete'}
             disabled={type === 'delete'}
@@ -144,9 +146,8 @@ Genesis Hash: ${genesisHash}`;
             fullWidth
             color={type === 'add' ? 'primary' : 'danger'}
             variant={type === 'add' ? 'solid' : 'flat'}
-            isDisabled={!signer || (type === 'add' && !proposer)}
-            isLoading={loading}
-            onPress={
+            disabled={loading || !signer || (type === 'add' && !proposer)}
+            onClick={
               type === 'add'
                 ? proposer
                   ? () => handleConfirm(proposer)
@@ -156,6 +157,7 @@ Genesis Hash: ${genesisHash}`;
                   : undefined
             }
           >
+            {loading ? buttonSpinner : null}
             {type === 'add' ? 'Confirm' : 'Delete'}
           </Button>
         </ModalFooter>
@@ -177,8 +179,8 @@ function ProposerSet({ account, refetch }: { account: AccountData; refetch: () =
         <Table
           removeWrapper
           classNames={{
-            th: 'bg-transparent text-small font-bold',
-            td: 'text-small'
+            th: 'bg-transparent text-sm font-bold',
+            td: 'text-sm'
           }}
         >
           <TableHeader>
@@ -205,7 +207,7 @@ function ProposerSet({ account, refetch }: { account: AccountData; refetch: () =
                     size='sm'
                     variant='light'
                     color='danger'
-                    onPress={() => {
+                    onClick={() => {
                       toggleOpen(true);
                       setDeleteProposer(item.proposer);
                       setType('delete');
@@ -221,7 +223,7 @@ function ProposerSet({ account, refetch }: { account: AccountData; refetch: () =
 
         <Button
           fullWidth
-          onPress={() => {
+          onClick={() => {
             toggleOpen(true);
             setType('add');
           }}

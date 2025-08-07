@@ -72,13 +72,13 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
         {icon}
         <div className='flex flex-1 items-center gap-[5px] sm:gap-2.5'>
           <AddressName value={address} /> {isUnLock ? 'unlock' : 'lock'}
-          <Tooltip classNames={{ content: 'max-w-[320px]' }} content={<span>{tip}</span>} closeDelay={0}>
+          <Tooltip classNames={{ content: 'max-w-[320px]' }} content={<span>{tip}</span>}>
             <IconQuestion className='text-primary/40' />
           </Tooltip>
         </div>
         <div className='flex items-center gap-[5px] sm:gap-2.5'>
           {!isUnLock && isEnought === false && (
-            <Button color='primary' variant='bordered' onPress={toggleOpen} size='sm' className='h-[20px]'>
+            <Button color='primary' variant='bordered' onClick={toggleOpen} size='sm' className='h-[20px]'>
               Fund
             </Button>
           )}
@@ -102,7 +102,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 }
 
 export const LockContainer = React.memo(({ children }: { children: React.ReactNode }) => {
-  return <div className='rounded-medium bg-secondary space-y-2.5 p-2.5'>{children}</div>;
+  return <div className='bg-secondary space-y-2.5 rounded-[10px] p-2.5'>{children}</div>;
 });
 
 export default React.memo(LockItem);

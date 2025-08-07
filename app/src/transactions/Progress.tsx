@@ -244,7 +244,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
   const filterPaths = useFilterPaths(account, transaction);
 
   return (
-    <div className={'bg-primary/5 rounded-medium min-w-[280px] space-y-2.5 p-5'.concat(props.className || '')}>
+    <div className={'bg-primary/5 min-w-[280px] space-y-2.5 rounded-[10px] p-5'.concat(props.className || '')}>
       <p className='text-primary font-bold'>Progress</p>
       <Divider className='bg-primary/5' />
 
@@ -254,7 +254,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           transaction={transaction}
           button={
             openOverview ? (
-              <Button onPress={openOverview} size='sm' variant='light'>
+              <Button onClick={openOverview} size='sm' variant='light'>
                 Overview
               </Button>
             ) : null
@@ -266,7 +266,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           transaction={transaction}
           button={
             openOverview ? (
-              <Button onPress={openOverview} size='sm' variant='light'>
+              <Button onClick={openOverview} size='sm' variant='light'>
                 Overview
               </Button>
             ) : null
@@ -278,7 +278,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           transaction={transaction}
           button={
             openOverview ? (
-              <Button onPress={openOverview} size='sm' variant='light'>
+              <Button onClick={openOverview} size='sm' variant='light'>
                 Overview
               </Button>
             ) : null

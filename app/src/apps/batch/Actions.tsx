@@ -55,10 +55,10 @@ function Actions({
         </Checkbox>
       </div>
       <Button
-        isDisabled={selected.length === 0}
+        disabled={selected.length === 0}
         color='danger'
         variant='ghost'
-        onPress={() => {
+        onClick={() => {
           setSelected((values) => values.filter((v) => !selected.includes(v)));
           deleteTx(selected);
         }}
@@ -67,7 +67,7 @@ function Actions({
       </Button>
       <TxButton
         color='primary'
-        isDisabled={selected.length === 0}
+        disabled={selected.length === 0}
         relatedBatches={relatedBatches}
         accountId={address}
         website='mimir://app/batch'

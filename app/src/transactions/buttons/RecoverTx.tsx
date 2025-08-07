@@ -49,8 +49,8 @@ function RecoverTx({
     <Modal size='2xl' onClose={onClose} isOpen={isOpen}>
       <ModalContent>
         <ModalHeader>Call Data</ModalHeader>
-        <ModalBody className='gap-y-2.5'>
-          <p className='text-foreground/50 text-tiny leading-[16px]'>
+        <ModalBody>
+          <p className='text-foreground/50 text-xs leading-[16px]'>
             <IconInfo className='mr-1 inline h-4 w-4 align-middle' />
             This transaction wasn’t initiated from Mimir. But you can copy Call Data from explorer to recover this
             transaction
@@ -70,8 +70,8 @@ function RecoverTx({
             fullWidth
             variant='ghost'
             color='primary'
-            isDisabled={!calldata}
-            onPress={() => handleRecover(calldata)}
+            disabled={!calldata}
+            onClick={() => handleRecover(calldata)}
           >
             Recover
           </Button>

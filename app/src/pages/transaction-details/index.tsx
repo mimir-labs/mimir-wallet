@@ -29,7 +29,7 @@ function SmPage({ transaction }: { transaction: Transaction }) {
 
       <Details transaction={transaction} />
 
-      <TxProgress account={account} transaction={transaction} className='rounded-large bg-content1' />
+      <TxProgress account={account} transaction={transaction} className='bg-content1 rounded-[20px]' />
     </div>
   );
 }

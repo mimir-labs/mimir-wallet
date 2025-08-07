@@ -8,7 +8,7 @@ import React from 'react';
 import { useAsyncFn } from 'react-use';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
+import { Button, buttonSpinner } from '@mimir-wallet/ui';
 
 function AddProxyButton({
   proxied,
@@ -66,7 +66,8 @@ function AddProxyButton({
   }, [api, custom, proxied, proxy, proxyArgs, proxyType, reviewWindow, setProxyArgs]);
 
   return (
-    <Button isDisabled={!(proxied && proxy)} fullWidth variant='ghost' onPress={onAdd} isLoading={state.loading}>
+    <Button disabled={state.loading || !(proxied && proxy)} fullWidth variant='ghost' onClick={onAdd}>
+      {state.loading ? buttonSpinner : null}
       Add
     </Button>
   );

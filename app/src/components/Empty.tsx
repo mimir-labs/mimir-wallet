@@ -6,8 +6,9 @@ import EmptyFavoriteDapp from '@/assets/images/empty-favorite-dapp.svg';
 import EmptyPendingTransactions from '@/assets/images/empty-pending-transactions.svg';
 import EmptySelectAccount from '@/assets/images/empty-select-account.svg';
 import NullImg from '@/assets/images/Null.png';
+import { Link } from 'react-router-dom';
 
-import { Button, Link } from '@mimir-wallet/ui';
+import { Button } from '@mimir-wallet/ui';
 
 interface Props {
   label?: string;
@@ -17,7 +18,7 @@ interface Props {
 }
 
 function Empty({ height, label, variant = 'default', className = '' }: Props) {
-  const cn = `flex flex-col items-center justify-center ${variant === 'favorite-dapps' || variant === 'pending-transaction' ? 'gap-[15px]' : 'gap-2.5'} text-small ${variant === 'account' || variant === 'select-account' ? 'text-[#949494]' : 'text-foreground'}`;
+  const cn = `flex flex-col items-center justify-center ${variant === 'favorite-dapps' || variant === 'pending-transaction' ? 'gap-[15px]' : 'gap-2.5'} text-sm ${variant === 'account' || variant === 'select-account' ? 'text-[#949494]' : 'text-foreground'}`;
 
   const getContent = () => {
     switch (variant) {
@@ -29,8 +30,8 @@ function Empty({ height, label, variant = 'default', className = '' }: Props) {
               <h6>You haven't favorited any apps yet.</h6>
               <p className='text-foreground/50 text-sm'>You can go to the App page to add them to your favorites.</p>
             </div>
-            <Button as={Link} size='sm' href='/dapp' color='primary' variant='bordered' radius='full'>
-              Go To Apps
+            <Button asChild size='sm' color='primary' variant='ghost' radius='full'>
+              <Link to='/dapp'>Go To Apps</Link>
             </Button>
           </>
         );
@@ -38,7 +39,7 @@ function Empty({ height, label, variant = 'default', className = '' }: Props) {
         return (
           <>
             <img src={EmptyPendingTransactions} />
-            <p className='text-medium'>No Pending Transaction</p>
+            <p className='text-base'>No Pending Transaction</p>
           </>
         );
       default:

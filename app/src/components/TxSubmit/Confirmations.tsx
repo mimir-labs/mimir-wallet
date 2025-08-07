@@ -29,7 +29,7 @@ function Confirmations({ account, transaction }: Props) {
         <div className='text-foreground/50 flex-1 text-sm leading-none font-bold'>
           ({confirmations}/{totalConfirmations})
         </div>
-        <Button variant='ghost' color='primary' radius='full' onPress={() => setShowOverview(true)}>
+        <Button variant='ghost' color='primary' radius='full' onClick={() => setShowOverview(true)}>
           Overview
         </Button>
       </div>

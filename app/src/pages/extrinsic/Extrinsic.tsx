@@ -12,7 +12,7 @@ import { Call as CallComp } from '@/params';
 import { useEffect, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Divider, Link } from '@mimir-wallet/ui';
+import { Divider } from '@mimir-wallet/ui';
 
 function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {
   if (!callData) return [null, null];
@@ -51,7 +51,7 @@ function Extrinsic({
   }, [api.registry, callData]);
 
   return (
-    <div className='rounded-large border-secondary bg-content1 shadow-medium mx-auto mt-3 w-full max-w-[500px] border-1 p-5'>
+    <div className='border-secondary bg-content1 shadow-medium mx-auto mt-3 w-full max-w-[500px] rounded-[20px] border-1 p-5'>
       <div className='space-y-5'>
         <h3>Submit Extrinsic</h3>
 
@@ -63,9 +63,9 @@ function Extrinsic({
           label={
             <div className='flex items-center justify-between gap-1'>
               Call Data
-              <Link as='button' underline='none' color='primary' onPress={() => events.emit('template_open', network)}>
+              <button className='text-primary hover:underline' onClick={() => events.emit('template_open', network)}>
                 View Template
-              </Link>
+              </button>
             </div>
           }
           placeholder='0x...'
@@ -73,13 +73,13 @@ function Extrinsic({
           helper={
             <div className='text-foreground mt-1'>
               You can paste the Encoded Call Data in{' '}
-              <Link underline='hover' target='_blank'>
+              <a className='hover:underline' target='_blank' rel='noopener noreferrer'>
                 DOT Console
-              </Link>
+              </a>
               /
-              <Link underline='hover' target='_blank'>
+              <a className='hover:underline' target='_blank' rel='noopener noreferrer'>
                 Polkadot.JS
-              </Link>
+              </a>
               .
             </div>
           }
@@ -88,8 +88,8 @@ function Extrinsic({
         />
 
         {callDataError && (
-          <div className='bg-secondary rounded-medium p-2.5 break-all'>
-            <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-tiny'>
+          <div className='bg-secondary rounded-[10px] p-2.5 break-all'>
+            <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-xs'>
               {callDataError.message}
             </p>
           </div>
@@ -101,19 +101,19 @@ function Extrinsic({
               <p className='font-bold'>
                 {parsedCallData.section}.{parsedCallData.method}
               </p>
-              <Link as='button' underline='none' color='primary' onPress={() => setShowDetail(!showDetail)}>
+              <button className='text-primary hover:underline' onClick={() => setShowDetail(!showDetail)}>
                 {showDetail ? 'Hide' : 'Details'}
-              </Link>
+              </button>
             </div>
 
-            <div className='rounded-medium border-divider-300 border-1 p-2.5'>
+            <div className='border-divider-300 rounded-[10px] border-1 p-2.5'>
               <ErrorBoundary>
                 <CallComp showFallback registry={api.registry} from={sending} call={parsedCallData} />
               </ErrorBoundary>
             </div>
 
             {showDetail && (
-              <div className='rounded-medium bg-secondary p-2.5'>
+              <div className='bg-secondary rounded-[10px] p-2.5'>
                 <JsonView data={parsedCallData.toHuman()} />
               </div>
             )}
@@ -126,7 +126,7 @@ function Extrinsic({
           fullWidth
           variant='solid'
           color='primary'
-          isDisabled={!parsedCallData}
+          disabled={!parsedCallData}
           accountId={sending}
           website='mimir://internal/template'
           getCall={parsedCallData ? () => parsedCallData : undefined}

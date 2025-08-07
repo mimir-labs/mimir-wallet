@@ -42,12 +42,8 @@ function Export() {
   };
 
   return (
-    <Button
-      color='primary'
-      variant='ghost'
-      startContent={<IconDownload className='rotate-180' />}
-      onPress={handleExport}
-    >
+    <Button color='primary' variant='ghost' onClick={handleExport}>
+      <IconDownload className='rotate-180' />
       Export
     </Button>
   );

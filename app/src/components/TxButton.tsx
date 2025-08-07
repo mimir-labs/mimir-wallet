@@ -14,11 +14,13 @@ import { GenericExtrinsic } from '@polkadot/types';
 import React, { forwardRef, useCallback, useState } from 'react';
 
 import { signAndSend, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, type ButtonProps } from '@mimir-wallet/ui';
+import { Button, type ButtonProps, buttonSpinner } from '@mimir-wallet/ui';
 
 import { toastError } from './utils';
 
-interface Props extends Omit<ButtonProps, 'onPress' | 'onClick'> {
+interface Props extends Omit<ButtonProps, 'onClick' | 'startContent' | 'endContent'> {
+  startContent?: React.ReactNode;
+  endContent?: React.ReactNode;
   accountId?: string;
   filterPaths?: FilterPath[];
   transaction?: Transaction | null;
@@ -58,11 +60,12 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
       filterPaths,
       beforeSend,
       onResults,
-      isDisabled,
       disabled,
       onDone,
       onError,
       overrideAction,
+      startContent,
+      endContent,
       ...props
     },
     ref
@@ -73,7 +76,7 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
     const address = accountId || transaction?.address || walletAccounts.at(0)?.address;
     const source = useAccountSource(address);
     const [loading, setLoading] = useState(false);
-    const handlePress = useCallback(() => {
+    const handleClick = useCallback(() => {
       if (getCall) {
         const call = getCall();
 
@@ -146,14 +149,10 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
     ]);
 
     return (
-      <Button
-        {...props}
-        ref={ref}
-        isLoading={loading}
-        isDisabled={isDisabled || disabled}
-        onPress={overrideAction || handlePress}
-      >
+      <Button {...props} ref={ref} disabled={loading || disabled} onClick={overrideAction || handleClick}>
+        {loading ? buttonSpinner : startContent}
         {children}
+        {endContent}
       </Button>
     );
   }

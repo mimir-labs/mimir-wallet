@@ -9,7 +9,7 @@ import { useAsyncFn } from 'react-use';
 
 import { type Endpoint, NETWORK_RPC_PREFIX, useNetworks } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
-import { Alert, Autocomplete, AutocompleteItem, Button, Divider } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Autocomplete, AutocompleteItem, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
 
 function Content({ chain }: { chain: Endpoint }) {
   const { networks } = useNetworks();
@@ -67,11 +67,16 @@ function Content({ chain }: { chain: Endpoint }) {
           </AutocompleteItem>
         )}
       </Autocomplete>
-      {error && <Alert color='danger'>{error.message}</Alert>}
+      {error && (
+        <Alert variant='destructive'>
+          <AlertTitle>{error.message}</AlertTitle>
+        </Alert>
+      )}
 
       <Divider />
 
-      <Button isDisabled={!url} fullWidth isLoading={state.loading} onPress={handleSave}>
+      <Button disabled={!url || state.loading} fullWidth onClick={handleSave}>
+        {state.loading ? buttonSpinner : undefined}
         Save
       </Button>
     </>
@@ -85,7 +90,7 @@ function NetworkSetting() {
   const chain = networks.find((item) => item.key === network);
 
   return (
-    <div className='bg-content1 shadow-medium rounded-large flex flex-col gap-5 p-5'>
+    <div className='bg-content1 shadow-medium flex flex-col gap-5 rounded-[20px] p-5'>
       <InputNetwork showAllNetworks label='Select Network' network={network} setNetwork={setNetwork} />
 
       {chain && <Content key={chain.key} chain={chain} />}

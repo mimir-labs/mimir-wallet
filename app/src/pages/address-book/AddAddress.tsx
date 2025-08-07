@@ -10,7 +10,7 @@ function AddAddress() {
   const { addAddressBook } = useAccount();
 
   return (
-    <Button onPress={() => addAddressBook()} variant='ghost'>
+    <Button onClick={() => addAddressBook()} variant='ghost'>
       Add New Contact
     </Button>
   );

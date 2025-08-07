@@ -5,7 +5,6 @@ import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import IconClock from '@/assets/svg/icon-clock.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
-import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Address, AddressCell, Empty, FormatBalance, InputNetwork, TxButton } from '@/components';
 import { findToken } from '@/config';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
@@ -15,16 +14,18 @@ import { useProxies } from '@/hooks/useProxies';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import {
   Alert,
+  AlertDescription,
+  AlertTitle,
   Avatar,
   Button,
   Chip,
   Divider,
-  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -60,7 +61,7 @@ function Content({
       <div className='space-y-5'>
         <InputNetwork network={network} setNetwork={setNetwork} />
 
-        <div className='rounded-medium bg-secondary p-2.5'>
+        <div className='bg-secondary rounded-[10px] p-2.5'>
           <div className='font-bold'>Proxy Account</div>
 
           <div className='mt-2.5 space-y-2.5'>
@@ -69,7 +70,7 @@ function Content({
               proxies[0].map((proxy, index) => (
                 <div
                   key={index}
-                  className='bg-content1 rounded-medium flex items-center justify-between gap-[5px] p-[5px]'
+                  className='bg-content1 flex items-center justify-between gap-[5px] rounded-[10px] p-[5px]'
                 >
                   <div className='flex-1'>
                     <AddressCell shorten value={proxy.delegate.toString()} />
@@ -119,30 +120,22 @@ function Content({
 
         <Divider />
 
-        <Alert
-          hideIconWrapper
-          color='warning'
-          description={
+        <Alert variant={'warning'}>
+          <AlertTitle className='font-bold'>Notice</AlertTitle>
+          <AlertDescription>
             <ul>
               <li>Only All authority can delete proxy.</li>
               <li>Deleting a Proxy will refund the fees, while adding a Proxy requires an additional deposit fee.</li>
             </ul>
-          }
-          classNames={{
-            title: 'font-bold text-small',
-            description: 'text-tiny'
-          }}
-          icon={<IconInfo />}
-          title='Notice'
-          variant='flat'
-        />
+          </AlertDescription>
+        </Alert>
 
-        <Button as={Link} color='primary' fullWidth href='/add-proxy'>
-          Add New Proxy
+        <Button asChild color='primary' fullWidth>
+          <RouterLink to='/add-proxy'>Add New Proxy</RouterLink>
         </Button>
 
         {account?.type === 'pure' ? (
-          <Button fullWidth color='danger' onPress={toggleOpen}>
+          <Button fullWidth color='danger' onClick={toggleOpen}>
             Delete Account
           </Button>
         ) : (
@@ -228,7 +221,7 @@ function Content({
           <ModalContent>
             <ModalHeader>Attention</ModalHeader>
 
-            <ModalBody className='py-5'>
+            <ModalBody>
               <p>
                 If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control
                 in this account and the initial deposit will not be withdrawn.
@@ -257,7 +250,7 @@ function ProxySet({ address }: { address: string }) {
       network={network}
       supportedNetworks={supportedNetworks?.map((item) => item.key)}
       Fallback={({ apiState: { chain } }) => (
-        <div className='bg-content1 rounded-large mx-auto my-0 flex w-[500px] max-w-full items-center justify-center py-10'>
+        <div className='bg-content1 mx-auto my-0 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
           <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
         </div>
       )}

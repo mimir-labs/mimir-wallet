@@ -22,7 +22,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       () => (
         <div className='flex flex-col gap-1'>
           <p className='font-bold'>Waiting</p>
-          <p className='text-tiny'>Transaction is inblock</p>
+          <p className='text-xs'>Transaction is inblock</p>
         </div>
       ),
       { type: 'success', icon: <SuccessAnimation />, autoClose: 3000 }
@@ -34,7 +34,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       () => (
         <div className='flex flex-col gap-1'>
           <p className='font-bold'>Waiting</p>
-          <p className='text-tiny'>Broadcasting transaction</p>
+          <p className='text-xs'>Broadcasting transaction</p>
         </div>
       ),
       { icon: <WaitingAnimation />, autoClose: false }
@@ -46,7 +46,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
       () => (
         <div className='flex flex-col gap-1'>
           <p className='font-bold'>Failed</p>
-          <p className='text-tiny'>
+          <p className='text-xs'>
             <TxError error={events.error} />
           </p>
         </div>
@@ -63,7 +63,7 @@ function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions
     () => (
       <div className='flex flex-col gap-1'>
         <p className='font-bold'>Waiting</p>
-        <p className='text-tiny'>Waiting for sign</p>
+        <p className='text-xs'>Waiting for sign</p>
       </div>
     ),
     { icon: <WaitingAnimation />, autoClose: false }

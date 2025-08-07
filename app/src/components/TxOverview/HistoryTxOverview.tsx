@@ -69,7 +69,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
         />
       )}
       <div>
-        <div className='bg-content1 rounded-medium border-divider-300 flex w-[220px] items-center justify-between border-1 px-2.5 py-[3px]'>
+        <div className='bg-content1 border-divider-300 flex w-[220px] items-center justify-between rounded-[10px] border-1 px-2.5 py-[3px]'>
           <AddressCell value={data.transaction.address} withCopy withAddressBook />
           {icon}
         </div>

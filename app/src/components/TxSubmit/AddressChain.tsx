@@ -42,7 +42,7 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
 
   return (
     <div>
-      {deep === 0 && <div className='text-small mb-2 font-bold'>Select Signer</div>}
+      {deep === 0 && <div className='mb-2 text-sm font-bold'>Select Signer</div>}
       {deep === 0 && !source ? null : (
         <SelectFilterPath
           filterPaths={addresses}

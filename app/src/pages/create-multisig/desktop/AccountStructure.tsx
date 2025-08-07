@@ -15,7 +15,7 @@ import { useToggle } from 'react-use';
 
 import { useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
 interface AccountStructureProps {
   name: string;
@@ -128,17 +128,18 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
 
   return (
     <>
-      <div className='rounded-medium bg-secondary relative h-[250px] pt-10'>
+      <div className='bg-secondary relative h-[250px] rounded-[10px] pt-10'>
         {/* View Full Structure Button */}
         <Button
-          isLoading={isFetching}
+          disabled={isFetching}
           size='sm'
           variant='ghost'
           color='primary'
           radius='full'
           className='bg-content1 absolute top-2.5 left-2.5 z-10'
-          onPress={fetchFullStructure}
+          onClick={fetchFullStructure}
         >
+          {isFetching ? buttonSpinner : null}
           View Full Structure
         </Button>
 
@@ -151,11 +152,11 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
       </div>
 
       {fullAccount && (
-        <Modal size='5xl' onClose={() => toggleOpen(false)} isOpen={isOpen}>
+        <Modal size='5xl' isOpen={isOpen} onClose={() => toggleOpen(false)}>
           <ModalContent>
             <ModalHeader>Full Structure</ModalHeader>
-            <ModalBody className='pb-5'>
-              <div className='rounded-medium bg-secondary h-[50dvh]'>
+            <ModalBody>
+              <div className='bg-secondary h-[50dvh] rounded-[10px]'>
                 {isOpen ? <AddressOverview showAddressNodeOperations={false} account={fullAccount} /> : null}
               </div>
             </ModalBody>

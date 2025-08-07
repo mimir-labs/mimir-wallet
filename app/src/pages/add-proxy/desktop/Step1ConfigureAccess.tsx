@@ -5,7 +5,7 @@ import { useAccount } from '@/accounts/useAccount';
 import PureIcon from '@/assets/images/pure-icon.svg';
 import { AddressName, EditableField, InputAddress, InputNetwork, ProxyControls } from '@/components';
 
-import { Alert, Button, Divider, Switch } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button, Divider, Switch } from '@mimir-wallet/ui';
 
 import Tips from '../components/Tips';
 import { useProxyValidation } from '../hooks/useProxyValidation';
@@ -80,7 +80,7 @@ function Step1ConfigureAccess({
 
           {/* Proxied Account (Lower) */}
           {isPureProxy ? (
-            <div className='bg-secondary rounded-medium flex h-14 w-full items-center gap-2.5 px-2.5'>
+            <div className='bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5'>
               <img src={PureIcon} style={{ width: 30 }} />
               <EditableField
                 className='font-bold'
@@ -130,15 +130,17 @@ function Step1ConfigureAccess({
       {/* Action Button */}
       <div className='flex flex-col gap-2.5'>
         {validationResult.visibleErrors.map((error) => (
-          <Alert color='danger' title={error} />
+          <Alert variant='destructive'>
+            <AlertTitle>{error}</AlertTitle>
+          </Alert>
         ))}
         <Button
           fullWidth
           size='md'
           color='primary'
           radius='full'
-          onPress={onNext}
-          isDisabled={!validationResult.canProceed}
+          onClick={onNext}
+          disabled={!validationResult.canProceed}
         >
           Next
         </Button>

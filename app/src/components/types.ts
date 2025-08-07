@@ -2,13 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type React from 'react';
-import type { InputProps as BaseInputProps } from '@mimir-wallet/ui';
 
-export interface InputProps extends Omit<BaseInputProps, 'onChange'> {
+export interface InputProps extends Omit<React.ComponentProps<'input'>, 'onChange'> {
   className?: string;
   defaultValue?: string;
   value?: string;
-  color?: 'danger' | 'primary' | 'secondary' | 'success' | 'warning';
   disabled?: boolean;
   label?: React.ReactNode;
   error?: Error | null;

@@ -25,7 +25,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
       network={network}
       supportedNetworks={supportedNetworks?.map((item) => item.key)}
       Fallback={() => (
-        <div className='bg-content1 rounded-large mx-auto my-0 flex w-[500px] max-w-full items-center justify-center py-10'>
+        <div className='bg-content1 mx-auto my-0 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
           <Spinner size='lg' variant='wave' label='Connecting to the network...' />
         </div>
       )}

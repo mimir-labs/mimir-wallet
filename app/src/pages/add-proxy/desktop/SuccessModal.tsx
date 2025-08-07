@@ -126,7 +126,7 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
           {/* Account Relationship Display */}
           <div className='relative flex w-full flex-col items-center gap-[5px]'>
             {/* Proxy Account (Upper) */}
-            <div className='bg-secondary rounded-medium w-full p-2.5'>
+            <div className='bg-secondary w-full rounded-[10px] p-2.5'>
               <AddressCell shorten={false} value={transactionResult?.context?.proxy} />
             </div>
 
@@ -138,14 +138,14 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
 
             {/* Proxied Account (Lower) */}
             {transactionResult?.context?.type === 'pure' ? (
-              <div className='bg-secondary rounded-medium flex h-14 w-full items-center gap-2.5 px-2.5'>
+              <div className='bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5'>
                 <img src={PureIcon} style={{ width: 30 }} />
                 <span className='text-foreground font-bold'>
                   {transactionResult.context.pureProxyName || DEFAULT_PURE_ACCOUNT_NAME}
                 </span>
               </div>
             ) : (
-              <div className='bg-secondary rounded-medium w-full p-2.5'>
+              <div className='bg-secondary w-full rounded-[10px] p-2.5'>
                 <AddressCell value={transactionResult?.context?.proxied} />
               </div>
             )}
@@ -156,15 +156,15 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
           {/* Action Buttons */}
           {transactionResult?.isPending ? (
             <>
-              <Button fullWidth color='primary' radius='full' onPress={handleGoToPending}>
+              <Button fullWidth color='primary' radius='full' onClick={handleGoToPending}>
                 Go to Pending
               </Button>
-              <Button fullWidth variant='bordered' color='primary' radius='full' onPress={handleShareToSigners}>
+              <Button fullWidth variant='bordered' color='primary' radius='full' onClick={handleShareToSigners}>
                 {isCopied ? '✅ Copied' : 'Share to other Signers'}
               </Button>
             </>
           ) : (
-            <Button fullWidth color='primary' radius='full' onPress={handleStartUsing}>
+            <Button fullWidth color='primary' radius='full' onClick={handleStartUsing}>
               Start using
             </Button>
           )}

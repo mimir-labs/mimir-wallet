@@ -9,7 +9,7 @@ import { asError } from '@/utils';
 import { useCallback, useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
-import { Alert, Avatar, Button, Divider, Spinner } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Avatar, Button, buttonSpinner, Divider, Spinner } from '@mimir-wallet/ui';
 
 import { isPairingUri } from '../utils';
 import { connect, disconnectSession } from '../wallet-connect';
@@ -21,7 +21,7 @@ function ConnectSession({ session }: { session: SessionTypes.Struct }) {
   const [showFallback, setShowFallback] = useState(false);
 
   return (
-    <div className='rounded-medium flex w-full items-center gap-2.5 border-1 border-[#d9d9d9]/50 p-2.5'>
+    <div className='flex w-full items-center gap-2.5 rounded-[10px] border-1 border-[#d9d9d9]/50 p-2.5'>
       <Avatar
         showFallback={showFallback}
         fallback={<Avatar src='/images/wallet-connect.webp' alt='wallet connect' style={{ width: 30, height: 30 }} />}
@@ -31,8 +31,9 @@ function ConnectSession({ session }: { session: SessionTypes.Struct }) {
           setShowFallback(true);
         }}
       />
-      <p className='text-small flex-1'>{session.peer.metadata.name}</p>
-      <Button radius='full' color='warning' size='sm' onPress={() => disconnect(session)} isLoading={state.loading}>
+      <p className='flex-1 text-sm'>{session.peer.metadata.name}</p>
+      <Button size='sm' color='danger' variant='light' disabled={state.loading} onClick={() => disconnect(session)}>
+        {state.loading ? buttonSpinner : null}
         Disconnect
       </Button>
     </div>
@@ -82,7 +83,11 @@ function Connect({ sessions }: { sessions: SessionTypes.Struct[] }) {
         color={error ? 'danger' : undefined}
         endAdornment={isLoading ? <Spinner size='sm' /> : null}
       />
-      {error && <Alert color='danger' title={error?.message} />}
+      {error && (
+        <Alert variant='destructive'>
+          <AlertTitle>{error?.message}</AlertTitle>
+        </Alert>
+      )}
       {sessions.length > 0 && <Divider />}
       {sessions.map((session) => (
         <ConnectSession session={session} key={session.topic} />

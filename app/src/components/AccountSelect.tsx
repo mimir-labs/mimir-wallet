@@ -33,7 +33,7 @@ function AccountSelect() {
       >
         <AddressCell
           showType={upSm}
-          className='[&_.AddressCell-Address]:text-tiny [&_.AddressCell-Address]:h-[14px]'
+          className='[&_.AddressCell-Address]:h-[14px] [&_.AddressCell-Address]:text-xs'
           iconSize={24}
           shorten
           addressCopyDisabled

@@ -4,7 +4,6 @@
 import type { ProxyArgs } from '../types';
 
 import { useAccount } from '@/accounts/useAccount';
-import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { Input, InputAddress, InputNetwork, Label } from '@/components';
 import { ONE_DAY, ONE_HOUR } from '@/constants';
@@ -17,7 +16,20 @@ import { useToggle } from 'react-use';
 
 import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
-import { Alert, Button, Divider, Select, SelectItem, Switch, Tooltip } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Divider,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+  Tooltip
+} from '@mimir-wallet/ui';
 
 import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
 import { filterAccountsByNetwork } from '../utils';
@@ -112,11 +124,11 @@ function AddProxy({
     <>
       <div className='mx-auto my-0 w-[500px] max-w-full'>
         <div className='flex items-center justify-between'>
-          <Button onPress={() => navigate(-1)} variant='ghost'>
+          <Button onClick={() => navigate(-1)} variant='ghost'>
             {'<'} Back
           </Button>
         </div>
-        <div className='rounded-large bg-content1 border-secondary shadow-medium mt-2.5 border-1 p-4 sm:p-5'>
+        <div className='bg-content1 border-secondary shadow-medium mt-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
           <div className='space-y-5'>
             <div className='flex justify-between'>
               <h3>{pure ? 'Create New Pure Proxy' : 'Add Proxy'}</h3>
@@ -141,7 +153,7 @@ function AddProxy({
                 />
               )}
               <Tooltip content='Switch'>
-                <Button isIconOnly variant='light' onPress={swap} isDisabled={pure || proxyArgs.length > 0}>
+                <Button isIconOnly variant='light' onClick={swap} disabled={pure || proxyArgs.length > 0}>
                   <IconTransfer className='h-4 w-4 rotate-90' />
                 </Button>
               </Tooltip>
@@ -166,7 +178,6 @@ function AddProxy({
               onChange={setProxyType}
               label='Authorize'
               description='Determines what actions the proxy can perform.'
-              variant='bordered'
             />
 
             <div className='flex items-center justify-between'>
@@ -182,36 +193,28 @@ function AddProxy({
             {advanced && (
               <>
                 <div className='flex'>
-                  <Select
-                    label={
-                      <Label tooltip='Wait for a specified number of blocks (the delay period) before executing it.'>
-                        Review Window
-                      </Label>
-                    }
-                    labelPlacement='outside'
-                    placeholder='Review Window'
-                    variant='bordered'
-                    selectionMode='single'
-                    selectedKeys={[reviewWindow.toString()]}
-                    onSelectionChange={(e) => {
-                      if (e.currentKey) {
-                        setReviewWindow(Number(e.currentKey.toString()));
-                      }
-                    }}
-                  >
-                    {Object.entries(reviewWindows).map(([key, text]) => (
-                      <SelectItem
-                        selectedIcon={(props) => {
-                          console.log(props);
-
-                          return <IconSuccess />;
-                        }}
-                        key={key}
-                      >
-                        {text}
-                      </SelectItem>
-                    ))}
-                  </Select>
+                  <div className='flex flex-col gap-2'>
+                    <Label tooltip='Wait for a specified number of blocks (the delay period) before executing it.'>
+                      Review Window
+                    </Label>
+                    <Select
+                      value={reviewWindow.toString()}
+                      onValueChange={(value) => {
+                        setReviewWindow(Number(value));
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder='Review Window' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(reviewWindows).map(([key, text]) => (
+                          <SelectItem key={key} value={key}>
+                            {text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 {reviewWindow === -1 && (
@@ -226,12 +229,13 @@ function AddProxy({
             )}
 
             {pure && proxyType !== 'Any' && (
-              <Alert
-                color='warning'
-                title='You have selected a Pure Proxy with non-ANY permissions, which means that the assets in this account
+              <Alert variant='warning'>
+                <AlertTitle>
+                  You have selected a Pure Proxy with non-ANY permissions, which means that the assets in this account
                   cannot be moved, and you will not be able to add or remove new proxies. Please ensure the security of
-                  your assets.'
-              />
+                  your assets.
+                </AlertTitle>
+              </Alert>
             )}
 
             {!pure && (
@@ -262,11 +266,13 @@ function AddProxy({
 
             {!!(proxyArgs.length + (existsProxies.length || 0)) && <Divider />}
 
-            <Alert color='warning'>
-              <ul>
-                <li>A deposit is required for proxy creation.</li>
-                <li>Only accounts with full authority (ANY) can delete a proxy.</li>
-              </ul>
+            <Alert variant='warning'>
+              <AlertDescription>
+                <ul>
+                  <li>A deposit is required for proxy creation.</li>
+                  <li>Only accounts with full authority (ANY) can delete a proxy.</li>
+                </ul>
+              </AlertDescription>
             </Alert>
 
             {pure ? (

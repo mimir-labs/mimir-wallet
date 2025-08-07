@@ -10,18 +10,13 @@ import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Drawer, DrawerBody, DrawerContent, Tooltip, usePress } from '@mimir-wallet/ui';
+import { Avatar, Button, Drawer, DrawerContent, Tooltip } from '@mimir-wallet/ui';
 
 function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (id: string | number) => void }) {
   const { network } = useApi();
   const navigate = useNavigate();
   const [isDrawerOpen, toggleDrawerOpen] = useToggle(false);
   const [element, setElement] = useState<JSX.Element>();
-  const { pressProps } = usePress({
-    onPress: () => {
-      removeFavorite(dapp.id);
-    }
-  });
 
   const openDapp = () => {
     if (!dapp.isDrawer) {
@@ -43,10 +38,8 @@ function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (i
   return (
     <>
       {dapp.isDrawer && (
-        <Drawer hideCloseButton placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
-          <DrawerContent className='w-auto max-w-full py-5'>
-            <DrawerBody>{element}</DrawerBody>
-          </DrawerContent>
+        <Drawer direction='right' open={isDrawerOpen} onClose={toggleDrawerOpen}>
+          <DrawerContent className='w-auto max-w-full py-5'>{element}</DrawerContent>
         </Drawer>
       )}
 
@@ -56,7 +49,7 @@ function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (i
           radius='md'
           className='relative aspect-square h-auto min-h-0 w-full p-[5px] hover:bg-transparent [&:hover>.close-btn]:block'
           variant='light'
-          onPress={openDapp}
+          onClick={openDapp}
         >
           <Avatar
             className='aspect-square'
@@ -72,7 +65,10 @@ function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (i
             viewBox='0 0 20 20'
             fill='none'
             className='close-btn text-primary absolute top-[2px] right-[2px] z-10 hidden rounded-full opacity-50 transition-opacity hover:opacity-100'
-            {...pressProps}
+            onClick={(e) => {
+              e.stopPropagation();
+              removeFavorite(dapp.id);
+            }}
           >
             <path
               d='M10 1C14.9706 1 19 5.02944 19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1Z'
@@ -100,7 +96,7 @@ function FavoriteDapps() {
 
   if (favoriteDapps.length === 0) {
     return (
-      <div className='rounded-large border-secondary bg-content1 shadow-medium h-auto border-1 p-4 sm:p-5 lg:h-[210px]'>
+      <div className='border-secondary bg-content1 shadow-medium h-auto rounded-[20px] border-1 p-4 sm:p-5 lg:h-[210px]'>
         <Empty variant='favorite-dapps' height='170px' />
       </div>
     );
@@ -108,7 +104,7 @@ function FavoriteDapps() {
 
   return (
     <div className='group'>
-      <div className='rounded-large border-secondary bg-content1 shadow-medium scroll-hover-show h-[210px] overflow-y-auto border-1 p-4 sm:p-5'>
+      <div className='border-secondary bg-content1 scroll-hover-show shadow-medium h-[210px] overflow-y-auto rounded-[20px] border-1 p-4 sm:p-5'>
         <div className='grid grid-cols-[repeat(auto-fill,_minmax(54px,1fr))] gap-2 lg:gap-3'>
           {favoriteDapps.map((dapp) => (
             <DappItem key={dapp.id} {...dapp} removeFavorite={removeFavorite} />

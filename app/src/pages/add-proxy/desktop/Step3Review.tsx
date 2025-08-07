@@ -10,7 +10,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
+import { Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
 
 import SafetyWarningModal from '../components/SafetyWarningModal';
 import { useDelayCalculation } from '../hooks/useDelayCalculation';
@@ -152,7 +152,7 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
 
         <div className='relative flex flex-col items-center gap-[5px]'>
           {/* Proxy Account (Upper) */}
-          <div className='bg-secondary rounded-medium w-full p-2.5'>
+          <div className='bg-secondary w-full rounded-[10px] p-2.5'>
             <AddressCell shorten={false} value={wizardData.proxy} />
           </div>
 
@@ -163,12 +163,12 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
 
           {/* Proxied Account / Pure Proxy (Lower) */}
           {wizardData.isPureProxy ? (
-            <div className='bg-secondary rounded-medium flex h-14 w-full items-center gap-2.5 px-2.5'>
+            <div className='bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5'>
               <img src={PureIcon} style={{ width: 30 }} />
               <span className='text-foreground font-bold'>{wizardData.pureProxyName || DEFAULT_PURE_ACCOUNT_NAME}</span>
             </div>
           ) : (
-            <div className='bg-secondary rounded-medium w-full p-2.5'>
+            <div className='bg-secondary w-full rounded-[10px] p-2.5'>
               <AddressCell shorten={false} value={wizardData.proxied} />
             </div>
           )}
@@ -178,7 +178,7 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
       {/* Permission Level Review */}
       <div className='flex flex-col gap-1'>
         <label className='text-foreground text-sm font-bold'>Permission Level</label>
-        <div className='bg-secondary rounded-medium flex items-center gap-[5px] px-3 py-2.5'>
+        <div className='bg-secondary flex items-center gap-[5px] rounded-[10px] px-3 py-2.5'>
           <span className='text-foreground text-sm font-medium'>{wizardData.proxyType}</span>
           {proxyTypeDescriptions[wizardData.proxyType] && (
             <span className='text-foreground/50 text-xs'>- {proxyTypeDescriptions[wizardData.proxyType]}</span>
@@ -189,7 +189,7 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
       {/* Time Delay Review */}
       <div className='flex flex-col gap-1'>
         <label className='text-foreground text-sm font-bold'>Time Delay</label>
-        <div className='bg-secondary rounded-medium px-3 py-2.5'>
+        <div className='bg-secondary rounded-[10px] px-3 py-2.5'>
           <span className='text-foreground text-sm'>{delayDisplay}</span>
         </div>
       </div>
@@ -197,7 +197,7 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
       {/* Network Review */}
       <div className='flex flex-col gap-1'>
         <label className='text-foreground text-sm font-bold'>Network</label>
-        <div className='bg-secondary rounded-medium flex items-center gap-2 px-3 py-2'>
+        <div className='bg-secondary flex items-center gap-2 rounded-[10px] px-3 py-2'>
           <img src={chain.icon} className='h-5 w-5' alt={chain.name} />
           <span className='text-foreground text-sm'>{chain.name}</span>
           {remoteProxyChain && (
@@ -216,7 +216,7 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
 
       {/* Action Buttons */}
       <div className='flex gap-2.5'>
-        <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onPress={onBack}>
+        <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
           Back
         </Button>
         <Button
@@ -224,10 +224,15 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
           size='md'
           color='primary'
           radius='full'
-          onPress={handleSafetyCheck}
-          isLoading={safetyResult.isLoading || isTransactionLoading}
-          isDisabled={!wizardData.proxy || (!wizardData.isPureProxy && !wizardData.proxied)}
+          onClick={handleSafetyCheck}
+          disabled={
+            safetyResult.isLoading ||
+            isTransactionLoading ||
+            !wizardData.proxy ||
+            (!wizardData.isPureProxy && !wizardData.proxied)
+          }
         >
+          {safetyResult.isLoading || isTransactionLoading ? buttonSpinner : null}
           Confirm
         </Button>
       </div>

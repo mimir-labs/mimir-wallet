@@ -10,7 +10,7 @@ import { toastError } from '@/components/utils';
 import { useContext, useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
-import { Alert, Avatar, Button, Divider, Link } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Avatar, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
 
 import { WalletConnectContext } from '../context';
 import { approveSession, rejectSession } from '../wallet-connect';
@@ -56,22 +56,24 @@ function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionPropo
       />
       <div>
         <h4 className='text-center text-xl font-bold'>{proposal.params.proposer.metadata.name}</h4>
-        <p className='text-small text-center'>
-          <Link isExternal href={proposal.params.proposer.metadata.url}>
+        <p className='text-center text-sm'>
+          <a href={proposal.params.proposer.metadata.url} target='_blank' rel='noopener noreferrer'>
             {proposal.params.proposer.metadata.url}
-          </Link>
+          </a>
         </p>
       </div>
-      <p className='text-small'>
+      <p className='text-sm'>
         You authorize access to {proposal.params.proposer.metadata.name} with the following identity.
       </p>
 
       {current ? (
-        <div className='rounded-medium bg-secondary w-full p-2.5'>
+        <div className='bg-secondary w-full rounded-[10px] p-2.5'>
           <AddressCell shorten={false} value={current} iconSize={30} />
         </div>
       ) : (
-        <Alert color='danger' title='Please create or select multisig account' />
+        <Alert variant='destructive'>
+          <AlertTitle>Please create or select multisig account</AlertTitle>
+        </Alert>
       )}
 
       <Divider />
@@ -82,12 +84,14 @@ function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionPropo
           radius='full'
           color='primary'
           variant='bordered'
-          onPress={handleReject}
-          isLoading={rejectState.loading}
+          disabled={rejectState.loading}
+          onClick={handleReject}
         >
+          {rejectState.loading ? buttonSpinner : null}
           Reject
         </Button>
-        <Button fullWidth radius='full' color='primary' onPress={handleApprove} isLoading={approveState.loading}>
+        <Button fullWidth radius='full' color='primary' disabled={approveState.loading} onClick={handleApprove}>
+          {approveState.loading ? buttonSpinner : null}
           Approve
         </Button>
       </div>

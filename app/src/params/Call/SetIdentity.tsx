@@ -24,7 +24,7 @@ const Item = React.memo(({ icon, value }: { icon: string; value: string }) => {
   const [copied, copy] = useCopyClipboard();
 
   return (
-    <Tooltip content={copied ? 'Copied' : value} closeDelay={0}>
+    <Tooltip content={copied ? 'Copied' : value}>
       <Avatar src={icon} style={{ cursor: 'copy', width: 32, height: 32 }} onClick={() => copy(value)} />
     </Tooltip>
   );

@@ -6,12 +6,20 @@ import Batch from '@/apps/batch';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
-import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useRef } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Badge, Button, Drawer, DrawerBody, DrawerContent, FreeSoloPopover, Tooltip } from '@mimir-wallet/ui';
+import {
+  Badge,
+  Button,
+  Drawer,
+  DrawerContent,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip
+} from '@mimir-wallet/ui';
 
 function BatchButton() {
   const { network } = useApi();
@@ -19,7 +27,6 @@ function BatchButton() {
   const [txs] = useBatchTxs(network, current);
   const [isOpen, toggleOpen] = useToggle(false);
   const [isDrawerOpen, toggleDrawerOpen] = useToggle(false);
-  const popoverRef = useRef<HTMLDivElement>(null);
   const anchorEl = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -36,67 +43,47 @@ function BatchButton() {
     };
   }, [toggleOpen]);
 
-  const popoverContent = isOpen ? (
-    <FreeSoloPopover
-      isOpen
-      disableDialogFocus
-      onClose={() => toggleOpen(false)}
-      ref={popoverRef}
-      triggerRef={anchorEl}
-      placement='bottom-start'
-      style={{ zIndex: 50 }}
-      classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
-    >
-      <div className='flex items-center gap-2.5 p-5'>
-        <IconBatch className='text-primary h-[32px] w-[32px]' />
-        <span>New transaction has been added to Batch</span>
-      </div>
-    </FreeSoloPopover>
-  ) : null;
-
   return (
     <>
-      <Badge
-        size='sm'
-        isInvisible={!txs.length}
-        placement='bottom-right'
-        content={txs.length}
-        shape='circle'
-        color='primary'
-        classNames={{
-          base: 'flex-[0_0_auto]',
-          badge: 'bottom-0.5 right-1 translate-x-0 -translate-y-0 pointer-events-none'
-        }}
-      >
-        <Tooltip content='Batch Transactions' closeDelay={0}>
-          <Button
-            isIconOnly
-            ref={anchorEl}
-            className='border-secondary bg-secondary h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent'
+      <Popover open={isOpen} onOpenChange={toggleOpen}>
+        <PopoverTrigger asChild>
+          <Badge
+            size='sm'
+            isInvisible={!txs.length}
+            content={txs.length}
+            shape='circle'
             color='primary'
-            variant='ghost'
-            radius='md'
-            onPress={toggleDrawerOpen}
+            classNames={{
+              base: 'flex-[0_0_auto]',
+              badge: 'bottom-0.5 right-1 translate-x-0 -translate-y-0 pointer-events-none'
+            }}
           >
-            <IconBatch className='h-[16px] w-[16px] sm:h-[22px] sm:w-[22px]' />
-          </Button>
-        </Tooltip>
-      </Badge>
+            <Tooltip content='Batch Transactions'>
+              <Button
+                isIconOnly
+                ref={anchorEl}
+                className='border-secondary bg-secondary h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent'
+                color='primary'
+                variant='ghost'
+                radius='md'
+                onClick={toggleDrawerOpen}
+              >
+                <IconBatch className='h-[16px] w-[16px] sm:h-[22px] sm:w-[22px]' />
+              </Button>
+            </Tooltip>
+          </Badge>
+        </PopoverTrigger>
+        <PopoverContent>
+          <div className='flex items-center gap-2.5 p-5'>
+            <IconBatch className='text-primary h-[32px] w-[32px]' />
+            <span>New transaction has been added to Batch</span>
+          </div>
+        </PopoverContent>
+      </Popover>
 
-      <AnimatePresence>{popoverContent}</AnimatePresence>
-
-      <Drawer
-        hideCloseButton
-        size='xl'
-        placement='right'
-        radius='none'
-        isOpen={isDrawerOpen}
-        onClose={toggleDrawerOpen}
-      >
-        <DrawerContent className='w-auto max-w-full py-5'>
-          <DrawerBody>
-            <Batch onClose={() => toggleDrawerOpen(false)} />
-          </DrawerBody>
+      <Drawer direction='right' open={isDrawerOpen} onClose={toggleDrawerOpen}>
+        <DrawerContent className='w-auto max-w-full p-5'>
+          <Batch onClose={() => toggleDrawerOpen(false)} />
         </DrawerContent>
       </Drawer>
     </>

@@ -10,20 +10,11 @@ import IconStar from '@/assets/svg/icon-star.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import IconX from '@/assets/svg/icon-x.svg?react';
 import { useToggle } from '@/hooks/useToggle';
-import React, { createElement, useCallback, useMemo, useRef, useState } from 'react';
+import React, { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import {
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  Link,
-  Tooltip,
-  useInteractOutside,
-  usePress
-} from '@mimir-wallet/ui';
+import { Button, Drawer, DrawerContent, Tooltip } from '@mimir-wallet/ui';
 
 import SupportedChains from './SupportedChains';
 
@@ -69,32 +60,26 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
 
   const ref = useRef<HTMLDivElement>(null);
 
-  useInteractOutside({
-    ref,
-    onInteractOutside: () => {
-      setFocus(false);
-    }
-  });
-
-  const { pressProps } = usePress({
-    onPress: () => {
-      if (isFocus) {
-        openDapp();
-      } else {
-        setFocus(true);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setFocus(false);
       }
-    }
-  });
+    };
 
-  const { pressProps: smPresssProps } = usePress({
-    onPress: openDapp
-  });
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const content =
     size === 'sm' ? (
       <div
-        className='rounded-large bg-content1 border-secondary shadow-medium hover:bg-secondary transition-background relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] border-1 p-5'
-        {...smPresssProps}
+        className='bg-content1 border-secondary hover:bg-secondary transition-background shadow-medium relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] rounded-[20px] border-1 p-5'
+        onClick={(e) => {
+          e.stopPropagation();
+          openDapp();
+        }}
       >
         <img src={dapp.icon} alt={dapp.name} className='h-12 w-12' />
 
@@ -104,7 +89,7 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
           <Button
             isIconOnly
             color='primary'
-            onPress={toggleFavorite}
+            onClick={toggleFavorite}
             className='bg-primary/10 absolute top-2.5 right-2.5 z-10'
           >
             <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
@@ -114,15 +99,23 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
     ) : (
       <div
         data-focus={isFocus}
-        className='rounded-large bg-content1 border-secondary shadow-medium relative aspect-square cursor-pointer border-1 p-5 transition-transform duration-300 data-[focus=true]:scale-x-[-1]'
-        {...pressProps}
+        className='bg-content1 border-secondary shadow-medium relative aspect-square cursor-pointer rounded-[20px] border-1 p-5 transition-transform duration-300 data-[focus=true]:scale-x-[-1]'
+        onClick={(e) => {
+          e.stopPropagation();
+
+          if (isFocus) {
+            openDapp();
+          } else {
+            setFocus(true);
+          }
+        }}
       >
         <Tooltip content={_isFavorite ? 'Unpin' : 'Pin'}>
           <Button
             data-focus={isFocus}
             isIconOnly
             color='primary'
-            onPress={toggleFavorite}
+            onClick={toggleFavorite}
             className='bg-primary/10 absolute top-2.5 right-2.5 z-10 data-[focus=true]:right-auto data-[focus=true]:left-2.5'
           >
             <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
@@ -136,35 +129,45 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
           >
             <div className='flex items-center gap-2.5'>
               {dapp.website && (
-                <Button isIconOnly color='secondary' as={Link} href={dapp.website} size='sm' target='_blank'>
-                  <IconWebsite className='h-4 w-4' />
+                <Button isIconOnly color='secondary' asChild size='sm'>
+                  <a href={dapp.website} target='_blank' rel='noopener noreferrer'>
+                    <IconWebsite className='h-4 w-4' />
+                  </a>
                 </Button>
               )}
               {dapp.github && (
-                <Button isIconOnly color='secondary' as={Link} href={dapp.github} size='sm' target='_blank'>
-                  <IconGithub className='h-4 w-4' />
+                <Button isIconOnly color='secondary' asChild size='sm'>
+                  <a href={dapp.github} target='_blank' rel='noopener noreferrer'>
+                    <IconGithub className='h-4 w-4' />
+                  </a>
                 </Button>
               )}
               {dapp.discord && (
-                <Button isIconOnly color='secondary' as={Link} href={dapp.discord} size='sm' target='_blank'>
-                  <IconDiscord className='h-4 w-4' />
+                <Button isIconOnly color='secondary' asChild size='sm'>
+                  <a href={dapp.discord} target='_blank' rel='noopener noreferrer'>
+                    <IconDiscord className='h-4 w-4' />
+                  </a>
                 </Button>
               )}
               {dapp.twitter && (
-                <Button isIconOnly color='secondary' as={Link} href={dapp.twitter} size='sm' target='_blank'>
-                  <IconX className='h-4 w-4' />
+                <Button isIconOnly color='secondary' asChild size='sm'>
+                  <a href={dapp.twitter} target='_blank' rel='noopener noreferrer'>
+                    <IconX className='h-4 w-4' />
+                  </a>
                 </Button>
               )}
               {dapp.matrix && (
-                <Button isIconOnly color='secondary' as={Link} href={dapp.matrix} size='sm' target='_blank'>
-                  <IconMatrix className='h-4 w-4' />
+                <Button isIconOnly color='secondary' asChild size='sm'>
+                  <a href={dapp.matrix} target='_blank' rel='noopener noreferrer'>
+                    <IconMatrix className='h-4 w-4' />
+                  </a>
                 </Button>
               )}
             </div>
 
             <p className='text-center'>{dapp.description}</p>
 
-            <Button size='lg' fullWidth className='w-[90%]' onPress={openDapp}>
+            <Button size='lg' fullWidth className='w-[90%]' onClick={openDapp}>
               Open Dapp
             </Button>
           </div>
@@ -183,7 +186,7 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
               </div>
             )}
 
-            <div className='text-tiny flex items-center justify-between gap-2'>
+            <div className='flex items-center justify-between gap-2 text-xs'>
               <span className='text-foreground/50'>Supported on</span> <SupportedChains app={dapp} />
             </div>
           </div>
@@ -194,10 +197,8 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
   return (
     <div ref={ref}>
       {dapp.isDrawer && (
-        <Drawer hideCloseButton placement='right' radius='none' isOpen={isDrawerOpen} onClose={toggleDrawerOpen}>
-          <DrawerContent className='w-auto max-w-full py-5'>
-            <DrawerBody>{element}</DrawerBody>
-          </DrawerContent>
+        <Drawer direction='right' open={isDrawerOpen} onClose={toggleDrawerOpen}>
+          <DrawerContent className='w-auto max-w-full p-5'>{element}</DrawerContent>
         </Drawer>
       )}
 

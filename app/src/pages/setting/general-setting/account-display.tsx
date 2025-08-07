@@ -25,14 +25,14 @@ function AccountDisplay() {
   }, [accounts, hideAccountHex, walletAccounts]);
 
   return (
-    <div className='bg-content1 border-secondary shadow-medium rounded-large flex flex-col gap-5 border-1 p-5'>
+    <div className='bg-content1 border-secondary shadow-medium flex flex-col gap-5 rounded-[20px] border-1 p-5'>
       {list.map((item) => {
         const isHide = hideAccountHex.includes(addressToHex(item.address));
 
         return (
           <div className='flex items-center justify-between'>
             <AddressCell shorten={!upSm} value={item.address} />
-            <Button variant='ghost' onPress={() => (isHide ? showAccount(item.address) : hideAccount(item.address))}>
+            <Button variant='ghost' onClick={() => (isHide ? showAccount(item.address) : hideAccount(item.address))}>
               {isHide ? 'Unhide' : 'Hide'}
             </Button>
           </div>

@@ -79,7 +79,7 @@ function DesktopCreateMultisig() {
       ) : (
         <div className='mx-auto flex w-full max-w-[800px] flex-col gap-5'>
           <div className='flex items-center justify-between'>
-            <Button onPress={() => navigate(-1)} variant='ghost'>
+            <Button onClick={() => navigate(-1)} variant='ghost'>
               {'<'} Back
             </Button>
             <Prepare onSelect={setPrepare} />

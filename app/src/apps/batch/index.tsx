@@ -12,10 +12,11 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Divider, Link } from '@mimir-wallet/ui';
+import { Avatar, Button, Divider } from '@mimir-wallet/ui';
 
 import Actions from './Actions';
 import BatchItemDrag from './BatchItemDrag';
@@ -104,17 +105,11 @@ function Content({
             </SortableContext>
           </DndContext>
         </div>
-        <Button
-          as={Link}
-          href={`/explorer/${encodeURIComponent('mimir://app/transfer')}`}
-          onPress={onClose}
-          color='secondary'
-          fullWidth
-          radius='md'
-          startContent={<IconAdd className='h-4 w-4' />}
-          className='text-foreground flex-shrink-0'
-        >
-          Add New Transfer
+        <Button asChild color='secondary' fullWidth radius='md' className='text-foreground flex-shrink-0'>
+          <Link to={`/explorer/${encodeURIComponent('mimir://app/transfer')}`} onClick={onClose}>
+            <IconAdd className='h-4 w-4' />
+            Add New Transfer
+          </Link>
         </Button>
       </div>
 
@@ -157,11 +152,7 @@ function Batch({
       <div className='flex items-center justify-between gap-2 text-xl font-bold'>
         {isRestore ? (
           <span className='inline-flex flex-1 items-center gap-2'>
-            <Avatar
-              disableAnimation
-              style={{ width: 20, height: 20, background: 'transparent' }}
-              src={networkChain?.icon}
-            />
+            <Avatar style={{ width: 20, height: 20, background: 'transparent' }} src={networkChain?.icon} />
             Restore Cache Transactions
           </span>
         ) : (
@@ -170,20 +161,20 @@ function Batch({
 
         {isRestore ? (
           <>
-            <Button key='close-restore' isIconOnly color='default' variant='light' onPress={toggleRestore}>
+            <Button key='close-restore' isIconOnly className='text-inherit' variant='light' onClick={toggleRestore}>
               <IconClose className='h-5 w-5' />
             </Button>
           </>
         ) : (
           <>
-            <Button key='open-restore' variant='ghost' onPress={toggleRestore}>
+            <Button key='open-restore' variant='ghost' onClick={toggleRestore}>
               Restore
             </Button>
 
             <InputNetwork
               isIconOnly
               placeholder=' '
-              className='text-small max-w-[60px]'
+              className='max-w-[60px] text-sm'
               contentClassName='min-h-[32px] h-[32px]'
               radius='full'
               network={network}

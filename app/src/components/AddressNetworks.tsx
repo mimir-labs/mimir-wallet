@@ -113,7 +113,7 @@ function Icon({
   // Wrap with tooltip if enabled
   if (showTooltip) {
     return (
-      <Tooltip color='foreground' content={name} closeDelay={0} disableAnimation>
+      <Tooltip color='foreground' content={name}>
         {avatar}
       </Tooltip>
     );

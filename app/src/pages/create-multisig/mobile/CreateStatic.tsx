@@ -28,9 +28,9 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
     <>
       {address && <CreateSuccess isOpen={isSuccess} onClose={() => setIsSuccess(false)} address={address} />}
       <Button
-        isDisabled={!name}
+        disabled={!name}
         fullWidth
-        onPress={() => {
+        onClick={() => {
           if (!(name && checkField())) return;
 
           toggleOpen();

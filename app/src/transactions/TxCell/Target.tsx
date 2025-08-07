@@ -34,23 +34,20 @@ function CallInfo({ call }: { call: IMethod }) {
       <div className='flex w-full shrink-0 flex-row items-center justify-start gap-2.5'>
         <b className='flex-1'>{action}</b>
         <Tooltip content='For better repeatly submit this transaction you can add to Template' color='foreground'>
-          <Button
-            variant='ghost'
-            size='sm'
-            endContent={<IconTemplate className='h-3.5 w-3.5' />}
-            onPress={() => events.emit('template_add', network, call.toHex())}
-          >
+          <Button variant='ghost' size='sm' onClick={() => events.emit('template_add', network, call.toHex())}>
             + Template
+            <IconTemplate className='h-3.5 w-3.5' />
           </Button>
         </Tooltip>
         <Tooltip content='Submit exact same transactions' color='foreground'>
-          <Button variant='ghost' size='sm' endContent={<IconBatch />}>
+          <Button variant='ghost' size='sm'>
             + Batch
+            <IconBatch />
           </Button>
         </Tooltip>
       </div>
       <FunctionArgs
-        className='rounded-medium bg-secondary flex w-full shrink-0 flex-col gap-2.5 p-2.5'
+        className='bg-secondary flex w-full shrink-0 flex-col gap-2.5 rounded-[10px] p-2.5'
         registry={call.registry}
         call={call}
       />

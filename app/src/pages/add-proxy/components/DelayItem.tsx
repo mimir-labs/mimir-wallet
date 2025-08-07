@@ -59,7 +59,7 @@ function DelayItem({ isSelected, delayType, customBlocks = '', onCustomBlockChan
     <div
       data-selected={isSelected}
       data-custom={isCustomSelected}
-      className='text-small bg-secondary text-secondary-foreground data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground flex h-[43px] w-[25%] cursor-pointer items-center justify-center gap-[5px] rounded-full px-2.5 transition-all data-[custom=true]:w-[50%] data-[custom=true]:flex-[0_0_auto] data-[custom=true]:shrink-0 data-[custom=true]:grow-0'
+      className='bg-secondary text-secondary-foreground data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground flex h-[43px] w-[25%] cursor-pointer items-center justify-center gap-[5px] rounded-full px-2.5 text-sm transition-all data-[custom=true]:w-[50%] data-[custom=true]:flex-[0_0_auto] data-[custom=true]:shrink-0 data-[custom=true]:grow-0'
       onClick={handleClick}
     >
       {isCustomSelected ? (

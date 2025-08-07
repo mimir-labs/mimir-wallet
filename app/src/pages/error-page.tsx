@@ -71,12 +71,12 @@ class ErrorPage extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             </div>
             <h1 className='text-foreground mb-3 text-4xl font-bold'>Something went wrong</h1>
             <h2 className='text-foreground/80 mb-4 text-xl font-medium'>{errorName}</h2>
-            <p className='text-foreground/60 bg-foreground/5 rounded-medium border-foreground/10 mx-auto mt-3 max-w-xl border p-4'>
+            <p className='text-foreground/60 bg-foreground/5 border-foreground/10 mx-auto mt-3 max-w-xl rounded-[10px] border p-4'>
               {errorMessage}
             </p>
           </div>
 
-          <div className='bg-background border-foreground/10 rounded-large shadow-medium overflow-hidden border'>
+          <div className='bg-background border-foreground/10 shadow-medium overflow-hidden rounded-[20px] border'>
             <div className='p-6'>
               <h3 className='text-foreground/80 mb-4 flex items-center text-lg font-semibold'>
                 <span className='bg-foreground/5 mr-3 flex h-8 w-8 items-center justify-center rounded-full'>
@@ -86,29 +86,29 @@ class ErrorPage extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               </h3>
 
               <details className='group mt-4' open>
-                <summary className='bg-foreground/5 rounded-medium flex cursor-pointer items-center justify-between p-3 text-sm font-medium transition-opacity select-none hover:opacity-80'>
+                <summary className='bg-foreground/5 flex cursor-pointer items-center justify-between rounded-[10px] p-3 text-sm font-medium transition-opacity select-none hover:opacity-80'>
                   <span className='inline-flex items-center'>Show stack trace</span>
                   <ArrowDown className='h-4 w-4 transform transition-transform group-open:rotate-180' />
                 </summary>
-                <div className='bg-foreground/5 rounded-medium border-foreground/10 mt-3 max-h-80 overflow-auto border p-4 font-mono text-sm break-all whitespace-pre-wrap'>
+                <div className='bg-foreground/5 border-foreground/10 mt-3 max-h-80 overflow-auto rounded-[10px] border p-4 font-mono text-sm break-all whitespace-pre-wrap'>
                   {errorStack || 'Stack trace not available'}
                 </div>
               </details>
 
               {componentStack && (
                 <details className='group mt-4' open>
-                  <summary className='bg-foreground/5 rounded-medium flex cursor-pointer items-center justify-between p-3 text-sm font-medium transition-opacity select-none hover:opacity-80'>
+                  <summary className='bg-foreground/5 flex cursor-pointer items-center justify-between rounded-[10px] p-3 text-sm font-medium transition-opacity select-none hover:opacity-80'>
                     <span className='inline-flex items-center'>Show component stack</span>
                     <ArrowDown className='h-4 w-4 transform transition-transform group-open:rotate-180' />
                   </summary>
-                  <div className='bg-foreground/5 rounded-medium border-foreground/10 mt-3 max-h-80 overflow-auto border p-4 font-mono text-sm break-all whitespace-pre-wrap'>
+                  <div className='bg-foreground/5 border-foreground/10 mt-3 max-h-80 overflow-auto rounded-[10px] border p-4 font-mono text-sm break-all whitespace-pre-wrap'>
                     {componentStack}
                   </div>
                 </details>
               )}
 
               <div className='mt-8 flex flex-col justify-center gap-4 sm:flex-row'>
-                <Button color='primary' size='lg' variant='bordered' onPress={() => (window.location.href = '/')}>
+                <Button color='primary' size='lg' variant='bordered' onClick={() => (window.location.href = '/')}>
                   <IconHome className='h-5 w-5' />
                   Go Home
                 </Button>
@@ -116,7 +116,7 @@ class ErrorPage extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                   color='primary'
                   size='lg'
                   variant='solid'
-                  onPress={() => window.location.replace(window.location.href)}
+                  onClick={() => window.location.replace(window.location.href)}
                 >
                   <IconRefresh className='h-5 w-5' />
                   Refresh Page

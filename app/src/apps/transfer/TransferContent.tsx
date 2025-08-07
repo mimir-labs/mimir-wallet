@@ -12,7 +12,7 @@ import { formatUnits } from '@/utils';
 import React, { useEffect, useMemo } from 'react';
 
 import { remoteProxyRelations, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Alert, Avatar, Button, Chip, Skeleton, Switch } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Avatar, Button, Chip, Skeleton, Switch } from '@mimir-wallet/ui';
 
 import { useTransferBalance } from './useTransferBalances';
 
@@ -91,7 +91,7 @@ function TransferContent({
       {disabledRecipient ? (
         <div className='flex flex-col gap-2'>
           <p className='font-bold'>To</p>
-          <div className='rounded-medium bg-secondary p-2'>
+          <div className='bg-secondary rounded-[10px] p-2'>
             <AddressCell shorten={!upSm} showType value={recipient} withCopy withAddressBook />
           </div>
         </div>
@@ -137,7 +137,7 @@ function TransferContent({
           <div className='flex items-center justify-between'>
             Amount
             {!isSendingFetched ? (
-              <Skeleton className='rounded-small h-[14px] w-[50px]' />
+              <Skeleton className='h-[14px] w-[50px] rounded-[5px]' />
             ) : (
               <span className='opacity-50'>
                 Balance: <FormatBalance format={format} value={sendingBalances} />
@@ -152,8 +152,8 @@ function TransferContent({
           <Button
             size='sm'
             variant='ghost'
-            className='rounded-small min-w-0 p-1.5 py-[1px]'
-            onPress={() => {
+            className='min-w-0 rounded-[5px] p-1.5 py-[1px]'
+            onClick={() => {
               setAmount(
                 keepAlive
                   ? formatUnits(sendingBalances.sub(existentialDeposit), format[0])
@@ -173,8 +173,8 @@ function TransferContent({
       </div>
 
       {!isRecipientSupported && (
-        <Alert color='danger'>
-          <div>
+        <Alert variant='destructive'>
+          <AlertTitle>
             You are about to transfer to a pure account only exist on{' '}
             <Avatar
               src={recipientNetwork?.icon}
@@ -182,7 +182,7 @@ function TransferContent({
             />
             &nbsp;
             {recipientNetwork?.name}, please change to correct network.
-          </div>
+          </AlertTitle>
         </Alert>
       )}
     </>

@@ -42,7 +42,7 @@ function Step3Review({ isPureProxy, members, name, onBack, onConfirm, threshold 
       {/* Name Review */}
       <div className='flex flex-col gap-1'>
         <label className='text-foreground text-sm font-bold'>Name</label>
-        <div className='rounded-medium bg-secondary px-2.5 py-2'>
+        <div className='bg-secondary rounded-[10px] px-2.5 py-2'>
           <span className='text-foreground text-sm'>{name}</span>
         </div>
       </div>
@@ -54,7 +54,7 @@ function Step3Review({ isPureProxy, members, name, onBack, onConfirm, threshold 
       {isPureProxy && (
         <div className='flex flex-col gap-1'>
           <label className='text-foreground text-sm font-bold'>Network</label>
-          <div className='rounded-medium bg-secondary px-2.5 py-2'>
+          <div className='bg-secondary rounded-[10px] px-2.5 py-2'>
             <img src={chain.icon} className='inline h-5 w-5' alt={chain.name} />
             &nbsp;
             <span className='text-foreground text-sm'>{chain.name}</span>
@@ -73,10 +73,10 @@ function Step3Review({ isPureProxy, members, name, onBack, onConfirm, threshold 
       {/* Multisig Signers Review */}
       <div className='flex flex-col gap-1'>
         <label className='text-foreground text-sm font-bold'>Multisig Signers</label>
-        <div className='rounded-medium border-divider-300 border p-2.5'>
+        <div className='border-divider-300 rounded-[10px] border p-2.5'>
           <div className='flex flex-col gap-2.5'>
             {members.map((member) => (
-              <div key={member} className='rounded-small bg-secondary flex items-center gap-1 px-1 py-1'>
+              <div key={member} className='bg-secondary flex items-center gap-1 rounded-[5px] px-1 py-1'>
                 <AddressRow
                   className='[&_.AddressRow-Address]:text-[#949494]'
                   value={member}
@@ -93,7 +93,7 @@ function Step3Review({ isPureProxy, members, name, onBack, onConfirm, threshold 
       {/* Threshold Review */}
       <div className='flex flex-col gap-1'>
         <label className='text-foreground text-sm font-bold'>Threshold</label>
-        <div className='rounded-medium bg-secondary px-2.5 py-2'>
+        <div className='bg-secondary rounded-[10px] px-2.5 py-2'>
           <span className='text-foreground text-sm'>
             {threshold} out of {members.length}
           </span>
@@ -105,10 +105,10 @@ function Step3Review({ isPureProxy, members, name, onBack, onConfirm, threshold 
 
       {/* Action Buttons */}
       <div className='flex gap-2.5'>
-        <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onPress={onBack}>
+        <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
           Back
         </Button>
-        <Button fullWidth size='md' color='primary' radius='full' onPress={onConfirm}>
+        <Button fullWidth size='md' color='primary' radius='full' onClick={onConfirm}>
           Confirm
         </Button>
       </div>

@@ -6,12 +6,12 @@ import type { AccountAssetInfo } from '@/hooks/types';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { useAssets, useNativeToken } from '@/hooks/useAssets';
 import { useAssetBalances, useNativeBalances } from '@/hooks/useBalances';
-import { AnimatePresence } from 'framer-motion';
+import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
-import { Avatar, FreeSoloPopover, Listbox, ListboxItem, Spinner, usePress } from '@mimir-wallet/ui';
+import { Avatar, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
 
 import FormatBalance from './FormatBalance';
 
@@ -52,7 +52,6 @@ function InputToken({
   const [allAssets] = useAssets(network);
   const nativeToken = useNativeToken(network);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
   const [isOpen, toggleOpen] = useToggle(false);
   const [value, setValue] = useState<string>(assetId || defaultAssetId || '');
   const onChangeRef = useRef(onChange);
@@ -76,10 +75,6 @@ function InputToken({
   const handleClose = () => {
     toggleOpen(false);
   };
-
-  const { pressProps } = usePress({
-    onPress: isOpen ? handleClose : handleOpen
-  });
 
   const token = useMemo(() => {
     return value === 'native' ? nativeToken : allAssets?.find((item) => item.assetId === value);
@@ -106,7 +101,7 @@ function InputToken({
         <Avatar
           alt={token.name}
           fallback={
-            <div className='bg-divider-300 text-content1 text-medium flex h-[20px] w-[20px] items-center justify-center rounded-full font-bold'>
+            <div className='bg-divider-300 text-content1 flex h-[20px] w-[20px] items-center justify-center rounded-full text-base font-bold'>
               {token.symbol.slice(0, 1)}
             </div>
           }
@@ -125,91 +120,98 @@ function InputToken({
       <span className='text-foreground-500'>{placeholder}</span>
     );
 
-  const popoverContent = isOpen ? (
-    <FreeSoloPopover
-      isOpen
-      disableDialogFocus
-      onClose={handleClose}
-      ref={popoverRef}
-      triggerRef={wrapperRef}
-      placement='bottom-start'
-      style={{ width: wrapperRef.current?.clientWidth, zIndex: 50, minWidth: 240 }}
-      classNames={{ content: 'rounded-medium border-1 border-divider-300 p-1' }}
-    >
-      <Listbox color='secondary' emptyContent='no tokens' className='text-foreground max-h-[250px] overflow-y-auto'>
-        {options.map(({ icon, name, symbol, assetId, transferrable, decimals }) => (
-          <ListboxItem
-            key={assetId}
-            onPress={() => {
-              handleClose();
-              setValue(assetId);
-            }}
-            className='text-foreground data-[hover=true]:text-foreground h-10'
-            startContent={
-              <Avatar
-                alt={name}
-                fallback={
-                  <div className='bg-divider-300 text-content1 text-medium flex h-[20px] w-[20px] items-center justify-center rounded-full font-bold'>
-                    {symbol.slice(0, 1)}
-                  </div>
-                }
-                src={icon}
-                style={{ width: 20, height: 20 }}
-              >
-                {symbol}
-              </Avatar>
-            }
-            endContent={<FormatBalance value={transferrable} format={[decimals, symbol]} />}
-          >
-            {name}&nbsp;<span className='text-foreground/50'>({symbol})</span>
-          </ListboxItem>
-        ))}
-      </Listbox>
-    </FreeSoloPopover>
-  ) : null;
-
   return (
-    <>
-      <div
-        data-disabled={disabled}
-        className={'input-token-wrapper w-full space-y-2 data-[disabled=true]:pointer-events-none'.concat(
-          ` ${className || ''}`
-        )}
-      >
-        {label && <div className='text-small font-bold'>{label}</div>}
+    <div
+      data-disabled={disabled}
+      className={'input-token-wrapper w-full space-y-2 data-[disabled=true]:pointer-events-none'.concat(
+        ` ${className || ''}`
+      )}
+    >
+      {label && <div className='text-sm font-bold'>{label}</div>}
 
-        <div
-          ref={wrapperRef}
-          className={twMerge([
-            'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none',
-            radius === 'full'
-              ? 'rounded-full'
-              : radius === 'lg'
-                ? 'rounded-large'
-                : radius === 'md'
-                  ? 'rounded-medium'
-                  : radius === 'sm'
-                    ? 'rounded-small'
-                    : 'rounded-none',
-            wrapperClassName
-          ])}
-          onClick={handleOpen}
+      <Popover open={isOpen} onOpenChange={toggleOpen}>
+        <PopoverTrigger asChild>
+          <div
+            ref={wrapperRef}
+            className={twMerge([
+              'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none',
+              radius === 'full'
+                ? 'rounded-full'
+                : radius === 'lg'
+                  ? 'rounded-[20px]'
+                  : radius === 'md'
+                    ? 'rounded-[10px]'
+                    : radius === 'sm'
+                      ? 'rounded-[5px]'
+                      : 'rounded-none',
+              wrapperClassName
+            ])}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpen();
+            }}
+          >
+            {element}
+
+            <ArrowDown
+              data-open={isOpen}
+              className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
+              style={{ color: 'inherit' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                isOpen ? handleClose() : handleOpen();
+              }}
+            />
+          </div>
+        </PopoverTrigger>
+        <PopoverContent
+          style={{ width: wrapperRef.current?.clientWidth }}
+          className='border-divider-300 border-1 p-[5px]'
         >
-          {element}
+          {options.length > 0 ? (
+            <div className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
+              <ul className={clsx('flex list-none flex-col')}>
+                {options.map(({ icon, name, symbol, assetId, transferrable, decimals }) => (
+                  <li
+                    key={assetId}
+                    onClick={() => {
+                      handleClose();
+                      setValue(assetId);
+                    }}
+                    className={clsx(
+                      'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5'
+                    )}
+                  >
+                    <Avatar
+                      alt={name}
+                      fallback={
+                        <div className='bg-divider-300 text-content1 flex h-[20px] w-[20px] items-center justify-center rounded-full text-base font-bold'>
+                          {symbol.slice(0, 1)}
+                        </div>
+                      }
+                      src={icon}
+                      style={{ width: 20, height: 20 }}
+                    >
+                      {symbol}
+                    </Avatar>
+                    <div className='flex-1'>
+                      {name}&nbsp;<span className='text-foreground/50'>({symbol})</span>
+                    </div>
+                    <div>
+                      <FormatBalance value={transferrable} format={[decimals, symbol]} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className='text-foreground/50 text-center'>no tokens</div>
+          )}
+        </PopoverContent>
+      </Popover>
 
-          <ArrowDown
-            data-open={isOpen}
-            className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
-            style={{ color: 'inherit' }}
-            {...pressProps}
-          />
-        </div>
-
-        {helper && <div className='text-tiny text-foreground/50'>{helper}</div>}
-      </div>
-
-      <AnimatePresence>{popoverContent}</AnimatePresence>
-    </>
+      {helper && <div className='text-foreground/50 text-xs'>{helper}</div>}
+    </div>
   );
 }
 

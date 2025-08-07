@@ -27,7 +27,7 @@ function SubmitPure({
     <TxButton
       fullWidth
       color='primary'
-      isDisabled={!(proxy && name)}
+      disabled={!(proxy && name)}
       accountId={proxy}
       website='mimir://internal/create-pure'
       getCall={() => {

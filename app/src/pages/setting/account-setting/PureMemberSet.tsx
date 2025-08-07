@@ -24,17 +24,16 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
 
   return (
     <div>
-      <h6 className='text-small text-foreground/50 mb-2.5 inline-flex items-center gap-1'>
+      <h6 className='text-foreground/50 mb-2.5 inline-flex items-center gap-1 text-sm'>
         Multisig Information
         <Tooltip
-          closeDelay={0}
           classNames={{ content: 'max-w-[300px]' }}
           content='For Pure Proxy, each controllable multisig account is listed as a member set.'
         >
           <IconQuestion className='text-primary' />
         </Tooltip>
       </h6>
-      <div className='rounded-large border-secondary bg-content1 shadow-medium border-1 p-4 sm:p-5'>
+      <div className='border-secondary bg-content1 shadow-medium rounded-[20px] border-1 p-4 sm:p-5'>
         {txs.length > 0 && (
           <div
             className='text-primary mb-5 cursor-pointer font-bold'

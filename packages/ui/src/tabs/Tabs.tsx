@@ -8,9 +8,9 @@ const Tabs = extendVariants(HeroTabs, {
   variants: {
     size: {
       md: {
-        tabList: 'rounded-large p-2.5',
+        tabList: 'rounded-[20px] p-2.5',
         tabContent: 'font-bold',
-        cursor: ['rounded-medium'],
+        cursor: ['rounded-[10px]'],
         panel: ['p-0', 'pt-0']
       }
     },

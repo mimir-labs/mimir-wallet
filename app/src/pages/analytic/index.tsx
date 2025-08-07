@@ -14,6 +14,7 @@ import { useMultiChainStats, useQueryStats } from '@/hooks/useQueryStats';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
+import { Link } from 'react-router-dom';
 
 import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
 import {
@@ -21,12 +22,11 @@ import {
   Button,
   Card,
   CardBody,
-  Link,
-  Listbox,
-  ListboxItem,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   Skeleton,
   Tab,
   Table,
@@ -177,13 +177,13 @@ function Chart({
   return (
     <Card className='col-span-2'>
       <CardBody className='gap-5 p-3 sm:p-5'>
-        <p className='text-medium text-foreground font-bold'>Transaction Statistic</p>
+        <p className='text-foreground text-base font-bold'>Transaction Statistic</p>
         <Tabs color='primary'>
           <Tab key='category' title='By Category'>
-            {upSm ? <div className='bg-secondary rounded-large p-3 sm:p-5'>{categoryChart}</div> : categoryChart}
+            {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{categoryChart}</div> : categoryChart}
           </Tab>
           <Tab key='time' title='By Time'>
-            {upSm ? <div className='bg-secondary rounded-large p-3 sm:p-5'>{timeChart}</div> : timeChart}
+            {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{timeChart}</div> : timeChart}
           </Tab>
         </Tabs>
       </CardBody>
@@ -222,7 +222,7 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
           <Card className='flex-1'>
             <CardBody className='flex-col items-stretch justify-between gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:px-12 sm:py-5'>
               <div className='flex flex-grow items-center justify-between'>
-                <div className='sm:text-medium text-small text-foreground flex items-center gap-2.5'>
+                <div className='text-foreground flex items-center gap-2.5 text-sm sm:text-base'>
                   <IconSafe className='text-primary' />
                   Multisig Transaction Executed
                 </div>
@@ -232,53 +232,42 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
               </div>
             </CardBody>
           </Card>
-          <Popover placement='bottom-start'>
-            <PopoverTrigger>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
                 radius='md'
                 variant='bordered'
-                color='default'
-                className='border-divider-300 bg-content1 rounded-large h-full w-auto min-w-[160px]'
-                startContent={<Avatar src={selectedHistoryNetwork?.icon} className='h-4 w-4 bg-transparent' />}
-                endContent={<ArrowDown className='h-4 w-4' />}
+                className='shadow-medium bg-content1 h-full w-auto min-w-[160px] rounded-[20px] border-transparent text-inherit'
               >
+                <Avatar src={selectedHistoryNetwork?.icon} className='h-4 w-4 bg-transparent' />
                 {selectedHistoryNetwork?.name}
+                <ArrowDown className='h-4 w-4' />
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className='rounded-medium w-[200px] p-1'>
-              <Listbox
-                disallowEmptySelection
-                selectedKeys={[selectedChain]}
-                selectionMode={'single'}
-                variant='flat'
-                onSelectionChange={(keys) => setSelectedChain(Array.from(keys).map((key) => key.toString())[0])}
-                color='primary'
-              >
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side='bottom' align='end' className='w-[200px] border-none p-2'>
+              <DropdownMenuRadioGroup value={selectedChain} onValueChange={(value) => setSelectedChain(value)}>
                 {chains.map((chain) => {
                   const network = networks.find(({ key }) => key === chain);
 
                   return (
-                    <ListboxItem
-                      key={chain}
-                      className='data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground h-8'
-                      startContent={<Avatar src={network?.icon} className='h-4 w-4 bg-transparent' />}
-                    >
+                    <DropdownMenuRadioItem key={chain} value={chain} className='h-8'>
+                      <Avatar src={network?.icon} className='h-4 w-4 bg-transparent' />
                       {network?.name}
-                    </ListboxItem>
+                    </DropdownMenuRadioItem>
                   );
                 })}
-              </Listbox>
-            </PopoverContent>
-          </Popover>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <Card className='col-span-2 sm:col-span-1'>
           <CardBody className='gap-5 p-3 sm:p-5'>
-            <p className='text-medium text-foreground font-bold'>Transaction Category</p>
+            <p className='text-foreground text-base font-bold'>Transaction Category</p>
             <Table
               removeWrapper
               classNames={{
-                th: ['bg-transparent', 'text-tiny', 'text-foreground/50'],
+                th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
                 td: ['text-foreground']
               }}
             >
@@ -302,11 +291,11 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
 
         <Card className='col-span-2 sm:col-span-1'>
           <CardBody className='gap-5 p-3 sm:p-5'>
-            <p className='text-medium text-foreground font-bold'>Recipients</p>
+            <p className='text-foreground text-base font-bold'>Recipients</p>
             <Table
               removeWrapper
               classNames={{
-                th: ['bg-transparent', 'text-tiny', 'text-foreground/50'],
+                th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
                 td: ['text-foreground']
               }}
             >
@@ -327,14 +316,12 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
                       <FormatBalance value={item.amount} withCurrency />
                     </TableCell>
                     <TableCell align='right'>
-                      <Button
-                        as={Link}
-                        variant='bordered'
-                        color='primary'
-                        size='sm'
-                        href={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?asset_network=${selectedChain}&to=${item.to}`}
-                      >
-                        Transfer
+                      <Button asChild variant='bordered' color='primary' size='sm'>
+                        <Link
+                          to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?asset_network=${selectedChain}&to=${item.to}`}
+                        >
+                          Transfer
+                        </Link>
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -358,10 +345,10 @@ function Analytic() {
   if (!isFetched && isFetching)
     return (
       <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
-        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-2 h-[80px]' />
-        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-1 h-[300px]' />
-        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-1 h-[300px]' />
-        <Skeleton className='bg-content1 shadow-medium rounded-large col-span-2 h-[500px]' />
+        <Skeleton className='bg-content1 shadow-medium col-span-2 h-[80px] rounded-[20px]' />
+        <Skeleton className='bg-content1 shadow-medium col-span-1 h-[300px] rounded-[20px]' />
+        <Skeleton className='bg-content1 shadow-medium col-span-1 h-[300px] rounded-[20px]' />
+        <Skeleton className='bg-content1 shadow-medium col-span-2 h-[500px] rounded-[20px]' />
       </div>
     );
 

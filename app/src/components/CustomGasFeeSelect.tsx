@@ -8,7 +8,7 @@ import { useAssetBalance, useNativeBalances } from '@/hooks/useBalances';
 import { useCustomGasFee } from '@/hooks/useCustomGasFee';
 import React, { useEffect, useMemo } from 'react';
 
-import { Avatar, Select, SelectItem, Skeleton } from '@mimir-wallet/ui';
+import { Avatar, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton } from '@mimir-wallet/ui';
 
 interface CustomGasFeeSelectProps {
   network: string;
@@ -67,7 +67,7 @@ function CustomGasFeeSelect({
   className = '',
   gasFeeInfo
 }: CustomGasFeeSelectProps) {
-  const { isSupported, feeEligibleAssets, selectedAsset, selectedAssetId, setSelectedAssetId, isFetched, isFetching } =
+  const { isSupported, feeEligibleAssets, selectedAssetId, setSelectedAssetId, isFetched, isFetching } =
     useCustomGasFee(network);
 
   const asset = useMemo(() => {
@@ -91,8 +91,8 @@ function CustomGasFeeSelect({
     return (
       <div className={className}>
         <div className='flex flex-col gap-2'>
-          <label className='text-small font-medium'>{label}</label>
-          <Skeleton className='rounded-medium h-14 w-full' />
+          <label className='text-sm font-medium'>{label}</label>
+          <Skeleton className='h-14 w-full rounded-[10px]' />
         </div>
       </div>
     );
@@ -100,68 +100,42 @@ function CustomGasFeeSelect({
 
   return (
     <div className={`${className}`}>
-      <Select
-        label={label}
-        placeholder={placeholder}
-        selectedKeys={selectedAssetId ? [selectedAssetId] : []}
-        onSelectionChange={(keys) => {
-          const value = Array.from(keys)[0];
-
-          if (value) {
-            setSelectedAssetId(value.toString());
-          }
-        }}
-        isDisabled={isDisabled || feeEligibleAssets.length === 0}
-        variant='bordered'
-        labelPlacement='outside'
-        renderValue={(items) => {
-          const item = items[0];
-
-          if (!item || !selectedAsset) {
-            return <span className='text-foreground/50'>{placeholder}</span>;
-          }
-
-          return (
-            <div className='flex w-full items-center justify-between'>
-              <div className='flex items-center gap-3'>
-                <Avatar
-                  alt={selectedAsset.symbol}
-                  fallback={selectedAsset.symbol.slice(0, 1)}
-                  src={selectedAsset.icon}
-                  style={{ width: 22, height: 22 }}
-                />
-                <span className='text-small font-medium'>{selectedAsset.symbol}</span>
-                <span className='text-tiny text-foreground/50'>{selectedAsset.assetId}</span>
-              </div>
-              <AssetBalance asset={selectedAsset} address={address} />
-            </div>
-          );
-        }}
-      >
-        {feeEligibleAssets.map((asset) => (
-          <SelectItem
-            key={asset.assetId}
-            selectedIcon={<span />}
-            endContent={<AssetBalance asset={asset} address={address} />}
-            textValue={asset.symbol}
-            color='secondary'
-          >
-            <div className='flex w-full items-center gap-3'>
-              <Avatar
-                alt={asset.symbol}
-                fallback={asset.symbol.slice(0, 1)}
-                src={asset.icon}
-                style={{ width: 22, height: 22 }}
-              />
-              <span className='text-small font-medium'>{asset.symbol}</span>
-              <span className='text-tiny text-foreground/50'>{asset.assetId}</span>
-            </div>
-          </SelectItem>
-        ))}
-      </Select>
+      <div className='flex flex-col gap-2'>
+        <label className='text-sm font-medium'>{label}</label>
+        <Select
+          value={selectedAssetId || ''}
+          onValueChange={(value) => {
+            setSelectedAssetId(value);
+          }}
+          disabled={isDisabled || feeEligibleAssets.length === 0}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {feeEligibleAssets.map((asset) => (
+              <SelectItem key={asset.assetId} value={asset.assetId} className='w-full pr-2.5 *:[span]:first:hidden'>
+                <div className='flex w-full items-center justify-between'>
+                  <div className='flex items-center gap-3'>
+                    <Avatar
+                      alt={asset.symbol}
+                      fallback={asset.symbol.slice(0, 1)}
+                      src={asset.icon}
+                      style={{ width: 22, height: 22 }}
+                    />
+                    <span className='text-sm font-medium'>{asset.symbol}</span>
+                    <span className='text-foreground/50 text-xs'>{asset.assetId}</span>
+                  </div>
+                  <AssetBalance asset={asset} address={address} />
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {gasFeeInfo ? (
-        <div className='text-small text-foreground mt-[5px] text-right leading-[20px]'>
+        <div className='text-foreground mt-[5px] text-right text-sm leading-[20px]'>
           <b>Required: </b>
           <span>
             <FormatBalance value={gasFeeInfo.amount} withCurrency format={[gasFeeInfo.decimals, gasFeeInfo.symbol]} />

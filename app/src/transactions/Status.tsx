@@ -65,7 +65,8 @@ export function MultisigStatus({ transaction, onClick }: { transaction: Transact
 
   return (
     <div className='flex-1'>
-      <Button onPress={onClick} size='sm' startContent={<IconMember />} variant='ghost'>
+      <Button onClick={onClick} size='sm' variant='ghost'>
+        <IconMember />
         {approvals}/{meta.threshold}
       </Button>
     </div>

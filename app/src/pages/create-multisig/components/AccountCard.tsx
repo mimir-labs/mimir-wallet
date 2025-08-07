@@ -22,7 +22,7 @@ function AccountCard({ label, address, onNameChange, placeholder }: AccountCardP
   return (
     <div className='flex flex-col gap-[5px]'>
       <label className='text-foreground text-sm font-bold'>{label}</label>
-      <div className='rounded-medium bg-primary/5 p-2.5'>
+      <div className='bg-primary/5 rounded-[10px] p-2.5'>
         <div className='flex items-center gap-[10px]'>
           <IdentityIcon size={40} value={address} />
           <div className='flex flex-1 flex-col gap-[5px]'>

@@ -55,7 +55,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       // You can render any custom fallback UI
       return (
         this.props.fallback || (
-          <div className='bg-content1 rounded-large shadow-small border-divider-300 relative w-full max-w-3xl overflow-hidden border'>
+          <div className='bg-content1 border-divider-300 shadow-small relative w-full max-w-3xl overflow-hidden rounded-[20px] border'>
             {/* Abstract graphic design element */}
             <div className='bg-danger-500/10 absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl'></div>
             <div className='bg-danger-500/10 absolute bottom-0 left-0 h-48 w-48 -translate-x-1/3 translate-y-1/3 rounded-full blur-3xl'></div>
@@ -76,9 +76,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                     <h3 className='text-danger-700 text-sm font-medium'>Error Message</h3>
                   </div>
                   <div className='bg-content1 rounded-b-lg px-4 py-3'>
-                    <div className='text-tiny text-danger font-mono break-words whitespace-pre-wrap'>
-                      {errorMessage}
-                    </div>
+                    <div className='text-danger font-mono text-xs break-words whitespace-pre-wrap'>{errorMessage}</div>
                   </div>
                 </div>
 
@@ -92,7 +90,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                     </div>
                   </summary>
                   <div className='bg-content1 rounded-b-lg'>
-                    <pre className='text-tiny text-danger max-h-64 overflow-x-auto overflow-y-auto p-4 font-mono break-words whitespace-pre-wrap'>
+                    <pre className='text-danger max-h-64 overflow-x-auto overflow-y-auto p-4 font-mono text-xs break-words whitespace-pre-wrap'>
                       {errorStack || 'Stack trace not available'}
                     </pre>
                   </div>
@@ -109,7 +107,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                       </div>
                     </summary>
                     <div className='bg-content1 rounded-b-lg'>
-                      <pre className='text-tiny text-danger max-h-64 overflow-x-auto overflow-y-auto p-4 font-mono break-words whitespace-pre-wrap'>
+                      <pre className='text-danger max-h-64 overflow-x-auto overflow-y-auto p-4 font-mono text-xs break-words whitespace-pre-wrap'>
                         {componentStack}
                       </pre>
                     </div>
