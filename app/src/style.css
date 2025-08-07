@@ -125,6 +125,12 @@
 
   button {
     @apply cursor-pointer disabled:pointer-events-none;
+    touch-action: manipulation;
+  }
+
+  /* Optimize mobile touch response for interactive elements */
+  a, button, input, select, textarea, [role="button"], [role="menuitem"] {
+    touch-action: manipulation;
   }
 
   /* custom styles */
