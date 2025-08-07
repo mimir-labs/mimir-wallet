@@ -4,70 +4,74 @@
 import type { TxEvents } from '@mimir-wallet/polkadot-core';
 
 import React, { useEffect, useRef } from 'react';
-import { toast, type ToastOptions } from 'react-toastify';
+import { toast } from 'sonner';
 
 import FailedAnimation from '../animation/Failed';
 import SuccessAnimation from '../animation/Success';
 import WaitingAnimation from '../animation/Waiting';
 import TxError from '../TxError';
 
-function getToastContent(events: TxEvents): [() => React.ReactNode, ToastOptions] {
+function toastCustom(events: TxEvents, id?: number | string) {
   if (
     events.status === 'inblock' ||
     events.status === 'finalized' ||
     events.status === 'completed' ||
     events.status === 'success'
   ) {
-    return [
-      () => (
-        <div className='flex flex-col gap-1'>
-          <p className='font-bold'>Waiting</p>
-          <p className='text-xs'>Transaction is inblock</p>
-        </div>
-      ),
-      { type: 'success', icon: <SuccessAnimation />, autoClose: 3000 }
-    ];
+    return toast.success(
+      <div className='flex flex-col gap-1'>
+        <p className='font-bold'>Waiting</p>
+        <p className='text-xs'>Transaction is inblock</p>
+      </div>,
+      {
+        id,
+        icon: <SuccessAnimation />,
+        duration: 3000
+      }
+    );
   }
 
   if (events.status === 'signed') {
-    return [
-      () => (
-        <div className='flex flex-col gap-1'>
-          <p className='font-bold'>Waiting</p>
-          <p className='text-xs'>Broadcasting transaction</p>
-        </div>
-      ),
-      { icon: <WaitingAnimation />, autoClose: false }
-    ];
+    return toast.warning(
+      <div className='flex flex-col gap-1'>
+        <p className='font-bold'>Waiting</p>
+        <p className='text-xs'>Transaction is inblock</p>
+      </div>,
+      {
+        id,
+        icon: <WaitingAnimation />,
+        duration: 9999999
+      }
+    );
   }
 
   if (events.status === 'error') {
-    return [
-      () => (
-        <div className='flex flex-col gap-1'>
-          <p className='font-bold'>Failed</p>
-          <p className='text-xs'>
-            <TxError error={events.error} />
-          </p>
-        </div>
-      ),
+    return toast.error(
+      <div className='flex flex-col gap-1'>
+        <p className='font-bold'>Failed</p>
+        <p className='text-xs'>
+          <TxError error={events.error} />
+        </p>
+      </div>,
       {
-        type: 'error',
-        autoClose: 3000,
-        icon: <FailedAnimation />
+        id,
+        icon: <FailedAnimation />,
+        duration: 3000
       }
-    ];
+    );
   }
 
-  return [
-    () => (
-      <div className='flex flex-col gap-1'>
-        <p className='font-bold'>Waiting</p>
-        <p className='text-xs'>Waiting for sign</p>
-      </div>
-    ),
-    { icon: <WaitingAnimation />, autoClose: false }
-  ];
+  return toast.warning(
+    <div className='flex flex-col gap-1'>
+      <p className='font-bold'>Waiting</p>
+      <p className='text-xs'>Waiting for sign</p>
+    </div>,
+    {
+      id,
+      icon: <WaitingAnimation />,
+      duration: 9999999
+    }
+  );
 }
 
 function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: () => void }) {
@@ -79,55 +83,27 @@ function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: (
     if (idRef.current) {
       id = idRef.current;
     } else {
-      const [content, options] = getToastContent(events);
-
-      idRef.current = toast.warn(content, options);
+      idRef.current = toastCustom(events);
       id = idRef.current;
     }
 
     const onInblock = () => {
-      const [content, options] = getToastContent(events);
-
-      toast.update(id, {
-        ...options,
-        render: content
-      });
+      idRef.current = toastCustom(events, id);
     };
 
     const onSign = () => {
-      const [content, options] = getToastContent(events);
-
-      toast.update(id, {
-        ...options,
-        render: content
-      });
+      idRef.current = toastCustom(events, id);
     };
 
     const onSuccess = () => {
-      const [content, options] = getToastContent(events);
-
-      toast.update(id, {
-        ...options,
-        render: content
-      });
+      idRef.current = toastCustom(events, id);
     };
 
     const onError = () => {
-      const [content, options] = getToastContent(events);
-
-      toast.update(id, {
-        ...options,
-        render: content
-      });
+      idRef.current = toastCustom(events, id);
     };
 
     events.on('signed', onSign).on('inblock', onInblock).on('success', onSuccess).on('error', onError);
-
-    toast.onChange((item) => {
-      if (id === item.id && item.status === 'removed') {
-        onRemove();
-      }
-    });
 
     return () => {
       events.off('signed', onSign);

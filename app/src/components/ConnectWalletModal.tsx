@@ -87,7 +87,7 @@ function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => v
     <>
       <Modal onClose={onClose} isOpen={open} size='xl'>
         <ModalContent>
-          <ModalHeader className='justify-center'>Connect Wallet</ModalHeader>
+          <ModalHeader>Connect Wallet</ModalHeader>
           <ModalBody>
             <div className='grid grid-cols-2 gap-x-5 gap-y-2.5 sm:grid-cols-2'>
               {sortedWalletConfig.map(([id, config]) => (

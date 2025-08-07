@@ -121,7 +121,7 @@ function ExplorerAddressModal() {
     return (
       <Drawer open={isOpen} onClose={close} direction='right'>
         <DrawerContent>
-          <div className='overflow-y-auto p-4'>{content}</div>
+          <div className='flex flex-col gap-2.5 overflow-y-auto p-4'>{content}</div>
         </DrawerContent>
       </Drawer>
     );

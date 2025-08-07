@@ -27,7 +27,7 @@ function Icons({ address }: { address: string }) {
   return (
     <>
       <Tooltip content='Copy Address'>
-        <CopyAddress address={address} color='primary' className='min-h-6 min-w-6 opacity-100' />
+        <CopyAddress address={address} color='primary' className='text-primary min-h-6 min-w-6 opacity-100' />
       </Tooltip>
       <Tooltip content='QR Code'>
         <Button isIconOnly color='primary' size='sm' variant='light' onClick={() => openQr(address)}>

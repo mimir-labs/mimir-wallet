@@ -7,17 +7,10 @@
 @source '../src/**/*.{js,ts,jsx,tsx,mdx}';
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  --toastify-text-color-light: #151F34;
-  --toastify-color-info: #2700FF;
-  --toastify-color-success: #00DBA6;
-  --toastify-color-warning: #FF8D07;
-  --toastify-color-error: #FF5310;
-}
-
 @theme {
   --color-popover: oklch(1 0 0);
   --color-popover-foreground: oklch(0.145 0 0);
+  --color-border: #D9D9D9;
   --color-input: #D9D9D9;
   --color-card: #FFF;
   --text-6xl: 2.25rem;
@@ -201,19 +194,8 @@
   }
 }
 
-.Toastify__toast {
-  border-radius: var(--heroui-radius-large);
-  box-shadow: var(--heroui-box-shadow-large);
-}
-
-.Toastify__toast-body {
-  align-items: start;
-}
-
-.Toastify__toast-body * {
-  user-select: none;
-}
-
-.Toastify__toast-icon {
-  width: 30px;
+[data-sonner-toast][data-styled=true] [data-icon] {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
 }
