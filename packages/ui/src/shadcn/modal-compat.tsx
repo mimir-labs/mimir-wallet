@@ -79,7 +79,7 @@ const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(({ children, cl
   const isTextContent = typeof children === 'string';
 
   return (
-    <DialogHeader ref={ref} className={cn('text-center sm:text-center', className)} {...props}>
+    <DialogHeader ref={ref} className={className} {...props}>
       {isTextContent ? <DialogTitle className='text-2xl font-bold'>{children}</DialogTitle> : children}
     </DialogHeader>
   );

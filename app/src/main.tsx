@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import 'react-toastify/ReactToastify.css';
 import '@xyflow/react/dist/style.css';
 import './style.css';
 import '@mimir-wallet/polkadot-core/augment';
@@ -28,6 +27,7 @@ import { ApiRoot, initializeApi, useNetworks } from '@mimir-wallet/polkadot-core
 import { API_CLIENT_GATEWAY, initService } from '@mimir-wallet/service';
 
 import { initializeAccount } from './accounts/initialize';
+import { toastError, toastSuccess, toastWarn } from './components/utils';
 import { initializeWallet } from './wallet/initialize';
 import { initAnalytics } from './analytics';
 import App from './App';
