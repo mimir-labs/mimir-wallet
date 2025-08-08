@@ -7,10 +7,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 import { API_CLIENT_WS_GATEWAY } from '../config.js';
-import { TransactionSocketContext } from './context.js';
+import { SocketContext } from './context.js';
 
-interface TransactionSocketProviderProps {
+interface SocketProviderProps {
   url?: string;
+  path?: string;
   autoConnect?: boolean;
   children: ReactNode;
 }
@@ -21,11 +22,12 @@ interface SocketState {
   error: Error | null;
 }
 
-const TransactionSocketProvider = ({
+const SocketProvider = ({
   url = API_CLIENT_WS_GATEWAY,
+  path = '/',
   autoConnect = true,
   children
-}: TransactionSocketProviderProps) => {
+}: SocketProviderProps) => {
   const [socketState, setSocketState] = useState<SocketState>({
     isConnected: false,
     isReconnecting: false,
@@ -33,37 +35,10 @@ const TransactionSocketProvider = ({
   });
 
   const socketRef = useRef<Socket | null>(null);
-  const subscriptionsRef = useRef<Map<string, Set<(event: unknown) => void>>>(new Map());
   const isConnectingRef = useRef<boolean>(false);
 
   const updateSocketState = useCallback((updates: Partial<SocketState>) => {
     setSocketState((prev) => ({ ...prev, ...updates }));
-  }, []);
-
-  const processAllSubscriptions = useCallback(() => {
-    const socket = socketRef.current;
-
-    if (!socket?.connected) return;
-
-    console.log('Processing all subscriptions...', subscriptionsRef.current.size);
-
-    subscriptionsRef.current.forEach((callbacks, address) => {
-      socket.emit('subscribe', address);
-
-      const eventName = `tx:${address}`;
-
-      socket.off(eventName);
-
-      socket.on(eventName, (event: unknown) => {
-        callbacks.forEach((callback) => {
-          try {
-            callback(event);
-          } catch (error) {
-            console.error(`Error in subscription callback for ${address}:`, error);
-          }
-        });
-      });
-    });
   }, []);
 
   const connect = useCallback(() => {
@@ -76,7 +51,7 @@ const TransactionSocketProvider = ({
 
     try {
       const socket = io(url, {
-        path: '/transaction-push',
+        path: path,
         transports: ['websocket'],
         reconnection: true,
         reconnectionAttempts: 10,
@@ -95,7 +70,6 @@ const TransactionSocketProvider = ({
           isReconnecting: false,
           error: null
         });
-        processAllSubscriptions();
       });
 
       socket.on('disconnect', (reason: string) => {
@@ -115,7 +89,6 @@ const TransactionSocketProvider = ({
           isReconnecting: false,
           error: null
         });
-        processAllSubscriptions();
       });
 
       socket.on('reconnect_failed', () => {
@@ -144,7 +117,7 @@ const TransactionSocketProvider = ({
         error: error instanceof Error ? error : new Error('Unknown connection error')
       });
     }
-  }, [url, updateSocketState, processAllSubscriptions]);
+  }, [url, path, updateSocketState]);
 
   const disconnect = useCallback(() => {
     const socket = socketRef.current;
@@ -162,58 +135,34 @@ const TransactionSocketProvider = ({
     }
   }, [updateSocketState]);
 
-  const subscribe = useCallback(
-    (address: string, callback: (event: unknown) => void) => {
-      console.log(`Subscribing to address: ${address}`);
-
-      if (!subscriptionsRef.current.has(address)) {
-        subscriptionsRef.current.set(address, new Set());
-      }
-
-      subscriptionsRef.current.get(address)?.add(callback);
-
-      const socket = socketRef.current;
-
-      if (socket?.connected) {
-        socket.emit('subscribe', address);
-
-        const eventName = `tx:${address}`;
-
-        if (!socket.hasListeners(eventName)) {
-          socket.on(eventName, (event: unknown) => {
-            const callbacks = subscriptionsRef.current.get(address);
-
-            callbacks?.forEach((cb) => {
-              try {
-                cb(event);
-              } catch (error) {
-                console.error(`Error in subscription callback for ${address}:`, error);
-              }
-            });
-          });
-        }
-      } else {
-        console.log(`Socket not connected, queuing subscription for ${address}`);
-
-        if (!isConnectingRef.current) {
-          connect();
-        }
-      }
-    },
-    [connect]
-  );
-
-  const unsubscribe = useCallback((address: string) => {
-    console.log(`Unsubscribing from address: ${address}`);
-
-    subscriptionsRef.current.delete(address);
+  const subscribe = useCallback((topic: string) => {
+    console.log(`Subscribing to topic: ${topic}`);
 
     const socket = socketRef.current;
 
     if (socket?.connected) {
-      socket.emit('unsubscribe', address);
-      socket.off(`tx:${address}`);
+      socket.emit('subscribe', topic);
     }
+  }, []);
+
+  const unsubscribe = useCallback((topic: string) => {
+    console.log(`Unsubscribing from topic: ${topic}`);
+
+    const socket = socketRef.current;
+
+    if (socket?.connected) {
+      socket.emit('unsubscribe', topic);
+    }
+  }, []);
+
+  const ack = useCallback((event: string, ...args: any[]) => {
+    const socket = socketRef.current;
+
+    if (socket?.connect) {
+      return socket.emitWithAck(event, ...args);
+    }
+
+    throw new Error('Socket is not connect');
   }, []);
 
   useEffect(() => {
@@ -223,20 +172,20 @@ const TransactionSocketProvider = ({
 
     return () => {
       disconnect();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      subscriptionsRef.current.clear();
     };
   }, [autoConnect, connect, disconnect]);
 
   const contextValue = {
+    ack,
     subscribe,
     unsubscribe,
     isConnected: socketState.isConnected,
     isReconnecting: socketState.isReconnecting,
-    error: socketState.error
+    error: socketState.error,
+    socket: socketRef.current
   };
 
-  return <TransactionSocketContext.Provider value={contextValue}>{children}</TransactionSocketContext.Provider>;
+  return <SocketContext.Provider value={contextValue}>{children}</SocketContext.Provider>;
 };
 
-export default TransactionSocketProvider;
+export default SocketProvider;

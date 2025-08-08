@@ -3,13 +3,13 @@
 
 import { useContext } from 'react';
 
-import { TransactionSocketContext } from './context.js';
+import { SocketContext } from './context.js';
 
-export const useTransactionSocket = () => {
-  const context = useContext(TransactionSocketContext);
+export const useSocket = () => {
+  const context = useContext(SocketContext);
 
   if (!context) {
-    throw new Error('useTransactionSocket must be used within a TransactionSocketProvider');
+    throw new Error('useSocket must be used within a SocketProvider');
   }
 
   return context;
