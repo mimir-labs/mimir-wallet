@@ -15,6 +15,7 @@ import { Button } from '@mimir-wallet/ui';
 
 import ChainSelect from '../chain-select';
 import BatchButton from './BatchButton';
+import NotificationButton from './NotificationButton';
 import TemplateButton from './TemplateButton';
 import WalletConnect from './WalletConnect';
 
@@ -56,6 +57,7 @@ function TopBar() {
       <div className='flex items-center gap-2 sm:gap-5'>
         {isApiReady && isInAppPage && <AccountSelect />}
         {/* <Notification /> */}
+        {isApiReady && <NotificationButton />}
         {isApiReady && <WalletConnect />}
         {isApiReady && <TemplateButton isOpen={rightSidebarOpen} open={openRightSidebar} close={closeRightSidebar} />}
         {isApiReady && <BatchButton />}
