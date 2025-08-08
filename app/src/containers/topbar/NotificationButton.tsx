@@ -68,7 +68,7 @@ function getNotificationMessage(notification: NotificationMessage): React.ReactN
           {txRef} has been approved by{' '}
           <AddressRow
             className='inline-flex align-middle'
-            value={notification.triggerAddress}
+            value={notification.signer}
             withName
             withAddress={false}
             iconSize={14}
@@ -150,13 +150,10 @@ function NotificationButton() {
   const [isOpen, toggleOpen] = useToggle(false);
   const anchorEl = useRef<HTMLButtonElement>(null);
 
-  const { notifications, isNotificationRead, markAsRead, markAllAsRead, getUnreadCount } = useNotifications();
+  const { notifications, isNotificationRead, markAsRead, getUnreadCount } = useNotifications();
   const [filter, setFilter] = useState<string>('all');
 
   const unreadCount = getUnreadCount();
-
-  // Remove console.log for performance
-  // console.log(unreadCount);
 
   // Memoize the mark as read callback
   const handleMarkAsRead = useCallback(
@@ -219,26 +216,17 @@ function NotificationButton() {
         >
           <div className='flex flex-col gap-2.5'>
             {/* Header Section */}
-            <div className='flex items-center justify-between px-2'>
-              <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className='w-[180px]'>
-                  <SelectValue placeholder='All Transaction' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>All Transaction</SelectItem>
-                  <SelectItem value='transaction_created'>Created</SelectItem>
-                  <SelectItem value='transaction_approved'>Approved</SelectItem>
-                  <SelectItem value='transaction_executed'>Executed</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Mark All as Read Button */}
-              {unreadCount > 0 && (
-                <Button size='sm' variant='ghost' onClick={markAllAsRead} className='text-primary text-xs'>
-                  Mark all as read
-                </Button>
-              )}
-            </div>
+            <Select value={filter} onValueChange={setFilter}>
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder='All Transaction' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>All Transaction</SelectItem>
+                <SelectItem value='transaction_created'>Created</SelectItem>
+                <SelectItem value='transaction_approved'>Approved</SelectItem>
+                <SelectItem value='transaction_executed'>Executed</SelectItem>
+              </SelectContent>
+            </Select>
 
             {/* Notifications List */}
             <div className='flex max-h-[400px] flex-col gap-2.5 overflow-y-auto px-2'>

@@ -7,3 +7,4 @@ export { BaseService, type ApiVersion, type BaseServiceOptions } from './BaseSer
 export { ChainService } from './ChainService.js';
 export { MultisigService } from './MultisigService.js';
 export { TransactionService } from './TransactionService.js';
+export { WebPushService } from './WebPushService.js';

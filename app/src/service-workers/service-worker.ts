@@ -5,6 +5,8 @@ import { clientsClaim, skipWaiting } from 'workbox-core';
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
 
+import { pushSw } from './push';
+
 declare const self: ServiceWorkerGlobalScope;
 
 skipWaiting();
@@ -14,3 +16,6 @@ precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')));
+
+// Initialize push notification handlers
+pushSw();

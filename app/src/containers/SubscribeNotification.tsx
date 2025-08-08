@@ -46,7 +46,7 @@ const handler = (message: NotificationMessage) => {
       <div className='flex flex-col gap-1'>
         <div className='font-bold'>Transaction</div>
         <p className='text-xs'>
-          <Address shorten value={message.triggerAddress} /> approve Transaction {formatTransactionId(message.id)}
+          <Address shorten value={message.signer} /> approve Transaction {formatTransactionId(message.id)}
         </p>
         <Link className='text-primary text-xs active:underline' to='/transactions?status=pending'>
           View Pending{'>'}
