@@ -40,7 +40,7 @@ function TimeCell({ time }: { time?: number }) {
 
   return (
     <Tooltip content={moment(time).format()}>
-      {now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`}
+      <span>{now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`}</span>
     </Tooltip>
   );
 }

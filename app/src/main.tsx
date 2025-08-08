@@ -27,7 +27,6 @@ import { ApiRoot, initializeApi, useNetworks } from '@mimir-wallet/polkadot-core
 import { API_CLIENT_GATEWAY, initService } from '@mimir-wallet/service';
 
 import { initializeAccount } from './accounts/initialize';
-import { toastError, toastSuccess, toastWarn } from './components/utils';
 import { initializeWallet } from './wallet/initialize';
 import { initAnalytics } from './analytics';
 import App from './App';

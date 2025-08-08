@@ -42,7 +42,12 @@ const AddressRow = forwardRef<HTMLDivElement, Props>(
     const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
     return (
-      <div className={`AddressRow flex items-center gap-[5px] ${className || ''}`} ref={ref} {...props}>
+      <div
+        className={`AddressRow flex items-center gap-[5px] ${className || ''}`}
+        ref={ref}
+        style={{ maxHeight: iconSize }}
+        {...props}
+      >
         <IdentityIcon className='AddressRow-Icon' size={iconSize} value={address} />
         <div className='AddressRow-Content flex items-center gap-[5px]'>
           {withName && (

@@ -655,3 +655,17 @@ export const remoteProxyRelations: Record<HexString, HexString> = allEndpoints.r
   },
   {} as Record<HexString, HexString>
 );
+
+const chainMap: Map<string, Endpoint | undefined> = new Map();
+
+export function getChainIcon(key: string) {
+  if (chainMap.has(key)) {
+    return chainMap.get(key);
+  }
+
+  const endpoint = allEndpoints.find((item) => item.key === key || item.genesisHash === key);
+
+  chainMap.set(key, endpoint);
+
+  return endpoint;
+}

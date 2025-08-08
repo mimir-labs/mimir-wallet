@@ -75,8 +75,6 @@ function DropdownMenuCheckboxItem({
   checked,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>) {
-  console.log(checked);
-
   return (
     <DropdownMenuPrimitive.CheckboxItem
       data-slot='dropdown-menu-checkbox-item'

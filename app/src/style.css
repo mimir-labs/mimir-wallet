@@ -169,7 +169,7 @@
   }
 
   a {
-    @apply text-primary text-[length:inherit] no-underline hover:opacity-90 active:opacity-80;
+    @apply text-primary text-[length:inherit] no-underline hover:opacity-70 active:opacity-50 transition-colors-opacity;
   }
 
   ::-webkit-scrollbar {

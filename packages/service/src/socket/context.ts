@@ -1,17 +1,20 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Socket } from 'socket.io-client';
+
 import { createContext } from 'react';
 
-export interface TransactionSocketContextValue {
+export interface SocketContextValue {
+  ack: (event: string, ...args: any[]) => Promise<any>;
   /**
-   * Subscribe to transaction events for a specific address
+   * Subscribe to room events for a specific topic
    */
-  subscribe: (address: string, callback: (event: any) => void) => void;
+  subscribe: (topic: string) => void;
   /**
-   * Unsubscribe from transaction events for a specific address
+   * Unsubscribe from room events for a specific topic
    */
-  unsubscribe: (address: string) => void;
+  unsubscribe: (topic: string) => void;
   /**
    * Whether the socket is currently connected
    */
@@ -24,6 +27,10 @@ export interface TransactionSocketContextValue {
    * Any connection error that occurred
    */
   error: Error | null;
+  /**
+   * Socket instance
+   */
+  socket: Socket | null;
 }
 
-export const TransactionSocketContext = createContext<TransactionSocketContextValue | null>(null);
+export const SocketContext = createContext<SocketContextValue | null>(null);

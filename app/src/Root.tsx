@@ -29,7 +29,7 @@ function Root({ children }: { children: React.ReactNode }) {
       <QueryProvider>
         <AccountConsumer>
           <WalletConnectProvider>
-            <TransactionSocketProvider>{children}</TransactionSocketProvider>
+            <TransactionSocketProvider path='/notification-push'>{children}</TransactionSocketProvider>
           </WalletConnectProvider>
         </AccountConsumer>
       </QueryProvider>

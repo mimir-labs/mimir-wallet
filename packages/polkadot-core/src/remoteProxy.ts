@@ -90,8 +90,6 @@ export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: st
   }
 
   if (proxyAddresses.length === 0) {
-    console.log(tx, tx instanceof GenericExtrinsic);
-
     return tx instanceof GenericExtrinsic ? tx.method.toU8a() : tx.toU8a();
   }
 
