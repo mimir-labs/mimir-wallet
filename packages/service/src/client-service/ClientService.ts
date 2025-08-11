@@ -7,6 +7,7 @@ import {
   AssetService,
   BaseServiceOptions,
   ChainService,
+  EmailNotificationService,
   MultisigService,
   TransactionService,
   WebPushService
@@ -18,6 +19,7 @@ export class ClientService {
   public readonly account: AccountService;
   public readonly asset: AssetService;
   public readonly chain: ChainService;
+  public readonly emailNotification: EmailNotificationService;
   public readonly multisig: MultisigService;
   public readonly transaction: TransactionService;
   public readonly webPush: WebPushService;
@@ -32,6 +34,7 @@ export class ClientService {
     this.account = new AccountService(clientGateway, options);
     this.asset = new AssetService(clientGateway, options);
     this.chain = new ChainService(clientGateway, options);
+    this.emailNotification = new EmailNotificationService(clientGateway, options);
     this.multisig = new MultisigService(clientGateway, options);
     this.transaction = new TransactionService(clientGateway, options);
     this.webPush = new WebPushService(clientGateway, options);

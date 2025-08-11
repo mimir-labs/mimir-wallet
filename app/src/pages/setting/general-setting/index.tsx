@@ -23,7 +23,7 @@ function GeneralSetting() {
         </Tab>
         {current ? (
           <Tab key='notification' title='Notification'>
-            <NotificationSetting address={current} />
+            <NotificationSetting address={current as `0x${string}`} />
           </Tab>
         ) : null}
       </Tabs>

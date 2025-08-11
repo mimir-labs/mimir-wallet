@@ -93,7 +93,7 @@ const NotificationItem: React.FC<NotificationItemProps> = React.memo(({ notifica
   const { ref, inView } = useInView({
     threshold: 0.5, // Trigger when 50% of the item is visible
     triggerOnce: false,
-    delay: 3000 // Mark as read after 3 second in view
+    delay: 1000 // Mark as read after 1 second in view
   });
 
   // Mark as read when the item comes into view

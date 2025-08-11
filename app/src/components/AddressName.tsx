@@ -49,7 +49,7 @@ function extractIdentity(
           style={{ marginRight: '0.2em' }}
           data-is-bad={isBad}
           data-is-good={isGood}
-          className='text-divider-300 data-[is-bad=true]:text-danger data-[is-good=true]:text-primary inline align-middle'
+          className='AddressIdentity_icon text-divider-300 data-[is-bad=true]:text-danger data-[is-good=true]:text-primary inline align-middle'
         />
       </Tooltip>
       {displayParent || displayName}
