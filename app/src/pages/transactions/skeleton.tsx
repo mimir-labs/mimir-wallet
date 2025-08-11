@@ -6,11 +6,11 @@ import { Skeleton } from '@mimir-wallet/ui';
 export const skeleton = (
   <div className='space-y-5'>
     {Array.from({ length: 3 }).map((_, index) => (
-      <div className='bg-content1 shadow-medium rounded-large space-y-5 p-4 sm:p-5' key={index}>
-        <Skeleton className='rounded-medium h-[118px] w-full' />
-        <Skeleton className='rounded-small h-[20px] w-full' />
-        <Skeleton className='rounded-small h-[20px] w-full' />
-        <Skeleton className='rounded-small h-[20px] w-full' />
+      <div className='bg-content1 shadow-medium space-y-5 rounded-[20px] p-4 sm:p-5' key={index}>
+        <Skeleton className='h-[118px] w-full rounded-[10px]' />
+        <Skeleton className='h-[20px] w-full rounded-[5px]' />
+        <Skeleton className='h-[20px] w-full rounded-[5px]' />
+        <Skeleton className='h-[20px] w-full rounded-[5px]' />
       </div>
     ))}
   </div>

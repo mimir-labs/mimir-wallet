@@ -45,7 +45,7 @@ function OperationItem({
   };
 
   return (
-    <div className='bg-secondary rounded-small text-tiny flex items-center justify-between p-[5px]'>
+    <div className='bg-secondary flex items-center justify-between rounded-[5px] p-[5px] text-xs'>
       <div className='text-foreground'>
         {type}
         {getActionEmoji()}
@@ -158,7 +158,7 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
   // Loading State
   if (simulation.isLoading) {
     return (
-      <div className='bg-secondary rounded-medium flex items-center justify-between p-2.5'>
+      <div className='bg-secondary flex items-center justify-between rounded-[10px] p-2.5'>
         <div className='flex items-center gap-2'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -182,7 +182,7 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
   // Error State
   if (simulation.isDone && !simulation.success) {
     return (
-      <div className='border-divider-300 rounded-medium flex items-center justify-between gap-2.5 border p-2.5'>
+      <div className='border-divider-300 flex items-center justify-between gap-2.5 rounded-[10px] border p-2.5'>
         <div className='flex items-center gap-2.5'>
           <div className='flex h-6 w-6 items-center justify-center'>
             <svg
@@ -209,7 +209,7 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
   // Success State
   if (simulation.isDone && simulation.success) {
     return (
-      <div className='border-divider-300 rounded-medium flex items-start justify-between gap-2.5 border p-2.5'>
+      <div className='border-divider-300 flex items-start justify-between gap-2.5 rounded-[10px] border p-2.5'>
         {/* Header with left-right layout */}
         <div className='flex flex-1 items-center gap-2.5'>
           <svg
@@ -243,7 +243,7 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
               size='sm'
               variant='light'
               color='primary'
-              className='text-tiny self-end'
+              className='self-end text-xs'
             >
               Copy All Event
             </CopyButton>
@@ -255,9 +255,9 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
 
   // Initial State
   return (
-    <div className='bg-secondary rounded-medium flex items-center justify-between p-2.5'>
+    <div className='bg-secondary flex items-center justify-between rounded-[10px] p-2.5'>
       <b>Ready to simulate</b>
-      <Button size='sm' variant='ghost' onPress={handleSimulate}>
+      <Button size='sm' variant='ghost' onClick={handleSimulate}>
         Simulate
       </Button>
     </div>

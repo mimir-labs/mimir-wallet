@@ -8,11 +8,10 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
-import { hexToU8a } from '@polkadot/util';
 import React, { useMemo } from 'react';
 
-import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Chip, usePress } from '@mimir-wallet/ui';
+import { addressEq, encodeAddress, useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { Button, Chip } from '@mimir-wallet/ui';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
@@ -58,15 +57,7 @@ function AddressCell({
   const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const copyAddress = useCopyAddressToClipboard(address);
-  const { pressProps } = usePress({
-    onPressStart: (e) => {
-      e.continuePropagation();
-    },
-    onPress: (e) => {
-      e.continuePropagation();
-      copyAddress();
-    }
-  });
+
   const [transactionCounts] = useMultiChainTransactionCounts(withPendingTxCounts ? address : undefined);
   const totalCounts = useMemo(
     () => Object.values(transactionCounts).reduce((acc, curr) => acc + curr.pending, 0),
@@ -117,13 +108,13 @@ function AddressCell({
           )}
         </div>
 
-        <div className='AddressCell-Address text-foreground/50 text-tiny flex h-[16px] min-w-0 items-center'>
+        <div className='AddressCell-Address text-foreground/50 flex h-[16px] min-w-0 items-center text-xs'>
           {showNetworkProxied && (
             <div className='mr-1 flex items-center gap-1'>
               <AddressNetworks address={address} avatarSize={12} />
             </div>
           )}
-          <span {...(addressCopyDisabled ? {} : pressProps)} className='min-w-0 truncate'>
+          <span onClick={addressCopyDisabled ? undefined : () => copyAddress} className='min-w-0 truncate'>
             <AddressComp shorten={shorten} value={address} />
           </span>
           {withCopy && <CopyAddress size='sm' address={address} className='flex-shrink-0 opacity-50' />}
@@ -131,11 +122,10 @@ function AddressCell({
             address &&
             !isLocalAccount(address) &&
             !isLocalAddress(address) &&
-            !addressEq(hexToU8a('0x0', 256), address) && (
+            !addressEq(zeroAddress, address) && (
               <Button
                 isIconOnly
-                color='default'
-                onPress={() => {
+                onClick={() => {
                   addAddressBook(address);
                 }}
                 variant='light'

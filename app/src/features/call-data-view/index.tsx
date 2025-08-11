@@ -29,7 +29,7 @@ function CallDataViewer({ calldata, onClose }: { calldata: string; onClose: () =
     <div className='space-y-5'>
       <div className='flex items-center justify-between'>
         <h4>Call Data Details</h4>
-        <Button isIconOnly color='primary' variant='ghost' onPress={onClose}>
+        <Button isIconOnly color='primary' variant='ghost' onClick={onClose}>
           <IconClose />
         </Button>
       </div>
@@ -37,12 +37,12 @@ function CallDataViewer({ calldata, onClose }: { calldata: string; onClose: () =
       <Input label='Call Data' placeholder='0x...' disabled value={calldata} />
 
       {callDataError && (
-        <div className='bg-secondary rounded-medium p-2.5 break-all'>
+        <div className='bg-secondary rounded-[10px] p-2.5 break-all'>
           <div
             style={{
               fontFamily: 'Geist Mono'
             }}
-            className='text-danger text-tiny'
+            className='text-danger text-xs'
           >
             {callDataError.message}
           </div>
@@ -50,7 +50,7 @@ function CallDataViewer({ calldata, onClose }: { calldata: string; onClose: () =
       )}
 
       {parsedCallData && (
-        <div className='rounded-medium bg-secondary p-2.5'>
+        <div className='bg-secondary rounded-[10px] p-2.5'>
           <JsonView data={parsedCallData.toHuman()} collapseStringsAfterLength={20} />
         </div>
       )}

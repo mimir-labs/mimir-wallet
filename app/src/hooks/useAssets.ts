@@ -42,8 +42,34 @@ function _extraAsset(
   });
 }
 
-export function useAssets(network: string): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean] {
-  const { data, isFetched, isFetching } = useQuery({
+export function useNativeToken(network: string): AssetInfo<true> | undefined {
+  const { allApis } = useApi();
+  const api = allApis[network];
+
+  if (api && api.isApiReady) {
+    const symbol = api.api.registry.chainTokens[0].toString();
+    const decimals = api.api.registry.chainDecimals[0];
+
+    return {
+      network: network,
+      name: symbol,
+      symbol: symbol,
+      decimals: decimals,
+      icon: api.chain.tokenIcon,
+      isNative: true,
+      assetId: 'native',
+      price: 0,
+      change24h: 0
+    };
+  }
+
+  return undefined;
+}
+
+export function useAssets(
+  network: string
+): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean, promise: Promise<AssetInfo[]>] {
+  const { data, isFetched, isFetching, promise } = useQuery({
     queryHash: `assets-${network}`,
     queryKey: [network] as const,
     queryFn: ({ queryKey: [chain] }): Promise<AssetInfo[]> => service.asset.getAllAssets(chain),
@@ -55,20 +81,18 @@ export function useAssets(network: string): [data: AssetInfo[] | undefined, isFe
     }
   });
 
-  return [
-    useMemo(
-      () =>
-        data?.map((item) => ({
-          ...item,
-          icon: findAsset(network, item.assetId)?.Icon,
-          isNative: false,
-          network: network
-        })),
-      [data, network]
-    ),
-    isFetched,
-    isFetching
-  ];
+  const transformedData = useMemo(
+    () =>
+      data?.map((item) => ({
+        ...item,
+        icon: findAsset(network, item.assetId)?.Icon,
+        isNative: false as const,
+        network: network
+      })),
+    [data, network]
+  );
+
+  return [transformedData, isFetched, isFetching, promise];
 }
 
 export function useAssetsByAddress(

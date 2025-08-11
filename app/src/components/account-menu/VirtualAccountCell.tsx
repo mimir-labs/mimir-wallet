@@ -41,7 +41,7 @@ function VirtualAccountCell({
           withAdd={withAdd}
         />
       ) : (
-        <div className='rounded-medium bg-secondary h-[50px] w-full animate-pulse' />
+        <div className='bg-secondary h-[50px] w-full animate-pulse rounded-[10px]' />
       )}
     </div>
   );

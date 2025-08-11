@@ -9,17 +9,7 @@ import { useCopyAddress } from '@/hooks/useCopyAddress';
 import { useMemo } from 'react';
 
 import { addressToHex, useNetworks } from '@mimir-wallet/polkadot-core';
-import {
-  Button,
-  Divider,
-  Link,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  usePress
-} from '@mimir-wallet/ui';
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import IdentityIcon from '../../components/IdentityIcon';
 
@@ -40,9 +30,6 @@ interface Props {
 function AccountItem({ account }: { account: MigratedAccount }) {
   const [balances] = useNativeBalances(account.address);
   const { open } = useCopyAddress();
-  const { pressProps } = usePress({
-    onPress: () => open(account.address)
-  });
 
   return (
     <div className='flex h-10 w-full items-center gap-[5px] rounded-[10px] border border-[#d9d9d9] bg-white px-2.5'>
@@ -57,7 +44,7 @@ function AccountItem({ account }: { account: MigratedAccount }) {
       </div>
 
       {/* Address */}
-      <div className='text-small min-w-0 flex-1' {...pressProps}>
+      <div className='text-small min-w-0 flex-1' onClick={() => open(account.address)}>
         <Address value={account.address} shorten />
       </div>
 
@@ -138,14 +125,14 @@ function MigrationModal({ isOpen, onClose, destChain, accounts = [] }: Props) {
             </div>
 
             <Divider />
-            <Link className='text-inherit' underline='always' isExternal href={MIGRATION_DOCS_URL}>
+            <a className='text-inherit underline' target='_blank' href={MIGRATION_DOCS_URL}>
               What's Assethub Migration?
-            </Link>
+            </a>
           </div>
         </ModalBody>
 
         <ModalFooter>
-          <Button onPress={onClose} fullWidth>
+          <Button onClick={onClose} fullWidth>
             Confirm
           </Button>
         </ModalFooter>

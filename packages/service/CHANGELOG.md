@@ -1,5 +1,40 @@
 # Changelog
 
+## [2.20.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.19.0...service-v2.20.0) (2025-08-07)
+
+
+### Miscellaneous Chores
+
+* **service:** Synchronize main group versions
+
+## [2.19.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.18.0...service-v2.19.0) (2025-08-05)
+
+
+### Miscellaneous Chores
+
+* **service:** Synchronize main group versions
+
+## [2.18.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.17.0...service-v2.18.0) (2025-08-04)
+
+
+### Miscellaneous Chores
+
+* **service:** Synchronize main group versions
+
+## [2.17.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.16.0...service-v2.17.0) (2025-07-29)
+
+
+### Features
+
+* **ui:** refactor create multisig UX with responsive design and step wizard ([#267](https://github.com/mimir-labs/mimir-wallet/issues/267)) ([e66378f](https://github.com/mimir-labs/mimir-wallet/commit/e66378fd1fc800075c0aa33caae5e4992bb83b79))
+
+## [2.16.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.15.0...service-v2.16.0) (2025-07-22)
+
+
+### Miscellaneous Chores
+
+* **service:** Synchronize main group versions
+
 ## [2.15.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.14.0...service-v2.15.0) (2025-07-22)
 
 

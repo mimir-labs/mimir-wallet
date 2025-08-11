@@ -5,6 +5,8 @@ import { useAccount } from '@/accounts/useAccount';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import ArrowRight from '@/assets/svg/ArrowRight.svg?react';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
+import IconAnalytic from '@/assets/svg/icon-analytic.svg?react';
+import IconAssets from '@/assets/svg/icon-assets.svg?react';
 import IconDapp from '@/assets/svg/icon-dapp.svg?react';
 import IconHome from '@/assets/svg/icon-home.svg?react';
 import IconLink from '@/assets/svg/icon-link.svg?react';
@@ -23,20 +25,10 @@ import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 import { formatDisplay } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
 import { useMemo, useState } from 'react';
-import { matchPath, useLocation } from 'react-router-dom';
+import { Link, matchPath, useLocation } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import {
-  Button,
-  Divider,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  Link,
-  Tooltip
-} from '@mimir-wallet/ui';
+import { Button, Divider, Drawer, DrawerContent, DrawerFooter, DrawerHeader, Tooltip } from '@mimir-wallet/ui';
 
 import ToggleSidebar from './ToggleSidebar';
 
@@ -66,23 +58,19 @@ function NavLink({
   return (
     <Button
       data-active={matched}
-      as={Link}
+      asChild
       fullWidth
-      onPress={onClick}
+      onClick={onClick}
       size='lg'
       radius='md'
-      startContent={<Icon className='h-5 w-5' />}
-      className='text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary h-[50px] items-center justify-start gap-x-2.5 px-[15px] py-[20px]'
-      href={matched ? undefined : to}
+      className='group text-foreground/50 hover:bg-secondary hover:text-primary data-[active=true]:bg-secondary data-[active=true]:text-primary h-[50px] items-center justify-start gap-x-2.5 px-[15px] py-[20px] text-base font-semibold'
       variant='light'
     >
-      <p
-        data-active={matched}
-        className='text-medium text-foreground/50 data-[active=true]:text-foreground font-semibold'
-      >
+      <Link to={matched ? {} : to}>
+        <Icon className='h-5 w-5' />
         {label}
-      </p>
-      {endContent}
+        {endContent}
+      </Link>
     </Button>
   );
 }
@@ -112,9 +100,9 @@ function TopContent() {
     <>
       {isConnected ? (
         selected ? (
-          <div className='border-secondary rounded-medium border-1'>
+          <div className='border-secondary rounded-[10px] border-1'>
             <div
-              className='rounded-tl-medium rounded-tr-medium hover:bg-secondary transition-background flex w-full cursor-pointer items-center gap-2.5 bg-transparent p-2.5'
+              className='hover:bg-secondary transition-background flex w-full cursor-pointer items-center gap-2.5 rounded-t-[10px] bg-transparent p-2.5'
               onClick={handleAccountOpen}
             >
               <AddressCell value={selected} addressCopyDisabled />
@@ -123,7 +111,7 @@ function TopContent() {
 
             <Divider className='mx-2.5 w-auto' />
 
-            <p className='text-tiny text-foreground/65 p-2.5'>
+            <p className='text-foreground/65 p-2.5 text-xs'>
               $ {formatUsd[0]}
               {formatUsd[1] ? `.${formatUsd[1]}` : ''}
               {formatUsd[2] || ''}
@@ -132,64 +120,57 @@ function TopContent() {
             <Divider className='mx-2.5 w-auto' />
 
             <div className='flex items-center p-2.5'>
-              <Tooltip content='QR Code' closeDelay={0}>
+              <Tooltip content='QR Code'>
                 <Button
                   isIconOnly
                   className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
                   color='primary'
                   variant='light'
-                  onPress={() => openQr(selected)}
+                  onClick={() => openQr(selected)}
                   size='sm'
                 >
                   <IconQr className='h-4 w-4' />
                 </Button>
               </Tooltip>
-              <Tooltip content='Copy' closeDelay={0}>
-                <CopyAddress address={selected} color='primary' className='opacity-100' />
+              <Tooltip content='Copy'>
+                <CopyAddress address={selected} color='primary' className='text-primary opacity-100' />
               </Tooltip>
-              <Tooltip content='Explorer' closeDelay={0}>
+              <Tooltip content='Explorer'>
                 <Button
                   isIconOnly
                   className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
                   color='primary'
                   variant='light'
                   size='sm'
-                  onPress={() => openExplorer(selected)}
+                  onClick={() => openExplorer(selected)}
                 >
                   <IconLink className='h-4 w-4' />
                 </Button>
               </Tooltip>
-              <Tooltip content='Transfer' closeDelay={0}>
+              <Tooltip content='Transfer'>
                 <Button
                   isIconOnly
                   className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
                   color='primary'
                   variant='light'
-                  as={Link}
+                  asChild
                   size='sm'
-                  href={`/transfer?from=${selected}`}
                 >
-                  <IconTransfer className='h-4 w-4' />
+                  <Link to={`/transfer?from=${selected}`}>
+                    <IconTransfer className='h-4 w-4' />
+                  </Link>
                 </Button>
               </Tooltip>
             </div>
           </div>
         ) : (
-          <Button
-            as={Link}
-            size='lg'
-            fullWidth
-            radius='md'
-            color='primary'
-            className='h-[48px]'
-            href='/create-multisig'
-          >
-            Create Multisig
+          <Button asChild size='lg' fullWidth radius='md' color='primary' className='h-[48px]'>
+            <Link to='/create-multisig'>Create Multisig</Link>
           </Button>
         )
       ) : (
         <Button
-          onPress={() => {
+          onClick={() => {
             openWallet();
             closeSidebar();
           }}
@@ -277,12 +258,13 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
 
       <NavLink Icon={IconHome} label='Home' onClick={closeSidebar} to='/' />
       <NavLink Icon={IconDapp} label='Apps' onClick={closeSidebar} to='/dapp' />
+      <NavLink Icon={IconAssets} label='Assets' onClick={closeSidebar} to='/assets' />
       <NavLink
         Icon={IconTransaction}
         label='Transactions'
         endContent={
           totalCounts ? (
-            <div className='text-small text-danger-foreground bg-danger flex aspect-1/1 w-5 items-center justify-center rounded-full leading-[1] font-semibold'>
+            <div className='text-danger-foreground bg-danger flex aspect-1/1 w-5 items-center justify-center rounded-full text-sm leading-[1] font-semibold'>
               {totalCounts}
             </div>
           ) : null
@@ -291,6 +273,7 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
         to='/transactions'
       />
       <NavLink Icon={IconAddressBook} label='Address Book' onClick={closeSidebar} to='/address-book' />
+      <NavLink Icon={IconAnalytic} label='Analytic' onClick={closeSidebar} to='/analytic' />
       <NavLink
         Icon={IconSetting}
         label='Setting'
@@ -304,19 +287,12 @@ function SideBar({ offsetTop = 0, withSideBar }: { offsetTop?: number; withSideB
   return (
     <>
       {!upMd || !withSideBar ? (
-        <Drawer
-          size='xs'
-          radius='lg'
-          hideCloseButton={upMd}
-          placement={upMd ? 'left' : 'right'}
-          onClose={closeSidebar}
-          isOpen={sidebarOpen}
-        >
-          <DrawerContent className='max-w-[280px]'>
+        <Drawer direction={upMd ? 'left' : 'right'} onClose={closeSidebar} open={sidebarOpen}>
+          <DrawerContent className='max-w-[280px] data-[vaul-drawer-direction=left]:rounded-r-[20px] data-[vaul-drawer-direction=right]:rounded-l-[20px]'>
             <DrawerHeader className='md:hidden'>
               <h3>Menu</h3>
             </DrawerHeader>
-            <DrawerBody className='scrollbar-hide px-4 py-4'>{element}</DrawerBody>
+            <div className='p-4'>{element}</div>
             <DrawerFooter className='px-4 pt-0'>
               <WalletContent />
             </DrawerFooter>

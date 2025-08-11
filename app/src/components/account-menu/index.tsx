@@ -20,16 +20,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { addressEq, addressToHex, encodeAddress, isPolkadotAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import {
-  Button,
-  Divider,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  usePress
-} from '@mimir-wallet/ui';
+import { Button, Divider, Drawer, DrawerContent, DrawerFooter, DrawerHeader } from '@mimir-wallet/ui';
 
 import AccountCell from './AccountCell';
 import CreateMultisig from './CreateMultisig';
@@ -78,17 +69,13 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
     return result;
   }, [pinnedAccounts, hideAccountHex, metas, keywords, chainSS58]);
+  const upSm = useMediaQuery('sm');
 
   const keywordsIsPolkadotAddress = !!keywords && isPolkadotAddress(keywords);
-
-  const { pressProps } = usePress({
-    onPress: () => setIsMimirExpanded(!isMimirExpanded)
-  });
 
   const [grouped, setGrouped] = useState<Record<GroupName, string[]>>(
     groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas)
   );
-  const upMd = useMediaQuery('md');
 
   useEffect(() => {
     if (!keywords) {
@@ -151,157 +138,153 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   );
 
   return (
-    <Drawer
-      hideCloseButton={upMd}
-      radius={!upMd ? 'lg' : 'none'}
-      onClose={onClose}
-      isOpen={open}
-      placement={anchor}
-      size='sm'
-      classNames={{ footer: 'px-2.5 py-2.5' }}
-    >
-      <DrawerContent className='max-w-[320px] sm:max-w-[400px]'>
+    <Drawer onClose={onClose} open={open} direction={anchor}>
+      <DrawerContent data-mobile={!upSm} className='max-w-[320px] data-[mobile=true]:rounded-l-[20px] sm:max-w-[400px]'>
         <DrawerHeader className='flex-col'>
           <h3 className='sm:none mb-2.5 flex items-center justify-between'>Menu</h3>
 
           <Search onChange={setKeywords} isSearching={isSearching} value={keywords} />
         </DrawerHeader>
 
-        <DrawerBody className='scrollbar-hide'>
-          <div className='text-tiny sm:text-small w-full space-y-2.5'>
-            {searchAccount && (
-              <>
-                <div className='flex flex-1 items-center gap-1'>
-                  <IconGlobal className='opacity-60' />
-                  Searched Account
-                </div>
-
-                <AccountCell
-                  key={`searched-${searchAccount.address}`}
-                  onClose={onClose}
-                  onSelect={onSelect}
-                  value={searchAccount.address}
-                  withAdd
-                />
-
-                <Divider />
-              </>
-            )}
-
-            {current && !keywordsIsPolkadotAddress && (
-              <>
-                <div className='flex items-center gap-1'>
-                  <IconUser className='opacity-60' />
-                  Current Wallet
-                </div>
-
-                <AccountCell key={`current-${current}`} onClose={onClose} value={current} selected />
-
-                <Divider />
-              </>
-            )}
-
-            {visiblePinnedAccounts.length > 0 && (
-              <>
-                <div className='flex items-center gap-1'>
-                  <IconPin className='h-4 w-4 opacity-60' />
-                  Pinned Wallet
-                </div>
-
-                {visiblePinnedAccounts.map((account) => (
-                  <AccountCell
-                    key={`pinned-${account}`}
-                    onClose={onClose}
-                    onSelect={onSelect}
-                    value={account}
-                    selected={addressEq(account, current)}
-                  />
-                ))}
-              </>
-            )}
-
-            {grouped.mimir.length > 0 && (
-              <>
-                <div className='flex cursor-pointer items-center gap-1' {...pressProps}>
-                  <IconUnion className='opacity-60' />
-                  <span className='flex-1'>Mimir Wallet</span>
-                  <Button
-                    isIconOnly
-                    color='default'
-                    size='sm'
-                    variant='light'
-                    data-expanded={isMimirExpanded}
-                    className='data-[expanded=true]:rotate-180'
-                    onPress={() => setIsMimirExpanded(!isMimirExpanded)}
-                  >
-                    <ArrowDownIcon />
-                  </Button>
-                </div>
-                {isMimirExpanded
-                  ? grouped.mimir.map((account) => (
-                      <VirtualAccountCell
-                        key={`multisig-${account}`}
-                        onClose={onClose}
-                        onSelect={onSelect}
-                        value={account}
-                        selected={addressEq(account, current)}
-                      />
-                    ))
-                  : null}
-
-                <Divider />
-              </>
-            )}
-
-            {grouped.injected.length > 0 && (
-              <>
-                <div className='flex items-center gap-1'>
-                  <IconExtension className='opacity-60' />
-                  Extension Wallet
-                </div>
-                {grouped.injected.map((account) => (
-                  <VirtualAccountCell
-                    key={`extension-${account}`}
-                    onClose={onClose}
-                    onSelect={onSelect}
-                    value={account}
-                  />
-                ))}
-
-                <Divider />
-              </>
-            )}
-
-            {!keywordsIsPolkadotAddress && (
-              <div className='flex items-center gap-1'>
-                <span className='flex flex-1 items-center gap-1'>
-                  <IconWatch className='opacity-60' />
-                  Watchlist
-                </span>
-                <Button
-                  isIconOnly
-                  color='default'
-                  size='sm'
-                  variant='light'
-                  onPress={() => addAddressBook(undefined, true)}
-                >
-                  <IconAdd />
-                </Button>
+        <div className='scrollbar-hide w-full space-y-2.5 overflow-y-auto px-4 text-xs sm:text-sm'>
+          {searchAccount && (
+            <>
+              <div className='flex flex-1 items-center gap-1'>
+                <IconGlobal className='opacity-60' />
+                Searched Account
               </div>
-            )}
 
-            {!keywordsIsPolkadotAddress &&
-              watchlist.map(({ address }) => (
-                <VirtualAccountCell
-                  key={`watchlist-${address}`}
-                  watchlist
+              <AccountCell
+                key={`searched-${searchAccount.address}`}
+                onClose={onClose}
+                onSelect={onSelect}
+                value={searchAccount.address}
+                withAdd
+              />
+
+              <Divider />
+            </>
+          )}
+
+          {current && !keywordsIsPolkadotAddress && (
+            <>
+              <div className='flex items-center gap-1'>
+                <IconUser className='opacity-60' />
+                Current Wallet
+              </div>
+
+              <AccountCell key={`current-${current}`} onClose={onClose} value={current} selected />
+
+              <Divider />
+            </>
+          )}
+
+          {visiblePinnedAccounts.length > 0 && (
+            <>
+              <div className='flex items-center gap-1'>
+                <IconPin className='h-4 w-4 opacity-60' />
+                Pinned Wallet
+              </div>
+
+              {visiblePinnedAccounts.map((account) => (
+                <AccountCell
+                  key={`pinned-${account}`}
                   onClose={onClose}
                   onSelect={onSelect}
-                  value={address}
+                  value={account}
+                  selected={addressEq(account, current)}
                 />
               ))}
-          </div>
-        </DrawerBody>
+            </>
+          )}
+
+          {grouped.mimir.length > 0 && (
+            <>
+              <div
+                className='flex cursor-pointer items-center gap-1'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMimirExpanded(!isMimirExpanded);
+                }}
+              >
+                <IconUnion className='opacity-60' />
+                <span className='flex-1'>Mimir Wallet</span>
+                <Button
+                  continuePropagation
+                  isIconOnly
+                  size='sm'
+                  variant='light'
+                  data-expanded={isMimirExpanded}
+                  className='text-inherit data-[expanded=true]:rotate-180'
+                  onClick={() => setIsMimirExpanded(!isMimirExpanded)}
+                >
+                  <ArrowDownIcon />
+                </Button>
+              </div>
+              {isMimirExpanded
+                ? grouped.mimir.map((account) => (
+                    <VirtualAccountCell
+                      key={`multisig-${account}`}
+                      onClose={onClose}
+                      onSelect={onSelect}
+                      value={account}
+                      selected={addressEq(account, current)}
+                    />
+                  ))
+                : null}
+
+              <Divider />
+            </>
+          )}
+
+          {grouped.injected.length > 0 && (
+            <>
+              <div className='flex items-center gap-1'>
+                <IconExtension className='opacity-60' />
+                Extension Wallet
+              </div>
+              {grouped.injected.map((account) => (
+                <VirtualAccountCell
+                  key={`extension-${account}`}
+                  onClose={onClose}
+                  onSelect={onSelect}
+                  value={account}
+                />
+              ))}
+
+              <Divider />
+            </>
+          )}
+
+          {!keywordsIsPolkadotAddress && (
+            <div className='flex items-center gap-1'>
+              <span className='flex flex-1 items-center gap-1'>
+                <IconWatch className='opacity-60' />
+                Watchlist
+              </span>
+              <Button
+                isIconOnly
+                className='text-inherit'
+                size='sm'
+                variant='light'
+                onClick={() => addAddressBook(undefined, true)}
+              >
+                <IconAdd />
+              </Button>
+            </div>
+          )}
+
+          {!keywordsIsPolkadotAddress &&
+            watchlist.map(({ address }) => (
+              <VirtualAccountCell
+                key={`watchlist-${address}`}
+                watchlist
+                onClose={onClose}
+                onSelect={onSelect}
+                value={address}
+              />
+            ))}
+        </div>
 
         <DrawerFooter>
           <CreateMultisig onClose={onClose} />

@@ -1,15 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BN } from '@polkadot/util';
 import type React from 'react';
-import type { InputProps as BaseInputProps } from '@mimir-wallet/ui';
 
-export interface InputProps extends Omit<BaseInputProps, 'onChange'> {
+export interface InputProps extends Omit<React.ComponentProps<'input'>, 'onChange'> {
   className?: string;
   defaultValue?: string;
   value?: string;
-  color?: 'danger' | 'primary' | 'secondary' | 'success' | 'warning';
   disabled?: boolean;
   label?: React.ReactNode;
   error?: Error | null;
@@ -29,7 +26,7 @@ export interface InputProps extends Omit<BaseInputProps, 'onChange'> {
 
 export interface InputAddressProps {
   className?: string;
-  format?: [decimals: number, unit: string];
+  wrapperClassName?: string;
   iconSize?: number;
   defaultValue?: string;
   value?: string;
@@ -37,13 +34,16 @@ export interface InputAddressProps {
   label?: React.ReactNode;
   placeholder?: string;
   onChange?: (value: string) => void;
-  withBalance?: boolean;
-  balance?: BN | bigint | string | number | null;
+  onSelect?: (value: string) => void | boolean; // return false to prevent onChange
   isSign?: boolean;
   filtered?: string[];
   excluded?: string[];
   shorten?: boolean;
+  addressType?: 'row' | 'cell';
   helper?: React.ReactNode;
+  endContent?: React.ReactNode;
+  withAddButton?: boolean;
+  withZeroAddress?: boolean;
 }
 
 export interface InputNumberProps extends Omit<InputProps, 'defaultValue' | 'value' | 'onChange'> {

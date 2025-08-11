@@ -75,7 +75,8 @@ function Import() {
   };
 
   return (
-    <Button color='primary' variant='ghost' startContent={<IconDownload />} onPress={handleButtonClick}>
+    <Button color='primary' variant='ghost' onClick={handleButtonClick}>
+      <IconDownload />
       Import
       <input type='file' accept='.csv' hidden onChange={handleImport} ref={fileInputRef} />
     </Button>

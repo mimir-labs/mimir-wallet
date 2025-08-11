@@ -1,19 +1,28 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AssetInfo } from '@/hooks/types';
-
 import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
+import { useAssets, useNativeToken } from '@/hooks/useAssets';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useWallet } from '@/wallet/useWallet';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Spinner
+} from '@mimir-wallet/ui';
 
 interface Props {
   defaultNetwork?: string;
@@ -36,7 +45,13 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   );
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber(defaultValue?.toString() || '', false, 0);
-  const [token, setToken] = useState<AssetInfo<boolean>>();
+  const [assetId, setAssetId] = useState('native');
+  const [assets] = useAssets(network);
+  const nativeToken = useNativeToken(network);
+  const token = useMemo(
+    () => (assetId === 'native' ? nativeToken : assets?.find((item) => item.assetId === assetId)),
+    [assetId, assets, nativeToken]
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,7 +61,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
       // reset
       setError(null);
       setAmount('');
-      setToken(undefined);
+      setAssetId('native');
       toggleKeepAlive(true);
     }
   }, [enableNetwork, network, open, setAmount, toggleKeepAlive]);
@@ -82,6 +97,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
                 isAmountValid={isAmountValid}
                 keepAlive={keepAlive}
                 token={token}
+                assetId={assetId}
                 sending={sending}
                 recipient={receipt}
                 network={network}
@@ -89,15 +105,19 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
                 setNetwork={setNetwork}
                 setAmount={setAmount}
                 toggleKeepAlive={toggleKeepAlive}
-                setToken={setToken}
+                setToken={setAssetId}
               />
             )}
 
-            {error && <Alert color='danger'>{error}</Alert>}
+            {error && (
+              <Alert variant='destructive'>
+                <AlertTitle>{error}</AlertTitle>
+              </Alert>
+            )}
           </ModalBody>
 
           <ModalFooter>
-            <Button fullWidth onPress={onClose} variant='ghost'>
+            <Button fullWidth onClick={onClose} variant='ghost'>
               Cancel
             </Button>
 

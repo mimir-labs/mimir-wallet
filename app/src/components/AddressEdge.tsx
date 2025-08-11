@@ -59,7 +59,7 @@ function AddressEdge({
       {data && data.tips && data.tips.length > 0 && (
         <EdgeLabelRenderer>
           <div
-            className='rounded-medium flex min-w-[40px] flex-col gap-[2px] p-[2px] text-[10px] font-bold'
+            className='flex min-w-[40px] flex-col gap-[2px] rounded-[10px] p-[2px] text-[10px] font-bold'
             style={labelStyle}
           >
             {data.tips.map((tip, index) => (

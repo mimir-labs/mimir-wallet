@@ -11,14 +11,16 @@ import { useTxQueue } from '@/hooks/useTxQueue';
 import { useAccountSource, useWallet } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
 import { GenericExtrinsic } from '@polkadot/types';
-import React, { useCallback, useState } from 'react';
+import React, { forwardRef, useCallback, useState } from 'react';
 
 import { signAndSend, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, type ButtonProps } from '@mimir-wallet/ui';
+import { Button, type ButtonProps, buttonSpinner } from '@mimir-wallet/ui';
 
 import { toastError } from './utils';
 
-interface Props extends Omit<ButtonProps, 'onPress' | 'onClick'> {
+interface Props extends Omit<ButtonProps, 'onClick' | 'startContent' | 'endContent'> {
+  startContent?: React.ReactNode;
+  endContent?: React.ReactNode;
   accountId?: string;
   filterPaths?: FilterPath[];
   transaction?: Transaction | null;
@@ -44,108 +46,116 @@ interface Props extends Omit<ButtonProps, 'onPress' | 'onClick'> {
   overrideAction?: () => void;
 }
 
-function TxButton({
-  getCall,
-  children,
-  accountId,
-  transaction,
-  website,
-  appName,
-  iconUrl,
-  relatedBatches,
-  filterPaths,
-  beforeSend,
-  onResults,
-  isDisabled,
-  disabled,
-  onDone,
-  onError,
-  overrideAction,
-  ...props
-}: Props) {
-  const { api, network } = useApi();
-  const { addQueue } = useTxQueue();
-  const { walletAccounts } = useWallet();
-  const address = accountId || transaction?.address || walletAccounts.at(0)?.address;
-  const source = useAccountSource(address);
-  const [loading, setLoading] = useState(false);
-  const handlePress = useCallback(() => {
-    if (getCall) {
-      const call = getCall();
+const TxButton = forwardRef<HTMLButtonElement, Props>(
+  (
+    {
+      getCall,
+      children,
+      accountId,
+      transaction,
+      website,
+      appName,
+      iconUrl,
+      relatedBatches,
+      filterPaths,
+      beforeSend,
+      onResults,
+      disabled,
+      onDone,
+      onError,
+      overrideAction,
+      startContent,
+      endContent,
+      ...props
+    },
+    ref
+  ) => {
+    const { api, network } = useApi();
+    const { addQueue } = useTxQueue();
+    const { walletAccounts } = useWallet();
+    const address = accountId || transaction?.address || walletAccounts.at(0)?.address;
+    const source = useAccountSource(address);
+    const [loading, setLoading] = useState(false);
+    const handleClick = useCallback(() => {
+      if (getCall) {
+        const call = getCall();
 
-      if (!address) {
-        toastError('Please select an account');
+        if (!address) {
+          toastError('Please select an account');
 
-        return;
-      }
+          return;
+        }
 
-      if (source) {
-        setLoading(true);
+        if (source) {
+          setLoading(true);
 
-        const events = signAndSend(
-          api,
-          api.tx(
-            api.registry.createType(
-              'Call',
-              typeof call === 'string' ? call : call instanceof GenericExtrinsic ? call.method.toU8a() : call.toU8a()
-            )
-          ),
-          address,
-          () => enableWallet(source, CONNECT_ORIGIN),
-          { beforeSend }
-        );
+          const events = signAndSend(
+            api,
+            api.tx(
+              api.registry.createType(
+                'Call',
+                typeof call === 'string' ? call : call instanceof GenericExtrinsic ? call.method.toU8a() : call.toU8a()
+              )
+            ),
+            address,
+            () => enableWallet(source, CONNECT_ORIGIN),
+            { beforeSend }
+          );
 
-        events.on('inblock', () => {
+          events.on('inblock', () => {
+            onDone?.();
+            setLoading(false);
+          });
+          events.on('error', (error: any) => {
+            setLoading(false);
+            onError?.(error);
+            toastError(error);
+          });
+        } else {
+          addQueue({
+            accountId: address,
+            transaction: transaction || undefined,
+            call,
+            website,
+            appName,
+            iconUrl,
+            filterPaths,
+            relatedBatches,
+            onResults: (result) => onResults?.(result),
+            beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
+            network,
+            onError
+          });
           onDone?.();
-          setLoading(false);
-        });
-        events.on('error', (error: any) => {
-          setLoading(false);
-          onError?.(error);
-          toastError(error);
-        });
-      } else {
-        addQueue({
-          accountId: address,
-          transaction: transaction || undefined,
-          call,
-          website,
-          appName,
-          iconUrl,
-          filterPaths,
-          relatedBatches,
-          onResults: (result) => onResults?.(result),
-          beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
-          network,
-          onError
-        });
-        onDone?.();
+        }
       }
-    }
-  }, [
-    getCall,
-    onDone,
-    address,
-    source,
-    addQueue,
-    transaction,
-    website,
-    appName,
-    iconUrl,
-    filterPaths,
-    relatedBatches,
-    network,
-    onError,
-    api,
-    onResults,
-    beforeSend
-  ]);
+    }, [
+      getCall,
+      onDone,
+      address,
+      source,
+      addQueue,
+      transaction,
+      website,
+      appName,
+      iconUrl,
+      filterPaths,
+      relatedBatches,
+      network,
+      onError,
+      api,
+      onResults,
+      beforeSend
+    ]);
 
-  return (
-    <Button {...props} isLoading={loading} isDisabled={isDisabled || disabled} onPress={overrideAction || handlePress}>
-      {children}
-    </Button>
-  );
-}
+    return (
+      <Button {...props} ref={ref} disabled={loading || disabled} onClick={overrideAction || handleClick}>
+        {loading ? buttonSpinner : startContent}
+        {children}
+        {endContent}
+      </Button>
+    );
+  }
+);
 
 export default React.memo(TxButton);

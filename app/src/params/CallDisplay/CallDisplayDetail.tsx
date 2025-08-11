@@ -3,7 +3,7 @@
 
 import type { IMethod, Registry } from '@polkadot/types/types';
 
-import { AddressRow, FormatBalance } from '@/components';
+import { FormatBalance } from '@/components';
 import { findToken } from '@/config';
 import { useAssetInfo } from '@/hooks/useAssets';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
@@ -103,47 +103,6 @@ function CallDisplayDetail({
     )
   ) {
     comp = <div className='flex items-center gap-1'>{(call.args?.[0] as any)?.length} calls</div>;
-  } else if (['proxy.proxy', 'proxy.announce'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
-    comp = (
-      <div className='flex items-center gap-1'>
-        <AddressRow
-          shorten
-          withName
-          withAddress={false}
-          iconSize={20}
-          defaultName='Real'
-          value={call.args[0].toString()}
-        />
-      </div>
-    );
-  } else if (['proxy.proxyAnnounced'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
-    comp = (
-      <div className='flex items-center gap-1'>
-        <AddressRow
-          shorten
-          withName
-          withAddress={false}
-          iconSize={20}
-          defaultName='Real'
-          value={call.args[1].toString()}
-        />
-      </div>
-    );
-  } else if (['proxy.addProxy', 'proxy.removeProxy'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
-    comp = (
-      <div className='flex items-center gap-1'>
-        <AddressRow
-          shorten
-          withName
-          withAddress={false}
-          iconSize={20}
-          defaultName='Proxy'
-          value={call.args[0].toString()}
-        />
-      </div>
-    );
-  } else if (['proxy.removeProxies'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
-    comp = <div className='flex items-center gap-1'>Remove Proxies</div>;
   } else if (['identity.setIdentity'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
     comp = <div className='flex items-center gap-1 font-bold'>{dataToUtf8((call.args?.[0] as any)?.display)}</div>;
   } else {

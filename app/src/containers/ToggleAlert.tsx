@@ -46,10 +46,10 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
 
         <Button
           isIconOnly
-          color='default'
+          className='text-inherit'
           size='sm'
           variant='light'
-          onPress={() => {
+          onClick={() => {
             setForceHide(true);
           }}
         >

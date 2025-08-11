@@ -15,7 +15,7 @@ interface Props extends ButtonProps {
 const CopyAddress = forwardRef<HTMLButtonElement, Props>(function CopyAddress({ address, ...props }, ref) {
   const copyAddress = useCopyAddressToClipboard(address);
 
-  return <CopyButton {...props} onPress={() => copyAddress()} ref={ref} value={address} />;
+  return <CopyButton {...props} onClick={() => copyAddress()} ref={ref} value={address} />;
 });
 
 export default React.memo(CopyAddress);

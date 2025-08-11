@@ -28,7 +28,7 @@ function OmniChainUpgradeTip() {
             }}
           >
             <Tab key='remoteProxy' title='Remote Proxy'>
-              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
+              <div className='bg-secondary flex items-center justify-center rounded-[10px] p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/Remoteproxy2.mp4'
                   autoPlay
@@ -46,7 +46,7 @@ function OmniChainUpgradeTip() {
               </p>
             </Tab>
             <Tab key='omniUX' title='OmniUX'>
-              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
+              <div className='bg-secondary flex items-center justify-center rounded-[10px] p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/OmniUX.mp4'
                   autoPlay
@@ -63,7 +63,7 @@ function OmniChainUpgradeTip() {
               </p>
             </Tab>
             <Tab key='callTemplate' title='Call Template'>
-              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
+              <div className='bg-secondary flex items-center justify-center rounded-[10px] p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/CallTemplate.mp4'
                   autoPlay
@@ -80,7 +80,7 @@ function OmniChainUpgradeTip() {
               </p>
             </Tab>
             <Tab key='walletConnect' title='WalletConnect'>
-              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
+              <div className='bg-secondary flex items-center justify-center rounded-[10px] p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/WalletConnect.mp4'
                   autoPlay
@@ -97,7 +97,7 @@ function OmniChainUpgradeTip() {
               </p>
             </Tab>
             <Tab key='quickSimulation' title='Quick Simulation'>
-              <div className='rounded-medium bg-secondary flex items-center justify-center p-5'>
+              <div className='bg-secondary flex items-center justify-center rounded-[10px] p-5'>
                 <video
                   src='https://mimir-labs.github.io/mimir-assets/videos/QuickSimulation.mp4'
                   autoPlay

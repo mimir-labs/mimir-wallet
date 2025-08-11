@@ -21,13 +21,13 @@ function Content({ address, onClose }: { address: string; onClose?: () => void }
         </div>
       </ModalBody>
       <ModalFooter>
-        <Button fullWidth onPress={onClose} variant='ghost'>
+        <Button fullWidth onClick={onClose} variant='ghost'>
           Cancel
         </Button>
         <Button
-          isDisabled={!(name && address)}
+          disabled={!(name && address)}
           fullWidth
-          onPress={() => {
+          onClick={() => {
             onClose?.();
             saveName(true, (name) => toastSuccess(`Save name to ${name} success`));
           }}

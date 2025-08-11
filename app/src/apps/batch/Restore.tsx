@@ -17,7 +17,7 @@ import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Alert, Button, Checkbox, Spinner } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button, buttonSpinner, Checkbox, Spinner } from '@mimir-wallet/ui';
 
 import BatchItem from './BatchItem';
 
@@ -97,7 +97,9 @@ Timestamp: ${time}`;
       <div className='scrollbar-hide flex-1 space-y-2.5 overflow-y-auto'>
         {current && !!txs?.length && (
           <>
-            <Alert className='flex-grow-0' color='success' title={`${txs.length} Transactions Founded`} />
+            <Alert variant='success' className='flex-grow-0'>
+              <AlertTitle>{txs.length} Transactions Founded</AlertTitle>
+            </Alert>
 
             {txs?.map((item) => (
               <BatchItem key={item.id} from={current} calldata={item.call} registry={api.registry}>
@@ -165,18 +167,18 @@ Timestamp: ${time}`;
         </div>
 
         <Button
-          isDisabled={selected.length === 0 || filtered.length === 0 || !current}
+          disabled={loading || selected.length === 0 || filtered.length === 0 || !current}
           color='danger'
           variant='ghost'
-          isLoading={loading}
-          onPress={handleDelete}
+          onClick={handleDelete}
         >
+          {loading ? buttonSpinner : null}
           Delete
         </Button>
 
         <Button
-          isDisabled={selected.length === 0}
-          onPress={() => {
+          disabled={selected.length === 0}
+          onClick={() => {
             restore(selected);
             onClose?.();
           }}

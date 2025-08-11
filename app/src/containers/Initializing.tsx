@@ -3,8 +3,7 @@
 
 import { MimirLoading } from '@/components';
 import { useEffect, useState } from 'react';
-
-import { Link } from '@mimir-wallet/ui';
+import { Link } from 'react-router-dom';
 
 function Initializing() {
   const [showCustomize, setShowCustomize] = useState(false);
@@ -31,7 +30,7 @@ function Initializing() {
       }}
     >
       <MimirLoading />
-      {showCustomize && <Link href='/setting'>Go to Customize RPC</Link>}
+      {showCustomize && <Link to='/setting'>Go to Customize RPC</Link>}
     </div>
   );
 }

@@ -9,9 +9,10 @@ import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { CopyButton } from '@/components';
 import { DotConsoleApp } from '@/config';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Link, Tooltip } from '@mimir-wallet/ui';
+import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import { decodeCallSection } from './utils';
 
@@ -28,15 +29,10 @@ function DotConsoleButton({ network, call }: { network: string; call: string }) 
   url.searchParams.set('callData', call);
 
   return (
-    <Button
-      isIconOnly
-      as={Link}
-      size='sm'
-      color='primary'
-      href={`/explorer/${encodeURIComponent(url.toString())}`}
-      variant='light'
-    >
-      <img src={DotConsoleApp.icon} alt='Dot Console' width={16} height={16} />
+    <Button isIconOnly asChild size='sm' color='primary' variant='light'>
+      <Link to={`/explorer/${encodeURIComponent(url.toString())}`}>
+        <img src={DotConsoleApp.icon} alt='Dot Console' width={16} height={16} />
+      </Link>
     </Button>
   );
 }
@@ -74,7 +70,7 @@ function TemplateItem({
   }, [registry, call]);
 
   return (
-    <div className='rounded-medium bg-secondary grid h-[40px] grid-cols-12 gap-2 pl-2 sm:pl-3'>
+    <div className='bg-secondary grid h-[40px] grid-cols-12 gap-2 rounded-[10px] pl-2 sm:pl-3'>
       <div className='col-span-4 flex items-center'>
         {isEditing ? (
           <input
@@ -98,10 +94,9 @@ function TemplateItem({
         )}
         <Button
           isIconOnly
-          color='default'
-          onPress={() => setIsEditing(true)}
+          onClick={() => setIsEditing(true)}
           size='sm'
-          className='opacity-50'
+          className='text-inherit opacity-50'
           variant='light'
         >
           <IconEdit />
@@ -110,19 +105,19 @@ function TemplateItem({
 
       <div className='col-span-8 flex items-center justify-between'>
         <div className='flex items-center'>
-          <Link as='button' color='foreground' onPress={() => onView(name, call)}>
-            <Tooltip content={`${section}.${method}`} closeDelay={0} color='foreground'>
+          <button className='text-foreground' onClick={() => onView(name, call)}>
+            <Tooltip content={`${section}.${method}`} color='foreground'>
               <span className='max-w-[110px] overflow-hidden text-ellipsis underline sm:max-w-[130px]'>
                 {section}.{method}
               </span>
             </Tooltip>
-          </Link>
+          </button>
           <CopyButton value={call} size='sm' />
         </div>
 
         <div className='shrink-0'>
           <DotConsoleButton network={network} call={call} />
-          <Button isIconOnly variant='light' size='sm' color='danger' onPress={() => onDelete()}>
+          <Button isIconOnly variant='light' size='sm' color='danger' onClick={() => onDelete()}>
             <IconDelete />
           </Button>
         </div>

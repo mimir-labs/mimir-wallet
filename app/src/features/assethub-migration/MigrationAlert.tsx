@@ -7,7 +7,7 @@ import { MIGRATION_NOTICE_DOCS_URL } from '@/constants';
 import { useEffect, useState } from 'react';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
-import { Button, Link } from '@mimir-wallet/ui';
+import { Button } from '@mimir-wallet/ui';
 
 import MigrationModal from './MigrationModal';
 import { useMigrationNetworks, useMigrationStatus } from './useMigrationStatus';
@@ -57,25 +57,25 @@ function Item({
                 <span>
                   {destNetwork?.name} Migration on {sourceNetwork?.name} has been completed — check out{' '}
                 </span>
-                <Link underline='always' isExternal href={MIGRATION_NOTICE_DOCS_URL} className='text-white'>
+                <a target='_blank' href={MIGRATION_NOTICE_DOCS_URL} className='text-white underline'>
                   what&apos;s changed
-                </Link>
+                </a>
                 <span> and </span>
-                <Link underline='always' as='button' className='text-white' onPress={handleMigratedAccountsClick}>
+                <button className='text-white underline' onClick={handleMigratedAccountsClick}>
                   migrated accounts
-                </Link>
+                </button>
               </p>
             ) : (
               <p className='text-small flex-1 text-left leading-normal font-bold text-white'>
                 The Assethub Migration starts on {sourceNetwork?.name} on July 7. After the migration, all
                 multisig/proxy on {sourceNetwork?.name} will be moved to {destNetwork?.name}.
-                <Link underline='always' isExternal href={MIGRATION_NOTICE_DOCS_URL} className='text-white'>
+                <a target='_blank' href={MIGRATION_NOTICE_DOCS_URL} className='text-white underline'>
                   View Details
-                </Link>
+                </a>
               </p>
             )}
 
-            <Button isIconOnly color='default' size='sm' variant='light' onPress={dismissAlert}>
+            <Button isIconOnly className='text-inherit' size='sm' variant='light' onClick={dismissAlert}>
               <IconClose className='h-4 w-4' />
             </Button>
           </div>

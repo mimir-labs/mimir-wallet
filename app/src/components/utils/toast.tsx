@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import TxError from '../TxError';
 
@@ -18,7 +18,7 @@ export function toastSuccess(message: any, description?: React.ReactNode) {
     description ? (
       <div className='flex flex-col gap-1'>
         <b>{message}</b>
-        <span className='text-tiny'>{description}</span>
+        <span className='text-xs'>{description}</span>
       </div>
     ) : (
       <div className='flex min-h-[30px] items-center'>{message}</div>
@@ -31,5 +31,5 @@ export function toastError(error: any) {
 }
 
 export function toastWarn(error: any) {
-  return toast.warn(<div className='flex min-h-[30px] items-center'>{getMessage(error)}</div>);
+  return toast.warning(<div className='flex min-h-[30px] items-center'>{getMessage(error)}</div>);
 }

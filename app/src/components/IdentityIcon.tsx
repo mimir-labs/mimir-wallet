@@ -8,11 +8,10 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { walletConfig } from '@/config';
 import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { polkadotIcon } from '@polkadot/ui-shared';
-import { hexToU8a } from '@polkadot/util';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
-import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, usePress } from '@mimir-wallet/ui';
+import { addressEq, encodeAddress, useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { Avatar } from '@mimir-wallet/ui';
 
 interface Props {
   className?: string;
@@ -31,21 +30,25 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
   const address = encodeAddress(value, prefix ?? chainSS58);
   const { meta } = useAddressMeta(value?.toString());
   const copyAddress = useCopyAddressToClipboard(address);
-  const { pressProps } = usePress({
-    onPress: () => {
-      copyAddress();
-    }
-  });
 
   const { isInjected, isMultisig, isProxied, source, threshold, who, multipleMultisig } = meta || {};
 
   const extensionIcon = isInjected ? walletConfig[source || '']?.icon : undefined;
 
-  const isZeroAddress = useMemo(() => addressEq(hexToU8a('0x0', 256), address), [address]);
+  const isZeroAddress = useMemo(() => addressEq(zeroAddress, address), [address]);
 
   const circles = useMemo(() => polkadotIcon(address, { isAlternative: false }), [address]);
 
   let element: React.ReactNode;
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      copyAddress();
+    },
+    [copyAddress]
+  );
 
   if (!value) {
     return <Avatar style={{ width: size, height: size }} />;
@@ -55,7 +58,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
     element = (
       <span
         className={`bg-primary text-white ${className || ''} IdentityIcon`}
-        {...pressProps}
+        onClick={handleClick}
         style={{
           cursor: 'copy',
           display: 'inline-flex',
@@ -76,7 +79,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
     element = (
       <span
         className={`bg-secondary ${className || ''} IdentityIcon`}
-        {...pressProps}
+        onClick={handleClick}
         style={{
           cursor: 'copy',
           position: 'relative',

@@ -13,12 +13,12 @@ import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { formatDisplay } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce } from 'react-use';
 
 import { addressEq, isPolkadotAddress, useNetworks } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button, Divider, Link, Spinner, usePress } from '@mimir-wallet/ui';
+import { Button, Divider, Spinner } from '@mimir-wallet/ui';
 
 const exampleAccounts = [
   '12pzUmpZrXmfjSjRksWrKZkD8jf6UXZXWTkhmA4ccR1Seppv',
@@ -51,22 +51,20 @@ function AccountItem({ address }: { address: string }) {
   const navigate = useNavigate();
   const [totalUsd] = useBalanceTotalUsd(address);
   const formatUsd = formatDisplay(totalUsd.toString());
-  const { pressProps } = usePress({
-    onPress: () => {
-      setCurrent(address);
-      navigate('/', { replace: true });
-    }
-  });
 
   return (
     <div
-      className='rounded-medium border-primary/5 bg-secondary flex cursor-pointer items-center justify-between border-1 px-2.5 py-[5px]'
+      className='border-primary/5 bg-secondary flex cursor-pointer items-center justify-between rounded-[10px] border-1 px-2.5 py-[5px]'
       key={`multisig-searched`}
-      {...pressProps}
+      onClick={(e) => {
+        e.stopPropagation();
+        setCurrent(address);
+        navigate('/', { replace: true });
+      }}
     >
       <AddressCell shorten={false} showType value={address} withCopy withAddressBook addressCopyDisabled />
 
-      <div className='text-tiny font-bold'>
+      <div className='text-xs font-bold'>
         $ {formatUsd[0]}
         {formatUsd[1] ? `.${formatUsd[1]}` : ''}
         {formatUsd[2] || ''}
@@ -124,12 +122,12 @@ function Accounts({
 
   if (!isConnected) {
     return (
-      <div className='bg-content1 shadow-medium rounded-large w-full space-y-4 p-5'>
+      <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
         <h3 className='font-extrabold'>Your Account</h3>
 
         <Divider />
 
-        <Button fullWidth color='primary' onPress={openWallet}>
+        <Button fullWidth color='primary' onClick={openWallet}>
           Connect Wallet
         </Button>
       </div>
@@ -137,14 +135,14 @@ function Accounts({
   }
 
   return (
-    <div className='bg-content1 shadow-medium rounded-large w-full space-y-4 p-5'>
+    <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
       <div className='flex items-center justify-between gap-2.5'>
         <h3 className='flex-1 font-extrabold'>Your Account</h3>
-        <Button as={Link} size='sm' href='/create-multisig' color='primary' variant='ghost'>
-          Create Multisig
+        <Button asChild size='sm' color='primary' variant='ghost'>
+          <Link to='/create-multisig'>Create Multisig</Link>
         </Button>
-        <Button as={Link} size='sm' href='/create-pure' color='primary' variant='ghost'>
-          Create Pure Account
+        <Button asChild size='sm' color='primary' variant='ghost'>
+          <Link to='/create-pure'>Create Pure Account</Link>
         </Button>
       </div>
 
@@ -182,10 +180,15 @@ function ExampleAccount() {
   const [exampleAccounts, setExampleAccounts] = useState<string[]>(nextExampleAccount());
 
   return (
-    <div className='bg-content1 shadow-medium rounded-large w-full space-y-4 p-5'>
+    <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
       <div className='flex items-center'>
         <h3 className='font-extrabold'>Example Account</h3>
-        <Button isIconOnly color='default' variant='light' onPress={() => setExampleAccounts(nextExampleAccount())}>
+        <Button
+          isIconOnly
+          className='text-inherit'
+          variant='light'
+          onClick={() => setExampleAccounts(nextExampleAccount())}
+        >
           <IconArrowClockWise className='h-4 w-4' />
         </Button>
       </div>
@@ -237,12 +240,7 @@ function Welcome() {
 
         <Input
           fullWidth
-          size='lg'
           className='w-full'
-          classNames={{
-            inputWrapper: 'bg-content1 shadow-medium'
-          }}
-          radius='full'
           endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider-300 h-4 w-4' />}
           onChange={setKeywords}
           placeholder='Please input address'

@@ -60,7 +60,7 @@ function AddTemplate({
   return (
     <div className='space-y-5'>
       <div className='flex items-center gap-1'>
-        <Button isIconOnly color='primary' variant='light' onPress={onBack}>
+        <Button isIconOnly color='primary' variant='light' onClick={onBack}>
           <IconArrowLeft />
         </Button>
         <h4>{isView ? 'View Template' : 'Add New Template'}</h4>
@@ -88,15 +88,15 @@ function AddTemplate({
       />
 
       {callDataError && (
-        <div className='bg-secondary rounded-medium p-2.5 break-all'>
-          <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-tiny'>
+        <div className='bg-secondary rounded-[10px] p-2.5 break-all'>
+          <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-xs'>
             {callDataError.message}
           </p>
         </div>
       )}
 
       {parsedCallData && (
-        <div className='rounded-medium bg-secondary p-2.5'>
+        <div className='bg-secondary rounded-[10px] p-2.5'>
           <JsonView data={parsedCallData.toHuman()} collapseStringsAfterLength={20} />
         </div>
       )}
@@ -108,8 +108,8 @@ function AddTemplate({
           fullWidth
           variant='solid'
           color='primary'
-          isDisabled={!(name && callData) || !!callDataError}
-          onPress={onAdd}
+          disabled={!(name && callData) || !!callDataError}
+          onClick={onAdd}
         >
           Add
         </Button>

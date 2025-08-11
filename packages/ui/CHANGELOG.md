@@ -1,5 +1,41 @@
 # Changelog
 
+## [2.20.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.19.0...ui-v2.20.0) (2025-08-07)
+
+
+### Features
+
+* Add sonner to replace react-toastify ([#280](https://github.com/mimir-labs/mimir-wallet/issues/280)) ([a56de1b](https://github.com/mimir-labs/mimir-wallet/commit/a56de1b5dc915982d10aee9b8efbc5f038d2eedc))
+* migrate some ui components to shadcn ([#278](https://github.com/mimir-labs/mimir-wallet/issues/278)) ([043f857](https://github.com/mimir-labs/mimir-wallet/commit/043f857a392fc016d69e1344532dda779e08267b))
+
+## [2.19.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.18.0...ui-v2.19.0) (2025-08-05)
+
+
+### Miscellaneous Chores
+
+* **ui:** Synchronize main group versions
+
+## [2.18.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.17.0...ui-v2.18.0) (2025-08-04)
+
+
+### Features
+
+* refactor home UI and add assets,analytic pages ([#270](https://github.com/mimir-labs/mimir-wallet/issues/270)) ([576a998](https://github.com/mimir-labs/mimir-wallet/commit/576a99815de88f8fceeebbeafa668c1a587f26d7))
+
+## [2.17.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.16.0...ui-v2.17.0) (2025-07-29)
+
+
+### Miscellaneous Chores
+
+* **ui:** Synchronize main group versions
+
+## [2.16.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.15.0...ui-v2.16.0) (2025-07-22)
+
+
+### Miscellaneous Chores
+
+* **ui:** Synchronize main group versions
+
 ## [2.15.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.14.0...ui-v2.15.0) (2025-07-22)
 
 

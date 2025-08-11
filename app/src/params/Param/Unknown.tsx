@@ -28,13 +28,13 @@ function Unknown({ name, value }: ParamProps) {
 
   return (
     <span onClick={(e) => e.stopPropagation()}>
-      <span className='text-primary text-tiny cursor-pointer font-bold' onClick={toggleOpen}>
+      <span className='text-primary cursor-pointer text-xs font-bold' onClick={toggleOpen}>
         View {name || 'Details'}
       </span>
 
-      <Modal size='xl' isOpen={open} onClose={toggleOpen} scrollBehavior='inside'>
+      <Modal size='xl' isOpen={open} onClose={toggleOpen}>
         <ModalContent>
-          <ModalBody className='px-5 py-5'>
+          <ModalBody>
             <JsonView data={human} />
           </ModalBody>
         </ModalContent>

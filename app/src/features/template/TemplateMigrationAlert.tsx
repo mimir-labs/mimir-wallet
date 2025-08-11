@@ -12,7 +12,7 @@ import {
 import { useState } from 'react';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
-import { Alert, Button, Link } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
 
 import TemplateMigrationModal from './TemplateMigrationModal';
 
@@ -42,30 +42,26 @@ function TemplateMigrationAlert({ chain, templates, onMigrationComplete }: Templ
 
   return (
     <>
-      <Alert
-        classNames={{ base: 'flex-grow-0' }}
-        color='warning'
-        title={
-          <div className='flex items-center'>
-            <span className='font-normal'>
-              Due to the Assethub Migration, you can copy Batch to{' '}
-              <img
-                draggable={false}
-                style={{ display: 'inline', width: '1em', height: '1em', verticalAlign: 'middle', userSelect: 'none' }}
-                src={destNetwork?.icon}
-              />{' '}
-              {destNetwork?.name}.{' '}
-              <Link as='button' onPress={() => setIsMigrationModalOpen(true)}>
-                View The List{'>>'}
-              </Link>
-            </span>
+      <Alert className='grow-0' variant='warning'>
+        <AlertTitle className='relative flex items-center'>
+          <span className='font-normal'>
+            Due to the Assethub Migration, you can copy Batch to{' '}
+            <img
+              draggable={false}
+              style={{ display: 'inline', width: '1em', height: '1em', verticalAlign: 'middle', userSelect: 'none' }}
+              src={destNetwork?.icon}
+            />{' '}
+            {destNetwork?.name}.{' '}
+            <button className='text-primary cursor-pointer' onClick={() => setIsMigrationModalOpen(true)}>
+              View The List{'>>'}
+            </button>
+          </span>
 
-            <Button className='flex-shrink-0' isIconOnly variant='light' color='default' onPress={dismissAlert}>
-              <IconClose className='h-5 w-5' />
-            </Button>
-          </div>
-        }
-      />
+          <Button size='sm' className='absolute right-0 text-inherit' isIconOnly variant='light' onClick={dismissAlert}>
+            <IconClose className='h-5 w-5' />
+          </Button>
+        </AlertTitle>
+      </Alert>
 
       <TemplateMigrationModal
         isOpen={isMigrationModalOpen}

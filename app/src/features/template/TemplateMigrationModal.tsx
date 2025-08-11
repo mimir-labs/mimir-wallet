@@ -171,7 +171,7 @@ function Content({
       </Checkbox>
 
       {/* Migrate Button */}
-      <Button color='primary' isDisabled={selected.length === 0} fullWidth onPress={handleMigrate}>
+      <Button color='primary' disabled={selected.length === 0} fullWidth onClick={handleMigrate}>
         Migrate ({selected.length})
       </Button>
     </div>
@@ -217,7 +217,7 @@ export function TemplateMigrationModal({
   }, [block, sourceChain, destChain, chains]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='lg' placement='center'>
+    <Modal isOpen={isOpen} onClose={onClose} size='lg'>
       <ModalContent>
         <ModalHeader>
           <div className='flex flex-col gap-2.5'>

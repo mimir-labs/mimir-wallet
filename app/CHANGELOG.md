@@ -1,5 +1,95 @@
 # Changelog
 
+## [2.20.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.19.0...mimir-wallet-app-v2.20.0) (2025-08-07)
+
+
+### Features
+
+* Add sonner to replace react-toastify ([#280](https://github.com/mimir-labs/mimir-wallet/issues/280)) ([a56de1b](https://github.com/mimir-labs/mimir-wallet/commit/a56de1b5dc915982d10aee9b8efbc5f038d2eedc))
+* migrate some ui components to shadcn ([#278](https://github.com/mimir-labs/mimir-wallet/issues/278)) ([043f857](https://github.com/mimir-labs/mimir-wallet/commit/043f857a392fc016d69e1344532dda779e08267b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.20.0
+    * @mimir-wallet/service bumped to 2.20.0
+    * @mimir-wallet/ui bumped to 2.20.0
+
+## [2.19.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.18.0...mimir-wallet-app-v2.19.0) (2025-08-05)
+
+
+### Features
+
+* add posthog integration ([#276](https://github.com/mimir-labs/mimir-wallet/issues/276)) ([07a6eb6](https://github.com/mimir-labs/mimir-wallet/commit/07a6eb6b780148a44be8ffd5c4dea3f8375f4586))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.19.0
+    * @mimir-wallet/service bumped to 2.19.0
+    * @mimir-wallet/ui bumped to 2.19.0
+
+## [2.18.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.17.0...mimir-wallet-app-v2.18.0) (2025-08-04)
+
+
+### Features
+
+* Add conviction voting display ([#273](https://github.com/mimir-labs/mimir-wallet/issues/273)) ([56ceb3f](https://github.com/mimir-labs/mimir-wallet/commit/56ceb3fb69972eaf367f201d5728e99a2585cec8))
+* Add multi-transfer app ([#271](https://github.com/mimir-labs/mimir-wallet/issues/271)) ([cc1866a](https://github.com/mimir-labs/mimir-wallet/commit/cc1866a4ae9ac1d776e2a4eb19f464ba6cebb706))
+* Add tooltip for favorite dapp items ([#275](https://github.com/mimir-labs/mimir-wallet/issues/275)) ([eca268a](https://github.com/mimir-labs/mimir-wallet/commit/eca268aee745edc700bdd236b362aa48ee30c430))
+* refactor home UI and add assets,analytic pages ([#270](https://github.com/mimir-labs/mimir-wallet/issues/270)) ([576a998](https://github.com/mimir-labs/mimir-wallet/commit/576a99815de88f8fceeebbeafa668c1a587f26d7))
+
+
+### Bug Fixes
+
+* Fix some ui issues ([#274](https://github.com/mimir-labs/mimir-wallet/issues/274)) ([c8ada56](https://github.com/mimir-labs/mimir-wallet/commit/c8ada5691a14dda94fc5479d010bdec1a8daafdf))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.18.0
+    * @mimir-wallet/service bumped to 2.18.0
+    * @mimir-wallet/ui bumped to 2.18.0
+
+## [2.17.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.16.0...mimir-wallet-app-v2.17.0) (2025-07-29)
+
+
+### Features
+
+* **ui:** refactor add proxy UX with responsive design and step wizard ([#268](https://github.com/mimir-labs/mimir-wallet/issues/268)) ([af683b2](https://github.com/mimir-labs/mimir-wallet/commit/af683b276cd9f4559a5b711615800bbc81312084))
+* **ui:** refactor create multisig UX with responsive design and step wizard ([#267](https://github.com/mimir-labs/mimir-wallet/issues/267)) ([e66378f](https://github.com/mimir-labs/mimir-wallet/commit/e66378fd1fc800075c0aa33caae5e4992bb83b79))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.17.0
+    * @mimir-wallet/service bumped to 2.17.0
+    * @mimir-wallet/ui bumped to 2.17.0
+
+## [2.16.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.15.0...mimir-wallet-app-v2.16.0) (2025-07-22)
+
+
+### Features
+
+* Add polkassembly app supported ([#265](https://github.com/mimir-labs/mimir-wallet/issues/265)) ([4bd4f58](https://github.com/mimir-labs/mimir-wallet/commit/4bd4f58ae7bb5a12072f7afdd757cf8662015c64))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.16.0
+    * @mimir-wallet/service bumped to 2.16.0
+    * @mimir-wallet/ui bumped to 2.16.0
+
 ## [2.15.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.14.0...mimir-wallet-app-v2.15.0) (2025-07-22)
 
 

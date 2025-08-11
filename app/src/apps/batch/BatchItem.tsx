@@ -36,8 +36,8 @@ function BatchItem({ children, actions, from, calldata, bgcolor, registry }: Pro
   }
 
   return (
-    <div data-open={isOpen} className='bg-secondary rounded-medium overflow-hidden' style={{ background: bgcolor }}>
-      <div className='text-small grid h-[44px] cursor-pointer grid-cols-6 px-2 sm:px-3' onClick={toggleOpen}>
+    <div data-open={isOpen} className='bg-secondary overflow-hidden rounded-[10px]' style={{ background: bgcolor }}>
+      <div className='grid h-[44px] cursor-pointer grid-cols-6 px-2 text-sm sm:px-3' onClick={toggleOpen}>
         {children}
         <div className='col-span-2 flex items-center'>
           <CallDisplayDetail fallbackWithName registry={registry} call={call} />
@@ -51,7 +51,7 @@ function BatchItem({ children, actions, from, calldata, bgcolor, registry }: Pro
             color='primary'
             data-open={isOpen}
             className='rotate-0 data-[open=true]:rotate-180'
-            onPress={toggleOpen}
+            onClick={toggleOpen}
           >
             <ArrowDown style={{ width: 16, height: 16 }} />
           </Button>
@@ -59,7 +59,7 @@ function BatchItem({ children, actions, from, calldata, bgcolor, registry }: Pro
       </div>
 
       {isOpen ? (
-        <div className='bg-content1 rounded-medium mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
+        <div className='bg-content1 mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
           <Call showFallback from={from} call={call} registry={registry} />
         </div>
       ) : null}

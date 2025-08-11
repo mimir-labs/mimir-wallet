@@ -5,19 +5,19 @@ import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { useQueryParam } from '@/hooks/useQueryParams';
-import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
+import { useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { useEffect, useMemo, useState } from 'react';
 
-import { type Endpoint, useApi } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
   Checkbox,
-  Listbox,
-  ListboxItem,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   Tab,
   Tabs,
   Tooltip
@@ -27,37 +27,10 @@ import HistoryTransactions from './HistoryTransactions';
 import PendingTransactions from './PendingTransactions';
 
 function Content({ address }: { address: string }) {
-  const { allApis } = useApi();
-  const [transactionCounts, isFetched, isFetching] = useMultiChainTransactionCounts(address);
-  const [validPendingNetworks, validHistoryNetworks] = useMemo(() => {
-    const validPendingNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
-    const validHistoryNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
-
-    Object.entries(transactionCounts || {}).forEach(([network, counts]) => {
-      if (counts.pending > 0 && allApis[network]?.chain) {
-        validPendingNetworks.push({
-          network,
-          counts: counts.pending,
-          chain: allApis[network]?.chain
-        });
-      }
-
-      if (counts.history > 0 && allApis[network]?.chain) {
-        validHistoryNetworks.push({
-          network,
-          counts: counts.history,
-          chain: allApis[network]?.chain
-        });
-      }
-    });
-
-    return [
-      validPendingNetworks.sort((a, b) => b.counts - a.counts),
-      validHistoryNetworks.sort((a, b) => b.counts - a.counts)
-    ];
-  }, [allApis, transactionCounts]);
+  const [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] = useValidTransactionNetworks(address);
   const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<string[]>([]);
   const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<string[]>([]);
+  const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
   const selectedPendingNetwork = useMemo(() => {
     return validPendingNetworks.find(({ network }) => selectedPendingNetworks.includes(network));
   }, [validPendingNetworks, selectedPendingNetworks]);
@@ -143,16 +116,10 @@ function Content({ address }: { address: string }) {
         {type === 'pending' &&
           validPendingNetworks.length > 0 &&
           (validPendingNetworks.length > 1 ? (
-            <Popover placement='bottom-end'>
-              <PopoverTrigger>
-                <Button
-                  radius='md'
-                  variant='bordered'
-                  color='default'
-                  className='border-divider-300 h-8'
-                  startContent={<Avatar src={selectedPendingNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />}
-                  endContent={<ArrowDown className='h-4 w-4' />}
-                >
+            <DropdownMenu open={pendingDropdownOpen} onOpenChange={setPendingDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button radius='md' variant='bordered' className='border-divider-300 h-8 text-inherit'>
+                  <Avatar src={selectedPendingNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
                   {selectedPendingNetworks.length > 1 ? (
                     <>
                       {selectedPendingNetwork?.chain.name} and other {selectedPendingNetworks.length - 1}
@@ -160,104 +127,68 @@ function Content({ address }: { address: string }) {
                   ) : (
                     selectedPendingNetwork?.chain.name
                   )}
+                  <ArrowDown className='h-4 w-4' />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className='rounded-medium w-[200px] p-1'>
-                <Listbox
-                  disallowEmptySelection
-                  selectedKeys={selectedPendingNetworks}
-                  selectionMode='multiple'
-                  variant='flat'
-                  onSelectionChange={(keys) =>
-                    keys === 'all'
-                      ? setSelectedPendingNetworks(validPendingNetworks.map(({ network }) => network))
-                      : setSelectedPendingNetworks(Array.from(keys).map((key) => key.toString()))
-                  }
-                  color='primary'
-                >
-                  {validPendingNetworks.map(({ network, chain, counts }) => (
-                    <ListboxItem
-                      key={network}
-                      startContent={<Avatar src={chain.icon} className='h-4 w-4 bg-transparent' />}
-                      className='data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground h-8'
-                      classNames={{
-                        selectedIcon: 'w-auto h-auto'
-                      }}
-                      selectedIcon={(props) => (
-                        <Checkbox
-                          className='pointer-events-none p-0'
-                          size='sm'
-                          isSelected={props.isSelected}
-                          isDisabled={props.isDisabled}
-                        />
-                      )}
-                    >
-                      {chain.name}({counts})
-                    </ListboxItem>
-                  ))}
-                </Listbox>
-              </PopoverContent>
-            </Popover>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
+                {validPendingNetworks.map(({ network, chain, counts }) => (
+                  <DropdownMenuCheckboxItem
+                    key={network}
+                    checked={selectedPendingNetworks.includes(network)}
+                    onSelect={(e) => e.preventDefault()}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedPendingNetworks([...selectedPendingNetworks, network]);
+                      } else {
+                        const remaining = selectedPendingNetworks.filter((n) => n !== network);
+
+                        if (remaining.length > 0) {
+                          setSelectedPendingNetworks(remaining);
+                        }
+                      }
+                    }}
+                    className='h-8'
+                  >
+                    <Avatar src={chain.icon} className='mr-2 h-4 w-4 bg-transparent' />
+                    {chain.name}({counts})
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
-            <Button
-              radius='md'
-              variant='bordered'
-              color='default'
-              className='border-divider-300 h-8'
-              startContent={<Avatar src={validPendingNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />}
-            >
+            <Button radius='md' variant='bordered' className='border-divider-300 h-8 text-inherit'>
+              <Avatar src={validPendingNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
               {validPendingNetworks[0].chain.name}({validPendingNetworks[0].counts})
             </Button>
           ))}
         {type === 'history' &&
           validHistoryNetworks.length > 0 &&
           (validHistoryNetworks.length > 1 ? (
-            <Popover placement='bottom-end'>
-              <PopoverTrigger>
-                <Button
-                  radius='md'
-                  variant='bordered'
-                  color='default'
-                  className='border-divider-300 h-8'
-                  startContent={<Avatar src={selectedHistoryNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />}
-                  endContent={<ArrowDown className='h-4 w-4' />}
-                >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button radius='md' variant='bordered' className='border-divider-300 h-8 text-inherit'>
+                  <Avatar src={selectedHistoryNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
                   {selectedHistoryNetwork?.chain.name}({selectedHistoryNetwork?.counts})
+                  <ArrowDown className='h-4 w-4' />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className='rounded-medium w-[200px] p-1'>
-                <Listbox
-                  disallowEmptySelection
-                  selectedKeys={selectedHistoryNetworks}
-                  selectionMode={'single'}
-                  variant='flat'
-                  onSelectionChange={(keys) =>
-                    keys === 'all'
-                      ? setSelectedHistoryNetworks(validHistoryNetworks.map(({ network }) => network))
-                      : setSelectedHistoryNetworks(Array.from(keys).map((key) => key.toString()))
-                  }
-                  color='primary'
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
+                <DropdownMenuRadioGroup
+                  value={selectedHistoryNetworks[0]}
+                  onValueChange={(value) => setSelectedHistoryNetworks([value])}
                 >
                   {validHistoryNetworks.map(({ network, chain, counts }) => (
-                    <ListboxItem
-                      key={network}
-                      className='data-[hover]:bg-secondary data-[hover]:text-foreground data-[selectable=true]:focus:bg-secondary data-[selectable=true]:focus:text-foreground h-8'
-                      startContent={<Avatar src={chain.icon} className='h-4 w-4 bg-transparent' />}
-                    >
+                    <DropdownMenuRadioItem key={network} value={network} className='h-8'>
+                      <Avatar src={chain.icon} className='mr-2 h-4 w-4 bg-transparent' />
                       {chain.name}({counts})
-                    </ListboxItem>
+                    </DropdownMenuRadioItem>
                   ))}
-                </Listbox>
-              </PopoverContent>
-            </Popover>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
-            <Button
-              radius='md'
-              variant='bordered'
-              color='default'
-              className='border-divider-300 h-8'
-              startContent={<Avatar src={validHistoryNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />}
-            >
+            <Button radius='md' variant='bordered' className='border-divider-300 h-8 text-inherit'>
+              <Avatar src={validHistoryNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
               {validHistoryNetworks[0].chain.name}({validHistoryNetworks[0].counts})
             </Button>
           ))}

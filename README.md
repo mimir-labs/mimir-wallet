@@ -162,9 +162,11 @@ Service layer and data management
 - **WebSocket support** for real-time blockchain updates
 
 #### [`@mimir-wallet/ui`](./packages/ui/)
-Modern React UI component library
-- **HeroUI v2** based accessible components
-- **Tailwind CSS v3.4** for utility-first styling
+Hybrid React UI component library with modern architecture
+- **HeroUI v2 + ShadCN/UI** hybrid component system for gradual migration
+- **Radix UI primitives** for enhanced accessibility and customization
+- **Tailwind CSS v4.1** for utility-first styling with modern features
+- **Class Variance Authority (CVA)** for type-safe component variants
 - **TypeScript-first** design system with strict typing
 - **Specialized blockchain components** (Address, Balance, etc.)
 - **Framer Motion** animations for enhanced UX
@@ -185,7 +187,7 @@ Development tooling and shared configurations
 | **React** | 18.3 | UI framework with concurrent features |
 | **TypeScript** | 5.6 | Type-safe development |
 | **Vite** | 6.3 | Fast build tool and dev server |
-| **HeroUI** | v2 | Accessible component library |
+| **HeroUI + ShadCN/UI** | v2 + Latest | Hybrid accessible component library |
 | **Tailwind CSS** | 3.4 | Utility-first styling |
 | **Framer Motion** | 12.12 | Smooth animations |
 

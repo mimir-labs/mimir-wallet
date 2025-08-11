@@ -1,65 +1,88 @@
 # @mimir-wallet/ui
 
-A modern, accessible React UI component library built specifically for Mimir Wallet, based on HeroUI with custom enhancements for blockchain applications.
+A modern, hybrid React UI component library built for Mimir Wallet, featuring both HeroUI and ShadCN/UI components in a unified system designed for enterprise blockchain applications.
 
 ## Overview
 
-This package provides a comprehensive set of React components designed for building intuitive and accessible blockchain applications. Built on top of HeroUI, it offers both fundamental UI primitives and specialized components for wallet interfaces.
+This package provides a comprehensive set of React components using a **hybrid architecture** that combines the best of both HeroUI v2 and ShadCN/UI. This approach enables gradual migration while maintaining backward compatibility and leveraging modern component patterns.
+
+## Architecture Strategy
+
+### 🔄 Hybrid Component System
+
+We employ a **dual-library approach** that allows developers to choose the most appropriate component for each use case:
+
+- **HeroUI v2 Components**: Mature, blockchain-specialized components (Avatar, Card, Table, Tabs)
+- **ShadCN/UI Components**: Modern, highly customizable components (Button, Input, Dialog, Alert)
+- **Unified Export**: All components exported through a single `@mimir-wallet/ui` package
+- **Compatibility Layer**: Seamless transition with compatibility wrappers (e.g., `modal-compat.tsx`)
 
 ## Features
 
 ### 🎨 Modern Design System
-- **HeroUI Foundation** - Built on the robust HeroUI component system
-- **Tailwind CSS Integration** - Utility-first CSS framework for rapid styling
-- **Dark/Light Theme Support** - Automatic theme switching with system preference
-- **Responsive Design** - Mobile-first responsive components
+- **Hybrid UI Foundation** - Best of HeroUI + ShadCN/UI components
+- **Radix UI Primitives** - Unstyled, accessible components as building blocks
+- **Class Variance Authority (CVA)** - Type-safe component variants
+- **Tailwind CSS v4.1** - Modern utility-first styling with latest features
+- **Dark/Light Theme Support** - Consistent theming across both component systems
 
-### ♿ Accessibility First
-- **WAI-ARIA Compliant** - Full accessibility support with proper ARIA attributes
-- **Keyboard Navigation** - Complete keyboard navigation support
-- **Screen Reader Friendly** - Optimized for assistive technologies
-- **Focus Management** - Proper focus handling and visual indicators
+### ♿ Enhanced Accessibility
+- **Radix UI Accessibility** - Industry-leading accessibility for ShadCN components
+- **HeroUI ARIA Support** - Comprehensive ARIA implementation
+- **Keyboard Navigation** - Full keyboard support across all components
+- **Screen Reader Optimized** - Enhanced assistive technology support
 
-### 🧩 Comprehensive Components
-- **Form Controls** - Inputs, selects, checkboxes, switches
-- **Navigation** - Tabs, dropdowns, menus
-- **Feedback** - Alerts, modals, tooltips, toasts
-- **Data Display** - Tables, cards, badges, avatars
-- **Layout** - Drawers, dividers, scroll shadows
+### 🧩 Component Categories
+
+#### ShadCN/UI Components (Preferred for new development)
+- **Form Controls**: Button, Input, Select, Checkbox
+- **Overlays**: Dialog, Drawer, Popover, Tooltip, DropdownMenu
+- **Feedback**: Alert, AlertTitle, AlertDescription
+
+#### HeroUI Components (Continued use)
+- **Data Display**: Avatar, Card, Table, Badge, Chip
+- **Navigation**: Tabs, Autocomplete
+- **Layout**: Divider, Spinner, Skeleton
 
 ### 🔧 Developer Experience
-- **TypeScript First** - Full TypeScript support with comprehensive type definitions
-- **Tree Shaking** - Optimized bundle size with tree-shakeable exports
-- **Custom Hooks** - Powerful hooks for common UI interactions
-- **Flexible Styling** - Easy customization with CSS variables and Tailwind
+- **TypeScript First** - Full type safety with inference
+- **Tree Shaking** - Optimized bundle size
+- **Component Variants** - Type-safe styling variants with CVA
+- **Utility Functions** - `cn()` for class merging, colorVariants for theming
 
 ## Installation
 
-This package is part of the Mimir Wallet monorepo and is typically not installed separately. However, if you need to use it in your own project:
+This package is part of the Mimir Wallet monorepo:
 
 ```bash
 yarn add @mimir-wallet/ui
 ```
 
-### Peer Dependencies
+### Dependencies
 
-```bash
-yarn add react-router-dom
+The package includes both UI systems:
+
+```json
+{
+  "dependencies": {
+    "@heroui/*": "^2.x",
+    "@radix-ui/*": "^1.x",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.1"
+  }
+}
 ```
 
 ## Setup
 
 ### Import Styles
 
-Import the component styles in your application:
-
 ```typescript
 import '@mimir-wallet/ui/styles.css';
 ```
 
 ### Provider Setup
-
-Wrap your application with the HeroUI provider:
 
 ```typescript
 import { HeroUIProvider } from '@mimir-wallet/ui';
@@ -73,359 +96,216 @@ function App() {
 }
 ```
 
-## Usage
+## Usage Guide
 
-### Basic Components
+### Component Selection Strategy
 
-```typescript
-import { Button, Input, Card, CardBody } from '@mimir-wallet/ui';
+#### 🟢 Use ShadCN Components For:
+- **Buttons**: Enhanced variant system with CVA
+- **Form Inputs**: Better customization and validation
+- **Dialogs/Modals**: Modern API with improved accessibility
+- **Alerts**: Rich content support with title/description
+- **Select Dropdowns**: Better performance and customization
 
-function LoginForm() {
-  return (
-    <Card className="max-w-md mx-auto">
-      <CardBody className="space-y-4">
-        <Input
-          label="Email"
-          type="email"
-          placeholder="Enter your email"
-        />
-        <Input
-          label="Password"
-          type="password"
-          placeholder="Enter your password"
-        />
-        <Button color="primary" className="w-full">
-          Sign In
-        </Button>
-      </CardBody>
-    </Card>
-  );
-}
-```
+#### 🔵 Use HeroUI Components For:
+- **Data Tables**: Mature table implementation with sorting/selection
+- **Avatars**: Specialized avatar components with fallbacks
+- **Cards**: Well-established card layouts
+- **Navigation Tabs**: Proven tab implementation
+- **Badges/Chips**: Existing design patterns
 
-### Advanced Components
+### ShadCN Component Usage
 
 ```typescript
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell
+  Button,
+  Input,
+  Dialog,
+  Alert,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  cn
 } from '@mimir-wallet/ui';
 
-function TransactionModal({ isOpen, onClose, transactions }) {
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} size="2xl">
-      <ModalContent>
-        <ModalHeader>Transaction History</ModalHeader>
-        <ModalBody>
-          <Table>
-            <TableHeader>
-              <TableColumn>Hash</TableColumn>
-              <TableColumn>Amount</TableColumn>
-              <TableColumn>Status</TableColumn>
-            </TableHeader>
-            <TableBody>
-              {transactions.map((tx) => (
-                <TableRow key={tx.id}>
-                  <TableCell>{tx.hash}</TableCell>
-                  <TableCell>{tx.amount}</TableCell>
-                  <TableCell>{tx.status}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="light" onPress={onClose}>
-            Close
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
-  );
-}
-```
-
-### Custom Hooks
-
-```typescript
-import { usePress, useHover, useFocus } from '@mimir-wallet/ui';
-
-function InteractiveComponent() {
-  const { pressProps, isPressed } = usePress({
-    onPress: () => console.log('Pressed!')
-  });
-
-  const { hoverProps, isHovered } = useHover({
-    onHoverStart: () => console.log('Hover started')
-  });
-
-  const { focusProps, isFocused } = useFocus({
-    onFocus: () => console.log('Focused')
-  });
-
-  return (
-    <div
-      {...pressProps}
-      {...hoverProps}
-      {...focusProps}
-      className={`p-4 rounded ${isPressed ? 'bg-blue-200' : isHovered ? 'bg-gray-100' : ''}`}
-    >
-      Interactive Element
-    </div>
-  );
-}
-```
-
-## Component Reference
-
-### Form Components
-
-#### Button
-Versatile button component with multiple variants and states.
-
-```typescript
+// Modern Button with CVA variants
 <Button
+  variant="ghost"
+  size="sm"
   color="primary"
-  variant="solid"
-  size="md"
-  isLoading={false}
-  isDisabled={false}
-  onPress={() => {}}
+  radius="full"
+  className={cn("custom-styles")}
 >
-  Click Me
+  Action
 </Button>
-```
 
-#### Input
-Flexible input component with built-in validation.
-
-```typescript
+// Enhanced Input with better validation
 <Input
-  label="Username"
-  placeholder="Enter username"
-  type="text"
-  isRequired
-  errorMessage="Username is required"
+  placeholder="Enter amount"
+  type="number"
+  className="w-full"
 />
+
+// Modern Dialog system
+<Dialog open={isOpen} onOpenChange={setIsOpen}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Transfer Confirmation</DialogTitle>
+    </DialogHeader>
+    {/* content */}
+  </DialogContent>
+</Dialog>
+
+// DropdownMenu with multi-select (no auto-close)
+<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+  <DropdownMenuTrigger asChild>
+    <Button variant="bordered">
+      Select Networks
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    {options.map((option) => (
+      <DropdownMenuCheckboxItem
+        key={option.id}
+        checked={selected.includes(option.id)}
+        onSelect={(e) => e.preventDefault()} // Prevent auto-close
+        onCheckedChange={(checked) => {
+          // Handle selection logic
+        }}
+      >
+        {option.name}
+      </DropdownMenuCheckboxItem>
+    ))}
+  </DropdownMenuContent>
+</DropdownMenu>
+
+// DropdownMenu with single select (auto-close)
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="bordered">Select Chain</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuRadioGroup value={selected} onValueChange={setSelected}>
+      {chains.map((chain) => (
+        <DropdownMenuRadioItem key={chain.id} value={chain.id}>
+          {chain.name}
+        </DropdownMenuRadioItem>
+      ))}
+    </DropdownMenuRadioGroup>
+  </DropdownMenuContent>
+</DropdownMenu>
 ```
 
-#### Select
-Accessible select component with search capabilities.
+### HeroUI Component Usage
 
 ```typescript
-<Select
-  label="Choose option"
-  placeholder="Select an option"
->
-  <SelectItem key="option1" value="option1">Option 1</SelectItem>
-  <SelectItem key="option2" value="option2">Option 2</SelectItem>
-</Select>
-```
+import { Card, CardHeader, CardTitle, CardContent, Table, Avatar, Tabs } from '@mimir-wallet/ui';
 
-### Layout Components
+// Mature data display components
+<Table>
+  <TableHeader>
+    <TableColumn>Address</TableColumn>
+    <TableColumn>Balance</TableColumn>
+  </TableHeader>
+  <TableBody>
+    {/* rows */}
+  </TableBody>
+</Table>
 
-#### Card
-Container component for grouping related content.
-
-```typescript
+// Specialized blockchain components
 <Card>
   <CardHeader>
-    <h3>Card Title</h3>
+    <CardTitle>Title</CardTitle>
   </CardHeader>
-  <CardBody>
-    <p>Card content goes here</p>
-  </CardBody>
+  <CardContent>
+    <Avatar src={account.avatar} name={account.name} />
+    <div>
+      <h4>{account.name}</h4>
+      <p className="text-sm">{account.address}</p>
+    </div>
+  </CardContent>
 </Card>
 ```
 
-#### Modal
-Accessible modal dialog component.
+### Utility Functions
 
 ```typescript
-<Modal isOpen={isOpen} onClose={onClose}>
-  <ModalContent>
-    <ModalHeader>Modal Title</ModalHeader>
-    <ModalBody>Modal content</ModalBody>
-    <ModalFooter>Modal actions</ModalFooter>
-  </ModalContent>
-</Modal>
+import { cn } from '@mimir-wallet/ui';
+
+// Class merging with conflict resolution
+const className = cn(
+  "base-styles",
+  "conditional-styles",
+  isActive && "active-styles",
+  props.className
+);
 ```
 
-### Data Display
-
-#### Table
-Flexible data table with sorting and selection.
-
-```typescript
-<Table>
-  <TableHeader>
-    <TableColumn>Name</TableColumn>
-    <TableColumn>Email</TableColumn>
-  </TableHeader>
-  <TableBody>
-    <TableRow>
-      <TableCell>John Doe</TableCell>
-      <TableCell>john@example.com</TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
-```
-
-## Styling & Customization
-
-### Tailwind Configuration
-
-The package includes a Tailwind plugin for HeroUI:
-
-```javascript
-// tailwind.config.js
-module.exports = {
-  plugins: [
-    require('@mimir-wallet/ui/hero')
-  ]
-};
-```
-
-### CSS Variables
-
-Customize theme colors with CSS variables:
-
-```css
-:root {
-  --heroui-primary: 220 78% 60%;
-  --heroui-secondary: 220 13% 69%;
-  --heroui-success: 142 71% 45%;
-  --heroui-warning: 38 92% 50%;
-  --heroui-danger: 0 84% 60%;
-}
-```
-
-### Custom Variants
-
-Create custom component variants:
-
-```typescript
-import { button } from '@heroui/theme';
-
-const customButton = button({
-  variants: {
-    color: {
-      custom: "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-    }
-  }
-});
-```
 
 ## Architecture
 
 ```
 @mimir-wallet/ui/
 ├── src/
-│   ├── alert/               # Alert components
-│   ├── button/              # Button components
-│   ├── checkbox/            # Checkbox components
-│   ├── input/               # Input components
-│   ├── modal/               # Modal components
-│   ├── table/               # Table components
-│   ├── tabs/                # Tab components
-│   └── styles.css           # Global styles
-└── hero.js           # Tailwind plugin
+│   ├── shadcn/              # ShadCN/UI components
+│   │   ├── button.tsx       # Modern button with CVA
+│   │   ├── input.tsx        # Enhanced input component
+│   │   ├── dialog.tsx       # Modern dialog system
+│   │   ├── alert.tsx        # Rich alert component
+│   │   ├── dropdown-menu.tsx # Dropdown menu with multi-select
+│   │   └── modal-compat.tsx # HeroUI → ShadCN compatibility
+│   ├── lib/                 # Utility functions
+│   │   ├── utils.ts         # cn() class merger
+│   │   └── variants.ts      # Color variant definitions
+│   ├── [component]/         # HeroUI component wrappers
+│   └── index.ts             # Unified export system
 ```
 
 ## Best Practices
 
-### Composition Over Inheritance
-
-Build complex components by composing simpler ones:
-
+### Component Selection
 ```typescript
-function WalletCard({ wallet }) {
-  return (
-    <Card>
-      <CardBody className="flex items-center space-x-4">
-        <Avatar src={wallet.avatar} name={wallet.name} />
-        <div>
-          <h3 className="font-semibold">{wallet.name}</h3>
-          <p className="text-small text-default-500">{wallet.address}</p>
-        </div>
-        <Badge color="success">{wallet.balance} DOT</Badge>
-      </CardBody>
-    </Card>
-  );
-}
+// ✅ Good: Choose appropriate component for use case
+import { Button } from '@mimir-wallet/ui'; // ShadCN Button
+import { Table } from '@mimir-wallet/ui';  // HeroUI Table
+
+// ❌ Avoid: Mixing similar components unnecessarily
 ```
 
-### Accessibility
-
-Always provide proper accessibility attributes:
-
+### Styling Consistency
 ```typescript
-<Button
-  aria-label="Close modal"
-  aria-describedby="close-description"
-  onPress={onClose}
->
-  ×
-</Button>
-<div id="close-description" className="sr-only">
-  Click to close the modal dialog
-</div>
+// ✅ Good: Use cn() for class merging
+import { cn } from '@mimir-wallet/ui';
+const className = cn("base-classes", conditionalClass, props.className);
+
+// ✅ Good: Leverage component variants
+<Button variant="ghost" size="sm" color="primary" />
+
+// ❌ Avoid: Custom styling that breaks design system
+<Button className="h-12 px-8 bg-blue-500" />
 ```
 
-### Performance
-
-Use React.memo for expensive components:
-
+### Future-Proofing
 ```typescript
-import React from 'react';
+// ✅ Good: Import from unified package
+import { Button, Card } from '@mimir-wallet/ui';
 
-const ExpensiveComponent = React.memo(({ data }) => {
-  // Complex rendering logic
-  return <div>{/* content */}</div>;
-});
-```
-
-## TypeScript Support
-
-Full TypeScript support with comprehensive type definitions:
-
-- Component prop types
-- Event handler types
-- Theme customization types
-- Generic component support
-
-```typescript
-interface CustomSelectProps<T> {
-  items: T[];
-  keyExtractor: (item: T) => string;
-  labelExtractor: (item: T) => string;
-}
-
-function CustomSelect<T>({ items, keyExtractor, labelExtractor }: CustomSelectProps<T>) {
-  return (
-    <Select>
-      {items.map((item) => (
-        <SelectItem key={keyExtractor(item)} value={keyExtractor(item)}>
-          {labelExtractor(item)}
-        </SelectItem>
-      ))}
-    </Select>
-  );
-}
+// ❌ Avoid: Direct library imports
+import { Button } from '@heroui/button';
+import { Alert } from '@shadcn/ui';
 ```
 
 ## Contributing
 
-This package is part of the Mimir Wallet monorepo. Please see the main [Contributing Guide](../../README.md#contributing) for details.
+When contributing to this package:
+
+1. **New Components**: Default to ShadCN/UI implementation
+2. **Updates**: Enhance existing HeroUI components as needed
+3. **Breaking Changes**: Always provide compatibility layer
+4. **Testing**: Ensure both component systems work correctly
 
 ## License
 

@@ -16,7 +16,18 @@ import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Alert, Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  buttonSpinner,
+  Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader
+} from '@mimir-wallet/ui';
 
 function Content({
   filtered,
@@ -88,11 +99,10 @@ Genesis Hash: ${genesisHash}`;
 
   return (
     <>
-      <ModalBody className='space-y-5'>
-        <Alert
-          color='primary'
-          title={`Please select the signer address to remove the propose with id ${transaction.id}.`}
-        />
+      <ModalBody className='gap-y-5'>
+        <Alert>
+          <AlertTitle>{`Please select the signer address to remove the propose with id ${transaction.id}.`}</AlertTitle>
+        </Alert>
         <InputAddress
           label='Select signer'
           placeholder='Please select signer address. e.g.5G789...'
@@ -104,7 +114,8 @@ Genesis Hash: ${genesisHash}`;
       </ModalBody>
       <Divider />
       <ModalFooter>
-        <Button fullWidth isLoading={loading} isDisabled={!signer} onPress={handleConfirm}>
+        <Button fullWidth color='danger' onClick={handleConfirm} disabled={!signer || loading}>
+          {loading ? buttonSpinner : null}
           Confirm
         </Button>
       </ModalFooter>

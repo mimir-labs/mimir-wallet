@@ -1,7 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import BatchIcon from '@/assets/images/batch.svg';
 import Failed from '@/assets/images/failed.svg';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import TemplateIcon from '@/assets/svg/template.svg';
@@ -167,6 +166,54 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
   }
 };
 
+export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
+  id: 1012,
+  icon: '/dapp-icons/polkassembly.png',
+  name: 'Polkassembly',
+  description: 'The premier platform for governance and collaboration in the Polkadot ecosystem.',
+  url: 'https://polkadot.polkassembly.io/',
+  supportedChains: [
+    'polkadot',
+    'kusama',
+    'acala',
+    'phala',
+    'collectives-polkadot',
+    'hydration',
+    'karura',
+    'paseo',
+    'crust',
+    'vara',
+    'polimec',
+    'pendulum'
+  ],
+  tags: ['Governance'],
+  website: 'https://polkassembly.io/',
+  twitter: 'https://x.com/polk_gov',
+  github: 'https://github.com/polkassembly/polkassembly',
+  urlSearch(network: string) {
+    const url = {
+      polkadot: 'https://polkadot.polkassembly.io/',
+      kusama: 'https://kusama.polkassembly.io/',
+      acala: 'https://acala.polkassembly.io/',
+      phala: 'https://phala.polkassembly.io/',
+      'collectives-polkadot': 'https://collectives.polkassembly.io/',
+      hydration: 'https://hydradx.polkassembly.io/',
+      karura: 'https://karura.polkassembly.io/',
+      paseo: 'https://paseo.polkassembly.io/',
+      crust: 'https://crust.polkassembly.io/',
+      vara: 'https://vara.polkassembly.io/',
+      polimec: 'https://polimec.polkassembly.io/',
+      pendulum: 'https://pendulum.polkassembly.io/'
+    }[network];
+
+    if (!url) {
+      return new URL(this.url);
+    }
+
+    return new URL(url);
+  }
+};
+
 export const StakingApp: DappOption<true | string[], (network: string) => URL> = {
   id: 1004,
   icon: '/dapp-icons/staking.png',
@@ -176,7 +223,7 @@ export const StakingApp: DappOption<true | string[], (network: string) => URL> =
   url: 'https://staking.mimir.global/',
   supportedChains: ['polkadot', 'kusama'],
   tags: ['Staking'],
-  website: 'https://staking.polkadot.network/',
+  website: 'https://polkadot.cloud',
   github: 'https://github.com/paritytech/polkadot-staking-dashboard'
 };
 
@@ -199,7 +246,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Batch',
     description: 'Batch multiple actions into one.',
     url: 'mimir://app/batch',
-    icon: BatchIcon,
+    icon: '/dapp-icons/batch.webp',
     supportedChains: true,
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
@@ -207,6 +254,19 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     tags: ['Batch', 'utility'],
     Component: () => import('@/apps/batch').then((res) => res.default),
     isDrawer: true
+  },
+  {
+    id: 3,
+    name: 'Multi Transfer',
+    description: 'Transfer different tokens to several addresses, developed by Mimir.',
+    url: 'mimir://app/multi-transfer',
+    icon: '/dapp-icons/multi-transfer.webp',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Assets', 'Transfer', 'MultiTransfer'],
+    Component: () => import('@/apps/multi-transfer').then((res) => res.default)
   },
   {
     id: 500,
@@ -376,5 +436,6 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     tags: ['Bounty', 'Tool'],
     website: 'https://bounties.usepapi.app/',
     github: 'https://github.com/polkadot-api/bounties'
-  }
+  },
+  PolkassemblyApp
 ];

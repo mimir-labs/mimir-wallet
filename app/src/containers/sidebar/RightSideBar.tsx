@@ -5,7 +5,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useEffect, useState } from 'react';
 
-import { Drawer, DrawerBody, DrawerContent } from '@mimir-wallet/ui';
+import { Drawer, DrawerContent } from '@mimir-wallet/ui';
 
 function RightSideBar({ offsetTop = 0 }: { offsetTop?: number }) {
   const { rightSidebarOpen, closeRightSidebar, rightSidebarElement } = useMimirLayout();
@@ -30,21 +30,12 @@ function RightSideBar({ offsetTop = 0 }: { offsetTop?: number }) {
   return (
     <>
       {!upMd ? (
-        <Drawer
-          size='xs'
-          radius='none'
-          hideCloseButton
-          placement='right'
-          onClose={closeRightSidebar}
-          isOpen={rightSidebarOpen}
-        >
-          <DrawerContent>
-            <DrawerBody className='py-5'>{rightSidebarElement}</DrawerBody>
-          </DrawerContent>
+        <Drawer direction='right' onClose={closeRightSidebar} open={rightSidebarOpen}>
+          <DrawerContent className='w-auto max-w-full p-5'>{rightSidebarElement}</DrawerContent>
         </Drawer>
       ) : (
         <div
-          className='bg-content1 border-l-divider border-l-1 transition-[margin-right] duration-150 ease-in-out'
+          className='bg-content1 border-l-secondary border-l-1 transition-[margin-right] duration-150 ease-in-out'
           style={{
             position: 'sticky',
             top: offsetTop + 56,

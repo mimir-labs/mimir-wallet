@@ -1,82 +1,96 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconClose from '@/assets/svg/icon-close.svg?react';
 import { useBalanceTotalUsd } from '@/hooks/useBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useQueryParam } from '@/hooks/useQueryParams';
-import { useMultiChainStats } from '@/hooks/useQueryStats';
-import { useRef, useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Link, Tab, Tabs } from '@mimir-wallet/ui';
+import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
 
+import AccountStructure from './AccountStructure';
 import Assets from './Assets';
+import FavoriteDapps from './FavoriteDapps';
 import Hero from './Hero';
-import Structure from './Structure';
-import TransactionStats from './TransactionStats';
+import PendingTransactions from './PendingTransactions';
 
-function Dashboard({ address }: { address: string }) {
-  const { genesisHash } = useApi();
-  const [tab, setTab] = useQueryParam('tab', 'asset', { replace: true });
-  const [showBanner, setShowBanner] = useState(true);
-  const tabsRef = useRef([
-    { tab: 'asset', label: 'Asset' },
-    { tab: 'structure', label: 'Structure' },
-    { tab: 'transaction', label: 'Transaction' }
-  ]);
-  const [totalUsd, changes] = useBalanceTotalUsd(address);
-  const [network, setNetwork] = useInputNetwork(undefined);
-  const [stats] = useMultiChainStats(address);
-
+function Title({ endContent, children }: { endContent?: React.ReactNode; children?: React.ReactNode }) {
   return (
-    <div className='w-full space-y-5'>
-      {[
-        '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
-        '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed'
-      ].includes(genesisHash) &&
-        showBanner && (
-          <div className='relative w-full'>
-            <Link href='https://wave.bifrost.io' target='_blank' rel='noreferrer' className='block w-full'>
-              <img className='rounded-medium w-full' src='/images/bifrost.webp' alt='Bifrost banner' />
-            </Link>
-            <Button
-              isIconOnly
-              className='absolute top-2 right-2 text-white'
-              onPress={() => setShowBanner(false)}
-              aria-label='Close banner'
-              color='primary'
-              variant='light'
-            >
-              <IconClose />
-            </Button>
-          </div>
-        )}
-
-      <Hero address={address} totalUsd={totalUsd} changes={changes} />
-
-      <Tabs
-        color='primary'
-        selectedKey={tab}
-        onSelectionChange={(key) => setTab(key.toString())}
-        classNames={{
-          base: 'w-full'
-        }}
-      >
-        {tabsRef.current.map((item) => (
-          <Tab key={item.tab} title={item.label}>
-            {tab === 'asset' && <Assets address={address} />}
-            {tab === 'structure' && (
-              <SubApiRoot network={network}>
-                <Structure address={address} setNetwork={setNetwork} />
-              </SubApiRoot>
-            )}
-            {tab === 'transaction' && <TransactionStats chains={Object.keys(stats)} address={address} />}
-          </Tab>
-        ))}
-      </Tabs>
+    <div className='mb-[5px] flex items-center justify-between'>
+      <h6 className='leading-[24px]'>{children}</h6>
+      {endContent}
     </div>
   );
 }
 
-export default Dashboard;
+function DashboardV2({ address }: { address: string }) {
+  const [totalUsd, changes] = useBalanceTotalUsd(address);
+  const [network, setNetwork] = useInputNetwork(undefined);
+
+  return (
+    <div className='w-full'>
+      {/* Main Content Grid */}
+      <div className='grid grid-cols-8 gap-5'>
+        {/* Hero Section */}
+        <div className='col-span-8 lg:col-span-5'>
+          <Title>Overview</Title>
+
+          <Hero address={address} totalUsd={totalUsd} changes={changes} />
+        </div>
+
+        {/* Favorite Dapps */}
+        <div className='col-span-8 lg:col-span-3'>
+          <Title
+            endContent={
+              <Button asChild variant='ghost' size='sm' className='h-[23px] px-[15px]'>
+                <Link to='/dapp'>View All</Link>
+              </Button>
+            }
+          >
+            Favorite Dapps
+          </Title>
+          <FavoriteDapps />
+        </div>
+
+        {/* Assets */}
+        <div className='col-span-8 lg:col-span-4'>
+          <Title
+            endContent={
+              <Button asChild variant='ghost' size='sm' className='h-[23px] px-[15px]'>
+                <Link to='/assets'>View All</Link>
+              </Button>
+            }
+          >
+            Assets
+          </Title>
+          <Assets address={address} />
+        </div>
+
+        {/* Pending Transactions */}
+        <div className='col-span-8 lg:col-span-4'>
+          <Title
+            endContent={
+              <Button asChild variant='ghost' size='sm' className='h-[23px] px-[15px]'>
+                <Link to='/transactions'>View All</Link>
+              </Button>
+            }
+          >
+            Pending Transaction
+          </Title>
+          <PendingTransactions address={address} />
+        </div>
+
+        {/* Account Structure */}
+        <div className='col-span-8'>
+          <Title>Account Strucuture</Title>
+          <SubApiRoot network={network}>
+            <AccountStructure address={address} setNetwork={setNetwork} />
+          </SubApiRoot>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default React.memo(DashboardV2);

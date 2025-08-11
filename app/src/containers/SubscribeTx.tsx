@@ -8,10 +8,10 @@ import { toastError, toastSuccess } from '@/components/utils';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 import { formatTransactionId } from '@/transactions';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { useTransactionSocket } from '@mimir-wallet/service';
-import { Link } from '@mimir-wallet/ui';
 
 type TxMessage = {
   id: number;
@@ -37,10 +37,10 @@ function SubscribeTx({ address }: { address: string }) {
         (message.status === TransactionStatus.Success ? toastSuccess : toastError)(
           <div className='flex flex-col gap-1'>
             <div className='font-bold'>Transaction</div>
-            <p className='text-tiny'>
+            <p className='text-xs'>
               Transaction {formatTransactionId(message.id)} Executed {TransactionStatus[message.status]}
             </p>
-            <Link color='primary' className='text-tiny' underline='active' href='/transactions?status=history'>
+            <Link className='text-primary text-xs active:underline' to='/transactions?status=history'>
               View Transaction{'>'}
             </Link>
           </div>
@@ -49,10 +49,10 @@ function SubscribeTx({ address }: { address: string }) {
         toastSuccess(
           <div className='flex flex-col gap-1'>
             <div className='font-bold'>Transaction</div>
-            <p className='text-tiny'>
+            <p className='text-xs'>
               New Transaction by <Address shorten value={message.triggerAddress} />
             </p>
-            <Link color='primary' className='text-tiny' underline='active' href='/transactions?status=pending'>
+            <Link className='text-primary text-xs active:underline' to='/transactions?status=pending'>
               View Pending{'>'}
             </Link>
           </div>
@@ -62,10 +62,10 @@ function SubscribeTx({ address }: { address: string }) {
           toastSuccess(
             <div className='flex flex-col gap-1'>
               <div className='font-bold'>Transaction</div>
-              <p className='text-tiny'>
+              <p className='text-xs'>
                 <Address shorten value={message.triggerAddress} /> approve Transaction {formatTransactionId(message.id)}
               </p>
-              <Link color='primary' className='text-tiny' underline='active' href='/transactions?status=pending'>
+              <Link className='text-primary text-xs active:underline' to='/transactions?status=pending'>
                 View Pending{'>'}
               </Link>
             </div>

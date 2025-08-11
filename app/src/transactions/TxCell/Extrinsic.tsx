@@ -5,6 +5,8 @@ import type { Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import IconLink from '@/assets/svg/icon-link.svg?react';
+import IconShare from '@/assets/svg/icon-share.svg?react';
 import { AppName, Bytes, Hash } from '@/components';
 import { events } from '@/events';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
@@ -13,13 +15,13 @@ import moment from 'moment';
 import React from 'react';
 
 import { chainLinks, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Link } from '@mimir-wallet/ui';
+import { Button, Divider } from '@mimir-wallet/ui';
 
 import Target from './Target';
 
 export function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
-    <div className='text-tiny grid w-full grid-cols-10 gap-2.5'>
+    <div className='grid w-full grid-cols-10 gap-2.5 text-xs'>
       <div className='col-span-2 flex items-center font-bold'>{title}</div>
       <div className='text-foreground/65 col-span-8 flex items-center font-bold'>{content}</div>
     </div>
@@ -62,7 +64,7 @@ function Extrinsic({
 
   return (
     <>
-      <div className='aaaaa flex flex-1 flex-col gap-2.5'>
+      <div className='flex flex-1 flex-col gap-2.5'>
         <>
           <Target address={transaction.address} call={displayCall} />
 
@@ -73,16 +75,15 @@ function Extrinsic({
                 className='font-bold'
                 color='secondary'
                 radius='md'
-                isLoading={isFetching || shouldLoadDetails}
-                onPress={onLoadDetails}
-                isDisabled={shouldLoadDetails}
+                onClick={onLoadDetails}
+                disabled={shouldLoadDetails}
               >
                 Load Big Call Data
               </Button>
             </div>
           )}
 
-          <Divider />
+          <Divider className='first:hidden' />
 
           <details className='group'>
             <summary className='hover:text-primary flex cursor-pointer list-none items-center font-bold no-underline transition-colors select-none'>
@@ -91,7 +92,7 @@ function Extrinsic({
               <ArrowDown className='transform transition-transform group-open:rotate-180' />
             </summary>
 
-            <div className='border-divider-300 rounded-medium mt-[5px] flex flex-col gap-2.5 border-1 p-2.5'>
+            <div className='border-divider-300 mt-[5px] flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5'>
               <Item title='Call Hash' content={<Hash value={transaction.callHash} withCopy />} />
 
               {transaction.call && (
@@ -103,8 +104,8 @@ function Extrinsic({
                       <Button
                         variant='ghost'
                         size='sm'
-                        className='text-tiny h-5 px-2.5'
-                        onPress={() => events.emit('call_data_view', network, transaction.call!)}
+                        className='h-5 px-2.5 text-xs'
+                        onClick={() => events.emit('call_data_view', network, transaction.call!)}
                       >
                         Verify
                       </Button>
@@ -147,21 +148,23 @@ function Extrinsic({
           </details>
 
           <div className='flex gap-2.5 pt-2.5'>
-            <Button
-              as={Link}
-              variant='ghost'
-              isExternal
-              href={
-                transaction.executedExtrinsicHash
-                  ? chainLinks.extrinsicExplorerLink(chain, transaction.executedExtrinsicHash)
-                  : chainLinks.extrinsicExplorerLink(chain, transaction.createdExtrinsicHash)
-              }
-            >
-              View in explorer
+            <Button asChild variant='ghost'>
+              <a
+                href={
+                  transaction.executedExtrinsicHash
+                    ? chainLinks.extrinsicExplorerLink(chain, transaction.executedExtrinsicHash)
+                    : chainLinks.extrinsicExplorerLink(chain, transaction.createdExtrinsicHash)
+                }
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                <IconLink className='h-4 w-4' />
+                View in explorer
+              </a>
             </Button>
             <Button
               variant='ghost'
-              onPress={() => {
+              onClick={() => {
                 const url = new URL(window.location.href);
 
                 url.searchParams.set('tx_id', transaction.id.toString());
@@ -171,6 +174,7 @@ function Extrinsic({
                 );
               }}
             >
+              <IconShare className='h-4 w-4' />
               {isCopied ? 'Copied' : 'Share'}
             </Button>
           </div>

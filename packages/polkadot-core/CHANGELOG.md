@@ -1,5 +1,76 @@
 # Changelog
 
+## [2.20.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.19.0...polkadot-core-v2.20.0) (2025-08-07)
+
+
+### Miscellaneous Chores
+
+* **polkadot-core:** Synchronize main group versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.20.0
+
+## [2.19.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.18.0...polkadot-core-v2.19.0) (2025-08-05)
+
+
+### Miscellaneous Chores
+
+* **polkadot-core:** Synchronize main group versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.19.0
+
+## [2.18.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.17.0...polkadot-core-v2.18.0) (2025-08-04)
+
+
+### Miscellaneous Chores
+
+* **polkadot-core:** Synchronize main group versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.18.0
+
+## [2.17.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.16.0...polkadot-core-v2.17.0) (2025-07-29)
+
+
+### Features
+
+* **ui:** refactor add proxy UX with responsive design and step wizard ([#268](https://github.com/mimir-labs/mimir-wallet/issues/268)) ([af683b2](https://github.com/mimir-labs/mimir-wallet/commit/af683b276cd9f4559a5b711615800bbc81312084))
+* **ui:** refactor create multisig UX with responsive design and step wizard ([#267](https://github.com/mimir-labs/mimir-wallet/issues/267)) ([e66378f](https://github.com/mimir-labs/mimir-wallet/commit/e66378fd1fc800075c0aa33caae5e4992bb83b79))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.17.0
+
+## [2.16.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.15.0...polkadot-core-v2.16.0) (2025-07-22)
+
+
+### Miscellaneous Chores
+
+* **polkadot-core:** Synchronize main group versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.16.0
+
 ## [2.15.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.14.0...polkadot-core-v2.15.0) (2025-07-22)
 
 

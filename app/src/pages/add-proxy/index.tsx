@@ -1,38 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAccount } from '@/accounts/useAccount';
-import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
-import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useState } from 'react';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Spinner } from '@mimir-wallet/ui';
-
-import AddProxy from './AddProxy';
+import DesktopAddProxy from './desktop';
+import MobileAddProxy from './mobile';
 
 function PageAddProxy({ pure }: { pure?: boolean }) {
-  const { current } = useAccount();
-  const [proxied, setProxied] = useState<string | undefined>(current);
-  const supportedNetworks = useAddressSupportedNetworks(proxied);
-  const [network, setNetwork] = useInputNetwork(
-    undefined,
-    supportedNetworks?.map((item) => item.key)
-  );
+  const upMd = useMediaQuery('md');
 
-  return (
-    <SubApiRoot
-      network={network}
-      supportedNetworks={supportedNetworks?.map((item) => item.key)}
-      Fallback={() => (
-        <div className='bg-content1 rounded-large mx-auto my-0 flex w-[500px] max-w-full items-center justify-center py-10'>
-          <Spinner size='lg' variant='wave' label='Connecting to the network...' />
-        </div>
-      )}
-    >
-      <AddProxy pure={pure} network={network} setNetwork={setNetwork} proxied={proxied} setProxied={setProxied} />
-    </SubApiRoot>
-  );
+  if (upMd) {
+    return <DesktopAddProxy pure={pure} />;
+  }
+
+  return <MobileAddProxy pure={pure} />;
 }
 
 export default PageAddProxy;

@@ -47,14 +47,14 @@ function TxCell({ withDetails, defaultOpen, address, transaction: propsTransacti
   const hasLargeCalls = !!transaction.isLargeCall;
 
   return (
-    <div className='rounded-large bg-content1 border-secondary shadow-small space-y-3 border-1 p-3 sm:p-4'>
+    <div className='bg-content1 border-secondary shadow-small space-y-3 rounded-[20px] border-1 p-3 sm:p-4'>
       <div className='flex flex-1 items-center justify-between gap-2.5'>
         <div className='flex flex-1 items-center gap-2.5'>
           <div
             data-pending={status < TransactionStatus.Success}
             data-success={status === TransactionStatus.Success}
             data-failed={status > TransactionStatus.Success}
-            className='rounded-medium data-[pending=true]:bg-warning data-[success=true]:bg-success data-[failed=true]:bg-danger h-2 w-2'
+            className='data-[pending=true]:bg-warning data-[success=true]:bg-success data-[failed=true]:bg-danger h-2 w-2 rounded-[10px]'
           />
           <Avatar src={chain.icon} className='h-5 w-5 bg-transparent' />
           {transaction.type === TransactionType.Propose ? (
@@ -70,17 +70,13 @@ function TxCell({ withDetails, defaultOpen, address, transaction: propsTransacti
             : moment(transaction.updatedAt).format()}
         </p>
 
-        <Tooltip
-          isOpen={isCopied ? true : undefined}
-          content={isCopied ? 'Copied' : 'Copy the transaction URL'}
-          closeDelay={0}
-        >
+        <Tooltip content={isCopied ? 'Copied' : 'Copy the transaction URL'}>
           <Button
             isIconOnly
             color='primary'
             size='sm'
             variant='light'
-            onPress={() => {
+            onClick={() => {
               const url = new URL(window.location.href);
 
               url.searchParams.set('tx_id', transaction.id.toString());

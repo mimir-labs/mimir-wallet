@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DotConsoleApp, PolkadotJsApp } from '@/config';
+import { Link } from 'react-router-dom';
 
-import { Button, Link } from '@mimir-wallet/ui';
+import { Button } from '@mimir-wallet/ui';
 
 function DotConsoleButton({ call, network }: { call: string; network: string }) {
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
@@ -14,8 +15,8 @@ function DotConsoleButton({ call, network }: { call: string; network: string }) 
     url.hash = `#/extrinsics/decode/${call}`;
 
     return (
-      <Button fullWidth as={Link} href={`/explorer/${encodeURIComponent(url.toString())}`}>
-        View In Polkadot.js
+      <Button fullWidth asChild>
+        <Link to={`/explorer/${encodeURIComponent(url.toString())}`}>View In Polkadot.js</Link>
       </Button>
     );
   }
@@ -26,8 +27,8 @@ function DotConsoleButton({ call, network }: { call: string; network: string }) 
   url.searchParams.set('callData', call);
 
   return (
-    <Button fullWidth as={Link} href={`/explorer/${encodeURIComponent(url.toString())}`}>
-      View In DOTConsole
+    <Button fullWidth asChild>
+      <Link to={`/explorer/${encodeURIComponent(url.toString())}`}>View In DOTConsole</Link>
     </Button>
   );
 }

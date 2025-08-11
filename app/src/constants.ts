@@ -57,3 +57,8 @@ export const MIGRATION_PURE_ALERT_DISMISSED_PREFIX = `${LS_NAMESPACE}migration-p
 export const MIGRATION_DOCS_URL = 'https://docs.mimir.global/asset-hub-migration';
 
 export const MIGRATION_NOTICE_DOCS_URL = 'https://docs.mimir.global/notice/asset-hub-migration';
+export const SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY = `${LS_NAMESPACE}show_all_networks_in_copy_modal`;
+
+export const REMOTE_PROXY_DOC_URL = 'https://blog.kchr.de/ecosystem-proxy/';
+export const POLKADOT_PROXY_WIKI_URL = 'https://wiki.polkadot.com/learn/learn-proxies/';
+export const POLKADOT_PROXY_TYPES_WIKI_URL = 'https://wiki.polkadot.com/learn/learn-proxies/#proxy-types';

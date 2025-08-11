@@ -1,20 +1,18 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @plugin '@mimir-wallet/ui/hero';
 @source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@source '../../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
 @source '../index.html';
 @source '../src/**/*.{js,ts,jsx,tsx,mdx}';
-@source '../../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  --toastify-text-color-light: #151F34;
-  --toastify-color-info: #2700FF;
-  --toastify-color-success: #00DBA6;
-  --toastify-color-warning: #FF8D07;
-  --toastify-color-error: #FF5310;
-}
-
 @theme {
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.145 0 0);
+  --color-border: #D9D9D9;
+  --color-input: #D9D9D9;
+  --color-card: #FFF;
   --text-6xl: 2.25rem;
   --text-5xl: 2rem;
   --text-4xl: 1.75rem;
@@ -109,10 +107,10 @@
     @apply text-xl leading-[1.2] font-bold;
   }
   h5 {
-    @apply text-large leading-[1.2] font-bold;
+    @apply text-lg leading-[1.2] font-bold;
   }
   h6 {
-    @apply text-medium leading-[1.2] font-bold;
+    @apply text-base leading-[1.2] font-bold;
   }
 
   input::placeholder {
@@ -120,7 +118,13 @@
   }
 
   button {
-    @apply cursor-pointer disabled:cursor-not-allowed;
+    @apply cursor-pointer disabled:pointer-events-none;
+    touch-action: manipulation;
+  }
+
+  /* Optimize mobile touch response for interactive elements */
+  a, button, input, select, textarea, [role="button"], [role="menuitem"] {
+    touch-action: manipulation;
   }
 
   /* custom styles */
@@ -130,6 +134,10 @@
     font-variation-settings: normal;
     -webkit-tap-highlight-color: transparent;
     tab-size: 4;
+  }
+
+  * {
+    scroll-behavior: smooth;
   }
 
   body {
@@ -149,27 +157,25 @@
     margin: 0;
   }
 
-  .Toastify__toast {
-    border-radius: var(--heroui-radius-large);
-    box-shadow: var(--heroui-box-shadow-large);
+  input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 
-  .Toastify__toast-body {
-    align-items: start;
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 
-  .Toastify__toast-body * {
-    user-select: none;
-  }
-
-  .Toastify__toast-icon {
-    width: 30px;
+  a {
+    @apply text-primary text-[length:inherit] no-underline hover:opacity-90 active:opacity-80;
   }
 
   ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
-    background: #fff;
+    background: transparent;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
@@ -182,7 +188,14 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #d9d9d9;
   }
-  ::-webkit-scrollbar-corner {
-    background: #d9d9d9;
+
+  .scroll-hover-show {
+    @apply [&::-webkit-scrollbar]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[#d9d9d9] group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-[#d9d9d9];
   }
+}
+
+[data-sonner-toast][data-styled=true] [data-icon] {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
 }

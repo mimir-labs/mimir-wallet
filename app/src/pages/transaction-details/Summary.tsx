@@ -14,7 +14,7 @@ import { Divider } from '@mimir-wallet/ui';
 
 function Summary({ transaction }: { transaction: Transaction }) {
   return (
-    <div className='rounded-large bg-content1 border-secondary shadow-medium space-y-2.5 border-1 p-4'>
+    <div className='bg-content1 border-secondary shadow-medium space-y-2.5 rounded-[20px] border-1 p-4'>
       <p>
         {transaction.status < TransactionStatus.Success
           ? moment(transaction.createdAt).format()
