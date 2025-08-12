@@ -28,12 +28,7 @@ function TopBar() {
   const isInAppPage = pathname.startsWith('/explorer');
 
   return (
-    <div
-      className='bg-content1/70 sticky top-0 z-50 flex h-[56px] w-full items-center justify-between gap-2 px-4 backdrop-blur-lg backdrop-saturate-150 sm:gap-2.5 sm:px-6'
-      style={{
-        boxShadow: 'inset 0px -1px 0px #E6F0FF'
-      }}
-    >
+    <div className='bg-content1/70 border-secondary sticky top-0 z-50 flex h-[56px] w-full items-center justify-between gap-2 border-b px-4 backdrop-blur-lg backdrop-saturate-150 sm:gap-2.5 sm:px-6'>
       <div className='flex items-center gap-2'>
         <Link to='/'>
           <img className='hidden sm:block' alt='Mimir' src={Logo} style={{ width: 87 }} />

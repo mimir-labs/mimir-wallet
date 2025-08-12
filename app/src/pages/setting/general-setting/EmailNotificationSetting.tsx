@@ -161,7 +161,7 @@ function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSe
           isOpen={isModalOpen}
           onClose={handleModalClose}
           onConfirm={handleModalConfirm}
-          title={pendingAction === 'bind' ? 'Choose an EOA account' : 'Confirm Unsubscribe'}
+          title={pendingAction === 'bind' ? 'Choose an Extension account' : 'Confirm Unsubscribe'}
           description={
             pendingAction === 'bind'
               ? 'Select an account to finish the subscription.'

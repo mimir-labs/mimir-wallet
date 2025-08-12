@@ -163,7 +163,7 @@ function OmniChainSelect() {
       <PopoverTrigger asChild>
         <Button
           variant='bordered'
-          className='border-secondary text-primary sm:text-foreground bg-secondary h-[32px] gap-1 px-2.5 sm:h-[42px] sm:gap-2 sm:bg-transparent sm:px-3'
+          className='border-secondary text-primary sm:text-foreground bg-secondary h-[32px] shrink-0 gap-1 px-2.5 sm:h-[42px] sm:gap-2 sm:bg-transparent sm:px-3'
           radius='md'
           onClick={() => setIsOpen(!isOpen)}
         >

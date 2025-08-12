@@ -38,7 +38,7 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
   const handleNetworkChange = useCallback(
     (newNetwork: string) => {
       setNetwork(newNetwork);
-      setData([]);
+      setData([['', '', '']]);
       setInvalidAssetIds([]);
     },
     [setNetwork, setData]

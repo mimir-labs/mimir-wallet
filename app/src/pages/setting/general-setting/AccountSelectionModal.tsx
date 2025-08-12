@@ -38,7 +38,7 @@ function AccountSelectionModal({
   isOpen,
   onClose,
   onConfirm,
-  title = 'Choose an EOA account',
+  title = 'Choose an Extension account',
   description = 'Select an account to finish the subscription.',
   confirmText = 'Confirm',
   isLoading = false,

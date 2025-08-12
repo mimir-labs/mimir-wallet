@@ -7,10 +7,10 @@ import { type NotificationMessage, useNotifications } from '@/hooks/useNotificat
 import { formatAgo } from '@/utils';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { getChainIcon } from '@mimir-wallet/polkadot-core';
+import { getChainIcon, useNetworks } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Badge,
@@ -86,63 +86,66 @@ function getNotificationMessage(notification: NotificationMessage): React.ReactN
 interface NotificationItemProps {
   notification: NotificationMessage;
   isRead: boolean;
-  onMarkAsRead: (id: number) => void;
+  handleSelect: (notification: NotificationMessage) => void;
+  onMarkAsViewed: (id: number) => void;
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = React.memo(({ notification, isRead, onMarkAsRead }) => {
-  const { ref, inView } = useInView({
-    threshold: 0.5, // Trigger when 50% of the item is visible
-    triggerOnce: false,
-    delay: 1000 // Mark as read after 1 second in view
-  });
+const NotificationItem: React.FC<NotificationItemProps> = React.memo(
+  ({ notification, isRead, handleSelect, onMarkAsViewed }) => {
+    const { ref, inView } = useInView({
+      threshold: 0.5, // Trigger when 50% of the item is visible
+      triggerOnce: true // Only trigger once when first viewed
+    });
 
-  // Mark as read when the item comes into view
-  useEffect(() => {
-    if (inView && !isRead) {
-      onMarkAsRead(notification.id);
-    }
-  }, [inView, isRead, notification.id, onMarkAsRead]);
+    // Track when the item has been viewed
+    useEffect(() => {
+      if (inView && !isRead) {
+        onMarkAsViewed(notification.id);
+      }
+    }, [inView, isRead, notification.id, onMarkAsViewed]);
 
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        'flex cursor-pointer gap-2.5 rounded-[10px] p-[10px] transition-all duration-200',
-        'bg-primary/5 hover:bg-primary/15',
-        isRead ? 'opacity-50' : ''
-      )}
-    >
-      {/* Status Indicator - Blue for unread, original colors for read */}
+    return (
       <div
+        ref={ref}
         className={cn(
-          'w-[5px] shrink-0 self-stretch rounded-[20px] transition-colors',
-          getNotificationStatusColor(notification.status)
+          'flex cursor-pointer gap-2.5 rounded-[10px] p-[10px] transition-all duration-200',
+          'bg-primary/5 hover:bg-primary/15',
+          isRead ? 'opacity-50' : ''
         )}
-      />
+        onClick={() => handleSelect(notification)}
+      >
+        {/* Status Indicator - Blue for unread, original colors for read */}
+        <div
+          className={cn(
+            'w-[5px] shrink-0 self-stretch rounded-[20px] transition-colors',
+            getNotificationStatusColor(notification.status)
+          )}
+        />
 
-      {/* Content */}
-      <div className='flex flex-1 flex-col gap-2.5'>
-        {/* Header */}
-        <div className='flex items-center gap-[5px]'>
-          <AddressRow className='flex-1' value={notification.address} withName withAddress={false} iconSize={20} />
+        {/* Content */}
+        <div className='flex flex-1 flex-col gap-2.5'>
+          {/* Header */}
+          <div className='flex items-center gap-[5px]'>
+            <AddressRow className='flex-1' value={notification.address} withName withAddress={false} iconSize={20} />
 
-          {/* Timestamp */}
-          <span className='text-foreground/60 text-xs font-normal whitespace-nowrap'>
-            {formatAgo(notification.updatedAt)} ago
-          </span>
+            {/* Timestamp */}
+            <span className='text-foreground/60 text-xs font-normal whitespace-nowrap'>
+              {formatAgo(notification.updatedAt)} ago
+            </span>
 
-          {/* Status Icon */}
-          <Avatar src={getChainIcon(notification.genesisHash)?.icon} style={{ width: 14, height: 14 }} />
-        </div>
+            {/* Status Icon */}
+            <Avatar src={getChainIcon(notification.genesisHash)?.icon} style={{ width: 14, height: 14 }} />
+          </div>
 
-        {/* Message */}
-        <div className={'text-foreground text-sm leading-normal font-normal'}>
-          {getNotificationMessage(notification)}
+          {/* Message */}
+          <div className={'text-foreground text-sm leading-normal font-normal'}>
+            {getNotificationMessage(notification)}
+          </div>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 NotificationItem.displayName = 'NotificationItem';
 
@@ -152,16 +155,58 @@ function NotificationButton() {
 
   const { notifications, isNotificationRead, markAsRead, getUnreadCount } = useNotifications();
   const [filter, setFilter] = useState<string>('all');
+  const [viewedNotifications, setViewedNotifications] = useState<Set<number>>(new Set());
+  const [shouldShake, setShouldShake] = useState(false);
+  const prevUnreadCountRef = useRef<number>(0);
+  const navigate = useNavigate();
+  const { enableNetwork } = useNetworks();
 
   const unreadCount = getUnreadCount();
 
-  // Memoize the mark as read callback
-  const handleMarkAsRead = useCallback(
-    (id: number) => {
-      markAsRead(id);
+  // Trigger shake animation when new unread message arrives
+  useEffect(() => {
+    if (unreadCount > prevUnreadCountRef.current && !isOpen) {
+      setShouldShake(true);
+      // Remove shake class after animation completes
+      const timer = setTimeout(() => {
+        setShouldShake(false);
+      }, 1000);
+
+      prevUnreadCountRef.current = unreadCount;
+
+      return () => clearTimeout(timer);
+    }
+
+    prevUnreadCountRef.current = unreadCount;
+
+    return () => {};
+  }, [unreadCount, isOpen]);
+
+  // Track viewed notifications
+  const handleMarkAsViewed = useCallback((id: number) => {
+    setViewedNotifications((prev) => new Set(prev).add(id));
+  }, []);
+
+  const handleSelect = useCallback(
+    (notification: NotificationMessage) => {
+      enableNetwork(notification.genesisHash);
+      navigate(`/transactions/${notification.transactionId}`);
+      toggleOpen(false);
     },
-    [markAsRead]
+    [enableNetwork, navigate, toggleOpen]
   );
+
+  // Mark viewed notifications as read when popover closes
+  useEffect(() => {
+    if (!isOpen && viewedNotifications.size > 0) {
+      // Mark all viewed notifications as read
+      viewedNotifications.forEach((id) => {
+        markAsRead(id);
+      });
+      // Clear viewed set after marking as read
+      setViewedNotifications(new Set());
+    }
+  }, [isOpen, viewedNotifications, markAsRead]);
 
   const filteredNotifications = notifications.filter((notification) => {
     if (filter === 'all') return true;
@@ -182,13 +227,15 @@ function NotificationButton() {
               <Button
                 isIconOnly
                 ref={anchorEl}
-                className='border-secondary bg-secondary relative h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent'
+                className={cn(
+                  'border-secondary bg-secondary relative h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent'
+                )}
                 color='primary'
                 variant='ghost'
                 radius='md'
                 onClick={toggleOpen}
               >
-                <IconNotification />
+                <IconNotification className={shouldShake ? 'origin-top animate-[swing_1s_ease-in-out]' : ''} />
                 <Badge
                   size='sm'
                   isOneChar
@@ -238,7 +285,8 @@ function NotificationButton() {
                     key={notification.id}
                     notification={notification}
                     isRead={isNotificationRead(notification.id)}
-                    onMarkAsRead={handleMarkAsRead}
+                    handleSelect={handleSelect}
+                    onMarkAsViewed={handleMarkAsViewed}
                   />
                 ))
               )}
@@ -246,7 +294,7 @@ function NotificationButton() {
 
             {/* Footer Link */}
             <div className='px-2 text-center'>
-              <Link className='text-primary hover:underline' to=''>
+              <Link className='text-primary hover:underline' to='/setting?tabs=notification' onClick={toggleOpen}>
                 Don't want miss information? Try Email→
               </Link>
             </div>
