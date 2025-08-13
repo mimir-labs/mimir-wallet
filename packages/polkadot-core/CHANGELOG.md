@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.21.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.20.0...polkadot-core-v2.21.0) (2025-08-13)
+
+
+### Features
+
+* Add notification center feature ([#282](https://github.com/mimir-labs/mimir-wallet/issues/282)) ([dbeb85c](https://github.com/mimir-labs/mimir-wallet/commit/dbeb85c86712264d3ff6d24f259d1adf893a8663))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.21.0
+
 ## [2.20.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.19.0...polkadot-core-v2.20.0) (2025-08-07)
 
 
