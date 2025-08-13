@@ -269,9 +269,8 @@ function NotificationButton() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='all'>All Transaction</SelectItem>
-                <SelectItem value='transaction_created'>Created</SelectItem>
-                <SelectItem value='transaction_approved'>Approved</SelectItem>
-                <SelectItem value='transaction_executed'>Executed</SelectItem>
+                <SelectItem value='transaction_created'>Pending</SelectItem>
+                <SelectItem value='transaction_executed'>History</SelectItem>
               </SelectContent>
             </Select>
 

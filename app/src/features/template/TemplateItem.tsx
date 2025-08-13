@@ -107,9 +107,9 @@ function TemplateItem({
         <div className='flex items-center'>
           <button className='text-foreground' onClick={() => onView(name, call)}>
             <Tooltip content={`${section}.${method}`} color='foreground'>
-              <span className='max-w-[110px] overflow-hidden text-ellipsis underline sm:max-w-[130px]'>
+              <div className='max-w-[110px] overflow-hidden text-ellipsis underline sm:max-w-[130px]'>
                 {section}.{method}
-              </span>
+              </div>
             </Tooltip>
           </button>
           <CopyButton value={call} size='sm' />

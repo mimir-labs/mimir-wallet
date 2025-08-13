@@ -278,7 +278,7 @@ function InputAddress({
       {label && <div className='text-sm font-bold'>{label}</div>}
 
       <div className='input-address-base flex gap-2.5'>
-        <Popover open={isOpen} onOpenChange={toggleOpen}>
+        <Popover open={isOpen} onOpenChange={(state) => (state ? handleOpen() : handleClose())}>
           <PopoverTrigger asChild>
             <div
               ref={wrapperRef}

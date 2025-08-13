@@ -6,10 +6,12 @@ import type { SortDescriptor } from '@react-types/shared';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
+import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
+import { toastError, toastSuccess } from '@/components/utils';
 import { StakingApp } from '@/config';
-import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
+import { useAssetBalancesAll, useNativeBalancesAll, useRefreshBalances } from '@/hooks/useBalances';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
 import { useMemo, useState } from 'react';
@@ -40,6 +42,7 @@ function Assets() {
     direction: 'descending'
   });
   const upSm = useMediaQuery('sm');
+  const { mutateAsync, isPending } = useRefreshBalances(current);
 
   const [list, done] = useMemo(() => {
     const _list: AccountAssetInfo[] = [];
@@ -119,7 +122,27 @@ function Assets() {
 
   return (
     <div className='flex flex-col gap-5'>
-      <h4>Assets</h4>
+      <div className='flex items-center gap-2'>
+        <h4>Assets</h4>
+        <Button
+          isIconOnly
+          variant='light'
+          size='sm'
+          onClick={() =>
+            mutateAsync(undefined, {
+              onSuccess: () => {
+                toastSuccess('Assets refreshed successfully');
+              },
+              onError: () => {
+                toastError('Failed to refresh assets');
+              }
+            })
+          }
+          disabled={isPending || !current}
+        >
+          <IconArrowClockWise className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
+        </Button>
+      </div>
       <Table
         classNames={{
           wrapper: 'rounded-[10px] sm:rounded-[20px] p-0 sm:p-3',

@@ -1,7 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useBalanceTotalUsd } from '@/hooks/useBalances';
+import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
+import { toastError, toastSuccess } from '@/components/utils';
+import { useBalanceTotalUsd, useRefreshBalances } from '@/hooks/useBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -27,6 +29,8 @@ function Title({ endContent, children }: { endContent?: React.ReactNode; childre
 function DashboardV2({ address }: { address: string }) {
   const [totalUsd, changes] = useBalanceTotalUsd(address);
   const [network, setNetwork] = useInputNetwork(undefined);
+
+  const { mutateAsync, isPending } = useRefreshBalances(address);
 
   return (
     <div className='w-full'>
@@ -62,7 +66,27 @@ function DashboardV2({ address }: { address: string }) {
               </Button>
             }
           >
-            Assets
+            <div className='flex items-center gap-2.5'>
+              Assets
+              <Button
+                isIconOnly
+                variant='light'
+                size='sm'
+                onClick={() =>
+                  mutateAsync(undefined, {
+                    onSuccess: () => {
+                      toastSuccess('Assets refreshed successfully');
+                    },
+                    onError: () => {
+                      toastError('Failed to refresh assets');
+                    }
+                  })
+                }
+                disabled={isPending || !address}
+              >
+                <IconArrowClockWise className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
           </Title>
           <Assets address={address} />
         </div>
