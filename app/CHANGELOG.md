@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.21.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.20.0...mimir-wallet-app-v2.21.0) (2025-08-13)
+
+
+### Features
+
+* Add group by date for transaction ([#284](https://github.com/mimir-labs/mimir-wallet/issues/284)) ([2f0e615](https://github.com/mimir-labs/mimir-wallet/commit/2f0e615f9cc290b957498717b0c7ea47569f4485))
+* Add notification center feature ([#282](https://github.com/mimir-labs/mimir-wallet/issues/282)) ([dbeb85c](https://github.com/mimir-labs/mimir-wallet/commit/dbeb85c86712264d3ff6d24f259d1adf893a8663))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.21.0
+    * @mimir-wallet/service bumped to 2.21.0
+    * @mimir-wallet/ui bumped to 2.21.0
+
 ## [2.20.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.19.0...mimir-wallet-app-v2.20.0) (2025-08-07)
 
 
