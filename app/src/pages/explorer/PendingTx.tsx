@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import ExpandArrow from '@/assets/svg/expand-arrow.svg?react';
-import { Empty } from '@/components';
 import { useToggle } from '@/hooks/useToggle';
-import { TxCell } from '@/transactions';
-import React from 'react';
+import { GroupedTransactions } from '@/transactions';
+import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
+import React, { useMemo } from 'react';
 
 import { Button } from '@mimir-wallet/ui';
 
@@ -20,6 +20,10 @@ function PendingTx({ address, url }: Props) {
   const txs = usePendingTx(address, url);
   const [expanded, toggleExpand] = useToggle();
   const counts = txs.length || 0;
+
+  const groupedTransactions = useMemo(() => {
+    return groupTransactionsByDate(txs);
+  }, [txs]);
 
   return (
     <>
@@ -52,11 +56,14 @@ function PendingTx({ address, url }: Props) {
         </div>
 
         <div className='h-[50vh] space-y-5 overflow-y-auto p-5'>
-          {txs.length > 0 ? (
-            txs.map((item) => <TxCell address={address} defaultOpen={false} key={item.id} transaction={item} />)
-          ) : (
-            <Empty height={280} label='No Pending Transactions' />
-          )}
+          <GroupedTransactions
+            groupedTransactions={groupedTransactions}
+            showEmpty={true}
+            emptyHeight={280}
+            emptyLabel='No Pending Transactions'
+            variant='compact'
+            spacing='md'
+          />
         </div>
       </div>
     </>

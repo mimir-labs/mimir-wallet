@@ -124,24 +124,26 @@ function Assets() {
     <div className='flex flex-col gap-5'>
       <div className='flex items-center gap-2'>
         <h4>Assets</h4>
-        <Button
-          isIconOnly
-          variant='light'
-          size='sm'
-          onClick={() =>
-            mutateAsync(undefined, {
-              onSuccess: () => {
-                toastSuccess('Assets refreshed successfully');
-              },
-              onError: () => {
-                toastError('Failed to refresh assets');
-              }
-            })
-          }
-          disabled={isPending || !current}
-        >
-          <IconArrowClockWise className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
-        </Button>
+        <Tooltip content='Refresh Asset List'>
+          <Button
+            isIconOnly
+            variant='light'
+            size='sm'
+            onClick={() =>
+              mutateAsync(undefined, {
+                onSuccess: () => {
+                  toastSuccess('Assets refreshed successfully');
+                },
+                onError: () => {
+                  toastError('Failed to refresh assets');
+                }
+              })
+            }
+            disabled={isPending || !current}
+          >
+            <IconArrowClockWise className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
+          </Button>
+        </Tooltip>
       </div>
       <Table
         classNames={{
