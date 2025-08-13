@@ -50,14 +50,17 @@ export function enableNetwork(key: string) {
       return state;
     }
 
-    const identityNetwork = state.networks.find((item) => item.key === key)?.identityNetwork;
+    const identityNetwork = state.networks.find(
+      (item) => item.key === key || item.genesisHash === key
+    )?.identityNetwork;
 
     return {
       networks: state.networks.some((network) => network.enabled && network.key === key)
         ? state.networks
         : (state.networks.map((item) => ({
             ...item,
-            enabled: key === item.key ? true : identityNetwork === item.key ? true : item.enabled
+            enabled:
+              key === item.key || key === item.genesisHash ? true : identityNetwork === item.key ? true : item.enabled
           })) as [Network, ...Network[]])
     };
   });

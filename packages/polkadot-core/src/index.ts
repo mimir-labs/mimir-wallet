@@ -23,7 +23,7 @@ export { useAllApis } from './useApiStore.js';
 export { useIdentityApi } from './useIdentityApi.js';
 export { useNetworks } from './useNetworks.js';
 
-export { allEndpoints, remoteProxyRelations } from './config.js';
+export { allEndpoints, remoteProxyRelations, getChainIcon } from './config.js';
 
 export * from './utils.js';
 export * from './registry.js';

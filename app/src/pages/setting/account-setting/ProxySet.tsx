@@ -123,7 +123,7 @@ function Content({
         <Alert variant={'warning'}>
           <AlertTitle className='font-bold'>Notice</AlertTitle>
           <AlertDescription>
-            <ul>
+            <ul style={{ listStyle: 'outside' }}>
               <li>Only All authority can delete proxy.</li>
               <li>Deleting a Proxy will refund the fees, while adding a Proxy requires an additional deposit fee.</li>
             </ul>

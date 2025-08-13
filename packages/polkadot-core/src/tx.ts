@@ -4,12 +4,7 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { SignerOptions, SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Injected } from '@polkadot/extension-inject/types';
-import type { Null, Result } from '@polkadot/types';
 import type { Extrinsic, ExtrinsicEra, Hash, Header, Index, SignerPayload } from '@polkadot/types/interfaces';
-import type {
-  SpRuntimeDispatchError,
-  SpRuntimeTransactionValidityTransactionValidityError
-} from '@polkadot/types/lookup';
 import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
@@ -256,31 +251,6 @@ export function signAndSend(
     })
     .then(async (extrinsic) => {
       events.emit('signed', extrinsic.signature, extrinsic);
-
-      let result: Result<
-        Result<Null, SpRuntimeDispatchError>,
-        SpRuntimeTransactionValidityTransactionValidityError
-      > | null = null;
-
-      try {
-        result = await api.call.blockBuilder.applyExtrinsic(extrinsic);
-      } catch {
-        /* empty */
-      }
-
-      if (result) {
-        if (result.isErr) {
-          if (result.asErr.isInvalid) {
-            throw new Error(`Invalid Transaction: ${result.asErr.asInvalid.type}`);
-          }
-
-          throw new Error(`Unknown Error: ${result.asErr.asUnknown.type}`);
-        }
-
-        if (result.asOk.isErr) {
-          throw assetDispatchError(api, result.asOk.asErr);
-        }
-      }
 
       return extrinsic;
     })

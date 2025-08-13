@@ -27,4 +27,8 @@ export class AssetService extends BaseService {
   public getTokenInfoAll() {
     return this.get(`token/all`);
   }
+
+  public forceUpdateAssetsByAddressAll(addressHex: string) {
+    return this.post(`balances/all/${addressHex}/update`);
+  }
 }

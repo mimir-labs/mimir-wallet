@@ -22,7 +22,7 @@ import SideBar from './sidebar/SideBar';
 import AddAddressBook from './AddAddressBook';
 import Initializing from './Initializing';
 import OmniChainUpgradeTip from './OmniChainUpgradeTip';
-import SubscribeTx from './SubscribeTx';
+import SubscribeNotification from './SubscribeNotification';
 import ToggleAlert from './ToggleAlert';
 import TopBar from './topbar';
 import Version from './Version';
@@ -67,12 +67,12 @@ function BaseContainer({
       <WalletConsumer />
       <AddAddressBook />
       <OmniChainUpgradeTip />
+      <SubscribeNotification />
       {hideTopBar ? null : <TopBar />}
       {isApiReady && isWalletReady && isMultisigSyned && current && (
         <>
           {hideTopBar ? null : <ToggleAlert address={current} setAlertOpen={setAlertOpen} />}
           <MigrationAlert onMigrationCounts={setAlertCounts} />
-          <SubscribeTx address={current} />
           <ViewCallData />
           <CopyAddressModal />
           <QrAddressModal />

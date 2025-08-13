@@ -34,7 +34,7 @@ function SelectTrigger({
       data-slot='select-trigger'
       data-size={size}
       className={cn(
-        "border-divider-300 data-[placeholder]:text-foreground/50 [&_svg:not([class*='text-'])]:text-foreground/50 data-[state=open]:border-primary data-[state=open]:bg-secondary hover:border-primary hover:bg-secondary focus:border-primary aria-invalid:border-danger flex w-full touch-manipulation items-center justify-between gap-2 rounded-[10px] border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow,border-color,background-color] outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:w-full *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "border-divider-300 data-[placeholder]:text-foreground/50 [&>svg:not([class*='text-'])]:text-foreground/50 data-[state=open]:border-primary data-[state=open]:bg-secondary hover:border-primary hover:bg-secondary focus:border-primary aria-invalid:border-danger flex w-full touch-manipulation items-center justify-between gap-2 rounded-[10px] border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow,border-color,background-color] outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:w-full *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&>svg]:pointer-events-none [&>svg]:shrink-0 [&>svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -109,29 +109,27 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
     <SelectPrimitive.Item
       data-slot='select-item'
       className={cn(
-        "focus:bg-secondary [&_svg:not([class*='text-'])]:text-foreground/50 relative flex w-full cursor-pointer touch-manipulation items-center gap-2 rounded-[5px] py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:w-full *:[span]:last:items-center *:[span]:last:gap-2",
+        "focus:bg-secondary [&>svg:not([class*='text-'])]:text-foreground/50 relative flex w-full cursor-pointer touch-manipulation items-center gap-2 rounded-[5px] py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 *:[span]:last:flex *:[span]:last:w-full *:[span]:last:items-center *:[span]:last:gap-2 [&>svg]:pointer-events-none [&>svg]:shrink-0",
         className
       )}
       {...props}
     >
-      <span className='absolute right-2 flex size-3.5 items-center justify-center'>
-        <SelectPrimitive.ItemIndicator>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='20'
-            height='20'
-            viewBox='0 0 20 20'
-            fill='none'
-            className='size-4 text-current'
-          >
-            <circle cx='10' cy='10' r='8' fill='currentColor' />
-            <path
-              d='M8.95621 13.1223C8.69224 13.1287 8.42621 13.0311 8.22476 12.8297L6.10344 10.7084C5.71292 10.3178 5.71292 9.68466 6.10344 9.29414C6.49396 8.90361 7.12713 8.90361 7.51765 9.29414L8.93271 10.7092L12.4691 7.17278C12.8597 6.78225 13.4928 6.78225 13.8833 7.17278C14.2739 7.5633 14.2739 8.19647 13.8833 8.58699L9.6407 12.8296C9.45119 13.0191 9.20454 13.1167 8.95621 13.1223Z'
-              fill='white'
-            />
-          </svg>
-        </SelectPrimitive.ItemIndicator>
-      </span>
+      <SelectPrimitive.ItemIndicator asChild>
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='20'
+          height='20'
+          viewBox='0 0 20 20'
+          fill='none'
+          className='absolute right-2 flex size-4 items-center justify-center text-current'
+        >
+          <circle cx='10' cy='10' r='8' fill='currentColor' />
+          <path
+            d='M8.95621 13.1223C8.69224 13.1287 8.42621 13.0311 8.22476 12.8297L6.10344 10.7084C5.71292 10.3178 5.71292 9.68466 6.10344 9.29414C6.49396 8.90361 7.12713 8.90361 7.51765 9.29414L8.93271 10.7092L12.4691 7.17278C12.8597 6.78225 13.4928 6.78225 13.8833 7.17278C14.2739 7.5633 14.2739 8.19647 13.8833 8.58699L9.6407 12.8296C9.45119 13.0191 9.20454 13.1167 8.95621 13.1223Z'
+            fill='white'
+          />
+        </svg>
+      </SelectPrimitive.ItemIndicator>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
   );

@@ -12,16 +12,16 @@ import type {
 import type { AccountAssetInfo, AssetInfo, OrmlTokensAccountData } from './types';
 
 import { findToken } from '@/config';
-import { formatUnits } from '@/utils';
+import { formatUnits, sleep } from '@/utils';
 import { BN_ZERO, isHex } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { isEqual } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
 
 import { addressToHex, useApi, type ValidApiState } from '@mimir-wallet/polkadot-core';
-import { useQueries, useQuery } from '@mimir-wallet/service';
+import { service, useMutation, useQueries, useQuery, useQueryClient } from '@mimir-wallet/service';
 
-import { useAssetInfo, useAssetsByAddress, useAssetsByAddressAll } from './useAssets';
+import { queryAssetsAllByAddressKey, useAssetInfo, useAssetsByAddress, useAssetsByAddressAll } from './useAssets';
 import { useTokenInfo, useTokenInfoAll } from './useTokenInfo';
 
 async function getBalances({
@@ -370,6 +370,8 @@ async function _fetchAssetBalance({
   throw new Error('Invalid network');
 }
 
+export const queryAssetsBalanceKey = (address: string) => ['query-assets-balance', address] as const;
+
 export function useAssetBalances(
   network: string,
   address?: AccountId | AccountId32 | string | null
@@ -378,40 +380,20 @@ export function useAssetBalances(
   const api: ValidApiState | undefined = allApis[network];
   const [assets] = useAssetsByAddress(network, address?.toString());
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
-  const queryHash = useMemo(
-    () =>
-      blake2AsHex(
-        `${network}-assets-balances-${addressHex}-${assets
-          ?.map((item) => item.assetId)
-          .sort()
-          .join(',')}`
-      ),
-    [addressHex, assets, network]
-  );
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [network, api?.api, address, assets] as const,
-    queryHash,
+    queryKey: [...queryAssetsBalanceKey(addressHex), network],
     staleTime: 12_000,
     refetchInterval: 12_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     enabled: !!address && !!api && api.isApiReady && !!assets,
-    queryFn: async ({
-      queryKey: [network, api, address, assets]
-    }: {
-      queryKey: [
-        network: string,
-        api: ApiPromise | null | undefined,
-        address?: AccountId | AccountId32 | string | null,
-        assets?: AssetInfo[]
-      ];
-    }): Promise<AccountAssetInfo[]> => {
-      if (!api || !assets || !address) {
+    queryFn: async (): Promise<AccountAssetInfo[]> => {
+      if (!api?.api || !assets || !address) {
         throw new Error('Api, assets and address are required');
       }
 
-      const data = await _fetchAssetBalances({ queryKey: [api, network, assets, address.toString()] });
+      const data = await _fetchAssetBalances({ queryKey: [api.api, network, assets, address.toString()] });
 
       return data;
     }
@@ -464,36 +446,19 @@ export function useAssetBalancesAll(address?: string): UseAssetBalancesAll[] {
     queries: Object.entries(allApis).map(([network, api]) => {
       const assets = allAssets?.[network];
 
-      const queryHash = blake2AsHex(
-        `${network}-assets-balances-${addressHex}-${assets
-          ?.map((item) => item.assetId)
-          .sort()
-          .join(',')}`
-      );
-
       return {
-        queryKey: [network, api.api, address, assets] as [
-          network: string,
-          api: ApiPromise,
-          address: string | undefined,
-          assets: AssetInfo[] | undefined
-        ],
-        queryHash,
+        queryKey: [...queryAssetsBalanceKey(addressHex), network],
         staleTime: 12_000,
         refetchInterval: 12_000,
         refetchOnMount: false,
         refetchOnWindowFocus: false,
-        enabled: !!address && !!api && !!api.isApiReady && !!assets,
-        queryFn: async ({
-          queryKey: [network, api, address, assets]
-        }: {
-          queryKey: [network: string, api: ApiPromise, address: string | undefined, assets: AssetInfo[] | undefined];
-        }): Promise<AccountAssetInfo[]> => {
-          if (!address || !assets) {
+        enabled: !!addressHex && !!api && !!api.api && !!api.isApiReady && !!assets,
+        queryFn: async (): Promise<AccountAssetInfo[]> => {
+          if (!addressHex || !assets) {
             throw new Error('Address and assets are required');
           }
 
-          const data = await _fetchAssetBalances({ queryKey: [api, network, assets, address] });
+          const data = await _fetchAssetBalances({ queryKey: [api.api, network, assets, addressHex] });
 
           return data;
         }
@@ -559,4 +524,43 @@ export function useBalanceTotalUsd(address?: string) {
   }, [assets, nativeBalances]);
 
   return [total, changes];
+}
+
+export function useRefreshBalances(address?: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const targetAddress = address;
+
+      if (!targetAddress) {
+        throw new Error('Address is required');
+      }
+
+      const addressHex = addressToHex(targetAddress);
+
+      // Force update assets from service
+      await service.asset.forceUpdateAssetsByAddressAll(addressHex);
+
+      // Invalidate assets queries
+      await queryClient.invalidateQueries({
+        queryKey: queryAssetsAllByAddressKey(addressHex),
+        exact: false
+      });
+
+      // Wait a bit before invalidating balance queries to ensure proper order
+      await sleep(100);
+
+      // Invalidate balance queries
+      await queryClient.invalidateQueries({
+        queryKey: queryAssetsBalanceKey(addressHex),
+        exact: false
+      });
+
+      return { success: true };
+    },
+    onError: (error) => {
+      console.error('Failed to refresh balances:', error);
+    }
+  });
 }

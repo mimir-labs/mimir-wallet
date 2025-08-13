@@ -4,10 +4,12 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { Endpoint } from './types.js';
 
+import { isHex } from '@polkadot/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useLocalStore } from '@mimir-wallet/service';
 
+import { allEndpoints } from './config.js';
 import { ApiContext } from './context.js';
 import { DEFAULE_SS58_CHAIN_KEY } from './defaults.js';
 import { destroyApi, initializeApi } from './initialize.js';
@@ -99,7 +101,13 @@ function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNo
   const _setNetwork = useCallback(
     (network: string) => {
       if (mode === 'omni') {
-        setNetwork(network);
+        if (isHex(network)) {
+          const key = allEndpoints.find((item) => item.genesisHash === network)?.key;
+
+          key && setNetwork(key);
+        } else {
+          setNetwork(network);
+        }
       }
     },
     [mode]

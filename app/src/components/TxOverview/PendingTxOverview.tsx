@@ -453,7 +453,7 @@ function TxOverview({ account, call, transaction, api, onApprove, showButton = t
   // Memoize the graph computation with performance monitoring
   const { layoutedNodes, layoutedEdges } = useMemo(() => {
     // Performance monitoring in development
-    const startTime = process.env.NODE_ENV === 'development' ? performance.now() : 0;
+    const startTime = import.meta.env.DEV ? performance.now() : 0;
 
     const initialNodes: Node<NodeData>[] = [];
     const initialEdges: Edge<EdgeData>[] = [];
@@ -462,7 +462,7 @@ function TxOverview({ account, call, transaction, api, onApprove, showButton = t
     const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 330, 70);
 
     // Log performance in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       const endTime = performance.now();
 
       console.log(

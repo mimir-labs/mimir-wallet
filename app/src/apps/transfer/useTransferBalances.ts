@@ -114,7 +114,7 @@ export function useTransferBalance(
     queryKey: [api, network, sender, token] as const,
     queryHash: `_retrieveBalance.${network}-${sender ? addressToHex(sender) : ''}-${token?.isNative ? 'native' : token?.assetId}.sender`,
     queryFn: _retrieveBalance,
-    refetchInterval: 60000,
+    refetchInterval: 6000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     enabled: isApiReady && !!sender && !!token
