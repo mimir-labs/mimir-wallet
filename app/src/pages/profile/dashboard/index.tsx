@@ -9,7 +9,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
+import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import AccountStructure from './AccountStructure';
 import Assets from './Assets';
@@ -68,24 +68,26 @@ function DashboardV2({ address }: { address: string }) {
           >
             <div className='flex items-center gap-2.5'>
               Assets
-              <Button
-                isIconOnly
-                variant='light'
-                size='sm'
-                onClick={() =>
-                  mutateAsync(undefined, {
-                    onSuccess: () => {
-                      toastSuccess('Assets refreshed successfully');
-                    },
-                    onError: () => {
-                      toastError('Failed to refresh assets');
-                    }
-                  })
-                }
-                disabled={isPending || !address}
-              >
-                <IconArrowClockWise className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
-              </Button>
+              <Tooltip content='Refresh Asset List'>
+                <Button
+                  isIconOnly
+                  variant='light'
+                  size='sm'
+                  onClick={() =>
+                    mutateAsync(undefined, {
+                      onSuccess: () => {
+                        toastSuccess('Assets refreshed successfully');
+                      },
+                      onError: () => {
+                        toastError('Failed to refresh assets');
+                      }
+                    })
+                  }
+                  disabled={isPending || !address}
+                >
+                  <IconArrowClockWise className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
+                </Button>
+              </Tooltip>
             </div>
           </Title>
           <Assets address={address} />

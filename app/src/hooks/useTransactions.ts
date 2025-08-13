@@ -5,7 +5,7 @@ import type { HistoryTransaction, Transaction } from './types';
 
 import { events } from '@/events';
 import { isEqual } from 'lodash-es';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { addressToHex, encodeAddress, type Endpoint, useApi } from '@mimir-wallet/polkadot-core';
 import { API_CLIENT_GATEWAY, fetcher, service, useInfiniteQuery, useQueries, useQuery } from '@mimir-wallet/service';
@@ -116,7 +116,6 @@ export function useHistoryTransactions(
   fetchNextPage: () => void
 ] {
   const { chainSS58 } = useApi();
-  const [txs, setTxs] = useState<HistoryTransaction[]>([]);
 
   const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
     initialPageParam: null,
@@ -165,21 +164,24 @@ export function useHistoryTransactions(
 
       return null;
     },
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
+    },
     maxPages: 100,
     refetchInterval: 0
   });
 
-  useEffect(() => {
-    if (data) {
-      setTxs((value) => {
-        const newData = data.pages.flat().map((item) => transformTransaction(chainSS58, item) as HistoryTransaction);
-
-        return isEqual(newData, value) ? value : newData;
-      });
-    }
-  }, [data, chainSS58]);
-
-  return [txs, isFetched, isFetching, hasNextPage, isFetchingNextPage, fetchNextPage];
+  return [
+    useMemo(
+      () => data?.pages.flat().map((item) => transformTransaction(chainSS58, item) as HistoryTransaction) || [],
+      [chainSS58, data?.pages]
+    ),
+    isFetched,
+    isFetching,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage
+  ];
 }
 
 export function useTransactionDetail(

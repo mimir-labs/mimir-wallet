@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Empty } from '@/components';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useHistoryTransactions } from '@/hooks/useTransactions';
-import { TxCell } from '@/transactions';
-import React from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import { GroupedTransactions } from '@/transactions';
+import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
+import React, { useMemo } from 'react';
 
 import { skeleton } from './skeleton';
 
@@ -31,27 +32,38 @@ function HistoryTransactions({
     txId
   );
 
-  if (isFetched && data && data.length === 0) {
-    return <Empty height='80dvh' />;
-  }
+  const groupedTransactions = useMemo(() => {
+    return groupTransactionsByDate(data);
+  }, [data]);
 
-  if ((!isFetched && isFetching) || (!propsIsFetched && propsIsFetching)) {
-    return skeleton;
-  }
+  const sentinelRef = useInfiniteScroll({
+    onLoadMore: fetchNextPage,
+    hasMore: hasNexPage,
+    loading: isFetching
+  });
 
   return (
-    <InfiniteScroll
-      dataLength={data.length}
-      next={fetchNextPage}
-      hasMore={hasNexPage}
-      loader={skeleton}
-      endMessage={<h6 className='text-foreground/50 text-center text-sm'>no data more.</h6>}
-      className='flex flex-col gap-5 !overflow-visible'
-    >
-      {data.map((item) => (
-        <TxCell key={item.id} address={address} transaction={item} />
-      ))}
-    </InfiniteScroll>
+    <div className='flex flex-col gap-5'>
+      {isFetched && data && data.length === 0 ? <Empty height='80dvh' /> : null}
+
+      <GroupedTransactions
+        groupedTransactions={groupedTransactions}
+        showEmpty={false}
+        defaultOpenFirst={false}
+        spacing='md'
+      />
+
+      {/* Loading indicator */}
+      {(!isFetched && isFetching) || (!propsIsFetched && propsIsFetching) || (isFetching && hasNexPage && skeleton)
+        ? skeleton
+        : null}
+
+      {/* End message */}
+      {!hasNexPage && data.length > 0 && <h6 className='text-foreground/50 text-center text-sm'>no data more.</h6>}
+
+      {/* Intersection Observer sentinel */}
+      {isFetching ? null : <div ref={sentinelRef} className='h-1' />}
+    </div>
   );
 }
 

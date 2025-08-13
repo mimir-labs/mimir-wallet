@@ -1,9 +1,9 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Empty } from '@/components';
 import { useMultichainPendingTransactions } from '@/hooks/useTransactions';
-import { TxCell } from '@/transactions';
+import { GroupedTransactions } from '@/transactions';
+import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
 import React, { useMemo } from 'react';
 
 import { skeleton } from './skeleton';
@@ -23,26 +23,20 @@ function PendingTransactions({
 }) {
   const data = useMultichainPendingTransactions(networks, address, txId);
 
-  const transactions = useMemo(() => {
+  const groupedTransactions = useMemo(() => {
     const list = data
       .map((item) => item.data)
       .flat()
       .sort((a, b) => b.createdAt - a.createdAt);
 
-    return list;
+    return groupTransactionsByDate(list);
   }, [data]);
 
   const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching && !item.isFetched);
 
-  if (!showSkeleton && transactions.length === 0) {
-    return <Empty height='80dvh' />;
-  }
-
   return (
     <div className='space-y-5'>
-      {transactions.map((transaction, index) => (
-        <TxCell defaultOpen={index === 0} key={transaction.id} address={address} transaction={transaction} />
-      ))}
+      <GroupedTransactions groupedTransactions={groupedTransactions} />
       {showSkeleton ? skeleton : null}
     </div>
   );

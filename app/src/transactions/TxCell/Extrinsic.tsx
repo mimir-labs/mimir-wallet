@@ -114,6 +114,8 @@ function Extrinsic({
                 />
               )}
 
+              <Item title='TransactionID' content={transaction.id} />
+
               <Item
                 title='App'
                 content={

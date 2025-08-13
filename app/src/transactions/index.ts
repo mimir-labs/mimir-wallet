@@ -3,6 +3,7 @@
 
 export { default as TxCell } from './TxCell';
 export { default as TxProgress } from './Progress';
+export { default as GroupedTransactions } from './GroupedTransactions';
 export * from './Status';
 
 export * from './utils';

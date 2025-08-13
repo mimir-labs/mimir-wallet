@@ -5,8 +5,10 @@ import type { ApiPromise } from '@polkadot/api';
 import type { IMethod } from '@polkadot/types/types';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import IconShare from '@/assets/svg/icon-share.svg?react';
 import { AppName, TxOverviewDialog } from '@/components';
 import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@/hooks/types';
+import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { useToggle } from '@/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
@@ -14,7 +16,7 @@ import moment from 'moment';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import Progress from '../Progress';
@@ -45,12 +47,22 @@ function TimeCell({ time }: { time?: number }) {
   );
 }
 
-function ActionsCell({ withDetails, detailOpen }: { withDetails?: boolean; detailOpen: boolean }) {
+function ActionsCell({
+  withDetails,
+  transaction,
+  detailOpen
+}: {
+  withDetails?: boolean;
+  transaction: Transaction;
+  detailOpen: boolean;
+}) {
+  const { network, chainSS58 } = useApi();
+  const [isCopied, copy] = useCopyClipboard();
+
   return (
-    <div className='flex w-full items-center justify-between'>
-      <div />
+    <div className='flex w-full flex-row-reverse items-center gap-1'>
       {withDetails ? (
-        <Button continuePropagation isIconOnly color='primary' variant='light'>
+        <Button size='sm' continuePropagation isIconOnly color='primary' variant='light'>
           <ArrowDown
             className={`text-primary transform-origin-center transition-transform duration-200 ${
               detailOpen ? 'rotate-180' : 'rotate-0'
@@ -59,10 +71,30 @@ function ActionsCell({ withDetails, detailOpen }: { withDetails?: boolean; detai
           />
         </Button>
       ) : (
-        <Button asChild variant='light'>
+        <Button size='sm' asChild variant='light'>
           <Link to='/transactions'>View More</Link>
         </Button>
       )}
+
+      <Tooltip content={isCopied ? 'Copied' : 'Copy the transaction URL'}>
+        <Button
+          isIconOnly
+          color='primary'
+          size='sm'
+          variant='light'
+          onClick={() => {
+            const url = new URL(window.location.href);
+
+            url.searchParams.set('tx_id', transaction.id.toString());
+
+            copy(
+              `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chainSS58)}`
+            );
+          }}
+        >
+          <IconShare className='h-4 w-4' />
+        </Button>
+      </Tooltip>
     </div>
   );
 }
@@ -100,9 +132,9 @@ function TxItems({
 
   return (
     <>
-      <div className='bg-secondary overflow-hidden rounded-[10px] transition-all duration-200'>
+      <div className='overflow-hidden transition-all duration-200'>
         <div
-          className='grid cursor-pointer grid-cols-10 gap-2.5 px-2.5 font-semibold sm:px-4 md:grid-cols-12 md:px-5 lg:grid-cols-[repeat(15,_minmax(0,_1fr))] [&>div]:flex [&>div]:h-10 [&>div]:items-center'
+          className='bg-secondary grid cursor-pointer grid-cols-10 gap-2.5 rounded-[10px] px-2.5 font-semibold sm:px-4 md:grid-cols-12 md:px-5 lg:grid-cols-[repeat(15,_minmax(0,_1fr))] [&>div]:flex [&>div]:h-10 [&>div]:items-center'
           onClick={toggleDetailOpen}
         >
           <div className='col-span-2'>
@@ -133,11 +165,12 @@ function TxItems({
             )}
           </div>
           <div className='col-span-1'>
-            <ActionsCell withDetails={withDetails} detailOpen={detailOpen} />
+            <ActionsCell withDetails={withDetails} transaction={transaction} detailOpen={detailOpen} />
           </div>
         </div>
+
         {withDetails && detailOpen && (
-          <div className='bg-content1 mx-3 mb-3 flex flex-row gap-3 rounded-[10px] p-3 md:mx-4 md:mb-4 md:gap-4 md:p-4'>
+          <div className='bg-content1 mt-3 flex flex-row gap-3 md:gap-4'>
             <Extrinsic
               transaction={transaction}
               call={call}
