@@ -139,7 +139,10 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
   return (
     <Drawer onClose={onClose} open={open} direction={anchor}>
-      <DrawerContent data-mobile={!upSm} className='max-w-[320px] data-[mobile=true]:rounded-l-[20px] sm:max-w-[400px]'>
+      <DrawerContent
+        data-mobile={!upSm}
+        className='w-full max-w-[320px] data-[mobile=true]:rounded-l-[20px] sm:max-w-[400px]'
+      >
         <DrawerHeader className='flex-col'>
           <h3 className='sm:none mb-2.5 flex items-center justify-between'>Menu</h3>
 

@@ -63,7 +63,7 @@ export function useQueryAccount(
     queryKey: [addressHex] as const,
     queryHash: `omni-chain-${addressHex}`,
     staleTime: 6_000,
-    refetchInterval: 60_000,
+    refetchInterval: 6_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     enabled: !!addressHex,

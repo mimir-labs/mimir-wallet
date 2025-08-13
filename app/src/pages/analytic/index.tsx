@@ -26,14 +26,12 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   Skeleton,
-  Tab,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow,
-  Tabs
+  TableRow
 } from '@mimir-wallet/ui';
 
 const options = {
@@ -175,14 +173,14 @@ function Chart({
   return (
     <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:p-5'>
       <p className='text-foreground text-base font-bold'>Transaction Statistic</p>
-      <Tabs color='primary'>
-        <Tab key='category' title='By Category'>
+      <div className='grid grid-cols-1 gap-2.5 lg:grid-cols-2'>
+        <div className='col-span-1'>
           {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{categoryChart}</div> : categoryChart}
-        </Tab>
-        <Tab key='time' title='By Time'>
+        </div>
+        <div className='col-span-1'>
           {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{timeChart}</div> : timeChart}
-        </Tab>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 }

@@ -7,8 +7,10 @@ import {
   AssetService,
   BaseServiceOptions,
   ChainService,
+  EmailNotificationService,
   MultisigService,
-  TransactionService
+  TransactionService,
+  WebPushService
 } from './services/index.js';
 
 export type ClientServiceOptions = BaseServiceOptions;
@@ -17,8 +19,10 @@ export class ClientService {
   public readonly account: AccountService;
   public readonly asset: AssetService;
   public readonly chain: ChainService;
+  public readonly emailNotification: EmailNotificationService;
   public readonly multisig: MultisigService;
   public readonly transaction: TransactionService;
+  public readonly webPush: WebPushService;
   private readonly version: ApiVersion;
 
   constructor(
@@ -30,8 +34,10 @@ export class ClientService {
     this.account = new AccountService(clientGateway, options);
     this.asset = new AssetService(clientGateway, options);
     this.chain = new ChainService(clientGateway, options);
+    this.emailNotification = new EmailNotificationService(clientGateway, options);
     this.multisig = new MultisigService(clientGateway, options);
     this.transaction = new TransactionService(clientGateway, options);
+    this.webPush = new WebPushService(clientGateway, options);
   }
 
   static create(clientGateway: string, options?: ClientServiceOptions) {

@@ -193,7 +193,7 @@ function AddressOverview({ account, showControls, showMiniMap, showAddressNodeOp
     if (!account) return { layoutedNodes: [], layoutedEdges: [] };
 
     // Performance monitoring in development
-    const startTime = process.env.NODE_ENV === 'development' ? performance.now() : 0;
+    const startTime = import.meta.env.DEV ? performance.now() : 0;
 
     const initialNodes: Node<NodeData>[] = [];
     const initialEdges: Edge<EdgeData>[] = [];
@@ -202,7 +202,7 @@ function AddressOverview({ account, showControls, showMiniMap, showAddressNodeOp
     const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 400);
 
     // Log performance in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       const endTime = performance.now();
 
       console.log(

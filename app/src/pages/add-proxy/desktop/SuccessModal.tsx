@@ -113,7 +113,7 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size='md' hideCloseButton>
-      <ModalContent className='p-0'>
+      <ModalContent>
         <ModalBody className='flex flex-col items-center gap-5 py-5 pt-10'>
           <div className='bg-primary flex h-[120px] w-[120px] items-center justify-center rounded-[30px]'>
             <img src='/images/congrats.png' className='w-20' />

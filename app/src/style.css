@@ -68,6 +68,30 @@
     }
   }
   --animate-dots: dots 1.5s ease-in-out infinite;
+  --animate-swing: swing 1s ease-in-out;
+  @keyframes swing {
+    0% {
+      transform: rotate(0deg);
+    }
+    10% {
+      transform: rotate(10deg);
+    }
+    30% {
+      transform: rotate(-10deg);
+    }
+    50% {
+      transform: rotate(10deg);
+    }
+    70% {
+      transform: rotate(-5deg);
+    }
+    90% {
+      transform: rotate(2deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
 }
 
 @layer base {
@@ -169,7 +193,7 @@
   }
 
   a {
-    @apply text-primary text-[length:inherit] no-underline hover:opacity-90 active:opacity-80;
+    @apply text-primary text-[length:inherit] no-underline hover:opacity-70 active:opacity-50 transition-colors-opacity;
   }
 
   ::-webkit-scrollbar {

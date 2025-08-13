@@ -66,13 +66,14 @@ export function useNativeToken(network: string): AssetInfo<true> | undefined {
   return undefined;
 }
 
+export const queryAssetsKey = (network: string) => ['query-assets', network];
+
 export function useAssets(
   network: string
 ): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean, promise: Promise<AssetInfo[]>] {
   const { data, isFetched, isFetching, promise } = useQuery({
-    queryHash: `assets-${network}`,
-    queryKey: [network] as const,
-    queryFn: ({ queryKey: [chain] }): Promise<AssetInfo[]> => service.asset.getAllAssets(chain),
+    queryKey: queryAssetsKey(network),
+    queryFn: (): Promise<AssetInfo[]> => service.asset.getAllAssets(network),
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -95,18 +96,16 @@ export function useAssets(
   return [transformedData, isFetched, isFetching, promise];
 }
 
+export const queryAssetsByAddressKey = (address: string) => ['query-assets-by-address', address];
+
 export function useAssetsByAddress(
   network: string,
   address?: string | null
 ): [data: AssetInfo[] | undefined, isFetched: boolean, isFetching: boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
   const { data, isFetched, isFetching } = useQuery({
-    queryHash: `assets-by-address-${network}-${addressHex}`,
-    queryKey: [network, addressHex] as const,
-    queryFn: addressHex
-      ? ({ queryKey: [chain, addr] }): Promise<AssetInfo[]> =>
-          service.asset.getAssetsByAddress(chain as string, addr as string)
-      : undefined,
+    queryKey: [...queryAssetsByAddressKey(addressHex), network] as const,
+    queryFn: (): Promise<AssetInfo[]> => service.asset.getAssetsByAddress(network, addressHex),
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -119,14 +118,15 @@ export function useAssetsByAddress(
   return [useMemo(() => (data ? _extraAsset(network, data) : undefined), [data, network]), isFetched, isFetching];
 }
 
+export const queryAssetsAllKey = () => ['query-assets-all'];
+
 export function useAssetsAll(): [
   data: Record<string, AssetInfo[]> | undefined,
   isFetched: boolean,
   isFetching: boolean
 ] {
   const { data, isFetched, isFetching } = useQuery<Record<string, AssetInfo[]>>({
-    queryKey: ['assets-all'] as const,
-    queryHash: 'assets-all',
+    queryKey: queryAssetsAllKey(),
     queryFn: (): Promise<Record<string, AssetInfo[]>> => service.asset.getAssetsAll(),
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
@@ -149,17 +149,16 @@ export function useAssetsAll(): [
   ];
 }
 
+export const queryAssetsAllByAddressKey = (address: string) => ['query-assets-all-by-address', address];
+
 export function useAssetsByAddressAll(
   address?: string | null
 ): [data: Record<string, AssetInfo[]> | undefined, isFetched: boolean, isFetching: boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [addressHex] as const,
-    queryHash: `balances-all-${addressHex}`,
-    queryFn: addressHex
-      ? ({ queryKey: [addr] }): Promise<Record<string, AssetInfo[]>> =>
-          service.asset.getAssetsByAddressAll(addr as string)
-      : undefined,
+    queryKey: queryAssetsAllByAddressKey(addressHex),
+    queryFn: (): Promise<Record<string, AssetInfo[]>> => service.asset.getAssetsByAddressAll(addressHex),
+    enabled: !!addressHex,
     refetchInterval: 60 * 10 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -184,19 +183,11 @@ export function useAssetsByAddressAll(
 async function fetchAssetInfo({
   queryKey
 }: {
-  queryKey: [api: ApiPromise, assetId: string | undefined | null, network: string];
+  queryKey: [api: ApiPromise, assetId: string, network: string];
 }): Promise<[AssetInfo<false>, BN] | undefined> {
   const [api, assetId, network] = queryKey;
 
-  if (!assetId) {
-    return Promise.resolve(undefined);
-  }
-
   if (api.query.assets) {
-    if (isHex(assetId) && !api.query.foreignAssets) {
-      return Promise.resolve(undefined);
-    }
-
     return Promise.all(
       isHex(assetId)
         ? [
@@ -248,7 +239,7 @@ async function fetchAssetInfo({
         ];
       }
 
-      return undefined;
+      throw new Error(`Asset not found ${assetId}`);
     });
   }
 
@@ -274,7 +265,7 @@ async function fetchAssetInfo({
         ];
       }
 
-      return undefined;
+      throw new Error(`Asset not found ${assetId}`);
     });
   }
 
@@ -300,25 +291,31 @@ async function fetchAssetInfo({
         ];
       }
 
-      return undefined;
+      throw new Error(`Asset not found ${assetId}`);
     });
   }
 
-  return Promise.resolve(undefined);
+  throw new Error(`Asset not found ${assetId}`);
 }
+
+export const queryAssetInfoKey = (network: string) => ['query-asset-info', network];
 
 export function useAssetInfo(network: string, assetId?: string | null): [AssetInfo<false> | undefined, BN] {
   const { allApis } = useApi();
   const api: ValidApiState | undefined = allApis[network];
-  const queryHash = `${network}-asset-info-${assetId}`;
   const { data } = useQuery({
-    queryKey: [api?.api, assetId, network] as const,
-    queryHash,
-    queryFn: fetchAssetInfo,
+    queryKey: [...queryAssetInfoKey(network), assetId || ''] as const,
+    queryFn: async () => {
+      if (!api?.api || !assetId) {
+        throw new Error('api,assets are required');
+      }
+
+      return fetchAssetInfo({ queryKey: [api.api, assetId, network] });
+    },
     refetchInterval: 60_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    enabled: !!api && api.isApiReady && !!assetId
+    enabled: !!api && !!api.isApiReady && !!assetId
   });
 
   return [data?.[0], data?.[1] ?? BN_ZERO];

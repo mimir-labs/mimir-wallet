@@ -85,7 +85,9 @@ function TransactionInfo({
           content={
             <div className='flex items-center'>
               <Bytes value={callData} />
-              <button onClick={() => events.emit('call_data_view', network, callData)}>View Detail</button>
+              <button className='text-primary' onClick={() => events.emit('call_data_view', network, callData)}>
+                View Detail
+              </button>
             </div>
           }
         />

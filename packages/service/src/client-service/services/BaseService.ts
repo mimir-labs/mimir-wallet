@@ -65,4 +65,12 @@ export abstract class BaseService {
       headers: jsonHeader
     });
   }
+
+  protected delete<T = any>(path: string, body?: unknown, version?: ApiVersion): Promise<T> {
+    return fetcher(this.getClientUrl(path, version), {
+      method: 'DELETE',
+      body: body ? JSON.stringify(body) : undefined,
+      headers: jsonHeader
+    });
+  }
 }

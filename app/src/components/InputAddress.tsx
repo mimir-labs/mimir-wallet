@@ -245,13 +245,13 @@ function InputAddress({
       className='inline-flex w-[calc(100%-20px)] flex-grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden [&[data-hide=true]_.AddressRow-Content]:hidden'
     >
       {addressType === 'cell' ? (
-        <AddressCell iconSize={iconSize} value={value} shorten={shorten ?? (upSm ? false : true)} />
+        <AddressCell iconSize={iconSize} value={value} shorten={upSm ? shorten : true} />
       ) : (
         <AddressRow
           className='[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal'
           iconSize={iconSize}
           value={value}
-          shorten={false}
+          shorten={upSm ? shorten : true}
           withAddress
         />
       )}
@@ -278,7 +278,7 @@ function InputAddress({
       {label && <div className='text-sm font-bold'>{label}</div>}
 
       <div className='input-address-base flex gap-2.5'>
-        <Popover open={isOpen} onOpenChange={toggleOpen}>
+        <Popover open={isOpen} onOpenChange={(state) => (state ? handleOpen() : handleClose())}>
           <PopoverTrigger asChild>
             <div
               ref={wrapperRef}
@@ -354,7 +354,7 @@ function InputAddress({
                             className='[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal'
                             iconSize={iconSize}
                             value={item}
-                            shorten={false}
+                            shorten={upSm ? shorten : true}
                             withCopy
                             withAddress
                           />

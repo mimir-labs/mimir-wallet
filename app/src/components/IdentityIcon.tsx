@@ -92,20 +92,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
           {circles.map(renderCircle)}
         </svg>
 
-        {extensionIcon ? (
-          <img
-            src={extensionIcon}
-            style={{
-              position: 'absolute',
-              right: -2,
-              bottom: -2,
-              width: size / 2.2,
-              height: size / 2.2
-            }}
-          />
-        ) : null}
-
-        {((who && who.length > 0) || multipleMultisig) && (
+        {(who && who.length > 0) || multipleMultisig ? (
           <span
             className='text-white'
             style={{
@@ -131,7 +118,18 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
           >
             {who && who.length > 0 ? `${threshold}/${who.length}` : 'Multi'}
           </span>
-        )}
+        ) : extensionIcon ? (
+          <img
+            src={extensionIcon}
+            style={{
+              position: 'absolute',
+              right: -2,
+              bottom: -2,
+              width: size / 2.2,
+              height: size / 2.2
+            }}
+          />
+        ) : null}
         {withBorder && !isInjected && (isProxied || isMultisig || multipleMultisig) ? (
           <div
             style={{
@@ -144,9 +142,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
               height: size + 6
             }}
             className='pointer-events-none rounded-full border-1'
-          >
-            {element}
-          </div>
+          />
         ) : null}
       </span>
     );
