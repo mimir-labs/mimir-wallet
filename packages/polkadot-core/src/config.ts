@@ -38,6 +38,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/DOT.webp',
     name: 'AssetHub',
     relayChain: 'polkadot',
+    paraId: 1000,
     wsUrl: {
       Dwellir: 'wss://asset-hub-polkadot-rpc.dwellir.com',
       OnFinality: 'wss://statemint.api.onfinality.io/public-ws',
@@ -62,6 +63,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/DOT.webp',
     name: 'People',
     relayChain: 'polkadot',
+    paraId: 1004,
     wsUrl: {
       IBP1: 'wss://sys.ibp.network/people-polkadot',
       IBP2: 'wss://people-polkadot.dotters.network',
@@ -89,6 +91,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/DOT.webp',
     name: 'Coretime',
     relayChain: 'polkadot',
+    paraId: 1005,
     wsUrl: {
       Parity: 'wss://polkadot-coretime-rpc.polkadot.io',
       IBP1: 'wss://sys.ibp.network/coretime-polkadot',
@@ -107,6 +110,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/DOT.webp',
     name: 'Collectives',
     relayChain: 'polkadot',
+    paraId: 1001,
     wsUrl: {
       Parity: 'wss://polkadot-collectives-rpc.polkadot.io',
       OnFinality: 'wss://collectives.api.onfinality.io/public-ws',
@@ -131,6 +135,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/bnc.png',
     name: 'Bifrost',
     relayChain: 'polkadot',
+    paraId: 2030,
     wsUrl: {
       Liebi: 'wss://hk.p.bifrost-rpc.liebi.com/ws',
       Dwellir: 'wss://bifrost-polkadot-rpc.dwellir.com',
@@ -149,6 +154,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/HDX.svg',
     name: 'Hydration',
     relayChain: 'polkadot',
+    paraId: 2034,
     wsUrl: {
       IBP1: 'wss://hydration.ibp.network',
       Dwellir: 'wss://hydration-rpc.n.dwellir.com',
@@ -167,6 +173,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/cru.svg',
     name: 'Crust',
     relayChain: 'polkadot',
+    paraId: 2008,
     wsUrl: {
       Crust: 'wss://crust-parachain.crustapps.net',
       'Crust APP': 'wss://crust-parachain.crustnetwork.app',
@@ -184,6 +191,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/pen.png',
     name: 'Pendulum',
     relayChain: 'polkadot',
+    paraId: 2094,
     wsUrl: {
       PendulumChain: 'wss://rpc-pendulum.prd.pendulumchain.tech'
     },
@@ -198,6 +206,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/ACA.svg',
     name: 'Acala',
     relayChain: 'polkadot',
+    paraId: 2000,
     wsUrl: {
       'Acala Foundation 3': 'wss://acala-rpc-3.aca-api.network/ws',
       'Acala Foundation 0': 'wss://acala-rpc-0.aca-api.network',
@@ -218,6 +227,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/PHA.svg',
     name: 'Phala',
     relayChain: 'polkadot',
+    paraId: 2035,
     wsUrl: {
       Phala: 'wss://api.phala.network/ws',
       OnFinality: 'wss://phala.api.onfinality.io/public-ws',
@@ -236,6 +246,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/BRIDGE.webp',
     name: 'Hyperbridge (Nexus)',
     relayChain: 'polkadot',
+    paraId: 3367,
     wsUrl: {
       IBP1: 'wss://nexus.ibp.network',
       BlockOps: 'wss://hyperbridge-nexus-rpc.blockops.network',
@@ -252,6 +263,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/PLMC.webp',
     name: 'Polimec Polkadot',
     relayChain: 'polkadot',
+    paraId: 3344,
     wsUrl: {
       IBP1: 'wss://polimec.ibp.network',
       Amforc: 'wss://polimec.rpc.amforc.com',
@@ -270,6 +282,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/ASTR.webp',
     name: 'Astar',
     relayChain: 'polkadot',
+    paraId: 2006,
     wsUrl: {
       Astar: 'wss://rpc.astar.network',
       'Automata 1RPC': 'wss://1rpc.io/astr',
@@ -288,6 +301,7 @@ const polkadotEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/XCAV.png',
     name: 'Xcavate',
     relayChain: 'polkadot',
+    paraId: 3413,
     wsUrl: {
       IBP1: 'wss://xcavate.ibp.network',
       IBP2: 'wss://xcavate.dotters.network',
@@ -332,6 +346,7 @@ const kusamaEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/Kusama.png',
     name: 'AssetHub Kusama',
     relayChain: 'kusama',
+    paraId: 1000,
     wsUrl: {
       Dwellir: 'wss://asset-hub-kusama-rpc.dwellir.com',
       'Dwellir Tunisia': 'wss://statemine-rpc-tn.dwellir.com',
@@ -355,6 +370,7 @@ const kusamaEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/Kusama.png',
     name: 'People Kusama',
     relayChain: 'kusama',
+    paraId: 1004,
     wsUrl: {
       Parity: 'wss://kusama-people-rpc.polkadot.io',
       Dwellir: 'wss://people-kusama-rpc.dwellir.com',
@@ -375,6 +391,7 @@ const kusamaEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/Kusama.png',
     name: 'Coretime Kusama',
     relayChain: 'kusama',
+    paraId: 1005,
     wsUrl: {
       Parity: 'wss://kusama-coretime-rpc.polkadot.io',
       Dwellir: 'wss://coretime-kusama-rpc.dwellir.com',
@@ -396,6 +413,7 @@ const kusamaEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/bnc.png',
     name: 'Bifrost Kusama',
     relayChain: 'kusama',
+    paraId: 2001,
     wsUrl: {
       Liebi: 'wss://bifrost-rpc.liebi.com/ws',
       Dwellir: 'wss://bifrost-rpc.dwellir.com',
@@ -413,6 +431,7 @@ const kusamaEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/ampe.svg',
     name: 'Amplitude',
     relayChain: 'kusama',
+    paraId: 2124,
     wsUrl: {
       Dwellir: 'wss://amplitude-rpc.dwellir.com',
       PendulumChain: 'wss://rpc-amplitude.pendulumchain.tech'
@@ -426,6 +445,7 @@ const kusamaEndpoints: Endpoint[] = [
     tokenIcon: '/token-icons/KAR.png',
     name: 'Karura',
     relayChain: 'kusama',
+    paraId: 2000,
     wsUrl: {
       'Acala Foundation 1': 'wss://karura-rpc-1.aca-api.network',
       'Acala Foundation 0': 'wss://karura-rpc-0.aca-api.network',
@@ -471,6 +491,7 @@ const paseoEndpoints: Endpoint[] = [
     ss58Format: 0,
     relayChain: 'paseo',
     isTestnet: true,
+    paraId: 1000,
     wsUrl: {
       Dwellir: 'wss://asset-hub-paseo-rpc.dwellir.com',
       IBP1: 'wss://sys.ibp.network/asset-hub-paseo',
@@ -491,6 +512,7 @@ const paseoEndpoints: Endpoint[] = [
     ss58Format: 0,
     relayChain: 'paseo',
     isTestnet: true,
+    paraId: 1111,
     wsUrl: {
       Parity: 'wss://testnet-passet-hub.polkadot.io/'
     },
@@ -505,6 +527,7 @@ const paseoEndpoints: Endpoint[] = [
     name: 'Xcavate(Paseo)',
     relayChain: 'paseo',
     isTestnet: true,
+    paraId: 4683,
     wsUrl: {
       Xcavate: 'wss://rpc2-paseo.xcavate.io'
     },
@@ -545,6 +568,7 @@ const westendEndpoints: Endpoint[] = [
     ss58Format: 42,
     relayChain: 'westend',
     isTestnet: true,
+    paraId: 1000,
     wsUrl: {
       Dwellir: 'wss://asset-hub-westend-rpc.dwellir.com',
       IBP1: 'wss://sys.ibp.network/asset-hub-westend',

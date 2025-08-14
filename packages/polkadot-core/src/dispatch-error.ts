@@ -3,7 +3,7 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { DispatchError } from '@polkadot/types/interfaces';
-import type { SpRuntimeDispatchError } from '@polkadot/types/lookup';
+import type { SpRuntimeDispatchError, XcmV5TraitsError } from '@polkadot/types/lookup';
 
 export class TxDispatchError extends Error {}
 export class TxModuleError extends TxDispatchError {
@@ -52,4 +52,10 @@ export function assetDispatchError(api: ApiPromise, dispatch: DispatchError | Sp
   }
 
   return new TxDispatchError(`Dispatch Error: ${dispatch.type}`);
+}
+
+// @internal assetXcmV5TraitsError
+// @description Parse XcmV5TraitsError
+export function assetXcmV5TraitsError(error: XcmV5TraitsError): Error {
+  return new Error(`XcmV5TraitsError: ${error.type}`);
 }
