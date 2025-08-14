@@ -32,7 +32,7 @@ function TemplateList({
   const { template, removeTemplate, editTemplateName } = useSavedTemplate(network);
 
   return (
-    <div className='h-full space-y-5'>
+    <div className='flex h-full flex-col gap-5'>
       <div className='flex items-center gap-1'>
         <h4>Call Template</h4>
         <Tooltip content='Save frequently used on-chain operation templates for repeated use in the future.'>
@@ -54,7 +54,7 @@ function TemplateList({
 
       <Divider />
 
-      <div className='scrollbar-hide h-full space-y-2.5 overflow-auto'>
+      <div className='scrollbar-hide flex-1 space-y-2.5 overflow-auto'>
         {template.length > 0 && <p>Saved</p>}
         {template.length > 0 ? (
           template.map(({ name, call }, index) => (
