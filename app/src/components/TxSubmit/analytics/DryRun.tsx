@@ -309,14 +309,25 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
             if (result.forwardedXcms.length > 0) {
               dryRunWithXcm(api, result.forwardedXcms)
                 .then((result) => {
-                  setBalancesChanges(
-                    extraBalancesChange(
-                      account,
-                      balancesChanges.concat(result.map((item) => (item.success ? item.balancesChanges : [])).flat())
-                    )
-                  );
+                  const errorResult = result.find((item) => !item.success);
 
-                  setCrossChainSimulation({ isDone: true, success: true, error: null, isLoading: false });
+                  if (errorResult) {
+                    setCrossChainSimulation({
+                      isDone: true,
+                      success: false,
+                      error: errorResult.error.message,
+                      isLoading: false
+                    });
+                  } else {
+                    setBalancesChanges(
+                      extraBalancesChange(
+                        account,
+                        balancesChanges.concat(result.map((item) => (item.success ? item.balancesChanges : [])).flat())
+                      )
+                    );
+
+                    setCrossChainSimulation({ isDone: true, success: true, error: null, isLoading: false });
+                  }
                 })
                 .catch((error) => {
                   setCrossChainSimulation({
