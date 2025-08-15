@@ -30,7 +30,7 @@ const PARENT_CHAIN_JUMP_LIMIT = 1;
 const SUPPORTED_XCM_VERSIONS = ['V3', 'V4', 'V5'] as const;
 
 /**
- * Logs XCM operations with structured format and timing
+ * Logs XCM operations with simplified format
  * @param operation - The operation being performed
  * @param data - Additional data to log
  * @param level - Log level
@@ -40,18 +40,15 @@ function logXcmOperation(
   data: Record<string, unknown>,
   level: 'info' | 'warn' | 'error' = 'info'
 ): void {
-  const timestamp = new Date().toISOString();
-  const logPrefix = `[XCM-${level.toUpperCase()}] ${timestamp}:`;
-
   switch (level) {
     case 'error':
-      console.error(logPrefix, operation, data);
+      console.error('[XCM-DRY-RUN]', operation, data);
       break;
     case 'warn':
-      console.warn(logPrefix, operation, data);
+      console.warn('[XCM-DRY-RUN]', operation, data);
       break;
     default:
-      console.info(logPrefix, operation, data);
+      console.info('[XCM-DRY-RUN]', operation, data);
   }
 }
 
@@ -143,10 +140,9 @@ export async function dryRunWithXcm(
 ): Promise<DryRunResult[]> {
   const startTime = Date.now();
 
-  logXcmOperation('XCM Dry Run Started', {
-    chainHash: api.genesisHash.toHex(),
-    forwardedXcmCount: forwardedXcms.length,
-    runtimeVersion: api.runtimeVersion.specVersion.toString()
+  logXcmOperation('Started', {
+    chain: api.genesisHash.toHex(),
+    messageCount: forwardedXcms.length
   });
 
   const initialChain = assertReturn(
@@ -154,10 +150,8 @@ export async function dryRunWithXcm(
     `Unsupported chain with genesisHash: ${api.genesisHash.toHex()}`
   );
 
-  logXcmOperation('Initial Chain Resolved', {
-    chainKey: initialChain.key,
-    chainName: initialChain.name,
-    isParachain: !!initialChain.paraId,
+  logXcmOperation('Initial Chain', {
+    chain: initialChain.key,
     paraId: initialChain.paraId
   });
 
@@ -169,10 +163,9 @@ export async function dryRunWithXcm(
   for (let i = 0; i < forwardedXcms.length; i++) {
     const xcm = forwardedXcms[i];
 
-    logXcmOperation('Processing XCM Message', {
-      messageIndex: i + 1,
-      totalMessages: forwardedXcms.length,
-      messageCount: xcm[1].length
+    logXcmOperation('Processing Message', {
+      index: i + 1,
+      total: forwardedXcms.length
     });
 
     try {
@@ -181,70 +174,53 @@ export async function dryRunWithXcm(
       originParents = originInfo.parents;
       originInterior = originInfo.interior;
 
-      logXcmOperation('XCM Location Processed', {
-        messageIndex: i + 1,
-        targetChain: chainApi.runtimeChain.toString(),
-        originParents,
-        hasOriginInterior: Object.keys(originInterior).length > 0
+      logXcmOperation('Location Processed', {
+        index: i + 1,
+        targetChain: chainApi.runtimeChain.toString()
       });
 
       const xcmResults = await executeXcmMessages(chainApi, xcm[1], originParents, originInterior);
 
-      logXcmOperation('XCM Messages Executed', {
-        messageIndex: i + 1,
-        resultCount: xcmResults.length,
-        successCount: xcmResults.filter((r) => r.success).length,
-        errorCount: xcmResults.filter((r) => !r.success).length
+      logXcmOperation('Messages Executed', {
+        index: i + 1,
+        results: xcmResults.length,
+        success: xcmResults.filter((r) => r.success).length
       });
 
       xcmDryRunResult.push(...xcmResults);
     } catch (error) {
       logXcmOperation(
-        'XCM Processing Error',
+        'Processing Error',
         {
-          messageIndex: i + 1,
-          error: error instanceof Error ? error.message : String(error),
-          errorType: error instanceof Error ? error.constructor.name : 'Unknown'
+          index: i + 1,
+          error: error instanceof Error ? error.message : String(error)
         },
         'error'
       );
-
       xcmDryRunResult.push(createErrorResult(error, 'XCM processing failed'));
     }
   }
 
   // Clean up all API connections
-  logXcmOperation('Cleaning up API connections', {
-    openApiCount: openApis.length,
-    totalProcessingTime: `${Date.now() - startTime}ms`
+  logXcmOperation('Cleanup', {
+    connections: openApis.length,
+    duration: `${Date.now() - startTime}ms`
   });
 
-  const disconnectResults = await Promise.allSettled(
+  await Promise.allSettled(
     openApis.map(async (apiInstance) => {
       try {
         await apiInstance.disconnect();
-
-        return { success: true, chain: apiInstance.runtimeChain.toString() };
-      } catch (error) {
-        return {
-          success: false,
-          chain: apiInstance.runtimeChain.toString(),
-          error: error instanceof Error ? error.message : String(error)
-        };
+      } catch {
+        // Ignore disconnect errors as they don't affect the results
       }
     })
   );
 
-  const successfulDisconnects = disconnectResults.filter((r) => r.status === 'fulfilled' && r.value.success).length;
-  const failedDisconnects = disconnectResults.length - successfulDisconnects;
-
-  logXcmOperation('API Cleanup Completed', {
-    totalConnections: openApis.length,
-    successfulDisconnects,
-    failedDisconnects,
-    totalResults: xcmDryRunResult.length,
-    successfulResults: xcmDryRunResult.filter((r) => r.success).length,
-    totalProcessingTime: `${Date.now() - startTime}ms`
+  logXcmOperation('Completed', {
+    results: xcmDryRunResult.length,
+    success: xcmDryRunResult.filter((r) => r.success).length,
+    duration: `${Date.now() - startTime}ms`
   });
 
   return xcmDryRunResult;
@@ -262,40 +238,18 @@ async function processXcmLocation(
   initialChain: ChainConfig,
   openApis: ApiPromise[]
 ): Promise<{ chainApi: ApiPromise; originInfo: OriginInfo }> {
-  logXcmOperation('Processing XCM Location', {
-    initialChain: initialChain.key,
-    initialChainName: initialChain.name
-  });
-
   let currentChain = initialChain;
   let originParents = 0;
   let originInterior: Record<string, any>;
 
   const { parents, interiors } = parseLocationChain(location);
 
-  logXcmOperation('Location Chain Parsed', {
-    parents,
-    interiorsCount: interiors.length,
-    interiorTypes: interiors.map((i) => Object.keys(i).find((key) => i[key as keyof typeof i]))
-  });
-
   // Handle parent chain navigation
   if (parents === 0) {
     originInterior = { Here: {} };
-    logXcmOperation('Parent Navigation - Same Chain', {
-      currentChain: currentChain.key,
-      parents: 0
-    });
   } else if (parents <= PARENT_CHAIN_JUMP_LIMIT) {
     if (currentChain.relayChain) {
       originInterior = { X1: [{ Parachain: currentChain.paraId }] };
-
-      logXcmOperation('Parent Navigation - To Relay Chain', {
-        fromParachain: currentChain.key,
-        paraId: currentChain.paraId,
-        toRelayChain: currentChain.relayChain,
-        parents
-      });
 
       currentChain = assertReturn(
         allEndpoints.find((item) => item.key === currentChain.relayChain),
@@ -304,30 +258,13 @@ async function processXcmLocation(
     } else {
       const errorMsg = `Cannot jump to parent(${parents}), current path is ${currentChain.key}`;
 
-      logXcmOperation(
-        'Parent Navigation Error - No Relay Chain',
-        {
-          currentChain: currentChain.key,
-          parents,
-          error: errorMsg
-        },
-        'error'
-      );
+      logXcmOperation('Navigation Error', { error: errorMsg }, 'error');
       throw new Error(errorMsg);
     }
   } else {
     const errorMsg = `Cannot jump to parents(${parents}): exceeds maximum parent chain jump limit`;
 
-    logXcmOperation(
-      'Parent Navigation Error - Limit Exceeded',
-      {
-        parents,
-        limit: PARENT_CHAIN_JUMP_LIMIT,
-        currentChain: currentChain.key,
-        error: errorMsg
-      },
-      'error'
-    );
+    logXcmOperation('Navigation Error', { error: errorMsg }, 'error');
     throw new Error(errorMsg);
   }
 
@@ -337,39 +274,16 @@ async function processXcmLocation(
     if (interior.isParachain) {
       const paraId = interior.asParachain.toNumber();
 
-      logXcmOperation('Interior Navigation - To Parachain', {
-        step: i + 1,
-        totalSteps: interiors.length,
-        fromChain: currentChain.key,
-        targetParaId: paraId
-      });
-
       originParents++;
 
       currentChain = assertReturn(
         allEndpoints.find((item) => item.relayChain && item.relayChain === currentChain.key && item.paraId === paraId),
         `Network not supported, current path is ${currentChain.key}, paraId is ${paraId}`
       );
-
-      logXcmOperation('Interior Navigation - Parachain Resolved', {
-        step: i + 1,
-        resolvedChain: currentChain.key,
-        chainName: currentChain.name,
-        paraId: currentChain.paraId
-      });
     } else {
       const errorMsg = `Cannot jump to path, current path is ${currentChain.key}, interior(${interior.toString()})`;
 
-      logXcmOperation(
-        'Interior Navigation Error',
-        {
-          step: i + 1,
-          currentChain: currentChain.key,
-          interiorType: Object.keys(interior).find((key) => interior[key as keyof typeof interior]),
-          error: errorMsg
-        },
-        'error'
-      );
+      logXcmOperation('Navigation Error', { error: errorMsg }, 'error');
       throw new Error(errorMsg);
     }
   }
@@ -379,19 +293,7 @@ async function processXcmLocation(
 
   if (exists) {
     chainApi = exists;
-    logXcmOperation('API Connection - Reusing Existing', {
-      targetChain: currentChain.key,
-      chainName: currentChain.name,
-      totalOpenApis: openApis.length
-    });
   } else {
-    logXcmOperation('API Connection - Creating New', {
-      targetChain: currentChain.key,
-      chainName: currentChain.name,
-      wsUrls: Object.values(currentChain.wsUrl),
-      hasHttpUrl: !!currentChain.httpUrl
-    });
-
     [chainApi] = await createApi(Object.values(currentChain.wsUrl), currentChain.key, currentChain.httpUrl);
   }
 
@@ -401,32 +303,12 @@ async function processXcmLocation(
     openApis.push(chainApi);
   }
 
-  logXcmOperation('API Connection - Ready', {
-    targetChain: currentChain.key,
-    runtimeVersion: chainApi.runtimeVersion.specVersion.toString(),
-    totalOpenApis: openApis.length
-  });
-
   if (!chainApi.call.dryRunApi?.dryRunXcm) {
     const errorMsg = `Chain ${currentChain.name} does not support XCM dry run API`;
 
-    logXcmOperation(
-      'API Validation Error - No XCM Support',
-      {
-        targetChain: currentChain.key,
-        chainName: currentChain.name,
-        availableApis: Object.keys(chainApi.call.dryRunApi || {}),
-        error: errorMsg
-      },
-      'error'
-    );
+    logXcmOperation('API Validation Error', { error: errorMsg }, 'error');
     throw new Error(errorMsg);
   }
-
-  logXcmOperation('API Validation - XCM Support Confirmed', {
-    targetChain: currentChain.key,
-    chainName: currentChain.name
-  });
 
   return {
     chainApi,
@@ -453,21 +335,8 @@ async function executeXcmMessages(
 ): Promise<DryRunResult[]> {
   const results: DryRunResult[] = [];
 
-  logXcmOperation('Executing XCM Messages', {
-    chain: chainApi.runtimeChain.toString(),
-    messageCount: messages.length,
-    originParents,
-    originInteriorType: Object.keys(originInterior)[0]
-  });
-
   for (let i = 0; i < messages.length; i++) {
     const message = messages[i];
-
-    logXcmOperation('Processing XCM Message', {
-      messageIndex: i + 1,
-      totalMessages: messages.length,
-      chain: chainApi.runtimeChain.toString()
-    });
 
     try {
       const result = await chainApi.call.dryRunApi.dryRunXcm(
@@ -480,33 +349,16 @@ async function executeXcmMessages(
         message
       );
 
-      logXcmOperation('XCM Dry Run Call Completed', {
-        messageIndex: i + 1,
-        success: result.isOk,
-        chain: chainApi.runtimeChain.toString()
-      });
-
       if (result.isOk) {
         const ok = result.asOk;
         const executionResult = ok.executionResult;
 
-        logXcmOperation('XCM Result Analysis', {
-          messageIndex: i + 1,
-          executionComplete: executionResult.isComplete,
-          executionIncomplete: executionResult.isIncomplete,
-          executionError: executionResult.isError,
-          eventCount: ok.emittedEvents.length,
-          forwardedXcmCount: ok.forwardedXcms.length
-        });
-
         if (executionResult.isComplete) {
           const balancesChanges = parseBalancesChange(ok.emittedEvents, chainApi.genesisHash.toHex());
 
-          logXcmOperation('XCM Execution Success', {
-            messageIndex: i + 1,
-            eventCount: ok.emittedEvents.length,
-            balanceChangesCount: balancesChanges.length,
-            forwardedXcmCount: ok.forwardedXcms.length
+          logXcmOperation('Execution Success', {
+            events: ok.emittedEvents.length,
+            balanceChanges: balancesChanges.length
           });
 
           results.push({
@@ -519,16 +371,7 @@ async function executeXcmMessages(
           const err = executionResult.asIncomplete;
           const xcmError = assetXcmV5TraitsError(err.error);
 
-          logXcmOperation(
-            'XCM Execution Incomplete',
-            {
-              messageIndex: i + 1,
-              error: xcmError.message,
-              errorType: err.error.type,
-              eventCount: ok.emittedEvents.length
-            },
-            'warn'
-          );
+          logXcmOperation('Execution Incomplete', { error: xcmError.message }, 'warn');
 
           results.push({
             success: false,
@@ -540,16 +383,7 @@ async function executeXcmMessages(
           const err = executionResult.asError;
           const xcmError = assetXcmV5TraitsError(err.error);
 
-          logXcmOperation(
-            'XCM Execution Error',
-            {
-              messageIndex: i + 1,
-              error: xcmError.message,
-              errorType: err.error.type,
-              eventCount: ok.emittedEvents.length
-            },
-            'error'
-          );
+          logXcmOperation('Execution Error', { error: xcmError.message }, 'error');
 
           results.push({
             success: false,
@@ -562,15 +396,7 @@ async function executeXcmMessages(
         const err = result.asErr;
         const errorMsg = `XCM dry run failed: ${err.type}`;
 
-        logXcmOperation(
-          'XCM Dry Run Failed',
-          {
-            messageIndex: i + 1,
-            errorType: err.type,
-            error: errorMsg
-          },
-          'error'
-        );
+        logXcmOperation('Dry Run Failed', { error: errorMsg }, 'error');
 
         results.push({
           success: false,
@@ -579,11 +405,9 @@ async function executeXcmMessages(
       }
     } catch (error) {
       logXcmOperation(
-        'XCM Message Execution Error',
+        'Message Execution Error',
         {
-          messageIndex: i + 1,
-          error: error instanceof Error ? error.message : String(error),
-          errorType: error instanceof Error ? error.constructor.name : 'Unknown'
+          error: error instanceof Error ? error.message : String(error)
         },
         'error'
       );
@@ -591,14 +415,6 @@ async function executeXcmMessages(
       results.push(createErrorResult(error, 'Unknown error during XCM execution'));
     }
   }
-
-  logXcmOperation('XCM Messages Execution Completed', {
-    totalMessages: messages.length,
-    totalResults: results.length,
-    successCount: results.filter((r) => r.success).length,
-    errorCount: results.filter((r) => !r.success).length,
-    chain: chainApi.runtimeChain.toString()
-  });
 
   return results;
 }

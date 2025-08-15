@@ -330,6 +330,7 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
                   }
                 })
                 .catch((error) => {
+                  console.error(error);
                   setCrossChainSimulation({
                     isDone: true,
                     success: false,
@@ -346,6 +347,7 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
           }
         })
         .catch((error) => {
+          console.error(error);
           setSimulation({ isDone: true, success: false, error: error.message || 'Unknown Error', isLoading: false });
           setCrossChainSimulation({ ...EMPTY_SIMULATION, isLoading: true });
         });
