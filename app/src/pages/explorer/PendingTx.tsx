@@ -58,7 +58,6 @@ function PendingTx({ address, url }: Props) {
         <div className='h-[50vh] space-y-5 overflow-y-auto p-5'>
           <GroupedTransactions
             groupedTransactions={groupedTransactions}
-            showEmpty={true}
             emptyHeight={280}
             emptyLabel='No Pending Transactions'
             variant='compact'
