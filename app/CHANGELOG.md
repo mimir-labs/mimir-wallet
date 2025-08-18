@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.22.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.22.0...mimir-wallet-app-v2.22.1) (2025-08-18)
+
+
+### Bug Fixes
+
+* Fixed the problem of empty ui and skeleton appearing at the same time ([#289](https://github.com/mimir-labs/mimir-wallet/issues/289)) ([cbbab64](https://github.com/mimir-labs/mimir-wallet/commit/cbbab64150f2a24b021d7daf38d57ed760d34da0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.22.1
+    * @mimir-wallet/service bumped to 2.22.1
+    * @mimir-wallet/ui bumped to 2.22.1
+
 ## [2.22.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.21.1...mimir-wallet-app-v2.22.0) (2025-08-18)
 
 
