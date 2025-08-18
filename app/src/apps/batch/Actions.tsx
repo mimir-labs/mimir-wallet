@@ -4,10 +4,12 @@
 import type { BatchTxItem } from '@/hooks/types';
 
 import { TxButton } from '@/components';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox } from '@mimir-wallet/ui';
+
+import { filterOutBatchAllTransactions } from './utils';
 
 function Actions({
   address,
@@ -31,8 +33,12 @@ function Actions({
   onClose?: () => void;
 }) {
   const { api } = useApi();
-  const isCheckAll = selected.length === txs.length;
-  const isCheckSome = selected.length > 0 && selected.length < txs.length;
+
+  // Filter out batchAll transactions for select all
+  const selectableTxs = useMemo(() => filterOutBatchAllTransactions(txs, api.registry), [txs, api.registry]);
+
+  const isCheckAll = selectableTxs.length > 0 && selected.length === selectableTxs.length;
+  const isCheckSome = selected.length > 0 && selected.length < selectableTxs.length;
 
   return (
     <div className='flex gap-5'>
@@ -43,8 +49,9 @@ function Actions({
           isIndeterminate={isCheckSome}
           onValueChange={(checked) => {
             if (checked) {
-              setSelected(txs.map((item) => item.id));
-              setRelatedBatches(txs.map((item) => item.relatedBatch).filter((item) => item !== undefined));
+              // Only select non-batchAll transactions
+              setSelected(selectableTxs.map((item) => item.id));
+              setRelatedBatches(selectableTxs.map((item) => item.relatedBatch).filter((item) => item !== undefined));
             } else {
               setSelected([]);
               setRelatedBatches([]);
@@ -72,12 +79,44 @@ function Actions({
         accountId={address}
         website='mimir://app/batch'
         beforeSend={async () => {
-          setTxs(txs.filter((tx) => !selected.includes(tx.id)));
-          setSelected([]);
+          try {
+            setTxs(txs.filter((tx) => !selected.includes(tx.id)));
+            setSelected([]);
+          } catch (error) {
+            console.error('Failed to update transactions state:', error);
+
+            throw error;
+          }
         }}
-        getCall={() =>
-          api.tx.utility.batchAll(txs.filter((item) => selected.includes(item.id)).map(({ calldata }) => calldata))
-        }
+        getCall={() => {
+          try {
+            const selectedTxs = txs.filter((item) => selected.includes(item.id));
+
+            if (selectedTxs.length === 0) {
+              throw new Error('No transactions selected');
+            }
+
+            const calls = selectedTxs.map(({ calldata }) => {
+              if (!calldata) {
+                throw new Error('Invalid transaction data');
+              }
+
+              return calldata;
+            });
+
+            // If only one transaction is selected, submit it directly without utility.batchAll wrapper
+            if (calls.length === 1) {
+              return calls[0];
+            }
+
+            // Otherwise, wrap multiple transactions with utility.batchAll
+            return api.tx.utility.batchAll(calls);
+          } catch (error) {
+            console.error('Failed to prepare batch transaction:', error);
+
+            throw error;
+          }
+        }}
         onDone={onClose}
       >
         Confirm Batch

@@ -11,7 +11,7 @@ import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
@@ -21,7 +21,8 @@ import { Avatar, Button, Divider } from '@mimir-wallet/ui';
 import Actions from './Actions';
 import BatchItemDrag from './BatchItemDrag';
 import EmptyBatch from './EmptyBatch';
-import Restore from './Restore';
+import LazyRestore from './LazyRestore';
+import { calculateSelectionConstraints } from './utils';
 
 function Content({
   address,
@@ -43,6 +44,49 @@ function Content({
   const [relatedBatches, setRelatedBatches] = useState<number[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Track selected transactions
+  const selectedTxs = useMemo(() => {
+    return txs.filter((tx) => selected.includes(tx.id));
+  }, [txs, selected]);
+
+  // Memoize IDs for SortableContext to prevent recreation
+  const sortableItems = useMemo(() => txs.map((item) => item.id), [txs]);
+
+  // Memoize handlers to prevent unnecessary re-renders
+  const handleItemSelection = useCallback((itemId: number | string, relatedBatch?: number) => {
+    return (state: boolean) => {
+      setSelected((values) => (state ? [...values, itemId] : values.filter((v) => itemId !== v)));
+      setRelatedBatches((values) =>
+        state
+          ? relatedBatch
+            ? [...values, relatedBatch]
+            : values
+          : relatedBatch
+            ? values.filter((v) => relatedBatch !== v)
+            : values
+      );
+    };
+  }, []);
+
+  const handleItemDelete = useCallback(
+    (itemId: number | string) => {
+      return () => {
+        setSelected((values) => values.filter((v) => v !== itemId));
+        deleteTx([itemId]);
+      };
+    },
+    [deleteTx]
+  );
+
+  const handleItemCopy = useCallback(
+    (item: BatchTxItem) => {
+      return () => {
+        addTx([item], false);
+      };
+    },
+    [addTx]
+  );
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -51,56 +95,55 @@ function Content({
     })
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
 
-    if (active.id !== over?.id) {
-      const oldIndex = txs.findIndex((item) => item.id === active.id);
-      const newIndex = txs.findIndex((item) => item.id === over?.id);
+      if (active.id !== over?.id) {
+        const oldIndex = txs.findIndex((item) => item.id === active.id);
+        const newIndex = txs.findIndex((item) => item.id === over?.id);
 
-      const newItems = arrayMove(txs, oldIndex, newIndex);
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newItems = arrayMove(txs, oldIndex, newIndex);
 
-      // setItems(newItems);
-      setTxs(newItems);
-    }
-  };
+          setTxs(newItems);
+        }
+      }
+    },
+    [txs, setTxs]
+  );
 
   return (
     <>
       <div className='scrollbar-hide flex flex-1 flex-col gap-2.5 overflow-y-auto'>
         <div ref={containerRef} style={{ touchAction: 'pan-y' }}>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={txs.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext items={sortableItems} strategy={verticalListSortingStrategy}>
               <div className='space-y-2.5'>
-                {txs.map((item, index) => (
-                  <BatchItemDrag
-                    key={item.id}
-                    {...item}
-                    index={index}
-                    from={address}
-                    selected={selected}
-                    registry={api.registry}
-                    onSelected={(state: boolean) => {
-                      setSelected((values) => (state ? [...values, item.id] : values.filter((v) => item.id !== v)));
-                      setRelatedBatches((values) =>
-                        state
-                          ? item.relatedBatch
-                            ? [...values, item.relatedBatch]
-                            : values
-                          : item.relatedBatch
-                            ? values.filter((v) => item.relatedBatch !== v)
-                            : values
-                      );
-                    }}
-                    onDelete={() => {
-                      setSelected((values) => values.filter((v) => v !== item.id));
-                      deleteTx([item.id]);
-                    }}
-                    onCopy={() => {
-                      addTx([item], false);
-                    }}
-                  />
-                ))}
+                {txs.map((item, index) => {
+                  const { isDisabled, disabledReason } = calculateSelectionConstraints(
+                    item,
+                    selectedTxs,
+                    api.registry,
+                    selected.includes(item.id)
+                  );
+
+                  return (
+                    <BatchItemDrag
+                      key={item.id}
+                      {...item}
+                      index={index}
+                      from={address}
+                      selected={selected}
+                      registry={api.registry}
+                      isSelectionDisabled={isDisabled}
+                      disabledReason={disabledReason}
+                      onSelected={isDisabled ? () => {} : handleItemSelection(item.id, item.relatedBatch)}
+                      onDelete={handleItemDelete(item.id)}
+                      onCopy={handleItemCopy(item)}
+                    />
+                  );
+                })}
               </div>
             </SortableContext>
           </DndContext>
@@ -187,7 +230,7 @@ function Batch({
 
       {isRestore ? (
         <SubApiRoot network={network}>
-          <Restore onClose={toggleRestore} />
+          <LazyRestore onClose={toggleRestore} />
         </SubApiRoot>
       ) : txs.length === 0 ? (
         <EmptyBatch onAdd={toggleOpen} onClose={onClose} onHandleRestore={toggleRestore} />
