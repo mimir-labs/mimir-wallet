@@ -7,6 +7,7 @@ import type { GroupedTransactions as GroupedTransactionsType } from './transacti
 import { Empty } from '@/components';
 import React from 'react';
 
+import { skeleton } from './skeleton';
 import TxCell from './TxCell';
 
 interface GroupedTransactionsProps {
@@ -14,10 +15,6 @@ interface GroupedTransactionsProps {
    * Grouped transactions data
    */
   groupedTransactions: GroupedTransactionsType[];
-  /**
-   * Whether to show empty state when no transactions
-   */
-  showEmpty?: boolean;
   /**
    * Height for empty state
    */
@@ -54,6 +51,7 @@ interface GroupedTransactionsProps {
    * Group card style variant
    */
   variant?: 'default' | 'compact';
+  showSkeleton?: boolean;
 }
 
 const spacingClasses = {
@@ -69,7 +67,6 @@ const variantClasses = {
 
 function GroupedTransactions({
   groupedTransactions,
-  showEmpty = true,
   emptyHeight = '80dvh',
   emptyLabel,
   defaultOpenFirst = true,
@@ -77,10 +74,11 @@ function GroupedTransactions({
   renderTransaction,
   className = '',
   spacing = 'md',
-  variant = 'default'
+  variant = 'default',
+  showSkeleton
 }: GroupedTransactionsProps) {
   // Show empty state if no transactions and showEmpty is enabled
-  if (showEmpty && groupedTransactions.length === 0) {
+  if (!showSkeleton && groupedTransactions.length === 0) {
     return <Empty height={emptyHeight} label={emptyLabel} />;
   }
 
@@ -117,6 +115,7 @@ function GroupedTransactions({
 
         return groupRenderer(group, groupIndex, transactions);
       })}
+      {showSkeleton ? skeleton : null}
     </div>
   );
 }
