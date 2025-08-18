@@ -2,11 +2,77 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { IMethod } from '@polkadot/types/types';
+import type { Call } from '@polkadot/types/interfaces';
+import type { IMethod, Registry } from '@polkadot/types/types';
 
 import { createKeyMulti } from '@polkadot/util-crypto';
 
 import { encodeAddress } from './defaults.js';
+
+// LRU cache for parsed calls to avoid repeated parsing
+class CallCache {
+  private cache = new Map<string, Call | null>();
+  private maxSize: number;
+
+  constructor(maxSize = 100) {
+    this.maxSize = maxSize;
+  }
+
+  get(key: string): Call | null | undefined {
+    const value = this.cache.get(key);
+
+    if (value !== undefined) {
+      // Move to end (most recently used)
+      this.cache.delete(key);
+      this.cache.set(key, value);
+    }
+
+    return value;
+  }
+
+  set(key: string, value: Call | null): void {
+    if (this.cache.size >= this.maxSize) {
+      // Remove least recently used (first entry)
+      const firstKey = this.cache.keys().next().value;
+
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
+    }
+
+    this.cache.set(key, value);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+const callCache = new CallCache(200); // Cache up to 200 parsed calls
+
+export function parseCall(registry: Registry, calldata: string): Call | null {
+  const chainSS58 = String(((registry as any).chainSS58 as string) || 'unknown');
+  const cacheKey = `${chainSS58}-${calldata}`;
+
+  const cachedCall = callCache.get(cacheKey);
+
+  if (cachedCall !== undefined) {
+    return cachedCall;
+  }
+
+  try {
+    const call = registry.createType('Call', calldata);
+
+    callCache.set(cacheKey, call);
+
+    return call;
+  } catch (error) {
+    console.warn('Failed to parse call data:', error);
+    callCache.set(cacheKey, null);
+
+    return null;
+  }
+}
 
 export function findTargetCall(
   api: ApiPromise,

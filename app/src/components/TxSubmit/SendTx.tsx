@@ -54,7 +54,7 @@ function SendTx({
   const [loading, setLoading] = useState(false);
   const { txBundle, isLoading, error, hashSet, delay } = buildTx;
   const source = useAccountSource(txBundle?.signer);
-  const { data: dryRunResult } = useDryRunResult(txBundle);
+  const { dryRunResult } = useDryRunResult(txBundle);
 
   const onConfirm = async () => {
     let events: TxEvents = new TxEvents();

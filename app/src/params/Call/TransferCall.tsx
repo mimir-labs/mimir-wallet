@@ -4,13 +4,14 @@
 import type { CallProps } from './types';
 
 import { Address, AddressName, CopyAddress, FormatBalance, IdentityIcon } from '@/components';
+import { findAsset } from '@/config';
 import { useAssetInfo } from '@/hooks/useAssets';
 import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
 import React, { forwardRef } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Skeleton } from '@mimir-wallet/ui';
+import { Avatar, Skeleton } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
 import { mergeClasses } from './utils';
@@ -54,7 +55,7 @@ const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) =
     showFallback,
     fallbackComponent: FallbackComponent = FunctionArgs
   } = props;
-  const { network } = useApi();
+  const { network, chain } = useApi();
   const results = useParseTransfer(registry, propFrom, call);
 
   const [assetInfo] = useAssetInfo(network, results?.[0]);
@@ -62,6 +63,8 @@ const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) =
   if (!results) return showFallback ? <FallbackComponent ref={ref} {...props} /> : null;
 
   const [assetId, from, to, value, isAll] = results;
+
+  const icon = assetId ? findAsset(network, assetId)?.Icon : chain.tokenIcon;
 
   return (
     <div
@@ -81,7 +84,12 @@ const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) =
               isAll ? (
                 `All ${assetInfo.symbol}`
               ) : (
-                <FormatBalance value={value} withCurrency format={[assetInfo.decimals, assetInfo.symbol]} />
+                <FormatBalance
+                  icon={<Avatar className='h-4 w-4' fallback={assetInfo.symbol.slice(0, 1)} src={icon} />}
+                  value={value}
+                  withCurrency
+                  format={[assetInfo.decimals, assetInfo.symbol]}
+                />
               )
             ) : (
               <Skeleton style={{ width: 50 }} />
@@ -89,7 +97,7 @@ const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) =
           ) : isAll ? (
             'All'
           ) : (
-            <FormatBalance value={value} withCurrency />
+            <FormatBalance icon={<Avatar className='h-4 w-4' src={icon} />} value={value} withCurrency />
           )}
         </div>
       </div>

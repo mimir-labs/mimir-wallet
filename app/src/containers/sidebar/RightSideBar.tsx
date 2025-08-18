@@ -47,7 +47,7 @@ function RightSideBar({ offsetTop = 0 }: { offsetTop?: number }) {
             height: `calc(100dvh - ${offsetTop}px - 1px - 56px)`
           }}
         >
-          <div className='flex-1 overflow-y-auto px-4 py-5 pb-[70px]'>{rightSidebarElement}</div>
+          <div className='flex-1 overflow-y-auto px-4 py-5'>{rightSidebarElement}</div>
         </div>
       )}
     </>

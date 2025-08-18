@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.22.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.21.1...ui-v2.22.0) (2025-08-18)
+
+
+### Features
+
+* Add cross-chain simulation support with XCM integration ([#285](https://github.com/mimir-labs/mimir-wallet/issues/285)) ([12f837d](https://github.com/mimir-labs/mimir-wallet/commit/12f837deb5b3eea26a59721916fc6fe769622348))
+
+## [2.21.1](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.21.0...ui-v2.21.1) (2025-08-18)
+
+
+### Miscellaneous Chores
+
+* **ui:** Synchronize main group versions
+
+## [2.21.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.20.0...ui-v2.21.0) (2025-08-13)
+
+
+### Features
+
+* Add notification center feature ([#282](https://github.com/mimir-labs/mimir-wallet/issues/282)) ([dbeb85c](https://github.com/mimir-labs/mimir-wallet/commit/dbeb85c86712264d3ff6d24f259d1adf893a8663))
+
 ## [2.20.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.19.0...ui-v2.20.0) (2025-08-07)
 
 

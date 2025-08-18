@@ -1,5 +1,54 @@
 # Changelog
 
+## [2.22.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.21.1...mimir-wallet-app-v2.22.0) (2025-08-18)
+
+
+### Features
+
+* Add cross-chain simulation support with XCM integration ([#285](https://github.com/mimir-labs/mimir-wallet/issues/285)) ([12f837d](https://github.com/mimir-labs/mimir-wallet/commit/12f837deb5b3eea26a59721916fc6fe769622348))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.22.0
+    * @mimir-wallet/service bumped to 2.22.0
+    * @mimir-wallet/ui bumped to 2.22.0
+
+## [2.21.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.21.0...mimir-wallet-app-v2.21.1) (2025-08-18)
+
+
+### Bug Fixes
+
+* fix some ui issues ([#286](https://github.com/mimir-labs/mimir-wallet/issues/286)) ([bfbbda0](https://github.com/mimir-labs/mimir-wallet/commit/bfbbda01ef6de043ecda405cb548493bf9586048))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.21.1
+    * @mimir-wallet/service bumped to 2.21.1
+    * @mimir-wallet/ui bumped to 2.21.1
+
+## [2.21.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.20.0...mimir-wallet-app-v2.21.0) (2025-08-13)
+
+
+### Features
+
+* Add group by date for transaction ([#284](https://github.com/mimir-labs/mimir-wallet/issues/284)) ([2f0e615](https://github.com/mimir-labs/mimir-wallet/commit/2f0e615f9cc290b957498717b0c7ea47569f4485))
+* Add notification center feature ([#282](https://github.com/mimir-labs/mimir-wallet/issues/282)) ([dbeb85c](https://github.com/mimir-labs/mimir-wallet/commit/dbeb85c86712264d3ff6d24f259d1adf893a8663))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.21.0
+    * @mimir-wallet/service bumped to 2.21.0
+    * @mimir-wallet/ui bumped to 2.21.0
+
 ## [2.20.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.19.0...mimir-wallet-app-v2.20.0) (2025-08-07)
 
 

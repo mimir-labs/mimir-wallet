@@ -7,7 +7,9 @@ import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { useTransactionDetail } from '@/hooks/useTransactions';
-import { TxCell, TxProgress } from '@/transactions';
+import { GroupedTransactions, TxProgress } from '@/transactions';
+import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
+import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
@@ -41,6 +43,10 @@ function PageTransactionDetails() {
   const [urlNetwork] = useQueryParam<string>('network');
   const upSm = useMediaQuery('sm');
 
+  const groupedTransactions = useMemo(() => {
+    return groupTransactionsByDate(transaction ? [transaction] : []);
+  }, [transaction]);
+
   if (isFetching && !isFetched) {
     return <Spinner size='lg' variant='wave' />;
   }
@@ -49,13 +55,11 @@ function PageTransactionDetails() {
     return null;
   }
 
-  return (
+  return upSm ? (
+    <GroupedTransactions groupedTransactions={groupedTransactions} />
+  ) : (
     <SubApiRoot network={urlNetwork || network}>
-      {upSm ? (
-        <TxCell defaultOpen address={transaction.address} transaction={transaction} />
-      ) : (
-        <SmPage transaction={transaction} />
-      )}
+      <SmPage transaction={transaction} />
     </SubApiRoot>
   );
 }
