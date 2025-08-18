@@ -40,7 +40,9 @@ function BatchItem({ children, actions, from, calldata, bgcolor, registry }: Pro
       <div className='grid h-[44px] cursor-pointer grid-cols-6 px-2 text-sm sm:px-3' onClick={toggleOpen}>
         {children}
         <div className='col-span-2 flex items-center'>
-          <CallDisplayDetail fallbackWithName registry={registry} call={call} />
+          <span className='overflow-hidden text-ellipsis'>
+            <CallDisplayDetail fallbackWithName registry={registry} call={call} />
+          </span>
         </div>
         <div className='col-span-1 flex items-center justify-between'>
           {actions || <div />}
