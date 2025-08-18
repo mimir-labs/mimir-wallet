@@ -6,14 +6,16 @@ import type { IMethod } from '@polkadot/types/types';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { events } from '@/events';
+import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { Call as CallComp, FunctionArgs } from '@/params';
 import React, { useMemo, useRef } from 'react';
 
 import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
-function CallInfo({ call }: { call: IMethod }) {
+function CallInfo({ address, call }: { address: string; call: IMethod }) {
   const { network } = useApi();
+  const [, addTx] = useBatchTxs(network, address);
 
   const action = useMemo(() => {
     try {
@@ -40,7 +42,17 @@ function CallInfo({ call }: { call: IMethod }) {
           </Button>
         </Tooltip>
         <Tooltip content='Submit exact same transactions' color='foreground'>
-          <Button variant='ghost' size='sm'>
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={() => {
+              addTx([
+                {
+                  calldata: call.toHex()
+                }
+              ]);
+            }}
+          >
             + Batch
             <IconBatch />
           </Button>
@@ -72,7 +84,7 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
     <>
       {callElement}
       <Divider className='first:hidden' />
-      <CallInfo call={targetCall} />
+      <CallInfo call={targetCall} address={address} />
     </>
   );
 }
