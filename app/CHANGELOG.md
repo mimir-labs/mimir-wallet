@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.22.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.21.1...mimir-wallet-app-v2.22.0) (2025-08-18)
+
+
+### Features
+
+* Add cross-chain simulation support with XCM integration ([#285](https://github.com/mimir-labs/mimir-wallet/issues/285)) ([12f837d](https://github.com/mimir-labs/mimir-wallet/commit/12f837deb5b3eea26a59721916fc6fe769622348))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.22.0
+    * @mimir-wallet/service bumped to 2.22.0
+    * @mimir-wallet/ui bumped to 2.22.0
+
 ## [2.21.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.21.0...mimir-wallet-app-v2.21.1) (2025-08-18)
 
 
