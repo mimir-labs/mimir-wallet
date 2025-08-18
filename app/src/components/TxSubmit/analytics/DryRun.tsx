@@ -17,7 +17,8 @@ import {
   dryRunWithXcm,
   getChainIcon,
   SubApiRoot,
-  useApi
+  useApi,
+  useNetworks
 } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Spinner } from '@mimir-wallet/ui';
 
@@ -40,6 +41,8 @@ function OperationItem({
   amount: bigint;
   assetId: string;
 }) {
+  const { enableNetwork } = useNetworks();
+
   const getActionEmoji = () => {
     switch (type) {
       case 'Receive':
@@ -54,6 +57,10 @@ function OperationItem({
         return '';
     }
   };
+
+  useEffect(() => {
+    enableNetwork(genesisHash);
+  }, [enableNetwork, genesisHash]);
 
   return (
     <SubApiRoot network={genesisHash} Fallback={() => <Spinner variant='wave' size='sm' />}>
@@ -159,7 +166,15 @@ function DryRunPending({ title }: { title: string }) {
   );
 }
 
-function DryRunSuccess({ rawEvents, balancesChanges }: { rawEvents?: any; balancesChanges: SelfBalanceChange[] }) {
+function DryRunSuccess({
+  title,
+  rawEvents,
+  balancesChanges
+}: {
+  title: string;
+  rawEvents?: any;
+  balancesChanges: SelfBalanceChange[];
+}) {
   return (
     <div className='border-divider-300 flex items-start justify-between gap-2.5 rounded-[10px] border p-2.5'>
       {/* Header with left-right layout */}
@@ -177,7 +192,7 @@ function DryRunSuccess({ rawEvents, balancesChanges }: { rawEvents?: any; balanc
             fill='currentColor'
           />
         </svg>
-        <b>Simulation Result Success!</b>
+        <b>{title}</b>
       </div>
 
       {/* Operations List */}
@@ -270,7 +285,7 @@ function extraBalancesChange(address: string, balancesChanges: BalanceChange[]) 
     }
   }
 
-  return results;
+  return results.filter((item) => item.amount !== 0n);
 }
 
 function DryRun({ call, account }: { call: IMethod; account?: string }) {
@@ -376,7 +391,13 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
       return <DryRunFailed title='Cross-Chain Simulation Result: Failed!' error={crossChainSimulation.error} />;
     }
 
-    return <DryRunSuccess balancesChanges={balancesChanges} rawEvents={rawEvents} />;
+    return (
+      <DryRunSuccess
+        title={crossChainSimulation.success ? 'Cross-Chain Simulation Result' : 'Simulation Result Success!'}
+        balancesChanges={balancesChanges}
+        rawEvents={rawEvents}
+      />
+    );
   }
 
   // Initial State

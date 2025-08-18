@@ -18,17 +18,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, Checkbox, Divider } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 
 import CustomGasFeeSelect from '../CustomGasFeeSelect';
 import Input from '../Input';
 import Chopsticks from './analytics/Chopsticks';
 import DryRun from './analytics/DryRun';
-import SafetyCheck from './analytics/SafetyCheck';
 import { useBuildTx } from './hooks/useBuildTx';
 import { useCloseWhenPathChange } from './hooks/useCloseWhenPathChange';
 import { useHighlightTab } from './hooks/useHighlightTab';
-import { useSafetyCheck } from './hooks/useSafetyCheck';
 import AddressChain from './AddressChain';
 import Call from './Call';
 import Confirmations from './Confirmations';
@@ -69,7 +67,7 @@ function TxSubmit({
 
     return propsCall;
   }, [api, propsCall]);
-  const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
+  // const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
   const [note, setNote] = useState<string>(transaction?.note || '');
   const filterPaths = useFilterPaths(accountData, transaction);
   const [addressChain, setAddressChain] = useState<FilterPath[]>(propsFilterPaths || []);
@@ -194,7 +192,7 @@ function TxSubmit({
             <DryRun call={call} account={accountData.address} />
           )}
 
-          <SafetyCheck safetyCheck={safetyCheck} />
+          {/* <SafetyCheck safetyCheck={safetyCheck} /> */}
         </div>
 
         <div className='bg-content1 shadow-medium sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start rounded-[20px] p-4 sm:p-5 md:w-[40%]'>
@@ -223,11 +221,11 @@ function TxSubmit({
 
               <Input label='Note(Optional)' onChange={setNote} value={note} placeholder='Please note' />
 
-              {safetyCheck && safetyCheck.severity === 'warning' && (
+              {/* {safetyCheck && safetyCheck.severity === 'warning' && (
                 <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
                   I confirm recipient address exsits on the destination chain.
                 </Checkbox>
-              )}
+              )} */}
 
               {buildTx.txBundle?.signer ? (
                 <CustomGasFeeSelect
@@ -249,9 +247,9 @@ function TxSubmit({
               {!isPropose && (
                 <SendTx
                   disabled={
-                    !safetyCheck ||
-                    safetyCheck.severity === 'error' ||
-                    (safetyCheck.severity === 'warning' && !isConfirm) ||
+                    // !safetyCheck ||
+                    // safetyCheck.severity === 'error' ||
+                    // (safetyCheck.severity === 'warning' && !isConfirm) ||
                     !!buildTx.error
                   }
                   assetId={selectedFeeAsset?.assetId}

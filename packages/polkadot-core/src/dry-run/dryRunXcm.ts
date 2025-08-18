@@ -253,7 +253,7 @@ async function processXcmLocation(
 
       currentChain = assertReturn(
         allEndpoints.find((item) => item.key === currentChain.relayChain),
-        `Network not supported, current path is (${currentChain.key})`
+        `Relay Network not supported(ParachainID:${currentChain.relayChain})`
       );
     } else {
       const errorMsg = `Cannot jump to parent(${parents}), current path is ${currentChain.key}`;
@@ -278,7 +278,7 @@ async function processXcmLocation(
 
       currentChain = assertReturn(
         allEndpoints.find((item) => item.relayChain && item.relayChain === currentChain.key && item.paraId === paraId),
-        `Network not supported, current path is ${currentChain.key}, paraId is ${paraId}`
+        `Network not supported(ParachainID:${paraId})`
       );
     } else {
       const errorMsg = `Cannot jump to path, current path is ${currentChain.key}, interior(${interior.toString()})`;
