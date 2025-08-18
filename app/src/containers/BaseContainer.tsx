@@ -110,7 +110,7 @@ function BaseContainer({
                 background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
               }}
             >
-              <TxSubmit {...queue[0]} />
+              <TxSubmit key={queue[0].id} {...queue[0]} />
             </div>
           ) : null}
 

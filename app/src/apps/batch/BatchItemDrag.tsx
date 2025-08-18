@@ -12,9 +12,10 @@ import { AppName } from '@/components';
 import { Call, CallDisplayDetail } from '@/params';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useToggle } from 'react-use';
 
+import { parseCall } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox, Tooltip } from '@mimir-wallet/ui';
 
 export type Props = BatchTxItem & {
@@ -22,6 +23,8 @@ export type Props = BatchTxItem & {
   index: number;
   selected: (number | string)[];
   registry: Registry;
+  isSelectionDisabled?: boolean;
+  disabledReason?: string;
   onSelected: (state: boolean) => void;
   onDelete: () => void;
   onCopy: () => void;
@@ -37,6 +40,8 @@ function BatchItemDrag({
   registry,
   index,
   selected,
+  isSelectionDisabled = false,
+  disabledReason,
   onSelected,
   onDelete,
   onCopy
@@ -44,14 +49,35 @@ function BatchItemDrag({
   const [isOpen, toggleOpen] = useToggle(false);
 
   const call = useMemo(() => {
-    try {
-      return registry.createType('Call', calldata);
-    } catch {
-      return null;
-    }
+    return parseCall(registry, calldata);
   }, [registry, calldata]);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+  const isSelected = useMemo(() => selected.includes(id), [selected, id]);
+
+  const handleSelection = useCallback(
+    (checked: boolean) => {
+      onSelected(checked);
+    },
+    [onSelected]
+  );
+
+  const handleCopy = useCallback(() => {
+    onCopy();
+  }, [onCopy]);
+
+  const handleDelete = useCallback(() => {
+    onDelete();
+  }, [onDelete]);
+
+  const handleToggle = useCallback(() => {
+    toggleOpen();
+  }, [toggleOpen]);
+
+  const handleStopPropagation = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
 
   if (!call) {
     return null;
@@ -70,20 +96,35 @@ function BatchItemDrag({
       {...attributes}
       data-open={isOpen}
       data-dragging={isDragging}
-      className='bg-secondary data-[dragging=true]:bg-primary-50 overflow-hidden rounded-[10px]'
+      data-disabled={isSelectionDisabled}
+      className='bg-secondary data-[dragging=true]:bg-primary-50 overflow-hidden rounded-[10px] data-[disabled=true]:opacity-50'
     >
-      <div className='grid h-[44px] cursor-pointer grid-cols-6 px-2 text-sm sm:px-3' onClick={toggleOpen}>
-        <div className='col-span-1 flex items-center' onClick={(e) => e.stopPropagation()}>
+      <div className='grid h-[44px] cursor-pointer grid-cols-6 px-2 text-sm sm:px-3' onClick={handleToggle}>
+        <div className='col-span-1 flex items-center' onClick={handleStopPropagation}>
           <img {...listeners} src={Drag} style={{ cursor: 'grab', padding: 10, marginLeft: -10, userSelect: 'none' }} />
-          <Checkbox
-            size='sm'
-            isSelected={selected.includes(id)}
-            onValueChange={(checked) => {
-              onSelected(checked);
-            }}
-          >
-            {index + 1}
-          </Checkbox>
+          {disabledReason ? (
+            <Tooltip content={disabledReason}>
+              <div>
+                <Checkbox
+                  size='sm'
+                  isSelected={isSelected}
+                  isDisabled={isSelectionDisabled}
+                  onValueChange={handleSelection}
+                >
+                  {index + 1}
+                </Checkbox>
+              </div>
+            </Tooltip>
+          ) : (
+            <Checkbox
+              size='sm'
+              isSelected={isSelected}
+              isDisabled={isSelectionDisabled}
+              onValueChange={handleSelection}
+            >
+              {index + 1}
+            </Checkbox>
+          )}
         </div>
 
         <div className='col-span-2 flex items-center'>
@@ -99,12 +140,12 @@ function BatchItemDrag({
         <div className='col-span-1 flex items-center justify-between'>
           <div className='flex items-center gap-1'>
             <Tooltip content='Copy'>
-              <Button isIconOnly variant='light' onClick={onCopy} size='sm' color='primary'>
+              <Button isIconOnly variant='light' onClick={handleCopy} size='sm' color='primary'>
                 <IconCopy style={{ width: '1em', height: '1em' }} />
               </Button>
             </Tooltip>
             <Tooltip content='Delete'>
-              <Button isIconOnly variant='light' onClick={onDelete} size='sm' color='danger'>
+              <Button isIconOnly variant='light' onClick={handleDelete} size='sm' color='danger'>
                 <IconDelete style={{ width: 16, height: 16 }} />
               </Button>
             </Tooltip>
@@ -116,7 +157,7 @@ function BatchItemDrag({
             color='primary'
             data-open={isOpen}
             className='rotate-0 data-[open=true]:rotate-180'
-            onClick={toggleOpen}
+            onClick={handleToggle}
           >
             <ArrowDown style={{ width: 16, height: 16 }} />
           </Button>

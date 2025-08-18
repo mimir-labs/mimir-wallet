@@ -13,6 +13,7 @@ export type Endpoint = {
   name: string;
   relayChain?: string;
   isRelayChain?: boolean;
+  paraId?: number;
   isTestnet?: boolean;
   wsUrl: Record<string, string>;
   httpUrl?: string;

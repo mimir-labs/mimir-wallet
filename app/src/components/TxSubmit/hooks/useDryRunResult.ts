@@ -3,24 +3,23 @@
 
 import type { TxBundle } from '../utils';
 
-import { dryRun, useApi } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
+import { useEffect, useState } from 'react';
+
+import { dryRun, type DryRunResult, useApi } from '@mimir-wallet/polkadot-core';
 
 export function useDryRunResult(txBundle: TxBundle | null) {
-  const method = txBundle?.tx.method.toU8a() || null;
+  const method = txBundle?.tx.method.toHex() || null;
   const address = txBundle?.signer || null;
-  const { api, isApiReady, genesisHash } = useApi();
+  const { api, isApiReady } = useApi();
+  const [dryRunResult, setDryRunResult] = useState<DryRunResult>();
 
-  return useQuery({
-    queryHash: `${genesisHash}-dryRun-${method}-${address}`,
-    queryKey: [method, address] as const,
-    enabled: !!isApiReady && !!method && !!address && !!api.call.dryRunApi?.dryRunCall,
-    queryFn: ({ queryKey: [method, address] }) => {
-      if (!method || !address) {
-        throw new Error('Method and address are required');
-      }
-
-      return dryRun(api, method, address);
+  useEffect(() => {
+    if (method && address && isApiReady && !!api.call.dryRunApi?.dryRunCall) {
+      dryRun(api, method, address).then(setDryRunResult);
     }
-  });
+  }, [address, api, isApiReady, method]);
+
+  return {
+    dryRunResult
+  };
 }

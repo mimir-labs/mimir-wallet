@@ -59,7 +59,9 @@ function Restore({ onClose }: { onClose: () => void }) {
     }
 
     if (!injectSigner.signRaw) {
-      toastError(`Wallet ${walletConfig[source]?.name || source} does not support signRaw`);
+      const walletName = walletConfig[source]?.name || source;
+
+      toastError(`Wallet ${walletName} does not support message signing`);
 
       return;
     }
@@ -82,7 +84,8 @@ Timestamp: ${time}`;
       setSelected([]);
       refetch();
     } catch (error) {
-      toastError(error);
+      console.error('Failed to delete batch transactions:', error);
+      toastError(error instanceof Error ? error.message : 'Failed to delete selected transactions');
     } finally {
       setLoading(false);
     }
