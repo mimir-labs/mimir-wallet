@@ -69,7 +69,7 @@ function Extrinsic({
             </div>
           }
           placeholder='0x...'
-          color={callDataError ? 'danger' : 'primary'}
+          error={callDataError}
           helper={
             <div className='text-foreground mt-1'>
               You can paste the Encoded Call Data in{' '}

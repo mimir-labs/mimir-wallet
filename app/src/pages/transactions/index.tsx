@@ -3,6 +3,7 @@
 
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,6 +11,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Avatar,
   Button,
+  Checkbox,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -17,7 +19,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   Tab,
-  Tabs
+  Tabs,
+  Tooltip
 } from '@mimir-wallet/ui';
 
 import HistoryTransactions from './HistoryTransactions';
@@ -37,6 +40,8 @@ function Content({ address }: { address: string }) {
 
   const [type, setType] = useQueryParam<string>('status', 'pending');
   const [txId] = useQueryParam<string>('tx_id');
+  const [discardedCounts, setDiscardedCounts] = useState(0);
+  const [showDiscarded, setShowDiscarded] = useState(false);
 
   useEffect(() => {
     setSelectedPendingNetworks((selectedPendingNetworks) => {
@@ -86,6 +91,27 @@ function Content({ address }: { address: string }) {
             <Tab key='history' title='History' />
           </Tabs>
         </div>
+
+        {type === 'pending' && (
+          <>
+            <Checkbox size='sm' isSelected={showDiscarded} onValueChange={setShowDiscarded}>
+              <span className='flex items-center gap-1'>Discarded Transactions({discardedCounts})</span>
+            </Checkbox>
+            <Tooltip
+              content={
+                <div>
+                  These transactions have now been discarded due to Assethub Migration.
+                  <br />
+                  You can re-initiate them on Assethub.
+                  <br />
+                  <b>Deposit has been refunded to your account on Assethub.</b>
+                </div>
+              }
+            >
+              <IconQuestion className='text-primary' />
+            </Tooltip>
+          </>
+        )}
 
         {type === 'pending' &&
           validPendingNetworks.length > 0 &&
@@ -170,11 +196,13 @@ function Content({ address }: { address: string }) {
 
       {type === 'pending' && (
         <PendingTransactions
+          showDiscarded={showDiscarded}
           isFetched={isFetched}
           isFetching={isFetching}
           networks={selectedPendingNetworks}
           address={address}
           txId={txId}
+          onDiscardedCountsChange={setDiscardedCounts}
         />
       )}
       {type === 'history' && (

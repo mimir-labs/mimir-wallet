@@ -66,9 +66,7 @@ function SoloChainSelect() {
             <div className='space-y-2.5'>
               {Object.keys(groupedEndpoints).map((group) => (
                 <div key={`group-${group}`}>
-                  <h6 color='primary.main' className='text-primary mb-[5px] pl-2.5 capitalize sm:mb-2.5'>
-                    {group}
-                  </h6>
+                  <h6 className='text-primary mb-[5px] pl-2.5 capitalize sm:mb-2.5'>{group}</h6>
                   <div className='grid grid-cols-2 gap-[5px] sm:grid-cols-3 sm:gap-2.5'>
                     {groupedEndpoints[group].map((endpoint) => (
                       <Button
