@@ -10,6 +10,7 @@ import { findAction } from '@mimir-wallet/polkadot-core';
 import BatchCall from './BatchCall';
 import CancelAsMulti from './CancelAsMulti';
 import ConvictionVotingCall from './ConvictionVotingCall';
+import CrossChainTransferCall from './CrossChainTransferCall';
 import FunctionArgs from './FunctionArgs';
 import SetIdentity from './SetIdentity';
 import TransferCall from './TransferCall';
@@ -40,6 +41,11 @@ const componentDef: ComponentConfig[] = [
   {
     component: ConvictionVotingCall,
     actions: ['convictionVoting.'],
+    matchType: 'prefix'
+  },
+  {
+    component: CrossChainTransferCall,
+    actions: ['polkadotXcm.', 'xcmPallet.', 'xTokens.', 'ormlXTokens.'],
     matchType: 'prefix'
   },
   {

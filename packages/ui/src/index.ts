@@ -15,6 +15,7 @@ export * from './spinner/index.js';
 export { Switch } from './switch/index.js';
 export { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from './table/index.js';
 export { Tabs, Tab } from './tabs/index.js';
+export { default as TextEllipsis } from './text-ellipsis/index.js';
 
 // Shadcn components
 export { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from './shadcn/modal-compat.js';
