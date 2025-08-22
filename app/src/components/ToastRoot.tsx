@@ -20,6 +20,7 @@ function ToastRoot() {
       position='top-right'
       theme='light'
       duration={3000}
+      closeButton
     />,
     document.body
   );
