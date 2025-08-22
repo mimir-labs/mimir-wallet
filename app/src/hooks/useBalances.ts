@@ -4,11 +4,7 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { Option } from '@polkadot/types';
 import type { AccountId, AccountId32 } from '@polkadot/types/interfaces';
-import type {
-  AcalaPrimitivesCurrencyAssetIds,
-  AcalaPrimitivesCurrencyCurrencyId,
-  PalletAssetsAssetAccount
-} from '@polkadot/types/lookup';
+import type { PalletAssetsAssetAccount } from '@polkadot/types/lookup';
 import type { AccountAssetInfo, AssetInfo, OrmlTokensAccountData } from './types';
 
 import { findToken } from '@/config';
@@ -208,10 +204,7 @@ async function _fetchAssetBalances({
         return Promise.all(
           assets
             .map((item) => {
-              const assetId: AcalaPrimitivesCurrencyAssetIds = api.registry.createType(
-                'AcalaPrimitivesCurrencyAssetIds',
-                item.assetId
-              );
+              const assetId: any = api.registry.createType('AcalaPrimitivesCurrencyAssetIds', item.assetId);
 
               if (assetId.isErc20) {
                 return api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {
@@ -226,7 +219,7 @@ async function _fetchAssetBalances({
                   StableAssetPoolToken: assetId.asStableAssetId.toNumber()
                 });
               } else if (assetId.isNativeAssetId) {
-                const nativeAssetId: AcalaPrimitivesCurrencyCurrencyId = api.registry.createType(
+                const nativeAssetId: any = api.registry.createType(
                   'AcalaPrimitivesCurrencyCurrencyId',
                   assetId.asNativeAssetId
                 );
@@ -312,12 +305,9 @@ async function _fetchAssetBalance({
 
   if (api.query.tokens) {
     if (network === 'acala' || network === 'karura') {
-      const assetId: AcalaPrimitivesCurrencyAssetIds = api.registry.createType(
-        'AcalaPrimitivesCurrencyAssetIds',
-        asset.assetId
-      );
+      const assetId: any = api.registry.createType('AcalaPrimitivesCurrencyAssetIds', asset.assetId);
 
-      let currencyId: AcalaPrimitivesCurrencyCurrencyId;
+      let currencyId: any;
 
       if (assetId.isErc20) {
         currencyId = api.registry.createType('AcalaPrimitivesCurrencyCurrencyId', {

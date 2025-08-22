@@ -11,7 +11,7 @@ import { useParseTransfer } from '@/hooks/useParseTransfer';
 import React, { forwardRef } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, Skeleton } from '@mimir-wallet/ui';
+import { Avatar, Skeleton, TextEllipsis } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
 import { mergeClasses } from './utils';
@@ -35,7 +35,9 @@ const AddressDisplay = React.memo(({ reverse, address }: { reverse: boolean; add
       <IdentityIcon size={24} value={address} />
       <div className='flex flex-col'>
         <div className='inline-flex h-[16px] max-h-[16px] items-center gap-1 truncate leading-[16px] font-bold group-data-[reverse=true]:flex-row-reverse sm:text-sm'>
-          <AddressName value={address} />
+          <TextEllipsis maxWidth={120}>
+            <AddressName value={address} />
+          </TextEllipsis>
           {address && <CopyAddress address={address} size='sm' />}
         </div>
         <div className='text-foreground/50 text-xs leading-[12px]'>

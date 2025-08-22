@@ -12,8 +12,8 @@ import { getSpecTypes } from '@polkadot/types-known';
 import { assert, formatBalance, isBn, isFunction, isHex, isNumber, objectSpread, u8aToHex } from '@polkadot/util';
 import { base64Encode } from '@polkadot/util-crypto';
 
+import { getFeeAssetLocation } from './xcm/fee-location.js';
 import { assetDispatchError } from './dispatch-error.js';
-import { getFeeAssetLocation } from './location.js';
 import { buildRemoteProxy } from './remoteProxy.js';
 import { TxEvents } from './tx-events.js';
 
