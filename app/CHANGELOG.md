@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.23.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.22.1...mimir-wallet-app-v2.23.0) (2025-08-25)
+
+
+### Features
+
+* Add regoinx dapp support ([da476a2](https://github.com/mimir-labs/mimir-wallet/commit/da476a2388752a5d4b541943b333d5efc2c8bf87))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.23.0
+    * @mimir-wallet/service bumped to 2.23.0
+    * @mimir-wallet/ui bumped to 2.23.0
+
 ## [2.22.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.22.0...mimir-wallet-app-v2.22.1) (2025-08-18)
 
 
