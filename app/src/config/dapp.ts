@@ -445,7 +445,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     description: 'The primary interface for interacting with Polkadot’s Agile Coretime model.',
     url: 'https://hub.regionx.tech/',
     supportedChains: ['polkadot', 'kusama', 'coretime-polkadot', 'coretime-kusama', 'paseo', 'westend'],
-    tags: ['Governance'],
+    tags: ['Coretime Tool'],
     website: 'https://hub.regionx.tech/',
     twitter: 'https://x.com/RegionXLabs',
     urlSearch(network: string) {
