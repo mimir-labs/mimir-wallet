@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.23.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.23.0...mimir-wallet-app-v2.23.1) (2025-08-25)
+
+
+### Bug Fixes
+
+* fix regionx dapp tag ([2d15b99](https://github.com/mimir-labs/mimir-wallet/commit/2d15b9954277f7c3f256817211d6247270932627))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.23.1
+    * @mimir-wallet/service bumped to 2.23.1
+    * @mimir-wallet/ui bumped to 2.23.1
+
 ## [2.23.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.22.1...mimir-wallet-app-v2.23.0) (2025-08-25)
 
 
