@@ -138,7 +138,7 @@ Timestamp: ${time}`;
                   key={item.id}
                   from={current}
                   calldata={item.call}
-                  bgcolor='linear-gradient(180deg, #F9F9FC 0%, #E5EBF9 100%)'
+                  bgcolor='var(--color-main-bg)'
                   registry={api.registry}
                 >
                   <div className='col-span-1 flex items-center'>{item.id}</div>

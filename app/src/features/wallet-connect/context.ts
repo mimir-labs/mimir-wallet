@@ -5,4 +5,16 @@ import type { WalletConnectState } from './types';
 
 import { createContext } from 'react';
 
-export const WalletConnectContext = createContext<WalletConnectState>({} as WalletConnectState);
+// Create a more type-safe default context value
+const defaultWalletConnectState: WalletConnectState = {
+  web3Wallet: null as any, // Will be properly initialized by provider
+  isReady: false,
+  isError: false,
+  sessions: [],
+  sessionProposal: undefined,
+  deleteProposal: () => {
+    console.warn('WalletConnect context not properly initialized');
+  }
+};
+
+export const WalletConnectContext = createContext<WalletConnectState>(defaultWalletConnectState);
