@@ -17,7 +17,7 @@ function Initializing() {
   return (
     <div
       style={{
-        background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)',
+        background: 'var(--color-main-bg)',
         position: 'absolute',
         left: 0,
         right: 0,

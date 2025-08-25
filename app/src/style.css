@@ -13,6 +13,10 @@
   --color-border: #D9D9D9;
   --color-input: #D9D9D9;
   --color-card: #FFF;
+  --color-sidebar-foreground: inherit;
+  --color-sidebar: #FFF;
+  --color-sidebar-border: #f4f2ff;
+  --color-main-bg: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
   --text-6xl: 2.25rem;
   --text-5xl: 2rem;
   --text-4xl: 1.75rem;
@@ -40,13 +44,13 @@
   --animate-blink-bg: blink-bg 1s 3;
   @keyframes blink-bg {
     0% {
-      background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
+      background: var(--color-main-bg);
     }
     50% {
       background: hsl(var(--heroui-primary-100));
     }
     100% {
-      background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
+      background: var(--color-main-bg);
     }
   }
   --animate-hourglass-flip: hourglassFlip 1.5s ease-in-out infinite;
@@ -165,7 +169,6 @@
   }
 
   body {
-    background: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
     font-size: 0.875rem;
     line-height: 1.2;
     color: hsl(var(--heroui-foreground));

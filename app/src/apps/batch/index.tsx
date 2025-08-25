@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Divider } from '@mimir-wallet/ui';
+import { Avatar, Button } from '@mimir-wallet/ui';
 
 import Actions from './Actions';
 import BatchItemDrag from './BatchItemDrag';
@@ -191,42 +191,33 @@ function Batch({
   const networkChain = useMemo(() => networks.find((n) => n.key === network), [networks, network]);
 
   return (
-    <div className='flex h-full w-[50vw] max-w-[560px] min-w-[320px] flex-col gap-5'>
-      <div className='flex items-center justify-between gap-2 text-xl font-bold'>
-        {isRestore ? (
+    <div className='flex h-full w-full flex-col gap-5'>
+      <div className='flex gap-4'>
+        <InputNetwork
+          placeholder=' '
+          contentClassName='min-h-[32px] h-[32px]'
+          radius='full'
+          network={network}
+          setNetwork={setNetwork}
+        />
+        {isRestore ? null : (
+          <Button variant='ghost' onClick={toggleRestore}>
+            Restore
+          </Button>
+        )}
+      </div>
+      {isRestore ? (
+        <div className='flex items-center justify-between gap-2 text-xl font-bold'>
           <span className='inline-flex flex-1 items-center gap-2'>
             <Avatar style={{ width: 20, height: 20, background: 'transparent' }} src={networkChain?.icon} />
             Restore Cache Transactions
           </span>
-        ) : (
-          <span className='flex-1'>Batch</span>
-        )}
 
-        {isRestore ? (
-          <>
-            <Button key='close-restore' isIconOnly className='text-inherit' variant='light' onClick={toggleRestore}>
-              <IconClose className='h-5 w-5' />
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button key='open-restore' variant='ghost' onClick={toggleRestore}>
-              Restore
-            </Button>
-
-            <InputNetwork
-              isIconOnly
-              placeholder=' '
-              className='max-w-[60px] text-sm'
-              contentClassName='min-h-[32px] h-[32px]'
-              radius='full'
-              network={network}
-              setNetwork={setNetwork}
-            />
-          </>
-        )}
-      </div>
-      <Divider />
+          <Button key='close-restore' isIconOnly className='text-inherit' variant='light' onClick={toggleRestore}>
+            <IconClose className='h-5 w-5' />
+          </Button>
+        </div>
+      ) : null}
 
       {isRestore ? (
         <SubApiRoot network={network}>

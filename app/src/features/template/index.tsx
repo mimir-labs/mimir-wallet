@@ -3,95 +3,90 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { events } from '@/events';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useEffect, useState } from 'react';
+import { forwardRef, useImperativeHandle } from 'react';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 
 import AddTemplate from './AddTemplate';
 import TemplateList from './TemplateList';
+import { useTemplateState } from './useTemplateState';
 
-interface Props {
-  defaultAdded?: boolean;
-  defaultCallData?: HexString;
-  onClose: () => void;
+// Template ref interface for external control
+export interface TemplateRef {
+  showList: () => void;
+  showAdd: (callData?: HexString) => void;
+  showView: (name: string, callData: HexString) => void;
+  reset: () => void;
+  setNetwork: (network: string) => void;
 }
 
-function Content({
-  defaultAdded,
-  defaultCallData,
-  onClose,
-  network,
-  setNetwork
-}: Props & { network: string; setNetwork: (network: string) => void }) {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface TemplateProps {}
+
+const Template = forwardRef<TemplateRef, TemplateProps>((_props, ref) => {
+  const [network, setNetwork] = useInputNetwork();
   const { api } = useApi();
-  const [isAdd, setIsAdd] = useState(defaultAdded);
-  const [isView, setIsView] = useState(false);
-  const [viewTemplate, setViewTemplate] = useState<HexString | undefined>(undefined);
-  const [viewTemplateName, setViewTemplateName] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    const handleTemplateAdd = (network: string, callData: HexString) => {
-      setIsAdd(true);
-      setNetwork(network);
-      setViewTemplate(callData);
-    };
+  // Internal state management
+  const templateState = useTemplateState({
+    network
+  });
 
-    events.on('template_add', handleTemplateAdd);
+  // Expose methods to parent via ref
+  useImperativeHandle(
+    ref,
+    () => ({
+      showList: templateState.actions.showList,
+      showAdd: templateState.actions.showAdd,
+      showView: templateState.actions.showView,
+      reset: templateState.actions.reset,
+      setNetwork: setNetwork
+    }),
+    [templateState.actions, setNetwork]
+  );
 
-    return () => {
-      events.off('template_add', handleTemplateAdd);
-    };
-  }, [setNetwork]);
+  // Render based on current view state
+  const renderContent = () => {
+    if (templateState.isAddView) {
+      return (
+        <AddTemplate
+          key={network}
+          defaultCallData={templateState.defaultCallData}
+          onBack={templateState.actions.showList}
+          setNetwork={setNetwork}
+          registry={api.registry}
+        />
+      );
+    }
 
-  if (isAdd)
+    if (templateState.isViewTemplate) {
+      return (
+        <AddTemplate
+          key={network}
+          isView
+          defaultCallData={templateState.viewTemplate}
+          registry={api.registry}
+          defaultName={templateState.viewTemplateName}
+          onBack={templateState.actions.showList}
+        />
+      );
+    }
+
     return (
-      <AddTemplate
+      <TemplateList
         key={network}
-        defaultCallData={defaultCallData}
-        onBack={() => setIsAdd(false)}
+        onAdd={() => templateState.actions.showAdd()}
+        onView={templateState.actions.showView}
         setNetwork={setNetwork}
         registry={api.registry}
       />
     );
+  };
 
-  if (isView)
-    return (
-      <AddTemplate
-        key={network}
-        isView
-        defaultCallData={viewTemplate}
-        registry={api.registry}
-        defaultName={viewTemplateName}
-        onBack={() => setIsView(false)}
-      />
-    );
+  return <SubApiRoot network={network}>{renderContent()}</SubApiRoot>;
+});
 
-  return (
-    <TemplateList
-      key={network}
-      onAdd={() => setIsAdd(true)}
-      onClose={onClose}
-      onView={(name, call) => {
-        setViewTemplate(call);
-        setViewTemplateName(name);
-        setIsView(true);
-      }}
-      setNetwork={setNetwork}
-      registry={api.registry}
-    />
-  );
-}
-
-function Template({ defaultNetwork, ...props }: Props & { defaultNetwork?: string }) {
-  const [network, setNetwork] = useInputNetwork(defaultNetwork);
-
-  return (
-    <SubApiRoot network={network}>
-      <Content {...props} network={network} setNetwork={setNetwork} />
-    </SubApiRoot>
-  );
-}
+Template.displayName = 'Template';
 
 export default Template;

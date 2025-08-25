@@ -13,8 +13,9 @@ export * from './dropdown-menu.js';
 export { Input } from './input.js';
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popover.js';
 export * from './select.js';
+export * from './sidebar.js';
 export * from './sonner.js';
-export * from './tooltip.js';
+export { Tooltip } from './tooltip.js';
 
 export { VisuallyHidden };
 

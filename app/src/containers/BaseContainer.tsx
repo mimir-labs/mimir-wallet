@@ -8,119 +8,212 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import WalletConsumer from '@/wallet/Consumer';
 import { useWallet } from '@/wallet/useWallet';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
+import { SidebarProvider } from '@mimir-wallet/ui';
 
-import CopyAddressModal from './address/CopyAddressModal';
-import ExplorerAddressModal from './address/ExplorerAddressModal';
-import QrAddressModal from './address/QrAddressModal';
-import RightSideBar from './sidebar/RightSideBar';
-import SideBar from './sidebar/SideBar';
 import AddAddressBook from './AddAddressBook';
+import { AddressModalsProvider } from './address';
+import { CSS_VARS, layoutHelpers } from './constants';
 import Initializing from './Initializing';
 import OmniChainUpgradeTip from './OmniChainUpgradeTip';
+import { AppSidebar, RightSideBar } from './sidebar';
 import SubscribeNotification from './SubscribeNotification';
 import ToggleAlert from './ToggleAlert';
 import TopBar from './topbar';
 import Version from './Version';
-import ViewCallData from './ViewCallData';
 
-function BaseContainer({
-  auth,
-  skipConnect = false,
-  withSideBar,
-  withPadding,
-  hideSideBar,
-  hideTopBar
-}: {
+interface BaseContainerProps {
   auth: boolean;
   skipConnect?: boolean;
   hideSideBar?: boolean;
   hideTopBar?: boolean;
-  withSideBar: boolean;
   withPadding: boolean;
-}) {
+}
+
+// Helper function for main content rendering
+const shouldShowMainContent = (
+  skipConnect: boolean,
+  isApiReady: boolean,
+  isWalletReady: boolean,
+  isMultisigSyned: boolean
+): boolean => {
+  return skipConnect || (isApiReady && isWalletReady && isMultisigSyned);
+};
+
+// Global modals and components
+const GlobalModalsAndComponents = () => (
+  <>
+    <ToastRoot />
+    <TxToast />
+    <WalletConsumer />
+    <AddAddressBook />
+    <OmniChainUpgradeTip />
+    <SubscribeNotification />
+  </>
+);
+
+// Top section component (TopBar + Alert)
+interface TopSectionProps {
+  hideTopBar?: boolean;
+  current: string | null | undefined;
+  setAlertOpen: (open: boolean) => void;
+}
+
+const TopSection = ({ hideTopBar, current, setAlertOpen }: TopSectionProps) => {
+  const handleSetAlertOpen = useCallback(
+    (open: boolean) => {
+      setAlertOpen(open);
+    },
+    [setAlertOpen]
+  );
+
+  if (hideTopBar) return null;
+
+  return (
+    <>
+      <TopBar />
+      {current && <ToggleAlert address={current} setAlertOpen={handleSetAlertOpen} />}
+    </>
+  );
+};
+
+// Transaction overlay component
+interface TransactionOverlayProps {
+  queue: any[];
+}
+
+const TransactionOverlay = ({ queue }: TransactionOverlayProps) => {
+  if (queue.length === 0) return null;
+
+  return (
+    <div className='absolute inset-0 z-50 flex-auto'>
+      <TxSubmit key={queue[0].id} {...queue[0]} />
+    </div>
+  );
+};
+
+// Content area component
+interface ContentAreaProps {
+  withPadding: boolean;
+  hideTopBar?: boolean;
+  isTransactionActive: boolean;
+}
+
+const ContentArea = ({ withPadding, hideTopBar, isTransactionActive }: ContentAreaProps) => {
+  const contentStyle: React.CSSProperties = {
+    display: isTransactionActive ? 'none' : 'flex',
+    padding: withPadding ? undefined : 0
+  };
+
+  const versionStyle: React.CSSProperties = {
+    padding: withPadding ? 0 : '0 0 16px 16px'
+  };
+
+  return (
+    <div className='flex flex-1 flex-col gap-6 p-4 sm:p-5' style={contentStyle}>
+      <div className='z-10 h-full flex-1'>
+        <Outlet />
+      </div>
+
+      {!hideTopBar && (
+        <div style={versionStyle}>
+          <Version />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Main content component
+interface MainContentProps {
+  hideSideBar?: boolean;
+  hideTopBar?: boolean;
+  withPadding: boolean;
+  alertOpen: boolean;
+  queue: any[];
+}
+
+const MainContent = ({ hideSideBar, hideTopBar, withPadding, alertOpen, queue }: MainContentProps) => {
+  const contentHeight = layoutHelpers.getContentHeight(alertOpen);
+  const isTransactionActive = queue.length > 0;
+
+  return (
+    <div className='flex w-full flex-1' style={{ minHeight: contentHeight }}>
+      {!hideSideBar && <AppSidebar />}
+
+      <main
+        className='relative flex flex-1 flex-col'
+        style={{
+          background: 'var(--color-main-bg)'
+        }}
+      >
+        <ContentArea withPadding={withPadding} hideTopBar={hideTopBar} isTransactionActive={isTransactionActive} />
+
+        <TransactionOverlay queue={queue} />
+      </main>
+
+      {!hideSideBar && <RightSideBar />}
+    </div>
+  );
+};
+
+function BaseContainer({ auth, skipConnect = false, withPadding, hideSideBar, hideTopBar }: BaseContainerProps) {
   const { isApiReady } = useApi();
   const { isWalletReady, closeWallet, walletOpen } = useWallet();
   const { current, isMultisigSyned } = useAccount();
   const { queue } = useTxQueue();
   const [alertOpen, setAlertOpen] = useState<boolean>(true);
 
+  // Custom hooks for side effects
   useFollowAccounts();
   usePageTitle();
 
+  // Early return for authentication check
   if (!current && auth) {
     return <Navigate to='/welcome' replace />;
   }
 
-  const alertHeight = alertOpen ? 38 : 0;
+  // Check if main content should be displayed
+  const showMainContent = shouldShowMainContent(skipConnect, isApiReady, isWalletReady, isMultisigSyned);
+
+  // Sidebar provider styles
+  const sidebarProviderStyle = {
+    [CSS_VARS.HEADER_HEIGHT]: `${layoutHelpers.getTotalHeaderHeight(alertOpen)}px`
+  } as React.CSSProperties;
 
   return (
     <>
+      {/* Wallet Connection Modal */}
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
-      <ToastRoot />
-      <TxToast />
-      <WalletConsumer />
-      <AddAddressBook />
-      <OmniChainUpgradeTip />
-      <SubscribeNotification />
-      {hideTopBar ? null : <TopBar />}
-      {isApiReady && isWalletReady && isMultisigSyned && current && (
-        <>
-          {hideTopBar ? null : <ToggleAlert address={current} setAlertOpen={setAlertOpen} />}
-          <ViewCallData />
-          <CopyAddressModal />
-          <QrAddressModal />
-          <ExplorerAddressModal />
-        </>
-      )}
 
-      {skipConnect || (isApiReady && isWalletReady && isMultisigSyned) ? (
-        <div
-          className='flex w-full'
-          style={{
-            minHeight: hideSideBar ? '100dvh' : `calc(100dvh - 1px - ${alertHeight}px - 56px)`
-          }}
-        >
-          {hideSideBar ? null : <SideBar offsetTop={alertHeight} withSideBar={withSideBar} />}
+      {/* Global Modals and Components */}
+      <GlobalModalsAndComponents />
 
-          <div
-            className='relative w-full flex-1 flex-col gap-6 p-4 sm:p-5'
-            style={{
-              display: queue.length > 0 ? 'none' : 'flex',
-              padding: withPadding ? undefined : 0
-            }}
-          >
-            <div className='z-10 h-full flex-1'>
-              <Outlet />
-            </div>
-            {hideTopBar ? null : (
-              <div style={{ padding: withPadding ? 0 : '0 0 16px 16px' }}>
-                <Version />
-              </div>
-            )}
+      {/* Address Modals Provider */}
+      <AddressModalsProvider />
+
+      <SidebarProvider className='flex flex-col [--header-height:calc(--spacing(14))]' style={sidebarProviderStyle}>
+        {/* Top Section: TopBar + Alert */}
+        <TopSection hideTopBar={hideTopBar} current={current} setAlertOpen={setAlertOpen} />
+
+        {/* Main Content or Initialization */}
+        {showMainContent ? (
+          <MainContent
+            hideSideBar={hideSideBar}
+            hideTopBar={hideTopBar}
+            withPadding={withPadding}
+            alertOpen={alertOpen}
+            queue={queue}
+          />
+        ) : (
+          <div className='flex flex-1 items-center justify-center'>
+            <Initializing />
           </div>
-
-          {queue.length > 0 ? (
-            <div
-              className='relative z-50 flex-auto'
-              style={{
-                background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
-              }}
-            >
-              <TxSubmit key={queue[0].id} {...queue[0]} />
-            </div>
-          ) : null}
-
-          <RightSideBar offsetTop={alertHeight} />
-        </div>
-      ) : (
-        <div>
-          <Initializing />
-        </div>
-      )}
+        )}
+      </SidebarProvider>
     </>
   );
 }

@@ -99,8 +99,8 @@ function BatchItemDrag({
       data-disabled={isSelectionDisabled}
       className='bg-secondary data-[dragging=true]:bg-primary-50 overflow-hidden rounded-[10px] data-[disabled=true]:opacity-50'
     >
-      <div className='grid h-[44px] cursor-pointer grid-cols-6 px-2 text-sm sm:px-3' onClick={handleToggle}>
-        <div className='col-span-1 flex items-center' onClick={handleStopPropagation}>
+      <div className='grid h-[44px] cursor-pointer grid-cols-12 px-2 text-sm sm:px-3' onClick={handleToggle}>
+        <div className='col-span-2 flex items-center' onClick={handleStopPropagation}>
           <img {...listeners} src={Drag} style={{ cursor: 'grab', padding: 10, marginLeft: -10, userSelect: 'none' }} />
           {disabledReason ? (
             <Tooltip content={disabledReason}>
@@ -127,17 +127,17 @@ function BatchItemDrag({
           )}
         </div>
 
-        <div className='col-span-2 flex items-center'>
+        <div className='col-span-3 flex items-center'>
           <AppName website={website} iconUrl={iconUrl} appName={appName} />
         </div>
 
-        <div className='col-span-2 flex items-center'>
+        <div className='col-span-5 flex items-center'>
           <span className='overflow-hidden text-ellipsis'>
             <CallDisplayDetail fallbackWithName registry={registry} call={call} />
           </span>
         </div>
 
-        <div className='col-span-1 flex items-center justify-between'>
+        <div className='col-span-2 flex items-center justify-between'>
           <div className='flex items-center gap-1'>
             <Tooltip content='Copy'>
               <Button isIconOnly variant='light' onClick={handleCopy} size='sm' color='primary'>

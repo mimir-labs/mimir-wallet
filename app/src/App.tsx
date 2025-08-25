@@ -32,7 +32,7 @@ const routes = [
     children: [
       {
         // Authenticated routes with sidebar and padding
-        element: <BaseContainer auth withSideBar withPadding />,
+        element: <BaseContainer auth withPadding />,
         children: [
           {
             index: true,
@@ -74,7 +74,7 @@ const routes = [
       },
       {
         // Authenticated routes without sidebar
-        element: <BaseContainer auth withSideBar={false} withPadding />,
+        element: <BaseContainer auth withPadding />,
 
         children: [
           {
@@ -85,7 +85,7 @@ const routes = [
       },
       {
         // Public routes for account creation
-        element: <BaseContainer auth={false} withSideBar={false} withPadding />,
+        element: <BaseContainer auth={false} withPadding />,
 
         children: [
           {
@@ -104,7 +104,7 @@ const routes = [
       },
       {
         // Explorer routes without padding
-        element: <BaseContainer auth withSideBar={false} withPadding={false} />,
+        element: <BaseContainer auth withPadding={false} />,
         children: [
           {
             path: '/explorer/:url',
@@ -114,7 +114,7 @@ const routes = [
       },
       {
         // Welcome page for new users
-        element: <BaseContainer auth={false} withSideBar withPadding={false} hideSideBar hideTopBar />,
+        element: <BaseContainer auth={false} withPadding={false} hideSideBar hideTopBar />,
 
         children: [
           {
@@ -124,7 +124,7 @@ const routes = [
         ]
       },
       {
-        element: <BaseContainer auth={false} skipConnect withSideBar withPadding />,
+        element: <BaseContainer auth={false} skipConnect withPadding />,
         children: [
           {
             path: '/setting',

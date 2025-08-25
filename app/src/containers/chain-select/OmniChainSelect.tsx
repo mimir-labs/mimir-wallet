@@ -96,7 +96,7 @@ function GroupedEndpoints({
               size='lg'
               className='text-foreground h-[52px] justify-start rounded-[10px] p-2.5 text-left font-bold shadow-none'
               style={{
-                background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
+                background: 'var(--color-main-bg)'
               }}
               onClick={endpoint.enabled ? () => disableNetworks([endpoint.key]) : () => enableNetworks([endpoint.key])}
             >
