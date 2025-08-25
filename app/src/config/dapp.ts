@@ -437,5 +437,32 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     website: 'https://bounties.usepapi.app/',
     github: 'https://github.com/polkadot-api/bounties'
   },
-  PolkassemblyApp
+  PolkassemblyApp,
+  {
+    id: 1013,
+    icon: '/dapp-icons/regoinx.svg',
+    name: 'RegoinX',
+    description: 'The primary interface for interacting with Polkadot’s Agile Coretime model.',
+    url: 'https://hub.regionx.tech/',
+    supportedChains: ['polkadot', 'kusama', 'coretime-polkadot', 'coretime-kusama', 'paseo', 'westend'],
+    tags: ['Governance'],
+    website: 'https://hub.regionx.tech/',
+    twitter: 'https://x.com/RegionXLabs',
+    urlSearch(network: string) {
+      const url = {
+        polkadot: 'https://hub.regionx.tech/?network=polkadot',
+        kusama: 'https://hub.regionx.tech/?network=kusama',
+        paseo: 'https://hub.regionx.tech/?network=paseo',
+        westend: 'https://hub.regionx.tech/?network=westend',
+        'coretime-polkadot': 'https://hub.regionx.tech/?network=polkadot',
+        'coretime-kusama': 'https://hub.regionx.tech/?network=kusama'
+      }[network];
+
+      if (!url) {
+        return new URL(this.url);
+      }
+
+      return new URL(url);
+    }
+  }
 ];
