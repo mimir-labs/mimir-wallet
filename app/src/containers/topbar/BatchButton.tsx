@@ -2,31 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
-import Batch from '@/apps/batch';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
+import { useMimirLayout } from '@/hooks/useMimirLayout';
 import React, { useEffect, useRef } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import {
-  Badge,
-  Button,
-  Drawer,
-  DrawerContent,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Tooltip
-} from '@mimir-wallet/ui';
+import { Badge, Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
 
 function BatchButton() {
   const { network } = useApi();
   const { current } = useAccount();
   const [txs] = useBatchTxs(network, current);
   const [isOpen, toggleOpen] = useToggle(false);
-  const [isDrawerOpen, toggleDrawerOpen] = useToggle(false);
+  const { openRightSidebar, closeRightSidebar, rightSidebarOpen, setRightSidebarTab } = useMimirLayout();
   const anchorEl = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -50,6 +41,7 @@ function BatchButton() {
           <Badge
             size='sm'
             isInvisible={!txs.length}
+            isOneChar
             content={txs.length}
             shape='circle'
             color='primary'
@@ -66,7 +58,10 @@ function BatchButton() {
                 color='primary'
                 variant='ghost'
                 radius='md'
-                onClick={toggleDrawerOpen}
+                onClick={() => {
+                  setRightSidebarTab('batch');
+                  rightSidebarOpen ? closeRightSidebar() : openRightSidebar();
+                }}
               >
                 <IconBatch className='h-[16px] w-[16px] sm:h-[22px] sm:w-[22px]' />
               </Button>
@@ -80,12 +75,6 @@ function BatchButton() {
           </div>
         </PopoverContent>
       </Popover>
-
-      <Drawer direction='right' open={isDrawerOpen} onClose={toggleDrawerOpen}>
-        <DrawerContent className='w-auto max-w-full p-5'>
-          <Batch onClose={() => toggleDrawerOpen(false)} />
-        </DrawerContent>
-      </Drawer>
     </>
   );
 }

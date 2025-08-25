@@ -5,44 +5,31 @@ import type { DappOption } from '@/config';
 
 import { Empty } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
-import React, { createElement, useMemo, useState } from 'react';
+import { useMimirLayout } from '@/hooks/useMimirLayout';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Drawer, DrawerContent, Tooltip } from '@mimir-wallet/ui';
+import { Avatar, Button, Tooltip } from '@mimir-wallet/ui';
 
 function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (id: string | number) => void }) {
   const { network } = useApi();
   const navigate = useNavigate();
-  const [isDrawerOpen, toggleDrawerOpen] = useToggle(false);
-  const [element, setElement] = useState<JSX.Element>();
+  const { openRightSidebar, setRightSidebarTab } = useMimirLayout();
 
   const openDapp = () => {
-    if (!dapp.isDrawer) {
+    if (dapp.url === 'mimir://app/batch') {
+      setRightSidebarTab('batch');
+      openRightSidebar();
+    } else {
       const url = dapp.urlSearch?.(network) || dapp.url;
 
       navigate(`/explorer/${encodeURIComponent(url.toString())}`);
-    } else {
-      dapp.Component?.().then((C) => {
-        toggleDrawerOpen(true);
-        setElement(
-          createElement(C, {
-            onClose: () => toggleDrawerOpen(false)
-          } as Record<string, unknown>)
-        );
-      });
     }
   };
 
   return (
     <>
-      {dapp.isDrawer && (
-        <Drawer direction='right' open={isDrawerOpen} onClose={toggleDrawerOpen}>
-          <DrawerContent className='w-auto max-w-full py-5'>{element}</DrawerContent>
-        </Drawer>
-      )}
-
       <Tooltip content={dapp.name}>
         <Button
           isIconOnly

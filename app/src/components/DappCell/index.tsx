@@ -9,12 +9,12 @@ import IconGithub from '@/assets/svg/icon-github.svg?react';
 import IconStar from '@/assets/svg/icon-star.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import IconX from '@/assets/svg/icon-x.svg?react';
-import { useToggle } from '@/hooks/useToggle';
-import React, { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMimirLayout } from '@/hooks/useMimirLayout';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Drawer, DrawerContent, Tooltip } from '@mimir-wallet/ui';
+import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import SupportedChains from './SupportedChains';
 
@@ -28,8 +28,7 @@ interface Props extends DappOption {
 function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dapp }: Props) {
   const { network } = useApi();
   const navigate = useNavigate();
-  const [isDrawerOpen, toggleDrawerOpen, setDrawerOpen] = useToggle();
-  const [element, setElement] = useState<JSX.Element>();
+  const { openRightSidebar, setRightSidebarTab } = useMimirLayout();
   const _isFavorite = useMemo(() => isFavorite(dapp.id), [dapp.id, isFavorite]);
   const toggleFavorite = useCallback(() => {
     if (_isFavorite) {
@@ -42,19 +41,13 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
   const [isFocus, setFocus] = useState(false);
 
   const openDapp = () => {
-    if (!dapp.isDrawer) {
+    if (dapp.url === 'mimir://app/batch') {
+      setRightSidebarTab('batch');
+      openRightSidebar();
+    } else {
       const url = dapp.urlSearch?.(network) || dapp.url;
 
       navigate(`/explorer/${encodeURIComponent(url.toString())}`);
-    } else {
-      dapp.Component?.().then((C) => {
-        setDrawerOpen(true);
-        setElement(
-          createElement(C, {
-            onClose: () => setDrawerOpen(false)
-          } as Record<string, unknown>)
-        );
-      });
     }
   };
 
@@ -194,17 +187,7 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
       </div>
     );
 
-  return (
-    <div ref={ref}>
-      {dapp.isDrawer && (
-        <Drawer direction='right' open={isDrawerOpen} onClose={toggleDrawerOpen}>
-          <DrawerContent className='w-auto max-w-full p-5'>{element}</DrawerContent>
-        </Drawer>
-      )}
-
-      {content}
-    </div>
-  );
+  return <div ref={ref}>{content}</div>;
 }
 
 export default React.memo(DappCell);

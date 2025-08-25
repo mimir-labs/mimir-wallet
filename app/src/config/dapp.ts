@@ -35,8 +35,6 @@ export interface DappOption<
   discord?: string;
   github?: string;
   matrix?: string;
-  isDrawer?: boolean;
-  Component?: () => Promise<React.ComponentType>; // only for mimir://dapp/*
   urlSearch?: urlSearch;
 }
 
@@ -238,8 +236,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     tags: ['Assets'],
     website: 'https://mimir.global',
     twitter: 'https://twitter.com/Mimir_global',
-    github: 'https://github.com/mimir-labs',
-    Component: () => import('@/apps/transfer').then((res) => res.default)
+    github: 'https://github.com/mimir-labs'
   },
   {
     id: 2,
@@ -251,9 +248,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Batch', 'utility'],
-    Component: () => import('@/apps/batch').then((res) => res.default),
-    isDrawer: true
+    tags: ['Batch', 'utility']
   },
   {
     id: 3,
@@ -265,8 +260,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Assets', 'Transfer', 'MultiTransfer'],
-    Component: () => import('@/apps/multi-transfer').then((res) => res.default)
+    tags: ['Assets', 'Transfer', 'MultiTransfer']
   },
   {
     id: 500,

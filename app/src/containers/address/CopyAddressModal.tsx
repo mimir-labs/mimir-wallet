@@ -11,6 +11,7 @@ import { useCopyAddress } from '@/hooks/useCopyAddress';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useQrAddress } from '@/hooks/useQrAddress';
+import { groupNetworksByChain } from '@/utils/networkGrouping';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 
@@ -52,7 +53,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       data-selected={ss58Chain === endpoint.key}
       ref={ref}
       style={{
-        background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
+        background: 'var(--color-main-bg)'
       }}
       className='data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 rounded-[10px] p-2 sm:gap-2 sm:p-2.5'
       onClick={(e) => {
@@ -109,34 +110,9 @@ function CopyAddressModal() {
 
   useEffect(() => {
     if (isOpen) {
-      const groupedEndpoints = networks
-        .filter((item) => (showAll ? true : !!item.enabled))
-        .reduce(
-          (acc, network) => {
-            if (network.isRelayChain) {
-              acc[network.key] = [network, ...(acc[network.key] || [])];
-            } else if (network.relayChain) {
-              acc[network.relayChain] = [...(acc[network.relayChain] || []), network];
-            } else {
-              acc['solochain'] = [...(acc['solochain'] || []), network];
-            }
+      const grouped = groupNetworksByChain(networks, showAll, ss58Chain);
 
-            return acc;
-          },
-          {} as Record<string, Network[]>
-        );
-
-      const polkadotNetworks = groupedEndpoints['polkadot'] || [];
-      const selectedNetwork = polkadotNetworks.find((network) => network.key === ss58Chain);
-
-      if (selectedNetwork && polkadotNetworks.indexOf(selectedNetwork) < 3) {
-        const index = polkadotNetworks.indexOf(selectedNetwork);
-
-        polkadotNetworks.splice(index, 1);
-        polkadotNetworks.splice(3, 0, selectedNetwork);
-      }
-
-      setGroupedEndpoints(groupedEndpoints);
+      setGroupedEndpoints(grouped);
     }
   }, [isOpen, networks, showAll, ss58Chain]);
 
