@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.24.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.23.1...polkadot-core-v2.24.0) (2025-08-27)
+
+
+### Features
+
+* Add cross-chain calldata display component ([#291](https://github.com/mimir-labs/mimir-wallet/issues/291)) ([5610b9d](https://github.com/mimir-labs/mimir-wallet/commit/5610b9de902d564f0af34e960d5cec225ae347f2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.24.0
+
 ## [2.23.1](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.23.0...polkadot-core-v2.23.1) (2025-08-25)
 
 
