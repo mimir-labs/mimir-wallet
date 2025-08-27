@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.24.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.23.1...mimir-wallet-app-v2.24.0) (2025-08-27)
+
+
+### Features
+
+* Add cross-chain calldata display component ([#291](https://github.com/mimir-labs/mimir-wallet/issues/291)) ([5610b9d](https://github.com/mimir-labs/mimir-wallet/commit/5610b9de902d564f0af34e960d5cec225ae347f2))
+* Refactor sidebar system with modular architecture and ShadCN integration ([#293](https://github.com/mimir-labs/mimir-wallet/issues/293)) ([c820a05](https://github.com/mimir-labs/mimir-wallet/commit/c820a056016698326f5b16bcd24f2c3bb952b8ca))
+
+
+### Bug Fixes
+
+* fix some ui issues ([cb4a6b9](https://github.com/mimir-labs/mimir-wallet/commit/cb4a6b92f8a66ca037dfae3c054e84063ebd6e5e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.24.0
+    * @mimir-wallet/service bumped to 2.24.0
+    * @mimir-wallet/ui bumped to 2.24.0
+
 ## [2.23.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.23.0...mimir-wallet-app-v2.23.1) (2025-08-25)
 
 
