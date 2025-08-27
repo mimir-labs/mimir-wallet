@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.24.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.24.0...mimir-wallet-app-v2.24.1) (2025-08-27)
+
+
+### Bug Fixes
+
+* Fixed the issue of not being able to open dapp ([00eb5bf](https://github.com/mimir-labs/mimir-wallet/commit/00eb5bfbe10c360a782da4fa6866270cad03f8e9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.24.1
+    * @mimir-wallet/service bumped to 2.24.1
+    * @mimir-wallet/ui bumped to 2.24.1
+
 ## [2.24.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.23.1...mimir-wallet-app-v2.24.0) (2025-08-27)
 
 
