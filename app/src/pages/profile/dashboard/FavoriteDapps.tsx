@@ -5,28 +5,13 @@ import type { DappOption } from '@/config';
 
 import { Empty } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
-import { useMimirLayout } from '@/hooks/useMimirLayout';
+import { useOpenDapp } from '@/hooks/useOpenDapp';
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Tooltip } from '@mimir-wallet/ui';
 
 function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (id: string | number) => void }) {
-  const { network } = useApi();
-  const navigate = useNavigate();
-  const { openRightSidebar, setRightSidebarTab } = useMimirLayout();
-
-  const openDapp = () => {
-    if (dapp.url === 'mimir://app/batch') {
-      setRightSidebarTab('batch');
-      openRightSidebar();
-    } else {
-      const url = dapp.urlSearch?.(network) || dapp.url;
-
-      navigate(`/explorer/${encodeURIComponent(url.toString())}`);
-    }
-  };
+  const openDapp = useOpenDapp(dapp);
 
   return (
     <>

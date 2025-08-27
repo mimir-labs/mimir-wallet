@@ -55,8 +55,8 @@ function ToggleSidebar({
 }) {
   const className =
     side === 'left'
-      ? 'left-0 origin-left pr-2 translate-x-0 data-[open=true]:translate-x-[var(--sidebar-width)]'
-      : 'right-0 origin-right pl-2 translate-x-0 data-[open=true]:-translate-x-[var(--sidebar-width)]';
+      ? 'left-0 origin-center translate-x-0 data-[open=true]:translate-x-[var(--sidebar-width)]'
+      : 'right-0 origin-center -translate-x-0 data-[open=true]:-translate-x-[var(--sidebar-width)]';
 
   return (
     <div
@@ -75,17 +75,17 @@ function ToggleSidebar({
         fill='none'
         className={side === 'right' ? 'flex rotate-z-180' : ''}
       >
-        <path d='M0 0H5C9.97056 0 14 4.02944 14 9C14 13.9706 9.97056 18 5 18H0V0Z' fill='#2700FF' />
+        <path d='M14 0H5C2.23858 0 0 2.23858 0 5V13C0 15.7614 2.23858 18 5 18H14V0Z' fill='#2700FF' />
         <path
           opacity='0.9'
-          d='M6 5.14258L8.52249 8.38578C8.80335 8.74689 8.80335 9.25255 8.52249 9.61366L6 12.8569'
+          d='M8 5L10.5225 8.2432C10.8034 8.60431 10.8034 9.10997 10.5225 9.47108L8 12.7143'
           stroke='white'
           strokeWidth='1.5'
           strokeLinecap='round'
         />
         <path
           opacity='0.9'
-          d='M2 5.14258L4.52249 8.38578C4.80335 8.74689 4.80335 9.25255 4.52249 9.61366L2 12.8569'
+          d='M4 5L6.52249 8.2432C6.80335 8.60431 6.80335 9.10997 6.52249 9.47108L4 12.7143'
           stroke='white'
           strokeWidth='1.5'
           strokeLinecap='round'

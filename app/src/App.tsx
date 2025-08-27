@@ -12,7 +12,6 @@ import PageCreateMultisig from './pages/create-multisig';
 import PageDapp from './pages/dapp';
 import ErrorPage from './pages/error-page';
 import PageExplorer from './pages/explorer';
-import PageExtrinsic from './pages/extrinsic';
 import PageProfile from './pages/profile';
 import PageWelcome from './pages/profile/Welcome';
 import PageSetting from './pages/setting';
@@ -68,7 +67,7 @@ const routes = [
           },
           {
             path: '/extrinsic',
-            element: <PageExtrinsic />
+            element: <Navigate replace to={`/explorer/${encodeURIComponent('mimir://app/submit-calldata')}`} />
           }
         ]
       },

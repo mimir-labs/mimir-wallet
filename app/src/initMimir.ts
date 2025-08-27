@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX } from '@/constants';
+import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX, FAVORITE_DAPP_KEY } from '@/constants';
 import { encodeAddress } from '@polkadot/util-crypto';
 
 import { addressToHex, allEndpoints, CURRENT_NETWORK_KEY, isPolkadotAddress } from '@mimir-wallet/polkadot-core';
@@ -53,4 +53,12 @@ export function initMimir(omni: boolean) {
     address,
     chain
   };
+}
+
+export function initFavoriteDapps() {
+  const value = store.get(FAVORITE_DAPP_KEY) as (string | number)[];
+
+  if (!value || value.length === 0) {
+    store.set(FAVORITE_DAPP_KEY, [1, 2, 4, 5, 1002, 1004].reverse());
+  }
 }

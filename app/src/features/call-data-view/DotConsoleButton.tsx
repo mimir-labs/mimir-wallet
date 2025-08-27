@@ -4,9 +4,9 @@
 import { DotConsoleApp, PolkadotJsApp } from '@/config';
 import { Link } from 'react-router-dom';
 
-import { Button } from '@mimir-wallet/ui';
+import { Button, type ButtonProps } from '@mimir-wallet/ui';
 
-function DotConsoleButton({ call, network }: { call: string; network: string }) {
+function DotConsoleButton({ call, network, ...props }: { call: string; network: string } & ButtonProps) {
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
 
   if (!isDotConsoleSupport) {
@@ -27,7 +27,7 @@ function DotConsoleButton({ call, network }: { call: string; network: string }) 
   url.searchParams.set('callData', call);
 
   return (
-    <Button fullWidth asChild>
+    <Button fullWidth asChild {...props}>
       <Link to={`/explorer/${encodeURIComponent(url.toString())}`}>View In DOTConsole</Link>
     </Button>
   );

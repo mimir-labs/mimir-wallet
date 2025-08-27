@@ -4,6 +4,7 @@
 import type { HexString } from '@polkadot/util/types';
 
 import Batch from '@/apps/batch';
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { events } from '@/events';
 import CallDataView, { type CallDataViewRef } from '@/features/call-data-view';
 import Template, { type TemplateRef } from '@/features/template';
@@ -11,7 +12,7 @@ import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useRefControl } from '@/hooks/useRefControl';
 import { useCallback, useEffect } from 'react';
 
-import { Sidebar, SidebarContent, SidebarHeader, Tab, Tabs } from '@mimir-wallet/ui';
+import { Sidebar, SidebarContent, SidebarHeader, Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 
 import { layoutHelpers } from '../constants';
 
@@ -82,20 +83,61 @@ function RightSideBar() {
       className='top-(--header-height) h-[calc(100svh-var(--header-height))]!'
       sideBarWidth={sidebarWidth}
     >
-      <SidebarHeader className='px-4'>
+      <SidebarHeader className='mb-3 px-4'>
         <Tabs
           color='primary'
           variant='underlined'
           classNames={{
-            tabList: 'px-0',
-            panel: 'hidden'
+            base: 'border-b-1 border-b-divider-300',
+            tabList: 'rounded-none p-0',
+            panel: 'hidden',
+            cursor: 'w-full'
           }}
           selectedKey={rightSidebarState.tab}
           onSelectionChange={(key) => setRightSidebarTab(key.toString() as any)}
         >
-          <Tab key='batch' title='Batch' />
-          <Tab key='template' title='Template' />
-          <Tab key='decoder' title='Decoder' />
+          <Tab
+            key='batch'
+            title={
+              <span className='flex items-center gap-1'>
+                Batch
+                <Tooltip
+                  classNames={{ content: 'max-w-[300px]' }}
+                  content={'Send multiple actions within a single transaction.'}
+                >
+                  <IconQuestion className='text-primary' />
+                </Tooltip>
+              </span>
+            }
+          />
+          <Tab
+            key='template'
+            title={
+              <span className='flex items-center gap-1'>
+                Template
+                <Tooltip
+                  classNames={{ content: 'max-w-[300px]' }}
+                  content={'Save frequent transactions as templates for future use.'}
+                >
+                  <IconQuestion className='text-primary' />
+                </Tooltip>
+              </span>
+            }
+          />
+          <Tab
+            key='decoder'
+            title={
+              <span className='flex items-center gap-1'>
+                Decoder
+                <Tooltip
+                  classNames={{ content: 'max-w-[300px]' }}
+                  content={'Decode call data to show raw information.'}
+                >
+                  <IconQuestion className='text-primary' />
+                </Tooltip>
+              </span>
+            }
+          />
         </Tabs>
       </SidebarHeader>
 

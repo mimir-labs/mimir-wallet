@@ -263,6 +263,42 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     tags: ['Assets', 'Transfer', 'MultiTransfer']
   },
   {
+    id: 4,
+    icon: '/dapp-icons/template.svg',
+    name: 'Template',
+    description: 'Save frequent transactions as templates for future use.',
+    url: 'mimir://app/template',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Tool']
+  },
+  {
+    id: 5,
+    icon: '/dapp-icons/decoder.svg',
+    name: 'Decoder',
+    description: 'Decode call data to show raw information.',
+    url: 'mimir://app/decoder',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Tool']
+  },
+  {
+    id: 6,
+    icon: '/dapp-icons/submit-calldata.svg',
+    name: 'Submit From Call Data',
+    description: "Use call data like '0x..' to submit transaction",
+    url: 'mimir://app/submit-calldata',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Tool']
+  },
+  {
     id: 500,
     icon: LogoCircle,
     name: 'Setup',
@@ -434,8 +470,8 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
   PolkassemblyApp,
   {
     id: 1013,
-    icon: '/dapp-icons/regoinx.svg',
-    name: 'RegoinX',
+    icon: '/dapp-icons/regionx.svg',
+    name: 'RegionX',
     description: 'The primary interface for interacting with Polkadot’s Agile Coretime model.',
     url: 'https://hub.regionx.tech/',
     supportedChains: ['polkadot', 'kusama', 'coretime-polkadot', 'coretime-kusama', 'paseo', 'westend'],

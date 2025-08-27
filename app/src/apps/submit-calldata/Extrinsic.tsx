@@ -10,9 +10,10 @@ import { events } from '@/events';
 import { useInput } from '@/hooks/useInput';
 import { Call as CallComp } from '@/params';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
-import { Divider } from '@mimir-wallet/ui';
+import { Button, Divider } from '@mimir-wallet/ui';
 
 function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {
   if (!callData) return [null, null];
@@ -42,6 +43,7 @@ function Extrinsic({
   const [parsedCallData, setParsedCallData] = useState<Call | null>(null);
   const [callDataError, setCallDataError] = useState<Error | null>(null);
   const [showDetail, setShowDetail] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const [call, error] = decodeCallData(api.registry, callData);
@@ -51,8 +53,11 @@ function Extrinsic({
   }, [api.registry, callData]);
 
   return (
-    <div className='border-secondary bg-content1 shadow-medium mx-auto mt-3 w-full max-w-[500px] rounded-[20px] border-1 p-5'>
-      <div className='space-y-5'>
+    <div className='mx-auto mt-3 w-full max-w-[500px] p-4 sm:p-5'>
+      <Button onClick={() => navigate(-1)} variant='ghost'>
+        {'<'} Back
+      </Button>
+      <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-5'>
         <h3>Submit Extrinsic</h3>
 
         <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
@@ -128,7 +133,7 @@ function Extrinsic({
           color='primary'
           disabled={!parsedCallData}
           accountId={sending}
-          website='mimir://internal/template'
+          website='mimir://app/submit-calldata'
           getCall={parsedCallData ? () => parsedCallData : undefined}
         >
           Submit

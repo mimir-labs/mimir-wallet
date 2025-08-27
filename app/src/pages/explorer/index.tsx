@@ -3,6 +3,7 @@
 
 import Batch from '@/apps/batch';
 import MultiTransfer from '@/apps/multi-transfer';
+import SubmitCalldata from '@/apps/submit-calldata';
 import Transfer from '@/apps/transfer';
 import { type CustomDappOption, dapps } from '@/config';
 import { CUSTOM_APP_KEY } from '@/constants';
@@ -38,6 +39,8 @@ function AppExplorer() {
           setElement(createElement(Batch, props));
         } else if (_url.startsWith('mimir://app/multi-transfer')) {
           setElement(createElement(MultiTransfer, props));
+        } else if (_url.startsWith('mimir://app/submit-calldata')) {
+          setElement(createElement(SubmitCalldata, props));
         }
       } else {
         const apps = [...dapps, ...customApps];
