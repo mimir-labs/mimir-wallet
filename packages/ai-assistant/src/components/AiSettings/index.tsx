@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Button, Card, CardContent, CardHeader, cn, Input } from '@mimir-wallet/ui';
+import { Button, Card, CardContent, CardHeader, cn } from '@mimir-wallet/ui';
 
 interface LabelProps {
   children: React.ReactNode;
@@ -29,28 +29,6 @@ function Textarea({ value, onChange, placeholder, rows = 4 }: TextareaProps) {
       rows={rows}
       className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
     />
-  );
-}
-
-interface SelectProps {
-  value: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string }[];
-}
-
-function Select({ value, onChange, options }: SelectProps) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-    >
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
   );
 }
 
@@ -84,17 +62,11 @@ function Slider({ value, onChange, min, max, step, label }: SliderProps) {
 }
 
 import { useAiStore } from '../../store/aiStore.js';
-import { AI_MODELS, AiConfig, AiProvider } from '../../types.js';
+import { AiConfig } from '../../types.js';
 
 interface AiSettingsProps {
   className?: string;
 }
-
-const providerOptions = [
-  { value: 'openai', label: 'OpenAI' },
-  { value: 'claude', label: 'Claude (Anthropic)' },
-  { value: 'kimi', label: 'Kimi (Moonshot)' }
-];
 
 const defaultSystemPrompt = `You are a helpful AI assistant for Mimir Wallet. Help users with wallet operations, multi-signature management, and Polkadot ecosystem questions.`;
 
@@ -106,83 +78,12 @@ export default function AiSettings({ className }: AiSettingsProps) {
     setConfig(localConfig);
   };
 
-  const handleProviderChange = (provider: string) => {
-    const firstModel = AI_MODELS[provider as AiProvider]?.[0]?.id || '';
-
-    setLocalConfig({
-      ...localConfig,
-      provider: provider as AiProvider,
-      model: firstModel
-    });
-  };
-
   const updateConfig = (field: keyof AiConfig, value: any) => {
     setLocalConfig((prev) => ({ ...prev, [field]: value }));
   };
 
-  const modelOptions =
-    AI_MODELS[localConfig.provider]?.map((model) => ({
-      value: model.id,
-      label: model.name
-    })) || [];
-
   return (
     <div className={cn('max-w-2xl space-y-6', className)}>
-      {/* 1. Model Provider Selection */}
-      <Card>
-        <CardHeader>
-          <h3 className='text-base font-semibold'>AI Provider</h3>
-        </CardHeader>
-        <CardContent>
-          <Label>Choose Provider</Label>
-          <Select value={localConfig.provider} onChange={handleProviderChange} options={providerOptions} />
-        </CardContent>
-      </Card>
-
-      {/* 2. API Key */}
-      <Card>
-        <CardHeader>
-          <h3 className='text-base font-semibold'>API Key</h3>
-        </CardHeader>
-        <CardContent>
-          <Label>API Key</Label>
-          <Input
-            type='password'
-            value={localConfig.apiKey}
-            onChange={(e) => updateConfig('apiKey', e.target.value)}
-            placeholder='Enter your API key'
-          />
-        </CardContent>
-      </Card>
-
-      {/* 3. API Base URL */}
-      <Card>
-        <CardHeader>
-          <h3 className='text-base font-semibold'>API Base URL</h3>
-        </CardHeader>
-        <CardContent>
-          <Label>Base URL (optional)</Label>
-          <Input
-            type='url'
-            value={localConfig.baseURL || ''}
-            onChange={(e) => updateConfig('baseURL', e.target.value)}
-            placeholder='https://api.openai.com/v1 (leave empty for default)'
-          />
-        </CardContent>
-      </Card>
-
-      {/* 4. Model Selection */}
-      <Card>
-        <CardHeader>
-          <h3 className='text-base font-semibold'>Model Selection</h3>
-        </CardHeader>
-        <CardContent>
-          <Label>Choose Model</Label>
-          <Select value={localConfig.model} onChange={(value) => updateConfig('model', value)} options={modelOptions} />
-        </CardContent>
-      </Card>
-
-      {/* 5. Parameters */}
       <Card>
         <CardHeader>
           <h3 className='text-base font-semibold'>Model Parameters</h3>
@@ -204,20 +105,17 @@ export default function AiSettings({ className }: AiSettingsProps) {
             max={1}
             step={0.1}
           />
-          {localConfig.topK && (
-            <Slider
-              label='Top K'
-              value={localConfig.topK}
-              onChange={(value) => updateConfig('topK', value)}
-              min={1}
-              max={100}
-              step={1}
-            />
-          )}
+          <Slider
+            label='Top K'
+            value={localConfig.topK}
+            onChange={(value) => updateConfig('topK', value)}
+            min={1}
+            max={100}
+            step={1}
+          />
         </CardContent>
       </Card>
 
-      {/* 6. System Prompt */}
       <Card>
         <CardHeader>
           <h3 className='text-base font-semibold'>System Prompt</h3>

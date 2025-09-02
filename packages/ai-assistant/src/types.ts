@@ -18,7 +18,7 @@ export interface AiConfig {
   temperature: number;
   maxTokens: number;
   topP: number;
-  topK?: number;
+  topK: number;
   systemPrompt: string;
   streamResponse?: boolean;
   baseURL?: string;
