@@ -34,7 +34,7 @@ function Upload({ onUpload, accept = '*', multiple = false, maxSize = 10 }: File
     (files: File[]) => {
       for (const file of files) {
         if (file.size > maxSize * 1024 * 1024) {
-          setError(`文件 ${file.name} 太大。最大限制 ${maxSize}MB`);
+          setError(`File ${file.name} too large。max ${maxSize}MB`);
 
           return false;
         }

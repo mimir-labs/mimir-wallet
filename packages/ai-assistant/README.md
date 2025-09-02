@@ -1,0 +1,1 @@
+# @mimir-wallet/ai-assistant

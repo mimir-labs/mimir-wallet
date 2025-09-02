@@ -72,8 +72,16 @@ export const layoutHelpers = {
   /**
    * Get right sidebar width based on tab
    */
-  getRightSidebarWidth: (tab?: 'batch' | 'template' | 'decoder') =>
-    tab === 'batch' ? LAYOUT.SIDEBAR.RIGHT_BATCH_WIDTH : LAYOUT.SIDEBAR.RIGHT_DEFAULT_WIDTH,
+  getRightSidebarWidth: (tab?: 'batch' | 'template' | 'decoder' | 'ai-assistant') => {
+    switch (tab) {
+      case 'batch':
+        return LAYOUT.SIDEBAR.RIGHT_BATCH_WIDTH;
+      case 'ai-assistant':
+        return '480px'; // Wider for AI chat interface
+      default:
+        return LAYOUT.SIDEBAR.RIGHT_DEFAULT_WIDTH;
+    }
+  },
 
   /**
    * Calculate viewport height minus header

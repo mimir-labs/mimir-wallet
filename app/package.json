@@ -39,6 +39,7 @@
     "@dagrejs/dagre": "^1.1.4",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
+    "@mimir-wallet/ai-assistant": "workspace:^",
     "@mimir-wallet/polkadot-core": "workspace:^",
     "@mimir-wallet/service": "workspace:^",
     "@mimir-wallet/ui": "workspace:^",

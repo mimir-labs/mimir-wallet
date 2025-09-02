@@ -1,0 +1,200 @@
+// Copyright 2023-2024 dev.mimir authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import type { FunctionCallEvent } from '../types.js';
+
+import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai';
+import { GlobeIcon } from 'lucide-react';
+import { useState } from 'react';
+
+import { useAIContext } from '../store/aiContext.js';
+import { useAiStore } from '../store/aiStore.js';
+import { functionCallManager } from '../store/functionCallManager.js';
+import { Conversation, ConversationContent, ConversationScrollButton } from './conversation.js';
+import { Loader } from './Loader.js';
+import { Message, MessageContent } from './message.js';
+import {
+  PromptInput,
+  PromptInputButton,
+  PromptInputModelSelect,
+  PromptInputModelSelectContent,
+  PromptInputModelSelectItem,
+  PromptInputModelSelectTrigger,
+  PromptInputModelSelectValue,
+  PromptInputSubmit,
+  PromptInputTextarea,
+  PromptInputToolbar,
+  PromptInputTools
+} from './prompt-input.js';
+import { Reasoning, ReasoningContent, ReasoningTrigger } from './reasoning.js';
+import { Response } from './response.js';
+import { Source, Sources, SourcesContent, SourcesTrigger } from './sources.js';
+
+const models = [
+  {
+    name: 'OpenAI: GPT-5 Mini',
+    value: 'openai/gpt-5-mini'
+  },
+  {
+    name: 'Anthropic: Claude Sonnet 4',
+    value: 'anthropic/claude-sonnet-4'
+  },
+  {
+    name: 'MoonshotAI: Kimi K2',
+    value: 'moonshotai/kimi-k2'
+  },
+  {
+    name: 'Google: Gemini 2.5 Flash',
+    value: 'google/gemini-2.5-flash'
+  }
+];
+
+function SimpleChat() {
+  const [input, setInput] = useState('');
+  const [model, setModel] = useState<string>(models[0].value);
+  const [webSearch, setWebSearch] = useState(false);
+  const { config } = useAiStore();
+
+  const { messages, sendMessage, status, addToolResult } = useChat({
+    transport: new DefaultChatTransport({
+      api: 'https://ai-assitant.mimir.global/'
+    }),
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    onToolCall: async ({ toolCall }) => {
+      console.log('Tool call received:', toolCall);
+
+      // Skip dynamic tool calls (server-side execution)
+      if (toolCall.dynamic) {
+        return;
+      }
+
+      // Create function call event
+      const functionCallEvent: FunctionCallEvent = {
+        id: toolCall.toolCallId,
+        name: toolCall.toolName,
+        arguments: toolCall.input || {},
+        timestamp: new Date()
+      };
+
+      try {
+        // Emit function call and wait for result
+        const result = await functionCallManager.emitFunctionCall(functionCallEvent);
+
+        // Add tool result back to chat
+        addToolResult({
+          tool: toolCall.toolName,
+          toolCallId: toolCall.toolCallId,
+          output: result.success ? JSON.stringify(result.result) : `Error: ${result.error}`
+        });
+      } catch (error) {
+        console.error('Function call error:', error);
+        addToolResult({
+          tool: toolCall.toolName,
+          toolCallId: toolCall.toolCallId,
+          output: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        });
+      }
+    }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (input.trim()) {
+      sendMessage(
+        { text: input },
+        {
+          body: {
+            system: config.systemPrompt || '',
+            contextMessage: useAIContext.getState().getFullContext(),
+            topK: config.topK,
+            topP: config.topP,
+            temperature: config.temperature,
+            model,
+            webSearch: webSearch
+          }
+        }
+      );
+      setInput('');
+    }
+  };
+
+  return (
+    <div className='flex h-full flex-col'>
+      <Conversation className='h-full'>
+        <ConversationContent>
+          {messages.map((message) => (
+            <div key={message.id}>
+              {message.role === 'assistant' && (
+                <Sources>
+                  <SourcesTrigger count={message.parts.filter((part) => part.type === 'source-url').length} />
+                  {message.parts
+                    .filter((part) => part.type === 'source-url')
+                    .map((part, i) => (
+                      <SourcesContent key={`${message.id}-${i}`}>
+                        <Source key={`${message.id}-${i}`} href={part.url} title={part.url} />
+                      </SourcesContent>
+                    ))}
+                </Sources>
+              )}
+              <Message from={message.role} key={message.id}>
+                <MessageContent>
+                  {message.parts.map((part, i) => {
+                    switch (part.type) {
+                      case 'text':
+                        return <Response key={`${message.id}-${i}`}>{part.text}</Response>;
+                      case 'reasoning':
+                        return (
+                          <Reasoning key={`${message.id}-${i}`} className='w-full' isStreaming={status === 'streaming'}>
+                            <ReasoningTrigger />
+                            <ReasoningContent>{part.text}</ReasoningContent>
+                          </Reasoning>
+                        );
+                      default:
+                        return null;
+                    }
+                  })}
+                </MessageContent>
+              </Message>
+            </div>
+          ))}
+          {status === 'submitted' && <Loader />}
+        </ConversationContent>
+        <ConversationScrollButton />
+      </Conversation>
+
+      <PromptInput onSubmit={handleSubmit} className='mt-4'>
+        <PromptInputTextarea onChange={(e) => setInput(e.target.value)} value={input} />
+        <PromptInputToolbar>
+          <PromptInputTools>
+            <PromptInputButton variant={webSearch ? 'light' : 'ghost'} onClick={() => setWebSearch(!webSearch)}>
+              <GlobeIcon size={16} />
+              <span>Search</span>
+            </PromptInputButton>
+            <PromptInputModelSelect
+              onValueChange={(value) => {
+                setModel(value);
+              }}
+              value={model}
+            >
+              <PromptInputModelSelectTrigger>
+                <PromptInputModelSelectValue />
+              </PromptInputModelSelectTrigger>
+              <PromptInputModelSelectContent>
+                {models.map((model) => (
+                  <PromptInputModelSelectItem key={model.value} value={model.value}>
+                    {model.name}
+                  </PromptInputModelSelectItem>
+                ))}
+              </PromptInputModelSelectContent>
+            </PromptInputModelSelect>
+          </PromptInputTools>
+          <PromptInputSubmit disabled={!input} status={status} />
+        </PromptInputToolbar>
+      </PromptInput>
+    </div>
+  );
+}
+
+export default SimpleChat;

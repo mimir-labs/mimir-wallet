@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "./app" },
+    { "path": "./packages/ai-assistant" },
     { "path": "./packages/polkadot-core" },
     { "path": "./packages/service" },
     { "path": "./packages/ui" }
