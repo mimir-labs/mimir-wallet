@@ -107,7 +107,7 @@ function RightSideBar() {
                   classNames={{ content: 'max-w-[300px]' }}
                   content={'Send multiple actions within a single transaction.'}
                 >
-                  <IconQuestion className='text-primary' />
+                  <IconQuestion className='text-foreground/50' />
                 </Tooltip>
               </span>
             }
@@ -121,7 +121,7 @@ function RightSideBar() {
                   classNames={{ content: 'max-w-[300px]' }}
                   content={'Save frequent transactions as templates for future use.'}
                 >
-                  <IconQuestion className='text-primary' />
+                  <IconQuestion className='text-foreground/50' />
                 </Tooltip>
               </span>
             }
@@ -135,7 +135,7 @@ function RightSideBar() {
                   classNames={{ content: 'max-w-[300px]' }}
                   content={'Decode call data to show raw information.'}
                 >
-                  <IconQuestion className='text-primary' />
+                  <IconQuestion className='text-foreground/50' />
                 </Tooltip>
               </span>
             }

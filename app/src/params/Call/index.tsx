@@ -90,11 +90,7 @@ const Call = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
   }
 
   // If we have a matched component, render it with render state detection
-  return (
-    <div className='@container'>
-      <Component ref={currentRef} {...props} />
-    </div>
-  );
+  return <Component ref={currentRef} {...props} />;
 });
 
 Call.displayName = 'Call';

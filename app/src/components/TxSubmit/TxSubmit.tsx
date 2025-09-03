@@ -174,7 +174,7 @@ function TxSubmit({
       )}
 
       <div className='md:bg-content1 md:shadow-medium flex w-full flex-1 flex-col gap-5 overflow-y-auto rounded-[20px] bg-transparent p-0 shadow-none md:flex-row md:p-5'>
-        <div className='bg-content1 shadow-medium flex w-full flex-col gap-5 rounded-[20px] p-4 md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
+        <div className='bg-content1 shadow-medium @container flex w-full flex-col gap-5 rounded-[20px] p-4 md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
           <TxInfo
             address={accountData.address}
             website={transaction?.website || website}

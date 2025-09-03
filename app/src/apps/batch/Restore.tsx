@@ -101,7 +101,7 @@ Timestamp: ${time}`;
         {current && !!txs?.length && (
           <>
             <Alert variant='success' className='flex-grow-0'>
-              <AlertTitle>{txs.length} Transactions Founded</AlertTitle>
+              <AlertTitle>{txs.length} Transactions Found</AlertTitle>
             </Alert>
 
             {txs?.map((item) => (

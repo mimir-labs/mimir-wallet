@@ -13,7 +13,6 @@ type EventTypes = {
   favorite_dapp_removed: (id: number) => void;
   app_installed: () => void;
   app_updated: () => void;
-  batch_tx_added: (value: BatchTxItem[], alert: boolean) => void;
   template_open: (network: string) => void;
   template_add: (network: string, callData: HexString) => void;
   call_data_view: (network: string, callData: HexString) => void;

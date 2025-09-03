@@ -74,7 +74,7 @@ function Extrinsic({
             </div>
           }
           placeholder='0x...'
-          color={callDataError ? 'danger' : 'primary'}
+          error={callDataError}
           helper={
             <div className='text-foreground mt-1'>
               You can paste the Encoded Call Data in{' '}
@@ -111,7 +111,7 @@ function Extrinsic({
               </button>
             </div>
 
-            <div className='border-divider-300 rounded-[10px] border-1 p-2.5'>
+            <div className='border-divider-300 @container rounded-[10px] border-1 p-2.5'>
               <ErrorBoundary>
                 <CallComp showFallback registry={api.registry} from={sending} call={parsedCallData} />
               </ErrorBoundary>

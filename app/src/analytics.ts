@@ -30,6 +30,7 @@ let isGA4Initialized = false;
 let isPostHogInitialized = false;
 
 // Format string for consistent event naming
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatString = (str: string) => {
   return str.toLowerCase().replace(/[^a-z0-9_]/g, '');
 };
@@ -128,21 +129,13 @@ export const analyticsActions = {
   },
 
   // Track connected wallets
-  connectedWallet(wallets: string[]) {
+  connectedWallet(wallet: string) {
     // GA4 Event
     if (isGA4Initialized) {
       try {
-        ReactGA.event(
-          'connect_wallet',
-          wallets.reduce(
-            (acc, wallet) => {
-              acc[formatString(wallet)] = 'true';
-
-              return acc;
-            },
-            {} as Record<string, 'true'>
-          )
-        );
+        ReactGA.event('connect_wallet', {
+          connect_wallet: wallet
+        });
       } catch (error) {
         console.error('GA4 event failed:', error);
       }
@@ -151,17 +144,9 @@ export const analyticsActions = {
     // PostHog Event
     if (isPostHogInitialized) {
       try {
-        posthogLib.capture(
-          'connect_wallet',
-          wallets.reduce(
-            (acc, wallet) => {
-              acc[formatString(wallet)] = 'true';
-
-              return acc;
-            },
-            {} as Record<string, 'true'>
-          )
-        );
+        posthogLib.capture('connect_wallet', {
+          connect_wallet: wallet
+        });
       } catch (error) {
         console.error('PostHog event failed:', error);
       }

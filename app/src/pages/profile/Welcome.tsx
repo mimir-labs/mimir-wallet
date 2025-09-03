@@ -69,6 +69,7 @@ function AccountItem({ address }: { address: string }) {
         {formatUsd[1] ? `.${formatUsd[1]}` : ''}
         {formatUsd[2] || ''}
       </div>
+      <span className='ml-1'>{'>'}</span>
     </div>
   );
 }

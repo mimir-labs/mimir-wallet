@@ -14,6 +14,7 @@ import { useQrAddress } from '@/hooks/useQrAddress';
 import { groupNetworksByChain } from '@/utils/networkGrouping';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
+import { toast } from 'sonner';
 
 import { encodeAddress, type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { useLocalStore } from '@mimir-wallet/service';
@@ -76,7 +77,20 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       <Button isIconOnly size='sm' className='text-inherit' variant='light' onClick={() => openQr(address)}>
         <IconQrcode className='h-[16px] w-[16px] opacity-30' />
       </Button>
-      <Button isIconOnly size='sm' className='text-inherit' variant='light' onClick={() => setSs58Chain(endpoint.key)}>
+      <Button
+        isIconOnly
+        size='sm'
+        className='text-inherit'
+        variant='light'
+        onClick={() => {
+          setSs58Chain(endpoint.key);
+
+          toast.success(<b>Address Formate Changed</b>, {
+            icon: <Avatar style={{ width: 30, height: 30 }} src={endpoint.icon} />,
+            description: `Switch to ${endpoint.name}`
+          });
+        }}
+      >
         <IconStar
           data-selected={ss58Chain === endpoint.key}
           className='data-[selected=true]:text-primary opacity-30 data-[selected=true]:opacity-100'

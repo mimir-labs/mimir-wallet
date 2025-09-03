@@ -134,8 +134,8 @@ const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) =
           />
           <defs>
             <linearGradient id='paint0_linear_23523_26394' x1='0' y1='9' x2='18' y2='9' gradientUnits='userSpaceOnUse'>
-              <stop stop-color='#0194FF' />
-              <stop offset='1' stop-color='#D306FF' />
+              <stop stopColor='#0194FF' />
+              <stop offset='1' stopColor='#D306FF' />
             </linearGradient>
           </defs>
         </svg>

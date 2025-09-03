@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { analyticsActions } from '@/analytics';
 import { walletConfig } from '@/config';
 import { connectWallet, disconnectWallet } from '@/wallet/connect';
 import { useWallet } from '@/wallet/useWallet';
@@ -12,7 +13,19 @@ import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wall
 import { toastError } from './utils';
 import WalletIcon from './WalletIcon';
 
-function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downloadUrl: string }) {
+function WalletCell({
+  downloadUrl,
+  id,
+  name,
+  onConnected,
+  onDisconnected
+}: {
+  name: string;
+  id: string;
+  downloadUrl: string;
+  onConnected?: () => void;
+  onDisconnected?: () => void;
+}) {
   const { connectedWallets, wallets } = useWallet();
 
   const isInstalled =
@@ -27,11 +40,26 @@ function WalletCell({ downloadUrl, id, name }: { name: string; id: string; downl
       <div className='flex-1 text-base'>{name}</div>
       {isInstalled ? (
         connectedWallets.includes(id) ? (
-          <Button className='h-7' color='danger' onClick={() => disconnectWallet(id)} variant='flat'>
+          <Button
+            className='h-7'
+            color='danger'
+            onClick={() => {
+              disconnectWallet(id);
+              onDisconnected?.();
+            }}
+            variant='flat'
+          >
             Disconnect
           </Button>
         ) : (
-          <Button className='h-7' onClick={() => connectWallet(id).catch(toastError)} variant='ghost'>
+          <Button
+            className='h-7'
+            onClick={() => {
+              analyticsActions.connectedWallet(id);
+              connectWallet(id).then(onConnected).catch(toastError);
+            }}
+            variant='ghost'
+          >
             Connect
           </Button>
         )
@@ -91,7 +119,13 @@ function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => v
           <ModalBody>
             <div className='grid grid-cols-2 gap-x-5 gap-y-2.5 sm:grid-cols-2'>
               {sortedWalletConfig.map(([id, config]) => (
-                <WalletCell key={id} downloadUrl={config.downloadUrl} id={id} name={config.name} />
+                <WalletCell
+                  key={id}
+                  downloadUrl={config.downloadUrl}
+                  id={id}
+                  name={config.name}
+                  onConnected={onClose}
+                />
               ))}
             </div>
           </ModalBody>

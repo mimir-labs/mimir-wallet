@@ -15,7 +15,7 @@ function CallDialog({ action, value, onClose }: { action: string; value: IMethod
     <Modal size='lg' isOpen onClose={onClose}>
       <ModalContent>
         <ModalHeader>{action}</ModalHeader>
-        <ModalBody className='gap-4'>
+        <ModalBody className='@container gap-4'>
           <Divider />
           <Call call={value} registry={value.registry} showFallback />
         </ModalBody>

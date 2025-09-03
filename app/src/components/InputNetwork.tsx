@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
 import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
 import { type Endpoint, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
+import { Avatar, Chip, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
 
 interface Props {
   showAllNetworks?: boolean;
@@ -52,6 +53,10 @@ function OmniChainInputNetwork({
       ...item,
       endContent: endContent?.[item.key] || endContent?.[item.genesisHash]
     }));
+  const { data: migrationNetworks } = useMigrationNetworks();
+  const completedMigrationNetworks = migrationNetworks
+    ?.filter((item) => item.status === 'completed')
+    .map((item) => item.chain);
 
   const chain: Options | undefined = options.find((item) => item.key === network);
 
@@ -129,6 +134,7 @@ function OmniChainInputNetwork({
               <ul className={clsx('flex list-none flex-col')}>
                 {options.map((item) => {
                   const isApiReady = !!allApis[item.key]?.isApiReady;
+                  const isMigrationCompleted = !!completedMigrationNetworks?.includes(item.key);
 
                   return (
                     <li
@@ -153,6 +159,11 @@ function OmniChainInputNetwork({
                       <div className='flex-1'>{item.name}</div>
                       <div className='flex items-center gap-2'>
                         {item.endContent}
+                        {isMigrationCompleted && (
+                          <Chip color='secondary' size='sm'>
+                            Migrated
+                          </Chip>
+                        )}
                         {showAllNetworks ? null : !isApiReady ? <Spinner size='sm' /> : null}
                       </div>
                     </li>
