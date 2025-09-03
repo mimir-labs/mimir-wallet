@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.25.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.24.1...ui-v2.25.0) (2025-09-03)
+
+
+### Features
+
+* implement AssetHub migration support ([#259](https://github.com/mimir-labs/mimir-wallet/issues/259)) ([32067df](https://github.com/mimir-labs/mimir-wallet/commit/32067df05ee764d21992c8834672721f41a3102d))
+
 ## [2.24.1](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.24.0...ui-v2.24.1) (2025-08-27)
 
 
