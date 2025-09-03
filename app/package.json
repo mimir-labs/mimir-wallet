@@ -68,6 +68,7 @@
     "react-use": "^17.5.1",
     "rxjs": "^7.8.1",
     "search-query-parser": "^1.6.0",
+    "sonner": "^2.0.7",
     "zustand": "^5.0.4"
   },
   "devDependencies": {

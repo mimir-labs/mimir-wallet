@@ -4,7 +4,6 @@
 import type { InjectedAccount } from '@polkadot/extension-inject/types';
 import type { WalletAccount } from './types';
 
-import { analyticsActions } from '@/analytics';
 import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
 import { useEffect } from 'react';
@@ -37,8 +36,6 @@ function WalletConsumer() {
 
   useEffect(() => {
     const unsubscribes: Promise<() => void>[] = [];
-
-    analyticsActions.connectedWallet(connectedWallets);
 
     for (const wallet of connectedWallets) {
       const key = walletConfig[wallet]?.key;

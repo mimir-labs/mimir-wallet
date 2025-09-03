@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { analyticsActions } from '@/analytics';
 import { walletConfig } from '@/config';
 import { connectWallet, disconnectWallet } from '@/wallet/connect';
 import { useWallet } from '@/wallet/useWallet';
@@ -51,7 +52,14 @@ function WalletCell({
             Disconnect
           </Button>
         ) : (
-          <Button className='h-7' onClick={() => connectWallet(id).then(onConnected).catch(toastError)} variant='ghost'>
+          <Button
+            className='h-7'
+            onClick={() => {
+              analyticsActions.connectedWallet(id);
+              connectWallet(id).then(onConnected).catch(toastError);
+            }}
+            variant='ghost'
+          >
             Connect
           </Button>
         )
