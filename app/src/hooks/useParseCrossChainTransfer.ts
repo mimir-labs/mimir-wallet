@@ -69,8 +69,6 @@ export function useParseCrossChainTransfer(
           const beneficiary = call.args[1];
           const assets = call.args[2];
 
-          console.log(destination.toHuman(), beneficiary.toHuman(), assets.toHuman());
-
           return {
             destination: parseDestChain(destination, chain),
             beneficiary: parseAccountFromLocation(beneficiary as any),

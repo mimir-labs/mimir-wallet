@@ -146,7 +146,7 @@ const MainContent = ({ hideSideBar, hideTopBar, withPadding, queue }: MainConten
   const isTransactionActive = queue.length > 0;
 
   return (
-    <div className='flex w-full flex-1' style={{ minHeight: contentHeight }}>
+    <div className='z-0 flex w-full flex-1' style={{ minHeight: contentHeight }}>
       {!hideSideBar && <AppSidebar />}
 
       <main
