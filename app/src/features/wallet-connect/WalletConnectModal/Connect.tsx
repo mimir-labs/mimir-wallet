@@ -80,7 +80,7 @@ function Connect({ sessions }: { sessions: SessionTypes.Struct[] }) {
         label='Pairing Key'
         placeholder='wc:'
         helper='In the application you wish to connect to, select the option to log in using WalletConnect and copy the Pairing Key.'
-        color={error ? 'danger' : undefined}
+        error={error}
         endAdornment={isLoading ? <Spinner size='sm' /> : null}
       />
       {error && (

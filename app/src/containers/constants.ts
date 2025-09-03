@@ -67,7 +67,7 @@ export const layoutHelpers = {
   /**
    * Calculate total header height including alert
    */
-  getTotalHeaderHeight: (hasAlert = false) => LAYOUT.TOPBAR_HEIGHT + (hasAlert ? LAYOUT.ALERT_HEIGHT : 0),
+  getTotalHeaderHeight: () => LAYOUT.TOPBAR_HEIGHT,
 
   /**
    * Get right sidebar width based on tab
@@ -78,5 +78,5 @@ export const layoutHelpers = {
   /**
    * Calculate viewport height minus header
    */
-  getContentHeight: (hasAlert = false) => `calc(100dvh - ${layoutHelpers.getTotalHeaderHeight(hasAlert)}px)`
+  getContentHeight: () => `calc(100dvh - ${layoutHelpers.getTotalHeaderHeight()}px)`
 } as const;

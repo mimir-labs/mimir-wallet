@@ -51,7 +51,8 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
       createdExtrinsicIndex: account.createdExtrinsicIndex,
       creator: account.creator,
       disambiguationIndex: account.disambiguationIndex,
-      pureCreatedAt: account.network
+      pureCreatedAt: account.network,
+      migrationNetwork: account.migrationNetwork
     } as AddressMeta;
   }
 

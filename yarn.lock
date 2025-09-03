@@ -14035,6 +14035,7 @@ __metadata:
     rollup-plugin-visualizer: "npm:^6.0.0"
     rxjs: "npm:^7.8.1"
     search-query-parser: "npm:^1.6.0"
+    sonner: "npm:^2.0.7"
     start-server-and-test: "npm:^2.0.5"
     typescript: "npm:^5.6.3"
     vite: "npm:^7.1.1"

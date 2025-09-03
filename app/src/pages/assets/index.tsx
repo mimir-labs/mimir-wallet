@@ -11,6 +11,7 @@ import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
 import { toastError, toastSuccess } from '@/components/utils';
 import { StakingApp } from '@/config';
+import { MigrationTip, useAssetsMigrationStatus, useMigrationNetworks } from '@/features/assethub-migration';
 import { useAssetBalancesAll, useNativeBalancesAll, useRefreshBalances } from '@/hooks/useBalances';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
@@ -31,6 +32,26 @@ import {
   TableRow,
   Tooltip
 } from '@mimir-wallet/ui';
+
+function MigrationTips() {
+  const { data: migrationNetworks } = useMigrationNetworks();
+
+  function Item({ chain }: { chain: string }) {
+    const { isAlertVisible, dismissAlert } = useAssetsMigrationStatus(chain);
+
+    if (!isAlertVisible) {
+      return null;
+    }
+
+    return <MigrationTip onClose={dismissAlert} type='transfer' chain={chain} />;
+  }
+
+  const completedMigrationNetworks = useMemo(() => {
+    return migrationNetworks?.filter((network) => network.status === 'completed');
+  }, [migrationNetworks]);
+
+  return completedMigrationNetworks?.map((item) => <Item key={item.chain} chain={item.chain} />);
+}
 
 function Assets() {
   const { current } = useAccount();
@@ -145,6 +166,9 @@ function Assets() {
           </Button>
         </Tooltip>
       </div>
+
+      <MigrationTips />
+
       <Table
         classNames={{
           wrapper: 'rounded-[10px] sm:rounded-[20px] p-0 sm:p-3',

@@ -73,9 +73,13 @@ function ToggleSidebar({
         height='18'
         viewBox='0 0 14 18'
         fill='none'
-        className={side === 'right' ? 'flex rotate-z-180' : ''}
+        className={side === 'right' ? 'flex rotate-y-180' : ''}
       >
-        <path d='M14 0H5C2.23858 0 0 2.23858 0 5V13C0 15.7614 2.23858 18 5 18H14V0Z' fill='#2700FF' />
+        <path
+          d='M14 0H5C2.23858 0 0 2.23858 0 5V13C0 15.7614 2.23858 18 5 18H14V0Z'
+          fill='#2700FF'
+          className={open ? '' : 'origin-center rotate-y-180'}
+        />
         <path
           opacity='0.9'
           d='M8 5L10.5225 8.2432C10.8034 8.60431 10.8034 9.10997 10.5225 9.47108L8 12.7143'

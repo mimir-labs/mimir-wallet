@@ -6,6 +6,7 @@ import type { TransferToken } from './types';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { AddressCell, FormatBalance, Input, InputAddress, InputNetwork, InputToken } from '@/components';
+import { MigrationTip } from '@/features/assethub-migration';
 import { useAssetInfo } from '@/hooks/useAssets';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatUnits } from '@/utils';
@@ -63,6 +64,8 @@ function TransferContent({
     recipientAccount?.type === 'pure'
       ? networks.find((item) => item.genesisHash === recipientAccount.network)
       : undefined;
+
+  // for migration tip
 
   const isRecipientSupported = useMemo(() => {
     return recipientAccount?.type === 'pure'
@@ -185,6 +188,8 @@ function TransferContent({
           </AlertTitle>
         </Alert>
       )}
+
+      <MigrationTip type='transfer' chain={network} />
     </>
   );
 }

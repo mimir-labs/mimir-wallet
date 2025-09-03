@@ -33,7 +33,7 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
                 addAddressBook(address, true);
               }
         }
-        className='bg-primary text-primary-foreground sticky top-[56px] z-50 flex h-[38px] w-full cursor-pointer items-center gap-1 py-1 pl-2.5 sm:gap-2.5 sm:pl-5'
+        className='text-primary-foreground bg-home-main flex h-[38px] w-full cursor-pointer items-center gap-1 rounded-[5px] py-1 pl-2.5 sm:gap-2.5 sm:pl-5'
       >
         <IconInfo className='h-4 w-4' />
 
