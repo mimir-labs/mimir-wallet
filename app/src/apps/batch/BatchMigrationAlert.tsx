@@ -33,8 +33,6 @@ function BatchMigrationAlert({
   const { networks } = useNetworks();
   const migrationCompleted = useNetworkMigrationCompleted(chain);
 
-  console.log(isAlertVisible, migrationCompleted.completed, migrationCompleted.block, migrationCompleted.destChain);
-
   if (!isAlertVisible || !migrationCompleted.completed || !migrationCompleted.block || !migrationCompleted.destChain) {
     return null;
   }
