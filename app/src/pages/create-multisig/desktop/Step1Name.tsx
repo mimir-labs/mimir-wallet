@@ -4,6 +4,7 @@
 import type { StepProps } from './types';
 
 import { Input, InputNetwork } from '@/components';
+import { MigrationTip } from '@/features/assethub-migration';
 
 import { Button, Divider } from '@mimir-wallet/ui';
 
@@ -47,6 +48,7 @@ function Step1Name({
 
       {isPureProxy ? <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} /> : null}
 
+      {isPureProxy && <MigrationTip type='create-multisig' chain={network} />}
       {/* Notice Alert */}
       <Tips flexible={isPureProxy} />
 

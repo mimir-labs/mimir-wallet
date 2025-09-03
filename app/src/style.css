@@ -219,6 +219,10 @@
   .scroll-hover-show {
     @apply [&::-webkit-scrollbar]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[#d9d9d9] group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-[#d9d9d9];
   }
+
+  .bg-home-main {
+    background: linear-gradient(90deg, #2700FF 0%, #0094FF 100%);
+  }
 }
 
 [data-sonner-toast][data-styled=true] [data-icon] {

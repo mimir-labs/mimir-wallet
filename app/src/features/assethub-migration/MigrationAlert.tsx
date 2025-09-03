@@ -42,10 +42,7 @@ function Item({
 
   return (
     <>
-      <div
-        data-completed={isCompleted}
-        className='sticky w-full bg-gradient-to-l from-[#0194ff] to-[#d306ff] data-[completed="true"]:bg-gradient-to-r'
-      >
+      <div data-completed={isCompleted} className='bg-home-main w-full rounded-[5px]'>
         <div className='relative flex w-full flex-row items-center'>
           <div className='relative flex h-[38px] w-full flex-row items-center justify-start gap-2.5 pl-5 text-white'>
             <div className='relative h-4 w-4 shrink-0'>

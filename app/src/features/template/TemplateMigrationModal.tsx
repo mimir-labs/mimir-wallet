@@ -229,7 +229,7 @@ export function TemplateMigrationModal({
           </div>
         </ModalHeader>
 
-        <ModalBody className='px-5 pt-0 pb-5'>
+        <ModalBody>
           {sourceReady && sourceNetwork && destReady && destNetwork && destApi && registry ? (
             <Content
               sourceNetwork={sourceNetwork}

@@ -28,9 +28,12 @@ function BatchMigrationAlert({
   onMigrationComplete?: () => void;
 }) {
   const { isAlertVisible, dismissAlert } = useBatchMigrationStatus(chain, address);
+
   const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false);
   const { networks } = useNetworks();
   const migrationCompleted = useNetworkMigrationCompleted(chain);
+
+  console.log(isAlertVisible, migrationCompleted.completed, migrationCompleted.block, migrationCompleted.destChain);
 
   if (!isAlertVisible || !migrationCompleted.completed || !migrationCompleted.block || !migrationCompleted.destChain) {
     return null;
@@ -55,7 +58,10 @@ function BatchMigrationAlert({
               style={{ display: 'inline', width: '1em', height: '1em', userSelect: 'none' }}
               src={destNetwork?.icon}
             />{' '}
-            {destNetwork?.name}. <button onClick={() => setIsMigrationModalOpen(true)}>View The List{'>>'}</button>
+            {destNetwork?.name}.{' '}
+            <button className='text-primary underline' onClick={() => setIsMigrationModalOpen(true)}>
+              View The List{'>>'}
+            </button>
           </span>
 
           <Button size='sm' className='absolute right-0' isIconOnly variant='light' onClick={dismissAlert}>

@@ -100,7 +100,7 @@ function GroupedEndpoints({
               radius='sm'
               color='secondary'
               size='lg'
-              className='text-foreground bg-divider-300/30 data-[completed-migration="true"]:text-opacity-30 data-[completed-migration="true"]:hover:bg-divider-300/30 h-[52px] justify-start rounded-[10px] p-2.5 text-left font-bold shadow-none'
+              className='text-foreground bg-divider-300/30 data-[completed-migration=true]:text-foreground/30 data-[completed-migration=true]:hover:bg-divider-300/30 h-[52px] justify-start rounded-[10px] p-2.5 text-left font-bold shadow-none'
               style={{
                 background: !isCompletedMigration ? 'var(--color-main-bg)' : undefined
               }}

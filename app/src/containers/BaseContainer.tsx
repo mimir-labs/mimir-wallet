@@ -77,8 +77,10 @@ const TopSection = ({ hideTopBar, current, setAlertOpen }: TopSectionProps) => {
   return (
     <>
       <TopBar />
-      {current && <ToggleAlert address={current} setAlertOpen={handleSetAlertOpen} />}
-      <MigrationAlert onMigrationCounts={setAlertCounts} />
+      <div className='fixed top-[56px] right-0 left-0 z-50 flex w-full flex-col gap-2.5 p-2.5'>
+        {current && <ToggleAlert address={current} setAlertOpen={handleSetAlertOpen} />}
+        <MigrationAlert onMigrationCounts={setAlertCounts} />
+      </div>
     </>
   );
 };
@@ -139,8 +141,8 @@ interface MainContentProps {
   queue: any[];
 }
 
-const MainContent = ({ hideSideBar, hideTopBar, withPadding, alertOpen, queue }: MainContentProps) => {
-  const contentHeight = layoutHelpers.getContentHeight(alertOpen);
+const MainContent = ({ hideSideBar, hideTopBar, withPadding, queue }: MainContentProps) => {
+  const contentHeight = layoutHelpers.getContentHeight();
   const isTransactionActive = queue.length > 0;
 
   return (
@@ -184,7 +186,7 @@ function BaseContainer({ auth, skipConnect = false, withPadding, hideSideBar, hi
 
   // Sidebar provider styles
   const sidebarProviderStyle = {
-    [CSS_VARS.HEADER_HEIGHT]: `${layoutHelpers.getTotalHeaderHeight(alertOpen)}px`
+    [CSS_VARS.HEADER_HEIGHT]: `${layoutHelpers.getTotalHeaderHeight()}px`
   } as React.CSSProperties;
 
   return (

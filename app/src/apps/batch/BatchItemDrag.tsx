@@ -165,7 +165,7 @@ function BatchItemDrag({
       </div>
 
       {isOpen ? (
-        <div className='bg-content1 mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
+        <div className='bg-content1 @container mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
           <Call showFallback from={from} call={call} registry={registry} />
         </div>
       ) : null}
