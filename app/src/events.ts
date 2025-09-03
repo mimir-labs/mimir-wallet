@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
-import type { BatchTxItem } from './hooks/types';
 
 import Events from 'eventemitter3';
 
