@@ -10,7 +10,7 @@ import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 
 import Extrinsic from './Extrinsic';
 
-function PageExtrinsic() {
+function SubmitCalldata() {
   const { current } = useAccount();
   const [sending, setSending] = useState<string>(current || '');
   const supportedNetworks = useAddressSupportedNetworks(sending);
@@ -24,4 +24,4 @@ function PageExtrinsic() {
   );
 }
 
-export default PageExtrinsic;
+export default SubmitCalldata;

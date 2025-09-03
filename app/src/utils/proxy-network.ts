@@ -141,6 +141,8 @@ export async function fetchAppMetadata(url: string): Promise<ProxyResponse<AppMe
       const htmlContent = await fetchThroughProxy(url);
       const metadata = parseHtml(htmlContent, url);
 
+      console.log(metadata);
+
       if (metadata.name) {
         return { success: true, data: metadata };
       }

@@ -35,8 +35,6 @@ export interface DappOption<
   discord?: string;
   github?: string;
   matrix?: string;
-  isDrawer?: boolean;
-  Component?: () => Promise<React.ComponentType>; // only for mimir://dapp/*
   urlSearch?: urlSearch;
 }
 
@@ -238,8 +236,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     tags: ['Assets'],
     website: 'https://mimir.global',
     twitter: 'https://twitter.com/Mimir_global',
-    github: 'https://github.com/mimir-labs',
-    Component: () => import('@/apps/transfer').then((res) => res.default)
+    github: 'https://github.com/mimir-labs'
   },
   {
     id: 2,
@@ -251,9 +248,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Batch', 'utility'],
-    Component: () => import('@/apps/batch').then((res) => res.default),
-    isDrawer: true
+    tags: ['Batch', 'utility']
   },
   {
     id: 3,
@@ -265,8 +260,43 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Assets', 'Transfer', 'MultiTransfer'],
-    Component: () => import('@/apps/multi-transfer').then((res) => res.default)
+    tags: ['Assets', 'Transfer', 'MultiTransfer']
+  },
+  {
+    id: 4,
+    icon: '/dapp-icons/template.svg',
+    name: 'Template',
+    description: 'Save frequent transactions as templates for future use.',
+    url: 'mimir://app/template',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Tool']
+  },
+  {
+    id: 5,
+    icon: '/dapp-icons/decoder.svg',
+    name: 'Decoder',
+    description: 'Decode call data to show raw information.',
+    url: 'mimir://app/decoder',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Tool']
+  },
+  {
+    id: 6,
+    icon: '/dapp-icons/submit-calldata.svg',
+    name: 'Submit From Call Data',
+    description: "Use call data like '0x..' to submit transaction",
+    url: 'mimir://app/submit-calldata',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['Tool']
   },
   {
     id: 500,
@@ -437,5 +467,32 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     website: 'https://bounties.usepapi.app/',
     github: 'https://github.com/polkadot-api/bounties'
   },
-  PolkassemblyApp
+  PolkassemblyApp,
+  {
+    id: 1013,
+    icon: '/dapp-icons/regionx.svg',
+    name: 'RegionX',
+    description: 'The primary interface for interacting with Polkadot’s Agile Coretime model.',
+    url: 'https://hub.regionx.tech/',
+    supportedChains: ['polkadot', 'kusama', 'coretime-polkadot', 'coretime-kusama', 'paseo', 'westend'],
+    tags: ['Coretime Tool'],
+    website: 'https://hub.regionx.tech/',
+    twitter: 'https://x.com/RegionXLabs',
+    urlSearch(network: string) {
+      const url = {
+        polkadot: 'https://hub.regionx.tech/?network=polkadot',
+        kusama: 'https://hub.regionx.tech/?network=kusama',
+        paseo: 'https://hub.regionx.tech/?network=paseo',
+        westend: 'https://hub.regionx.tech/?network=westend',
+        'coretime-polkadot': 'https://hub.regionx.tech/?network=polkadot',
+        'coretime-kusama': 'https://hub.regionx.tech/?network=kusama'
+      }[network];
+
+      if (!url) {
+        return new URL(this.url);
+      }
+
+      return new URL(url);
+    }
+  }
 ];

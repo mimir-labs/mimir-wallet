@@ -4,10 +4,8 @@
 import { analyticsActions } from '@/analytics';
 import Logo from '@/assets/images/logo.png';
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
-import IconMenu from '@/assets/svg/icon-menu.svg?react';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import { AccountSelect } from '@/components';
-import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -23,8 +21,6 @@ function TopBar() {
   const { isApiReady } = useApi();
   const { mode, setNetworkMode } = useNetworks();
   const { pathname } = useLocation();
-  const { closeSidebar, openSidebar, sidebarOpen, rightSidebarOpen, openRightSidebar, closeRightSidebar } =
-    useMimirLayout();
   const isInAppPage = pathname.startsWith('/explorer');
 
   return (
@@ -54,18 +50,9 @@ function TopBar() {
         {/* <Notification /> */}
         {isApiReady && <NotificationButton />}
         {isApiReady && <WalletConnect />}
-        {isApiReady && <TemplateButton isOpen={rightSidebarOpen} open={openRightSidebar} close={closeRightSidebar} />}
+        {isApiReady && <TemplateButton />}
         {isApiReady && <BatchButton />}
         <ChainSelect />
-
-        <Button
-          isIconOnly
-          variant='light'
-          onClick={sidebarOpen ? closeSidebar : openSidebar}
-          className='flex text-inherit md:hidden'
-        >
-          <IconMenu />
-        </Button>
       </div>
     </div>
   );

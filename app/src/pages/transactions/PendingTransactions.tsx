@@ -6,8 +6,6 @@ import { GroupedTransactions } from '@/transactions';
 import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
 import React, { useEffect, useMemo } from 'react';
 
-import { skeleton } from './skeleton';
-
 function PendingTransactions({
   showDiscarded = false,
   isFetched,
@@ -53,8 +51,7 @@ function PendingTransactions({
 
   return (
     <div className='space-y-5'>
-      <GroupedTransactions groupedTransactions={groupedTransactions} />
-      {showSkeleton ? skeleton : null}
+      <GroupedTransactions showSkeleton={showSkeleton} groupedTransactions={groupedTransactions} />
     </div>
   );
 }

@@ -12,7 +12,6 @@ import PageCreateMultisig from './pages/create-multisig';
 import PageDapp from './pages/dapp';
 import ErrorPage from './pages/error-page';
 import PageExplorer from './pages/explorer';
-import PageExtrinsic from './pages/extrinsic';
 import PageProfile from './pages/profile';
 import PageWelcome from './pages/profile/Welcome';
 import PageSetting from './pages/setting';
@@ -32,7 +31,7 @@ const routes = [
     children: [
       {
         // Authenticated routes with sidebar and padding
-        element: <BaseContainer auth withSideBar withPadding />,
+        element: <BaseContainer auth withPadding />,
         children: [
           {
             index: true,
@@ -68,13 +67,13 @@ const routes = [
           },
           {
             path: '/extrinsic',
-            element: <PageExtrinsic />
+            element: <Navigate replace to={`/explorer/${encodeURIComponent('mimir://app/submit-calldata')}`} />
           }
         ]
       },
       {
         // Authenticated routes without sidebar
-        element: <BaseContainer auth withSideBar={false} withPadding />,
+        element: <BaseContainer auth withPadding />,
 
         children: [
           {
@@ -85,7 +84,7 @@ const routes = [
       },
       {
         // Public routes for account creation
-        element: <BaseContainer auth={false} withSideBar={false} withPadding />,
+        element: <BaseContainer auth={false} withPadding />,
 
         children: [
           {
@@ -104,7 +103,7 @@ const routes = [
       },
       {
         // Explorer routes without padding
-        element: <BaseContainer auth withSideBar={false} withPadding={false} />,
+        element: <BaseContainer auth withPadding={false} />,
         children: [
           {
             path: '/explorer/:url',
@@ -114,7 +113,7 @@ const routes = [
       },
       {
         // Welcome page for new users
-        element: <BaseContainer auth={false} withSideBar withPadding={false} hideSideBar hideTopBar />,
+        element: <BaseContainer auth={false} withPadding={false} hideSideBar hideTopBar />,
 
         children: [
           {
@@ -124,7 +123,7 @@ const routes = [
         ]
       },
       {
-        element: <BaseContainer auth={false} skipConnect withSideBar withPadding />,
+        element: <BaseContainer auth={false} skipConnect withPadding />,
         children: [
           {
             path: '/setting',

@@ -5,7 +5,6 @@ import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
-import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Empty, InputNetwork } from '@/components';
 
@@ -19,13 +18,11 @@ import { useSavedTemplate } from './useSavedTemplate';
 function TemplateList({
   registry,
   onAdd,
-  onClose,
   onView,
   setNetwork
 }: {
   registry: Registry;
   onAdd: () => void;
-  onClose: () => void;
   onView: (name: string, call: HexString) => void;
   setNetwork: (network: string) => void;
 }) {
@@ -38,7 +35,7 @@ function TemplateList({
   };
 
   return (
-    <div className='flex h-full flex-col gap-5'>
+    <div className='scrollbar-hide flex h-full flex-col gap-5 overflow-y-auto'>
       <div className='flex items-center gap-1'>
         <h4>Call Template</h4>
         <Tooltip content='Save frequently used on-chain operation templates for repeated use in the future.'>
@@ -50,9 +47,6 @@ function TemplateList({
         <Button variant='ghost' color='primary' onClick={onAdd}>
           Add
           <IconAdd className='h-4 w-4' />
-        </Button>
-        <Button isIconOnly color='primary' variant='ghost' onClick={onClose}>
-          <IconClose />
         </Button>
       </div>
 

@@ -1,5 +1,91 @@
 # Changelog
 
+## [2.24.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.24.0...mimir-wallet-app-v2.24.1) (2025-08-27)
+
+
+### Bug Fixes
+
+* Fixed the issue of not being able to open dapp ([00eb5bf](https://github.com/mimir-labs/mimir-wallet/commit/00eb5bfbe10c360a782da4fa6866270cad03f8e9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.24.1
+    * @mimir-wallet/service bumped to 2.24.1
+    * @mimir-wallet/ui bumped to 2.24.1
+
+## [2.24.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.23.1...mimir-wallet-app-v2.24.0) (2025-08-27)
+
+
+### Features
+
+* Add cross-chain calldata display component ([#291](https://github.com/mimir-labs/mimir-wallet/issues/291)) ([5610b9d](https://github.com/mimir-labs/mimir-wallet/commit/5610b9de902d564f0af34e960d5cec225ae347f2))
+* Refactor sidebar system with modular architecture and ShadCN integration ([#293](https://github.com/mimir-labs/mimir-wallet/issues/293)) ([c820a05](https://github.com/mimir-labs/mimir-wallet/commit/c820a056016698326f5b16bcd24f2c3bb952b8ca))
+
+
+### Bug Fixes
+
+* fix some ui issues ([cb4a6b9](https://github.com/mimir-labs/mimir-wallet/commit/cb4a6b92f8a66ca037dfae3c054e84063ebd6e5e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.24.0
+    * @mimir-wallet/service bumped to 2.24.0
+    * @mimir-wallet/ui bumped to 2.24.0
+
+## [2.23.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.23.0...mimir-wallet-app-v2.23.1) (2025-08-25)
+
+
+### Bug Fixes
+
+* fix regionx dapp tag ([2d15b99](https://github.com/mimir-labs/mimir-wallet/commit/2d15b9954277f7c3f256817211d6247270932627))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.23.1
+    * @mimir-wallet/service bumped to 2.23.1
+    * @mimir-wallet/ui bumped to 2.23.1
+
+## [2.23.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.22.1...mimir-wallet-app-v2.23.0) (2025-08-25)
+
+
+### Features
+
+* Add regoinx dapp support ([da476a2](https://github.com/mimir-labs/mimir-wallet/commit/da476a2388752a5d4b541943b333d5efc2c8bf87))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.23.0
+    * @mimir-wallet/service bumped to 2.23.0
+    * @mimir-wallet/ui bumped to 2.23.0
+
+## [2.22.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.22.0...mimir-wallet-app-v2.22.1) (2025-08-18)
+
+
+### Bug Fixes
+
+* Fixed the problem of empty ui and skeleton appearing at the same time ([#289](https://github.com/mimir-labs/mimir-wallet/issues/289)) ([cbbab64](https://github.com/mimir-labs/mimir-wallet/commit/cbbab64150f2a24b021d7daf38d57ed760d34da0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.22.1
+    * @mimir-wallet/service bumped to 2.22.1
+    * @mimir-wallet/ui bumped to 2.22.1
+
 ## [2.22.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.21.1...mimir-wallet-app-v2.22.0) (2025-08-18)
 
 

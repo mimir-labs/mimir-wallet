@@ -29,7 +29,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       data-selected={ss58Chain === endpoint.key}
       ref={ref}
       style={{
-        background: 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)'
+        background: 'var(--color-main-bg)'
       }}
       className='data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 rounded-[10px] p-2 sm:gap-2 sm:p-2.5'
       onClick={(e) => {

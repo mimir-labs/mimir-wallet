@@ -99,7 +99,7 @@ function Content({
                                 call:
                                   proxies[0].length === 1
                                     ? api.tx.proxy.removeProxies()
-                                    : api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType, proxy.delay),
+                                    : api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType.toU8a(), proxy.delay),
                                 website: 'mimir://internal/setup',
                                 network
                               });

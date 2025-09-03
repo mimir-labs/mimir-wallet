@@ -77,7 +77,7 @@ function ExecuteAnnounce({
       } else {
         addQueue({
           accountId: walletAccounts[0].address,
-          call: api.tx.proxy.proxyAnnounced(delegate, transaction.address, proxyDefine.proxyType, call),
+          call: api.tx.proxy.proxyAnnounced(delegate, transaction.address, proxyDefine.proxyType.toU8a(), call),
           website: 'mimir://internal/execute-announcement',
           network
         });

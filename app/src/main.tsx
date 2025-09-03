@@ -29,7 +29,7 @@ import { initializeAccount } from './accounts/initialize';
 import { initializeWallet } from './wallet/initialize';
 import { initAnalytics } from './analytics';
 import App from './App';
-import { initMimir } from './initMimir';
+import { initFavoriteDapps, initMimir } from './initMimir';
 import { upgradeAddresBook } from './upgrade';
 
 // Set default date-time format for the entire application
@@ -57,6 +57,8 @@ const isOmni = useNetworks.getState().mode === 'omni';
 // Initialize core Mimir wallet configuration and get initial chain and address settings
 // This sets up the basic configuration needed for the wallet to function
 const { chain, address } = initMimir(isOmni);
+
+initFavoriteDapps();
 
 initService(API_CLIENT_GATEWAY);
 

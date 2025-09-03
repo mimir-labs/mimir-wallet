@@ -102,7 +102,7 @@ function GroupedEndpoints({
               size='lg'
               className='text-foreground bg-divider-300/30 data-[completed-migration="true"]:text-opacity-30 data-[completed-migration="true"]:hover:bg-divider-300/30 h-[52px] justify-start rounded-[10px] p-2.5 text-left font-bold shadow-none'
               style={{
-                background: !isCompletedMigration ? 'linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%)' : undefined
+                background: !isCompletedMigration ? 'var(--color-main-bg)' : undefined
               }}
               onClick={endpoint.enabled ? () => disableNetworks([endpoint.key]) : () => enableNetworks([endpoint.key])}
             >

@@ -4,6 +4,7 @@
 import type { Call } from '@polkadot/types/interfaces';
 import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
+import type { FeatureError } from '../shared/error-handling';
 
 import IconArrowLeft from '@/assets/svg/icon-arrow-left.svg?react';
 import { Input, InputNetwork } from '@/components';
@@ -17,6 +18,7 @@ import { Button, Divider } from '@mimir-wallet/ui';
 import DotConsoleButton from '../call-data-view/DotConsoleButton';
 import DotConsoleLink from '../call-data-view/DotConsoleLink';
 import { decodeCallData } from '../call-data-view/utils';
+import { ErrorDisplay } from '../shared/ErrorDisplay';
 import { useSavedTemplate } from './useSavedTemplate';
 
 function AddTemplate({
@@ -39,7 +41,7 @@ function AddTemplate({
   const [name, setName] = useInput(defaultName || '');
   const [callData, setCallData] = useInput(defaultCallData || '');
   const [parsedCallData, setParsedCallData] = useState<Call | null>(null);
-  const [callDataError, setCallDataError] = useState<Error | null>(null);
+  const [callDataError, setCallDataError] = useState<FeatureError | null>(null);
 
   useEffect(() => {
     const [call, error] = decodeCallData(registry, callData);
@@ -58,7 +60,7 @@ function AddTemplate({
   };
 
   return (
-    <div className='space-y-5'>
+    <div className='scrollbar-hide h-full space-y-5 overflow-y-auto'>
       <div className='flex items-center gap-1'>
         <Button isIconOnly color='primary' variant='light' onClick={onBack}>
           <IconArrowLeft />
@@ -87,13 +89,7 @@ function AddTemplate({
         onChange={setCallData}
       />
 
-      {callDataError && (
-        <div className='bg-secondary rounded-[10px] p-2.5 break-all'>
-          <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-xs'>
-            {callDataError.message}
-          </p>
-        </div>
-      )}
+      <ErrorDisplay error={callDataError} showDetails={process.env.NODE_ENV === 'development'} />
 
       {parsedCallData && (
         <div className='bg-secondary rounded-[10px] p-2.5'>

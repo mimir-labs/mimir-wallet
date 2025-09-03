@@ -2,17 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Vec } from '@polkadot/types';
-import type {
-  StagingXcmV4Junction,
-  StagingXcmV4Junctions,
-  StagingXcmV5Junction,
-  StagingXcmV5Junctions,
-  XcmV3Junction,
-  XcmV3Junctions,
-  XcmVersionedLocation,
-  XcmVersionedXcm
-} from '@polkadot/types/lookup';
+import type { XcmVersionedLocation, XcmVersionedXcm } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
+import type { SupportXcmChainConfig } from '../xcm/types.js';
 import type { DryRunResult } from './types.js';
 
 import { ApiPromise } from '@polkadot/api';
@@ -21,13 +13,8 @@ import { assertReturn } from '@polkadot/util';
 import { allEndpoints } from '../config.js';
 import { assetXcmV5TraitsError } from '../dispatch-error.js';
 import { createApi } from '../initialize.js';
+import { findDestChain } from '../xcm/parseLocation.js';
 import { parseBalancesChange } from './parse-balances-change.js';
-
-type Junctions = XcmV3Junction[] | StagingXcmV4Junction[] | StagingXcmV5Junction[];
-
-// Constants for XCM configuration
-const PARENT_CHAIN_JUMP_LIMIT = 1;
-const SUPPORTED_XCM_VERSIONS = ['V3', 'V4', 'V5'] as const;
 
 /**
  * Logs XCM operations with simplified format
@@ -50,81 +37,6 @@ function logXcmOperation(
     default:
       console.info('[XCM-DRY-RUN]', operation, data);
   }
-}
-
-interface ChainConfig {
-  key: string;
-  name?: string;
-  genesisHash: string;
-  relayChain?: string;
-  paraId?: number;
-  wsUrl: Record<string, string>;
-  httpUrl?: string;
-}
-
-interface OriginInfo {
-  parents: number;
-  interior: Record<string, any>;
-}
-
-interface LocationInfo {
-  parents: number;
-  interiors: Junctions;
-}
-
-/**
- * Parses XCM junctions from different versions into a unified format
- * @param junctions - The junctions to parse
- * @returns Array of parsed junctions
- * @throws Error if junctions cannot be parsed
- */
-function parseJunctions(junctions: XcmV3Junctions | StagingXcmV4Junctions | StagingXcmV5Junctions): Junctions {
-  if (junctions.isHere) {
-    return [];
-  }
-
-  // Check for X1 through X8 junctions
-  const junctionTypes = ['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8'] as const;
-
-  for (const type of junctionTypes) {
-    const isMethodName = `is${type}` as keyof typeof junctions;
-    const asMethodName = `as${type}` as keyof typeof junctions;
-
-    if (junctions[isMethodName] && typeof junctions[isMethodName] === 'boolean' && junctions[isMethodName]) {
-      return junctions[asMethodName] as Junctions;
-    }
-  }
-
-  throw new Error('Cannot parse junctions', {
-    cause: junctions
-  });
-}
-
-/**
- * Parses XCM versioned location into chain navigation information
- * @param location - The versioned location to parse
- * @returns Object containing parents count and interior junctions
- * @throws Error if location version is not supported
- */
-function parseLocationChain(location: XcmVersionedLocation): LocationInfo {
-  // Check supported versions
-  for (const version of SUPPORTED_XCM_VERSIONS) {
-    const isMethodName = `is${version}` as keyof typeof location;
-    const asMethodName = `as${version}` as keyof typeof location;
-
-    if (location[isMethodName] && typeof location[isMethodName] === 'boolean' && location[isMethodName]) {
-      const versionedLocation = location[asMethodName] as any;
-
-      return {
-        parents: versionedLocation.parents.toNumber(),
-        interiors: parseJunctions(versionedLocation.interior)
-      };
-    }
-  }
-
-  throw new Error('Unknown version for XcmVersionedLocation', {
-    cause: location
-  });
 }
 
 /**
@@ -169,7 +81,7 @@ export async function dryRunWithXcm(
     });
 
     try {
-      const { chainApi, originInfo } = await processXcmLocation(xcm[0], initialChain, openApis);
+      const { chainApi, originInfo } = await processXcmLocation(xcm[0], { isSupport: true, ...initialChain }, openApis);
 
       originParents = originInfo.parents;
       originInterior = originInfo.interior;
@@ -235,66 +147,28 @@ export async function dryRunWithXcm(
  */
 async function processXcmLocation(
   location: XcmVersionedLocation,
-  initialChain: ChainConfig,
+  initialChain: SupportXcmChainConfig,
   openApis: ApiPromise[]
-): Promise<{ chainApi: ApiPromise; originInfo: OriginInfo }> {
-  let currentChain = initialChain;
-  let originParents = 0;
-  let originInterior: Record<string, any>;
+): Promise<{
+  chainApi: ApiPromise;
+  originInfo: {
+    parents: number;
+    interior: Record<string, any>;
+  };
+}> {
+  const { chain, origin } = findDestChain(location, initialChain);
 
-  const { parents, interiors } = parseLocationChain(location);
-
-  // Handle parent chain navigation
-  if (parents === 0) {
-    originInterior = { Here: {} };
-  } else if (parents <= PARENT_CHAIN_JUMP_LIMIT) {
-    if (currentChain.relayChain) {
-      originInterior = { X1: [{ Parachain: currentChain.paraId }] };
-
-      currentChain = assertReturn(
-        allEndpoints.find((item) => item.key === currentChain.relayChain),
-        `Relay Network not supported(ParachainID:${currentChain.relayChain})`
-      );
-    } else {
-      const errorMsg = `Cannot jump to parent(${parents}), current path is ${currentChain.key}`;
-
-      logXcmOperation('Navigation Error', { error: errorMsg }, 'error');
-      throw new Error(errorMsg);
-    }
-  } else {
-    const errorMsg = `Cannot jump to parents(${parents}): exceeds maximum parent chain jump limit`;
-
-    logXcmOperation('Navigation Error', { error: errorMsg }, 'error');
-    throw new Error(errorMsg);
-  }
-
-  for (let i = 0; i < interiors.length; i++) {
-    const interior = interiors[i];
-
-    if (interior.isParachain) {
-      const paraId = interior.asParachain.toNumber();
-
-      originParents++;
-
-      currentChain = assertReturn(
-        allEndpoints.find((item) => item.relayChain && item.relayChain === currentChain.key && item.paraId === paraId),
-        `Network not supported(ParachainID:${paraId})`
-      );
-    } else {
-      const errorMsg = `Cannot jump to path, current path is ${currentChain.key}, interior(${interior.toString()})`;
-
-      logXcmOperation('Navigation Error', { error: errorMsg }, 'error');
-      throw new Error(errorMsg);
-    }
+  if (!chain.isSupport) {
+    throw new Error(`Chain not supported ${chain}`);
   }
 
   let chainApi: ApiPromise;
-  const exists = openApis.find((item) => item.genesisHash.toHex() === currentChain.genesisHash);
+  const exists = openApis.find((item) => item.genesisHash.toHex() === chain.genesisHash);
 
   if (exists) {
     chainApi = exists;
   } else {
-    [chainApi] = await createApi(Object.values(currentChain.wsUrl), currentChain.key, currentChain.httpUrl);
+    [chainApi] = await createApi(Object.values(chain.wsUrl), chain.key, chain.httpUrl);
   }
 
   await chainApi.isReady;
@@ -304,7 +178,7 @@ async function processXcmLocation(
   }
 
   if (!chainApi.call.dryRunApi?.dryRunXcm) {
-    const errorMsg = `Chain ${currentChain.name} does not support XCM dry run API`;
+    const errorMsg = `Chain ${chain.name} does not support XCM dry run API`;
 
     logXcmOperation('API Validation Error', { error: errorMsg }, 'error');
     throw new Error(errorMsg);
@@ -312,10 +186,7 @@ async function processXcmLocation(
 
   return {
     chainApi,
-    originInfo: {
-      parents: originParents,
-      interior: originInterior
-    }
+    originInfo: origin
   };
 }
 

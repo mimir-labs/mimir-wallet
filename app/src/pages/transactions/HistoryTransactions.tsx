@@ -1,14 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Empty } from '@/components';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useHistoryTransactions } from '@/hooks/useTransactions';
 import { GroupedTransactions } from '@/transactions';
 import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
 import React, { useMemo } from 'react';
-
-import { skeleton } from './skeleton';
 
 const limit = 20;
 
@@ -44,19 +41,12 @@ function HistoryTransactions({
 
   return (
     <div className='flex flex-col gap-5'>
-      {isFetched && data && data.length === 0 ? <Empty height='80dvh' /> : null}
-
       <GroupedTransactions
+        showSkeleton={(!isFetched && isFetching) || (!propsIsFetched && propsIsFetching) || (isFetching && hasNexPage)}
         groupedTransactions={groupedTransactions}
-        showEmpty={false}
         defaultOpenFirst={false}
         spacing='md'
       />
-
-      {/* Loading indicator */}
-      {(!isFetched && isFetching) || (!propsIsFetched && propsIsFetching) || (isFetching && hasNexPage && skeleton)
-        ? skeleton
-        : null}
 
       {/* End message */}
       {!hasNexPage && data.length > 0 && <h6 className='text-foreground/50 text-center text-sm'>no data more.</h6>}
