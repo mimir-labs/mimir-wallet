@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
-import { Address, AddressName, FormatBalance } from '@/components';
+import { Address, AddressName } from '@/components';
 import { MIGRATION_DOCS_URL } from '@/constants';
-import { useNativeBalances } from '@/hooks/useBalances';
 import { useCopyAddress } from '@/hooks/useCopyAddress';
 import { useMemo } from 'react';
 
@@ -28,33 +27,23 @@ interface Props {
 }
 
 function AccountItem({ account }: { account: MigratedAccount }) {
-  const [balances] = useNativeBalances(account.address);
   const { open } = useCopyAddress();
 
   return (
-    <div className='flex h-10 w-full items-center gap-[5px] rounded-[10px] border border-[#d9d9d9] bg-white px-2.5'>
+    <div className='border-divider-300 flex h-10 w-full items-center gap-[5px] rounded-[10px] border bg-white px-2.5'>
       {/* Account Icon */}
       <div className='h-5 w-5 flex-shrink-0'>
         <IdentityIcon value={account.address} size={20} />
       </div>
 
       {/* Account Name */}
-      <div className='w-[36%]'>
+      <div className='w-[50%]'>
         <AddressName value={account.address} />
       </div>
 
       {/* Address */}
-      <div className='text-small min-w-0 flex-1' onClick={() => open(account.address)}>
+      <div className='text-small min-w-0 flex-1 text-right' onClick={() => open(account.address)}>
         <Address value={account.address} shorten />
-      </div>
-
-      {/* Balance */}
-      <div className='text-small flex-shrink-0 text-right'>
-        <FormatBalance
-          icon={<img src={account.tokenIcon} className='h-3.5 w-3.5 rounded-full' />}
-          value={balances?.total}
-          withCurrency
-        />
       </div>
     </div>
   );

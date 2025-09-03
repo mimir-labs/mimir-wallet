@@ -91,14 +91,16 @@ function MigrationAlert({ onMigrationCounts }: { onMigrationCounts: (counts: num
     onMigrationCounts(migrationNetworks?.length ?? 0);
   }, [migrationNetworks, onMigrationCounts]);
 
-  return migrationNetworks?.map((network) => (
-    <Item
-      key={network.chain}
-      isCompleted={network.status === 'completed'}
-      sourceChain={network.chain}
-      destChain={network.destChain}
-    />
-  ));
+  return migrationNetworks
+    ?.slice(0, 1)
+    ?.map((network) => (
+      <Item
+        key={network.chain}
+        isCompleted={network.status === 'completed'}
+        sourceChain={network.chain}
+        destChain={network.destChain}
+      />
+    ));
 }
 
 export default MigrationAlert;
