@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
+import { dapps } from '@/config';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { type FunctionCallHandler, useAIContext, useFunctionCall } from '@mimir-wallet/ai-assistant';
-import { encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 
 import { useDapps } from './useDapp';
 import { useMimirLayout } from './useMimirLayout';
@@ -14,10 +15,11 @@ import { useMimirLayout } from './useMimirLayout';
 export function useUpdateAIContext() {
   const { openRightSidebar, setRightSidebarTab } = useMimirLayout();
   const { networks } = useNetworks();
-  const { metas, isLocalAccount } = useAccount();
+  const { metas, isLocalAccount, accounts, addresses, current } = useAccount();
   const { chainSS58 } = useApi();
-  const { dapps, isFavorite } = useDapps();
+  const { isFavorite } = useDapps();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     useAIContext.setState({
@@ -36,29 +38,85 @@ export function useUpdateAIContext() {
 
   useEffect(() => {
     useAIContext.setState({
-      addresses: Object.entries(metas).map(([key, item]) => ({
-        name: item.name || '',
-        address: encodeAddress(key, chainSS58),
-        hasPermission: isLocalAccount(key),
-        isMultisig: !!item.isMultisig,
-        isPure: !!item.isPure,
-        network: item.network
-      }))
+      addresses: (accounts as { address: string }[])
+        .concat(addresses)
+        .map((item) => {
+          const meta = metas[addressToHex(item.address)];
+
+          if (!meta) return null;
+
+          return {
+            name: meta.name || '',
+            address: encodeAddress(item.address, chainSS58),
+            hasPermission: isLocalAccount(item.address),
+            isMultisig: !!meta.isMultisig,
+            isPure: !!meta.isPure,
+            network: meta.network
+          };
+        })
+        .filter((item) => !!item)
     });
-  }, [chainSS58, isLocalAccount, metas]);
+  }, [accounts, addresses, chainSS58, isLocalAccount, metas]);
 
   useEffect(() => {
     useAIContext.setState({
-      dapps: dapps.map((item) => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        supportedChains: Array.isArray(item.supportedChains) ? item.supportedChains : 'All',
-        isFavorite: isFavorite(item.id),
-        website: item.website
-      }))
+      internalDapps: dapps
+        .filter((item) => item.url.startsWith('mimir://app'))
+        .map((item) => ({
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          supportedChains: Array.isArray(item.supportedChains) ? item.supportedChains : 'All',
+          isFavorite: isFavorite(item.id),
+          website: item.website
+        }))
     });
-  }, [dapps, isFavorite]);
+
+    useAIContext.setState({
+      internalDapps: dapps
+        .filter((item) => item.url.startsWith('https://'))
+        .map((item) => ({
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          supportedChains: Array.isArray(item.supportedChains) ? item.supportedChains : 'All',
+          isFavorite: isFavorite(item.id),
+          website: item.website
+        }))
+    });
+  }, [isFavorite]);
+
+  useEffect(() => {
+    const currentAccount = (() => {
+      if (current) {
+        const hex = addressToHex(current);
+        const meta = metas[hex];
+
+        if (meta) {
+          return {
+            address: encodeAddress(current, chainSS58),
+            isPure: !!meta.isPure,
+            network: meta.network,
+            isMultisig: !!meta.isMultisig,
+            delegatees: meta.delegatees || [],
+            members: meta.isMultisig ? meta.who : [],
+            threshold: meta.isMultisig ? meta.threshold : undefined
+          };
+        }
+
+        return null;
+      }
+
+      return null;
+    })();
+
+    useAIContext.setState({
+      state: {
+        ...(currentAccount ? currentAccount : {}),
+        currentPath: pathname
+      }
+    });
+  });
 
   const functionHandlers: Record<string, FunctionCallHandler> = {
     // Standard server tool: createMultisig

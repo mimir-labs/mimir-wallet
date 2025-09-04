@@ -5,6 +5,28 @@ import { create } from 'zustand';
 
 import { routingContext } from './routing-context.js';
 
+interface DappInfo {
+  id: number | string;
+  name: string;
+  description: string;
+  supportedChains: 'All' | string[];
+  isFavorite: boolean;
+  website?: string;
+}
+
+interface State {
+  currentAccount?: {
+    address: string;
+    isPure: boolean;
+    network?: string;
+    isMultisig: boolean;
+    delegatees: string[];
+    members?: string[];
+    threshold?: number;
+  };
+  currentPath?: string;
+}
+
 interface AIContext {
   context: string;
   routingContext: string;
@@ -26,14 +48,9 @@ interface AIContext {
     isPure: boolean;
     network?: string;
   }>;
-  dapps: Array<{
-    id: number | string;
-    name: string;
-    description: string;
-    supportedChains: 'All' | string[];
-    isFavorite: boolean;
-    website?: string;
-  }>;
+  state?: State;
+  internalDapps: Array<DappInfo>;
+  externalDapps: Array<DappInfo>;
   updateContext: (value: string) => () => void;
   getFullContext: () => string;
 }
@@ -43,7 +60,8 @@ export const useAIContext = create<AIContext>()((set, get) => {
     context: '',
     supportedNetworks: [],
     addresses: [],
-    dapps: [],
+    internalDapps: [],
+    externalDapps: [],
     routingContext: JSON.stringify(routingContext),
     updateContext: (value) => {
       set({ context: value });
@@ -51,47 +69,57 @@ export const useAIContext = create<AIContext>()((set, get) => {
       return () => set({ context: '' });
     },
     getFullContext: () => {
-      const { context, routingContext, supportedNetworks, addresses, dapps } = get();
+      const { context, routingContext, supportedNetworks, addresses, internalDapps, externalDapps, state } = get();
 
       // Combine routing context with any additional context
       return `
-# Mimir Wallet Context Information
+# MIMIR WALLET AI ASSISTANT CONTEXT
 
-You are an AI assistant for Mimir Wallet, an enterprise-grade multi-signature wallet for the Polkadot ecosystem. Below is the current application context to help you assist users effectively.
+You are an AI assistant for Mimir Wallet - an enterprise-grade multi-signature wallet for the Polkadot ecosystem. Focus on the current user context and provide precise, actionable assistance.
 
-## Application Routes (<App-routing-info>)
-The following routes are available in the application. Each route represents a specific feature or page:
-- path: The URL path for navigation
-- description: The functionality and purpose of each route
+## CURRENT USER STATE (<global-state>)
+**Active session information for immediate context:**
+- currentPath: The route path where the user currently is
+- currentAccount.address: The active account's SS58-encoded address
+- currentAccount.isPure: Whether this is a pure proxy account (anonymous, no private key)
+- currentAccount.network: Genesis hash of the network (only for pure proxy accounts)
+- currentAccount.isMultisig: Whether this is a multi-signature account
+- currentAccount.delegatees: Array of proxy accounts that can act on behalf of this account
+- currentAccount.members: Multisig members array (only if isMultisig=true)
+- currentAccount.threshold: Required approvals for multisig transactions (only if isMultisig=true)
 
-## Supported Blockchain Networks (<all-supported-networks>)
-Mimir Wallet supports multiple Polkadot ecosystem networks with the following properties:
-- key: Unique identifier for the network (used internally and in API calls)
-- name: Human-readable display name of the network
-- isRelayChain: Boolean indicating if this is a relay chain (true) or parachain (false)
-- genesisHash: The genesis hash of the blockchain network for identification
-- ss58Format: The SS58 address format number used for encoding addresses on this network
-- paraId: Parachain ID (only present for parachains, not relay chains)
-- isTestnet: Boolean indicating if this is a testnet (true) or mainnet (false)
-- isEnabled: Boolean indicating if this network is currently enabled in the wallet
+## NAVIGATION ROUTES (<App-routing-info>)
+**Available application paths and their purposes:**
+- path: URL path for navigation (e.g., "/transfer", "/transactions")
+- description: Feature functionality at this route
 
-## User Accounts & Addresses (<local-address>)
-The user's wallet contains various types of accounts with different capabilities:
-- name: Custom label assigned by the user for easy identification
-- address: The SS58-encoded address string (formatted according to the network's ss58Format)
-- hasPermission: Boolean indicating if this account has permission controls applied
-- isMultisig: Boolean indicating if this is a multi-signature account requiring multiple approvals
-- isPure: Boolean indicating if this is a pure proxy account (anonymous proxy without private key)
-- network: The network this account belongs to (only present for pure proxy accounts)
+## BLOCKCHAIN NETWORKS (<all-supported-networks>)
+**Polkadot ecosystem networks configuration:**
+- key: Network identifier for API calls and internal reference
+- name: Display name shown to users
+- isRelayChain: true = relay chain (Polkadot/Kusama), false = parachain
+- genesisHash: Unique blockchain identifier
+- ss58Format: Address encoding format (e.g., 0 for Polkadot, 2 for Kusama)
+- paraId: Parachain ID number (only for parachains)
+- isTestnet: true = test network, false = production network
+- isEnabled: Whether this network is active in the wallet
 
-## Available DApps & Features (<all-dapps>)
-Mimir Wallet integrates with various decentralized applications and provides internal features:
-- id: Unique identifier (1-500: internal features, 501-999: internal utilities, 1000+: external dapps)
-- name: The display name of the application or feature
-- description: Brief explanation of what the app/feature does
-- supportedChains: Either "All" (supports all networks) or an array of network keys
-- isFavorite: Boolean indicating if the user has marked this as a favorite
-- website: Optional URL to the dapp's official website
+## USER ACCOUNTS (<local-address>)
+**All available accounts in the wallet:**
+- name: User-defined label for the account
+- address: SS58-encoded address string
+- hasPermission: Whether permission controls are applied
+- isMultisig: Multi-signature account requiring multiple approvals
+- isPure: Pure proxy account without private key
+- network: Network association (pure proxies only)
+
+## INTERNAL DAPPS (<internal-dapps>) And EXTERNAL DAPPS (<external-dapps>)
+- id: Unique identifier
+- name: Application name
+- description: Feature explanation
+- supportedChains: "All" or array of network keys
+- isFavorite: User's bookmark status
+- website: Official URL (optional)
 
 <App-routing-info>
 ${routingContext}
@@ -105,9 +133,17 @@ ${JSON.stringify(supportedNetworks)}
 ${JSON.stringify(addresses)}
 </local-address>
 
-<all-dapps>
-${JSON.stringify(dapps)}
-</all-dapps>
+<internal-dapps>
+${JSON.stringify(internalDapps)}
+</internal-dapps>
+
+<external-dapps>
+${JSON.stringify(externalDapps)}
+</external-dapps>
+
+<global-state>
+${JSON.stringify(state || {})}
+</global-state>
 `.concat(context);
     }
   };
