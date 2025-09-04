@@ -3,45 +3,37 @@
 
 import { create } from 'zustand';
 
-// Default routing context for AI prompt
-const DEFAULT_ROUTING_CONTEXT = `
-## Mimir Wallet Application Routes
-
-You are an AI assistant for Mimir Wallet, a Polkadot ecosystem multi-signature wallet application. Here are all available routes and their purposes:
-
-### Main Application Pages (Authenticated)
-- **/** (Dashboard): Main dashboard displaying account overview, total assets, recent transactions, and quick actions
-- **/assets**: Asset management page for viewing and managing cryptocurrency balances across different chains
-- **/transactions**: Transaction history and pending transaction management interface
-- **/transactions/:id**: Detailed view of a specific transaction including status, approvals, and execution details
-- **/address-book**: Contact management for saving frequently used addresses with labels
-- **/dapp**: DApp browser for interacting with decentralized applications within the wallet
-- **/analytic**: Analytics dashboard showing account activity statistics and insights
-- **/account-setting**: Account-specific settings including members, threshold, and proxy configuration
-
-### Account Creation Pages (Public)
-- **/create-multisig**: Create a new multi-signature account with multiple members and approval threshold
-- **/create-multisig-one**: Simplified flow for creating a single-member multisig account
-- **/create-pure**: Create a pure proxy account for advanced account management scenarios
-- **/welcome**: Onboarding page for new users with wallet introduction and setup guidance
-
-### Special Pages
-- **/add-proxy**: Add a proxy account to perform transactions on behalf of another account
-- **/transfer**: Standalone transfer interface for sending tokens to other accounts
-- **/explorer/:url**: Built-in explorer for interacting with external DApps and blockchain data
-- **/setting**: General application settings including network, language, and display preferences
-
-### Navigation Context
-- Pages with sidebar navigation: Dashboard, Assets, Transactions, Address Book, DApp, Analytics
-- Pages without sidebar: Account creation flows, Add Proxy, Transfer, Explorer
-- Authentication required: Most pages except account creation and welcome pages
-
-When helping users navigate, suggest the most appropriate route based on their intent. For transaction-related queries, guide to /transactions. For account setup, use /create-multisig. For sending funds, use /transfer.
-`;
+import { routingContext } from './routing-context.js';
 
 interface AIContext {
   context: string;
   routingContext: string;
+  supportedNetworks: Array<{
+    key: string;
+    name: string;
+    isRelayChain: boolean;
+    genesisHash: string;
+    ss58Format: number;
+    paraId?: number;
+    isTestnet: boolean;
+    isEnabled: boolean;
+  }>;
+  addresses: Array<{
+    name: string;
+    address: string;
+    hasPermission: boolean;
+    isMultisig: boolean;
+    isPure: boolean;
+    network?: string;
+  }>;
+  dapps: Array<{
+    id: number | string;
+    name: string;
+    description: string;
+    supportedChains: 'All' | string[];
+    isFavorite: boolean;
+    website?: string;
+  }>;
   updateContext: (value: string) => () => void;
   getFullContext: () => string;
 }
@@ -49,17 +41,74 @@ interface AIContext {
 export const useAIContext = create<AIContext>()((set, get) => {
   return {
     context: '',
-    routingContext: DEFAULT_ROUTING_CONTEXT,
+    supportedNetworks: [],
+    addresses: [],
+    dapps: [],
+    routingContext: JSON.stringify(routingContext),
     updateContext: (value) => {
       set({ context: value });
 
       return () => set({ context: '' });
     },
     getFullContext: () => {
-      const { context, routingContext } = get();
+      const { context, routingContext, supportedNetworks, addresses, dapps } = get();
 
       // Combine routing context with any additional context
-      return routingContext + (context ? `\n\n## Current Context\n${context}` : '');
+      return `
+# Mimir Wallet Context Information
+
+You are an AI assistant for Mimir Wallet, an enterprise-grade multi-signature wallet for the Polkadot ecosystem. Below is the current application context to help you assist users effectively.
+
+## Application Routes (<App-routing-info>)
+The following routes are available in the application. Each route represents a specific feature or page:
+- path: The URL path for navigation
+- description: The functionality and purpose of each route
+
+## Supported Blockchain Networks (<all-supported-networks>)
+Mimir Wallet supports multiple Polkadot ecosystem networks with the following properties:
+- key: Unique identifier for the network (used internally and in API calls)
+- name: Human-readable display name of the network
+- isRelayChain: Boolean indicating if this is a relay chain (true) or parachain (false)
+- genesisHash: The genesis hash of the blockchain network for identification
+- ss58Format: The SS58 address format number used for encoding addresses on this network
+- paraId: Parachain ID (only present for parachains, not relay chains)
+- isTestnet: Boolean indicating if this is a testnet (true) or mainnet (false)
+- isEnabled: Boolean indicating if this network is currently enabled in the wallet
+
+## User Accounts & Addresses (<local-address>)
+The user's wallet contains various types of accounts with different capabilities:
+- name: Custom label assigned by the user for easy identification
+- address: The SS58-encoded address string (formatted according to the network's ss58Format)
+- hasPermission: Boolean indicating if this account has permission controls applied
+- isMultisig: Boolean indicating if this is a multi-signature account requiring multiple approvals
+- isPure: Boolean indicating if this is a pure proxy account (anonymous proxy without private key)
+- network: The network this account belongs to (only present for pure proxy accounts)
+
+## Available DApps & Features (<all-dapps>)
+Mimir Wallet integrates with various decentralized applications and provides internal features:
+- id: Unique identifier (1-500: internal features, 501-999: internal utilities, 1000+: external dapps)
+- name: The display name of the application or feature
+- description: Brief explanation of what the app/feature does
+- supportedChains: Either "All" (supports all networks) or an array of network keys
+- isFavorite: Boolean indicating if the user has marked this as a favorite
+- website: Optional URL to the dapp's official website
+
+<App-routing-info>
+${routingContext}
+</App-routing-info>
+
+<all-supported-networks>
+${JSON.stringify(supportedNetworks)}
+</all-supported-networks>
+
+<local-address>
+${JSON.stringify(addresses)}
+</local-address>
+
+<all-dapps>
+${JSON.stringify(dapps)}
+</all-dapps>
+`.concat(context);
     }
   };
 });

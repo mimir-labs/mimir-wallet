@@ -3160,6 +3160,7 @@ __metadata:
     "@ai-sdk/anthropic": "npm:^2.0.9"
     "@ai-sdk/openai": "npm:^2.0.22"
     "@ai-sdk/react": "npm:^2.0.27"
+    "@mimir-wallet/polkadot-core": "workspace:^"
     "@mimir-wallet/service": "workspace:^"
     "@mimir-wallet/ui": "workspace:^"
     "@polkadot/extension-base": "npm:^0.61.5"

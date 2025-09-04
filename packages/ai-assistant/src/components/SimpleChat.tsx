@@ -33,20 +33,20 @@ import { Source, Sources, SourcesContent, SourcesTrigger } from './sources.js';
 
 const models = [
   {
-    name: 'OpenAI: GPT-5 Mini',
-    value: 'openai/gpt-5-mini'
-  },
-  {
     name: 'Anthropic: Claude Sonnet 4',
     value: 'anthropic/claude-sonnet-4'
+  },
+  {
+    name: 'OpenAI: GPT-5',
+    value: 'openai/gpt-5'
   },
   {
     name: 'MoonshotAI: Kimi K2',
     value: 'moonshotai/kimi-k2'
   },
   {
-    name: 'Google: Gemini 2.5 Flash',
-    value: 'google/gemini-2.5-flash'
+    name: 'Google: Gemini 2.5 Pro',
+    value: 'google/gemini-2.5-pro'
   }
 ];
 
