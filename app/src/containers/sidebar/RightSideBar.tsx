@@ -5,6 +5,7 @@ import type { HexString } from '@polkadot/util/types';
 
 import Batch from '@/apps/batch';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
+import IconRobot from '@/assets/svg/icon-robot.svg?react';
 import { events } from '@/events';
 import CallDataView, { type CallDataViewRef } from '@/features/call-data-view';
 import Template, { type TemplateRef } from '@/features/template';
@@ -12,6 +13,7 @@ import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useRefControl } from '@/hooks/useRefControl';
 import { useCallback, useEffect } from 'react';
 
+import { SimpleChat } from '@mimir-wallet/ai-assistant';
 import { Sidebar, SidebarContent, SidebarHeader, Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 
 import { layoutHelpers } from '../constants';
@@ -138,6 +140,20 @@ function RightSideBar() {
               </span>
             }
           />
+          <Tab
+            key='ai-assistant'
+            title={
+              <span className='flex items-center gap-1'>
+                AI Assistant
+                <Tooltip
+                  classNames={{ content: 'max-w-[300px]' }}
+                  content={'Chat with AI assistant for help with blockchain, crypto, and wallet questions.'}
+                >
+                  <IconRobot className='text-primary h-4 w-4' />
+                </Tooltip>
+              </span>
+            }
+          />
         </Tabs>
       </SidebarHeader>
 
@@ -145,6 +161,7 @@ function RightSideBar() {
         {rightSidebarState.tab === 'batch' ? <Batch /> : null}
         {rightSidebarState.tab === 'template' ? <Template ref={templateRef} /> : null}
         {rightSidebarState.tab === 'decoder' ? <CallDataView ref={callDataViewRef} /> : null}
+        {rightSidebarState.tab === 'ai-assistant' ? <SimpleChat /> : null}
       </SidebarContent>
     </Sidebar>
   );

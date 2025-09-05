@@ -4,4 +4,3 @@
 @source '../src/**/*.{js,ts,jsx,tsx,mdx}';
 @source '../../../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
-

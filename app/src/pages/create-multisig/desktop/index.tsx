@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { type FunctionCallHandler, useFunctionCall } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
 
@@ -57,7 +58,46 @@ function DesktopCreateMultisig() {
   );
 
   const { currentStep, data: multisigData } = wizardState;
-  const { goToNext, goToPrevious, updateData } = wizardActions;
+  const { goToNext, goToPrevious, goToStep, updateData } = wizardActions;
+
+  // Define function call handlers matching server tool names
+  const functionHandlers: Record<string, FunctionCallHandler> = {
+    // Standard server tool: createMultisig
+    createMultisig: async (event) => {
+      const newData: Partial<MultisigData> = {};
+
+      if (event.arguments.name !== undefined) {
+        newData.name = event.arguments.name;
+      }
+
+      if (event.arguments.threshold !== undefined) {
+        newData.threshold = event.arguments.threshold;
+      }
+
+      if (event.arguments.members !== undefined) {
+        newData.members = event.arguments.members;
+      }
+
+      if (event.arguments.isPureProxy !== undefined) {
+        newData.isPureProxy = event.arguments.isPureProxy;
+      }
+
+      if (event.arguments.step !== undefined) {
+        goToStep(event.arguments.step);
+      }
+
+      updateData(newData);
+
+      return {
+        id: event.id,
+        success: true,
+        result: newData
+      };
+    }
+  };
+
+  // Register function call handlers
+  useFunctionCall(functionHandlers);
 
   const handleConfirm = async () => {
     if (multisigData.isPureProxy) {

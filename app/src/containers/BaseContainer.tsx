@@ -7,6 +7,7 @@ import { MigrationAlert } from '@/features/assethub-migration';
 import { useFollowAccounts } from '@/hooks/useFollowAccounts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
+import { useUpdateAIContext } from '@/hooks/useUpdateAIContext';
 import WalletConsumer from '@/wallet/Consumer';
 import { useWallet } from '@/wallet/useWallet';
 import { useCallback, useState } from 'react';
@@ -175,6 +176,7 @@ function BaseContainer({ auth, skipConnect = false, withPadding, hideSideBar, hi
   // Custom hooks for side effects
   useFollowAccounts();
   usePageTitle();
+  useUpdateAIContext();
 
   // Early return for authentication check
   if (!current && auth) {

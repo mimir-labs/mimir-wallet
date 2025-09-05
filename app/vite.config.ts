@@ -86,7 +86,7 @@ export default defineConfig(({ mode }) => ({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.png', 'robots.txt', 'apple-touch-icon.png', 'icons/*.svg', 'fonts/*.woff2'],
             injectManifest: {
-              maximumFileSizeToCacheInBytes: 3000000,
+              maximumFileSizeToCacheInBytes: 10000000,
               buildPlugins: {
                 vite: [tsconfigPaths()]
               }
