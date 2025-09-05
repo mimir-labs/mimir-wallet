@@ -25,6 +25,7 @@ interface State {
     threshold?: number;
   };
   currentPath?: string;
+  chainSS58?: number;
 }
 
 interface AIContext {
@@ -80,6 +81,7 @@ You are an AI assistant for Mimir Wallet - an enterprise-grade multi-signature w
 ## CURRENT USER STATE (<global-state>)
 **Active session information for immediate context:**
 - currentPath: The route path where the user currently is
+- chainSS58: Global ss58 format, numberic
 - currentAccount.address: The active account's SS58-encoded address
 - currentAccount.isPure: Whether this is a pure proxy account (anonymous, no private key)
 - currentAccount.network: Genesis hash of the network (only for pure proxy accounts)

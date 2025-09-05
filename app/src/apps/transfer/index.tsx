@@ -12,6 +12,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { type FunctionCallHandler, useFunctionCall } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Spinner } from '@mimir-wallet/ui';
 
@@ -41,6 +42,41 @@ function PageTransfer() {
     () => (assetId === 'native' ? nativeToken : assets?.find((item) => item.assetId === assetId)),
     [assetId, assets, nativeToken]
   );
+
+  // Define function call handlers matching server tool names
+  const functionHandlers: Record<string, FunctionCallHandler> = {
+    // Standard server tool: transferForm
+    transferForm: async (event) => {
+      if (event.arguments.sending !== undefined) {
+        setSending(event.arguments.sending);
+      }
+
+      if (event.arguments.recipient !== undefined) {
+        setRecipient(event.arguments.recipient);
+      }
+
+      if (event.arguments.amount !== undefined) {
+        setAmount(event.arguments.amount.toString());
+      }
+
+      if (event.arguments.amount !== undefined) {
+        setAmount(event.arguments.amount.toString());
+      }
+
+      if (event.arguments.network !== undefined) {
+        setNetwork(event.arguments.network);
+      }
+
+      return {
+        id: event.id,
+        success: true,
+        result: 'Success update'
+      };
+    }
+  };
+
+  // Register function call handlers
+  useFunctionCall(functionHandlers);
 
   return (
     <SubApiRoot

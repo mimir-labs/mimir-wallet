@@ -14,9 +14,9 @@ import { useMimirLayout } from './useMimirLayout';
 
 export function useUpdateAIContext() {
   const { openRightSidebar, setRightSidebarTab } = useMimirLayout();
-  const { networks } = useNetworks();
+  const { networks, enableNetwork, disableNetwork } = useNetworks();
   const { metas, isLocalAccount, accounts, addresses, current } = useAccount();
-  const { chainSS58 } = useApi();
+  const { chainSS58, setSs58Chain } = useApi();
   const { isFavorite } = useDapps();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -51,7 +51,7 @@ export function useUpdateAIContext() {
             hasPermission: isLocalAccount(item.address),
             isMultisig: !!meta.isMultisig,
             isPure: !!meta.isPure,
-            network: meta.network
+            network: meta.pureCreatedAt
           };
         })
         .filter((item) => !!item)
@@ -73,7 +73,7 @@ export function useUpdateAIContext() {
     });
 
     useAIContext.setState({
-      internalDapps: dapps
+      externalDapps: dapps
         .filter((item) => item.url.startsWith('https://'))
         .map((item) => ({
           id: item.id,
@@ -96,7 +96,7 @@ export function useUpdateAIContext() {
           return {
             address: encodeAddress(current, chainSS58),
             isPure: !!meta.isPure,
-            network: meta.network,
+            network: meta.pureCreatedAt,
             isMultisig: !!meta.isMultisig,
             delegatees: meta.delegatees || [],
             members: meta.isMultisig ? meta.who : [],
@@ -112,14 +112,14 @@ export function useUpdateAIContext() {
 
     useAIContext.setState({
       state: {
-        ...(currentAccount ? currentAccount : {}),
-        currentPath: pathname
+        ...(currentAccount ? { ...currentAccount } : {}),
+        currentPath: pathname,
+        chainSS58
       }
     });
-  });
+  }, [chainSS58, current, metas, pathname]);
 
   const functionHandlers: Record<string, FunctionCallHandler> = {
-    // Standard server tool: createMultisig
     navigateToDapp: async (event) => {
       const dapp = dapps.find((item) => item.id === event.arguments.id);
 
@@ -151,6 +151,32 @@ export function useUpdateAIContext() {
           result: 'Not support dapp'
         };
       }
+    },
+    changeNetworkBatch: async (event) => {
+      event.arguments.networks.forEach((element: any) => {
+        const { network, enabled } = element;
+
+        if (enabled) {
+          enableNetwork(network);
+        } else {
+          disableNetwork(network);
+        }
+      });
+
+      return {
+        id: event.id,
+        success: true,
+        result: `operation success`
+      };
+    },
+    setSs58Chain: async (event) => {
+      setSs58Chain(event.arguments.value);
+
+      return {
+        id: event.id,
+        success: true,
+        result: `ss58 chain set to ${event.arguments.value}`
+      };
     }
   };
 
