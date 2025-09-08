@@ -13,6 +13,7 @@ export interface CustomDappOption {
   name: string;
   description: string;
   url: string;
+  visible?: boolean;
 }
 
 export interface DappOption<
@@ -36,6 +37,7 @@ export interface DappOption<
   github?: string;
   matrix?: string;
   urlSearch?: urlSearch;
+  visible?: boolean;
 }
 
 export const PolkadotJsApp: DappOption<true, (network: string) => URL> = {
@@ -215,14 +217,14 @@ export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
 export const StakingApp: DappOption<true | string[], (network: string) => URL> = {
   id: 1004,
   icon: '/dapp-icons/staking.png',
-  name: 'Staking',
+  name: 'Polkadot Cloud Staking',
   description:
-    'Polkadot Staking Dashboard is the easiest way to stake DOT, check validator stats, manage your nominations and join nomination pools.',
-  url: 'https://staking.mimir.global/',
-  supportedChains: ['polkadot', 'kusama'],
+    'Polkadot Cloud Staking is the easiest way to stake DOT, check validator stats, manage your nominations and join nomination pools. Stake on Polkadot (DOT).',
+  url: 'https://staking.polkadot.cloud/',
+  supportedChains: ['polkadot', 'kusama', 'westend'],
   tags: ['Staking'],
   website: 'https://polkadot.cloud',
-  github: 'https://github.com/paritytech/polkadot-staking-dashboard'
+  github: 'https://github.com/polkadot-cloud/polkadot-staking-dashboard'
 };
 
 export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
@@ -494,5 +496,11 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
 
       return new URL(url);
     }
+  },
+  {
+    ...StakingApp,
+    id: 1014,
+    url: 'https://staking.mimir.global/',
+    visible: false
   }
 ];
