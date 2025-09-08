@@ -145,7 +145,7 @@ export const analyticsActions = {
     if (isPostHogInitialized) {
       try {
         posthogLib.capture('connect_wallet', {
-          connect_wallet: wallet
+          wallet_type: wallet
         });
       } catch (error) {
         console.error('PostHog event failed:', error);
