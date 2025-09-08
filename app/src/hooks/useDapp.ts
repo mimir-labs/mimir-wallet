@@ -71,6 +71,7 @@ export function useDapps(): UseDapps {
     () =>
       dapps
         .filter((item) => !item.url.startsWith('mimir://internal'))
+        .filter((item) => item.visible !== false)
         .sort((a, b) => favoriteIds.indexOf(b.id) - favoriteIds.indexOf(a.id)),
     [favoriteIds]
   );
