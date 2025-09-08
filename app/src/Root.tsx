@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WalletConnectProvider } from '@/features/wallet-connect';
-import { resolveIntentToRoute, sanitizePath } from '@/utils/navigation';
 import { useHref, useNavigate } from 'react-router-dom';
 
 import { type FunctionCallHandler, useFunctionCall } from '@mimir-wallet/ai-assistant';
@@ -29,45 +28,96 @@ function Root({ children }: { children: React.ReactNode }) {
   // Global navigation function call handlers
   const globalHandlers: Record<string, FunctionCallHandler> = {
     navigateTo: async (event) => {
-      const { path, replace = false } = event.arguments;
+      const { path, search, replace = false } = event.arguments;
 
       try {
-        // Try to resolve intent to route first
-        const targetPath = typeof path === 'string' ? resolveIntentToRoute(path) || path : String(path);
-
-        // Sanitize the path
-        const sanitizedPath = sanitizePath(targetPath);
-
-        if (!sanitizedPath) {
-          return {
-            id: event.id,
-            success: false,
-            error: `Invalid or unsafe path: ${path}`
-          };
+        // Validate path parameter
+        if (!path || typeof path !== 'string') {
+          throw new Error('Invalid path parameter: path must be a non-empty string');
         }
 
-        // Perform navigation
-        navigate(sanitizedPath, { replace });
+        // Build the complete URL
+        let fullPath = path.trim();
 
-        console.log(`AI Navigation: ${replace ? 'Replaced' : 'Navigated'} to ${sanitizedPath}`);
+        // Ensure path starts with /
+        if (!fullPath.startsWith('/')) {
+          fullPath = `/${fullPath}`;
+        }
+
+        // Remove any double slashes
+        fullPath = fullPath.replace(/\/+/g, '/');
+
+        // Add search parameters if provided
+        if (search && typeof search === 'object' && Object.keys(search).length > 0) {
+          const searchParams = new URLSearchParams();
+
+          Object.entries(search).forEach(([key, value]) => {
+            // Only add non-empty values
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+              const cleanKey = String(key).trim();
+              const cleanValue = String(value).trim();
+
+              if (cleanKey) {
+                searchParams.set(cleanKey, cleanValue);
+              }
+            }
+          });
+
+          const searchString = searchParams.toString();
+
+          if (searchString) {
+            fullPath += `?${searchString}`;
+          }
+        }
+
+        // Validate final path format
+        // eslint-disable-next-line no-useless-escape
+        const pathPattern = /^\/[a-zA-Z0-9\-_\/]*(\?.*)?$/;
+
+        if (!pathPattern.test(fullPath) && fullPath !== '/') {
+          console.warn(`AI Navigation: Potentially invalid path format: ${fullPath}`);
+        }
+
+        // Perform navigation with error handling
+        await new Promise<void>((resolve, reject) => {
+          try {
+            navigate(fullPath, { replace });
+            // Give a small delay to ensure navigation completes
+            setTimeout(resolve, 10);
+          } catch (navError) {
+            reject(navError);
+          }
+        });
+
+        console.log(`AI Navigation: ${replace ? 'Replaced' : 'Navigated'} to ${fullPath}`);
 
         return {
           id: event.id,
           success: true,
           result: {
-            path: sanitizedPath,
-            action: replace ? 'replace' : 'push'
+            path: fullPath,
+            action: replace ? 'replace' : 'push',
+            timestamp: new Date().toISOString()
           }
         };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown navigation error';
 
-        console.error('Navigation error:', error);
+        console.error('AI Navigation Error:', {
+          error: errorMessage,
+          arguments: event.arguments,
+          timestamp: new Date().toISOString()
+        });
 
         return {
           id: event.id,
           success: false,
-          error: errorMessage
+          error: `Navigation failed: ${errorMessage}`,
+          details: {
+            requestedPath: event.arguments.path,
+            requestedSearch: event.arguments.search,
+            timestamp: new Date().toISOString()
+          }
         };
       }
     },

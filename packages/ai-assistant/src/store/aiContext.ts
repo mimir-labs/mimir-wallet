@@ -3,8 +3,6 @@
 
 import { create } from 'zustand';
 
-import { routingContext } from './routing-context.js';
-
 interface DappInfo {
   id: number | string;
   name: string;
@@ -28,9 +26,15 @@ interface State {
   chainSS58?: number;
 }
 
+interface Routing {
+  path: string;
+  description: string;
+  search: Record<string, string>; // [search] => description
+}
+
 interface AIContext {
   context: string;
-  routingContext: string;
+  routingContext: Routing[];
   supportedNetworks: Array<{
     key: string;
     name: string;
@@ -63,7 +67,7 @@ export const useAIContext = create<AIContext>()((set, get) => {
     addresses: [],
     internalDapps: [],
     externalDapps: [],
-    routingContext: JSON.stringify(routingContext),
+    routingContext: [],
     updateContext: (value) => {
       set({ context: value });
 
@@ -91,9 +95,12 @@ You are an AI assistant for Mimir Wallet - an enterprise-grade multi-signature w
 - currentAccount.threshold: Required approvals for multisig transactions (only if isMultisig=true)
 
 ## NAVIGATION ROUTES (<App-routing-info>)
-**Available application paths and their purposes:**
-- path: URL path for navigation (e.g., "/transfer", "/transactions")
-- description: Feature functionality at this route
+**Mimir multisig wallet navigation paths:**
+- path: URL route for navigation (e.g., "/", "/transactions", "/create-multisig")
+- description: Page functionality focused on multisig, proxy, and Polkadot ecosystem features
+- search: Query parameters and their purposes for filtering, configuration, or state management
+  - Format: { "param=value": "description" } or { "param": "description" }
+  - Examples: "status=pending" for filtering, "tabs=network" for tab selection
 
 ## BLOCKCHAIN NETWORKS (<all-supported-networks>)
 **Polkadot ecosystem networks configuration:**
@@ -124,7 +131,7 @@ You are an AI assistant for Mimir Wallet - an enterprise-grade multi-signature w
 - website: Official URL (optional)
 
 <App-routing-info>
-${routingContext}
+${JSON.stringify(routingContext)}
 </App-routing-info>
 
 <all-supported-networks>
