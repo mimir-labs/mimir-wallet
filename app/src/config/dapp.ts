@@ -500,6 +500,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
   {
     ...StakingApp,
     id: 1014,
-    url: 'https://staking.mimir.global/'
+    url: 'https://staking.mimir.global/',
+    visible: false
   }
 ];
