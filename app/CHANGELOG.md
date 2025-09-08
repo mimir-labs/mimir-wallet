@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.27.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.26.0...mimir-wallet-app-v2.27.0) (2025-09-08)
+
+
+### Features
+
+* change polkadot cloud staking app informations ([#307](https://github.com/mimir-labs/mimir-wallet/issues/307)) ([7d246fd](https://github.com/mimir-labs/mimir-wallet/commit/7d246fdbb6074d8dd74c96a05863ccd595e4f55b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.27.0
+    * @mimir-wallet/service bumped to 2.27.0
+    * @mimir-wallet/ui bumped to 2.27.0
+
 ## [2.26.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.25.1...mimir-wallet-app-v2.26.0) (2025-09-08)
 
 
