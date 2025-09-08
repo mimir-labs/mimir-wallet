@@ -217,11 +217,11 @@ export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
 export const StakingApp: DappOption<true | string[], (network: string) => URL> = {
   id: 1004,
   icon: '/dapp-icons/staking.png',
-  name: 'Staking',
+  name: 'Polkadot Cloud Staking',
   description:
     'Polkadot Cloud Staking is the easiest way to stake DOT, check validator stats, manage your nominations and join nomination pools. Stake on Polkadot (DOT).',
   url: 'https://staking.polkadot.cloud/',
-  supportedChains: ['polkadot', 'kusama'],
+  supportedChains: ['polkadot', 'kusama', 'westend'],
   tags: ['Staking'],
   website: 'https://polkadot.cloud',
   github: 'https://github.com/polkadot-cloud/polkadot-staking-dashboard'
