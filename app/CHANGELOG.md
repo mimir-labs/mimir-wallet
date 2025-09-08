@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.26.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.25.1...mimir-wallet-app-v2.26.0) (2025-09-08)
+
+
+### Features
+
+* add visible field to DappOption for display control ([#305](https://github.com/mimir-labs/mimir-wallet/issues/305)) ([960a2a2](https://github.com/mimir-labs/mimir-wallet/commit/960a2a27bda371c7861a6dcbc4cdeea81a0896bc))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.26.0
+    * @mimir-wallet/service bumped to 2.26.0
+    * @mimir-wallet/ui bumped to 2.26.0
+
 ## [2.25.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.25.0...mimir-wallet-app-v2.25.1) (2025-09-03)
 
 
