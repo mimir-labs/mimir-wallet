@@ -58,7 +58,23 @@ function SimpleChat() {
 
   const { messages, sendMessage, status, addToolResult } = useChat({
     transport: new DefaultChatTransport({
-      api: 'https://ai-assitant.mimir.global/'
+      api: 'https://ai-assitant.mimir.global/',
+      prepareSendMessagesRequest: (options) => {
+        return {
+          body: {
+            messages: options.messages,
+            system: config.systemPrompt || '',
+            nativeFeatures: useAIContext.getState().getFeatureContext(),
+            dappFeatures: useAIContext.getState().getDappFeatureContext(),
+            stateMessage: useAIContext.getState().getStateContext(),
+            topK: config.topK,
+            topP: config.topP,
+            temperature: config.temperature,
+            model,
+            webSearch: webSearch
+          }
+        };
+      }
     }),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onToolCall: async ({ toolCall }) => {
@@ -102,20 +118,7 @@ function SimpleChat() {
     e.preventDefault();
 
     if (input.trim()) {
-      sendMessage(
-        { text: input },
-        {
-          body: {
-            system: config.systemPrompt || '',
-            contextMessage: useAIContext.getState().getFullContext(),
-            topK: config.topK,
-            topP: config.topP,
-            temperature: config.temperature,
-            model,
-            webSearch: webSearch
-          }
-        }
-      );
+      sendMessage({ text: input });
       setInput('');
     }
   };

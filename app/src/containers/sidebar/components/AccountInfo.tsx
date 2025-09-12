@@ -106,7 +106,7 @@ function AccountInfoComponent({ address, onAccountOpen }: AccountInfoProps) {
             variant='light'
             size='sm'
           >
-            <Link to='/transfer'>
+            <Link to={`/explorer/${encodeURI('mimir://app/transfer')}`}>
               <IconTransfer className='h-4 w-4' />
             </Link>
           </Button>

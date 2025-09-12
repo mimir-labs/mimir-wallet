@@ -15,11 +15,8 @@ import PageWelcome from '@/pages/profile/Welcome';
 import PageSetting from '@/pages/setting';
 import PageTransactionDetails from '@/pages/transaction-details';
 import PageTransactions from '@/pages/transactions';
-import PageTransfer from '@/pages/transfer';
 import Root from '@/Root';
 import { Outlet } from 'react-router-dom';
-
-import { useAIContext } from '@mimir-wallet/ai-assistant';
 
 export const routes = [
   {
@@ -43,10 +40,10 @@ export const routes = [
             path: '/dapp',
             element: <PageDapp />,
             description:
-              'Integrated DApp hub with deep integrations (Subsquare, DOTConsole, Bifrost) and WalletConnect support for Polkadot ecosystem',
+              'Integrated DApp hub with deep integrations (Subsquare, DOTConsole, Bifrost) for Polkadot ecosystem',
             search: {
               'tab=apps': 'Browse Mimir-integrated Polkadot DApps',
-              'tab=custom': 'Manage custom DApps and WalletConnect sessions'
+              'tab=custom': 'Manage custom DApps'
             }
           },
           {
@@ -120,11 +117,6 @@ export const routes = [
               'Create static or flexible multisig account with customizable threshold and member management via proxy layer'
           },
           {
-            path: '/create-multisig-one',
-            element: <PageCreateMultisig />,
-            description: 'Quick multisig creation for power users - single page setup with all options visible'
-          },
-          {
             path: '/create-pure',
             element: <PageAddProxy pure={true} />,
             description:
@@ -173,13 +165,6 @@ export const routes = [
         ]
       },
       {
-        // Standalone transfer page
-        path: '/transfer',
-        element: <PageTransfer />,
-        description:
-          'Token transfer with batch support, XCM cross-chain transfers, transaction simulation, and call templates'
-      },
-      {
         // Redirect all unmatched routes to home
         path: '*',
         element: <Navigate replace to='/' />,
@@ -197,7 +182,7 @@ interface RoutingContext {
 }
 
 // Recursive function to extract routing context from route configuration
-function extractRoutingContext(routeConfig: any[], parentPath = ''): RoutingContext[] {
+export function extractRoutingContext(routeConfig: any[], parentPath = ''): RoutingContext[] {
   const result: RoutingContext[] = [];
 
   routeConfig.forEach((route) => {
@@ -248,7 +233,3 @@ function extractRoutingContext(routeConfig: any[], parentPath = ''): RoutingCont
 
   return result;
 }
-
-const routingContext = extractRoutingContext(routes);
-
-useAIContext.setState({ routingContext });

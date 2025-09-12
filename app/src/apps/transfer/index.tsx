@@ -59,10 +59,6 @@ function PageTransfer() {
         setAmount(event.arguments.amount.toString());
       }
 
-      if (event.arguments.amount !== undefined) {
-        setAmount(event.arguments.amount.toString());
-      }
-
       if (event.arguments.network !== undefined) {
         setNetwork(event.arguments.network);
       }

@@ -3,15 +3,6 @@
 
 import { create } from 'zustand';
 
-interface DappInfo {
-  id: number | string;
-  name: string;
-  description: string;
-  supportedChains: 'All' | string[];
-  isFavorite: boolean;
-  website?: string;
-}
-
 interface State {
   currentAccount?: {
     address: string;
@@ -26,15 +17,15 @@ interface State {
   chainSS58?: number;
 }
 
-interface Routing {
+interface Feature {
   path: string;
   description: string;
   search: Record<string, string>; // [search] => description
 }
 
 interface AIContext {
-  context: string;
-  routingContext: Routing[];
+  features: Feature[];
+  dappFeatures: Feature[];
   supportedNetworks: Array<{
     key: string;
     name: string;
@@ -54,106 +45,107 @@ interface AIContext {
     network?: string;
   }>;
   state?: State;
-  internalDapps: Array<DappInfo>;
-  externalDapps: Array<DappInfo>;
-  updateContext: (value: string) => () => void;
-  getFullContext: () => string;
+  getFeatureContext: () => string;
+  getDappFeatureContext: () => string;
+  getStateContext: () => string;
 }
 
-export const useAIContext = create<AIContext>()((set, get) => {
+export const useAIContext = create<AIContext>()((_, get) => {
   return {
-    context: '',
     supportedNetworks: [],
     addresses: [],
-    internalDapps: [],
-    externalDapps: [],
-    routingContext: [],
-    updateContext: (value) => {
-      set({ context: value });
+    features: [],
+    dappFeatures: [],
+    getFeatureContext: () => {
+      const { features } = get();
 
-      return () => set({ context: '' });
+      // Generate available features list from features
+      const featuresDescription = features
+        .map((route) => {
+          let desc = `- **${route.path}** - ${route.description}`;
+
+          if (route.search && Object.keys(route.search).length > 0) {
+            const searchOptions = Object.entries(route.search)
+              .map(([key, value]) => `  - search: ${key} (${value})`)
+              .join('\n');
+
+            desc += '\n' + searchOptions;
+          }
+
+          return desc;
+        })
+        .join('\n');
+
+      // Combine system prompt with dynamic context
+      return `${featuresDescription}`;
     },
-    getFullContext: () => {
-      const { context, routingContext, supportedNetworks, addresses, internalDapps, externalDapps, state } = get();
+    getDappFeatureContext: () => {
+      const { dappFeatures } = get();
 
-      // Combine routing context with any additional context
-      return `
-# MIMIR WALLET AI ASSISTANT CONTEXT
+      // Generate available features list from features
+      const featuresDescription = dappFeatures
+        .map((route) => {
+          let desc = `- **${route.path}** - ${route.description}`;
 
-You are an AI assistant for Mimir Wallet - an enterprise-grade multi-signature wallet for the Polkadot ecosystem. Focus on the current user context and provide precise, actionable assistance.
+          if (route.search && Object.keys(route.search).length > 0) {
+            const searchOptions = Object.entries(route.search)
+              .map(([key, value]) => `  - search: ${key} (${value})`)
+              .join('\n');
 
-## CURRENT USER STATE (<global-state>)
-**Active session information for immediate context:**
-- currentPath: The route path where the user currently is
-- chainSS58: Global ss58 format, numberic
-- currentAccount.address: The active account's SS58-encoded address
-- currentAccount.isPure: Whether this is a pure proxy account (anonymous, no private key)
-- currentAccount.network: Genesis hash of the network (only for pure proxy accounts)
-- currentAccount.isMultisig: Whether this is a multi-signature account
-- currentAccount.delegatees: Array of proxy accounts that can act on behalf of this account
-- currentAccount.members: Multisig members array (only if isMultisig=true)
-- currentAccount.threshold: Required approvals for multisig transactions (only if isMultisig=true)
+            desc += '\n' + searchOptions;
+          }
 
-## NAVIGATION ROUTES (<App-routing-info>)
-**Mimir multisig wallet navigation paths:**
-- path: URL route for navigation (e.g., "/", "/transactions", "/create-multisig")
-- description: Page functionality focused on multisig, proxy, and Polkadot ecosystem features
-- search: Query parameters and their purposes for filtering, configuration, or state management
-  - Format: { "param=value": "description" } or { "param": "description" }
-  - Examples: "status=pending" for filtering, "tabs=network" for tab selection
+          return desc;
+        })
+        .join('\n');
 
-## BLOCKCHAIN NETWORKS (<all-supported-networks>)
-**Polkadot ecosystem networks configuration:**
-- key: Network identifier for API calls and internal reference
-- name: Display name shown to users
-- isRelayChain: true = relay chain (Polkadot/Kusama), false = parachain
-- genesisHash: Unique blockchain identifier
-- ss58Format: Address encoding format (e.g., 0 for Polkadot, 2 for Kusama)
-- paraId: Parachain ID number (only for parachains)
-- isTestnet: true = test network, false = production network
-- isEnabled: Whether this network is active in the wallet
+      // Combine system prompt with dynamic context
+      return `${featuresDescription}`;
+    },
+    getStateContext: () => {
+      const { state } = get();
 
-## USER ACCOUNTS (<local-address>)
-**All available accounts in the wallet:**
-- name: User-defined label for the account
-- address: SS58-encoded address string
-- hasPermission: Whether permission controls are applied
-- isMultisig: Multi-signature account requiring multiple approvals
-- isPure: Pure proxy account without private key
-- network: Network association (pure proxies only)
+      // Format current account information
+      let currentAccountInfo = '';
 
-## INTERNAL DAPPS (<internal-dapps>) And EXTERNAL DAPPS (<external-dapps>)
-- id: Unique identifier
-- name: Application name
-- description: Feature explanation
-- supportedChains: "All" or array of network keys
-- isFavorite: User's bookmark status
-- website: Official URL (optional)
+      if (state?.currentAccount) {
+        const { address, isPure, isMultisig, network, delegatees, members, threshold } = state.currentAccount;
+        const accountType = isPure ? '纯代理账户' : isMultisig ? '多重签名账户' : '普通账户';
+        const networkInfo = network ? ` (网络: ${network})` : '';
 
-<App-routing-info>
-${JSON.stringify(routingContext)}
-</App-routing-info>
+        // Format members list if multisig
+        const membersList =
+          isMultisig && members && members.length > 0
+            ? `\n- **多签成员列表** (${members.length}人, 阈值: ${threshold}):\n${members.map((m) => `  - ${m}`).join('\n')}`
+            : isMultisig
+              ? `\n- **多签成员**: 暂无成员信息 (阈值: ${threshold})`
+              : '';
 
-<all-supported-networks>
-${JSON.stringify(supportedNetworks)}
-</all-supported-networks>
+        // Format delegatees list
+        const delegateesList =
+          delegatees?.length > 0
+            ? `\n- **委托人列表** (${delegatees.length}人):\n${delegatees.map((d) => `  - ${d}`).join('\n')}`
+            : '';
 
-<local-address>
-${JSON.stringify(addresses)}
-</local-address>
+        currentAccountInfo = `### 当前账户
+- **地址**: ${address}
+- **类型**: ${accountType}${networkInfo}${membersList}${delegateesList}`;
+      } else {
+        currentAccountInfo = `### 当前账户
+- 未选择账户`;
+      }
 
-<internal-dapps>
-${JSON.stringify(internalDapps)}
-</internal-dapps>
+      // Format current page state
+      const stateInfo = state
+        ? `<当前页面路径>${state.currentPath || '未知'}</当前页面路径>
+<当前选择的SS58 格式>${state.chainSS58 !== undefined ? state.chainSS58 : '未设置'}</当前选择的SS58 格式>`
+        : '暂无状态信息';
 
-<external-dapps>
-${JSON.stringify(externalDapps)}
-</external-dapps>
-
-<global-state>
-${JSON.stringify(state || {})}
-</global-state>
-`.concat(context);
+      return `${currentAccountInfo}
+<当前状态>
+${stateInfo}
+</当前状态>
+`;
     }
   };
 });

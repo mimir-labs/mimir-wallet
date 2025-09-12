@@ -86,6 +86,10 @@ function DesktopCreateMultisig() {
         goToStep(event.arguments.step);
       }
 
+      if (event.arguments.network !== undefined) {
+        setNetwork(event.arguments.network);
+      }
+
       updateData(newData);
 
       return {
