@@ -5,10 +5,10 @@
 
 import { create } from 'zustand';
 
-type RightSidebarTab = 'batch' | 'template' | 'decoder';
+type RightSidebarTab = 'batch' | 'template' | 'decoder' | 'ai-assistant';
 
 type RightSidebarState = {
-  tab: 'batch' | 'template' | 'decoder';
+  tab: 'batch' | 'template' | 'decoder' | 'ai-assistant';
 };
 
 interface MimirLayoutState {

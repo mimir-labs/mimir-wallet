@@ -7,6 +7,7 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { type FunctionCallHandler, useFunctionCall } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Spinner } from '@mimir-wallet/ui';
 
@@ -19,6 +20,40 @@ function MultiTransfer() {
   const [network, setNetwork] = useInputNetwork();
   const [sending, setSending] = useState(current || '');
   const [data, setData] = useState<MultiTransferData[]>([['', '', '']]);
+
+  // Define function call handlers matching server tool names
+  const functionHandlers: Record<string, FunctionCallHandler> = {
+    // Standard server tool: transferForm
+    batchTransferForm: async (event) => {
+      if (event.arguments.sending !== undefined) {
+        setSending(event.arguments.sending);
+      }
+
+      if (event.arguments.addRecipient !== undefined) {
+        setData((data) => [
+          ...data,
+          ...event.arguments.addRecipient.map((item: { recipient: string; amount: number }) => [
+            item.recipient,
+            'native',
+            item.amount.toString()
+          ])
+        ]);
+      }
+
+      if (event.arguments.network !== undefined) {
+        setNetwork(event.arguments.network);
+      }
+
+      return {
+        id: event.id,
+        success: true,
+        result: 'Success update'
+      };
+    }
+  };
+
+  // Register function call handlers
+  useFunctionCall(functionHandlers);
 
   return (
     <SubApiRoot
