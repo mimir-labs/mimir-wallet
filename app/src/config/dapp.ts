@@ -38,6 +38,8 @@ export interface DappOption<
   matrix?: string;
   urlSearch?: urlSearch;
   visible?: boolean;
+  subPaths?: Record<string, string>;
+  isSubPathHash?: boolean;
 }
 
 export const PolkadotJsApp: DappOption<true, (network: string) => URL> = {
@@ -58,6 +60,12 @@ export const PolkadotJsApp: DappOption<true, (network: string) => URL> = {
     }
 
     return new URL(`${this.url}?rpc=${encodeURIComponent(Object.values(wsUrl)[0])}`);
+  },
+  isSubPathHash: true,
+  subPaths: {
+    '/extrinsics': 'Submit and manage on-chain calls (extrinsics) across modules',
+    '/signing': 'Sign and verify arbitrary messages for identity proof or message validation.',
+    '/files': 'Manage/import chain specification and metadata files'
   }
 };
 
@@ -105,6 +113,9 @@ export const DotConsoleApp: DappOption<string[], (network: string) => URL> = {
     }
 
     return new URL(`${this.url}?chain=${chain}`);
+  },
+  subPaths: {
+    '/extrinsics': 'Submit and manage on-chain calls (extrinsics) across modules'
   }
 };
 
@@ -163,6 +174,11 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
     }
 
     return new URL(url);
+  },
+  subPaths: {
+    '/referenda/:referendaId': 'Polkadot on-chain governance referenda',
+    '/posts/:postId': 'publishing or viewing community discussion posts or governance-related messages',
+    '/delegation': 'delegate their voting power to an expert'
   }
 };
 
@@ -211,6 +227,11 @@ export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
     }
 
     return new URL(url);
+  },
+  subPaths: {
+    '/referenda/:referendaId': 'Polkadot on-chain governance referenda',
+    '/posts/:postId': 'publishing or viewing community discussion posts or governance-related messages',
+    '/delegation': 'delegate their voting power to an expert'
   }
 };
 
@@ -224,7 +245,16 @@ export const StakingApp: DappOption<true | string[], (network: string) => URL> =
   supportedChains: ['polkadot', 'kusama', 'westend'],
   tags: ['Staking'],
   website: 'https://polkadot.cloud',
-  github: 'https://github.com/polkadot-cloud/polkadot-staking-dashboard'
+  github: 'https://github.com/polkadot-cloud/polkadot-staking-dashboard',
+  isSubPathHash: true,
+  subPaths: {
+    '/pools': 'Bond DOT and join nominating pool(>1 DOT)',
+    '/nominate':
+      'Section for direct nominations where users can select and delegate DOT to individual validators(>250 DOT)',
+    '/rewards': 'Displays staking reward history and current earnings.',
+    '/validators': 'Shows a comprehensive list of active validators.',
+    '/operators': 'Section dedicated to nomination pool or validator operators.'
+  }
 };
 
 export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
@@ -393,7 +423,13 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     supportedChains: ['polkadot', 'bifrost-polkadot', 'kusama', 'bifrost-kusama', 'assethub-polkadot'],
     tags: ['Defi'],
     website: 'https://bifrost.finance/',
-    github: 'https://github.com/bifrost-finance'
+    github: 'https://github.com/bifrost-finance',
+    subPaths: {
+      '/vstaking': 'Mint and staking vDOT',
+      '/swap': 'Swap on Bifrost network',
+      '/crosschain': 'Transfer assets across Bifrost and other networks',
+      '/farming': 'Supply LP tokens to farming pools to earn extra yields'
+    }
   },
   {
     id: 1006,
@@ -465,7 +501,11 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     supportedChains: ['polkadot', 'kusama'],
     tags: ['Bounty', 'Tool'],
     website: 'https://bounties.usepapi.app/',
-    github: 'https://github.com/polkadot-api/bounties'
+    github: 'https://github.com/polkadot-api/bounties',
+    subPaths: {
+      '/bounty/:id':
+        'View bounty details, manage curator actions, approve child bounties, and track bounty progress for a specific bounty ID'
+    }
   },
   PolkassemblyApp,
   {

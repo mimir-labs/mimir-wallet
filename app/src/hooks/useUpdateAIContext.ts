@@ -8,16 +8,18 @@ import { extractRoutingContext, routes } from '@/routes';
 import { useWallet } from '@/wallet/useWallet';
 import { isAddress } from '@polkadot/util-crypto';
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { parsePath, useLocation, useNavigate } from 'react-router-dom';
 
 import { type FunctionCallHandler, useAIContext, useFunctionCall } from '@mimir-wallet/ai-assistant';
 import { addressEq, addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 
 import { useAddressExplorer } from './useAddressExplorer';
+import { useMimirLayout } from './useMimirLayout';
 import { useQrAddress } from './useQrAddress';
 
 export function useUpdateAIContext() {
   const { networks } = useNetworks();
+  const { openRightSidebar, setRightSidebarTab } = useMimirLayout();
   const { metas, isLocalAccount, accounts, addresses, current, addAddressBook } = useAccount();
   const { chainSS58, setSs58Chain } = useApi();
   const navigate = useNavigate();
@@ -94,22 +96,21 @@ export function useUpdateAIContext() {
 
   // Update routingContext whenever it changes
   useEffect(() => {
-    const routeFeatures = extractRoutingContext(routes)
-      .map((item) => ({
-        path: item.path,
-        description: item.description,
-        search: item.search
-      }))
-      .filter((item) => !item.path.includes(':'));
+    const routeFeatures = extractRoutingContext(routes).map((item) => ({
+      path: item.path,
+      description: item.description,
+      search: item.search
+    }));
 
     const dappFeatures = dapps
       .filter((item) => {
         return item.visible !== false && !item.url.startsWith('mimir://internal');
       })
       .map((item) => ({
-        path: `/explorer/${encodeURIComponent(item.url)}`,
+        id: item.id,
+        subPaths: item.subPaths,
         description: item.description,
-        search: {}
+        tags: item.tags
       }));
 
     // Update routingContext in AIContext
@@ -121,67 +122,94 @@ export function useUpdateAIContext() {
 
   const functionHandlers: Record<string, FunctionCallHandler> = {
     navigate: async (event) => {
-      const { path, from, search } = event.arguments as {
+      const { path, query, params } = event.arguments as {
         path: string;
-        from: 'native' | 'dapp';
-        search?: string;
+        query?: Record<string, string>;
+        params?: Record<string, string>;
       };
 
-      if (from === 'native' || from === 'dapp') {
-        const features = from === 'native' ? useAIContext.getState().features : useAIContext.getState().dappFeatures;
+      let finalPath = path;
 
-        // Find the corresponding feature to validate path and search parameter
-        const feature = features.find((f) => f.path === path);
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          finalPath = finalPath.replace(`:${key}`, value);
+        });
+      }
 
-        if (!feature) {
-          return {
-            id: event.id,
-            success: false,
-            error: `Invalid path: ${path}. Path not found in available features.`
-          };
+      const url = parsePath(finalPath);
+
+      if (query) {
+        url.search = `?${Object.entries(query)
+          .map(([key, value]) => `${key}=${value}`)
+          .join('&')}`;
+      }
+
+      // Execute navigation for regular routes and mark as AI navigation
+      navigate(url);
+
+      return {
+        id: event.id,
+        success: true,
+        result: {
+          message: `已完成页面跳转，页面状态可能会变化，需要注意时效性`
         }
+      };
+    },
 
-        if (search && feature.search) {
-          const validSearchKeys = Object.keys(feature.search);
+    openDapp: async (event) => {
+      const { id, path, params } = event.arguments as {
+        id: string;
+        path?: string;
+        params?: Record<string, string>;
+      };
 
-          if (validSearchKeys.length > 0 && !validSearchKeys.includes(search)) {
-            return {
-              id: event.id,
-              success: false,
-              error: `Invalid search parameter: ${search}. Available options for ${path}: ${validSearchKeys.join(', ')}`
-            };
-          }
-        }
+      const dapp = dapps.find((item) => item.id.toString() === id);
 
-        // Construct the final URL with search parameters for regular routes
-        let finalPath = path;
-
-        if (search) {
-          const searchParams = new URLSearchParams();
-          const [key, value] = search.split('=');
-
-          if (key && value) {
-            searchParams.set(key, value);
-            finalPath = `${path}?${searchParams.toString()}`;
-          }
-        }
-
-        // Execute navigation for regular routes and mark as AI navigation
-        navigate(finalPath);
-
+      if (!dapp) {
         return {
           id: event.id,
-          success: true,
-          result: {
-            message: `已完成页面跳转，页面状态可能会变化，需要注意时效性`
-          }
+          success: false,
+          error: 'Unsupport dapp'
         };
+      }
+
+      if (dapp.url === 'mimir://app/batch') {
+        setRightSidebarTab('batch');
+        openRightSidebar();
+      } else if (dapp.url === 'mimir://app/template') {
+        setRightSidebarTab('template');
+        openRightSidebar();
+      } else if (dapp.url === 'mimir://app/decoder') {
+        setRightSidebarTab('decoder');
+        openRightSidebar();
+      } else {
+        const url = new URL(dapp.url);
+
+        if (path) {
+          let finalPath = path;
+
+          if (params) {
+            Object.entries(params).forEach(([key, value]) => {
+              finalPath = finalPath.replace(`:${key}`, value);
+            });
+          }
+
+          if (dapp.isSubPathHash) {
+            url.hash = path;
+          } else {
+            url.pathname = path;
+          }
+        }
+
+        navigate(`/explorer/${encodeURIComponent(url.toString())}`);
       }
 
       return {
         id: event.id,
-        success: false,
-        error: 'Operation failed'
+        success: true,
+        result: {
+          message: `已打开 dapp ${dapp.name}`
+        }
       };
     },
 

@@ -23,9 +23,16 @@ interface Feature {
   search: Record<string, string>; // [search] => description
 }
 
+interface DappFeature {
+  id: string | number;
+  subPaths?: Record<string, string>;
+  description: string;
+  tags?: string[];
+}
+
 interface AIContext {
   features: Feature[];
-  dappFeatures: Feature[];
+  dappFeatures: DappFeature[];
   supportedNetworks: Array<{
     key: string;
     name: string;
@@ -59,48 +66,13 @@ export const useAIContext = create<AIContext>()((_, get) => {
     getFeatureContext: () => {
       const { features } = get();
 
-      // Generate available features list from features
-      const featuresDescription = features
-        .map((route) => {
-          let desc = `- **${route.path}** - ${route.description}`;
-
-          if (route.search && Object.keys(route.search).length > 0) {
-            const searchOptions = Object.entries(route.search)
-              .map(([key, value]) => `  - search: ${key} (${value})`)
-              .join('\n');
-
-            desc += '\n' + searchOptions;
-          }
-
-          return desc;
-        })
-        .join('\n');
-
-      // Combine system prompt with dynamic context
-      return `${featuresDescription}`;
+      return JSON.stringify(features);
     },
     getDappFeatureContext: () => {
       const { dappFeatures } = get();
 
-      // Generate available features list from features
-      const featuresDescription = dappFeatures
-        .map((route) => {
-          let desc = `- **${route.path}** - ${route.description}`;
-
-          if (route.search && Object.keys(route.search).length > 0) {
-            const searchOptions = Object.entries(route.search)
-              .map(([key, value]) => `  - search: ${key} (${value})`)
-              .join('\n');
-
-            desc += '\n' + searchOptions;
-          }
-
-          return desc;
-        })
-        .join('\n');
-
       // Combine system prompt with dynamic context
-      return `${featuresDescription}`;
+      return JSON.stringify(dappFeatures);
     },
     getStateContext: () => {
       const { state } = get();

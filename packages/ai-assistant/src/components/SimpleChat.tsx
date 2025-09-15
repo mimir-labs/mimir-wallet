@@ -58,7 +58,7 @@ function SimpleChat() {
 
   const { messages, sendMessage, status, addToolResult } = useChat({
     transport: new DefaultChatTransport({
-      api: 'https://ai-assitant.mimir.global/',
+      api: import.meta.env.VITE_AI_ENDPOINT || 'https://ai-assitant.mimir.global/',
       prepareSendMessagesRequest: (options) => {
         return {
           body: {

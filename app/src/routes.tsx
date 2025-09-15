@@ -42,8 +42,7 @@ export const routes = [
             description:
               'Integrated DApp hub with deep integrations (Subsquare, DOTConsole, Bifrost) for Polkadot ecosystem',
             search: {
-              'tab=apps': 'Browse Mimir-integrated Polkadot DApps',
-              'tab=custom': 'Manage custom DApps'
+              tab: 'Tab switch, available values: apps (view local apps), custom (custom apps)'
             }
           },
           {
@@ -58,8 +57,8 @@ export const routes = [
             description:
               'Multisig transaction queue with batch operations, simulation preview, and AssetHub migration status tracking',
             search: {
-              'status=pending': 'View multisig transactions awaiting signatures',
-              'status=history': 'Browse executed and cancelled transactions'
+              status:
+                'Transaction status, available values: pending (View pending transactions), history (Browse executed and cancelled transactions)'
             }
           },
           {
@@ -157,9 +156,7 @@ export const routes = [
             description:
               'Configure Mimir settings: network RPC endpoints, account visibility, Mimo AI assistant, email/push notifications',
             search: {
-              'tabs=network': 'Configure Polkadot/Kusama RPC endpoints',
-              'tabs=account-display': 'Hide/unhide accounts for cleaner dashboard',
-              'tabs=notification': 'Email and explorer push notification opt-in'
+              tabs: 'Tab switch, available values: network (Configure RPC endpoints), account-display (Hide/unhide accounts for cleaner dashboard), notification (Email and explorer push notification opt-in)'
             }
           }
         ]
