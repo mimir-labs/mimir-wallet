@@ -4,10 +4,10 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { type FunctionCallHandler, useFunctionCall } from '@mimir-wallet/ai-assistant';
+import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Spinner } from '@mimir-wallet/ui';
 
@@ -21,10 +21,10 @@ function MultiTransfer() {
   const [sending, setSending] = useState(current || '');
   const [data, setData] = useState<MultiTransferData[]>([['', '', '']]);
 
-  // Define function call handlers matching server tool names
-  const functionHandlers: Record<string, FunctionCallHandler> = {
-    // Standard server tool: transferForm
-    batchTransferForm: async (event) => {
+  useEffect(() => {
+    const handler: FunctionCallHandler = (event) => {
+      if (event.name !== 'batchTransferForm') return;
+
       if (event.arguments.sending !== undefined) {
         setSending(event.arguments.sending);
       }
@@ -44,16 +44,15 @@ function MultiTransfer() {
         setNetwork(event.arguments.network);
       }
 
-      return {
+      return functionCallManager.respondToFunctionCall({
         id: event.id,
         success: true,
         result: 'Success update'
-      };
-    }
-  };
+      });
+    };
 
-  // Register function call handlers
-  useFunctionCall(functionHandlers);
+    return functionCallManager.onFunctionCall(handler);
+  }, [setNetwork]);
 
   return (
     <SubApiRoot

@@ -5,91 +5,91 @@ import type { FunctionCallEvent, FunctionCallHandler, FunctionCallResult } from 
 
 import { EventEmitter } from 'eventemitter3';
 
-interface FunctionCallEvents {
-  'function-call': (event: FunctionCallEvent, callback: (result: FunctionCallResult) => void) => void;
+// Internal types for the FunctionCallManager
+interface PendingRequest {
+  resolve: (result: FunctionCallResult) => void;
+  reject: (error: Error) => void;
 }
 
-class FunctionCallManager extends EventEmitter<FunctionCallEvents> {
-  private handlers: Map<string, FunctionCallHandler> = new Map();
+type FunctionCallManagerEvents = {
+  functioncall: (event: FunctionCallEvent) => void;
+  'functioncall:response': (response: FunctionCallResult) => void;
+};
 
-  /**
-   * Register a function call handler
-   */
-  register(name: string, handler: FunctionCallHandler): () => void {
-    this.handlers.set(name, handler);
+/**
+ * FunctionCallManager handles promise-based request-response pattern using EventEmitter
+ * Supports emitting function call events and waiting for responses
+ */
+class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
+  private readonly pendingRequests = new Map<string, PendingRequest>();
 
-    // Return unregister function
-    return () => {
-      this.handlers.delete(name);
-    };
+  constructor() {
+    super();
+    this.setupResponseListener();
   }
 
   /**
-   * Unregister a function call handler
+   * Setup internal response listener to handle function call responses
    */
-  unregister(name: string): void {
-    this.handlers.delete(name);
-  }
+  private setupResponseListener(): void {
+    this.on('functioncall:response', (response: FunctionCallResult) => {
+      const pending = this.pendingRequests.get(response.id);
 
-  /**
-   * Execute a function call
-   */
-  async execute(event: FunctionCallEvent): Promise<FunctionCallResult> {
-    const handler = this.handlers.get(event.name);
+      if (pending) {
+        this.pendingRequests.delete(response.id);
 
-    if (!handler) {
-      return {
-        id: event.id,
-        success: false,
-        error: `No handler registered for function: ${event.name}`
-      };
-    }
-
-    try {
-      const result = await handler(event);
-
-      return result;
-    } catch (error) {
-      return {
-        id: event.id,
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
-      };
-    }
-  }
-
-  /**
-   * Emit a function call event and wait for result
-   */
-  async emitFunctionCall(event: FunctionCallEvent): Promise<FunctionCallResult> {
-    return new Promise((resolve) => {
-      const timeout = setTimeout(() => {
-        resolve({
-          id: event.id,
-          success: false,
-          error: 'Function call timeout after 30 seconds'
-        });
-      }, 30000);
-
-      // First try registered handlers
-      this.execute(event).then((result) => {
-        clearTimeout(timeout);
-        resolve(result);
-      });
-
-      // Also emit for external listeners
-      this.emit('function-call', event, (result) => {
-        clearTimeout(timeout);
-        resolve(result);
-      });
+        if (response.success) {
+          pending.resolve(response);
+        } else {
+          pending.reject(new Error(response.error || 'Function call failed'));
+        }
+      }
     });
   }
 
   /**
-   * Clear all handlers
+   * Emit a function call event and return a Promise that resolves when response is received
+   * @param event - The function call event to emit
+   * @returns Promise that resolves with the function call result
    */
-  clear(): void {
-    this.handlers.clear();
+  public emitFunctionCall(event: FunctionCallEvent): Promise<FunctionCallResult> {
+    return new Promise<FunctionCallResult>((resolve, reject) => {
+      // Store the promise resolvers
+      this.pendingRequests.set(event.id, { resolve, reject });
+
+      // Emit the function call event
+      this.emit('functioncall', event);
+    });
+  }
+
+  /**
+   * Respond to a function call with the result
+   * This method should be called by external handlers to provide the response
+   * @param result - The function call result
+   */
+  public respondToFunctionCall(result: FunctionCallResult): void {
+    this.emit('functioncall:response', result);
+  }
+
+  /**
+   * Register a function call handler
+   * @param handler - The function call handler
+   * @returns A function to remove the handler
+   */
+  public onFunctionCall(handler: FunctionCallHandler): () => void {
+    this.on('functioncall', handler);
+
+    // Return cleanup function
+    return () => {
+      this.off('functioncall', handler);
+    };
+  }
+
+  /**
+   * Clean up all pending requests
+   */
+  public cleanup(): void {
+    this.pendingRequests.clear();
     this.removeAllListeners();
   }
 }

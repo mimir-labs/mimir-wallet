@@ -7,11 +7,11 @@ import { useAccount } from '@/accounts/useAccount';
 import { StepIndicator } from '@/components';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useWizardState } from '@/hooks/useWizardState';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { type FunctionCallHandler, useFunctionCall } from '@mimir-wallet/ai-assistant';
+import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
 
@@ -60,10 +60,10 @@ function DesktopCreateMultisig() {
   const { currentStep, data: multisigData } = wizardState;
   const { goToNext, goToPrevious, goToStep, updateData } = wizardActions;
 
-  // Define function call handlers matching server tool names
-  const functionHandlers: Record<string, FunctionCallHandler> = {
-    // Standard server tool: createMultisig
-    createMultisig: async (event) => {
+  useEffect(() => {
+    const handler: FunctionCallHandler = (event) => {
+      if (event.name !== 'createMultisig') return;
+
       const newData: Partial<MultisigData> = {};
 
       if (event.arguments.name !== undefined) {
@@ -92,16 +92,15 @@ function DesktopCreateMultisig() {
 
       updateData(newData);
 
-      return {
+      return functionCallManager.respondToFunctionCall({
         id: event.id,
         success: true,
         result: newData
-      };
-    }
-  };
+      });
+    };
 
-  // Register function call handlers
-  useFunctionCall(functionHandlers);
+    return functionCallManager.onFunctionCall(handler);
+  }, [goToStep, setNetwork, updateData]);
 
   const handleConfirm = async () => {
     if (multisigData.isPureProxy) {

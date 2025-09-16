@@ -4,8 +4,7 @@
 import type { FunctionCallEvent } from '../types.js';
 
 import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai';
-import { GlobeIcon } from 'lucide-react';
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type ToolUIPart, type UITools } from 'ai';
 import { useState } from 'react';
 
 import { useAIContext } from '../store/aiContext.js';
@@ -16,7 +15,6 @@ import { Loader } from './Loader.js';
 import { Message, MessageContent } from './message.js';
 import {
   PromptInput,
-  PromptInputButton,
   PromptInputModelSelect,
   PromptInputModelSelectContent,
   PromptInputModelSelectItem,
@@ -29,7 +27,6 @@ import {
 } from './prompt-input.js';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './reasoning.js';
 import { Response } from './response.js';
-import { Source, Sources, SourcesContent, SourcesTrigger } from './sources.js';
 
 const models = [
   {
@@ -50,13 +47,16 @@ const models = [
   }
 ];
 
-function SimpleChat() {
+interface Props {
+  renderTool?: ({ tool }: { tool: ToolUIPart<UITools> }) => React.ReactNode;
+}
+
+function SimpleChat({ renderTool }: Props) {
   const [input, setInput] = useState('');
   const [model, setModel] = useState<string>(models[0].value);
-  const [webSearch, setWebSearch] = useState(false);
   const { config } = useAiStore();
 
-  const { messages, sendMessage, status, addToolResult } = useChat({
+  const { messages, sendMessage, status, addToolResult, stop } = useChat({
     transport: new DefaultChatTransport({
       api: import.meta.env.VITE_AI_ENDPOINT || 'https://ai-assitant.mimir.global/',
       prepareSendMessagesRequest: (options) => {
@@ -70,8 +70,7 @@ function SimpleChat() {
             topK: config.topK,
             topP: config.topP,
             temperature: config.temperature,
-            model,
-            webSearch: webSearch
+            model
           }
         };
       }
@@ -117,9 +116,13 @@ function SimpleChat() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (input.trim()) {
-      sendMessage({ text: input });
-      setInput('');
+    if (status === 'streaming') {
+      stop();
+    } else if (status === 'ready') {
+      if (input.trim()) {
+        sendMessage({ text: input });
+        setInput('');
+      }
     }
   };
 
@@ -128,19 +131,7 @@ function SimpleChat() {
       <Conversation className='h-full'>
         <ConversationContent>
           {messages.map((message) => (
-            <div key={message.id}>
-              {message.role === 'assistant' && (
-                <Sources>
-                  <SourcesTrigger count={message.parts.filter((part) => part.type === 'source-url').length} />
-                  {message.parts
-                    .filter((part) => part.type === 'source-url')
-                    .map((part, i) => (
-                      <SourcesContent key={`${message.id}-${i}`}>
-                        <Source key={`${message.id}-${i}`} href={part.url} title={part.url} />
-                      </SourcesContent>
-                    ))}
-                </Sources>
-              )}
+            <div key={`${message.id}-message`}>
               <Message from={message.role} key={message.id}>
                 <MessageContent>
                   {message.parts.map((part, i) => {
@@ -155,6 +146,10 @@ function SimpleChat() {
                           </Reasoning>
                         );
                       default:
+                        if (part.type.startsWith('tool-')) {
+                          return renderTool?.({ tool: part as ToolUIPart<UITools> });
+                        }
+
                         return null;
                     }
                   })}
@@ -171,10 +166,6 @@ function SimpleChat() {
         <PromptInputTextarea onChange={(e) => setInput(e.target.value)} value={input} />
         <PromptInputToolbar>
           <PromptInputTools>
-            <PromptInputButton variant={webSearch ? 'light' : 'ghost'} onClick={() => setWebSearch(!webSearch)}>
-              <GlobeIcon size={16} />
-              <span>Search</span>
-            </PromptInputButton>
             <PromptInputModelSelect
               onValueChange={(value) => {
                 setModel(value);

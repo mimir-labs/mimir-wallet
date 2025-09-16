@@ -3,7 +3,9 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { ConnectWalletModal, Navigate, ToastRoot, TxSubmit, TxToast } from '@/components';
+import { DraggableChatWithFAB } from '@/components/DraggableChat';
 import { MigrationAlert } from '@/features/assethub-migration';
+import { useAIFunctionCall } from '@/hooks/useAIFunctionCall';
 import { useFollowAccounts } from '@/hooks/useFollowAccounts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
@@ -54,6 +56,7 @@ const GlobalModalsAndComponents = () => (
     <AddAddressBook />
     <OmniChainUpgradeTip />
     <SubscribeNotification />
+    <DraggableChatWithFAB />
   </>
 );
 
@@ -177,6 +180,7 @@ function BaseContainer({ auth, skipConnect = false, withPadding, hideSideBar, hi
   useFollowAccounts();
   usePageTitle();
   useUpdateAIContext();
+  useAIFunctionCall();
 
   // Early return for authentication check
   if (!current && auth) {

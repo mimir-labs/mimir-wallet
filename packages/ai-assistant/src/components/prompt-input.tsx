@@ -6,7 +6,7 @@
 import type { ChatStatus } from 'ai';
 import type { ComponentProps, HTMLAttributes, KeyboardEventHandler } from 'react';
 
-import { Loader2Icon, SendIcon, SquareIcon, XIcon } from 'lucide-react';
+import { ArrowUp, Loader2Icon, SquareIcon, XIcon } from 'lucide-react';
 import { Children } from 'react';
 
 import { Button, cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from '@mimir-wallet/ui';
@@ -15,7 +15,7 @@ export type PromptInputProps = HTMLAttributes<HTMLFormElement>;
 
 export const PromptInput = ({ className, ...props }: PromptInputProps) => (
   <form
-    className={cn('bg-background w-full divide-y overflow-hidden rounded-xl border shadow-sm', className)}
+    className={cn('bg-background border-divider-300 w-full overflow-hidden rounded-xl border shadow-sm', className)}
     {...props}
   />
 );
@@ -29,8 +29,6 @@ export const PromptInputTextarea = ({
   onChange,
   className,
   placeholder = 'What would you like to know?',
-  minHeight = 48,
-  maxHeight = 164,
   ...props
 }: PromptInputTextareaProps) => {
   const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
@@ -119,7 +117,7 @@ export const PromptInputSubmit = ({
   children,
   ...props
 }: PromptInputSubmitProps) => {
-  let Icon = <SendIcon className='size-4' />;
+  let Icon = <ArrowUp className='size-4' />;
 
   if (status === 'submitted') {
     Icon = <Loader2Icon className='size-4 animate-spin' />;
@@ -131,9 +129,10 @@ export const PromptInputSubmit = ({
 
   return (
     <Button
-      className={cn('gap-1.5 rounded-lg', className)}
+      className={cn('gap-1.5', className)}
       isIconOnly={isIconOnly}
       type='submit'
+      radius='full'
       variant={variant}
       {...props}
     >

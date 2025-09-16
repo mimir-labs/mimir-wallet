@@ -7,11 +7,11 @@ import { useAccount } from '@/accounts/useAccount';
 import { StepIndicator } from '@/components';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useWizardState } from '@/hooks/useWizardState';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { type FunctionCallHandler, useFunctionCall } from '@mimir-wallet/ai-assistant';
+import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider, Spinner } from '@mimir-wallet/ui';
 
@@ -74,10 +74,10 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
     toggleSuccess(true);
   };
 
-  // Define function call handlers matching server tool names
-  const functionHandlers: Record<string, FunctionCallHandler> = {
-    // Standard server tool: createMultisig
-    createProxy: async (event) => {
+  useEffect(() => {
+    const handler: FunctionCallHandler = (event) => {
+      if (event.name !== 'createProxy') return;
+
       const newData: Partial<ProxyWizardData> = {};
 
       if (event.arguments.proxied !== undefined) {
@@ -118,15 +118,15 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
 
       updateData(newData);
 
-      return {
+      return functionCallManager.respondToFunctionCall({
         id: event.id,
         success: true,
         result: newData
-      };
-    }
-  };
+      });
+    };
 
-  useFunctionCall(functionHandlers);
+    return functionCallManager.onFunctionCall(handler);
+  }, [goToStep, setNetwork, updateData]);
 
   return (
     <SubApiRoot
