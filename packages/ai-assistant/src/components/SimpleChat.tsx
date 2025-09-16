@@ -27,6 +27,7 @@ import {
 } from './prompt-input.js';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './reasoning.js';
 import { Response } from './response.js';
+import { Suggestion, Suggestions } from './suggestion.js';
 
 const models = [
   {
@@ -50,6 +51,18 @@ const models = [
 interface Props {
   renderTool?: ({ tool }: { tool: ToolUIPart<UITools> }) => React.ReactNode;
 }
+
+const suggestions = [
+  'How do I create a multisig wallet on Mimir?',
+  'Can I send a transaction using a multisig account?',
+  'What is multisig deposit?',
+  'What’s the difference between static and flexible multisig?',
+  'How can I use the Call Template to reuse transactions?',
+  'How does the proposer role work in a multisig?',
+  'Can I stake DOT using a multisig account?',
+  'How do I vote on OpenGov with a proxy or multisig?',
+  'How could i use multisig on HydraDX?'
+];
 
 function SimpleChat({ renderTool }: Props) {
   const [input, setInput] = useState('');
@@ -126,10 +139,21 @@ function SimpleChat({ renderTool }: Props) {
     }
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    sendMessage({ text: suggestion });
+  };
+
   return (
     <div className='flex h-full flex-col'>
       <Conversation className='h-full'>
         <ConversationContent>
+          {messages.length === 0 ? (
+            <Suggestions>
+              {suggestions.map((suggestion) => (
+                <Suggestion key={suggestion} onClick={handleSuggestionClick} suggestion={suggestion} />
+              ))}
+            </Suggestions>
+          ) : null}
           {messages.map((message) => (
             <div key={`${message.id}-message`}>
               <Message from={message.role} key={message.id}>
