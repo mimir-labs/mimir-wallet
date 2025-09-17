@@ -5,7 +5,7 @@ import type { FunctionCallEvent } from '../types.js';
 
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type ToolUIPart, type UITools } from 'ai';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useAIContext } from '../store/aiContext.js';
 import { useAiStore } from '../store/aiStore.js';
@@ -67,7 +67,9 @@ const suggestions = [
 function SimpleChat({ renderTool }: Props) {
   const [input, setInput] = useState('');
   const [model, setModel] = useState<string>(models[0].value);
-  const { config } = useAiStore();
+  const modelRef = useRef(model);
+
+  modelRef.current = model;
 
   const { messages, sendMessage, status, addToolResult, stop } = useChat({
     transport: new DefaultChatTransport({
@@ -76,14 +78,12 @@ function SimpleChat({ renderTool }: Props) {
         return {
           body: {
             messages: options.messages,
-            system: config.systemPrompt || '',
-            nativeFeatures: useAIContext.getState().getFeatureContext(),
-            dappFeatures: useAIContext.getState().getDappFeatureContext(),
+            system: useAiStore.getState().config.systemPrompt || '',
             stateMessage: useAIContext.getState().getStateContext(),
-            topK: config.topK,
-            topP: config.topP,
-            temperature: config.temperature,
-            model
+            topK: useAiStore.getState().config.topK,
+            topP: useAiStore.getState().config.topP,
+            temperature: useAiStore.getState().config.temperature,
+            model: modelRef.current
           }
         };
       }
@@ -120,7 +120,7 @@ function SimpleChat({ renderTool }: Props) {
         addToolResult({
           tool: toolCall.toolName,
           toolCallId: toolCall.toolCallId,
-          output: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
+          output: JSON.stringify({ error: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` })
         });
       }
     }

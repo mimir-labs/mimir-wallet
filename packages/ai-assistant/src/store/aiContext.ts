@@ -52,8 +52,6 @@ interface AIContext {
     network?: string;
   }>;
   state?: State;
-  getFeatureContext: () => string;
-  getDappFeatureContext: () => string;
   getStateContext: () => string;
 }
 
@@ -63,48 +61,20 @@ export const useAIContext = create<AIContext>()((_, get) => {
     addresses: [],
     features: [],
     dappFeatures: [],
-    getFeatureContext: () => {
-      const { features } = get();
-
-      return JSON.stringify(features);
-    },
-    getDappFeatureContext: () => {
-      const { dappFeatures } = get();
-
-      // Combine system prompt with dynamic context
-      return JSON.stringify(dappFeatures);
-    },
     getStateContext: () => {
-      const { state } = get();
+      const { state, supportedNetworks } = get();
 
       // Format current account information
       let currentAccountInfo = '';
 
       if (state?.currentAccount) {
-        const { address, isPure, isMultisig, network, delegatees, members, threshold } = state.currentAccount;
-        const accountType = isPure ? '纯代理账户' : isMultisig ? '多重签名账户' : '普通账户';
-        const networkInfo = network ? ` (网络: ${network})` : '';
+        const { address, isPure, isMultisig, network } = state.currentAccount;
+        const accountType = isPure ? 'pure proxy account' : isMultisig ? 'multisig account' : 'eoa account';
+        const networkInfo = network ? ` (network: ${network || 'all'})` : '';
 
-        // Format members list if multisig
-        const membersList =
-          isMultisig && members && members.length > 0
-            ? `\n- **多签成员列表** (${members.length}人, 阈值: ${threshold}):\n${members.map((m) => `  - ${m}`).join('\n')}`
-            : isMultisig
-              ? `\n- **多签成员**: 暂无成员信息 (阈值: ${threshold})`
-              : '';
-
-        // Format delegatees list
-        const delegateesList =
-          delegatees?.length > 0
-            ? `\n- **委托人列表** (${delegatees.length}人):\n${delegatees.map((d) => `  - ${d}`).join('\n')}`
-            : '';
-
-        currentAccountInfo = `### 当前账户
-- **地址**: ${address}
-- **类型**: ${accountType}${networkInfo}${membersList}${delegateesList}`;
+        currentAccountInfo = `我当前的地址:${address}, ${accountType}, ${networkInfo}`;
       } else {
-        currentAccountInfo = `### 当前账户
-- 未选择账户`;
+        currentAccountInfo = ``;
       }
 
       // Format current page state
@@ -113,9 +83,29 @@ export const useAIContext = create<AIContext>()((_, get) => {
 <当前选择的SS58 格式>${state.chainSS58 !== undefined ? state.chainSS58 : '未设置'}</当前选择的SS58 格式>`
         : '暂无状态信息';
 
+      // Format network information
+      const networkInfo =
+        supportedNetworks && supportedNetworks.length > 0
+          ? `<网络列表>
+${supportedNetworks
+  .map(
+    (network) =>
+      `<网络>
+    <key>${network.key}</key>
+    <name>${network.name}</name>
+    <genesisHash>${network.genesisHash}</genesisHash>
+    <isEnabled>${network.isEnabled}</isEnabled>
+    <ss58Format>${network.ss58Format}</ss58Format>
+  </网络>`
+  )
+  .join('\n')}
+</网络列表>`
+          : '<网络列表>暂无网络信息</网络列表>';
+
       return `${currentAccountInfo}
 <当前状态>
 ${stateInfo}
+${networkInfo}
 </当前状态>
 `;
     }

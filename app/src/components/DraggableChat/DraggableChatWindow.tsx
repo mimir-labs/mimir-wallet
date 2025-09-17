@@ -11,12 +11,18 @@ import { createPortal } from 'react-dom';
 import { SimpleChat } from '@mimir-wallet/ai-assistant';
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 
+import AddToWatchlist from './AddToWatchlist';
 import { AccountInfo, ChatTitle } from './ChatHeader';
+import ConnectWallet from './ConnectWallet';
+import GetFund from './GetFund';
 import MatchedApps from './MatchedApps';
-import MatchOtherFeatures from './MatchOtherFeatures';
 import SearchAddressBook from './SearchAddress';
+import ShowQRCode from './ShowQRCode';
+import SwitchNetworks from './SwitchNetworks';
 import { useDraggableChat } from './useDraggableChat';
+import ViewOnExplorer from './ViewOnExplorer';
 import ViewPendingTransactions from './ViewPendingTransactions';
+import WalletConnect from './WalletConnect';
 
 export interface DraggableChatProps {
   isOpen: boolean;
@@ -30,49 +36,61 @@ function DraggableChatWindow({ isOpen, onClose, initialPosition, className = '' 
   const currentHex = useMemo(() => (current ? addressToHex(current) : ''), [current]);
   const dragControls = useDragControls();
 
+  // General function for parsing tool output
+  const parseToolOutput = (tool: ToolUIPart<UITools>) => {
+    if (tool.state !== 'output-available') return null;
+
+    try {
+      const output = JSON.parse(tool.output as string);
+
+      // Check if operation has error
+      if (output.error) {
+        return null;
+      }
+
+      return output;
+    } catch {
+      return null;
+    }
+  };
+
   // RenderTool function for displaying tool results
   const renderTool = ({ tool }: { tool: ToolUIPart<UITools> }) => {
-    if (tool.type === 'tool-matchDapps' && (tool.state === 'input-available' || tool.state === 'output-available')) {
-      // Render the MatchedApps component
-      return <MatchedApps eventId={tool.toolCallId} apps={(tool.input as any).dapps} />;
-    }
+    const { type, state, toolCallId } = tool;
 
-    if (
-      tool.type === 'tool-matchOtherFeatures' &&
-      (tool.state === 'input-available' || tool.state === 'output-available')
-    ) {
-      // Render the MatchOtherFeatures component
-      const input = tool.input as any;
-
-      return <MatchOtherFeatures eventId={tool.toolCallId} type={input.type} address={input.address} />;
-    }
-
-    if (tool.type === 'tool-queryAccount' && tool.state === 'output-available') {
-      try {
-        const output = JSON.parse(tool.output as string);
-
-        if (!output.accounts?.length) {
-          return null;
-        }
-
-        return <SearchAddressBook eventId={tool.toolCallId} accounts={output.accounts} />;
-      } catch {
-        return null;
+    // Simple tools that don't require output parsing
+    if (state === 'input-available' || state === 'output-available') {
+      switch (type) {
+        case 'tool-getFund':
+          return <GetFund eventId={toolCallId} />;
+        case 'tool-walletConnect':
+          return <WalletConnect eventId={toolCallId} />;
+        case 'tool-connectWallet':
+          return <ConnectWallet eventId={toolCallId} />;
+        case 'tool-matchDapps':
+          return <MatchedApps eventId={toolCallId} apps={(tool.input as any).dapps} />;
+        case 'tool-switchNetworks':
+          return <SwitchNetworks eventId={toolCallId} networks={(tool.input as any).networks} />;
       }
     }
 
-    if (tool.type === 'tool-viewPendingTransaction' && tool.state === 'output-available') {
-      try {
-        const output = JSON.parse(tool.output as string);
+    // Complex tools that require output parsing
 
-        if (!output.address) {
-          return null;
-        }
+    const output = parseToolOutput(tool);
 
-        return <ViewPendingTransactions address={output.address} />;
-      } catch {
-        return null;
-      }
+    if (!output) return null;
+
+    switch (type) {
+      case 'tool-showQRCode':
+        return <ShowQRCode eventId={toolCallId} address={output.address} />;
+      case 'tool-viewOnExplorer':
+        return output.address ? <ViewOnExplorer eventId={toolCallId} address={output.address} /> : null;
+      case 'tool-addToWatchlist':
+        return output.address ? <AddToWatchlist eventId={toolCallId} address={output.address} /> : null;
+      case 'tool-queryAccount':
+        return output.accounts?.length ? <SearchAddressBook eventId={toolCallId} accounts={output.accounts} /> : null;
+      case 'tool-viewPendingTransaction':
+        return output.address ? <ViewPendingTransactions address={output.address} /> : null;
     }
 
     return null;

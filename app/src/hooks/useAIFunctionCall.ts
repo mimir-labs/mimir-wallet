@@ -6,7 +6,62 @@ import { useEffect } from 'react';
 import { parsePath, useNavigate } from 'react-router-dom';
 
 import { type FunctionCallHandler, functionCallManager, useAIContext } from '@mimir-wallet/ai-assistant';
-import { addressEq, addressToHex, encodeAddress, isValidAddress, useApi } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  addressToHex,
+  encodeAddress,
+  isValidAddress,
+  useApi,
+  useNetworks
+} from '@mimir-wallet/polkadot-core';
+
+// Types for function call arguments
+interface AddressArguments {
+  address: string;
+}
+
+interface AccountsArguments {
+  accounts: string[];
+}
+
+// Helper function to create success response
+function createSuccessResponse(id: string, result: any) {
+  return functionCallManager.respondToFunctionCall({
+    id,
+    success: true,
+    result
+  });
+}
+
+// Helper function to create error response
+function createErrorResponse(id: string, error: string) {
+  return functionCallManager.respondToFunctionCall({
+    id,
+    success: false,
+    error
+  });
+}
+
+// Helper function to validate single address
+function validateAddress(id: string, address: string) {
+  if (!address || !isValidAddress(address)) {
+    return createErrorResponse(id, `Invalid address format: ${address || 'empty address'}`);
+  }
+
+  return null;
+}
+
+// Helper function to validate multiple addresses
+function validateAddresses(id: string, addresses: string[]) {
+  const validAddresses = addresses.filter((addr) => isValidAddress(addr));
+  const invalidAddresses = addresses.filter((addr) => !isValidAddress(addr));
+
+  if (validAddresses.length === 0) {
+    return createErrorResponse(id, `Invalid address format: ${invalidAddresses.join(', ')}`);
+  }
+
+  return validAddresses;
+}
 
 function useNavigateCall() {
   const navigate = useNavigate();
@@ -292,7 +347,7 @@ function useSearchNetworksCall() {
           success: true,
           result: {
             query: query,
-            results: sortedResults.map(({ score, ...result }) => result), // Remove score from final result
+            results: sortedResults.map(({ score: _score, ...result }) => result), // eslint-disable-line @typescript-eslint/no-unused-vars
             totalFound: results.length,
             searchLimit: searchLimit,
             message:
@@ -335,69 +390,125 @@ function useSetSs58ChainCall() {
   });
 }
 
+function useSwitchNetworksCall() {
+  const { enableNetwork, disableNetwork } = useNetworks();
+
+  useEffect(() => {
+    const handler: FunctionCallHandler = (event) => {
+      if (event.name !== 'switchNetworks') return;
+      const networks = event.arguments.networks as { networkKey: string; isEnabled: boolean }[];
+
+      networks.forEach((item) => {
+        if (item.isEnabled) {
+          enableNetwork(item.networkKey);
+        } else {
+          disableNetwork(item.networkKey);
+        }
+      });
+
+      return functionCallManager.respondToFunctionCall({
+        id: event.id,
+        success: true,
+        result: `operate successful`
+      });
+    };
+
+    return functionCallManager.onFunctionCall(handler);
+  });
+}
+
+// Function call handlers map for better organization
+function createFunctionCallHandlers() {
+  const handlers = {
+    // Simple handlers without validation
+    matchDapps: (id: string) => createSuccessResponse(id, 'please select a dapps'),
+    getFund: (id: string) => createSuccessResponse(id, 'please select fund option'),
+    walletConnect: (id: string) => createSuccessResponse(id, 'please use wallet connect'),
+    connectWallet: (id: string) => createSuccessResponse(id, 'please manage wallet connections'),
+
+    // Address validation handlers
+    showQRCode: (id: string, { address }: AddressArguments) => {
+      const error = validateAddress(id, address);
+
+      if (error) return error;
+
+      return createSuccessResponse(id, {
+        message: 'please generate QR code',
+        address
+      });
+    },
+
+    viewOnExplorer: (id: string, { address }: AddressArguments) => {
+      const error = validateAddress(id, address);
+
+      if (error) return error;
+
+      return createSuccessResponse(id, {
+        message: 'please view on explorer',
+        address
+      });
+    },
+
+    addToWatchlist: (id: string, { address }: AddressArguments) => {
+      const error = validateAddress(id, address);
+
+      if (error) return error;
+
+      return createSuccessResponse(id, {
+        message: 'please add to watchlist',
+        address
+      });
+    },
+
+    viewPendingTransaction: (id: string, { address }: AddressArguments) => {
+      const error = validateAddress(id, address);
+
+      if (error) return error;
+
+      return createSuccessResponse(id, {
+        message: `正在为地址 ${address} 加载待处理交易`,
+        address
+      });
+    },
+
+    queryAccount: (id: string, { accounts }: AccountsArguments) => {
+      const validAddresses = validateAddresses(id, accounts);
+
+      if (typeof validAddresses === 'object' && 'success' in validAddresses) {
+        return validAddresses; // Error response
+      }
+
+      return createSuccessResponse(id, { accounts: validAddresses });
+    }
+  };
+
+  return handlers;
+}
+
 export function useAIFunctionCall() {
   useNavigateCall();
   useSearchAddressBookCall();
   useSearchNetworksCall();
   useSetSs58ChainCall();
+  useSwitchNetworksCall();
 
   useEffect(() => {
+    const handlers = createFunctionCallHandlers();
+
     const handler: FunctionCallHandler = (event) => {
-      if (event.name === 'matchDapps') {
-        return functionCallManager.respondToFunctionCall({
-          id: event.id,
-          success: true,
-          result: 'please select a dapps'
-        });
-      }
+      const { name, id, arguments: args } = event;
 
-      if (event.name === 'matchOtherFeatures') {
-        return functionCallManager.respondToFunctionCall({
-          id: event.id,
-          success: true,
-          result: 'operate by user'
-        });
-      }
+      // Handle function calls using the handlers map
+      if (name in handlers) {
+        const handlerFn = handlers[name as keyof typeof handlers];
 
-      if (event.name === 'queryAccount') {
-        const { accounts } = event.arguments as { accounts: string[] };
-
-        const list = accounts.filter((item) => isValidAddress(item));
-
-        if (list.length === 0) {
-          return functionCallManager.respondToFunctionCall({
-            id: event.id,
-            success: false,
-            result: 'not valid address'
-          });
-        } else {
-          return functionCallManager.respondToFunctionCall({
-            id: event.id,
-            success: true,
-            result: { accounts: list }
-          });
+        // Simple handlers (no arguments)
+        if (['matchDapps', 'getFund', 'walletConnect', 'connectWallet'].includes(name)) {
+          return (handlerFn as (id: string) => any)(id);
         }
-      }
 
-      if (event.name === 'viewPendingTransaction') {
-        const { address } = event.arguments as { address: string };
-
-        if (!isValidAddress(address)) {
-          return functionCallManager.respondToFunctionCall({
-            id: event.id,
-            success: false,
-            result: 'not valid address'
-          });
-        } else {
-          return functionCallManager.respondToFunctionCall({
-            id: event.id,
-            success: true,
-            result: {
-              message: `正在为地址 ${address} 加载待处理交易`,
-              address
-            }
-          });
-        }
+        // Handlers with arguments
+        return (handlerFn as (id: string, args: any) => any)(id, args);
       }
     };
 
