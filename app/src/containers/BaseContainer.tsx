@@ -21,6 +21,7 @@ import { SidebarProvider } from '@mimir-wallet/ui';
 import AddAddressBook from './AddAddressBook';
 import { AddressModalsProvider } from './address';
 import { CSS_VARS, layoutHelpers } from './constants';
+import CookieConsent from './CookieConsent';
 import Initializing from './Initializing';
 import OmniChainUpgradeTip from './OmniChainUpgradeTip';
 import { AppSidebar, RightSideBar } from './sidebar';
@@ -162,6 +163,9 @@ const MainContent = ({ hideSideBar, hideTopBar, withPadding, queue }: MainConten
         <ContentArea withPadding={withPadding} hideTopBar={hideTopBar} isTransactionActive={isTransactionActive} />
 
         <TransactionOverlay queue={queue} />
+
+        {/* Cookie Consent Banner - Absolute positioned */}
+        <CookieConsent privacyPolicyUrl='/privacy' termsUrl='/terms' />
       </main>
 
       {!hideSideBar && <RightSideBar />}
@@ -206,7 +210,10 @@ function BaseContainer({ auth, skipConnect = false, withPadding, hideSideBar, hi
       {/* Address Modals Provider */}
       <AddressModalsProvider />
 
-      <SidebarProvider className='flex flex-col [--header-height:calc(--spacing(14))]' style={sidebarProviderStyle}>
+      <SidebarProvider
+        className='relative flex flex-col [--header-height:calc(--spacing(14))]'
+        style={sidebarProviderStyle}
+      >
         {/* Top Section: TopBar + Alert */}
         <TopSection hideTopBar={hideTopBar} current={current} setAlertOpen={setAlertOpen} />
 

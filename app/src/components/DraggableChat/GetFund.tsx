@@ -13,7 +13,7 @@ function GetFund({ eventId }: GetFundProps) {
   const navigate = useNavigate();
 
   const handleFund = () => {
-    navigate('/explorer/mimir://app/transfer');
+    navigate('/fund');
   };
 
   return (

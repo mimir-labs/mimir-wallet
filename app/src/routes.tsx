@@ -10,6 +10,7 @@ import PageAssets from '@/pages/assets';
 import PageCreateMultisig from '@/pages/create-multisig';
 import PageDapp from '@/pages/dapp';
 import PageExplorer from '@/pages/explorer';
+import PageFund from '@/pages/fund';
 import PageProfile from '@/pages/profile';
 import PageWelcome from '@/pages/profile/Welcome';
 import PageSetting from '@/pages/setting';
@@ -78,6 +79,12 @@ export const routes = [
             element: <PageAnalytic />,
             description:
               'Multisig analytics dashboard showing common extrinsics, recipient patterns, transaction volume, and signer activity'
+          },
+          {
+            path: '/fund',
+            element: <PageFund />,
+            description:
+              'Fund pure or multisig accounts with guided transfer form, reusable via query params for AI prompts and shortcuts'
           },
           {
             path: '/account-setting',

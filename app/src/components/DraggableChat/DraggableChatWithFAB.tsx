@@ -1,12 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
+import { AnimatePresence, motion, useDragControls } from 'framer-motion';
+import React, { useCallback, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import DraggableChatWindow from './DraggableChatWindow';
 import MimoLogo from './MimoLogo';
+import { useDraggableFAB } from './useDraggableFAB';
 
 export interface DraggableChatWithFABProps {
   // FAB button position
@@ -35,11 +36,26 @@ function DraggableChatWithFAB({
 }: DraggableChatWithFABProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
-  // Don't show FAB on mobile if disabled
-  if (!showFABOnMobile) {
-    return null;
-  }
+  const dragControls = useDragControls();
+
+  // Calculate initial FAB position from fabPosition prop
+  const calculateInitialPosition = useCallback(() => {
+    if (typeof window === 'undefined') return { x: 24, y: 24 };
+
+    const bottom = typeof fabPosition.bottom === 'number' ? fabPosition.bottom : 24;
+    const right = typeof fabPosition.right === 'number' ? fabPosition.right : 24;
+
+    return {
+      x: window.innerWidth - right - 60, // 60 is FAB size
+      y: window.innerHeight - bottom - 60
+    };
+  }, [fabPosition.bottom, fabPosition.right]);
+
+  const { position, dragConstraints, containerRef, handleDragEnd } = useDraggableFAB({
+    initialPosition: calculateInitialPosition()
+  });
 
   // Calculate dynamic height: half of screen height, minimum 600px, but if screen height < 600, use screen height
   const calculateHeight = () => {
@@ -71,22 +87,31 @@ function DraggableChatWithFAB({
   };
 
   const handleOpen = () => {
+    if (isDragging) {
+      return;
+    }
+
     setIsOpen(true);
     onOpen?.();
   };
-
-  // Debug function to reset position (can be called in console)
-  if (typeof window !== 'undefined') {
-    (window as any).resetChatPosition = () => {
-      localStorage.removeItem('draggable-chat-position');
-      console.log('Chat position reset. Close and reopen the chat to see the change.');
-    };
-  }
 
   const handleClose = () => {
     setIsOpen(false);
     onClose?.();
   };
+
+  const fabStyle = useMemo(() => {
+    return {
+      filter: 'drop-shadow(0 0 30px rgba(0, 82, 255, 0.25))',
+      x: position.x,
+      y: position.y
+    } as React.CSSProperties;
+  }, [position.x, position.y]);
+
+  // Don't show FAB on mobile if disabled
+  if (!showFABOnMobile) {
+    return null;
+  }
 
   return (
     <>
@@ -95,36 +120,51 @@ function DraggableChatWithFAB({
         <AnimatePresence>
           {!isOpen && (
             <motion.button
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{
-                type: 'spring',
-                stiffness: 400,
-                damping: 17
-              }}
+              ref={containerRef}
               onClick={handleOpen}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
-              className={`fixed z-50 duration-200 ${fabClassName} `}
-              style={{
-                filter: 'drop-shadow(0 0 30px rgba(0, 82, 255, 0.25))',
-                bottom: typeof fabPosition.bottom === 'number' ? `${fabPosition.bottom}px` : fabPosition.bottom,
-                right: typeof fabPosition.right === 'number' ? `${fabPosition.right}px` : fabPosition.right
-              }}
+              className={`fixed top-0 z-50 ${fabClassName} `}
+              style={fabStyle}
               aria-label='Open AI Assistant'
+              drag
+              dragControls={dragControls}
+              dragConstraints={dragConstraints}
+              dragElastic={0}
+              dragMomentum={false}
+              onDragStart={() => setIsDragging(true)}
+              onDragEnd={(event, info) => {
+                setIsDragging(false);
+                handleDragEnd(event, info);
+              }}
+              dragListener={false}
+              onPointerDown={(e) => {
+                // Prevent click when starting drag
+                e.preventDefault();
+                dragControls.start(e);
+              }}
             >
               <motion.div
-                animate={isHovered ? { rotate: 0 } : { rotate: [0, 10, -10, 0] }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={
+                  isDragging
+                    ? { opacity: 1, scale: 1, rotate: 0 }
+                    : isHovered
+                      ? { opacity: 1, scale: 1, rotate: 0 }
+                      : { opacity: 1, scale: 1, rotate: [0, 10, -10, 0] }
+                }
+                exit={{ scale: 0, opacity: 0 }}
                 transition={
-                  isHovered
-                    ? { duration: 0 }
+                  isDragging || isHovered
+                    ? { duration: 0.2, opacity: { duration: 0.2 }, scale: { duration: 0.2 } }
                     : {
-                        duration: 4,
-                        repeat: Infinity,
-                        repeatDelay: 3
+                        opacity: { duration: 0.2 },
+                        scale: { duration: 0.2 },
+                        rotate: {
+                          duration: 3,
+                          repeat: Infinity,
+                          repeatDelay: 2
+                        }
                       }
                 }
               >
