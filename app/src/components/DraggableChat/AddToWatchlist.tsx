@@ -2,23 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
-import { isAddress } from '@polkadot/util-crypto';
 
 import { Button } from '@mimir-wallet/ui';
 
 interface AddToWatchlistProps {
   eventId: string;
-  address: string;
+  address?: string;
 }
 
-function AddToWatchlist({ eventId, address }: AddToWatchlistProps) {
+function AddToWatchlist({ address }: AddToWatchlistProps) {
   const { addAddressBook } = useAccount();
-  const isValidAddress = isAddress(address);
 
   const handleAddToWatchlist = () => {
-    if (isValidAddress) {
-      addAddressBook(address, true);
-    }
+    addAddressBook(address, true);
   };
 
   return (
@@ -49,7 +45,7 @@ function AddToWatchlist({ eventId, address }: AddToWatchlistProps) {
       </div>
 
       {/* Right side: Add button */}
-      <Button size='sm' color='secondary' disabled={!isValidAddress} onClick={handleAddToWatchlist}>
+      <Button size='sm' color='secondary' onClick={handleAddToWatchlist}>
         Add
       </Button>
     </div>

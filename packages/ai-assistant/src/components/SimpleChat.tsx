@@ -5,7 +5,7 @@ import type { FunctionCallEvent } from '../types.js';
 
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type ToolUIPart, type UITools } from 'ai';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { useAIContext } from '../store/aiContext.js';
 import { useAiStore } from '../store/aiStore.js';
@@ -70,6 +70,21 @@ function SimpleChat({ renderTool }: Props) {
   const modelRef = useRef(model);
 
   modelRef.current = model;
+
+  // Randomly select 3 suggestions: one from each group (1-3, 4-6, 7-9)
+  const randomSuggestions = useMemo(() => {
+    const group1 = suggestions.slice(0, 3); // indices 0-2
+    const group2 = suggestions.slice(3, 6); // indices 3-5
+    const group3 = suggestions.slice(6, 9); // indices 6-8
+
+    const selected = [
+      group1[Math.floor(Math.random() * group1.length)],
+      group2[Math.floor(Math.random() * group2.length)],
+      group3[Math.floor(Math.random() * group3.length)]
+    ];
+
+    return selected;
+  }, []);
 
   const { messages, sendMessage, status, addToolResult, stop } = useChat({
     transport: new DefaultChatTransport({
@@ -149,7 +164,7 @@ function SimpleChat({ renderTool }: Props) {
         <ConversationContent>
           {messages.length === 0 ? (
             <Suggestions>
-              {suggestions.map((suggestion) => (
+              {randomSuggestions.map((suggestion) => (
                 <Suggestion key={suggestion} onClick={handleSuggestionClick} suggestion={suggestion} />
               ))}
             </Suggestions>

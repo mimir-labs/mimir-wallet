@@ -30,7 +30,7 @@ export function useOpenDapp(dapp: DappOption) {
         const _url = dapp.urlSearch?.(network) || new URL(dapp.url);
 
         if (path) {
-          _url.pathname = path;
+          dapp.isSubPathHash ? (_url.hash = path) : (_url.pathname = path);
         }
 
         navigate(`/explorer/${encodeURIComponent(_url.toString())}`);

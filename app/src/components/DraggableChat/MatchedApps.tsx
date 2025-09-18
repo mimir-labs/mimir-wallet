@@ -29,8 +29,8 @@ function MatchedApps({ apps }: { eventId: string; apps: { id: string; tag?: stri
       <div className='text-foreground text-[14px] font-normal'>Matched Apps ({list.length})</div>
 
       {/* Apps list */}
-      {list.map((app) => (
-        <MatchedAppItem key={app.dapp.id} {...app.dapp} path={app.path} tag={app.tag} />
+      {list.map((app, index) => (
+        <MatchedAppItem key={index} {...app.dapp} path={app.path} tag={app.tag} />
       ))}
     </div>
   );
@@ -42,7 +42,10 @@ function MatchedAppItem(dapp: DappOption & { path?: string; tag?: string }) {
   const openDapp = useOpenDapp(dapp);
 
   return (
-    <div className='border-divider-300 flex w-full items-center justify-between rounded-[10px] border p-2.5'>
+    <div
+      onClick={() => openDapp(path)}
+      className='border-divider-300 hover:border-primary focus-visible:border-primary focus-visible:ring-primary/30 flex w-full cursor-pointer items-center justify-between rounded-[10px] border p-2.5 transition-colors focus-visible:ring-2 focus-visible:outline-none'
+    >
       {/* Left side: Icon and name */}
       <div className='flex items-center gap-2.5'>
         <img src={icon} alt={name} className='h-[30px] w-[30px] rounded-full' />

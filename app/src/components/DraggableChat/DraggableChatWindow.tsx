@@ -17,6 +17,7 @@ import ConnectWallet from './ConnectWallet';
 import GetFund from './GetFund';
 import MatchedApps from './MatchedApps';
 import SearchAddressBook from './SearchAddress';
+import SetSs58Chain from './SetSs58Chain';
 import ShowQRCode from './ShowQRCode';
 import SwitchNetworks from './SwitchNetworks';
 import { useDraggableChat } from './useDraggableChat';
@@ -71,6 +72,8 @@ function DraggableChatWindow({ isOpen, onClose, initialPosition, className = '' 
           return <MatchedApps eventId={toolCallId} apps={(tool.input as any).dapps} />;
         case 'tool-switchNetworks':
           return <SwitchNetworks eventId={toolCallId} networks={(tool.input as any).networks} />;
+        case 'tool-setSs58Chain':
+          return <SetSs58Chain eventId={toolCallId} networkKey={(tool.input as any).networkKey} />;
       }
     }
 

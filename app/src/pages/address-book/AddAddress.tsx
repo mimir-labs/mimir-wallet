@@ -6,12 +6,16 @@ import React from 'react';
 
 import { Button } from '@mimir-wallet/ui';
 
-function AddAddress() {
+interface AddAddressProps {
+  isWatchlist?: boolean;
+}
+
+function AddAddress({ isWatchlist = false }: AddAddressProps) {
   const { addAddressBook } = useAccount();
 
   return (
-    <Button onClick={() => addAddressBook()} variant='ghost'>
-      Add New Contact
+    <Button onClick={() => addAddressBook(undefined, isWatchlist)} variant='ghost'>
+      {isWatchlist ? 'Add Watchlist Address' : 'Add New Contact'}
     </Button>
   );
 }

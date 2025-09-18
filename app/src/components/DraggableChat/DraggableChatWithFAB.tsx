@@ -34,6 +34,7 @@ function DraggableChatWithFAB({
   showFABOnMobile = true
 }: DraggableChatWithFABProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Don't show FAB on mobile if disabled
   if (!showFABOnMobile) {
@@ -105,6 +106,8 @@ function DraggableChatWithFAB({
                 damping: 17
               }}
               onClick={handleOpen}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
               className={`fixed z-50 duration-200 ${fabClassName} `}
               style={{
                 filter: 'drop-shadow(0 0 30px rgba(0, 82, 255, 0.25))',
@@ -114,12 +117,16 @@ function DraggableChatWithFAB({
               aria-label='Open AI Assistant'
             >
               <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  repeatDelay: 3
-                }}
+                animate={isHovered ? { rotate: 0 } : { rotate: [0, 10, -10, 0] }}
+                transition={
+                  isHovered
+                    ? { duration: 0 }
+                    : {
+                        duration: 4,
+                        repeat: Infinity,
+                        repeatDelay: 3
+                      }
+                }
               >
                 <MimoLogo size={50} />
               </motion.div>

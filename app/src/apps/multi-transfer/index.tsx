@@ -30,14 +30,25 @@ function MultiTransfer() {
       }
 
       if (event.arguments.addRecipient !== undefined) {
-        setData((data) => [
-          ...data,
-          ...event.arguments.addRecipient.map((item: { recipient: string; amount: number }) => [
-            item.recipient,
-            'native',
-            item.amount.toString()
-          ])
-        ]);
+        const recipients: MultiTransferData[] = event.arguments.addRecipient.map(
+          (item: { recipient: string; amount: number }) => [item.recipient, 'native', item.amount.toString()]
+        );
+
+        setData((prev) => {
+          const next = [...prev];
+
+          recipients.forEach((recipient) => {
+            const emptyIndex = next.findIndex(([address, assetId, amount]) => !address && !assetId && !amount);
+
+            if (emptyIndex !== -1) {
+              next[emptyIndex] = recipient;
+            } else {
+              next.push(recipient);
+            }
+          });
+
+          return next;
+        });
       }
 
       if (event.arguments.network !== undefined) {

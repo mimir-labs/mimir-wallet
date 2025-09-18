@@ -449,10 +449,12 @@ function createFunctionCallHandlers() {
       });
     },
 
-    addToWatchlist: (id: string, { address }: AddressArguments) => {
-      const error = validateAddress(id, address);
+    addToWatchlist: (id: string, { address }: { address?: string }) => {
+      if (address) {
+        const error = validateAddress(id, address);
 
-      if (error) return error;
+        if (error) return error;
+      }
 
       return createSuccessResponse(id, {
         message: 'please add to watchlist',
@@ -466,7 +468,7 @@ function createFunctionCallHandlers() {
       if (error) return error;
 
       return createSuccessResponse(id, {
-        message: `正在为地址 ${address} 加载待处理交易`,
+        message: `Loading pending transactions for ${address}`,
         address
       });
     },

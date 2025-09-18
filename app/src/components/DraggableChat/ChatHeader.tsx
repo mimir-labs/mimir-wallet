@@ -22,6 +22,7 @@ export function AccountInfo() {
         withAddress
         withName
         shorten
+        showMultisigBadge={false}
       />
     </div>
   );
