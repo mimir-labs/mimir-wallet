@@ -5,18 +5,18 @@ import { type DappOption, dapps } from '@/config';
 import { useOpenDapp } from '@/hooks/useOpenDapp';
 import { useMemo } from 'react';
 
-import { Button } from '@mimir-wallet/ui';
+import { Button, Chip } from '@mimir-wallet/ui';
 
 // MatchedApps component based on Figma design
-function MatchedApps({ apps }: { eventId: string; apps: string[] }) {
+function MatchedApps({ apps }: { eventId: string; apps: { id: string; tag?: string; path?: string }[] }) {
   const list = useMemo(() => {
     const result = [];
 
-    for (const id of apps) {
+    for (const { id, tag, path } of apps) {
       const dapp = dapps.find((item) => item.id.toString() === id);
 
       if (dapp) {
-        result.push(dapp);
+        result.push({ dapp, tag, path });
       }
     }
 
@@ -30,15 +30,15 @@ function MatchedApps({ apps }: { eventId: string; apps: string[] }) {
 
       {/* Apps list */}
       {list.map((app) => (
-        <MatchedAppItem key={app.id} {...app} />
+        <MatchedAppItem key={app.dapp.id} {...app.dapp} path={app.path} tag={app.tag} />
       ))}
     </div>
   );
 }
 
 // Individual app item component
-function MatchedAppItem(dapp: DappOption) {
-  const { name, icon } = dapp;
+function MatchedAppItem(dapp: DappOption & { path?: string; tag?: string }) {
+  const { name, icon, tag, path } = dapp;
   const openDapp = useOpenDapp(dapp);
 
   return (
@@ -48,13 +48,14 @@ function MatchedAppItem(dapp: DappOption) {
         <img src={icon} alt={name} className='h-[30px] w-[30px] rounded-full' />
         <div className='text-foreground text-[14px] font-bold'>{name}</div>
       </div>
+      {tag && <Chip color='secondary'>{tag}</Chip>}
 
       {/* Right side: View button */}
       <Button
         size='sm'
         color='secondary'
         onClick={() => {
-          openDapp();
+          openDapp(path);
         }}
       >
         View

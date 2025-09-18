@@ -36,7 +36,7 @@ const models = [
   },
   {
     name: 'OpenAI: GPT-5',
-    value: 'openai/gpt-5'
+    value: 'openai/gpt-5-nano'
   },
   {
     name: 'MoonshotAI: Kimi K2',
