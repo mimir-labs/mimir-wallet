@@ -15,20 +15,27 @@ export function useOpenDapp(dapp: DappOption) {
   const { network } = useApi();
   const navigate = useNavigate();
 
-  return useCallback(() => {
-    if (dapp.url === 'mimir://app/batch') {
-      setRightSidebarTab('batch');
-      openRightSidebar();
-    } else if (dapp.url === 'mimir://app/template') {
-      setRightSidebarTab('template');
-      openRightSidebar();
-    } else if (dapp.url === 'mimir://app/decoder') {
-      setRightSidebarTab('decoder');
-      openRightSidebar();
-    } else {
-      const _url = dapp.urlSearch?.(network) || dapp.url;
+  return useCallback(
+    (path?: string) => {
+      if (dapp.url === 'mimir://app/batch') {
+        setRightSidebarTab('batch');
+        openRightSidebar();
+      } else if (dapp.url === 'mimir://app/template') {
+        setRightSidebarTab('template');
+        openRightSidebar();
+      } else if (dapp.url === 'mimir://app/decoder') {
+        setRightSidebarTab('decoder');
+        openRightSidebar();
+      } else {
+        const _url = dapp.urlSearch?.(network) || new URL(dapp.url);
 
-      navigate(`/explorer/${encodeURIComponent(_url.toString())}`);
-    }
-  }, [dapp, navigate, network, openRightSidebar, setRightSidebarTab]);
+        if (path) {
+          dapp.isSubPathHash ? (_url.hash = path) : (_url.pathname = path);
+        }
+
+        navigate(`/explorer/${encodeURIComponent(_url.toString())}`);
+      }
+    },
+    [dapp, navigate, network, openRightSidebar, setRightSidebarTab]
+  );
 }

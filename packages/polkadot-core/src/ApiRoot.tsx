@@ -17,7 +17,7 @@ import { useAllApis } from './useApiStore.js';
 import { useNetworks } from './useNetworks.js';
 
 function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNode }): JSX.Element | null {
-  const { networks, mode } = useNetworks();
+  const { networks } = useNetworks();
   const { chains } = useAllApis();
   const [storeSs58Chain, setStoreSs58Chain] = useLocalStore<string>(DEFAULE_SS58_CHAIN_KEY);
   const [network, setNetwork] = useState(chain.key);
@@ -30,14 +30,6 @@ function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNo
 
     return networkValues;
   }, [network, chains]);
-
-  useEffect(() => {
-    if (mode === 'solo' && chain.identityNetwork) {
-      const identity = networks.find((network) => network.key === chain.identityNetwork);
-
-      identity && initializeApi(identity);
-    }
-  }, [mode, chain, networks]);
 
   useEffect(() => {
     setNetwork(networkValues.network);
@@ -60,36 +52,31 @@ function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNo
   );
 
   useEffect(() => {
-    if (mode === 'omni') {
-      for (const network of networks) {
-        if (network.enabled) {
-          initializeApi(network);
-        } else {
-          destroyApi(network.key);
-        }
+    for (const network of networks) {
+      if (network.enabled) {
+        initializeApi(network);
+      } else {
+        destroyApi(network.key);
       }
     }
-  }, [mode, networks]);
+  }, [networks]);
 
   const [chainSS58, ss58Chain] = useMemo(() => {
     let ss58Format: number;
     let ss58Chain: string;
 
     if (!storeSs58Chain) {
-      ss58Format = mode === 'omni' ? 0 : networkValues.chain.ss58Format;
-      ss58Chain = mode === 'omni' ? networks[0].key : networkValues.chain.key;
+      ss58Format = 0;
+      ss58Chain = networks[0].key;
     } else {
-      const network =
-        mode === 'omni'
-          ? (networks.find((item) => item.key === storeSs58Chain) ?? networkValues.chain)
-          : networkValues.chain;
+      const network = networks.find((item) => item.key === storeSs58Chain) ?? networkValues.chain;
 
       ss58Format = network.ss58Format;
       ss58Chain = network.key;
     }
 
     return [ss58Format, ss58Chain];
-  }, [storeSs58Chain, mode, networkValues.chain, networks]);
+  }, [storeSs58Chain, networkValues.chain, networks]);
 
   const setSs58Chain = useCallback(
     (chain: string) => {
@@ -98,20 +85,15 @@ function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNo
     [setStoreSs58Chain]
   );
 
-  const _setNetwork = useCallback(
-    (network: string) => {
-      if (mode === 'omni') {
-        if (isHex(network)) {
-          const key = allEndpoints.find((item) => item.genesisHash === network)?.key;
+  const _setNetwork = useCallback((network: string) => {
+    if (isHex(network)) {
+      const key = allEndpoints.find((item) => item.genesisHash === network)?.key;
 
-          key && setNetwork(key);
-        } else {
-          setNetwork(network);
-        }
-      }
-    },
-    [mode]
-  );
+      key && setNetwork(key);
+    } else {
+      setNetwork(network);
+    }
+  }, []);
 
   if (!networkValues || !networkValues.api) {
     return null;
@@ -121,7 +103,7 @@ function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNo
     <ApiContext.Provider
       value={{
         ...networkValues,
-        allApis: mode === 'omni' ? allApis : { [networkValues.network]: networkValues },
+        allApis: allApis,
         network: networkValues.network,
         api: networkValues.api,
         chainSS58,

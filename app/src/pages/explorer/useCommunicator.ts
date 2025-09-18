@@ -20,8 +20,8 @@ export function useCommunicator(
   appName?: string
 ): IframeCommunicator | null {
   const [communicator, setCommunicator] = useState<IframeCommunicator | null>(null);
-  const { genesisHash, chainSS58, network: currentNetwork } = useApi();
-  const { networks, enableNetwork, mode } = useNetworks();
+  const { genesisHash, chainSS58 } = useApi();
+  const { networks, enableNetwork } = useNetworks();
   const { addQueue } = useTxQueue();
   const { current } = useAccount();
   const { meta } = useAddressMeta(current);
@@ -42,24 +42,14 @@ export function useCommunicator(
         }
       }
 
-      let network: string | undefined;
+      const network = networks.find((item) => item.genesisHash === payload.genesisHash)?.key;
 
-      if (mode === 'omni') {
-        network = networks.find((item) => item.genesisHash === payload.genesisHash)?.key;
-
-        if (!network) {
-          throw new Error(`Network not supported`);
-        }
-      } else {
-        if (payload.genesisHash !== genesisHash) {
-          throw new Error(`Network not supported`);
-        }
-
-        network = currentNetwork;
+      if (!network) {
+        throw new Error(`Network not supported`);
       }
 
       return new Promise((resolve, reject) => {
-        if (mode === 'omni') enableNetwork(network);
+        enableNetwork(network);
 
         const website = new URL(url);
         const { withSignedTransaction } = payload;

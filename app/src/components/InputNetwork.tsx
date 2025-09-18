@@ -183,13 +183,7 @@ function OmniChainInputNetwork({
 }
 
 function InputNetwork(props: Props) {
-  const { mode } = useNetworks();
-
-  if (mode === 'omni') {
-    return <OmniChainInputNetwork {...props} />;
-  }
-
-  return null;
+  return <OmniChainInputNetwork {...props} />;
 }
 
 export default React.memo(InputNetwork);

@@ -22,7 +22,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 
-import { ApiRoot, initializeApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { ApiRoot, initializeApi } from '@mimir-wallet/polkadot-core';
 import { API_CLIENT_GATEWAY, initService } from '@mimir-wallet/service';
 
 import { initializeAccount } from './accounts/initialize';
@@ -52,11 +52,9 @@ ChartJS.register(
 // Create React root container for application mounting
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
-const isOmni = useNetworks.getState().mode === 'omni';
-
 // Initialize core Mimir wallet configuration and get initial chain and address settings
 // This sets up the basic configuration needed for the wallet to function
-const { chain, address } = initMimir(isOmni);
+const { chain, address } = initMimir(true);
 
 initFavoriteDapps();
 
