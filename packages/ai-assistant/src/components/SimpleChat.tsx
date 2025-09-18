@@ -208,7 +208,7 @@ function SimpleChat({ renderTool }: Props) {
               </PromptInputModelSelectContent>
             </PromptInputModelSelect>
           </PromptInputTools>
-          <PromptInputSubmit disabled={!input} status={status} />
+          <PromptInputSubmit disabled={status === 'ready' && !input.trim()} status={status} />
         </PromptInputToolbar>
       </PromptInput>
     </div>
