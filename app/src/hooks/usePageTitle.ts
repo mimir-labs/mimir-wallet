@@ -6,14 +6,10 @@ import { isSameOrigin } from '@/utils';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
-
 export function usePageTitle() {
   const { pathname } = useLocation();
-  const { mode } = useNetworks();
 
-  const PREFIX =
-    mode === 'omni' ? 'Mimir|Your Ultimate Omni Web3 Multisig Wallet' : 'Mimir|Your Ultimate Web3 Multisig Wallet';
+  const PREFIX = 'Mimir|Your Ultimate Omni Web3 Multisig Wallet';
 
   useEffect(() => {
     let title = PREFIX;
