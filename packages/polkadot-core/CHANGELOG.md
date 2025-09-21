@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.28.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.27.0...polkadot-core-v2.28.0) (2025-09-21)
+
+
+### Features
+
+* Add ErrorBoundary for submit transaction ([#309](https://github.com/mimir-labs/mimir-wallet/issues/309)) ([4bf4fcd](https://github.com/mimir-labs/mimir-wallet/commit/4bf4fcd42120d0d2b1d51b253839cbd6aa5f137a))
+* Optimize balance retrieval logic ([#311](https://github.com/mimir-labs/mimir-wallet/issues/311)) ([a5e767d](https://github.com/mimir-labs/mimir-wallet/commit/a5e767d4db9bdf7d29d3545272137e4e3feab57d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.28.0
+
 ## [2.27.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.26.0...polkadot-core-v2.27.0) (2025-09-08)
 
 
