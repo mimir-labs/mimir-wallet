@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AssetInfo } from './types';
+import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
 import { getFeeAssetLocation, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
@@ -12,7 +12,7 @@ import { useQuery } from '@mimir-wallet/service';
  */
 export function useAssetConversion(
   nativeGasFee: bigint | undefined | null,
-  targetAsset: AssetInfo | undefined | null
+  targetAsset: CompleteEnhancedAssetInfo | undefined | null
 ): bigint | undefined | null {
   const { api } = useApi();
   const { data: gasFeeData } = useQuery({

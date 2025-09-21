@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { Bytes, Option, Struct, u8, u128 } from '@polkadot/types';
+import type { Struct, u128 } from '@polkadot/types';
 import type { HexString } from '@polkadot/util/types';
 
 export type CallParam = any;
@@ -171,113 +171,6 @@ export type Transaction = UnknownTransaction | MultisigTransaction | ProxyTransa
 
 export type HistoryTransaction = Transaction & { uuid: string };
 
-export interface TokenInfo {
-  detail: Record<
-    string,
-    {
-      asset_type: string;
-      available_balance: string;
-      bonded_locked_balance: string;
-      democracy_locked_balance: string;
-      display_name: string;
-      election_locked_balance: string;
-      free_balance: string;
-      inflation: string;
-      locked_balance: string;
-      nominator_bonded: string;
-      price: string;
-      price_change: string;
-      reserved_balance: string;
-      symbol: string;
-      token_decimals: number;
-      total_issuance: string;
-      unbonded_locked_balance: string;
-      unique_id: string;
-      validator_bonded: string;
-      vesting_balance: string;
-    }
-  >;
-  token: string[];
-}
-
-export type NewTxMessage = {
-  uuid: string;
-  action: string;
-  initiator: HexString;
-  blockTime: string;
-  blockHeight: number;
-  extrinsicIndex: number;
-};
-
-export type ApproveTxMessage = {
-  uuid: string;
-  action: string;
-  approver: HexString;
-  blockTime: string;
-  blockHeight: number;
-  extrinsicIndex: number;
-};
-
-export type ExecuteTxMessage = {
-  uuid: string;
-  action: string;
-  executer: HexString;
-  status: TransactionStatus;
-  blockTime: string;
-  blockHeight: number;
-  extrinsicIndex: number;
-};
-
-export type CancelTxMessage = {
-  uuid: string;
-  action: string;
-  canceller: HexString;
-  blockTime: string;
-  blockHeight: number;
-  extrinsicIndex: number;
-};
-
-export interface PushMessageData {
-  id: number;
-  address: HexString;
-  sender: HexString;
-  type: 'initial' | 'approve' | 'execute' | 'cancel';
-  blockHeight: number;
-  extrinsicIndex: number;
-  blockTime: string;
-  raw: NewTxMessage | ApproveTxMessage | ExecuteTxMessage | CancelTxMessage;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type AssetInfo<T extends boolean = boolean> = {
-  readonly network: string;
-  readonly name: string;
-  readonly symbol: string;
-  readonly decimals: number;
-  readonly price?: number;
-  readonly change24h?: number;
-  readonly icon?: string;
-  readonly isSufficient?: boolean;
-} & (T extends false
-  ? {
-      readonly isNative: false;
-      readonly assetId: string;
-    }
-  : {
-      readonly isNative: true;
-      readonly assetId: 'native';
-    });
-
-export type AccountAssetInfo<T extends boolean = boolean> = AssetInfo<T> & {
-  total: bigint;
-  locked: bigint;
-  reserved: bigint;
-  free: bigint;
-  transferrable: bigint;
-  account: string;
-};
-
 export interface SafetyLevel {
   severity: 'none' | 'warning' | 'error';
   title: string;
@@ -406,22 +299,8 @@ export interface BatchTxItem {
   relatedBatch?: number;
 }
 
-export interface PalletAssetRegistryAssetDetails extends Struct {
-  readonly name: Option<Bytes>;
-  readonly symbol: Option<Bytes>;
-  readonly decimals: Option<u8>;
-  readonly existentialDeposit: u128;
-}
-
 export interface OrmlTokensAccountData extends Struct {
   readonly free: u128;
   readonly reserved: u128;
   readonly frozen: u128;
-}
-
-export interface AssetMetadata extends Struct {
-  readonly name: Bytes;
-  readonly symbol: Bytes;
-  readonly decimals: u8;
-  readonly minimalBalance: u128;
 }

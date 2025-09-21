@@ -9,7 +9,7 @@ import IconLock from '@/assets/svg/icon-lock.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconUnLock from '@/assets/svg/icon-unlock.svg?react';
-import { useNativeBalances } from '@/hooks/useBalances';
+import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { formatUnits } from '@/utils';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo, useRef } from 'react';
@@ -32,7 +32,7 @@ interface Props {
 
 function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   const { api, chainSS58, network } = useApi();
-  const [allBalances] = useNativeBalances(address.toString());
+  const [allBalances] = useBalanceByIdentifier(network, address.toString(), 'native');
   const [open, toggleOpen] = useToggle(false);
   const onEnoughtStateRef = useRef(onEnoughtState);
 

@@ -1,6 +1,6 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AssetInfo } from '@/hooks/types';
+import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
-export type TransferToken = AssetInfo<boolean>;
+export type TransferToken = CompleteEnhancedAssetInfo;

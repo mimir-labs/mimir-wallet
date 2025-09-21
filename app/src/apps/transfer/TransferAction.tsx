@@ -4,7 +4,7 @@
 import type { TransferToken } from './types';
 
 import { TxButton } from '@/components';
-import { useAssetInfo } from '@/hooks/useAssets';
+import { useXcmAsset } from '@/hooks/useXcmAssets';
 import { parseUnits } from '@/utils';
 import { BN, isHex } from '@polkadot/util';
 import React, { useCallback } from 'react';
@@ -39,9 +39,13 @@ function TransferAction({
   const { api } = useApi();
 
   const [format, sendingBalances] = useTransferBalance(token, sending);
-  const [, assetExistentialDeposit] = useAssetInfo(network, token?.isNative ? null : token?.assetId);
+  const [assetInfo] = useXcmAsset(network, token?.isNative ? null : token?.assetId);
 
-  const existentialDeposit = token?.isNative ? api.consts.balances.existentialDeposit : assetExistentialDeposit;
+  const existentialDeposit = token?.isNative
+    ? api.consts.balances.existentialDeposit
+    : assetInfo?.existentialDeposit
+      ? new BN(assetInfo.existentialDeposit.toString())
+      : new BN(0);
   const isInsufficientBalance = keepAlive
     ? sendingBalances.sub(existentialDeposit).lt(new BN(parseUnits(amount, format[0]).toString()))
     : sendingBalances.lt(new BN(parseUnits(amount, format[0]).toString()));
@@ -58,7 +62,7 @@ function TransferAction({
           : api.tx.balances.transferAllowDeath(recipient, parseUnits(amount, format[0])).method;
       }
 
-      if (api.tx.assets) {
+      if (api.tx.assets && token.assetId) {
         if (isHex(token.assetId) && !api.tx.foreignAssets) {
           throw new Error('Invalid asset id');
         }
@@ -76,7 +80,7 @@ function TransferAction({
             ).method;
       }
 
-      if (api.tx.tokens) {
+      if (api.tx.tokens && token.assetId) {
         return keepAlive
           ? api.tx.tokens.transferKeepAlive(recipient, token.assetId, parseUnits(amount, format[0])).method
           : api.tx.tokens.transfer(recipient, token.assetId, parseUnits(amount, format[0])).method;

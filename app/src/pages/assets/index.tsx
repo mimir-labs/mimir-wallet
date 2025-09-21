@@ -1,8 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountAssetInfo } from '@/hooks/types';
 import type { SortDescriptor } from '@react-types/shared';
+import type { AccountEnhancedAssetBalance } from '@mimir-wallet/polkadot-core';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
@@ -12,10 +12,11 @@ import { Empty, FormatBalance } from '@/components';
 import { toastError, toastSuccess } from '@/components/utils';
 import { StakingApp } from '@/config';
 import { MigrationTip, useAssetsMigrationStatus, useMigrationNetworks } from '@/features/assethub-migration';
-import { useAssetBalancesAll, useNativeBalancesAll, useRefreshBalances } from '@/hooks/useBalances';
+import { useAllChainBalances } from '@/hooks/useChainBalances';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
-import { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
@@ -55,34 +56,51 @@ function MigrationTips() {
 
 function Assets() {
   const { current } = useAccount();
-  const nativeBalances = useNativeBalancesAll(current);
-  const assets = useAssetBalancesAll(current);
+  const allChainBalances = useAllChainBalances(current);
   const { networks } = useNetworks();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: 'balanceUsd',
     direction: 'descending'
   });
   const upSm = useMediaQuery('sm');
-  const { mutateAsync, isPending } = useRefreshBalances(current);
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const refreshAssets = useCallback(async () => {
+    if (isRefreshing || !current) return;
+
+    setIsRefreshing(true);
+
+    try {
+      // Invalidate all balance-related queries for this address
+      await queryClient.invalidateQueries({
+        queryKey: ['chain-balances']
+      });
+
+      toastSuccess('Assets refreshed successfully');
+    } catch (error) {
+      console.error(error);
+      toastError('Failed to refresh assets');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [current, isRefreshing, queryClient]);
 
   const [list, done] = useMemo(() => {
-    const _list: AccountAssetInfo[] = [];
+    const _list: (AccountEnhancedAssetBalance & { network: string })[] = [];
     let done = true;
 
-    for (const item of assets) {
-      if (item.isFetched) {
-        if (item.data) {
-          _list.push(...item.data);
-        }
-      } else {
-        done = false;
-      }
-    }
-
-    for (const item of nativeBalances) {
-      if (item.isFetched) {
-        if (item.data && item.data.total > 0n) {
-          _list.push(item.data);
+    for (const chainBalance of allChainBalances) {
+      if (chainBalance.isFetched) {
+        if (chainBalance.data) {
+          for (const asset of chainBalance.data) {
+            if (asset.total > 0n) {
+              _list.push({
+                ...asset,
+                network: chainBalance.chain
+              });
+            }
+          }
         }
       } else {
         done = false;
@@ -109,12 +127,12 @@ function Assets() {
 
           if (sortDescriptor.column === 'change24h') {
             const bChange24h = b.price
-              ? b.change24h || 0
+              ? b.priceChange || 0
               : sortDescriptor.direction === 'descending'
                 ? -Number.MAX_SAFE_INTEGER
                 : Number.MAX_SAFE_INTEGER;
             const aChange24h = a.price
-              ? a.change24h || 0
+              ? a.priceChange || 0
               : sortDescriptor.direction === 'descending'
                 ? -Number.MAX_SAFE_INTEGER
                 : Number.MAX_SAFE_INTEGER;
@@ -139,30 +157,15 @@ function Assets() {
         }),
       done
     ];
-  }, [assets, nativeBalances, sortDescriptor.column, sortDescriptor.direction]);
+  }, [allChainBalances, sortDescriptor.column, sortDescriptor.direction]);
 
   return (
     <div className='flex flex-col gap-5'>
       <div className='flex items-center gap-2'>
         <h4>Assets</h4>
         <Tooltip content='Refresh Asset List'>
-          <Button
-            isIconOnly
-            variant='light'
-            size='sm'
-            onClick={() =>
-              mutateAsync(undefined, {
-                onSuccess: () => {
-                  toastSuccess('Assets refreshed successfully');
-                },
-                onError: () => {
-                  toastError('Failed to refresh assets');
-                }
-              })
-            }
-            disabled={isPending || !current}
-          >
-            <IconArrowClockWise className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
+          <Button isIconOnly variant='light' size='sm' onClick={refreshAssets} disabled={isRefreshing || !current}>
+            <IconArrowClockWise className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
         </Tooltip>
       </div>
@@ -210,8 +213,7 @@ function Assets() {
         >
           {(item) => {
             const isNative = item.isNative;
-            const assetId = item.assetId;
-            const icon = item.icon;
+            const icon = item.logoUri;
             const network = item.network;
             const symbol = item.symbol;
             const total = item.total;
@@ -220,7 +222,7 @@ function Assets() {
             const reserved = item.reserved;
             const price = item.price || 0;
             const decimals = item.decimals;
-            const change24h = item.change24h;
+            const change24h = item.priceChange;
             const format: [number, string] = [decimals, symbol];
             const chainIcon = networks.find((network) => network.key === item.network)?.icon;
             const balanceUsd = formatDisplay(
@@ -228,7 +230,7 @@ function Assets() {
             );
 
             return (
-              <TableRow key={`asset-balance-${item.assetId}-${item.network}`}>
+              <TableRow key={`asset-balance-${isNative ? 'native' : item.key}-${network}`}>
                 <TableCell className='bg-content1 sticky left-0 z-[1] sm:relative'>
                   <div className='flex items-center gap-1'>
                     <div className='relative'>
@@ -253,7 +255,9 @@ function Assets() {
                     <div className='flex flex-col items-start gap-0 sm:flex-row sm:items-center sm:gap-1'>
                       <span>{symbol}</span>
 
-                      {!isNative && <small className='text-foreground/50 text-[10px] sm:text-xs'>{assetId}</small>}
+                      {!isNative && !!item.assetId ? (
+                        <small className='text-foreground/50 text-[10px] sm:text-xs'>{item.assetId}</small>
+                      ) : null}
                     </div>
                   </div>
                 </TableCell>
@@ -264,7 +268,7 @@ function Assets() {
                   className='text-foreground/50 data-[up=true]:text-success data-[down=true]:text-danger'
                 >
                   {change24h && change24h > 0 ? '+' : ''}
-                  {change24h ? (change24h * 100).toFixed(2) : '0'}%
+                  {change24h ? change24h.toFixed(2) : '0'}%
                 </TableCell>
                 <TableCell>
                   ${balanceUsd[0]}
@@ -300,7 +304,7 @@ function Assets() {
                   <div className='inline-flex max-w-[180px] flex-row-reverse items-center gap-0 sm:gap-2.5'>
                     <Button asChild variant={upSm ? 'ghost' : 'light'} size='sm'>
                       <Link
-                        to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
+                        to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${item.isNative ? 'native' : item.key}&asset_network=${network}`}
                       >
                         {upSm ? (
                           <>

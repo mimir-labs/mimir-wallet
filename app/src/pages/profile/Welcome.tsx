@@ -9,7 +9,7 @@ import Logo from '@/assets/images/logo.png';
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import IconSearch from '@/assets/svg/icon-search.svg?react';
 import { AddressCell, Input } from '@/components';
-import { useBalanceTotalUsd } from '@/hooks/useBalances';
+import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { formatDisplay } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
 import { useEffect, useState } from 'react';

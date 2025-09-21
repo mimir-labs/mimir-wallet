@@ -5,8 +5,8 @@ import type { IMethod, Registry } from '@polkadot/types/types';
 
 import { FormatBalance } from '@/components';
 import { findToken } from '@/config';
-import { useAssetInfo } from '@/hooks/useAssets';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
+import { useXcmAsset } from '@/hooks/useXcmAssets';
 import { dataToUtf8 } from '@/utils';
 import React, { useMemo } from 'react';
 
@@ -24,7 +24,7 @@ function TransferDetail({
 }) {
   const { network, genesisHash } = useApi();
   const results = useParseTransfer(registry, propsFrom, call);
-  const [assetInfo] = useAssetInfo(network, results?.[0]);
+  const [assetInfo] = useXcmAsset(network, results?.[0]);
 
   if (!results) {
     return null;
@@ -53,7 +53,7 @@ function TransferDetail({
         <Avatar
           alt='Token'
           fallback={assetInfo.symbol.slice(0, 1)}
-          src={assetInfo.icon}
+          src={assetInfo.logoUri}
           style={{ width: 20, height: 20 }}
         />
         <p>

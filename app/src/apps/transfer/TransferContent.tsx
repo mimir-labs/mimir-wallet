@@ -7,9 +7,10 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { AddressCell, FormatBalance, Input, InputAddress, InputNetwork, InputToken } from '@/components';
 import { MigrationTip } from '@/features/assethub-migration';
-import { useAssetInfo } from '@/hooks/useAssets';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useXcmAsset } from '@/hooks/useXcmAssets';
 import { formatUnits } from '@/utils';
+import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo } from 'react';
 
 import { remoteProxyRelations, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -23,7 +24,7 @@ function TransferContent({
   isAmountValid,
   sending,
   recipient,
-  assetId,
+  identifier,
   network,
   keepAlive,
   disabledRecipient,
@@ -43,7 +44,7 @@ function TransferContent({
   network: string;
   keepAlive: boolean;
   disabledRecipient?: boolean;
-  assetId?: string;
+  identifier?: string;
   filterSending?: string[];
   setSending: (sending: string) => void;
   setNetwork: (network: string) => void;
@@ -56,7 +57,7 @@ function TransferContent({
   const { networks } = useNetworks();
   const upSm = useMediaQuery('sm');
   const [format, sendingBalances, isSendingFetched] = useTransferBalance(token, sending);
-  const [, assetExistentialDeposit] = useAssetInfo(network, token?.isNative ? null : token?.assetId);
+  const [assetInfo] = useXcmAsset(network, token?.isNative ? 'native' : token?.key);
   const { meta: sendingMeta } = useAddressMeta(sending);
   const { meta: recipientMeta } = useAddressMeta(recipient);
   const [recipientAccount] = useQueryAccountOmniChain(recipient);
@@ -74,7 +75,11 @@ function TransferContent({
       : true;
   }, [recipientAccount, chain]);
 
-  const existentialDeposit = token?.isNative ? api.consts.balances.existentialDeposit : assetExistentialDeposit;
+  const existentialDeposit = token?.isNative
+    ? api.consts.balances.existentialDeposit
+    : assetInfo?.existentialDeposit
+      ? new BN(assetInfo.existentialDeposit.toString())
+      : new BN(0);
 
   useEffect(() => {
     setAmount('');
@@ -131,11 +136,17 @@ function TransferContent({
         }
       />
 
-      <InputToken network={network} label='Select an asset' address={sending} onChange={setToken} assetId={assetId} />
+      <InputToken
+        network={network}
+        label='Select an asset'
+        address={sending}
+        onChange={setToken}
+        identifier={identifier}
+      />
 
       <Input
         error={isAmountValid ? null : new Error('Invalid number')}
-        key={token?.assetId}
+        key={token?.isNative ? 'native' : token?.key}
         label={
           <div className='flex items-center justify-between'>
             Amount
