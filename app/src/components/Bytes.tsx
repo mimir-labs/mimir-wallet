@@ -3,13 +3,17 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { u8aToU8a } from '@polkadot/util';
-import React, { useMemo } from 'react';
+import { hexToU8a } from '@polkadot/util';
+import React, { useEffect, useState } from 'react';
 
 import CopyButton from './CopyButton';
 
 function Bytes({ value }: { value?: string | HexString }) {
-  const size = useMemo(() => u8aToU8a(value || '0x').length, [value]);
+  const [size, setSize] = useState(0);
+
+  useEffect(() => {
+    setSize(hexToU8a(value || '0x').length);
+  }, [value]);
 
   return (
     <span className='inline-flex items-center gap-x-1'>
