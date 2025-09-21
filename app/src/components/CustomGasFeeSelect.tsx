@@ -1,10 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AssetInfo } from '@/hooks/types';
+import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
 import { FormatBalance } from '@/components';
-import { useAssetBalance, useNativeBalances } from '@/hooks/useBalances';
+import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { useCustomGasFee } from '@/hooks/useCustomGasFee';
 import React, { useEffect, useMemo } from 'react';
 
@@ -15,7 +15,7 @@ interface CustomGasFeeSelectProps {
   address?: string;
   label?: string;
   placeholder?: string;
-  onChange?: (asset: AssetInfo | null) => void;
+  onChange?: (asset: CompleteEnhancedAssetInfo | null) => void;
   isDisabled?: boolean;
   className?: string;
   /** Gas fee information to display */
@@ -34,17 +34,22 @@ export interface GasFeeInfo {
   decimals: number;
 }
 
-function AssetBalance({ asset, address }: { asset: AssetInfo; address: string | undefined }) {
-  const [assetBalance, isAssetFetched, isAssetFetching] = useAssetBalance(
-    asset.network,
+function AssetBalance({
+  asset,
+  address,
+  network
+}: {
+  asset: CompleteEnhancedAssetInfo;
+  address: string | undefined;
+  network: string;
+}) {
+  const [balanceData, isFetched, isFetching] = useBalanceByIdentifier(
+    network,
     address,
-    asset.isNative ? undefined : asset.assetId
+    asset.isNative ? 'native' : asset.assetId || ''
   );
-  const [nativeBalance, isNativeFetched, isNativeFetching] = useNativeBalances(address);
 
-  const balance = asset.isNative ? nativeBalance?.transferrable : assetBalance?.transferrable;
-  const isFetching = asset.isNative ? isNativeFetching : isAssetFetching;
-  const isFetched = asset.isNative ? isNativeFetched : isAssetFetched;
+  const balance = balanceData?.transferrable;
 
   if (isFetching && !isFetched) {
     return <Skeleton className='h-[16px] w-16' />;
@@ -114,19 +119,23 @@ function CustomGasFeeSelect({
           </SelectTrigger>
           <SelectContent>
             {feeEligibleAssets.map((asset) => (
-              <SelectItem key={asset.assetId} value={asset.assetId} className='w-full pr-2.5 *:[span]:first:hidden'>
+              <SelectItem
+                key={asset.assetId || 'native'}
+                value={asset.assetId || 'native'}
+                className='w-full pr-2.5 *:[span]:first:hidden'
+              >
                 <div className='flex w-full items-center justify-between'>
                   <div className='flex items-center gap-3'>
                     <Avatar
                       alt={asset.symbol}
                       fallback={asset.symbol.slice(0, 1)}
-                      src={asset.icon}
+                      src={asset.logoUri}
                       style={{ width: 22, height: 22 }}
                     />
                     <span className='text-sm font-medium'>{asset.symbol}</span>
                     <span className='text-foreground/50 text-xs'>{asset.assetId}</span>
                   </div>
-                  <AssetBalance asset={asset} address={address} />
+                  <AssetBalance asset={asset} address={address} network={network} />
                 </div>
               </SelectItem>
             ))}

@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AssetInfo } from './types';
+import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
 import { findToken } from '@/config';
 import { isHex } from '@polkadot/util';
@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 
-import { useAssets } from './useAssets';
+import { useChainXcmAsset } from './useXcmAssets';
 
 /**
  * Hook to check if the current chain supports custom asset fees
@@ -35,11 +35,11 @@ export function useCustomGasFeeSupport(): boolean {
 export function useCustomGasFee(network: string) {
   const isSupported = useCustomGasFeeSupport();
   const { api, isApiReady } = useApi();
-  const [assets, isFetched, isFetching] = useAssets(network);
+  const [assets, isFetched, isFetching] = useChainXcmAsset(network);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
   // Create native asset info
-  const nativeAsset = useMemo((): AssetInfo<true> | null => {
+  const nativeAsset = useMemo((): CompleteEnhancedAssetInfo | null => {
     if (!api || !isApiReady) {
       return null;
     }
@@ -49,22 +49,22 @@ export function useCustomGasFee(network: string) {
     const genesisHash = api.genesisHash.toHex();
 
     return {
-      network: network,
       name: symbol,
       symbol: symbol,
       decimals: decimals,
-      icon: findToken(genesisHash).Icon,
+      existentialDeposit: api.consts.balances.existentialDeposit.toString(),
+      logoUri: findToken(genesisHash).Icon,
       isNative: true,
-      assetId: 'native',
       price: 0,
-      change24h: 0
+      priceChange: 0,
+      isSufficient: true
     };
-  }, [api, isApiReady, network]);
+  }, [api, isApiReady]);
 
   // Filter assets that can be used for fees
   // Include native token and local assets (exclude foreignAssets)
   const feeEligibleAssets = useMemo(() => {
-    const eligibleAssets: AssetInfo[] = [];
+    const eligibleAssets: CompleteEnhancedAssetInfo[] = [];
 
     // Always include native token first
     if (nativeAsset) {
@@ -131,7 +131,7 @@ export function useCustomGasFee(network: string) {
 /**
  * Get the asset ID in the format expected by the transaction
  */
-export function getTransactionAssetId(asset: AssetInfo | null): string | null {
+export function getTransactionAssetId(asset: CompleteEnhancedAssetInfo | null): string | null {
   if (!asset) {
     return null;
   }
@@ -141,5 +141,5 @@ export function getTransactionAssetId(asset: AssetInfo | null): string | null {
     return null;
   }
 
-  return asset.assetId;
+  return asset.assetId || null;
 }

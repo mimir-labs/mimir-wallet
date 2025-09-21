@@ -4,9 +4,9 @@
 import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
-import { useAssets, useNativeToken } from '@/hooks/useAssets';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
+import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { useWallet } from '@/wallet/useWallet';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
@@ -46,12 +46,12 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber(defaultValue?.toString() || '', false, 0);
   const [assetId, setAssetId] = useState('native');
-  const [assets] = useAssets(network);
-  const nativeToken = useNativeToken(network);
-  const token = useMemo(
-    () => (assetId === 'native' ? nativeToken : assets?.find((item) => item.assetId === assetId)),
-    [assetId, assets, nativeToken]
-  );
+  const [assets] = useChainXcmAsset(network);
+  const token = useMemo(() => {
+    const foundAsset = assets?.find((item) => (assetId === 'native' ? item.isNative : item.key === assetId));
+
+    return foundAsset;
+  }, [assetId, assets]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -97,7 +97,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
                 isAmountValid={isAmountValid}
                 keepAlive={keepAlive}
                 token={token}
-                assetId={assetId}
+                identifier={assetId}
                 sending={sending}
                 recipient={receipt}
                 network={network}

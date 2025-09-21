@@ -48,16 +48,16 @@ export function useParseTransfer(registry: Registry, fromAddress?: string, call?
       }
     } else if (section === 'assets') {
       if (method === 'forceTransfer') {
-        assetId = call.args[0].toString();
+        assetId = call.args[0].toHex();
         from = call.args[1].toString();
         to = call.args[2].toString();
         value = call.args[3].toString();
       } else if (method === 'transfer' || method === 'transferKeepAlive') {
-        assetId = call.args[0].toString();
+        assetId = call.args[0].toHex();
         to = call.args[1].toString();
         value = call.args[2].toString();
       } else if (method === 'transferAll') {
-        assetId = call.args[1].toString();
+        assetId = call.args[1].toHex();
         to = call.args[0].toString();
         value = '0';
         isAll = true;

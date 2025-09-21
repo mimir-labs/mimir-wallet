@@ -1,14 +1,14 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountAssetInfo } from '@/hooks/types';
 import type { SortDescriptor } from '@react-types/shared';
+import type { AccountEnhancedAssetBalance } from '@mimir-wallet/polkadot-core';
 
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import { Empty, FormatBalance } from '@/components';
 import { StakingApp } from '@/config';
-import { useAssetBalancesAll, useNativeBalancesAll } from '@/hooks/useBalances';
+import { useAllChainBalances } from '@/hooks/useChainBalances';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -29,8 +29,7 @@ import {
 } from '@mimir-wallet/ui';
 
 function Assets({ address }: { address: string }) {
-  const nativeBalances = useNativeBalancesAll(address);
-  const assets = useAssetBalancesAll(address);
+  const allChainBalances = useAllChainBalances(address);
   const { networks } = useNetworks();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: 'balanceUsd',
@@ -38,23 +37,20 @@ function Assets({ address }: { address: string }) {
   });
 
   const [list, done] = useMemo(() => {
-    const _list: AccountAssetInfo[] = [];
+    const _list: (AccountEnhancedAssetBalance & { network: string })[] = [];
     let done = true;
 
-    for (const item of assets) {
-      if (item.isFetched) {
-        if (item.data) {
-          _list.push(...item.data);
-        }
-      } else {
-        done = false;
-      }
-    }
-
-    for (const item of nativeBalances) {
-      if (item.isFetched) {
-        if (item.data && item.data.total > 0n) {
-          _list.push(item.data);
+    for (const chainBalance of allChainBalances) {
+      if (chainBalance.isFetched) {
+        if (chainBalance.data) {
+          for (const asset of chainBalance.data) {
+            if (asset.total > 0n) {
+              _list.push({
+                ...asset,
+                network: chainBalance.chain
+              });
+            }
+          }
         }
       } else {
         done = false;
@@ -81,12 +77,12 @@ function Assets({ address }: { address: string }) {
 
           if (sortDescriptor.column === 'change24h') {
             const bChange24h = b.price
-              ? b.change24h || 0
+              ? b.priceChange || 0
               : sortDescriptor.direction === 'descending'
                 ? -Number.MAX_SAFE_INTEGER
                 : Number.MAX_SAFE_INTEGER;
             const aChange24h = a.price
-              ? a.change24h || 0
+              ? a.priceChange || 0
               : sortDescriptor.direction === 'descending'
                 ? -Number.MAX_SAFE_INTEGER
                 : Number.MAX_SAFE_INTEGER;
@@ -111,7 +107,7 @@ function Assets({ address }: { address: string }) {
         }),
       done
     ];
-  }, [assets, nativeBalances, sortDescriptor.column, sortDescriptor.direction]);
+  }, [allChainBalances, sortDescriptor.column, sortDescriptor.direction]);
 
   return (
     <Table
@@ -150,8 +146,7 @@ function Assets({ address }: { address: string }) {
       >
         {(item) => {
           const isNative = item.isNative;
-          const assetId = item.assetId;
-          const icon = item.icon;
+          const icon = item.logoUri;
           const symbol = item.symbol;
           const total = item.total;
           const transferrable = item.transferrable;
@@ -168,7 +163,7 @@ function Assets({ address }: { address: string }) {
 
           return (
             <TableRow
-              key={`asset-balance-${item.assetId}-${item.network}`}
+              key={`asset-balance-${isNative ? 'native' : item.key}-${network}`}
               className='[&:hover>td]:bg-secondary [&:hover_.operation]:flex [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]'
             >
               <TableCell>
@@ -195,7 +190,9 @@ function Assets({ address }: { address: string }) {
                   <div className='flex flex-col items-start gap-0'>
                     <span>{symbol}</span>
 
-                    {!isNative && <small className='text-foreground/50 text-[10px]'>{assetId}</small>}
+                    {!isNative && !!item.assetId ? (
+                      <small className='text-foreground/50 text-[10px] sm:text-xs'>{item.assetId}</small>
+                    ) : null}
                   </div>
                 </div>
               </TableCell>
@@ -236,7 +233,7 @@ function Assets({ address }: { address: string }) {
                     <Tooltip content='Transfer'>
                       <Button asChild isIconOnly variant='light' size='sm'>
                         <Link
-                          to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${assetId}&asset_network=${network}`}
+                          to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${item.isNative ? 'native' : item.key}&asset_network=${network}`}
                         >
                           <IconSend className='h-[14px] w-[14px]' />
                         </Link>

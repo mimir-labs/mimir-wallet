@@ -7,7 +7,7 @@ import IconQr from '@/assets/svg/icon-qr.svg?react';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { AddressCell, CopyAddress } from '@/components';
 import { useAddressExplorer } from '@/hooks/useAddressExplorer';
-import { useBalanceTotalUsd } from '@/hooks/useBalances';
+import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { formatDisplay } from '@/utils';
 import { memo, useCallback } from 'react';

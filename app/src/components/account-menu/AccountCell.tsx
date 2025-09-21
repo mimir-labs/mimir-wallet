@@ -4,7 +4,7 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconMore from '@/assets/svg/icon-more.svg?react';
-import { useBalanceTotalUsd } from '@/hooks/useBalances';
+import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { usePinAccounts } from '@/hooks/usePinAccounts';
 import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';

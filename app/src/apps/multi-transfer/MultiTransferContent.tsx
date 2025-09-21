@@ -7,7 +7,7 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import { Input, InputAddress, InputNetwork, InputToken, TxButton } from '@/components';
-import { useAssets } from '@/hooks/useAssets';
+import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { isValidNumber, parseUnits } from '@/utils';
 import { isHex } from '@polkadot/util';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -29,7 +29,7 @@ interface Props {
 
 function MultiTransferContent({ data, sending, network, setSending, setNetwork, setData }: Props) {
   const { api, genesisHash } = useApi();
-  const [assets, , , assetsPromise] = useAssets(network);
+  const [assets, , , assetsPromise] = useChainXcmAsset(network);
   const [invalidAssetIds, setInvalidAssetIds] = useState<string[]>([]);
 
   const { meta: sendingMeta } = useAddressMeta(sending);
@@ -132,7 +132,7 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
         accept='.csv'
         onUpload={async (file) => {
           try {
-            const assetsToValidate = assets || (await assetsPromise);
+            const assetsToValidate = assets ? assets : await assetsPromise();
 
             // Parse with validation
             parseCsv(
@@ -186,7 +186,7 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
               <InputToken
                 address={sending}
                 placeholder='select token'
-                assetId={assetId}
+                identifier={assetId}
                 wrapperClassName='h-[40px]'
                 network={network}
                 onChange={async (value) => {
