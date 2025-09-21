@@ -10,6 +10,7 @@ import { Avatar, Spinner } from '@mimir-wallet/ui';
 
 import MimirLoading from '../animation/MimirLoading';
 import TxSubmit from './TxSubmit';
+import TxSubmitErrorBoundary from './TxSubmitErrorBoundary';
 
 function Content({ accountId, ...props }: TxSubmitProps) {
   const { isApiReady, chain } = useApi();
@@ -34,7 +35,11 @@ function Content({ accountId, ...props }: TxSubmitProps) {
     );
   }
 
-  return <TxSubmit {...props} accountData={accountData} />;
+  return (
+    <TxSubmitErrorBoundary>
+      <TxSubmit {...props} accountData={accountData} />
+    </TxSubmitErrorBoundary>
+  );
 }
 
 function TxSubmitRoot({ network, ...props }: TxSubmitProps & { network: string }) {
