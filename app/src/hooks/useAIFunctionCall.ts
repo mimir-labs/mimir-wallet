@@ -98,7 +98,7 @@ function useNavigateCall() {
           id: event.id,
           success: true,
           result: {
-            message: `已完成页面跳转，页面状态可能会变化，需要注意时效性`
+            message: `Navigation completed. Page state may change, so please confirm any time-sensitive information.`
           }
         });
       }
@@ -175,7 +175,7 @@ export function useSearchAddressBookCall() {
         searchData.forEach((addr) => {
           const name = (addr.name || '').toLowerCase();
           const address = addr.address.toLowerCase();
-          const type = addr.isPure ? '纯代理账户' : addr.isMultisig ? '多重签名账户' : '普通账户';
+          const type = addr.isPure ? 'Pure proxy account' : addr.isMultisig ? 'Multisig account' : 'Standard account';
 
           let matchType: 'address_exact' | 'name_exact' | null = null;
 
@@ -194,7 +194,7 @@ export function useSearchAddressBookCall() {
           // Add result if exact match found
           if (matchType) {
             results.push({
-              name: addr.name || '未命名',
+              name: addr.name || 'Unnamed',
               address: addr.address,
               hasPermission: addr.hasPermission,
               isMultisig: addr.isMultisig,
@@ -352,10 +352,10 @@ function useSearchNetworksCall() {
             searchLimit: searchLimit,
             message:
               results.length === 0
-                ? `未找到匹配 "${query}" 的网络`
+                ? `No networks found matching "${query}".`
                 : isAllQuery
-                  ? `共有 ${results.length} 个网络${results.length > searchLimit ? ` (显示前 ${searchLimit} 个)` : ''}`
-                  : `找到 ${results.length} 个匹配 "${query}" 的网络${results.length > searchLimit ? ` (显示前 ${searchLimit} 个)` : ''}`
+                  ? `Found ${results.length} networks${results.length > searchLimit ? ` (showing the first ${searchLimit})` : ''}.`
+                  : `Found ${results.length} networks matching "${query}"${results.length > searchLimit ? ` (showing the first ${searchLimit})` : ''}.`
           }
         });
       } catch (error) {

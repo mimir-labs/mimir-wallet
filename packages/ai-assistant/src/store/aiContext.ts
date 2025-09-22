@@ -70,43 +70,43 @@ export const useAIContext = create<AIContext>()((_, get) => {
       if (state?.currentAccount) {
         const { address, isPure, isMultisig, network } = state.currentAccount;
         const accountType = isPure ? 'pure proxy account' : isMultisig ? 'multisig account' : 'eoa account';
-        const networkInfo = network ? ` (network: ${network || 'all'})` : '';
+        const networkLabel = network ? ` (network: ${network || 'all'})` : '';
 
-        currentAccountInfo = `我当前的地址:${address}, ${accountType}, ${networkInfo}`;
+        currentAccountInfo = `My Current address: ${address}, ${accountType}${networkLabel}`;
       } else {
         currentAccountInfo = ``;
       }
 
       // Format current page state
       const stateInfo = state
-        ? `<当前页面路径>${state.currentPath || '未知'}</当前页面路径>
-<当前选择的SS58 格式>${state.chainSS58 !== undefined ? state.chainSS58 : '未设置'}</当前选择的SS58 格式>`
-        : '暂无状态信息';
+        ? `<current-path>${state.currentPath || 'unknown'}</current-path>
+<selectedSs58Format>${state.chainSS58 !== undefined ? state.chainSS58 : 'not set'}</selectedSs58Format>`
+        : '<stateDetails>No state information available</stateDetails>';
 
       // Format network information
-      const networkInfo =
+      const networkSummary =
         supportedNetworks && supportedNetworks.length > 0
-          ? `<网络列表>
+          ? `<network-list>
 ${supportedNetworks
   .map(
     (network) =>
-      `<网络>
+      `<network>
     <key>${network.key}</key>
     <name>${network.name}</name>
     <genesisHash>${network.genesisHash}</genesisHash>
     <isEnabled>${network.isEnabled}</isEnabled>
     <ss58Format>${network.ss58Format}</ss58Format>
-  </网络>`
+  </network>`
   )
   .join('\n')}
-</网络列表>`
-          : '<网络列表>暂无网络信息</网络列表>';
+</network-list>`
+          : '<network-list>No network information available</network-list>';
 
       return `${currentAccountInfo}
-<当前状态>
+<state>
 ${stateInfo}
-${networkInfo}
-</当前状态>
+${networkSummary}
+</state>
 `;
     }
   };
