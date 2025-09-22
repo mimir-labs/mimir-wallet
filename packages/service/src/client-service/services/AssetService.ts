@@ -116,4 +116,8 @@ export class AssetService extends BaseService {
   public getXcmAsset(chain: string, identifier: 'native' | HexString | string): Promise<CompleteEnhancedAssetInfo> {
     return this.get(`chains/${chain}/xcm-assets/${identifier}`);
   }
+
+  public getAllXcmAsset(): Promise<Record<string, CompleteEnhancedAssetInfo[]>> {
+    return this.get(`/xcm-assets`);
+  }
 }

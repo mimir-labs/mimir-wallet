@@ -5,9 +5,9 @@ import { useAccount } from '@/accounts/useAccount';
 import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
-import { useAssets, useNativeToken } from '@/hooks/useAssets';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
+import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { useWallet } from '@/wallet/useWallet';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -32,12 +32,12 @@ function PageFund() {
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
   const [assetId, setAssetId] = useState('native');
-  const [assets] = useAssets(network);
-  const nativeToken = useNativeToken(network);
-  const token = useMemo(
-    () => (assetId === 'native' ? nativeToken : assets?.find((item) => item.assetId === assetId)),
-    [assetId, assets, nativeToken]
-  );
+  const [assets] = useChainXcmAsset(network);
+  const token = useMemo(() => {
+    const foundAsset = assets?.find((item) => (assetId === 'native' ? item.isNative : item.key === assetId));
+
+    return foundAsset;
+  }, [assetId, assets]);
   const [error, setError] = useState<string | null>(null);
 
   if (!receipt) {
@@ -68,7 +68,7 @@ function PageFund() {
               isAmountValid={isAmountValid}
               keepAlive={keepAlive}
               token={token}
-              assetId={assetId}
+              identifier={assetId}
               sending={sending}
               recipient={receipt}
               network={network}

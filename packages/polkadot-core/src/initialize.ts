@@ -198,11 +198,9 @@ export async function initializeApi(chain: Endpoint) {
                 }
               : state
           );
-          api.rpc.state.subscribeRuntimeVersion(async (runtimeVersion) => {
-            const specVersion = runtimeVersion.specVersion.toString();
-
-            api.getBlockRegistry(await api.rpc.chain.getBlockHash()).then(({ metadata }) => {
-              saveMetadata(chain.key, api.genesisHash.toHex(), specVersion, metadata.toHex());
+          api.rpc.state.subscribeRuntimeVersion(async () => {
+            api.getBlockRegistry(await api.rpc.chain.getBlockHash()).then(({ metadata, runtimeVersion }) => {
+              saveMetadata(chain.key, api.genesisHash.toHex(), runtimeVersion.specVersion.toString(), metadata.toHex());
             });
           });
         });

@@ -4,10 +4,10 @@
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
-import { useAssets, useNativeToken } from '@/hooks/useAssets';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useQueryParam } from '@/hooks/useQueryParams';
+import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
@@ -36,12 +36,12 @@ function PageTransfer() {
   );
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
-  const [assets] = useAssets(network);
-  const nativeToken = useNativeToken(network);
-  const token = useMemo(
-    () => (assetId === 'native' ? nativeToken : assets?.find((item) => item.assetId === assetId)),
-    [assetId, assets, nativeToken]
-  );
+  const [assets] = useChainXcmAsset(network);
+  const token = useMemo(() => {
+    const foundAsset = assets?.find((item) => (assetId === 'native' ? item.isNative : item.key === assetId));
+
+    return foundAsset;
+  }, [assetId, assets]);
 
   useEffect(() => {
     const handler: FunctionCallHandler = (event) => {
@@ -106,7 +106,7 @@ function PageTransfer() {
               token={token}
               sending={sending}
               recipient={recipient}
-              assetId={assetId}
+              identifier={assetId}
               network={network}
               setSending={setSending}
               setNetwork={setNetwork}

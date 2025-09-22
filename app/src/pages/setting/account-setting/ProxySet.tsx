@@ -8,7 +8,7 @@ import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import { Address, AddressCell, Empty, FormatBalance, InputNetwork, TxButton } from '@/components';
 import { findToken } from '@/config';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
-import { useNativeBalances } from '@/hooks/useBalances';
+import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useProxies } from '@/hooks/useProxies';
 import { useTxQueue } from '@/hooks/useTxQueue';
@@ -50,7 +50,7 @@ function Content({
   const [isOpen, toggleOpen] = useToggle(false);
   const [isAlertOpen, toggleAlertOpen] = useToggle(false);
   const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
-  const [allBalances] = useNativeBalances(address);
+  const [allBalances] = useBalanceByIdentifier(network, address, 'native');
   const [proxies, isFetched, isFetching] = useProxies(address);
   const [account] = useQueryAccount(address);
 

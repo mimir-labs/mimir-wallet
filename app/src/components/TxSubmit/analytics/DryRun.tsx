@@ -7,7 +7,7 @@ import type { HexString } from '@mimir-wallet/service';
 import { FormatBalance } from '@/components';
 import CopyButton from '@/components/CopyButton';
 import { findToken } from '@/config';
-import { useAssetInfo } from '@/hooks/useAssets';
+import { useXcmAsset } from '@/hooks/useXcmAssets';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
@@ -111,7 +111,7 @@ function NativeToken({ genesisHash, amount }: { genesisHash: HexString; amount: 
 function AssetToken({ genesisHash, assetId, amount }: { genesisHash: HexString; assetId: string; amount: bigint }) {
   const { network } = useApi();
   const chainIcon = useMemo(() => getChainIcon(genesisHash)?.icon, [genesisHash]);
-  const [assetInfo] = useAssetInfo(network, assetId);
+  const [assetInfo] = useXcmAsset(network, assetId);
 
   if (!assetInfo) {
     return <Spinner variant='wave' size='sm' />;
@@ -126,7 +126,7 @@ function AssetToken({ genesisHash, assetId, amount }: { genesisHash: HexString; 
               alt={assetInfo?.symbol}
               fallback={assetInfo?.symbol.slice(0, 1)}
               style={{ width: 16, height: 16 }}
-              src={assetInfo?.icon}
+              src={assetInfo?.logoUri}
             />
             <Avatar
               className='absolute right-0 bottom-0 border-1 border-black'

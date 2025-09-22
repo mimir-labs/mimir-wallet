@@ -1,7 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AssetInfo, FilterPath } from '@/hooks/types';
+import type { AccountData, FilterPath } from '@/hooks/types';
+import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 import type { TxSubmitProps } from './types';
 
 import { useAccount } from '@/accounts/useAccount';
@@ -10,8 +11,8 @@ import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { events } from '@/events';
 import { useAssetConversion } from '@/hooks/useAssetConversion';
-import { useAssetBalance, useNativeBalances } from '@/hooks/useBalances';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
+import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useGasFeeEstimate } from '@/hooks/useGasFeeEstimate';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -81,7 +82,7 @@ function TxSubmit({
 
   // Gas fee calculation state
   const nativeGasFee = useGasFeeEstimate(buildTx.txBundle?.tx || null, buildTx.txBundle?.signer);
-  const [selectedFeeAsset, setSelectedFeeAsset] = useState<AssetInfo | null>(null);
+  const [selectedFeeAsset, setSelectedFeeAsset] = useState<CompleteEnhancedAssetInfo | null>(null);
   const convertedFee = useAssetConversion(nativeGasFee, selectedFeeAsset);
 
   const gasFeeInfo = useMemo(() => {
@@ -96,12 +97,12 @@ function TxSubmit({
     };
   }, [convertedFee, selectedFeeAsset]);
 
-  const [assetBalance] = useAssetBalance(
+  const [assetBalance] = useBalanceByIdentifier(
     network,
     buildTx.txBundle?.signer,
-    selectedFeeAsset?.isNative ? undefined : selectedFeeAsset?.assetId
+    selectedFeeAsset?.isNative ? 'native' : selectedFeeAsset?.assetId
   );
-  const [nativeBalance] = useNativeBalances(buildTx.txBundle?.signer);
+  const [nativeBalance] = useBalanceByIdentifier(network, buildTx.txBundle?.signer, 'native');
 
   const gasFeeWarning = useMemo(() => {
     if (!selectedFeeAsset) {

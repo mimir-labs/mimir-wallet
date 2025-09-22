@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.28.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.27.0...service-v2.28.0) (2025-09-21)
+
+
+### Features
+
+* Optimize balance retrieval logic ([#311](https://github.com/mimir-labs/mimir-wallet/issues/311)) ([a5e767d](https://github.com/mimir-labs/mimir-wallet/commit/a5e767d4db9bdf7d29d3545272137e4e3feab57d))
+
 ## [2.27.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.26.0...service-v2.27.0) (2025-09-08)
 
 

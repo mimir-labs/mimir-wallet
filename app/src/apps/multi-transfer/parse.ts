@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AssetInfo } from '@/hooks/types';
+import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 import type { MultiTransferData } from './types';
 
 import { isValidNumber } from '@/utils';
@@ -12,7 +12,7 @@ import { isPolkadotAddress } from '@mimir-wallet/polkadot-core';
 export function parseCsv(
   file: File,
   onDataParsed: (data: MultiTransferData[], invalidAssets?: string[]) => void,
-  availableAssets: AssetInfo[],
+  availableAssets: CompleteEnhancedAssetInfo[],
   onError?: (error: string) => void
 ) {
   const reader = new FileReader();
@@ -100,13 +100,15 @@ export function generateExampleCsv() {
  * @param availableAssets - Available assets on the current network
  * @returns Array of invalid asset IDs
  */
-export function validateAssetIds(data: MultiTransferData[], availableAssets: AssetInfo[]): string[] {
+export function validateAssetIds(data: MultiTransferData[], availableAssets: CompleteEnhancedAssetInfo[]): string[] {
   const invalidAssetIds: string[] = [];
   const validAssetIds = new Set(['native']); // 'native' is always valid
 
   // Add all available asset IDs to the valid set
   availableAssets.forEach((asset) => {
-    validAssetIds.add(asset.assetId);
+    if (asset.assetId) {
+      validAssetIds.add(asset.assetId);
+    }
   });
 
   // Check each asset ID in the data

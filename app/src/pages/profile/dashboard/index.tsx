@@ -3,9 +3,10 @@
 
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import { toastError, toastSuccess } from '@/components/utils';
-import { useBalanceTotalUsd, useRefreshBalances } from '@/hooks/useBalances';
+import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
@@ -29,8 +30,28 @@ function Title({ endContent, children }: { endContent?: React.ReactNode; childre
 function DashboardV2({ address }: { address: string }) {
   const [totalUsd, changes] = useBalanceTotalUsd(address);
   const [network, setNetwork] = useInputNetwork(undefined);
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { mutateAsync, isPending } = useRefreshBalances(address);
+  const refreshAssets = useCallback(async () => {
+    if (isRefreshing || !address) return;
+
+    setIsRefreshing(true);
+
+    try {
+      // Invalidate all balance-related queries for this address
+      await queryClient.invalidateQueries({
+        queryKey: ['chain-balances']
+      });
+
+      toastSuccess('Assets refreshed successfully');
+    } catch (error) {
+      console.error(error);
+      toastError('Failed to refresh assets');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [address, isRefreshing, queryClient]);
 
   return (
     <div className='w-full'>
@@ -73,19 +94,10 @@ function DashboardV2({ address }: { address: string }) {
                   isIconOnly
                   variant='light'
                   size='sm'
-                  onClick={() =>
-                    mutateAsync(undefined, {
-                      onSuccess: () => {
-                        toastSuccess('Assets refreshed successfully');
-                      },
-                      onError: () => {
-                        toastError('Failed to refresh assets');
-                      }
-                    })
-                  }
-                  disabled={isPending || !address}
+                  onClick={refreshAssets}
+                  disabled={isRefreshing || !address}
                 >
-                  <IconArrowClockWise className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
+                  <IconArrowClockWise className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                 </Button>
               </Tooltip>
             </div>

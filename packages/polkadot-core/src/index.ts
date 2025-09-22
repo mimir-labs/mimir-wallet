@@ -4,6 +4,8 @@
 export { NETWORK_RPC_PREFIX, CURRENT_NETWORK_KEY, decodeAddress, encodeAddress } from './defaults.js';
 export { initializeApi, createApi } from './initialize.js';
 
+export * from './balances/index.js';
+
 export * from './callFilter.js';
 export * from './call.js';
 

@@ -16,7 +16,7 @@
   "sideEffects": true,
   "type": "module",
   "name": "@mimir-wallet/polkadot-core",
-  "version": "2.27.0",
+  "version": "2.28.0",
   "main": "build/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
