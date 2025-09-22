@@ -39,7 +39,7 @@ export function ChatTitle({ onClose }: ChatTitleProps) {
       <div className='flex items-center gap-2.5 px-[15px] py-3'>
         <MimoLogo className='border-primary/20 rounded-full border-1' size={30} />
         <span className='text-foreground flex-1 text-[16px] font-normal tracking-[0.16px]'>Mimo</span>
-        <Button isIconOnly size='sm' variant='light' onClick={onClose}>
+        <Button isIconOnly size='sm' variant='light' className='text-foreground' onClick={onClose}>
           <X size={16} className='opacity-50' />
         </Button>
       </div>

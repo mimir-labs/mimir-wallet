@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AnimatePresence, motion, useDragControls } from 'framer-motion';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import DraggableChatWindow from './DraggableChatWindow';
+import { useDraggable } from '@mimir-wallet/ui';
+
+import DraggableChatWindow, { type DraggableChatWindowRef } from './DraggableChatWindow';
 import MimoLogo from './MimoLogo';
-import { useDraggableFAB } from './useDraggableFAB';
 
 export interface DraggableChatWithFABProps {
   // FAB button position
@@ -37,6 +38,36 @@ function DraggableChatWithFAB({
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [chatStatus, setChatStatus] = useState<'ready' | 'streaming' | 'submitted' | 'error'>('ready');
+  const [hasNewReply, setHasNewReply] = useState(false);
+  const chatWindowRef = useRef<DraggableChatWindowRef>(null);
+
+  // Define suggestions and randomly select 3: one from each group
+  const suggestions = useMemo(() => {
+    const allSuggestions: Record<string, string> = {
+      'Create a multisig': 'Help me create a new multisig',
+      'Initiate a transfer': 'Help me initiate a new transfer',
+      'Create a proxy': 'Help me create a new proxy',
+      'Call Template': "What is Mimir's call template?",
+      'Batch Transaction': "What is Mimir's call Batch transaction?",
+      'Set Proposer': 'What is proposer?',
+      'Stake DOT': 'i want to stake dot',
+      'Participate OpenGov': 'i want to vote in OpenGov',
+      'Use Hydration App': 'I want to user Hydration App'
+    };
+
+    const suggestionEntries = Object.entries(allSuggestions);
+    const group1 = suggestionEntries.slice(0, 3); // indices 0-2
+    const group2 = suggestionEntries.slice(3, 6); // indices 3-5
+    const group3 = suggestionEntries.slice(6, 9); // indices 6-8
+
+    const pickRandom = <T,>(items: T[]) =>
+      items.length > 0 ? items[Math.floor(Math.random() * items.length)] : undefined;
+
+    const selected = [pickRandom(group1), pickRandom(group2), pickRandom(group3)];
+
+    return selected.filter(Boolean) as Array<[string, string]>;
+  }, []); // Empty dependency array means suggestions are selected once when component mounts
 
   const dragControls = useDragControls();
 
@@ -53,9 +84,30 @@ function DraggableChatWithFAB({
     };
   }, [fabPosition.bottom, fabPosition.right]);
 
-  const { position, dragConstraints, containerRef, handleDragEnd } = useDraggableFAB({
-    initialPosition: calculateInitialPosition()
+  const { position, dragConstraints, containerRef, handleDragEnd } = useDraggable({
+    initialPosition: calculateInitialPosition(),
+    bounds: { width: 60, height: 60 }, // Use max size for bounds
+    margin: 8
   });
+
+  // Calculate transform offset to keep bubble within screen when showing status
+  const calculateStatusTransform = () => {
+    if (typeof window === 'undefined') return { x: 0, y: 0 };
+
+    const bubbleWidth = 120;
+    const logoWidth = 60;
+    const extraWidth = bubbleWidth - logoWidth;
+
+    // Check if bubble would overflow on the right
+    const wouldOverflowRight = position.x + bubbleWidth > window.innerWidth - 8;
+
+    return {
+      x: wouldOverflowRight ? -extraWidth : 0, // Shift left by extra width if needed
+      y: 0
+    };
+  };
+
+  const statusTransform = calculateStatusTransform();
 
   // Calculate dynamic height: half of screen height, minimum 600px, but if screen height < 600, use screen height
   const calculateHeight = () => {
@@ -92,21 +144,40 @@ function DraggableChatWithFAB({
     }
 
     setIsOpen(true);
+    setIsHovered(false);
+    setHasNewReply(false); // Clear new reply indicator when opening chat
     onOpen?.();
+  };
+
+  const handleStatusChange = (status: 'ready' | 'streaming' | 'submitted' | 'error') => {
+    const prevStatus = chatStatus;
+
+    setChatStatus(status);
+
+    // If chat is closed and status changed from streaming/submitted to ready, mark as new reply
+    if (!isOpen && (prevStatus === 'streaming' || prevStatus === 'submitted') && status === 'ready') {
+      setHasNewReply(true);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    if (isOpen) {
+      // If chat is already open, send the message directly
+      chatWindowRef.current?.sendMessage(suggestion);
+    } else {
+      // If chat is closed, open it first then send the message
+      handleOpen();
+      // Wait for the chat to be fully open before sending the message
+      setTimeout(() => {
+        chatWindowRef.current?.sendMessage(suggestion);
+      }, 300); // Small delay to ensure chat is mounted
+    }
   };
 
   const handleClose = () => {
     setIsOpen(false);
     onClose?.();
   };
-
-  const fabStyle = useMemo(() => {
-    return {
-      filter: 'drop-shadow(0 0 30px rgba(0, 82, 255, 0.25))',
-      x: position.x,
-      y: position.y
-    } as React.CSSProperties;
-  }, [position.x, position.y]);
 
   // Don't show FAB on mobile if disabled
   if (!showFABOnMobile) {
@@ -115,18 +186,19 @@ function DraggableChatWithFAB({
 
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Floating Action Button with Suggestions */}
       {createPortal(
         <AnimatePresence>
           {!isOpen && (
-            <motion.button
-              ref={containerRef}
-              onClick={handleOpen}
+            <motion.div
+              ref={containerRef as any}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
-              className={`fixed top-0 z-50 ${fabClassName} `}
-              style={fabStyle}
-              aria-label='Open AI Assistant'
+              className={`fixed top-0 z-50 ${fabClassName}`}
+              style={{
+                x: position.x,
+                y: position.y
+              }}
               drag
               dragControls={dragControls}
               dragConstraints={dragConstraints}
@@ -139,45 +211,126 @@ function DraggableChatWithFAB({
               }}
               dragListener={false}
               onPointerDown={(e) => {
-                // Prevent click when starting drag
-                e.preventDefault();
                 dragControls.start(e);
               }}
             >
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={
-                  isDragging
-                    ? { opacity: 1, scale: 1, rotate: 0 }
-                    : isHovered
-                      ? { opacity: 1, scale: 1, rotate: 0 }
-                      : { opacity: 1, scale: 1, rotate: [0, 10, -10, 0] }
-                }
-                exit={{ scale: 0, opacity: 0 }}
-                transition={
-                  isDragging || isHovered
-                    ? { duration: 0.2, opacity: { duration: 0.2 }, scale: { duration: 0.2 } }
-                    : {
-                        opacity: { duration: 0.2 },
-                        scale: { duration: 0.2 },
-                        rotate: {
-                          duration: 3,
-                          repeat: Infinity,
-                          repeatDelay: 2
-                        }
-                      }
-                }
+              {/* Suggestion Buttons - appear on hover only when not showing status */}
+              <AnimatePresence>
+                {isHovered &&
+                  !isDragging &&
+                  !(chatStatus === 'streaming' || chatStatus === 'submitted' || hasNewReply) && (
+                    <motion.div
+                      className='absolute right-0 bottom-full flex flex-col items-end gap-[5px] pb-[5px]'
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2, staggerChildren: 0.05 }}
+                    >
+                      {suggestions.map(([label, value], index) => (
+                        <motion.button
+                          key={label}
+                          onClick={() => handleSuggestionClick(value)}
+                          className='border-primary/20 bg-card text-primary hover:bg-secondary rounded-full border px-[15px] py-[5px] text-[12px] text-nowrap shadow-[0px_0px_10px_0px_rgba(0,82,255,0.15)] transition-colors'
+                          initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                          animate={{ opacity: 1, x: 0, scale: 1 }}
+                          exit={{ opacity: 0, x: 20, scale: 0.8 }}
+                          transition={{
+                            delay: index * 0.05,
+                            duration: 0.2,
+                            type: 'spring',
+                            damping: 20,
+                            stiffness: 300
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {label}
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+              </AnimatePresence>
+
+              {/* FAB Button */}
+              <motion.button
+                onClick={handleOpen}
+                className='relative'
+                aria-label='Open AI Assistant'
+                style={{
+                  filter: 'drop-shadow(0 0 30px rgba(0, 82, 255, 0.25))'
+                }}
               >
-                <MimoLogo size={50} />
-              </motion.div>
-            </motion.button>
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={
+                    chatStatus === 'streaming' || chatStatus === 'submitted'
+                      ? { opacity: 1, scale: 1, rotate: 0, x: statusTransform.x, y: statusTransform.y }
+                      : hasNewReply
+                        ? { opacity: 1, scale: [1, 1.05, 1], rotate: 0, x: statusTransform.x, y: statusTransform.y }
+                        : isDragging
+                          ? { opacity: 1, scale: 1, rotate: 0, x: 0, y: 0 }
+                          : isHovered
+                            ? { opacity: 1, scale: 1, rotate: 0, x: 0, y: 0 }
+                            : { opacity: 1, scale: 1, rotate: [0, 10, -10, 0], x: 0, y: 0 } // Default wiggle for logo
+                  }
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={
+                    chatStatus === 'streaming' || chatStatus === 'submitted'
+                      ? {
+                          opacity: { duration: 0.2 },
+                          scale: { duration: 0.2 },
+                          rotate: { duration: 0.2 }
+                        }
+                      : hasNewReply
+                        ? {
+                            opacity: { duration: 0.2 },
+                            scale: {
+                              duration: 1.5,
+                              repeat: Infinity,
+                              ease: 'easeInOut'
+                            },
+                            rotate: { duration: 0.2 }
+                          }
+                        : isDragging || isHovered
+                          ? { duration: 0.2, opacity: { duration: 0.2 }, scale: { duration: 0.2 } }
+                          : {
+                              opacity: { duration: 0.2 },
+                              scale: { duration: 0.2 },
+                              rotate: {
+                                duration: 3,
+                                repeat: Infinity,
+                                repeatDelay: 2
+                              }
+                            }
+                  }
+                >
+                  {/* Status-based FAB content */}
+                  {chatStatus === 'streaming' || chatStatus === 'submitted' || hasNewReply ? (
+                    // Thinking state - show thinking bubble
+                    <div className='border-primary/20 text-primary bg-background flex items-center gap-[5px] rounded-full border-1 px-[15px] py-[5px] shadow-[0_0_10px_0_rgba(0,82,255,0.15)]'>
+                      {hasNewReply ? '✅ Reply ready!' : '💡 Thinking...'}
+                    </div>
+                  ) : (
+                    // Default state - show logo
+                    <MimoLogo size={50} />
+                  )}
+                </motion.div>
+              </motion.button>
+            </motion.div>
           )}
         </AnimatePresence>,
         document.body
       )}
 
       {/* Draggable Chat Window */}
-      <DraggableChatWindow isOpen={isOpen} onClose={handleClose} initialPosition={calculateChatPosition()} />
+      <DraggableChatWindow
+        ref={chatWindowRef}
+        isOpen={isOpen}
+        onClose={handleClose}
+        initialPosition={calculateChatPosition()}
+        suggestions={suggestions}
+        onStatusChange={handleStatusChange}
+      />
     </>
   );
 }

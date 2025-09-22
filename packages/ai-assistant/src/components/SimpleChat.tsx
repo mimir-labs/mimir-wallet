@@ -5,7 +5,7 @@ import type { FunctionCallEvent } from '../types.js';
 
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type ToolUIPart, type UITools } from 'ai';
-import { useMemo, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { useAIContext } from '../store/aiContext.js';
 import { useAiStore } from '../store/aiStore.js';
@@ -50,43 +50,25 @@ const models = [
 
 interface Props {
   renderTool?: ({ tool }: { tool: ToolUIPart<UITools> }) => React.ReactNode;
+  suggestions: Array<[string, string]>; // Array of [label, value] pairs - required
+  onStatusChange?: (status: 'submitted' | 'streaming' | 'ready' | 'error') => void;
 }
 
-const suggestions = [
-  'How do I create a multisig wallet on Mimir?',
-  'Can I send a transaction using a multisig account?',
-  'What is multisig deposit?',
-  'What’s the difference between static and flexible multisig?',
-  'How can I use the Call Template to reuse transactions?',
-  'How does the proposer role work in a multisig?',
-  'Can I stake DOT using a multisig account?',
-  'How do I vote on OpenGov with a proxy or multisig?',
-  'How could i use multisig on HydraDX?'
-];
+export interface SimpleChatRef {
+  sendMessage: (message: string) => void;
+}
 
-function SimpleChat({ renderTool }: Props) {
+const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, onStatusChange }, ref) => {
   const [input, setInput] = useState('');
   const [model, setModel] = useState<string>(models[0].value);
   const modelRef = useRef(model);
 
   modelRef.current = model;
 
-  // Randomly select 3 suggestions: one from each group (1-3, 4-6, 7-9)
-  const randomSuggestions = useMemo(() => {
-    const group1 = suggestions.slice(0, 3); // indices 0-2
-    const group2 = suggestions.slice(3, 6); // indices 3-5
-    const group3 = suggestions.slice(6, 9); // indices 6-8
+  // Use provided suggestions directly
+  const displaySuggestions = suggestions;
 
-    const selected = [
-      group1[Math.floor(Math.random() * group1.length)],
-      group2[Math.floor(Math.random() * group2.length)],
-      group3[Math.floor(Math.random() * group3.length)]
-    ];
-
-    return selected;
-  }, []);
-
-  const { messages, sendMessage, status, addToolResult, stop } = useChat({
+  const { messages, sendMessage, status, addToolResult, stop, regenerate } = useChat({
     transport: new DefaultChatTransport({
       api: import.meta.env.VITE_AI_ENDPOINT || 'https://ai-assitant.mimir.global/',
       prepareSendMessagesRequest: (options) => {
@@ -141,10 +123,28 @@ function SimpleChat({ renderTool }: Props) {
     }
   });
 
+  // Expose sendMessage through ref
+  useImperativeHandle(
+    ref,
+    () => ({
+      sendMessage: (message: string) => {
+        sendMessage({ text: message });
+      }
+    }),
+    [sendMessage]
+  );
+
+  // Notify parent about status changes
+  useEffect(() => {
+    onStatusChange?.(status);
+  }, [status, onStatusChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (status === 'streaming') {
+    if (status === 'error') {
+      regenerate();
+    } else if (status === 'streaming') {
       stop();
     } else if (status === 'ready') {
       if (input.trim()) {
@@ -164,8 +164,10 @@ function SimpleChat({ renderTool }: Props) {
         <ConversationContent>
           {messages.length === 0 ? (
             <Suggestions>
-              {randomSuggestions.map((suggestion) => (
-                <Suggestion key={suggestion} onClick={handleSuggestionClick} suggestion={suggestion} />
+              {displaySuggestions.map(([label, value]) => (
+                <Suggestion key={label} onClick={handleSuggestionClick} suggestion={value}>
+                  {label}
+                </Suggestion>
               ))}
             </Suggestions>
           ) : null}
@@ -228,6 +230,8 @@ function SimpleChat({ renderTool }: Props) {
       </PromptInput>
     </div>
   );
-}
+});
+
+SimpleChat.displayName = 'SimpleChat';
 
 export default SimpleChat;

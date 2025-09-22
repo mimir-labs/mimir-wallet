@@ -75,6 +75,8 @@ export const PreferencePopover: React.FC<PreferencePopoverProps> = ({
   open,
   onOpenChange
 }) => {
+  const effectivePreference: CookiePreference = selectedPreference ?? 'all';
+
   const handlePreferenceSelect = (preference: CookiePreference) => {
     onPreferenceChange(preference);
     // Close popover after selection
@@ -93,14 +95,13 @@ export const PreferencePopover: React.FC<PreferencePopoverProps> = ({
         <div className='flex flex-col gap-[5px]'>
           <PreferenceOption
             label='All'
-            selected={selectedPreference === 'all'}
+            selected={effectivePreference === 'all'}
             onClick={() => handlePreferenceSelect('all')}
           />
 
           <PreferenceOption
             label='Only Essentials'
-            selected={selectedPreference === 'essentials'}
-            disabled
+            selected={effectivePreference === 'essentials'}
             onClick={() => handlePreferenceSelect('essentials')}
           />
         </div>

@@ -31,8 +31,8 @@ const getDefaultConsentState = (): CookieConsentState => ({
  * CookieConsent component displays a privacy terms banner with cookie preference management
  */
 export const CookieConsent: React.FC<CookieConsentProps> = ({
-  privacyPolicyUrl = '/privacy',
-  termsUrl = '/terms',
+  privacyPolicyUrl = '/privacy.html',
+  termsUrl = '/terms.html',
   privacyText,
   onPreferenceChange,
   initialVisible,
@@ -98,7 +98,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({
   return (
     <div
       className={cn(
-        'absolute bottom-4 z-50',
+        'absolute top-[calc(100svh-144px)] z-50',
         'right-4 left-4',
         'bg-secondary shadow-medium rounded-[20px] p-4',
         className

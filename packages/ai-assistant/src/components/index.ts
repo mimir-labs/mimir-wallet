@@ -2,5 +2,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { default as AiSettings } from './AiSettings/index.js';
-export { default as SimpleChat } from './SimpleChat.js';
+export { default as SimpleChat, type SimpleChatRef } from './SimpleChat.js';
 export { default as SimpleAiChat } from './SimpleChat.js';

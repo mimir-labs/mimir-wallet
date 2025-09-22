@@ -19,6 +19,12 @@ function Version() {
       <a className='text-primary' href='https://docs.mimir.global' target='_blank' rel='noopener noreferrer'>
         Docs
       </a>
+      <a className='text-primary' href='/privacy.html' target='_blank'>
+        Privacy
+      </a>
+      <a className='text-primary' href='/terms.html' target='_blank'>
+        Terms
+      </a>
     </div>
   );
 }

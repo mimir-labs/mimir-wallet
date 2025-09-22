@@ -165,7 +165,7 @@ const MainContent = ({ hideSideBar, hideTopBar, withPadding, queue }: MainConten
         <TransactionOverlay queue={queue} />
 
         {/* Cookie Consent Banner - Absolute positioned */}
-        <CookieConsent privacyPolicyUrl='/privacy' termsUrl='/terms' />
+        <CookieConsent />
       </main>
 
       {!hideSideBar && <RightSideBar />}

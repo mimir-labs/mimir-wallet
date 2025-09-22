@@ -457,7 +457,7 @@ function createFunctionCallHandlers() {
       }
 
       return createSuccessResponse(id, {
-        message: 'please add to watchlist',
+        message: 'Please click add button to add',
         address
       });
     },

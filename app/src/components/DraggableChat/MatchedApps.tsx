@@ -8,15 +8,15 @@ import { useMemo } from 'react';
 import { Button, Chip } from '@mimir-wallet/ui';
 
 // MatchedApps component based on Figma design
-function MatchedApps({ apps }: { eventId: string; apps: { id: string; tag?: string; path?: string }[] }) {
+function MatchedApps({ apps }: { eventId: string; apps: { id: string; path?: string }[] }) {
   const list = useMemo(() => {
     const result = [];
 
-    for (const { id, tag, path } of apps) {
+    for (const { id, path } of apps) {
       const dapp = dapps.find((item) => item.id.toString() === id);
 
       if (dapp) {
-        result.push({ dapp, tag, path });
+        result.push({ dapp, path });
       }
     }
 
@@ -30,16 +30,18 @@ function MatchedApps({ apps }: { eventId: string; apps: { id: string; tag?: stri
 
       {/* Apps list */}
       {list.map((app, index) => (
-        <MatchedAppItem key={index} {...app.dapp} path={app.path} tag={app.tag} />
+        <MatchedAppItem key={index} {...app.dapp} path={app.path} />
       ))}
     </div>
   );
 }
 
 // Individual app item component
-function MatchedAppItem(dapp: DappOption & { path?: string; tag?: string }) {
-  const { name, icon, tag, path } = dapp;
+function MatchedAppItem(dapp: DappOption & { path?: string }) {
+  const { name, icon, path } = dapp;
   const openDapp = useOpenDapp(dapp);
+
+  const tag = path?.split('/').at(-1);
 
   return (
     <div
