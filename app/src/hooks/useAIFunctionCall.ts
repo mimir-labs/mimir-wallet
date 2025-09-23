@@ -423,8 +423,8 @@ function createFunctionCallHandlers() {
     // Simple handlers without validation
     matchDapps: (id: string) => createSuccessResponse(id, 'please select a dapps'),
     getFund: (id: string) => createSuccessResponse(id, 'please click fund button'),
-    walletConnect: (id: string) => createSuccessResponse(id, 'please use wallet connect'),
-    connectWallet: (id: string) => createSuccessResponse(id, 'please manage wallet connections'),
+    walletConnect: (id: string) => createSuccessResponse(id, 'please click Connect button'),
+    connectWallet: (id: string) => createSuccessResponse(id, 'please click View button'),
 
     // Address validation handlers
     showQRCode: (id: string, { address }: AddressArguments) => {

@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useAccount } from '@/accounts/useAccount';
 import { useToggle } from 'react-use';
 
 import { Button } from '@mimir-wallet/ui';
@@ -13,6 +14,7 @@ interface GetFundProps {
 
 function GetFund({ eventId }: GetFundProps) {
   const [open, toggleOpen] = useToggle(false);
+  const { current } = useAccount();
 
   return (
     <>
@@ -49,7 +51,7 @@ function GetFund({ eventId }: GetFundProps) {
         </Button>
       </div>
 
-      <Fund onClose={toggleOpen} open={open} />
+      <Fund onClose={toggleOpen} open={open} receipt={current} />
     </>
   );
 }
