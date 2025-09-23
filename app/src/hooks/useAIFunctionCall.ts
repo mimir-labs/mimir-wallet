@@ -422,7 +422,7 @@ function createFunctionCallHandlers() {
   const handlers = {
     // Simple handlers without validation
     matchDapps: (id: string) => createSuccessResponse(id, 'please select a dapps'),
-    getFund: (id: string) => createSuccessResponse(id, 'please select fund option'),
+    getFund: (id: string) => createSuccessResponse(id, 'please click fund button'),
     walletConnect: (id: string) => createSuccessResponse(id, 'please use wallet connect'),
     connectWallet: (id: string) => createSuccessResponse(id, 'please manage wallet connections'),
 

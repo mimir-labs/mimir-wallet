@@ -31,20 +31,16 @@ import { Suggestion, Suggestions } from './suggestion.js';
 
 const models = [
   {
-    name: 'Anthropic: Claude Sonnet 4',
-    value: 'anthropic/claude-sonnet-4'
+    name: 'Kimi k2 turbo',
+    value: 'kimi-k2-turbo-preview'
   },
   {
-    name: 'OpenAI: GPT-5',
-    value: 'openai/gpt-5-nano'
+    name: 'Kimi k2 0905',
+    value: 'kimi-k2-0905-preview'
   },
   {
-    name: 'MoonshotAI: Kimi K2',
-    value: 'moonshotai/kimi-k2'
-  },
-  {
-    name: 'Google: Gemini 2.5 Pro',
-    value: 'google/gemini-2.5-pro'
+    name: 'kimi-openrouter',
+    value: 'openrouter'
   }
 ];
 

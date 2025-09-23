@@ -6,7 +6,7 @@ import type { CookiePreference } from './types';
 import IconCheck from '@/assets/svg/icon-success-fill.svg?react';
 import React from 'react';
 
-import { cn, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
 
 interface PreferencePopoverProps {
   /**
@@ -51,9 +51,7 @@ const PreferenceOption: React.FC<{
         'hover:bg-secondary focus:bg-secondary focus:outline-none'
       )}
     >
-      <span
-        className={cn('text-[14px] leading-normal font-normal', !disabled ? 'text-foreground' : 'text-foreground/50')}
-      >
+      <span className={cn('text-[14px] text-nowrap', !disabled ? 'text-foreground' : 'text-foreground/50')}>
         {label}
       </span>
 
@@ -76,10 +74,25 @@ export const PreferencePopover: React.FC<PreferencePopoverProps> = ({
   onOpenChange
 }) => {
   const effectivePreference: CookiePreference = selectedPreference ?? 'all';
+  const [pendingPreference, setPendingPreference] = React.useState<CookiePreference>(effectivePreference);
+
+  React.useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    setPendingPreference(effectivePreference);
+  }, [open, effectivePreference]);
 
   const handlePreferenceSelect = (preference: CookiePreference) => {
-    onPreferenceChange(preference);
-    // Close popover after selection
+    setPendingPreference(preference);
+  };
+
+  const handleApply = () => {
+    if (pendingPreference) {
+      onPreferenceChange(pendingPreference);
+    }
+
     onOpenChange?.(false);
   };
 
@@ -95,15 +108,18 @@ export const PreferencePopover: React.FC<PreferencePopoverProps> = ({
         <div className='flex flex-col gap-[5px]'>
           <PreferenceOption
             label='All'
-            selected={effectivePreference === 'all'}
+            selected={pendingPreference === 'all'}
             onClick={() => handlePreferenceSelect('all')}
           />
 
           <PreferenceOption
             label='Only Essentials'
-            selected={effectivePreference === 'essentials'}
+            selected={pendingPreference === 'essentials'}
             onClick={() => handlePreferenceSelect('essentials')}
           />
+          <Button color='primary' onClick={handleApply} variant='ghost' size='sm' fullWidth>
+            Apply
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

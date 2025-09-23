@@ -90,25 +90,6 @@ function DraggableChatWithFAB({
     margin: 8
   });
 
-  // Calculate transform offset to keep bubble within screen when showing status
-  const calculateStatusTransform = () => {
-    if (typeof window === 'undefined') return { x: 0, y: 0 };
-
-    const bubbleWidth = 120;
-    const logoWidth = 60;
-    const extraWidth = bubbleWidth - logoWidth;
-
-    // Check if bubble would overflow on the right
-    const wouldOverflowRight = position.x + bubbleWidth > window.innerWidth - 8;
-
-    return {
-      x: wouldOverflowRight ? -extraWidth : 0, // Shift left by extra width if needed
-      y: 0
-    };
-  };
-
-  const statusTransform = calculateStatusTransform();
-
   // Calculate dynamic height: half of screen height, minimum 600px, but if screen height < 600, use screen height
   const calculateHeight = () => {
     if (typeof window === 'undefined') return 600;
@@ -214,18 +195,12 @@ function DraggableChatWithFAB({
                 dragControls.start(e);
               }}
             >
-              {/* Suggestion Buttons - appear on hover only when not showing status */}
-              <AnimatePresence>
-                {isHovered &&
-                  !isDragging &&
-                  !(chatStatus === 'streaming' || chatStatus === 'submitted' || hasNewReply) && (
-                    <motion.div
-                      className='absolute right-0 bottom-full flex flex-col items-end gap-[5px] pb-[5px]'
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.2, staggerChildren: 0.05 }}
-                    >
+              {/* Container for status and suggestions */}
+              <motion.div className='absolute right-0 bottom-full flex flex-col items-end gap-[5px] pb-[5px]'>
+                {/* Suggestion Buttons - only show on hover */}
+                <AnimatePresence>
+                  {isHovered && !isDragging && (
+                    <>
                       {suggestions.map(([label, value], index) => (
                         <motion.button
                           key={label}
@@ -247,9 +222,26 @@ function DraggableChatWithFAB({
                           {label}
                         </motion.button>
                       ))}
+                    </>
+                  )}
+                </AnimatePresence>
+
+                {/* Status Indicator - always visible when thinking or has new reply */}
+                <AnimatePresence>
+                  {(chatStatus === 'streaming' || chatStatus === 'submitted' || hasNewReply) && !isDragging && (
+                    <motion.div
+                      className='border-primary/20 bg-card text-primary hover:bg-secondary cursor-pointer rounded-full border px-[15px] py-[5px] text-[12px] text-nowrap shadow-[0px_0px_10px_0px_rgba(0,82,255,0.15)] transition-colors'
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={handleOpen}
+                    >
+                      {hasNewReply ? '✅ Reply ready!' : '💡 Thinking...'}
                     </motion.div>
                   )}
-              </AnimatePresence>
+                </AnimatePresence>
+              </motion.div>
 
               {/* FAB Button */}
               <motion.button
@@ -263,57 +255,29 @@ function DraggableChatWithFAB({
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={
-                    chatStatus === 'streaming' || chatStatus === 'submitted'
-                      ? { opacity: 1, scale: 1, rotate: 0, x: statusTransform.x, y: statusTransform.y }
-                      : hasNewReply
-                        ? { opacity: 1, scale: [1, 1.05, 1], rotate: 0, x: statusTransform.x, y: statusTransform.y }
-                        : isDragging
-                          ? { opacity: 1, scale: 1, rotate: 0, x: 0, y: 0 }
-                          : isHovered
-                            ? { opacity: 1, scale: 1, rotate: 0, x: 0, y: 0 }
-                            : { opacity: 1, scale: 1, rotate: [0, 10, -10, 0], x: 0, y: 0 } // Default wiggle for logo
+                    isDragging
+                      ? { opacity: 1, scale: 1, rotate: 0 }
+                      : isHovered
+                        ? { opacity: 1, scale: 1, rotate: 0 }
+                        : { opacity: 1, scale: 1, rotate: [0, 10, -10, 0] } // Default wiggle for logo
                   }
                   exit={{ scale: 0, opacity: 0 }}
                   transition={
-                    chatStatus === 'streaming' || chatStatus === 'submitted'
-                      ? {
+                    isDragging || isHovered
+                      ? { duration: 0.2, opacity: { duration: 0.2 }, scale: { duration: 0.2 } }
+                      : {
                           opacity: { duration: 0.2 },
                           scale: { duration: 0.2 },
-                          rotate: { duration: 0.2 }
-                        }
-                      : hasNewReply
-                        ? {
-                            opacity: { duration: 0.2 },
-                            scale: {
-                              duration: 1.5,
-                              repeat: Infinity,
-                              ease: 'easeInOut'
-                            },
-                            rotate: { duration: 0.2 }
+                          rotate: {
+                            duration: 3,
+                            repeat: Infinity,
+                            repeatDelay: 2
                           }
-                        : isDragging || isHovered
-                          ? { duration: 0.2, opacity: { duration: 0.2 }, scale: { duration: 0.2 } }
-                          : {
-                              opacity: { duration: 0.2 },
-                              scale: { duration: 0.2 },
-                              rotate: {
-                                duration: 3,
-                                repeat: Infinity,
-                                repeatDelay: 2
-                              }
-                            }
+                        }
                   }
                 >
-                  {/* Status-based FAB content */}
-                  {chatStatus === 'streaming' || chatStatus === 'submitted' || hasNewReply ? (
-                    // Thinking state - show thinking bubble
-                    <div className='border-primary/20 text-primary bg-background flex items-center gap-[5px] rounded-full border-1 px-[15px] py-[5px] shadow-[0_0_10px_0_rgba(0,82,255,0.15)]'>
-                      {hasNewReply ? '✅ Reply ready!' : '💡 Thinking...'}
-                    </div>
-                  ) : (
-                    // Default state - show logo
-                    <MimoLogo size={50} />
-                  )}
+                  {/* Always show logo */}
+                  <MimoLogo size={50} />
                 </motion.div>
               </motion.button>
             </motion.div>
