@@ -34,7 +34,7 @@ function MultiTransfer() {
       }
 
       if (event.arguments.addRecipient) {
-        const invalidAddress = event.arguments.addRecipient.map(
+        const invalidAddress = event.arguments.addRecipient.filter(
           (item: { recipient: string; amount: number }) => !isValidAddress(item.recipient)
         );
 

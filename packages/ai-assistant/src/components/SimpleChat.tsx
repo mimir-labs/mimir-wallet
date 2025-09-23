@@ -31,15 +31,11 @@ import { Suggestion, Suggestions } from './suggestion.js';
 
 const models = [
   {
-    name: 'Kimi k2 turbo',
-    value: 'kimi-k2-turbo-preview'
+    name: 'Deepseek',
+    value: 'deepseek-chat'
   },
   {
-    name: 'Kimi k2 0905',
-    value: 'kimi-k2-0905-preview'
-  },
-  {
-    name: 'kimi-openrouter',
+    name: 'OpenAI: GPT-5',
     value: 'openrouter'
   }
 ];
