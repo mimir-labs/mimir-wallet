@@ -31,12 +31,20 @@ import { Suggestion, Suggestions } from './suggestion.js';
 
 const models = [
   {
-    name: 'Deepseek',
-    value: 'deepseek-chat'
+    name: 'OpenAI: GPT-5',
+    value: 'openai/gpt-5'
   },
   {
-    name: 'OpenAI: GPT-5',
-    value: 'openrouter'
+    name: 'OpenAI: GPT-5 Mini',
+    value: 'openai/gpt-5-mini'
+  },
+  {
+    name: 'OpenAI: GPT-5 Nano',
+    value: 'openai/gpt-5-nano'
+  },
+  {
+    name: 'Google: Gemini 2.5 Pro',
+    value: 'google/gemini-2.5-pro'
   }
 ];
 
