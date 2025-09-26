@@ -109,7 +109,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
       }
 
       if (event.arguments.customBlocks !== undefined) {
-        newData.customBlocks = event.arguments.customBlocks;
+        newData.customBlocks = event.arguments.customBlocks.toString();
       }
 
       if (event.arguments.step !== undefined) {

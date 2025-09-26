@@ -58,7 +58,13 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
       this.pendingRequests.set(event.id, { resolve, reject });
 
       // Emit the function call event
-      this.emit('functioncall', event);
+      if (['createMultisig', 'createProxy', 'transferForm', 'batchTransferForm'].includes(event.name)) {
+        setTimeout(() => {
+          this.emit('functioncall', event);
+        }, 1000);
+      } else {
+        this.emit('functioncall', event);
+      }
     });
   }
 

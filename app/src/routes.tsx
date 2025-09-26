@@ -139,6 +139,14 @@ export const routes = [
             element: <PageExplorer />,
             description:
               'Sandboxed DApp container with Mimir SDK integration for in-wallet DApp execution and transaction signing'
+          },
+          {
+            path: '/transfer',
+            element: <Navigate replace to='/explorer/mimir%3A%2F%2Fapp%2Ftransfer' />
+          },
+          {
+            path: '/multi-transfer',
+            element: <Navigate replace to='/explorer/mimir%3A%2F%2Fapp%2Fmulti-transfer' />
           }
         ]
       },

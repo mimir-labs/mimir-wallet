@@ -423,10 +423,10 @@ function useSwitchNetworksCall() {
 function createFunctionCallHandlers(chainSS58: number) {
   const handlers = {
     // Simple handlers without validation
-    matchDapps: (id: string) => createSuccessResponse(id, 'please select a dapps'),
-    getFund: (id: string) => createSuccessResponse(id, 'please click fund button'),
-    walletConnect: (id: string) => createSuccessResponse(id, 'please click Connect button'),
-    connectWallet: (id: string) => createSuccessResponse(id, 'please click View button'),
+    matchDapps: (id: string) => createSuccessResponse(id, 'tell user to click dapps in page'),
+    getFund: (id: string) => createSuccessResponse(id, 'tell user to click fund button in page'),
+    walletConnect: (id: string) => createSuccessResponse(id, 'tell user to click Connect button in page'),
+    connectWallet: (id: string) => createSuccessResponse(id, 'tell user to click View button in page'),
 
     // Address validation handlers
     showQRCode: (id: string, { address }: AddressArguments) => {
