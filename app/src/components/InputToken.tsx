@@ -180,6 +180,7 @@ function InputToken({
                     >
                       <Avatar
                         alt={name}
+                        className='shrink-0'
                         fallback={
                           <div className='bg-divider-300 text-content1 flex h-[20px] w-[20px] items-center justify-center rounded-full text-base font-bold'>
                             {symbol.slice(0, 1)}

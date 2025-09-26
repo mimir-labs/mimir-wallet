@@ -19,11 +19,6 @@ const DEFAULT_NETWORKS = [
 ];
 
 const ENABLED_NETWORKS_KEY = 'enabled_networks';
-const NETWORK_MODE_KEY = 'network_mode';
-
-function getNetworkMode(): 'omni' | 'solo' {
-  return (store.get(NETWORK_MODE_KEY) as 'omni' | 'solo') || 'omni';
-}
 
 function getEnabledNetworks(): [Network, ...Network[]] {
   let enabledNetworks = store.get(ENABLED_NETWORKS_KEY) as string[] | undefined;
@@ -46,10 +41,6 @@ function getEnabledNetworks(): [Network, ...Network[]] {
 
 export function enableNetwork(key: string) {
   useNetworks.setState((state) => {
-    if (state.mode !== 'omni') {
-      return state;
-    }
-
     const identityNetwork = state.networks.find(
       (item) => item.key === key || item.genesisHash === key
     )?.identityNetwork;
@@ -68,20 +59,13 @@ export function enableNetwork(key: string) {
 
 export const useNetworks = create<{
   networks: [Network, ...Network[]];
-  mode: 'omni' | 'solo';
   enableNetwork: (key: string) => void;
   disableNetwork: (key: string) => void;
-  setNetworkMode: (mode: 'omni' | 'solo', cb?: () => void) => void;
 }>()((set) => ({
   networks: getEnabledNetworks(),
-  mode: getNetworkMode(),
   enableNetwork: enableNetwork,
   disableNetwork: (key: string) => {
     set((state) => {
-      if (state.mode !== 'omni') {
-        return state;
-      }
-
       return {
         networks:
           state.networks.filter((item) => item.enabled).length === 1
@@ -94,13 +78,6 @@ export const useNetworks = create<{
                 ])
       };
     });
-  },
-  setNetworkMode: (mode: 'omni' | 'solo', cb?: () => void) => {
-    store.set(NETWORK_MODE_KEY, mode);
-
-    if (cb) {
-      cb();
-    }
   }
 }));
 

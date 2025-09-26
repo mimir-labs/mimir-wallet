@@ -19,13 +19,14 @@ interface Props {
   size?: number;
   value?: AccountId | AccountIndex | Address | string | Uint8Array | null;
   withBorder?: boolean;
+  showMultisigBadge?: boolean;
 }
 
 function renderCircle({ cx, cy, fill, r }: Circle, index: number) {
   return <circle key={index} cx={cx} cy={cy} fill={fill} r={r} />;
 }
 
-function IdentityIcon({ className, prefix, size = 30, value, withBorder = false }: Props) {
+function IdentityIcon({ className, prefix, size = 30, value, withBorder = false, showMultisigBadge = true }: Props) {
   const { chainSS58 } = useApi();
   const address = encodeAddress(value, prefix ?? chainSS58);
   const { meta } = useAddressMeta(value?.toString());
@@ -76,6 +77,9 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
       </span>
     );
   } else {
+    const hasMultisig = (who && who.length > 0) || multipleMultisig;
+    const shouldShowBadge = showMultisigBadge && hasMultisig;
+
     element = (
       <span
         className={`bg-secondary ${className || ''} IdentityIcon`}
@@ -84,7 +88,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
           cursor: 'copy',
           position: 'relative',
           width: size,
-          height: size + ((who && who.length > 0) || multipleMultisig ? 6 + size / 16 : 0),
+          height: size + (shouldShowBadge ? 6 + size / 16 : 0),
           borderRadius: '50%'
         }}
       >
@@ -92,7 +96,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false 
           {circles.map(renderCircle)}
         </svg>
 
-        {(who && who.length > 0) || multipleMultisig ? (
+        {shouldShowBadge ? (
           <span
             className='text-white'
             style={{

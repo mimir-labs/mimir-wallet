@@ -1,0 +1,71 @@
+{
+  "author": "dev.mimir",
+  "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
+  "engines": {
+    "node": ">=20"
+  },
+  "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/ai-assistant#readme",
+  "license": "Apache-2.0",
+  "packageManager": "yarn@4.5.3",
+  "private": true,
+  "repository": {
+    "directory": "packages/ai-assistant",
+    "type": "git",
+    "url": "https://github.com/mimir-labs/mimir-wallet.git"
+  },
+  "sideEffects": true,
+  "type": "module",
+  "name": "@mimir-wallet/ai-assistant",
+  "version": "2.24.1",
+  "main": "build/index.js",
+  "module": "build/index.js",
+  "types": "build/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "@mimir-wallet/source": "./src/index.ts",
+        "types": "./build/index.d.ts",
+        "default": "./build/index.js"
+      }
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "build",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --build && tailwindcss -i ./src/styles.css -o ./dist/styles.css",
+    "check-types": "tsc --noEmit",
+    "dev": "run-p dev:tsc dev:tailwindcss",
+    "dev:tsc": "tsc --watch",
+    "dev:tailwindcss": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "zustand": ">=5"
+  },
+  "dependencies": {
+    "@ai-sdk/react": "^2.0.27",
+    "@mimir-wallet/polkadot-core": "workspace:^",
+    "@mimir-wallet/ui": "workspace:^",
+    "@radix-ui/react-use-controllable-state": "^1.2.2",
+    "ai": "^5.0.26",
+    "eventemitter3": "^5.0.1",
+    "lucide-react": "^0.542.0",
+    "streamdown": "^1.1.6",
+    "use-stick-to-bottom": "^1.1.1"
+  },
+  "devDependencies": {
+    "@mimir-wallet/service": "workspace:^",
+    "@polkadot/extension-base": "^0.61.5",
+    "@polkadot/extension-inject": "^0.61.5",
+    "@tailwindcss/cli": "^4.1.11",
+    "npm-run-all2": "^7.0.2",
+    "tailwind-variants": "^1.0.0",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.8.2"
+  }
+}

@@ -146,7 +146,7 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
 
             <p className='text-center'>{dapp.description}</p>
 
-            <Button size='lg' fullWidth className='w-[90%]' onClick={openDapp}>
+            <Button size='lg' fullWidth className='w-[90%]' onClick={() => openDapp()}>
               Open Dapp
             </Button>
           </div>

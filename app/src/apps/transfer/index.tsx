@@ -8,10 +8,11 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useQueryParam } from '@/hooks/useQueryParams';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Spinner } from '@mimir-wallet/ui';
 
@@ -41,6 +42,36 @@ function PageTransfer() {
 
     return foundAsset;
   }, [assetId, assets]);
+
+  useEffect(() => {
+    const handler: FunctionCallHandler = (event) => {
+      if (event.name !== 'transferForm') return;
+
+      if (event.arguments.sending !== undefined) {
+        setSending(event.arguments.sending);
+      }
+
+      if (event.arguments.recipient !== undefined) {
+        setRecipient(event.arguments.recipient);
+      }
+
+      if (event.arguments.amount !== undefined) {
+        setAmount(event.arguments.amount.toString());
+      }
+
+      if (event.arguments.network !== undefined) {
+        setNetwork(event.arguments.network);
+      }
+
+      return functionCallManager.respondToFunctionCall({
+        id: event.id,
+        success: true,
+        result: 'Success update'
+      });
+    };
+
+    return functionCallManager.onFunctionCall(handler);
+  }, [setAmount, setNetwork]);
 
   return (
     <SubApiRoot

@@ -7,10 +7,11 @@ import { useAccount } from '@/accounts/useAccount';
 import { StepIndicator } from '@/components';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useWizardState } from '@/hooks/useWizardState';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
 
@@ -57,7 +58,49 @@ function DesktopCreateMultisig() {
   );
 
   const { currentStep, data: multisigData } = wizardState;
-  const { goToNext, goToPrevious, updateData } = wizardActions;
+  const { goToNext, goToPrevious, goToStep, updateData } = wizardActions;
+
+  useEffect(() => {
+    const handler: FunctionCallHandler = (event) => {
+      if (event.name !== 'createMultisig') return;
+
+      const newData: Partial<MultisigData> = {};
+
+      if (event.arguments.name !== undefined) {
+        newData.name = event.arguments.name;
+      }
+
+      if (event.arguments.threshold !== undefined) {
+        newData.threshold = event.arguments.threshold;
+      }
+
+      if (event.arguments.members !== undefined) {
+        newData.members = event.arguments.members;
+      }
+
+      if (event.arguments.isPureProxy !== undefined) {
+        newData.isPureProxy = event.arguments.isPureProxy;
+      }
+
+      if (event.arguments.step !== undefined) {
+        goToStep(event.arguments.step);
+      }
+
+      if (event.arguments.network !== undefined) {
+        setNetwork(event.arguments.network);
+      }
+
+      updateData(newData);
+
+      return functionCallManager.respondToFunctionCall({
+        id: event.id,
+        success: true,
+        result: newData
+      });
+    };
+
+    return functionCallManager.onFunctionCall(handler);
+  }, [goToStep, setNetwork, updateData]);
 
   const handleConfirm = async () => {
     if (multisigData.isPureProxy) {

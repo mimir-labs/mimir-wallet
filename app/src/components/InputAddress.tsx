@@ -172,8 +172,13 @@ function InputAddress({
   const upSm = useMediaQuery('sm');
   const [options, setOptions] = useState<string[]>([]);
   const onChangeRef = useRef(onChange);
+  const stateRef = useRef({
+    polkavm,
+    chainSS58
+  });
 
   onChangeRef.current = onChange;
+  stateRef.current = { polkavm, chainSS58 };
 
   useEffect(() => {
     const list = sortAccounts(createOptions(accounts, addresses, isSign, metas, inputValue, filtered, excluded), metas);
@@ -198,12 +203,12 @@ function InputAddress({
   useEffect(() => {
     const key = value || '';
 
-    if (isValidAddressUtil(key, polkavm)) {
-      onChangeRef.current?.(isEthAddress(key) ? evm2Ss58(key, chainSS58) : key);
+    if (isValidAddressUtil(key, stateRef.current.polkavm)) {
+      onChangeRef.current?.(isEthAddress(key) ? evm2Ss58(key, stateRef.current.chainSS58) : key);
     } else if (key === '') {
       onChangeRef.current?.('');
     }
-  }, [value, polkavm, chainSS58]);
+  }, [value]);
 
   const handleSelect = useCallback(
     (item: string) => {

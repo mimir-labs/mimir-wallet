@@ -4,13 +4,13 @@
 import type { AccountData, AddressMeta } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX } from '@/constants';
+import { CURRENT_ADDRESS_HEX_KEY } from '@/constants';
 import { type AddressState, useAddressStore } from '@/hooks/useAddressStore';
 import { useWallet } from '@/wallet/useWallet';
 import { isEqual } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { addressEq, addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { AccountContext } from './context';
@@ -24,7 +24,6 @@ import { deriveAccountMeta } from './utils';
  */
 function AddressConsumer({ children }: { children: React.ReactNode }) {
   const { chainSS58, network, genesisHash } = useApi();
-  const { mode } = useNetworks();
   const { isWalletReady, walletAccounts } = useWallet();
   const { accounts, addresses } = useAddressStore();
   const [metas, setMetas] = useState<Record<HexString, AddressMeta>>({});
@@ -96,16 +95,14 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const onChange = (state: AddressState, prevState: AddressState) => {
       if (state.current && state.current !== prevState.current) {
-        mode === 'omni'
-          ? store.set(CURRENT_ADDRESS_HEX_KEY, addressToHex(state.current))
-          : store.set(`${CURRENT_ADDRESS_PREFIX}${network}`, state.current);
+        store.set(CURRENT_ADDRESS_HEX_KEY, addressToHex(state.current));
       }
     };
 
     const unsubscribe = useAddressStore.subscribe(onChange);
 
     return unsubscribe;
-  }, [mode, network]);
+  }, []);
 
   // Initialize address book from local storage
   // This effect runs once when the network changes to load stored addresses
@@ -174,11 +171,11 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
 
     if (isWalletReady && sortedWalletAccounts) {
       // Initial sync when wallet is ready
-      sync(mode === 'omni', network, chainSS58, sortedWalletAccounts.split(','), update);
+      sync(true, network, chainSS58, sortedWalletAccounts.split(','), update);
 
       // Set up periodic sync every 6 seconds
       interval = setInterval(() => {
-        sync(mode === 'omni', network, chainSS58, sortedWalletAccounts.split(','), update);
+        sync(true, network, chainSS58, sortedWalletAccounts.split(','), update);
       }, 12000);
     }
 
@@ -186,7 +183,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
     return () => {
       clearInterval(interval);
     };
-  }, [chainSS58, isWalletReady, mode, network, sortedWalletAccounts]);
+  }, [chainSS58, isWalletReady, network, sortedWalletAccounts]);
 
   useEffect(() => {
     const updateAccounts = (values: AccountData[]) => {
@@ -202,10 +199,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
               type: 'account'
             })
           );
-        const newValues =
-          mode === 'solo'
-            ? values.filter((account) => (account.type === 'pure' ? account.network === genesisHash : true))
-            : values;
+        const newValues = values;
         const newAccounts = [...newValues, ...newWalletAccounts];
 
         return {
@@ -216,7 +210,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
     };
 
     updateAccounts(syncData);
-  }, [chainSS58, genesisHash, mode, syncData, walletAccounts]);
+  }, [chainSS58, genesisHash, syncData, walletAccounts]);
 
   // Component doesn't render anything visible
   return <AccountContext.Provider value={{ metas: finalMetas, updateMetas }}>{children}</AccountContext.Provider>;

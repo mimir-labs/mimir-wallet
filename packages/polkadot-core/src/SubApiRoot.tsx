@@ -7,7 +7,6 @@ import { isHex } from '@polkadot/util';
 import React, { useContext, useMemo } from 'react';
 
 import { ApiContext, SubApiContext } from './context.js';
-import { useNetworks } from './useNetworks.js';
 
 type Fallback = React.ComponentType<{ apiState: ValidApiState }>;
 
@@ -74,17 +73,11 @@ function SubApiRoot({
   Fallback?: Fallback;
   children: React.ReactNode;
 }): React.ReactNode {
-  const { mode } = useNetworks();
-
-  if (mode === 'omni') {
-    return (
-      <OmniApiRoot supportedNetworks={supportedNetworks} network={networkOrGenesisHash} Fallback={Fallback}>
-        {children}
-      </OmniApiRoot>
-    );
-  }
-
-  return children;
+  return (
+    <OmniApiRoot supportedNetworks={supportedNetworks} network={networkOrGenesisHash} Fallback={Fallback}>
+      {children}
+    </OmniApiRoot>
+  );
 }
 
 export default SubApiRoot;

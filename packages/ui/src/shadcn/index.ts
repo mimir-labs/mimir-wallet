@@ -6,6 +6,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 export { Alert, AlertTitle, AlertDescription } from './alert.js';
 export { Autocomplete, type AutocompleteProps, type AutocompleteOption } from './autocomplete.js';
 export { Button } from './button.js';
+export * from './collapsible.js';
 export * from './card.js';
 export * from './dialog.js';
 export * from './drawer.js';
@@ -15,6 +16,7 @@ export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popove
 export * from './select.js';
 export * from './sidebar.js';
 export * from './sonner.js';
+export { Textarea } from './textarea.js';
 export { Tooltip } from './tooltip.js';
 
 export { VisuallyHidden };

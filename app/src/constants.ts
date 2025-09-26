@@ -62,3 +62,5 @@ export const SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY = `${LS_NAMESPACE}show_all_netw
 export const REMOTE_PROXY_DOC_URL = 'https://blog.kchr.de/ecosystem-proxy/';
 export const POLKADOT_PROXY_WIKI_URL = 'https://wiki.polkadot.com/learn/learn-proxies/';
 export const POLKADOT_PROXY_TYPES_WIKI_URL = 'https://wiki.polkadot.com/learn/learn-proxies/#proxy-types';
+
+export const COOKIE_CONSENT_STORAGE_KEY = `${LS_NAMESPACE}cookie_consent`;
