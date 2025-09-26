@@ -29,25 +29,6 @@ import { Reasoning, ReasoningContent, ReasoningTrigger } from './reasoning.js';
 import { Response } from './response.js';
 import { Suggestion, Suggestions } from './suggestion.js';
 
-const models = [
-  {
-    name: 'OpenAI: GPT-5',
-    value: 'openai/gpt-5'
-  },
-  {
-    name: 'OpenAI: GPT-5 Mini',
-    value: 'openai/gpt-5-mini'
-  },
-  {
-    name: 'OpenAI: GPT-5 Nano',
-    value: 'openai/gpt-5-nano'
-  },
-  {
-    name: 'Google: Gemini 2.5 Pro',
-    value: 'google/gemini-2.5-pro'
-  }
-];
-
 interface Props {
   renderTool?: ({ tool }: { tool: ToolUIPart<UITools> }) => React.ReactNode;
   suggestions: Array<[string, string]>; // Array of [label, value] pairs - required
@@ -60,10 +41,6 @@ export interface SimpleChatRef {
 
 const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, onStatusChange }, ref) => {
   const [input, setInput] = useState('');
-  const [model, setModel] = useState<string>(models[0].value);
-  const modelRef = useRef(model);
-
-  modelRef.current = model;
 
   // Use provided suggestions directly
   const displaySuggestions = suggestions;
@@ -79,8 +56,7 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
             stateMessage: useAIContext.getState().getStateContext(),
             topK: useAiStore.getState().config.topK,
             topP: useAiStore.getState().config.topP,
-            temperature: useAiStore.getState().config.temperature,
-            model: modelRef.current
+            temperature: useAiStore.getState().config.temperature
           }
         };
       }
@@ -206,25 +182,7 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
       <PromptInput onSubmit={handleSubmit} className='mt-4'>
         <PromptInputTextarea onChange={(e) => setInput(e.target.value)} value={input} />
         <PromptInputToolbar>
-          <PromptInputTools>
-            <PromptInputModelSelect
-              onValueChange={(value) => {
-                setModel(value);
-              }}
-              value={model}
-            >
-              <PromptInputModelSelectTrigger>
-                <PromptInputModelSelectValue />
-              </PromptInputModelSelectTrigger>
-              <PromptInputModelSelectContent>
-                {models.map((model) => (
-                  <PromptInputModelSelectItem key={model.value} value={model.value}>
-                    {model.name}
-                  </PromptInputModelSelectItem>
-                ))}
-              </PromptInputModelSelectContent>
-            </PromptInputModelSelect>
-          </PromptInputTools>
+          <PromptInputTools></PromptInputTools>
           <PromptInputSubmit disabled={status === 'ready' && !input.trim()} status={status} />
         </PromptInputToolbar>
       </PromptInput>
