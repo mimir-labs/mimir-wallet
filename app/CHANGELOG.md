@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.29.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.28.0...mimir-wallet-app-v2.29.0) (2025-09-26)
+
+
+### Features
+
+* Add zkverify mainnet support ([#312](https://github.com/mimir-labs/mimir-wallet/issues/312)) ([39d5d37](https://github.com/mimir-labs/mimir-wallet/commit/39d5d373775fb66ee73f50a41c8aefb639f7e955))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.29.0
+    * @mimir-wallet/service bumped to 2.29.0
+    * @mimir-wallet/ui bumped to 2.29.0
+
 ## [2.28.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.27.0...mimir-wallet-app-v2.28.0) (2025-09-21)
 
 
