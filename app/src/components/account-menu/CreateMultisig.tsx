@@ -12,6 +12,7 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
   const navigate = useNavigate();
   const ref = useRef<HTMLButtonElement>(null);
   const [width, setWidth] = useState<number>();
+  const [isOpen, setOpen] = useState(false);
 
   useEffect(() => {
     setWidth(ref.current?.clientWidth);
@@ -19,9 +20,9 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
 
   return (
     <>
-      <Popover>
+      <Popover open={isOpen} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button className='h-12' fullWidth radius='md' ref={ref}>
+          <Button className='h-12' fullWidth radius='md' ref={ref} onClick={() => setOpen(true)}>
             <IconAddFill />
             Create New
           </Button>
@@ -32,7 +33,18 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
           className='flex flex-col items-stretch space-y-2.5 p-2.5'
           style={{ width }}
         >
-          <Button asChild key='Multisig' radius='sm' variant='light' color='primary' className='text-foreground'>
+          <Button
+            asChild
+            key='Multisig'
+            radius='sm'
+            variant='light'
+            color='primary'
+            className='text-foreground'
+            onClick={() => {
+              setOpen(false);
+              onClose?.();
+            }}
+          >
             <Link to='/create-multisig'>Create Multisig</Link>
           </Button>
           <Button
@@ -42,6 +54,7 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
             color='primary'
             className='text-foreground'
             onClick={() => {
+              setOpen(false);
               navigate('/add-proxy');
               onClose?.();
             }}
@@ -58,6 +71,7 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
             color='primary'
             className='text-foreground'
             onClick={() => {
+              setOpen(false);
               navigate('/create-pure');
               onClose?.();
             }}

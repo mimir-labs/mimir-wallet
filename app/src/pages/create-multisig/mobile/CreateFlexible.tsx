@@ -21,7 +21,7 @@ import { useToggle } from 'react-use';
 
 import { addressToHex, signAndSend, useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
+import { Button, buttonSpinner, Divider, Tooltip } from '@mimir-wallet/ui';
 
 import AccountVisibility from '../components/AccountVisibility';
 import CreateSuccess from '../components/CreateSuccess';
@@ -330,7 +330,7 @@ function CreateFlexible({
               )}
               {pure ? (
                 <Button
-                  disabled={!(signer && pure) || loadingCancel || !source}
+                  disabled={loadingSecond || !(signer && pure) || loadingCancel || !source}
                   fullWidth
                   color='primary'
                   onClick={() => {
@@ -339,10 +339,17 @@ function CreateFlexible({
                     }
                   }}
                 >
-                  Set Signers
+                  {loadingSecond ? buttonSpinner : null}
+                  Set Members
                 </Button>
               ) : (
-                <Button disabled={!(signer && isEnought)} fullWidth color='primary' onClick={createPure}>
+                <Button
+                  disabled={loadingFirst || !(signer && isEnought)}
+                  fullWidth
+                  color='primary'
+                  onClick={createPure}
+                >
+                  {loadingFirst ? buttonSpinner : null}
                   Create
                 </Button>
               )}
