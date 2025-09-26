@@ -120,8 +120,8 @@ function CustomGasFeeSelect({
           <SelectContent>
             {feeEligibleAssets.map((asset) => (
               <SelectItem
-                key={asset.assetId || 'native'}
-                value={asset.assetId || 'native'}
+                key={asset.isNative ? 'native' : asset.key}
+                value={asset.isNative ? 'native' : asset.key}
                 className='w-full pr-2.5 *:[span]:first:hidden'
               >
                 <div className='flex w-full items-center justify-between'>

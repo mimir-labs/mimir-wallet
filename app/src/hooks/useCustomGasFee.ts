@@ -3,8 +3,6 @@
 
 import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
-import { findToken } from '@/config';
-import { isHex } from '@polkadot/util';
 import { useMemo, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
@@ -34,77 +32,16 @@ export function useCustomGasFeeSupport(): boolean {
  */
 export function useCustomGasFee(network: string) {
   const isSupported = useCustomGasFeeSupport();
-  const { api, isApiReady } = useApi();
   const [assets, isFetched, isFetching] = useChainXcmAsset(network);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
-
-  // Create native asset info
-  const nativeAsset = useMemo((): CompleteEnhancedAssetInfo | null => {
-    if (!api || !isApiReady) {
-      return null;
-    }
-
-    const symbol = api.registry.chainTokens[0].toString();
-    const decimals = api.registry.chainDecimals[0];
-    const genesisHash = api.genesisHash.toHex();
-
-    return {
-      name: symbol,
-      symbol: symbol,
-      decimals: decimals,
-      existentialDeposit: api.consts.balances.existentialDeposit.toString(),
-      logoUri: findToken(genesisHash).Icon,
-      isNative: true,
-      price: 0,
-      priceChange: 0,
-      isSufficient: true
-    };
-  }, [api, isApiReady]);
 
   // Filter assets that can be used for fees
   // Include native token and local assets (exclude foreignAssets)
   const feeEligibleAssets = useMemo(() => {
-    const eligibleAssets: CompleteEnhancedAssetInfo[] = [];
-
-    // Always include native token first
-    if (nativeAsset) {
-      eligibleAssets.push(nativeAsset);
-    }
-
-    if (!isSupported) {
-      return eligibleAssets;
-    }
-
-    // Add local assets (exclude foreignAssets)
-    if (assets) {
-      const localAssets = assets.filter((asset) => {
-        // Exclude foreignAssets (identified by hex assetId)
-        if (isHex(asset.assetId)) {
-          return false;
-        }
-
-        // For local assets, include those marked as sufficient
-        return asset.isSufficient === true;
-      });
-
-      eligibleAssets.push(...localAssets);
-    }
-
-    return eligibleAssets;
-  }, [assets, isSupported, nativeAsset]);
-
-  // Get the currently selected asset info
-  const selectedAsset = useMemo(() => {
-    if (!selectedAssetId) {
-      return null;
-    }
-
-    return (
-      feeEligibleAssets.find((asset) =>
-        asset.isNative ? selectedAssetId === 'native' : asset.assetId === selectedAssetId
-      ) || null
-    );
-  }, [selectedAssetId, feeEligibleAssets]);
+    return assets.filter((asset) => {
+      return isSupported ? asset.isNative || asset.isSufficient : !!asset.isNative;
+    });
+  }, [assets, isSupported]);
 
   // Auto-select native token by default
   useMemo(() => {
@@ -120,7 +57,6 @@ export function useCustomGasFee(network: string) {
   return {
     isSupported,
     feeEligibleAssets,
-    selectedAsset,
     selectedAssetId,
     setSelectedAssetId,
     isFetched,

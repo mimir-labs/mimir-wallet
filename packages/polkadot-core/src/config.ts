@@ -647,6 +647,18 @@ const solochainEndpoints: Endpoint[] = [
     explorerUrl: 'https://avail-turing.subscan.io/'
   },
   {
+    key: 'zkverify',
+    icon: '/chain-icons/zkverify.svg',
+    tokenIcon: '/token-icons/VFY.svg',
+    name: 'zkVerify Mainnet',
+    wsUrl: {
+      zkVerify: 'wss://zkverify-rpc.zkverify.io/'
+    },
+    genesisHash: '0x060e3dd3fa2904d031206bb913c954687a2bcc350e5a83d33d9e273ad21460f1',
+    ss58Format: 8741,
+    explorerUrl: 'https://zkverify.subscan.io/'
+  },
+  {
     key: 'zkverify-testnet',
     icon: '/chain-icons/zkverify.svg',
     tokenIcon: '/token-icons/VFY.svg',
