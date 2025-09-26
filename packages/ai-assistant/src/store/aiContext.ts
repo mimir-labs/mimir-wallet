@@ -68,11 +68,30 @@ export const useAIContext = create<AIContext>()((_, get) => {
       let currentAccountInfo = '';
 
       if (state?.currentAccount) {
-        const { address, isPure, isMultisig, network } = state.currentAccount;
+        const { address, isPure, isMultisig, network, members, delegatees, threshold } = state.currentAccount;
         const accountType = isPure ? 'pure proxy account' : isMultisig ? 'multisig account' : 'eoa account';
         const networkLabel = network ? ` (network: ${network || 'all'})` : '';
 
-        currentAccountInfo = `My Current address: ${address}, ${accountType}${networkLabel}`;
+        let accountDetails = `My Current address: ${address}, ${accountType}${networkLabel}`;
+
+        // Add multisig details if applicable
+        if (isMultisig && members && threshold) {
+          accountDetails += `
+Multisig Details:
+- Members: ${members.length} accounts [${members.join(', ')}]
+- Threshold: ${threshold}/${members.length} (requires ${threshold} member signatures to execute transactions)
+- Description: This multisig account requires at least ${threshold} out of ${members.length} members to approve transactions`;
+        }
+
+        // Add delegatees information if applicable
+        if (delegatees && delegatees.length > 0) {
+          accountDetails += `
+Delegation Details:
+- Delegatees: ${delegatees.length} accounts [${delegatees.join(', ')}]
+- Description: This account has delegated transaction permissions to the listed accounts`;
+        }
+
+        currentAccountInfo = accountDetails;
       } else {
         currentAccountInfo = ``;
       }

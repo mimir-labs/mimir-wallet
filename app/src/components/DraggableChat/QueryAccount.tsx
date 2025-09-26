@@ -3,7 +3,6 @@
 
 import type { AccountData, DelegateeProp } from '@/hooks/types';
 
-import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import IconClock from '@/assets/svg/icon-clock.svg?react';
 import { useMemo } from 'react';
 
@@ -13,7 +12,7 @@ import { Chip, Tooltip } from '@mimir-wallet/ui';
 import AddressCell from '../AddressCell';
 
 interface QueryAccountProps {
-  address: string; // Single address to query
+  account: AccountData; // Single address to query
 }
 
 // Component for proxy type tags with network info tooltip
@@ -93,43 +92,8 @@ function AddressSection({
   );
 }
 
-// Empty state component
-function EmptyState() {
-  return (
-    <div className='border-divider-300 flex w-full items-center justify-center rounded-[10px] border p-[10px]'>
-      <div className='text-foreground/50 text-[14px]'>No account data found</div>
-    </div>
-  );
-}
-
 // Main QueryAccount component
-function QueryAccount({ address }: QueryAccountProps) {
-  const [accountData, isFetched, isFetching] = useQueryAccountOmniChain(address);
-
-  // Show loading state
-  if (isFetching && !accountData) {
-    return (
-      <div className='flex w-full flex-col items-start gap-[5px]'>
-        <div className='text-foreground text-[14px]'>Loading account data...</div>
-        <div className='border-divider-300 flex w-full items-center justify-center rounded-[10px] border p-[10px]'>
-          <div className='text-foreground/50 text-[14px]'>Fetching account information...</div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show empty state if no data
-  if (isFetched && !accountData) {
-    return (
-      <div className='flex w-full flex-col items-start gap-[5px]'>
-        <div className='text-foreground text-[14px]'>Account Information</div>
-        <EmptyState />
-      </div>
-    );
-  }
-
-  if (!accountData) return null;
-
+function QueryAccount({ account: accountData }: QueryAccountProps) {
   // Extract data for different sections
   const members = accountData.type === 'multisig' ? accountData.members : [];
   const proxies = accountData.delegatees || [];
@@ -167,7 +131,7 @@ function QueryAccount({ address }: QueryAccountProps) {
         // Show the queried address itself when no other data is available
         <div className='flex w-full flex-col gap-[5px]'>
           <div className='text-foreground text-[14px] font-normal'>Queried Address</div>
-          <AccountCard address={address} />
+          <AccountCard address={accountData.address} />
         </div>
       )}
     </div>

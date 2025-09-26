@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AccountData } from '@/hooks/types';
 import type { ToolUIPart, UITools } from 'ai';
 
 import { useAccount } from '@/accounts/useAccount';
@@ -112,8 +113,8 @@ const DraggableChatWindow = forwardRef<DraggableChatWindowRef, DraggableChatProp
         case 'tool-queryAccount':
           return output.accounts?.length ? (
             <div className='flex w-full flex-col gap-[10px]'>
-              {output.accounts.map((address: string, index: number) => (
-                <QueryAccount key={`${address}-${index}`} address={address} />
+              {output.accounts.map((account: AccountData, index: number) => (
+                <QueryAccount key={`${account.address}-${index}`} account={account} />
               ))}
             </div>
           ) : null;

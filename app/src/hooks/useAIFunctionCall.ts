@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
+import { transformAccount } from '@/accounts/useQueryAccount';
 import { useEffect } from 'react';
 import { parsePath, useNavigate } from 'react-router-dom';
 
@@ -14,6 +15,7 @@ import {
   useApi,
   useNetworks
 } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 
 // Types for function call arguments
 interface AddressArguments {
@@ -418,7 +420,7 @@ function useSwitchNetworksCall() {
 }
 
 // Function call handlers map for better organization
-function createFunctionCallHandlers() {
+function createFunctionCallHandlers(chainSS58: number) {
   const handlers = {
     // Simple handlers without validation
     matchDapps: (id: string) => createSuccessResponse(id, 'please select a dapps'),
@@ -473,14 +475,18 @@ function createFunctionCallHandlers() {
       });
     },
 
-    queryAccount: (id: string, { accounts }: AccountsArguments) => {
+    queryAccount: async (id: string, { accounts }: AccountsArguments) => {
       const validAddresses = validateAddresses(id, accounts);
 
       if (typeof validAddresses === 'object' && 'success' in validAddresses) {
         return validAddresses; // Error response
       }
 
-      return createSuccessResponse(id, { accounts: validAddresses });
+      const accountDetails = await Promise.all(accounts.map((address) => service.account.getOmniChainDetails(address)));
+
+      return createSuccessResponse(id, {
+        accounts: accountDetails.map((item) => transformAccount(chainSS58, item))
+      });
     }
   };
 
@@ -488,6 +494,8 @@ function createFunctionCallHandlers() {
 }
 
 export function useAIFunctionCall() {
+  const { chainSS58 } = useApi();
+
   useNavigateCall();
   useSearchAddressBookCall();
   useSearchNetworksCall();
@@ -495,7 +503,7 @@ export function useAIFunctionCall() {
   useSwitchNetworksCall();
 
   useEffect(() => {
-    const handlers = createFunctionCallHandlers();
+    const handlers = createFunctionCallHandlers(chainSS58);
 
     const handler: FunctionCallHandler = (event) => {
       const { name, id, arguments: args } = event;
@@ -515,5 +523,5 @@ export function useAIFunctionCall() {
     };
 
     return functionCallManager.onFunctionCall(handler);
-  }, []);
+  }, [chainSS58]);
 }
