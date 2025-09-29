@@ -4,8 +4,6 @@
 // Types
 export * from './types.js';
 
-// Store
-export { useAiStore } from './store/aiStore.js';
 export { functionCallManager } from './store/functionCallManager.js';
 
 // Components

@@ -7,7 +7,6 @@ import { useQueryParam } from '@/hooks/useQueryParams';
 import { Tab, Tabs } from '@mimir-wallet/ui';
 
 import AccountDisplay from './account-display';
-import AiAssistantSetting from './ai-assistant-setting';
 import NetworkSetting from './network';
 import NotificationSetting from './notification-setting';
 
@@ -29,9 +28,6 @@ function GeneralSetting() {
         </Tab>
         <Tab key='account-display' title='Account Display'>
           <AccountDisplay />
-        </Tab>
-        <Tab key='ai-assistant' title='AI Assistant'>
-          <AiAssistantSetting />
         </Tab>
         {current ? (
           <Tab key='notification' title='Notification'>

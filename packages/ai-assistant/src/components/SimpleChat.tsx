@@ -4,27 +4,22 @@
 import type { FunctionCallEvent } from '../types.js';
 
 import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type ToolUIPart, type UITools } from 'ai';
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import {
+  DefaultChatTransport,
+  isToolOrDynamicToolUIPart,
+  type ToolUIPart,
+  type UIDataTypes,
+  type UIMessage,
+  type UITools
+} from 'ai';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 import { useAIContext } from '../store/aiContext.js';
-import { useAiStore } from '../store/aiStore.js';
 import { functionCallManager } from '../store/functionCallManager.js';
 import { Conversation, ConversationContent, ConversationScrollButton } from './conversation.js';
 import { Loader } from './Loader.js';
 import { Message, MessageContent } from './message.js';
-import {
-  PromptInput,
-  PromptInputModelSelect,
-  PromptInputModelSelectContent,
-  PromptInputModelSelectItem,
-  PromptInputModelSelectTrigger,
-  PromptInputModelSelectValue,
-  PromptInputSubmit,
-  PromptInputTextarea,
-  PromptInputToolbar,
-  PromptInputTools
-} from './prompt-input.js';
+import { PromptInput, PromptInputSubmit, PromptInputTextarea } from './prompt-input.js';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './reasoning.js';
 import { Response } from './response.js';
 import { Suggestion, Suggestions } from './suggestion.js';
@@ -37,6 +32,51 @@ interface Props {
 
 export interface SimpleChatRef {
   sendMessage: (message: string) => void;
+}
+
+function lastAssistantMessageIsCompleteWithToolCalls(messages: UIMessage<unknown, UIDataTypes, UITools>[]) {
+  const message = messages[messages.length - 1];
+
+  if (!message) {
+    return false;
+  }
+
+  if (message.role !== 'assistant') {
+    return false;
+  }
+
+  const lastStepStartIndex = message.parts.reduce((lastIndex, part, index) => {
+    return part.type === 'step-start' ? index : lastIndex;
+  }, -1);
+  const lastStepToolInvocations = message.parts.slice(lastStepStartIndex + 1).filter(isToolOrDynamicToolUIPart);
+
+  if (lastStepToolInvocations.length === 0) {
+    return false;
+  }
+
+  // Tool types that should prevent automatic sending when they are the last tool
+  const blockedToolTypes = [
+    'tool-matchDapps',
+    'tool-getFund',
+    'tool-walletConnect',
+    'tool-connectWallet',
+    'tool-switchNetworks',
+    'tool-setSs58Chain',
+    'tool-showQRCode',
+    'tool-viewOnExplorer',
+    'tool-addToWatchlist',
+    'tool-queryAccount',
+    'tool-viewPendingTransaction'
+  ];
+
+  // Check if the last tool invocation is one of the blocked types
+  const lastTool = lastStepToolInvocations[lastStepToolInvocations.length - 1];
+
+  if (blockedToolTypes.includes(lastTool.type)) {
+    return false;
+  }
+
+  return lastStepToolInvocations.every((part) => part.state === 'output-available');
 }
 
 const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, onStatusChange }, ref) => {
@@ -52,16 +92,12 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
         return {
           body: {
             messages: options.messages,
-            system: useAiStore.getState().config.systemPrompt || '',
-            stateMessage: useAIContext.getState().getStateContext(),
-            topK: useAiStore.getState().config.topK,
-            topP: useAiStore.getState().config.topP,
-            temperature: useAiStore.getState().config.temperature
+            stateMessage: useAIContext.getState().getStateContext()
           }
         };
       }
     }),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: ({ messages }) => lastAssistantMessageIsCompleteWithToolCalls(messages),
     onToolCall: async ({ toolCall }) => {
       console.log('Tool call received:', toolCall);
 
@@ -93,7 +129,7 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
         addToolResult({
           tool: toolCall.toolName,
           toolCallId: toolCall.toolCallId,
-          output: JSON.stringify({ error: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` })
+          output: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
         });
       }
     }
@@ -179,12 +215,13 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
         <ConversationScrollButton />
       </Conversation>
 
-      <PromptInput onSubmit={handleSubmit} className='mt-4'>
+      <PromptInput onSubmit={handleSubmit} className='relative mt-4'>
         <PromptInputTextarea onChange={(e) => setInput(e.target.value)} value={input} />
-        <PromptInputToolbar>
-          <PromptInputTools></PromptInputTools>
-          <PromptInputSubmit disabled={status === 'ready' && !input.trim()} status={status} />
-        </PromptInputToolbar>
+        <PromptInputSubmit
+          className='absolute right-1 bottom-1'
+          disabled={status === 'ready' && !input.trim()}
+          status={status}
+        />
       </PromptInput>
     </div>
   );

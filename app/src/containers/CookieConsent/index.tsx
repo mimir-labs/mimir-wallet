@@ -97,12 +97,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({
 
   return (
     <div
-      className={cn(
-        'absolute top-[calc(100svh-144px)] z-50',
-        'right-4 left-4',
-        'bg-secondary shadow-medium rounded-[20px] p-4',
-        className
-      )}
+      className={cn('sticky bottom-4 z-50', 'mx-4 mt-auto', 'bg-secondary shadow-medium rounded-[20px] p-4', className)}
     >
       <div className='flex items-start gap-4'>
         {/* Content */}

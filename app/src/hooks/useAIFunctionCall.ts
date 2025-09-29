@@ -164,11 +164,6 @@ export function useSearchAddressBookCall() {
         interface SearchResult {
           name: string;
           address: string;
-          hasPermission: boolean;
-          isMultisig: boolean;
-          isPure: boolean;
-          network?: string;
-          type: string;
           matchType: 'address_exact' | 'name_exact';
         }
 
@@ -177,7 +172,6 @@ export function useSearchAddressBookCall() {
         searchData.forEach((addr) => {
           const name = (addr.name || '').toLowerCase();
           const address = addr.address.toLowerCase();
-          const type = addr.isPure ? 'Pure proxy account' : addr.isMultisig ? 'Multisig account' : 'Standard account';
 
           let matchType: 'address_exact' | 'name_exact' | null = null;
 
@@ -198,11 +192,6 @@ export function useSearchAddressBookCall() {
             results.push({
               name: addr.name || 'Unnamed',
               address: addr.address,
-              hasPermission: addr.hasPermission,
-              isMultisig: addr.isMultisig,
-              isPure: addr.isPure,
-              network: addr.network,
-              type,
               matchType
             });
           }
@@ -423,10 +412,10 @@ function useSwitchNetworksCall() {
 function createFunctionCallHandlers(chainSS58: number) {
   const handlers = {
     // Simple handlers without validation
-    matchDapps: (id: string) => createSuccessResponse(id, 'tell user to click dapps in page'),
-    getFund: (id: string) => createSuccessResponse(id, 'tell user to click fund button in page'),
-    walletConnect: (id: string) => createSuccessResponse(id, 'tell user to click Connect button in page'),
-    connectWallet: (id: string) => createSuccessResponse(id, 'tell user to click View button in page'),
+    matchDapps: (id: string) => createSuccessResponse(id, 'please click dapps button'),
+    getFund: (id: string) => createSuccessResponse(id, 'please click fund button'),
+    walletConnect: (id: string) => createSuccessResponse(id, 'please click Connect button'),
+    connectWallet: (id: string) => createSuccessResponse(id, 'please click View button'),
 
     // Address validation handlers
     showQRCode: (id: string, { address }: AddressArguments) => {
