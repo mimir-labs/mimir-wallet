@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.30.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.29.0...ui-v2.30.0) (2025-09-29)
+
+
+### Features
+
+* add ai assistant for mimir ([#301](https://github.com/mimir-labs/mimir-wallet/issues/301)) ([7966a82](https://github.com/mimir-labs/mimir-wallet/commit/7966a825f327478c8f3795b05cff51c73dfb61b1))
+
 ## [2.29.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.28.0...ui-v2.29.0) (2025-09-26)
 
 
