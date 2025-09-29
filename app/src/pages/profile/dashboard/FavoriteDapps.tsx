@@ -21,7 +21,7 @@ function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (i
           radius='md'
           className='relative aspect-square h-auto min-h-0 w-full p-[5px] hover:bg-transparent [&:hover>.close-btn]:block'
           variant='light'
-          onClick={openDapp}
+          onClick={() => openDapp()}
         >
           <Avatar
             className='aspect-square'

@@ -21,6 +21,7 @@ interface Props {
   withAddress?: boolean;
   withCopy?: boolean;
   withName?: boolean;
+  showMultisigBadge?: boolean;
 }
 
 const AddressRow = forwardRef<HTMLDivElement, Props>(
@@ -34,6 +35,7 @@ const AddressRow = forwardRef<HTMLDivElement, Props>(
       withAddress = false,
       withCopy = false,
       withName = true,
+      showMultisigBadge = true,
       ...props
     }: Props,
     ref
@@ -48,7 +50,12 @@ const AddressRow = forwardRef<HTMLDivElement, Props>(
         style={{ maxHeight: iconSize }}
         {...props}
       >
-        <IdentityIcon className='AddressRow-Icon' size={iconSize} value={address} />
+        <IdentityIcon
+          className='AddressRow-Icon'
+          size={iconSize}
+          value={address}
+          showMultisigBadge={showMultisigBadge}
+        />
         <div className='AddressRow-Content flex items-center gap-[5px]'>
           {withName && (
             <span data-bold={withName && withAddress} className='AddressRow-Name data-[bold="true"]:font-bold'>

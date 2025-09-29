@@ -7,10 +7,11 @@ import { useAccount } from '@/accounts/useAccount';
 import { StepIndicator } from '@/components';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useWizardState } from '@/hooks/useWizardState';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
+import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider, Spinner } from '@mimir-wallet/ui';
 
@@ -59,6 +60,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
   };
 
   const [wizardState, wizardActions] = useWizardState(initialData, STEPS);
+  const { goToStep, updateData } = wizardActions;
 
   // Success modal state
   const [isSuccess, toggleSuccess] = useToggle(false);
@@ -71,6 +73,60 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
     // Show success modal for both completed and pending transactions
     toggleSuccess(true);
   };
+
+  useEffect(() => {
+    const handler: FunctionCallHandler = (event) => {
+      if (event.name !== 'createProxy') return;
+
+      const newData: Partial<ProxyWizardData> = {};
+
+      if (event.arguments.proxied !== undefined) {
+        newData.proxied = event.arguments.proxied;
+      }
+
+      if (event.arguments.proxy !== undefined) {
+        newData.proxy = event.arguments.proxy;
+      }
+
+      if (event.arguments.isPureProxy !== undefined) {
+        newData.isPureProxy = event.arguments.isPureProxy;
+      }
+
+      if (event.arguments.pureProxyName !== undefined) {
+        newData.pureProxyName = event.arguments.pureProxyName;
+      }
+
+      if (event.arguments.proxyType !== undefined) {
+        newData.proxyType = event.arguments.proxyType;
+      }
+
+      if (event.arguments.hasDelay !== undefined) {
+        newData.hasDelay = event.arguments.hasDelay;
+      }
+
+      if (event.arguments.delayType !== undefined) {
+        newData.delayType = event.arguments.delayType;
+      }
+
+      if (event.arguments.customBlocks !== undefined) {
+        newData.customBlocks = event.arguments.customBlocks.toString();
+      }
+
+      if (event.arguments.step !== undefined) {
+        goToStep(event.arguments.step);
+      }
+
+      updateData(newData);
+
+      return functionCallManager.respondToFunctionCall({
+        id: event.id,
+        success: true,
+        result: newData
+      });
+    };
+
+    return functionCallManager.onFunctionCall(handler);
+  }, [goToStep, setNetwork, updateData]);
 
   return (
     <SubApiRoot

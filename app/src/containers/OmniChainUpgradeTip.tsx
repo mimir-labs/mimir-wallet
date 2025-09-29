@@ -24,9 +24,27 @@ function OmniChainUpgradeTip() {
             placement={upSm ? 'start' : 'bottom'}
             classNames={{
               tab: 'justify-start',
+              tabList: 'p-0 rounded-none pr-2',
               panel: 'space-y-5'.concat(upSm ? ' border-l-1 border-l-secondary pl-3' : '')
             }}
           >
+            <Tab key='ai-assistant' title='AI'>
+              <div className='bg-secondary flex items-center justify-center rounded-[10px] p-5'>
+                <video
+                  src='https://mimir-labs.github.io/mimir-assets/videos/ai.mp4'
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  controls={false}
+                  className='pointer-events-none h-auto max-w-full'
+                />
+              </div>
+              <p className='text-foreground font-bold'>
+                Mimir AI: Use the AI assistant to help with daily interactions, quickly understand multisig, and find
+                applications that match your intentions.
+              </p>
+            </Tab>
             <Tab key='remoteProxy' title='Remote Proxy'>
               <div className='bg-secondary flex items-center justify-center rounded-[10px] p-5'>
                 <video
