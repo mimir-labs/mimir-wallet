@@ -4,14 +4,7 @@
 import type { FunctionCallEvent } from '../types.js';
 
 import { useChat } from '@ai-sdk/react';
-import {
-  DefaultChatTransport,
-  isToolOrDynamicToolUIPart,
-  type ToolUIPart,
-  type UIDataTypes,
-  type UIMessage,
-  type UITools
-} from 'ai';
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type ToolUIPart, type UITools } from 'ai';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 import { useAIContext } from '../store/aiContext.js';
@@ -34,51 +27,6 @@ export interface SimpleChatRef {
   sendMessage: (message: string) => void;
 }
 
-function lastAssistantMessageIsCompleteWithToolCalls(messages: UIMessage<unknown, UIDataTypes, UITools>[]) {
-  const message = messages[messages.length - 1];
-
-  if (!message) {
-    return false;
-  }
-
-  if (message.role !== 'assistant') {
-    return false;
-  }
-
-  const lastStepStartIndex = message.parts.reduce((lastIndex, part, index) => {
-    return part.type === 'step-start' ? index : lastIndex;
-  }, -1);
-  const lastStepToolInvocations = message.parts.slice(lastStepStartIndex + 1).filter(isToolOrDynamicToolUIPart);
-
-  if (lastStepToolInvocations.length === 0) {
-    return false;
-  }
-
-  // Tool types that should prevent automatic sending when they are the last tool
-  const blockedToolTypes = [
-    'tool-matchDapps',
-    'tool-getFund',
-    'tool-walletConnect',
-    'tool-connectWallet',
-    'tool-switchNetworks',
-    'tool-setSs58Chain',
-    'tool-showQRCode',
-    'tool-viewOnExplorer',
-    'tool-addToWatchlist',
-    'tool-queryAccount',
-    'tool-viewPendingTransaction'
-  ];
-
-  // Check if the last tool invocation is one of the blocked types
-  const lastTool = lastStepToolInvocations[lastStepToolInvocations.length - 1];
-
-  if (blockedToolTypes.includes(lastTool.type)) {
-    return false;
-  }
-
-  return lastStepToolInvocations.every((part) => part.state === 'output-available');
-}
-
 const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, onStatusChange }, ref) => {
   const [input, setInput] = useState('');
 
@@ -97,7 +45,7 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
         };
       }
     }),
-    sendAutomaticallyWhen: ({ messages }) => lastAssistantMessageIsCompleteWithToolCalls(messages),
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onToolCall: async ({ toolCall }) => {
       console.log('Tool call received:', toolCall);
 
