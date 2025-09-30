@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.30.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.29.0...ui-v2.30.0) (2025-09-30)
+
+
+### Features
+
+* Add conversation id for ai assistant ([75c79e5](https://github.com/mimir-labs/mimir-wallet/commit/75c79e5227aaed8e4bf5827d0eca6c5e1ff2b739))
+
 ## [2.29.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.28.0...ui-v2.29.0) (2025-09-26)
 
 

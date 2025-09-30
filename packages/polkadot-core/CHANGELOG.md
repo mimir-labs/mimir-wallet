@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.30.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.29.0...polkadot-core-v2.30.0) (2025-09-30)
+
+
+### Features
+
+* Add conversation id for ai assistant ([75c79e5](https://github.com/mimir-labs/mimir-wallet/commit/75c79e5227aaed8e4bf5827d0eca6c5e1ff2b739))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.30.0
+
 ## [2.29.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.28.0...polkadot-core-v2.29.0) (2025-09-26)
 
 
