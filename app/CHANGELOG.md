@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.30.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.29.0...mimir-wallet-app-v2.30.0) (2025-09-30)
+
+
+### Features
+
+* add ai assistant for mimir ([#319](https://github.com/mimir-labs/mimir-wallet/issues/319)) ([4e884c0](https://github.com/mimir-labs/mimir-wallet/commit/4e884c0e94a137f1bbe5846cd6ceb831e9097adb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.30.0
+    * @mimir-wallet/service bumped to 2.30.0
+    * @mimir-wallet/ui bumped to 2.30.0
+
 ## [2.29.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.28.0...mimir-wallet-app-v2.29.0) (2025-09-26)
 
 
