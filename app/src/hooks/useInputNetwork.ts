@@ -7,7 +7,7 @@ import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 
 export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: string[]) {
   const { allApis, network: rootNetwork, setNetwork: setRootNetwork } = useApi();
-  const { enableNetwork } = useNetworks();
+  const { enableNetwork, mode } = useNetworks();
   const [network, setNetwork] = useState(supportedNetworks?.at(0) || defaultNetwork || rootNetwork);
 
   const allApisRef = useRef(allApis);
@@ -15,33 +15,37 @@ export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: str
   allApisRef.current = allApis;
 
   useEffect(() => {
-    if (!supportedNetworks || supportedNetworks.length === 0) {
-      if (!allApisRef.current[network]) {
-        setNetwork(rootNetwork);
-      }
-    } else {
-      if (!supportedNetworks.includes(network)) {
-        const network = supportedNetworks[0];
+    if (mode === 'omni') {
+      if (!supportedNetworks || supportedNetworks.length === 0) {
+        if (!allApisRef.current[network]) {
+          setNetwork(rootNetwork);
+        }
+      } else {
+        if (!supportedNetworks.includes(network)) {
+          const network = supportedNetworks[0];
 
-        setNetwork(network);
+          setNetwork(network);
+        }
       }
     }
-  }, [network, supportedNetworks, rootNetwork]);
+  }, [network, supportedNetworks, mode, rootNetwork]);
 
   useEffect(() => {
-    if (!allApisRef.current[network]) {
+    if (mode === 'omni' && !allApisRef.current[network]) {
       enableNetwork(network);
     }
-  }, [network, enableNetwork]);
+  }, [network, enableNetwork, mode]);
 
   return [
     network,
     useCallback(
       (network: string) => {
-        setNetwork(network);
-        setRootNetwork(network);
+        if (mode === 'omni') {
+          setNetwork(network);
+          setRootNetwork(network);
+        }
       },
-      [setRootNetwork]
+      [mode, setRootNetwork]
     )
   ] as const;
 }

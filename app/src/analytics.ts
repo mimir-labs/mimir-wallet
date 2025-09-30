@@ -98,6 +98,36 @@ export function gaAction(action: string, parameters?: Record<string, any>) {
 
 // Specific analytics actions
 export const analyticsActions = {
+  // Switch between omni and solo mode
+  omniSolochain(mode: string) {
+    // GA4 Event
+    if (isGA4Initialized) {
+      try {
+        ReactGA.event({
+          category: 'TopBar',
+          action: 'OmniSoloSwitch',
+          label: `Switch to ${mode}`,
+          transport: 'beacon'
+        });
+      } catch (error) {
+        console.error('GA4 event failed:', error);
+      }
+    }
+
+    // PostHog Event
+    if (isPostHogInitialized) {
+      try {
+        posthogLib.capture('OmniSoloSwitch', {
+          mode,
+          previous_mode: mode === 'omni' ? 'solo' : 'omni',
+          source: 'topbar'
+        });
+      } catch (error) {
+        console.error('PostHog event failed:', error);
+      }
+    }
+  },
+
   // Track connected wallets
   connectedWallet(wallet: string) {
     // GA4 Event

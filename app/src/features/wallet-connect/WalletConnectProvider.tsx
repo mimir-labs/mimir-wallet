@@ -25,8 +25,8 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
   const { current } = useAccount();
   const [, , , , promise] = useQueryAccountOmniChain(current);
   const handlerRef = useRef<(event: Web3WalletTypes.SessionRequest) => void>();
-  const { networks, enableNetwork } = useNetworks();
-  const { chainSS58 } = useApi();
+  const { networks, mode, enableNetwork } = useNetworks();
+  const { genesisHash, network: currentNetwork, chainSS58 } = useApi();
   const { addQueue } = useTxQueue();
 
   handlerRef.current = async (event) => {
@@ -48,13 +48,23 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
             }
           }
 
-          const network = networks.find((item) => item.genesisHash === payload.genesisHash)?.key;
+          let network: string | undefined;
 
-          if (!network) {
-            throw new Error(`Network not supported`);
+          if (mode === 'omni') {
+            network = networks.find((item) => item.genesisHash === payload.genesisHash)?.key;
+
+            if (!network) {
+              throw new Error(`Network not supported`);
+            }
+          } else {
+            if (payload.genesisHash !== genesisHash) {
+              throw new Error(`Network not supported`);
+            }
+
+            network = currentNetwork;
           }
 
-          enableNetwork(network);
+          if (mode === 'omni') enableNetwork(network);
 
           addQueue({
             call: payload.method,

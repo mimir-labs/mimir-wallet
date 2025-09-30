@@ -8,12 +8,16 @@ import { useAllApis } from './useApiStore.js';
 import { useNetworks } from './useNetworks.js';
 
 export function useIdentityApi() {
-  const { networks } = useNetworks();
+  const { mode, networks } = useNetworks();
   const rootApi = useContext(ApiContext);
   const { chains } = useAllApis();
 
-  const identityNetwork =
-    networks.find((network) => network.key === rootApi.ss58Chain)?.identityNetwork || rootApi.ss58Chain;
+  if (mode === 'omni') {
+    const identityNetwork =
+      networks.find((network) => network.key === rootApi.ss58Chain)?.identityNetwork || rootApi.ss58Chain;
 
-  return chains[identityNetwork] ? chains[identityNetwork] : null;
+    return chains[identityNetwork] ? chains[identityNetwork] : null;
+  }
+
+  return rootApi.chain.identityNetwork ? chains[rootApi.chain.identityNetwork] : rootApi;
 }
