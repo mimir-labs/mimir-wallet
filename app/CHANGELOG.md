@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.30.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.30.0...mimir-wallet-app-v2.30.1) (2025-09-30)
+
+
+### Reverts
+
+* Restore Solo Chain Mode functionality ([#315](https://github.com/mimir-labs/mimir-wallet/issues/315)) ([d4bfad1](https://github.com/mimir-labs/mimir-wallet/commit/d4bfad1f76b8ee59a48ef04fac60f5e759215169))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.30.1
+    * @mimir-wallet/service bumped to 2.30.1
+    * @mimir-wallet/ui bumped to 2.30.1
+
 ## [2.30.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.29.0...mimir-wallet-app-v2.30.0) (2025-09-29)
 
 

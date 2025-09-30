@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.30.1](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.30.0...ui-v2.30.1) (2025-09-30)
+
+
+### Reverts
+
+* Restore Solo Chain Mode functionality ([#315](https://github.com/mimir-labs/mimir-wallet/issues/315)) ([d4bfad1](https://github.com/mimir-labs/mimir-wallet/commit/d4bfad1f76b8ee59a48ef04fac60f5e759215169))
+
 ## [2.30.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.29.0...ui-v2.30.0) (2025-09-29)
 
 
