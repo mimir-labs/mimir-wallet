@@ -4,10 +4,11 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
+import { isValidAddress, SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Spinner } from '@mimir-wallet/ui';
 
 import MultiTransferContent from './MultiTransferContent';
@@ -19,6 +20,72 @@ function MultiTransfer() {
   const [network, setNetwork] = useInputNetwork();
   const [sending, setSending] = useState(current || '');
   const [data, setData] = useState<MultiTransferData[]>([['', '', '']]);
+
+  useEffect(() => {
+    const handler: FunctionCallHandler = (event) => {
+      if (event.name !== 'batchTransferForm') return;
+
+      if (event.arguments.sending && !isValidAddress(event.arguments.sending)) {
+        return functionCallManager.respondToFunctionCall({
+          id: event.id,
+          success: false,
+          error: `Invalid sending address format ${event.arguments.sending}`
+        });
+      }
+
+      if (event.arguments.addRecipient) {
+        const invalidAddress = event.arguments.addRecipient.filter(
+          (item: { recipient: string; amount: number }) => !isValidAddress(item.recipient)
+        );
+
+        if (invalidAddress.length > 0) {
+          return functionCallManager.respondToFunctionCall({
+            id: event.id,
+            success: false,
+            error: `Invalid recipients address format ${invalidAddress.map((item: { recipient: string; amount: number }) => item.recipient).join(',')}`
+          });
+        }
+      }
+
+      if (event.arguments.sending !== undefined) {
+        setSending(event.arguments.sending);
+      }
+
+      if (event.arguments.addRecipient !== undefined) {
+        const recipients: MultiTransferData[] = event.arguments.addRecipient.map(
+          (item: { recipient: string; amount: number }) => [item.recipient, 'native', item.amount.toString()]
+        );
+
+        setData((prev) => {
+          const next = [...prev];
+
+          recipients.forEach((recipient) => {
+            const emptyIndex = next.findIndex(([address, assetId, amount]) => !address && !assetId && !amount);
+
+            if (emptyIndex !== -1) {
+              next[emptyIndex] = recipient;
+            } else {
+              next.push(recipient);
+            }
+          });
+
+          return next;
+        });
+      }
+
+      if (event.arguments.network !== undefined) {
+        setNetwork(event.arguments.network);
+      }
+
+      return functionCallManager.respondToFunctionCall({
+        id: event.id,
+        success: true,
+        result: 'Success update'
+      });
+    };
+
+    return functionCallManager.onFunctionCall(handler);
+  }, [setNetwork]);
 
   return (
     <SubApiRoot

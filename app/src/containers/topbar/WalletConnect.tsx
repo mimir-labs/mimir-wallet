@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import IconWalletConnect from '@/assets/svg/icon-wallet-connect.svg?react';
+import { events } from '@/events';
 import { WalletConnectContext, WalletConnectModal } from '@/features/wallet-connect';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { Avatar, Badge, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
@@ -31,6 +32,18 @@ function WalletConnect() {
   const [isOpen, toggleOpen] = useToggle(false);
 
   const buttonClassName = 'border-secondary  w-[32px] h-[32px] sm:w-[42px] sm:h-[42px] bg-secondary sm:bg-transparent';
+
+  useEffect(() => {
+    const handleEvent = () => {
+      toggleOpen(true);
+    };
+
+    events.on('walletconnect', handleEvent);
+
+    return () => {
+      events.off('walletconnect', handleEvent);
+    };
+  }, [toggleOpen]);
 
   if (!isReady)
     return (
