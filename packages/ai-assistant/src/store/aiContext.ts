@@ -53,6 +53,7 @@ interface AIContext {
   }>;
   state?: State;
   getStateContext: () => string;
+  getUserAddress: () => string | undefined;
 }
 
 export const useAIContext = create<AIContext>()((_, get) => {
@@ -127,6 +128,11 @@ ${stateInfo}
 ${networkSummary}
 </state>
 `;
+    },
+    getUserAddress: () => {
+      const { state } = get();
+
+      return state?.currentAccount?.address;
     }
   };
 });

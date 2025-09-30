@@ -5,7 +5,7 @@ import type { FunctionCallEvent } from '../types.js';
 
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type ToolUIPart, type UITools } from 'ai';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { useAIContext } from '../store/aiContext.js';
 import { functionCallManager } from '../store/functionCallManager.js';
@@ -29,22 +29,37 @@ export interface SimpleChatRef {
 
 const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, onStatusChange }, ref) => {
   const [input, setInput] = useState('');
+  const conversationIdRef = useRef<string>();
 
   // Use provided suggestions directly
   const displaySuggestions = suggestions;
 
-  const { messages, sendMessage, status, addToolResult, stop, regenerate } = useChat({
-    transport: new DefaultChatTransport({
-      api: import.meta.env.VITE_AI_ENDPOINT || 'https://ai-assitant.mimir.global/',
-      prepareSendMessagesRequest: (options) => {
-        return {
-          body: {
-            messages: options.messages,
-            stateMessage: useAIContext.getState().getStateContext()
-          }
-        };
+  const customTransport = new DefaultChatTransport({
+    api: import.meta.env.VITE_AI_ENDPOINT || 'https://ai-assitant.mimir.global/',
+    prepareSendMessagesRequest: (options) => ({
+      body: {
+        messages: options.messages,
+        stateMessage: useAIContext.getState().getStateContext(),
+        conversationId: conversationIdRef.current,
+        userAddress: useAIContext.getState().getUserAddress()
       }
     }),
+    fetch: async (input, init) => {
+      const response = await fetch(input, init);
+
+      const newConversationId = response.headers.get('x-conversation-id');
+
+      if (newConversationId && newConversationId !== conversationIdRef.current) {
+        conversationIdRef.current = newConversationId;
+        console.log('Conversation ID updated:', newConversationId);
+      }
+
+      return response;
+    }
+  });
+
+  const { messages, sendMessage, status, addToolResult, stop, regenerate } = useChat({
+    transport: customTransport,
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onToolCall: async ({ toolCall }) => {
       console.log('Tool call received:', toolCall);
