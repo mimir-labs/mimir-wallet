@@ -362,7 +362,8 @@ const kusamaEndpoints: Endpoint[] = [
     ss58Format: 2,
     explorerUrl: 'https://assethub-kusama.subscan.io/',
     statescanUrl: 'https://assethub-kusama.statescan.io/',
-    identityNetwork: 'people-kusama'
+    identityNetwork: 'people-kusama',
+    useRelayBlockForProxy: true
   },
   {
     key: 'people-kusama',
@@ -502,7 +503,8 @@ const paseoEndpoints: Endpoint[] = [
     httpUrl: 'https://asset-hub-paseo.dotters.network',
     genesisHash: '0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2',
     explorerUrl: 'https://assethub-paseo.subscan.io/',
-    statescanUrl: 'https://assethub-paseo.statescan.io/'
+    statescanUrl: 'https://assethub-paseo.statescan.io/',
+    useRelayBlockForProxy: true
   },
   {
     key: 'passethub',
@@ -581,7 +583,8 @@ const westendEndpoints: Endpoint[] = [
     genesisHash: '0x67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9',
     explorerUrl: 'https://assethub-westend.subscan.io/',
     statescanUrl: 'https://assethub-westend.statescan.io/',
-    polkavm: true
+    polkavm: true,
+    useRelayBlockForProxy: true
   }
 ];
 

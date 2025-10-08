@@ -27,6 +27,8 @@ export type Endpoint = {
   identityNetwork?: string;
   polkavm?: boolean;
   remoteProxyTo?: HexString;
+  // Indicates if proxy announcements use relay chain block numbers instead of parachain block numbers
+  useRelayBlockForProxy?: boolean;
 };
 
 export type Network = Endpoint & {
