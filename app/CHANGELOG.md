@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.31.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.30.0...mimir-wallet-app-v2.31.0) (2025-10-08)
+
+
+### Features
+
+* add relay chain auto-dependency for all parachains ([#321](https://github.com/mimir-labs/mimir-wallet/issues/321)) ([094ba22](https://github.com/mimir-labs/mimir-wallet/commit/094ba2253f04f7d4d7fa72155a8cb52c27f001c0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.31.0
+    * @mimir-wallet/service bumped to 2.31.0
+    * @mimir-wallet/ui bumped to 2.31.0
+
 ## [2.30.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.29.0...mimir-wallet-app-v2.30.0) (2025-09-30)
 
 
