@@ -32,11 +32,40 @@ function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNo
   }, [network, chains]);
 
   useEffect(() => {
+    // Track initialized APIs for cleanup
+    const initializedApis: string[] = [];
+
+    // Initialize identity network if needed in solo mode
     if (mode === 'solo' && chain.identityNetwork) {
       const identity = networks.find((network) => network.key === chain.identityNetwork);
 
-      identity && initializeApi(identity);
+      if (identity) {
+        initializeApi(identity);
+        initializedApis.push(identity.key);
+      }
     }
+
+    // Initialize relay chain for all parachains in solo mode
+    // Parachains need relay chain for various operations including proxy announcements
+    if (mode === 'solo' && chain.relayChain) {
+      const relayChain = networks.find((network) => network.key === chain.relayChain);
+
+      if (relayChain) {
+        initializeApi(relayChain);
+        initializedApis.push(relayChain.key);
+      }
+    }
+
+    // Cleanup: destroy initialized APIs when switching chain or mode
+    return () => {
+      if (mode === 'solo') {
+        // Only cleanup the APIs we initialized (identity and relay chain)
+        // Don't cleanup the main chain API
+        for (const apiKey of initializedApis) {
+          destroyApi(apiKey);
+        }
+      }
+    };
   }, [mode, chain, networks]);
 
   useEffect(() => {

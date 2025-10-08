@@ -64,8 +64,9 @@ function Item({
               </p>
             ) : (
               <p className='text-small flex-1 text-left leading-normal font-bold text-white'>
-                The Assethub Migration starts on {sourceNetwork?.name} on July 7. After the migration, all
-                multisig/proxy on {sourceNetwork?.name} will be moved to {destNetwork?.name}.
+                The Assethub Migration starts on {sourceNetwork?.name} on{' '}
+                {sourceChain === 'kusama' ? 'October 7' : 'July 7'}. After the migration, all multisig/proxy on{' '}
+                {sourceNetwork?.name} will be moved to {destNetwork?.name}.
                 <a target='_blank' href={MIGRATION_NOTICE_DOCS_URL} className='text-white underline'>
                   View Details
                 </a>

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@/hooks/types';
-import { useBestBlock } from '@/hooks/useBestBlock';
+import { useProxyBestBlock } from '@/hooks/useProxyBestBlock';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
@@ -32,7 +32,7 @@ export function useAnnouncementStatus(
     [account.delegatees, transaction.delegate]
   );
 
-  const [bestBlock, isFetched, isFetching] = useBestBlock();
+  const [bestBlock, isFetched, isFetching] = useProxyBestBlock();
   const {
     data: result,
     isFetched: isFetchedResult,
