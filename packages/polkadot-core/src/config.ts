@@ -461,7 +461,7 @@ const kusamaEndpoints: Endpoint[] = [
     explorerUrl: 'https://karura.subscan.io/'
   },
   {
-    key: 'acurast-canary',
+    key: 'acurast',
     icon: '/chain-icons/Acurast.png',
     tokenIcon: '/token-icons/ACU.png',
     name: 'Acurast Canary',
