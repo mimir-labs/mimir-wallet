@@ -459,6 +459,19 @@ const kusamaEndpoints: Endpoint[] = [
     genesisHash: '0xbaf5aabe40646d11f0ee8abbdc64f4a4b7674925cba08e4a05ff9ebed6e2126b',
     ss58Format: 8,
     explorerUrl: 'https://karura.subscan.io/'
+  },
+  {
+    key: 'acurast',
+    icon: '/chain-icons/Acurast.png',
+    tokenIcon: '/token-icons/ACU.png',
+    name: 'Acurast Canary',
+    relayChain: 'kusama',
+    paraId: 2239,
+    wsUrl: {
+      Acurast: 'wss://public-rpc.canary.acurast.com/'
+    },
+    genesisHash: '0xce7681fb12aa8f7265d229a9074be0ea1d5e99b53eedcec2deade43857901808',
+    ss58Format: 42
   }
 ];
 
