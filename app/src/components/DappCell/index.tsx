@@ -3,6 +3,7 @@
 
 import type { DappOption } from '@/config';
 
+import { analyticsActions } from '@/analytics';
 import IconMatrix from '@/assets/images/matrix.svg?react';
 import IconDiscord from '@/assets/svg/icon-discord.svg?react';
 import IconGithub from '@/assets/svg/icon-github.svg?react';
@@ -37,6 +38,12 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
 
   const openDapp = useOpenDapp(dapp);
 
+  // Track apps view when opening dapp
+  const handleOpenDapp = useCallback(() => {
+    analyticsActions.appsView(dapp.name);
+    openDapp();
+  }, [dapp.name, openDapp]);
+
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,7 +64,7 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
         className='bg-content1 border-secondary hover:bg-secondary transition-background shadow-medium relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] rounded-[20px] border-1 p-5'
         onClick={(e) => {
           e.stopPropagation();
-          openDapp();
+          handleOpenDapp();
         }}
       >
         <img src={dapp.icon} alt={dapp.name} className='h-12 w-12' />
@@ -83,7 +90,7 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
           e.stopPropagation();
 
           if (isFocus) {
-            openDapp();
+            handleOpenDapp();
           } else {
             setFocus(true);
           }
@@ -146,7 +153,7 @@ function DappCell({ addFavorite, isFavorite, size = 'md', removeFavorite, ...dap
 
             <p className='text-center'>{dapp.description}</p>
 
-            <Button size='lg' fullWidth className='w-[90%]' onClick={() => openDapp()}>
+            <Button size='lg' fullWidth className='w-[90%]' onClick={() => handleOpenDapp()}>
               Open Dapp
             </Button>
           </div>

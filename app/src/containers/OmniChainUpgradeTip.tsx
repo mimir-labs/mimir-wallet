@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { analyticsActions } from '@/analytics';
 import { NEW_FEATURE_TIP_KEY } from '@/constants';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
@@ -14,7 +15,14 @@ function OmniChainUpgradeTip() {
   if (isRead) return null;
 
   return (
-    <Modal isOpen size='3xl' onClose={() => setIsRead(true)}>
+    <Modal
+      isOpen
+      size='3xl'
+      onClose={() => {
+        analyticsActions.onboardingFeaturesClose();
+        setIsRead(true);
+      }}
+    >
       <ModalContent>
         <ModalHeader className='text-xl font-bold'>✨New Features</ModalHeader>
         <ModalBody>
@@ -22,6 +30,9 @@ function OmniChainUpgradeTip() {
             color='secondary'
             variant='light'
             placement={upSm ? 'start' : 'bottom'}
+            onSelectionChange={(value) => {
+              analyticsActions.onboardingFeature(value.toString());
+            }}
             classNames={{
               tab: 'justify-start',
               tabList: 'p-0 rounded-none pr-2',

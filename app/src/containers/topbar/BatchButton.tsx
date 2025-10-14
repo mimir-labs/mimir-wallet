@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
+import { analyticsActions } from '@/analytics';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
@@ -40,6 +41,10 @@ function BatchButton() {
           radius='md'
           onClick={() => {
             setRightSidebarTab('batch');
+
+            // Track batch started when opening
+            analyticsActions.batchStarted(txs.length);
+
             rightSidebarOpen ? closeRightSidebar() : openRightSidebar();
           }}
         >

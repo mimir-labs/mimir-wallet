@@ -4,6 +4,7 @@
 import type { BatchTxItem } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
+import { analyticsActions } from '@/analytics';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { InputNetwork } from '@/components';
@@ -56,6 +57,8 @@ function Content({
   // Memoize handlers to prevent unnecessary re-renders
   const handleItemSelection = useCallback((itemId: number | string, relatedBatch?: number) => {
     return (state: boolean) => {
+      // Track batch interacted when selecting/deselecting individual items
+      analyticsActions.batchInteracted();
       setSelected((values) => (state ? [...values, itemId] : values.filter((v) => itemId !== v)));
       setRelatedBatches((values) =>
         state
@@ -72,6 +75,8 @@ function Content({
   const handleItemDelete = useCallback(
     (itemId: number | string) => {
       return () => {
+        // Track batch interacted when deleting individual item
+        analyticsActions.batchInteracted();
         setSelected((values) => values.filter((v) => v !== itemId));
         deleteTx([itemId]);
       };
@@ -82,6 +87,8 @@ function Content({
   const handleItemCopy = useCallback(
     (item: BatchTxItem) => {
       return () => {
+        // Track batch interacted when copying individual item
+        analyticsActions.batchInteracted();
         addTx([item], false);
       };
     },
@@ -105,6 +112,8 @@ function Content({
         const newIndex = txs.findIndex((item) => item.id === over?.id);
 
         if (oldIndex !== -1 && newIndex !== -1) {
+          // Track batch interacted when reordering transactions
+          analyticsActions.batchInteracted();
           const newItems = arrayMove(txs, oldIndex, newIndex);
 
           setTxs(newItems);

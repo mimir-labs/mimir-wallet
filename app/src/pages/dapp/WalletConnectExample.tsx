@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { analyticsActions } from '@/analytics';
 import IconWalletConnect from '@/assets/svg/icon-wallet-connect.svg?react';
 import { WalletConnectContext, WalletConnectModal } from '@/features/wallet-connect';
 import { useContext } from 'react';
@@ -51,7 +52,15 @@ function WalletConnectExample() {
             </p>
           </div>
         </div>
-        <Button color='primary' radius='full' onClick={toggleOpen} className='w-full sm:w-auto'>
+        <Button
+          color='primary'
+          radius='full'
+          onClick={() => {
+            analyticsActions.multisigLoginCta();
+            toggleOpen();
+          }}
+          className='w-full sm:w-auto'
+        >
           Connect to Dapp
           <div className='bg-primary-foreground text-primary h-4 w-4 rounded-full p-0.5'>
             <IconWalletConnect style={{ width: 12, height: 12 }} />
