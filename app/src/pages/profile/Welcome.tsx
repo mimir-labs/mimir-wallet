@@ -5,6 +5,7 @@ import type { AccountData } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { groupAccounts, type GroupName } from '@/accounts/utils';
+import { analyticsActions } from '@/analytics';
 import Logo from '@/assets/images/logo.png';
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import IconSearch from '@/assets/svg/icon-search.svg?react';
@@ -46,7 +47,15 @@ function nextExampleAccount() {
   return list;
 }
 
-function AccountItem({ address }: { address: string }) {
+function AccountItem({
+  isExample,
+  isExtension,
+  address
+}: {
+  isExample?: boolean;
+  isExtension?: boolean;
+  address: string;
+}) {
   const { setCurrent } = useAccount();
   const navigate = useNavigate();
   const [totalUsd] = useBalanceTotalUsd(address);
@@ -60,6 +69,12 @@ function AccountItem({ address }: { address: string }) {
         e.stopPropagation();
         setCurrent(address);
         navigate('/', { replace: true });
+
+        if (isExample) {
+          analyticsActions.onboardingClickExample();
+        } else if (isExtension) {
+          analyticsActions.onboardingConnectedExtension();
+        }
       }}
     >
       <AddressCell shorten={false} showType value={address} withCopy withAddressBook addressCopyDisabled />
@@ -128,7 +143,14 @@ function Accounts({
 
         <Divider />
 
-        <Button fullWidth color='primary' onClick={openWallet}>
+        <Button
+          fullWidth
+          color='primary'
+          onClick={() => {
+            analyticsActions.onboardingConnectWallet();
+            openWallet();
+          }}
+        >
           Connect Wallet
         </Button>
       </div>
@@ -169,7 +191,7 @@ function Accounts({
         <>
           <h6>Extension Account</h6>
           {grouped.injected.map((account) => (
-            <AccountItem key={`extension-${account}`} address={account} />
+            <AccountItem key={`extension-${account}`} isExtension address={account} />
           ))}
         </>
       )}
@@ -197,7 +219,7 @@ function ExampleAccount() {
       <Divider />
 
       {exampleAccounts.map((account) => (
-        <AccountItem key={`example-${account}`} address={account} />
+        <AccountItem key={`example-${account}`} isExample address={account} />
       ))}
     </div>
   );

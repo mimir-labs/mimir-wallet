@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { analyticsActions } from '@/analytics';
 import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import React from 'react';
@@ -27,6 +28,9 @@ function TemplateButton() {
         variant='ghost'
         radius='md'
         onClick={() => {
+          // Track template started when opening
+          analyticsActions.templateStarted();
+
           if (isOpen) {
             closeRightSidebar();
           } else {

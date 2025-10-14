@@ -6,11 +6,12 @@ import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { FeatureError } from '../shared/error-handling';
 
+import { analyticsActions } from '@/analytics';
 import IconArrowLeft from '@/assets/svg/icon-arrow-left.svg?react';
 import { Input, InputNetwork } from '@/components';
 import JsonView from '@/components/JsonView';
 import { useInput } from '@/hooks/useInput';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Divider } from '@mimir-wallet/ui';
@@ -42,6 +43,7 @@ function AddTemplate({
   const [callData, setCallData] = useInput(defaultCallData || '');
   const [parsedCallData, setParsedCallData] = useState<Call | null>(null);
   const [callDataError, setCallDataError] = useState<FeatureError | null>(null);
+  const hasTrackedInteraction = useRef(false);
 
   useEffect(() => {
     const [call, error] = decodeCallData(registry, callData);
@@ -50,11 +52,26 @@ function AddTemplate({
     setCallDataError(error);
   }, [registry, callData]);
 
+  // Track interaction when user enters any input (only once)
+  useEffect(() => {
+    if (isView || hasTrackedInteraction.current) return;
+
+    const hasUserInput = (name && name !== defaultName) || (callData && callData !== defaultCallData);
+
+    if (hasUserInput) {
+      analyticsActions.templateInteracted();
+      hasTrackedInteraction.current = true;
+    }
+  }, [name, callData, defaultName, defaultCallData, isView]);
+
   const onAdd = () => {
     if (!(name && callData) || !!callDataError || !parsedCallData) return;
     parsedCallData.data;
 
     addTemplate({ name, call: parsedCallData.toHex() });
+
+    // Track template success when successfully added
+    analyticsActions.templateSuccess();
 
     onBack();
   };

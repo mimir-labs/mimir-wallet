@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
+import { analyticsActions } from '@/analytics';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { useQueryParam } from '@/hooks/useQueryParams';
@@ -42,6 +43,11 @@ function Content({ address }: { address: string }) {
   const [txId] = useQueryParam<string>('tx_id');
   const [discardedCounts, setDiscardedCounts] = useState(0);
   const [showDiscarded, setShowDiscarded] = useState(false);
+
+  // Track initial page view
+  useEffect(() => {
+    analyticsActions.transactionsView(type);
+  }, [type]); // Only run once on mount
 
   useEffect(() => {
     setSelectedPendingNetworks((selectedPendingNetworks) => {
@@ -85,7 +91,13 @@ function Content({ address }: { address: string }) {
             color='primary'
             aria-label='Transaction'
             selectedKey={type}
-            onSelectionChange={(key) => setType(key.toString())}
+            onSelectionChange={(key) => {
+              const viewType = key.toString();
+
+              setType(viewType);
+              // Track transactions view
+              analyticsActions.transactionsView(viewType as 'pending' | 'history');
+            }}
           >
             <Tab key='pending' title='Pending' />
             <Tab key='history' title='History' />

@@ -3,6 +3,7 @@
 
 import type { SessionTypes } from '@walletconnect/types';
 
+import { analyticsActions } from '@/analytics';
 import { Input } from '@/components';
 import { useInput } from '@/hooks/useInput';
 import { asError } from '@/utils';
@@ -58,6 +59,9 @@ function Connect({ sessions }: { sessions: SessionTypes.Struct[] }) {
       setError(undefined);
 
       if (!val) return;
+
+      // Track pairing key entered
+      analyticsActions.walletConnectPairingKey();
 
       setIsLoading(true);
 
