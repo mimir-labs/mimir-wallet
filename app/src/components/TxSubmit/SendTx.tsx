@@ -6,6 +6,7 @@ import type { ExtrinsicPayloadValue, ISubmittableResult } from '@polkadot/types/
 import type { HexString } from '@polkadot/util/types';
 import type { BuildTx } from './hooks/useBuildTx';
 
+import { analyticsActions } from '@/analytics';
 import { CONNECT_ORIGIN } from '@/constants';
 import { addTxToast } from '@/hooks/useTxQueue';
 import { useAccountSource } from '@/wallet/useWallet';
@@ -107,6 +108,10 @@ function SendTx({
 
         onSignature?.(signer, signature, signedTransaction, payload);
         events.emit('success', 'Sign success');
+
+        // Track transaction success
+        analyticsActions.transactionResult(true);
+
         setLoading(false);
       } else {
         events = signAndSend(api, tx, signer, () => enableWallet(source, CONNECT_ORIGIN), {
@@ -138,6 +143,10 @@ function SendTx({
         events.once('finalized', (result) => {
           setLoading(false);
           onFinalized?.(result);
+
+          // Track transaction finalized successfully
+          analyticsActions.transactionResult(true);
+
           setTimeout(() => {
             // clear all listener after 3s
             events.removeAllListeners();
@@ -147,6 +156,12 @@ function SendTx({
     } catch (error) {
       onError?.(error);
       events.emit('error', error);
+
+      // Track transaction failure
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      analyticsActions.transactionResult(false, errorMessage);
+
       setLoading(false);
     }
   };

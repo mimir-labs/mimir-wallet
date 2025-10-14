@@ -5,6 +5,7 @@ import type { Web3WalletTypes } from '@walletconnect/web3wallet';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
+import { analyticsActions } from '@/analytics';
 import { AddressCell } from '@/components';
 import { toastError } from '@/components/utils';
 import { useContext, useState } from 'react';
@@ -33,6 +34,8 @@ function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionPropo
 
     try {
       await approveSession(proposal, account);
+      // Track wallet connect success
+      analyticsActions.walletConnectSuccess();
       onClose();
     } catch (error) {
       toastError(error);

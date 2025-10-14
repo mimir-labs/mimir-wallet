@@ -3,6 +3,7 @@
 
 import type { BatchTxItem } from '@/hooks/types';
 
+import { analyticsActions } from '@/analytics';
 import { TxButton } from '@/components';
 import React, { useMemo } from 'react';
 
@@ -49,6 +50,8 @@ function Actions({
           isIndeterminate={isCheckSome}
           onValueChange={(checked) => {
             if (checked) {
+              // Track batch interacted when selecting all
+              analyticsActions.batchInteracted();
               // Only select non-batchAll transactions
               setSelected(selectableTxs.map((item) => item.id));
               setRelatedBatches(selectableTxs.map((item) => item.relatedBatch).filter((item) => item !== undefined));
@@ -117,7 +120,11 @@ function Actions({
             throw error;
           }
         }}
-        onDone={onClose}
+        onDone={() => {
+          // Track batch success
+          analyticsActions.batchSuccess(selected.length);
+          onClose?.();
+        }}
       >
         Confirm Batch
       </TxButton>
