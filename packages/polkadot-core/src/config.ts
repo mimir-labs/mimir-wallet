@@ -310,6 +310,29 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://xcavate.ibp.network',
     genesisHash: '0xd17bc7f93d054d8aba31f24d5bb0ac462247c594e31beed479b1c04d2d0ba48f',
     ss58Format: 5
+  },
+  {
+    key: 'moonbeam',
+    icon: '/chain-icons/Moonbeam.svg',
+    tokenIcon: '/token-icons/GLMR.svg',
+    name: 'Moonbeam',
+    relayChain: 'polkadot',
+    paraId: 2004,
+    wsUrl: {
+      Allnodes: 'wss://moonbeam-rpc.publicnode.com',
+      Blast: 'wss://moonbeam.public.blastapi.io',
+      Dwellir: 'wss://moonbeam-rpc.n.dwellir.com',
+      IBP1: 'wss://moonbeam.ibp.network',
+      IBP2: 'wss://moonbeam.dotters.network',
+      'Moonbeam Foundation': 'wss://wss.api.moonbeam.network',
+      OnFinality: 'wss://moonbeam.api.onfinality.io/public-ws',
+      RadiumBlock: 'wss://moonbeam.public.curie.radiumblock.co/ws',
+      UnitedBloc: 'wss://moonbeam.unitedbloc.com'
+    },
+    httpUrl: 'https://moonbeam-rpc.publicnode.com',
+    genesisHash: '0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d',
+    ss58Format: 1284,
+    explorerUrl: 'https://moonbeam.subscan.io/'
   }
 ];
 
@@ -686,6 +709,18 @@ const solochainEndpoints: Endpoint[] = [
     genesisHash: '0xff7fe5a610f15fe7a0c52f94f86313fb7db7d3786e7f8acf2b66c11d5be7c242',
     ss58Format: 251,
     explorerUrl: 'https://zkverify-testnet.subscan.io/'
+  },
+  {
+    key: 'tanssi',
+    icon: '/chain-icons/tanssi.webp',
+    tokenIcon: '/token-icons/tanssi.webp',
+    name: 'Tanssi',
+    wsUrl: {
+      'Tanssi Foundation': 'wss://services.tanssi-mainnet.network/tanssi'
+    },
+    genesisHash: '0xdd6d086f75ec041b66e20c4186d327b23c8af244c534a2418de6574e8c041a60',
+    ss58Format: 42,
+    explorerUrl: 'https://tanssi.subscan.io/'
   }
 ];
 
