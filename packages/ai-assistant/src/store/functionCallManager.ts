@@ -14,6 +14,7 @@ interface PendingRequest {
 type FunctionCallManagerEvents = {
   functioncall: (event: FunctionCallEvent) => void;
   'functioncall:response': (response: FunctionCallResult) => void;
+  'functioncall:pre-navigation': (event: FunctionCallEvent) => void;
 };
 
 /**
@@ -57,11 +58,15 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
       // Store the promise resolvers
       this.pendingRequests.set(event.id, { resolve, reject });
 
-      // Emit the function call event
+      // Emit pre-navigation event for route-dependent function calls
+      // This allows route checking middleware to navigate before the actual function call
       if (['createMultisig', 'createProxy', 'transferForm', 'batchTransferForm'].includes(event.name)) {
+        this.emit('functioncall:pre-navigation', event);
+
+        // Delay the actual function call to allow navigation to complete
         setTimeout(() => {
           this.emit('functioncall', event);
-        }, 1000);
+        }, 300);
       } else {
         this.emit('functioncall', event);
       }
@@ -88,6 +93,21 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
     // Return cleanup function
     return () => {
       this.off('functioncall', handler);
+    };
+  }
+
+  /**
+   * Register a pre-navigation handler for route-dependent function calls
+   * This handler is called BEFORE the actual function call, allowing for route navigation
+   * @param handler - The pre-navigation handler
+   * @returns A function to remove the handler
+   */
+  public onPreNavigation(handler: FunctionCallHandler): () => void {
+    this.on('functioncall:pre-navigation', handler);
+
+    // Return cleanup function
+    return () => {
+      this.off('functioncall:pre-navigation', handler);
     };
   }
 

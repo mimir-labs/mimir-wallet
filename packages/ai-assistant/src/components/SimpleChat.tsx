@@ -16,6 +16,7 @@ import { PromptInput, PromptInputSubmit, PromptInputTextarea } from './prompt-in
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './reasoning.js';
 import { Response } from './response.js';
 import { Suggestion, Suggestions } from './suggestion.js';
+import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from './tool.js';
 
 interface Props {
   renderTool?: ({ tool }: { tool: ToolUIPart<UITools> }) => React.ReactNode;
@@ -163,7 +164,25 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
                         );
                       default:
                         if (part.type.startsWith('tool-')) {
-                          return renderTool?.({ tool: part as ToolUIPart<UITools> });
+                          const toolPart = part as ToolUIPart<UITools>;
+
+                          return (
+                            <div key={`${message.id}-${i}`} className='space-y-2'>
+                              {/* Tool status component - always displayed */}
+                              <Tool>
+                                <ToolHeader type={toolPart.type} state={toolPart.state} />
+                                <ToolContent>
+                                  {toolPart.input !== undefined && <ToolInput input={toolPart.input as any} />}
+                                  {(toolPart.output !== undefined || toolPart.errorText !== undefined) && (
+                                    <ToolOutput output={toolPart.output as any} errorText={toolPart.errorText as any} />
+                                  )}
+                                </ToolContent>
+                              </Tool>
+
+                              {/* Custom renderTool content - if provided */}
+                              {renderTool && renderTool({ tool: toolPart })}
+                            </div>
+                          );
                         }
 
                         return null;

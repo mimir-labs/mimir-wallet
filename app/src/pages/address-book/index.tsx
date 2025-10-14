@@ -3,7 +3,7 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { Empty } from '@/components';
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { Tab, Tabs } from '@mimir-wallet/ui';
 
@@ -14,19 +14,19 @@ import Import from './Import';
 
 function PageAddressBook() {
   const { addresses } = useAccount();
-  const [selectedTab, setSelectedTab] = useState<string>('contacts');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedTab = searchParams.get('tab') || 'contacts';
 
   const contactAddresses = addresses.filter((address) => !address.watchlist);
   const watchlistAddresses = addresses.filter((address) => address.watchlist);
 
+  const handleTabChange = (key: React.Key) => {
+    setSearchParams({ tab: key.toString() }, { replace: true });
+  };
+
   return (
     <>
-      <Tabs
-        color='primary'
-        aria-label='Address Book'
-        selectedKey={selectedTab}
-        onSelectionChange={(key) => setSelectedTab(key.toString())}
-      >
+      <Tabs color='primary' aria-label='Address Book' selectedKey={selectedTab} onSelectionChange={handleTabChange}>
         <Tab key='contacts' title='Contacts' />
         <Tab key='watchlist' title='Watchlist' />
       </Tabs>
