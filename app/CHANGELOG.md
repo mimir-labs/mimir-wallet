@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.32.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.31.0...mimir-wallet-app-v2.32.0) (2025-10-14)
+
+
+### Features
+
+* Add Acurast Canary network support ([#323](https://github.com/mimir-labs/mimir-wallet/issues/323)) ([06fa926](https://github.com/mimir-labs/mimir-wallet/commit/06fa926df5c6b55ab36fa35fb5ecf6d392deceff))
+* add comprehensive analytics tracking for user interactions ([#326](https://github.com/mimir-labs/mimir-wallet/issues/326)) ([785aa64](https://github.com/mimir-labs/mimir-wallet/commit/785aa64b3e48302f53dabfe6d4307103dd7f7c14))
+* Add moonbeam and tanssi network support ([#327](https://github.com/mimir-labs/mimir-wallet/issues/327)) ([1d85e2a](https://github.com/mimir-labs/mimir-wallet/commit/1d85e2a98ae59bcaf5eb4dd4b40fd0ab0dfdd066))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.32.0
+    * @mimir-wallet/service bumped to 2.32.0
+    * @mimir-wallet/ui bumped to 2.32.0
+
 ## [2.31.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.30.0...mimir-wallet-app-v2.31.0) (2025-10-08)
 
 
