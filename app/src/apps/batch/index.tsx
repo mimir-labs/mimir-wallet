@@ -216,7 +216,6 @@ function Batch({
     <div className='flex h-full w-full flex-col gap-5'>
       <div className='flex gap-4'>
         <InputNetwork
-          placeholder=' '
           contentClassName='min-h-[32px] h-[32px]'
           radius='full'
           network={network}

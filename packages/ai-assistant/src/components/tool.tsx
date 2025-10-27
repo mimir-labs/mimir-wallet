@@ -3,50 +3,62 @@
 
 'use client';
 
-import type { ToolUIPart } from 'ai';
 import type { ComponentProps, ReactNode } from 'react';
 
-import { CheckCircleIcon, ChevronDownIcon, CircleIcon, WrenchIcon, XCircleIcon } from 'lucide-react';
+import { CheckCircleIcon, CircleIcon, WrenchIcon, XCircleIcon } from 'lucide-react';
 import { isValidElement } from 'react';
 
-import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@mimir-wallet/ui';
+import { cn } from '@mimir-wallet/ui';
 
 import { CodeBlock } from './code-block.js';
 
-export type ToolProps = ComponentProps<typeof Collapsible>;
+/**
+ * Tool state types (matching backend protocol)
+ */
+export type ToolState =
+  | 'input-streaming'
+  | 'input-available'
+  | 'output-streaming'
+  | 'output-available'
+  | 'output-error';
+
+export type ToolProps = ComponentProps<'div'>;
 
 export const Tool = ({ className, ...props }: ToolProps) => (
-  <Collapsible className={cn('not-prose border-divider-300 mb-4 w-full rounded-[10px] border', className)} {...props} />
+  <div className={cn('not-prose border-divider-300 mb-4 w-full rounded-[10px] border', className)} {...props} />
 );
 
-export type ToolHeaderProps = {
+export type ToolHeaderProps = ComponentProps<'div'> & {
   title?: string;
-  type: ToolUIPart['type'];
-  state: ToolUIPart['state'];
-  className?: string;
+  type: string;
+  state: ToolState;
+  onRetry?: () => void;
 };
 
-const getStatusIndicator = (status: ToolUIPart['state']) => {
-  const labels = {
+const getStatusIndicator = (status: ToolState) => {
+  const labels: Record<ToolState, string> = {
     'input-streaming': 'Pending',
     'input-available': 'Running',
+    'output-streaming': 'Processing',
     'output-available': 'Completed',
     'output-error': 'Error'
-  } as const;
+  };
 
-  const iconColors = {
+  const iconColors: Record<ToolState, string> = {
     'input-streaming': 'text-muted-foreground',
     'input-available': 'text-primary animate-pulse',
+    'output-streaming': 'text-primary animate-pulse',
     'output-available': 'text-success',
     'output-error': 'text-danger'
-  } as const;
+  };
 
-  const icons = {
+  const icons: Record<ToolState, JSX.Element> = {
     'input-streaming': <CircleIcon className={cn('size-[10px]', iconColors[status])} />,
     'input-available': <CircleIcon className={cn('size-[10px]', iconColors[status])} />,
+    'output-streaming': <CircleIcon className={cn('size-[10px]', iconColors[status])} />,
     'output-available': <CheckCircleIcon className={cn('size-[10px]', iconColors[status])} />,
     'output-error': <XCircleIcon className={cn('size-[10px]', iconColors[status])} />
-  } as const;
+  };
 
   return (
     <div className='flex items-center gap-[5px]'>
@@ -56,31 +68,39 @@ const getStatusIndicator = (status: ToolUIPart['state']) => {
   );
 };
 
-export const ToolHeader = ({ className, title, type, state, ...props }: ToolHeaderProps) => (
-  <CollapsibleTrigger className={cn('flex w-full items-center justify-between gap-4 p-2', className)} {...props}>
-    <div className='flex items-center gap-3'>
-      <WrenchIcon className='text-foreground/50 size-4' />
-      <span className='text-sm font-medium'>{title ?? type.split('-').slice(1).join('-')}</span>
-      {getStatusIndicator(state)}
+export const ToolHeader = ({ className, title, type, state, onRetry, ...divProps }: ToolHeaderProps) => {
+  return (
+    <div
+      data-retry={!!onRetry}
+      className={cn(
+        'data-[retry=true]:hover:border-primary not-prose border-divider-300 mb-4 flex w-full items-center justify-between gap-4 rounded-[10px] border p-2 data-[retry=true]:cursor-pointer',
+        className
+      )}
+      onClick={onRetry}
+      {...divProps}
+    >
+      <div className='flex items-center gap-3'>
+        <WrenchIcon className='text-foreground/50 size-4' />
+        <span
+          data-retry={!!onRetry}
+          className='text-sm font-medium data-[retry=true]:font-bold data-[retry=true]:underline'
+        >
+          {title ?? type.split('-').slice(1).join('-')}
+        </span>
+        {getStatusIndicator(state)}
+      </div>
     </div>
-    <ChevronDownIcon className='text-foreground/50 size-4 transition-transform group-data-[state=open]:rotate-180' />
-  </CollapsibleTrigger>
-);
+  );
+};
 
-export type ToolContentProps = ComponentProps<typeof CollapsibleContent>;
+export type ToolContentProps = ComponentProps<'div'>;
 
 export const ToolContent = ({ className, ...props }: ToolContentProps) => (
-  <CollapsibleContent
-    className={cn(
-      'data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 text-popover-foreground data-[state=closed]:animate-out data-[state=open]:animate-in outline-none',
-      className
-    )}
-    {...props}
-  />
+  <div className={cn('text-popover-foreground outline-none', className)} {...props} />
 );
 
 export type ToolInputProps = ComponentProps<'div'> & {
-  input: ToolUIPart['input'];
+  input: unknown;
 };
 
 export const ToolInput = ({ className, input, ...props }: ToolInputProps) => (
@@ -93,8 +113,8 @@ export const ToolInput = ({ className, input, ...props }: ToolInputProps) => (
 );
 
 export type ToolOutputProps = ComponentProps<'div'> & {
-  output: ToolUIPart['output'];
-  errorText: ToolUIPart['errorText'];
+  output?: unknown;
+  errorText?: string;
 };
 
 export const ToolOutput = ({ className, output, errorText, ...props }: ToolOutputProps) => {

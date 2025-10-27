@@ -1,11 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { Input, InputNetwork } from '@/components';
 import AddressRow from '@/components/AddressRow';
-import { useMemo } from 'react';
 
-import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
+import { useApi } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 
 import AddPureProxy from '../components/AddPureProxy';
 import AccountStructure from './AccountStructure';
@@ -16,20 +16,27 @@ interface Step3ReviewProps {
   threshold: number;
   isPureProxy: boolean;
   network: string;
+  onNameChange: (name: string) => void;
+  setNetwork: (network: string) => void;
+  onPureProxyChange: (value: boolean) => void;
   onBack: () => void;
   onConfirm: () => void;
 }
 
-function Step3Review({ isPureProxy, members, name, onBack, onConfirm, threshold }: Step3ReviewProps) {
-  const { chain, genesisHash } = useApi();
-
-  const remoteProxyChain = useMemo(
-    () =>
-      remoteProxyRelations[genesisHash]
-        ? allEndpoints.find((item) => item.genesisHash === remoteProxyRelations[genesisHash])
-        : null,
-    [genesisHash]
-  );
+function Step3Review({
+  isPureProxy,
+  members,
+  name,
+  network,
+  onNameChange,
+  setNetwork,
+  onBack,
+  onConfirm,
+  onPureProxyChange,
+  threshold
+}: Step3ReviewProps) {
+  const { api } = useApi();
+  const isProxyModuleSupported = !!api.tx.proxy;
 
   return (
     <div className='flex flex-col gap-4'>
@@ -40,35 +47,23 @@ function Step3Review({ isPureProxy, members, name, onBack, onConfirm, threshold 
       </div>
 
       {/* Name Review */}
-      <div className='flex flex-col gap-1'>
-        <label className='text-foreground text-sm font-bold'>Name</label>
-        <div className='bg-secondary rounded-[10px] px-2.5 py-2'>
-          <span className='text-foreground text-sm'>{name}</span>
-        </div>
-      </div>
+      <Input
+        label='Name'
+        placeholder='Enter multisig name'
+        value={name}
+        onChange={onNameChange}
+        helper={
+          <p className='text-foreground/50 text-xs'>
+            This name will be visible to all Signers and can be changed anytime.
+          </p>
+        }
+      />
 
       {/* Add Pure Proxy */}
-      <AddPureProxy isDisabled isPureProxy={isPureProxy} />
+      <AddPureProxy isDisabled isPureProxy={isPureProxy} onPureProxyChange={onPureProxyChange} />
 
       {/* Network */}
-      {isPureProxy && (
-        <div className='flex flex-col gap-1'>
-          <label className='text-foreground text-sm font-bold'>Network</label>
-          <div className='bg-secondary rounded-[10px] px-2.5 py-2'>
-            <img src={chain.icon} className='inline h-5 w-5' alt={chain.name} />
-            &nbsp;
-            <span className='text-foreground text-sm'>{chain.name}</span>
-            {remoteProxyChain ? (
-              <>
-                &nbsp; (also on{' '}
-                <img src={remoteProxyChain.icon} className='inline h-5 w-5' alt={remoteProxyChain.name} />
-                &nbsp;
-                <span className='text-foreground text-sm'>{remoteProxyChain.name}</span> due to remote proxy)
-              </>
-            ) : null}
-          </div>
-        </div>
-      )}
+      {isPureProxy ? <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} /> : null}
 
       {/* Multisig Signers Review */}
       <div className='flex flex-col gap-1'>
@@ -103,12 +98,26 @@ function Step3Review({ isPureProxy, members, name, onBack, onConfirm, threshold 
       {/* Divider */}
       <Divider className='bg-secondary' />
 
+      {/* Proxy Module Not Supported Alert */}
+      {isPureProxy && !isProxyModuleSupported && (
+        <Alert variant='destructive'>
+          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        </Alert>
+      )}
+
       {/* Action Buttons */}
       <div className='flex gap-2.5'>
         <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
           Back
         </Button>
-        <Button fullWidth size='md' color='primary' radius='full' onClick={onConfirm}>
+        <Button
+          fullWidth
+          size='md'
+          color='primary'
+          radius='full'
+          onClick={onConfirm}
+          disabled={isPureProxy && !isProxyModuleSupported}
+        >
           Confirm
         </Button>
       </div>

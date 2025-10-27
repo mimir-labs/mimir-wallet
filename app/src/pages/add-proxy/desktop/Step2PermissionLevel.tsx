@@ -6,7 +6,8 @@ import type { DelayType } from '../types';
 import PureIcon from '@/assets/images/pure-icon.svg';
 import { AddressCell, ProxyControls } from '@/components';
 
-import { Button, Divider, Switch } from '@mimir-wallet/ui';
+import { useApi } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button, Divider, Switch } from '@mimir-wallet/ui';
 
 import DelayItem from '../components/DelayItem';
 import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
@@ -44,6 +45,9 @@ function Step2PermissionLevel({
   onBack,
   onDataChange
 }: Step2PermissionLevelProps) {
+  const { api } = useApi();
+  const isProxyModuleSupported = !!api.tx.proxy;
+
   const handleDelayTypeChange = (type: DelayType) => {
     onDataChange({ delayType: type });
   };
@@ -117,12 +121,19 @@ function Step2PermissionLevel({
       {/* Divider */}
       <Divider />
 
+      {/* Proxy Module Not Supported Alert */}
+      {!isProxyModuleSupported && (
+        <Alert variant='destructive'>
+          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        </Alert>
+      )}
+
       {/* Action Buttons */}
       <div className='flex gap-2.5'>
         <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
           Back
         </Button>
-        <Button fullWidth size='md' color='primary' radius='full' onClick={onNext}>
+        <Button fullWidth size='md' color='primary' radius='full' onClick={onNext} disabled={!isProxyModuleSupported}>
           Next
         </Button>
       </div>

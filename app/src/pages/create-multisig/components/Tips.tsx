@@ -3,6 +3,7 @@
 
 import { FormatBalance } from '@/components';
 import { REMOTE_PROXY_DOC_URL } from '@/constants';
+import { BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
 
 import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
@@ -19,7 +20,7 @@ function Tips({ flexible }: { flexible: boolean }) {
     [genesisHash]
   );
   const reservedAmount = useMemo(
-    () => api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor),
+    () => (api.consts.proxy ? api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor) : BN_ZERO),
     [api]
   );
 

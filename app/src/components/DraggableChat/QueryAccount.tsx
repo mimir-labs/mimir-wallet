@@ -3,6 +3,7 @@
 
 import type { AccountData, DelegateeProp } from '@/hooks/types';
 
+import { useQueryAccount } from '@/accounts/useQueryAccount';
 import IconClock from '@/assets/svg/icon-clock.svg?react';
 import { useMemo } from 'react';
 
@@ -12,7 +13,7 @@ import { Chip, Tooltip } from '@mimir-wallet/ui';
 import AddressCell from '../AddressCell';
 
 interface QueryAccountProps {
-  account: AccountData; // Single address to query
+  account: string; // Single address to query
 }
 
 // Component for proxy type tags with network info tooltip
@@ -93,7 +94,13 @@ function AddressSection({
 }
 
 // Main QueryAccount component
-function QueryAccount({ account: accountData }: QueryAccountProps) {
+function QueryAccount({ account }: QueryAccountProps) {
+  const [accountData] = useQueryAccount(account);
+
+  if (!accountData) {
+    return null;
+  }
+
   // Extract data for different sections
   const members = accountData.type === 'multisig' ? accountData.members : [];
   const proxies = accountData.delegatees || [];

@@ -7,6 +7,7 @@ import { Empty, InputAddress } from '@/components';
 import AddressRow from '@/components/AddressRow';
 import { useState } from 'react';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import {
   Alert,
   AlertDescription,
@@ -23,15 +24,26 @@ import {
 interface Step2MembersProps {
   members: string[];
   threshold: number;
+  isPureProxy: boolean;
   onMembersChange: (members: string[]) => void;
   onThresholdChange: (threshold: number) => void;
   onNext: () => void;
   onBack: () => void;
 }
 
-function Step2Members({ members, onBack, onMembersChange, onNext, onThresholdChange, threshold }: Step2MembersProps) {
+function Step2Members({
+  members,
+  isPureProxy,
+  onBack,
+  onMembersChange,
+  onNext,
+  onThresholdChange,
+  threshold
+}: Step2MembersProps) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [selectedAccount, setSelectedAccount] = useState<string>('');
+  const { api } = useApi();
+  const isProxyModuleSupported = !!api.tx.proxy;
 
   const handleAddMember = () => {
     if (selectedAccount && !members.find((m) => m === selectedAccount)) {
@@ -166,12 +178,26 @@ function Step2Members({ members, onBack, onMembersChange, onNext, onThresholdCha
       {/* Divider */}
       <Divider className='bg-secondary' />
 
+      {/* Proxy Module Not Supported Alert */}
+      {isPureProxy && !isProxyModuleSupported && (
+        <Alert variant='destructive'>
+          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        </Alert>
+      )}
+
       {/* Action Buttons */}
       <div className='flex gap-2.5'>
         <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
           Back
         </Button>
-        <Button fullWidth size='md' color='primary' radius='full' onClick={onNext} disabled={members.length === 0}>
+        <Button
+          fullWidth
+          size='md'
+          color='primary'
+          radius='full'
+          onClick={onNext}
+          disabled={members.length === 0 || (isPureProxy && !isProxyModuleSupported)}
+        >
           Next
         </Button>
       </div>

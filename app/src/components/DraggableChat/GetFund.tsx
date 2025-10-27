@@ -18,7 +18,10 @@ function GetFund({ eventId }: GetFundProps) {
 
   return (
     <>
-      <div className='border-divider-300 flex w-full items-center justify-between rounded-[10px] border bg-white p-[10px]'>
+      <div
+        onClick={toggleOpen}
+        className='border-divider-300 hover:border-primary focus-visible:border-primary focus-visible:ring-primary/30 flex w-full cursor-pointer items-center justify-between rounded-[10px] border bg-white p-[10px] transition-colors focus-visible:ring-2 focus-visible:outline-none'
+      >
         {/* Left side: Icon and title */}
         <div className='flex items-center gap-2.5'>
           <svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30' fill='none'>
@@ -46,7 +49,7 @@ function GetFund({ eventId }: GetFundProps) {
         </div>
 
         {/* Right side: View button */}
-        <Button size='sm' color='secondary' onClick={toggleOpen}>
+        <Button size='sm' color='secondary' continuePropagation>
           Fund
         </Button>
       </div>

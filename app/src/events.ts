@@ -17,6 +17,7 @@ type EventTypes = {
   call_data_view: (network: string, callData: HexString) => void;
   refetch_pending_tx: () => void;
   walletconnect: () => void;
+  'sidebar:open': () => void;
 };
 
 export const events = new Events<EventTypes>();

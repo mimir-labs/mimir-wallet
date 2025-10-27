@@ -10,7 +10,12 @@ import { useToggle } from 'react-use';
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
-function Relation({ address, setNetwork }: { address: string; setNetwork: (network: string) => void }) {
+interface RelationProps {
+  address: string;
+  setNetwork: (network: string) => void;
+}
+
+function Relation({ address, setNetwork }: RelationProps) {
   const { network } = useApi();
   const [account] = useQueryAccount(address);
   const ref = useRef<HTMLDivElement>(null);

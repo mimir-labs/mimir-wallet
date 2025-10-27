@@ -1,146 +1,131 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { FunctionCallEvent } from '../types.js';
+import type { ToolState } from '../hooks/chat.types.js';
 
-import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type ToolUIPart, type UITools } from 'ai';
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 
-import { useAIContext } from '../store/aiContext.js';
-import { functionCallManager } from '../store/functionCallManager.js';
-import { Conversation, ConversationContent, ConversationScrollButton } from './conversation.js';
+import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
+
+import { useChat } from '../hooks/useChat.js';
+import { useFrontendAction } from '../hooks/useFrontendAction.js';
+import { Conversation, ConversationContent, ScrollController } from './conversation.js';
 import { Loader } from './Loader.js';
 import { Message, MessageContent } from './message.js';
 import { PromptInput, PromptInputSubmit, PromptInputTextarea } from './prompt-input.js';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './reasoning.js';
 import { Response } from './response.js';
 import { Suggestion, Suggestions } from './suggestion.js';
-import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from './tool.js';
+import { ToolHeader } from './tool.js';
+
+/**
+ * Tool data structure for custom rendering
+ */
+export interface ToolData {
+  type: string;
+  toolCallId: string;
+  toolName: string;
+  input: unknown;
+  output?: unknown;
+  state: ToolState;
+}
 
 interface Props {
-  renderTool?: ({ tool }: { tool: ToolUIPart<UITools> }) => React.ReactNode;
+  renderTool?: (params: { tool: ToolData }) => React.ReactNode;
   suggestions: Array<[string, string]>; // Array of [label, value] pairs - required
   onStatusChange?: (status: 'submitted' | 'streaming' | 'ready' | 'error') => void;
 }
 
 export interface SimpleChatRef {
   sendMessage: (message: string) => void;
+  clearChat: () => void;
+}
+
+interface ConversationRef {
+  scrollToBottom: () => void;
 }
 
 const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, onStatusChange }, ref) => {
   const [input, setInput] = useState('');
-  const conversationIdRef = useRef<string>();
+  const conversationRef = useRef<ConversationRef>(null);
 
-  // Use provided suggestions directly
-  const displaySuggestions = suggestions;
-
-  const customTransport = new DefaultChatTransport({
-    api: import.meta.env.VITE_AI_ENDPOINT || 'https://ai-assitant.mimir.global/',
-    prepareSendMessagesRequest: (options) => ({
-      body: {
-        messages: options.messages,
-        stateMessage: useAIContext.getState().getStateContext(),
-        conversationId: conversationIdRef.current,
-        userAddress: useAIContext.getState().getUserAddress()
-      }
-    }),
-    fetch: async (input, init) => {
-      const response = await fetch(input, init);
-
-      const newConversationId = response.headers.get('x-conversation-id');
-
-      if (newConversationId && newConversationId !== conversationIdRef.current) {
-        conversationIdRef.current = newConversationId;
-        console.log('Conversation ID updated:', newConversationId);
-      }
-
-      return response;
-    }
+  // Use the chat hook
+  const {
+    messages,
+    status,
+    lastFailedMessage,
+    sendMessage: chatSendMessage,
+    retry,
+    stop,
+    clearChat
+  } = useChat({
+    onStatusChange
   });
 
-  const { messages, sendMessage, status, addToolResult, stop, regenerate } = useChat({
-    transport: customTransport,
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
-    onToolCall: async ({ toolCall }) => {
-      console.log('Tool call received:', toolCall);
+  // Use frontend action hook for retrying tool calls
+  const { triggerFrontendAction } = useFrontendAction();
 
-      // Skip dynamic tool calls (server-side execution)
-      if (toolCall.dynamic) {
-        return;
-      }
+  // Wrapper for sendMessage that scrolls to bottom
+  const sendMessage = useCallback(
+    (message: string) => {
+      chatSendMessage(message);
+      // Scroll to bottom after sending message
+      setTimeout(() => {
+        conversationRef.current?.scrollToBottom();
+      }, 100);
+    },
+    [chatSendMessage]
+  );
 
-      // Create function call event
-      const functionCallEvent: FunctionCallEvent = {
-        id: toolCall.toolCallId,
-        name: toolCall.toolName,
-        arguments: toolCall.input || {},
-        timestamp: new Date()
-      };
-
-      try {
-        // Emit function call and wait for result
-        const result = await functionCallManager.emitFunctionCall(functionCallEvent);
-
-        // Add tool result back to chat
-        addToolResult({
-          tool: toolCall.toolName,
-          toolCallId: toolCall.toolCallId,
-          output: result.success ? JSON.stringify(result.result) : `Error: ${result.error}`
-        });
-      } catch (error) {
-        console.error('Function call error:', error);
-        addToolResult({
-          tool: toolCall.toolName,
-          toolCallId: toolCall.toolCallId,
-          output: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
-        });
-      }
-    }
-  });
-
-  // Expose sendMessage through ref
+  // Expose sendMessage and clearChat through ref
   useImperativeHandle(
     ref,
     () => ({
-      sendMessage: (message: string) => {
-        sendMessage({ text: message });
+      sendMessage: sendMessage,
+      clearChat: () => {
+        clearChat();
+        setInput('');
       }
     }),
-    [sendMessage]
+    [sendMessage, clearChat]
   );
 
-  // Notify parent about status changes
-  useEffect(() => {
-    onStatusChange?.(status);
-  }, [status, onStatusChange]);
-
+  // Handle submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (status === 'error') {
-      regenerate();
-    } else if (status === 'streaming') {
+    if (status === 'streaming') {
+      // Stop streaming
       stop();
-    } else if (status === 'ready') {
+    } else if (status === 'ready' || status === 'error') {
       if (input.trim()) {
-        sendMessage({ text: input });
+        sendMessage(input);
         setInput('');
       }
     }
   };
 
+  // Handle suggestion click
   const handleSuggestionClick = (suggestion: string) => {
-    sendMessage({ text: suggestion });
+    sendMessage(suggestion);
   };
+
+  // Handle tool retry
+  const handleRetryTool = useCallback(
+    (toolName: string, toolInput: unknown) => {
+      triggerFrontendAction(toolName, toolInput);
+    },
+    [triggerFrontendAction]
+  );
 
   return (
     <div className='flex h-full flex-col'>
-      <Conversation className='h-full'>
+      <Conversation className='h-full' ref={conversationRef}>
         <ConversationContent>
+          <ScrollController />
           {messages.length === 0 ? (
             <Suggestions>
-              {displaySuggestions.map(([label, value]) => (
+              {suggestions.map(([label, value]) => (
                 <Suggestion key={label} onClick={handleSuggestionClick} suggestion={value}>
                   {label}
                 </Suggestion>
@@ -148,8 +133,8 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
             </Suggestions>
           ) : null}
           {messages.map((message) => (
-            <div key={`${message.id}-message`}>
-              <Message from={message.role} key={message.id}>
+            <div key={message.id}>
+              <Message from={message.role}>
                 <MessageContent>
                   {message.parts.map((part, i) => {
                     switch (part.type) {
@@ -162,29 +147,36 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
                             <ReasoningContent>{part.text}</ReasoningContent>
                           </Reasoning>
                         );
+                      case 'tool':
+                        return (
+                          <div key={`${message.id}-${i}`} className='space-y-2'>
+                            {/* Tool status component - always displayed */}
+                            <ToolHeader
+                              type={`tool-call`}
+                              state={part.state}
+                              title={part.toolName}
+                              onRetry={
+                                part.toolName === 'navigate'
+                                  ? () => handleRetryTool(part.toolName, part.input)
+                                  : undefined
+                              }
+                            />
+
+                            {/* Custom renderTool content - if provided */}
+                            {renderTool &&
+                              renderTool({
+                                tool: {
+                                  type: `tool-${part.toolName}`,
+                                  toolCallId: `${message.id}-${i}`,
+                                  toolName: part.toolName,
+                                  input: part.input,
+                                  output: part.output,
+                                  state: part.state
+                                }
+                              })}
+                          </div>
+                        );
                       default:
-                        if (part.type.startsWith('tool-')) {
-                          const toolPart = part as ToolUIPart<UITools>;
-
-                          return (
-                            <div key={`${message.id}-${i}`} className='space-y-2'>
-                              {/* Tool status component - always displayed */}
-                              <Tool>
-                                <ToolHeader type={toolPart.type} state={toolPart.state} />
-                                <ToolContent>
-                                  {toolPart.input !== undefined && <ToolInput input={toolPart.input as any} />}
-                                  {(toolPart.output !== undefined || toolPart.errorText !== undefined) && (
-                                    <ToolOutput output={toolPart.output as any} errorText={toolPart.errorText as any} />
-                                  )}
-                                </ToolContent>
-                              </Tool>
-
-                              {/* Custom renderTool content - if provided */}
-                              {renderTool && renderTool({ tool: toolPart })}
-                            </div>
-                          );
-                        }
-
                         return null;
                     }
                   })}
@@ -193,8 +185,22 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
             </div>
           ))}
           {status === 'submitted' && <Loader />}
+
+          {/* Error retry prompt */}
+          {status === 'error' && lastFailedMessage && (
+            <Alert variant='destructive'>
+              <AlertTitle>Meet some problems, please retry</AlertTitle>
+              <Button
+                size='sm'
+                variant='ghost'
+                onClick={retry}
+                className='absolute top-0 right-2 bottom-0 m-auto mt-2 h-[20px]'
+              >
+                Retry
+              </Button>
+            </Alert>
+          )}
         </ConversationContent>
-        <ConversationScrollButton />
       </Conversation>
 
       <PromptInput onSubmit={handleSubmit} className='relative mt-4'>

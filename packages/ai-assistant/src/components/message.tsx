@@ -1,13 +1,17 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { UIMessage } from 'ai';
 import type { ComponentProps, HTMLAttributes } from 'react';
 
 import { Avatar, cn } from '@mimir-wallet/ui';
 
+/**
+ * Message role type
+ */
+export type MessageRole = 'user' | 'assistant' | 'system';
+
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
-  from: UIMessage['role'];
+  from: MessageRole;
 };
 
 export const Message = ({ className, from, ...props }: MessageProps) => (

@@ -1,10 +1,14 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import IconClose from '@/assets/svg/icon-close.svg?react';
+import { SUGGESTIONS_DISMISSED_KEY } from '@/constants';
+import { events } from '@/events';
 import { AnimatePresence, motion, useDragControls } from 'framer-motion';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useLocalStore } from '@mimir-wallet/service';
 import { useDraggable } from '@mimir-wallet/ui';
 
 import DraggableChatWindow, { type DraggableChatWindowRef } from './DraggableChatWindow';
@@ -40,6 +44,10 @@ function DraggableChatWithFAB({
   const [isDragging, setIsDragging] = useState(false);
   const [chatStatus, setChatStatus] = useState<'ready' | 'streaming' | 'submitted' | 'error'>('ready');
   const [hasNewReply, setHasNewReply] = useState(false);
+  const [hasDismissedSuggestions, setHasDismissedSuggestions] = useLocalStore<boolean>(
+    SUGGESTIONS_DISMISSED_KEY,
+    false
+  );
   const chatWindowRef = useRef<DraggableChatWindowRef>(null);
 
   // Define suggestions and randomly select 3: one from each group
@@ -53,7 +61,7 @@ function DraggableChatWithFAB({
       'Set Proposer': 'What is proposer?',
       'Stake DOT': 'i want to stake dot',
       'Participate OpenGov': 'i want to vote in OpenGov',
-      'Use Hydration App': 'I want to user Hydration App'
+      'Use Hydration Dapp': 'I want to use Hydration Dapp'
     };
 
     const suggestionEntries = Object.entries(allSuggestions);
@@ -160,6 +168,19 @@ function DraggableChatWithFAB({
     onClose?.();
   };
 
+  // Listen to sidebar:open event to minimize chat
+  useEffect(() => {
+    const handleSidebarOpen = () => {
+      setIsOpen(false);
+    };
+
+    events.on('sidebar:open', handleSidebarOpen);
+
+    return () => {
+      events.off('sidebar:open', handleSidebarOpen);
+    };
+  }, []);
+
   // Don't show FAB on mobile if disabled
   if (!showFABOnMobile) {
     return null;
@@ -197,10 +218,38 @@ function DraggableChatWithFAB({
             >
               {/* Container for status and suggestions */}
               <motion.div className='absolute right-0 bottom-full flex flex-col items-end gap-[5px] pb-[5px]'>
-                {/* Suggestion Buttons - only show on hover */}
+                {/* Suggestion Buttons - show on hover or initially if not dismissed */}
                 <AnimatePresence>
-                  {isHovered && !isDragging && (
+                  {(isHovered || !hasDismissedSuggestions) && !isDragging && (
                     <>
+                      {/* Close button */}
+                      {!hasDismissedSuggestions ? (
+                        <motion.button
+                          key='close-suggestions'
+                          onClick={() => {
+                            setHasDismissedSuggestions(true);
+                            setIsHovered(false);
+                          }}
+                          className='border-primary/20 bg-card text-primary hover:bg-secondary flex h-[24px] w-[24px] items-center justify-center rounded-full border shadow-[0px_0px_10px_0px_rgba(0,82,255,0.15)] transition-colors'
+                          initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                          animate={{ opacity: 1, x: 0, scale: 1 }}
+                          exit={{ opacity: 0, x: 20, scale: 0.8 }}
+                          transition={{
+                            delay: 0,
+                            duration: 0.2,
+                            type: 'spring',
+                            damping: 20,
+                            stiffness: 300
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          aria-label='Close suggestions'
+                        >
+                          <IconClose className='h-4 w-4' />
+                        </motion.button>
+                      ) : null}
+
+                      {/* Suggestion buttons */}
                       {suggestions.map(([label, value], index) => (
                         <motion.button
                           key={label}
@@ -210,7 +259,7 @@ function DraggableChatWithFAB({
                           animate={{ opacity: 1, x: 0, scale: 1 }}
                           exit={{ opacity: 0, x: 20, scale: 0.8 }}
                           transition={{
-                            delay: index * 0.05,
+                            delay: (index + 1) * 0.05, // +1 to account for close button
                             duration: 0.2,
                             type: 'spring',
                             damping: 20,

@@ -11,7 +11,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
+import {
+  type FunctionCallHandler,
+  functionCallManager,
+  toFunctionCallNumber,
+  toFunctionCallString,
+  toFunctionCallStringArray
+} from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
 
@@ -38,7 +44,6 @@ const STEPS = [
 
 function DesktopCreateMultisig() {
   const { addAddress } = useAccount();
-  const [network, setNetwork] = useInputNetwork();
   const navigate = useNavigate();
   const [staticOpen, toggleStaticOpen] = useToggle(false);
   const [isSuccess, toggleSuccess] = useToggle(false);
@@ -57,6 +62,8 @@ function DesktopCreateMultisig() {
     1
   );
 
+  const [network, setNetwork] = useInputNetwork();
+
   const { currentStep, data: multisigData } = wizardState;
   const { goToNext, goToPrevious, goToStep, updateData } = wizardActions;
 
@@ -66,28 +73,43 @@ function DesktopCreateMultisig() {
 
       const newData: Partial<MultisigData> = {};
 
-      if (event.arguments.name !== undefined) {
-        newData.name = event.arguments.name;
+      // Extract multisigType and convert to isPureProxy boolean
+      const multisigType = toFunctionCallString(event.arguments.multisigType);
+
+      if (multisigType === 'standard') {
+        newData.isPureProxy = false;
+      } else if (multisigType === 'pureProxy') {
+        newData.isPureProxy = true;
       }
 
-      if (event.arguments.threshold !== undefined) {
-        newData.threshold = event.arguments.threshold;
+      // Safe type conversion for name
+      const nameValue = toFunctionCallString(event.arguments.name);
+
+      if (nameValue) {
+        newData.name = nameValue;
       }
 
-      if (event.arguments.members !== undefined) {
-        newData.members = event.arguments.members;
+      // Safe type conversion for threshold
+      const thresholdValue = toFunctionCallNumber(event.arguments.threshold);
+
+      if (thresholdValue !== undefined) {
+        newData.threshold = thresholdValue;
       }
 
-      if (event.arguments.isPureProxy !== undefined) {
-        newData.isPureProxy = event.arguments.isPureProxy;
+      // Safe type conversion for members array
+      const membersValue = toFunctionCallStringArray(event.arguments.members);
+
+      if (membersValue !== undefined) {
+        newData.members = membersValue;
       }
 
-      if (event.arguments.step !== undefined) {
-        goToStep(event.arguments.step);
-      }
+      goToStep(3);
 
-      if (event.arguments.network !== undefined) {
-        setNetwork(event.arguments.network);
+      // Handle network field (required for pureProxy type)
+      const networkValue = toFunctionCallString(event.arguments.network);
+
+      if (networkValue) {
+        setNetwork(networkValue);
       }
 
       updateData(newData);
@@ -133,7 +155,7 @@ function DesktopCreateMultisig() {
               <CardTitle className='text-foreground text-center text-xl font-extrabold'>Create Multisig</CardTitle>
               <Divider />
               <CardDescription>
-                <StepIndicator steps={STEPS} currentStep={currentStep} />
+                <StepIndicator steps={STEPS} currentStep={currentStep} onStepClick={goToStep} />
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -154,6 +176,7 @@ function DesktopCreateMultisig() {
                   onMembersChange={(members) => updateData({ members })}
                   threshold={multisigData.threshold}
                   onThresholdChange={(threshold) => updateData({ threshold })}
+                  isPureProxy={multisigData.isPureProxy}
                   onNext={goToNext}
                   onBack={goToPrevious}
                 />
@@ -165,6 +188,9 @@ function DesktopCreateMultisig() {
                   threshold={multisigData.threshold}
                   isPureProxy={multisigData.isPureProxy}
                   network={network}
+                  onNameChange={(name) => updateData({ name })}
+                  setNetwork={setNetwork}
+                  onPureProxyChange={(isPureProxy) => updateData({ isPureProxy })}
                   onBack={goToPrevious}
                   onConfirm={handleConfirm}
                 />

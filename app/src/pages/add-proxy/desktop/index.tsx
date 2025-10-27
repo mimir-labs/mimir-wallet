@@ -11,7 +11,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
+import {
+  type FunctionCallHandler,
+  functionCallManager,
+  isFunctionCallObject,
+  toFunctionCallBoolean,
+  toFunctionCallString
+} from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider, Spinner } from '@mimir-wallet/ui';
 
@@ -80,40 +86,83 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
 
       const newData: Partial<ProxyWizardData> = {};
 
-      if (event.arguments.proxied !== undefined) {
-        newData.proxied = event.arguments.proxied;
+      // Safe type conversion for proxied address
+      const proxiedValue = toFunctionCallString(event.arguments.proxied);
+
+      if (proxiedValue) {
+        newData.proxied = proxiedValue;
       }
 
-      if (event.arguments.proxy !== undefined) {
-        newData.proxy = event.arguments.proxy;
+      // Safe type conversion for proxy address
+      const proxyValue = toFunctionCallString(event.arguments.proxy);
+
+      if (proxyValue) {
+        newData.proxy = proxyValue;
       }
 
-      if (event.arguments.isPureProxy !== undefined) {
-        newData.isPureProxy = event.arguments.isPureProxy;
+      // Safe type conversion for isPureProxy flag
+      const isPureProxyValue = toFunctionCallBoolean(event.arguments.isPureProxy);
+
+      if (isPureProxyValue !== undefined) {
+        newData.isPureProxy = isPureProxyValue;
       }
 
-      if (event.arguments.pureProxyName !== undefined) {
-        newData.pureProxyName = event.arguments.pureProxyName;
+      // Safe type conversion for pureProxyName
+      const pureProxyNameValue = toFunctionCallString(event.arguments.pureProxyName);
+
+      if (pureProxyNameValue) {
+        newData.pureProxyName = pureProxyNameValue;
       }
 
-      if (event.arguments.proxyType !== undefined) {
-        newData.proxyType = event.arguments.proxyType;
+      // Safe type conversion for proxyType
+      const proxyTypeValue = toFunctionCallString(event.arguments.proxyType);
+
+      if (proxyTypeValue) {
+        newData.proxyType = proxyTypeValue;
       }
 
-      if (event.arguments.hasDelay !== undefined) {
-        newData.hasDelay = event.arguments.hasDelay;
+      // Handle delay discriminated union: { enabled: boolean, period?: { type, blocks? } }
+      const delayValue = event.arguments.delay;
+
+      if (isFunctionCallObject(delayValue)) {
+        const enabled = toFunctionCallBoolean(delayValue.enabled);
+
+        if (enabled === false) {
+          // No delay
+          newData.hasDelay = false;
+        } else if (enabled === true) {
+          // Has delay
+          newData.hasDelay = true;
+
+          // Handle nested period discriminated union
+          const periodValue = delayValue.period;
+
+          if (isFunctionCallObject(periodValue)) {
+            const periodType = toFunctionCallString(periodValue.type);
+
+            if (periodType === 'hour' || periodType === 'day' || periodType === 'week' || periodType === 'custom') {
+              newData.delayType = periodType;
+
+              // If custom type, extract blocks
+              if (periodType === 'custom') {
+                const blocksValue = toFunctionCallString(periodValue.blocks);
+
+                if (blocksValue) {
+                  newData.customBlocks = blocksValue;
+                }
+              }
+            }
+          }
+        }
       }
 
-      if (event.arguments.delayType !== undefined) {
-        newData.delayType = event.arguments.delayType;
-      }
+      goToStep(3);
 
-      if (event.arguments.customBlocks !== undefined) {
-        newData.customBlocks = event.arguments.customBlocks.toString();
-      }
+      // Handle network field
+      const networkValue = toFunctionCallString(event.arguments.network);
 
-      if (event.arguments.step !== undefined) {
-        goToStep(event.arguments.step);
+      if (networkValue) {
+        setNetwork(networkValue);
       }
 
       updateData(newData);
@@ -151,7 +200,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
             </CardTitle>
             <Divider />
             <CardDescription>
-              <StepIndicator steps={STEPS} currentStep={wizardState.currentStep} />
+              <StepIndicator steps={STEPS} currentStep={wizardState.currentStep} onStepClick={goToStep} />
             </CardDescription>
           </CardHeader>
           <CardContent>

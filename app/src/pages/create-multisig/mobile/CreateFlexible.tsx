@@ -14,7 +14,7 @@ import { addTxToast } from '@/hooks/useTxQueue';
 import { sleep } from '@/utils';
 import { accountSource, useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
-import { u8aEq } from '@polkadot/util';
+import { BN_ZERO, u8aEq } from '@polkadot/util';
 import { encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
@@ -91,16 +91,23 @@ function CreateFlexible({
   const [isSuccess, setIsSuccess] = useState(false);
 
   const reservedAmount = useMemo(
-    () => api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2)),
+    () =>
+      api.consts.proxy
+        ? api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2))
+        : BN_ZERO,
     [api]
   );
 
   const createMembers = (pure: string, who: string[], signer: string, source: string, threshold: number) => {
     const extrinsic = api.tx.utility.batchAll([
-      api.tx.balances.transferKeepAlive(
-        pure,
-        api.consts.proxy.proxyDepositFactor.muln(2).add(api.consts.proxy.proxyDepositBase)
-      ),
+      ...(api.consts.proxy
+        ? [
+            api.tx.balances.transferKeepAlive(
+              pure,
+              api.consts.proxy.proxyDepositFactor.muln(2).add(api.consts.proxy.proxyDepositBase)
+            )
+          ]
+        : []),
       api.tx.proxy.proxy(
         pure,
         'Any',

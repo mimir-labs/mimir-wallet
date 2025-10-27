@@ -3,6 +3,7 @@
 
 'use client';
 
+import { events } from '@/events';
 import { create } from 'zustand';
 
 type RightSidebarTab = 'batch' | 'template' | 'decoder';
@@ -49,9 +50,27 @@ export const useMimirLayout = create<MimirLayoutState>()((set) => {
     sidebarOpen: initialState.sidebarOpen,
     rightSidebarOpen: initialState.rightSidebarOpen,
     rightSidebarState: { tab: 'batch' },
-    openSidebar: () => set({ sidebarOpen: true }),
+    openSidebar: () => {
+      set((state) => {
+        // Only emit event if sidebar is currently closed
+        if (!state.sidebarOpen) {
+          events.emit('sidebar:open');
+        }
+
+        return { sidebarOpen: true };
+      });
+    },
     closeSidebar: () => set({ sidebarOpen: false }),
-    openRightSidebar: () => set({ rightSidebarOpen: true }),
+    openRightSidebar: () => {
+      set((state) => {
+        // Only emit event if right sidebar is currently closed
+        if (!state.rightSidebarOpen) {
+          events.emit('sidebar:open');
+        }
+
+        return { rightSidebarOpen: true };
+      });
+    },
     closeRightSidebar: () => set({ rightSidebarOpen: false }),
     setRightSidebarTab: (tab: RightSidebarTab) => {
       set((state) => ({
