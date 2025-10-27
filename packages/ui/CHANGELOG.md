@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.32.1](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.32.0...ui-v2.32.1) (2025-10-27)
+
+
+### Bug Fixes
+
+* fix ai assistant bugs ([#330](https://github.com/mimir-labs/mimir-wallet/issues/330)) ([6db8afe](https://github.com/mimir-labs/mimir-wallet/commit/6db8afe26ed44459928e9284a722ce4c68529043))
+
 ## [2.32.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.31.0...ui-v2.32.0) (2025-10-14)
 
 
