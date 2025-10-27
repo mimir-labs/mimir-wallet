@@ -6,7 +6,8 @@ import type { StepProps } from './types';
 import { Input, InputNetwork } from '@/components';
 import { MigrationTip } from '@/features/assethub-migration';
 
-import { Button, Divider } from '@mimir-wallet/ui';
+import { useApi } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 
 import AddPureProxy from '../components/AddPureProxy';
 import Tips from '../components/Tips';
@@ -28,6 +29,9 @@ function Step1Name({
   onNext,
   onPureProxyChange
 }: Step1NameProps) {
+  const { api } = useApi();
+  const isProxyModuleSupported = !!api.tx.proxy;
+
   return (
     <div className='flex flex-col gap-4'>
       {/* Name Input Section */}
@@ -55,9 +59,23 @@ function Step1Name({
       {/* Divider */}
       <Divider />
 
+      {/* Proxy Module Not Supported Alert */}
+      {isPureProxy && !isProxyModuleSupported && (
+        <Alert variant='destructive'>
+          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        </Alert>
+      )}
+
       {/* Action Buttons */}
       <div className='flex gap-2.5'>
-        <Button fullWidth size='md' color='primary' radius='full' onClick={onNext} disabled={!name.trim()}>
+        <Button
+          fullWidth
+          size='md'
+          color='primary'
+          radius='full'
+          onClick={onNext}
+          disabled={!name.trim() || (isPureProxy && !isProxyModuleSupported)}
+        >
           Next
         </Button>
       </div>

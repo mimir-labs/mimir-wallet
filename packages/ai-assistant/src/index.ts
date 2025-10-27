@@ -4,6 +4,9 @@
 // Types
 export * from './types.js';
 
+// Function Call Utilities
+export * from './functionCallUtils.js';
+
 export { functionCallManager } from './store/functionCallManager.js';
 
 // Components

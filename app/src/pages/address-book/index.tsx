@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Empty } from '@/components';
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-import { Tab, Tabs } from '@mimir-wallet/ui';
+import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 
 import AddAddress from './AddAddress';
 import AddressItem from './AddressItem';
@@ -14,21 +15,31 @@ import Import from './Import';
 
 function PageAddressBook() {
   const { addresses } = useAccount();
-  const [selectedTab, setSelectedTab] = useState<string>('contacts');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedTab = searchParams.get('tab') || 'contacts';
 
   const contactAddresses = addresses.filter((address) => !address.watchlist);
   const watchlistAddresses = addresses.filter((address) => address.watchlist);
 
+  const handleTabChange = (key: React.Key) => {
+    setSearchParams({ tab: key.toString() }, { replace: true });
+  };
+
   return (
     <>
-      <Tabs
-        color='primary'
-        aria-label='Address Book'
-        selectedKey={selectedTab}
-        onSelectionChange={(key) => setSelectedTab(key.toString())}
-      >
+      <Tabs color='primary' aria-label='Address Book' selectedKey={selectedTab} onSelectionChange={handleTabChange}>
         <Tab key='contacts' title='Contacts' />
-        <Tab key='watchlist' title='Watchlist' />
+        <Tab
+          key='watchlist'
+          title={
+            <div className='flex items-center gap-1'>
+              <span>Watchlist</span>
+              <Tooltip content='You can view watchlist in account side bar'>
+                <IconQuestion className='h-4 w-4 opacity-70' />
+              </Tooltip>
+            </div>
+          }
+        />
       </Tabs>
 
       <div className='mt-5 flex justify-between gap-2.5'>

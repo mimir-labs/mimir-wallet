@@ -72,7 +72,10 @@ export const routes = [
             path: '/address-book',
             element: <PageAddressBook />,
             description:
-              'Address book for frequently used Polkadot addresses, multisig members, and proxy accounts with identity integration'
+              'Address book for frequently used Polkadot addresses, multisig members, and proxy accounts with identity integration',
+            search: {
+              tab: 'Tab switch, available values: contacts (View contact addresses), watchlist (View watchlist addresses)'
+            }
           },
           {
             path: '/analytic',

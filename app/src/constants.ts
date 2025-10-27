@@ -64,3 +64,5 @@ export const POLKADOT_PROXY_WIKI_URL = 'https://wiki.polkadot.com/learn/learn-pr
 export const POLKADOT_PROXY_TYPES_WIKI_URL = 'https://wiki.polkadot.com/learn/learn-proxies/#proxy-types';
 
 export const COOKIE_CONSENT_STORAGE_KEY = `${LS_NAMESPACE}cookie_consent`;
+
+export const SUGGESTIONS_DISMISSED_KEY = `${LS_NAMESPACE}suggestions_dismissed`;

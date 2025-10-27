@@ -3,6 +3,7 @@
 
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import { toastError, toastSuccess } from '@/components/utils';
+import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useQueryClient } from '@tanstack/react-query';
@@ -29,9 +30,15 @@ function Title({ endContent, children }: { endContent?: React.ReactNode; childre
 
 function DashboardV2({ address }: { address: string }) {
   const [totalUsd, changes] = useBalanceTotalUsd(address);
-  const [network, setNetwork] = useInputNetwork(undefined);
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Get supported networks based on address type
+  const supportedNetworks = useAddressSupportedNetworks(address);
+  const [network, setNetwork] = useInputNetwork(
+    undefined,
+    supportedNetworks?.map((n) => n.key)
+  );
 
   const refreshAssets = useCallback(async () => {
     if (isRefreshing || !address) return;
@@ -122,7 +129,7 @@ function DashboardV2({ address }: { address: string }) {
         {/* Account Structure */}
         <div className='col-span-8'>
           <Title>Account Strucuture</Title>
-          <SubApiRoot network={network}>
+          <SubApiRoot network={network} supportedNetworks={supportedNetworks?.map((n) => n.key)}>
             <AccountStructure address={address} setNetwork={setNetwork} />
           </SubApiRoot>
         </div>

@@ -13,17 +13,29 @@ interface StepIndicatorProps {
   currentStep: number;
   className?: string;
   variant?: 'default' | 'compact';
+  onStepClick?: (stepNumber: number) => void;
 }
 
-function StepIndicator({ currentStep, steps, className = '', variant = 'default' }: StepIndicatorProps) {
+function StepIndicator({ currentStep, steps, className = '', variant = 'default', onStepClick }: StepIndicatorProps) {
+  const handleStepClick = (stepNumber: number) => {
+    if (onStepClick) {
+      onStepClick(stepNumber);
+    }
+  };
+
   return (
     <div className={`flex w-full items-center gap-4 ${className}`}>
       {steps.map((step) => {
         const isActive = currentStep === step.number;
         const isCompleted = currentStep > step.number;
+        const isClickable = !!onStepClick;
 
         return (
-          <div key={step.number} className='bg-secondary flex h-10 flex-1 items-center rounded-full'>
+          <div
+            key={step.number}
+            className={`bg-secondary flex h-10 flex-1 items-center rounded-full ${isClickable ? 'hover:bg-secondary/80 cursor-pointer transition-colors' : ''}`}
+            onClick={() => handleStepClick(step.number)}
+          >
             <div className='flex h-10 items-center gap-2.5 pr-2.5'>
               <div
                 className={`flex h-10 w-10 flex-[0_0_auto] items-center justify-center rounded-full text-base font-bold ${

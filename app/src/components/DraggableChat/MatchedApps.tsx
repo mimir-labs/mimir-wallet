@@ -13,7 +13,7 @@ function MatchedApps({ apps }: { eventId: string; apps: { id: string; path?: str
     const result = [];
 
     for (const { id, path } of apps) {
-      const dapp = dapps.find((item) => item.id.toString() === id);
+      const dapp = dapps.find((item) => item.id.toString() === id.toString());
 
       if (dapp) {
         result.push({ dapp, path });

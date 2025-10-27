@@ -53,7 +53,7 @@ function AccountInfoComponent({ address, onAccountOpen }: AccountInfoProps) {
         className='hover:bg-secondary transition-background flex w-full cursor-pointer items-center gap-2.5 rounded-t-[10px] bg-transparent p-2.5'
         onClick={handleAccountOpen}
       >
-        <AddressCell value={address} addressCopyDisabled />
+        <AddressCell value={address} withIconBorder shorten withAddressBook showNetworkProxied />
         <ArrowRight className='text-primary' />
       </div>
 

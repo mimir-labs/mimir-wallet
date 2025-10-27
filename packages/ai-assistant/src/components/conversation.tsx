@@ -6,28 +6,73 @@
 import type { ComponentProps } from 'react';
 
 import { ArrowDownIcon } from 'lucide-react';
-import { useCallback } from 'react';
+import { createContext, forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom';
 
 import { Button, cn } from '@mimir-wallet/ui';
 
+export interface ConversationRef {
+  scrollToBottom: () => void;
+}
+
 export type ConversationProps = ComponentProps<typeof StickToBottom>;
 
-export const Conversation = ({ className, ...props }: ConversationProps) => (
-  <StickToBottom
-    className={cn('relative flex-1 overflow-y-auto', className)}
-    initial='smooth'
-    resize='smooth'
-    role='log'
-    {...props}
-  />
-);
+// Context to share scrollToBottomRef between Conversation and ConversationContent
+const ScrollRefContext = createContext<React.MutableRefObject<(() => void) | null> | null>(null);
+
+// Helper component to capture scrollToBottom from StickToBottom context
+const ScrollController = () => {
+  const scrollToBottomRef = useContext(ScrollRefContext);
+  const { scrollToBottom } = useStickToBottomContext();
+
+  useEffect(() => {
+    if (scrollToBottomRef) {
+      scrollToBottomRef.current = scrollToBottom;
+    }
+  }, [scrollToBottom, scrollToBottomRef]);
+
+  return null;
+};
+
+export const Conversation = forwardRef<ConversationRef, ConversationProps>(({ className, children, ...props }, ref) => {
+  const scrollToBottomRef = useRef<(() => void) | null>(null);
+
+  // Expose scrollToBottom through ref
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToBottom: () => {
+        scrollToBottomRef.current?.();
+      }
+    }),
+    []
+  );
+
+  return (
+    <ScrollRefContext.Provider value={scrollToBottomRef}>
+      <StickToBottom
+        className={cn('relative flex-1 overflow-y-auto', className)}
+        initial='smooth'
+        resize='smooth'
+        role='log'
+        {...props}
+      >
+        {children}
+      </StickToBottom>
+    </ScrollRefContext.Provider>
+  );
+});
+
+Conversation.displayName = 'Conversation';
 
 export type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>;
 
 export const ConversationContent = ({ className, ...props }: ConversationContentProps) => (
   <StickToBottom.Content className={cn('', className)} {...props} />
 );
+
+// Export ScrollController for internal use in SimpleChat
+export { ScrollController };
 
 export type ConversationScrollButtonProps = ComponentProps<typeof Button>;
 

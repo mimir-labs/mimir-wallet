@@ -5,6 +5,7 @@ import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import SubId from '@/assets/images/subid.svg';
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
+import IconExtrinsic from '@/assets/svg/icon-extrinsic.svg?react';
 import IconProxy from '@/assets/svg/icon-proxy-fill.svg?react';
 import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@/assets/svg/icon-set.svg?react';
@@ -74,7 +75,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
       <Button asChild variant='ghost' color='primary' size='md' className='h-[26px]'>
         <Link to='/extrinsic'>
           Extrinsic
-          <IconProxy />
+          <IconExtrinsic />
         </Link>
       </Button>
       {showAddWatchlistButton ? (

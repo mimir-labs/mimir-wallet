@@ -10,7 +10,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
 
 import SafetyWarningModal from '../components/SafetyWarningModal';
 import { useDelayCalculation } from '../hooks/useDelayCalculation';
@@ -38,7 +38,8 @@ interface Step3ReviewProps {
 }
 
 function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
-  const { chain, genesisHash, network } = useApi();
+  const { api, chain, genesisHash, network } = useApi();
+  const isProxyModuleSupported = !!api.tx.proxy;
   const [alertOpen, toggleAlertOpen] = useToggle(false);
   const [detectedControllers, setDetectedControllers] = useState<string[]>([]);
 
@@ -214,6 +215,13 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
       {/* Divider */}
       <Divider />
 
+      {/* Proxy Module Not Supported Alert */}
+      {!isProxyModuleSupported && (
+        <Alert variant='destructive'>
+          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        </Alert>
+      )}
+
       {/* Action Buttons */}
       <div className='flex gap-2.5'>
         <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
@@ -226,6 +234,7 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
           radius='full'
           onClick={handleSafetyCheck}
           disabled={
+            !isProxyModuleSupported ||
             safetyResult.isLoading ||
             isTransactionLoading ||
             !wizardData.proxy ||

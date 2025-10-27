@@ -5,6 +5,7 @@ import { useAccount } from '@/accounts/useAccount';
 import PureIcon from '@/assets/images/pure-icon.svg';
 import { AddressName, EditableField, InputAddress, InputNetwork, ProxyControls } from '@/components';
 
+import { useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider, Switch } from '@mimir-wallet/ui';
 
 import Tips from '../components/Tips';
@@ -37,7 +38,9 @@ function Step1ConfigureAccess({
   onNext,
   onDataChange
 }: Step1ConfigureAccessProps) {
+  const { api } = useApi();
   const { current } = useAccount();
+  const isProxyModuleSupported = !!api.tx.proxy;
 
   // Use validation hook for account filtering and validation
   const validationResult = useProxyValidation({
@@ -127,6 +130,13 @@ function Step1ConfigureAccess({
       {/* Divider */}
       <Divider />
 
+      {/* Proxy Module Not Supported Alert */}
+      {!isProxyModuleSupported && (
+        <Alert variant='destructive'>
+          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        </Alert>
+      )}
+
       {/* Action Button */}
       <div className='flex flex-col gap-2.5'>
         {validationResult.visibleErrors.map((error) => (
@@ -140,7 +150,7 @@ function Step1ConfigureAccess({
           color='primary'
           radius='full'
           onClick={onNext}
-          disabled={!validationResult.canProceed}
+          disabled={!validationResult.canProceed || !isProxyModuleSupported}
         >
           Next
         </Button>

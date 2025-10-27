@@ -6,7 +6,12 @@ import { useMemo } from 'react';
 
 import { remoteProxyRelations, useNetworks } from '@mimir-wallet/polkadot-core';
 
-// get supported networks by address, undefined if supported all
+/**
+ * Get supported networks by address
+ *
+ * @param address - The address to check
+ * @returns Array of supported networks, or undefined if all networks are supported
+ */
 export function useAddressSupportedNetworks(address?: string | null) {
   const { networks } = useNetworks();
   const { meta } = useAddressMeta(address);

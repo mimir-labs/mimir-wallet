@@ -5,8 +5,8 @@ import type { ApiPromise } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Option } from '@polkadot/types';
 import type { Call, Multisig } from '@polkadot/types/interfaces';
-import type { BN } from '@polkadot/util';
 
+import { type BN, BN_ZERO } from '@polkadot/util';
 import { blake2AsU8a, encodeMultiAddress } from '@polkadot/util-crypto';
 
 import { addressEq } from './utils.js';
@@ -27,6 +27,11 @@ export async function txReserve(
   unreserve: Record<string, { value: BN }> = {},
   delay: Record<string, BN> = {}
 ) {
+  const announcementDepositBase = api.consts.proxy ? api.consts.proxy.announcementDepositBase : BN_ZERO;
+  const announcementDepositFactor = api.consts.proxy ? api.consts.proxy.announcementDepositFactor : BN_ZERO;
+  const proxyDepositBase = api.consts.proxy ? api.consts.proxy.proxyDepositBase : BN_ZERO;
+  const proxyDepositFactor = api.consts.proxy ? api.consts.proxy.proxyDepositFactor : BN_ZERO;
+
   if (api.tx.multisig?.approveAsMulti.is(call) || api.tx.multisig?.asMulti.is(call)) {
     const threshold = call.args[0];
     const multisigAddress = encodeMultiAddress([address, ...call.args[1]], threshold, api.registry.chainSS58);
@@ -90,9 +95,7 @@ export async function txReserve(
     _increaseValue(
       reserve,
       address,
-      announcements[0].length === 0
-        ? api.consts.proxy.announcementDepositBase.add(api.consts.proxy.announcementDepositFactor)
-        : api.consts.proxy.announcementDepositFactor
+      announcements[0].length === 0 ? announcementDepositBase.add(announcementDepositFactor) : announcementDepositFactor
     );
 
     const proxy = proxies[0].find((item) => addressEq(item.delegate.toString(), address) && item.delay.gtn(0));
@@ -108,7 +111,7 @@ export async function txReserve(
     if (announcements[0].length <= 1) {
       _increaseValue(unreserve, delegate, announcements[1]);
     } else {
-      _increaseValue(unreserve, delegate, api.consts.proxy.announcementDepositFactor);
+      _increaseValue(unreserve, delegate, announcementDepositFactor);
     }
 
     await txReserve(api, api.registry.createType('Call', call.args[3].toU8a()), real, reserve, unreserve, delay);
@@ -118,7 +121,7 @@ export async function txReserve(
     if (announcements[0].length <= 1) {
       _increaseValue(unreserve, address, announcements[1]);
     } else {
-      _increaseValue(unreserve, address, api.consts.proxy.announcementDepositFactor);
+      _increaseValue(unreserve, address, announcementDepositFactor);
     }
   } else if (api.tx.proxy?.rejectAnnouncement?.is(call)) {
     const delegate = call.args[0].toString();
@@ -127,25 +130,25 @@ export async function txReserve(
     if (announcements[0].length <= 1) {
       _increaseValue(unreserve, delegate, announcements[1]);
     } else {
-      _increaseValue(unreserve, delegate, api.consts.proxy.announcementDepositFactor);
+      _increaseValue(unreserve, delegate, announcementDepositFactor);
     }
   } else if (api.tx.proxy?.createPure?.is(call)) {
-    _increaseValue(reserve, address, api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor));
+    _increaseValue(reserve, address, proxyDepositBase.add(proxyDepositFactor));
   } else if (api.tx.proxy?.removeProxy?.is(call)) {
     const proxies = await api.query.proxy.proxies(address);
 
     if (proxies[0].length <= 1) {
       _increaseValue(unreserve, address, proxies[1]);
     } else {
-      _increaseValue(unreserve, address, api.consts.proxy.proxyDepositFactor);
+      _increaseValue(unreserve, address, proxyDepositFactor);
     }
   } else if (api.tx.proxy?.addProxy?.is(call)) {
     const proxies = await api.query.proxy.proxies(address);
 
     if (proxies[0].length === 0) {
-      _increaseValue(reserve, address, api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor));
+      _increaseValue(reserve, address, proxyDepositBase.add(proxyDepositFactor));
     } else {
-      _increaseValue(reserve, address, api.consts.proxy.proxyDepositFactor);
+      _increaseValue(reserve, address, proxyDepositFactor);
     }
   } else if (api.tx.proxy?.removeProxies?.is(call)) {
     const proxies = await api.query.proxy.proxies(address);
@@ -163,7 +166,7 @@ export async function txReserve(
   } else if (api.tx.proxy?.killPure?.is(call)) {
     const address = call.args[0].toString();
 
-    _increaseValue(unreserve, address, api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor));
+    _increaseValue(unreserve, address, proxyDepositBase.add(proxyDepositFactor));
   } else if (api.tx.utility.batch.is(call) || api.tx.utility.forceBatch.is(call) || api.tx.utility.batchAll.is(call)) {
     for (const item of call.args[0]) {
       await txReserve(api, api.registry.createType('Call', item.toU8a()), address, reserve, unreserve, delay);

@@ -7,7 +7,12 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
+import {
+  type FunctionCallHandler,
+  functionCallManager,
+  isFunctionCallArray,
+  toFunctionCallString
+} from '@mimir-wallet/ai-assistant';
 import { isValidAddress, SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Spinner } from '@mimir-wallet/ui';
 
@@ -25,36 +30,61 @@ function MultiTransfer() {
     const handler: FunctionCallHandler = (event) => {
       if (event.name !== 'batchTransferForm') return;
 
-      if (event.arguments.sending && !isValidAddress(event.arguments.sending)) {
+      // Validate sending address
+      const sendingAddress = toFunctionCallString(event.arguments.sending);
+
+      if (sendingAddress && !isValidAddress(sendingAddress)) {
         return functionCallManager.respondToFunctionCall({
           id: event.id,
           success: false,
-          error: `Invalid sending address format ${event.arguments.sending}`
+          error: `Invalid sending address format ${sendingAddress}`
         });
       }
 
-      if (event.arguments.addRecipient) {
-        const invalidAddress = event.arguments.addRecipient.filter(
-          (item: { recipient: string; amount: number }) => !isValidAddress(item.recipient)
-        );
+      // Validate recipient addresses
+      const addRecipient = event.arguments.addRecipient;
+
+      if (addRecipient && isFunctionCallArray(addRecipient)) {
+        const invalidAddress = addRecipient
+          .filter((item) => {
+            if (!item || typeof item !== 'object') return false;
+            const recipient = 'recipient' in item ? toFunctionCallString(item.recipient) : undefined;
+
+            return recipient && !isValidAddress(recipient);
+          })
+          .map((item) => {
+            if (item && typeof item === 'object' && 'recipient' in item) {
+              return toFunctionCallString(item.recipient) || '';
+            }
+
+            return '';
+          });
 
         if (invalidAddress.length > 0) {
           return functionCallManager.respondToFunctionCall({
             id: event.id,
             success: false,
-            error: `Invalid recipients address format ${invalidAddress.map((item: { recipient: string; amount: number }) => item.recipient).join(',')}`
+            error: `Invalid recipients address format ${invalidAddress.join(',')}`
           });
         }
       }
 
-      if (event.arguments.sending !== undefined) {
-        setSending(event.arguments.sending);
+      // Update sending address
+      if (sendingAddress) {
+        setSending(sendingAddress);
       }
 
-      if (event.arguments.addRecipient !== undefined) {
-        const recipients: MultiTransferData[] = event.arguments.addRecipient.map(
-          (item: { recipient: string; amount: number }) => [item.recipient, 'native', item.amount.toString()]
-        );
+      // Update recipients
+      if (addRecipient && isFunctionCallArray(addRecipient)) {
+        const recipients: MultiTransferData[] = addRecipient
+          .filter((item) => item && typeof item === 'object' && 'recipient' in item && 'amount' in item)
+          .map((item) => {
+            const recipient = toFunctionCallString((item as { recipient: unknown }).recipient) || '';
+            const amount = (item as { amount: unknown }).amount;
+            const amountStr = typeof amount === 'number' ? amount.toString() : String(amount || '');
+
+            return [recipient, 'native', amountStr] as MultiTransferData;
+          });
 
         setData((prev) => {
           const next = [...prev];
@@ -73,8 +103,11 @@ function MultiTransfer() {
         });
       }
 
-      if (event.arguments.network !== undefined) {
-        setNetwork(event.arguments.network);
+      // Update network
+      const networkValue = toFunctionCallString(event.arguments.network);
+
+      if (networkValue) {
+        setNetwork(networkValue);
       }
 
       return functionCallManager.respondToFunctionCall({

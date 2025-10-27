@@ -3,10 +3,14 @@
 
 'use client';
 
-import type { ChatStatus } from 'ai';
 import type { ComponentProps, HTMLAttributes, KeyboardEventHandler } from 'react';
 
-import { ArrowUp, Loader2Icon, XIcon } from 'lucide-react';
+/**
+ * Chat status types (matching backend protocol)
+ */
+export type ChatStatus = 'submitted' | 'streaming' | 'ready' | 'error';
+
+import { ArrowUp, Loader2Icon } from 'lucide-react';
 import { Children } from 'react';
 
 import { Button, cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from '@mimir-wallet/ui';
@@ -128,8 +132,6 @@ export const PromptInputSubmit = ({
     Icon = <Loader2Icon className='size-4 animate-spin' />;
   } else if (status === 'streaming') {
     Icon = <div className='h-2.5 w-2.5 bg-[currentColor]' />;
-  } else if (status === 'error') {
-    Icon = <XIcon className='size-4' />;
   }
 
   return (

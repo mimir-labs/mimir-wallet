@@ -1,15 +1,12 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData } from '@/hooks/types';
-import type { ToolUIPart, UITools } from 'ai';
-
 import { useAccount } from '@/accounts/useAccount';
 import { motion, useDragControls } from 'framer-motion';
 import React, { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-import { SimpleChat, type SimpleChatRef } from '@mimir-wallet/ai-assistant';
+import { SimpleChat, type SimpleChatRef, type ToolData } from '@mimir-wallet/ai-assistant';
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 
 import AddToWatchlist from './AddToWatchlist';
@@ -57,69 +54,58 @@ const DraggableChatWindow = forwardRef<DraggableChatWindowRef, DraggableChatProp
       []
     );
 
-    // General function for parsing tool output
-    const parseToolOutput = (tool: ToolUIPart<UITools>) => {
-      if (tool.state !== 'output-available') return null;
-
-      try {
-        const output = JSON.parse(tool.output as string);
-
-        // Check if operation has error
-        if (output.error) {
-          return null;
-        }
-
-        return output;
-      } catch {
-        return null;
-      }
+    // Handle clear chat
+    const handleClearChat = () => {
+      simpleChatRef.current?.clearChat();
     };
 
     // RenderTool function for displaying tool results
-    const renderTool = ({ tool }: { tool: ToolUIPart<UITools> }) => {
-      const { type, state, toolCallId } = tool;
+    const renderTool = ({ tool }: { tool: ToolData }) => {
+      const { type, toolCallId } = tool;
 
-      // Simple tools that don't require output parsing
-      if (state === 'input-available' || state === 'output-available') {
-        switch (type) {
-          case 'tool-getFund':
+      // Handle unified showComponent tool
+      if (type === 'tool-showComponent') {
+        // Parse output from backend: { componentType: "...", props: { ... } }
+        const output = tool.output as any;
+
+        if (!output) return null;
+
+        const { componentType, props = {} } = output;
+
+        switch (componentType) {
+          case 'matchDapps':
+            return <MatchedApps eventId={toolCallId} apps={props.dapps} />;
+          case 'getFund':
             return <GetFund eventId={toolCallId} />;
-          case 'tool-walletConnect':
+          case 'walletConnect':
             return <WalletConnect eventId={toolCallId} />;
-          case 'tool-connectWallet':
+          case 'showQRCode':
+            return props.address ? <ShowQRCode eventId={toolCallId} address={props.address} /> : null;
+          case 'connectWallet':
             return <ConnectWallet eventId={toolCallId} />;
-          case 'tool-matchDapps':
-            return <MatchedApps eventId={toolCallId} apps={(tool.input as any).dapps} />;
-          case 'tool-switchNetworks':
-            return <SwitchNetworks eventId={toolCallId} networks={(tool.input as any).networks} />;
-          case 'tool-setSs58Chain':
-            return <SetSs58Chain eventId={toolCallId} networkKey={(tool.input as any).networkKey} />;
+          case 'viewOnExplorer':
+            return props.address ? <ViewOnExplorer eventId={toolCallId} address={props.address} /> : null;
+          case 'addToWatchlist':
+            return props.address ? <AddToWatchlist eventId={toolCallId} address={props.address} /> : null;
+          case 'viewPendingTransaction':
+            return props.address ? <ViewPendingTransactions address={props.address} /> : null;
+          case 'setSs58Chain':
+            return <SetSs58Chain eventId={toolCallId} networkKey={props.networkKey} />;
+          case 'switchNetworks':
+            return <SwitchNetworks eventId={toolCallId} networks={props.networks} />;
+          default:
+            return null;
         }
-      }
+      } else if (type === 'tool-queryAccount') {
+        const { accounts } = tool.input as { accounts?: string[] };
 
-      // Complex tools that require output parsing
-
-      const output = parseToolOutput(tool);
-
-      if (!output) return null;
-
-      switch (type) {
-        case 'tool-showQRCode':
-          return <ShowQRCode eventId={toolCallId} address={output.address} />;
-        case 'tool-viewOnExplorer':
-          return output.address ? <ViewOnExplorer eventId={toolCallId} address={output.address} /> : null;
-        case 'tool-addToWatchlist':
-          return output.address ? <AddToWatchlist eventId={toolCallId} address={output.address} /> : null;
-        case 'tool-queryAccount':
-          return output.accounts?.length ? (
-            <div className='flex w-full flex-col gap-[10px]'>
-              {output.accounts.map((account: AccountData, index: number) => (
-                <QueryAccount key={`${account.address}-${index}`} account={account} />
-              ))}
-            </div>
-          ) : null;
-        case 'tool-viewPendingTransaction':
-          return output.address ? <ViewPendingTransactions address={output.address} /> : null;
+        return accounts?.length ? (
+          <div className='flex w-full flex-col gap-[10px]'>
+            {accounts.map((account: string, index: number) => (
+              <QueryAccount key={`${account}-${index}`} account={account} />
+            ))}
+          </div>
+        ) : null;
       }
 
       return null;
@@ -183,7 +169,7 @@ const DraggableChatWindow = forwardRef<DraggableChatWindowRef, DraggableChatProp
 
           {/* Non-draggable chat title with close button */}
           <div className='cursor-default'>
-            <ChatTitle onClose={onClose} />
+            <ChatTitle onClose={onClose} onClearChat={handleClearChat} />
           </div>
 
           {/* Chat content area - SimpleChat */}
@@ -195,6 +181,11 @@ const DraggableChatWindow = forwardRef<DraggableChatWindowRef, DraggableChatProp
               suggestions={suggestions || []}
               onStatusChange={onStatusChange}
             />
+          </div>
+
+          {/* Disclaimer message */}
+          <div className='text-foreground/50 cursor-default px-[15px] pb-3 text-center text-xs'>
+            Mimo can make mistakes. Check important info.
           </div>
         </div>
       </motion.div>,

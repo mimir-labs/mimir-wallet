@@ -12,7 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
-import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
+import { type FunctionCallHandler, functionCallManager, toFunctionCallString } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Spinner } from '@mimir-wallet/ui';
 
@@ -47,20 +47,34 @@ function PageTransfer() {
     const handler: FunctionCallHandler = (event) => {
       if (event.name !== 'transferForm') return;
 
-      if (event.arguments.sending !== undefined) {
-        setSending(event.arguments.sending);
+      // Safe type conversion for sending
+      const sendingValue = toFunctionCallString(event.arguments.sending);
+
+      if (sendingValue) {
+        setSending(sendingValue);
       }
 
-      if (event.arguments.recipient !== undefined) {
-        setRecipient(event.arguments.recipient);
+      // Safe type conversion for recipient
+      const recipientValue = toFunctionCallString(event.arguments.recipient);
+
+      if (recipientValue) {
+        setRecipient(recipientValue);
       }
 
-      if (event.arguments.amount !== undefined) {
-        setAmount(event.arguments.amount.toString());
+      // Safe type conversion for amount
+      const amountValue = event.arguments.amount;
+
+      if (amountValue !== undefined && amountValue !== null) {
+        const amountStr = typeof amountValue === 'number' ? amountValue.toString() : String(amountValue);
+
+        setAmount(amountStr);
       }
 
-      if (event.arguments.network !== undefined) {
-        setNetwork(event.arguments.network);
+      // Safe type conversion for network
+      const networkValue = toFunctionCallString(event.arguments.network);
+
+      if (networkValue) {
+        setNetwork(networkValue);
       }
 
       return functionCallManager.respondToFunctionCall({

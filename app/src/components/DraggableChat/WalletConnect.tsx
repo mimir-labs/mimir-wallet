@@ -15,7 +15,10 @@ function WalletConnect({ eventId }: WalletConnectProps) {
   };
 
   return (
-    <div className='border-divider-300 flex w-full items-center justify-between rounded-[10px] border bg-white p-[10px]'>
+    <div
+      onClick={handleWalletConnect}
+      className='border-divider-300 hover:border-primary focus-visible:border-primary focus-visible:ring-primary/30 flex w-full cursor-pointer items-center justify-between rounded-[10px] border bg-white p-[10px] transition-colors focus-visible:ring-2 focus-visible:outline-none'
+    >
       {/* Left side: Icon and title */}
       <div className='flex items-center gap-2.5'>
         <svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30' fill='none'>
@@ -42,7 +45,7 @@ function WalletConnect({ eventId }: WalletConnectProps) {
       </div>
 
       {/* Right side: Connect button */}
-      <Button size='sm' color='secondary' onClick={handleWalletConnect}>
+      <Button size='sm' color='secondary' continuePropagation>
         Connect
       </Button>
     </div>
