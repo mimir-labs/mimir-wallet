@@ -4,6 +4,8 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconChatSlash from '@/assets/svg/icon-chat-slash.svg?react';
 import IconMinimize from '@/assets/svg/icon-minimize.svg?react';
+import { getKeyboardShortcut } from '@/utils/common';
+import { useState } from 'react';
 
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
@@ -92,6 +94,8 @@ export interface ChatTitleProps {
 }
 
 export function ChatTitle({ onClose, onClearChat }: ChatTitleProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <>
       <div className='flex items-center gap-2.5 px-[15px] py-3'>
@@ -110,8 +114,24 @@ export function ChatTitle({ onClose, onClearChat }: ChatTitleProps) {
           </Button>
         </Tooltip>
         <div className='flex-1' />
-        <Button isIconOnly variant='light' className='text-foreground' onClick={onClose} aria-label='Minimize'>
-          <IconMinimize className='h-5 w-5 opacity-50' />
+        <Button
+          variant='light'
+          size='sm'
+          data-hovered={isHovered}
+          onClick={onClose}
+          isIconOnly={!isHovered}
+          radius='md'
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className='data-[hovered=true]:bg-secondary py-[10px] text-[#949494] transition-all'
+          aria-label='Minimize'
+        >
+          {isHovered && (
+            <span className='text-[14px] leading-normal font-bold text-nowrap text-current'>
+              {getKeyboardShortcut('K')}
+            </span>
+          )}
+          <IconMinimize className='h-5 w-5 text-current' />
         </Button>
       </div>
       {/* Divider */}
