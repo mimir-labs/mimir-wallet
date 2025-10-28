@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.33.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.32.1...polkadot-core-v2.33.0) (2025-10-28)
+
+
+### Features
+
+* add '⌘K' on macOS, 'Ctrl+K' on Windows/Linux for ai window ([#332](https://github.com/mimir-labs/mimir-wallet/issues/332)) ([41a35d0](https://github.com/mimir-labs/mimir-wallet/commit/41a35d006f4983a4030ae247ca7a8c628b0c1178))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.33.0
+
 ## [2.32.1](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.32.0...polkadot-core-v2.32.1) (2025-10-27)
 
 
