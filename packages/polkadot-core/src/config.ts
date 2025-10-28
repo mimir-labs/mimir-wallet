@@ -257,25 +257,25 @@ const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     statescanUrl: 'https://nexus.statescan.io/'
   },
-  {
-    key: 'polimec',
-    icon: '/chain-icons/polimec.svg',
-    tokenIcon: '/token-icons/PLMC.webp',
-    name: 'Polimec Polkadot',
-    relayChain: 'polkadot',
-    paraId: 3344,
-    wsUrl: {
-      IBP1: 'wss://polimec.ibp.network',
-      Amforc: 'wss://polimec.rpc.amforc.com',
-      'Polimec Foundation': 'wss://rpc.polimec.org',
-      IBP2: 'wss://polimec.dotters.network',
-      Helikon: 'wss://rpc.helikon.io/polimec'
-    },
-    httpUrl: 'https://polimec.ibp.network',
-    genesisHash: '0x7eb9354488318e7549c722669dcbdcdc526f1fef1420e7944667212f3601fdbd',
-    ss58Format: 41,
-    statescanUrl: 'https://polimec.statescan.io/'
-  },
+  // {
+  //   key: 'polimec',
+  //   icon: '/chain-icons/polimec.svg',
+  //   tokenIcon: '/token-icons/PLMC.webp',
+  //   name: 'Polimec Polkadot',
+  //   relayChain: 'polkadot',
+  //   paraId: 3344,
+  //   wsUrl: {
+  //     IBP1: 'wss://polimec.ibp.network',
+  //     Amforc: 'wss://polimec.rpc.amforc.com',
+  //     'Polimec Foundation': 'wss://rpc.polimec.org',
+  //     IBP2: 'wss://polimec.dotters.network',
+  //     Helikon: 'wss://rpc.helikon.io/polimec'
+  //   },
+  //   httpUrl: 'https://polimec.ibp.network',
+  //   genesisHash: '0x7eb9354488318e7549c722669dcbdcdc526f1fef1420e7944667212f3601fdbd',
+  //   ss58Format: 41,
+  //   statescanUrl: 'https://polimec.statescan.io/'
+  // },
   {
     key: 'astar',
     icon: '/chain-icons/astar.webp',
@@ -310,30 +310,30 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://xcavate.ibp.network',
     genesisHash: '0xd17bc7f93d054d8aba31f24d5bb0ac462247c594e31beed479b1c04d2d0ba48f',
     ss58Format: 5
-  },
-  {
-    key: 'moonbeam',
-    icon: '/chain-icons/Moonbeam.svg',
-    tokenIcon: '/token-icons/GLMR.svg',
-    name: 'Moonbeam',
-    relayChain: 'polkadot',
-    paraId: 2004,
-    wsUrl: {
-      Allnodes: 'wss://moonbeam-rpc.publicnode.com',
-      Blast: 'wss://moonbeam.public.blastapi.io',
-      Dwellir: 'wss://moonbeam-rpc.n.dwellir.com',
-      IBP1: 'wss://moonbeam.ibp.network',
-      IBP2: 'wss://moonbeam.dotters.network',
-      'Moonbeam Foundation': 'wss://wss.api.moonbeam.network',
-      OnFinality: 'wss://moonbeam.api.onfinality.io/public-ws',
-      RadiumBlock: 'wss://moonbeam.public.curie.radiumblock.co/ws',
-      UnitedBloc: 'wss://moonbeam.unitedbloc.com'
-    },
-    httpUrl: 'https://moonbeam-rpc.publicnode.com',
-    genesisHash: '0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d',
-    ss58Format: 1284,
-    explorerUrl: 'https://moonbeam.subscan.io/'
   }
+  // {
+  //   key: 'moonbeam',
+  //   icon: '/chain-icons/Moonbeam.svg',
+  //   tokenIcon: '/token-icons/GLMR.svg',
+  //   name: 'Moonbeam',
+  //   relayChain: 'polkadot',
+  //   paraId: 2004,
+  //   wsUrl: {
+  //     Allnodes: 'wss://moonbeam-rpc.publicnode.com',
+  //     Blast: 'wss://moonbeam.public.blastapi.io',
+  //     Dwellir: 'wss://moonbeam-rpc.n.dwellir.com',
+  //     IBP1: 'wss://moonbeam.ibp.network',
+  //     IBP2: 'wss://moonbeam.dotters.network',
+  //     'Moonbeam Foundation': 'wss://wss.api.moonbeam.network',
+  //     OnFinality: 'wss://moonbeam.api.onfinality.io/public-ws',
+  //     RadiumBlock: 'wss://moonbeam.public.curie.radiumblock.co/ws',
+  //     UnitedBloc: 'wss://moonbeam.unitedbloc.com'
+  //   },
+  //   httpUrl: 'https://moonbeam-rpc.publicnode.com',
+  //   genesisHash: '0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d',
+  //   ss58Format: 1284,
+  //   explorerUrl: 'https://moonbeam.subscan.io/'
+  // }
 ];
 
 const kusamaEndpoints: Endpoint[] = [

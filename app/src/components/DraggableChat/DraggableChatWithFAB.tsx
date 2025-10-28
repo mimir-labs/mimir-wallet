@@ -4,6 +4,7 @@
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { SUGGESTIONS_DISMISSED_KEY } from '@/constants';
 import { events } from '@/events';
+import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
 import { AnimatePresence, motion, useDragControls } from 'framer-motion';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -127,7 +128,7 @@ function DraggableChatWithFAB({
     };
   };
 
-  const handleOpen = () => {
+  const handleOpen = useCallback(() => {
     if (isDragging) {
       return;
     }
@@ -136,7 +137,12 @@ function DraggableChatWithFAB({
     setIsHovered(false);
     setHasNewReply(false); // Clear new reply indicator when opening chat
     onOpen?.();
-  };
+  }, [isDragging, onOpen]);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    onClose?.();
+  }, [onClose]);
 
   const handleStatusChange = (status: 'ready' | 'streaming' | 'submitted' | 'error') => {
     const prevStatus = chatStatus;
@@ -163,10 +169,21 @@ function DraggableChatWithFAB({
     }
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-    onClose?.();
-  };
+  // Toggle chat window with keyboard shortcut (Cmd/Ctrl + K)
+  const toggleChat = useCallback(() => {
+    if (isDragging) return; // Don't toggle while dragging
+
+    if (isOpen) {
+      handleClose();
+    } else {
+      handleOpen();
+    }
+  }, [isOpen, isDragging, handleClose, handleOpen]);
+
+  // Setup keyboard shortcut: Cmd/Ctrl + K
+  useKeyboardShortcut('k', toggleChat, {
+    enabled: showFABOnMobile // Only enable if FAB is visible
+  });
 
   // Listen to sidebar:open event to minimize chat
   useEffect(() => {
