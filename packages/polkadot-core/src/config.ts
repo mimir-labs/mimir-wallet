@@ -6,37 +6,10 @@ import type { Endpoint } from './types.js';
 
 const polkadotEndpoints: Endpoint[] = [
   {
-    key: 'polkadot',
+    key: 'assethub-polkadot',
     icon: '/chain-icons/Polkadot.webp',
     tokenIcon: '/token-icons/DOT.webp',
     name: 'Polkadot',
-    isRelayChain: true,
-    wsUrl: {
-      Allnodes: 'wss://polkadot-rpc.publicnode.com',
-      Blockops: 'wss://polkadot-public-rpc.blockops.network/ws',
-      Dwellir: 'wss://polkadot-rpc.dwellir.com',
-      'Dwellir Tunisia': 'wss://polkadot-rpc-tn.dwellir.com',
-      IBP1: 'wss://rpc.ibp.network/polkadot',
-      IBP2: 'wss://polkadot.dotters.network',
-      LuckyFriday: 'wss://rpc-polkadot.luckyfriday.io',
-      OnFinality: 'wss://polkadot.api.onfinality.io/public-ws',
-      RadiumBlock: 'wss://polkadot.public.curie.radiumblock.co/ws',
-      RockX: 'wss://rockx-dot.w3node.com/polka-public-dot/ws',
-      Stakeworld: 'wss://dot-rpc.stakeworld.io',
-      SubQuery: 'wss://polkadot.rpc.subquery.network/public/ws'
-    },
-    httpUrl: 'https://polkadot-rpc.publicnode.com',
-    genesisHash: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
-    ss58Format: 0,
-    explorerUrl: 'https://polkadot.subscan.io/',
-    statescanUrl: 'https://polkadot.statescan.io/',
-    identityNetwork: 'people-polkadot'
-  },
-  {
-    key: 'assethub-polkadot',
-    icon: '/chain-icons/assethub.svg',
-    tokenIcon: '/token-icons/DOT.webp',
-    name: 'AssetHub',
     relayChain: 'polkadot',
     paraId: 1000,
     wsUrl: {
@@ -310,7 +283,7 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://xcavate.ibp.network',
     genesisHash: '0xd17bc7f93d054d8aba31f24d5bb0ac462247c594e31beed479b1c04d2d0ba48f',
     ss58Format: 5
-  }
+  },
   // {
   //   key: 'moonbeam',
   //   icon: '/chain-icons/Moonbeam.svg',
@@ -334,40 +307,41 @@ const polkadotEndpoints: Endpoint[] = [
   //   ss58Format: 1284,
   //   explorerUrl: 'https://moonbeam.subscan.io/'
   // }
+  {
+    key: 'polkadot',
+    icon: '/chain-icons/Polkadot.webp',
+    tokenIcon: '/token-icons/DOT.webp',
+    name: 'Polkadot Relaychain',
+    isRelayChain: true,
+    wsUrl: {
+      Allnodes: 'wss://polkadot-rpc.publicnode.com',
+      Blockops: 'wss://polkadot-public-rpc.blockops.network/ws',
+      Dwellir: 'wss://polkadot-rpc.dwellir.com',
+      'Dwellir Tunisia': 'wss://polkadot-rpc-tn.dwellir.com',
+      IBP1: 'wss://rpc.ibp.network/polkadot',
+      IBP2: 'wss://polkadot.dotters.network',
+      LuckyFriday: 'wss://rpc-polkadot.luckyfriday.io',
+      OnFinality: 'wss://polkadot.api.onfinality.io/public-ws',
+      RadiumBlock: 'wss://polkadot.public.curie.radiumblock.co/ws',
+      RockX: 'wss://rockx-dot.w3node.com/polka-public-dot/ws',
+      Stakeworld: 'wss://dot-rpc.stakeworld.io',
+      SubQuery: 'wss://polkadot.rpc.subquery.network/public/ws'
+    },
+    httpUrl: 'https://polkadot-rpc.publicnode.com',
+    genesisHash: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+    ss58Format: 0,
+    explorerUrl: 'https://polkadot.subscan.io/',
+    statescanUrl: 'https://polkadot.statescan.io/',
+    identityNetwork: 'people-polkadot'
+  }
 ];
 
 const kusamaEndpoints: Endpoint[] = [
   {
-    key: 'kusama',
+    key: 'assethub-kusama',
     icon: '/chain-icons/Kusama.png',
     tokenIcon: '/token-icons/Kusama.png',
     name: 'Kusama',
-    isRelayChain: true,
-    wsUrl: {
-      Allnodes: 'wss://kusama-rpc.publicnode.com',
-      OnFinality: 'wss://kusama.api.onfinality.io/public-ws',
-      Dwellir: 'wss://kusama-rpc.dwellir.com',
-      'Dwellir Tunisia': 'wss://kusama-rpc-tn.dwellir.com',
-      IBP1: 'wss://rpc.ibp.network/kusama',
-      IBP2: 'wss://kusama.dotters.network',
-      LuckyFriday: 'wss://rpc-kusama.luckyfriday.io',
-      RadiumBlock: 'wss://kusama.public.curie.radiumblock.co/ws',
-      RockX: 'wss://rockx-ksm.w3node.com/polka-public-ksm/ws',
-      Stakeworld: 'wss://ksm-rpc.stakeworld.io'
-    },
-    httpUrl: 'https://kusama-rpc.publicnode.com',
-    genesisHash: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
-    ss58Format: 2,
-    explorerUrl: 'https://kusama.subscan.io/',
-    statescanUrl: 'https://kusama.statescan.io/',
-    identityNetwork: 'people-kusama',
-    remoteProxyTo: '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a'
-  },
-  {
-    key: 'assethub-kusama',
-    icon: '/chain-icons/assethub-kusama.svg',
-    tokenIcon: '/token-icons/Kusama.png',
-    name: 'AssetHub Kusama',
     relayChain: 'kusama',
     paraId: 1000,
     wsUrl: {
@@ -495,36 +469,41 @@ const kusamaEndpoints: Endpoint[] = [
     },
     genesisHash: '0xce7681fb12aa8f7265d229a9074be0ea1d5e99b53eedcec2deade43857901808',
     ss58Format: 42
+  },
+  {
+    key: 'kusama',
+    icon: '/chain-icons/Kusama.png',
+    tokenIcon: '/token-icons/Kusama.png',
+    name: 'Kusama Relaychain',
+    isRelayChain: true,
+    wsUrl: {
+      Allnodes: 'wss://kusama-rpc.publicnode.com',
+      OnFinality: 'wss://kusama.api.onfinality.io/public-ws',
+      Dwellir: 'wss://kusama-rpc.dwellir.com',
+      'Dwellir Tunisia': 'wss://kusama-rpc-tn.dwellir.com',
+      IBP1: 'wss://rpc.ibp.network/kusama',
+      IBP2: 'wss://kusama.dotters.network',
+      LuckyFriday: 'wss://rpc-kusama.luckyfriday.io',
+      RadiumBlock: 'wss://kusama.public.curie.radiumblock.co/ws',
+      RockX: 'wss://rockx-ksm.w3node.com/polka-public-ksm/ws',
+      Stakeworld: 'wss://ksm-rpc.stakeworld.io'
+    },
+    httpUrl: 'https://kusama-rpc.publicnode.com',
+    genesisHash: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
+    ss58Format: 2,
+    explorerUrl: 'https://kusama.subscan.io/',
+    statescanUrl: 'https://kusama.statescan.io/',
+    identityNetwork: 'people-kusama',
+    remoteProxyTo: '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a'
   }
 ];
 
 const paseoEndpoints: Endpoint[] = [
   {
-    key: 'paseo',
+    key: 'assethub-paseo',
     icon: '/chain-icons/Paseo.png',
     tokenIcon: '/token-icons/Paseo.png',
     name: 'Paseo',
-    ss58Format: 0,
-    isRelayChain: true,
-    isTestnet: true,
-    wsUrl: {
-      Dwellir: 'wss://paseo-rpc.dwellir.com',
-      IBP1: 'wss://rpc.ibp.network/paseo',
-      StakeWorld: 'wss://pas-rpc.stakeworld.io',
-      IBP2: 'wss://paseo.dotters.network',
-      Amforc: 'wss://paseo.rpc.amforc.com',
-      Zondax: 'wss://api2.zondax.ch/pas/node/rpc'
-    },
-    httpUrl: 'https://rpc.ibp.network/paseo',
-    genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
-    explorerUrl: 'https://paseo.subscan.io/',
-    statescanUrl: 'https://paseo.statescan.io/'
-  },
-  {
-    key: 'assethub-paseo',
-    icon: '/chain-icons/assethub-paseo.webp',
-    tokenIcon: '/token-icons/Paseo.png',
-    name: 'AssetHub Paseo',
     ss58Format: 0,
     relayChain: 'paseo',
     isTestnet: true,
@@ -572,37 +551,36 @@ const paseoEndpoints: Endpoint[] = [
     httpUrl: 'https://rpc2-paseo.xcavate.io',
     genesisHash: '0xac9dc5e0f7aeae019818f5859215044f80676e562cf934f6683d6424abdabbc8',
     ss58Format: 5
+  },
+  {
+    key: 'paseo',
+    icon: '/chain-icons/Paseo.png',
+    tokenIcon: '/token-icons/Paseo.png',
+    name: 'Paseo Relaychain',
+    ss58Format: 0,
+    isRelayChain: true,
+    isTestnet: true,
+    wsUrl: {
+      Dwellir: 'wss://paseo-rpc.dwellir.com',
+      IBP1: 'wss://rpc.ibp.network/paseo',
+      StakeWorld: 'wss://pas-rpc.stakeworld.io',
+      IBP2: 'wss://paseo.dotters.network',
+      Amforc: 'wss://paseo.rpc.amforc.com',
+      Zondax: 'wss://api2.zondax.ch/pas/node/rpc'
+    },
+    httpUrl: 'https://rpc.ibp.network/paseo',
+    genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
+    explorerUrl: 'https://paseo.subscan.io/',
+    statescanUrl: 'https://paseo.statescan.io/'
   }
 ];
 
 const westendEndpoints: Endpoint[] = [
   {
-    key: 'westend',
+    key: 'assethub-westend',
     icon: '/chain-icons/Westend.webp',
     tokenIcon: '/token-icons/WND.webp',
     name: 'Westend',
-    ss58Format: 42,
-    isRelayChain: true,
-    isTestnet: true,
-    wsUrl: {
-      Dwellir: 'wss://westend-rpc.dwellir.com',
-      OnFinality: 'wss://westend.api.onfinality.io/public-ws',
-      Parity: 'wss://westend-rpc.polkadot.io',
-      IBP1: 'wss://rpc.ibp.network/westend',
-      'Dwellir Tunisia': 'wss://westend-rpc-tn.dwellir.com',
-      IBP2: 'wss://westend.dotters.network',
-      RadiumBlock: 'wss://westend.public.curie.radiumblock.co/ws'
-    },
-    httpUrl: 'https://westend-rpc.polkadot.io',
-    genesisHash: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e',
-    explorerUrl: 'https://westend.subscan.io/',
-    statescanUrl: 'https://westend.statescan.io/'
-  },
-  {
-    key: 'assethub-westend',
-    icon: '/chain-icons/assethub-westend.webp',
-    tokenIcon: '/token-icons/WND.webp',
-    name: 'AssetHub Westend',
     ss58Format: 42,
     relayChain: 'westend',
     isTestnet: true,
@@ -621,6 +599,28 @@ const westendEndpoints: Endpoint[] = [
     statescanUrl: 'https://assethub-westend.statescan.io/',
     polkavm: true,
     useRelayBlockForProxy: true
+  },
+  {
+    key: 'westend',
+    icon: '/chain-icons/Westend.webp',
+    tokenIcon: '/token-icons/WND.webp',
+    name: 'Westend Relaychain',
+    ss58Format: 42,
+    isRelayChain: true,
+    isTestnet: true,
+    wsUrl: {
+      Dwellir: 'wss://westend-rpc.dwellir.com',
+      OnFinality: 'wss://westend.api.onfinality.io/public-ws',
+      Parity: 'wss://westend-rpc.polkadot.io',
+      IBP1: 'wss://rpc.ibp.network/westend',
+      'Dwellir Tunisia': 'wss://westend-rpc-tn.dwellir.com',
+      IBP2: 'wss://westend.dotters.network',
+      RadiumBlock: 'wss://westend.public.curie.radiumblock.co/ws'
+    },
+    httpUrl: 'https://westend-rpc.polkadot.io',
+    genesisHash: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e',
+    explorerUrl: 'https://westend.subscan.io/',
+    statescanUrl: 'https://westend.statescan.io/'
   }
 ];
 

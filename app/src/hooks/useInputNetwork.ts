@@ -41,8 +41,11 @@ export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: str
     useCallback(
       (network: string) => {
         if (mode === 'omni') {
-          setNetwork(network);
-          setRootNetwork(network);
+          const newKey = setRootNetwork(network);
+
+          if (newKey) {
+            setNetwork(network);
+          }
         }
       },
       [mode, setRootNetwork]

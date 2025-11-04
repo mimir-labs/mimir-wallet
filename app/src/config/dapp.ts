@@ -151,9 +151,9 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
   urlSearch(network: string) {
     const url = {
       polkadot: 'https://polkadot.subsquare.io/',
-      'assethub-polkadot': 'https://polkadot.subsquare.io/assethub',
+      'assethub-polkadot': 'https://polkadot.subsquare.io',
       kusama: 'https://kusama.subsquare.io/',
-      'assethub-kusama': 'https://kusama.subsquare.io/assethub',
+      'assethub-kusama': 'https://kusama.subsquare.io',
       acala: 'https://acala.subsquare.io/',
       phala: 'https://phala.subsquare.io/',
       'collectives-polkadot': 'https://collectives.subsquare.io/',
@@ -161,9 +161,9 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
       hydration: 'https://hydration.subsquare.io/',
       'bifrost-kusama': 'https://bifrost-kusama.subsquare.io/',
       karura: 'https://karura.subsquare.io/',
-      'assethub-westend': 'https://westend.subsquare.io/assethub',
+      'assethub-westend': 'https://westend.subsquare.io',
       paseo: 'https://paseo.subsquare.io/',
-      'assethub-paseo': 'https://paseo.subsquare.io/assethub',
+      'assethub-paseo': 'https://paseo.subsquare.io',
       crust: 'https://crust.subsquare.io/',
       vara: 'https://vara.subsquare.io/',
       'zkverify-testnet': 'https://zkverify-testnet.subsquare.io/'
@@ -190,7 +190,9 @@ export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
   url: 'https://polkadot.polkassembly.io/',
   supportedChains: [
     'polkadot',
+    'assethub-polkadot',
     'kusama',
+    'assethub-kusama',
     'acala',
     'phala',
     'collectives-polkadot',
@@ -209,7 +211,9 @@ export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
   urlSearch(network: string) {
     const url = {
       polkadot: 'https://polkadot.polkassembly.io/',
+      'assethub-polkadot': 'https://polkadot.polkassembly.io/',
       kusama: 'https://kusama.polkassembly.io/',
+      'assethub-kusama': 'https://kusama.polkassembly.io/',
       acala: 'https://acala.polkassembly.io/',
       phala: 'https://phala.polkassembly.io/',
       'collectives-polkadot': 'https://collectives.polkassembly.io/',

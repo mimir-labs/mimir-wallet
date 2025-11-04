@@ -20,10 +20,10 @@ import {
 } from '@mimir-wallet/ui';
 
 function Content({ chain }: { chain: Endpoint }) {
-  const { networks } = useNetworks();
   const [url, setUrl] = useState(
-    (store.get(`${NETWORK_RPC_PREFIX}${chain.key}`) as string) || Object.values(networks[0].wsUrl)[0] || ''
+    (store.get(`${NETWORK_RPC_PREFIX}${chain.key}`) as string) || Object.values(chain.wsUrl)[0] || ''
   );
+
   const [error, setError] = useState<Error | undefined>(undefined);
 
   const [state, handleSave] = useAsyncFn(async () => {

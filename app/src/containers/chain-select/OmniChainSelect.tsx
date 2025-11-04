@@ -4,7 +4,6 @@
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
-import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -51,13 +50,11 @@ function Status({ network }: { network: Network }) {
 function GroupedEndpoints({
   group,
   endpoints,
-  completedMigrationNetworks,
   enableNetworks,
   disableNetworks
 }: {
   group: string;
   endpoints: Network[];
-  completedMigrationNetworks: string[];
   enableNetworks: (networks: string[]) => void;
   disableNetworks: (networks: string[]) => void;
 }) {
@@ -89,12 +86,10 @@ function GroupedEndpoints({
       </div>
       <div className='grid grid-cols-1 gap-2.5 sm:grid-cols-2'>
         {endpoints.map((endpoint) => {
-          const isCompletedMigration = completedMigrationNetworks.includes(endpoint.key);
-
           return (
             <Button
               key={endpoint.key}
-              data-completed-migration={isCompletedMigration}
+              data-completed-migration={!!endpoint.isRelayChain}
               fullWidth
               variant='light'
               radius='sm'
@@ -102,7 +97,7 @@ function GroupedEndpoints({
               size='lg'
               className='text-foreground bg-divider-300/30 data-[completed-migration=true]:text-foreground/30 data-[completed-migration=true]:hover:bg-divider-300/30 h-[52px] justify-start rounded-[10px] p-2.5 text-left font-bold shadow-none'
               style={{
-                background: !isCompletedMigration ? 'var(--color-main-bg)' : undefined
+                background: !endpoint.isRelayChain ? 'var(--color-main-bg)' : undefined
               }}
               onClick={endpoint.enabled ? () => disableNetworks([endpoint.key]) : () => enableNetworks([endpoint.key])}
             >
@@ -118,10 +113,10 @@ function GroupedEndpoints({
                   </Tooltip>
                 )}
 
-                {isCompletedMigration && (
+                {!!endpoint.isRelayChain && (
                   <Tooltip
                     classNames={{ content: 'max-w-[300px]' }}
-                    content='Due to the Assethub Migration, this network is no longer the primary one for regular users. Please connect to Assethub instead.'
+                    content={`Due to the Assethub Migration, this network is no longer the primary one for regular users. Please connect to ${endpoints[0]?.name} instead.`}
                   >
                     <IconQuestion className='text-primary' />
                   </Tooltip>
@@ -150,18 +145,13 @@ function GroupedEndpoints({
 function OmniChainSelect() {
   const { isApiReady } = useApi();
   const { networks, enableNetwork, disableNetwork } = useNetworks();
-  const { data: migrationNetworks } = useMigrationNetworks();
-
-  const completedMigrationNetworks = useMemo(() => {
-    return migrationNetworks?.filter((network) => network.status === 'completed').map((network) => network.chain) || [];
-  }, [migrationNetworks]);
 
   const enabledNetworks = useMemo(() => networks.filter((network) => network.enabled), [networks]);
   const groupedEndpoints = useMemo(() => {
     const list = networks.reduce(
       (acc, network) => {
         if (network.isRelayChain) {
-          acc[network.key] = [network, ...(acc[network.key] || [])];
+          acc[network.key] = [...(acc[network.key] || []), network];
         } else if (network.relayChain) {
           acc[network.relayChain] = [...(acc[network.relayChain] || []), network];
         } else {
@@ -173,23 +163,8 @@ function OmniChainSelect() {
       {} as Record<string, Network[]>
     );
 
-    // Sort networks within each group to put completed migration networks at the end
-    Object.keys(list).forEach((groupKey) => {
-      list[groupKey] = list[groupKey].sort((a, b) => {
-        const aIsCompleted = completedMigrationNetworks.includes(a.key);
-        const bIsCompleted = completedMigrationNetworks.includes(b.key);
-
-        // If one is completed and the other is not, put completed at the end
-        if (aIsCompleted && !bIsCompleted) return 1;
-        if (!aIsCompleted && bIsCompleted) return -1;
-
-        // If both are completed or both are not completed, maintain original order
-        return 0;
-      });
-    });
-
     return list;
-  }, [networks, completedMigrationNetworks]);
+  }, [networks]);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -281,7 +256,6 @@ function OmniChainSelect() {
                 key={`group-${group}`}
                 group={group}
                 endpoints={groupedEndpoints[group]}
-                completedMigrationNetworks={completedMigrationNetworks}
                 enableNetworks={(networks) => networks.forEach((network) => enableNetwork(network))}
                 disableNetworks={(networks) => networks.forEach((network) => disableNetwork(network))}
               />
