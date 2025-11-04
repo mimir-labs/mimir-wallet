@@ -77,9 +77,8 @@ function CustomGasFeeSelect({
 
   const asset = useMemo(() => {
     return (
-      feeEligibleAssets.find((item) =>
-        item.isNative ? 'native' === selectedAssetId : item.assetId === selectedAssetId
-      ) || null
+      feeEligibleAssets.find((item) => (item.isNative ? 'native' === selectedAssetId : item.key === selectedAssetId)) ||
+      null
     );
   }, [feeEligibleAssets, selectedAssetId]);
 

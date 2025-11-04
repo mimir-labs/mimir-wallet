@@ -54,7 +54,7 @@ export interface ApiContextProps extends ValidApiState, Omit<ApiProps, 'api'> {
   ss58Chain: string;
   setSs58Chain: (chain: string) => void;
   allApis: Record<string, ValidApiState>;
-  setNetwork: (network: string) => void;
+  setNetwork: (network: string) => string | null;
 }
 
 export type ValidApiState = ApiState & {

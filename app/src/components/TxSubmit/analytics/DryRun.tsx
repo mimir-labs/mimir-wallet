@@ -304,12 +304,14 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
   const [balancesChanges, setBalancesChanges] = useState<SelfBalanceChange[]>([]);
   const { api } = useApi();
   const [rawEvents, setRawEvents] = useState<any>();
+  const [hasXcm, setHasXcm] = useState(false);
 
   const handleSimulate = useCallback(() => {
     if (account && call) {
       setSimulation({ ...EMPTY_SIMULATION, isLoading: true });
       setCrossChainSimulation({ ...EMPTY_SIMULATION, isLoading: true });
       setBalancesChanges([]);
+      setHasXcm(false);
 
       dryRun(api, call, account)
         .then((result) => {
@@ -322,6 +324,7 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
             setSimulation({ isDone: true, success: true, error: null, isLoading: false });
 
             if (result.forwardedXcms.length > 0) {
+              setHasXcm(true);
               dryRunWithXcm(api, result.forwardedXcms)
                 .then((result) => {
                   const errorResult = result.find((item) => !item.success);
@@ -393,7 +396,7 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
 
     return (
       <DryRunSuccess
-        title={crossChainSimulation.success ? 'Cross-Chain Simulation Result' : 'Simulation Result Success!'}
+        title={hasXcm ? 'Cross-Chain Simulation Result' : 'Simulation Result Success!'}
         balancesChanges={balancesChanges}
         rawEvents={rawEvents}
       />

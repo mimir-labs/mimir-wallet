@@ -74,7 +74,7 @@ const DraggableChatWindow = forwardRef<DraggableChatWindowRef, DraggableChatProp
 
         switch (componentType) {
           case 'matchDapps':
-            return <MatchedApps eventId={toolCallId} apps={props.dapps} />;
+            return <MatchedApps eventId={toolCallId} apps={props.dapps} network={props.network} />;
           case 'getFund':
             return <GetFund eventId={toolCallId} />;
           case 'walletConnect':

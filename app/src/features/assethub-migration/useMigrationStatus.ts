@@ -5,12 +5,10 @@ import {
   MIGRATION_ALERT_DISMISSED_PREFIX,
   MIGRATION_ASSETS_ALERT_DISMISSED_PREFIX,
   MIGRATION_BATCH_ALERT_DISMISSED_PREFIX,
-  MIGRATION_PURE_ALERT_DISMISSED_PREFIX,
   MIGRATION_TEMPLATE_ALERT_DISMISSED_PREFIX
 } from '@/constants';
 import { useMemo } from 'react';
 
-import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { service, useLocalStore, useQuery } from '@mimir-wallet/service';
 
 interface MigrationStatus {
@@ -118,28 +116,6 @@ export function useBatchMigrationStatus(chain: string, address: string): Migrati
 
 export function useTemplateMigrationStatus(chain: string): MigrationStatus {
   const [isDismissed, setIsDismissed] = useLocalStore(`${MIGRATION_TEMPLATE_ALERT_DISMISSED_PREFIX}${chain}`, false);
-
-  const dismissAlert = () => {
-    setIsDismissed(true);
-  };
-
-  const resetAlert = () => {
-    setIsDismissed(false);
-  };
-
-  return {
-    isAlertVisible: !isDismissed,
-    dismissAlert,
-    resetAlert
-  };
-}
-
-export function usePureMigrationStatus(chain: string, address: string): MigrationStatus {
-  const addressHex = useMemo(() => addressToHex(address), [address]);
-  const [isDismissed, setIsDismissed] = useLocalStore(
-    `${MIGRATION_PURE_ALERT_DISMISSED_PREFIX}${chain}:${addressHex}`,
-    false
-  );
 
   const dismissAlert = () => {
     setIsDismissed(true);

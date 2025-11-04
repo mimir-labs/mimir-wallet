@@ -136,11 +136,19 @@ function Accounts({
     }
   }, [accounts, keywords, metas, setIsSearching, setSearchAccount]);
 
+  const description = (
+    <p className='text-xs'>
+      Mimir auto-syncs all multisig accounts across networks, including those created in other apps. (Multix, Signet,
+      PolkadotJS, Polkasafe, etc.)
+    </p>
+  );
+
   if (!isConnected) {
     return (
       <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
         <h3 className='font-extrabold'>Your Account</h3>
 
+        {description}
         <Divider />
 
         <Button
@@ -168,6 +176,8 @@ function Accounts({
           <Link to='/create-pure'>Create Pure Account</Link>
         </Button>
       </div>
+
+      {description}
 
       <Divider />
 
@@ -263,7 +273,7 @@ function Welcome() {
 
         <Input
           fullWidth
-          className='w-full'
+          className='[&_input]:bg-background w-full [&_input]:rounded-full'
           endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider-300 h-4 w-4' />}
           onChange={setKeywords}
           placeholder='Please input address'

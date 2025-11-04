@@ -18,19 +18,30 @@ export function useAddressSupportedNetworks(address?: string | null) {
 
   const supportedNetwork = useMemo(() => {
     if (meta.isPure) {
-      const supported = networks.filter(
-        (item) =>
-          item.genesisHash === meta.pureCreatedAt ||
-          (remoteProxyRelations[meta.pureCreatedAt]
-            ? item.genesisHash === remoteProxyRelations[meta.pureCreatedAt]
-            : false)
-      );
+      const genesisHashes = new Set<string>();
+
+      // Add the network where the pure address was created
+      if (meta.pureCreatedAt) {
+        genesisHashes.add(meta.pureCreatedAt);
+
+        // Add remote proxy relation if exists
+        if (remoteProxyRelations[meta.pureCreatedAt]) {
+          genesisHashes.add(remoteProxyRelations[meta.pureCreatedAt]);
+        }
+      }
+
+      // Add proxy networks
+      if (meta.proxyNetworks && meta.proxyNetworks.length > 0) {
+        meta.proxyNetworks.forEach((network) => genesisHashes.add(network));
+      }
+
+      const supported = networks.filter((item) => genesisHashes.has(item.genesisHash));
 
       return supported;
     }
 
     return undefined;
-  }, [meta.isPure, meta.pureCreatedAt, networks]);
+  }, [meta.isPure, meta.pureCreatedAt, meta.proxyNetworks, networks]);
 
   return useMemo(() => (supportedNetwork ? supportedNetwork : undefined), [supportedNetwork]);
 }

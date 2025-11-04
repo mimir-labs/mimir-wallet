@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { Button, Chip } from '@mimir-wallet/ui';
 
 // MatchedApps component based on Figma design
-function MatchedApps({ apps }: { eventId: string; apps: { id: string; path?: string }[] }) {
+function MatchedApps({ apps, network }: { eventId: string; network: string; apps: { id: string; path?: string }[] }) {
   const list = useMemo(() => {
     const result = [];
 
@@ -30,22 +30,22 @@ function MatchedApps({ apps }: { eventId: string; apps: { id: string; path?: str
 
       {/* Apps list */}
       {list.map((app, index) => (
-        <MatchedAppItem key={index} {...app.dapp} path={app.path} />
+        <MatchedAppItem key={index} {...app.dapp} path={app.path} network={network} />
       ))}
     </div>
   );
 }
 
 // Individual app item component
-function MatchedAppItem(dapp: DappOption & { path?: string }) {
-  const { name, icon, path } = dapp;
+function MatchedAppItem(dapp: DappOption & { path?: string; network?: string }) {
+  const { name, icon, path, network } = dapp;
   const openDapp = useOpenDapp(dapp);
 
   const tag = path?.split('/').at(-1);
 
   return (
     <div
-      onClick={() => openDapp(path)}
+      onClick={() => openDapp(path, network)}
       className='border-divider-300 hover:border-primary focus-visible:border-primary focus-visible:ring-primary/30 flex w-full cursor-pointer items-center justify-between rounded-[10px] border p-2.5 transition-colors focus-visible:ring-2 focus-visible:outline-none'
     >
       {/* Left side: Icon and name */}
@@ -60,7 +60,7 @@ function MatchedAppItem(dapp: DappOption & { path?: string }) {
         size='sm'
         color='secondary'
         onClick={() => {
-          openDapp(path);
+          openDapp(path, network);
         }}
       >
         View
