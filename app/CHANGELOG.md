@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.34.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.33.0...mimir-wallet-app-v2.34.0) (2025-11-04)
+
+
+### Features
+
+* update some feature for assethub migration ([#334](https://github.com/mimir-labs/mimir-wallet/issues/334)) ([f02f185](https://github.com/mimir-labs/mimir-wallet/commit/f02f18567620ee1e56739409a489cc808b7b6914))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.34.0
+    * @mimir-wallet/service bumped to 2.34.0
+    * @mimir-wallet/ui bumped to 2.34.0
+
 ## [2.33.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.32.1...mimir-wallet-app-v2.33.0) (2025-10-28)
 
 
