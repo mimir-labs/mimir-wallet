@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.35.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.34.0...polkadot-core-v2.35.0) (2025-11-05)
+
+
+### Features
+
+* update pjs version to 16.4.9 ([#336](https://github.com/mimir-labs/mimir-wallet/issues/336)) ([c0f4274](https://github.com/mimir-labs/mimir-wallet/commit/c0f42746b91fce24ad1a00675fab1aec4102f6af))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.35.0
+
 ## [2.34.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.33.0...polkadot-core-v2.34.0) (2025-11-04)
 
 
