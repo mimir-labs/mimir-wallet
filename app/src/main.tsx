@@ -5,6 +5,7 @@ import '@xyflow/react/dist/style.css';
 import './style.css';
 import '@mimir-wallet/polkadot-core/augment';
 
+import { RouterProvider } from '@tanstack/react-router';
 import {
   ArcElement,
   BarElement,
@@ -20,7 +21,6 @@ import {
 import moment from 'moment';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 
 import { ApiRoot, initializeApi, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -29,8 +29,8 @@ import { API_CLIENT_GATEWAY, initService } from '@mimir-wallet/service';
 import { initializeAccount } from './accounts/initialize';
 import { initializeWallet } from './wallet/initialize';
 import { initAnalytics } from './analytics';
-import App from './App';
 import { initFavoriteDapps, initMimir } from './initMimir';
+import { router } from './router';
 import { upgradeAddresBook } from './upgrade';
 
 // Set default date-time format for the entire application
@@ -83,9 +83,7 @@ initializeAccount(chain, address);
 // StrictMode is enabled in development to help identify potential problems
 const app = (
   <ApiRoot chain={chain}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <RouterProvider router={router} />
   </ApiRoot>
 );
 

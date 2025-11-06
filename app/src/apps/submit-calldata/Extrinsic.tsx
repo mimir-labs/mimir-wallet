@@ -9,8 +9,8 @@ import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInput } from '@/hooks/useInput';
 import { Call as CallComp } from '@/params';
+import { useRouter } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Divider } from '@mimir-wallet/ui';
@@ -43,7 +43,7 @@ function Extrinsic({
   const [parsedCallData, setParsedCallData] = useState<Call | null>(null);
   const [callDataError, setCallDataError] = useState<Error | null>(null);
   const [showDetail, setShowDetail] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     const [call, error] = decodeCallData(api.registry, callData);
@@ -54,7 +54,7 @@ function Extrinsic({
 
   return (
     <div className='mx-auto mt-3 w-full max-w-[500px] p-4 sm:p-5'>
-      <Button onClick={() => navigate(-1)} variant='ghost'>
+      <Button onClick={() => router.history.back()} variant='ghost'>
         {'<'} Back
       </Button>
       <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-5'>

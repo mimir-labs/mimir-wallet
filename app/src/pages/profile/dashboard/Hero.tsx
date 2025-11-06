@@ -14,8 +14,8 @@ import { Fund } from '@/components';
 import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
 import { formatDisplay } from '@/utils';
+import { Link } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
@@ -34,7 +34,7 @@ function SubsquareLink({ network, address }: { network: string; address: string 
 
   return (
     <Tooltip content='Subsquare'>
-      <Link to={`/explorer/${encodeURIComponent(url.toString())}`}>
+      <Link to='/explorer/$url' params={{ url: url.toString() }}>
         <img style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subsquare' />
       </Link>
     </Tooltip>
@@ -57,7 +57,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
   const buttons = (
     <div className='item-center grid w-full grid-cols-2 gap-2 pt-2.5 sm:w-auto md:flex'>
       <Button asChild variant='solid' color='primary' size='md' className='h-[26px]'>
-        <Link to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}`}>
+        <Link to='/explorer/$url' params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}>
           Transfer
           <IconSend />
         </Link>
@@ -106,7 +106,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
           color='secondary'
           size='lg'
         >
-          <Link to='/account-setting'>
+          <Link to='/setting' search={{ type: 'account' }}>
             <IconSet />
           </Link>
         </Button>

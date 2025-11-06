@@ -5,8 +5,8 @@ import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { AddressCell } from '@/components';
+import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, Tooltip } from '@mimir-wallet/ui';
@@ -91,7 +91,7 @@ function CreateSuccess({ isOpen, onClose, address }: Props) {
             onClick={() => {
               onClose();
               setCurrent(address);
-              navigate('/');
+              navigate({ to: '/' });
             }}
           >
             Start using

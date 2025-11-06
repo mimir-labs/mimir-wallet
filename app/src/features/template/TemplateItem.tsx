@@ -8,8 +8,8 @@ import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { CopyButton } from '@/components';
 import { DotConsoleApp } from '@/config';
+import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
@@ -30,7 +30,7 @@ function DotConsoleButton({ network, call }: { network: string; call: string }) 
 
   return (
     <Button isIconOnly asChild size='sm' color='primary' variant='light'>
-      <Link to={`/explorer/${encodeURIComponent(url.toString())}`}>
+      <Link to='/explorer/$url' params={{ url: url.toString() }}>
         <img src={DotConsoleApp.icon} alt='Dot Console' width={16} height={16} />
       </Link>
     </Button>

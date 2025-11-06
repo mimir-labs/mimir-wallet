@@ -4,7 +4,7 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Empty } from '@/components';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 
 import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 
@@ -15,14 +15,18 @@ import Import from './Import';
 
 function PageAddressBook() {
   const { addresses } = useAccount();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedTab = searchParams.get('tab') || 'contacts';
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { tab?: 'contacts' | 'watchlist' };
+  const selectedTab = search.tab || 'contacts';
 
   const contactAddresses = addresses.filter((address) => !address.watchlist);
   const watchlistAddresses = addresses.filter((address) => address.watchlist);
 
   const handleTabChange = (key: React.Key) => {
-    setSearchParams({ tab: key.toString() }, { replace: true });
+    navigate({
+      search: ((prev: any) => ({ ...prev, tab: key.toString() })) as any,
+      replace: true
+    });
   };
 
   return (

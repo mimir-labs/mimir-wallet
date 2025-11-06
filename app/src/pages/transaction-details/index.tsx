@@ -5,12 +5,13 @@ import type { Transaction } from '@/hooks/types';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useQueryParam } from '@/hooks/useQueryParams';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 import { GroupedTransactions, TxProgress } from '@/transactions';
 import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
+import { getRouteApi, useParams } from '@tanstack/react-router';
 import { useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+
+const routeApi = getRouteApi('/_authenticated/transactions/$id');
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
@@ -38,9 +39,10 @@ function SmPage({ transaction }: { transaction: Transaction }) {
 
 function PageTransactionDetails() {
   const { network } = useApi();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams({ from: '/_authenticated/transactions/$id' });
+  const search = routeApi.useSearch();
+  const urlNetwork = search.network;
   const [transaction, isFetched, isFetching] = useTransactionDetail(network, id);
-  const [urlNetwork] = useQueryParam<string>('network');
   const upSm = useMediaQuery('sm');
 
   const groupedTransactions = useMemo(() => {

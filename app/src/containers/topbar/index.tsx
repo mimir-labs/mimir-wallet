@@ -6,7 +6,7 @@ import Logo from '@/assets/images/logo.png';
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import { AccountSelect } from '@/components';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from '@tanstack/react-router';
 
 import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';

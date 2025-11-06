@@ -8,8 +8,8 @@ import { Address } from '@/components';
 import { toastError, toastSuccess } from '@/components/utils';
 import { type NotificationMessage, notificationStore } from '@/hooks/useNotifications';
 import { formatTransactionId } from '@/transactions';
+import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { useSocket } from '@mimir-wallet/service';
@@ -24,7 +24,7 @@ const handler = (message: NotificationMessage) => {
         <p className='text-xs'>
           Transaction {formatTransactionId(message.id)} Executed {message.status}
         </p>
-        <Link className='text-primary text-xs active:underline' to='/transactions?status=history'>
+        <Link className='text-primary text-xs active:underline' to='/transactions' search={{ status: 'history' }}>
           View Transaction{'>'}
         </Link>
       </div>
@@ -36,7 +36,7 @@ const handler = (message: NotificationMessage) => {
         <p className='text-xs'>
           New Transaction by <Address shorten value={message.signer} />
         </p>
-        <Link className='text-primary text-xs active:underline' to='/transactions?status=pending'>
+        <Link className='text-primary text-xs active:underline' to='/transactions' search={{ status: 'pending' }}>
           View Pending{'>'}
         </Link>
       </div>
@@ -48,7 +48,7 @@ const handler = (message: NotificationMessage) => {
         <p className='text-xs'>
           <Address shorten value={message.signer} /> approve Transaction {formatTransactionId(message.id)}
         </p>
-        <Link className='text-primary text-xs active:underline' to='/transactions?status=pending'>
+        <Link className='text-primary text-xs active:underline' to='/transactions' search={{ status: 'pending' }}>
           View Pending{'>'}
         </Link>
       </div>

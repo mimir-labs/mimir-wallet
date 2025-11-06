@@ -1,8 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect } from 'react';
-import { parsePath, useLocation, useNavigate } from 'react-router-dom';
 
 import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
 import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -50,7 +50,7 @@ function useRouteCheck() {
 
       return {
         isOnRequiredRoute,
-        navigateToRoute: () => navigate(requiredRoute)
+        navigateToRoute: () => navigate({ to: requiredRoute })
       };
     },
     [location, navigate]
@@ -113,24 +113,21 @@ function useNavigateCall() {
           params?: Record<string, string>;
         };
 
-        let finalPath = path;
+        // Build navigation parameters for TanStack Router
+        const navParams: { to: string; params?: Record<string, string>; search?: Record<string, string> } = {
+          to: path
+        };
 
         if (params) {
-          Object.entries(params).forEach(([key, value]) => {
-            finalPath = finalPath.replace(`:${key}`, value);
-          });
+          navParams.params = params;
         }
 
-        const url = parsePath(finalPath);
-
         if (query) {
-          url.search = `?${Object.entries(query)
-            .map(([key, value]) => `${key}=${value}`)
-            .join('&')}`;
+          navParams.search = query;
         }
 
         // Execute navigation for regular routes and mark as AI navigation
-        navigate(url);
+        navigate(navParams);
 
         return functionCallManager.respondToFunctionCall({
           id: event.id,

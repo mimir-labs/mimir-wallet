@@ -10,8 +10,8 @@ import { ONE_DAY, ONE_HOUR } from '@/constants';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useInput } from '@/hooks/useInput';
 import { useProxyTypes } from '@/hooks/useProxyTypes';
+import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
@@ -124,7 +124,7 @@ function AddProxy({
     <>
       <div className='mx-auto my-0 w-[500px] max-w-full'>
         <div className='flex items-center justify-between'>
-          <Button onClick={() => navigate(-1)} variant='ghost'>
+          <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
             {'<'} Back
           </Button>
         </div>

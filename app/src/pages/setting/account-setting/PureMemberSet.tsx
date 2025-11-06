@@ -5,7 +5,7 @@ import type { PureAccountData } from '@/hooks/types';
 
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { usePendingTransactions } from '@/hooks/useTransactions';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
@@ -38,7 +38,7 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
           <div
             className='text-primary mb-5 cursor-pointer font-bold'
             onClick={() => {
-              navigate('/transactions');
+              navigate({ to: '/transactions' });
             }}
           >
             Please process {txs.length} Pending Transaction first
