@@ -131,6 +131,7 @@ function ConnectWalletModal({ onClose, open }: { open: boolean; onClose: () => v
           </ModalBody>
         </ModalContent>
       </Modal>
+      {/* @ts-expect-error plutonication-modal is a web component from @plutonication/plutonication */}
       <plutonication-modal />
     </>
   );

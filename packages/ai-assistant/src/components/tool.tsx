@@ -6,7 +6,7 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 import { CheckCircleIcon, CircleIcon, WrenchIcon, XCircleIcon } from 'lucide-react';
-import { isValidElement } from 'react';
+import React, { isValidElement } from 'react';
 
 import { cn } from '@mimir-wallet/ui';
 
@@ -52,7 +52,7 @@ const getStatusIndicator = (status: ToolState) => {
     'output-error': 'text-danger'
   };
 
-  const icons: Record<ToolState, JSX.Element> = {
+  const icons: Record<ToolState, React.ReactElement> = {
     'input-streaming': <CircleIcon className={cn('size-[10px]', iconColors[status])} />,
     'input-available': <CircleIcon className={cn('size-[10px]', iconColors[status])} />,
     'output-streaming': <CircleIcon className={cn('size-[10px]', iconColors[status])} />,

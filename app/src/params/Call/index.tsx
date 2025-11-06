@@ -17,9 +17,7 @@ import TransferCall from './TransferCall';
 
 type MatchType = 'exact' | 'prefix';
 
-type CallComponent = React.MemoExoticComponent<
-  React.ForwardRefExoticComponent<CallProps & React.RefAttributes<HTMLDivElement | null>>
->;
+type CallComponent = React.ComponentType<CallProps & { ref?: React.Ref<HTMLDivElement | null> }>;
 
 interface ComponentConfig {
   component: CallComponent;

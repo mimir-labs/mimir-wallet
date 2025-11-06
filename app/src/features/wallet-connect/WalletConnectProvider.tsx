@@ -24,7 +24,7 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
   const [sessionProposal, setSessionProposal] = useState<Web3WalletTypes.SessionProposal>();
   const { current } = useAccount();
   const [, , , , promise] = useQueryAccountOmniChain(current);
-  const handlerRef = useRef<(event: Web3WalletTypes.SessionRequest) => void>();
+  const handlerRef = useRef<((event: Web3WalletTypes.SessionRequest) => void) | undefined>(undefined);
   const { networks, mode, enableNetwork } = useNetworks();
   const { genesisHash, network: currentNetwork, chainSS58 } = useApi();
   const { addQueue } = useTxQueue();

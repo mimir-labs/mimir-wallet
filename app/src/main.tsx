@@ -18,6 +18,7 @@ import {
   Tooltip
 } from 'chart.js';
 import moment from 'moment';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
@@ -79,13 +80,16 @@ initializeWallet();
 initializeAccount(chain, address);
 
 // Render the main App component with initial configuration
-root.render(
+// StrictMode is enabled in development to help identify potential problems
+const app = (
   <ApiRoot chain={chain}>
     <BrowserRouter>
       <App />
     </BrowserRouter>
   </ApiRoot>
 );
+
+root.render(import.meta.env.DEV ? <StrictMode>{app}</StrictMode> : app);
 
 // Production-only features
 if (import.meta.env.PROD) {

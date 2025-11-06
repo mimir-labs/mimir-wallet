@@ -6,7 +6,7 @@ import type { OverrideBundleType, RegistryTypes } from '@polkadot/types/types';
 import { typesBundleForPolkadot } from '@acala-network/type-definitions';
 import { typesBundle as typesBundleJs } from '@polkadot/apps-config/api';
 
-import avail from './avail.json';
+import avail from './avail.json' with { type: 'json' };
 
 export const typesBundle: OverrideBundleType = {
   ...typesBundleJs,

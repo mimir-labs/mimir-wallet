@@ -64,6 +64,6 @@
     "@polkadot/extension-base": "^0.62.3",
     "@polkadot/extension-inject": "^0.62.3",
     "npm-run-all2": "^7.0.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.9.3"
   }
 }

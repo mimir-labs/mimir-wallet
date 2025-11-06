@@ -6,7 +6,7 @@ import { useNetworks } from '@mimir-wallet/polkadot-core';
 import OmiChainSelect from './OmniChainSelect';
 import SoloChainSelect from './SoloChainSelect';
 
-function ChainSelect(): JSX.Element {
+function ChainSelect(): React.ReactElement {
   const { mode } = useNetworks();
 
   return mode === 'omni' ? <OmiChainSelect /> : <SoloChainSelect />;
