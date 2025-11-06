@@ -67,24 +67,23 @@ interface TooltipProps extends VariantProps<typeof tooltipVariants> {
   classNames?: {
     content?: string;
   };
+  ref?: React.Ref<React.ComponentRef<typeof TooltipContent>>;
 }
 
-const Tooltip = React.forwardRef<React.ElementRef<typeof TooltipContent>, TooltipProps>(
-  ({ content, color, classNames, children, ...props }, ref) => {
-    if (!content) {
-      return children;
-    }
-
-    return (
-      <TooltipWrapper>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent ref={ref} className={cn(tooltipVariants({ color }), classNames?.content)} {...props}>
-          {content}
-        </TooltipContent>
-      </TooltipWrapper>
-    );
+function Tooltip({ content, color, classNames, ref, children, ...props }: TooltipProps) {
+  if (!content) {
+    return children;
   }
-);
+
+  return (
+    <TooltipWrapper>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent ref={ref} className={cn(tooltipVariants({ color }), classNames?.content)} {...props}>
+        {content}
+      </TooltipContent>
+    </TooltipWrapper>
+  );
+}
 
 Tooltip.displayName = 'Tooltip';
 

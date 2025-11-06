@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WalletConnectProvider } from '@/features/wallet-connect';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRoute, Outlet, retainSearchParams, useRouter } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { zodValidator } from '@tanstack/zod-adapter';
 import { z } from 'zod';
 
-import { QueryProvider, TransactionSocketProvider } from '@mimir-wallet/service';
+import { TransactionSocketProvider } from '@mimir-wallet/service';
 import { HeroUIProvider } from '@mimir-wallet/ui';
 
 import AccountConsumer from '../accounts/Consumer';
@@ -58,16 +59,15 @@ function RootComponent() {
       navigate={(to, options: unknown) => router.navigate({ to, ...(options as object) })}
       useHref={(to) => router.buildLocation({ to }).href}
     >
-      <QueryProvider>
-        <AccountConsumer>
-          <WalletConnectProvider>
-            <TransactionSocketProvider path='/notification-push'>
-              <Outlet />
-              {import.meta.env.DEV && <TanStackRouterDevtools />}
-            </TransactionSocketProvider>
-          </WalletConnectProvider>
-        </AccountConsumer>
-      </QueryProvider>
+      <AccountConsumer>
+        <WalletConnectProvider>
+          <TransactionSocketProvider path='/notification-push'>
+            <Outlet />
+            {import.meta.env.DEV && <TanStackRouterDevtools />}
+            {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+          </TransactionSocketProvider>
+        </WalletConnectProvider>
+      </AccountConsumer>
     </HeroUIProvider>
   );
 }

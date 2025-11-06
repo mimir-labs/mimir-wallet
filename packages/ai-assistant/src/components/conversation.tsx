@@ -6,7 +6,7 @@
 import type { ComponentProps } from 'react';
 
 import { ArrowDownIcon } from 'lucide-react';
-import { createContext, forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
+import { createContext, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom';
 
 import { Button, cn } from '@mimir-wallet/ui';
@@ -15,7 +15,9 @@ export interface ConversationRef {
   scrollToBottom: () => void;
 }
 
-export type ConversationProps = ComponentProps<typeof StickToBottom>;
+export interface ConversationProps extends ComponentProps<typeof StickToBottom> {
+  ref?: React.Ref<ConversationRef>;
+}
 
 // Context to share scrollToBottomRef between Conversation and ConversationContent
 const ScrollRefContext = createContext<React.MutableRefObject<(() => void) | null> | null>(null);
@@ -34,7 +36,7 @@ const ScrollController = () => {
   return null;
 };
 
-export const Conversation = forwardRef<ConversationRef, ConversationProps>(({ className, children, ...props }, ref) => {
+export function Conversation({ className, children, ref, ...props }: ConversationProps) {
   const scrollToBottomRef = useRef<(() => void) | null>(null);
 
   // Expose scrollToBottom through ref
@@ -61,7 +63,7 @@ export const Conversation = forwardRef<ConversationRef, ConversationProps>(({ cl
       </StickToBottom>
     </ScrollRefContext.Provider>
   );
-});
+}
 
 Conversation.displayName = 'Conversation';
 

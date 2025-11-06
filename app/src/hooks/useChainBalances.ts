@@ -59,7 +59,7 @@ export function useChainBalances(
   }, [allXcmAssets, chain, options?.alwaysIncludeNative]);
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: ['chain-balances', chain, addressHex, options?.alwaysIncludeNative],
+    queryKey: ['chain-balances', chain, addressHex] as const,
     queryFn: async (): Promise<AccountEnhancedAssetBalance[]> => {
       if (!api?.api || !api.isApiReady || !address || !chainAssets.length) {
         throw new Error('API, address, and chain assets are required');
@@ -107,55 +107,70 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
   const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
   const [list, setList] = useState<UseAllChainBalances[]>([]);
 
+  // Memoize queries configuration to prevent unnecessary re-creation
+  const queriesConfig = useMemo(
+    () =>
+      Object.entries(allApis).map(([chainName, api]) => {
+        let chainAssets = allXcmAssets?.[chainName];
+
+        if (chainAssets) {
+          // Find native asset for potential inclusion
+          const nativeAsset = chainAssets.find((asset) => asset.isNative);
+
+          // Filter assets with price if option is enabled
+          if (options?.onlyWithPrice) {
+            chainAssets = chainAssets.filter((asset) => asset.price && asset.price > 0);
+          }
+
+          // Always include native asset if option is enabled and it's not already included
+          if (options?.alwaysIncludeNative && nativeAsset) {
+            const hasNative = chainAssets.some((asset) => asset.isNative);
+
+            if (!hasNative) {
+              chainAssets = [nativeAsset, ...chainAssets];
+            } else {
+              // Ensure native is at the beginning
+              chainAssets = [nativeAsset, ...chainAssets.filter((asset) => !asset.isNative)];
+            }
+          }
+        }
+
+        return {
+          queryKey: ['chain-balances', chainName, addressHex, options?.onlyWithPrice] as const,
+          staleTime: 12_000,
+          refetchInterval: 12_000,
+          refetchOnMount: false,
+          refetchOnWindowFocus: false,
+          enabled:
+            !!api?.api &&
+            !!api.isApiReady &&
+            !!address &&
+            !!isXcmAssetsFetched &&
+            !!allXcmAssets &&
+            !!chainAssets &&
+            chainAssets.length > 0,
+          queryFn: async (): Promise<AccountEnhancedAssetBalance[]> => {
+            if (!addressHex || !chainAssets?.length) {
+              return [];
+            }
+
+            return fetchAccountBalances(api.api, addressHex as HexString, chainAssets);
+          }
+        };
+      }),
+    [
+      allApis,
+      allXcmAssets,
+      addressHex,
+      isXcmAssetsFetched,
+      address,
+      options?.onlyWithPrice,
+      options?.alwaysIncludeNative
+    ]
+  );
+
   const queries = useQueries({
-    queries: Object.entries(allApis).map(([chainName, api]) => {
-      let chainAssets = allXcmAssets?.[chainName];
-
-      if (chainAssets) {
-        // Find native asset for potential inclusion
-        const nativeAsset = chainAssets.find((asset) => asset.isNative);
-
-        // Filter assets with price if option is enabled
-        if (options?.onlyWithPrice) {
-          chainAssets = chainAssets.filter((asset) => asset.price && asset.price > 0);
-        }
-
-        // Always include native asset if option is enabled and it's not already included
-        if (options?.alwaysIncludeNative && nativeAsset) {
-          const hasNative = chainAssets.some((asset) => asset.isNative);
-
-          if (!hasNative) {
-            chainAssets = [nativeAsset, ...chainAssets];
-          } else {
-            // Ensure native is at the beginning
-            chainAssets = [nativeAsset, ...chainAssets.filter((asset) => !asset.isNative)];
-          }
-        }
-      }
-
-      return {
-        queryKey: ['chain-balances', chainName, addressHex, options?.onlyWithPrice, options?.alwaysIncludeNative],
-        staleTime: 12_000,
-        refetchInterval: 12_000,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        enabled:
-          !!api?.api &&
-          !!api.isApiReady &&
-          !!address &&
-          !!isXcmAssetsFetched &&
-          !!allXcmAssets &&
-          !!chainAssets &&
-          chainAssets.length > 0,
-        queryFn: async (): Promise<AccountEnhancedAssetBalance[]> => {
-          if (!addressHex || !chainAssets?.length) {
-            return [];
-          }
-
-          return fetchAccountBalances(api.api, addressHex as HexString, chainAssets);
-        }
-      };
-    })
+    queries: queriesConfig
   });
 
   useEffect(() => {

@@ -288,47 +288,44 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   continuePropagation?: boolean;
   asChild?: boolean;
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      className,
-      variant,
-      color,
-      size,
-      radius,
-      fullWidth,
-      isIconOnly,
-      continuePropagation,
-      asChild = false,
-      onClick,
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    const Comp = asChild ? Slot : 'button';
+function Button({
+  className,
+  variant,
+  color,
+  size,
+  radius,
+  fullWidth,
+  isIconOnly,
+  continuePropagation,
+  asChild = false,
+  onClick,
+  ref,
+  children,
+  ...props
+}: ButtonProps) {
+  const Comp = asChild ? Slot : 'button';
 
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, color, size, radius, isIconOnly, fullWidth }), className)}
-        ref={ref}
-        onClick={
-          !continuePropagation
-            ? (e) => {
-                e.stopPropagation();
-                onClick?.(e);
-              }
-            : onClick
-        }
-        {...props}
-      >
-        {children}
-      </Comp>
-    );
-  }
-);
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, color, size, radius, isIconOnly, fullWidth }), className)}
+      ref={ref}
+      onClick={
+        !continuePropagation
+          ? (e) => {
+              e.stopPropagation();
+              onClick?.(e);
+            }
+          : onClick
+      }
+      {...props}
+    >
+      {children}
+    </Comp>
+  );
+}
 
 Button.displayName = 'Button';
 

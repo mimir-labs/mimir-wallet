@@ -9,12 +9,29 @@ import { TxButton } from '@/components';
 import { TransactionType } from '@/hooks/types';
 import React, { useMemo } from 'react';
 
-import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { Tooltip } from '@mimir-wallet/ui';
 
+async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, string, string, string] }) {
+  const [, network, address, callHash] = queryKey;
+
+  if (!address || !callHash) {
+    throw new Error('Invalid multisig transaction');
+  }
+
+  const allApis = useAllApis.getState().chains;
+  const api = allApis[network]?.api;
+
+  if (!api) {
+    throw new Error(`API not available for network: ${network}`);
+  }
+
+  return api.query.multisig.multisigs(address, callHash);
+}
+
 function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction: Transaction }) {
-  const { api, genesisHash, isApiReady } = useApi();
+  const { api, isApiReady, network } = useApi();
   const { isLocalAccount } = useAccount();
 
   const multisigTx = useMemo(() => {
@@ -32,21 +49,10 @@ function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction
   }, [transaction]);
 
   const { data: multisigInfo } = useQuery({
-    queryKey: [multisigTx?.address, multisigTx?.callHash] as const,
-    queryHash: `${genesisHash}.api.query.multisig.multisigs(${multisigTx?.address ? addressToHex(multisigTx.address) : ''},${
-      multisigTx?.callHash ? multisigTx.callHash : ''
-    })`,
+    queryKey: ['multisig-info', network, multisigTx?.address || '', multisigTx?.callHash || ''] as const,
     enabled: isApiReady && !!multisigTx,
     refetchOnMount: false,
-    queryFn: ({ queryKey }) => {
-      const [address, callHash] = queryKey;
-
-      if (!address || !callHash) {
-        throw new Error('Invalid multisig transaction');
-      }
-
-      return api.query.multisig.multisigs(address, callHash);
-    }
+    queryFn: fetchMultisigInfo
   });
 
   const depositor = useMemo(

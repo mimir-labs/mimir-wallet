@@ -24,7 +24,7 @@ import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 
 import { ApiRoot, initializeApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { API_CLIENT_GATEWAY, initService } from '@mimir-wallet/service';
+import { API_CLIENT_GATEWAY, initService, QueryProvider } from '@mimir-wallet/service';
 
 import { initializeAccount } from './accounts/initialize';
 import { initializeWallet } from './wallet/initialize';
@@ -83,7 +83,9 @@ initializeAccount(chain, address);
 // StrictMode is enabled in development to help identify potential problems
 const app = (
   <ApiRoot chain={chain}>
-    <RouterProvider router={router} />
+    <QueryProvider>
+      <RouterProvider router={router} />
+    </QueryProvider>
   </ApiRoot>
 );
 

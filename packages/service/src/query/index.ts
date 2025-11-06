@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { default as QueryProvider } from './QueryProvider.js';
+export { queryClient, REFETCH_INTERVALS, STALE_TIMES } from './queryClient.js';
 
 export {
   useQuery,

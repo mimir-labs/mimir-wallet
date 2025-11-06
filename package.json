@@ -75,5 +75,8 @@
     "@walletconnect/utils": "2.15.1",
     "bn.js": "^5.2.1",
     "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "@tanstack/react-virtual": "^3.13.12"
   }
 }

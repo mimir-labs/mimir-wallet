@@ -8,11 +8,10 @@ import type { ITuple } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { dataToUtf8 } from '@/utils';
-import { blake2AsHex } from '@polkadot/util-crypto';
 import { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
 
-import { addressToHex, useIdentityApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useAllApis, useIdentityApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 type AccountInfo = {
@@ -134,6 +133,23 @@ async function getIdentityInfo({
   };
 }
 
+async function fetchIdentityInfo({ queryKey }: { queryKey: readonly [string, string | undefined, string] }) {
+  const [, network, addressHex] = queryKey;
+
+  if (!network) {
+    throw new Error('Network is required');
+  }
+
+  const allApis = useAllApis.getState().chains;
+  const api = allApis[network]?.api;
+
+  if (!api) {
+    throw new Error(`API not available for network: ${network}`);
+  }
+
+  return getIdentityInfo({ queryKey: [api, addressHex] });
+}
+
 export const useIdentityStore = create<Record<HexString, string>>()(() => ({}));
 
 export function useDeriveAccountInfo(
@@ -142,21 +158,16 @@ export function useDeriveAccountInfo(
   const identityApi = useIdentityApi();
 
   const address = value ? value.toString() : '';
-  const addressHex = address ? addressToHex(address) : '0x';
+  const addressHex = useMemo(() => (address ? addressToHex(address) : '0x'), [address]);
 
   const enabled =
     !!identityApi && !!identityApi.isApiReady && !!identityApi.api?.query?.identity?.identityOf && !!address;
-  const queryHash = useMemo(
-    () => blake2AsHex(`${identityApi?.network}-identity-info-${addressHex}-${enabled.valueOf()}`),
-    [addressHex, enabled, identityApi?.network]
-  );
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [identityApi?.api, address] as const,
-    queryHash,
+    queryKey: ['identity-info', identityApi?.network, addressHex] as const,
     refetchInterval: 12000,
     refetchOnMount: false,
-    queryFn: getIdentityInfo,
+    queryFn: fetchIdentityInfo,
     enabled: enabled
   });
 

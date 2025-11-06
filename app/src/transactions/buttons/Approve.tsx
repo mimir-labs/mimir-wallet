@@ -9,11 +9,28 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { useAllApis, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import RecoverTx from './RecoverTx';
+
+async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, string, string, string] }) {
+  const [, network, address, callHash] = queryKey;
+
+  if (!address || !callHash) {
+    throw new Error('Invalid multisig transaction');
+  }
+
+  const allApis = useAllApis.getState().chains;
+  const api = allApis[network]?.api;
+
+  if (!api) {
+    throw new Error(`API not available for network: ${network}`);
+  }
+
+  return api.query.multisig.multisigs(address, callHash);
+}
 
 function ExecuteMultisig({ transaction, account }: { account: AccountData; transaction: Transaction }) {
   const { api, network } = useApi();
@@ -75,7 +92,7 @@ function Approve({
   transaction: Transaction;
   filterPaths: FilterPath[][];
 }) {
-  const { api, genesisHash, isApiReady, network } = useApi();
+  const { api, isApiReady, network } = useApi();
   const [isOpen, toggleOpen] = useToggle(false);
   const { addQueue } = useTxQueue();
 
@@ -94,21 +111,10 @@ function Approve({
   }, [transaction]);
 
   const { data: multisigInfo } = useQuery({
-    queryKey: [multisigTx?.address, multisigTx?.callHash] as const,
-    queryHash: `${genesisHash}.api.query.multisig.multisigs(${multisigTx?.address ? addressToHex(multisigTx.address) : ''},${
-      multisigTx?.callHash ? multisigTx.callHash : ''
-    })`,
-    enabled: isApiReady && !!multisigTx,
+    queryKey: ['multisig-info', network, multisigTx?.address || '', multisigTx?.callHash || ''] as const,
+    enabled: isApiReady && !!multisigTx?.callHash,
     refetchOnMount: false,
-    queryFn: ({ queryKey }) => {
-      const [address, callHash] = queryKey;
-
-      if (!address || !callHash) {
-        throw new Error('Invalid multisig transaction');
-      }
-
-      return api.query.multisig.multisigs(address, callHash);
-    }
+    queryFn: fetchMultisigInfo
   });
 
   if (multisigTx && multisigInfo && multisigInfo.unwrapOrDefault().approvals.length >= multisigTx.threshold) {
@@ -138,6 +144,12 @@ function Approve({
   };
 
   const handleRecover = (calldata: string) => {
+    if (!api) {
+      toastError('API not available');
+
+      return;
+    }
+
     const call = api.createType('Call', calldata);
 
     if (

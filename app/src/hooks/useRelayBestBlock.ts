@@ -1,10 +1,35 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useAllApis, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 import { useBlockInterval } from './useBlockInterval';
+
+async function fetchRelayBestBlock({ queryKey }: { queryKey: readonly [string, string | undefined] }) {
+  const [, relayChainKey] = queryKey;
+
+  if (!relayChainKey) {
+    throw new Error('Relay chain key is required');
+  }
+
+  const allApis = useAllApis.getState().chains;
+  const relayApi = allApis[relayChainKey];
+
+  // Double-check API availability (defense in depth)
+  if (!relayApi?.api || !relayApi.isApiReady) {
+    throw new Error(`Relay chain API not available for ${relayChainKey}`);
+  }
+
+  try {
+    const header = await relayApi.api.rpc.chain.getHeader();
+
+    return header;
+  } catch (error) {
+    console.error(`Failed to fetch relay chain block header for ${relayChainKey}:`, error);
+    throw error;
+  }
+}
 
 /**
  * Hook to fetch the best block from the relay chain of the current parachain
@@ -28,7 +53,6 @@ export function useRelayBestBlock() {
 
   const relayChainKey = chain.relayChain;
   const relayApi = relayChainKey ? allApis[relayChainKey] : undefined;
-  const relayGenesisHash = relayApi?.genesisHash;
 
   const blockInterval = useBlockInterval();
 
@@ -38,28 +62,13 @@ export function useRelayBestBlock() {
     isFetching
   } = useQuery({
     queryKey: ['relayBestBlock', relayChainKey] as const,
-    queryHash: `${relayGenesisHash}.api.rpc.chain.getHeader()`,
     // Only enable query when:
     // 1. Current chain has a relay chain (is a parachain)
     // 2. Relay chain API is initialized and ready
     enabled: !!relayApi?.isApiReady && !!relayChainKey,
     refetchOnMount: false,
     refetchInterval: blockInterval.toNumber(),
-    queryFn: async () => {
-      // Double-check API availability (defense in depth)
-      if (!relayApi?.api) {
-        throw new Error(`Relay chain API not available for ${relayChainKey || 'unknown chain'}`);
-      }
-
-      try {
-        const header = await relayApi.api.rpc.chain.getHeader();
-
-        return header;
-      } catch (error) {
-        console.error(`Failed to fetch relay chain block header for ${relayChainKey}:`, error);
-        throw error;
-      }
-    }
+    queryFn: fetchRelayBestBlock
   });
 
   return [bestBlock, isFetched, isFetching] as const;

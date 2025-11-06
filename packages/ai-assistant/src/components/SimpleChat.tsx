@@ -3,7 +3,7 @@
 
 import type { ToolState } from '../hooks/chat.types.js';
 
-import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import { useCallback, useImperativeHandle, useRef, useState } from 'react';
 
 import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
 
@@ -34,6 +34,7 @@ interface Props {
   renderTool?: (params: { tool: ToolData }) => React.ReactNode;
   suggestions: Array<[string, string]>; // Array of [label, value] pairs - required
   onStatusChange?: (status: 'submitted' | 'streaming' | 'ready' | 'error') => void;
+  ref?: React.Ref<SimpleChatRef>;
 }
 
 export interface SimpleChatRef {
@@ -45,7 +46,7 @@ interface ConversationRef {
   scrollToBottom: () => void;
 }
 
-const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, onStatusChange }, ref) => {
+function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
   const [input, setInput] = useState('');
   const conversationRef = useRef<ConversationRef>(null);
 
@@ -213,7 +214,7 @@ const SimpleChat = forwardRef<SimpleChatRef, Props>(({ renderTool, suggestions, 
       </PromptInput>
     </div>
   );
-});
+}
 
 SimpleChat.displayName = 'SimpleChat';
 

@@ -45,11 +45,10 @@ export function usePendingTransactions(
   const { chainSS58 } = useApi();
 
   const { data, isFetched, isFetching, refetch } = useQuery({
-    queryKey: [network, address, txId] as const,
-    queryHash: `pending-transactions-${network}-${address}-${txId || 'all'}`,
+    queryKey: ['pending-transactions', network, address, txId || 'all'] as const,
     enabled: !!address,
-    queryFn: ({ queryKey: [network, address, txId] }): Promise<Transaction[]> =>
-      service.transaction.getPendingTransactions(network, address!, txId),
+    queryFn: ({ queryKey: [, network, address, txId] }): Promise<Transaction[]> =>
+      service.transaction.getPendingTransactions(network, address!, txId === 'all' ? undefined : txId),
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }
@@ -76,17 +75,16 @@ export function useMultichainPendingTransactions(networks: string[], address?: s
   const data = useQueries({
     queries: networks.map((network) => ({
       initialData: [],
-      queryKey: [network, address, txId] as [network: string, address?: string | null, txId?: string],
-      queryHash: `multichain-pending-transactions-${network}-${address}-${txId || 'all'}`,
+      queryKey: ['multichain-pending-transactions', network, address, txId || 'all'] as const,
       structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
         const nextTransactions = (next as Transaction[]).map((item) => transformTransaction(chainSS58, item));
 
         return isEqual(prev, nextTransactions) ? (prev as Transaction[]) : nextTransactions;
       },
       queryFn: async ({
-        queryKey: [network, address, txId]
+        queryKey: [, network, address, txId]
       }: {
-        queryKey: [network: string, address?: string | null, txId?: string];
+        queryKey: readonly [string, string, string | null | undefined, string];
       }): Promise<Transaction[]> => {
         const data = await fetcher(
           txId
@@ -119,17 +117,12 @@ export function useHistoryTransactions(
 
   const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
     initialPageParam: null,
-    queryHash: `history-transactions-v2-${network}-${address}-${txId || 'all'}-${limit}`,
-    queryKey: [network, address, txId, limit] as [
-      network?: string,
-      address?: string | null,
-      txId?: string,
-      limit?: number
-    ],
+    queryKey: ['history-transactions', network, address, txId || 'all', limit] as const,
     enabled: !!network && !!address,
     queryFn: async ({ pageParam, queryKey }) => {
-      const [network, address, txId, limit] = queryKey as [
-        network?: string,
+      const [, network, address, txId, limit] = queryKey as readonly [
+        string,
+        string | undefined,
         address?: string | null,
         txId?: string,
         limit?: number
@@ -191,10 +184,9 @@ export function useTransactionDetail(
   const { chainSS58 } = useApi();
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [network, id] as const,
-    queryHash: `transaction-detail-${network}-${id}`,
+    queryKey: ['transaction-detail', network, id] as const,
     enabled: !!id,
-    queryFn: ({ queryKey: [network, id] }): Promise<Transaction> =>
+    queryFn: ({ queryKey: [, network, id] }): Promise<Transaction> =>
       service.transaction.getTransactionDetail(network, id!),
     structuralSharing: (prev: unknown | undefined, next: unknown): Transaction | null => {
       const nextData = next ? transformTransaction(chainSS58, next as Transaction) : null;
@@ -213,11 +205,10 @@ export function useMultiChainTransactionCounts(
   const { allApis } = useApi();
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [addressHex] as const,
-    queryHash: `transaction-counts-${addressHex}`,
+    queryKey: ['transaction-counts', addressHex] as const,
     refetchOnMount: false,
     enabled: !!addressHex,
-    queryFn: ({ queryKey: [addressHex] }): Promise<Record<string, { pending: number; history: number }>> =>
+    queryFn: ({ queryKey: [, addressHex] }): Promise<Record<string, { pending: number; history: number }>> =>
       service.transaction.getTransactionCounts(addressHex),
     structuralSharing: (
       prev: unknown | undefined,
