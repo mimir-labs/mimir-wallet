@@ -6,8 +6,8 @@ import type { ProxyArgs } from '../types';
 import { Address, TxButton } from '@/components';
 import { toastSuccess } from '@/components/utils';
 import { useTxQueue } from '@/hooks/useTxQueue';
+import { Link } from '@tanstack/react-router';
 import React, { useCallback, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAsyncFn, useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
@@ -64,7 +64,11 @@ function SubmitProxy({
               <p className='text-xs'>
                 <Address value={proxied} shorten /> added {proxyArgs.length} new proxy
               </p>
-              <Link className='text-primary text-xs no-underline' to={`/?address=${proxied.toString()}&tab=structure`}>
+              <Link
+                className='text-primary text-xs no-underline'
+                to='/'
+                search={{ address: proxied.toString(), tab: 'structure' }}
+              >
                 Account Structure{'>'}
               </Link>
             </div>

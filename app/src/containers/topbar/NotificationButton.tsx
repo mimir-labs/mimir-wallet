@@ -5,9 +5,9 @@ import IconNotification from '@/assets/svg/icon-notification.svg?react';
 import { AddressRow } from '@/components';
 import { type NotificationMessage, useNotifications } from '@/hooks/useNotifications';
 import { formatAgo } from '@/utils';
+import { Link, useNavigate } from '@tanstack/react-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { Link, useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { getChainIcon, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -190,7 +190,7 @@ function NotificationButton() {
   const handleSelect = useCallback(
     (notification: NotificationMessage) => {
       enableNetwork(notification.genesisHash);
-      navigate(`/transactions/${notification.transactionId}`);
+      navigate({ to: '/transactions/$id', params: { id: notification.transactionId.toString() } });
       toggleOpen(false);
     },
     [enableNetwork, navigate, toggleOpen]
@@ -293,7 +293,12 @@ function NotificationButton() {
 
             {/* Footer Link */}
             <div className='px-2 text-center'>
-              <Link className='text-primary hover:underline' to='/setting?tabs=notification' onClick={toggleOpen}>
+              <Link
+                className='text-primary hover:underline'
+                to='/setting'
+                search={{ tabs: 'notification' }}
+                onClick={toggleOpen}
+              >
                 Don't want miss information? Try Email→
               </Link>
             </div>

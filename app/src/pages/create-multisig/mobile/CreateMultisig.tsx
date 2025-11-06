@@ -7,8 +7,8 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Input, InputNetwork } from '@/components';
 import { encodeMultiAddress } from '@polkadot/util-crypto';
+import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { Button, Divider, Switch } from '@mimir-wallet/ui';
 
@@ -89,7 +89,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
     <>
       <div className='mx-auto w-full max-w-[500px]'>
         <div className='flex items-center justify-between'>
-          <Button onClick={prepare ? _onFlexibleCancel : () => navigate(-1)} variant='ghost'>
+          <Button onClick={prepare ? _onFlexibleCancel : () => navigate({ to: '..' })} variant='ghost'>
             {'<'} Back
           </Button>
           <Prepare onSelect={setPrepare} />

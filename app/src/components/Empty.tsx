@@ -6,7 +6,7 @@ import EmptyFavoriteDapp from '@/assets/images/empty-favorite-dapp.svg';
 import EmptyPendingTransactions from '@/assets/images/empty-pending-transactions.svg';
 import EmptySelectAccount from '@/assets/images/empty-select-account.svg';
 import NullImg from '@/assets/images/Null.png';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 import { Button } from '@mimir-wallet/ui';
 

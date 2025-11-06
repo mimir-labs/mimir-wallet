@@ -7,8 +7,8 @@ import { useAccount } from '@/accounts/useAccount';
 import { StepIndicator } from '@/components';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useWizardState } from '@/hooks/useWizardState';
+import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import {
@@ -188,7 +188,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
     >
       <div className='mx-auto flex w-full max-w-[800px] flex-col gap-5'>
         <div className='flex items-center justify-between'>
-          <Button onClick={() => navigate(-1)} variant='ghost'>
+          <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
             {'<'} Back
           </Button>
         </div>

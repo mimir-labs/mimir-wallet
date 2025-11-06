@@ -3,8 +3,8 @@
 
 import IconAddFill from '@/assets/svg/icon-add-fill.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
+import { Link, useNavigate } from '@tanstack/react-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 
 import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
 
@@ -55,7 +55,7 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
             className='text-foreground'
             onClick={() => {
               setOpen(false);
-              navigate('/add-proxy');
+              navigate({ to: '/add-proxy' });
               onClose?.();
             }}
           >
@@ -72,7 +72,7 @@ function CreateMultisig({ onClose }: { onClose?: () => void }) {
             className='text-foreground'
             onClick={() => {
               setOpen(false);
-              navigate('/create-pure');
+              navigate({ to: '/create-pure' });
               onClose?.();
             }}
           >

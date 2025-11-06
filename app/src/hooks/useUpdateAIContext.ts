@@ -3,9 +3,8 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { dapps } from '@/config';
-import { extractRoutingContext, routes } from '@/routes';
+import { useLocation } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 
 import { useAIContext } from '@mimir-wallet/ai-assistant';
 import { addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -84,12 +83,6 @@ export function useUpdateAIContext() {
 
   // Update routingContext whenever it changes
   useEffect(() => {
-    const routeFeatures = extractRoutingContext(routes).map((item) => ({
-      path: item.path,
-      description: item.description,
-      search: item.search
-    }));
-
     const dappFeatures = dapps
       .filter((item) => {
         return item.visible !== false && !item.url.startsWith('mimir://internal');
@@ -103,7 +96,6 @@ export function useUpdateAIContext() {
 
     // Update routingContext in AIContext
     useAIContext.setState({
-      features: routeFeatures,
       dappFeatures: dappFeatures
     });
   }, []);

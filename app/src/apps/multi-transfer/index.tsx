@@ -4,8 +4,8 @@
 import { useAccount } from '@/accounts/useAccount';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 
 import {
   type FunctionCallHandler,
@@ -130,7 +130,7 @@ function MultiTransfer() {
       )}
     >
       <div className='mx-auto w-full max-w-[900px] p-4 sm:p-5'>
-        <Button onClick={() => navigate(-1)} variant='ghost'>
+        <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
           {'<'} Back
         </Button>
         <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-4 sm:p-5'>
@@ -139,7 +139,12 @@ function MultiTransfer() {
               <h3>Multi Transfer</h3>
 
               <Button asChild color='primary' variant='light'>
-                <Link to={`/explorer/${encodeURIComponent('mimir://app/transfer')}`}>
+                <Link
+                  to='/explorer/$url'
+                  params={{
+                    url: 'mimir://app/transfer'
+                  }}
+                >
                   <IconTransfer />
                   Solo-Transfer
                 </Link>

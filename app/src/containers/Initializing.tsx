@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MimirLoading } from '@/components';
+import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 function Initializing() {
   const [showCustomize, setShowCustomize] = useState(false);
@@ -30,7 +30,11 @@ function Initializing() {
       }}
     >
       <MimirLoading />
-      {showCustomize && <Link to='/setting'>Go to Customize RPC</Link>}
+      {showCustomize && (
+        <Link to='/setting' className='text-primary hover:underline'>
+          Go to Customize RPC
+        </Link>
+      )}
     </div>
   );
 }

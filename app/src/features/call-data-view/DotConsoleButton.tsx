@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DotConsoleApp, PolkadotJsApp } from '@/config';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 import { Button, type ButtonProps } from '@mimir-wallet/ui';
 
@@ -16,7 +16,9 @@ function DotConsoleButton({ call, network, ...props }: { call: string; network: 
 
     return (
       <Button fullWidth asChild>
-        <Link to={`/explorer/${encodeURIComponent(url.toString())}`}>View In Polkadot.js</Link>
+        <Link to='/explorer/$url' params={{ url: url.toString() }}>
+          View In Polkadot.js
+        </Link>
       </Button>
     );
   }
@@ -28,7 +30,9 @@ function DotConsoleButton({ call, network, ...props }: { call: string; network: 
 
   return (
     <Button fullWidth asChild {...props}>
-      <Link to={`/explorer/${encodeURIComponent(url.toString())}`}>View In DOTConsole</Link>
+      <Link to='/explorer/$url' params={{ url: url.toString() }}>
+        View In DOTConsole
+      </Link>
     </Button>
   );
 }

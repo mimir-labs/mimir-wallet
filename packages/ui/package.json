@@ -45,9 +45,6 @@
     "dev:tsc": "tsc --watch",
     "dev:tailwindcss": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch"
   },
-  "peerDependencies": {
-    "react-router-dom": ">=6.0.0"
-  },
   "dependencies": {
     "@heroui/avatar": "^2.2.19",
     "@heroui/badge": "^2.2.15",

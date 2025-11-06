@@ -6,8 +6,8 @@ import type { Transaction } from '@/hooks/types';
 import ArrowRight from '@/assets/svg/ArrowRight.svg?react';
 import { AppName } from '@/components';
 import { CallDisplaySection } from '@/params';
+import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
@@ -37,7 +37,10 @@ function TxItems({ transaction }: { transaction: Transaction }) {
       className='bg-secondary grid cursor-pointer grid-cols-7 overflow-hidden rounded-[10px] px-2.5 font-semibold [&_div]:flex [&_div]:h-10 [&_div]:items-center'
       onClick={() => {
         setNetwork(transaction.network);
-        navigate(`/transactions/${transaction.id}`);
+        navigate({
+          to: '/transactions/$id',
+          params: { id: transaction.id.toString() }
+        });
       }}
     >
       <div className='col-span-3'>

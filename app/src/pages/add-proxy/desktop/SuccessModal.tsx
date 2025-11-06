@@ -7,8 +7,8 @@ import { useAccount } from '@/accounts/useAccount';
 import PureIcon from '@/assets/images/pure-icon.svg';
 import { AddressCell, ProxyControls } from '@/components';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useNavigate } from '@tanstack/react-router';
 import { memo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
 
@@ -41,7 +41,7 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
     }
 
     onClose();
-    navigate('/'); // Navigate to profile page
+    navigate({ to: '/' as any }); // Navigate to profile page
   };
 
   const handleGoToPending = () => {
@@ -60,9 +60,15 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
 
     // Navigate to transactions page with the specific account
     if (accountAddress) {
-      navigate(`/transactions?address=${accountAddress}&network=${network}`);
+      navigate({
+        to: `/transactions`,
+        search: {
+          address: accountAddress,
+          network: network
+        }
+      });
     } else {
-      navigate(`/transactions?network=${network}`);
+      navigate({ to: `/transactions`, search: { network: network } });
     }
   };
 

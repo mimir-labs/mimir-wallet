@@ -6,11 +6,12 @@ import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
-import { useQueryParam } from '@/hooks/useQueryParams';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
+import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { useToggle } from 'react-use';
+
+const routeApi = getRouteApi('/_authenticated/explorer/$url');
 
 import { type FunctionCallHandler, functionCallManager, toFunctionCallString } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
@@ -22,10 +23,19 @@ import TransferContent from './TransferContent';
 function PageTransfer() {
   const selected = useSelectedAccount();
   const navigate = useNavigate();
-  const [fromParam] = useQueryParam<string>('from');
-  const [assetId, setAssetId] = useQueryParam<string>('assetId', 'native', { replace: true });
-  const [assetNetwork] = useQueryParam<string>('asset_network');
-  const [toParam] = useQueryParam<string>('to');
+  const search = routeApi.useSearch();
+  const fromParam = search.from;
+  const assetId = search.assetId;
+  const assetNetwork = search.asset_network;
+  const toParam = search.to;
+
+  const setAssetId = (newAssetId: string) => {
+    navigate({
+      to: '.',
+      search: { ...search, assetId: newAssetId },
+      replace: true
+    });
+  };
 
   const [sending, setSending] = useState<string>(fromParam || selected || '');
   const [recipient, setRecipient] = useState<string>(toParam || '');
@@ -98,7 +108,7 @@ function PageTransfer() {
       )}
     >
       <div className='mx-auto w-full max-w-[500px] p-4 sm:p-5'>
-        <Button onClick={() => navigate(-1)} variant='ghost'>
+        <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
           {'<'} Back
         </Button>
         <div className='border-secondary bg-content1 shadow-medium mt-4 rounded-[20px] border-1 p-4 sm:p-6'>
@@ -107,7 +117,12 @@ function PageTransfer() {
               <h3>Transfer</h3>
 
               <Button asChild color='primary' variant='light'>
-                <Link to={`/explorer/${encodeURIComponent('mimir://app/multi-transfer')}`}>
+                <Link
+                  to='/explorer/$url'
+                  params={{
+                    url: 'mimir://app/multi-transfer'
+                  }}
+                >
                   <IconMultiTransfer />
                   Multi-Transfer
                 </Link>

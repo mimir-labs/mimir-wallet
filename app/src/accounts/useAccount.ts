@@ -5,9 +5,9 @@ import type { AddressMeta } from '@/hooks/types';
 
 import { SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
+import { useNavigate } from '@tanstack/react-router';
 import { merge } from 'lodash-es';
 import { createContext, useCallback, useContext, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 import { addressEq, encodeAddress, isPolkadotAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
@@ -32,7 +32,7 @@ export function useAccount() {
   }, [metas, overrideMetas]);
 
   const { accounts, current, addresses, hideAccountHex, isMultisigSyned, switchAddress } = useAddressStore();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const setCurrent = (address: string, confirm?: boolean) => {
     if (address && isPolkadotAddress(address)) {
@@ -47,10 +47,10 @@ export function useAccount() {
       useAddressStore.setState({ switchAddress: undefined });
 
       // update url
-      const newSearchParams = new URLSearchParams(searchParams);
-
-      newSearchParams.set('address', value);
-      setSearchParams(newSearchParams);
+      navigate({
+        to: '.',
+        search: (prev) => ({ ...prev, address: value })
+      });
 
       useAddressStore.setState({ current: value });
     }

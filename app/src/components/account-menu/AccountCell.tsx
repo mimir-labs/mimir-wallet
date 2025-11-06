@@ -8,8 +8,8 @@ import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { usePinAccounts } from '@/hooks/usePinAccounts';
 import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
+import { Link } from '@tanstack/react-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { Button, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@mimir-wallet/ui';
@@ -130,7 +130,9 @@ function AccountCell({
                   className='text-foreground justify-start'
                   onClick={onClose}
                 >
-                  <Link to={`/account-setting?address=${value}`}>Setting</Link>
+                  <Link to='/setting' search={{ type: 'account', address: value }}>
+                    Setting
+                  </Link>
                 </Button>,
                 <Button
                   key='pin-0'

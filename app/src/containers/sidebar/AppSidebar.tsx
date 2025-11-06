@@ -5,8 +5,8 @@ import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { AccountMenu } from '@/components';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useWallet } from '@/wallet/useWallet';
+import { Link, useLocation } from '@tanstack/react-router';
 import { memo, useCallback, useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';

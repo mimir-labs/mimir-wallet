@@ -12,8 +12,8 @@ import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { Link } from '@tanstack/react-router';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -171,7 +171,13 @@ function Content({
           </DndContext>
         </div>
         <Button asChild color='secondary' fullWidth radius='md' className='text-foreground flex-shrink-0'>
-          <Link to={`/explorer/${encodeURIComponent('mimir://app/transfer')}`} onClick={onClose}>
+          <Link
+            to='/explorer/$url'
+            params={{
+              url: 'mimir://app/transfer'
+            }}
+            onClick={onClose}
+          >
             <IconAdd className='h-4 w-4' />
             Add New Transfer
           </Link>

@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useQueryParam } from '@/hooks/useQueryParams';
+import { getRouteApi, useNavigate } from '@tanstack/react-router';
 
 import { Tab, Tabs } from '@mimir-wallet/ui';
 
@@ -9,8 +9,21 @@ import AppList from './AppList';
 import CustomApps from './CustomApps';
 import WalletConnectExample from './WalletConnectExample';
 
+const routeApi = getRouteApi('/_authenticated/dapp');
+
 function PageDapp() {
-  const [tab, setTab] = useQueryParam<string>('tab', 'apps');
+  const navigate = useNavigate();
+  const search = routeApi.useSearch();
+  const tab = search.tab;
+
+  const handleTabChange = (key: string | number) => {
+    const newTab = key.toString() as 'apps' | 'custom';
+
+    navigate({
+      to: '.',
+      search: { ...search, tab: newTab }
+    });
+  };
 
   return (
     <div className='flex flex-col gap-5'>
@@ -21,7 +34,7 @@ function PageDapp() {
         variant='solid'
         aria-label='Tabs'
         selectedKey={tab}
-        onSelectionChange={(key) => setTab(key.toString())}
+        onSelectionChange={handleTabChange}
         classNames={{
           tabList: ['bg-white', 'shadow-medium', 'rounded-[20px]', 'p-2.5'],
           tabContent: ['text-primary/50', 'font-bold'],

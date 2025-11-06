@@ -6,9 +6,9 @@ import { Empty } from '@/components';
 import { type Transaction, TransactionStatus } from '@/hooks/types';
 import { useMultichainPendingTransactions, useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { formatAgo } from '@/utils';
+import { useNavigate } from '@tanstack/react-router';
 import moment from 'moment';
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { getChainIcon, useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Skeleton, Tooltip } from '@mimir-wallet/ui';
@@ -50,7 +50,16 @@ function TransactionItem({ transaction, address }: { transaction: Transaction; a
   const handleViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setNetwork(transaction.network);
-    navigate(`/transactions/${transaction.id}?network=${transaction.network}&address=${address}`);
+    navigate({
+      to: '/transactions/$id',
+      params: {
+        id: transaction.id.toString()
+      },
+      search: {
+        network: transaction.network,
+        address: address
+      }
+    });
   };
 
   return (
@@ -100,7 +109,7 @@ function ViewPendingTransactions({ address, className }: ViewPendingTransactions
   const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching && !item.isFetched);
 
   const handleViewAllClick = () => {
-    navigate(`/transactions?tab=pending&address=${address}`);
+    navigate({ to: `/transactions?tab=pending&address=${address}` as any });
   };
 
   // Loading state

@@ -3,6 +3,7 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
+import { internalToUrlNetwork } from '@/utils/networkMapping';
 import { useMemo } from 'react';
 
 import { allEndpoints, type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -78,10 +79,14 @@ function SoloChainSelect() {
                         data-selected={network === endpoint.key}
                         className='text-foreground data-[selected=true]:bg-secondary data-[hover=true]:bg-secondary justify-start px-2.5 text-left font-normal shadow-none'
                         onClick={() => {
+                          // Convert internal key to URL-friendly format for network parameter
+                          // e.g., 'assethub-polkadot' → 'polkadot', 'polkadot' → 'polkadot-relay'
+                          const urlNetwork = internalToUrlNetwork(endpoint.key);
+
                           if ((account && account.type === 'pure') || !current) {
-                            window.location.href = `${window.location.origin}?network=${endpoint.key}`;
+                            window.location.href = `${window.location.origin}?network=${urlNetwork}`;
                           } else {
-                            window.location.href = `${window.location.origin}?network=${endpoint.key}&address=${current}`;
+                            window.location.href = `${window.location.origin}?network=${urlNetwork}&address=${current}`;
                           }
                         }}
                       >

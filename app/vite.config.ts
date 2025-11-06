@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import tanstackRouter from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import { readFileSync } from 'node:fs';
 import path, { join } from 'node:path';
@@ -74,6 +75,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     tsconfigPaths(),
+    tanstackRouter(), // Must be before react()
     react(),
     svgr({ svgrOptions: { ref: true } }),
     ...(mode === 'test'

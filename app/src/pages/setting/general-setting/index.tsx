@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAccount } from '@/accounts/useAccount';
-import { useQueryParam } from '@/hooks/useQueryParams';
+import { getRouteApi, useNavigate } from '@tanstack/react-router';
 
 import { Tab, Tabs } from '@mimir-wallet/ui';
 
@@ -10,9 +10,22 @@ import AccountDisplay from './account-display';
 import NetworkSetting from './network';
 import NotificationSetting from './notification-setting';
 
+const routeApi = getRouteApi('/_authenticated/setting');
+
 function GeneralSetting() {
   const { current } = useAccount();
-  const [tab, setTab] = useQueryParam<string>('tabs', 'network');
+  const navigate = useNavigate();
+  const search = routeApi.useSearch();
+  const tabs = search.tabs || 'network';
+
+  const handleTabChange = (key: string | number) => {
+    const newTab = key.toString() as 'network' | 'account-display' | 'notification';
+
+    navigate({
+      to: '.',
+      search: { ...search, tabs: newTab }
+    });
+  };
 
   return (
     <div className='flex flex-col items-stretch gap-5'>
@@ -20,8 +33,8 @@ function GeneralSetting() {
         color='primary'
         aria-label='General Setting'
         variant='underlined'
-        selectedKey={tab}
-        onSelectionChange={(key) => setTab(key.toString())}
+        selectedKey={tabs}
+        onSelectionChange={handleTabChange}
       >
         <Tab key='network' title='Network'>
           <NetworkSetting />
