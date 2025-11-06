@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "npm-run-all2": "^7.0.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.7",

@@ -8,7 +8,7 @@ import Transfer from '@/apps/transfer';
 import { type CustomDappOption, dapps } from '@/config';
 import { CUSTOM_APP_KEY } from '@/constants';
 import { useParams } from '@tanstack/react-router';
-import { createElement, useEffect, useState } from 'react';
+import React, { createElement, useEffect, useState } from 'react';
 
 import { store } from '@mimir-wallet/service';
 
@@ -17,7 +17,7 @@ import AppFrame from './AppFrame';
 function AppExplorer() {
   const { url } = useParams({ from: '/_authenticated/explorer/$url' });
 
-  const [element, setElement] = useState<JSX.Element>();
+  const [element, setElement] = useState<React.ReactElement>();
 
   useEffect(() => {
     if (url) {

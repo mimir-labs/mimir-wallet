@@ -52,7 +52,7 @@
     "@mimir-wallet/ui": "workspace:^",
     "@radix-ui/react-use-controllable-state": "^1.2.2",
     "eventemitter3": "^5.0.1",
-    "lucide-react": "^0.542.0",
+    "lucide-react": "^0.552.0",
     "react-syntax-highlighter": "^15.6.6",
     "streamdown": "^1.1.6",
     "use-stick-to-bottom": "^1.1.1"
@@ -61,11 +61,11 @@
     "@mimir-wallet/service": "workspace:^",
     "@polkadot/extension-base": "^0.62.3",
     "@polkadot/extension-inject": "^0.62.3",
-    "@tailwindcss/cli": "^4.1.11",
+    "@tailwindcss/cli": "^4.1.16",
     "@types/react-syntax-highlighter": "^15",
     "npm-run-all2": "^7.0.2",
-    "tailwind-variants": "^1.0.0",
-    "tailwindcss": "^4.1.11",
-    "typescript": "^5.8.2"
+    "tailwind-variants": "^3.1.1",
+    "tailwindcss": "^4.1.16",
+    "typescript": "^5.9.3"
   }
 }

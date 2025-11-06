@@ -99,7 +99,7 @@ export function checkSubmittableResult(api: ApiPromise, result: ISubmittableResu
 function makeSignOptions(
   api: ApiPromise,
   partialOptions: Partial<SignerOptions>,
-  extras: { blockHash?: Hash; era?: ExtrinsicEra; nonce?: Index }
+  extras: { blockHash?: HexString; era?: ExtrinsicEra; nonce?: Index }
 ): SignatureOptions {
   return objectSpread({ blockHash: api.genesisHash, genesisHash: api.genesisHash }, partialOptions, extras, {
     runtimeVersion: api.runtimeVersion,
@@ -128,7 +128,7 @@ function makeEraOptions(
   }
 
   return makeSignOptions(api, partialOptions, {
-    blockHash: header.hash,
+    blockHash: header.hash.toHex(),
     era: api.registry.createTypeUnsafe<ExtrinsicEra>('ExtrinsicEra', [
       {
         current: header.number,

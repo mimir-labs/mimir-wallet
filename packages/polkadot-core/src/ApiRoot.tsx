@@ -15,7 +15,7 @@ import { destroyApi, initializeApi } from './initialize.js';
 import { useAllApis } from './useApiStore.js';
 import { useNetworks } from './useNetworks.js';
 
-function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNode }): JSX.Element | null {
+function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNode }): React.ReactElement | null {
   const { networks, mode } = useNetworks();
   const { chains } = useAllApis();
   const [storeSs58Chain, setStoreSs58Chain] = useLocalStore<string>(DEFAULE_SS58_CHAIN_KEY);

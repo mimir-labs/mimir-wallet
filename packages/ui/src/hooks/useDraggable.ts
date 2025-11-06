@@ -29,7 +29,7 @@ export interface UseDraggableOptions {
 export interface UseDraggableReturn<T extends HTMLElement = HTMLElement> {
   position: Position;
   dragConstraints: DragConstraints;
-  containerRef: React.RefObject<T>;
+  containerRef: React.RefObject<T | null>;
   handleDragEnd: (event: any, info: any) => void;
 }
 

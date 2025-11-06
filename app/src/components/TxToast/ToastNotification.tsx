@@ -75,7 +75,7 @@ function toastCustom(events: TxEvents, id?: number | string) {
 }
 
 function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: () => void }) {
-  const idRef = useRef<number | string>();
+  const idRef = useRef<number | string | undefined>(undefined);
 
   useEffect(() => {
     let id: number | string;

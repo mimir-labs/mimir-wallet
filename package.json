@@ -74,6 +74,6 @@
     "@walletconnect/types": "2.15.1",
     "@walletconnect/utils": "2.15.1",
     "bn.js": "^5.2.1",
-    "typescript": "5.6.3"
+    "typescript": "5.9.3"
   }
 }

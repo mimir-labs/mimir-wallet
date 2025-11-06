@@ -27,7 +27,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
   const isProxied = data.account.delegatees.length > 0;
   const isMultisig = data.account.type === 'multisig';
 
-  let cell: JSX.Element;
+  let cell: React.ReactElement;
 
   if (data.account.type === 'pure' && data.account.isUnknownPure) {
     cell = data.isTop ? (
