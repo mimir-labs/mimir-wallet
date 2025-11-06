@@ -13,8 +13,8 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useProxies } from '@/hooks/useProxies';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { BN_ZERO } from '@polkadot/util';
+import { Link as RouterLink } from '@tanstack/react-router';
 import { useMemo } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';

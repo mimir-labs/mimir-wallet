@@ -1,53 +1,85 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { dapps } from '@/config';
-import { isSameOrigin } from '@/utils';
+import { useMatches } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 
+/**
+ * Route metadata interface for page title
+ */
+export interface RouteMetadata {
+  title?: string;
+  /**
+   * Function to generate dynamic title based on route context
+   * Receives route params, search params, and other context
+   */
+  getTitle?: (context: {
+    params?: Record<string, string>;
+    search?: Record<string, any>;
+    mode?: 'solo' | 'omni';
+  }) => string;
+}
+
+/**
+ * Hook to automatically set page title based on route metadata
+ *
+ * Best Practice: Define page titles in route definitions using staticData
+ *
+ * @example
+ * // In route file (e.g., dapp.tsx)
+ * export const Route = createFileRoute('/_authenticated/dapp')({
+ *   staticData: {
+ *     title: 'Dapp'
+ *   },
+ *   component: PageDapp
+ * });
+ *
+ * @example
+ * // For dynamic titles (e.g., transaction details)
+ * export const Route = createFileRoute('/_authenticated/transactions/$id')({
+ *   staticData: {
+ *     getTitle: ({ params }) => `Transaction #${params.id}`
+ *   },
+ *   component: PageTransactionDetails
+ * });
+ */
 export function usePageTitle() {
-  const { pathname } = useLocation();
+  const matches = useMatches();
   const { mode } = useNetworks();
 
   const PREFIX =
     mode === 'omni' ? 'Mimir|Your Ultimate Omni Web3 Multisig Wallet' : 'Mimir|Your Ultimate Web3 Multisig Wallet';
 
   useEffect(() => {
+    // Find the deepest route match with metadata
+    const matchWithMetadata = [...matches].reverse().find((match) => {
+      const meta = match.staticData as RouteMetadata | undefined;
+
+      return meta?.title || meta?.getTitle;
+    });
+
     let title = PREFIX;
 
-    if (pathname.startsWith('/dapp')) {
-      title += ' - Dapp';
-    } else if (pathname.startsWith('/transactions')) {
-      title += ' - Transactions';
-    } else if (pathname.startsWith('/address-book')) {
-      title += ' - Address Book';
-    } else if (pathname.startsWith('/account-setting')) {
-      title += ' - Account Setting';
-    } else if (pathname.startsWith('/add-proxy')) {
-      title += ' - Add Proxy';
-    } else if (pathname.startsWith('/create-multisig')) {
-      title += ' - Create Multisig';
-    } else if (pathname.startsWith('/create-multisig-one')) {
-      title += ' - Create Multisig Threshold 1';
-    } else if (pathname.startsWith('/create-pure')) {
-      title += ' - Create Pure';
-    } else if (pathname.startsWith('/explorer')) {
-      const appUrl = pathname.split('/')[2];
+    if (matchWithMetadata) {
+      const meta = matchWithMetadata.staticData as RouteMetadata;
 
-      const dapp = dapps.find((item) => item.url.startsWith('https://') && isSameOrigin(item.url, appUrl));
+      if (meta.getTitle) {
+        // Use dynamic title generator
+        const dynamicTitle = meta.getTitle({
+          params: matchWithMetadata.params as Record<string, string>,
+          search: matchWithMetadata.search as Record<string, any>,
+          mode
+        });
 
-      if (dapp) {
-        title += ` - ${dapp.name}`;
-      } else {
-        title += ` - Explorer(${appUrl})`;
+        title += ` - ${dynamicTitle}`;
+      } else if (meta.title) {
+        // Use static title
+        title += ` - ${meta.title}`;
       }
-    } else if (pathname.startsWith('/welcome')) {
-      title += ' - Welcome';
     }
 
     document.title = title;
-  }, [PREFIX, pathname]);
+  }, [matches, PREFIX, mode]);
 }

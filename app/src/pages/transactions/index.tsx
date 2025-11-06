@@ -5,9 +5,11 @@ import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { analyticsActions } from '@/analytics';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { useQueryParam } from '@/hooks/useQueryParams';
 import { useValidTransactionNetworks } from '@/hooks/useTransactions';
+import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
+
+const routeApi = getRouteApi('/_authenticated/transactions/');
 
 import {
   Avatar,
@@ -28,6 +30,11 @@ import HistoryTransactions from './HistoryTransactions';
 import PendingTransactions from './PendingTransactions';
 
 function Content({ address }: { address: string }) {
+  const navigate = useNavigate();
+  const search = routeApi.useSearch();
+  const status = search.status;
+  const txId = search.tx_id;
+
   const [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] = useValidTransactionNetworks(address);
   const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<string[]>([]);
   const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<string[]>([]);
@@ -39,15 +46,22 @@ function Content({ address }: { address: string }) {
     return validHistoryNetworks.find(({ network }) => selectedHistoryNetworks.includes(network));
   }, [validHistoryNetworks, selectedHistoryNetworks]);
 
-  const [type, setType] = useQueryParam<string>('status', 'pending');
-  const [txId] = useQueryParam<string>('tx_id');
   const [discardedCounts, setDiscardedCounts] = useState(0);
   const [showDiscarded, setShowDiscarded] = useState(false);
 
   // Track initial page view
   useEffect(() => {
-    analyticsActions.transactionsView(type);
-  }, [type]); // Only run once on mount
+    analyticsActions.transactionsView(status);
+  }, [status]); // Only run once on mount
+
+  const handleStatusChange = (key: string | number) => {
+    const newStatus = key.toString() as 'pending' | 'history';
+
+    navigate({
+      to: '.',
+      search: { ...search, status: newStatus }
+    });
+  };
 
   useEffect(() => {
     setSelectedPendingNetworks((selectedPendingNetworks) => {
@@ -90,11 +104,11 @@ function Content({ address }: { address: string }) {
           <Tabs
             color='primary'
             aria-label='Transaction'
-            selectedKey={type}
+            selectedKey={status}
             onSelectionChange={(key) => {
               const viewType = key.toString();
 
-              setType(viewType);
+              handleStatusChange(viewType);
               // Track transactions view
               analyticsActions.transactionsView(viewType as 'pending' | 'history');
             }}
@@ -104,7 +118,7 @@ function Content({ address }: { address: string }) {
           </Tabs>
         </div>
 
-        {type === 'pending' && (
+        {status === 'pending' && (
           <>
             <Checkbox size='sm' isSelected={showDiscarded} onValueChange={setShowDiscarded}>
               <span className='flex items-center gap-1'>Discarded Transactions({discardedCounts})</span>
@@ -125,7 +139,7 @@ function Content({ address }: { address: string }) {
           </>
         )}
 
-        {type === 'pending' &&
+        {status === 'pending' &&
           validPendingNetworks.length > 0 &&
           (validPendingNetworks.length > 1 ? (
             <DropdownMenu open={pendingDropdownOpen} onOpenChange={setPendingDropdownOpen}>
@@ -173,7 +187,7 @@ function Content({ address }: { address: string }) {
               {validPendingNetworks[0].chain.name}({validPendingNetworks[0].counts})
             </Button>
           ))}
-        {type === 'history' &&
+        {status === 'history' &&
           validHistoryNetworks.length > 0 &&
           (validHistoryNetworks.length > 1 ? (
             <DropdownMenu>
@@ -206,7 +220,7 @@ function Content({ address }: { address: string }) {
           ))}
       </div>
 
-      {type === 'pending' && (
+      {status === 'pending' && (
         <PendingTransactions
           showDiscarded={showDiscarded}
           isFetched={isFetched}
@@ -217,7 +231,7 @@ function Content({ address }: { address: string }) {
           onDiscardedCountsChange={setDiscardedCounts}
         />
       )}
-      {type === 'history' && (
+      {status === 'history' && (
         <HistoryTransactions
           isFetched={isFetched}
           isFetching={isFetching}

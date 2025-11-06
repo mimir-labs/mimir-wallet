@@ -16,8 +16,8 @@ import { useAllChainBalances } from '@/hooks/useChainBalances';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import { useCallback, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import {
@@ -304,7 +304,9 @@ function Assets() {
                   <div className='inline-flex max-w-[180px] flex-row-reverse items-center gap-0 sm:gap-2.5'>
                     <Button asChild variant={upSm ? 'ghost' : 'light'} size='sm'>
                       <Link
-                        to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${item.isNative ? 'native' : item.key}&asset_network=${network}`}
+                        to='/explorer/$url'
+                        params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}
+                        search={{ assetId: item.isNative ? 'native' : item.key, asset_network: network }}
                       >
                         {upSm ? (
                           <>
@@ -319,7 +321,7 @@ function Assets() {
 
                     {isNative && network === 'polkadot' && (
                       <Button asChild variant={upSm ? 'ghost' : 'light'} size='sm'>
-                        <Link to={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}>
+                        <Link to='/explorer/$url' params={{ url: StakingApp.url }}>
                           {upSm ? (
                             <>
                               Staking

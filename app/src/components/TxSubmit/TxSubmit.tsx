@@ -15,8 +15,8 @@ import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useGasFeeEstimate } from '@/hooks/useGasFeeEstimate';
+import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
@@ -289,7 +289,7 @@ function TxSubmit({
                     if (onlySign) {
                       onError?.(new Error('This transaction is proposed, please wait for it to be initialized.'));
                     } else {
-                      navigate('/transactions');
+                      navigate({ to: '/transactions' });
                     }
                   }}
                 />

@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 import { Button } from '@mimir-wallet/ui';
 
@@ -29,12 +29,24 @@ function EmptyBatch({
         Add New Transaction
       </Button> */}
       <Button asChild color='primary'>
-        <Link to={`/explorer/${encodeURIComponent('mimir://app/transfer')}`} onClick={onClose}>
+        <Link
+          to='/explorer/$url'
+          params={{
+            url: 'mimir://app/transfer'
+          }}
+          onClick={onClose}
+        >
           Add New Transfer
         </Link>
       </Button>
       <Button asChild color='primary' variant='ghost'>
-        <Link to={`/explorer/${encodeURIComponent('https://apps.mimir.global')}`} onClick={onClose}>
+        <Link
+          to='/explorer/$url'
+          params={{
+            url: 'https://apps.mimir.global'
+          }}
+          onClick={onClose}
+        >
           Go to PolkadotJS
         </Link>
       </Button>

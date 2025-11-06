@@ -11,10 +11,10 @@ import IconSafe from '@/assets/svg/icon-safe.svg?react';
 import { AddressRow, Empty, FormatBalance } from '@/components';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMultiChainStats, useQueryStats } from '@/hooks/useQueryStats';
+import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
-import { Link } from 'react-router-dom';
 
 import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
 import {
@@ -307,7 +307,9 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
                   <TableCell align='right'>
                     <Button asChild variant='bordered' color='primary' size='sm'>
                       <Link
-                        to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?asset_network=${selectedChain}&to=${item.to}`}
+                        to='/explorer/$url'
+                        params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}
+                        search={{ asset_network: selectedChain, to: item.to }}
                       >
                         Transfer
                       </Link>

@@ -10,8 +10,8 @@ import { Empty, FormatBalance } from '@/components';
 import { StakingApp } from '@/config';
 import { useAllChainBalances } from '@/hooks/useChainBalances';
 import { formatDisplay, formatUnits } from '@/utils';
+import { Link } from '@tanstack/react-router';
 import React, { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import {
@@ -233,7 +233,9 @@ function Assets({ address }: { address: string }) {
                     <Tooltip content='Transfer'>
                       <Button asChild isIconOnly variant='light' size='sm'>
                         <Link
-                          to={`/explorer/${encodeURIComponent(`mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`)}?assetId=${item.isNative ? 'native' : item.key}&asset_network=${network}`}
+                          to='/explorer/$url'
+                          params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}
+                          search={{ assetId: item.isNative ? 'native' : item.key, asset_network: network }}
                         >
                           <IconSend className='h-[14px] w-[14px]' />
                         </Link>
@@ -243,7 +245,7 @@ function Assets({ address }: { address: string }) {
                     {isNative && network === 'polkadot' && (
                       <Tooltip content='Stake'>
                         <Button asChild isIconOnly variant='light' size='sm'>
-                          <Link to={`/explorer/${encodeURIComponent(`${StakingApp.url}`)}`}>
+                          <Link to='/explorer/$url' params={{ url: `${StakingApp.url}` }}>
                             <IconAdd className='h-[14px] w-[14px]' />
                           </Link>
                         </Button>

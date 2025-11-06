@@ -1,8 +1,8 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useLocation } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
 
 export function useCloseWhenPathChange(onClose?: () => void) {
   const { pathname } = useLocation();

@@ -3,8 +3,8 @@
 
 import type { DappOption } from '@/config';
 
+import { useNavigate } from '@tanstack/react-router';
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 
@@ -63,7 +63,7 @@ export function useOpenDapp(dapp: DappOption) {
           dapp.isSubPathHash ? (_url.hash = path) : (_url.pathname = path);
         }
 
-        navigate(`/explorer/${encodeURIComponent(_url.toString())}`);
+        navigate({ to: '/explorer/$url', params: { url: _url.toString() } });
       }
     },
     [dapp, navigate, defaultNetwork, openRightSidebar, setRightSidebarTab]

@@ -4,8 +4,8 @@
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
+import { Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import {

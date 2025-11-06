@@ -1,44 +1,50 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAccount } from '@/accounts/useAccount';
-import { ConnectWalletModal, Navigate, ToastRoot, TxSubmit, TxToast } from '@/components';
+import { ConnectWalletModal, ToastRoot, TxSubmit, TxToast } from '@/components';
 import { DraggableChatWithFAB } from '@/components/DraggableChat';
 import { MigrationAlert } from '@/features/assethub-migration';
 import { useAIFunctionCall } from '@/hooks/useAIFunctionCall';
-import { useFollowAccounts } from '@/hooks/useFollowAccounts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { useUpdateAIContext } from '@/hooks/useUpdateAIContext';
 import WalletConsumer from '@/wallet/Consumer';
 import { useWallet } from '@/wallet/useWallet';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
-import { Outlet } from 'react-router-dom';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { SidebarProvider } from '@mimir-wallet/ui';
 
-import AddAddressBook from './AddAddressBook';
-import { AddressModalsProvider } from './address';
-import { CSS_VARS, layoutHelpers } from './constants';
-import CookieConsent from './CookieConsent';
-import Initializing from './Initializing';
-import OmniChainUpgradeTip from './OmniChainUpgradeTip';
-import { AppSidebar, RightSideBar } from './sidebar';
-import SubscribeNotification from './SubscribeNotification';
-import ToggleAlert from './ToggleAlert';
-import TopBar from './topbar';
-import Version from './Version';
+import { useAccount } from '../accounts/useAccount';
+import AddAddressBook from '../containers/AddAddressBook';
+import { AddressModalsProvider } from '../containers/address';
+import { CSS_VARS, layoutHelpers } from '../containers/constants';
+import CookieConsent from '../containers/CookieConsent';
+import Initializing from '../containers/Initializing';
+import OmniChainUpgradeTip from '../containers/OmniChainUpgradeTip';
+import { AppSidebar, RightSideBar } from '../containers/sidebar';
+import SubscribeNotification from '../containers/SubscribeNotification';
+import ToggleAlert from '../containers/ToggleAlert';
+import TopBar from '../containers/topbar';
+import Version from '../containers/Version';
 
-interface BaseContainerProps {
-  auth: boolean;
-  skipConnect?: boolean;
-  hideSideBar?: boolean;
-  hideTopBar?: boolean;
-  withPadding: boolean;
-}
+/**
+ * Authenticated Layout Route
+ *
+ * This layout route handles:
+ * - Authentication check via beforeLoad (moved to component for now)
+ * - Initialization state (API, Wallet, Multisig sync)
+ * - Common UI components (sidebar, topbar, alerts)
+ *
+ * Note: Authentication check is performed in the component itself
+ * because we need access to useAccount hook. We'll redirect if not authenticated.
+ */
+export const Route = createFileRoute('/_authenticated')({
+  component: AuthenticatedLayout
+});
 
-// Helper function for main content rendering
+// Helper function to determine if main content should be shown
 const shouldShowMainContent = (
   skipConnect: boolean,
   isApiReady: boolean,
@@ -142,7 +148,6 @@ interface MainContentProps {
   hideSideBar?: boolean;
   hideTopBar?: boolean;
   withPadding: boolean;
-  alertOpen: boolean;
   queue: any[];
 }
 
@@ -173,22 +178,42 @@ const MainContent = ({ hideSideBar, hideTopBar, withPadding, queue }: MainConten
   );
 };
 
-function BaseContainer({ auth, skipConnect = false, withPadding, hideSideBar, hideTopBar }: BaseContainerProps) {
+interface AuthenticatedLayoutOptions {
+  skipConnect?: boolean;
+  hideSideBar?: boolean;
+  hideTopBar?: boolean;
+  withPadding?: boolean;
+}
+
+function AuthenticatedLayout() {
+  // Get layout options from route context (will be set by child routes)
+  const {
+    skipConnect = false,
+    withPadding = true,
+    hideSideBar = false,
+    hideTopBar = false
+  } = {} as AuthenticatedLayoutOptions; // TODO: Get from route context
+
   const { isApiReady } = useApi();
   const { isWalletReady, closeWallet, walletOpen } = useWallet();
   const { current, isMultisigSyned } = useAccount();
   const { queue } = useTxQueue();
-  const [alertOpen, setAlertOpen] = useState<boolean>(true);
+  const [, setAlertOpen] = useState<boolean>(true);
 
   // Custom hooks for side effects
-  useFollowAccounts();
   usePageTitle();
   useUpdateAIContext();
   useAIFunctionCall();
 
-  // Early return for authentication check
-  if (!current && auth) {
-    return <Navigate to='/welcome' replace />;
+  // Redirect to welcome if not authenticated
+  // Note: This would ideally be in beforeLoad, but we need the useAccount hook
+  if (!current) {
+    // Use window.location for redirect since we're not in beforeLoad
+    if (typeof window !== 'undefined' && window.location.pathname !== '/welcome') {
+      window.location.href = '/welcome';
+    }
+
+    return null;
   }
 
   // Check if main content should be displayed
@@ -219,13 +244,7 @@ function BaseContainer({ auth, skipConnect = false, withPadding, hideSideBar, hi
 
         {/* Main Content or Initialization */}
         {showMainContent ? (
-          <MainContent
-            hideSideBar={hideSideBar}
-            hideTopBar={hideTopBar}
-            withPadding={withPadding}
-            alertOpen={alertOpen}
-            queue={queue}
-          />
+          <MainContent hideSideBar={hideSideBar} hideTopBar={hideTopBar} withPadding={withPadding} queue={queue} />
         ) : (
           <div className='flex flex-1 items-center justify-center'>
             <Initializing />
@@ -235,5 +254,3 @@ function BaseContainer({ auth, skipConnect = false, withPadding, hideSideBar, hi
     </>
   );
 }
-
-export default BaseContainer;

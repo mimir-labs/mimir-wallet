@@ -17,12 +17,6 @@ interface State {
   chainSS58?: number;
 }
 
-interface Feature {
-  path: string;
-  description: string;
-  search: Record<string, string>; // [search] => description
-}
-
 interface DappFeature {
   id: string | number;
   subPaths?: Record<string, string>;
@@ -31,7 +25,6 @@ interface DappFeature {
 }
 
 interface AIContext {
-  features: Feature[];
   dappFeatures: DappFeature[];
   supportedNetworks: Array<{
     key: string;

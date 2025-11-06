@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DotConsoleApp, PolkadotJsApp } from '@/config';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 function DotConsoleLink({ network }: { network: string }) {
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
@@ -13,7 +13,7 @@ function DotConsoleLink({ network }: { network: string }) {
     url.hash = '#/extrinsics';
 
     return (
-      <Link to={`/explorer/${encodeURIComponent(url.toString())}`} className='hover:underline'>
+      <Link to='/explorer/$url' params={{ url: url.toString() }} className='hover:underline'>
         Polkadot.js
       </Link>
     );
@@ -24,7 +24,7 @@ function DotConsoleLink({ network }: { network: string }) {
   url.pathname = '/extrinsics';
 
   return (
-    <Link to={`/explorer/${encodeURIComponent(url.toString())}`} className='hover:underline'>
+    <Link to='/explorer/$url' params={{ url: url.toString() }} className='hover:underline'>
       DOT Console
     </Link>
   );

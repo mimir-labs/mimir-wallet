@@ -13,8 +13,8 @@ import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { useToggle } from '@/hooks/useToggle';
+import { Link } from '@tanstack/react-router';
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
 
@@ -86,7 +86,7 @@ function AddressItem({ address }: { address: string }) {
               Edit
             </Button>
             <Button asChild variant='solid'>
-              <Link to={`/transfer?to=${address}`}>
+              <Link to='/transfer' search={{ to: address }}>
                 Send
                 <IconSend />
               </Link>
@@ -116,7 +116,7 @@ function AddressItem({ address }: { address: string }) {
               Edit
             </Button>
             <Button asChild variant='solid'>
-              <Link to={`/transfer?to=${address}`}>
+              <Link to='/transfer' search={{ to: address }}>
                 Send
                 <IconSend />
               </Link>

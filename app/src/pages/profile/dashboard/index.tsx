@@ -7,8 +7,8 @@ import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork'
 import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useQueryClient } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import React, { useCallback, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';

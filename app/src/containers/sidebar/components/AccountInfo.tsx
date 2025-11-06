@@ -10,8 +10,8 @@ import { useAddressExplorer } from '@/hooks/useAddressExplorer';
 import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { formatDisplay } from '@/utils';
+import { Link } from '@tanstack/react-router';
 import { memo, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 
 import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
@@ -106,7 +106,7 @@ function AccountInfoComponent({ address, onAccountOpen }: AccountInfoProps) {
             variant='light'
             size='sm'
           >
-            <Link to={`/explorer/${encodeURI('mimir://app/transfer')}`}>
+            <Link to='/explorer/$url' params={{ url: encodeURI('mimir://app/transfer') }}>
               <IconTransfer className='h-4 w-4' />
             </Link>
           </Button>

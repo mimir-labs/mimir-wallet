@@ -12,9 +12,9 @@ import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { useToggle } from '@/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
+import { Link } from '@tanstack/react-router';
 import moment from 'moment';
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 
 import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';

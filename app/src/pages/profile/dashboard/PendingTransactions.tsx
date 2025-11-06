@@ -22,8 +22,8 @@ import {
   RemoveOrDenyButton
 } from '@/transactions';
 import { useAnnouncementStatus } from '@/transactions/hooks/useAnnouncementStatus';
+import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
@@ -173,7 +173,16 @@ function PendingTransactions({ address }: { address: string }) {
               className='[&:hover>td]:bg-secondary border-secondary [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px]'
               onClick={() => {
                 setNetwork(item.network);
-                navigate(`/transactions/${item.id}?network=${item.network}&address=${address}`);
+                navigate({
+                  to: `/transactions/$id`,
+                  params: {
+                    id: item.id.toString()
+                  },
+                  search: {
+                    network: item.network,
+                    address: address
+                  }
+                });
               }}
             >
               <TableCell>

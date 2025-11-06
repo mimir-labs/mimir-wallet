@@ -13,8 +13,8 @@ import { AddressCell, Input } from '@/components';
 import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { formatDisplay } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce } from 'react-use';
 
 import { addressEq, isPolkadotAddress, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -68,7 +68,7 @@ function AccountItem({
       onClick={(e) => {
         e.stopPropagation();
         setCurrent(address);
-        navigate('/', { replace: true });
+        navigate({ to: '/', replace: true });
 
         if (isExample) {
           analyticsActions.onboardingClickExample();
