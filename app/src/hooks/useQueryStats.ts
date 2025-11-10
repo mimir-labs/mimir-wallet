@@ -13,10 +13,9 @@ export function useMultiChainStats(
   const { allApis } = useApi();
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [addressHex] as const,
-    queryHash: `multi-chain-stats-${addressHex}`,
+    queryKey: ['multi-chain-stats', addressHex] as const,
     enabled: !!addressHex,
-    queryFn: ({ queryKey: [addressHex] }): Promise<Record<string, boolean>> =>
+    queryFn: ({ queryKey: [, addressHex] }): Promise<Record<string, boolean>> =>
       service.account.getMultiChainStats(addressHex)
   });
 
@@ -34,11 +33,10 @@ export function useQueryStats(chain: string, address?: string | null) {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: [chain, addressHex] as const,
-    queryHash: `chain-stats-${chain}-${addressHex}`,
+    queryKey: ['chain-stats', chain, addressHex] as const,
     enabled: !!addressHex,
     queryFn: ({
-      queryKey: [chain, addressHex]
+      queryKey: [, chain, addressHex]
     }): Promise<{
       total: number;
       callOverview: { section: string; method: string; counts: number }[];

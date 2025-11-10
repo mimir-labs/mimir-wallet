@@ -4,7 +4,7 @@
 import type { HexString } from '@polkadot/util/types';
 
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { forwardRef, useImperativeHandle } from 'react';
+import { useImperativeHandle } from 'react';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 
@@ -21,10 +21,11 @@ export interface TemplateRef {
   setNetwork: (network: string) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface TemplateProps {}
+interface TemplateProps {
+  ref?: React.Ref<TemplateRef>;
+}
 
-const Template = forwardRef<TemplateRef, TemplateProps>((_props, ref) => {
+function Template({ ref }: TemplateProps) {
   const [network, setNetwork] = useInputNetwork();
   const { api } = useApi();
 
@@ -85,7 +86,7 @@ const Template = forwardRef<TemplateRef, TemplateProps>((_props, ref) => {
   };
 
   return <SubApiRoot network={network}>{renderContent()}</SubApiRoot>;
-});
+}
 
 Template.displayName = 'Template';
 

@@ -3,7 +3,6 @@
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 
-import { blake2AsHex } from '@polkadot/util-crypto';
 import { useMemo } from 'react';
 
 import { useQuery } from '@mimir-wallet/service';
@@ -16,15 +15,14 @@ export function useGasFeeEstimate(
   signer?: string
 ): bigint | undefined | null {
   const extrinsicHex = useMemo(() => extrinsic?.toHex(), [extrinsic]);
+
   // Query gas fee in native token
   const { data: gasFeeData } = useQuery({
-    queryKey: [extrinsic, signer] as const,
-    queryHash: `gas-fee-estimate-${blake2AsHex(extrinsicHex ?? '')}-${signer}`,
-    queryFn: async ({ queryKey }) => {
-      const [extrinsic, signer] = queryKey;
-
+    // Use extrinsicHex as identifier instead of the large extrinsic object
+    queryKey: ['gas-fee-estimate', extrinsicHex, signer] as const,
+    queryFn: async (): Promise<{ partialFee: any; weight: any }> => {
       if (!extrinsic || !signer) {
-        throw new Error('Extrinsic is not defined');
+        throw new Error('Extrinsic and signer are required');
       }
 
       try {

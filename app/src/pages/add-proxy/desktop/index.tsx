@@ -5,15 +5,15 @@ import type { TransactionResult } from '../types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { StepIndicator } from '@/components';
+import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useWizardState } from '@/hooks/useWizardState';
 import { useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import {
   type FunctionCallHandler,
-  functionCallManager,
   isFunctionCallObject,
   toFunctionCallBoolean,
   toFunctionCallString
@@ -80,45 +80,63 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
     toggleSuccess(true);
   };
 
-  useEffect(() => {
-    const handler: FunctionCallHandler = (event) => {
-      if (event.name !== 'createProxy') return;
-
+  const handleCreateProxy = useCallback<FunctionCallHandler>(
+    (event) => {
+      // No need to check event.name - only 'createProxy' events arrive here
       const newData: Partial<ProxyWizardData> = {};
 
-      // Safe type conversion for proxied address
-      const proxiedValue = toFunctionCallString(event.arguments.proxied);
-
-      if (proxiedValue) {
-        newData.proxied = proxiedValue;
-      }
-
-      // Safe type conversion for proxy address
-      const proxyValue = toFunctionCallString(event.arguments.proxy);
-
-      if (proxyValue) {
-        newData.proxy = proxyValue;
-      }
-
-      // Safe type conversion for isPureProxy flag
-      const isPureProxyValue = toFunctionCallBoolean(event.arguments.isPureProxy);
-
-      if (isPureProxyValue !== undefined) {
-        newData.isPureProxy = isPureProxyValue;
-      }
-
-      // Safe type conversion for pureProxyName
-      const pureProxyNameValue = toFunctionCallString(event.arguments.pureProxyName);
-
-      if (pureProxyNameValue) {
-        newData.pureProxyName = pureProxyNameValue;
-      }
-
-      // Safe type conversion for proxyType
+      // Safe type conversion for proxyType (top-level)
       const proxyTypeValue = toFunctionCallString(event.arguments.proxyType);
+      const proxyValue = toFunctionCallString(event.arguments.proxy);
+      const networkValue = toFunctionCallString(event.arguments.network);
 
       if (proxyTypeValue) {
         newData.proxyType = proxyTypeValue;
+      }
+
+      // Safe access to config object
+      const config = event.arguments.config as unknown as
+        | (
+            | {
+                isPureProxy: false;
+                proxied?: string;
+              }
+            | {
+                isPureProxy: true;
+                pureProxyName: string;
+              }
+          )
+        | undefined;
+
+      if (config) {
+        if (config.isPureProxy === false) {
+          // Standard proxy configuration
+          newData.isPureProxy = false;
+
+          if (config.proxied) {
+            newData.proxied = config.proxied;
+          }
+
+          // Clear pureProxyName when switching to standard proxy mode
+          newData.pureProxyName = '';
+        } else if (config.isPureProxy === true) {
+          // Pure proxy configuration
+          newData.isPureProxy = true;
+
+          if (config.pureProxyName) {
+            newData.pureProxyName = config.pureProxyName;
+          }
+
+          // IMPORTANT: Clear proxy field in pure proxy mode
+          // Pure proxy doesn't need a specific proxy address
+          newData.proxy = '';
+        }
+      }
+
+      // IMPORTANT: Always update proxy field if provided explicitly
+      // This will override the default behavior above
+      if (proxyValue !== undefined && proxyValue !== null) {
+        newData.proxy = proxyValue;
       }
 
       // Handle delay discriminated union: { enabled: boolean, period?: { type, blocks? } }
@@ -156,26 +174,24 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
         }
       }
 
+      // Navigate to review step first
       goToStep(3);
 
-      // Handle network field
-      const networkValue = toFunctionCallString(event.arguments.network);
+      // Then update data - using setTimeout to ensure step change completes first
+      setTimeout(() => {
+        updateData(newData);
+      });
 
       if (networkValue) {
         setNetwork(networkValue);
       }
+    },
+    [goToStep, setNetwork, updateData]
+  );
 
-      updateData(newData);
-
-      return functionCallManager.respondToFunctionCall({
-        id: event.id,
-        success: true,
-        result: newData
-      });
-    };
-
-    return functionCallManager.onFunctionCall(handler);
-  }, [goToStep, setNetwork, updateData]);
+  useRouteDependentHandler('createProxy', '/add-proxy', handleCreateProxy, {
+    displayName: 'Add Proxy'
+  });
 
   return (
     <SubApiRoot

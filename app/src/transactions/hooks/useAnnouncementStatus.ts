@@ -6,7 +6,7 @@ import { useProxyBestBlock } from '@/hooks/useProxyBestBlock';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
-import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 type AnnouncementStatus =
@@ -19,11 +19,28 @@ type AnnouncementStatus =
   | 'removed'
   | 'proxy_removed';
 
+async function fetchAnnouncementsForStatus({ queryKey }: { queryKey: readonly [string, string, string] }) {
+  const [, network, delegate] = queryKey;
+
+  if (!delegate) {
+    throw new Error('Invalid delegate');
+  }
+
+  const allApis = useAllApis.getState().chains;
+  const api = allApis[network]?.api;
+
+  if (!api) {
+    throw new Error(`API not available for network: ${network}`);
+  }
+
+  return api.query.proxy.announcements(delegate);
+}
+
 export function useAnnouncementStatus(
   transaction: Transaction,
   account: AccountData
 ): [status: AnnouncementStatus, isFetching: boolean] {
-  const { api, isApiReady, genesisHash } = useApi();
+  const { isApiReady, network, api } = useApi();
 
   const status = transaction.status;
   const type = transaction.type;
@@ -38,24 +55,15 @@ export function useAnnouncementStatus(
     isFetched: isFetchedResult,
     isFetching: isFetchingResult
   } = useQuery({
-    queryKey: [transaction.delegate] as const,
-    queryHash: `${genesisHash}.api.query.proxy.announcements(${transaction.delegate ? addressToHex(transaction.delegate) : ''})`,
+    queryKey: ['announcement-status', network, transaction.delegate || ''] as const,
     enabled:
       isApiReady &&
-      !!api.query.proxy?.announcements &&
+      !!api?.query.proxy?.announcements &&
       !!transaction.delegate &&
       status === TransactionStatus.Pending &&
       type === TransactionType.Announce,
     refetchOnMount: false,
-    queryFn: async ({ queryKey }) => {
-      const [delegate] = queryKey;
-
-      if (!delegate) {
-        throw new Error('Invalid delegate');
-      }
-
-      return api.query.proxy.announcements(delegate);
-    }
+    queryFn: fetchAnnouncementsForStatus
   });
 
   const announcements = result?.[0];

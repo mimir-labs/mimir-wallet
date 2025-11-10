@@ -47,8 +47,7 @@ export function useMigrationStatus(chain: string, isComplete: boolean): Migratio
 
 export function useMigrationNetworks() {
   return useQuery<MigrationNetwork[]>({
-    queryKey: [],
-    queryHash: 'migration-networks',
+    queryKey: ['migration-networks'],
     refetchInterval: false,
     refetchOnMount: false,
     refetchOnWindowFocus: true,

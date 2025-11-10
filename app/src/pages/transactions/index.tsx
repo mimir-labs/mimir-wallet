@@ -7,7 +7,7 @@ import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState, useTransition } from 'react';
 
 const routeApi = getRouteApi('/_authenticated/transactions/');
 
@@ -21,13 +21,24 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  Spinner,
   Tab,
   Tabs,
   Tooltip
 } from '@mimir-wallet/ui';
 
-import HistoryTransactions from './HistoryTransactions';
-import PendingTransactions from './PendingTransactions';
+// Lazy load transaction list components for better code splitting
+const HistoryTransactions = lazy(() => import('./HistoryTransactions'));
+const PendingTransactions = lazy(() => import('./PendingTransactions'));
+
+// Loading fallback for transaction lists
+function TransactionListFallback() {
+  return (
+    <div className='flex h-64 items-center justify-center'>
+      <Spinner variant='wave' />
+    </div>
+  );
+}
 
 function Content({ address }: { address: string }) {
   const navigate = useNavigate();
@@ -39,6 +50,8 @@ function Content({ address }: { address: string }) {
   const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<string[]>([]);
   const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<string[]>([]);
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
+
+  const [, startTransition] = useTransition();
   const selectedPendingNetwork = useMemo(() => {
     return validPendingNetworks.find(({ network }) => selectedPendingNetworks.includes(network));
   }, [validPendingNetworks, selectedPendingNetworks]);
@@ -57,9 +70,12 @@ function Content({ address }: { address: string }) {
   const handleStatusChange = (key: string | number) => {
     const newStatus = key.toString() as 'pending' | 'history';
 
-    navigate({
-      to: '.',
-      search: { ...search, status: newStatus }
+    // Wrap navigation in transition for non-blocking UI updates
+    startTransition(() => {
+      navigate({
+        to: '.',
+        search: { ...search, status: newStatus }
+      });
     });
   };
 
@@ -163,15 +179,18 @@ function Content({ address }: { address: string }) {
                     checked={selectedPendingNetworks.includes(network)}
                     onSelect={(e) => e.preventDefault()}
                     onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelectedPendingNetworks([...selectedPendingNetworks, network]);
-                      } else {
-                        const remaining = selectedPendingNetworks.filter((n) => n !== network);
+                      // Wrap network selection in transition for non-blocking updates
+                      startTransition(() => {
+                        if (checked) {
+                          setSelectedPendingNetworks([...selectedPendingNetworks, network]);
+                        } else {
+                          const remaining = selectedPendingNetworks.filter((n) => n !== network);
 
-                        if (remaining.length > 0) {
-                          setSelectedPendingNetworks(remaining);
+                          if (remaining.length > 0) {
+                            setSelectedPendingNetworks(remaining);
+                          }
                         }
-                      }
+                      });
                     }}
                     className='h-8'
                   >
@@ -201,7 +220,12 @@ function Content({ address }: { address: string }) {
               <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
                 <DropdownMenuRadioGroup
                   value={selectedHistoryNetworks[0]}
-                  onValueChange={(value) => setSelectedHistoryNetworks([value])}
+                  onValueChange={(value) => {
+                    // Wrap network selection in transition for non-blocking updates
+                    startTransition(() => {
+                      setSelectedHistoryNetworks([value]);
+                    });
+                  }}
                 >
                   {validHistoryNetworks.map(({ network, chain, counts }) => (
                     <DropdownMenuRadioItem key={network} value={network} className='h-8'>
@@ -221,24 +245,28 @@ function Content({ address }: { address: string }) {
       </div>
 
       {status === 'pending' && (
-        <PendingTransactions
-          showDiscarded={showDiscarded}
-          isFetched={isFetched}
-          isFetching={isFetching}
-          networks={selectedPendingNetworks}
-          address={address}
-          txId={txId}
-          onDiscardedCountsChange={setDiscardedCounts}
-        />
+        <Suspense fallback={<TransactionListFallback />}>
+          <PendingTransactions
+            showDiscarded={showDiscarded}
+            isFetched={isFetched}
+            isFetching={isFetching}
+            networks={selectedPendingNetworks}
+            address={address}
+            txId={txId}
+            onDiscardedCountsChange={setDiscardedCounts}
+          />
+        </Suspense>
       )}
       {status === 'history' && (
-        <HistoryTransactions
-          isFetched={isFetched}
-          isFetching={isFetching}
-          network={selectedHistoryNetworks.at(0)}
-          address={address}
-          txId={txId}
-        />
+        <Suspense fallback={<TransactionListFallback />}>
+          <HistoryTransactions
+            isFetched={isFetched}
+            isFetching={isFetching}
+            network={selectedHistoryNetworks.at(0)}
+            address={address}
+            txId={txId}
+          />
+        </Suspense>
       )}
     </div>
   );

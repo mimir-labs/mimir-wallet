@@ -8,7 +8,7 @@ import { Input, InputNetwork } from '@/components';
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useState } from 'react';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
@@ -82,7 +82,12 @@ function CallDataViewerContent({
   );
 }
 
-const CallDataViewer = forwardRef<CallDataViewRef, { calldata?: string }>(({ calldata: initialCallData }, ref) => {
+interface CallDataViewerProps {
+  calldata?: string;
+  ref?: React.Ref<CallDataViewRef>;
+}
+
+function CallDataViewer({ calldata: initialCallData, ref }: CallDataViewerProps) {
   const [network, setNetwork] = useInputNetwork();
   const [calldata, setCallData] = useState(initialCallData || '');
 
@@ -101,7 +106,7 @@ const CallDataViewer = forwardRef<CallDataViewRef, { calldata?: string }>(({ cal
       <CallDataViewerContent network={network} calldata={calldata} setNetwork={setNetwork} setCallData={setCallData} />
     </SubApiRoot>
   );
-});
+}
 
 CallDataViewer.displayName = 'CallDataViewer';
 

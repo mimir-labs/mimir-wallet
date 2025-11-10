@@ -174,8 +174,7 @@ const accountDataStructuralSharing = <T>(prev: T, next: T): T => {
  */
 function createQueryConfig(addressHex: string) {
   return {
-    queryKey: [addressHex] as const,
-    queryHash: `omni-chain-${addressHex}`,
+    queryKey: ['omni-chain-account', addressHex] as const,
     // Cache data for 6 seconds before marking as stale
     staleTime: 6_000,
     // Automatically refetch every 6 seconds to keep data fresh
@@ -185,7 +184,8 @@ function createQueryConfig(addressHex: string) {
     // Only enable query when address is provided
     enabled: !!addressHex,
     // Fetch account details from service
-    queryFn: ({ queryKey: [address] }: { queryKey: readonly [string] }) => service.account.getOmniChainDetails(address),
+    queryFn: ({ queryKey: [, address] }: { queryKey: readonly [string, string] }) =>
+      service.account.getOmniChainDetails(address),
     structuralSharing: accountDataStructuralSharing
   };
 }

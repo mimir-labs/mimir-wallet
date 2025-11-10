@@ -35,19 +35,37 @@ function Content({ chain }: { chain: Endpoint }) {
 
     const provider = new WsProvider(url);
 
-    const rpcGenesisHash = await provider.isReady.then(() => {
-      return provider.send('chain_getBlockHash', [0]);
-    });
+    try {
+      // Create a timeout promise that rejects after 30 seconds
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error('Connection timeout (30s)'));
+        }, 30000);
+      });
 
-    if (rpcGenesisHash !== chain.genesisHash) {
-      setError(new Error('Genesis hash mismatch'));
+      // Race between provider connection and timeout
+      const rpcGenesisHash = await Promise.race([
+        provider.isReady.then(() => {
+          return provider.send('chain_getBlockHash', [0]);
+        }),
+        timeoutPromise
+      ]);
 
-      return;
+      if (rpcGenesisHash !== chain.genesisHash) {
+        setError(new Error('Genesis hash mismatch'));
+        provider.disconnect();
+
+        return;
+      }
+
+      provider.disconnect();
+
+      store.set(`${NETWORK_RPC_PREFIX}${chain.key}`, url);
+    } catch (error) {
+      // Ensure provider is disconnected on any error
+      provider.disconnect();
+      setError(error instanceof Error ? error : new Error('Unknown error'));
     }
-
-    provider.disconnect();
-
-    store.set(`${NETWORK_RPC_PREFIX}${chain.key}`, url);
   }, [url, chain.genesisHash, chain.key]);
 
   // Convert wsUrl entries to autocomplete options

@@ -77,6 +77,7 @@
   "devDependencies": {
     "@mimir-wallet/dev": "workspace:^",
     "@tailwindcss/postcss": "^4.1.11",
+    "@tanstack/react-query-devtools": "^5.90.2",
     "@tanstack/react-router-devtools": "^1.134.13",
     "@testing-library/cypress": "^10.0.2",
     "@testing-library/dom": "^10.4.0",

@@ -12,12 +12,12 @@ import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import {
-  addressEq,
   addressToHex,
   evm2Ss58,
   isEthAddress,
@@ -44,44 +44,47 @@ function createOptions(
   const list: Set<string> = new Set();
   const identity = useIdentityStore.getState();
 
+  // Pre-compute hex addresses for excluded/filtered for O(1) lookup
+  const excludedSet = excluded?.length ? new Set(excluded.map((addr) => addressToHex(addr))) : null;
+  const filteredSet = filtered?.length ? new Set(filtered.map((addr) => addressToHex(addr))) : null;
+
+  // Pre-compute lowercase input once
+  const inputLower = input?.toLowerCase();
+  const isAddressInput = input ? isPolkadotAddress(input) : false;
+  const inputHex = isAddressInput ? addressToHex(input!) : null;
+
+  // Helper function to check if address matches search criteria
+  const matchesSearch = (address: string, addressHex: string, name?: string): boolean => {
+    if (!input) return true;
+
+    if (isAddressInput && inputHex) {
+      return addressHex === inputHex;
+    }
+
+    const addressLower = address.toLowerCase();
+    const nameLower = name?.toLowerCase();
+    const identityValue = (identity as Record<string, string>)[addressHex]?.toLowerCase();
+
+    return (
+      addressLower.includes(inputLower!) ||
+      (!!nameLower && nameLower.includes(inputLower!)) ||
+      (!!identityValue && identityValue.includes(inputLower!))
+    );
+  };
+
   // Process accounts
   for (const item of accounts) {
     const address = item.address;
     const addressHex = addressToHex(address);
-    let flag = true;
 
-    if (excluded && excluded.length > 0) {
-      flag = flag && !excluded.some((item) => addressEq(item, address));
-    }
+    // Early filtering with O(1) Set lookups
+    if (excludedSet?.has(addressHex)) continue;
+    if (filteredSet && !filteredSet.has(addressHex)) continue;
 
-    if (!flag) continue;
+    // Check search match
+    const name = item.name || metas[addressHex]?.name;
 
-    if (filtered && filtered.length > 0) {
-      flag = flag && filtered.some((item) => addressEq(item, address));
-    }
-
-    if (!flag) continue;
-
-    if (input) {
-      if (isPolkadotAddress(input)) {
-        flag = flag && addressEq(input, address);
-
-        if (!flag) continue;
-      } else {
-        const addressLowerCase = address.toLowerCase();
-        const inputLowerCase = input.toLowerCase();
-        const nameLowerCase = (item.name || metas[addressHex].name)?.toLowerCase();
-        const identityValue = identity[addressHex]?.toLowerCase();
-
-        flag =
-          flag &&
-          (addressLowerCase.includes(inputLowerCase) ||
-            (!!nameLowerCase && nameLowerCase.includes(inputLowerCase)) ||
-            (!!identityValue && identityValue.includes(inputLowerCase)));
-
-        if (!flag) continue;
-      }
-    }
+    if (!matchesSearch(address, addressHex, name)) continue;
 
     list.add(addressHex);
   }
@@ -91,40 +94,15 @@ function createOptions(
     for (const item of addresses) {
       const address = item.address;
       const addressHex = addressToHex(address);
-      let flag = true;
 
-      if (excluded && excluded.length > 0) {
-        flag = flag && !excluded.some((item) => addressEq(item, address));
-      }
+      // Early filtering with O(1) Set lookups
+      if (excludedSet?.has(addressHex)) continue;
+      if (filteredSet && !filteredSet.has(addressHex)) continue;
 
-      if (!flag) continue;
+      // Check search match
+      const name = item.name || metas[addressHex]?.name;
 
-      if (filtered && filtered.length > 0) {
-        flag = flag && filtered.some((item) => addressEq(item, address));
-      }
-
-      if (!flag) continue;
-
-      if (input) {
-        if (isPolkadotAddress(input)) {
-          flag = flag && addressEq(input, address);
-
-          if (!flag) continue;
-        } else {
-          const addressLowerCase = address.toLowerCase();
-          const inputLowerCase = input.toLowerCase();
-          const nameLowerCase = (item.name || metas[addressHex].name)?.toLowerCase();
-          const identityValue = identity[addressHex]?.toLowerCase();
-
-          flag =
-            flag &&
-            (addressLowerCase.includes(inputLowerCase) ||
-              (!!nameLowerCase && nameLowerCase.includes(inputLowerCase)) ||
-              (!!identityValue && identityValue.includes(inputLowerCase)));
-
-          if (!flag) continue;
-        }
-      }
+      if (!matchesSearch(address, addressHex, name)) continue;
 
       list.add(addressHex);
     }
@@ -167,20 +145,18 @@ function InputAddress({
   const [[inputValue, isValidAddress], setInputValue] = useInputAddress(undefined, polkavm);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isOpen, toggleOpen] = useToggle(false);
   const [isFocused, setIsFocused] = useState(false);
   const upSm = useMediaQuery('sm');
-  const [options, setOptions] = useState<string[]>([]);
   const onChangeRef = useRef(onChange);
   const stateRef = useRef({
     polkavm,
     chainSS58
   });
 
-  onChangeRef.current = onChange;
-  stateRef.current = { polkavm, chainSS58 };
-
-  useEffect(() => {
+  // Memoize options computation to avoid unnecessary recalculations
+  const options = useMemo(() => {
     const list = sortAccounts(createOptions(accounts, addresses, isSign, metas, inputValue, filtered, excluded), metas);
 
     if (list.length === 0 && isValidAddressUtil(inputValue, polkavm)) {
@@ -191,8 +167,30 @@ function InputAddress({
       list.unshift(zeroAddress);
     }
 
-    return setOptions(list);
+    return list;
   }, [accounts, addresses, chainSS58, excluded, filtered, inputValue, isSign, metas, polkavm, withZeroAddress]);
+
+  // Set up virtualizer for efficient list rendering
+  const rowVirtualizer = useVirtualizer({
+    count: options.length,
+    getScrollElement: () => scrollContainerRef.current,
+    estimateSize: () => (addressType === 'cell' ? 50 : 40), // estimated row height
+    overscan: 10, // render 10 extra items above/below viewport
+    // Provide initial measurement to prevent empty state on first open
+    initialRect: { width: 0, height: 250 }
+  });
+
+  // Remeasure when dropdown opens to ensure virtualizer has correct dimensions
+  // useLayoutEffect runs synchronously after DOM updates but before browser paint
+  useEffect(() => {
+    if (isOpen)
+      startTransition(() => {
+        rowVirtualizer.measure();
+      });
+  }, [isOpen, rowVirtualizer]);
+
+  onChangeRef.current = onChange;
+  stateRef.current = { polkavm, chainSS58 };
 
   useEffect(() => {
     if (isControl.current) {
@@ -247,7 +245,7 @@ function InputAddress({
   const element = (
     <div
       data-hide={isOpen && isFocused}
-      className='inline-flex w-[calc(100%-20px)] flex-grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden [&[data-hide=true]_.AddressRow-Content]:hidden'
+      className='inline-flex w-[calc(100%-20px)] grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden [&[data-hide=true]_.AddressRow-Content]:hidden'
     >
       {addressType === 'cell' ? (
         <AddressCell iconSize={iconSize} value={value} shorten={upSm ? shorten : true} />
@@ -288,7 +286,7 @@ function InputAddress({
             <div
               ref={wrapperRef}
               data-error={!isValidAddress && !!inputValue}
-              className={`input-address-content tap-highlight-transparent border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden rounded-[10px] border-1 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none ${wrapperClassName || ''}`}
+              className={`input-address-content tap-highlight-transparent border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden rounded-[10px] border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none ${wrapperClassName || ''}`}
             >
               {element}
               <input
@@ -332,43 +330,57 @@ function InputAddress({
             className='border-divider-300 border-1 p-[5px]'
           >
             {options.length > 0 ? (
-              <div className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
-                <ul className={clsx('flex list-none flex-col', addressType === 'cell' ? '' : 'gap-2.5')}>
-                  {options.map((item) => (
-                    <React.Fragment key={item}>
-                      <li
-                        onClick={() => {
-                          const shouldContinue = onSelect?.(item);
+              <div ref={scrollContainerRef} className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
+                <ul
+                  className={clsx('relative flex list-none flex-col', addressType === 'cell' ? '' : 'gap-2.5')}
+                  style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
+                >
+                  {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                    const item = options[virtualRow.index];
 
-                          if (shouldContinue !== false) {
-                            handleSelect(item);
-                          } else {
-                            setInputValue('');
-                            toggleOpen(false);
-                          }
-                        }}
-                        className={clsx(
-                          'text-foreground transition-background hover:bg-secondary flex cursor-pointer items-center justify-between rounded-[10px] px-2 py-1.5',
-                          addressType === 'cell' ? '' : 'bg-secondary p-[5px]'
-                        )}
-                      >
-                        {addressType === 'cell' ? (
-                          <AddressCell addressCopyDisabled withCopy value={item} shorten={upSm ? shorten : true} />
-                        ) : (
-                          <AddressRow
-                            className='[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal'
-                            iconSize={iconSize}
-                            value={item}
-                            shorten={upSm ? shorten : true}
-                            withCopy
-                            withAddress
-                          />
-                        )}
-                        {withAddButton ? <IconAdd className='text-primary' /> : undefined}
-                      </li>
-                      {item === zeroAddress ? <Divider className='my-2.5' /> : null}
-                    </React.Fragment>
-                  ))}
+                    return (
+                      <React.Fragment key={virtualRow.key}>
+                        <li
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            transform: `translateY(${virtualRow.start}px)`
+                          }}
+                          onClick={() => {
+                            const shouldContinue = onSelect?.(item);
+
+                            if (shouldContinue !== false) {
+                              handleSelect(item);
+                            } else {
+                              setInputValue('');
+                              toggleOpen(false);
+                            }
+                          }}
+                          className={clsx(
+                            'text-foreground transition-background hover:bg-secondary flex cursor-pointer items-center justify-between rounded-[10px] px-2 py-1.5',
+                            addressType === 'cell' ? '' : 'bg-secondary p-[5px]'
+                          )}
+                        >
+                          {addressType === 'cell' ? (
+                            <AddressCell addressCopyDisabled withCopy value={item} shorten={upSm ? shorten : true} />
+                          ) : (
+                            <AddressRow
+                              className='[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal'
+                              iconSize={iconSize}
+                              value={item}
+                              shorten={upSm ? shorten : true}
+                              withCopy
+                              withAddress
+                            />
+                          )}
+                          {withAddButton ? <IconAdd className='text-primary' /> : undefined}
+                        </li>
+                        {item === zeroAddress ? <Divider className='my-2.5' /> : null}
+                      </React.Fragment>
+                    );
+                  })}
                 </ul>
               </div>
             ) : (

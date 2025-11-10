@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
-import { useEffect } from 'react';
 
-import { functionCallManager } from '@mimir-wallet/ai-assistant';
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import { Avatar } from '@mimir-wallet/ui';
 
@@ -13,18 +11,9 @@ interface SetSs58ChainProps {
   networkKey?: string;
 }
 
-function SetSs58Chain({ eventId, networkKey }: SetSs58ChainProps) {
+function SetSs58Chain({ networkKey }: SetSs58ChainProps) {
   const { networks } = useNetworks();
   const chain = networks.find((network) => network.key === networkKey);
-
-  useEffect(() => {
-    // Auto-respond that the chain switch was successful
-    functionCallManager.respondToFunctionCall({
-      id: eventId,
-      success: true,
-      result: { message: `Switched to ${chain?.name || networkKey} Format` }
-    });
-  }, [eventId, chain?.name, networkKey]);
 
   if (!chain) return null;
 

@@ -17,7 +17,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDisplay, formatUnits } from '@/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useTransition } from 'react';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import {
@@ -65,6 +65,8 @@ function Assets() {
   const upSm = useMediaQuery('sm');
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [, startTransition] = useTransition();
 
   const refreshAssets = useCallback(async () => {
     if (isRefreshing || !current) return;
@@ -180,7 +182,12 @@ function Assets() {
           loadingWrapper: 'relative h-10 table-cell px-2'
         }}
         sortDescriptor={sortDescriptor}
-        onSortChange={setSortDescriptor}
+        onSortChange={(descriptor) => {
+          // Wrap sort operation in transition for non-blocking updates
+          startTransition(() => {
+            setSortDescriptor(descriptor);
+          });
+        }}
       >
         <TableHeader>
           <TableColumn className='bg-content1 sticky left-0 sm:relative'>Token</TableColumn>

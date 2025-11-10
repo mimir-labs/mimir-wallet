@@ -5,6 +5,7 @@ import { useAccount } from '@/accounts/useAccount';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Empty } from '@/components';
 import { useNavigate, useSearch } from '@tanstack/react-router';
+import { useTransition } from 'react';
 
 import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 
@@ -19,13 +20,18 @@ function PageAddressBook() {
   const search = useSearch({ strict: false }) as { tab?: 'contacts' | 'watchlist' };
   const selectedTab = search.tab || 'contacts';
 
+  const [, startTransition] = useTransition();
+
   const contactAddresses = addresses.filter((address) => !address.watchlist);
   const watchlistAddresses = addresses.filter((address) => address.watchlist);
 
   const handleTabChange = (key: React.Key) => {
-    navigate({
-      search: ((prev: any) => ({ ...prev, tab: key.toString() })) as any,
-      replace: true
+    // Wrap tab navigation in transition for smooth switching
+    startTransition(() => {
+      navigate({
+        search: ((prev: any) => ({ ...prev, tab: key.toString() })) as any,
+        replace: true
+      });
     });
   };
 

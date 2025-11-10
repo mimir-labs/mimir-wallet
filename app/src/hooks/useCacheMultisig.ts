@@ -15,14 +15,13 @@ export function useCacheMultisig(): [data: CacheMultisig[], isLoading: boolean] 
 
   const addresses: string[] = walletAccounts.map(({ address }) => addressToHex(address)).sort();
   const { data, isLoading } = useQuery({
-    queryKey: [network, addresses] as const,
-    queryHash: `prepare-pure-pending-${network}-${addresses.join(',')}`,
+    queryKey: ['cache-multisig', network, addresses] as const,
     staleTime: 6_000,
     refetchInterval: 6_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     enabled: !!network && addresses.length > 0,
-    queryFn: ({ queryKey: [chain, address] }): Promise<CacheMultisig[]> =>
+    queryFn: ({ queryKey: [, chain, address] }): Promise<CacheMultisig[]> =>
       service.multisig.pendingPrepareMultisig(chain, address),
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;

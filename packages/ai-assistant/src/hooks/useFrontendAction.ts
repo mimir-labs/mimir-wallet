@@ -28,10 +28,8 @@ export function useFrontendAction() {
     };
 
     // Emit to frontend listeners (navigation, modals, etc.)
-    // This is fire-and-forget, we don't wait for result
-    functionCallManager.emitFunctionCall(functionCallEvent).catch((error) => {
-      console.error('[useFrontendAction] Frontend action error:', error);
-    });
+    // This is fire-and-forget event emission
+    functionCallManager.emitFunctionCall(functionCallEvent);
   }, []);
 
   return { triggerFrontendAction };

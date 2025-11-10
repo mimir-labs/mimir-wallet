@@ -14,7 +14,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import {
   Alert,
@@ -39,6 +39,23 @@ import PureCell from './PureCell';
 import SubmitProxy from './SubmitProxy';
 import SubmitPure from './SubmitPure';
 
+async function fetchProxiesForAddress({ queryKey }: { queryKey: readonly [string, string, string] }) {
+  const [, network, address] = queryKey;
+
+  if (!address) {
+    throw new Error('Invalid proxy address');
+  }
+
+  const allApis = useAllApis.getState().chains;
+  const api = allApis[network]?.api;
+
+  if (!api) {
+    throw new Error(`API not available for network: ${network}`);
+  }
+
+  return api.query.proxy.proxies(address);
+}
+
 function AddProxy({
   pure,
   network,
@@ -52,7 +69,7 @@ function AddProxy({
   setNetwork: (network: string) => void;
   setProxied: (proxied: string | undefined) => void;
 }) {
-  const { api, genesisHash, isApiReady } = useApi();
+  const { genesisHash, isApiReady } = useApi();
   const navigate = useNavigate();
   const { accounts, addresses, current } = useAccount();
 
@@ -79,18 +96,9 @@ function AddProxy({
   const [proxy, setProxy] = useState<string | undefined>(pure ? current : filteredProxy[0]);
 
   const { data: proxies } = useQuery({
-    queryKey: [proxied] as const,
-    queryHash: `${genesisHash}.api.query.proxy.proxies(${proxied ? addressToHex(proxied) : ''})`,
+    queryKey: ['proxies', network, proxied || ''] as const,
     enabled: !!isApiReady && !pure && !!proxied,
-    queryFn: ({ queryKey }) => {
-      const [address] = queryKey;
-
-      if (!address) {
-        throw new Error('Invalid proxy address');
-      }
-
-      return api.query.proxy.proxies(address);
-    }
+    queryFn: fetchProxiesForAddress
   });
 
   const swap = useCallback(() => {

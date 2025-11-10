@@ -2,12 +2,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
+import { lazy, Suspense, useTransition } from 'react';
 
-import { Tab, Tabs } from '@mimir-wallet/ui';
+import { Spinner, Tab, Tabs } from '@mimir-wallet/ui';
 
-import AppList from './AppList';
-import CustomApps from './CustomApps';
 import WalletConnectExample from './WalletConnectExample';
+
+// Lazy load dapp list components for better code splitting
+const AppList = lazy(() => import('./AppList'));
+const CustomApps = lazy(() => import('./CustomApps'));
+
+// Loading fallback for dapp lists
+function DappListFallback() {
+  return (
+    <div className='flex h-64 items-center justify-center'>
+      <Spinner variant='wave' />
+    </div>
+  );
+}
 
 const routeApi = getRouteApi('/_authenticated/dapp');
 
@@ -16,12 +28,18 @@ function PageDapp() {
   const search = routeApi.useSearch();
   const tab = search.tab;
 
+  // Use React 19 useTransition for non-blocking tab switches
+  const [, startTransition] = useTransition();
+
   const handleTabChange = (key: string | number) => {
     const newTab = key.toString() as 'apps' | 'custom';
 
-    navigate({
-      to: '.',
-      search: { ...search, tab: newTab }
+    // Wrap tab navigation in transition for smooth switching
+    startTransition(() => {
+      navigate({
+        to: '.',
+        search: { ...search, tab: newTab }
+      });
     });
   };
 
@@ -42,10 +60,14 @@ function PageDapp() {
         }}
       >
         <Tab key='apps' title='Apps'>
-          <AppList />
+          <Suspense fallback={<DappListFallback />}>
+            <AppList />
+          </Suspense>
         </Tab>
         <Tab key='custom' title='Custom Apps'>
-          <CustomApps />
+          <Suspense fallback={<DappListFallback />}>
+            <CustomApps />
+          </Suspense>
         </Tab>
       </Tabs>
     </div>

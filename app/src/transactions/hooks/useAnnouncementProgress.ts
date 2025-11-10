@@ -6,14 +6,31 @@ import { useProxyBestBlock } from '@/hooks/useProxyBestBlock';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
-import { addressEq, addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
+
+async function fetchAnnouncements({ queryKey }: { queryKey: readonly [string, string, string] }) {
+  const [, network, delegate] = queryKey;
+
+  if (!delegate) {
+    throw new Error('Invalid delegate');
+  }
+
+  const allApis = useAllApis.getState().chains;
+  const api = allApis[network]?.api;
+
+  if (!api) {
+    throw new Error(`API not available for network: ${network}`);
+  }
+
+  return api.query.proxy.announcements(delegate);
+}
 
 export function useAnnouncementProgress(
   transaction: ProxyTransaction,
   account: AccountData
 ): [startBlock: number, currentBlock: number, endBlock: number] {
-  const { api, isApiReady, genesisHash } = useApi();
+  const { isApiReady, network, api } = useApi();
 
   const status = transaction.status;
   const type = transaction.type;
@@ -25,24 +42,15 @@ export function useAnnouncementProgress(
   const [bestBlock] = useProxyBestBlock();
 
   const { data: result } = useQuery({
-    queryKey: [transaction.delegate] as const,
-    queryHash: `${genesisHash}.api.query.proxy.announcements(${transaction.delegate ? addressToHex(transaction.delegate) : ''})`,
+    queryKey: ['announcement-progress', network, transaction.delegate || ''] as const,
     enabled:
       isApiReady &&
-      !!api.query.proxy?.announcements &&
+      !!api?.query.proxy?.announcements &&
       !!transaction.delegate &&
       status === TransactionStatus.Pending &&
       type === TransactionType.Announce,
     refetchOnMount: false,
-    queryFn: async ({ queryKey }) => {
-      const [delegate] = queryKey;
-
-      if (!delegate) {
-        throw new Error('Invalid delegate');
-      }
-
-      return api.query.proxy.announcements(delegate);
-    }
+    queryFn: fetchAnnouncements
   });
   const announcements = result?.[0];
 
