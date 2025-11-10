@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.36.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.35.0...polkadot-core-v2.36.0) (2025-11-10)
+
+
+### Features
+
+* upgrade react to 19 ([#340](https://github.com/mimir-labs/mimir-wallet/issues/340)) ([91d6d6f](https://github.com/mimir-labs/mimir-wallet/commit/91d6d6f588472fddc835070dca8114e6fb09bd83))
+
+
+### Bug Fixes
+
+* fix some bugs ([#341](https://github.com/mimir-labs/mimir-wallet/issues/341)) ([dd1770d](https://github.com/mimir-labs/mimir-wallet/commit/dd1770d8a88f53a15a9a663fbafb6c02deb05831))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.36.0
+
 ## [2.35.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.34.0...polkadot-core-v2.35.0) (2025-11-05)
 
 
