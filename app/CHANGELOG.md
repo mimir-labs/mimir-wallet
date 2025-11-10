@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.36.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.35.0...mimir-wallet-app-v2.36.0) (2025-11-10)
+
+
+### Features
+
+* migrate to tanstack router from react router ([#338](https://github.com/mimir-labs/mimir-wallet/issues/338)) ([196b8a4](https://github.com/mimir-labs/mimir-wallet/commit/196b8a445e4a15e5413e61453bcb4f03f75fdcf6))
+* upgrade react to 19 ([#340](https://github.com/mimir-labs/mimir-wallet/issues/340)) ([91d6d6f](https://github.com/mimir-labs/mimir-wallet/commit/91d6d6f588472fddc835070dca8114e6fb09bd83))
+
+
+### Bug Fixes
+
+* fix some bugs ([#341](https://github.com/mimir-labs/mimir-wallet/issues/341)) ([dd1770d](https://github.com/mimir-labs/mimir-wallet/commit/dd1770d8a88f53a15a9a663fbafb6c02deb05831))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.36.0
+    * @mimir-wallet/service bumped to 2.36.0
+    * @mimir-wallet/ui bumped to 2.36.0
+
 ## [2.35.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.34.0...mimir-wallet-app-v2.35.0) (2025-11-05)
 
 
