@@ -20,7 +20,7 @@ function SoloChainSelect() {
     const groupedEndpoints = networks.reduce(
       (acc, network) => {
         if (network.isRelayChain) {
-          acc[network.key] = [network, ...(acc[network.key] || [])];
+          acc[network.key] = [...(acc[network.key] || []), network];
         } else if (network.relayChain) {
           acc[network.relayChain] = [...(acc[network.relayChain] || []), network];
         } else {

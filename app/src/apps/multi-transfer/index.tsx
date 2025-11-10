@@ -3,16 +3,12 @@
 
 import { useAccount } from '@/accounts/useAccount';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
+import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import {
-  type FunctionCallHandler,
-  functionCallManager,
-  isFunctionCallArray,
-  toFunctionCallString
-} from '@mimir-wallet/ai-assistant';
+import { type FunctionCallHandler, isFunctionCallArray, toFunctionCallString } from '@mimir-wallet/ai-assistant';
 import { isValidAddress, SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Spinner } from '@mimir-wallet/ui';
 
@@ -26,19 +22,17 @@ function MultiTransfer() {
   const [sending, setSending] = useState(current || '');
   const [data, setData] = useState<MultiTransferData[]>([['', '', '']]);
 
-  useEffect(() => {
-    const handler: FunctionCallHandler = (event) => {
-      if (event.name !== 'batchTransferForm') return;
+  const handleBatchTransferForm = useCallback<FunctionCallHandler>(
+    (event) => {
+      // No need to check event.name - only 'batchTransferForm' events arrive here
 
       // Validate sending address
       const sendingAddress = toFunctionCallString(event.arguments.sending);
 
       if (sendingAddress && !isValidAddress(sendingAddress)) {
-        return functionCallManager.respondToFunctionCall({
-          id: event.id,
-          success: false,
-          error: `Invalid sending address format ${sendingAddress}`
-        });
+        console.error(`Invalid sending address format ${sendingAddress}`);
+
+        return;
       }
 
       // Validate recipient addresses
@@ -61,11 +55,9 @@ function MultiTransfer() {
           });
 
         if (invalidAddress.length > 0) {
-          return functionCallManager.respondToFunctionCall({
-            id: event.id,
-            success: false,
-            error: `Invalid recipients address format ${invalidAddress.join(',')}`
-          });
+          console.error(`Invalid recipients address format ${invalidAddress.join(',')}`);
+
+          return;
         }
       }
 
@@ -109,16 +101,18 @@ function MultiTransfer() {
       if (networkValue) {
         setNetwork(networkValue);
       }
+    },
+    [setNetwork]
+  );
 
-      return functionCallManager.respondToFunctionCall({
-        id: event.id,
-        success: true,
-        result: 'Success update'
-      });
-    };
-
-    return functionCallManager.onFunctionCall(handler);
-  }, [setNetwork]);
+  useRouteDependentHandler(
+    'batchTransferForm',
+    '/explorer/mimir%3A%2F%2Fapp%2Fmulti-transfer',
+    handleBatchTransferForm,
+    {
+      displayName: 'Multi Transfer'
+    }
+  );
 
   return (
     <SubApiRoot

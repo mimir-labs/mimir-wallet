@@ -17,7 +17,7 @@ export * from './select.js';
 export * from './sidebar.js';
 export * from './sonner.js';
 export { Textarea } from './textarea.js';
-export { Tooltip } from './tooltip.js';
+export { Tooltip, TooltipContent, TooltipTrigger, TooltipWrapper } from './tooltip.js';
 
 export { VisuallyHidden };
 

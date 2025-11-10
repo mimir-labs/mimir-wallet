@@ -45,10 +45,10 @@ export function usePendingTransactions(
   const { chainSS58 } = useApi();
 
   const { data, isFetched, isFetching, refetch } = useQuery({
-    queryKey: ['pending-transactions', network, address, txId || 'all'] as const,
+    queryKey: ['pending-transactions', network, address, txId] as const,
     enabled: !!address,
     queryFn: ({ queryKey: [, network, address, txId] }): Promise<Transaction[]> =>
-      service.transaction.getPendingTransactions(network, address!, txId === 'all' ? undefined : txId),
+      service.transaction.getPendingTransactions(network, address!, txId),
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }
@@ -74,8 +74,9 @@ export function useMultichainPendingTransactions(networks: string[], address?: s
 
   const data = useQueries({
     queries: networks.map((network) => ({
-      initialData: [],
-      queryKey: ['multichain-pending-transactions', network, address, txId || 'all'] as const,
+      queryKey: ['multichain-pending-transactions', network, address, txId] as const,
+      // Only enable query when address is provided
+      enabled: !!address,
       structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
         const nextTransactions = (next as Transaction[]).map((item) => transformTransaction(chainSS58, item));
 
@@ -84,8 +85,13 @@ export function useMultichainPendingTransactions(networks: string[], address?: s
       queryFn: async ({
         queryKey: [, network, address, txId]
       }: {
-        queryKey: readonly [string, string, string | null | undefined, string];
+        queryKey: readonly [string, string, string | null | undefined, string | undefined];
       }): Promise<Transaction[]> => {
+        // Validate address before making request
+        if (!address) {
+          throw new Error('Address is required');
+        }
+
         const data = await fetcher(
           txId
             ? `${API_CLIENT_GATEWAY}/chains/${network}/${address}/transactions/pending?tx_id=${txId}`
@@ -97,7 +103,7 @@ export function useMultichainPendingTransactions(networks: string[], address?: s
     }))
   });
 
-  return data;
+  return useMemo(() => data.map((item) => ({ ...item, data: item.data || [] })), [data]);
 }
 
 export function useHistoryTransactions(
@@ -117,7 +123,7 @@ export function useHistoryTransactions(
 
   const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
     initialPageParam: null,
-    queryKey: ['history-transactions', network, address, txId || 'all', limit] as const,
+    queryKey: ['history-transactions', network, address, txId, limit] as const,
     enabled: !!network && !!address,
     queryFn: async ({ pageParam, queryKey }) => {
       const [, network, address, txId, limit] = queryKey as readonly [

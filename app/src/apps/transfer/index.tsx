@@ -4,16 +4,17 @@
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
+import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
 const routeApi = getRouteApi('/_authenticated/explorer/$url');
 
-import { type FunctionCallHandler, functionCallManager, toFunctionCallString } from '@mimir-wallet/ai-assistant';
+import { type FunctionCallHandler, toFunctionCallString } from '@mimir-wallet/ai-assistant';
 import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Spinner } from '@mimir-wallet/ui';
 
@@ -25,7 +26,7 @@ function PageTransfer() {
   const navigate = useNavigate();
   const search = routeApi.useSearch();
   const fromParam = search.from;
-  const assetId = search.assetId;
+  const assetId = search.assetId || 'native';
   const assetNetwork = search.asset_network;
   const toParam = search.to;
 
@@ -53,9 +54,9 @@ function PageTransfer() {
     return foundAsset;
   }, [assetId, assets]);
 
-  useEffect(() => {
-    const handler: FunctionCallHandler = (event) => {
-      if (event.name !== 'transferForm') return;
+  const handleTransferForm = useCallback<FunctionCallHandler>(
+    (event) => {
+      // No need to check event.name - only 'transferForm' events arrive here
 
       // Safe type conversion for sending
       const sendingValue = toFunctionCallString(event.arguments.sending);
@@ -86,16 +87,13 @@ function PageTransfer() {
       if (networkValue) {
         setNetwork(networkValue);
       }
+    },
+    [setAmount, setNetwork]
+  );
 
-      return functionCallManager.respondToFunctionCall({
-        id: event.id,
-        success: true,
-        result: 'Success update'
-      });
-    };
-
-    return functionCallManager.onFunctionCall(handler);
-  }, [setAmount, setNetwork]);
+  useRouteDependentHandler('transferForm', '/explorer/mimir%3A%2F%2Fapp%2Ftransfer', handleTransferForm, {
+    displayName: 'Transfer'
+  });
 
   return (
     <SubApiRoot

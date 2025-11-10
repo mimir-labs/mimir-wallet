@@ -86,6 +86,14 @@ export interface FunctionCallResult {
 
 export type FunctionCallHandler = (event: FunctionCallEvent) => void;
 
+// Export metadata types
+export type {
+  RouteRequirement,
+  HandlerMetadata,
+  HandlerRegistrationOptions,
+  HandlerRegistration
+} from './types/metadata.js';
+
 // Default configurations
 export const DEFAULT_AI_CONFIG: AiConfig = {
   provider: 'openai',

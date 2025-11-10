@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AddressMeta } from '@/hooks/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { PalletIdentityJudgement } from '@polkadot/types/lookup';
 
@@ -22,6 +23,8 @@ import { Tooltip } from '@mimir-wallet/ui';
 interface Props {
   defaultName?: string;
   value: AccountId | AccountIndex | Address | string | Uint8Array | null | undefined;
+  /** Optional meta to avoid redundant useAddressMeta calls */
+  meta?: AddressMeta;
 }
 
 function extractIdentity(
@@ -61,13 +64,15 @@ function extractIdentity(
   return elem;
 }
 
-function AddressName({ defaultName, value }: Props): React.ReactElement<Props> {
+function AddressName({ defaultName, value, meta: propMeta }: Props): React.ReactElement<Props> {
   const { chainSS58 } = useApi();
   const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
   const [identity, isFetched, isFetching, identityEnabled] = useDeriveAccountInfo(address);
   const [chainName, setChainName] = useState<React.ReactNode>(null);
-  const { meta } = useAddressMeta(address);
+  // Use prop meta if provided, otherwise fetch it (for backward compatibility)
+  const { meta: fetchedMeta } = useAddressMeta(propMeta ? undefined : address);
+  const meta = propMeta || fetchedMeta;
   const isZeroAddress = useMemo(() => addressEq(zeroAddress, address), [address]);
 
   // set the actual nickname, local name, accountId

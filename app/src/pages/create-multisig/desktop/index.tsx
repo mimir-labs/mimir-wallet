@@ -5,15 +5,15 @@ import type { PrepareFlexible } from '../types';
 
 import { useAccount } from '@/accounts/useAccount';
 import { StepIndicator } from '@/components';
+import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useWizardState } from '@/hooks/useWizardState';
 import { useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import {
   type FunctionCallHandler,
-  functionCallManager,
   toFunctionCallNumber,
   toFunctionCallString,
   toFunctionCallStringArray
@@ -67,25 +67,26 @@ function DesktopCreateMultisig() {
   const { currentStep, data: multisigData } = wizardState;
   const { goToNext, goToPrevious, goToStep, updateData } = wizardActions;
 
-  useEffect(() => {
-    const handler: FunctionCallHandler = (event) => {
-      if (event.name !== 'createMultisig') return;
-
+  const handleCreateMultisig = useCallback<FunctionCallHandler>(
+    (event) => {
+      // No need to check event.name - only 'createMultisig' events arrive here
       const newData: Partial<MultisigData> = {};
 
-      // Extract multisigType and convert to isPureProxy boolean
-      const multisigType = toFunctionCallString(event.arguments.multisigType);
+      // Safe access to config object
+      const network = event.arguments.network as string | undefined;
 
-      if (multisigType === 'standard') {
-        newData.isPureProxy = false;
-      } else if (multisigType === 'pureProxy') {
+      if (network) {
+        setNetwork(network);
+
         newData.isPureProxy = true;
+      } else {
+        newData.isPureProxy = false;
       }
 
       // Safe type conversion for name
       const nameValue = toFunctionCallString(event.arguments.name);
 
-      if (nameValue) {
+      if (nameValue !== undefined && nameValue !== null) {
         newData.name = nameValue;
       }
 
@@ -103,26 +104,20 @@ function DesktopCreateMultisig() {
         newData.members = membersValue;
       }
 
+      // Navigate to review step first
       goToStep(3);
 
-      // Handle network field (required for pureProxy type)
-      const networkValue = toFunctionCallString(event.arguments.network);
+      // Then update data - using setTimeout to ensure step change completes first
+      setTimeout(() => {
+        updateData(newData);
+      }, 0);
+    },
+    [goToStep, setNetwork, updateData]
+  );
 
-      if (networkValue) {
-        setNetwork(networkValue);
-      }
-
-      updateData(newData);
-
-      return functionCallManager.respondToFunctionCall({
-        id: event.id,
-        success: true,
-        result: newData
-      });
-    };
-
-    return functionCallManager.onFunctionCall(handler);
-  }, [goToStep, setNetwork, updateData]);
+  useRouteDependentHandler('createMultisig', '/create-multisig', handleCreateMultisig, {
+    displayName: 'Create Multisig'
+  });
 
   const handleConfirm = async () => {
     if (multisigData.isPureProxy) {

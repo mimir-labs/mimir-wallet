@@ -19,7 +19,7 @@ import { z } from 'zod';
 const explorerSearchSchema = z.object({
   // Transfer app parameters
   from: z.string().optional(),
-  assetId: z.string().optional().default('native'),
+  assetId: z.string().optional(),
   asset_network: z.string().optional(),
   to: z.string().optional()
 });

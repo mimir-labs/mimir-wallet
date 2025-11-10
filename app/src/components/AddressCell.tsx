@@ -54,15 +54,20 @@ function AddressCell({
 }: Props) {
   const { chainSS58 } = useApi();
   const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
-  const { meta: { isMultisig, isProxied, isPure } = {} } = useAddressMeta(address);
+  // Fetch meta once and pass to child components to avoid redundant calls
+  const { meta } = useAddressMeta(address);
+  const { isMultisig, isProxied, isPure } = meta || {};
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const copyAddress = useCopyAddressToClipboard(address);
 
+  // Only fetch transaction counts when needed to avoid unnecessary API calls
   const [transactionCounts] = useMultiChainTransactionCounts(withPendingTxCounts ? address : undefined);
-  const totalCounts = useMemo(
-    () => Object.values(transactionCounts).reduce((acc, curr) => acc + curr.pending, 0),
-    [transactionCounts]
-  );
+  const totalCounts = useMemo(() => {
+    // Skip calculation if counts are not needed
+    if (!withPendingTxCounts || !transactionCounts) return 0;
+
+    return Object.values(transactionCounts).reduce((acc, curr) => acc + curr.pending, 0);
+  }, [withPendingTxCounts, transactionCounts]);
 
   const showTypeWidth = useMemo(() => {
     if (!showType && !withPendingTxCounts) return 0;
@@ -86,7 +91,7 @@ function AddressCell({
               maxWidth: showType && (isMultisig || isPure || isProxied) ? `calc(100% - ${showTypeWidth}px)` : '100%'
             }}
           >
-            <AddressName defaultName={defaultName} value={value} />
+            <AddressName defaultName={defaultName} value={value} meta={meta} />
           </span>
 
           {showType && isMultisig && (
@@ -111,7 +116,7 @@ function AddressCell({
         <div className='AddressCell-Address text-foreground/50 flex h-[16px] min-w-0 items-center text-xs'>
           {showNetworkProxied && (
             <div className='mr-1 flex items-center gap-1'>
-              <AddressNetworks address={address} avatarSize={12} />
+              <AddressNetworks address={address} avatarSize={12} meta={meta} />
             </div>
           )}
           <span onClick={addressCopyDisabled ? undefined : () => copyAddress} className='min-w-0 truncate'>

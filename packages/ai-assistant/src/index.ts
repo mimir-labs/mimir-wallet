@@ -8,6 +8,10 @@ export * from './types.js';
 export * from './functionCallUtils.js';
 
 export { functionCallManager } from './store/functionCallManager.js';
+export { handlerMetadataRegistry } from './store/handlerMetadataRegistry.js';
+
+// Middleware
+export { NavigationMiddleware } from './middleware/navigationMiddleware.js';
 
 // Components
 export * from './components/index.js';

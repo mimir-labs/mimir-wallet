@@ -71,7 +71,7 @@ function Step1ConfigureAccess({
           />
 
           <ProxyControls
-            className='!absolute inset-x-auto inset-y-0 z-10 m-auto'
+            className='absolute! inset-x-auto inset-y-0 z-10 m-auto'
             onSwitch={() => {
               // Switch proxy and proxied accounts
               onDataChange({

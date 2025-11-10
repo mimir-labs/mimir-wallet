@@ -28,8 +28,10 @@
  * </div>
  */
 
+import type { AddressMeta } from '@/hooks/types';
+
 import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 
 import { useNetworks } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
@@ -49,6 +51,10 @@ interface AddressNetworksProps {
    * @default true
    */
   showTooltip?: boolean;
+  /**
+   * Optional meta to avoid redundant useAddressMeta calls
+   */
+  meta?: AddressMeta;
 }
 
 function Icon({
@@ -127,8 +133,15 @@ function Icon({
  * Returns an array of Avatar components for networks where the account has proxy relationships
  * For pure accounts with migration networks, shows a gradient from migration to current network
  */
-function AddressNetworks({ address, avatarSize = 20, showTooltip = true }: AddressNetworksProps) {
-  const { meta } = useAddressMeta(address);
+function AddressNetworksComponent({
+  address,
+  avatarSize = 20,
+  showTooltip = true,
+  meta: propMeta
+}: AddressNetworksProps) {
+  // Use prop meta if provided, otherwise fetch it (for backward compatibility)
+  const { meta: fetchedMeta } = useAddressMeta(propMeta ? undefined : address);
+  const meta = propMeta || fetchedMeta;
   const { networks } = useNetworks();
 
   // Get the networks where this address has proxy relationships
@@ -164,5 +177,8 @@ function AddressNetworks({ address, avatarSize = 20, showTooltip = true }: Addre
     );
   });
 }
+
+// Memoize to prevent unnecessary re-renders
+const AddressNetworks = memo(AddressNetworksComponent);
 
 export default AddressNetworks;

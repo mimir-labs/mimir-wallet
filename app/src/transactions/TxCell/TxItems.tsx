@@ -14,10 +14,10 @@ import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
 import { Link } from '@tanstack/react-router';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Button, Tooltip, TooltipContent, TooltipTrigger, TooltipWrapper } from '@mimir-wallet/ui';
 
 import Progress from '../Progress';
 import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
@@ -57,7 +57,15 @@ function ActionsCell({
   detailOpen: boolean;
 }) {
   const { network, chainSS58 } = useApi();
-  const [isCopied, copy] = useCopyClipboard();
+  const [isCopied, copy] = useCopyClipboard(2000);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
+  const handleCopyUrl = () => {
+    const url = `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chainSS58)}`;
+
+    copy(url);
+    setTooltipOpen(true);
+  };
 
   return (
     <div className='flex w-full flex-row-reverse items-center gap-1'>
@@ -76,25 +84,14 @@ function ActionsCell({
         </Button>
       )}
 
-      <Tooltip content={isCopied ? 'Copied' : 'Copy the transaction URL'}>
-        <Button
-          isIconOnly
-          color='primary'
-          size='sm'
-          variant='light'
-          onClick={() => {
-            const url = new URL(window.location.href);
-
-            url.searchParams.set('tx_id', transaction.id.toString());
-
-            copy(
-              `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chainSS58)}`
-            );
-          }}
-        >
-          <IconShare className='h-4 w-4' />
-        </Button>
-      </Tooltip>
+      <TooltipWrapper open={tooltipOpen} onOpenChange={setTooltipOpen}>
+        <TooltipTrigger asChild>
+          <Button isIconOnly color='primary' size='sm' variant='light' onClick={handleCopyUrl}>
+            <IconShare className='h-4 w-4' />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{isCopied ? 'Copied!' : 'Copy the transaction URL'}</TooltipContent>
+      </TooltipWrapper>
     </div>
   );
 }
@@ -134,7 +131,7 @@ function TxItems({
     <>
       <div className='overflow-hidden transition-all duration-200'>
         <div
-          className='bg-secondary grid cursor-pointer grid-cols-10 gap-2.5 rounded-[10px] px-2.5 font-semibold sm:px-4 md:grid-cols-12 md:px-5 lg:grid-cols-[repeat(15,_minmax(0,_1fr))] [&>div]:flex [&>div]:h-10 [&>div]:items-center'
+          className='bg-secondary grid cursor-pointer grid-cols-10 gap-2.5 rounded-[10px] px-2.5 font-semibold sm:px-4 md:grid-cols-12 md:px-5 lg:grid-cols-15 [&>div]:flex [&>div]:h-10 [&>div]:items-center'
           onClick={toggleDetailOpen}
         >
           <div className='col-span-2'>

@@ -108,7 +108,7 @@ function DraggableChatWindow({
       const { accounts } = tool.input as { accounts?: string[] };
 
       return accounts?.length ? (
-        <div className='flex w-full flex-col gap-[10px]'>
+        <div className='flex w-full flex-col gap-2.5'>
           {accounts.map((account: string, index: number) => (
             <QueryAccount key={`${account}-${index}`} account={account} />
           ))}

@@ -174,7 +174,7 @@ function InputAddress({
   const rowVirtualizer = useVirtualizer({
     count: options.length,
     getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => (addressType === 'cell' ? 50 : 60), // estimated row height
+    estimateSize: () => (addressType === 'cell' ? 50 : 40), // estimated row height
     overscan: 10, // render 10 extra items above/below viewport
     // Provide initial measurement to prevent empty state on first open
     initialRect: { width: 0, height: 250 }
@@ -245,7 +245,7 @@ function InputAddress({
   const element = (
     <div
       data-hide={isOpen && isFocused}
-      className='inline-flex w-[calc(100%-20px)] flex-grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden [&[data-hide=true]_.AddressRow-Content]:hidden'
+      className='inline-flex w-[calc(100%-20px)] grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden [&[data-hide=true]_.AddressRow-Content]:hidden'
     >
       {addressType === 'cell' ? (
         <AddressCell iconSize={iconSize} value={value} shorten={upSm ? shorten : true} />
@@ -286,7 +286,7 @@ function InputAddress({
             <div
               ref={wrapperRef}
               data-error={!isValidAddress && !!inputValue}
-              className={`input-address-content tap-highlight-transparent border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden rounded-[10px] border-1 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none ${wrapperClassName || ''}`}
+              className={`input-address-content tap-highlight-transparent border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden rounded-[10px] border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none ${wrapperClassName || ''}`}
             >
               {element}
               <input

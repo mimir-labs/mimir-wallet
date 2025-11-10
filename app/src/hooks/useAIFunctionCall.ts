@@ -1,32 +1,19 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { FunctionCallHandler } from '@mimir-wallet/ai-assistant';
+
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect } from 'react';
 
-import { type FunctionCallHandler, functionCallManager } from '@mimir-wallet/ai-assistant';
+import { NavigationMiddleware } from '@mimir-wallet/ai-assistant';
 import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 
-// Route dependency configuration for function calls that require specific routes
-const ROUTE_DEPENDENT_FUNCTION_CALLS: Record<string, string> = {
-  transferForm: '/explorer/mimir%3A%2F%2Fapp%2Ftransfer',
-  batchTransferForm: '/explorer/mimir%3A%2F%2Fapp%2Fmulti-transfer',
-  createMultisig: '/create-multisig',
-  createProxy: '/add-proxy'
-} as const;
+import { useFunctionCallHandler } from './useFunctionCallHandler';
 
-// Friendly route names for user-facing messages
-const ROUTE_FRIENDLY_NAMES: Record<string, string> = {
-  '/explorer/mimir%3A%2F%2Fapp%2Ftransfer': 'Transfer',
-  '/explorer/mimir%3A%2F%2Fapp%2Fmulti-transfer': 'Multi-Transfer',
-  '/create-multisig': 'Create Multisig',
-  '/add-proxy': 'Add Proxy'
-};
-
-// Helper function to get friendly route name
-function getFriendlyRouteName(route: string): string {
-  return ROUTE_FRIENDLY_NAMES[route] || route;
-}
+// ============================================================================
+// Route Check Helper
+// ============================================================================
 
 /**
  * Hook to check if current route matches required route and provide navigation capability
@@ -50,7 +37,9 @@ function useRouteCheck() {
 
       return {
         isOnRequiredRoute,
-        navigateToRoute: () => navigate({ to: requiredRoute })
+        navigateToRoute: async () => {
+          await navigate({ to: requiredRoute });
+        }
       };
     },
     [location, navigate]
@@ -59,96 +48,67 @@ function useRouteCheck() {
   return checkAndNavigate;
 }
 
+// ============================================================================
+// Navigation Middleware Initialization
+// ============================================================================
+
 /**
- * Hook to handle route-dependent function calls via pre-navigation event
- * Automatically navigates to required route if not already there
- *
- * Design: This hook uses the dedicated pre-navigation event that:
- * 1. Is emitted BEFORE the actual functioncall event
- * 2. Only for route-dependent function calls (transferForm, batchTransferForm, createMultisig, createProxy)
- * 3. Allows route navigation without interfering with page component handlers
- * 4. Page components listen to the regular functioncall event and handle it normally
+ * Initialize navigation middleware for route-dependent function calls
+ * Uses metadata registry to determine which functions require routes
  */
-function useRouteDependentFunctionCalls() {
+function useNavigationMiddleware() {
   const checkAndNavigate = useRouteCheck();
 
   useEffect(() => {
-    const handler: FunctionCallHandler = (event) => {
-      const { name } = event;
+    const middleware = new NavigationMiddleware(checkAndNavigate);
 
-      // Check if this function call requires a specific route
-      const requiredRoute = ROUTE_DEPENDENT_FUNCTION_CALLS[name];
-
-      if (!requiredRoute) {
-        return; // Not a route-dependent function call, skip (shouldn't happen for pre-navigation events)
-      }
-
-      const { isOnRequiredRoute, navigateToRoute } = checkAndNavigate(requiredRoute);
-
-      // If not on required route, navigate
-      // The page component will handle the functioncall event after navigation completes
-      if (!isOnRequiredRoute) {
-        console.log(`[Mimir AI] Auto-navigating to ${getFriendlyRouteName(requiredRoute)} page for ${name} operation`);
-        navigateToRoute();
-      }
-
-      // If already on correct route, do nothing
-      // The functioncall event will be emitted shortly and handled by page components
-    };
-
-    // Use onPreNavigation instead of onFunctionCall to only listen to pre-navigation events
-    return functionCallManager.onPreNavigation(handler);
+    return middleware.start();
   }, [checkAndNavigate]);
 }
 
-function useNavigateCall() {
+// ============================================================================
+// Global Function Call Handlers
+// ============================================================================
+
+/**
+ * Handler for 'navigate' function calls
+ */
+function useNavigateCallHandler() {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handler: FunctionCallHandler = (event) => {
-      if (event.name === 'navigate') {
-        const { path, query, params } = event.arguments as {
-          path: string;
-          query?: Record<string, string>;
-          params?: Record<string, string>;
-        };
+  const handler = useCallback<FunctionCallHandler>(
+    (event) => {
+      const { path, query, params } = event.arguments as {
+        path: string;
+        query?: Record<string, string>;
+        params?: Record<string, string>;
+      };
 
-        // Build navigation parameters for TanStack Router
-        const navParams: { to: string; params?: Record<string, string>; search?: Record<string, string> } = {
-          to: path
-        };
+      const navParams: { to: string; params?: Record<string, string>; search?: Record<string, string> } = {
+        to: path
+      };
 
-        if (params) {
-          navParams.params = params;
-        }
+      if (params) navParams.params = params;
+      if (query) navParams.search = query;
 
-        if (query) {
-          navParams.search = query;
-        }
+      navigate(navParams);
+    },
+    [navigate]
+  );
 
-        // Execute navigation for regular routes and mark as AI navigation
-        navigate(navParams);
-
-        return functionCallManager.respondToFunctionCall({
-          id: event.id,
-          success: true,
-          result: {
-            message: `Navigation completed. Page state may change, so please confirm any time-sensitive information.`
-          }
-        });
-      }
-    };
-
-    return functionCallManager.onFunctionCall(handler);
-  }, [navigate]);
+  useFunctionCallHandler('navigate', handler);
 }
 
-function useSwitchNetworksCall() {
+/**
+ * Handler for 'showComponent' with 'switchNetworks' type
+ */
+function useSwitchNetworksHandler() {
   const { enableNetwork, disableNetwork } = useNetworks();
 
-  useEffect(() => {
-    const handler: FunctionCallHandler = (event) => {
-      if (event.name !== 'showComponent' && event.arguments.componentType !== 'switchNetworks') return;
+  const handler = useCallback<FunctionCallHandler>(
+    (event) => {
+      if ((event.arguments as any).componentType !== 'switchNetworks') return;
+
       const networks = ((event.arguments?.props as any)?.networks || []) as {
         networkKey: string;
         isEnabled: boolean;
@@ -161,47 +121,56 @@ function useSwitchNetworksCall() {
           disableNetwork(item.networkKey);
         }
       });
+    },
+    [enableNetwork, disableNetwork]
+  );
 
-      return functionCallManager.respondToFunctionCall({
-        id: event.id,
-        success: true,
-        result: `operate successful`
-      });
-    };
-
-    return functionCallManager.onFunctionCall(handler);
+  useFunctionCallHandler('showComponent', handler, {
+    metadata: { componentType: 'switchNetworks' }
   });
 }
 
-function useSetSs58Chain() {
+/**
+ * Handler for 'showComponent' with 'setSs58Chain' type
+ */
+function useSetSs58ChainHandler() {
   const { setSs58Chain } = useApi();
 
-  useEffect(() => {
-    const handler: FunctionCallHandler = (event) => {
-      if (event.name !== 'showComponent' && event.arguments.componentType !== 'setSs58Chain') return;
+  const handler = useCallback<FunctionCallHandler>(
+    (event) => {
+      if ((event.arguments as any).componentType !== 'setSs58Chain') return;
+
       const networkKey = (event.arguments?.props as any)?.networkKey as string;
 
       if (networkKey) {
         setSs58Chain(networkKey);
       }
+    },
+    [setSs58Chain]
+  );
 
-      return functionCallManager.respondToFunctionCall({
-        id: event.id,
-        success: true,
-        result: `operate successful`
-      });
-    };
-
-    return functionCallManager.onFunctionCall(handler);
+  useFunctionCallHandler('showComponent', handler, {
+    metadata: { componentType: 'setSs58Chain' }
   });
 }
 
-export function useAIFunctionCall() {
-  // Route-dependent function calls middleware (runs first to check route requirements)
-  useRouteDependentFunctionCalls();
+// ============================================================================
+// Main Hook
+// ============================================================================
 
-  // Regular function call handlers
-  useNavigateCall();
-  useSwitchNetworksCall();
-  useSetSs58Chain();
+/**
+ * Main AI function call initialization hook
+ * Coordinates navigation middleware and global handlers
+ *
+ * NO HARDCODED ROUTE DEPENDENCIES - All route requirements are declared
+ * via metadata when handlers register themselves
+ */
+export function useAIFunctionCall() {
+  // Initialize navigation middleware (handles ALL route-dependent calls via metadata)
+  useNavigationMiddleware();
+
+  // Register global non-route-dependent handlers
+  useNavigateCallHandler();
+  useSwitchNetworksHandler();
+  useSetSs58ChainHandler();
 }
