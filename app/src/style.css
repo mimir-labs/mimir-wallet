@@ -98,6 +98,15 @@
       transform: rotate(0deg);
     }
   }
+  --animate-highlight: highlight 1.5s ease-in-out 2;
+  @keyframes highlight {
+    0%, 100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+    50% {
+      box-shadow: 0 0 0 4px hsl(var(--heroui-primary) / 0.3);
+    }
+  }
 }
 
 @layer base {

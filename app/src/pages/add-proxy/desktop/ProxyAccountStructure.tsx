@@ -43,53 +43,55 @@ function ProxyAccountStructure({
 
   // Create account structure similar to AccountStructure
   useEffect(() => {
-    const delegatee: AccountData = {
-      type: 'account',
-      name: '',
-      address: proxy,
-      createdAt: 0,
-      delegatees: []
-    };
-
-    if (isPureProxy) {
-      setProxyAccount({
-        type: 'pure',
-        isUnknownPure: true,
-        name: pureName || DEFAULT_PURE_ACCOUNT_NAME,
-        address: zeroAddress,
-        createdAt: 0,
-        delegatees: [
-          {
-            ...delegatee,
-            proxyDelay: hasDelay ? 1 : 0, //mock,
-            proxyNetwork: genesisHash,
-            proxyType
-          }
-        ],
-        createdBlock: '0',
-        createdBlockHash: '0x',
-        createdExtrinsicHash: '0x',
-        createdExtrinsicIndex: 1,
-        creator: '0x',
-        disambiguationIndex: 0,
-        network: genesisHash
-      });
-    } else if (proxied) {
-      setProxyAccount({
+    queueMicrotask(() => {
+      const delegatee: AccountData = {
         type: 'account',
         name: '',
-        address: proxied,
-        delegatees: [
-          {
-            ...delegatee,
-            proxyDelay: hasDelay ? 1 : 0, //mock,
-            proxyNetwork: genesisHash,
-            proxyType
-          }
-        ],
-        createdAt: 0
-      });
-    }
+        address: proxy,
+        createdAt: 0,
+        delegatees: []
+      };
+
+      if (isPureProxy) {
+        setProxyAccount({
+          type: 'pure',
+          isUnknownPure: true,
+          name: pureName || DEFAULT_PURE_ACCOUNT_NAME,
+          address: zeroAddress,
+          createdAt: 0,
+          delegatees: [
+            {
+              ...delegatee,
+              proxyDelay: hasDelay ? 1 : 0, //mock,
+              proxyNetwork: genesisHash,
+              proxyType
+            }
+          ],
+          createdBlock: '0',
+          createdBlockHash: '0x',
+          createdExtrinsicHash: '0x',
+          createdExtrinsicIndex: 1,
+          creator: '0x',
+          disambiguationIndex: 0,
+          network: genesisHash
+        });
+      } else if (proxied) {
+        setProxyAccount({
+          type: 'account',
+          name: '',
+          address: proxied,
+          delegatees: [
+            {
+              ...delegatee,
+              proxyDelay: hasDelay ? 1 : 0, //mock,
+              proxyNetwork: genesisHash,
+              proxyType
+            }
+          ],
+          createdAt: 0
+        });
+      }
+    });
   }, [genesisHash, hasDelay, isPureProxy, proxied, proxy, proxyType, pureName]);
 
   const fetchFullStructure = async () => {

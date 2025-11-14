@@ -39,39 +39,40 @@ export function useBuildTx(
   transaction?: Transaction | null | undefined
 ): BuildTx {
   const { api } = useApi();
-  const [state, setState] = useState<Record<string, BuildTx>>({});
+  // Initialize state with empty state for proposer-type filterPaths
+  const [state, setState] = useState<Record<string, BuildTx>>(() => {
+    if (filterPath.length > 0 && filterPath.some((item) => item.type === 'proposer')) {
+      const key = filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '');
+
+      return {
+        [key]: { ...EMPTY_STATE, isLoading: false }
+      };
+    }
+
+    return {};
+  });
 
   useEffect(() => {
-    if (filterPath.length > 0) {
-      if (!filterPath.some((item) => item.type === 'proposer')) {
-        const hashSet = new Set<HexString>();
+    if (filterPath.length > 0 && !filterPath.some((item) => item.type === 'proposer')) {
+      const hashSet = new Set<HexString>();
+      const key = filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '');
 
-        const key = filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '');
+      buildTx(api, api.createType('Call', method), filterPath as [FilterPath, ...FilterPath[]], transaction, hashSet)
+        .then(async (bundle) => {
+          const { reserve, unreserve, delay } = await extrinsicReserve(api, bundle.signer, bundle.tx);
 
-        buildTx(api, api.createType('Call', method), filterPath as [FilterPath, ...FilterPath[]], transaction, hashSet)
-          .then(async (bundle) => {
-            const { reserve, unreserve, delay } = await extrinsicReserve(api, bundle.signer, bundle.tx);
-
-            setState((state) => ({
-              ...state,
-              [key]: { isLoading: false, txBundle: bundle, error: null, hashSet, reserve, unreserve, delay }
-            }));
-          })
-          .catch((error) => {
-            console.error(error);
-            setState((state) => ({
-              ...state,
-              [key]: { ...EMPTY_STATE, isLoading: false, error }
-            }));
-          });
-      } else {
-        const key = filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '');
-
-        setState((state) => ({
-          ...state,
-          [key]: { ...EMPTY_STATE, isLoading: false }
-        }));
-      }
+          setState((state) => ({
+            ...state,
+            [key]: { isLoading: false, txBundle: bundle, error: null, hashSet, reserve, unreserve, delay }
+          }));
+        })
+        .catch((error) => {
+          console.error(error);
+          setState((state) => ({
+            ...state,
+            [key]: { ...EMPTY_STATE, isLoading: false, error }
+          }));
+        });
     }
   }, [api, filterPath, method, transaction]);
 

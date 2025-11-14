@@ -4,7 +4,7 @@
 import type { AccountData, AddressMeta } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
-import { groupAccounts, type GroupName } from '@/accounts/utils';
+import { groupAccounts } from '@/accounts/utils';
 import ArrowDownIcon from '@/assets/svg/ArrowDown.svg?react';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconExtension from '@/assets/svg/icon-extension.svg?react';
@@ -73,27 +73,37 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
   const keywordsIsPolkadotAddress = !!keywords && isPolkadotAddress(keywords);
 
-  const [grouped, setGrouped] = useState<Record<GroupName, string[]>>(
-    groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas)
-  );
+  // Derive grouped accounts from keywords filter
+  const grouped = useMemo(() => {
+    if (!keywords) {
+      return groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas);
+    }
 
+    if (isPolkadotAddress(keywords)) {
+      return groupAccounts(
+        accounts.filter((account) => addressEq(account.address, keywords)),
+        hideAccountHex.concat(pinnedAccounts),
+        metas
+      );
+    }
+
+    return groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas, keywords);
+  }, [accounts, hideAccountHex, keywords, metas, pinnedAccounts]);
+
+  // Async search effect for polkadot addresses
   useEffect(() => {
     if (!keywords) {
-      setSearchAccount(undefined);
-      setGrouped(groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas));
+      queueMicrotask(() => {
+        setSearchAccount(undefined);
+      });
 
       return;
     }
 
     if (isPolkadotAddress(keywords)) {
-      setGrouped(
-        groupAccounts(
-          accounts.filter((account) => addressEq(account.address, keywords)),
-          hideAccountHex.concat(pinnedAccounts),
-          metas
-        )
-      );
-      setIsSearching(true);
+      queueMicrotask(() => {
+        setIsSearching(true);
+      });
       service.account
         .getOmniChainDetails(keywords)
         .then((data) => {
@@ -103,10 +113,11 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
           setIsSearching(false);
         });
     } else {
-      setSearchAccount(undefined);
-      setGrouped(groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas, keywords));
+      queueMicrotask(() => {
+        setSearchAccount(undefined);
+      });
     }
-  }, [accounts, hideAccountHex, keywords, metas, pinnedAccounts]);
+  }, [keywords]);
 
   const onSelect = useCallback(
     (address: string) => {

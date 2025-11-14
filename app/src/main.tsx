@@ -82,11 +82,13 @@ initializeAccount(chain, address);
 // Render the main App component with initial configuration
 // StrictMode is enabled in development to help identify potential problems
 const app = (
-  <ApiRoot chain={chain}>
-    <QueryProvider>
-      <RouterProvider router={router} />
-    </QueryProvider>
-  </ApiRoot>
+  <StrictMode>
+    <ApiRoot chain={chain}>
+      <QueryProvider>
+        <RouterProvider router={router} />
+      </QueryProvider>
+    </ApiRoot>
+  </StrictMode>
 );
 
 root.render(import.meta.env.DEV ? <StrictMode>{app}</StrictMode> : app);

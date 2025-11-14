@@ -57,7 +57,7 @@ const handler = (message: NotificationMessage) => {
 };
 
 function SubscribeItem({ address }: { address: HexString }) {
-  const { subscribe, ack, unsubscribe, isConnected, socket } = useSocket();
+  const { subscribe, ack, unsubscribe, isConnected } = useSocket();
 
   useEffect(() => {
     if (isConnected) {
@@ -72,7 +72,7 @@ function SubscribeItem({ address }: { address: HexString }) {
     }
 
     return () => {};
-  }, [ack, address, isConnected, socket, subscribe, unsubscribe]);
+  }, [ack, address, isConnected, subscribe, unsubscribe]);
 
   return null;
 }

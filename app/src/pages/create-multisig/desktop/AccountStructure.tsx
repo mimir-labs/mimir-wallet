@@ -1,13 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AccountData, AddressMeta, MultisigAccountData } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { AddressMetaContext } from '@/accounts/useAccount';
 import { transformAccount } from '@/accounts/useQueryAccount';
 import { AddressOverview } from '@/components';
 import { toastError } from '@/components/utils';
-import { type AccountData, AddressMeta, type MultisigAccountData } from '@/hooks/types';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useEffect, useState } from 'react';
@@ -33,46 +33,48 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
   const [isOpen, toggleOpen] = useToggle(false);
 
   useEffect(() => {
-    const multisigAddress = encodeMultiAddress(members, threshold);
-    const multisigAddressHex = u8aToHex(decodeAddress(multisigAddress));
+    queueMicrotask(() => {
+      const multisigAddress = encodeMultiAddress(members, threshold);
+      const multisigAddressHex = u8aToHex(decodeAddress(multisigAddress));
 
-    const multisigAccount: MultisigAccountData = {
-      type: 'multisig',
-      name: name,
-      members: members.map((member) => ({ type: 'account', address: member, delegatees: [], createdAt: 0 })),
-      address: encodeMultiAddress(members, threshold),
-      threshold: threshold,
-      createdAt: 0,
-      delegatees: []
-    };
-
-    if (isPureProxy) {
-      setMultisigAccount({
-        type: 'pure',
-        isUnknownPure: true,
+      const multisigAccount: MultisigAccountData = {
+        type: 'multisig',
         name: name,
-        address: zeroAddress,
-        createdAt: 0,
-        delegatees: [{ ...multisigAccount, proxyDelay: 0, proxyNetwork: genesisHash, proxyType: 'Any' }],
-        createdBlock: '0',
-        createdBlockHash: '0x',
-        createdExtrinsicHash: '0x',
-        createdExtrinsicIndex: 1,
-        creator: '0x',
-        disambiguationIndex: 0,
-        network: genesisHash
-      });
-    } else {
-      setMultisigAccount(multisigAccount);
-    }
-
-    setOverrideMetas({
-      [multisigAddressHex]: {
-        isMultisig: true,
-        name: name,
+        members: members.map((member) => ({ type: 'account', address: member, delegatees: [], createdAt: 0 })),
+        address: encodeMultiAddress(members, threshold),
         threshold: threshold,
-        who: members
+        createdAt: 0,
+        delegatees: []
+      };
+
+      if (isPureProxy) {
+        setMultisigAccount({
+          type: 'pure',
+          isUnknownPure: true,
+          name: name,
+          address: zeroAddress,
+          createdAt: 0,
+          delegatees: [{ ...multisigAccount, proxyDelay: 0, proxyNetwork: genesisHash, proxyType: 'Any' }],
+          createdBlock: '0',
+          createdBlockHash: '0x',
+          createdExtrinsicHash: '0x',
+          createdExtrinsicIndex: 1,
+          creator: '0x',
+          disambiguationIndex: 0,
+          network: genesisHash
+        });
+      } else {
+        setMultisigAccount(multisigAccount);
       }
+
+      setOverrideMetas({
+        [multisigAddressHex]: {
+          isMultisig: true,
+          name: name,
+          threshold: threshold,
+          who: members
+        }
+      });
     });
   }, [genesisHash, isPureProxy, members, name, threshold]);
 

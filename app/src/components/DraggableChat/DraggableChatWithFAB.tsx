@@ -6,7 +6,7 @@ import { SUGGESTIONS_DISMISSED_KEY } from '@/constants';
 import { events } from '@/events';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
 import { AnimatePresence, motion, useDragControls } from 'framer-motion';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useLocalStore } from '@mimir-wallet/service';
@@ -52,7 +52,8 @@ function DraggableChatWithFAB({
   const chatWindowRef = useRef<DraggableChatWindowRef>(null);
 
   // Define suggestions and randomly select 3: one from each group
-  const suggestions = useMemo(() => {
+  // Use useState with lazy initializer to avoid calling Math.random() during render
+  const [suggestions] = useState<Array<[string, string]>>(() => {
     const allSuggestions: Record<string, string> = {
       'Create a multisig': 'Help me create a new multisig',
       'Initiate a transfer': 'Help me initiate a new transfer',
@@ -76,7 +77,7 @@ function DraggableChatWithFAB({
     const selected = [pickRandom(group1), pickRandom(group2), pickRandom(group3)];
 
     return selected.filter(Boolean) as Array<[string, string]>;
-  }, []); // Empty dependency array means suggestions are selected once when component mounts
+  });
 
   const dragControls = useDragControls();
 

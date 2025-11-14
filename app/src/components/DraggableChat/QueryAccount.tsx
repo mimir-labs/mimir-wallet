@@ -109,7 +109,7 @@ function QueryAccount({ account }: QueryAccountProps) {
       address: p.proposer,
       name: undefined,
       type: 'account' as const,
-      createdAt: Date.now(),
+      createdAt: 0, // Use stable default value instead of Date.now()
       delegatees: [],
       isMimir: false
     })) || [];

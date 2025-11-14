@@ -193,25 +193,13 @@ function HistoryTxOverview({ transaction, ...props }: Props) {
     []
   );
 
-  // Memoize the graph computation with performance monitoring
+  // Memoize the graph computation
   const { layoutedNodes, layoutedEdges } = useMemo(() => {
-    // Performance monitoring in development
-    const startTime = import.meta.env.DEV ? performance.now() : 0;
-
     const initialNodes: Node<NodeData>[] = [];
     const initialEdges: Edge<EdgeData>[] = [];
 
     makeNodes(transaction, initialNodes, initialEdges);
     const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 330, 70);
-
-    // Log performance in development
-    if (import.meta.env.DEV) {
-      const endTime = performance.now();
-
-      console.log(
-        `[HistoryTxOverview] Graph computation took ${(endTime - startTime).toFixed(2)}ms for ${nodes.length} nodes and ${edges.length} edges`
-      );
-    }
 
     return { layoutedNodes: nodes, layoutedEdges: edges };
   }, [transaction]);

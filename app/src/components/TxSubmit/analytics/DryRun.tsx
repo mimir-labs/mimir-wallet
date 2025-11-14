@@ -374,7 +374,10 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
 
   useEffect(() => {
     if (!simulation.isDone && !simulation.isLoading) {
-      handleSimulate();
+      // Use queueMicrotask to avoid setState during effect
+      queueMicrotask(() => {
+        handleSimulate();
+      });
     }
   }, [handleSimulate, simulation]);
 

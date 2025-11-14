@@ -40,27 +40,29 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    setMetas((prevMetas) => {
-      const metas: Record<HexString, AddressMeta> = { ...prevMetas };
+    queueMicrotask(() => {
+      setMetas((prevMetas) => {
+        const metas: Record<HexString, AddressMeta> = { ...prevMetas };
 
-      for (const account of accounts) {
-        deriveAccountMeta(account, metas);
-      }
+        for (const account of accounts) {
+          deriveAccountMeta(account, metas);
+        }
 
-      // add injected accounts to metas
-      for (const account of walletAccounts) {
-        const addressHex = addressToHex(account.address);
+        // add injected accounts to metas
+        for (const account of walletAccounts) {
+          const addressHex = addressToHex(account.address);
 
-        metas[addressHex] = {
-          ...metas[addressHex],
-          isInjected: true,
-          source: account.source,
-          cryptoType: account.type || 'ed25519',
-          name: account.name || metas[addressHex].name || ''
-        } as AddressMeta;
-      }
+          metas[addressHex] = {
+            ...metas[addressHex],
+            isInjected: true,
+            source: account.source,
+            cryptoType: account.type || 'ed25519',
+            name: account.name || metas[addressHex]?.name || ''
+          } as AddressMeta;
+        }
 
-      return metas;
+        return metas;
+      });
     });
   }, [accounts, walletAccounts]);
   // add addresses book to metas

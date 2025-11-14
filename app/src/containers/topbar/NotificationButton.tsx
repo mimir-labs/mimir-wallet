@@ -166,7 +166,11 @@ function NotificationButton() {
   // Trigger shake animation when new unread message arrives
   useEffect(() => {
     if (unreadCount > prevUnreadCountRef.current && !isOpen) {
-      setShouldShake(true);
+      // Use queueMicrotask to avoid setState during effect
+      queueMicrotask(() => {
+        setShouldShake(true);
+      });
+
       // Remove shake class after animation completes
       const timer = setTimeout(() => {
         setShouldShake(false);
@@ -204,7 +208,10 @@ function NotificationButton() {
         markAsRead(id);
       });
       // Clear viewed set after marking as read
-      setViewedNotifications(new Set());
+      // Use queueMicrotask to avoid setState during effect
+      queueMicrotask(() => {
+        setViewedNotifications(new Set());
+      });
     }
   }, [isOpen, viewedNotifications, markAsRead]);
 

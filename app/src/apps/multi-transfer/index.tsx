@@ -1,11 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { MultiTransferData } from './types';
+
 import { useAccount } from '@/accounts/useAccount';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 
 import { type FunctionCallHandler, isFunctionCallArray, toFunctionCallString } from '@mimir-wallet/ai-assistant';
@@ -13,10 +15,8 @@ import { isValidAddress, SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Spinner } from '@mimir-wallet/ui';
 
 import MultiTransferContent from './MultiTransferContent';
-import { MultiTransferData } from './types';
 
 function MultiTransfer() {
-  const navigate = useNavigate();
   const { current } = useAccount();
   const [network, setNetwork] = useInputNetwork();
   const [sending, setSending] = useState(current || '');
@@ -124,7 +124,7 @@ function MultiTransfer() {
       )}
     >
       <div className='mx-auto w-full max-w-[900px] p-4 sm:p-5'>
-        <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
+        <Button onClick={() => window.history.back()} variant='ghost'>
           {'<'} Back
         </Button>
         <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-4 sm:p-5'>

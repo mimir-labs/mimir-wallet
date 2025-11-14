@@ -1,14 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Call } from '@polkadot/types/interfaces';
-import type { FeatureError } from '../shared/error-handling';
-
 import { Input, InputNetwork } from '@/components';
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import React, { useEffect, useImperativeHandle, useState } from 'react';
+import React, { useImperativeHandle, useMemo, useState } from 'react';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
@@ -35,14 +32,10 @@ function CallDataViewerContent({
   setCallData: (value: string) => void;
 }) {
   const { api } = useApi();
-  const [parsedCallData, setParsedCallData] = useState<Call | null>(null);
-  const [callDataError, setCallDataError] = useState<FeatureError | null>(null);
 
-  useEffect(() => {
-    const [call, error] = decodeCallData(api.registry, calldata);
-
-    setParsedCallData(call);
-    setCallDataError(error);
+  // Derive parsed call data and error from registry and calldata
+  const [parsedCallData, callDataError] = useMemo(() => {
+    return decodeCallData(api.registry, calldata);
   }, [api.registry, calldata]);
 
   return (

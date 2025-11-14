@@ -3,9 +3,9 @@
 
 import {
   AccountService,
-  ApiVersion,
+  type ApiVersion,
   AssetService,
-  BaseServiceOptions,
+  type BaseServiceOptions,
   ChainService,
   EmailNotificationService,
   MultisigService,

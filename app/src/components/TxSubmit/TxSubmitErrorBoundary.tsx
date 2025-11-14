@@ -7,7 +7,7 @@ import type { Endpoint } from '@mimir-wallet/polkadot-core';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import Bytes from '@/components/Bytes';
 import Hash from '@/components/Hash';
-import { Component, useEffect, useRef } from 'react';
+import { Component, useEffect, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertDescription, AlertTitle, Button, Card } from '@mimir-wallet/ui';
@@ -213,37 +213,39 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
 // Wrapper component that captures API context and injects it into the error boundary
 function TxSubmitErrorBoundaryWrapper({ children, onError }: Omit<TxSubmitErrorBoundaryProps, 'chainInfo'>) {
   const { api, chain, isApiReady } = useApi();
-  const chainInfoRef = useRef<ChainInfo | null>(null);
+  const [chainInfo, setChainInfo] = useState<ChainInfo | undefined>(undefined);
 
   useEffect(() => {
     if (!isApiReady || !api || !chain) return;
 
-    try {
-      const chainInfo: ChainInfo = {
-        chainInfo: chain,
-        runtimeChainName: api.runtimeChain?.toString(),
-        specName: api.runtimeVersion?.specName?.toString(),
-        specVersion: api.runtimeVersion?.specVersion?.toNumber()
-      };
+    queueMicrotask(() => {
+      try {
+        const newChainInfo: ChainInfo = {
+          chainInfo: chain,
+          runtimeChainName: api.runtimeChain?.toString(),
+          specName: api.runtimeVersion?.specName?.toString(),
+          specVersion: api.runtimeVersion?.specVersion?.toNumber()
+        };
 
-      // Get metadata hash if available
-      if (api.runtimeMetadata) {
-        try {
-          chainInfo.metadataHash = api.runtimeMetadata.hash.toHex();
-          chainInfo.metadata = api.runtimeMetadata.toHex();
-        } catch (e) {
-          console.warn('Failed to get metadata hash:', e);
+        // Get metadata hash if available
+        if (api.runtimeMetadata) {
+          try {
+            newChainInfo.metadataHash = api.runtimeMetadata.hash.toHex();
+            newChainInfo.metadata = api.runtimeMetadata.toHex();
+          } catch (e) {
+            console.warn('Failed to get metadata hash:', e);
+          }
         }
-      }
 
-      chainInfoRef.current = chainInfo;
-    } catch (e) {
-      console.warn('Failed to capture chain info:', e);
-    }
+        setChainInfo(newChainInfo);
+      } catch (e) {
+        console.warn('Failed to capture chain info:', e);
+      }
+    });
   }, [api, chain, isApiReady]);
 
   return (
-    <TxSubmitErrorBoundary onError={onError} chainInfo={chainInfoRef.current || undefined}>
+    <TxSubmitErrorBoundary onError={onError} chainInfo={chainInfo}>
       {children}
     </TxSubmitErrorBoundary>
   );

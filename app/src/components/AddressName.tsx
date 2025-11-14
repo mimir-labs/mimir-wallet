@@ -8,7 +8,7 @@ import type { PalletIdentityJudgement } from '@polkadot/types/lookup';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconIdentity from '@/assets/svg/identity.svg?react';
 import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import {
   addressEq,
@@ -69,25 +69,22 @@ function AddressName({ defaultName, value, meta: propMeta }: Props): React.React
   const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
   const [identity, isFetched, isFetching, identityEnabled] = useDeriveAccountInfo(address);
-  const [chainName, setChainName] = useState<React.ReactNode>(null);
   // Use prop meta if provided, otherwise fetch it (for backward compatibility)
   const { meta: fetchedMeta } = useAddressMeta(propMeta ? undefined : address);
   const meta = propMeta || fetchedMeta;
   const isZeroAddress = useMemo(() => addressEq(zeroAddress, address), [address]);
 
-  // set the actual nickname, local name, accountId
-  useEffect((): void => {
+  // Derive chain name from identity
+  const chainName = useMemo(() => {
     const { display, displayParent, judgements } = identity || {};
 
-    const cacheAddr = address.toString();
-
     if (display && judgements) {
-      setChainName(() => (display ? extractIdentity(cacheAddr, display, judgements, displayParent) : null));
+      const cacheAddr = address.toString();
+
+      return extractIdentity(cacheAddr, display, judgements, displayParent);
     }
 
-    if (!display) {
-      setChainName(null);
-    }
+    return null;
   }, [address, identity]);
 
   const fallbackName = useMemo(() => {

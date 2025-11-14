@@ -10,7 +10,7 @@ import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
 import { useManageProposerFilter } from '@/hooks/useProposeFilter';
 import { accountSource } from '@/wallet/useWallet';
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
@@ -244,4 +244,5 @@ function ProposerSet({ account, refetch }: { account: AccountData; refetch: () =
   );
 }
 
-export default ProposerSet;
+// Memoize component to prevent unnecessary re-renders
+export default memo(ProposerSet);

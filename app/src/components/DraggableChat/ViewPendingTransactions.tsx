@@ -8,7 +8,7 @@ import { useMultichainPendingTransactions, useValidTransactionNetworks } from '@
 import { formatAgo } from '@/utils';
 import { useNavigate } from '@tanstack/react-router';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { getChainIcon, useApi } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Skeleton, Tooltip } from '@mimir-wallet/ui';
@@ -40,12 +40,22 @@ function NetworkIcon({ network }: { network: string }) {
 function TransactionItem({ transaction, address }: { transaction: Transaction; address: string }) {
   const { setNetwork } = useApi();
   const navigate = useNavigate();
-  const now = Date.now();
+  // Use state to track current time for time-ago display
+  const [now, setNow] = useState(() => Date.now());
   const time = transaction.createdAt;
   const { meta } = useAddressMeta(transaction.address);
   const approvals = useMemo(() => {
     return transaction.children.filter((item) => item.status === TransactionStatus.Success).length;
   }, [transaction.children]);
+
+  // Update 'now' every minute to keep time-ago display current
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -6,15 +6,14 @@ import type { AccountData, Transaction } from '@/hooks/types';
 import { reduceAccount } from '@/accounts/utils';
 import { TransactionType } from '@/hooks/types';
 import { useWallet } from '@/wallet/useWallet';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { addressEq } from '@mimir-wallet/polkadot-core';
 
 export function useProposeFilterForRemove(account: AccountData, transaction: Transaction) {
-  const [filtered, setFiltered] = useState<string[]>([]);
   const { walletAccounts } = useWallet();
 
-  useEffect(() => {
+  const filtered = useMemo(() => {
     const addresses: string[] = [];
 
     reduceAccount(account, (account, proxyType, delay) => {
@@ -29,9 +28,9 @@ export function useProposeFilterForRemove(account: AccountData, transaction: Tra
       transaction.type === TransactionType.Propose &&
       walletAccounts.some((item) => addressEq(item.address, transaction.proposer))
     ) {
-      setFiltered(Array.from(new Set(addresses.concat(transaction.proposer))));
+      return Array.from(new Set(addresses.concat(transaction.proposer)));
     } else {
-      setFiltered(Array.from(new Set(addresses)));
+      return Array.from(new Set(addresses));
     }
   }, [account, walletAccounts, transaction.type, transaction.proposer]);
 
@@ -39,10 +38,9 @@ export function useProposeFilterForRemove(account: AccountData, transaction: Tra
 }
 
 export function useManageProposerFilter(account: AccountData) {
-  const [filtered, setFiltered] = useState<string[]>([]);
   const { walletAccounts } = useWallet();
 
-  useEffect(() => {
+  const filtered = useMemo(() => {
     const addresses: string[] = [];
 
     reduceAccount(account, (account, proxyType, delay) => {
@@ -52,21 +50,19 @@ export function useManageProposerFilter(account: AccountData) {
         }
       }
     });
-    setFiltered(Array.from(new Set(addresses)));
+
+    return Array.from(new Set(addresses));
   }, [account, walletAccounts]);
 
   return filtered;
 }
 
 export function useProposersAndMembersFilter(account?: AccountData | null) {
-  const [filtered, setFiltered] = useState<string[]>([]);
   const { walletAccounts } = useWallet();
 
-  useEffect(() => {
+  const filtered = useMemo(() => {
     if (!account) {
-      setFiltered([]);
-
-      return;
+      return [];
     }
 
     const addresses: Set<string> = new Set();
@@ -85,7 +81,7 @@ export function useProposersAndMembersFilter(account?: AccountData | null) {
       }
     });
 
-    setFiltered(Array.from(addresses));
+    return Array.from(addresses);
   }, [account, walletAccounts]);
 
   return filtered;

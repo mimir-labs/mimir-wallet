@@ -3,7 +3,7 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
@@ -45,14 +45,15 @@ export function useBatchSync(
   const syncedIds = useMemo(() => {
     return txs.map((item) => item.relatedBatch).filter((item) => typeof item === 'number');
   }, [txs]);
-  // const [synced, setSynced] = useLocalStore<Record<string, number[]>>(`${BATCH_SYNC_TX_PREFIX}${network}`, {});
-  const [list, setList] = useState<SyncBatchItem[]>([]);
-  const [restoreList, setRestoreList] = useState<SyncBatchItem[]>([]);
 
-  useEffect(() => {
-    setList((data || []).filter((item) => !syncedIds.includes(item.id)));
-    setRestoreList((data || []).filter((item) => syncedIds.includes(item.id)));
-  }, [data, address, syncedIds]);
+  // Derive list and restoreList from data and syncedIds
+  const list = useMemo(() => {
+    return (data || []).filter((item) => !syncedIds.includes(item.id));
+  }, [data, syncedIds]);
+
+  const restoreList = useMemo(() => {
+    return (data || []).filter((item) => syncedIds.includes(item.id));
+  }, [data, syncedIds]);
 
   const restore = useCallback(
     (values: number[]) => {

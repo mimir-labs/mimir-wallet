@@ -3,20 +3,17 @@
 
 import IconAddFill from '@/assets/svg/icon-add-fill.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
+import { useElementWidth } from '@/hooks/useElementWidth';
 import { Link, useNavigate } from '@tanstack/react-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
 
 function CreateMultisig({ onClose }: { onClose?: () => void }) {
   const navigate = useNavigate();
   const ref = useRef<HTMLButtonElement>(null);
-  const [width, setWidth] = useState<number>();
+  const width = useElementWidth(ref);
   const [isOpen, setOpen] = useState(false);
-
-  useEffect(() => {
-    setWidth(ref.current?.clientWidth);
-  }, []);
 
   return (
     <>

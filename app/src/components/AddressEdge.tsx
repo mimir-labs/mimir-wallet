@@ -49,7 +49,7 @@ function AddressEdge({
       backgroundColor: data?.color || '#ffcc00',
       color: data?.color || '#ffcc00'
     }),
-    [targetX, targetY, data?.tips, data?.color]
+    [targetX, targetY, data]
   );
 
   return (

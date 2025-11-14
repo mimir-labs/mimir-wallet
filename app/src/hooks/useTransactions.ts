@@ -7,7 +7,7 @@ import { events } from '@/events';
 import { isEqual } from 'lodash-es';
 import { useEffect, useMemo } from 'react';
 
-import { addressToHex, encodeAddress, type Endpoint, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, allEndpoints, encodeAddress, type Endpoint, useApi } from '@mimir-wallet/polkadot-core';
 import { API_CLIENT_GATEWAY, fetcher, service, useInfiniteQuery, useQueries, useQuery } from '@mimir-wallet/service';
 
 function transformTransaction(chainSS58: number, transaction: Transaction): Transaction {
@@ -251,6 +251,9 @@ export function useValidTransactionNetworks(address?: string | null) {
     const validPendingNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
     const validHistoryNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
 
+    // Create network order mapping based on config.ts
+    const networkOrderMap = new Map(allEndpoints.map((endpoint, index) => [endpoint.key, index]));
+
     Object.entries(transactionCounts || {}).forEach(([network, counts]) => {
       if (counts.pending > 0 && allApis[network]?.chain) {
         validPendingNetworks.push({
@@ -269,9 +272,17 @@ export function useValidTransactionNetworks(address?: string | null) {
       }
     });
 
+    // Sort by config.ts order
+    const sortByConfigOrder = (a: { network: string }, b: { network: string }) => {
+      const orderA = networkOrderMap.get(a.network) ?? Infinity;
+      const orderB = networkOrderMap.get(b.network) ?? Infinity;
+
+      return orderA - orderB;
+    };
+
     return [
-      validPendingNetworks.sort((a, b) => b.counts - a.counts),
-      validHistoryNetworks.sort((a, b) => b.counts - a.counts)
+      validPendingNetworks.filter((item) => networkOrderMap.has(item.network)).sort(sortByConfigOrder),
+      validHistoryNetworks.filter((item) => networkOrderMap.has(item.network)).sort(sortByConfigOrder)
     ];
   }, [allApis, transactionCounts]);
 

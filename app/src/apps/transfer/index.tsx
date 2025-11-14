@@ -106,7 +106,7 @@ function PageTransfer() {
       )}
     >
       <div className='mx-auto w-full max-w-[500px] p-4 sm:p-5'>
-        <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
+        <Button onClick={() => window.history.back()} variant='ghost'>
           {'<'} Back
         </Button>
         <div className='border-secondary bg-content1 shadow-medium mt-4 rounded-[20px] border-1 p-4 sm:p-6'>

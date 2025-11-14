@@ -78,18 +78,21 @@ function useNavigateCallHandler() {
 
   const handler = useCallback<FunctionCallHandler>(
     (event) => {
-      const { path, query, params } = event.arguments as {
+      const { path, query, params, hash } = event.arguments as {
         path: string;
         query?: Record<string, string>;
         params?: Record<string, string>;
+        hash?: string;
       };
 
-      const navParams: { to: string; params?: Record<string, string>; search?: Record<string, string> } = {
-        to: path
-      };
+      const navParams: { to: string; params?: Record<string, string>; search?: Record<string, string>; hash?: string } =
+        {
+          to: path
+        };
 
       if (params) navParams.params = params;
       if (query) navParams.search = query;
+      if (hash) navParams.hash = hash.startsWith('#') ? hash.slice(1) : hash;
 
       navigate(navParams);
     },

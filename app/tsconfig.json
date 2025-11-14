@@ -1,21 +1,13 @@
 {
-  "extends": "@mimir-wallet/dev/tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
   "compilerOptions": {
     "baseUrl": ".",
-    "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "types": [
-      "vite/client",
-      "vitest/globals",
-      "vite-plugin-pwa/client",
-      "vite-plugin-pwa/react",
-      "vite-plugin-svgr/client"
-    ],
     "paths": {
       "@/*": ["./src/*"]
     }
-  },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  }
 }

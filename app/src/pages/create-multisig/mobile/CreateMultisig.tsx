@@ -7,7 +7,6 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Input, InputNetwork } from '@/components';
 import { encodeMultiAddress } from '@polkadot/util-crypto';
-import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Button, Divider, Switch } from '@mimir-wallet/ui';
@@ -37,7 +36,6 @@ function checkError(
 }
 
 function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: (network: string) => void }) {
-  const navigate = useNavigate();
   const [name, setName] = useState<string>('');
 
   const [flexible, setFlexible] = useState(false);
@@ -89,7 +87,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
     <>
       <div className='mx-auto w-full max-w-[500px]'>
         <div className='flex items-center justify-between'>
-          <Button onClick={prepare ? _onFlexibleCancel : () => navigate({ to: '..' })} variant='ghost'>
+          <Button onClick={prepare ? _onFlexibleCancel : () => window.history.back()} variant='ghost'>
             {'<'} Back
           </Button>
           <Prepare onSelect={setPrepare} />
@@ -121,7 +119,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
               <AccountSelect scroll={false} accounts={signatories} onClick={unselect} title='Members' type='delete' />
 
               {threshold === 1 ? (
-                <div className='text-foreground/50 flex h-[14px] max-h-[14px] items-center gap-1 text-xs leading-[14px] font-normal'>
+                <div className='text-foreground/50 flex h-3.5 max-h-3.5 items-center gap-1 text-xs leading-3.5 font-normal'>
                   <IconInfo />
                   All members can initiate transactions.
                 </div>

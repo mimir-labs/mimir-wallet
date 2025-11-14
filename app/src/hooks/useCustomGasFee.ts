@@ -49,7 +49,9 @@ export function useCustomGasFee(network: string) {
       const nativeAsset = feeEligibleAssets.find((asset) => asset.isNative);
 
       if (nativeAsset) {
-        setSelectedAssetId('native');
+        queueMicrotask(() => {
+          setSelectedAssetId('native');
+        });
       }
     }
   }, [feeEligibleAssets, selectedAssetId]);

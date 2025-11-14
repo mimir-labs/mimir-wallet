@@ -9,7 +9,6 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { useWallet } from '@/wallet/useWallet';
-import { useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -17,7 +16,6 @@ import { SubApiRoot } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Spinner } from '@mimir-wallet/ui';
 
 function PageFund() {
-  const navigate = useNavigate();
   const { walletAccounts } = useWallet();
   const { current: receipt } = useAccount();
 
@@ -55,7 +53,7 @@ function PageFund() {
       )}
     >
       <div className='mx-auto w-full max-w-[500px] p-4 sm:p-5'>
-        <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
+        <Button onClick={() => window.history.back()} variant='ghost'>
           {'<'} Back
         </Button>
         <div className='border-secondary bg-content1 shadow-medium mt-4 rounded-[20px] border-1 p-4 sm:p-6'>

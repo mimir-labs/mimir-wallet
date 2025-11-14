@@ -1,14 +1,17 @@
 {
+  "extends": "@mimir-wallet/dev/tsconfig.base.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "composite": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "target": "ES2023",
+    "lib": ["ES2023"],
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "types": ["node"],
     "skipLibCheck": true,
-    "strict": true,
-    "target": "ESNext"
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
   },
-  "include": ["vite.config.ts", "cypress.config.ts"]
+  "include": ["vite.config.ts"]
 }

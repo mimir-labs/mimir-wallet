@@ -10,7 +10,7 @@ import { useTxQueue } from '@/hooks/useTxQueue';
 import { useUpdateAIContext } from '@/hooks/useUpdateAIContext';
 import WalletConsumer from '@/wallet/Consumer';
 import { useWallet } from '@/wallet/useWallet';
-import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { createFileRoute, Navigate, Outlet, useLocation } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
@@ -197,6 +197,7 @@ function AuthenticatedLayout() {
   const { isApiReady } = useApi();
   const { isWalletReady, closeWallet, walletOpen } = useWallet();
   const { current, isMultisigSyned } = useAccount();
+  const { pathname } = useLocation();
   const { queue } = useTxQueue();
   const [, setAlertOpen] = useState<boolean>(true);
 
@@ -209,8 +210,8 @@ function AuthenticatedLayout() {
   // Note: This would ideally be in beforeLoad, but we need the useAccount hook
   if (!current) {
     // Use window.location for redirect since we're not in beforeLoad
-    if (typeof window !== 'undefined' && window.location.pathname !== '/welcome') {
-      window.location.href = '/welcome';
+    if (pathname !== '/welcome') {
+      return <Navigate to='/welcome' replace />;
     }
 
     return null;

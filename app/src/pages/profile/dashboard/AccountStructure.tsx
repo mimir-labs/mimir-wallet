@@ -28,10 +28,10 @@ function Relation({ address, setNetwork }: RelationProps) {
         ref={ref}
         className='xs:h-[calc(100dvh-500px)] bg-content1 border-secondary shadow-medium relative h-[300px] min-h-[360px] w-full rounded-[20px] border-1'
       >
-        <Button variant='light' className='absolute z-[1] inline-flex sm:hidden' onClick={toggleOpen}>
+        <Button variant='light' className='absolute z-1 inline-flex sm:hidden' onClick={toggleOpen}>
           Overview
         </Button>
-        <div className='bg-content1 absolute top-4 right-4 z-[1] w-[200px]'>
+        <div className='bg-content1 absolute top-4 right-4 z-1 w-[200px]'>
           <InputNetwork network={network} setNetwork={setNetwork} />
         </div>
         <AddressOverview key={account?.address || 'none'} account={account} showControls={upSm} showMiniMap={false} />

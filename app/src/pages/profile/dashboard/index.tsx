@@ -3,7 +3,7 @@
 
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import { toastError, toastSuccess } from '@/components/utils';
-import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
+import { useAddressStructureNetworks } from '@/hooks/useAddressStructureNetworks';
 import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useQueryClient } from '@tanstack/react-query';
@@ -22,7 +22,7 @@ import PendingTransactions from './PendingTransactions';
 function Title({ endContent, children }: { endContent?: React.ReactNode; children?: React.ReactNode }) {
   return (
     <div className='mb-[5px] flex items-center justify-between'>
-      <h6 className='leading-[24px]'>{children}</h6>
+      <h6 className='leading-6'>{children}</h6>
       {endContent}
     </div>
   );
@@ -33,8 +33,8 @@ function DashboardV2({ address }: { address: string }) {
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Get supported networks based on address type
-  const supportedNetworks = useAddressSupportedNetworks(address);
+  // Get supported networks based on address structure (delegatees)
+  const supportedNetworks = useAddressStructureNetworks(address);
   const [network, setNetwork] = useInputNetwork(
     undefined,
     supportedNetworks?.map((n) => n.key)

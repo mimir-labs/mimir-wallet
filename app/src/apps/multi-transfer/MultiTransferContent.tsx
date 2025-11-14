@@ -10,7 +10,7 @@ import { Input, InputAddress, InputNetwork, InputToken, TxButton } from '@/compo
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { isValidNumber, parseUnits } from '@/utils';
 import { isHex } from '@polkadot/util';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Chip, Divider } from '@mimir-wallet/ui';
@@ -44,12 +44,11 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
     [setNetwork, setData]
   );
 
-  // Clear invalid asset IDs when data is empty
-  useEffect(() => {
-    if (data.length === 0) {
-      setInvalidAssetIds([]);
-    }
-  }, [data.length]);
+  // Derive invalid asset IDs: empty when data is empty, otherwise use state
+  const effectiveInvalidAssetIds = useMemo(
+    () => (data.length === 0 ? [] : invalidAssetIds),
+    [data.length, invalidAssetIds]
+  );
 
   // Check if all data is valid for batch transfer
   const isDataValid = useMemo(() => {
@@ -218,9 +217,9 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
       </div>
 
       {/* Asset validation alert */}
-      {invalidAssetIds.length > 0 && (
+      {effectiveInvalidAssetIds.length > 0 && (
         <Alert variant='destructive'>
-          <AlertTitle>Token not found. (ID= {invalidAssetIds.join(', ')})</AlertTitle>
+          <AlertTitle>Token not found. (ID= {effectiveInvalidAssetIds.join(', ')})</AlertTitle>
         </Alert>
       )}
 
