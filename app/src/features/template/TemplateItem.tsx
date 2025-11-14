@@ -9,7 +9,7 @@ import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { CopyButton } from '@/components';
 import { DotConsoleApp } from '@/config';
 import { Link } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
@@ -53,20 +53,16 @@ function TemplateItem({
   onView: (name: string, call: HexString) => void;
 }) {
   const { network } = useApi();
-  const [section, setSection] = useState<string | undefined>(undefined);
-  const [method, setMethod] = useState<string | undefined>(undefined);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
 
-  useEffect(() => {
+  // Derive section and method from registry and call
+  const [section, method] = useMemo(() => {
     const result = decodeCallSection(registry, call);
 
-    if (!result) return;
+    if (!result) return [undefined, undefined];
 
-    const [section, method] = result;
-
-    setSection(section);
-    setMethod(method);
+    return result;
   }, [registry, call]);
 
   return (

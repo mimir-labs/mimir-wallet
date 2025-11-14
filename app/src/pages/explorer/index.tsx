@@ -34,21 +34,25 @@ function AppExplorer() {
         }
 
         // Map URLs to components
-        if (_url.startsWith('mimir://app/transfer')) {
-          setElement(createElement(Transfer, props));
-        } else if (_url.startsWith('mimir://app/batch')) {
-          setElement(createElement(Batch, props));
-        } else if (_url.startsWith('mimir://app/multi-transfer')) {
-          setElement(createElement(MultiTransfer, props));
-        } else if (_url.startsWith('mimir://app/submit-calldata')) {
-          setElement(createElement(SubmitCalldata, props));
-        }
+        queueMicrotask(() => {
+          if (_url.startsWith('mimir://app/transfer')) {
+            setElement(createElement(Transfer, props));
+          } else if (_url.startsWith('mimir://app/batch')) {
+            setElement(createElement(Batch, props));
+          } else if (_url.startsWith('mimir://app/multi-transfer')) {
+            setElement(createElement(MultiTransfer, props));
+          } else if (_url.startsWith('mimir://app/submit-calldata')) {
+            setElement(createElement(SubmitCalldata, props));
+          }
+        });
       } else {
-        const apps = [...dapps, ...customApps];
+        queueMicrotask(() => {
+          const apps = [...dapps, ...customApps];
 
-        const app = apps.find((item) => _url.startsWith(item.url));
+          const app = apps.find((item) => _url.startsWith(item.url));
 
-        setElement(<AppFrame url={url} iconUrl={app?.icon} appName={app?.name} />);
+          setElement(<AppFrame url={url} iconUrl={app?.icon} appName={app?.name} />);
+        });
       }
     }
   }, [url]);

@@ -1,15 +1,13 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// Copyright 2023-2024 dev.mimir authors & contributors
-// SPDX-License-Identifier: Apache-2.0
-import type { ReactNode } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconRefresh from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import IconFailedFill from '@/assets/svg/icon-failed-fill.svg?react';
 import IconHome from '@/assets/svg/icon-home.svg?react';
-import { Component, ErrorInfo } from 'react';
+import { Component } from 'react';
 
 import { Button } from '@mimir-wallet/ui';
 

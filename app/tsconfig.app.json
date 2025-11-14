@@ -1,0 +1,30 @@
+{
+  "extends": "@mimir-wallet/dev/tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "types": [
+      "vite/client",
+      "vitest/globals",
+      "vite-plugin-pwa/client",
+      "vite-plugin-pwa/react",
+      "vite-plugin-svgr/client"
+    ],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["src/**/__tests__/**/*", "src/**/*.test.ts", "src/**/*.test.tsx"]
+}

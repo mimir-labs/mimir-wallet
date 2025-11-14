@@ -12,22 +12,26 @@ export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: str
 
   const allApisRef = useRef(allApis);
 
-  allApisRef.current = allApis;
+  useEffect(() => {
+    allApisRef.current = allApis;
+  }, [allApis]);
 
   useEffect(() => {
-    if (mode === 'omni') {
-      if (!supportedNetworks || supportedNetworks.length === 0) {
-        if (!allApisRef.current[network]) {
-          setNetwork(rootNetwork);
-        }
-      } else {
-        if (!supportedNetworks.includes(network)) {
-          const network = supportedNetworks[0];
+    queueMicrotask(() => {
+      if (mode === 'omni') {
+        if (!supportedNetworks || supportedNetworks.length === 0) {
+          if (!allApisRef.current[network]) {
+            setNetwork(rootNetwork);
+          }
+        } else {
+          if (!supportedNetworks.includes(network)) {
+            const network = supportedNetworks[0];
 
-          setNetwork(network);
+            setNetwork(network);
+          }
         }
       }
-    }
+    });
   }, [network, supportedNetworks, mode, rootNetwork]);
 
   useEffect(() => {

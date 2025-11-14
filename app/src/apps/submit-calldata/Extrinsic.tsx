@@ -10,7 +10,7 @@ import { events } from '@/events';
 import { useInput } from '@/hooks/useInput';
 import { Call as CallComp } from '@/params';
 import { useRouter } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Divider } from '@mimir-wallet/ui';
@@ -40,17 +40,14 @@ function Extrinsic({
 }) {
   const { api } = useApi();
   const [callData, setCallData] = useInput('');
-  const [parsedCallData, setParsedCallData] = useState<Call | null>(null);
-  const [callDataError, setCallDataError] = useState<Error | null>(null);
   const [showDetail, setShowDetail] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const [call, error] = decodeCallData(api.registry, callData);
-
-    setParsedCallData(call);
-    setCallDataError(error);
-  }, [api.registry, callData]);
+  // Derive parsed call data and error directly from callData
+  const [parsedCallData, callDataError] = useMemo(
+    () => decodeCallData(api.registry, callData),
+    [api.registry, callData]
+  );
 
   return (
     <div className='mx-auto mt-3 w-full max-w-[500px] p-4 sm:p-5'>

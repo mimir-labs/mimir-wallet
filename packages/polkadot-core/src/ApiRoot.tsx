@@ -21,13 +21,21 @@ function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNo
   const [storeSs58Chain, setStoreSs58Chain] = useLocalStore<string>(DEFAULE_SS58_CHAIN_KEY);
   const [network, setNetwork] = useState(chain.key);
   const networkValues = useMemo(() => {
-    const networkValues = chains[network];
+    let _networkValues = chains[network];
 
-    if (!networkValues) {
-      return Object.values(chains)[0];
+    if (!_networkValues) {
+      _networkValues = Object.values(chains)[0];
     }
 
-    return networkValues;
+    // Sync network state with the actual network from chains
+    // Use queueMicrotask to avoid setState during render
+    if (_networkValues && _networkValues.network !== network) {
+      queueMicrotask(() => {
+        setNetwork(_networkValues.network);
+      });
+    }
+
+    return _networkValues;
   }, [network, chains]);
 
   useEffect(() => {
@@ -66,10 +74,6 @@ function ApiRoot({ chain, children }: { chain: Endpoint; children: React.ReactNo
       }
     };
   }, [mode, chain, networks]);
-
-  useEffect(() => {
-    setNetwork(networkValues.network);
-  }, [networkValues.network]);
 
   const allApis = useMemo(
     () =>

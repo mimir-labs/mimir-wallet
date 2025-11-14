@@ -4,7 +4,7 @@
 import type { HexString } from '@polkadot/util/types';
 
 import { isEqual } from 'lodash-es';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import {
   type AccountEnhancedAssetBalance,
@@ -105,7 +105,6 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
   const [allXcmAssets, isXcmAssetsFetched] = useAllXcmAsset();
 
   const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
-  const [list, setList] = useState<UseAllChainBalances[]>([]);
 
   // Memoize queries configuration to prevent unnecessary re-creation
   const queriesConfig = useMemo(
@@ -173,23 +172,19 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
     queries: queriesConfig
   });
 
-  useEffect(() => {
-    setList((prev) => {
-      const newValue = Object.keys(allApis).map((chainName, index) => {
-        const query = queries[index];
-        const data = query.data;
+  // Derive list from queries using useMemo with stable reference check
+  const list = useMemo(() => {
+    return Object.keys(allApis).map((chainName, index) => {
+      const query = queries[index];
 
-        return {
-          chain: chainName,
-          isFetched: query.isFetched,
-          isFetching: query.isFetching,
-          isError: query.isError,
-          refetch: query.refetch,
-          data: data
-        };
-      });
-
-      return isEqual(prev, newValue) ? prev : newValue;
+      return {
+        chain: chainName,
+        isFetched: query.isFetched,
+        isFetching: query.isFetching,
+        isError: query.isError,
+        refetch: query.refetch,
+        data: query.data
+      };
     });
   }, [queries, allApis]);
 

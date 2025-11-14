@@ -13,7 +13,7 @@ import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -171,6 +171,7 @@ function InputAddress({
   }, [accounts, addresses, chainSS58, excluded, filtered, inputValue, isSign, metas, polkavm, withZeroAddress]);
 
   // Set up virtualizer for efficient list rendering
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: options.length,
     getScrollElement: () => scrollContainerRef.current,

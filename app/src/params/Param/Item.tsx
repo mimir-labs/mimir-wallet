@@ -22,7 +22,7 @@ function Item({ content, name, type = 'horizontal' }: Props) {
 
   return (
     <div className='grid w-full grid-cols-10 gap-2.5 text-xs'>
-      <div className='col-span-2 flex items-center font-bold'>{name}</div>
+      <div className='col-span-2 flex items-center font-bold text-wrap break-all'>{name}</div>
       <div className='text-foreground/65 col-span-8 flex items-center font-bold'>{content}</div>
     </div>
   );

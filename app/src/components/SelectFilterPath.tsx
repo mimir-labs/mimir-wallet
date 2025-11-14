@@ -4,6 +4,7 @@
 import type { FilterPath } from '@/hooks/types';
 
 import IconClock from '@/assets/svg/icon-clock.svg?react';
+import { useElementWidth } from '@/hooks/useElementWidth';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 
@@ -62,6 +63,7 @@ function FilterPathCell({ filterPath }: { filterPath: FilterPath }) {
 
 function SelectFilterPath({ label, filterPaths, value, onChange }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const popoverWidth = useElementWidth(wrapperRef);
   const [isOpen, toggleOpen] = useToggle(false);
 
   const handleSelect = (item: FilterPath) => {
@@ -88,10 +90,7 @@ function SelectFilterPath({ label, filterPaths, value, onChange }: Props) {
             <FilterPathCell filterPath={value} />
           </div>
         </PopoverTrigger>
-        <PopoverContent
-          style={{ width: wrapperRef.current?.clientWidth }}
-          className='border-divider-300 border-1 p-[5px]'
-        >
+        <PopoverContent style={{ width: popoverWidth }} className='border-divider-300 border-1 p-[5px]'>
           {filterPaths.length > 0 ? (
             <div className='text-foreground max-h-[250px] overflow-y-auto'>
               <ul className='flex list-none flex-col'>

@@ -80,36 +80,38 @@ function Content({ address }: { address: string }) {
   };
 
   useEffect(() => {
-    setSelectedPendingNetworks((selectedPendingNetworks) => {
-      if (selectedPendingNetworks.length === 0 && validPendingNetworks.length > 0) {
-        return validPendingNetworks.map(({ network }) => network);
-      } else if (validPendingNetworks.length > 0) {
-        return Array.from(
-          new Set(
-            selectedPendingNetworks
-              .filter((network) => validPendingNetworks.some(({ network: n }) => n === network))
-              .concat(validPendingNetworks.map(({ network }) => network))
-          )
-        );
-      } else {
-        return selectedPendingNetworks;
-      }
-    });
+    queueMicrotask(() => {
+      setSelectedPendingNetworks((selectedPendingNetworks) => {
+        if (selectedPendingNetworks.length === 0 && validPendingNetworks.length > 0) {
+          return validPendingNetworks.map(({ network }) => network);
+        } else if (validPendingNetworks.length > 0) {
+          return Array.from(
+            new Set(
+              selectedPendingNetworks
+                .filter((network) => validPendingNetworks.some(({ network: n }) => n === network))
+                .concat(validPendingNetworks.map(({ network }) => network))
+            )
+          );
+        } else {
+          return selectedPendingNetworks;
+        }
+      });
 
-    setSelectedHistoryNetworks((selectedHistoryNetworks) => {
-      if (selectedHistoryNetworks.length === 0 && validHistoryNetworks.length > 0) {
-        return validHistoryNetworks.map(({ network }) => network).slice(0, 1);
-      } else if (validHistoryNetworks.length > 0) {
-        return Array.from(
-          new Set(
-            selectedHistoryNetworks
-              .filter((network) => validHistoryNetworks.some(({ network: n }) => n === network))
-              .concat(validHistoryNetworks.map(({ network }) => network))
-          )
-        ).slice(0, 1);
-      } else {
-        return selectedHistoryNetworks;
-      }
+      setSelectedHistoryNetworks((selectedHistoryNetworks) => {
+        if (selectedHistoryNetworks.length === 0 && validHistoryNetworks.length > 0) {
+          return validHistoryNetworks.map(({ network }) => network).slice(0, 1);
+        } else if (validHistoryNetworks.length > 0) {
+          return Array.from(
+            new Set(
+              selectedHistoryNetworks
+                .filter((network) => validHistoryNetworks.some(({ network: n }) => n === network))
+                .concat(validHistoryNetworks.map(({ network }) => network))
+            )
+          ).slice(0, 1);
+        } else {
+          return selectedHistoryNetworks;
+        }
+      });
     });
   }, [validPendingNetworks, validHistoryNetworks]);
 

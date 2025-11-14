@@ -10,7 +10,6 @@ import { ONE_DAY, ONE_HOUR } from '@/constants';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useInput } from '@/hooks/useInput';
 import { useProxyTypes } from '@/hooks/useProxyTypes';
-import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -70,7 +69,6 @@ function AddProxy({
   setProxied: (proxied: string | undefined) => void;
 }) {
   const { genesisHash, isApiReady } = useApi();
-  const navigate = useNavigate();
   const { accounts, addresses, current } = useAccount();
 
   // filter accounts by network
@@ -119,7 +117,9 @@ function AddProxy({
 
   useEffect(() => {
     if (!pure && addressEq(proxied, proxy)) {
-      setProxy(undefined);
+      queueMicrotask(() => {
+        setProxy(undefined);
+      });
     }
   }, [proxied, proxy, pure]);
 
@@ -132,7 +132,7 @@ function AddProxy({
     <>
       <div className='mx-auto my-0 w-[500px] max-w-full'>
         <div className='flex items-center justify-between'>
-          <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
+          <Button onClick={() => window.history.back()} variant='ghost'>
             {'<'} Back
           </Button>
         </div>

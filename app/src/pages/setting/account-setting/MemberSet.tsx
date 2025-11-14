@@ -6,7 +6,7 @@ import type { MultisigAccountData, PureAccountData } from '@/hooks/types';
 import { Input, TxButton } from '@/components';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
-import { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
@@ -180,4 +180,5 @@ function MemberSet({
   );
 }
 
-export default MemberSet;
+// Memoize component to prevent unnecessary re-renders
+export default memo(MemberSet);

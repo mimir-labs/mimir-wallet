@@ -6,6 +6,7 @@ import type { PureAccountData } from '@/hooks/types';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { usePendingTransactions } from '@/hooks/useTransactions';
 import { useNavigate } from '@tanstack/react-router';
+import { memo, useCallback, useMemo } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
@@ -14,10 +15,23 @@ import MemberSet from './MemberSet';
 
 function PureMemberSet({ account }: { account: PureAccountData }) {
   const { network } = useApi();
-  const multisigDelegatees = account.delegatees.filter((item) => item.type === 'multisig');
-  const [txs] = usePendingTransactions(network, account.address);
   const navigate = useNavigate();
 
+  // Memoize filtered delegatees to avoid recalculation on every render
+  const multisigDelegatees = useMemo(
+    () => account.delegatees.filter((item) => item.type === 'multisig'),
+    [account.delegatees]
+  );
+
+  // Call hooks unconditionally before any early returns
+  const [txs] = usePendingTransactions(network, account.address);
+
+  // Memoize navigate callback
+  const handleNavigateToTransactions = useCallback(() => {
+    navigate({ to: '/transactions' });
+  }, [navigate]);
+
+  // Early return after all hooks
   if (multisigDelegatees.length === 0) {
     return null;
   }
@@ -35,12 +49,7 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
       </h6>
       <div className='border-secondary bg-content1 shadow-medium rounded-[20px] border-1 p-4 sm:p-5'>
         {txs.length > 0 && (
-          <div
-            className='text-primary mb-5 cursor-pointer font-bold'
-            onClick={() => {
-              navigate({ to: '/transactions' });
-            }}
-          >
+          <div className='text-primary mb-5 cursor-pointer font-bold' onClick={handleNavigateToTransactions}>
             Please process {txs.length} Pending Transaction first
           </div>
         )}
@@ -68,4 +77,5 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
   );
 }
 
-export default PureMemberSet;
+// Memoize component to prevent unnecessary re-renders
+export default memo(PureMemberSet);

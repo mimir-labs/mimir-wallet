@@ -69,6 +69,8 @@ export default defineConfig(({ mode }) => ({
           if (id.includes(join(workspace, 'packages'))) {
             return 'mimir-vendor';
           }
+
+          return undefined;
         }
       }
     }
@@ -76,7 +78,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     tsconfigPaths(),
     tanstackRouter(), // Must be before react()
-    react(),
+    react({ babel: { plugins: ['babel-plugin-react-compiler'] } }),
     svgr({ svgrOptions: { ref: true } }),
     ...(mode === 'test'
       ? []

@@ -5,27 +5,25 @@ import type { TypeDef } from '@polkadot/types/types';
 import type { CallProps } from './types';
 
 import { getTypeDef } from '@polkadot/types';
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 
 import Param from '../Param';
 import Item from '../Param/Item';
 import { mergeClasses } from './utils';
 
 const FunctionArgs = forwardRef<HTMLDivElement | null, CallProps>(({ registry, call, displayType, className }, ref) => {
-  const [args, setArgs] = useState<[string, TypeDef][]>();
-  const [done, setDone] = useState(false);
-
-  useEffect(() => {
+  // Derive args from registry and call
+  const args = useMemo<[string, TypeDef][] | undefined>(() => {
     try {
       const callFunction = registry.findMetaCall(call.callIndex);
 
-      setArgs(callFunction.meta.args.map((item) => [item.name.toString(), getTypeDef(item.type.toString())]));
+      return callFunction.meta.args.map((item) => [item.name.toString(), getTypeDef(item.type.toString())]);
     } catch {
-      /* empty */
+      return undefined;
     }
-
-    setDone(true);
   }, [registry, call]);
+
+  const done = true;
 
   return done ? (
     <div

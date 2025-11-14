@@ -8,7 +8,7 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { useWallet } from '@/wallet/useWallet';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -53,17 +53,23 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
     return foundAsset;
   }, [assetId, assets]);
   const [error, setError] = useState<string | null>(null);
+  const prevOpenRef = useRef(open);
 
   useEffect(() => {
     if (open) enableNetwork(network);
 
-    if (!open) {
-      // reset
-      setError(null);
-      setAmount('');
-      setAssetId('native');
-      toggleKeepAlive(true);
+    // Reset form when dialog closes (transition from true to false)
+    if (prevOpenRef.current && !open) {
+      // Use queueMicrotask to reset state after the effect completes
+      queueMicrotask(() => {
+        setError(null);
+        setAmount('');
+        setAssetId('native');
+        toggleKeepAlive(true);
+      });
     }
+
+    prevOpenRef.current = open;
   }, [enableNetwork, network, open, setAmount, toggleKeepAlive]);
 
   return (

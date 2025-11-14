@@ -20,6 +20,7 @@ interface SocketState {
   isConnected: boolean;
   isReconnecting: boolean;
   error: Error | null;
+  socket: Socket | null;
 }
 
 const SocketProvider = ({
@@ -31,7 +32,8 @@ const SocketProvider = ({
   const [socketState, setSocketState] = useState<SocketState>({
     isConnected: false,
     isReconnecting: false,
-    error: null
+    error: null,
+    socket: null
   });
 
   const socketRef = useRef<Socket | null>(null);
@@ -40,100 +42,6 @@ const SocketProvider = ({
   const updateSocketState = useCallback((updates: Partial<SocketState>) => {
     setSocketState((prev) => ({ ...prev, ...updates }));
   }, []);
-
-  const connect = useCallback(() => {
-    if (socketRef.current?.connected || isConnectingRef.current) {
-      return;
-    }
-
-    console.log('Establishing WebSocket connection...');
-    isConnectingRef.current = true;
-
-    try {
-      const socket = io(url, {
-        path: path,
-        transports: ['websocket'],
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        timeout: 20000
-      });
-
-      socketRef.current = socket;
-
-      socket.on('connect', () => {
-        console.log('WebSocket connected successfully');
-        isConnectingRef.current = false;
-        updateSocketState({
-          isConnected: true,
-          isReconnecting: false,
-          error: null
-        });
-      });
-
-      socket.on('disconnect', (reason: string) => {
-        console.log('WebSocket disconnected:', reason);
-        updateSocketState({ isConnected: false });
-      });
-
-      socket.on('reconnect_attempt', (attemptNumber: number) => {
-        console.log(`WebSocket reconnecting... (attempt ${attemptNumber})`);
-        updateSocketState({ isReconnecting: true });
-      });
-
-      socket.on('reconnect', (attemptNumber: number) => {
-        console.log(`WebSocket reconnected successfully (after ${attemptNumber} attempts)`);
-        updateSocketState({
-          isConnected: true,
-          isReconnecting: false,
-          error: null
-        });
-      });
-
-      socket.on('reconnect_failed', () => {
-        console.error('WebSocket reconnection failed after all attempts');
-        isConnectingRef.current = false;
-        updateSocketState({
-          isReconnecting: false,
-          error: new Error('Failed to reconnect after multiple attempts')
-        });
-      });
-
-      socket.on('connect_error', (error: Error) => {
-        console.error('WebSocket connection error:', error);
-        isConnectingRef.current = false;
-        updateSocketState({ error });
-      });
-
-      socket.on('error', (error: Error) => {
-        console.error('WebSocket error:', error);
-        updateSocketState({ error });
-      });
-    } catch (error) {
-      console.error('Failed to create socket connection:', error);
-      isConnectingRef.current = false;
-      updateSocketState({
-        error: error instanceof Error ? error : new Error('Unknown connection error')
-      });
-    }
-  }, [url, path, updateSocketState]);
-
-  const disconnect = useCallback(() => {
-    const socket = socketRef.current;
-
-    if (socket) {
-      console.log('Disconnecting WebSocket...');
-      socket.disconnect();
-      socketRef.current = null;
-      isConnectingRef.current = false;
-      updateSocketState({
-        isConnected: false,
-        isReconnecting: false,
-        error: null
-      });
-    }
-  }, [updateSocketState]);
 
   const subscribe = useCallback((topic: string) => {
     console.log(`Subscribing to topic: ${topic}`);
@@ -166,14 +74,99 @@ const SocketProvider = ({
   }, []);
 
   useEffect(() => {
-    if (autoConnect) {
-      connect();
+    // External synchronization: Connect to WebSocket when autoConnect is true
+    if (!autoConnect) {
+      return;
     }
 
+    if (socketRef.current?.connected || isConnectingRef.current) {
+      return;
+    }
+
+    console.log('Establishing WebSocket connection...');
+    isConnectingRef.current = true;
+
+    const socket = io(url, {
+      path: path,
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000
+    });
+
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      console.log('WebSocket connected successfully');
+      isConnectingRef.current = false;
+      updateSocketState({
+        isConnected: true,
+        isReconnecting: false,
+        error: null,
+        socket
+      });
+    });
+
+    socket.on('disconnect', (reason: string) => {
+      console.log('WebSocket disconnected:', reason);
+      updateSocketState({ isConnected: false });
+    });
+
+    socket.on('reconnect_attempt', (attemptNumber: number) => {
+      console.log(`WebSocket reconnecting... (attempt ${attemptNumber})`);
+      updateSocketState({ isReconnecting: true });
+    });
+
+    socket.on('reconnect', (attemptNumber: number) => {
+      console.log(`WebSocket reconnected successfully (after ${attemptNumber} attempts)`);
+      updateSocketState({
+        isConnected: true,
+        isReconnecting: false,
+        error: null,
+        socket
+      });
+    });
+
+    socket.on('reconnect_failed', () => {
+      console.error('WebSocket reconnection failed after all attempts');
+      isConnectingRef.current = false;
+      updateSocketState({
+        isReconnecting: false,
+        error: new Error('Failed to reconnect after multiple attempts')
+      });
+    });
+
+    socket.on('connect_error', (error: Error) => {
+      console.error('WebSocket connection error:', error);
+      isConnectingRef.current = false;
+      updateSocketState({ error });
+    });
+
+    socket.on('error', (error: Error) => {
+      console.error('WebSocket error:', error);
+      updateSocketState({ error });
+    });
+
+    // Cleanup: disconnect when component unmounts
     return () => {
-      disconnect();
+      const socket = socketRef.current;
+
+      if (socket) {
+        console.log('Disconnecting WebSocket...');
+        socket.disconnect();
+        socketRef.current = null;
+        isConnectingRef.current = false;
+        updateSocketState({
+          isConnected: false,
+          isReconnecting: false,
+          error: null,
+          socket: null
+        });
+      }
     };
-  }, [autoConnect, connect, disconnect]);
+  }, [autoConnect, url, path, updateSocketState]);
 
   const contextValue = {
     ack,
@@ -182,7 +175,7 @@ const SocketProvider = ({
     isConnected: socketState.isConnected,
     isReconnecting: socketState.isReconnecting,
     error: socketState.error,
-    socket: socketRef.current
+    socket: socketState.socket
   };
 
   return <SocketContext.Provider value={contextValue}>{children}</SocketContext.Provider>;

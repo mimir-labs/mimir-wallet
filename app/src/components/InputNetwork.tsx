@@ -3,7 +3,8 @@
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
-import clsx from 'clsx';
+import { useElementWidth } from '@/hooks/useElementWidth';
+import { clsx } from 'clsx';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
@@ -46,6 +47,8 @@ function OmniChainInputNetwork({
   const { allApis } = useApi();
   const { networks } = useNetworks();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const popoverWidth = useElementWidth(wrapperRef, 200);
+
   const [isOpen, toggleOpen] = useToggle(false);
   const options = networks
     .filter((item) => (showAllNetworks ? true : !!allApis[item.key]))
@@ -125,10 +128,7 @@ function OmniChainInputNetwork({
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent
-          style={{ width: wrapperRef.current?.clientWidth, minWidth: 200 }}
-          className='border-divider-300 border-1 p-[5px]'
-        >
+        <PopoverContent style={{ width: popoverWidth, minWidth: 200 }} className='border-divider-300 border-1 p-[5px]'>
           {options.length > 0 ? (
             <div autoFocus className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
               <ul className={clsx('flex list-none flex-col')}>

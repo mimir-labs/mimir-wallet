@@ -9,10 +9,10 @@ import { usePinAccounts } from '@/hooks/usePinAccounts';
 import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
 import { Link } from '@tanstack/react-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { Button, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@mimir-wallet/ui';
+import { Button, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
 
 import AddressCell from '../AddressCell';
 
@@ -34,22 +34,22 @@ function AccountCell({
   const { isLocalAccount, deleteAddress, hideAccount, addAddressBook } = useAccount();
   const [totalUsd] = useBalanceTotalUsd(value);
   const source = useAccountSource(value);
-  const [formatUsd, setFormatUsd] = useState<React.ReactNode>(<Skeleton className='h-4 w-16 rounded-[5px]' />);
 
-  useEffect(() => {
+  // Derive formatted USD display from totalUsd
+  const formatUsd = useMemo(() => {
     if (!totalUsd) {
-      setFormatUsd(<div className='text-xs font-bold whitespace-nowrap'>$ 0</div>);
-    } else {
-      const formatUsd = formatDisplay(totalUsd.toString());
-
-      setFormatUsd(
-        <div className='text-xs font-bold whitespace-nowrap'>
-          $ {formatUsd[0]}
-          {formatUsd[1] ? `.${formatUsd[1]}` : ''}
-          {formatUsd[2] || ''}
-        </div>
-      );
+      return <div className='text-xs font-bold whitespace-nowrap'>$ 0</div>;
     }
+
+    const formattedParts = formatDisplay(totalUsd.toString());
+
+    return (
+      <div className='text-xs font-bold whitespace-nowrap'>
+        $ {formattedParts[0]}
+        {formattedParts[1] ? `.${formattedParts[1]}` : ''}
+        {formattedParts[2] || ''}
+      </div>
+    );
   }, [totalUsd]);
   const { pinnedAccounts, addPinnedAccount, removePinnedAccount } = usePinAccounts();
 

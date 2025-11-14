@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2021",
+    "target": "esnext",
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "jsx": "react-jsx",
@@ -8,6 +8,8 @@
     "declaration": true,
     "isolatedModules": true,
     "strict": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -20,6 +22,7 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "noUncheckedSideEffectImports": true,
     "customConditions": ["@mimir-wallet/source"]
   }
 }

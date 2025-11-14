@@ -15,7 +15,7 @@ import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
 import { formatDisplay } from '@/utils';
 import { Link } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
@@ -46,8 +46,19 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
   const [open, toggleOpen] = useToggle(false);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [account] = useQueryAccount(address);
+  const [days, setDays] = useState<string | number>('--');
 
-  const days = account ? Math.ceil((Date.now() - account.createdAt) / (ONE_DAY * 1000)) : '--';
+  // Calculate days in useEffect to avoid calling Date.now() during render
+  useEffect(() => {
+    queueMicrotask(() => {
+      if (account) {
+        setDays(Math.ceil((Date.now() - account.createdAt) / (ONE_DAY * 1000)));
+      } else {
+        setDays('--');
+      }
+    });
+  }, [account]);
+
   const formatUsd = formatDisplay(totalUsd.toString());
 
   const showAddWatchlistButton = useMemo(
@@ -99,7 +110,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
     <>
       <div className='border-secondary bg-content1 shadow-medium relative flex h-auto w-full flex-col items-start justify-between gap-[5px] rounded-[20px] border-1 p-4 sm:p-5 md:h-[210px]'>
         <Button
-          className='absolute top-4 right-4 flex rotate-0 !transition-transform !duration-300 hover:rotate-180'
+          className='absolute top-4 right-4 flex rotate-0 transition-transform! duration-300! hover:rotate-180'
           asChild
           isIconOnly
           variant='solid'
@@ -121,7 +132,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
           <span
             data-up={changes > 0}
             data-down={changes < 0}
-            className='data-[up]:text-success data-[down]:text-danger text-secondary mr-[5px]'
+            className='data-up:text-success data-down:text-danger text-secondary mr-[5px]'
           >
             {changes > 0 ? '+' : ''}
             {(changes * 100).toFixed(2)}%

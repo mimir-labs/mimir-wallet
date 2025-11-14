@@ -1,10 +1,10 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ReactNode } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { Component, ErrorInfo } from 'react';
+import { Component } from 'react';
 
 interface ErrorBoundaryProps {
   children: ReactNode;

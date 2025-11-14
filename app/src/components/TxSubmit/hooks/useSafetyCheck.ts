@@ -18,65 +18,69 @@ export function useSafetyCheck(call: IMethod) {
   useEffect(() => {
     const section = api.registry.findMetaCall(call.callIndex).section;
 
-    if (
-      [
-        'system',
-        'scheduler',
-        'preimage',
-        'babe',
-        'timestamp',
-        'indices',
-        'balances',
-        'staking',
-        'session',
-        'grandpa',
-        'treasury',
-        'convictionVoting',
-        'referenda',
-        'whitelist',
-        'parameters',
-        'claims',
-        'vesting',
-        'bounties',
-        'childBounties',
-        'electionProviderMultiPhase',
-        'voterList',
-        'nominationPools',
-        'fastUnstake',
-        'configuration',
-        'initializer',
-        'hrmp',
-        'parasDisputes',
-        'parasSlashing',
-        'onDemand',
-        'registrar',
-        'slots',
-        'auctions',
-        'crowdloan',
-        'coretime',
-        'stateTrieMigration',
-        'messageQueue',
-        'assetRate',
-        'beefy',
-        'paraSudoWrapper',
-        'sudo'
-      ].includes(section)
-    ) {
-      setConfirm(true);
-      setSafetyCheck({
-        severity: 'none',
-        title: 'Success',
-        message: 'This transaction is safe to execute.'
-      });
-    } else {
-      service.chain.safetyCheck(network, call.toHex()).then((level) => {
-        if (level.severity === 'none') {
-          setConfirm(true);
-        }
+    // Use Promise for both sync and async paths to avoid setState in effect
+    const checkSafety = () => {
+      if (
+        [
+          'system',
+          'scheduler',
+          'preimage',
+          'babe',
+          'timestamp',
+          'indices',
+          'balances',
+          'staking',
+          'session',
+          'grandpa',
+          'treasury',
+          'convictionVoting',
+          'referenda',
+          'whitelist',
+          'parameters',
+          'claims',
+          'vesting',
+          'bounties',
+          'childBounties',
+          'electionProviderMultiPhase',
+          'voterList',
+          'nominationPools',
+          'fastUnstake',
+          'configuration',
+          'initializer',
+          'hrmp',
+          'parasDisputes',
+          'parasSlashing',
+          'onDemand',
+          'registrar',
+          'slots',
+          'auctions',
+          'crowdloan',
+          'coretime',
+          'stateTrieMigration',
+          'messageQueue',
+          'assetRate',
+          'beefy',
+          'paraSudoWrapper',
+          'sudo'
+        ].includes(section)
+      ) {
+        return Promise.resolve({
+          severity: 'none',
+          title: 'Success',
+          message: 'This transaction is safe to execute.'
+        } as SafetyLevel);
+      } else {
+        return service.chain.safetyCheck(network, call.toHex());
+      }
+    };
 
-        setSafetyCheck(level);
-      });
-    }
+    checkSafety().then((level) => {
+      if (level.severity === 'none') {
+        setConfirm(true);
+      }
+
+      setSafetyCheck(level);
+    });
   }, [api, call, network, setConfirm]);
 
   return [safetyCheck, isConfirm, setConfirm] as const;

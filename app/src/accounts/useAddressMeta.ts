@@ -4,7 +4,7 @@
 import type { AddressMeta } from '@/hooks/types';
 
 import { toastError } from '@/components/utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
@@ -24,18 +24,21 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
   const addressHex = useMemo(() => (value ? addressToHex(value) : '0x'), [value]);
   const _meta = metas[addressHex];
 
-  const [meta, setMeta] = useState<AddressMeta>(_meta || {});
-  const [name, setName] = useState<string>(meta.name || '');
+  // Derive meta directly from _meta - no need for state
+  const meta = _meta || {};
 
-  useEffect(() => {
-    if (_meta) {
-      setMeta(_meta);
-      setName(_meta.name || '');
-    } else {
-      setMeta({});
-      setName('');
+  // Name is editable state, initialized from meta.name
+  const [name, setName] = useState<string>(() => _meta?.name || '');
+  const [prevAddressHex, setPrevAddressHex] = useState<string>(addressHex);
+
+  // When address changes, reset the name to the new address's name
+  if (prevAddressHex !== addressHex) {
+    setPrevAddressHex(addressHex);
+
+    if (name !== (_meta?.name || '')) {
+      setName(_meta?.name || '');
     }
-  }, [_meta]);
+  }
 
   const saveName = useCallback(
     async (isAddressBook: boolean, cb?: (name: string) => void) => {

@@ -4,7 +4,7 @@
 import type { AccountData } from '@/hooks/types';
 
 import { useAccount } from '@/accounts/useAccount';
-import { groupAccounts, type GroupName } from '@/accounts/utils';
+import { groupAccounts } from '@/accounts/utils';
 import { analyticsActions } from '@/analytics';
 import Logo from '@/assets/images/logo.png';
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
@@ -14,7 +14,7 @@ import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { formatDisplay } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 
 import { addressEq, isPolkadotAddress, useNetworks } from '@mimir-wallet/polkadot-core';
@@ -103,24 +103,33 @@ function Accounts({
   const { connectedWallets, openWallet } = useWallet();
   const isConnected = Object.keys(connectedWallets).length > 0;
   const { accounts, metas } = useAccount();
-  const [grouped, setGrouped] = useState<Record<GroupName, string[]>>(groupAccounts(accounts, [], metas));
 
+  // Derive grouped accounts from keywords, accounts, and metas
+  const grouped = useMemo(() => {
+    if (!keywords) {
+      return groupAccounts(accounts, [], metas);
+    }
+
+    if (isPolkadotAddress(keywords)) {
+      return groupAccounts(
+        accounts.filter((account) => addressEq(account.address, keywords)),
+        [],
+        metas
+      );
+    }
+
+    return groupAccounts(accounts, [], metas, keywords);
+  }, [accounts, keywords, metas]);
+
+  // Handle async search for omnichain details
   useEffect(() => {
     if (!keywords) {
       setSearchAccount(undefined);
-      setGrouped(groupAccounts(accounts, [], metas));
 
       return;
     }
 
     if (isPolkadotAddress(keywords)) {
-      setGrouped(
-        groupAccounts(
-          accounts.filter((account) => addressEq(account.address, keywords)),
-          [],
-          metas
-        )
-      );
       setIsSearching(true);
       service.account
         .getOmniChainDetails(keywords)
@@ -132,9 +141,8 @@ function Accounts({
         });
     } else {
       setSearchAccount(undefined);
-      setGrouped(groupAccounts(accounts, [], metas, keywords));
     }
-  }, [accounts, keywords, metas, setIsSearching, setSearchAccount]);
+  }, [keywords, setIsSearching, setSearchAccount]);
 
   const description = (
     <p className='text-xs'>

@@ -6,15 +6,12 @@ import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { CONNECT_ORIGIN } from '@/constants';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { useAccountSource, useWallet } from '@/wallet/useWallet';
-import { enableWallet } from '@/wallet/utils';
-import { GenericExtrinsic } from '@polkadot/types';
-import React, { forwardRef, useCallback, useState } from 'react';
+import { useWallet } from '@/wallet/useWallet';
+import React, { forwardRef, useCallback } from 'react';
 
-import { signAndSend, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, type ButtonProps, buttonSpinner } from '@mimir-wallet/ui';
+import { useApi } from '@mimir-wallet/polkadot-core';
+import { Button, type ButtonProps } from '@mimir-wallet/ui';
 
 import { toastError } from './utils';
 
@@ -70,12 +67,10 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
     },
     ref
   ) => {
-    const { api, network } = useApi();
+    const { network } = useApi();
     const { addQueue } = useTxQueue();
     const { walletAccounts } = useWallet();
     const address = accountId || transaction?.address || walletAccounts.at(0)?.address;
-    const source = useAccountSource(address);
-    const [loading, setLoading] = useState(false);
     const handleClick = useCallback(() => {
       if (getCall) {
         const call = getCall();
@@ -86,54 +81,26 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
           return;
         }
 
-        if (source) {
-          setLoading(true);
-
-          const events = signAndSend(
-            api,
-            api.tx(
-              api.registry.createType(
-                'Call',
-                typeof call === 'string' ? call : call instanceof GenericExtrinsic ? call.method.toU8a() : call.toU8a()
-              )
-            ),
-            address,
-            () => enableWallet(source, CONNECT_ORIGIN),
-            { beforeSend }
-          );
-
-          events.on('inblock', () => {
-            onDone?.();
-            setLoading(false);
-          });
-          events.on('error', (error: any) => {
-            setLoading(false);
-            onError?.(error);
-            toastError(error);
-          });
-        } else {
-          addQueue({
-            accountId: address,
-            transaction: transaction || undefined,
-            call,
-            website,
-            appName,
-            iconUrl,
-            filterPaths,
-            relatedBatches,
-            onResults: (result) => onResults?.(result),
-            beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
-            network,
-            onError
-          });
-          onDone?.();
-        }
+        addQueue({
+          accountId: address,
+          transaction: transaction || undefined,
+          call,
+          website,
+          appName,
+          iconUrl,
+          filterPaths,
+          relatedBatches,
+          onResults: (result) => onResults?.(result),
+          beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
+          network,
+          onError
+        });
+        onDone?.();
       }
     }, [
       getCall,
       onDone,
       address,
-      source,
       addQueue,
       transaction,
       website,
@@ -143,14 +110,13 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
       relatedBatches,
       network,
       onError,
-      api,
       onResults,
       beforeSend
     ]);
 
     return (
-      <Button {...props} ref={ref} disabled={loading || disabled} onClick={overrideAction || handleClick}>
-        {loading ? buttonSpinner : startContent}
+      <Button {...props} ref={ref} disabled={disabled} onClick={overrideAction || handleClick}>
+        {startContent}
         {children}
         {endContent}
       </Button>

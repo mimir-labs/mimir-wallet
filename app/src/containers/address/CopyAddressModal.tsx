@@ -12,7 +12,7 @@ import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { groupNetworksByChain } from '@/utils/networkGrouping';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useMemo, useRef } from 'react';
 import { useEffectOnce } from 'react-use';
 import { toast } from 'sonner';
 
@@ -118,16 +118,16 @@ function CopyAddressModal() {
   const { networks } = useNetworks();
   const { ss58Chain } = useApi();
   const upMd = useMediaQuery('md');
-  const [groupedEndpoints, setGroupedEndpoints] = useState<Record<string, Network[]>>({});
   const { meta } = useAddressMeta(address);
   const [showAll, setShowAll] = useLocalStore(SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY, false);
 
-  useEffect(() => {
-    if (isOpen) {
-      const grouped = groupNetworksByChain(networks, showAll, ss58Chain);
-
-      setGroupedEndpoints(grouped);
+  // Derive grouped endpoints from networks, showAll, and ss58Chain
+  const groupedEndpoints = useMemo(() => {
+    if (!isOpen) {
+      return {};
     }
+
+    return groupNetworksByChain(networks, showAll, ss58Chain);
   }, [isOpen, networks, showAll, ss58Chain]);
 
   if (!isOpen || !address) {

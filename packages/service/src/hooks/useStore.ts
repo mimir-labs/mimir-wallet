@@ -25,18 +25,22 @@ export function useStore<T>(
 ): [T | undefined, (value: T | ((value: T) => T)) => void] {
   const defaultValueRef = useRef(defaultValue);
   const ref = useRef<BaseStore>(isSession ? session : store);
-  const [value, setValue] = useState<T | undefined>(
-    key ? (ref.current.get(key) as T) || defaultValueRef.current : defaultValueRef.current
+  // Use lazy initializer to avoid accessing ref during render
+  const [value, setValue] = useState<T | undefined>(() =>
+    key ? ((isSession ? session : store).get(key) as T) || defaultValue : defaultValue
   );
   const latestValue = useRef<T | undefined>(value);
 
-  latestValue.current = value;
-  defaultValueRef.current = defaultValue;
+  // Update refs in useEffect to avoid accessing during render
+  useEffect(() => {
+    latestValue.current = value;
+    defaultValueRef.current = defaultValue;
+  });
 
   useEffect(() => {
-    setValue(key ? (ref.current.get(key) as T) || defaultValueRef.current : defaultValueRef.current);
     const store = ref.current;
 
+    // Subscribe to store changes (external synchronization)
     const onChange = (_key: string, _: unknown, newValue: unknown) => {
       if (key && key === _key) {
         setValue((value) => {

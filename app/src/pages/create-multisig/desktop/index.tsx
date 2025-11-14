@@ -8,7 +8,6 @@ import { StepIndicator } from '@/components';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useWizardState } from '@/hooks/useWizardState';
-import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -44,7 +43,6 @@ const STEPS = [
 
 function DesktopCreateMultisig() {
   const { addAddress } = useAccount();
-  const navigate = useNavigate();
   const [staticOpen, toggleStaticOpen] = useToggle(false);
   const [isSuccess, toggleSuccess] = useToggle(false);
   const [completedAddress, setCompletedAddress] = useState<string | null>(null);
@@ -139,7 +137,7 @@ function DesktopCreateMultisig() {
       ) : (
         <div className='mx-auto flex w-full max-w-[800px] flex-col gap-5'>
           <div className='flex items-center justify-between'>
-            <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
+            <Button onClick={() => window.history.back()} variant='ghost'>
               {'<'} Back
             </Button>
             <Prepare onSelect={setPrepare} />

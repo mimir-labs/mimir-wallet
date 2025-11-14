@@ -14,7 +14,7 @@ import { useProxies } from '@/hooks/useProxies';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { BN_ZERO } from '@polkadot/util';
 import { Link as RouterLink } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useToggle } from 'react-use';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
@@ -260,4 +260,5 @@ function ProxySet({ address }: { address: string }) {
   );
 }
 
-export default ProxySet;
+// Memoize component to prevent unnecessary re-renders
+export default memo(ProxySet);

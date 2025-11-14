@@ -8,7 +8,6 @@ import { StepIndicator } from '@/components';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useWizardState } from '@/hooks/useWizardState';
-import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -48,7 +47,6 @@ const STEPS = [
 
 function PageAddProxy({ pure }: { pure?: boolean }) {
   const { current } = useAccount();
-  const navigate = useNavigate();
 
   // Network and API setup
   const [network, setNetwork] = useInputNetwork();
@@ -204,7 +202,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
     >
       <div className='mx-auto flex w-full max-w-[800px] flex-col gap-5'>
         <div className='flex items-center justify-between'>
-          <Button onClick={() => navigate({ to: '..' })} variant='ghost'>
+          <Button onClick={() => window.history.back()} variant='ghost'>
             {'<'} Back
           </Button>
         </div>

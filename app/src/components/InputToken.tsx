@@ -5,8 +5,9 @@ import type { AccountEnhancedAssetBalance } from '@mimir-wallet/polkadot-core';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { useChainBalances } from '@/hooks/useChainBalances';
+import { useElementWidth } from '@/hooks/useElementWidth';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
@@ -50,11 +51,14 @@ function InputToken({
   const [allBalances, isFetched, isFetching] = useChainBalances(network, address, { alwaysIncludeNative: true });
   const [allAssets] = useChainXcmAsset(network);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const popoverWidth = useElementWidth(wrapperRef);
   const [isOpen, toggleOpen] = useToggle(false);
   const [value, setValue] = useState<string>(identifier || defaultIdentifier || '');
   const onChangeRef = useRef(onChange);
 
-  onChangeRef.current = onChange;
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   const options = useMemo((): AccountEnhancedAssetBalance[] => {
     return allBalances || [];
@@ -74,7 +78,9 @@ function InputToken({
 
   useEffect(() => {
     if (isControl.current) {
-      setValue(identifier || '');
+      queueMicrotask(() => {
+        setValue(identifier || '');
+      });
     }
   }, [identifier]);
 
@@ -156,10 +162,7 @@ function InputToken({
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent
-          style={{ width: wrapperRef.current?.clientWidth }}
-          className='border-divider-300 border-1 p-[5px]'
-        >
+        <PopoverContent style={{ width: popoverWidth }} className='border-divider-300 border-1 p-[5px]'>
           {options.length > 0 ? (
             <div className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
               <ul className={clsx('flex list-none flex-col')}>
