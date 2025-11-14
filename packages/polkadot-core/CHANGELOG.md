@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.37.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.36.0...polkadot-core-v2.37.0) (2025-11-14)
+
+
+### Features
+
+* Add submit transaction support for eoa account ([#342](https://github.com/mimir-labs/mimir-wallet/issues/342)) ([ac7738c](https://github.com/mimir-labs/mimir-wallet/commit/ac7738c32dbff36e179869bc3748fa41197f7b93))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.37.0
+
 ## [2.36.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.35.0...polkadot-core-v2.36.0) (2025-11-10)
 
 
