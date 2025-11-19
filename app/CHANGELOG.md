@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.37.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.37.0...mimir-wallet-app-v2.37.1) (2025-11-19)
+
+
+### Bug Fixes
+
+* Fixed the issue where the wallet connection pop-up would not appear in welcome page. ([#344](https://github.com/mimir-labs/mimir-wallet/issues/344)) ([ac575c9](https://github.com/mimir-labs/mimir-wallet/commit/ac575c97862927dead3d207e9d3a8ff08e5a31fb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.37.1
+    * @mimir-wallet/service bumped to 2.37.1
+    * @mimir-wallet/ui bumped to 2.37.1
+
 ## [2.37.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.36.0...mimir-wallet-app-v2.37.0) (2025-11-14)
 
 
