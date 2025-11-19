@@ -59,8 +59,6 @@
   },
   "devDependencies": {
     "@mimir-wallet/service": "workspace:^",
-    "@polkadot/extension-base": "^0.62.3",
-    "@polkadot/extension-inject": "^0.62.3",
     "@tailwindcss/cli": "^4.1.16",
     "@types/react-syntax-highlighter": "^15",
     "npm-run-all2": "^7.0.2",

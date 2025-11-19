@@ -1,30 +1,27 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConnectWalletModal, ToastRoot, TxSubmit, TxToast } from '@/components';
-import { DraggableChatWithFAB } from '@/components/DraggableChat';
+import type { LayoutOptions } from '@/router';
+
+import { TxSubmit } from '@/components';
 import { MigrationAlert } from '@/features/assethub-migration';
 import { useAIFunctionCall } from '@/hooks/useAIFunctionCall';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { useUpdateAIContext } from '@/hooks/useUpdateAIContext';
-import WalletConsumer from '@/wallet/Consumer';
 import { useWallet } from '@/wallet/useWallet';
-import { createFileRoute, Navigate, Outlet, useLocation } from '@tanstack/react-router';
+import { createFileRoute, Navigate, Outlet, useLocation, useMatches } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 
 import { useApi } from '@mimir-wallet/polkadot-core';
 import { SidebarProvider } from '@mimir-wallet/ui';
 
 import { useAccount } from '../accounts/useAccount';
-import AddAddressBook from '../containers/AddAddressBook';
 import { AddressModalsProvider } from '../containers/address';
 import { CSS_VARS, layoutHelpers } from '../containers/constants';
 import CookieConsent from '../containers/CookieConsent';
 import Initializing from '../containers/Initializing';
-import OmniChainUpgradeTip from '../containers/OmniChainUpgradeTip';
 import { AppSidebar, RightSideBar } from '../containers/sidebar';
-import SubscribeNotification from '../containers/SubscribeNotification';
 import ToggleAlert from '../containers/ToggleAlert';
 import TopBar from '../containers/topbar';
 import Version from '../containers/Version';
@@ -54,27 +51,13 @@ const shouldShowMainContent = (
   return skipConnect || (isApiReady && isWalletReady && isMultisigSyned);
 };
 
-// Global modals and components
-const GlobalModalsAndComponents = () => (
-  <>
-    <ToastRoot />
-    <TxToast />
-    <WalletConsumer />
-    <AddAddressBook />
-    <OmniChainUpgradeTip />
-    <SubscribeNotification />
-    <DraggableChatWithFAB />
-  </>
-);
-
 // Top section component (TopBar + Alert)
 interface TopSectionProps {
-  hideTopBar?: boolean;
   current: string | null | undefined;
   setAlertOpen: (open: boolean) => void;
 }
 
-const TopSection = ({ hideTopBar, current, setAlertOpen }: TopSectionProps) => {
+const TopSection = ({ current, setAlertOpen }: TopSectionProps) => {
   const handleSetAlertOpen = useCallback(
     (open: boolean) => {
       setAlertOpen(open);
@@ -82,8 +65,6 @@ const TopSection = ({ hideTopBar, current, setAlertOpen }: TopSectionProps) => {
     [setAlertOpen]
   );
   const [, setAlertCounts] = useState<number>(0);
-
-  if (hideTopBar) return null;
 
   return (
     <>
@@ -114,11 +95,10 @@ const TransactionOverlay = ({ queue }: TransactionOverlayProps) => {
 // Content area component
 interface ContentAreaProps {
   withPadding: boolean;
-  hideTopBar?: boolean;
   isTransactionActive: boolean;
 }
 
-const ContentArea = ({ withPadding, hideTopBar, isTransactionActive }: ContentAreaProps) => {
+const ContentArea = ({ withPadding, isTransactionActive }: ContentAreaProps) => {
   const contentStyle: React.CSSProperties = {
     display: isTransactionActive ? 'none' : 'flex',
     padding: withPadding ? undefined : 0
@@ -134,30 +114,26 @@ const ContentArea = ({ withPadding, hideTopBar, isTransactionActive }: ContentAr
         <Outlet />
       </div>
 
-      {!hideTopBar && (
-        <div style={versionStyle}>
-          <Version />
-        </div>
-      )}
+      <div style={versionStyle}>
+        <Version />
+      </div>
     </div>
   );
 };
 
 // Main content component
 interface MainContentProps {
-  hideSideBar?: boolean;
-  hideTopBar?: boolean;
   withPadding: boolean;
   queue: any[];
 }
 
-const MainContent = ({ hideSideBar, hideTopBar, withPadding, queue }: MainContentProps) => {
+const MainContent = ({ withPadding, queue }: MainContentProps) => {
   const contentHeight = layoutHelpers.getContentHeight();
   const isTransactionActive = queue.length > 0;
 
   return (
     <div className='z-0 flex w-full flex-1' style={{ minHeight: contentHeight }}>
-      {!hideSideBar && <AppSidebar />}
+      <AppSidebar />
 
       <main
         className='relative flex flex-1 flex-col'
@@ -165,7 +141,7 @@ const MainContent = ({ hideSideBar, hideTopBar, withPadding, queue }: MainConten
           background: 'var(--color-main-bg)'
         }}
       >
-        <ContentArea withPadding={withPadding} hideTopBar={hideTopBar} isTransactionActive={isTransactionActive} />
+        <ContentArea withPadding={withPadding} isTransactionActive={isTransactionActive} />
 
         <TransactionOverlay queue={queue} />
 
@@ -173,29 +149,28 @@ const MainContent = ({ hideSideBar, hideTopBar, withPadding, queue }: MainConten
         <CookieConsent />
       </main>
 
-      {!hideSideBar && <RightSideBar />}
+      <RightSideBar />
     </div>
   );
 };
 
-interface AuthenticatedLayoutOptions {
-  skipConnect?: boolean;
-  hideSideBar?: boolean;
-  hideTopBar?: boolean;
-  withPadding?: boolean;
-}
-
 function AuthenticatedLayout() {
-  // Get layout options from route context (will be set by child routes)
-  const {
-    skipConnect = false,
-    withPadding = true,
-    hideSideBar = false,
-    hideTopBar = false
-  } = {} as AuthenticatedLayoutOptions; // TODO: Get from route context
+  // Get layout options from matched routes (set by child routes via beforeLoad)
+  const matches = useMatches();
+
+  // Find the deepest route that has layoutOptions in its context
+  const matchWithOptions = [...matches].reverse().find((match) => (match.context as any)?.layoutOptions !== undefined);
+
+  const layoutOptions = matchWithOptions
+    ? ((matchWithOptions.context as any)?.layoutOptions as LayoutOptions)
+    : undefined;
+
+  console.log(layoutOptions);
+
+  const { skipConnect = false, withPadding = true } = layoutOptions || {};
 
   const { isApiReady } = useApi();
-  const { isWalletReady, closeWallet, walletOpen } = useWallet();
+  const { isWalletReady } = useWallet();
   const { current, isMultisigSyned } = useAccount();
   const { pathname } = useLocation();
   const { queue } = useTxQueue();
@@ -227,12 +202,6 @@ function AuthenticatedLayout() {
 
   return (
     <>
-      {/* Wallet Connection Modal */}
-      <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
-
-      {/* Global Modals and Components */}
-      <GlobalModalsAndComponents />
-
       {/* Address Modals Provider */}
       <AddressModalsProvider />
 
@@ -241,11 +210,11 @@ function AuthenticatedLayout() {
         style={sidebarProviderStyle}
       >
         {/* Top Section: TopBar + Alert */}
-        <TopSection hideTopBar={hideTopBar} current={current} setAlertOpen={setAlertOpen} />
+        <TopSection current={current} setAlertOpen={setAlertOpen} />
 
         {/* Main Content or Initialization */}
         {showMainContent ? (
-          <MainContent hideSideBar={hideSideBar} hideTopBar={hideTopBar} withPadding={withPadding} queue={queue} />
+          <MainContent withPadding={withPadding} queue={queue} />
         ) : (
           <div className='flex flex-1 items-center justify-center'>
             <Initializing />
