@@ -22,6 +22,19 @@ const settingSearchSchema = z.object({
 
 export const Route = createFileRoute('/_authenticated/setting')({
   validateSearch: settingSearchSchema,
+  beforeLoad: ({ search }) => {
+    // Skip connection checks for general settings
+    // - type=general with tabs=network: network configuration (no wallet needed)
+    // - type=general with other tabs or no tabs: general settings (no wallet needed)
+    // Account settings (type=account) require full connection
+    const shouldSkipConnect = search.type === 'general';
+
+    return {
+      layoutOptions: {
+        skipConnect: shouldSkipConnect
+      }
+    };
+  },
   staticData: {
     title: 'Setting'
   } as RouteMetadata,

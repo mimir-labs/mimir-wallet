@@ -7,18 +7,23 @@ import { createRouter } from '@tanstack/react-router';
 import { routeTree } from './routeTree.gen';
 
 /**
+ * Layout Options Type
+ *
+ * Defines the layout configuration options that can be set by individual routes
+ */
+export interface LayoutOptions {
+  skipConnect?: boolean;
+  withPadding?: boolean;
+}
+
+/**
  * Router Context Type
  *
  * Defines the shape of the context available to all routes
  */
 export interface RouterContext {
-  // Authentication state
-  current: string | null | undefined;
-
-  // Initialization state
-  isApiReady: boolean;
-  isWalletReady: boolean;
-  isMultisigSyned: boolean;
+  // Layout configuration (set by child routes via beforeLoad)
+  layoutOptions?: LayoutOptions;
 }
 
 /**
@@ -31,12 +36,7 @@ export interface RouterContext {
  */
 export const router = createRouter({
   routeTree,
-  context: {
-    current: undefined,
-    isApiReady: false,
-    isWalletReady: false,
-    isMultisigSyned: false
-  } as RouterContext,
+  context: {} as RouterContext,
   defaultPreload: 'intent',
   defaultPreloadDelay: 100
 });

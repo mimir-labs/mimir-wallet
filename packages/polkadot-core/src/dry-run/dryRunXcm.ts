@@ -168,7 +168,7 @@ async function processXcmLocation(
   if (exists) {
     chainApi = exists;
   } else {
-    [chainApi] = await createApi(Object.values(chain.wsUrl), chain.key, chain.httpUrl);
+    [chainApi] = await createApi(Object.values(chain.wsUrl), chain.key);
   }
 
   await chainApi.isReady;
@@ -240,7 +240,7 @@ async function executeXcmMessages(
           });
         } else if (executionResult.isIncomplete) {
           const err = executionResult.asIncomplete;
-          const xcmError = assetXcmV5TraitsError(err.error);
+          const xcmError = assetXcmV5TraitsError(err.error.error);
 
           logXcmOperation('Execution Incomplete', { error: xcmError.message }, 'warn');
 

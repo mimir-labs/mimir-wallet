@@ -1,7 +1,11 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ConnectWalletModal, ToastRoot, TxToast } from '@/components';
+import { DraggableChatWithFAB } from '@/components/DraggableChat';
 import { WalletConnectProvider } from '@/features/wallet-connect';
+import WalletConsumer from '@/wallet/Consumer';
+import { useWallet } from '@/wallet/useWallet';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRoute, Outlet, retainSearchParams, useRouter } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
@@ -12,11 +16,32 @@ import { TransactionSocketProvider } from '@mimir-wallet/service';
 import { HeroUIProvider } from '@mimir-wallet/ui';
 
 import AccountConsumer from '../accounts/Consumer';
+import AddAddressBook from '../containers/AddAddressBook';
+import OmniChainUpgradeTip from '../containers/OmniChainUpgradeTip';
+import SubscribeNotification from '../containers/SubscribeNotification';
 
 const searchSchema = z.looseObject({
   address: z.string().optional(),
   network: z.string().optional()
 });
+
+// Global modals and components
+const GlobalModalsAndComponents = () => {
+  const { closeWallet, walletOpen } = useWallet();
+
+  return (
+    <>
+      <ToastRoot />
+      <TxToast />
+      <WalletConsumer />
+      <AddAddressBook />
+      <OmniChainUpgradeTip />
+      <SubscribeNotification />
+      <DraggableChatWithFAB />
+      <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
+    </>
+  );
+};
 
 /**
  * Root Route Component
@@ -63,6 +88,7 @@ function RootComponent() {
         <WalletConnectProvider>
           <TransactionSocketProvider path='/notification-push'>
             <Outlet />
+            <GlobalModalsAndComponents />
             {import.meta.env.DEV && <TanStackRouterDevtools />}
             {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
           </TransactionSocketProvider>

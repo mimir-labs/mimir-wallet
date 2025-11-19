@@ -26,6 +26,14 @@ const explorerSearchSchema = z.object({
 
 export const Route = createFileRoute('/_authenticated/explorer/$url')({
   validateSearch: explorerSearchSchema,
+  beforeLoad: () => {
+    // Explorer needs full-screen layout without padding
+    return {
+      layoutOptions: {
+        withPadding: false
+      }
+    };
+  },
   staticData: {
     getTitle: ({ params }) => {
       const appUrl = params?.url;
