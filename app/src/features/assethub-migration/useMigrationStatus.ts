@@ -22,6 +22,7 @@ interface MigrationNetwork {
   destChain: string;
   block?: number;
   status: 'pending' | 'completed';
+  updatedAt: string;
 }
 
 export function useMigrationStatus(chain: string, isComplete: boolean): MigrationStatus {
@@ -53,7 +54,11 @@ export function useMigrationNetworks() {
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     queryFn: async () => {
-      return service.chain.getMigrationStatus();
+      return service.chain
+        .getMigrationStatus()
+        .then((list: MigrationNetwork[]) =>
+          list.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+        );
     }
   });
 }

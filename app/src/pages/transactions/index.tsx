@@ -1,13 +1,17 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useAccountMeta } from '@/accounts/useAccountMeta';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { analyticsActions } from '@/analytics';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { useValidTransactionNetworks } from '@/hooks/useTransactions';
+import { getChainsWithSubscanSupport } from '@/utils/networkGrouping';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { lazy, Suspense, useEffect, useMemo, useState, useTransition } from 'react';
+
+import { useApi } from '@mimir-wallet/polkadot-core';
 
 const routeApi = getRouteApi('/_authenticated/transactions/');
 
@@ -30,6 +34,7 @@ import {
 // Lazy load transaction list components for better code splitting
 const HistoryTransactions = lazy(() => import('./HistoryTransactions'));
 const PendingTransactions = lazy(() => import('./PendingTransactions'));
+const AllHistoryTransactions = lazy(() => import('./AllHistoryTransactions'));
 
 // Loading fallback for transaction lists
 function TransactionListFallback() {
@@ -46,10 +51,30 @@ function Content({ address }: { address: string }) {
   const status = search.status;
   const txId = search.tx_id;
 
+  const { allApis } = useApi();
+  const meta = useAccountMeta(address);
   const [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] = useValidTransactionNetworks(address);
+
+  // Show All History tab only for non-multisig and non-pure accounts
+  const showAllHistoryTab = useMemo(() => {
+    return !meta?.isMultisig && !meta?.isPure;
+  }, [meta]);
   const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<string[]>([]);
   const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<string[]>([]);
+  const [selectedAllHistoryNetwork, setSelectedAllHistoryNetwork] = useState<string | undefined>(undefined);
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
+
+  // Get chains with Subscan support for All History tab
+  const subscanChains = useMemo(() => {
+    const chainsWithSubscan = getChainsWithSubscanSupport();
+
+    return chainsWithSubscan
+      .filter((chain) => allApis[chain.key]) // Only show enabled chains
+      .map((chain) => ({
+        network: chain.key,
+        chain
+      }));
+  }, [allApis]);
 
   const [, startTransition] = useTransition();
   const selectedPendingNetwork = useMemo(() => {
@@ -68,7 +93,7 @@ function Content({ address }: { address: string }) {
   }, [status]); // Only run once on mount
 
   const handleStatusChange = (key: string | number) => {
-    const newStatus = key.toString() as 'pending' | 'history';
+    const newStatus = key.toString() as 'pending' | 'history' | 'all-history';
 
     // Wrap navigation in transition for non-blocking UI updates
     startTransition(() => {
@@ -115,10 +140,19 @@ function Content({ address }: { address: string }) {
     });
   }, [validPendingNetworks, validHistoryNetworks]);
 
+  // Initialize all-history network selection
+  useEffect(() => {
+    if (!selectedAllHistoryNetwork && subscanChains.length > 0) {
+      queueMicrotask(() => {
+        setSelectedAllHistoryNetwork(subscanChains[0].network);
+      });
+    }
+  }, [selectedAllHistoryNetwork, subscanChains]);
+
   return (
     <div className='space-y-5'>
-      <div className='flex items-center justify-between gap-2'>
-        <div className='flex-1'>
+      <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='w-full sm:flex-1'>
           <Tabs
             color='primary'
             aria-label='Transaction'
@@ -133,117 +167,184 @@ function Content({ address }: { address: string }) {
           >
             <Tab key='pending' title='Pending' />
             <Tab key='history' title='History' />
+            {showAllHistoryTab && <Tab key='all-history' title='All History' />}
           </Tabs>
         </div>
 
-        {status === 'pending' && (
-          <>
-            <Checkbox size='sm' isSelected={showDiscarded} onValueChange={setShowDiscarded}>
-              <span className='flex items-center gap-1'>Discarded Transactions({discardedCounts})</span>
-            </Checkbox>
-            <Tooltip
-              content={
-                <div>
-                  These transactions have now been discarded due to Assethub Migration.
-                  <br />
-                  You can re-initiate them on Assethub.
-                  <br />
-                  <b>Deposit has been refunded to your account on Assethub.</b>
-                </div>
-              }
-            >
-              <IconQuestion className='text-primary' />
-            </Tooltip>
-          </>
-        )}
+        <div className='flex items-center justify-between gap-2'>
+          {status === 'pending' && (
+            <span className='inline-flex items-center gap-2'>
+              <Checkbox size='sm' isSelected={showDiscarded} onValueChange={setShowDiscarded}>
+                <span className='flex items-center gap-1'>Discarded Transactions({discardedCounts})</span>
+              </Checkbox>
+              <Tooltip
+                content={
+                  <div>
+                    These transactions have now been discarded due to Assethub Migration.
+                    <br />
+                    You can re-initiate them on Assethub.
+                    <br />
+                    <b>Deposit has been refunded to your account on Assethub.</b>
+                  </div>
+                }
+              >
+                <IconQuestion className='text-primary' />
+              </Tooltip>
+            </span>
+          )}
 
-        {status === 'pending' &&
-          validPendingNetworks.length > 0 &&
-          (validPendingNetworks.length > 1 ? (
-            <DropdownMenu open={pendingDropdownOpen} onOpenChange={setPendingDropdownOpen}>
-              <DropdownMenuTrigger asChild>
-                <Button radius='md' variant='bordered' className='border-divider-300 h-8 text-inherit'>
-                  <Avatar src={selectedPendingNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
-                  {selectedPendingNetworks.length > 1 ? (
-                    <>
-                      {selectedPendingNetwork?.chain.name} and other {selectedPendingNetworks.length - 1}
-                    </>
-                  ) : (
-                    selectedPendingNetwork?.chain.name
-                  )}
-                  <ArrowDown className='h-4 w-4' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
-                {validPendingNetworks.map(({ network, chain, counts }) => (
-                  <DropdownMenuCheckboxItem
-                    key={network}
-                    checked={selectedPendingNetworks.includes(network)}
-                    onSelect={(e) => e.preventDefault()}
-                    onCheckedChange={(checked) => {
-                      // Wrap network selection in transition for non-blocking updates
-                      startTransition(() => {
-                        if (checked) {
-                          setSelectedPendingNetworks([...selectedPendingNetworks, network]);
-                        } else {
-                          const remaining = selectedPendingNetworks.filter((n) => n !== network);
-
-                          if (remaining.length > 0) {
-                            setSelectedPendingNetworks(remaining);
-                          }
-                        }
-                      });
-                    }}
-                    className='h-8'
+          {status === 'pending' &&
+            validPendingNetworks.length > 0 &&
+            (validPendingNetworks.length > 1 ? (
+              <DropdownMenu open={pendingDropdownOpen} onOpenChange={setPendingDropdownOpen}>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    radius='md'
+                    variant='bordered'
+                    className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
                   >
-                    <Avatar src={chain.icon} className='mr-2 h-4 w-4 bg-transparent' />
-                    {chain.name}({counts})
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button radius='md' variant='bordered' className='border-divider-300 h-8 text-inherit'>
-              <Avatar src={validPendingNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
-              {validPendingNetworks[0].chain.name}({validPendingNetworks[0].counts})
-            </Button>
-          ))}
-        {status === 'history' &&
-          validHistoryNetworks.length > 0 &&
-          (validHistoryNetworks.length > 1 ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button radius='md' variant='bordered' className='border-divider-300 h-8 text-inherit'>
-                  <Avatar src={selectedHistoryNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
-                  {selectedHistoryNetwork?.chain.name}({selectedHistoryNetwork?.counts})
-                  <ArrowDown className='h-4 w-4' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
-                <DropdownMenuRadioGroup
-                  value={selectedHistoryNetworks[0]}
-                  onValueChange={(value) => {
-                    // Wrap network selection in transition for non-blocking updates
-                    startTransition(() => {
-                      setSelectedHistoryNetworks([value]);
-                    });
-                  }}
-                >
-                  {validHistoryNetworks.map(({ network, chain, counts }) => (
-                    <DropdownMenuRadioItem key={network} value={network} className='h-8'>
+                    <Avatar src={selectedPendingNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
+                    {selectedPendingNetworks.length > 1 ? (
+                      <>
+                        {selectedPendingNetwork?.chain.name} and other {selectedPendingNetworks.length - 1}
+                      </>
+                    ) : (
+                      selectedPendingNetwork?.chain.name
+                    )}
+                    <ArrowDown className='h-4 w-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
+                  {validPendingNetworks.map(({ network, chain, counts }) => (
+                    <DropdownMenuCheckboxItem
+                      key={network}
+                      checked={selectedPendingNetworks.includes(network)}
+                      onSelect={(e) => e.preventDefault()}
+                      onCheckedChange={(checked) => {
+                        // Wrap network selection in transition for non-blocking updates
+                        startTransition(() => {
+                          if (checked) {
+                            setSelectedPendingNetworks([...selectedPendingNetworks, network]);
+                          } else {
+                            const remaining = selectedPendingNetworks.filter((n) => n !== network);
+
+                            if (remaining.length > 0) {
+                              setSelectedPendingNetworks(remaining);
+                            }
+                          }
+                        });
+                      }}
+                      className='h-8'
+                    >
                       <Avatar src={chain.icon} className='mr-2 h-4 w-4 bg-transparent' />
                       {chain.name}({counts})
-                    </DropdownMenuRadioItem>
+                    </DropdownMenuCheckboxItem>
                   ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button radius='md' variant='bordered' className='border-divider-300 h-8 text-inherit'>
-              <Avatar src={validHistoryNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
-              {validHistoryNetworks[0].chain.name}({validHistoryNetworks[0].counts})
-            </Button>
-          ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                radius='md'
+                variant='bordered'
+                className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+              >
+                <Avatar src={validPendingNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
+                {validPendingNetworks[0].chain.name}({validPendingNetworks[0].counts})
+              </Button>
+            ))}
+          {status === 'history' &&
+            validHistoryNetworks.length > 0 &&
+            (validHistoryNetworks.length > 1 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    radius='md'
+                    variant='bordered'
+                    className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                  >
+                    <Avatar src={selectedHistoryNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
+                    {selectedHistoryNetwork?.chain.name}({selectedHistoryNetwork?.counts})
+                    <ArrowDown className='h-4 w-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
+                  <DropdownMenuRadioGroup
+                    value={selectedHistoryNetworks[0]}
+                    onValueChange={(value) => {
+                      // Wrap network selection in transition for non-blocking updates
+                      startTransition(() => {
+                        setSelectedHistoryNetworks([value]);
+                      });
+                    }}
+                  >
+                    {validHistoryNetworks.map(({ network, chain, counts }) => (
+                      <DropdownMenuRadioItem key={network} value={network} className='h-8'>
+                        <Avatar src={chain.icon} className='mr-2 h-4 w-4 bg-transparent' />
+                        {chain.name}({counts})
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                radius='md'
+                variant='bordered'
+                className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+              >
+                <Avatar src={validHistoryNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
+                {validHistoryNetworks[0].chain.name}({validHistoryNetworks[0].counts})
+              </Button>
+            ))}
+          {showAllHistoryTab &&
+            status === 'all-history' &&
+            subscanChains.length > 0 &&
+            (subscanChains.length > 1 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    radius='md'
+                    variant='bordered'
+                    className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                  >
+                    <Avatar
+                      src={subscanChains.find((c) => c.network === selectedAllHistoryNetwork)?.chain.icon}
+                      className='h-4 w-4 bg-transparent'
+                    />
+                    {subscanChains.find((c) => c.network === selectedAllHistoryNetwork)?.chain.name}
+                    <ArrowDown className='h-4 w-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
+                  <DropdownMenuRadioGroup
+                    value={selectedAllHistoryNetwork}
+                    onValueChange={(value) => {
+                      // Wrap network selection in transition for non-blocking updates
+                      startTransition(() => {
+                        setSelectedAllHistoryNetwork(value);
+                      });
+                    }}
+                  >
+                    {subscanChains.map(({ network, chain }) => (
+                      <DropdownMenuRadioItem key={network} value={network} className='h-8'>
+                        <Avatar src={chain.icon} className='mr-2 h-4 w-4 bg-transparent' />
+                        {chain.name}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                radius='md'
+                variant='bordered'
+                className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+              >
+                <Avatar src={subscanChains[0].chain.icon} className='h-4 w-4 bg-transparent' />
+                {subscanChains[0].chain.name}
+              </Button>
+            ))}
+        </div>
       </div>
 
       {status === 'pending' && (
@@ -267,6 +368,16 @@ function Content({ address }: { address: string }) {
             network={selectedHistoryNetworks.at(0)}
             address={address}
             txId={txId}
+          />
+        </Suspense>
+      )}
+      {showAllHistoryTab && status === 'all-history' && (
+        <Suspense fallback={<TransactionListFallback />}>
+          <AllHistoryTransactions
+            isFetched={isFetched}
+            isFetching={isFetching}
+            network={selectedAllHistoryNetwork}
+            address={address}
           />
         </Suspense>
       )}

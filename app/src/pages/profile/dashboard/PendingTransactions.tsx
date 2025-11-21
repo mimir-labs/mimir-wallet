@@ -186,7 +186,7 @@ function PendingTransactions({ address }: { address: string }) {
               }}
             >
               <TableCell>
-                <div className='flex items-center gap-[5px] text-nowrap'>
+                <div className='flex min-w-max items-center gap-[5px] text-nowrap'>
                   <AppName
                     website={item.website}
                     iconSize={16}

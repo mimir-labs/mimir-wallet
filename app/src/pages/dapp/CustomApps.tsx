@@ -4,7 +4,7 @@
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import { DappCell } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
-import { useToggle } from 'react-use';
+import { useMedia, useToggle } from 'react-use';
 
 import { Button } from '@mimir-wallet/ui';
 
@@ -12,11 +12,12 @@ import AddCustomApp from './AddCustomApp';
 
 function CustomApps() {
   const [isOpen, toggleOpen] = useToggle(false);
-  const { customApps, addFavorite, removeFavorite, isFavorite } = useDapps();
+  const { customApps, removeCustom } = useDapps();
+  const isMobile = useMedia('(max-width: 768px)');
 
   return (
     <>
-      <div className='grid grid-cols-[repeat(auto-fill,_minmax(258px,1fr))] gap-6'>
+      <div className={isMobile ? 'flex flex-col gap-4' : 'grid grid-cols-[repeat(auto-fill,minmax(258px,1fr))] gap-6'}>
         <div
           key='add-custom-app'
           className='bg-content1 border-secondary shadow-medium relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-5 rounded-[20px] border-1 p-5'
@@ -33,9 +34,8 @@ function CustomApps() {
           <DappCell
             key={app.id}
             supportedChains={true}
-            addFavorite={addFavorite}
-            isFavorite={isFavorite}
-            removeFavorite={removeFavorite}
+            onDelete={removeCustom}
+            variant={isMobile ? 'mobile' : 'default'}
             {...app}
             icon={app.icon || ''}
           />

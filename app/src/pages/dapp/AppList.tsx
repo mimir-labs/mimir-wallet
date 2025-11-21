@@ -3,12 +3,14 @@
 
 import { DappCell } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
+import { useMedia } from 'react-use';
 
 function AppList() {
   const { addFavorite, dapps, isFavorite, removeFavorite } = useDapps();
+  const isMobile = useMedia('(max-width: 768px)');
 
   return (
-    <div className='grid grid-cols-[repeat(auto-fill,_minmax(258px,1fr))] gap-6'>
+    <div className={isMobile ? 'flex flex-col gap-4' : 'grid grid-cols-[repeat(auto-fill,_minmax(258px,1fr))] gap-6'}>
       {dapps.map((dapp) => {
         return (
           <DappCell
@@ -16,6 +18,7 @@ function AppList() {
             addFavorite={addFavorite}
             isFavorite={isFavorite}
             removeFavorite={removeFavorite}
+            variant={isMobile ? 'mobile' : 'default'}
             {...dapp}
           />
         );

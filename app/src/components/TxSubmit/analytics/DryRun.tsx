@@ -8,19 +8,18 @@ import { FormatBalance } from '@/components';
 import CopyButton from '@/components/CopyButton';
 import { findToken } from '@/config';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import {
   addressEq,
   type BalanceChange,
   dryRun,
   dryRunWithXcm,
-  getChainIcon,
   SubApiRoot,
   useApi,
   useNetworks
 } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Spinner } from '@mimir-wallet/ui';
+import { Avatar, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
 
 const EMPTY_SIMULATION = {
   isDone: false,
@@ -69,48 +68,52 @@ function OperationItem({
           {type}
           {getActionEmoji()}
         </div>
-        {assetId === 'native' ? (
-          <NativeToken genesisHash={genesisHash} amount={amount} />
-        ) : (
-          <AssetToken genesisHash={genesisHash} assetId={assetId} amount={amount} />
-        )}
+        {assetId === 'native' ? <NativeToken amount={amount} /> : <AssetToken assetId={assetId} amount={amount} />}
       </div>
     </SubApiRoot>
   );
 }
 
-function NativeToken({ genesisHash, amount }: { genesisHash: HexString; amount: bigint }) {
-  const { api } = useApi();
+function NativeToken({ amount }: { amount: bigint }) {
+  const { api, chain, genesisHash } = useApi();
   const symbol = api.registry.chainTokens[0] || 'Native';
   const decimals = api.registry.chainDecimals[0] || 1;
   const icon = findToken(genesisHash).Icon;
-  const chainIcon = useMemo(() => getChainIcon(genesisHash)?.icon, [genesisHash]);
 
   return (
-    <span>
-      <FormatBalance
-        className='gap-[5px]'
-        icon={
-          <div className='relative'>
-            <Avatar alt={symbol} style={{ width: 16, height: 16 }} src={icon} />
-            <Avatar
-              className='absolute right-0 bottom-0 border-1 border-black'
-              style={{ width: 8, height: 8 }}
-              src={chainIcon}
-            />
-          </div>
-        }
-        withCurrency
-        value={amount > 0n ? amount : -amount}
-        format={[decimals, symbol]}
-      />
-    </span>
+    <Tooltip
+      content={
+        <span className='inline-flex items-center'>
+          {symbol} on&nbsp;
+          <img src={chain.icon} className='h-4 w-4' />
+          &nbsp;{chain.name}
+        </span>
+      }
+    >
+      <span>
+        <FormatBalance
+          className='gap-[5px]'
+          icon={
+            <div className='relative'>
+              <Avatar alt={symbol} style={{ width: 16, height: 16 }} src={icon} />
+              <Avatar
+                className='absolute right-0 bottom-0 border-1 border-black'
+                style={{ width: 8, height: 8 }}
+                src={chain.icon}
+              />
+            </div>
+          }
+          withCurrency
+          value={amount > 0n ? amount : -amount}
+          format={[decimals, symbol]}
+        />
+      </span>
+    </Tooltip>
   );
 }
 
-function AssetToken({ genesisHash, assetId, amount }: { genesisHash: HexString; assetId: string; amount: bigint }) {
-  const { network } = useApi();
-  const chainIcon = useMemo(() => getChainIcon(genesisHash)?.icon, [genesisHash]);
+function AssetToken({ assetId, amount }: { assetId: string; amount: bigint }) {
+  const { network, chain } = useApi();
   const [assetInfo] = useXcmAsset(network, assetId);
 
   if (!assetInfo) {
@@ -118,28 +121,38 @@ function AssetToken({ genesisHash, assetId, amount }: { genesisHash: HexString; 
   }
 
   return (
-    <span>
-      <FormatBalance
-        icon={
-          <div className='relative'>
-            <Avatar
-              alt={assetInfo?.symbol}
-              fallback={assetInfo?.symbol.slice(0, 1)}
-              style={{ width: 16, height: 16 }}
-              src={assetInfo?.logoUri}
-            />
-            <Avatar
-              className='absolute right-0 bottom-0 border-1 border-black'
-              style={{ width: 8, height: 8 }}
-              src={chainIcon}
-            />
-          </div>
-        }
-        withCurrency
-        value={amount > 0n ? amount : -amount}
-        format={[assetInfo.decimals, assetInfo.symbol || 'UNKNOWN']}
-      />
-    </span>
+    <Tooltip
+      content={
+        <span className='inline-flex items-center'>
+          {assetInfo.symbol} on&nbsp;
+          <img src={chain.icon} className='h-4 w-4' />
+          &nbsp;{chain.name}
+        </span>
+      }
+    >
+      <span>
+        <FormatBalance
+          icon={
+            <div className='relative'>
+              <Avatar
+                alt={assetInfo?.symbol}
+                fallback={assetInfo?.symbol.slice(0, 1)}
+                style={{ width: 16, height: 16 }}
+                src={assetInfo?.logoUri}
+              />
+              <Avatar
+                className='absolute right-0 bottom-0 border-1 border-black'
+                style={{ width: 8, height: 8 }}
+                src={chain.icon}
+              />
+            </div>
+          }
+          withCurrency
+          value={amount > 0n ? amount : -amount}
+          format={[assetInfo.decimals, assetInfo.symbol || 'UNKNOWN']}
+        />
+      </span>
+    </Tooltip>
   );
 }
 

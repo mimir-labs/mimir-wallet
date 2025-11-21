@@ -209,7 +209,7 @@ export function useBalanceTotalUsd(address?: string): [number, number] {
       if (chainBalance.data) {
         for (const asset of chainBalance.data) {
           // Only process assets with price information
-          if (asset.price && asset.price > 0) {
+          if (asset.price && asset.price > 0 && asset.total > 0n) {
             // Convert balance to decimal and multiply by price
             const assetValue = (Number(asset.total) / Math.pow(10, asset.decimals)) * asset.price;
 
@@ -217,7 +217,8 @@ export function useBalanceTotalUsd(address?: string): [number, number] {
 
             // Calculate previous value for 24h change
             // If priceChange exists, calculate what the value was 24h ago
-            const previousPrice = asset.priceChange ? asset.price / (1 + asset.priceChange) : asset.price;
+            // priceChange is a percentage number (e.g., 5 means 5%), so divide by 100
+            const previousPrice = asset.priceChange ? asset.price / (1 + asset.priceChange / 100) : asset.price;
 
             lastTotal += (Number(asset.total) / Math.pow(10, asset.decimals)) * previousPrice;
           }

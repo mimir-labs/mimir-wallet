@@ -1,7 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HistoryTransaction, Transaction } from './types';
+import type { HistoryTransaction, SubscanExtrinsic, Transaction } from './types';
 
 import { events } from '@/events';
 import { isEqual } from 'lodash-es';
@@ -43,12 +43,14 @@ export function usePendingTransactions(
   txId?: string
 ): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
   const { chainSS58 } = useApi();
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
 
   const { data, isFetched, isFetching, refetch } = useQuery({
-    queryKey: ['pending-transactions', network, address, txId] as const,
-    enabled: !!address,
-    queryFn: ({ queryKey: [, network, address, txId] }): Promise<Transaction[]> =>
-      service.transaction.getPendingTransactions(network, address!, txId),
+    queryKey: ['pending-transactions', network, addressHex, txId] as const,
+    enabled: !!addressHex,
+    staleTime: 0,
+    queryFn: ({ queryKey: [, network, addressHex, txId] }): Promise<Transaction[]> =>
+      service.transaction.getPendingTransactions(network, addressHex, txId),
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
     }
@@ -71,31 +73,32 @@ export function usePendingTransactions(
 
 export function useMultichainPendingTransactions(networks: string[], address?: string | null, txId?: string) {
   const { chainSS58 } = useApi();
+  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
 
   const data = useQueries({
     queries: networks.map((network) => ({
-      queryKey: ['multichain-pending-transactions', network, address, txId] as const,
+      queryKey: ['pending-transactions', network, addressHex, txId] as const,
       // Only enable query when address is provided
-      enabled: !!address,
+      enabled: !!addressHex,
       structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
         const nextTransactions = (next as Transaction[]).map((item) => transformTransaction(chainSS58, item));
 
         return isEqual(prev, nextTransactions) ? (prev as Transaction[]) : nextTransactions;
       },
       queryFn: async ({
-        queryKey: [, network, address, txId]
+        queryKey: [, network, addressHex, txId]
       }: {
         queryKey: readonly [string, string, string | null | undefined, string | undefined];
       }): Promise<Transaction[]> => {
         // Validate address before making request
-        if (!address) {
+        if (!addressHex) {
           throw new Error('Address is required');
         }
 
         const data = await fetcher(
           txId
-            ? `${API_CLIENT_GATEWAY}/chains/${network}/${address}/transactions/pending?tx_id=${txId}`
-            : `${API_CLIENT_GATEWAY}/chains/${network}/${address}/transactions/pending`
+            ? `${API_CLIENT_GATEWAY}/chains/${network}/${addressHex}/transactions/pending?tx_id=${txId}`
+            : `${API_CLIENT_GATEWAY}/chains/${network}/${addressHex}/transactions/pending`
         );
 
         return data.map((item: any) => ({ ...item, network }));
@@ -287,4 +290,43 @@ export function useValidTransactionNetworks(address?: string | null) {
   }, [allApis, transactionCounts]);
 
   return [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] as const;
+}
+
+/**
+ * Fetch simple transaction history from Subscan API
+ * Automatically filters out multisig and proxy transactions
+ * @param network - Chain identifier
+ * @param address - Account address
+ * @param row - Number of records (default: 100, max: 100)
+ * @returns [data, isFetched, isFetching]
+ */
+export function useSimpleHistory(
+  network?: string,
+  address?: string | null,
+  row = 100
+): [data: SubscanExtrinsic[], isFetched: boolean, isFetching: boolean] {
+  const { data, isFetched, isFetching } = useQuery({
+    queryKey: ['simple-history', network, address, row] as const,
+    enabled: !!network && !!address,
+    queryFn: async ({ queryKey }) => {
+      const [, network, address, row] = queryKey as readonly [string, string | undefined, string | null, number];
+
+      if (!network) {
+        throw new Error('Network is required');
+      }
+
+      if (!address) {
+        throw new Error('Address is required');
+      }
+
+      const result = await service.transaction.getSimpleHistory(network, address, row);
+
+      return result as SubscanExtrinsic[];
+    },
+    structuralSharing: (prev, next) => {
+      return isEqual(prev, next) ? prev : next;
+    }
+  });
+
+  return [data || [], isFetched, isFetching];
 }

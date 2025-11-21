@@ -76,7 +76,7 @@ function TemplateItem({
               setIsEditing(false);
             }}
             onChange={(e) => setEditName(e.target.value)}
-            className='font-inherit w-0 flex-auto flex-shrink-0 border-none bg-transparent p-0 outline-none'
+            className='font-inherit w-0 flex-auto shrink-0 border-none bg-transparent p-0 outline-none'
             defaultValue={name}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -86,7 +86,7 @@ function TemplateItem({
             }}
           />
         ) : (
-          <p className='max-w-[80px] overflow-hidden text-ellipsis'>{name}</p>
+          <p className='line-clamp-2 max-w-20 overflow-hidden text-ellipsis'>{name}</p>
         )}
         <Button
           isIconOnly

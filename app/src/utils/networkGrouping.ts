@@ -1,7 +1,26 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { type Network } from '@mimir-wallet/polkadot-core';
+import { allEndpoints, type Endpoint, type Network } from '@mimir-wallet/polkadot-core';
+
+/**
+ * Get all chains that have Subscan explorer support
+ * @returns Array of endpoints with explorerUrl
+ */
+export function getChainsWithSubscanSupport(): Endpoint[] {
+  return allEndpoints.filter((endpoint) => !!endpoint.explorerUrl);
+}
+
+/**
+ * Check if a specific chain has Subscan support
+ * @param chainKey - The chain key or genesis hash
+ * @returns Boolean indicating if chain has Subscan support
+ */
+export function hasSubscanSupport(chainKey: string): boolean {
+  const endpoint = allEndpoints.find((e) => e.key === chainKey || e.genesisHash === chainKey);
+
+  return !!endpoint?.explorerUrl;
+}
 
 export function groupNetworksByChain(
   networks: Network[],

@@ -304,3 +304,27 @@ export interface OrmlTokensAccountData extends Struct {
   readonly reserved: u128;
   readonly frozen: u128;
 }
+
+/**
+ * Subscan extrinsic data structure returned by simple-history API
+ * This represents a simplified transaction without multisig/proxy details
+ */
+export interface SubscanExtrinsic {
+  id: number;
+  block_num: number;
+  block_timestamp: number;
+  extrinsic_index: string;
+  call_module_function: string;
+  call_module: string;
+  nonce: number;
+  extrinsic_hash: string;
+  success: boolean;
+  fee: string;
+  fee_used: string;
+  tip: string;
+  finalized: boolean;
+  account_display: {
+    address: string;
+    people: Record<string, any>;
+  };
+}

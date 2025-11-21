@@ -15,7 +15,7 @@ import { z } from 'zod';
  */
 
 const transactionsSearchSchema = z.object({
-  status: z.enum(['pending', 'history']).optional().default('pending'),
+  status: z.enum(['pending', 'history', 'all-history']).optional().default('pending'),
   tx_id: z.string().optional()
 });
 

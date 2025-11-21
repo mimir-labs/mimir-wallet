@@ -72,7 +72,6 @@ function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction
         variant={isIcon ? 'light' : 'ghost'}
         size={isIcon ? 'sm' : 'md'}
         color='danger'
-        disabled={!transaction.call}
         accountId={depositor}
         website='mimir://internal/cancel'
         getCall={() =>

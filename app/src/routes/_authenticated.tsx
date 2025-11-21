@@ -136,7 +136,7 @@ const MainContent = ({ withPadding, queue }: MainContentProps) => {
       <AppSidebar />
 
       <main
-        className='relative flex flex-1 flex-col'
+        className='relative flex w-full flex-1 flex-col'
         style={{
           background: 'var(--color-main-bg)'
         }}
@@ -164,8 +164,6 @@ function AuthenticatedLayout() {
   const layoutOptions = matchWithOptions
     ? ((matchWithOptions.context as any)?.layoutOptions as LayoutOptions)
     : undefined;
-
-  console.log(layoutOptions);
 
   const { skipConnect = false, withPadding = true } = layoutOptions || {};
 

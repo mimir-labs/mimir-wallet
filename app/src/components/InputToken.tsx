@@ -12,7 +12,16 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
-import { Avatar, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
+import {
+  Avatar,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Spinner,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipWrapper
+} from '@mimir-wallet/ui';
 
 import FormatBalance from './FormatBalance';
 
@@ -99,7 +108,7 @@ function InputToken({
         <Avatar
           alt={token.name}
           fallback={
-            <div className='bg-divider-300 text-content1 flex h-[20px] w-[20px] items-center justify-center rounded-full text-base font-bold'>
+            <div className='bg-divider-300 text-content1 flex h-5 w-5 items-center justify-center rounded-full text-base font-bold'>
               {token.symbol.slice(0, 1)}
             </div>
           }
@@ -132,7 +141,7 @@ function InputToken({
           <div
             ref={wrapperRef}
             className={twMerge([
-              'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none',
+              'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none',
               radius === 'full'
                 ? 'rounded-full'
                 : radius === 'lg'
@@ -162,7 +171,7 @@ function InputToken({
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent style={{ width: popoverWidth }} className='border-divider-300 border-1 p-[5px]'>
+        <PopoverContent style={{ width: popoverWidth, minWidth: 200 }} className='border-divider-300 border-1 p-[5px]'>
           {options.length > 0 ? (
             <div className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
               <ul className={clsx('flex list-none flex-col')}>
@@ -171,36 +180,40 @@ function InputToken({
                   const identifier = item.isNative ? 'native' : item.key;
 
                   return (
-                    <li
-                      key={identifier}
-                      onClick={() => {
-                        handleClose();
-                        setValue(identifier);
-                      }}
-                      className={clsx(
-                        'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5'
-                      )}
-                    >
-                      <Avatar
-                        alt={name}
-                        className='shrink-0'
-                        fallback={
-                          <div className='bg-divider-300 text-content1 flex h-[20px] w-[20px] items-center justify-center rounded-full text-base font-bold'>
-                            {symbol.slice(0, 1)}
+                    <TooltipWrapper>
+                      <TooltipTrigger asChild>
+                        <li
+                          onClick={() => {
+                            handleClose();
+                            setValue(identifier);
+                          }}
+                          className={clsx(
+                            'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5'
+                          )}
+                        >
+                          <Avatar
+                            alt={name}
+                            className='shrink-0'
+                            fallback={
+                              <div className='bg-divider-300 text-content1 flex h-5 w-5 items-center justify-center rounded-full text-base font-bold'>
+                                {symbol.slice(0, 1)}
+                              </div>
+                            }
+                            src={logoUri}
+                            style={{ width: 20, height: 20 }}
+                          >
+                            {symbol}
+                          </Avatar>
+                          <span className='flex-1'>{symbol}</span>
+                          <div>
+                            <FormatBalance value={transferrable} format={[decimals, symbol]} />
                           </div>
-                        }
-                        src={logoUri}
-                        style={{ width: 20, height: 20 }}
-                      >
-                        {symbol}
-                      </Avatar>
-                      <div className='flex-1'>
-                        {name}&nbsp;<span className='text-foreground/50'>({symbol})</span>
-                      </div>
-                      <div>
-                        <FormatBalance value={transferrable} format={[decimals, symbol]} />
-                      </div>
-                    </li>
+                        </li>
+                      </TooltipTrigger>
+                      <TooltipContent side='left' className='bg-background text-foreground'>
+                        {name}
+                      </TooltipContent>
+                    </TooltipWrapper>
                   );
                 })}
               </ul>
