@@ -103,4 +103,32 @@ export class TransactionService extends BaseService {
 
     return this.get(path, Object.keys(params).length > 0 ? params : undefined, 'v2');
   }
+
+  /**
+   * Supplement missing call data for existing transaction
+   * @param chain - Chain identifier (e.g., "polkadot", "kusama")
+   * @param id - Transaction ID
+   * @param call - Encoded call data in hexadecimal format
+   * @returns Promise resolving to success status
+   */
+  public supplementCall(chain: string, id: number, call: HexString): Promise<{ success: boolean }> {
+    return this.post(`chains/${chain}/transactions/supplement-call/${id}`, { call });
+  }
+
+  /**
+   * Get simple transaction history from Subscan API
+   * Automatically filters out multisig and proxy transactions
+   * @param chain - Chain identifier (e.g., "polkadot", "kusama")
+   * @param address - Account address (SS58 or hex format)
+   * @param row - Number of records to fetch (default: 100, max: 100)
+   * @returns Promise resolving to array of Subscan extrinsics
+   */
+  public getSimpleHistory(chain: string, address: string, row?: number) {
+    const path = `chains/${chain}/${address}/transactions/simple-history`;
+    const params: Record<string, string> = {};
+
+    if (row) params.row = row.toString();
+
+    return this.get(path, Object.keys(params).length > 0 ? params : undefined);
+  }
 }

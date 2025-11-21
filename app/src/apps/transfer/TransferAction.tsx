@@ -82,8 +82,8 @@ function TransferAction({
 
       if (api.tx.tokens && token.assetId) {
         return keepAlive
-          ? api.tx.tokens.transferKeepAlive(recipient, token.assetId, parseUnits(amount, format[0])).method
-          : api.tx.tokens.transfer(recipient, token.assetId, parseUnits(amount, format[0])).method;
+          ? api.tx.tokens.transferKeepAlive(recipient, token.key, parseUnits(amount, format[0])).method
+          : api.tx.tokens.transfer(recipient, token.key, parseUnits(amount, format[0])).method;
       }
     }
 

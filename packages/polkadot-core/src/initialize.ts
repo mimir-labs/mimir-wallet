@@ -75,7 +75,7 @@ function loadOnReady(api: ApiPromise, chain: Endpoint): ApiState {
   };
 }
 
-function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: string) {
+function getApiProvider(apiUrl: string | string[], network: string) {
   let wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string | undefined;
 
   if (wsUrl && (wsUrl.startsWith('ws://') || wsUrl.startsWith('wss://'))) {
@@ -85,8 +85,10 @@ function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: st
   }
 
   const apiUrls = Array.isArray(apiUrl) ? apiUrl : [apiUrl];
+  const endpoints = wsUrl ? [wsUrl, ...apiUrls] : apiUrls;
 
-  const provider = new ApiProvider(wsUrl ? [wsUrl, ...apiUrls] : apiUrls, httpUrl);
+  // Use enhanced ApiProvider with connection timeout
+  const provider = new ApiProvider(endpoints);
 
   return provider;
 }
@@ -99,13 +101,9 @@ function getApiProvider(apiUrl: string | string[], network: string, httpUrl?: st
  * @param httpUrl - HTTP URL for the chain
  * @param onError - Error handler callback
  */
-export async function createApi(
-  apiUrl: string | string[],
-  network: string,
-  httpUrl?: string
-): Promise<[ApiPromise, StoredRegistry]> {
+export async function createApi(apiUrl: string | string[], network: string): Promise<[ApiPromise, StoredRegistry]> {
   // Initialize WebSocket provider and API
-  const provider = getApiProvider(apiUrl, network, httpUrl);
+  const provider = getApiProvider(apiUrl, network);
 
   const registry = new StoredRegistry();
 
@@ -176,7 +174,7 @@ export async function initializeApi(chain: Endpoint) {
 
   // Initialize main blockchain API connection
   return new Promise<void>((resolve) => {
-    createApi(Object.values(chain.wsUrl), chain.key, chain.httpUrl)
+    createApi(Object.values(chain.wsUrl), chain.key)
       .then(([api]) => {
         // Set up event listeners for connection state
         api.on('error', onError);

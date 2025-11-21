@@ -12,9 +12,10 @@ import type {
 } from '@polkadot/rpc-provider/types';
 
 import { RpcCoder } from '@polkadot/rpc-provider/coder';
-import { LRUCache } from '@polkadot/rpc-provider/lru';
+import defaults from '@polkadot/rpc-provider/defaults';
+import { DEFAULT_CAPACITY, DEFAULT_TTL, LRUCache } from '@polkadot/rpc-provider/lru';
 import { getWSErrorString } from '@polkadot/rpc-provider/ws/errors';
-import { isNull, isUndefined, noop, objectSpread, stringify } from '@polkadot/util';
+import { isNull, isUndefined, logger, noop, objectSpread, stringify } from '@polkadot/util';
 import { WebSocket } from '@polkadot/x-ws';
 import { EventEmitter } from 'eventemitter3';
 
@@ -44,8 +45,10 @@ const ALIASES: Record<string, string> = {
 
 const RETRY_DELAY = 2_500;
 
-const DEFAULT_TIMEOUT_MS = 15 * 1000;
+const DEFAULT_TIMEOUT_MS = 60 * 1000;
 const TIMEOUT_INTERVAL = 5_000;
+
+const l = logger('api-ws');
 
 /** @internal Clears a Record<*> of all keys, optionally with all callback on clear */
 function eraseRecord<T>(record: Record<string, T>, cb?: (item: T) => void): void {
@@ -63,61 +66,71 @@ function defaultEndpointStats(): EndpointStats {
   return { bytesRecv: 0, bytesSent: 0, cached: 0, errors: 0, requests: 0, subscriptions: 0, timeout: 0 };
 }
 
-function fetchWithRetry(
-  url: string,
-  options: RequestInit,
-  retries: number = 3,
-  delay: number = 1000
-): Promise<Response> {
-  return fetch(url, options)
-    .then((response) => {
-      if (response.ok) {
-        return response;
-      }
-
-      throw new Error(`${response.status}::${response.statusText}`);
-    })
-    .catch((error) => {
-      if (retries > 0) {
-        return new Promise((resolve) => setTimeout(() => resolve(fetchWithRetry(url, options, retries - 1)), delay));
-      }
-
-      throw error;
-    });
-}
-
+/**
+ * # @polkadot/rpc-provider/ws
+ *
+ * @name WsProvider
+ *
+ * @description The WebSocket Provider allows sending requests using WebSocket to a WebSocket RPC server TCP port. Unlike the [[HttpProvider]], it does support subscriptions and allows listening to events such as new blocks or balance changes.
+ *
+ * @example
+ * <BR>
+ *
+ * ```javascript
+ * import Api from '@polkadot/api/promise';
+ * import { WsProvider } from '@polkadot/rpc-provider/ws';
+ *
+ * const provider = new WsProvider('ws://127.0.0.1:9944');
+ * const api = new Api(provider);
+ * ```
+ *
+ * @see [[HttpProvider]]
+ */
 export class ApiProvider implements ProviderInterface {
   readonly #callCache: LRUCache;
   readonly #coder: RpcCoder;
   readonly #endpoints: string[];
-  readonly #http?: string;
   readonly #eventemitter: EventEmitter;
   readonly #handlers: Record<string, WsStateAwaiting> = {};
   readonly #isReadyPromise: Promise<ApiProvider>;
   readonly #stats: ProviderStats;
   readonly #waitingForId: Record<string, JsonRpcResponse<unknown>> = {};
   readonly #cacheCapacity: number;
+  readonly #ttl: number | null | undefined;
 
   #autoConnectMs: number;
   #endpointIndex: number;
   #endpointStats: EndpointStats;
-  #isWsConnected = false;
+  #isConnected = false;
   #subscriptions: Record<string, WsStateSubscription> = {};
   #timeoutId?: ReturnType<typeof setInterval> | null = null;
   #websocket: WebSocket | null;
   #timeout: number;
 
+  // Connection timeout feature (default 15 seconds)
+  readonly #connectionTimeout: number;
+  #connectionTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /**
+   * @param {string | string[]} endpoint The endpoint url. Usually `ws://ip:9944` or `wss://ip:9944`, may provide an array of endpoint strings.
+   * @param {number | false} autoConnectMs Whether to connect automatically or not (default). Provided value is used as a delay between retries.
+   * @param {number} [timeout] Custom timeout value used per request . Defaults to `DEFAULT_TIMEOUT_MS`
+   * @param {number} [cacheCapacity] Custom size of the WsProvider LRUCache. Defaults to `DEFAULT_CAPACITY` (1024)
+   * @param {number} [cacheTtl] Custom TTL of the WsProvider LRUCache. Determines how long an object can live in the cache. Defaults to DEFAULT_TTL` (30000)
+   * @param {number} [connectionTimeout] Connection timeout in milliseconds. Defaults to 10000ms (10 seconds)
+   */
   constructor(
-    endpoints: string | string[],
-    http?: string,
+    endpoint: string | string[] = defaults.WS_URL,
     autoConnectMs: number | false = RETRY_DELAY,
     timeout?: number,
-    cacheCapacity = 1024
+    cacheCapacity?: number,
+    cacheTtl?: number | null,
+    connectionTimeout: number = 10000
   ) {
-    endpoints = Array.isArray(endpoints) ? endpoints : [endpoints];
+    const endpoints = Array.isArray(endpoint) ? endpoint : [endpoint];
 
     if (endpoints.length === 0) {
-      throw new Error('ApiProvider requires at least one Endpoint');
+      throw new Error('WsProvider requires at least one Endpoint');
     }
 
     endpoints.forEach((endpoint) => {
@@ -125,14 +138,16 @@ export class ApiProvider implements ProviderInterface {
         throw new Error(`Endpoint should start with 'ws://', received '${endpoint}'`);
       }
     });
-    this.#callCache = new LRUCache(cacheCapacity);
-    this.#cacheCapacity = cacheCapacity;
+    const ttl = cacheTtl === undefined ? DEFAULT_TTL : cacheTtl;
+
+    this.#callCache = new LRUCache(cacheCapacity === 0 ? 0 : cacheCapacity || DEFAULT_CAPACITY, ttl);
+    this.#ttl = cacheTtl;
+    this.#cacheCapacity = cacheCapacity || DEFAULT_CAPACITY;
     this.#eventemitter = new EventEmitter();
     this.#autoConnectMs = autoConnectMs || 0;
     this.#coder = new RpcCoder();
     this.#endpointIndex = -1;
     this.#endpoints = endpoints;
-    this.#http = http;
     this.#websocket = null;
     this.#stats = {
       active: { requests: 0, subscriptions: 0 },
@@ -140,8 +155,11 @@ export class ApiProvider implements ProviderInterface {
     };
     this.#endpointStats = defaultEndpointStats();
     this.#timeout = timeout || DEFAULT_TIMEOUT_MS;
+    this.#connectionTimeout = connectionTimeout;
 
-    this.connectWithRetry().catch(noop);
+    if (autoConnectMs && autoConnectMs > 0) {
+      this.connectWithRetry().catch(noop);
+    }
 
     this.#isReadyPromise = new Promise((resolve): void => {
       this.#eventemitter.once('connected', (): void => {
@@ -169,7 +187,14 @@ export class ApiProvider implements ProviderInterface {
    * @return {boolean} true if connected
    */
   public get isConnected(): boolean {
-    return true;
+    return this.#isConnected;
+  }
+
+  /**
+   * @description Promise that resolves the first time we are connected and loaded
+   */
+  public get isReady(): Promise<ApiProvider> {
+    return this.#isReadyPromise;
   }
 
   public get endpoint(): string {
@@ -187,41 +212,43 @@ export class ApiProvider implements ProviderInterface {
     return (this.#endpointIndex + 1) % endpoints.length;
   }
 
+  /**
+   * @summary Manually connect
+   * @description The [[WsProvider]] connects automatically by default, however if you decided otherwise, you may
+   * connect manually using this method.
+   */
+
   public async connect(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    if (this.#websocket) {
+      throw new Error('WebSocket is already connected');
+    }
+
+    try {
+      this.#endpointIndex = this.selectEndpointIndex(this.#endpoints);
+
+      // Start connection timeout timer
+      this.#startConnectionTimer();
+
+      // the as here is Deno-specific - not available on the globalThis
+      this.#websocket = new WebSocket(this.endpoint);
+
       if (this.#websocket) {
-        throw new Error('WebSocket is already connected');
+        this.#websocket.onclose = this.#onSocketClose;
+        this.#websocket.onerror = this.#onSocketError;
+        this.#websocket.onmessage = this.#onSocketMessage;
+        this.#websocket.onopen = this.#onSocketOpen;
       }
 
-      try {
-        this.#endpointIndex = this.selectEndpointIndex(this.#endpoints);
+      // timeout any handlers that have not had a response
+      this.#timeoutId = setInterval(() => this.#timeoutHandlers(), TIMEOUT_INTERVAL);
+    } catch (error) {
+      this.#clearConnectionTimer();
+      l.error(error);
 
-        // the as here is Deno-specific - not available on the globalThis
-        this.#websocket = new WebSocket(this.endpoint, []);
+      this.#emit('error', error);
 
-        if (this.#websocket) {
-          this.#websocket.onclose = this.#onSocketClose;
-          this.#websocket.onmessage = this.#onSocketMessage;
-
-          this.#websocket.onerror = (event) => {
-            console.error('websocket error', this.endpoint, event);
-            reject(event);
-          };
-
-          this.#websocket.onopen = () => {
-            resolve();
-            this.#onSocketOpen();
-          };
-        }
-
-        // timeout any handlers that have not had a response
-        this.#timeoutId = setInterval(() => this.#timeoutHandlers(), TIMEOUT_INTERVAL);
-      } catch (error) {
-        this.#emit('error', error);
-
-        throw error;
-      }
-    });
+      throw error;
+    }
   }
 
   /**
@@ -233,14 +260,6 @@ export class ApiProvider implements ProviderInterface {
         await this.connect();
       } catch {
         setTimeout((): void => {
-          if (this.#websocket) {
-            this.#websocket.onclose = null;
-            this.#websocket.onerror = null;
-            this.#websocket.onmessage = null;
-            this.#websocket.onopen = null;
-            this.#websocket = null;
-          }
-
           this.connectWithRetry().catch(noop);
         }, this.#autoConnectMs);
       }
@@ -261,7 +280,7 @@ export class ApiProvider implements ProviderInterface {
         this.#websocket.close(1000);
       }
     } catch (error) {
-      console.error(this.endpoint, error);
+      l.error(error);
 
       this.#emit('error', error);
 
@@ -280,6 +299,13 @@ export class ApiProvider implements ProviderInterface {
       },
       total: this.#stats.total
     };
+  }
+
+  /**
+   * @description Returns the connection stats
+   */
+  public get ttl(): number | null | undefined {
+    return this.#ttl;
   }
 
   public get endpointStats(): EndpointStats {
@@ -338,24 +364,24 @@ export class ApiProvider implements ProviderInterface {
     return resultPromise;
   }
 
-  async #wsSend<T>(
+  async #send<T>(
     id: number,
     body: string,
     method: string,
     params: unknown[],
     subscription?: SubscriptionHandler
   ): Promise<T> {
-    await this.#isReadyPromise;
-
     return new Promise<T>((resolve, reject): void => {
       try {
-        if (!this.#isWsConnected || this.#websocket === null) {
+        if (!this.isConnected || this.#websocket === null) {
           throw new Error('WebSocket is not connected');
         }
 
         const callback = (error?: Error | null, result?: T): void => {
           error ? reject(error) : resolve(result as T);
         };
+
+        l.debug(() => ['calling', method, body]);
 
         this.#handlers[id] = {
           callback,
@@ -371,71 +397,38 @@ export class ApiProvider implements ProviderInterface {
         this.#stats.total.bytesSent += bytesSent;
 
         this.#websocket.send(body);
-      } catch (error) {
+      } catch (error: any) {
         this.#endpointStats.errors++;
         this.#stats.total.errors++;
 
-        reject(error);
+        const rpcError = error;
+        const failedRequest = `\nFailed WS Request: ${JSON.stringify({ method, params })}`;
+
+        // Provide WS Request alongside the error
+        rpcError.message = `${rpcError.message}${failedRequest}`;
+        reject(rpcError);
       }
     });
   }
 
-  async #httpSend<T>(body: string, httpUrl: string): Promise<T> {
-    this.#stats.total.requests++;
-
-    this.#stats.active.requests++;
-    this.#stats.total.bytesSent += body.length;
-
-    try {
-      const response = await fetchWithRetry(httpUrl, {
-        body,
-        headers: {
-          Accept: 'application/json',
-          'Content-Length': `${body.length}`,
-          'Content-Type': 'application/json'
-        },
-        method: 'POST'
-      });
-
-      if (!response.ok) {
-        throw new Error(`[${response.status}]: ${response.statusText}`);
-      }
-
-      const result = await response.text();
-
-      this.#stats.total.bytesRecv += result.length;
-
-      const decoded = this.#coder.decodeResponse<T>(JSON.parse(result) as JsonRpcResponse<T>);
-
-      this.#stats.active.requests--;
-
-      return decoded;
-    } catch (e) {
-      this.#stats.active.requests--;
-      this.#stats.total.errors++;
-
-      throw e;
-    }
-  }
-
-  async #send<T>(
-    id: number,
-    body: string,
-    method: string,
-    params: unknown[],
-    subscription?: SubscriptionHandler
-  ): Promise<T> {
-    const httpUrl = this.#http;
-
-    if (!subscription && !this.#isWsConnected && httpUrl) {
-      return this.#httpSend<T>(body, httpUrl).catch(() => {
-        return this.#wsSend<T>(id, body, method, params, subscription);
-      });
-    }
-
-    return this.#wsSend(id, body, method, params, subscription);
-  }
-
+  /**
+   * @name subscribe
+   * @summary Allows subscribing to a specific event.
+   *
+   * @example
+   * <BR>
+   *
+   * ```javascript
+   * const provider = new WsProvider('ws://127.0.0.1:9944');
+   * const rpc = new Rpc(provider);
+   *
+   * rpc.state.subscribeStorage([[storage.system.account, <Address>]], (_, values) => {
+   *   console.log(values)
+   * }).then((subscriptionId) => {
+   *   console.log('balance changes subscription id: ', subscriptionId)
+   * })
+   * ```
+   */
   public subscribe(
     type: string,
     method: string,
@@ -460,6 +453,8 @@ export class ApiProvider implements ProviderInterface {
     // a slight complication in solving - since we cannot rely on the send id, but rather
     // need to find the actual subscription id to map it
     if (isUndefined(this.#subscriptions[subscription])) {
+      l.debug(() => `Unable to find active subscription=${subscription}`);
+
       return false;
     }
 
@@ -482,10 +477,13 @@ export class ApiProvider implements ProviderInterface {
     );
 
     if (this.#autoConnectMs > 0) {
-      console.error(error.message);
+      l.error(error.message);
     }
 
-    this.#isWsConnected = false;
+    this.#isConnected = false;
+
+    // Clear connection timeout timer
+    this.#clearConnectionTimer();
 
     if (this.#websocket) {
       this.#websocket.onclose = null;
@@ -506,7 +504,7 @@ export class ApiProvider implements ProviderInterface {
         h.callback(error, undefined);
       } catch (err) {
         // does not throw
-        console.error(err);
+        l.error(err);
       }
     });
     eraseRecord(this.#waitingForId);
@@ -523,7 +521,14 @@ export class ApiProvider implements ProviderInterface {
     }
   };
 
-  #onSocketMessage = (message: MessageEvent): void => {
+  #onSocketError = (error: Event): void => {
+    l.debug(() => ['socket error', error]);
+    this.#emit('error', error);
+  };
+
+  #onSocketMessage = (message: MessageEvent<string>): void => {
+    l.debug(() => ['received', message.data]);
+
     const bytesRecv = message.data.length;
 
     this.#endpointStats.bytesRecv += bytesRecv;
@@ -540,6 +545,8 @@ export class ApiProvider implements ProviderInterface {
     const handler = this.#handlers[response.id];
 
     if (!handler) {
+      l.debug(() => `Unable to find handler for id=${response.id}`);
+
       return;
     }
 
@@ -587,6 +594,8 @@ export class ApiProvider implements ProviderInterface {
       // store the JSON, we could have out-of-order subid coming in
       this.#waitingForId[subId] = response;
 
+      l.debug(() => `Unable to find handler for subscription=${subId}`);
+
       return;
     }
 
@@ -610,7 +619,12 @@ export class ApiProvider implements ProviderInterface {
       throw new Error('WebSocket cannot be null in onOpen');
     }
 
-    this.#isWsConnected = true;
+    l.debug(() => ['connected to', this.endpoint]);
+
+    this.#isConnected = true;
+
+    // Clear connection timeout timer on successful connection
+    this.#clearConnectionTimer();
 
     this.#resubscribe();
 
@@ -638,10 +652,10 @@ export class ApiProvider implements ProviderInterface {
         try {
           await this.subscribe(type, method, params, callback);
         } catch (error) {
-          console.error(error);
+          l.error(error);
         }
       })
-    ).catch(console.error);
+    ).catch(l.error);
   };
 
   #timeoutHandlers = (): void => {
@@ -661,6 +675,51 @@ export class ApiProvider implements ProviderInterface {
         this.#endpointStats.timeout++;
         this.#stats.total.timeout++;
         delete this.#handlers[ids[i]];
+      }
+    }
+  };
+
+  /**
+   * Start connection timeout timer
+   * If connection doesn't establish within the timeout period, close the socket
+   * to trigger automatic endpoint rotation
+   */
+  #startConnectionTimer = (): void => {
+    this.#clearConnectionTimer();
+
+    this.#connectionTimer = setTimeout(() => {
+      this.#handleConnectionTimeout();
+    }, this.#connectionTimeout);
+  };
+
+  /**
+   * Clear connection timeout timer
+   */
+  #clearConnectionTimer = (): void => {
+    if (this.#connectionTimer) {
+      clearTimeout(this.#connectionTimer);
+      this.#connectionTimer = null;
+    }
+  };
+
+  /**
+   * Handle connection timeout by closing the WebSocket
+   * This will trigger #onSocketClose which automatically retries with the next endpoint
+   */
+  #handleConnectionTimeout = (): void => {
+    const currentEndpoint = this.endpoint;
+
+    console.warn(`[ApiProvider] Connection timeout after ${this.#connectionTimeout}ms on endpoint: ${currentEndpoint}`);
+
+    if (this.#websocket) {
+      console.log(`[ApiProvider] Closing connection to rotate to next endpoint from: ${currentEndpoint}`);
+
+      // Close the WebSocket to trigger #onSocketClose
+      // This will automatically retry with the next endpoint via connectWithRetry
+      try {
+        this.#websocket.close(1000);
+      } catch (error) {
+        l.error('Failed to close WebSocket on timeout:', error);
       }
     }
   };

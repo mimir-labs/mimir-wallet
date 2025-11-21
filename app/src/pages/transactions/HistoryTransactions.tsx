@@ -49,7 +49,7 @@ function HistoryTransactions({
       />
 
       {/* End message */}
-      {!hasNexPage && data.length > 0 && <h6 className='text-foreground/50 text-center text-sm'>no data more.</h6>}
+      {!hasNexPage && data.length > 0 && <h6 className='text-foreground/50 text-center text-sm'>No more data.</h6>}
 
       {/* Intersection Observer sentinel */}
       {isFetching ? null : <div ref={sentinelRef} className='h-1' />}

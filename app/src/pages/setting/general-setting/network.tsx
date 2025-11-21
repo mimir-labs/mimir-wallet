@@ -7,7 +7,7 @@ import { WsProvider } from '@polkadot/api';
 import { useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
-import { type Endpoint, NETWORK_RPC_PREFIX, useNetworks } from '@mimir-wallet/polkadot-core';
+import { type Endpoint, NETWORK_RPC_PREFIX, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 import {
   Alert,
@@ -94,6 +94,7 @@ function Content({ chain }: { chain: Endpoint }) {
           }}
           placeholder='Please select or input rpc url ws:// or wss://'
           allowCustomValue
+          filterOptions={(options) => options}
           onCustomValue={(value) => {
             if (isValidWsUrl(value)) {
               setUrl(value);
@@ -127,7 +128,8 @@ function Content({ chain }: { chain: Endpoint }) {
 
 function NetworkSetting() {
   const { networks } = useNetworks();
-  const [network, setNetwork] = useState(networks[0].key);
+  const { network: defaultNetwork } = useApi();
+  const [network, setNetwork] = useState(defaultNetwork);
 
   const chain = networks.find((item) => item.key === network);
 

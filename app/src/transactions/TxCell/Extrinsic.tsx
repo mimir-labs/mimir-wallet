@@ -15,7 +15,7 @@ import moment from 'moment';
 import React from 'react';
 
 import { chainLinks, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
+import { Button, cn, Divider } from '@mimir-wallet/ui';
 
 import Target from './Target';
 
@@ -29,12 +29,14 @@ export function Item({ content, title }: { title?: React.ReactNode; content?: Re
 }
 
 function Extrinsic({
+  isMobile = false,
   transaction,
   call,
   hasLargeCalls = false,
   shouldLoadDetails = false,
   onLoadDetails
 }: {
+  isMobile?: boolean;
   defaultOpen?: boolean;
   transaction: Transaction;
   call?: IMethod | null;
@@ -66,7 +68,7 @@ function Extrinsic({
     <>
       <div className='@container flex flex-1 flex-col gap-2.5'>
         <>
-          <Target address={transaction.address} call={displayCall} />
+          <Target isMobile={isMobile} address={transaction.address} call={displayCall} />
 
           {hasLargeCalls && (!shouldLoadDetails || (!isFetched && isFetching)) && (
             <div className='flex flex-col gap-[5px]'>
@@ -85,14 +87,20 @@ function Extrinsic({
 
           <Divider className='first:hidden' />
 
-          <details className='group'>
+          <details className='group' open={isMobile}>
             <summary className='hover:text-primary flex cursor-pointer list-none items-center font-bold no-underline transition-colors select-none'>
               <span className='group-open:hidden'>View Details</span>
               <span className='hidden group-open:block'>Hide Details</span>
               <ArrowDown className='transform transition-transform group-open:rotate-180' />
             </summary>
 
-            <div className='border-divider-300 mt-[5px] flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5'>
+            <div
+              data-mobile={isMobile}
+              className={cn(
+                'border-divider-300 mt-[5px] flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5',
+                'data-[mobile=true]:bg-background'
+              )}
+            >
               <Item title='Call Hash' content={<Hash value={transaction.callHash} withCopy />} />
 
               {transaction.call && (

@@ -107,7 +107,7 @@ export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: st
       throw new Error('Remote chain not support');
     }
 
-    [remoteApi] = await createApi(Object.values(chain.wsUrl), chain.name, chain.httpUrl);
+    [remoteApi] = await createApi(Object.values(chain.wsUrl), chain.name);
   }
 
   const blockToRoot = JSON.parse((await api.query.remoteProxyRelayChain.blockToRoot()) as any);

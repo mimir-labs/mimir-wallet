@@ -3,11 +3,14 @@
 
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Hash, Input } from '@/components';
+import { toastError } from '@/components/utils';
 import { type Transaction, TransactionType } from '@/hooks/types';
 import { blake2AsHex } from '@polkadot/util-crypto';
+import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { service, useMutation } from '@mimir-wallet/service';
 import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 function RecoverTx({
@@ -21,8 +24,25 @@ function RecoverTx({
   onClose: () => void;
   handleRecover: (calldata: string) => void;
 }) {
-  const { api } = useApi();
+  const { api, network } = useApi();
+  const queryClient = useQueryClient();
   const [calldata, setCalldata] = useState('');
+
+  // Mutation for uploading calldata to server
+  const { mutateAsync: uploadCalldata, isPending } = useMutation({
+    mutationFn: async (calldata: string) => {
+      await service.transaction.supplementCall(network, transaction.id, calldata as `0x${string}`);
+
+      // Refetch both single-chain and multi-chain pending transactions
+      queryClient.invalidateQueries({
+        queryKey: ['pending-transactions', transaction.network, addressToHex(transaction.address)]
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to upload call data:', error);
+      toastError('Failed to upload call data to server');
+    }
+  });
 
   const error = useMemo(() => {
     if (!calldata) {
@@ -50,7 +70,7 @@ function RecoverTx({
       <ModalContent>
         <ModalHeader>Call Data</ModalHeader>
         <ModalBody>
-          <p className='text-foreground/50 text-xs leading-[16px]'>
+          <p className='text-foreground/50 text-xs leading-4'>
             <IconInfo className='mr-1 inline h-4 w-4 align-middle' />
             This transaction wasn’t initiated from Mimir. But you can copy Call Data from explorer to recover this
             transaction
@@ -70,10 +90,15 @@ function RecoverTx({
             fullWidth
             variant='ghost'
             color='primary'
-            disabled={!calldata}
-            onClick={() => handleRecover(calldata)}
+            disabled={!calldata || !!error || isPending}
+            onClick={async () => {
+              // Upload calldata to server and refetch queries
+              await uploadCalldata(calldata);
+              // Call parent's handleRecover to add to queue
+              handleRecover(calldata);
+            }}
           >
-            Recover
+            {isPending ? 'Loading...' : 'Recover'}
           </Button>
         </ModalFooter>
       </ModalContent>

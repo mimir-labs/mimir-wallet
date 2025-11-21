@@ -11,7 +11,7 @@ import { autoFormatTimeStr } from '@/utils';
 import React, { useMemo } from 'react';
 
 import { addressEq } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
+import { Button, cn, Divider } from '@mimir-wallet/ui';
 
 import Approve from './buttons/Approve';
 import Cancel from './buttons/Cancel';
@@ -244,7 +244,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
   const filterPaths = useFilterPaths(account, transaction);
 
   return (
-    <div className={'bg-primary/5 min-w-[280px] space-y-2.5 rounded-[10px] p-5'.concat(props.className || '')}>
+    <div className={cn('bg-primary/5 min-w-[280px] space-y-2.5 rounded-[10px] p-5', props.className)}>
       <p className='text-primary font-bold'>Progress</p>
       <Divider className='bg-primary/5' />
 

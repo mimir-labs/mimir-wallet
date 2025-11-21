@@ -11,9 +11,9 @@ import { Call as CallComp, FunctionArgs } from '@/params';
 import React, { useMemo, useRef } from 'react';
 
 import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
+import { Button, cn, Divider, Tooltip } from '@mimir-wallet/ui';
 
-function CallInfo({ address, call }: { address: string; call: IMethod }) {
+function CallInfo({ isMobile = false, address, call }: { isMobile?: boolean; address: string; call: IMethod }) {
   const { network } = useApi();
   const [, addTx] = useBatchTxs(network, address);
 
@@ -32,7 +32,13 @@ function CallInfo({ address, call }: { address: string; call: IMethod }) {
   }, [call.callIndex, call.registry]);
 
   return (
-    <div className='flex w-full flex-col items-start justify-start gap-[5px]'>
+    <div
+      data-mobile={isMobile}
+      className={cn(
+        'flex w-full flex-col items-start justify-start gap-[5px]',
+        'data-[mobile=true]:bg-background data-[mobile=true]:shadow-medium data-[mobile=true]:rounded-[20px] data-[mobile=true]:p-[15px]'
+      )}
+    >
       <div className='flex w-full shrink-0 flex-row items-center justify-start gap-2.5'>
         <b className='flex-1'>{action}</b>
         <Tooltip content='For better repeatly submit this transaction you can add to Template' color='foreground'>
@@ -67,7 +73,7 @@ function CallInfo({ address, call }: { address: string; call: IMethod }) {
   );
 }
 
-function Target({ call, address }: { address: string; call?: IMethod | null }) {
+function Target({ isMobile = false, call, address }: { isMobile?: boolean; address: string; call?: IMethod | null }) {
   const { api } = useApi();
   const [from, targetCall] = useMemo(() => findTargetCall(api, address, call), [address, api, call]);
   const ref = useRef<any>(null);
@@ -76,15 +82,19 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
     return null;
   }
 
+  const Wrapper = isMobile ? 'div' : React.Fragment;
+
   const callElement = targetCall ? (
-    <CallComp ref={ref} from={from} registry={targetCall.registry} call={targetCall} />
+    <Wrapper className='bg-background shadow-medium rounded-[20px] p-[15px]'>
+      <CallComp ref={ref} from={from} registry={targetCall.registry} call={targetCall} />
+    </Wrapper>
   ) : null;
 
   return (
     <>
       {callElement}
-      <Divider className='first:hidden' />
-      <CallInfo call={targetCall} address={address} />
+      {isMobile ? null : <Divider className='first:hidden' />}
+      <CallInfo isMobile={isMobile} call={targetCall} address={address} />
     </>
   );
 }

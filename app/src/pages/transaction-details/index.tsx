@@ -2,25 +2,44 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
+import type { IMethod } from '@polkadot/types/types';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 import { GroupedTransactions, TxProgress } from '@/transactions';
 import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
-import { getRouteApi, useParams } from '@tanstack/react-router';
-import { useMemo } from 'react';
-
-const routeApi = getRouteApi('/_authenticated/transactions/$id');
+import Extrinsic from '@/transactions/TxCell/Extrinsic';
+import { useParams } from '@tanstack/react-router';
+import { useMemo, useState } from 'react';
 
 import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
 
-import Details from './Details';
 import Summary from './Summary';
 
-function SmPage({ transaction }: { transaction: Transaction }) {
-  const [account] = useQueryAccount(transaction?.address);
+function SmPage({ transaction: propsTransaction }: { transaction: Transaction }) {
+  const { api, network } = useApi();
+  const [account] = useQueryAccount(propsTransaction?.address);
+  const [shouldLoadDetails, setShouldLoadDetails] = useState(false);
+  const [fullTransaction] = useTransactionDetail(
+    network,
+    shouldLoadDetails ? propsTransaction.id.toString() : undefined
+  );
+  // Use full transaction if loaded, otherwise use original
+  const transaction = fullTransaction || propsTransaction;
+
+  const call = useMemo(() => {
+    if (!transaction.call) return null;
+
+    try {
+      return api.registry.createTypeUnsafe('Call', [transaction.call]) as IMethod;
+    } catch (e) {
+      console.log(e);
+
+      return null;
+    }
+  }, [api, transaction.call]);
 
   if (!account) {
     return null;
@@ -30,19 +49,27 @@ function SmPage({ transaction }: { transaction: Transaction }) {
     <div className='space-y-4'>
       <Summary transaction={transaction} />
 
-      <Details transaction={transaction} />
+      <Extrinsic
+        isMobile
+        transaction={transaction}
+        call={call}
+        hasLargeCalls={!!transaction.isLargeCall}
+        shouldLoadDetails={shouldLoadDetails}
+        onLoadDetails={() => setShouldLoadDetails(true)}
+      />
 
-      <TxProgress account={account} transaction={transaction} className='bg-content1 rounded-[20px]' />
+      <TxProgress
+        account={account}
+        transaction={transaction}
+        className='bg-background shadow-medium rounded-[20px] p-[15px]'
+      />
     </div>
   );
 }
 
 function PageTransactionDetails() {
-  const { network } = useApi();
   const { id } = useParams({ from: '/_authenticated/transactions/$id' });
-  const search = routeApi.useSearch();
-  const urlNetwork = search.network;
-  const [transaction, isFetched, isFetching] = useTransactionDetail(network, id);
+  const [transaction, isFetched, isFetching] = useTransactionDetail('polkadot', id);
   const upSm = useMediaQuery('sm');
 
   const groupedTransactions = useMemo(() => {
@@ -60,7 +87,7 @@ function PageTransactionDetails() {
   return upSm ? (
     <GroupedTransactions groupedTransactions={groupedTransactions} />
   ) : (
-    <SubApiRoot network={urlNetwork || network}>
+    <SubApiRoot network={transaction.network}>
       <SmPage transaction={transaction} />
     </SubApiRoot>
   );
