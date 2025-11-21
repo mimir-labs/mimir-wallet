@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.37.2](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.37.1...mimir-wallet-app-v2.37.2) (2025-11-21)
+
+
+### Bug Fixes
+
+* fix some ui issues ([#346](https://github.com/mimir-labs/mimir-wallet/issues/346)) ([dff358e](https://github.com/mimir-labs/mimir-wallet/commit/dff358e98c711b6b424e7a361f1cd202fc7f6fc6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.37.2
+    * @mimir-wallet/service bumped to 2.37.2
+    * @mimir-wallet/ui bumped to 2.37.2
+
 ## [2.37.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.37.0...mimir-wallet-app-v2.37.1) (2025-11-19)
 
 
