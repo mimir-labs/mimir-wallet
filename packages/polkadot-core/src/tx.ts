@@ -9,7 +9,7 @@ import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@p
 import type { HexString } from '@polkadot/util/types';
 
 import { getSpecTypes } from '@polkadot/types-known';
-import { assert, formatBalance, isBn, isFunction, isHex, isNumber, objectSpread, u8aToHex } from '@polkadot/util';
+import { assert, formatBalance, isFunction, isHex, isNumber, objectSpread, u8aToHex } from '@polkadot/util';
 import { base64Encode } from '@polkadot/util-crypto';
 
 import { getFeeAssetLocation } from './xcm/fee-location.js';
@@ -139,10 +139,6 @@ function makeEraOptions(
   });
 }
 
-function optionsOrNonce(partialOptions: Partial<SignerOptions> = {}): Partial<SignerOptions> {
-  return isBn(partialOptions) || isNumber(partialOptions) ? { nonce: partialOptions } : partialOptions;
-}
-
 export async function sign(
   api: ApiPromise,
   extrinsic: SubmittableExtrinsic<'promise'>,
@@ -150,9 +146,8 @@ export async function sign(
   injected: Injected | (() => Promise<Injected>),
   { assetId }: { assetId?: string } = {}
 ): Promise<[signature: HexString, payload: SignerPayloadJSON, txHash: Hash, signedTransaction: HexString]> {
-  const options = optionsOrNonce();
-  const signingInfo = await api.derive.tx.signingInfo(signer, options.nonce, options.era);
-  const eraOptions = makeEraOptions(api, options, signingInfo);
+  const signingInfo = await api.derive.tx.signingInfo(signer);
+  const eraOptions = makeEraOptions(api, {}, signingInfo);
 
   const callU8a = await buildRemoteProxy(api, extrinsic, signer);
 
