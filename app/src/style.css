@@ -176,6 +176,7 @@
   }
 
   * {
+    border-color: var(--color-border);
     scroll-behavior: smooth;
   }
 

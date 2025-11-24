@@ -9,15 +9,7 @@ import { useAsyncFn } from 'react-use';
 
 import { type Endpoint, NETWORK_RPC_PREFIX, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
-import {
-  Alert,
-  AlertTitle,
-  Autocomplete,
-  type AutocompleteOption,
-  Button,
-  buttonSpinner,
-  Divider
-} from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button, buttonSpinner, Combobox, type ComboboxOption, Divider } from '@mimir-wallet/ui';
 
 function Content({ chain }: { chain: Endpoint }) {
   const [url, setUrl] = useState(
@@ -68,46 +60,43 @@ function Content({ chain }: { chain: Endpoint }) {
     }
   }, [url, chain.genesisHash, chain.key]);
 
-  // Convert wsUrl entries to autocomplete options
-  const rpcOptions: AutocompleteOption[] = Object.entries(chain.wsUrl).map(([name, wsUrl]) => ({
+  // Convert wsUrl entries to combobox options
+  const rpcOptions: ComboboxOption[] = Object.entries(chain.wsUrl).map(([name, wsUrl]) => ({
     value: wsUrl,
-    label: name,
-    url: wsUrl,
-    name
+    label: name
   }));
+
+  const handleValueChange = (value: string) => {
+    setUrl(value);
+    setError(undefined);
+  };
+
+  // Validate custom RPC URL
+  const validateRpcUrl = (value: string): boolean => isValidWsUrl(value);
 
   return (
     <>
       <div className='flex flex-col gap-2'>
         <label className='text-sm font-medium'>Network RPC</label>
-        <Autocomplete
+        <Combobox
           options={rpcOptions}
           value={url}
-          onValueChange={(value) => {
-            setUrl(value);
-            setError(undefined);
-          }}
-          inputValue={url}
-          onInputChange={(value) => {
-            setUrl(value);
-            setError(undefined);
-          }}
+          onValueChange={handleValueChange}
           placeholder='Please select or input rpc url ws:// or wss://'
+          searchPlaceholder='Search or enter custom RPC URL...'
+          emptyMessage='No matching RPC endpoints'
           allowCustomValue
-          filterOptions={(options) => options}
-          onCustomValue={(value) => {
-            if (isValidWsUrl(value)) {
-              setUrl(value);
-            } else {
-              setError(new Error('Invalid URL, expect ws:// or wss://'));
-            }
-          }}
-          renderOption={(option) => (
-            <div className='flex w-full items-center justify-between'>
-              <span className='text-sm'>{option.url}</span>
-              <span className='text-muted-foreground text-right text-xs'>{option.name}</span>
-            </div>
+          validateCustomValue={validateRpcUrl}
+          renderOption={(option, isSelected) => (
+            <>
+              <span className={isSelected ? 'opacity-100' : 'opacity-0'}>✓</span>
+              <div className='ml-2 flex flex-1 items-center justify-between'>
+                <span className='text-sm'>{option.value}</span>
+                <span className='text-muted-foreground text-right text-xs'>{option.label}</span>
+              </div>
+            </>
           )}
+          renderValue={(value) => value}
         />
       </div>
       {error && (

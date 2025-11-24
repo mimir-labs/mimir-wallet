@@ -20,7 +20,8 @@ export function useElementWidth(elementRef: RefObject<HTMLElement | null>, defau
     // Observe size changes (external synchronization with DOM)
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        const newWidth = entry.contentRect.width;
+        // Use borderBoxSize to include padding, fallback to contentRect for older browsers
+        const newWidth = entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width;
 
         if (newWidth > 0) {
           setWidth(newWidth);
