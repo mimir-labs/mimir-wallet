@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.38.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.37.2...ui-v2.38.0) (2025-11-24)
+
+
+### Features
+
+* **ui:** add Combobox component and use it in network setting ([#348](https://github.com/mimir-labs/mimir-wallet/issues/348)) ([14cc440](https://github.com/mimir-labs/mimir-wallet/commit/14cc440c88037d3f126067290f92f4a76b4b3fcd))
+
 ## [2.37.2](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.37.1...ui-v2.37.2) (2025-11-21)
 
 
