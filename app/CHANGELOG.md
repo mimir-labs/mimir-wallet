@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.38.1](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.38.0...mimir-wallet-app-v2.38.1) (2025-11-27)
+
+
+### Bug Fixes
+
+* add isApiReady check to prevent React Compiler memoization error ([#351](https://github.com/mimir-labs/mimir-wallet/issues/351)) ([c8fa288](https://github.com/mimir-labs/mimir-wallet/commit/c8fa2884133108630bdffa4d495fde3168c632ed))
+* **formatbalance.tsx:** improve DOT balance formatting with proper defaults ([#350](https://github.com/mimir-labs/mimir-wallet/issues/350)) ([e68e805](https://github.com/mimir-labs/mimir-wallet/commit/e68e8054343db6e9a1dfbbc47bc582a5f891969e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 2.38.1
+    * @mimir-wallet/service bumped to 2.38.1
+    * @mimir-wallet/ui bumped to 2.38.1
+
 ## [2.38.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v2.37.2...mimir-wallet-app-v2.38.0) (2025-11-24)
 
 
