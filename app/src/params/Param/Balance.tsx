@@ -7,7 +7,7 @@ import { FormatBalance } from '@/components';
 import React from 'react';
 
 function Balance({ value }: ParamProps) {
-  return <FormatBalance value={value.toString()} />;
+  return <FormatBalance value={value.toString()} withCurrency />;
 }
 
 export default React.memo(Balance);

@@ -27,10 +27,14 @@ function FormatBalance({
   ...props
 }: Props): React.ReactElement<Props> {
   const { api } = useApi();
-  const decimals = format?.[0] ?? api.registry.chainDecimals[0];
-  const currency = format?.[1] ?? api.registry.chainTokens[0];
+  // Get decimals with fallback to DOT's standard 10 decimals
+  const decimals = format?.[0] ?? (api.registry.chainDecimals?.[0] || 10);
+  const currency = format?.[1] ?? (api.registry.chainTokens?.[0] || 'DOT');
+
   const [major, rest, unit] = useMemo(() => {
-    const _value = formatUnits(BigInt(value?.toString() || 0), decimals || 0);
+    // Ensure valid decimals, default to 10 for DOT if not available
+    const finalDecimals = typeof decimals === 'number' && decimals > 0 ? decimals : 10;
+    const _value = formatUnits(BigInt(value?.toString() || 0), finalDecimals);
 
     return formatDisplay(_value);
   }, [value, decimals]);
