@@ -13,8 +13,14 @@ import { useApi } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
 
 function RemoveOrDeny({ isIcon = false, transaction }: { isIcon?: boolean; transaction: Transaction }) {
-  const { api } = useApi();
+  const { api, isApiReady } = useApi();
   const { isLocalAccount } = useAccount();
+
+  // Early return before accessing api.tx to prevent React Compiler
+  // from evaluating api.tx.proxy during memoization when API is not ready
+  if (!isApiReady) {
+    return null;
+  }
 
   if (transaction.type !== TransactionType.Announce || transaction.status !== TransactionStatus.Pending) {
     return null;
