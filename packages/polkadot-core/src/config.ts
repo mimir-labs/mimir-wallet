@@ -284,6 +284,19 @@ const polkadotEndpoints: Endpoint[] = [
     genesisHash: '0xd17bc7f93d054d8aba31f24d5bb0ac462247c594e31beed479b1c04d2d0ba48f',
     ss58Format: 5
   },
+  {
+    key: 'acurast-mainnet',
+    icon: '/chain-icons/Acurast.png',
+    tokenIcon: '/token-icons/ACU.png',
+    name: 'Acurast Mainnet',
+    relayChain: 'polkadot',
+    paraId: 3396,
+    wsUrl: {
+      Acurast: 'wss://public-rpc.mainnet.acurast.com/'
+    },
+    genesisHash: '0x4b5f95eefedf0d0fb514339edc24d2d411310520f687b4146145bcedb99885b9',
+    ss58Format: 42
+  },
   // {
   //   key: 'moonbeam',
   //   icon: '/chain-icons/Moonbeam.svg',
