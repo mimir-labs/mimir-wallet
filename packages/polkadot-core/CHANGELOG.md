@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.39.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.38.1...polkadot-core-v2.39.0) (2025-11-30)
+
+
+### Features
+
+* Add acurast mainnet supported ([#353](https://github.com/mimir-labs/mimir-wallet/issues/353)) ([6727cd0](https://github.com/mimir-labs/mimir-wallet/commit/6727cd048b1050e1d31dfece35d8e8d0f6ca0da4))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 2.39.0
+
 ## [2.38.1](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.38.0...polkadot-core-v2.38.1) (2025-11-27)
 
 
