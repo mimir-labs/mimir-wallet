@@ -24,7 +24,8 @@ import {
   isPolkadotAddress,
   isPolkadotEvmAddress,
   isValidAddress as isValidAddressUtil,
-  useApi,
+  useNetwork,
+  useSs58Format,
   zeroAddress
 } from '@mimir-wallet/polkadot-core';
 import { Divider, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
@@ -133,10 +134,9 @@ function InputAddress({
   withZeroAddress = false
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
-  const {
-    chainSS58,
-    chain: { polkavm }
-  } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
+  const { chain } = useNetwork();
+  const polkavm = chain.polkavm;
   const { accounts, addresses, isLocalAccount, isLocalAddress, addAddressBook, metas } = useAccount();
   const [value, setValue] = useState<string>(
     isValidAddressUtil(propsValue || defaultValue, polkavm) ? propsValue || defaultValue || '' : ''

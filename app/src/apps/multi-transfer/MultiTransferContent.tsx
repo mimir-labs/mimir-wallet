@@ -12,7 +12,7 @@ import { isValidNumber, parseUnits } from '@/utils';
 import { isHex } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Chip, Divider } from '@mimir-wallet/ui';
 
 import { parseCsv } from './parse';
@@ -28,7 +28,8 @@ interface Props {
 }
 
 function MultiTransferContent({ data, sending, network, setSending, setNetwork, setData }: Props) {
-  const { api, genesisHash } = useApi();
+  const { network: currentNetwork, chain } = useNetwork();
+  const genesisHash = chain.genesisHash;
   const [assets, , , assetsPromise] = useChainXcmAsset(network);
   const [invalidAssetIds, setInvalidAssetIds] = useState<string[]>([]);
 
@@ -60,9 +61,15 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
   }, [data]);
 
   // Create batch transfer calls
-  const getBatchCalls = useCallback(() => {
+  const getBatchCalls = useCallback(async () => {
     if (!isDataValid || !assets) {
       throw new Error('Invalid transfer data');
+    }
+
+    const api = await ApiManager.getInstance().getApi(currentNetwork);
+
+    if (!api) {
+      throw new Error('API not ready');
     }
 
     const calls = data.map(([address, assetId, amount]) => {
@@ -95,7 +102,7 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
     });
 
     return api.tx.utility.batchAll(calls).method;
-  }, [api, assets, data, isDataValid]);
+  }, [currentNetwork, assets, data, isDataValid]);
 
   return (
     <>

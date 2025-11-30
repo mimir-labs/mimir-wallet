@@ -18,7 +18,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { usePinAccounts } from '@/hooks/usePinAccounts';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { addressEq, addressToHex, encodeAddress, isPolkadotAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, Divider, Drawer, DrawerContent, DrawerFooter, DrawerHeader } from '@mimir-wallet/ui';
 
@@ -48,7 +48,7 @@ function filterKeywords(address: string, keywords: string, metas: Record<string,
 
 function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   const [keywords, setKeywords] = useState<string>('');
-  const { chainSS58 } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
   const { current, setCurrent, addresses, addAddressBook, accounts, hideAccountHex, metas } = useAccount();
   const [isSearching, setIsSearching] = useState(false);
   const [searchAccount, setSearchAccount] = useState<AccountData>();

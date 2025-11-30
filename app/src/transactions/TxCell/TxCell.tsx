@@ -8,7 +8,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 import React, { useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
 
 import TxItems from './TxItems';
@@ -23,7 +23,8 @@ interface Props {
 
 function TxCell({ withDetails, defaultOpen, address, transaction: propsTransaction }: Props) {
   const upSm = useMediaQuery('sm');
-  const { network, isApiReady } = useApi();
+  const { network } = useNetwork();
+  const { isApiReady } = useChainStatus(network);
   const [account] = useQueryAccount(address);
 
   // State for loading full transaction details

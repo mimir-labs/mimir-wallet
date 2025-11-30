@@ -10,7 +10,7 @@ import { useTxQueue } from '@/hooks/useTxQueue';
 import { useWallet } from '@/wallet/useWallet';
 import React, { forwardRef, useCallback } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, type ButtonProps } from '@mimir-wallet/ui';
 
 import { toastError } from './utils';
@@ -38,7 +38,7 @@ interface Props extends Omit<ButtonProps, 'onClick' | 'startContent' | 'endConte
     payload: ExtrinsicPayloadValue
   ) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
-  getCall?: () => IMethod | string;
+  getCall?: () => IMethod | string | Promise<IMethod | string>;
   onDone?: () => void;
   overrideAction?: () => void;
 }
@@ -67,13 +67,13 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
     },
     ref
   ) => {
-    const { network } = useApi();
+    const { network } = useNetwork();
     const { addQueue } = useTxQueue();
     const { walletAccounts } = useWallet();
     const address = accountId || transaction?.address || walletAccounts.at(0)?.address;
-    const handleClick = useCallback(() => {
+    const handleClick = useCallback(async () => {
       if (getCall) {
-        const call = getCall();
+        const call = await getCall();
 
         if (!address) {
           toastError('Please select an account');

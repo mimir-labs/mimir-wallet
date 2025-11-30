@@ -10,7 +10,7 @@ import { useWallet } from '@/wallet/useWallet';
 import { isEqual } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { addressEq, addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, encodeAddress, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { AccountContext } from './context';
@@ -23,8 +23,10 @@ import { deriveAccountMeta } from './utils';
  * This component doesn't render anything but handles important background tasks
  */
 function AddressConsumer({ children }: { children: React.ReactNode }) {
-  const { chainSS58, network, genesisHash } = useApi();
-  const { mode } = useNetworks();
+  const { network, chain } = useNetwork();
+  const { mode } = useChains();
+  const chainSS58 = chain.ss58Format;
+  const genesisHash = chain.genesisHash;
   const { isWalletReady, walletAccounts } = useWallet();
   const { accounts, addresses } = useAddressStore();
   const [metas, setMetas] = useState<Record<HexString, AddressMeta>>({});
@@ -176,11 +178,21 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
 
     if (isWalletReady && sortedWalletAccounts) {
       // Initial sync when wallet is ready
-      sync(mode === 'omni', network, chainSS58, sortedWalletAccounts.split(','), update);
+      const initialSync = () => {
+        const isOmni = mode === 'omni';
+
+        if (isOmni) {
+          sync(true, chainSS58, sortedWalletAccounts.split(','), update);
+        } else {
+          sync(false, network, chainSS58, sortedWalletAccounts.split(','), update);
+        }
+      };
+
+      initialSync();
 
       // Set up periodic sync every 6 seconds
       interval = setInterval(() => {
-        sync(mode === 'omni', network, chainSS58, sortedWalletAccounts.split(','), update);
+        initialSync();
       }, 12000);
     }
 

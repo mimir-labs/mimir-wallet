@@ -8,7 +8,7 @@ import { CONNECT_ORIGIN } from '@/constants';
 import { accountSource } from '@/wallet/useWallet';
 import React, { useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, buttonSpinner } from '@mimir-wallet/ui';
 
@@ -24,7 +24,7 @@ function ProposeTx({
   note,
   onProposed
 }: {
-  call: IMethod;
+  call: IMethod | null;
   account?: string;
   proposer?: string;
   website?: string;
@@ -33,11 +33,12 @@ function ProposeTx({
   note?: string;
   onProposed?: () => void;
 }) {
-  const { genesisHash, network } = useApi();
+  const { network, chain } = useNetwork();
+  const genesisHash = chain.genesisHash;
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
-    if (!proposer || !account) {
+    if (!proposer || !account || !call) {
       return;
     }
 
@@ -107,7 +108,7 @@ Call Data: ${call.toHex()}`;
         variant='solid'
         color='primary'
         onClick={handleClick}
-        disabled={loading || !account || !proposer}
+        disabled={loading || !account || !proposer || !call}
       >
         {loading ? buttonSpinner : null}
         Propose

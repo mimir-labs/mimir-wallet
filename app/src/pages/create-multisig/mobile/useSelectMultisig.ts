@@ -8,7 +8,7 @@ import { accountSource } from '@/wallet/useWallet';
 import { hexToU8a } from '@polkadot/util';
 import { useCallback, useMemo, useState } from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
 
 interface UseSelectMultisig {
   unselected: string[];
@@ -24,13 +24,13 @@ interface UseSelectMultisig {
 
 export function useSelectMultisig(): UseSelectMultisig {
   const { accounts, addresses } = useAccount();
-  const { chainSS58 } = useApi();
+  const { chain } = useNetwork();
   const all = useMemo(
     () =>
-      [encodeAddress(hexToU8a('0x0', 256), chainSS58)].concat(
+      [encodeAddress(hexToU8a('0x0', 256), chain.ss58Format)].concat(
         accounts.map((item) => item.address).concat(addresses.map((item) => item.address))
       ),
-    [accounts, addresses, chainSS58]
+    [accounts, addresses, chain.ss58Format]
   );
   const [signatories, setSignatories] = useState<string[]>([]);
   const [threshold, setThreshold] = useState<number>(2);

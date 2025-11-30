@@ -6,7 +6,7 @@ import type { HexString } from '@polkadot/util/types';
 import IconLink from '@/assets/svg/icon-link.svg?react';
 import React from 'react';
 
-import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
+import { chainLinks, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 import CopyButton from './CopyButton';
@@ -18,7 +18,7 @@ interface Props {
 }
 
 function Hash({ value, withCopy, withExplorer }: Props) {
-  const { chain } = useApi();
+  const { chain } = useNetwork();
   const stringValue = value?.toString();
 
   const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(chain, stringValue) : undefined;

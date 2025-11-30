@@ -8,7 +8,7 @@ import { Input, Label } from '@/components';
 import { toastSuccess } from '@/components/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 import MemberSet from './MemberSet';
@@ -142,9 +142,9 @@ function AccountSetting() {
           </div>
         </div>
       ) : account?.type === 'pure' ? (
-        <SubApiRoot network={account.network} supportedNetworks={[account.network]}>
+        <NetworkProvider network={account.network}>
           <PureMemberSet account={account} />
-        </SubApiRoot>
+        </NetworkProvider>
       ) : null}
 
       {address ? (

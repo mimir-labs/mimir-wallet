@@ -11,7 +11,7 @@ import { useTxQueue } from '@/hooks/useTxQueue';
 import { getSdkError } from '@walletconnect/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
 
 import { SESSION_ADD_EVENT } from './constants';
 import { WalletConnectContext } from './context';
@@ -25,8 +25,10 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
   const { current } = useAccount();
   const [, , , , promise] = useQueryAccountOmniChain(current);
   const handlerRef = useRef<((event: Web3WalletTypes.SessionRequest) => void) | undefined>(undefined);
-  const { networks, mode, enableNetwork } = useNetworks();
-  const { genesisHash, network: currentNetwork, chainSS58 } = useApi();
+  const { chains: networks, mode, enableNetwork } = useChains();
+  const { chain, network: currentNetwork } = useNetwork();
+  const { ss58: chainSS58 } = useSs58Format();
+  const genesisHash = chain.genesisHash;
   const { addQueue } = useTxQueue();
 
   handlerRef.current = async (event) => {

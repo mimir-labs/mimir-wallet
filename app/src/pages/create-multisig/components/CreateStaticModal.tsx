@@ -8,7 +8,7 @@ import { u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useState } from 'react';
 
-import { addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { addressToHex, encodeAddress, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
@@ -42,8 +42,9 @@ async function createMultisig(
 function CreateStaticModal({ name, signatories, threshold, isOpen, onClose, onSuccess }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const { resync } = useAccount();
-  const { network, chainSS58 } = useApi();
-  const { mode } = useNetworks();
+  const { network } = useNetwork();
+  const { ss58: chainSS58 } = useSs58Format();
+  const { mode } = useChains();
 
   const handleCreate = async () => {
     if (!name) return;
@@ -55,7 +56,11 @@ function CreateStaticModal({ name, signatories, threshold, isOpen, onClose, onSu
 
       utm && (await service.account.utm(network, u8aToHex(address), utm));
 
-      await resync(mode === 'omni', network, chainSS58);
+      if (mode === 'omni') {
+        await resync(true, chainSS58);
+      } else {
+        await resync(false, network, chainSS58);
+      }
 
       const encodedAddress = encodeAddress(address, chainSS58);
 

@@ -9,7 +9,7 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { useAllApis, useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
@@ -22,8 +22,7 @@ async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, str
     throw new Error('Invalid multisig transaction');
   }
 
-  const allApis = useAllApis.getState().chains;
-  const api = allApis[network]?.api;
+  const api = await ApiManager.getInstance().getApi(network);
 
   if (!api) {
     throw new Error(`API not available for network: ${network}`);
@@ -33,7 +32,7 @@ async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, str
 }
 
 function ExecuteMultisig({ transaction, account }: { account: AccountData; transaction: Transaction }) {
-  const { api, network } = useApi();
+  const { network } = useNetwork();
   const [isOpen, toggleOpen] = useToggle(false);
   const { addQueue } = useTxQueue();
 
@@ -49,7 +48,9 @@ function ExecuteMultisig({ transaction, account }: { account: AccountData; trans
     }
   };
 
-  const handleRecover = (calldata: string) => {
+  const handleRecover = async (calldata: string) => {
+    const api = await ApiManager.getInstance().getApi(network);
+
     const call = api.createType('Call', calldata);
 
     if (
@@ -92,7 +93,7 @@ function Approve({
   transaction: Transaction;
   filterPaths: FilterPath[][];
 }) {
-  const { api, isApiReady, network } = useApi();
+  const { network } = useNetwork();
   const [isOpen, toggleOpen] = useToggle(false);
   const { addQueue } = useTxQueue();
 
@@ -112,7 +113,7 @@ function Approve({
 
   const { data: multisigInfo } = useQuery({
     queryKey: ['multisig-info', network, multisigTx?.address || '', multisigTx?.callHash || ''] as const,
-    enabled: isApiReady && !!multisigTx?.callHash,
+    enabled: !!multisigTx?.callHash,
     refetchOnMount: false,
     queryFn: fetchMultisigInfo
   });
@@ -143,12 +144,8 @@ function Approve({
     }
   };
 
-  const handleRecover = (calldata: string) => {
-    if (!api) {
-      toastError('API not available');
-
-      return;
-    }
+  const handleRecover = async (calldata: string) => {
+    const api = await ApiManager.getInstance().getApi(network);
 
     const call = api.createType('Call', calldata);
 

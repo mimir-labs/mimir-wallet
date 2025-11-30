@@ -17,7 +17,7 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 
-import { addressEq, isPolkadotAddress, useNetworks } from '@mimir-wallet/polkadot-core';
+import { addressEq, isPolkadotAddress, useChains } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, Divider, Spinner } from '@mimir-wallet/ui';
 
@@ -247,7 +247,7 @@ function Welcome() {
   const [keywords, setKeywords] = useState<string>('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchAccount, setSearchAccount] = useState<AccountData>();
-  const { enableNetwork, networks } = useNetworks();
+  const { enableNetwork, chains: networks } = useChains();
 
   useEffectOnce(() => {
     enableNetwork(networks[0].key);

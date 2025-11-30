@@ -5,7 +5,7 @@ import { AddressRow } from '@/components';
 import { useWallet } from '@/wallet/useWallet';
 import { useMemo, useState } from 'react';
 
-import { addressEq, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
 import {
   Button,
   buttonSpinner,
@@ -44,19 +44,19 @@ function AccountSelectionModal({
   isLoading = false,
   filteredAddress
 }: AccountSelectionModalProps) {
-  const { chainSS58 } = useApi();
+  const { ss58 } = useSs58Format();
   const { walletAccounts } = useWallet();
 
   // Filter and format wallet accounts for Select
   const accountOptions = useMemo(() => {
     const list = walletAccounts.map((account) => ({
-      address: encodeAddress(account.address, chainSS58),
+      address: encodeAddress(account.address, ss58),
       name: account.name || 'Unknown Account',
       source: account.source
     }));
 
     return filteredAddress ? list.filter((item) => addressEq(item.address, filteredAddress)) : list;
-  }, [walletAccounts, filteredAddress, chainSS58]);
+  }, [walletAccounts, filteredAddress, ss58]);
 
   const [selectedAddress, setSelectedAddress] = useState<string | undefined>(() => {
     return accountOptions.at(0)?.address;

@@ -22,7 +22,7 @@ export type Props = BatchTxItem & {
   from: string;
   index: number;
   selected: (number | string)[];
-  registry: Registry;
+  registry: Registry | null;
   isSelectionDisabled?: boolean;
   disabledReason?: string;
   onSelected: (state: boolean) => void;
@@ -49,7 +49,7 @@ function BatchItemDrag({
   const [isOpen, toggleOpen] = useToggle(false);
 
   const call = useMemo(() => {
-    return parseCall(registry, calldata);
+    return registry ? parseCall(registry, calldata) : null;
   }, [registry, calldata]);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
@@ -99,7 +99,7 @@ function BatchItemDrag({
       data-disabled={isSelectionDisabled}
       className='bg-secondary data-[dragging=true]:bg-primary-50 overflow-hidden rounded-[10px] data-[disabled=true]:opacity-50'
     >
-      <div className='grid h-[44px] cursor-pointer grid-cols-12 px-2 text-sm sm:px-3' onClick={handleToggle}>
+      <div className='grid h-11 cursor-pointer grid-cols-12 px-2 text-sm sm:px-3' onClick={handleToggle}>
         <div className='col-span-2 flex items-center' onClick={handleStopPropagation}>
           <img {...listeners} src={Drag} style={{ cursor: 'grab', padding: 10, marginLeft: -10, userSelect: 'none' }} />
           {disabledReason ? (
@@ -133,7 +133,7 @@ function BatchItemDrag({
 
         <div className='col-span-5 flex items-center'>
           <span className='overflow-hidden text-ellipsis'>
-            <CallDisplayDetail fallbackWithName registry={registry} call={call} />
+            {registry ? <CallDisplayDetail fallbackWithName registry={registry} call={call} /> : null}
           </span>
         </div>
 
@@ -166,7 +166,7 @@ function BatchItemDrag({
 
       {isOpen ? (
         <div className='bg-content1 @container mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
-          <Call showFallback from={from} call={call} registry={registry} />
+          {registry ? <Call showFallback from={from} call={call} registry={registry} /> : null}
         </div>
       ) : null}
     </div>

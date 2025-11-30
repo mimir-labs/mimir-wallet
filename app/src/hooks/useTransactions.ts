@@ -7,7 +7,15 @@ import { events } from '@/events';
 import { isEqual } from 'lodash-es';
 import { useEffect, useMemo } from 'react';
 
-import { addressToHex, allEndpoints, encodeAddress, type Endpoint, useApi } from '@mimir-wallet/polkadot-core';
+import {
+  addressToHex,
+  allEndpoints,
+  encodeAddress,
+  type Endpoint,
+  useChain,
+  useChains,
+  useSs58Format
+} from '@mimir-wallet/polkadot-core';
 import { API_CLIENT_GATEWAY, fetcher, service, useInfiniteQuery, useQueries, useQuery } from '@mimir-wallet/service';
 
 function transformTransaction(chainSS58: number, transaction: Transaction): Transaction {
@@ -42,7 +50,8 @@ export function usePendingTransactions(
   address?: string | null,
   txId?: string
 ): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
-  const { chainSS58 } = useApi();
+  const chain = useChain(network);
+  const chainSS58 = chain.ss58Format;
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
 
   const { data, isFetched, isFetching, refetch } = useQuery({
@@ -72,7 +81,7 @@ export function usePendingTransactions(
 }
 
 export function useMultichainPendingTransactions(networks: string[], address?: string | null, txId?: string) {
-  const { chainSS58 } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
 
   const data = useQueries({
@@ -122,7 +131,8 @@ export function useHistoryTransactions(
   isFetchingNextPage: boolean,
   fetchNextPage: () => void
 ] {
-  const { chainSS58 } = useApi();
+  const chain = useChain(network ?? '');
+  const chainSS58 = chain.ss58Format;
 
   const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
     initialPageParam: null,
@@ -190,7 +200,8 @@ export function useTransactionDetail(
   network: string,
   id?: string
 ): [transactions: Transaction | undefined, isFetched: boolean, isFetching: boolean] {
-  const { chainSS58 } = useApi();
+  const chain = useChain(network);
+  const chainSS58 = chain.ss58Format;
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['transaction-detail', network, id] as const,
@@ -211,7 +222,10 @@ export function useMultiChainTransactionCounts(
   address?: string | null
 ): [data: Record<string, { pending: number; history: number }>, isFetched: boolean, isFetching: boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
-  const { allApis } = useApi();
+  const { chains } = useChains();
+
+  // Get enabled network keys
+  const enabledNetworks = useMemo(() => new Set(chains.filter((c) => c.enabled).map((c) => c.key)), [chains]);
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['transaction-counts', addressHex] as const,
@@ -238,8 +252,8 @@ export function useMultiChainTransactionCounts(
 
   return [
     useMemo(
-      () => Object.fromEntries(Object.entries(data || {}).filter(([network]) => allApis[network])),
-      [data, allApis]
+      () => Object.fromEntries(Object.entries(data || {}).filter(([network]) => enabledNetworks.has(network))),
+      [data, enabledNetworks]
     ),
     isFetched,
     isFetching
@@ -247,8 +261,11 @@ export function useMultiChainTransactionCounts(
 }
 
 export function useValidTransactionNetworks(address?: string | null) {
-  const { allApis } = useApi();
+  const { chains } = useChains();
   const [transactionCounts, isFetched, isFetching] = useMultiChainTransactionCounts(address);
+
+  // Create a map from network key to chain info for enabled networks
+  const enabledChainsMap = useMemo(() => new Map(chains.filter((c) => c.enabled).map((c) => [c.key, c])), [chains]);
 
   const [validPendingNetworks, validHistoryNetworks] = useMemo(() => {
     const validPendingNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
@@ -258,19 +275,21 @@ export function useValidTransactionNetworks(address?: string | null) {
     const networkOrderMap = new Map(allEndpoints.map((endpoint, index) => [endpoint.key, index]));
 
     Object.entries(transactionCounts || {}).forEach(([network, counts]) => {
-      if (counts.pending > 0 && allApis[network]?.chain) {
+      const chain = enabledChainsMap.get(network);
+
+      if (counts.pending > 0 && chain) {
         validPendingNetworks.push({
           network,
           counts: counts.pending,
-          chain: allApis[network]?.chain
+          chain
         });
       }
 
-      if (counts.history > 0 && allApis[network]?.chain) {
+      if (counts.history > 0 && chain) {
         validHistoryNetworks.push({
           network,
           counts: counts.history,
-          chain: allApis[network]?.chain
+          chain
         });
       }
     });
@@ -287,7 +306,7 @@ export function useValidTransactionNetworks(address?: string | null) {
       validPendingNetworks.filter((item) => networkOrderMap.has(item.network)).sort(sortByConfigOrder),
       validHistoryNetworks.filter((item) => networkOrderMap.has(item.network)).sort(sortByConfigOrder)
     ];
-  }, [allApis, transactionCounts]);
+  }, [enabledChainsMap, transactionCounts]);
 
   return [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] as const;
 }

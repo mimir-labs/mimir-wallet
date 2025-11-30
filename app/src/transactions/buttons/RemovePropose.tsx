@@ -14,7 +14,7 @@ import { accountSource } from '@/wallet/useWallet';
 import React, { useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import {
   Alert,
@@ -38,12 +38,14 @@ function Content({
   transaction: ProposeTransaction;
   onRemove: () => void;
 }) {
-  const { genesisHash, network } = useApi();
+  const { network, chain } = useNetwork();
   const [signer, setSigner] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
+  const genesisHash = chain.genesisHash;
+
   const handleConfirm = async () => {
-    if (!signer) {
+    if (!signer || !genesisHash) {
       toastError('Please select a valid signer address');
 
       return;

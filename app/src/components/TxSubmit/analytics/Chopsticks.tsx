@@ -7,7 +7,7 @@ import IconFailed from '@/assets/svg/icon-failed-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success.svg?react';
 import React, { useState } from 'react';
 
-import { simulate, useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, simulate, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, buttonSpinner } from '@mimir-wallet/ui';
 
 import Cell from './Cell';
@@ -26,20 +26,32 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
     error: string | null;
     isLoading: boolean;
   }>(EMPTY_SIMULATION);
-  const { api, chain } = useApi();
+  const { network, chain } = useNetwork();
   const [html, setHtml] = useState<string>('');
 
-  const handleSimulate = () => {
+  const handleSimulate = async () => {
     if (account && call) {
       setSimulation({ ...EMPTY_SIMULATION, isLoading: true });
-      simulate(api, Object.values(chain.wsUrl), call, account)
-        .then(({ success, html, error }) => {
-          setSimulation({ isDone: true, success, error, isLoading: false });
-          setHtml(html);
-        })
-        .catch((error) => {
-          setSimulation({ isDone: true, success: false, error: error.message || 'Unknown Error', isLoading: false });
+
+      try {
+        const api = await ApiManager.getInstance().getApi(network);
+
+        if (!api) {
+          throw new Error('API not ready');
+        }
+
+        const { success, html, error } = await simulate(api, Object.values(chain.wsUrl), call, account);
+
+        setSimulation({ isDone: true, success, error, isLoading: false });
+        setHtml(html);
+      } catch (error) {
+        setSimulation({
+          isDone: true,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown Error',
+          isLoading: false
         });
+      }
     }
   };
 

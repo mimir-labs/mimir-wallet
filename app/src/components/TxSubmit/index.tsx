@@ -5,7 +5,7 @@ import type { TxSubmitProps } from './types';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 
-import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Avatar, Spinner } from '@mimir-wallet/ui';
 
 import MimirLoading from '../animation/MimirLoading';
@@ -13,7 +13,8 @@ import TxSubmit from './TxSubmit';
 import TxSubmitErrorBoundary from './TxSubmitErrorBoundary';
 
 function Content({ accountId, ...props }: TxSubmitProps) {
-  const { isApiReady, chain } = useApi();
+  const { chain, network } = useNetwork();
+  const { isApiReady } = useChainStatus(network);
   const [accountData] = useQueryAccount(accountId);
 
   if (!isApiReady || !accountData) {
@@ -44,9 +45,9 @@ function Content({ accountId, ...props }: TxSubmitProps) {
 
 function TxSubmitRoot({ network, ...props }: TxSubmitProps & { network: string }) {
   return (
-    <SubApiRoot network={network}>
+    <NetworkProvider network={network}>
       <Content {...props} />
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

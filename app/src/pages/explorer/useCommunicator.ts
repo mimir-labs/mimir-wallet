@@ -11,7 +11,7 @@ import { IframeCommunicator } from '@/communicator';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { type MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
-import { encodeAddress, remoteProxyRelations, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, remoteProxyRelations, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
 
 export function useCommunicator(
   iframeRef: MutableRefObject<HTMLIFrameElement | null>,
@@ -20,8 +20,10 @@ export function useCommunicator(
   appName?: string
 ): IframeCommunicator | null {
   const [communicator, setCommunicator] = useState<IframeCommunicator | null>(null);
-  const { genesisHash, chainSS58, network: currentNetwork } = useApi();
-  const { networks, enableNetwork, mode } = useNetworks();
+  const { chain, network: currentNetwork } = useNetwork();
+  const genesisHash = chain.genesisHash;
+  const { ss58: chainSS58 } = useSs58Format();
+  const { chains: networks, enableNetwork, mode } = useChains();
   const { addQueue } = useTxQueue();
   const { current } = useAccount();
   const { meta } = useAddressMeta(current);

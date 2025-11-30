@@ -15,7 +15,7 @@ interface BatchItemBaseProps {
   children: React.ReactNode;
   actions?: React.ReactNode;
   calldata: HexString;
-  registry: Registry;
+  registry: Registry | null;
   from: string;
   bgcolor?: string;
   isOpen: boolean;
@@ -24,6 +24,8 @@ interface BatchItemBaseProps {
 
 function BatchItemBase({ children, actions, from, calldata, bgcolor, registry, isOpen, onToggle }: BatchItemBaseProps) {
   const call = useMemo(() => {
+    if (!registry) return null;
+
     return parseCall(registry, calldata);
   }, [registry, calldata]);
 
@@ -54,7 +56,8 @@ function BatchItemBase({ children, actions, from, calldata, bgcolor, registry, i
         {children}
         <div className='col-span-2 flex items-center'>
           <span className='overflow-hidden text-ellipsis'>
-            <CallDisplayDetail fallbackWithName registry={registry} call={call} />
+            {/* registry is guaranteed non-null here since call is non-null (call requires registry) */}
+            <CallDisplayDetail fallbackWithName registry={registry!} call={call} />
           </span>
         </div>
         <div className='col-span-1 flex items-center justify-between'>
@@ -76,7 +79,8 @@ function BatchItemBase({ children, actions, from, calldata, bgcolor, registry, i
 
       {isOpen && (
         <div className='bg-content1 @container mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
-          <Call showFallback from={from} call={call} registry={registry} />
+          {/* registry is guaranteed non-null here since call is non-null (call requires registry) */}
+          <Call showFallback from={from} call={call} registry={registry!} />
         </div>
       )}
     </div>

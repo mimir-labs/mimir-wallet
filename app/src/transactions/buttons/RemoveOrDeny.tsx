@@ -9,18 +9,12 @@ import { TxButton } from '@/components';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 import React from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
 
 function RemoveOrDeny({ isIcon = false, transaction }: { isIcon?: boolean; transaction: Transaction }) {
-  const { api, isApiReady } = useApi();
+  const { network } = useNetwork();
   const { isLocalAccount } = useAccount();
-
-  // Early return before accessing api.tx to prevent React Compiler
-  // from evaluating api.tx.proxy during memoization when API is not ready
-  if (!isApiReady) {
-    return null;
-  }
 
   if (transaction.type !== TransactionType.Announce || transaction.status !== TransactionStatus.Pending) {
     return null;
@@ -43,7 +37,11 @@ function RemoveOrDeny({ isIcon = false, transaction }: { isIcon?: boolean; trans
           color='danger'
           accountId={delegate}
           website='mimir://internal/remove-announcement'
-          getCall={() => api.tx.proxy.removeAnnouncement(transaction.address, transaction.callHash)}
+          getCall={async () => {
+            const api = await ApiManager.getInstance().getApi(network);
+
+            return api.tx.proxy.removeAnnouncement(transaction.address, transaction.callHash);
+          }}
         >
           {isIcon ? <IconFailed /> : 'Remove'}
         </TxButton>
@@ -62,7 +60,11 @@ function RemoveOrDeny({ isIcon = false, transaction }: { isIcon?: boolean; trans
           color={isIcon ? 'danger' : 'primary'}
           accountId={transaction.address}
           website='mimir://internal/deny-announcement'
-          getCall={() => api.tx.proxy.rejectAnnouncement(delegate, transaction.callHash)}
+          getCall={async () => {
+            const api = await ApiManager.getInstance().getApi(network);
+
+            return api.tx.proxy.rejectAnnouncement(delegate, transaction.callHash);
+          }}
         >
           {isIcon ? <IconFailed /> : 'Deny'}
         </TxButton>

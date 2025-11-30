@@ -5,7 +5,7 @@ import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { analyticsActions } from '@/analytics';
 import { lazy, Suspense, useEffect } from 'react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
 
 // Lazy load dashboard component for better code splitting
@@ -22,7 +22,7 @@ function DashboardFallback() {
 
 function PageProfile() {
   const selected = useSelectedAccount();
-  const { mode } = useNetworks();
+  const { mode } = useChains();
 
   // Track connected mode when entering dashboard from welcome page
   useEffect(() => {

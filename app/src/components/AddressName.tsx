@@ -15,7 +15,7 @@ import {
   encodeAddress,
   isPolkadotEvmAddress,
   sub2Eth,
-  useApi,
+  useSs58Format,
   zeroAddress
 } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
@@ -65,10 +65,10 @@ function extractIdentity(
 }
 
 function AddressName({ defaultName, value, meta: propMeta }: Props): React.ReactElement<Props> {
-  const { chainSS58 } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
   const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
-  const [identity, isFetched, isFetching, identityEnabled] = useDeriveAccountInfo(address);
+  const [identity, isFetched, isFetching] = useDeriveAccountInfo(address);
   // Use prop meta if provided, otherwise fetch it (for backward compatibility)
   const { meta: fetchedMeta } = useAddressMeta(propMeta ? undefined : address);
   const meta = propMeta || fetchedMeta;
@@ -100,7 +100,7 @@ function AddressName({ defaultName, value, meta: propMeta }: Props): React.React
   }
 
   return (
-    <span data-loading={identityEnabled && !isFetched && !isFetching} className='data-[loading=true]:animate-pulse'>
+    <span data-loading={!isFetched && isFetching} className='data-[loading=true]:animate-pulse'>
       {chainName || meta?.name || defaultName || fallbackName}
     </span>
   );

@@ -3,7 +3,7 @@
 
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 import { Avatar } from '@mimir-wallet/ui';
 
 interface SetSs58ChainProps {
@@ -12,8 +12,8 @@ interface SetSs58ChainProps {
 }
 
 function SetSs58Chain({ networkKey }: SetSs58ChainProps) {
-  const { networks } = useNetworks();
-  const chain = networks.find((network) => network.key === networkKey);
+  const { chains } = useChains();
+  const chain = chains.find((network) => network.key === networkKey);
 
   if (!chain) return null;
 

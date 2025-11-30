@@ -6,13 +6,13 @@ import type { TransferToken } from './types';
 import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { BN, BN_ZERO } from '@polkadot/util';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 
 export function useTransferBalance(
   token?: TransferToken,
   sender?: string
 ): [format: [decimals: number, symbol: string], sendingBalance: BN, isFetched: boolean, isFetching: boolean] {
-  const { network } = useApi();
+  const { network } = useNetwork();
 
   // Convert token to identifier format
   const identifier = token ? (token.isNative ? 'native' : token.assetId) : undefined;

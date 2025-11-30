@@ -19,7 +19,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { useCallback, useMemo, useState, useTransition } from 'react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
@@ -57,7 +57,7 @@ function MigrationTips() {
 function Assets() {
   const { current } = useAccount();
   const allChainBalances = useAllChainBalances(current);
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: 'balanceUsd',
     direction: 'descending'

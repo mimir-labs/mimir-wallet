@@ -15,7 +15,7 @@ import { useXcmAsset } from '@/hooks/useXcmAssets';
 import React, { forwardRef } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Avatar, cn, Popover, PopoverContent, PopoverTrigger, Skeleton, TextEllipsis, Tooltip } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
@@ -129,7 +129,7 @@ const CrossChainTransferCall = forwardRef<HTMLDivElement | null, CallProps>((pro
     showFallback,
     fallbackComponent: FallbackComponent = FunctionArgs
   } = props;
-  const { chain } = useApi();
+  const { chain } = useNetwork();
   const results = useParseCrossChainTransfer(registry, chain, call);
   const [open, toggleOpen] = useToggle(false);
   const asset0 = results?.assets.at(0);

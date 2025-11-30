@@ -7,7 +7,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
 interface RelationProps {
@@ -16,7 +16,7 @@ interface RelationProps {
 }
 
 function Relation({ address, setNetwork }: RelationProps) {
-  const { network } = useApi();
+  const { network } = useNetwork();
   const [account] = useQueryAccount(address);
   const ref = useRef<HTMLDivElement>(null);
   const upSm = useMediaQuery('sm');

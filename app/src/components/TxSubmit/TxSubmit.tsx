@@ -13,12 +13,14 @@ import { events } from '@/events';
 import { useAssetConversion } from '@/hooks/useAssetConversion';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
+import { useSupportsDryRun } from '@/hooks/useChainCapabilities';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useGasFeeEstimate } from '@/hooks/useGasFeeEstimate';
+import { useRegistry } from '@/hooks/useRegistry';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 
 import CustomGasFeeSelect from '../CustomGasFeeSelect';
@@ -60,14 +62,19 @@ function TxSubmit({
   beforeSend
 }: Props) {
   const { current } = useAccount();
-  const { chain, network, api } = useApi();
+  const { chain, network } = useNetwork();
+  const { supportsDryRun } = useSupportsDryRun(network);
+  const { registry } = useRegistry(network);
+
   const call = useMemo(() => {
     if (typeof propsCall === 'string') {
-      return api.registry.createType('Call', propsCall);
+      if (!registry) return null;
+
+      return registry.createType('Call', propsCall);
     }
 
     return propsCall;
-  }, [api, propsCall]);
+  }, [registry, propsCall]);
   // const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
   const [note, setNote] = useState<string>(transaction?.note || '');
   const filterPaths = useFilterPaths(accountData, transaction);
@@ -78,12 +85,12 @@ function TxSubmit({
     () => addressChain.length > 0 && addressChain.some((item) => item.type === 'proposer'),
     [addressChain]
   );
-  const buildTx = useBuildTx(call, addressChain, transaction);
+  const buildTx = useBuildTx(network, call ?? undefined, addressChain, transaction);
 
   // Gas fee calculation state
   const nativeGasFee = useGasFeeEstimate(buildTx.txBundle?.tx || null, buildTx.txBundle?.signer);
   const [selectedFeeAsset, setSelectedFeeAsset] = useState<CompleteEnhancedAssetInfo | null>(null);
-  const convertedFee = useAssetConversion(nativeGasFee, selectedFeeAsset);
+  const convertedFee = useAssetConversion(network, nativeGasFee, selectedFeeAsset);
 
   const gasFeeInfo = useMemo(() => {
     if (convertedFee === undefined || convertedFee === null || !selectedFeeAsset) {
@@ -129,6 +136,8 @@ function TxSubmit({
   const hasPermission = isLocalAccount(accountData.address);
 
   const handleAddBatch = useCallback(() => {
+    if (!call) return;
+
     addTx([
       {
         calldata: call.toHex(),
@@ -141,6 +150,8 @@ function TxSubmit({
   }, [addTx, appName, call, iconUrl, onClose, website]);
 
   const handleAddTemplate = useCallback(() => {
+    if (!call) return;
+
     events.emit('template_add', network, call.toHex());
   }, [call, network]);
 
@@ -169,7 +180,7 @@ function TxSubmit({
       </div>
 
       {alert && (
-        <Alert className='flex-grow-0'>
+        <Alert className='grow-0'>
           <AlertTitle>{alert}</AlertTitle>
         </Alert>
       )}
@@ -185,13 +196,14 @@ function TxSubmit({
 
           <Divider />
 
-          <Call account={accountData.address} method={call} transaction={transaction} />
+          {call && <Call account={accountData.address} method={call} transaction={transaction} />}
 
-          {!api.call.dryRunApi?.dryRunCall ? (
-            <Chopsticks call={call} account={accountData.address} />
-          ) : (
-            <DryRun call={call} account={accountData.address} />
-          )}
+          {call &&
+            (supportsDryRun ? (
+              <DryRun call={call} account={accountData.address} />
+            ) : (
+              <Chopsticks call={call} account={accountData.address} />
+            ))}
 
           {/* <SafetyCheck safetyCheck={safetyCheck} /> */}
         </div>

@@ -8,11 +8,11 @@ import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import React, { useRef } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Badge, Button, Tooltip } from '@mimir-wallet/ui';
 
 function BatchButton() {
-  const { network } = useApi();
+  const { network } = useNetwork();
   const { current } = useAccount();
   const [txs] = useBatchTxs(network, current);
   const { openRightSidebar, closeRightSidebar, rightSidebarOpen, setRightSidebarTab } = useMimirLayout();

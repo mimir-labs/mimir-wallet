@@ -5,14 +5,15 @@ import { Input, InputNetwork } from '@/components';
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { useParseCall } from '@/hooks/useParseCall';
 import React, { useImperativeHandle, useMemo, useState } from 'react';
 
-import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
+import { handleDecodeError } from '../shared/error-handling';
 import { ErrorDisplay } from '../shared/ErrorDisplay';
 import DotConsoleButton from './DotConsoleButton';
-import { decodeCallData } from './utils';
 
 // CallDataView ref interface for external control
 export interface CallDataViewRef {
@@ -31,12 +32,11 @@ function CallDataViewerContent({
   setNetwork: (value: string) => void;
   setCallData: (value: string) => void;
 }) {
-  const { api } = useApi();
+  // Parse call data using async hook
+  const { call: parsedCallData, error } = useParseCall(network, calldata);
 
-  // Derive parsed call data and error from registry and calldata
-  const [parsedCallData, callDataError] = useMemo(() => {
-    return decodeCallData(api.registry, calldata);
-  }, [api.registry, calldata]);
+  // Convert standard Error to FeatureError for ErrorDisplay
+  const callDataError = useMemo(() => (error ? handleDecodeError(error, 'call data decoding') : null), [error]);
 
   return (
     <div className='h-full space-y-5'>
@@ -95,9 +95,9 @@ function CallDataViewer({ calldata: initialCallData, ref }: CallDataViewerProps)
   );
 
   return (
-    <SubApiRoot network={network}>
+    <NetworkProvider network={network}>
       <CallDataViewerContent network={network} calldata={calldata} setNetwork={setNetwork} setCallData={setCallData} />
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

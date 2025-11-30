@@ -7,7 +7,7 @@ import { WsProvider } from '@polkadot/api';
 import { useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
-import { type Endpoint, NETWORK_RPC_PREFIX, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { type Endpoint, NETWORK_RPC_PREFIX, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 import { Alert, AlertTitle, Button, buttonSpinner, Combobox, type ComboboxOption, Divider } from '@mimir-wallet/ui';
 
@@ -116,8 +116,8 @@ function Content({ chain }: { chain: Endpoint }) {
 }
 
 function NetworkSetting() {
-  const { networks } = useNetworks();
-  const { network: defaultNetwork } = useApi();
+  const { chains: networks } = useChains();
+  const { network: defaultNetwork } = useNetwork();
   const [network, setNetwork] = useState(defaultNetwork);
 
   const chain = networks.find((item) => item.key === network);

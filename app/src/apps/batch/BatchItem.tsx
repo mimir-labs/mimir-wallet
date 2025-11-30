@@ -13,7 +13,7 @@ interface Props {
   children: React.ReactNode;
   actions?: React.ReactNode;
   calldata: HexString;
-  registry: Registry;
+  registry: Registry | null;
   from: string;
   bgcolor?: string;
 }

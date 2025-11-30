@@ -13,7 +13,6 @@ import { useWallet } from '@/wallet/useWallet';
 import { createFileRoute, Navigate, Outlet, useLocation, useMatches } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
 import { SidebarProvider } from '@mimir-wallet/ui';
 
 import { useAccount } from '../accounts/useAccount';
@@ -42,13 +41,9 @@ export const Route = createFileRoute('/_authenticated')({
 });
 
 // Helper function to determine if main content should be shown
-const shouldShowMainContent = (
-  skipConnect: boolean,
-  isApiReady: boolean,
-  isWalletReady: boolean,
-  isMultisigSyned: boolean
-): boolean => {
-  return skipConnect || (isApiReady && isWalletReady && isMultisigSyned);
+// Note: isApiReady check removed - ApiManager.getApi() handles API readiness internally
+const shouldShowMainContent = (skipConnect: boolean, isWalletReady: boolean, isMultisigSyned: boolean): boolean => {
+  return skipConnect || (isWalletReady && isMultisigSyned);
 };
 
 // Top section component (TopBar + Alert)
@@ -167,7 +162,6 @@ function AuthenticatedLayout() {
 
   const { skipConnect = false, withPadding = true } = layoutOptions || {};
 
-  const { isApiReady } = useApi();
   const { isWalletReady } = useWallet();
   const { current, isMultisigSyned } = useAccount();
   const { pathname } = useLocation();
@@ -191,7 +185,7 @@ function AuthenticatedLayout() {
   }
 
   // Check if main content should be displayed
-  const showMainContent = shouldShowMainContent(skipConnect, isApiReady, isWalletReady, isMultisigSyned);
+  const showMainContent = shouldShowMainContent(skipConnect, isWalletReady, isMultisigSyned);
 
   // Sidebar provider styles
   const sidebarProviderStyle = {

@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 
 interface SwitchNetworksProps {
   eventId: string;
@@ -12,7 +12,7 @@ interface SwitchNetworksProps {
 
 // SwitchNetworks component based on Figma design
 function SwitchNetworks({ networks }: SwitchNetworksProps) {
-  const { networks: allNetworks } = useNetworks();
+  const { chains: allNetworks } = useChains();
 
   const networkList = useMemo(() => {
     const result = [];

@@ -6,7 +6,7 @@ import { useProxyBestBlock } from '@/hooks/useProxyBestBlock';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
-import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, ApiManager, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 type AnnouncementStatus =
@@ -26,8 +26,7 @@ async function fetchAnnouncementsForStatus({ queryKey }: { queryKey: readonly [s
     throw new Error('Invalid delegate');
   }
 
-  const allApis = useAllApis.getState().chains;
-  const api = allApis[network]?.api;
+  const api = await ApiManager.getInstance().getApi(network);
 
   if (!api) {
     throw new Error(`API not available for network: ${network}`);
@@ -40,7 +39,8 @@ export function useAnnouncementStatus(
   transaction: Transaction,
   account: AccountData
 ): [status: AnnouncementStatus, isFetching: boolean] {
-  const { isApiReady, network, api } = useApi();
+  const { network } = useNetwork();
+  const { isApiReady } = useChainStatus(network);
 
   const status = transaction.status;
   const type = transaction.type;
@@ -49,7 +49,7 @@ export function useAnnouncementStatus(
     [account.delegatees, transaction.delegate]
   );
 
-  const [bestBlock, isFetched, isFetching] = useProxyBestBlock();
+  const [bestBlock, isFetched, isFetching] = useProxyBestBlock(network);
   const {
     data: result,
     isFetched: isFetchedResult,
@@ -57,11 +57,7 @@ export function useAnnouncementStatus(
   } = useQuery({
     queryKey: ['announcement-status', network, transaction.delegate || ''] as const,
     enabled:
-      isApiReady &&
-      !!api?.query.proxy?.announcements &&
-      !!transaction.delegate &&
-      status === TransactionStatus.Pending &&
-      type === TransactionType.Announce,
+      isApiReady && !!transaction.delegate && status === TransactionStatus.Pending && type === TransactionType.Announce,
     refetchOnMount: false,
     queryFn: fetchAnnouncementsForStatus
   });

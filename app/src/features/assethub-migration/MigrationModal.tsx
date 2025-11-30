@@ -7,7 +7,7 @@ import { MIGRATION_DOCS_URL } from '@/constants';
 import { useCopyAddress } from '@/hooks/useCopyAddress';
 import { useMemo } from 'react';
 
-import { addressToHex, useNetworks } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useChains } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import IdentityIcon from '../../components/IdentityIcon';
@@ -50,7 +50,7 @@ function AccountItem({ account }: { account: MigratedAccount }) {
 }
 
 function MigrationModal({ isOpen, onClose, destChain, accounts = [] }: Props) {
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
   const { accounts: localAccounts, metas } = useAccount();
 
   const destNetwork = useMemo(() => networks.find((network) => network.key === destChain), [networks, destChain]);

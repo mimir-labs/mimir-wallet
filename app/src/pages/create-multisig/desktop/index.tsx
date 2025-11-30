@@ -17,7 +17,7 @@ import {
   toFunctionCallString,
   toFunctionCallStringArray
 } from '@mimir-wallet/ai-assistant';
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
 
 import CreateStaticModal from '../components/CreateStaticModal';
@@ -131,7 +131,7 @@ function DesktopCreateMultisig() {
   };
 
   return (
-    <SubApiRoot network={network}>
+    <NetworkProvider network={network}>
       {prepare ? (
         <CreateFlexible prepare={prepare} onCancel={() => setPrepare(undefined)} />
       ) : (
@@ -210,7 +210,7 @@ function DesktopCreateMultisig() {
       {completedAddress && (
         <CreateSuccess isOpen={isSuccess} onClose={() => toggleSuccess(false)} address={completedAddress} />
       )}
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

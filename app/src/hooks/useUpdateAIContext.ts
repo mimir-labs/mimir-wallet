@@ -7,17 +7,17 @@ import { useLocation } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
 import { useAIContext } from '@mimir-wallet/ai-assistant';
-import { addressToHex, encodeAddress, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { addressToHex, encodeAddress, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
 
 export function useUpdateAIContext() {
-  const { networks } = useNetworks();
+  const { chains } = useChains();
   const { metas, isLocalAccount, accounts, addresses, current } = useAccount();
-  const { chainSS58 } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
   const { pathname } = useLocation();
 
   useEffect(() => {
     useAIContext.setState({
-      supportedNetworks: networks.map((item) => ({
+      supportedNetworks: chains.map((item) => ({
         key: item.key,
         name: item.name,
         isRelayChain: !!item.isRelayChain,
@@ -28,7 +28,7 @@ export function useUpdateAIContext() {
         isEnabled: item.enabled
       }))
     });
-  }, [networks]);
+  }, [chains]);
 
   useEffect(() => {
     useAIContext.setState({

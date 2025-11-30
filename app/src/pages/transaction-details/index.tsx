@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
-import type { IMethod } from '@polkadot/types/types';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useParseCall } from '@/hooks/useParseCall';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 import { GroupedTransactions, TxProgress } from '@/transactions';
 import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
@@ -13,13 +13,13 @@ import Extrinsic from '@/transactions/TxCell/Extrinsic';
 import { useParams } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
-import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
 
 import Summary from './Summary';
 
 function SmPage({ transaction: propsTransaction }: { transaction: Transaction }) {
-  const { api, network } = useApi();
+  const { network } = useNetwork();
   const [account] = useQueryAccount(propsTransaction?.address);
   const [shouldLoadDetails, setShouldLoadDetails] = useState(false);
   const [fullTransaction] = useTransactionDetail(
@@ -29,17 +29,8 @@ function SmPage({ transaction: propsTransaction }: { transaction: Transaction })
   // Use full transaction if loaded, otherwise use original
   const transaction = fullTransaction || propsTransaction;
 
-  const call = useMemo(() => {
-    if (!transaction.call) return null;
-
-    try {
-      return api.registry.createTypeUnsafe('Call', [transaction.call]) as IMethod;
-    } catch (e) {
-      console.log(e);
-
-      return null;
-    }
-  }, [api, transaction.call]);
+  // Parse call data using async hook
+  const { call } = useParseCall(network, transaction.call);
 
   if (!account) {
     return null;
@@ -87,9 +78,9 @@ function PageTransactionDetails() {
   return upSm ? (
     <GroupedTransactions groupedTransactions={groupedTransactions} />
   ) : (
-    <SubApiRoot network={transaction.network}>
+    <NetworkProvider network={transaction.network}>
       <SmPage transaction={transaction} />
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

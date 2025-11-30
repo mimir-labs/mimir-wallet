@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useToggle } from 'react-use';
 
-import { getChainIcon, useNetworks } from '@mimir-wallet/polkadot-core';
+import { getChainIcon, useChains } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Badge,
@@ -159,7 +159,7 @@ function NotificationButton() {
   const [shouldShake, setShouldShake] = useState(false);
   const prevUnreadCountRef = useRef<number>(0);
   const navigate = useNavigate();
-  const { enableNetwork } = useNetworks();
+  const { enableNetwork } = useChains();
 
   const unreadCount = getUnreadCount();
 

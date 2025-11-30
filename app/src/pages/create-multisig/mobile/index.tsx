@@ -3,7 +3,7 @@
 
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 
 import CreateMultisig from './CreateMultisig';
 
@@ -11,9 +11,9 @@ function PageCreateMultisig() {
   const [network, setNetwork] = useInputNetwork();
 
   return (
-    <SubApiRoot network={network}>
+    <NetworkProvider network={network}>
       <CreateMultisig network={network} setNetwork={setNetwork} />
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

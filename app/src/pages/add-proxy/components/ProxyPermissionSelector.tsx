@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { proxyTypeDescriptions } from '../utils';
 
 export interface ProxyPermissionSelectorProps {
+  network: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -24,6 +25,7 @@ export interface ProxyPermissionSelectorProps {
  * Used for both desktop and mobile versions
  */
 function ProxyPermissionSelector({
+  network,
   value,
   onChange,
   placeholder = 'Select permission level',
@@ -32,7 +34,7 @@ function ProxyPermissionSelector({
   label,
   description
 }: ProxyPermissionSelectorProps) {
-  const proxyTypes = useProxyTypes();
+  const proxyTypes = useProxyTypes(network);
 
   return (
     <div className={`flex flex-col gap-1 ${className}`}>

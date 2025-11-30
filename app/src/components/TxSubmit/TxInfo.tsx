@@ -5,7 +5,7 @@ import IconCopy from '@/assets/svg/icon-copy.svg?react';
 import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import React from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Avatar } from '@mimir-wallet/ui';
 
 import Address from '../Address';
@@ -21,7 +21,7 @@ interface Props {
 }
 
 function TxInfo({ address, website, iconUrl, appName }: Props) {
-  const { chain } = useApi();
+  const { chain } = useNetwork();
   const copyAddress = useCopyAddressToClipboard(address);
 
   return (

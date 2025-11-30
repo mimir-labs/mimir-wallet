@@ -9,7 +9,7 @@ import type { TemplateInfo } from './types';
 import { CopyButton } from '@/components';
 import { useEffect, useMemo, useState } from 'react';
 
-import { createBlockRegistry, useAllApis, useNetworks } from '@mimir-wallet/polkadot-core';
+import { ApiManager, createBlockRegistry, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
 
 import { useSavedTemplate } from './useSavedTemplate';
@@ -187,13 +187,12 @@ export function TemplateMigrationModal({
   block,
   onMigrate
 }: TemplateMigrationModalProps) {
-  const { networks, enableNetwork } = useNetworks();
-  const { chains } = useAllApis();
+  const { chains: networks, enableNetwork } = useChains();
+  const { isApiReady: sourceReady } = useChainStatus(sourceChain);
+  const { isApiReady: destReady } = useChainStatus(destChain);
+  const [sourceApi, setSourceApi] = useState<ApiPromise | null>(null);
+  const [destApi, setDestApi] = useState<ApiPromise | null>(null);
   const [registry, setRegistry] = useState<Registry | null>(null);
-
-  const sourceReady = !!chains[sourceChain]?.isApiReady;
-  const destReady = !!chains[destChain]?.isApiReady;
-  const destApi = chains[destChain]?.api;
 
   const sourceNetwork = networks.find((network) => network.key === sourceChain);
   const destNetwork = networks.find((network) => network.key === destChain);
@@ -205,16 +204,35 @@ export function TemplateMigrationModal({
     }
   }, [enableNetwork, sourceChain, destChain, isOpen]);
 
+  // Load APIs
+  useEffect(() => {
+    if (sourceReady) {
+      ApiManager.getInstance()
+        .getApi(sourceChain)
+        .then((api) => {
+          if (api) setSourceApi(api);
+        });
+    }
+  }, [sourceChain, sourceReady]);
+
+  useEffect(() => {
+    if (destReady) {
+      ApiManager.getInstance()
+        .getApi(destChain)
+        .then((api) => {
+          if (api) setDestApi(api);
+        });
+    }
+  }, [destChain, destReady]);
+
   // Create registry for parsing calls
   useEffect(() => {
-    if (block && chains[sourceChain]?.api) {
-      const api = chains[sourceChain].api!;
-
-      createBlockRegistry(api, block).then((registry) => {
+    if (block && sourceApi) {
+      createBlockRegistry(sourceApi, block).then((registry) => {
         setRegistry(registry);
       });
     }
-  }, [block, sourceChain, destChain, chains]);
+  }, [block, sourceApi]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size='lg'>

@@ -13,7 +13,7 @@ import { formatDisplay, formatUnits } from '@/utils';
 import { Link } from '@tanstack/react-router';
 import React, { useMemo, useState } from 'react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
@@ -30,7 +30,7 @@ import {
 
 function Assets({ address }: { address: string }) {
   const allChainBalances = useAllChainBalances(address);
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: 'balanceUsd',
     direction: 'descending'

@@ -13,7 +13,7 @@ import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useEffect, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { useNetwork, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
@@ -25,7 +25,9 @@ interface AccountStructureProps {
 }
 
 function AccountStructure({ members, name, threshold, isPureProxy }: AccountStructureProps) {
-  const { genesisHash, chainSS58 } = useApi();
+  const { chain } = useNetwork();
+  const genesisHash = chain.genesisHash;
+  const { ss58: chainSS58 } = useSs58Format();
   const [multisigAccount, setMultisigAccount] = React.useState<AccountData>();
   const [fullAccount, setFullAccount] = React.useState<AccountData>();
   const [isFetching, setIsFetching] = React.useState(false);

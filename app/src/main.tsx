@@ -23,7 +23,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 
-import { ApiRoot, initializeApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { getNetworkMode, NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { API_CLIENT_GATEWAY, initService, QueryProvider } from '@mimir-wallet/service';
 
 import { initializeAccount } from './accounts/initialize';
@@ -53,7 +53,7 @@ ChartJS.register(
 // Create React root container for application mounting
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
-const isOmni = useNetworks.getState().mode === 'omni';
+const isOmni = getNetworkMode() === 'omni';
 
 // Initialize core Mimir wallet configuration and get initial chain and address settings
 // This sets up the basic configuration needed for the wallet to function
@@ -67,10 +67,6 @@ initService(API_CLIENT_GATEWAY);
 // This ensures older versions of stored address data are compatible with current version
 upgradeAddresBook();
 
-// Initialize blockchain API connection
-// This establishes connection to the blockchain node and sets up API instance
-initializeApi(chain);
-
 // Set up wallet connection and state management
 // This initializes wallet providers (like Polkadot.js) and restores previous connections
 initializeWallet();
@@ -83,11 +79,11 @@ initializeAccount(chain, address);
 // StrictMode is enabled in development to help identify potential problems
 const app = (
   <StrictMode>
-    <ApiRoot chain={chain}>
+    <NetworkProvider network={chain.key}>
       <QueryProvider>
         <RouterProvider router={router} />
       </QueryProvider>
-    </ApiRoot>
+    </NetworkProvider>
   </StrictMode>
 );
 

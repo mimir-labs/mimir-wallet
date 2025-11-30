@@ -7,40 +7,19 @@ import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import { Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
-import { type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import {
-  Avatar,
-  Badge,
-  Button,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Spinner,
-  Switch,
-  Tooltip
-} from '@mimir-wallet/ui';
+import { type Network, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
+import { Avatar, Badge, Button, Popover, PopoverContent, PopoverTrigger, Switch, Tooltip } from '@mimir-wallet/ui';
 
 function Status({ network }: { network: Network }) {
-  const { allApis } = useApi();
+  const { isApiReady, isApiInitialized, apiError } = useChainStatus(network.key);
 
-  const apiState = allApis[network.key];
-
-  if (!apiState) {
+  if (!isApiInitialized) {
     return <Avatar src={network.icon} style={{ width: 32, height: 32, backgroundColor: 'transparent' }} />;
   }
 
   return (
-    <Tooltip
-      content={
-        apiState.isApiReady ? 'Connected' : apiState.apiError ? apiState.apiError || 'Connect Failed' : 'Connecting...'
-      }
-    >
-      <Badge
-        color={apiState.isApiReady ? 'success' : apiState.apiError ? 'danger' : 'warning'}
-        content=''
-        shape='circle'
-        size='sm'
-      >
+    <Tooltip content={isApiReady ? 'Connected' : apiError ? apiError || 'Connect Failed' : 'Connecting...'}>
+      <Badge color={isApiReady ? 'success' : apiError ? 'danger' : 'warning'} content='' shape='circle' size='sm'>
         <Avatar src={network.icon} style={{ width: 32, height: 32, backgroundColor: 'transparent' }} />
       </Badge>
     </Tooltip>
@@ -143,12 +122,11 @@ function GroupedEndpoints({
 }
 
 function OmniChainSelect() {
-  const { isApiReady } = useApi();
-  const { networks, enableNetwork, disableNetwork } = useNetworks();
+  const { chains, enableNetwork, disableNetwork } = useChains();
 
-  const enabledNetworks = useMemo(() => networks.filter((network) => network.enabled), [networks]);
+  const enabledNetworks = useMemo(() => chains.filter((network) => network.enabled), [chains]);
   const groupedEndpoints = useMemo(() => {
-    const list = networks.reduce(
+    const list = chains.reduce(
       (acc, network) => {
         if (network.isRelayChain) {
           acc[network.key] = [...(acc[network.key] || []), network];
@@ -164,7 +142,7 @@ function OmniChainSelect() {
     );
 
     return list;
-  }, [networks]);
+  }, [chains]);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -180,67 +158,58 @@ function OmniChainSelect() {
           <>
             <IconWebsite className='block sm:hidden' />
             <div className='hidden sm:block'>
-              {isApiReady ? (
-                enabledNetworks.length > 3 ? (
-                  <div className='flex items-center'>
-                    <Avatar
-                      className='bg-transparent select-none'
-                      style={{ width: 20, height: 20 }}
-                      src={enabledNetworks[0].icon}
-                    />
-                    <Avatar
-                      className='ml-[-10px] bg-transparent select-none'
-                      style={{ width: 20, height: 20 }}
-                      src={enabledNetworks[1].icon}
-                    />
-                    <Avatar
-                      className='ml-[-10px] bg-transparent select-none'
-                      style={{ width: 20, height: 20 }}
-                      src={enabledNetworks[2].icon}
-                    />
-                    <Avatar
-                      className='bg-primary border-divider-300 ml-[-10px] border-1 select-none'
-                      style={{ width: 20, height: 20 }}
-                      showFallback
-                      fallback={
-                        <svg xmlns='http://www.w3.org/2000/svg' width='11' height='2' viewBox='0 0 11 2' fill='none'>
-                          <path
-                            fillRule='evenodd'
-                            clipRule='evenodd'
-                            d='M2.73975 1C2.73975 1.55228 2.29203 2 1.73975 2C1.18746 2 0.739746 1.55228 0.739746 1C0.739746 0.447715 1.18746 0 1.73975 0C2.29203 0 2.73975 0.447715 2.73975 1ZM6.73975 1C6.73975 1.55228 6.29203 2 5.73975 2C5.18746 2 4.73975 1.55228 4.73975 1C4.73975 0.447715 5.18746 0 5.73975 0C6.29203 0 6.73975 0.447715 6.73975 1ZM9.73975 2C10.292 2 10.7397 1.55228 10.7397 1C10.7397 0.447715 10.292 0 9.73975 0C9.18746 0 8.73975 0.447715 8.73975 1C8.73975 1.55228 9.18746 2 9.73975 2Z'
-                            fill='white'
-                          />
-                        </svg>
-                      }
-                    />
-                  </div>
-                ) : (
-                  <div className='flex items-center'>
-                    {enabledNetworks.map((network, index) => (
-                      <Avatar
-                        className='bg-transparent select-none'
-                        style={{ width: 20, height: 20, marginLeft: index > 0 ? '-10px' : 0 }}
-                        src={network.icon}
-                      />
-                    ))}
-                  </div>
-                )
+              {enabledNetworks.length > 3 ? (
+                <div className='flex items-center'>
+                  <Avatar
+                    className='bg-transparent select-none'
+                    style={{ width: 20, height: 20 }}
+                    src={enabledNetworks[0].icon}
+                  />
+                  <Avatar
+                    className='ml-[-10px] bg-transparent select-none'
+                    style={{ width: 20, height: 20 }}
+                    src={enabledNetworks[1].icon}
+                  />
+                  <Avatar
+                    className='ml-[-10px] bg-transparent select-none'
+                    style={{ width: 20, height: 20 }}
+                    src={enabledNetworks[2].icon}
+                  />
+                  <Avatar
+                    className='bg-primary border-divider-300 ml-[-10px] border-1 select-none'
+                    style={{ width: 20, height: 20 }}
+                    showFallback
+                    fallback={
+                      <svg xmlns='http://www.w3.org/2000/svg' width='11' height='2' viewBox='0 0 11 2' fill='none'>
+                        <path
+                          fillRule='evenodd'
+                          clipRule='evenodd'
+                          d='M2.73975 1C2.73975 1.55228 2.29203 2 1.73975 2C1.18746 2 0.739746 1.55228 0.739746 1C0.739746 0.447715 1.18746 0 1.73975 0C2.29203 0 2.73975 0.447715 2.73975 1ZM6.73975 1C6.73975 1.55228 6.29203 2 5.73975 2C5.18746 2 4.73975 1.55228 4.73975 1C4.73975 0.447715 5.18746 0 5.73975 0C6.29203 0 6.73975 0.447715 6.73975 1ZM9.73975 2C10.292 2 10.7397 1.55228 10.7397 1C10.7397 0.447715 10.292 0 9.73975 0C9.18746 0 8.73975 0.447715 8.73975 1C8.73975 1.55228 9.18746 2 9.73975 2Z'
+                          fill='white'
+                        />
+                      </svg>
+                    }
+                  />
+                </div>
               ) : (
-                <Spinner size='sm' />
+                <div className='flex items-center'>
+                  {enabledNetworks.map((network, index) => (
+                    <Avatar
+                      key={network.key}
+                      className='bg-transparent select-none'
+                      style={{ width: 20, height: 20, marginLeft: index > 0 ? '-10px' : 0 }}
+                      src={network.icon}
+                    />
+                  ))}
+                </div>
               )}
             </div>
           </>
           <span className='hidden sm:block'>
-            {isApiReady
-              ? enabledNetworks.length > 1
-                ? `${enabledNetworks.length} Networks`
-                : `${enabledNetworks.at(0)?.name}`
-              : 'Connecting...'}
+            {enabledNetworks.length > 1 ? `${enabledNetworks.length} Networks` : `${enabledNetworks.at(0)?.name}`}
           </span>
-          <span className='block sm:hidden'>
-            {isApiReady ? (enabledNetworks.length > 1 ? `${enabledNetworks.length}` : '') : 'Connecting...'}
-          </span>
-          {isApiReady ? <ArrowDown className='hidden sm:block' /> : null}
+          <span className='block sm:hidden'>{enabledNetworks.length > 1 ? `${enabledNetworks.length}` : ''}</span>
+          <ArrowDown className='hidden sm:block' />
         </Button>
       </PopoverTrigger>
       <PopoverContent side='bottom' align='end' className='rounded-[20px] p-2.5'>

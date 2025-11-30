@@ -15,8 +15,8 @@ import { useToggle } from 'react-use';
 const routeApi = getRouteApi('/_authenticated/explorer/$url');
 
 import { type FunctionCallHandler, toFunctionCallString } from '@mimir-wallet/ai-assistant';
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Spinner } from '@mimir-wallet/ui';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
 
 import TransferAction from './TransferAction';
 import TransferContent from './TransferContent';
@@ -96,15 +96,7 @@ function PageTransfer() {
   });
 
   return (
-    <SubApiRoot
-      network={network}
-      supportedNetworks={supportedNetworks?.map((item) => item.key)}
-      Fallback={({ apiState: { chain } }) => (
-        <div className='bg-content1 mx-auto mt-16 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
-          <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-        </div>
-      )}
-    >
+    <NetworkProvider network={network}>
       <div className='mx-auto w-full max-w-[500px] p-4 sm:p-5'>
         <Button onClick={() => window.history.back()} variant='ghost'>
           {'<'} Back
@@ -156,7 +148,7 @@ function PageTransfer() {
           </div>
         </div>
       </div>
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

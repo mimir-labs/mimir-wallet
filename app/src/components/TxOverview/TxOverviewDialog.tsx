@@ -4,7 +4,7 @@
 import { type AccountData, type Transaction, TransactionStatus } from '@/hooks/types';
 import React from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
 import HistoryTxOverview from './HistoryTxOverview';
@@ -19,7 +19,7 @@ interface Props {
 }
 
 function TxOverviewDialog({ account, showButton, transaction, onClose, open }: Props) {
-  const { api } = useApi();
+  const { network } = useNetwork();
 
   return (
     <Modal size='5xl' onClose={onClose} isOpen={open}>
@@ -29,7 +29,7 @@ function TxOverviewDialog({ account, showButton, transaction, onClose, open }: P
           <div className='border-divider-300 h-[50dvh] flex-auto rounded-[10px] border-1'>
             {open && transaction.status < TransactionStatus.Success ? (
               <PendingTxOverview
-                api={api}
+                network={network}
                 showButton={showButton}
                 account={account}
                 call={transaction.call}

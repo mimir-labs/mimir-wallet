@@ -5,25 +5,34 @@ import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
 import { useMemo, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
 
 import { useChainXcmAsset } from './useXcmAssets';
 
+async function fetchCustomGasFeeSupport({ queryKey }: { queryKey: readonly [string, string] }): Promise<boolean> {
+  const [, network] = queryKey;
+
+  const api = await ApiManager.getInstance().getApi(network);
+
+  // Check if the chain has ChargeAssetTxPayment signed extension
+  return api.registry.signedExtensions.some((ext) => ext === 'ChargeAssetTxPayment');
+}
+
 /**
- * Hook to check if the current chain supports custom asset fees
+ * Hook to check if a specific chain supports custom asset fees
  * This is determined by checking for ChargeAssetTxPayment in signed extensions
+ * @param network - The network key to query
  */
-export function useCustomGasFeeSupport(): boolean {
-  const { api, isApiReady } = useApi();
+export function useCustomGasFeeSupport(network: string): boolean {
+  const { data } = useQuery({
+    queryKey: ['custom-gas-fee-support', network] as const,
+    queryFn: fetchCustomGasFeeSupport,
+    enabled: !!network,
+    staleTime: Infinity // Support status doesn't change
+  });
 
-  return useMemo(() => {
-    if (!isApiReady || !api) {
-      return false;
-    }
-
-    // Check if the chain has ChargeAssetTxPayment signed extension
-    return api.registry.signedExtensions.some((ext) => ext === 'ChargeAssetTxPayment');
-  }, [api, isApiReady]);
+  return data ?? false;
 }
 
 /**
@@ -31,7 +40,7 @@ export function useCustomGasFeeSupport(): boolean {
  * Filters assets that can be used for transaction fees
  */
 export function useCustomGasFee(network: string) {
-  const isSupported = useCustomGasFeeSupport();
+  const isSupported = useCustomGasFeeSupport(network);
   const [assets, isFetched, isFetching] = useChainXcmAsset(network);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 

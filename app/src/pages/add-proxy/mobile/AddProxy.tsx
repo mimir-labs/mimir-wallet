@@ -13,7 +13,7 @@ import { useProxyTypes } from '@/hooks/useProxyTypes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, ApiManager, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import {
   Alert,
@@ -45,8 +45,7 @@ async function fetchProxiesForAddress({ queryKey }: { queryKey: readonly [string
     throw new Error('Invalid proxy address');
   }
 
-  const allApis = useAllApis.getState().chains;
-  const api = allApis[network]?.api;
+  const api = await ApiManager.getInstance().getApi(network);
 
   if (!api) {
     throw new Error(`API not available for network: ${network}`);
@@ -68,7 +67,9 @@ function AddProxy({
   setNetwork: (network: string) => void;
   setProxied: (proxied: string | undefined) => void;
 }) {
-  const { genesisHash, isApiReady } = useApi();
+  const { chain } = useNetwork();
+  const genesisHash = chain.genesisHash;
+  const { isApiReady } = useChainStatus(network);
   const { accounts, addresses, current } = useAccount();
 
   // filter accounts by network
@@ -78,12 +79,12 @@ function AddProxy({
 
     return [filteredProxied, filteredProxy];
   }, [accounts, addresses, genesisHash]);
-  const proxyTypes = useProxyTypes();
+  const proxyTypes = useProxyTypes(network);
   const [proxyType, setProxyType] = useState<string>(proxyTypes?.[0]?.text || 'Any');
   const [name, setName] = useInput('');
   const [advanced, toggleAdvanced] = useToggle(false);
   const [custom, setCustom] = useState<string>('');
-  const blockInterval = useBlockInterval().toNumber();
+  const blockInterval = useBlockInterval(network).toNumber();
   const reviewWindows = {
     [(ONE_DAY * 1000) / blockInterval]: '1 Day',
     [(ONE_DAY * 7 * 1000) / blockInterval]: '1 Week',
@@ -182,6 +183,7 @@ function AddProxy({
             {pure && <Input label='Name' value={name} onChange={setName} />}
 
             <ProxyPermissionSelector
+              network={network}
               value={proxyType}
               onChange={setProxyType}
               label='Authorize'
@@ -262,6 +264,7 @@ function AddProxy({
               proxyArgs.map((arg, index) => (
                 <ProxyInfo
                   key={index}
+                  network={network}
                   proxied={proxied}
                   delegate={arg.delegate}
                   delay={arg.delay}
@@ -296,6 +299,7 @@ function AddProxy({
                 {existsProxies.map((proxy, index) => (
                   <ProxyInfo
                     key={`proxy_${index}`}
+                    network={network}
                     proxied={proxy.proxied}
                     delegate={proxy.delegate}
                     delay={proxy.delay}

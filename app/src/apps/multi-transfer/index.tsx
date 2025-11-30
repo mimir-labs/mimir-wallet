@@ -11,8 +11,8 @@ import { Link } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 
 import { type FunctionCallHandler, isFunctionCallArray, toFunctionCallString } from '@mimir-wallet/ai-assistant';
-import { isValidAddress, SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Spinner } from '@mimir-wallet/ui';
+import { isValidAddress, NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { Button, Divider } from '@mimir-wallet/ui';
 
 import MultiTransferContent from './MultiTransferContent';
 
@@ -115,14 +115,7 @@ function MultiTransfer() {
   );
 
   return (
-    <SubApiRoot
-      network={network}
-      Fallback={({ apiState: { chain } }) => (
-        <div className='bg-content1 mx-auto mt-16 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
-          <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-        </div>
-      )}
-    >
+    <NetworkProvider network={network}>
       <div className='mx-auto w-full max-w-[900px] p-4 sm:p-5'>
         <Button onClick={() => window.history.back()} variant='ghost'>
           {'<'} Back
@@ -157,7 +150,7 @@ function MultiTransfer() {
           />
         </div>
       </div>
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

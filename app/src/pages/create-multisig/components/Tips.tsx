@@ -3,25 +3,22 @@
 
 import { FormatBalance } from '@/components';
 import { REMOTE_PROXY_DOC_URL } from '@/constants';
-import { BN_ZERO } from '@polkadot/util';
+import { useProxyDeposit } from '@/hooks/useProxyDeposit';
 import { useMemo } from 'react';
 
-import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
+import { allEndpoints, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertDescription, AlertTitle } from '@mimir-wallet/ui';
 
 function Tips({ flexible }: { flexible: boolean }) {
-  const { chain, genesisHash, api } = useApi();
+  const { chain, network } = useNetwork();
+  const { totalDeposit } = useProxyDeposit(network);
 
   const remoteProxyChain = useMemo(
     () =>
-      remoteProxyRelations[genesisHash]
-        ? allEndpoints.find((item) => item.genesisHash === remoteProxyRelations[genesisHash])
+      remoteProxyRelations[chain.genesisHash]
+        ? allEndpoints.find((item) => item.genesisHash === remoteProxyRelations[chain.genesisHash])
         : null,
-    [genesisHash]
-  );
-  const reservedAmount = useMemo(
-    () => (api.consts.proxy ? api.consts.proxy.proxyDepositBase.add(api.consts.proxy.proxyDepositFactor) : BN_ZERO),
-    [api]
+    [chain.genesisHash]
   );
 
   return (
@@ -57,7 +54,7 @@ function Tips({ flexible }: { flexible: boolean }) {
             <li>
               <FormatBalance
                 withCurrency
-                value={reservedAmount}
+                value={totalDeposit}
                 icon={<img src={chain.tokenIcon} style={{ width: 14, height: 14, verticalAlign: 'middle' }} />}
               />{' '}
               will be locked until the pure proxy removal.

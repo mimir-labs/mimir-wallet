@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BatchTxItem } from '@/hooks/types';
+import type { Registry } from '@polkadot/types/types';
 
 import { analyticsActions } from '@/analytics';
 import { TxButton } from '@/components';
 import React, { useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox } from '@mimir-wallet/ui';
 
 import { filterOutBatchAllTransactions } from './utils';
@@ -17,6 +18,7 @@ function Actions({
   txs,
   selected,
   relatedBatches,
+  registry,
   setTxs,
   deleteTx,
   setSelected,
@@ -27,16 +29,17 @@ function Actions({
   txs: BatchTxItem[];
   selected: (string | number)[];
   relatedBatches: number[];
+  registry: Registry | null;
   setTxs: (txs: BatchTxItem[]) => void;
   deleteTx: (ids: (number | string)[]) => void;
   setSelected: React.Dispatch<React.SetStateAction<(string | number)[]>>;
   setRelatedBatches: (relatedBatches: number[]) => void;
   onClose?: () => void;
 }) {
-  const { api } = useApi();
+  const { network } = useNetwork();
 
   // Filter out batchAll transactions for select all
-  const selectableTxs = useMemo(() => filterOutBatchAllTransactions(txs, api.registry), [txs, api.registry]);
+  const selectableTxs = useMemo(() => (registry ? filterOutBatchAllTransactions(txs, registry) : []), [txs, registry]);
 
   const isCheckAll = selectableTxs.length > 0 && selected.length === selectableTxs.length;
   const isCheckSome = selected.length > 0 && selected.length < selectableTxs.length;
@@ -91,8 +94,14 @@ function Actions({
             throw error;
           }
         }}
-        getCall={() => {
+        getCall={async () => {
           try {
+            const api = await ApiManager.getInstance().getApi(network);
+
+            if (!api) {
+              throw new Error('API not ready');
+            }
+
             const selectedTxs = txs.filter((item) => selected.includes(item.id));
 
             if (selectedTxs.length === 0) {

@@ -11,7 +11,7 @@ import {
 } from '@/features/assethub-migration/useMigrationStatus';
 import { useState } from 'react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { type Network, useChains } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
 
 import { BatchMigrationModal } from './BatchMigrationModal';
@@ -30,14 +30,14 @@ function BatchMigrationAlert({
   const { isAlertVisible, dismissAlert } = useBatchMigrationStatus(chain, address);
 
   const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false);
-  const { networks } = useNetworks();
+  const { chains } = useChains();
   const migrationCompleted = useNetworkMigrationCompleted(chain);
 
   if (!isAlertVisible || !migrationCompleted.completed || !migrationCompleted.block || !migrationCompleted.destChain) {
     return null;
   }
 
-  const destNetwork = networks.find((network) => network.key === migrationCompleted.destChain);
+  const destNetwork = chains.find((network: Network) => network.key === migrationCompleted.destChain);
 
   const handleMigrationComplete = () => {
     dismissAlert();

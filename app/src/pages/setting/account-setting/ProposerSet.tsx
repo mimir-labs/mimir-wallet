@@ -13,7 +13,7 @@ import { accountSource } from '@/wallet/useWallet';
 import { memo, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import {
   Button,
@@ -47,7 +47,8 @@ function AddModal({
   onClose: () => void;
   refetch: () => void;
 }) {
-  const { genesisHash, network } = useApi();
+  const { chain, network } = useNetwork();
+  const genesisHash = chain.genesisHash;
   const [proposer, setProposer] = useState<string | undefined>();
   const [signer, setSigner] = useState<string | undefined>();
   const filtered = useManageProposerFilter(account);

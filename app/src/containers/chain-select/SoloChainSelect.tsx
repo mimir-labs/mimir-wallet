@@ -6,18 +6,19 @@ import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { internalToUrlNetwork } from '@/utils/networkMapping';
 import { useMemo } from 'react';
 
-import { allEndpoints, type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { allEndpoints, type Network, useChains, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
 
 function SoloChainSelect() {
   const { current } = useAccount();
-  const { isApiReady, network } = useApi();
-  const { networks } = useNetworks();
+  const { network } = useNetwork();
+  const { chains } = useChains();
+  const { isApiReady } = useChainStatus(network);
   const [account] = useQueryAccount(current);
 
   const endpoint = useMemo(() => allEndpoints.find((item) => item.key === network), [network]);
   const groupedEndpoints = useMemo(() => {
-    const groupedEndpoints = networks.reduce(
+    const groupedEndpoints = chains.reduce(
       (acc, network) => {
         if (network.isRelayChain) {
           acc[network.key] = [...(acc[network.key] || []), network];
@@ -33,7 +34,7 @@ function SoloChainSelect() {
     );
 
     return groupedEndpoints;
-  }, [networks]);
+  }, [chains]);
 
   return (
     <>

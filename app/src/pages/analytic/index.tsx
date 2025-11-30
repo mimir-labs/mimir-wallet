@@ -16,7 +16,7 @@ import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
 
-import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useChains } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
@@ -188,7 +188,7 @@ function Chart({
 function Transaction({ chains, address }: { chains: string[]; address: string }) {
   const [selectedChain, setSelectedChain] = useState<string>(chains[0]);
   const [data] = useQueryStats(selectedChain, address);
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
 
   const callOverview = useMemo(
     () =>
@@ -210,7 +210,7 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
   }, [networks, selectedChain]);
 
   return (
-    <SubApiRoot network={selectedChain}>
+    <NetworkProvider network={selectedChain}>
       <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
         <div className='col-span-2 flex gap-5'>
           <div className='bg-background shadow-medium col-span-2 flex w-full flex-col items-stretch justify-between gap-3 rounded-[20px] p-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:p-5 sm:px-12 sm:py-5'>
@@ -323,7 +323,7 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
 
         <Chart txDaily={data?.transactionCounts} callOverview={data?.callOverview} />
       </div>
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

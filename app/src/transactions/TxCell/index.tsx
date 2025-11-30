@@ -3,7 +3,7 @@
 
 import type { Transaction } from '@/hooks/types';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 
 import TxCell from './TxCell';
 
@@ -16,9 +16,9 @@ interface Props {
 
 function TxCellWrapper(props: Props) {
   return (
-    <SubApiRoot network={props.transaction.network}>
+    <NetworkProvider network={props.transaction.network}>
       <TxCell {...props} />
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

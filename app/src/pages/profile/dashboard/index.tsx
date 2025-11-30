@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import React, { useCallback, useState } from 'react';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import AccountStructure from './AccountStructure';
@@ -129,9 +129,9 @@ function DashboardV2({ address }: { address: string }) {
         {/* Account Structure */}
         <div className='col-span-8'>
           <Title>Account Strucuture</Title>
-          <SubApiRoot network={network} supportedNetworks={supportedNetworks?.map((n) => n.key)}>
+          <NetworkProvider network={network}>
             <AccountStructure address={address} setNetwork={setNetwork} />
-          </SubApiRoot>
+          </NetworkProvider>
         </div>
       </div>
     </div>

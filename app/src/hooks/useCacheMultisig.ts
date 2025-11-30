@@ -6,12 +6,15 @@ import type { CacheMultisig } from './types';
 import { useWallet } from '@/wallet/useWallet';
 import { isEqual } from 'lodash-es';
 
-import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
 
-export function useCacheMultisig(): [data: CacheMultisig[], isLoading: boolean] {
+/**
+ * Hook to get cached multisig data for a specific network
+ * @param network - The network key to query
+ */
+export function useCacheMultisig(network: string): [data: CacheMultisig[], isLoading: boolean] {
   const { walletAccounts } = useWallet();
-  const { network } = useApi();
 
   const addresses: string[] = walletAccounts.map(({ address }) => addressToHex(address)).sort();
   const { data, isLoading } = useQuery({

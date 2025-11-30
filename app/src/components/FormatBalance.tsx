@@ -7,7 +7,7 @@ import type { BN } from '@polkadot/util';
 import { formatDisplay, formatUnits } from '@/utils';
 import React, { useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 
 interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
   format?: [decimals: number, symbol: string];
@@ -26,10 +26,10 @@ function FormatBalance({
   className = '',
   ...props
 }: Props): React.ReactElement<Props> {
-  const { api } = useApi();
+  const { chain } = useNetwork();
   // Get decimals with fallback to DOT's standard 10 decimals
-  const decimals = format?.[0] ?? (api.registry.chainDecimals?.[0] || 10);
-  const currency = format?.[1] ?? (api.registry.chainTokens?.[0] || 'DOT');
+  const decimals = format?.[0] ?? (chain.nativeDecimals || 10);
+  const currency = format?.[1] ?? (chain.nativeToken || 'DOT');
 
   const [major, rest, unit] = useMemo(() => {
     // Ensure valid decimals, default to 10 for DOT if not available

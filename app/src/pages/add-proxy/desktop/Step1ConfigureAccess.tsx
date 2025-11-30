@@ -4,8 +4,8 @@
 import { useAccount } from '@/accounts/useAccount';
 import PureIcon from '@/assets/images/pure-icon.svg';
 import { AddressName, EditableField, InputAddress, InputNetwork, ProxyControls } from '@/components';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider, Switch } from '@mimir-wallet/ui';
 
 import Tips from '../components/Tips';
@@ -38,9 +38,8 @@ function Step1ConfigureAccess({
   onNext,
   onDataChange
 }: Step1ConfigureAccessProps) {
-  const { api } = useApi();
+  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(network);
   const { current } = useAccount();
-  const isProxyModuleSupported = !!api.tx.proxy;
 
   // Use validation hook for account filtering and validation
   const validationResult = useProxyValidation({
@@ -125,7 +124,7 @@ function Step1ConfigureAccess({
       </div>
 
       {/* Notice Alert */}
-      <Tips pure={isPureProxy} proxied={proxied} proxy={proxy} />
+      <Tips network={network} pure={isPureProxy} proxied={proxied} proxy={proxy} />
 
       {/* Divider */}
       <Divider />

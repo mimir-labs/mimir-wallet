@@ -3,7 +3,7 @@
 
 import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
-import { getFeeAssetLocation, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, getFeeAssetLocation } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 /**
@@ -37,14 +37,15 @@ function getAssetQueryKey(asset: CompleteEnhancedAssetInfo | undefined | null): 
 
 /**
  * Hook to convert native gas fee to required amount in target asset
- * Currently uses fallback calculation, will be updated to use assetConversionApi.quotePriceTokensForExactTokens
+ * @param network - The network key to use for conversion
+ * @param nativeGasFee - The native gas fee amount
+ * @param targetAsset - The target asset to convert to
  */
 export function useAssetConversion(
+  network: string,
   nativeGasFee: bigint | undefined | null,
   targetAsset: CompleteEnhancedAssetInfo | undefined | null
 ): bigint | undefined | null {
-  const { network, isApiReady } = useApi();
-
   // Convert bigint to string for queryKey, and extract asset identifier
   const nativeGasFeeStr = nativeGasFee?.toString() ?? null;
   const targetAssetKey = getAssetQueryKey(targetAsset);
@@ -61,12 +62,7 @@ export function useAssetConversion(
         return nativeGasFee;
       }
 
-      const allApis = useAllApis.getState().chains;
-      const api = allApis[network]?.api;
-
-      if (!api) {
-        throw new Error(`API not available for network: ${network}`);
-      }
+      const api = await ApiManager.getInstance().getApi(network);
 
       if (!api.call.assetConversionApi.quotePriceTokensForExactTokens) {
         throw new Error('Asset conversion API not available');
@@ -93,7 +89,7 @@ export function useAssetConversion(
         throw error;
       }
     },
-    enabled: !!nativeGasFee && !!targetAsset && isApiReady,
+    enabled: !!nativeGasFee && !!targetAsset && !!network,
     staleTime: 30000, // Cache for 30 seconds
     retry: 1
   });

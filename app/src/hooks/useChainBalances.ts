@@ -9,9 +9,10 @@ import { useMemo } from 'react';
 import {
   type AccountEnhancedAssetBalance,
   addressToHex,
+  ApiManager,
   fetchAccountBalances,
   fetchSingleAssetBalance,
-  useApi
+  useChains
 } from '@mimir-wallet/polkadot-core';
 import { useQueries, useQuery } from '@mimir-wallet/service';
 
@@ -33,11 +34,9 @@ export function useChainBalances(
   address?: string,
   options?: ChainBalancesOptions
 ): [AccountEnhancedAssetBalance[] | undefined, boolean, boolean] {
-  const { allApis } = useApi();
   const [allXcmAssets, isXcmAssetsFetched] = useAllXcmAsset();
 
   const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
-  const api = chain ? allApis[chain] : undefined;
 
   // Filter XCM assets for the specific chain
   const chainAssets = useMemo(() => {
@@ -61,13 +60,15 @@ export function useChainBalances(
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['chain-balances', chain, addressHex] as const,
     queryFn: async (): Promise<AccountEnhancedAssetBalance[]> => {
-      if (!api?.api || !api.isApiReady || !address || !chainAssets.length) {
-        throw new Error('API, address, and chain assets are required');
+      if (!chain || !address || !chainAssets.length) {
+        throw new Error('Chain, address, and chain assets are required');
       }
 
-      return fetchAccountBalances(api.api, addressHex as HexString, chainAssets);
+      const api = await ApiManager.getInstance().getApi(chain);
+
+      return fetchAccountBalances(api, addressHex as HexString, chainAssets);
     },
-    enabled: !!api?.api && !!api.isApiReady && !!address && !!chain && isXcmAssetsFetched && chainAssets.length > 0,
+    enabled: !!address && !!chain && isXcmAssetsFetched && chainAssets.length > 0,
     staleTime: 12_000,
     refetchInterval: 12_000,
     refetchOnMount: false,
@@ -101,15 +102,20 @@ type AllChainBalancesOptions = {
  * @returns Array of chain balance results
  */
 export function useAllChainBalances(address?: string, options?: AllChainBalancesOptions): UseAllChainBalances[] {
-  const { allApis } = useApi();
+  const apiManager = ApiManager.getInstance();
+  const { chains } = useChains();
   const [allXcmAssets, isXcmAssetsFetched] = useAllXcmAsset();
+
+  // Get user's enabled networks
+  const enabledChains = useMemo(() => chains.filter((c) => c.enabled), [chains]);
 
   const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
 
   // Memoize queries configuration to prevent unnecessary re-creation
   const queriesConfig = useMemo(
     () =>
-      Object.entries(allApis).map(([chainName, api]) => {
+      enabledChains.map((chain) => {
+        const chainName = chain.key;
         let chainAssets = allXcmAssets?.[chainName];
 
         if (chainAssets) {
@@ -134,6 +140,8 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
           }
         }
 
+        const finalChainAssets = chainAssets;
+
         return {
           queryKey: ['chain-balances', chainName, addressHex, options?.onlyWithPrice] as const,
           staleTime: 12_000,
@@ -141,30 +149,27 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
           refetchOnMount: false,
           refetchOnWindowFocus: false,
           enabled:
-            !!api?.api &&
-            !!api.isApiReady &&
-            !!address &&
-            !!isXcmAssetsFetched &&
-            !!allXcmAssets &&
-            !!chainAssets &&
-            chainAssets.length > 0,
+            !!address && !!isXcmAssetsFetched && !!allXcmAssets && !!finalChainAssets && finalChainAssets.length > 0,
           queryFn: async (): Promise<AccountEnhancedAssetBalance[]> => {
-            if (!addressHex || !chainAssets?.length) {
+            if (!addressHex || !finalChainAssets?.length) {
               return [];
             }
 
-            return fetchAccountBalances(api.api, addressHex as HexString, chainAssets);
+            const api = await apiManager.getApi(chainName);
+
+            return fetchAccountBalances(api, addressHex as HexString, finalChainAssets);
           }
         };
       }),
     [
-      allApis,
+      enabledChains,
       allXcmAssets,
       addressHex,
       isXcmAssetsFetched,
       address,
       options?.onlyWithPrice,
-      options?.alwaysIncludeNative
+      options?.alwaysIncludeNative,
+      apiManager
     ]
   );
 
@@ -174,11 +179,11 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
 
   // Derive list from queries using useMemo with stable reference check
   const list = useMemo(() => {
-    return Object.keys(allApis).map((chainName, index) => {
+    return enabledChains.map((chain, index) => {
       const query = queries[index];
 
       return {
-        chain: chainName,
+        chain: chain.key,
         isFetched: query.isFetched,
         isFetching: query.isFetching,
         isError: query.isError,
@@ -186,7 +191,7 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
         data: query.data
       };
     });
-  }, [queries, allApis]);
+  }, [queries, enabledChains]);
 
   return list;
 }
@@ -245,9 +250,7 @@ export function useBalanceByIdentifier(
   address?: string,
   identifier?: 'native' | HexString | string | null
 ): [AccountEnhancedAssetBalance | undefined, boolean, boolean] {
-  const { allApis } = useApi();
   const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
-  const api = network ? allApis[network] : undefined;
 
   // Get asset information first
   const [assetInfo, isAssetFetched, isAssetFetching] = useXcmAsset(network, identifier);
@@ -256,13 +259,15 @@ export function useBalanceByIdentifier(
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['single-asset-balance', network, addressHex, identifier],
     queryFn: async (): Promise<AccountEnhancedAssetBalance | null> => {
-      if (!api?.api || !api.isApiReady || !address || !assetInfo) {
-        throw new Error('API, address, and asset info are required');
+      if (!network || !address || !assetInfo) {
+        throw new Error('Network, address, and asset info are required');
       }
 
-      return fetchSingleAssetBalance(api.api, addressHex as HexString, assetInfo);
+      const api = await ApiManager.getInstance().getApi(network);
+
+      return fetchSingleAssetBalance(api, addressHex as HexString, assetInfo);
     },
-    enabled: !!api?.api && !!api.isApiReady && !!address && !!network && !!identifier && !!assetInfo && isAssetFetched,
+    enabled: !!address && !!network && !!identifier && !!assetInfo && isAssetFetched,
     staleTime: 12_000,
     refetchInterval: 12_000,
     refetchOnMount: false,

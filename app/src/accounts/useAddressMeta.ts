@@ -6,7 +6,7 @@ import type { AddressMeta } from '@/hooks/types';
 import { toastError } from '@/components/utils';
 import { useCallback, useMemo, useState } from 'react';
 
-import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
@@ -19,7 +19,7 @@ interface UseAddressMeta {
 }
 
 export function useAddressMeta(value?: string | null): UseAddressMeta {
-  const { network } = useApi();
+  const { network } = useNetwork();
   const { metas, addAddress, setAccountName } = useAccount();
   const addressHex = useMemo(() => (value ? addressToHex(value) : '0x'), [value]);
   const _meta = metas[addressHex];

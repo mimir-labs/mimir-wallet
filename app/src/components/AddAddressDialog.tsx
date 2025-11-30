@@ -5,7 +5,7 @@ import { useAccount } from '@/accounts/useAccount';
 import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { addressEq, decodeAddress, encodeAddress, isPolkadotAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, decodeAddress, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 import Input from './Input';
@@ -22,7 +22,7 @@ function Content({
   onClose?: () => void;
 }) {
   const { addAddress, addresses } = useAccount();
-  const { chainSS58 } = useApi();
+  const { ss58 } = useSs58Format();
   const [name, setName] = useState<string>('');
   const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
   const [info] = useDeriveAccountInfo(isPolkadotAddress(address) ? address : undefined);
@@ -44,13 +44,13 @@ function Content({
       try {
         const publicKey = decodeAddress(addressInput);
 
-        address = encodeAddress(publicKey, chainSS58);
+        address = encodeAddress(publicKey, ss58);
         setAddress(address);
       } catch {
         setAddress(addressInput);
       }
     },
-    [chainSS58]
+    [ss58]
   );
 
   const exists = useMemo(

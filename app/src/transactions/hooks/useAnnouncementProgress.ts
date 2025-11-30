@@ -6,7 +6,7 @@ import { useProxyBestBlock } from '@/hooks/useProxyBestBlock';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
-import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, ApiManager, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 async function fetchAnnouncements({ queryKey }: { queryKey: readonly [string, string, string] }) {
@@ -16,8 +16,7 @@ async function fetchAnnouncements({ queryKey }: { queryKey: readonly [string, st
     throw new Error('Invalid delegate');
   }
 
-  const allApis = useAllApis.getState().chains;
-  const api = allApis[network]?.api;
+  const api = await ApiManager.getInstance().getApi(network);
 
   if (!api) {
     throw new Error(`API not available for network: ${network}`);
@@ -30,7 +29,8 @@ export function useAnnouncementProgress(
   transaction: ProxyTransaction,
   account: AccountData
 ): [startBlock: number, currentBlock: number, endBlock: number] {
-  const { isApiReady, network, api } = useApi();
+  const { network } = useNetwork();
+  const { isApiReady } = useChainStatus(network);
 
   const status = transaction.status;
   const type = transaction.type;
@@ -39,16 +39,12 @@ export function useAnnouncementProgress(
     [account.delegatees, transaction.delegate]
   );
 
-  const [bestBlock] = useProxyBestBlock();
+  const [bestBlock] = useProxyBestBlock(network);
 
   const { data: result } = useQuery({
     queryKey: ['announcement-progress', network, transaction.delegate || ''] as const,
     enabled:
-      isApiReady &&
-      !!api?.query.proxy?.announcements &&
-      !!transaction.delegate &&
-      status === TransactionStatus.Pending &&
-      type === TransactionType.Announce,
+      isApiReady && !!transaction.delegate && status === TransactionStatus.Pending && type === TransactionType.Announce,
     refetchOnMount: false,
     queryFn: fetchAnnouncements
   });

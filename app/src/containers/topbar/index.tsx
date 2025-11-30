@@ -8,7 +8,7 @@ import LogoCircle from '@/assets/svg/logo-circle.svg';
 import { AccountSelect } from '@/components';
 import { Link, useLocation } from '@tanstack/react-router';
 
-import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 import ChainSelect from '../chain-select';
@@ -18,8 +18,7 @@ import TemplateButton from './TemplateButton';
 import WalletConnect from './WalletConnect';
 
 function TopBar() {
-  const { isApiReady } = useApi();
-  const { mode, setNetworkMode } = useNetworks();
+  const { mode, setNetworkMode } = useChains();
   const { pathname } = useLocation();
   const isInAppPage = pathname.startsWith('/explorer');
 
@@ -46,12 +45,12 @@ function TopBar() {
       </div>
 
       <div className='flex items-center gap-2 sm:gap-5'>
-        {isApiReady && isInAppPage && <AccountSelect />}
+        {isInAppPage && <AccountSelect />}
         {/* <Notification /> */}
-        {isApiReady && <NotificationButton />}
-        {isApiReady && <WalletConnect />}
-        {isApiReady && <TemplateButton />}
-        {isApiReady && <BatchButton />}
+        <NotificationButton />
+        <WalletConnect />
+        <TemplateButton />
+        <BatchButton />
         <ChainSelect />
       </div>
     </div>

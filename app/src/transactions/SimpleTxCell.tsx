@@ -13,7 +13,7 @@ import { formatAgo } from '@/utils';
 import moment from 'moment';
 import React, { useState } from 'react';
 
-import { chainLinks, useApi } from '@mimir-wallet/polkadot-core';
+import { chainLinks, useChain } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 interface Props {
@@ -62,8 +62,7 @@ function StatusView({ success, finalized }: { success: boolean; finalized: boole
 }
 
 function SimpleTxCell({ transaction, network }: Props) {
-  const { allApis } = useApi();
-  const chain = allApis[network]?.chain;
+  const chain = useChain(network);
 
   const explorerLink = chain ? chainLinks.extrinsicExplorerLink(chain, transaction.extrinsic_hash) : undefined;
 

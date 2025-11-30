@@ -11,19 +11,21 @@ import React from 'react';
 import { Button } from '@mimir-wallet/ui';
 
 function ProxyInfo({
+  network,
   delay,
   proxyType,
   proxied,
   delegate,
   onDelete
 }: {
+  network: string;
   delay: number;
   proxyType: string;
   proxied?: string;
   delegate: string;
   onDelete?: () => void;
 }) {
-  const blockInterval = useBlockInterval().toNumber();
+  const blockInterval = useBlockInterval(network).toNumber();
   const estimateTime =
     Number(delay) * blockInterval > ONE_DAY * 1000
       ? `${((Number(delay) * blockInterval) / (ONE_DAY * 1000)).toFixed(2)} Days`

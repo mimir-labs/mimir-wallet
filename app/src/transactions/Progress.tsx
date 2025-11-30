@@ -10,7 +10,7 @@ import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { autoFormatTimeStr } from '@/utils';
 import React, { useMemo } from 'react';
 
-import { addressEq } from '@mimir-wallet/polkadot-core';
+import { addressEq, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, cn, Divider } from '@mimir-wallet/ui';
 
 import Approve from './buttons/Approve';
@@ -176,8 +176,9 @@ function AnnounceContent({
   transaction: ProxyTransaction;
   button?: React.ReactNode;
 }) {
+  const { network } = useNetwork();
   const [startBlock, currentBlock, endBlock] = useAnnouncementProgress(transaction, account);
-  const blockInterval = useBlockInterval().toNumber();
+  const blockInterval = useBlockInterval(network).toNumber();
 
   const leftTime = currentBlock >= endBlock ? 0 : ((endBlock - currentBlock) * blockInterval) / 1000;
 

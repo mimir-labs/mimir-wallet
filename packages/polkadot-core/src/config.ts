@@ -28,7 +28,11 @@ const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     explorerUrl: 'https://assethub-polkadot.subscan.io/',
     statescanUrl: 'https://assethub-polkadot.statescan.io/',
-    identityNetwork: 'people-polkadot'
+    identityNetwork: 'people-polkadot',
+    nativeDecimals: 10,
+    nativeToken: 'DOT',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'people-polkadot',
@@ -48,7 +52,11 @@ const polkadotEndpoints: Endpoint[] = [
     genesisHash: '0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008',
     ss58Format: 0,
     explorerUrl: 'https://people-polkadot.subscan.io/',
-    statescanUrl: 'https://people-polkadot.statescan.io/'
+    statescanUrl: 'https://people-polkadot.statescan.io/',
+    nativeDecimals: 10,
+    nativeToken: 'DOT',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   // {
   //   icon: '/chain-icons/bridgehub.svg',
@@ -75,7 +83,11 @@ const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     explorerUrl: 'https://coretime-polkadot.subscan.io/',
     statescanUrl: 'https://coretime-polkadot.statescan.io/',
-    identityNetwork: 'people-polkadot'
+    identityNetwork: 'people-polkadot',
+    nativeDecimals: 10,
+    nativeToken: 'DOT',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'collectives-polkadot',
@@ -100,7 +112,11 @@ const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     explorerUrl: 'https://collectives-polkadot.subscan.io/',
     statescanUrl: 'https://collectives.statescan.io/',
-    identityNetwork: 'people-polkadot'
+    identityNetwork: 'people-polkadot',
+    nativeDecimals: 10,
+    nativeToken: 'DOT',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'bifrost-polkadot',
@@ -119,7 +135,11 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://hk.p.bifrost-rpc.liebi.com',
     genesisHash: '0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b',
     ss58Format: 0,
-    explorerUrl: 'https://bifrost.subscan.io/'
+    explorerUrl: 'https://bifrost.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'BNC',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'hydration',
@@ -138,7 +158,11 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://hydration.ibp.network',
     genesisHash: '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d',
     ss58Format: 63,
-    explorerUrl: 'https://hydration.subscan.io/'
+    explorerUrl: 'https://hydration.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'HDX',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'crust-polkadot',
@@ -156,7 +180,11 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://crust-parachain.crustapps.net',
     genesisHash: '0x4319cc49ee79495b57a1fec4d2bd43f59052dcc690276de566c2691d6df4f7b8',
     ss58Format: 88,
-    explorerUrl: 'https://crust-parachain.subscan.io/'
+    explorerUrl: 'https://crust-parachain.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'CRU',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'pendulum',
@@ -171,7 +199,11 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://rpc-pendulum.prd.pendulumchain.tech',
     genesisHash: '0x5d3c298622d5634ed019bf61ea4b71655030015bde9beb0d6a24743714462c86',
     ss58Format: 56,
-    explorerUrl: 'https://pendulum.subscan.io/'
+    explorerUrl: 'https://pendulum.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'PEN',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'acala',
@@ -192,7 +224,11 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://acala-rpc-0.aca-api.network',
     genesisHash: '0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c',
     ss58Format: 10,
-    explorerUrl: 'https://acala.subscan.io/'
+    explorerUrl: 'https://acala.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'ACA',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'phala',
@@ -211,7 +247,11 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://api.phala.network/ws',
     genesisHash: '0x1bb969d85965e4bb5a651abbedf21a54b6b31a21f66b5401cc3f1e286268d736',
     ss58Format: 30,
-    explorerUrl: 'https://phala.subscan.io/'
+    explorerUrl: 'https://phala.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'PHA',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'nexus',
@@ -228,7 +268,11 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://nexus.ibp.network',
     genesisHash: '0x61ea8a51fd4a058ee8c0e86df0a89cc85b8b67a0a66432893d09719050c9f540',
     ss58Format: 0,
-    statescanUrl: 'https://nexus.statescan.io/'
+    statescanUrl: 'https://nexus.statescan.io/',
+    nativeDecimals: 10,
+    nativeToken: 'DOT',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   // {
   //   key: 'polimec',
@@ -266,7 +310,11 @@ const polkadotEndpoints: Endpoint[] = [
     httpUrl: 'https://rpc.astar.network',
     genesisHash: '0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6',
     ss58Format: 5,
-    explorerUrl: 'https://astar.subscan.io/'
+    explorerUrl: 'https://astar.subscan.io/',
+    nativeDecimals: 18,
+    nativeToken: 'ASTR',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'xcavate-polkadot',
@@ -282,7 +330,11 @@ const polkadotEndpoints: Endpoint[] = [
     },
     httpUrl: 'https://xcavate.ibp.network',
     genesisHash: '0xd17bc7f93d054d8aba31f24d5bb0ac462247c594e31beed479b1c04d2d0ba48f',
-    ss58Format: 5
+    ss58Format: 5,
+    nativeDecimals: 12,
+    nativeToken: 'XCAV',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   // {
   //   key: 'moonbeam',
@@ -332,7 +384,11 @@ const polkadotEndpoints: Endpoint[] = [
     ss58Format: 0,
     explorerUrl: 'https://polkadot.subscan.io/',
     statescanUrl: 'https://polkadot.statescan.io/',
-    identityNetwork: 'people-polkadot'
+    identityNetwork: 'people-polkadot',
+    nativeDecimals: 10,
+    nativeToken: 'DOT',
+    supportsDryRun: true,
+    supportsProxy: true
   }
 ];
 
@@ -360,7 +416,11 @@ const kusamaEndpoints: Endpoint[] = [
     explorerUrl: 'https://assethub-kusama.subscan.io/',
     statescanUrl: 'https://assethub-kusama.statescan.io/',
     identityNetwork: 'people-kusama',
-    useRelayBlockForProxy: true
+    useRelayBlockForProxy: true,
+    nativeDecimals: 12,
+    nativeToken: 'KSM',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'people-kusama',
@@ -381,7 +441,11 @@ const kusamaEndpoints: Endpoint[] = [
     genesisHash: '0xc1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f',
     ss58Format: 2,
     explorerUrl: 'https://people-kusama.subscan.io/',
-    statescanUrl: 'https://people-kusama.statescan.io/'
+    statescanUrl: 'https://people-kusama.statescan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'KSM',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'coretime-kusama',
@@ -403,7 +467,11 @@ const kusamaEndpoints: Endpoint[] = [
     ss58Format: 2,
     explorerUrl: 'https://coretime-kusama.subscan.io/',
     statescanUrl: 'https://coretime-kusama.statescan.io/',
-    identityNetwork: 'people-kusama'
+    identityNetwork: 'people-kusama',
+    nativeDecimals: 12,
+    nativeToken: 'KSM',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'bifrost-kusama',
@@ -421,7 +489,11 @@ const kusamaEndpoints: Endpoint[] = [
     httpUrl: 'https://bifrost-rpc.liebi.com',
     genesisHash: '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed',
     ss58Format: 0,
-    explorerUrl: 'https://bifrost.subscan.io/'
+    explorerUrl: 'https://bifrost.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'BNC',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'amplitude',
@@ -435,7 +507,11 @@ const kusamaEndpoints: Endpoint[] = [
       PendulumChain: 'wss://rpc-amplitude.pendulumchain.tech'
     },
     genesisHash: '0xcceae7f3b9947cdb67369c026ef78efa5f34a08fe5808d373c04421ecf4f1aaf',
-    ss58Format: 57
+    ss58Format: 57,
+    nativeDecimals: 12,
+    nativeToken: 'AMPE',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'karura',
@@ -455,7 +531,11 @@ const kusamaEndpoints: Endpoint[] = [
     httpUrl: 'https://karura-rpc-1.aca-api.network',
     genesisHash: '0xbaf5aabe40646d11f0ee8abbdc64f4a4b7674925cba08e4a05ff9ebed6e2126b',
     ss58Format: 8,
-    explorerUrl: 'https://karura.subscan.io/'
+    explorerUrl: 'https://karura.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'KAR',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'acurast',
@@ -468,7 +548,11 @@ const kusamaEndpoints: Endpoint[] = [
       Acurast: 'wss://public-rpc.canary.acurast.com/'
     },
     genesisHash: '0xce7681fb12aa8f7265d229a9074be0ea1d5e99b53eedcec2deade43857901808',
-    ss58Format: 42
+    ss58Format: 42,
+    nativeDecimals: 12,
+    nativeToken: 'ACU',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'kusama',
@@ -494,7 +578,11 @@ const kusamaEndpoints: Endpoint[] = [
     explorerUrl: 'https://kusama.subscan.io/',
     statescanUrl: 'https://kusama.statescan.io/',
     identityNetwork: 'people-kusama',
-    remoteProxyTo: '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a'
+    remoteProxyTo: '0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a',
+    nativeDecimals: 12,
+    nativeToken: 'KSM',
+    supportsDryRun: true,
+    supportsProxy: true
   }
 ];
 
@@ -519,7 +607,11 @@ const paseoEndpoints: Endpoint[] = [
     genesisHash: '0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2',
     explorerUrl: 'https://assethub-paseo.subscan.io/',
     statescanUrl: 'https://assethub-paseo.statescan.io/',
-    useRelayBlockForProxy: true
+    useRelayBlockForProxy: true,
+    nativeDecimals: 10,
+    nativeToken: 'PAS',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'passethub',
@@ -535,7 +627,11 @@ const paseoEndpoints: Endpoint[] = [
     },
     httpUrl: 'https://testnet-passet-hub.polkadot.io',
     genesisHash: '0xfd974cf9eaf028f5e44b9fdd1949ab039c6cf9cc54449b0b60d71b042e79aeb6',
-    polkavm: true
+    polkavm: true,
+    nativeDecimals: 10,
+    nativeToken: 'PAS',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'xcavate-paseo',
@@ -550,7 +646,11 @@ const paseoEndpoints: Endpoint[] = [
     },
     httpUrl: 'https://rpc2-paseo.xcavate.io',
     genesisHash: '0xac9dc5e0f7aeae019818f5859215044f80676e562cf934f6683d6424abdabbc8',
-    ss58Format: 5
+    ss58Format: 5,
+    nativeDecimals: 12,
+    nativeToken: 'XCAV',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'paseo',
@@ -571,7 +671,11 @@ const paseoEndpoints: Endpoint[] = [
     httpUrl: 'https://rpc.ibp.network/paseo',
     genesisHash: '0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f',
     explorerUrl: 'https://paseo.subscan.io/',
-    statescanUrl: 'https://paseo.statescan.io/'
+    statescanUrl: 'https://paseo.statescan.io/',
+    nativeDecimals: 10,
+    nativeToken: 'PAS',
+    supportsDryRun: true,
+    supportsProxy: true
   }
 ];
 
@@ -598,7 +702,11 @@ const westendEndpoints: Endpoint[] = [
     explorerUrl: 'https://assethub-westend.subscan.io/',
     statescanUrl: 'https://assethub-westend.statescan.io/',
     polkavm: true,
-    useRelayBlockForProxy: true
+    useRelayBlockForProxy: true,
+    nativeDecimals: 12,
+    nativeToken: 'WND',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'westend',
@@ -620,7 +728,11 @@ const westendEndpoints: Endpoint[] = [
     httpUrl: 'https://westend-rpc.polkadot.io',
     genesisHash: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e',
     explorerUrl: 'https://westend.subscan.io/',
-    statescanUrl: 'https://westend.statescan.io/'
+    statescanUrl: 'https://westend.statescan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'WND',
+    supportsDryRun: true,
+    supportsProxy: true
   }
 ];
 
@@ -638,7 +750,11 @@ const solochainEndpoints: Endpoint[] = [
     httpUrl: 'https://rpc.vara.network',
     genesisHash: '0xfe1b4c55fd4d668101126434206571a7838a8b6b93a6d1b95d607e78e6c53763',
     ss58Format: 137,
-    explorerUrl: 'https://vara.subscan.io/'
+    explorerUrl: 'https://vara.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'VARA',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'crust',
@@ -656,7 +772,11 @@ const solochainEndpoints: Endpoint[] = [
     httpUrl: 'https://crust.api.onfinality.io/public',
     genesisHash: '0x8b404e7ed8789d813982b9cb4c8b664c05b3fbf433309f603af014ec9ce56a8c',
     ss58Format: 66,
-    explorerUrl: 'https://crust.subscan.io/'
+    explorerUrl: 'https://crust.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'CRU',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'avail',
@@ -670,7 +790,11 @@ const solochainEndpoints: Endpoint[] = [
     httpUrl: 'https://avail.api.onfinality.io/public',
     genesisHash: '0xb91746b45e0346cc2f815a520b9c6cb4d5c0902af848db0a80f85932d2e8276a',
     ss58Format: 42,
-    explorerUrl: 'https://avail.subscan.io/'
+    explorerUrl: 'https://avail.subscan.io/',
+    nativeDecimals: 18,
+    nativeToken: 'AVAIL',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'avail-turing',
@@ -683,7 +807,11 @@ const solochainEndpoints: Endpoint[] = [
     },
     genesisHash: '0xd3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70',
     ss58Format: 42,
-    explorerUrl: 'https://avail-turing.subscan.io/'
+    explorerUrl: 'https://avail-turing.subscan.io/',
+    nativeDecimals: 18,
+    nativeToken: 'AVAIL',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'zkverify',
@@ -695,7 +823,11 @@ const solochainEndpoints: Endpoint[] = [
     },
     genesisHash: '0x060e3dd3fa2904d031206bb913c954687a2bcc350e5a83d33d9e273ad21460f1',
     ss58Format: 8741,
-    explorerUrl: 'https://zkverify.subscan.io/'
+    explorerUrl: 'https://zkverify.subscan.io/',
+    nativeDecimals: 18,
+    nativeToken: 'VFY',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'zkverify-testnet',
@@ -708,7 +840,11 @@ const solochainEndpoints: Endpoint[] = [
     },
     genesisHash: '0xff7fe5a610f15fe7a0c52f94f86313fb7db7d3786e7f8acf2b66c11d5be7c242',
     ss58Format: 251,
-    explorerUrl: 'https://zkverify-testnet.subscan.io/'
+    explorerUrl: 'https://zkverify-testnet.subscan.io/',
+    nativeDecimals: 18,
+    nativeToken: 'VFY',
+    supportsDryRun: true,
+    supportsProxy: true
   },
   {
     key: 'tanssi',
@@ -720,7 +856,11 @@ const solochainEndpoints: Endpoint[] = [
     },
     genesisHash: '0xdd6d086f75ec041b66e20c4186d327b23c8af244c534a2418de6574e8c041a60',
     ss58Format: 42,
-    explorerUrl: 'https://tanssi.subscan.io/'
+    explorerUrl: 'https://tanssi.subscan.io/',
+    nativeDecimals: 12,
+    nativeToken: 'DANCE',
+    supportsDryRun: true,
+    supportsProxy: true
   }
 ];
 

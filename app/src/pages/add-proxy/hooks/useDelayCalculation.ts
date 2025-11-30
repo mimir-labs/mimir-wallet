@@ -8,6 +8,7 @@ import { useMemo } from 'react';
 export type DelayType = 'hour' | 'day' | 'week' | 'custom';
 
 interface DelayCalculationOptions {
+  network: string;
   delayType: DelayType;
   customBlocks?: string;
   hasDelay?: boolean;
@@ -23,11 +24,12 @@ interface DelayCalculationResult {
  * Handles conversion between time units and blockchain blocks
  */
 export function useDelayCalculation({
+  network,
   delayType,
   customBlocks = '0',
   hasDelay = true
 }: DelayCalculationOptions): DelayCalculationResult {
-  const blockInterval = useBlockInterval().toNumber();
+  const blockInterval = useBlockInterval(network).toNumber();
 
   const delayInBlocks = useMemo(() => {
     if (!hasDelay) return 0;

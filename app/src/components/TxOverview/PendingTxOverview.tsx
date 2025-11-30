@@ -9,7 +9,6 @@ import type {
   MultisigAccountData,
   Transaction
 } from '@/hooks/types';
-import type { ApiPromise } from '@polkadot/api';
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
@@ -34,7 +33,7 @@ import {
 } from '@xyflow/react';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 
-import { addressEq, addressToHex } from '@mimir-wallet/polkadot-core';
+import { addressEq, addressToHex, ApiManager } from '@mimir-wallet/polkadot-core';
 
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
@@ -42,7 +41,7 @@ import TxButton from '../TxButton';
 import { getLayoutedElements } from '../utils';
 
 interface State {
-  api: ApiPromise;
+  network: string;
   transaction: Transaction;
   onApprove?: () => void;
   showButton?: boolean;
@@ -73,7 +72,7 @@ type EdgeData = {
 const context = createContext<State>({} as State);
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
-  const { api, transaction: topTransaction, onApprove, showButton } = useContext(context);
+  const { network, transaction: topTransaction, onApprove, showButton } = useContext(context);
   const source = useAccountSource(data.account.address);
 
   const { call, transaction } = data;
@@ -149,7 +148,11 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
               accountId={topTransaction.address}
               filterPaths={data.path}
               transaction={topTransaction}
-              getCall={() => api.createType('Call', topTransaction.call)}
+              getCall={async () => {
+                const api = await ApiManager.getInstance().getApi(network);
+
+                return api!.createType('Call', topTransaction.call);
+              }}
               onDone={onApprove}
             >
               Approve
@@ -434,11 +437,11 @@ function makeNodes(
   });
 }
 
-function TxOverview({ account, call, transaction, api, onApprove, showButton = true }: Props) {
+function TxOverview({ account, call, transaction, network, onApprove, showButton = true }: Props) {
   // Memoize the context value to prevent unnecessary re-renders
   const contextValue = useMemo(
-    () => ({ api, transaction, onApprove, showButton }),
-    [api, transaction, onApprove, showButton]
+    () => ({ network, transaction, onApprove, showButton }),
+    [network, transaction, onApprove, showButton]
   );
 
   // Memoize fitView options

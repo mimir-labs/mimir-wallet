@@ -11,7 +11,7 @@ import { CopyButton } from '@/components';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useEffect, useMemo, useState } from 'react';
 
-import { createBlockRegistry, useAllApis, useNetworks } from '@mimir-wallet/polkadot-core';
+import { ApiManager, createBlockRegistry, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
 
 interface BatchMigrationModalProps {
@@ -190,16 +190,17 @@ export function BatchMigrationModal({
   onMigrate,
   address
 }: BatchMigrationModalProps) {
-  const { networks, enableNetwork } = useNetworks();
-  const { chains } = useAllApis();
+  const { chains, enableNetwork } = useChains();
+  const sourceStatus = useChainStatus(sourceChain);
+  const destStatus = useChainStatus(destChain);
   const [registry, setRegistry] = useState<Registry | null>(null);
+  const [destApi, setDestApi] = useState<ApiPromise | null>(null);
 
-  const sourceReady = !!chains[sourceChain]?.isApiReady;
-  const destReady = !!chains[destChain]?.isApiReady;
-  const destApi = chains[destChain]?.api;
+  const sourceReady = sourceStatus.isApiReady;
+  const destReady = destStatus.isApiReady;
 
-  const sourceNetwork = networks.find((network) => network.key === sourceChain);
-  const destNetwork = networks.find((network) => network.key === destChain);
+  const sourceNetwork = chains.find((network) => network.key === sourceChain);
+  const destNetwork = chains.find((network) => network.key === destChain);
 
   useEffect(() => {
     if (isOpen) {
@@ -208,16 +209,33 @@ export function BatchMigrationModal({
     }
   }, [enableNetwork, sourceChain, destChain, isOpen]);
 
+  // Get dest API async
+  useEffect(() => {
+    if (destReady) {
+      ApiManager.getInstance()
+        .getApi(destChain)
+        .then((api) => {
+          if (api) {
+            setDestApi(api);
+          }
+        });
+    }
+  }, [destChain, destReady]);
+
   // Create registry for parsing calls
   useEffect(() => {
-    if (block && chains[sourceChain]?.api) {
-      const api = chains[sourceChain].api!;
-
-      createBlockRegistry(api, block).then((registry) => {
-        setRegistry(registry);
-      });
+    if (block && sourceReady) {
+      ApiManager.getInstance()
+        .getApi(sourceChain)
+        .then((api) => {
+          if (api) {
+            createBlockRegistry(api, block).then((reg) => {
+              setRegistry(reg);
+            });
+          }
+        });
     }
-  }, [block, sourceChain, destChain, chains]);
+  }, [block, sourceChain, sourceReady]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size='xl'>

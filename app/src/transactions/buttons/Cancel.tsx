@@ -9,7 +9,7 @@ import { TxButton } from '@/components';
 import { TransactionType } from '@/hooks/types';
 import React, { useMemo } from 'react';
 
-import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { Tooltip } from '@mimir-wallet/ui';
 
@@ -20,8 +20,7 @@ async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, str
     throw new Error('Invalid multisig transaction');
   }
 
-  const allApis = useAllApis.getState().chains;
-  const api = allApis[network]?.api;
+  const api = await ApiManager.getInstance().getApi(network);
 
   if (!api) {
     throw new Error(`API not available for network: ${network}`);
@@ -31,7 +30,7 @@ async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, str
 }
 
 function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction: Transaction }) {
-  const { api, isApiReady, network } = useApi();
+  const { network } = useNetwork();
   const { isLocalAccount } = useAccount();
 
   const multisigTx = useMemo(() => {
@@ -50,7 +49,7 @@ function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction
 
   const { data: multisigInfo } = useQuery({
     queryKey: ['multisig-info', network, multisigTx?.address || '', multisigTx?.callHash || ''] as const,
-    enabled: isApiReady && !!multisigTx,
+    enabled: !!multisigTx,
     refetchOnMount: false,
     queryFn: fetchMultisigInfo
   });
@@ -74,14 +73,16 @@ function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction
         color='danger'
         accountId={depositor}
         website='mimir://internal/cancel'
-        getCall={() =>
-          api.tx.multisig.cancelAsMulti(
+        getCall={async () => {
+          const api = await ApiManager.getInstance().getApi(network);
+
+          return api.tx.multisig.cancelAsMulti(
             multisigTx.threshold,
             multisigTx.members.filter((item) => !addressEq(item, depositor)),
             multisigInfo?.unwrap().when,
             multisigTx.callHash
-          )
-        }
+          );
+        }}
       >
         {isIcon ? <IconFailed /> : 'Cancel'}
       </TxButton>

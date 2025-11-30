@@ -3,14 +3,17 @@
 
 import { useMemo } from 'react';
 
-import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useChains } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
 
 export function useMultiChainStats(
   address?: string | null
 ): [data: Record<string, boolean>, isFetched: boolean, isFetching: boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
-  const { allApis } = useApi();
+  const { chains } = useChains();
+
+  // Get enabled network keys
+  const enabledNetworks = useMemo(() => new Set(chains.filter((c) => c.enabled).map((c) => c.key)), [chains]);
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['multi-chain-stats', addressHex] as const,
@@ -21,8 +24,11 @@ export function useMultiChainStats(
 
   return [
     useMemo(
-      () => Object.fromEntries(Object.entries(data || {}).filter(([network, enabled]) => allApis[network] && enabled)),
-      [data, allApis]
+      () =>
+        Object.fromEntries(
+          Object.entries(data || {}).filter(([network, enabled]) => enabledNetworks.has(network) && enabled)
+        ),
+      [data, enabledNetworks]
     ),
     isFetched,
     isFetching

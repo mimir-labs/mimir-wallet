@@ -7,14 +7,15 @@ import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
+import { useFindTargetCallFromMethod } from '@/hooks/useFindTargetCall';
 import { Call as CallComp, FunctionArgs } from '@/params';
 import React, { useMemo, useRef } from 'react';
 
-import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, cn, Divider, Tooltip } from '@mimir-wallet/ui';
 
 function CallInfo({ isMobile = false, address, call }: { isMobile?: boolean; address: string; call: IMethod }) {
-  const { network } = useApi();
+  const { network } = useNetwork();
   const [, addTx] = useBatchTxs(network, address);
 
   const action = useMemo(() => {
@@ -74,11 +75,13 @@ function CallInfo({ isMobile = false, address, call }: { isMobile?: boolean; add
 }
 
 function Target({ isMobile = false, call, address }: { isMobile?: boolean; address: string; call?: IMethod | null }) {
-  const { api } = useApi();
-  const [from, targetCall] = useMemo(() => findTargetCall(api, address, call), [address, api, call]);
+  const { network } = useNetwork();
   const ref = useRef<any>(null);
 
-  if (!targetCall) {
+  // Find target call using async hook
+  const { from, targetCall, isLoading } = useFindTargetCallFromMethod(network, address, call);
+
+  if (isLoading || !targetCall) {
     return null;
   }
 

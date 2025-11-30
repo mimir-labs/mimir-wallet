@@ -5,8 +5,9 @@ import type { StepProps } from './types';
 
 import { Input, InputNetwork } from '@/components';
 import { MigrationTip } from '@/features/assethub-migration';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 
 import AddPureProxy from '../components/AddPureProxy';
@@ -29,8 +30,9 @@ function Step1Name({
   onNext,
   onPureProxyChange
 }: Step1NameProps) {
-  const { api } = useApi();
-  const isProxyModuleSupported = !!api.tx.proxy;
+  const currentNetwork = useNetwork();
+  const targetNetwork = isPureProxy ? network : currentNetwork.network;
+  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(targetNetwork);
 
   return (
     <div className='flex flex-col gap-4'>

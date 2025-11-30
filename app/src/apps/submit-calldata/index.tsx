@@ -6,7 +6,7 @@ import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork'
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useMemo, useState } from 'react';
 
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 
 import Extrinsic from './Extrinsic';
 
@@ -18,9 +18,9 @@ function SubmitCalldata() {
   const [network, setNetwork] = useInputNetwork(undefined, supportedNetworksKeys);
 
   return (
-    <SubApiRoot network={network} supportedNetworks={supportedNetworksKeys}>
+    <NetworkProvider network={network}>
       <Extrinsic sending={sending} setSending={setSending} network={network} setNetwork={setNetwork} />
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

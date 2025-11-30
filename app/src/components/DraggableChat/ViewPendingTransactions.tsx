@@ -10,7 +10,7 @@ import { useNavigate } from '@tanstack/react-router';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { getChainIcon, useApi } from '@mimir-wallet/polkadot-core';
+import { getChainIcon, useChains } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Skeleton, Tooltip } from '@mimir-wallet/ui';
 
 // Component props interface
@@ -38,7 +38,7 @@ function NetworkIcon({ network }: { network: string }) {
 
 // Transaction item component matching Figma design exactly
 function TransactionItem({ transaction, address }: { transaction: Transaction; address: string }) {
-  const { setNetwork } = useApi();
+  const { enableNetwork } = useChains();
   const navigate = useNavigate();
   // Use state to track current time for time-ago display
   const [now, setNow] = useState(() => Date.now());
@@ -59,7 +59,8 @@ function TransactionItem({ transaction, address }: { transaction: Transaction; a
 
   const handleViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setNetwork(transaction.network);
+    // Ensure the network is enabled before navigating
+    enableNetwork(transaction.network);
     navigate({
       to: '/transactions/$id',
       params: {

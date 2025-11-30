@@ -13,7 +13,7 @@ import { formatUnits } from '@/utils';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo } from 'react';
 
-import { remoteProxyRelations, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { remoteProxyRelations, useChain, useChains } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Avatar, Button, Chip, Skeleton, Switch } from '@mimir-wallet/ui';
 
 import { useTransferBalance } from './useTransferBalances';
@@ -53,8 +53,10 @@ function TransferContent({
   setToken: (token: string) => void;
   setRecipient?: (recipient: string) => void;
 }) {
-  const { api, chain, genesisHash } = useApi();
-  const { networks } = useNetworks();
+  const chain = useChain(network);
+  const genesisHash = chain.genesisHash;
+  const { chains } = useChains();
+
   const upSm = useMediaQuery('sm');
   const [format, sendingBalances, isSendingFetched] = useTransferBalance(token, sending);
   const [assetInfo] = useXcmAsset(network, token?.isNative ? 'native' : token?.key);
@@ -63,7 +65,7 @@ function TransferContent({
   const [recipientAccount] = useQueryAccountOmniChain(recipient);
   const recipientNetwork =
     recipientAccount?.type === 'pure'
-      ? networks.find((item) => item.genesisHash === recipientAccount.network)
+      ? chains.find((item) => item.genesisHash === recipientAccount.network)
       : undefined;
 
   // for migration tip
@@ -75,11 +77,16 @@ function TransferContent({
       : true;
   }, [recipientAccount, chain]);
 
-  const existentialDeposit = token?.isNative
-    ? api.consts.balances.existentialDeposit
-    : assetInfo?.existentialDeposit
-      ? new BN(assetInfo.existentialDeposit.toString())
-      : new BN(0);
+  // Determine existential deposit based on token type
+  const existentialDeposit = useMemo(() => {
+    if (token?.isNative) {
+      return new BN(token.existentialDeposit);
+    } else if (assetInfo?.existentialDeposit) {
+      return new BN(assetInfo.existentialDeposit.toString());
+    }
+
+    return new BN(0);
+  }, [token, assetInfo]);
 
   useEffect(() => {
     setAmount('');

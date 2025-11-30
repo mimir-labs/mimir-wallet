@@ -10,7 +10,7 @@ import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 import React, { useMemo } from 'react';
 
-import { addressEq, encodeAddress, useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { Button, Chip } from '@mimir-wallet/ui';
 
 import AddressComp from './Address';
@@ -52,7 +52,7 @@ function AddressCell({
   withIconBorder = false,
   showNetworkProxied = false
 }: Props) {
-  const { chainSS58 } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
   const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
   // Fetch meta once and pass to child components to avoid redundant calls
   const { meta } = useAddressMeta(address);

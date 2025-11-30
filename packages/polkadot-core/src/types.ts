@@ -29,6 +29,14 @@ export type Endpoint = {
   remoteProxyTo?: HexString;
   // Indicates if proxy announcements use relay chain block numbers instead of parachain block numbers
   useRelayBlockForProxy?: boolean;
+  // Native token decimals (e.g., 10 for DOT, 12 for KSM)
+  nativeDecimals: number;
+  // Native token symbol (e.g., 'DOT', 'KSM')
+  nativeToken: string;
+  // Indicates if the chain supports dry-run API (api.call.dryRunApi)
+  supportsDryRun?: boolean;
+  // Indicates if the chain supports proxy pallet (api.tx.proxy)
+  supportsProxy?: boolean;
 };
 
 export type Network = Endpoint & {
@@ -64,3 +72,45 @@ export type ValidApiState = ApiState & {
   isApiInitialized: boolean;
   network: string;
 };
+
+// New types for refactored API management
+
+/**
+ * Chain connection status
+ */
+export interface ChainStatus {
+  isApiReady: boolean;
+  isApiInitialized: boolean;
+  apiError: string | null;
+}
+
+/**
+ * API connection state managed by ApiManager
+ */
+export interface ApiConnection {
+  api: ApiPromise | null;
+  chain: Endpoint;
+  network: string;
+  status: ChainStatus;
+  genesisHash: HexString;
+  tokenSymbol: string;
+}
+
+/**
+ * SS58 format control returned by useSs58Format
+ */
+export interface Ss58FormatControl {
+  /** Current SS58 format number */
+  ss58: number;
+  /** Current chain key for SS58 */
+  ss58Chain: string;
+  /** Chain info for current SS58 format */
+  chainInfo: Endpoint;
+  /** Set SS58 chain by network key */
+  setSs58Chain: (chain: string) => void;
+}
+
+/**
+ * Listener type for ApiManager state changes
+ */
+export type ApiManagerListener = (apis: Record<string, ApiConnection>) => void;

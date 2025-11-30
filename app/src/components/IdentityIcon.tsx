@@ -10,7 +10,7 @@ import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { polkadotIcon } from '@polkadot/ui-shared';
 import React, { useCallback, useMemo } from 'react';
 
-import { addressEq, encodeAddress, useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { Avatar } from '@mimir-wallet/ui';
 
 interface Props {
@@ -27,7 +27,7 @@ function renderCircle({ cx, cy, fill, r }: Circle, index: number) {
 }
 
 function IdentityIcon({ className, prefix, size = 30, value, withBorder = false, showMultisigBadge = true }: Props) {
-  const { chainSS58 } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
   const address = encodeAddress(value, prefix ?? chainSS58);
   const { meta } = useAddressMeta(value?.toString());
   const copyAddress = useCopyAddressToClipboard(address);

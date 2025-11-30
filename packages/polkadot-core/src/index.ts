@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { NETWORK_RPC_PREFIX, CURRENT_NETWORK_KEY, decodeAddress, encodeAddress } from './defaults.js';
-export { initializeApi, createApi } from './initialize.js';
 
 export * from './balances/index.js';
 
@@ -20,16 +19,32 @@ export * from './xcm/index.js';
 
 export { chainLinks } from './chain-links.js';
 
-export { useApi } from './useApi.js';
-export { useAllApis } from './useApiStore.js';
-export { useIdentityApi } from './useIdentityApi.js';
-export { useNetworks } from './useNetworks.js';
+// New API management exports
+export {
+  ApiManager,
+  useAllChainStatuses,
+  useChain,
+  useChains,
+  useChainStatus,
+  useSs58Format,
+  getNetworkMode
+} from './api/index.js';
+export type { ChainsControl } from './api/index.js';
+
+// Network context exports
+export { NetworkProvider, useNetwork, useNetworkOptional } from './NetworkContext.js';
 
 export { allEndpoints, remoteProxyRelations, getChainIcon } from './config.js';
 
 export * from './utils.js';
 export * from './registry.js';
 
-export { default as ApiRoot } from './ApiRoot.js';
-export { default as SubApiRoot } from './SubApiRoot.js';
-export type { Endpoint, ValidApiState, Network } from './types.js';
+export type {
+  Endpoint,
+  ValidApiState,
+  Network,
+  ChainStatus,
+  ApiConnection,
+  Ss58FormatControl,
+  ApiManagerListener
+} from './types.js';

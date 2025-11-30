@@ -12,6 +12,7 @@ import {
   TransactionType
 } from '@/hooks/types';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
+import { useParseCall } from '@/hooks/useParseCall';
 import { useMultichainPendingTransactions, useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { CallDisplayDetail } from '@/params';
 import {
@@ -25,23 +26,16 @@ import { useAnnouncementStatus } from '@/transactions/hooks/useAnnouncementStatu
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 
-import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
 
 function CallDetail({ value }: { value?: string | null }) {
-  const { api, isApiReady } = useApi();
+  const { network } = useNetwork();
+  const { call, isLoading } = useParseCall(network, value);
 
-  const call = useMemo(() => {
-    if (!isApiReady) return null;
+  if (isLoading || !call) return null;
 
-    try {
-      return api.registry.createType('Call', value);
-    } catch {
-      return null;
-    }
-  }, [api.registry, isApiReady, value]);
-
-  return <CallDisplayDetail fallbackWithName registry={api.registry} call={call} />;
+  return <CallDisplayDetail fallbackWithName registry={call.registry} call={call} />;
 }
 
 function AnnouncementStatus({ account, transaction }: { account: AccountData; transaction: ProxyTransaction }) {
@@ -100,7 +94,7 @@ function Operation({ transaction, address }: { transaction: Transaction; address
 }
 
 function NetworkWrapper({ network, children }: { network: string; children: React.ReactNode }) {
-  return <SubApiRoot network={network}>{children}</SubApiRoot>;
+  return <NetworkProvider network={network}>{children}</NetworkProvider>;
 }
 
 function PendingTransactions({ address }: { address: string }) {
@@ -109,7 +103,7 @@ function PendingTransactions({ address }: { address: string }) {
     validPendingNetworks.map((item) => item.network),
     address
   );
-  const { setNetwork } = useApi();
+  const { enableNetwork } = useChains();
   const navigate = useNavigate();
 
   const transactions = useMemo(() => {
@@ -172,7 +166,7 @@ function PendingTransactions({ address }: { address: string }) {
               key={item.id}
               className='[&:hover>td]:bg-secondary border-secondary [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px]'
               onClick={() => {
-                setNetwork(item.network);
+                enableNetwork(item.network);
                 navigate({
                   to: `/transactions/$id`,
                   params: {

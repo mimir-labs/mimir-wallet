@@ -1,17 +1,17 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { CopyButton } from '@/components';
 import { DotConsoleApp } from '@/config';
+import { useRegistry } from '@/hooks/useRegistry';
 import { Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import { decodeCallSection } from './utils';
@@ -42,22 +42,23 @@ function TemplateItem({
   call,
   onDelete,
   onEditName,
-  onView,
-  registry
+  onView
 }: {
   name: string;
   call: HexString;
-  registry: Registry;
   onDelete: () => void;
   onEditName: (name: string) => void;
   onView: (name: string, call: HexString) => void;
 }) {
-  const { network } = useApi();
+  const { network } = useNetwork();
+  const { registry } = useRegistry(network);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
 
   // Derive section and method from registry and call
   const [section, method] = useMemo(() => {
+    if (!registry) return [undefined, undefined];
+
     const result = decodeCallSection(registry, call);
 
     if (!result) return [undefined, undefined];

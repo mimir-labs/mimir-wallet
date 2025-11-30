@@ -7,9 +7,8 @@ import type { IMethod } from '@polkadot/types/types';
 import { GenericExtrinsic } from '@polkadot/types';
 import { blake2AsU8a, encodeMultiAddress } from '@polkadot/util-crypto';
 
-import { allEndpoints, remoteProxyRelations } from './config.js';
-import { createApi } from './initialize.js';
-import { useAllApis } from './useApiStore.js';
+import { ApiManager } from './api/ApiManager.js';
+import { remoteProxyRelations } from './config.js';
 
 function hasRemoteProxy(api: ApiPromise, tx: IMethod) {
   if (!api.tx.remoteProxyRelayChain) {
@@ -96,19 +95,11 @@ export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: st
   const genesisHash = api.genesisHash.toHex();
   const remoteGenesisHash = Object.entries(remoteProxyRelations).find(([, value]) => value === genesisHash)?.[0];
 
-  let remoteApi = Object.values(useAllApis.getState().chains).find(
-    (chain) => chain.genesisHash === remoteGenesisHash
-  )?.api;
-
-  if (!remoteApi) {
-    const chain = allEndpoints.find((chain) => chain.genesisHash === remoteGenesisHash);
-
-    if (!chain) {
-      throw new Error('Remote chain not support');
-    }
-
-    [remoteApi] = await createApi(Object.values(chain.wsUrl), chain.name);
+  if (!remoteGenesisHash) {
+    throw new Error('Remote chain not support');
   }
+
+  const remoteApi = await ApiManager.getInstance().getApi(remoteGenesisHash);
 
   const blockToRoot = JSON.parse((await api.query.remoteProxyRelayChain.blockToRoot()) as any);
   // Get the latest block for which AH knows the storage root.

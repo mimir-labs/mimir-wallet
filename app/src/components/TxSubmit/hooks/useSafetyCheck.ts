@@ -7,16 +7,17 @@ import type { IMethod } from '@polkadot/types/types';
 import { useToggle } from '@/hooks/useToggle';
 import { useEffect, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 
 export function useSafetyCheck(call: IMethod) {
-  const { api, network } = useApi();
+  const { network } = useNetwork();
   const [safetyCheck, setSafetyCheck] = useState<SafetyLevel>();
   const [isConfirm, , setConfirm] = useToggle(false);
 
   useEffect(() => {
-    const section = api.registry.findMetaCall(call.callIndex).section;
+    // Use call's own registry to find metadata
+    const section = call.registry.findMetaCall(call.callIndex).section;
 
     // Use Promise for both sync and async paths to avoid setState in effect
     const checkSafety = () => {
@@ -81,7 +82,7 @@ export function useSafetyCheck(call: IMethod) {
 
       setSafetyCheck(level);
     });
-  }, [api, call, network, setConfirm]);
+  }, [call, network, setConfirm]);
 
   return [safetyCheck, isConfirm, setConfirm] as const;
 }

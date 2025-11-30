@@ -10,11 +10,12 @@ import IconShare from '@/assets/svg/icon-share.svg?react';
 import { AppName, Bytes, Hash } from '@/components';
 import { events } from '@/events';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useParseCallWithFallback } from '@/hooks/useParseCall';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 import moment from 'moment';
 import React from 'react';
 
-import { chainLinks, encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { chainLinks, encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, cn, Divider } from '@mimir-wallet/ui';
 
 import Target from './Target';
@@ -44,7 +45,7 @@ function Extrinsic({
   shouldLoadDetails?: boolean;
   onLoadDetails?: () => void;
 }) {
-  const { network, chain, chainSS58, api } = useApi();
+  const { network, chain } = useNetwork();
   const [isCopied, copy] = useCopyClipboard();
 
   // Get the loading state for the button
@@ -53,22 +54,16 @@ function Extrinsic({
     shouldLoadDetails ? transaction.id.toString() : undefined
   );
 
-  const displayCall =
-    transaction.call && !call
-      ? (() => {
-          try {
-            return api.registry.createTypeUnsafe('Call', [transaction.call]) as IMethod;
-          } catch {
-            return null;
-          }
-        })()
-      : call;
+  // Parse call data using the async hook
+  const { call: parsedCall, isLoading: isParsingCall } = useParseCallWithFallback(network, transaction.call, call);
+
+  if (isParsingCall) return null;
 
   return (
     <>
       <div className='@container flex flex-1 flex-col gap-2.5'>
         <>
-          <Target isMobile={isMobile} address={transaction.address} call={displayCall} />
+          <Target isMobile={isMobile} address={transaction.address} call={parsedCall} />
 
           {hasLargeCalls && (!shouldLoadDetails || (!isFetched && isFetching)) && (
             <div className='flex flex-col gap-[5px]'>
@@ -180,7 +175,7 @@ function Extrinsic({
                 url.searchParams.set('tx_id', transaction.id.toString());
 
                 copy(
-                  `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chainSS58)}`
+                  `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chain.ss58Format)}`
                 );
               }}
             >

@@ -4,7 +4,7 @@
 import { useAccount } from '@/accounts/useAccount';
 import { useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@mimir-wallet/ui';
 
@@ -21,7 +21,7 @@ function AccountVisibility({ isOpen, onConfirm, pureAddress, multisigAddress }: 
   const [pureName, setPureName] = useState('');
   const [multisigName, setMultisigName] = useState('');
   const [hide, setHide] = useState(true);
-  const { network } = useApi();
+  const { network } = useNetwork();
   const { setAccountName, hideAccount } = useAccount();
 
   return (

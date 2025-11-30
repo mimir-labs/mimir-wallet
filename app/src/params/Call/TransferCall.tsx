@@ -10,7 +10,7 @@ import { useParseTransfer } from '@/hooks/useParseTransfer';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
 import React, { forwardRef } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Avatar, cn, Skeleton, TextEllipsis } from '@mimir-wallet/ui';
 
 import FunctionArgs from './FunctionArgs';
@@ -72,7 +72,7 @@ const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) =
     showFallback,
     fallbackComponent: FallbackComponent = FunctionArgs
   } = props;
-  const { network, chain } = useApi();
+  const { network, chain } = useNetwork();
   const results = useParseTransfer(registry, propFrom, call);
 
   const [assetInfo] = useXcmAsset(network, results?.[0]);

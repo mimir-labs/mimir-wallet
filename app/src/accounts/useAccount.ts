@@ -9,7 +9,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { merge } from 'lodash-es';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
-import { addressEq, encodeAddress, isPolkadotAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { addAddressBook, deleteAddress, hideAccount, resync, setAccountName, setName, showAccount } from './actions';
@@ -18,7 +18,7 @@ import { AccountContext } from './context';
 export const AddressMetaContext = createContext<Record<`0x${string}`, AddressMeta>>({});
 
 export function useAccount() {
-  const { chainSS58 } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
   const { metas, updateMetas } = useContext(AccountContext);
   const overrideMetas = useContext(AddressMetaContext);
 

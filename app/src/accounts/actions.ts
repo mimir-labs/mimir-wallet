@@ -1,6 +1,7 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AccountData } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { HIDE_ACCOUNT_HEX_KEY } from '@/constants';
@@ -14,21 +15,27 @@ import { store } from '@mimir-wallet/service';
 
 import { sync } from './sync';
 
-export async function resync(isOmni: boolean, network: string, chainSS58: number) {
-  const { walletAccounts } = useWallet.getState();
+// Overload signatures
+export async function resync(isOmni: true, chainSS58: number): Promise<void>;
+export async function resync(isOmni: false, network: string, chainSS58: number): Promise<void>;
 
-  await sync(
-    isOmni,
-    network,
-    chainSS58,
-    walletAccounts.map((item) => item.address),
-    (values) => {
-      useAddressStore.setState((state) => ({
-        accounts: isEqual(values, state.accounts) ? state.accounts : values,
-        isMultisigSyned: true
-      }));
-    }
-  );
+// Implementation
+export async function resync(isOmni: boolean, networkOrChainSS58: string | number, chainSS58?: number): Promise<void> {
+  const { walletAccounts } = useWallet.getState();
+  const addresses = walletAccounts.map((item) => item.address);
+
+  const callback = (values: AccountData[]) => {
+    useAddressStore.setState((state) => ({
+      accounts: isEqual(values, state.accounts) ? state.accounts : values,
+      isMultisigSyned: true
+    }));
+  };
+
+  if (isOmni) {
+    await sync(true, networkOrChainSS58 as number, addresses, callback);
+  } else {
+    await sync(false, networkOrChainSS58 as string, chainSS58!, addresses, callback);
+  }
 }
 
 export function showAccount(address: string) {

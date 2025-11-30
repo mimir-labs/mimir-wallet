@@ -1,41 +1,51 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 
 export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: string[]) {
-  const { allApis, network: rootNetwork, setNetwork: setRootNetwork } = useApi();
-  const { enableNetwork, mode } = useNetworks();
-  const [network, setNetwork] = useState(supportedNetworks?.at(0) || defaultNetwork || rootNetwork);
+  const { chains, enableNetwork, mode } = useChains();
 
-  const allApisRef = useRef(allApis);
+  // Get enabled network keys as a Set for fast lookup
+  const enabledNetworks = useMemo(() => new Set(chains.filter((c) => c.enabled).map((c) => c.key)), [chains]);
+
+  // Get first enabled network as default fallback
+  const firstEnabledNetwork = useMemo(() => {
+    const enabled = chains.find((c) => c.enabled);
+
+    return enabled?.key || 'polkadot';
+  }, [chains]);
+
+  const [network, setNetwork] = useState(supportedNetworks?.at(0) || defaultNetwork || firstEnabledNetwork);
+
+  const enabledNetworksRef = useRef(enabledNetworks);
 
   useEffect(() => {
-    allApisRef.current = allApis;
-  }, [allApis]);
+    enabledNetworksRef.current = enabledNetworks;
+  }, [enabledNetworks]);
 
   useEffect(() => {
     queueMicrotask(() => {
       if (mode === 'omni') {
         if (!supportedNetworks || supportedNetworks.length === 0) {
-          if (!allApisRef.current[network]) {
-            setNetwork(rootNetwork);
+          if (!enabledNetworksRef.current.has(network)) {
+            setNetwork(firstEnabledNetwork);
           }
         } else {
           if (!supportedNetworks.includes(network)) {
-            const network = supportedNetworks[0];
+            const newNetwork = supportedNetworks[0];
 
-            setNetwork(network);
+            setNetwork(newNetwork);
           }
         }
       }
     });
-  }, [network, supportedNetworks, mode, rootNetwork]);
+  }, [network, supportedNetworks, mode, firstEnabledNetwork]);
 
   useEffect(() => {
-    if (mode === 'omni' && !allApisRef.current[network]) {
+    if (mode === 'omni' && !enabledNetworksRef.current.has(network)) {
       enableNetwork(network);
     }
   }, [network, enableNetwork, mode]);
@@ -43,16 +53,12 @@ export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: str
   return [
     network,
     useCallback(
-      (network: string) => {
+      (newNetwork: string) => {
         if (mode === 'omni') {
-          const newKey = setRootNetwork(network);
-
-          if (newKey) {
-            setNetwork(network);
-          }
+          setNetwork(newNetwork);
         }
       },
-      [mode, setRootNetwork]
+      [mode]
     )
   ] as const;
 }

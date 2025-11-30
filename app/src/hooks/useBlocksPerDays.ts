@@ -9,8 +9,8 @@ import { useBlockInterval } from './useBlockInterval';
 
 export const A_DAY = new BN(24 * 60 * 60 * 1000);
 
-function useBlocksPerDaysImpl(days: BN | number = 1): BN {
-  const blockTime = useBlockInterval();
+function useBlocksPerDaysImpl(network: string, days: BN | number = 1): BN {
+  const blockTime = useBlockInterval(network);
 
   return useMemo(() => A_DAY.mul(bnToBn(days)).div(blockTime), [blockTime, days]);
 }

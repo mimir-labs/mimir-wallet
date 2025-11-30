@@ -9,7 +9,6 @@ import { Link, useLocation } from '@tanstack/react-router';
 import { memo, useCallback, useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
 import { Button, Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@mimir-wallet/ui';
 
 import { LAYOUT } from '../constants';
@@ -20,7 +19,6 @@ import { AccountInfo, NavigationMenu, WalletSelector } from './components';
  * Handles wallet connection, account selection, and navigation
  */
 function AppSidebarComponent() {
-  const { isApiReady } = useApi();
   const selected = useSelectedAccount();
   const { connectedWallets, openWallet } = useWallet();
   const { closeSidebar, sidebarOpen, openSidebar } = useMimirLayout();
@@ -46,7 +44,7 @@ function AppSidebarComponent() {
       >
         {/* Header with account/wallet selection */}
         <SidebarHeader className='p-4'>
-          {pathname !== '/welcome' && isApiReady && (
+          {pathname !== '/welcome' && (
             <>
               {isConnected ? (
                 selected ? (

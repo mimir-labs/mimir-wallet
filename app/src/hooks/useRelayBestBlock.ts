@@ -1,42 +1,28 @@
 // Copyright 2023-2024 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAllApis, useApi } from '@mimir-wallet/polkadot-core';
+import type { Header } from '@polkadot/types/interfaces';
+
+import { ApiManager, useChain } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 import { useBlockInterval } from './useBlockInterval';
 
-async function fetchRelayBestBlock({ queryKey }: { queryKey: readonly [string, string | undefined] }) {
+async function fetchRelayBestBlock({ queryKey }: { queryKey: readonly [string, string] }): Promise<Header> {
   const [, relayChainKey] = queryKey;
 
-  if (!relayChainKey) {
-    throw new Error('Relay chain key is required');
-  }
+  const api = await ApiManager.getInstance().getApi(relayChainKey);
 
-  const allApis = useAllApis.getState().chains;
-  const relayApi = allApis[relayChainKey];
-
-  // Double-check API availability (defense in depth)
-  if (!relayApi?.api || !relayApi.isApiReady) {
-    throw new Error(`Relay chain API not available for ${relayChainKey}`);
-  }
-
-  try {
-    const header = await relayApi.api.rpc.chain.getHeader();
-
-    return header;
-  } catch (error) {
-    console.error(`Failed to fetch relay chain block header for ${relayChainKey}:`, error);
-    throw error;
-  }
+  return api.rpc.chain.getHeader();
 }
 
 /**
- * Hook to fetch the best block from the relay chain of the current parachain
+ * Hook to fetch the best block from the relay chain of a parachain
  *
  * This hook is specifically designed for parachains that require relay chain block numbers
  * for proxy announcement time calculations (e.g., assethub-kusama, assethub-paseo, assethub-westend).
  *
+ * @param network - The parachain network key to get relay chain block for
  * @returns A tuple containing:
  *   - bestBlock: The latest relay chain block header, or undefined if unavailable
  *   - isFetched: Whether the initial fetch has completed
@@ -44,28 +30,22 @@ async function fetchRelayBestBlock({ queryKey }: { queryKey: readonly [string, s
  *
  * @remarks
  * - Returns undefined if the current chain is not a parachain (no relayChain config)
- * - Returns undefined if the relay chain API is not initialized or ready
  * - Automatically refetches at the chain's block interval
- * - Query is disabled if relay chain API is not available
+ * - Query is disabled if relay chain is not available
  */
-export function useRelayBestBlock() {
-  const { chain, allApis } = useApi();
-
-  const relayChainKey = chain.relayChain;
-  const relayApi = relayChainKey ? allApis[relayChainKey] : undefined;
-
-  const blockInterval = useBlockInterval();
+export function useRelayBestBlock(network: string) {
+  const chain = useChain(network);
+  const relayChainKey = chain?.relayChain;
+  const blockInterval = useBlockInterval(relayChainKey ?? network);
 
   const {
     data: bestBlock,
     isFetched,
     isFetching
   } = useQuery({
-    queryKey: ['relayBestBlock', relayChainKey] as const,
-    // Only enable query when:
-    // 1. Current chain has a relay chain (is a parachain)
-    // 2. Relay chain API is initialized and ready
-    enabled: !!relayApi?.isApiReady && !!relayChainKey,
+    queryKey: ['relayBestBlock', relayChainKey ?? ''] as const,
+    // Only enable query when current chain has a relay chain (is a parachain)
+    enabled: !!relayChainKey,
     refetchOnMount: false,
     refetchInterval: blockInterval.toNumber(),
     queryFn: fetchRelayBestBlock

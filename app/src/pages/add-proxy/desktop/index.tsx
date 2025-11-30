@@ -17,7 +17,7 @@ import {
   toFunctionCallBoolean,
   toFunctionCallString
 } from '@mimir-wallet/ai-assistant';
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider, Spinner } from '@mimir-wallet/ui';
 
 import Step1ConfigureAccess from './Step1ConfigureAccess';
@@ -192,14 +192,56 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
   });
 
   return (
-    <SubApiRoot
-      network={network}
-      Fallback={() => (
-        <div className='bg-content1 mx-auto my-0 flex w-[800px] max-w-full items-center justify-center rounded-[20px] py-10'>
-          <Spinner size='lg' variant='wave' label='Connecting to the network...' />
-        </div>
-      )}
-    >
+    <NetworkProvider network={network}>
+      <AddProxyContent
+        network={network}
+        setNetwork={setNetwork}
+        wizardState={wizardState}
+        wizardActions={wizardActions}
+        handleConfirm={handleConfirm}
+        isSuccess={isSuccess}
+        toggleSuccess={toggleSuccess}
+        transactionData={transactionData}
+      />
+    </NetworkProvider>
+  );
+}
+
+interface AddProxyContentProps {
+  network: string;
+  setNetwork: (network: string) => void;
+  wizardState: ReturnType<typeof useWizardState<ProxyWizardData>>[0];
+  wizardActions: ReturnType<typeof useWizardState<ProxyWizardData>>[1];
+  handleConfirm: (result: TransactionResult) => Promise<void>;
+  isSuccess: boolean;
+  toggleSuccess: (value?: boolean) => void;
+  transactionData: TransactionResult | null;
+}
+
+function AddProxyContent({
+  network,
+  setNetwork,
+  wizardState,
+  wizardActions,
+  handleConfirm,
+  isSuccess,
+  toggleSuccess,
+  transactionData
+}: AddProxyContentProps) {
+  const { chain } = useNetwork();
+  const { isApiReady } = useChainStatus(network);
+  const { goToStep } = wizardActions;
+
+  if (!isApiReady) {
+    return (
+      <div className='bg-content1 mx-auto my-0 flex w-[800px] max-w-full items-center justify-center rounded-[20px] py-10'>
+        <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
+      </div>
+    );
+  }
+
+  return (
+    <>
       <div className='mx-auto flex w-full max-w-[800px] flex-col gap-5'>
         <div className='flex items-center justify-between'>
           <Button onClick={() => window.history.back()} variant='ghost'>
@@ -232,6 +274,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
             )}
             {wizardState.currentStep === 2 && (
               <Step2PermissionLevel
+                network={network}
                 proxyType={wizardState.data.proxyType}
                 hasDelay={wizardState.data.hasDelay}
                 delayType={wizardState.data.delayType}
@@ -263,7 +306,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
         transactionResult={transactionData}
         network={network}
       />
-    </SubApiRoot>
+    </>
   );
 }
 

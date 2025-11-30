@@ -4,7 +4,7 @@
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useMemo } from 'react';
 
-import { remoteProxyRelations, useNetworks } from '@mimir-wallet/polkadot-core';
+import { remoteProxyRelations, useChains } from '@mimir-wallet/polkadot-core';
 
 /**
  * Get supported networks by address
@@ -13,7 +13,7 @@ import { remoteProxyRelations, useNetworks } from '@mimir-wallet/polkadot-core';
  * @returns Array of supported networks, or undefined if all networks are supported
  */
 export function useAddressSupportedNetworks(address?: string | null) {
-  const { networks } = useNetworks();
+  const { chains } = useChains();
   const { meta } = useAddressMeta(address);
 
   const supportedNetwork = useMemo(() => {
@@ -35,13 +35,13 @@ export function useAddressSupportedNetworks(address?: string | null) {
         meta.proxyNetworks.forEach((network) => genesisHashes.add(network));
       }
 
-      const supported = networks.filter((item) => genesisHashes.has(item.genesisHash));
+      const supported = chains.filter((item) => genesisHashes.has(item.genesisHash));
 
       return supported;
     }
 
     return undefined;
-  }, [meta.isPure, meta.pureCreatedAt, meta.proxyNetworks, networks]);
+  }, [meta.isPure, meta.pureCreatedAt, meta.proxyNetworks, chains]);
 
   return useMemo(() => (supportedNetwork ? supportedNetwork : undefined), [supportedNetwork]);
 }

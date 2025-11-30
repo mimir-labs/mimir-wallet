@@ -11,7 +11,7 @@ import {
 } from '@/features/assethub-migration/useMigrationStatus';
 import { useState } from 'react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
 
 import TemplateMigrationModal from './TemplateMigrationModal';
@@ -25,7 +25,7 @@ interface TemplateMigrationAlertProps {
 function TemplateMigrationAlert({ chain, templates, onMigrationComplete }: TemplateMigrationAlertProps) {
   const { isAlertVisible, dismissAlert } = useTemplateMigrationStatus(chain);
   const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false);
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
   const migrationCompleted = useNetworkMigrationCompleted(chain);
 
   if (!isAlertVisible || !migrationCompleted.completed || !migrationCompleted.block || !migrationCompleted.destChain) {

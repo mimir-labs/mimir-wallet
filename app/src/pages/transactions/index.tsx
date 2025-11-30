@@ -11,7 +11,7 @@ import { getChainsWithSubscanSupport } from '@/utils/networkGrouping';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { lazy, Suspense, useEffect, useMemo, useState, useTransition } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 
 const routeApi = getRouteApi('/_authenticated/transactions/');
 
@@ -51,7 +51,17 @@ function Content({ address }: { address: string }) {
   const status = search.status;
   const txId = search.tx_id;
 
-  const { allApis } = useApi();
+  const { chains } = useChains();
+  const allApis = useMemo(() => {
+    return chains.reduce(
+      (acc, chain) => {
+        acc[chain.key] = chain;
+
+        return acc;
+      },
+      {} as Record<string, (typeof chains)[0]>
+    );
+  }, [chains]);
   const meta = useAccountMeta(address);
   const [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] = useValidTransactionNetworks(address);
 

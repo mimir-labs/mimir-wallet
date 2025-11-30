@@ -8,11 +8,12 @@ import { ErrorBoundary, Input, InputAddress, InputNetwork, TxButton } from '@/co
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInput } from '@/hooks/useInput';
+import { useRegistry } from '@/hooks/useRegistry';
 import { Call as CallComp } from '@/params';
 import { useRouter } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Divider } from '@mimir-wallet/ui';
 
 function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {
@@ -38,15 +39,16 @@ function Extrinsic({
   setSending: (sending: string) => void;
   setNetwork: (network: string) => void;
 }) {
-  const { api } = useApi();
+  const { network: currentNetwork } = useNetwork();
+  const { registry } = useRegistry(currentNetwork);
   const [callData, setCallData] = useInput('');
   const [showDetail, setShowDetail] = useState(false);
   const router = useRouter();
 
   // Derive parsed call data and error directly from callData
   const [parsedCallData, callDataError] = useMemo(
-    () => decodeCallData(api.registry, callData),
-    [api.registry, callData]
+    () => (registry ? decodeCallData(registry, callData) : [null, null]),
+    [registry, callData]
   );
 
   return (
@@ -110,7 +112,7 @@ function Extrinsic({
 
             <div className='border-divider-300 @container rounded-[10px] border-1 p-2.5'>
               <ErrorBoundary>
-                <CallComp showFallback registry={api.registry} from={sending} call={parsedCallData} />
+                {registry && <CallComp showFallback registry={registry} from={sending} call={parsedCallData} />}
               </ErrorBoundary>
             </div>
 

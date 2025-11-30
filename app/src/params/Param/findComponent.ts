@@ -82,6 +82,9 @@ function fromDef({ displayName, info, lookupName, sub, type }: TypeDef): string 
     case TypeDefInfo.BTreeSet:
       return 'BTreeSet';
 
+    case TypeDefInfo.BTreeMap:
+      return 'BTreeMap';
+
     case TypeDefInfo.Tuple:
       return components[type] === Account ? type : 'Tuple';
 

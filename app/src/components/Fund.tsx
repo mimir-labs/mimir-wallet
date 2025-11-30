@@ -11,7 +11,7 @@ import { useWallet } from '@/wallet/useWallet';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useChains, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import {
   Alert,
   AlertTitle,
@@ -32,17 +32,28 @@ interface Props {
   onClose: () => void;
 }
 
-function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
-  const { enableNetwork } = useNetworks();
-  const { walletAccounts } = useWallet();
-  const filterSending = walletAccounts.map((item) => item.address);
+// Inner content component that uses network context
+function FundContent({
+  defaultValue,
+  onClose,
+  open,
+  receipt,
+  filterSending,
+  network,
+  setNetwork
+}: {
+  defaultValue?: string | { toString: () => string };
+  onClose: () => void;
+  open: boolean;
+  receipt?: string;
+  filterSending: string[];
+  network: string;
+  setNetwork: (network: string) => void;
+}) {
+  const { chain } = useNetwork();
+  const { isApiReady } = useChainStatus(network);
 
   const [sending, setSending] = useState<string>(filterSending.at(0) || '');
-  const supportedNetworks = useAddressSupportedNetworks(receipt);
-  const [network, setNetwork] = useInputNetwork(
-    defaultNetwork,
-    supportedNetworks?.map((item) => item.key)
-  );
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber(defaultValue?.toString() || '', false, 0);
   const [assetId, setAssetId] = useState('native');
@@ -56,11 +67,8 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const prevOpenRef = useRef(open);
 
   useEffect(() => {
-    if (open) enableNetwork(network);
-
     // Reset form when dialog closes (transition from true to false)
     if (prevOpenRef.current && !open) {
-      // Use queueMicrotask to reset state after the effect completes
       queueMicrotask(() => {
         setError(null);
         setAmount('');
@@ -70,87 +78,111 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
     }
 
     prevOpenRef.current = open;
-  }, [enableNetwork, network, open, setAmount, toggleKeepAlive]);
+  }, [open, setAmount, toggleKeepAlive]);
 
-  return (
-    <SubApiRoot
-      network={network}
-      supportedNetworks={supportedNetworks?.map((item) => item.key)}
-      Fallback={
-        open
-          ? ({ apiState: { chain } }) => (
-              <Modal size='lg' onClose={onClose} isOpen={open}>
-                <ModalContent>
-                  <ModalBody>
-                    <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-                  </ModalBody>
-                </ModalContent>
-              </Modal>
-            )
-          : undefined
-      }
-    >
+  // Show loading state when API is not ready
+  if (!isApiReady && open) {
+    return (
       <Modal size='lg' onClose={onClose} isOpen={open}>
         <ModalContent>
-          <ModalHeader>Fund</ModalHeader>
-
-          <ModalBody className='flex flex-col gap-5'>
-            {receipt && (
-              <TransferContent
-                disabledRecipient
-                filterSending={filterSending}
-                amount={amount}
-                isAmountValid={isAmountValid}
-                keepAlive={keepAlive}
-                token={token}
-                identifier={assetId}
-                sending={sending}
-                recipient={receipt}
-                network={network}
-                setSending={setSending}
-                setNetwork={setNetwork}
-                setAmount={setAmount}
-                toggleKeepAlive={toggleKeepAlive}
-                setToken={setAssetId}
-              />
-            )}
-
-            {error && (
-              <Alert variant='destructive'>
-                <AlertTitle>{error}</AlertTitle>
-              </Alert>
-            )}
+          <ModalBody>
+            <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
           </ModalBody>
-
-          <ModalFooter>
-            <Button fullWidth onClick={onClose} variant='ghost'>
-              Cancel
-            </Button>
-
-            {receipt && (
-              <TransferAction
-                network={network}
-                token={token}
-                amount={amount}
-                isAmountValid={isAmountValid}
-                keepAlive={keepAlive}
-                sending={sending}
-                recipient={receipt}
-                onDone={() => {
-                  setError(null);
-                  onClose();
-                }}
-                onError={(error: any) => {
-                  setError(error.message || 'Something went wrong');
-                }}
-              >
-                Submit
-              </TransferAction>
-            )}
-          </ModalFooter>
         </ModalContent>
       </Modal>
-    </SubApiRoot>
+    );
+  }
+
+  return (
+    <Modal size='lg' onClose={onClose} isOpen={open}>
+      <ModalContent>
+        <ModalHeader>Fund</ModalHeader>
+
+        <ModalBody className='flex flex-col gap-5'>
+          {receipt && (
+            <TransferContent
+              disabledRecipient
+              filterSending={filterSending}
+              amount={amount}
+              isAmountValid={isAmountValid}
+              keepAlive={keepAlive}
+              token={token}
+              identifier={assetId}
+              sending={sending}
+              recipient={receipt}
+              network={network}
+              setSending={setSending}
+              setNetwork={setNetwork}
+              setAmount={setAmount}
+              toggleKeepAlive={toggleKeepAlive}
+              setToken={setAssetId}
+            />
+          )}
+
+          {error && (
+            <Alert variant='destructive'>
+              <AlertTitle>{error}</AlertTitle>
+            </Alert>
+          )}
+        </ModalBody>
+
+        <ModalFooter>
+          <Button fullWidth onClick={onClose} variant='ghost'>
+            Cancel
+          </Button>
+
+          {receipt && (
+            <TransferAction
+              network={network}
+              token={token}
+              amount={amount}
+              isAmountValid={isAmountValid}
+              keepAlive={keepAlive}
+              sending={sending}
+              recipient={receipt}
+              onDone={() => {
+                setError(null);
+                onClose();
+              }}
+              onError={(error: any) => {
+                setError(error.message || 'Something went wrong');
+              }}
+            >
+              Submit
+            </TransferAction>
+          )}
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
+  const { enableNetwork } = useChains();
+  const { walletAccounts } = useWallet();
+  const filterSending = walletAccounts.map((item) => item.address);
+  const supportedNetworks = useAddressSupportedNetworks(receipt);
+  const [network, setNetwork] = useInputNetwork(
+    defaultNetwork,
+    supportedNetworks?.map((item) => item.key)
+  );
+
+  useEffect(() => {
+    if (open) enableNetwork(network);
+  }, [enableNetwork, network, open]);
+
+  return (
+    <NetworkProvider network={network}>
+      <FundContent
+        defaultValue={defaultValue}
+        onClose={onClose}
+        open={open}
+        receipt={receipt}
+        filterSending={filterSending}
+        network={network}
+        setNetwork={setNetwork}
+      />
+    </NetworkProvider>
   );
 }
 

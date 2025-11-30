@@ -4,11 +4,10 @@
 import type { ApiPromise } from '@polkadot/api';
 
 import { BN, BN_THOUSAND, BN_TWO, bnMin } from '@polkadot/util';
-import { useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
 
-import { createNamedHook } from './createNamedHook';
 import { A_DAY } from './useBlocksPerDays';
 
 // Some chains incorrectly use these, i.e. it is set to values such as 0 or even 2
@@ -37,10 +36,26 @@ function calcInterval(api: ApiPromise): BN {
   );
 }
 
-function useBlockIntervalImpl(apiOverride?: ApiPromise | null): BN {
-  const { api } = useApi();
+async function fetchBlockInterval({ queryKey }: { queryKey: readonly [string, string] }): Promise<BN> {
+  const [, network] = queryKey;
 
-  return useMemo(() => calcInterval(apiOverride || api), [api, apiOverride]);
+  const api = await ApiManager.getInstance().getApi(network);
+
+  return calcInterval(api);
 }
 
-export const useBlockInterval = createNamedHook('useBlockInterval', useBlockIntervalImpl);
+/**
+ * Hook to get block interval for a specific network
+ * @param network - The network key to query
+ * @returns Block interval in milliseconds as BN
+ */
+export function useBlockInterval(network: string): BN {
+  const { data } = useQuery({
+    queryKey: ['block-interval', network] as const,
+    queryFn: fetchBlockInterval,
+    enabled: !!network,
+    staleTime: Infinity // Block interval doesn't change
+  });
+
+  return data ?? DEFAULT_TIME;
+}

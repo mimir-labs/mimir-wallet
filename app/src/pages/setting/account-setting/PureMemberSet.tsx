@@ -8,13 +8,13 @@ import { usePendingTransactions } from '@/hooks/useTransactions';
 import { useNavigate } from '@tanstack/react-router';
 import { memo, useCallback, useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 
 import MemberSet from './MemberSet';
 
 function PureMemberSet({ account }: { account: PureAccountData }) {
-  const { network } = useApi();
+  const { network } = useNetwork();
   const navigate = useNavigate();
 
   // Memoize filtered delegatees to avoid recalculation on every render

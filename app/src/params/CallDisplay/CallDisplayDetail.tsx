@@ -4,13 +4,12 @@
 import type { IMethod, Registry } from '@polkadot/types/types';
 
 import { FormatBalance } from '@/components';
-import { findToken } from '@/config';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
 import { dataToUtf8 } from '@/utils';
 import React, { useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Avatar, Skeleton } from '@mimir-wallet/ui';
 
 function TransferDetail({
@@ -22,7 +21,7 @@ function TransferDetail({
   registry: Registry;
   call: IMethod | null;
 }) {
-  const { network, genesisHash } = useApi();
+  const { network, chain } = useNetwork();
   const results = useParseTransfer(registry, propsFrom, call);
   const [assetInfo] = useXcmAsset(network, results?.[0]);
 
@@ -37,7 +36,7 @@ function TransferDetail({
       'All'
     ) : (
       <div className='flex items-center gap-1'>
-        <Avatar alt='Token' src={findToken(genesisHash).Icon} style={{ width: 20, height: 20 }} />
+        <Avatar alt='Token' src={chain.tokenIcon} style={{ width: 20, height: 20 }} />
         <p>
           -<FormatBalance value={value} withCurrency />
         </p>

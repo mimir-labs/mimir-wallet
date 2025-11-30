@@ -5,7 +5,7 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { toastSuccess } from '@/components/utils';
 import { create } from 'zustand';
 
-import { encodeAddress, isPolkadotEvmAddress, sub2Eth, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, isPolkadotEvmAddress, sub2Eth, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
 
 import { useCopyClipboard } from './useCopyClipboard';
 
@@ -25,8 +25,8 @@ export function useCopyAddressToClipboard(address?: string) {
   const [, copy] = useCopyClipboard();
   const { open: openCopy } = useCopyAddress();
   const { meta } = useAddressMeta(address);
-  const { chainSS58 } = useApi();
-  const { networks } = useNetworks();
+  const { ss58: chainSS58 } = useSs58Format();
+  const { chains } = useChains();
 
   return (_address: string | undefined = address) => {
     if (!_address) {
@@ -36,7 +36,7 @@ export function useCopyAddressToClipboard(address?: string) {
     let encodedAddress: string;
 
     if (meta.isPure) {
-      const network = networks.find((network) => network.genesisHash === meta.pureCreatedAt);
+      const network = chains.find((chain) => chain.genesisHash === meta.pureCreatedAt);
 
       if (!network) {
         return;

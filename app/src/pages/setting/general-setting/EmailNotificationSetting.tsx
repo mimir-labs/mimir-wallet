@@ -10,7 +10,7 @@ import { sanitizeEmail } from '@/utils/emailSignatureUtils';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Card } from '@mimir-wallet/ui';
 
 import AccountSelectionModal from './AccountSelectionModal';
@@ -20,7 +20,7 @@ interface EmailNotificationSettingProps {
 }
 
 function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSettingProps) {
-  const { chainSS58 } = useApi();
+  const { ss58 } = useSs58Format();
   const [email, setEmail] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<'bind' | 'unbind' | null>(null);
@@ -109,7 +109,7 @@ function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSe
               label={<span className='font-normal'>Subscribe this account</span>}
               wrapperClassName='h-[36px]'
               value={address}
-              onChange={(value) => setAddress(encodeAddress(value, chainSS58))}
+              onChange={(value) => setAddress(encodeAddress(value, ss58))}
               placeholder='Please select account'
               helper='You will receive email notification once your account got new transaction information.'
             />

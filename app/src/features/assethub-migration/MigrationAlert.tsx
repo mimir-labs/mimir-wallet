@@ -6,7 +6,7 @@ import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { MIGRATION_NOTICE_DOCS_URL } from '@/constants';
 import { useEffect, useState } from 'react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 
 import MigrationModal from './MigrationModal';
@@ -22,7 +22,7 @@ function Item({
   destChain: string;
 }) {
   const { isAlertVisible, dismissAlert } = useMigrationStatus(sourceChain, isCompleted);
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sourceNetwork = networks.find((network) => network.key === sourceChain);

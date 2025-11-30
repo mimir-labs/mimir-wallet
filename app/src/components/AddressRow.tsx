@@ -5,7 +5,7 @@ import type { AccountId, AccountIndex, Address } from '@polkadot/types/interface
 
 import React, { forwardRef, useMemo } from 'react';
 
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
@@ -40,7 +40,7 @@ const AddressRow = forwardRef<HTMLDivElement, Props>(
     }: Props,
     ref
   ) => {
-    const { chainSS58 } = useApi();
+    const { ss58: chainSS58 } = useSs58Format();
     const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
     return (

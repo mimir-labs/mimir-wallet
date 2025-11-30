@@ -13,7 +13,7 @@ import { useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
 import React, { useState } from 'react';
 
-import { sign, signAndSend, TxEvents, useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, sign, signAndSend, TxEvents, useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Alert, AlertTitle, Button, buttonSpinner } from '@mimir-wallet/ui';
 
@@ -51,7 +51,7 @@ function SendTx({
   onSignature?: (signer: string, signature: HexString, tx: HexString, payload: ExtrinsicPayloadValue) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }) {
-  const { api, network } = useApi();
+  const { network } = useNetwork();
   const [loading, setLoading] = useState(false);
   const { txBundle, isLoading, error, hashSet, delay } = buildTx;
   const source = useAccountSource(txBundle?.signer);
@@ -79,6 +79,12 @@ function SendTx({
     setLoading(true);
 
     try {
+      const api = await ApiManager.getInstance().getApi(network);
+
+      if (!api) {
+        throw new Error('API not ready');
+      }
+
       for await (const item of hashSet) {
         await service.chain.updateCalldata(network, item);
       }

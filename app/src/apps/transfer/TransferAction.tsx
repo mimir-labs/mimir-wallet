@@ -4,12 +4,13 @@
 import type { TransferToken } from './types';
 
 import { TxButton } from '@/components';
+import { useExistentialDeposit } from '@/hooks/useExistentialDeposit';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
 import { parseUnits } from '@/utils';
 import { BN, isHex } from '@polkadot/util';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 
 import { useTransferBalance } from './useTransferBalances';
 
@@ -36,21 +37,34 @@ function TransferAction({
   onError?: (error: unknown) => void;
   children?: React.ReactNode;
 }) {
-  const { api } = useApi();
+  const { network: currentNetwork } = useNetwork();
+  const { existentialDeposit: nativeED } = useExistentialDeposit(currentNetwork);
 
   const [format, sendingBalances] = useTransferBalance(token, sending);
   const [assetInfo] = useXcmAsset(network, token?.isNative ? null : token?.assetId);
 
-  const existentialDeposit = token?.isNative
-    ? api.consts.balances.existentialDeposit
-    : assetInfo?.existentialDeposit
-      ? new BN(assetInfo.existentialDeposit.toString())
-      : new BN(0);
+  // Determine existential deposit based on token type
+  const existentialDeposit = useMemo(() => {
+    if (token?.isNative) {
+      return nativeED;
+    } else if (assetInfo?.existentialDeposit) {
+      return new BN(assetInfo.existentialDeposit.toString());
+    }
+
+    return new BN(0);
+  }, [token?.isNative, nativeED, assetInfo?.existentialDeposit]);
+
   const isInsufficientBalance = keepAlive
     ? sendingBalances.sub(existentialDeposit).lt(new BN(parseUnits(amount, format[0]).toString()))
     : sendingBalances.lt(new BN(parseUnits(amount, format[0]).toString()));
 
-  const getCall = useCallback(() => {
+  const getCall = useCallback(async () => {
+    const api = await ApiManager.getInstance().getApi(currentNetwork);
+
+    if (!api) {
+      throw new Error('API not ready');
+    }
+
     if (recipient && sending && amount && token) {
       if (!isAmountValid) {
         throw new Error('Invalid amount');
@@ -88,7 +102,7 @@ function TransferAction({
     }
 
     throw new Error('Invalid arguments');
-  }, [amount, api, format, isAmountValid, keepAlive, recipient, sending, token]);
+  }, [amount, currentNetwork, format, isAmountValid, keepAlive, recipient, sending, token]);
 
   return (
     <TxButton

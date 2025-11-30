@@ -5,9 +5,10 @@ import { useAccount } from '@/accounts/useAccount';
 import DeleteIcon from '@/assets/svg/icon-delete.svg?react';
 import { Empty, InputAddress } from '@/components';
 import AddressRow from '@/components/AddressRow';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 import { useState } from 'react';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import {
   Alert,
   AlertDescription,
@@ -42,8 +43,8 @@ function Step2Members({
 }: Step2MembersProps) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [selectedAccount, setSelectedAccount] = useState<string>('');
-  const { api } = useApi();
-  const isProxyModuleSupported = !!api.tx.proxy;
+  const { network } = useNetwork();
+  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(network);
 
   const handleAddMember = () => {
     if (selectedAccount && !members.find((m) => m === selectedAccount)) {

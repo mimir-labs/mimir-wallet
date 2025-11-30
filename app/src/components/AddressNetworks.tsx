@@ -33,7 +33,7 @@ import type { AddressMeta } from '@/hooks/types';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { memo, useMemo } from 'react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
 
 interface AddressNetworksProps {
@@ -92,7 +92,7 @@ function Icon({
         }}
       />
       <img
-        className='animate-fade-in animation absolute top-0 left-0 z-[1] select-none'
+        className='animate-fade-in animation absolute top-0 left-0 z-1 select-none'
         src={icon}
         alt={name}
         draggable={false}
@@ -142,7 +142,7 @@ function AddressNetworksComponent({
   // Use prop meta if provided, otherwise fetch it (for backward compatibility)
   const { meta: fetchedMeta } = useAddressMeta(propMeta ? undefined : address);
   const meta = propMeta || fetchedMeta;
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
 
   // Get the networks where this address has proxy relationships
   const proxyNetworks = useMemo(() => {
