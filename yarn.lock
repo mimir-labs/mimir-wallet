@@ -3276,6 +3276,7 @@ __metadata:
     idb: "npm:^8.0.2"
     jsondiffpatch: "npm:^0.6.0"
     npm-run-all2: "npm:^7.0.2"
+    tsx: "npm:^4.20.6"
     typescript: "npm:^5.9.3"
   peerDependencies:
     react: ">=18"
@@ -17007,7 +17008,7 @@ __metadata:
     lint-staged: "npm:^15.2.9"
     npm-run-all2: "npm:^7.0.2"
     release-please: "npm:^16.18.0"
-    tsx: "npm:^4.19.3"
+    tsx: "npm:^4.20.6"
     turbo: "npm:^2.4.4"
   languageName: unknown
   linkType: soft
@@ -21553,7 +21554,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:^4.19.2":
+"tsx@npm:^4.19.2, tsx@npm:^4.20.6":
   version: 4.20.6
   resolution: "tsx@npm:4.20.6"
   dependencies:
@@ -21566,22 +21567,6 @@ __metadata:
   bin:
     tsx: dist/cli.mjs
   checksum: 10c0/07757a9bf62c271e0a00869b2008c5f2d6e648766536e4faf27d9d8027b7cde1ac8e4871f4bb570c99388bcee0018e6869dad98c07df809b8052f9c549cd216f
-  languageName: node
-  linkType: hard
-
-"tsx@npm:^4.19.3":
-  version: 4.19.4
-  resolution: "tsx@npm:4.19.4"
-  dependencies:
-    esbuild: "npm:~0.25.0"
-    fsevents: "npm:~2.3.3"
-    get-tsconfig: "npm:^4.7.5"
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  bin:
-    tsx: dist/cli.mjs
-  checksum: 10c0/f7b8d44362343fbde1f2ecc9832d243a450e1168dd09702a545ebe5f699aa6912e45b431a54b885466db414cceda48e5067b36d182027c43b2c02a4f99d8721e
   languageName: node
   linkType: hard
 

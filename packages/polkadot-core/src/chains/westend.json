@@ -1,0 +1,49 @@
+[
+  {
+    "key": "assethub-westend",
+    "icon": "/chain-icons/Westend.webp",
+    "tokenIcon": "/token-icons/WND.webp",
+    "name": "Westend",
+    "ss58Format": 42,
+    "relayChain": "westend",
+    "isTestnet": true,
+    "paraId": 1000,
+    "wsUrl": {
+      "Dwellir": "wss://asset-hub-westend-rpc.n.dwellir.com",
+      "Dwellir Tunisia": "wss://westmint-rpc-tn.dwellir.com",
+      "Parity": "wss://westend-asset-hub-rpc.polkadot.io"
+    },
+    "genesisHash": "0x67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9",
+    "explorerUrl": "https://assethub-westend.subscan.io/",
+    "statescanUrl": "https://assethub-westend.statescan.io/",
+    "polkavm": true,
+    "useRelayBlockForProxy": true,
+    "nativeDecimals": 12,
+    "nativeToken": "WND",
+    "supportsDryRun": true,
+    "supportsProxy": true
+  },
+  {
+    "key": "westend",
+    "icon": "/chain-icons/Westend.webp",
+    "tokenIcon": "/token-icons/WND.webp",
+    "name": "Westend Relay",
+    "ss58Format": 42,
+    "isRelayChain": true,
+    "isTestnet": true,
+    "wsUrl": {
+    "Dwellir": "wss://westend-rpc.n.dwellir.com",
+    "Dwellir Tunisia": "wss://westend-rpc-tn.dwellir.com",
+    "OnFinality": "wss://westend.api.onfinality.io/public-ws",
+    "Parity": "wss://westend-rpc.polkadot.io",
+    "RadiumBlock": "wss://westend.public.curie.radiumblock.co/ws"
+  },
+    "genesisHash": "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+    "explorerUrl": "https://westend.subscan.io/",
+    "statescanUrl": "https://westend.statescan.io/",
+    "nativeDecimals": 12,
+    "nativeToken": "WND",
+    "supportsDryRun": true,
+    "supportsProxy": true
+  }
+]

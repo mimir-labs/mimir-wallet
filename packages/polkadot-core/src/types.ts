@@ -4,40 +4,75 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 
-// helpers for HOC props
-export type OmitProps<T, K> = Pick<T, Exclude<keyof T, K>>;
-export type SubtractProps<T, K> = OmitProps<T, keyof K>;
+import kusamaChains from './chains/kusama.json' with { type: 'json' };
+import paseoChains from './chains/paseo.json' with { type: 'json' };
+import polkadotChains from './chains/polkadot.json' with { type: 'json' };
+import solochainChains from './chains/solochain.json' with { type: 'json' };
+import westendChains from './chains/westend.json' with { type: 'json' };
 
-export type Endpoint = {
-  key: string;
-  name: string;
-  relayChain?: string;
-  isRelayChain?: boolean;
-  paraId?: number;
-  isTestnet?: boolean;
-  wsUrl: Record<string, string>;
-  httpUrl?: string;
-  icon: string;
-  tokenIcon: string;
-  ss58Format: number;
-  genesisHash: HexString;
-  explorerUrl?: string;
-  statescanUrl?: string;
-  subsquareUrl?: string;
-  identityNetwork?: string;
-  polkavm?: boolean;
-  remoteProxyTo?: HexString;
-  // Indicates if proxy announcements use relay chain block numbers instead of parachain block numbers
-  useRelayBlockForProxy?: boolean;
-  // Native token decimals (e.g., 10 for DOT, 12 for KSM)
-  nativeDecimals: number;
-  // Native token symbol (e.g., 'DOT', 'KSM')
-  nativeToken: string;
-  // Indicates if the chain supports dry-run API (api.call.dryRunApi)
-  supportsDryRun?: boolean;
-  // Indicates if the chain supports proxy pallet (api.tx.proxy)
-  supportsProxy?: boolean;
+/**
+ * Union type of all chain configurations from JSON files
+ */
+type AllChains =
+  | (typeof polkadotChains)[number]
+  | (typeof kusamaChains)[number]
+  | (typeof paseoChains)[number]
+  | (typeof westendChains)[number]
+  | (typeof solochainChains)[number];
+
+/**
+ * Get all possible keys from a union (union of keys)
+ */
+type AllKeys<T> = T extends unknown ? keyof T : never;
+
+/**
+ * Get keys that exist in ALL union members (intersection of keys)
+ * keyof Union returns only shared keys
+ */
+type SharedKeys<T> = keyof T;
+
+/**
+ * Get keys that exist in SOME but not ALL union members
+ */
+type OptionalKeys<T> = Exclude<AllKeys<T>, SharedKeys<T>>;
+
+/**
+ * Get the type of a key from any member of the union
+ */
+type UnionValue<T, K extends PropertyKey> = T extends unknown ? (K extends keyof T ? T[K] : never) : never;
+
+/**
+ * Widen literal types to base types
+ */
+type Widen<T> = T extends string ? string : T extends number ? number : T extends boolean ? boolean : T;
+
+/**
+ * Required fields: exist in ALL chain configs, non-optional
+ * Except genesisHash which is overridden to HexString, and wsUrl to Record<string, string>
+ */
+type RequiredFieldsFromJSON = {
+  [K in Exclude<SharedKeys<AllChains>, 'genesisHash' | 'wsUrl'>]: Widen<AllChains[K]>;
 };
+
+/**
+ * Optional fields: exist in SOME but not ALL chain configs
+ */
+type OptionalFieldsFromJSON = {
+  [K in OptionalKeys<AllChains>]?: Widen<UnionValue<AllChains, K>>;
+};
+
+/**
+ * Endpoint type: automatically derived from JSON
+ * - Fields in ALL chains -> required
+ * - Fields in SOME chains -> optional
+ * - genesisHash -> HexString (type safety)
+ * - wsUrl -> Record<string, string> (different providers per chain)
+ */
+export type Endpoint = RequiredFieldsFromJSON &
+  OptionalFieldsFromJSON & {
+    genesisHash: HexString;
+    wsUrl: Record<string, string>;
+  };
 
 export type Network = Endpoint & {
   enabled: boolean;

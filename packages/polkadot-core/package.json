@@ -38,7 +38,8 @@
   "scripts": {
     "build": "tsc --build",
     "check-types": "tsc --noEmit",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "fetch-chain-info": "tsx scripts/fetch-chain-info.ts"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -64,6 +65,7 @@
     "@polkadot/extension-base": "^0.62.5",
     "@polkadot/extension-inject": "^0.62.5",
     "npm-run-all2": "^7.0.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }

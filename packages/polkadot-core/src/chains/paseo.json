@@ -1,0 +1,89 @@
+[
+  {
+    "key": "assethub-paseo",
+    "icon": "/chain-icons/Paseo.png",
+    "tokenIcon": "/token-icons/Paseo.png",
+    "name": "Paseo",
+    "ss58Format": 0,
+    "relayChain": "paseo",
+    "isTestnet": true,
+    "paraId": 1000,
+    "wsUrl": {
+      "Dwellir": "wss://asset-hub-paseo-rpc.n.dwellir.com",
+      "IBP1": "wss://sys.ibp.network/asset-hub-paseo",
+      "IBP2": "wss://asset-hub-paseo.dotters.network",
+      "StakeWorld": "wss://pas-rpc.stakeworld.io/assethub",
+      "TurboFlakes": "wss://sys.turboflakes.io/asset-hub-paseo"
+    },
+    "genesisHash": "0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2",
+    "explorerUrl": "https://assethub-paseo.subscan.io/",
+    "statescanUrl": "https://assethub-paseo.statescan.io/",
+    "useRelayBlockForProxy": true,
+    "nativeDecimals": 10,
+    "nativeToken": "PAS",
+    "supportsDryRun": true,
+    "supportsProxy": true
+  },
+  {
+    "key": "passethub",
+    "icon": "/chain-icons/assethub-paseo.webp",
+    "tokenIcon": "/token-icons/Paseo.png",
+    "name": "PAssetHub",
+    "ss58Format": 42,
+    "relayChain": "paseo",
+    "isTestnet": true,
+    "paraId": 1111,
+    "wsUrl": {
+      "IBP1": "wss://passet-hub-paseo.ibp.network",
+      "IBP2": "wss://passet-hub-paseo.dotters.network",
+      "Parity": "wss://testnet-passet-hub.polkadot.io"
+    },
+    "genesisHash": "0xfd974cf9eaf028f5e44b9fdd1949ab039c6cf9cc54449b0b60d71b042e79aeb6",
+    "polkavm": true,
+    "nativeDecimals": 10,
+    "nativeToken": "PAS",
+    "supportsDryRun": true,
+    "supportsProxy": true
+  },
+  {
+    "key": "xcavate-paseo",
+    "icon": "/chain-icons/xcavate.png",
+    "tokenIcon": "/token-icons/XCAV.png",
+    "name": "Xcavate(Paseo)",
+    "relayChain": "paseo",
+    "isTestnet": true,
+    "paraId": 4683,
+    "wsUrl": {
+      "Xcavate": "wss://rpc2-paseo.xcavate.io"
+    },
+    "genesisHash": "0xac9dc5e0f7aeae019818f5859215044f80676e562cf934f6683d6424abdabbc8",
+    "ss58Format": 0,
+    "nativeDecimals": 12,
+    "nativeToken": "XCAV",
+    "supportsDryRun": false,
+    "supportsProxy": true
+  },
+  {
+    "key": "paseo",
+    "icon": "/chain-icons/Paseo.png",
+    "tokenIcon": "/token-icons/Paseo.png",
+    "name": "Paseo Relay",
+    "ss58Format": 0,
+    "isRelayChain": true,
+    "isTestnet": true,
+    "wsUrl": {
+      "Amforc": "wss://paseo.rpc.amforc.com",
+      "Dwellir": "wss://paseo-rpc.n.dwellir.com",
+      "IBP1": "wss://rpc.ibp.network/paseo",
+      "IBP2": "wss://paseo.dotters.network",
+      "StakeWorld": "wss://pas-rpc.stakeworld.io"
+    },
+    "genesisHash": "0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f",
+    "explorerUrl": "https://paseo.subscan.io/",
+    "statescanUrl": "https://paseo.statescan.io/",
+    "nativeDecimals": 10,
+    "nativeToken": "PAS",
+    "supportsDryRun": true,
+    "supportsProxy": true
+  }
+]
