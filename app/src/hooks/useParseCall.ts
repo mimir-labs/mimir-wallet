@@ -23,13 +23,11 @@ async function parseCallData({
 
   const api = await ApiManager.getInstance().getApi(network);
 
-  if (!api) {
-    return null;
-  }
-
   try {
-    return api.registry.createTypeUnsafe<IMethod>('Call', [callData]);
-  } catch {
+    return api.registry.createType<IMethod>('Call', callData);
+  } catch (error) {
+    console.error(error, network);
+
     return null;
   }
 }

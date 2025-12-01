@@ -9,15 +9,17 @@ import React, { useCallback, useMemo, useState } from 'react';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
+import { BorderSpinWrapper } from '@/components/BorderSpinWrapper';
+import { useAllChainsConnected } from '@/hooks/useAllChainsConnected';
 
 const Status = React.memo(function Status({ network }: { network: Network }) {
-  const { isApiReady, apiError } = useChainStatus(network.key);
+  const { isApiReady, isApiConnected, apiError } = useChainStatus(network.key);
 
   return (
     <Tooltip content={isApiReady ? 'Connected' : apiError ? apiError || 'Connect Failed' : 'Connecting...'}>
       <Badge
         hidden={!network.enabled && !isApiReady}
-        color={isApiReady ? 'success' : apiError ? 'danger' : 'warning'}
+        color={isApiReady && isApiConnected ? 'success' : apiError ? 'danger' : 'warning'}
         content=''
         shape='circle'
         size='sm'
@@ -125,6 +127,7 @@ const GroupedEndpoints = React.memo(function GroupedEndpoints({
 
 function OmniChainSelect() {
   const { chains, enableNetwork, disableNetwork } = useChains();
+  const allConnected = useAllChainsConnected();
 
   const enabledNetworks = useMemo(() => chains.filter((network) => network.enabled), [chains]);
   const groupedEndpoints = useMemo(() => {
@@ -158,71 +161,75 @@ function OmniChainSelect() {
     [disableNetwork]
   );
 
+  const triggerButton = (
+    <Button
+      variant='bordered'
+      className='border-secondary text-primary sm:text-foreground bg-secondary h-8 shrink-0 gap-1 px-2.5 sm:h-[42px] sm:gap-2 sm:bg-transparent sm:px-3'
+      radius='md'
+      onClick={() => setIsOpen(!isOpen)}
+    >
+      <>
+        <IconWebsite className='block sm:hidden' />
+        <div className='hidden sm:block'>
+          {enabledNetworks.length > 3 ? (
+            <div className='flex items-center'>
+              <Avatar
+                className='bg-transparent select-none'
+                style={{ width: 20, height: 20 }}
+                src={enabledNetworks[0].icon}
+              />
+              <Avatar
+                className='-ml-2.5 bg-transparent select-none'
+                style={{ width: 20, height: 20 }}
+                src={enabledNetworks[1].icon}
+              />
+              <Avatar
+                className='-ml-2.5 bg-transparent select-none'
+                style={{ width: 20, height: 20 }}
+                src={enabledNetworks[2].icon}
+              />
+              <Avatar
+                className='bg-primary border-divider-300 -ml-2.5 border-1 select-none'
+                style={{ width: 20, height: 20 }}
+                showFallback
+                fallback={
+                  <svg xmlns='http://www.w3.org/2000/svg' width='11' height='2' viewBox='0 0 11 2' fill='none'>
+                    <path
+                      fillRule='evenodd'
+                      clipRule='evenodd'
+                      d='M2.73975 1C2.73975 1.55228 2.29203 2 1.73975 2C1.18746 2 0.739746 1.55228 0.739746 1C0.739746 0.447715 1.18746 0 1.73975 0C2.29203 0 2.73975 0.447715 2.73975 1ZM6.73975 1C6.73975 1.55228 6.29203 2 5.73975 2C5.18746 2 4.73975 1.55228 4.73975 1C4.73975 0.447715 5.18746 0 5.73975 0C6.29203 0 6.73975 0.447715 6.73975 1ZM9.73975 2C10.292 2 10.7397 1.55228 10.7397 1C10.7397 0.447715 10.292 0 9.73975 0C9.18746 0 8.73975 0.447715 8.73975 1C8.73975 1.55228 9.18746 2 9.73975 2Z'
+                      fill='white'
+                    />
+                  </svg>
+                }
+              />
+            </div>
+          ) : (
+            <div className='flex items-center'>
+              {enabledNetworks.map((network, index) => (
+                <Avatar
+                  key={network.key}
+                  className='bg-transparent select-none'
+                  style={{ width: 20, height: 20, marginLeft: index > 0 ? '-10px' : 0 }}
+                  src={network.icon}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </>
+      <span className='hidden sm:block'>
+        {enabledNetworks.length > 1 ? `${enabledNetworks.length} Networks` : `${enabledNetworks.at(0)?.name}`}
+      </span>
+      <span className='block sm:hidden'>{enabledNetworks.length > 1 ? `${enabledNetworks.length}` : ''}</span>
+      <ArrowDown className='hidden sm:block' />
+    </Button>
+  );
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant='bordered'
-          className='border-secondary text-primary sm:text-foreground bg-secondary h-8 shrink-0 gap-1 px-2.5 sm:h-[42px] sm:gap-2 sm:bg-transparent sm:px-3'
-          radius='md'
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <>
-            <IconWebsite className='block sm:hidden' />
-            <div className='hidden sm:block'>
-              {enabledNetworks.length > 3 ? (
-                <div className='flex items-center'>
-                  <Avatar
-                    className='bg-transparent select-none'
-                    style={{ width: 20, height: 20 }}
-                    src={enabledNetworks[0].icon}
-                  />
-                  <Avatar
-                    className='-ml-2.5 bg-transparent select-none'
-                    style={{ width: 20, height: 20 }}
-                    src={enabledNetworks[1].icon}
-                  />
-                  <Avatar
-                    className='-ml-2.5 bg-transparent select-none'
-                    style={{ width: 20, height: 20 }}
-                    src={enabledNetworks[2].icon}
-                  />
-                  <Avatar
-                    className='bg-primary border-divider-300 -ml-2.5 border-1 select-none'
-                    style={{ width: 20, height: 20 }}
-                    showFallback
-                    fallback={
-                      <svg xmlns='http://www.w3.org/2000/svg' width='11' height='2' viewBox='0 0 11 2' fill='none'>
-                        <path
-                          fillRule='evenodd'
-                          clipRule='evenodd'
-                          d='M2.73975 1C2.73975 1.55228 2.29203 2 1.73975 2C1.18746 2 0.739746 1.55228 0.739746 1C0.739746 0.447715 1.18746 0 1.73975 0C2.29203 0 2.73975 0.447715 2.73975 1ZM6.73975 1C6.73975 1.55228 6.29203 2 5.73975 2C5.18746 2 4.73975 1.55228 4.73975 1C4.73975 0.447715 5.18746 0 5.73975 0C6.29203 0 6.73975 0.447715 6.73975 1ZM9.73975 2C10.292 2 10.7397 1.55228 10.7397 1C10.7397 0.447715 10.292 0 9.73975 0C9.18746 0 8.73975 0.447715 8.73975 1C8.73975 1.55228 9.18746 2 9.73975 2Z'
-                          fill='white'
-                        />
-                      </svg>
-                    }
-                  />
-                </div>
-              ) : (
-                <div className='flex items-center'>
-                  {enabledNetworks.map((network, index) => (
-                    <Avatar
-                      key={network.key}
-                      className='bg-transparent select-none'
-                      style={{ width: 20, height: 20, marginLeft: index > 0 ? '-10px' : 0 }}
-                      src={network.icon}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </>
-          <span className='hidden sm:block'>
-            {enabledNetworks.length > 1 ? `${enabledNetworks.length} Networks` : `${enabledNetworks.at(0)?.name}`}
-          </span>
-          <span className='block sm:hidden'>{enabledNetworks.length > 1 ? `${enabledNetworks.length}` : ''}</span>
-          <ArrowDown className='hidden sm:block' />
-        </Button>
+        <BorderSpinWrapper loading={!allConnected}>{triggerButton}</BorderSpinWrapper>
       </PopoverTrigger>
       <PopoverContent side='bottom' align='end' className='rounded-[20px] p-2.5'>
         <div className='scrollbar-hide max-h-[80dvh] w-[610px] max-w-[90vw] overflow-y-auto'>

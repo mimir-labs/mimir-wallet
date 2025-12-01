@@ -521,8 +521,35 @@ export class ApiProvider implements ProviderInterface {
     }
   };
 
-  #onSocketError = (error: Event): void => {
-    l.debug(() => ['socket error', error]);
+  #onSocketError = (event: Event): void => {
+    l.debug(() => ['socket error', event]);
+
+    // Try to extract error details from ErrorEvent (Node.js ws library)
+    // In browsers, error events are generic Events with no details (security restriction)
+    let errorMessage = `WebSocket error on ${this.endpoint}`;
+
+    // Check if it's an ErrorEvent (Node.js environment)
+    if ('message' in event && typeof (event as ErrorEvent).message === 'string') {
+      const errorEvent = event as ErrorEvent;
+
+      errorMessage = errorEvent.message || errorMessage;
+
+      // Try to get more details from nested error object
+      if ('error' in errorEvent && errorEvent.error instanceof Error) {
+        const nestedError = errorEvent.error as NodeJS.ErrnoException;
+        const details: string[] = [];
+
+        if (nestedError.code) details.push(`code: ${nestedError.code}`);
+        if (nestedError.syscall) details.push(`syscall: ${nestedError.syscall}`);
+
+        if (details.length > 0) {
+          errorMessage = `${errorMessage} (${details.join(', ')})`;
+        }
+      }
+    }
+
+    const error = new Error(errorMessage);
+
     this.#emit('error', error);
   };
 

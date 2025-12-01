@@ -1,15 +1,8 @@
 {
-  "extends": "@mimir-wallet/dev/tsconfig.base.json",
-  "compilerOptions": {
-    "composite": true,
-    "outDir": "./build",
-    "rootDir": "./src",
-    "resolveJsonModule": true,
-    "types": [
-      "vite/client"
-    ]
-  },
-  "include": ["src", "augment.d.ts", "src/types/api-types/avail.json", "src/chains/*.json"],
-  "exclude": ["build/**/*", "**/*.spec.ts", "**/test/**/*"],
-  "references": []
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.scripts.json" },
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.test.json" }
+  ]
 }

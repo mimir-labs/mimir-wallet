@@ -9,7 +9,6 @@ import {
   Avatar,
   Button,
   Skeleton,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -213,7 +212,6 @@ function Assets() {
           loadingContent={
             <>
               <Skeleton className='h-10 w-full rounded-[10px]' />
-              <Spinner size='sm' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
             </>
           }
           isLoading={!done}

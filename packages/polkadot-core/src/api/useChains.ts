@@ -8,6 +8,8 @@ import { useSyncExternalStore } from 'react';
 
 import { allEndpoints } from '../chains/config.js';
 
+import { ApiManager } from './ApiManager.js';
+
 const DEFAULT_NETWORKS = [
   'polkadot',
   'kusama',
@@ -33,6 +35,13 @@ function initNetworks(): Network[] {
   }
 
   store.set(ENABLED_NETWORKS_KEY, enabledNetworks);
+
+  // Add user references for initially enabled networks
+  const apiManager = ApiManager.getInstance();
+
+  enabledNetworks.forEach((key) => {
+    apiManager.addReference(key, 'user');
+  });
 
   return allEndpoints.map((item) => ({ ...item, enabled: enabledNetworks!.includes(item.key) }));
 }
@@ -99,6 +108,9 @@ function enableNetwork(key: string): void {
     enabled: n.key === key || n.genesisHash === key ? true : n.enabled
   }));
 
+  // Add user reference when enabling network
+  ApiManager.getInstance().addReference(target.key, 'user');
+
   persistNetworks();
   updateSnapshot();
   notifyListeners();
@@ -120,6 +132,13 @@ function disableNetwork(key: string): void {
     ...n,
     enabled: n.key === key ? false : n.enabled
   }));
+
+  // Remove user reference and destroy connection if no references remain
+  const shouldDestroy = ApiManager.getInstance().removeReference(key, 'user');
+
+  if (shouldDestroy) {
+    ApiManager.getInstance().destroy(key);
+  }
 
   persistNetworks();
   updateSnapshot();

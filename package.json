@@ -25,6 +25,8 @@
     "build": "turbo run build",
     "check-types": "turbo run check-types",
     "dev": "turbo run dev",
+    "test": "turbo run test --concurrency=100",
+    "test:cov": "turbo run test:cov --concurrency=100",
     "commit": "cz",
     "preinstall": "npx only-allow yarn",
     "postinstall": "husky"

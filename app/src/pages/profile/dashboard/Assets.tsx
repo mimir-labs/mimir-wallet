@@ -9,7 +9,6 @@ import {
   Avatar,
   Button,
   Skeleton,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -125,11 +124,11 @@ function Assets({ address }: { address: string }) {
       onSortChange={setSortDescriptor}
     >
       <TableHeader>
-        <TableColumn className='w-[160px]'>Token</TableColumn>
-        <TableColumn key='total' allowsSorting className='w-[160px]'>
+        <TableColumn className='w-[33%]'>Token</TableColumn>
+        <TableColumn key='total' allowsSorting className='w-[33%]'>
           Amount
         </TableColumn>
-        <TableColumn key='balanceUsd' allowsSorting className='w-[160px]'>
+        <TableColumn key='balanceUsd' allowsSorting className='w-[33%]'>
           USD Value
         </TableColumn>
       </TableHeader>
@@ -139,7 +138,6 @@ function Assets({ address }: { address: string }) {
         loadingContent={
           <>
             <Skeleton className='h-10 w-full rounded-[10px]' />
-            <Spinner size='sm' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
           </>
         }
         isLoading={!done}

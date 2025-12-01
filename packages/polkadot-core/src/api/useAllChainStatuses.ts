@@ -1,6 +1,9 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ChainStatus } from '../types/types.js';
+
+import { isEqual } from 'lodash-es';
 import { useSyncExternalStore } from 'react';
 
 import { ApiManager } from './ApiManager.js';
@@ -11,22 +14,22 @@ function subscribeToApiManager(onStoreChange: () => void): () => void {
 }
 
 // Cache for chain statuses to avoid unnecessary re-renders
-let cachedStatuses: Record<string, boolean> = {};
+let cachedStatuses: Record<string, ChainStatus> = {};
 
-function getChainStatusesSnapshot(): Record<string, boolean> {
+function getChainStatusesSnapshot(): Record<string, ChainStatus> {
   const manager = ApiManager.getInstance();
   const apis = manager.getAllApis();
-  const newStatuses: Record<string, boolean> = {};
+  const newStatuses: Record<string, ChainStatus> = {};
 
   for (const [key, connection] of Object.entries(apis)) {
-    newStatuses[key] = connection.status.isApiReady;
+    newStatuses[key] = connection.status;
   }
 
   // Check if statuses have changed
   const keys = Object.keys(newStatuses);
   const cachedKeys = Object.keys(cachedStatuses);
 
-  if (keys.length === cachedKeys.length && keys.every((key) => cachedStatuses[key] === newStatuses[key])) {
+  if (keys.length === cachedKeys.length && keys.every((key) => isEqual(cachedStatuses[key], newStatuses[key]))) {
     return cachedStatuses;
   }
 
@@ -51,6 +54,6 @@ function getChainStatusesSnapshot(): Record<string, boolean> {
  * const isPolkadotReady = statuses['polkadot'] ?? false;
  * ```
  */
-export function useAllChainStatuses(): Record<string, boolean> {
+export function useAllChainStatuses(): Record<string, ChainStatus> {
   return useSyncExternalStore(subscribeToApiManager, getChainStatusesSnapshot, () => ({}));
 }

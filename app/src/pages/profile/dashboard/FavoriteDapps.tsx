@@ -77,7 +77,7 @@ function FavoriteDapps() {
   return (
     <div className='group'>
       <div className='border-secondary bg-content1 scroll-hover-show shadow-medium h-[210px] overflow-y-auto rounded-[20px] border-1 p-4 sm:p-5'>
-        <div className='grid grid-cols-[repeat(auto-fill,_minmax(54px,1fr))] gap-2 lg:gap-3'>
+        <div className='grid grid-cols-[repeat(auto-fill,minmax(54px,1fr))] gap-2 lg:gap-3'>
           {favoriteDapps.map((dapp) => (
             <DappItem key={dapp.id} {...dapp} removeFavorite={removeFavorite} />
           ))}

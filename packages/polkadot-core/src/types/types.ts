@@ -114,8 +114,13 @@ export type ValidApiState = ApiState & {
  * Chain connection status
  */
 export interface ChainStatus {
+  /** WebSocket is physically connected (socket level) */
+  isApiConnected: boolean;
+  /** API is fully initialized and ready for use */
   isApiReady: boolean;
+  /** API instance has been created (connection attempt started) */
   isApiInitialized: boolean;
+  /** Error message if connection failed */
   apiError: string | null;
 }
 

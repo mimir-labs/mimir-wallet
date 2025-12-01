@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useChains, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
@@ -31,6 +31,7 @@ import { useAnnouncementStatus } from '@/transactions/hooks/useAnnouncementStatu
 
 function CallDetail({ value }: { value?: string | null }) {
   const { network } = useNetwork();
+
   const { call, isLoading } = useParseCall(network, value);
 
   if (isLoading || !call) return null;
@@ -42,7 +43,7 @@ function AnnouncementStatus({ account, transaction }: { account: AccountData; tr
   const [status, isFetching] = useAnnouncementStatus(transaction, account);
 
   if (isFetching) {
-    return <Skeleton className='h-[20px] w-[60px]' />;
+    return <Skeleton className='ml-auto h-[20px] w-[60px]' />;
   }
 
   if (status === 'indexing') return 'Indexing';
@@ -65,7 +66,7 @@ function Status({ transaction, address }: { transaction: Transaction; address: s
   const [account] = useQueryAccount(address);
 
   if (!account) {
-    return <Skeleton className='h-[20px] w-[60px]' />;
+    return <Skeleton className='ml-auto h-[20px] w-[60px]' />;
   }
 
   if (transaction.type === TransactionType.Announce) {
@@ -93,7 +94,21 @@ function Operation({ transaction, address }: { transaction: Transaction; address
   );
 }
 
-function NetworkWrapper({ network, children }: { network: string; children: React.ReactNode }) {
+function NetworkWrapper({
+  network,
+  children,
+  skeleton
+}: {
+  network: string;
+  children: React.ReactNode;
+  skeleton?: React.ReactNode;
+}) {
+  const { isApiReady } = useChainStatus(network);
+
+  if (!isApiReady) {
+    return skeleton ?? <Skeleton className='h-[20px] w-[60px]' />;
+  }
+
   return <NetworkProvider network={network}>{children}</NetworkProvider>;
 }
 
@@ -201,7 +216,7 @@ function PendingTransactions({ address }: { address: string }) {
                 </NetworkWrapper>
               </TableCell>
               <TableCell className='w-[180px]'>
-                <NetworkWrapper network={item.network}>
+                <NetworkWrapper network={item.network} skeleton={<Skeleton className='ml-auto h-[20px] w-[60px]' />}>
                   <span className='status'>
                     <Status address={address} transaction={item} />
                   </span>

@@ -44,6 +44,7 @@
     "react-dom": ">=18"
   },
   "devDependencies": {
+    "@mimir-wallet/dev": "workspace:^",
     "npm-run-all2": "^7.0.2",
     "typescript": "^5.9.3"
   },

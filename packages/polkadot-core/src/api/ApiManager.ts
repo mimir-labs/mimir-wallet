@@ -27,6 +27,8 @@ export class ApiManager {
   private apis: Map<string, ApiConnection> = new Map();
   private listeners: Set<ApiManagerListener> = new Set();
   private initPromises: Map<string, Promise<void>> = new Map();
+  // Map<network, Set<source>> - Track which sources reference each network
+  private references: Map<string, Set<string>> = new Map();
 
   private constructor() {}
 
@@ -117,6 +119,7 @@ export class ApiManager {
       genesisHash: chain.genesisHash,
       tokenSymbol: '',
       status: {
+        isApiConnected: false,
         isApiReady: false,
         isApiInitialized: false,
         apiError: null
@@ -126,28 +129,35 @@ export class ApiManager {
     try {
       const api = await this._createApi(Object.values(chain.wsUrl), chain.key);
 
-      // Setup event handlers before waiting for ready
-      api.on('error', (error: Error) => this._handleError(chain.key, error));
-      api.on('disconnected', () => this._handleDisconnected(chain.key));
-      api.on('connected', () => this._handleConnected(chain.key));
-
       // Update to initialized state
       this._updateConnection(chain.key, {
         ...this.apis.get(chain.key)!,
         api,
         status: {
+          isApiConnected: false,
           isApiReady: false,
           isApiInitialized: true,
           apiError: null
         }
       });
 
-      api.isReadyOrError.catch(() => {});
+      // Setup event handlers before waiting for ready
+      api.on('error', (error: Error) => this._handleError(chain.key, error));
+      api.on('disconnected', () => this._handleDisconnected(chain.key));
+      api.on('connected', () => this._handleConnected(chain.key));
+
       // Wait for API to be ready using api.isReady Promise
       await api.isReady;
 
       // Process ready state
       const readyState = this._loadOnReady(api, chain);
+
+      // Subscribe to runtime updates for metadata caching
+      api.rpc.state.subscribeRuntimeVersion(async () => {
+        const { metadata, runtimeVersion } = await api.getBlockRegistry(await api.rpc.chain.getBlockHash());
+
+        saveMetadata(chain.key, api.genesisHash.toHex(), runtimeVersion.specVersion.toString(), metadata.toHex());
+      });
 
       this._updateConnection(chain.key, {
         ...this.apis.get(chain.key)!,
@@ -155,17 +165,11 @@ export class ApiManager {
         tokenSymbol: readyState.tokenSymbol,
         genesisHash: readyState.genesisHash,
         status: {
+          isApiConnected: true,
           isApiReady: true,
           isApiInitialized: true,
           apiError: null
         }
-      });
-
-      // Subscribe to runtime updates for metadata caching
-      api.rpc.state.subscribeRuntimeVersion(async () => {
-        const { metadata, runtimeVersion } = await api.getBlockRegistry(await api.rpc.chain.getBlockHash());
-
-        saveMetadata(chain.key, api.genesisHash.toHex(), runtimeVersion.specVersion.toString(), metadata.toHex());
       });
     } catch (error) {
       this._handleError(chain.key, error as Error);
@@ -217,7 +221,7 @@ export class ApiManager {
     if (connection) {
       this._updateConnection(network, {
         ...connection,
-        status: { ...connection.status, isApiReady: false }
+        status: { ...connection.status, isApiConnected: false, isApiReady: false }
       });
     }
   }
@@ -225,10 +229,15 @@ export class ApiManager {
   private _handleConnected(network: string): void {
     const connection = this.apis.get(network);
 
-    if (connection && connection.api?.isReady) {
+    if (connection) {
       this._updateConnection(network, {
         ...connection,
-        status: { ...connection.status, isApiReady: true, apiError: null }
+        status: {
+          ...connection.status,
+          isApiConnected: true,
+          isApiReady: connection.status.isApiReady ? true : connection.status.isApiReady,
+          apiError: null
+        }
       });
     }
   }
@@ -245,9 +254,84 @@ export class ApiManager {
   }
 
   /**
-   * Destroy API connection
+   * Add a reference to a network
+   * @param network - The network being referenced
+   * @param source - The source of reference (e.g., 'user', 'identity:assethub-polkadot', 'xcm:hydration')
+   */
+  addReference(network: string, source: string): void {
+    if (!this.references.has(network)) {
+      this.references.set(network, new Set());
+    }
+
+    this.references.get(network)!.add(source);
+  }
+
+  /**
+   * Remove a reference from a network
+   * @param network - The network being dereferenced
+   * @param source - The source of reference to remove
+   * @returns true if no more references remain (network can be disconnected)
+   */
+  removeReference(network: string, source: string): boolean {
+    const refs = this.references.get(network);
+
+    if (refs) {
+      refs.delete(source);
+
+      if (refs.size === 0) {
+        this.references.delete(network);
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if a network has any references
+   */
+  hasReferences(network: string): boolean {
+    const refs = this.references.get(network);
+
+    return refs ? refs.size > 0 : false;
+  }
+
+  /**
+   * Get all references for a network
+   */
+  getReferences(network: string): Set<string> {
+    return this.references.get(network) ?? new Set();
+  }
+
+  /**
+   * Destroy API connection (only if no references remain)
+   * If the network still has references, this method does nothing
    */
   destroy(network: string): void {
+    // Only disconnect if no references remain
+    if (this.hasReferences(network)) {
+      return;
+    }
+
+    const connection = this.apis.get(network);
+
+    if (connection?.api) {
+      connection.api.disconnect();
+    }
+
+    this.apis.delete(network);
+    this._notifyListeners();
+  }
+
+  /**
+   * Force destroy API connection regardless of references
+   * Use this for testing or cleanup scenarios
+   */
+  forceDestroy(network: string): void {
+    // Clear all references
+    this.references.delete(network);
+
     const connection = this.apis.get(network);
 
     if (connection?.api) {
@@ -268,7 +352,7 @@ export class ApiManager {
       throw new Error(`No connection found for network: ${network}`);
     }
 
-    this.destroy(network);
+    this.forceDestroy(network);
     await this.initialize(connection.chain);
   }
 
@@ -308,6 +392,7 @@ export class ApiManager {
 
     return (
       connection?.status ?? {
+        isApiConnected: false,
         isApiReady: false,
         isApiInitialized: false,
         apiError: null
@@ -378,12 +463,18 @@ export class ApiManager {
   /**
    * Get API instance for identity queries
    * Resolves the identity network and returns the API for that network
+   * Automatically adds identity reference when the identity network differs
    *
    * @param network - Network key to get identity API for
    * @returns Promise resolving to ApiPromise for identity queries
    */
   async getIdentityApi(network: string): Promise<ApiPromise> {
     const identityNetwork = ApiManager.getIdentityNetwork(network);
+
+    // Add identity reference if the identity network is different from the requesting network
+    if (identityNetwork !== network) {
+      this.addReference(identityNetwork, `identity:${network}`);
+    }
 
     return this.getApi(identityNetwork);
   }

@@ -19,6 +19,7 @@ const statusCache = new Map<string, ChainStatus>();
 
 // Default status for uninitialized chains (stable reference)
 const DEFAULT_STATUS: ChainStatus = {
+  isApiConnected: false,
   isApiReady: false,
   isApiInitialized: false,
   apiError: null
@@ -33,7 +34,12 @@ function getCachedStatus(chain: string): ChainStatus {
   const newStatus = manager.getStatus(chain);
 
   // Use default status for uninitialized chains
-  if (!newStatus.isApiInitialized && !newStatus.isApiReady && newStatus.apiError === null) {
+  if (
+    !newStatus.isApiInitialized &&
+    !newStatus.isApiReady &&
+    !newStatus.isApiConnected &&
+    newStatus.apiError === null
+  ) {
     return DEFAULT_STATUS;
   }
 
@@ -42,6 +48,7 @@ function getCachedStatus(chain: string): ChainStatus {
   // Return cached if content is the same (shallow compare)
   if (
     cached &&
+    cached.isApiConnected === newStatus.isApiConnected &&
     cached.isApiReady === newStatus.isApiReady &&
     cached.isApiInitialized === newStatus.isApiInitialized &&
     cached.apiError === newStatus.apiError
