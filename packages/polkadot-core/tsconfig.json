@@ -9,7 +9,7 @@
       "vite/client"
     ]
   },
-  "include": ["src", "augment.d.ts", "src/api-types/avail.json", "src/chains/*.json"],
+  "include": ["src", "augment.d.ts", "src/types/api-types/avail.json", "src/chains/*.json"],
   "exclude": ["build/**/*", "**/*.spec.ts", "**/test/**/*"],
   "references": []
 }

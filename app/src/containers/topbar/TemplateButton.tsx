@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button, Tooltip } from '@mimir-wallet/ui';
+import React from 'react';
 
 import { analyticsActions } from '@/analytics';
 import IconTemplate from '@/assets/svg/icon-template.svg?react';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
-import React from 'react';
-
-import { Button, Tooltip } from '@mimir-wallet/ui';
 
 // Component styles
 const BUTTON_STYLES = {

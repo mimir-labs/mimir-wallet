@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { Circle } from '@polkadot/ui-shared/icons/types';
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { walletConfig } from '@/config';
-import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
+import { addressEq, encodeAddress, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { Avatar } from '@mimir-wallet/ui';
 import { polkadotIcon } from '@polkadot/ui-shared';
 import React, { useCallback, useMemo } from 'react';
 
-import { addressEq, encodeAddress, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
-import { Avatar } from '@mimir-wallet/ui';
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import { walletConfig } from '@/config';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 
 interface Props {
   className?: string;

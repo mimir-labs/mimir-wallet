@@ -1,7 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IMethod } from '@polkadot/types/types';
+
+import { encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Tooltip, TooltipContent, TooltipTrigger, TooltipWrapper } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import moment from 'moment';
+import React, { useState } from 'react';
+
+import Progress from '../Progress';
+import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
+
+import Extrinsic from './Extrinsic';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconShare from '@/assets/svg/icon-share.svg?react';
@@ -12,16 +23,6 @@ import { useParseCall } from '@/hooks/useParseCall';
 import { useToggle } from '@/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
-import { Link } from '@tanstack/react-router';
-import moment from 'moment';
-import React, { useState } from 'react';
-
-import { encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip, TooltipContent, TooltipTrigger, TooltipWrapper } from '@mimir-wallet/ui';
-
-import Progress from '../Progress';
-import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
-import Extrinsic from './Extrinsic';
 
 function AppCell({ transaction }: { transaction: Transaction }) {
   return <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />;
@@ -120,9 +121,7 @@ function TxItems({
   const [overviewOpen, toggleOverviewOpen] = useToggle();
 
   // Parse call data using async hook
-  const { call, isLoading } = useParseCall(network, transaction.call);
-
-  if (isLoading) return null;
+  const { call } = useParseCall(network, transaction.call);
 
   return (
     <>

@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Ss58FormatControl } from '../types.js';
-
-import { useSyncExternalStore } from 'react';
+import type { Ss58FormatControl } from '../types/types.js';
 
 import { store } from '@mimir-wallet/service';
+import { useSyncExternalStore } from 'react';
 
-import { allEndpoints } from '../config.js';
-import { DEFAULE_SS58_CHAIN_KEY } from '../defaults.js';
+import { allEndpoints } from '../chains/config.js';
+import { DEFAULE_SS58_CHAIN_KEY } from '../utils/defaults.js';
+
 import { ApiManager } from './ApiManager.js';
 
 // Internal state

@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
@@ -9,7 +9,7 @@ import type { Call, Multisig } from '@polkadot/types/interfaces';
 import { type BN, BN_ZERO } from '@polkadot/util';
 import { blake2AsU8a, encodeMultiAddress } from '@polkadot/util-crypto';
 
-import { addressEq } from './utils.js';
+import { addressEq } from '../utils/utils.js';
 
 function _increaseValue(values: Record<string, { value: BN }>, key: string, amount: BN) {
   if (values[key]) {

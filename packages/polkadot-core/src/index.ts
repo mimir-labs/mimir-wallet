@@ -1,25 +1,32 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-export { NETWORK_RPC_PREFIX, CURRENT_NETWORK_KEY, decodeAddress, encodeAddress } from './defaults.js';
+// Utils exports
+export { NETWORK_RPC_PREFIX, CURRENT_NETWORK_KEY, decodeAddress, encodeAddress } from './utils/index.js';
+export * from './utils/utils.js';
+export * from './utils/registry.js';
 
+// Balances exports
 export * from './balances/index.js';
 
-export * from './callFilter.js';
-export * from './call.js';
+// Call exports
+export * from './call/index.js';
 
+// Simulation exports
 export * from './simulate/index.js';
 export * from './dry-run/index.js';
-export * from './tx-events.js';
-export * from './tx-reserve.js';
-export * from './tx.js';
-export * from './dispatch-error.js';
-export * from './dry-run/index.js';
+
+// Transaction exports
+export * from './tx/index.js';
+
+// XCM exports
 export * from './xcm/index.js';
 
-export { chainLinks } from './chain-links.js';
+// Chain config exports
+export { chainLinks } from './chains/index.js';
+export { allEndpoints, remoteProxyRelations, getChainIcon } from './chains/index.js';
 
-// New API management exports
+// API management exports
 export {
   ApiManager,
   useAllChainStatuses,
@@ -32,13 +39,9 @@ export {
 export type { ChainsControl } from './api/index.js';
 
 // Network context exports
-export { NetworkProvider, useNetwork, useNetworkOptional } from './NetworkContext.js';
+export { NetworkProvider, useNetwork, useNetworkOptional } from './context/index.js';
 
-export { allEndpoints, remoteProxyRelations, getChainIcon } from './config.js';
-
-export * from './utils.js';
-export * from './registry.js';
-
+// Type exports
 export type {
   Endpoint,
   ValidApiState,
@@ -47,4 +50,4 @@ export type {
   ApiConnection,
   Ss58FormatControl,
   ApiManagerListener
-} from './types.js';
+} from './types/index.js';

@@ -1,11 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IMethod, Registry } from '@polkadot/types/types';
 
-import { useMemo } from 'react';
-
 import { findAction } from '@mimir-wallet/polkadot-core';
+import { useMemo } from 'react';
 
 export function useParseTransfer(registry: Registry, fromAddress?: string, call?: IMethod | null) {
   const results = useMemo(() => {

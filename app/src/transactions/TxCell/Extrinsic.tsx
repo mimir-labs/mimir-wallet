@@ -1,8 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
+
+import { chainLinks, encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, cn, Divider, Skeleton } from '@mimir-wallet/ui';
+import moment from 'moment';
+import React from 'react';
+
+import Target from './Target';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconLink from '@/assets/svg/icon-link.svg?react';
@@ -12,13 +19,6 @@ import { events } from '@/events';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { useParseCallWithFallback } from '@/hooks/useParseCall';
 import { useTransactionDetail } from '@/hooks/useTransactions';
-import moment from 'moment';
-import React from 'react';
-
-import { chainLinks, encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, cn, Divider } from '@mimir-wallet/ui';
-
-import Target from './Target';
 
 export function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
@@ -57,7 +57,39 @@ function Extrinsic({
   // Parse call data using the async hook
   const { call: parsedCall, isLoading: isParsingCall } = useParseCallWithFallback(network, transaction.call, call);
 
-  if (isParsingCall) return null;
+  if (isParsingCall) {
+    return (
+      <div className='flex flex-1 flex-col gap-2.5'>
+        {/* Call component skeleton */}
+        <div className='bg-secondary flex flex-col gap-2.5 rounded-[10px] p-2.5'>
+          <Skeleton className='h-5 w-40' />
+          <Skeleton className='h-4 w-full' />
+          <Skeleton className='h-4 w-3/4' />
+        </div>
+
+        <Divider />
+
+        {/* CallInfo skeleton - action name + buttons */}
+        <div className='flex w-full flex-col gap-[5px]'>
+          <div className='flex w-full items-center justify-start gap-2.5'>
+            <Skeleton className='h-5 w-32' />
+            <div className='flex-1' />
+            <Skeleton className='h-8 w-24 rounded-md' />
+            <Skeleton className='h-8 w-20 rounded-md' />
+          </div>
+          <div className='bg-secondary flex flex-col gap-2.5 rounded-[10px] p-2.5'>
+            <Skeleton className='h-4 w-full' />
+            <Skeleton className='h-4 w-2/3' />
+          </div>
+        </div>
+
+        <Divider />
+
+        {/* View Details skeleton */}
+        <Skeleton className='h-4 w-24' />
+      </div>
+    );
+  }
 
   return (
     <>

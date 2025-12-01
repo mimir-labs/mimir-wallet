@@ -1,10 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
-
-import { isEqual } from 'lodash-es';
-import { useMemo } from 'react';
 
 import {
   type AccountEnhancedAssetBalance,
@@ -15,6 +12,8 @@ import {
   useChains
 } from '@mimir-wallet/polkadot-core';
 import { useQueries, useQuery } from '@mimir-wallet/service';
+import { isEqual } from 'lodash-es';
+import { useMemo } from 'react';
 
 import { useAllXcmAsset, useXcmAsset } from './useXcmAssets';
 
@@ -58,9 +57,10 @@ export function useChainBalances(
   }, [allXcmAssets, chain, options?.alwaysIncludeNative]);
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: ['chain-balances', chain, addressHex] as const,
-    queryFn: async (): Promise<AccountEnhancedAssetBalance[]> => {
-      if (!chain || !address || !chainAssets.length) {
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['chain-balances', chain, addressHex, false] as const,
+    queryFn: async ({ queryKey: [, chain, addressHex] }): Promise<AccountEnhancedAssetBalance[]> => {
+      if (!chain || !addressHex || !chainAssets.length) {
         throw new Error('Chain, address, and chain assets are required');
       }
 
@@ -143,7 +143,7 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
         const finalChainAssets = chainAssets;
 
         return {
-          queryKey: ['chain-balances', chainName, addressHex, options?.onlyWithPrice] as const,
+          queryKey: ['chain-balances', chainName, addressHex, !!options?.onlyWithPrice] as const,
           staleTime: 12_000,
           refetchInterval: 12_000,
           refetchOnMount: false,
@@ -173,27 +173,18 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
     ]
   );
 
-  const queries = useQueries({
-    queries: queriesConfig
-  });
-
-  // Derive list from queries using useMemo with stable reference check
-  const list = useMemo(() => {
-    return enabledChains.map((chain, index) => {
-      const query = queries[index];
-
-      return {
+  return useQueries({
+    queries: queriesConfig,
+    combine: (results) =>
+      enabledChains.map((chain, index) => ({
         chain: chain.key,
-        isFetched: query.isFetched,
-        isFetching: query.isFetching,
-        isError: query.isError,
-        refetch: query.refetch,
-        data: query.data
-      };
-    });
-  }, [queries, enabledChains]);
-
-  return list;
+        isFetched: results[index].isFetched,
+        isFetching: results[index].isFetching,
+        isError: results[index].isError,
+        refetch: results[index].refetch,
+        data: results[index].data
+      }))
+  });
 }
 
 /**
@@ -257,9 +248,9 @@ export function useBalanceByIdentifier(
 
   // Query single asset balance directly
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: ['single-asset-balance', network, addressHex, identifier],
-    queryFn: async (): Promise<AccountEnhancedAssetBalance | null> => {
-      if (!network || !address || !assetInfo) {
+    queryKey: ['single-asset-balance', network, addressHex, assetInfo ?? null] as const,
+    queryFn: async ({ queryKey: [, network, addressHex, assetInfo] }): Promise<AccountEnhancedAssetBalance | null> => {
+      if (!network || !addressHex || !assetInfo) {
         throw new Error('Network, address, and asset info are required');
       }
 

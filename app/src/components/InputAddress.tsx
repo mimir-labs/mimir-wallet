@@ -1,21 +1,8 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AddressMeta } from '@/hooks/types';
 import type { InputAddressProps } from './types';
-
-import { useAccount } from '@/accounts/useAccount';
-import { sortAccounts } from '@/accounts/utils';
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import IconAdd from '@/assets/svg/icon-add.svg?react';
-import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
-import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
-import { useInputAddress } from '@/hooks/useInputAddress';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { clsx } from 'clsx';
-import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useToggle } from 'react-use';
+import type { AccountData, AddressMeta } from '@/hooks/types';
 
 import {
   addressToHex,
@@ -29,9 +16,22 @@ import {
   zeroAddress
 } from '@mimir-wallet/polkadot-core';
 import { Divider, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { clsx } from 'clsx';
+import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import AddressCell from './AddressCell';
 import AddressRow from './AddressRow';
+
+import { useAccount } from '@/accounts/useAccount';
+import { sortAccounts } from '@/accounts/utils';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import IconAdd from '@/assets/svg/icon-add.svg?react';
+import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
+import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
+import { useInputAddress } from '@/hooks/useInputAddress';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 function createOptions(
   accounts: AccountData[],

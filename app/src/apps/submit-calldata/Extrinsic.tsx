@@ -1,8 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Call } from '@polkadot/types/interfaces';
 import type { Registry } from '@polkadot/types/types';
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Divider } from '@mimir-wallet/ui';
+import { useRouter } from '@tanstack/react-router';
+import { useMemo, useState } from 'react';
 
 import { ErrorBoundary, Input, InputAddress, InputNetwork, TxButton } from '@/components';
 import JsonView from '@/components/JsonView';
@@ -10,11 +15,6 @@ import { events } from '@/events';
 import { useInput } from '@/hooks/useInput';
 import { useRegistry } from '@/hooks/useRegistry';
 import { Call as CallComp } from '@/params';
-import { useRouter } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
-
-import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
 
 function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {
   if (!callData) return [null, null];

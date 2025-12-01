@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { useAccount } from '@/accounts/useAccount';
-import { useState } from 'react';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@mimir-wallet/ui';
+import { useState } from 'react';
 
 import AccountCard from './AccountCard';
+
+import { useAccount } from '@/accounts/useAccount';
 
 interface Props {
   isOpen: boolean;

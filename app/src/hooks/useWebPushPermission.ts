@@ -1,5 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   getNotificationPermission,
@@ -7,7 +9,6 @@ import {
   isWebPushSupported,
   requestNotificationPermission
 } from '@/utils/webPushUtils';
-import { useCallback, useEffect, useState } from 'react';
 
 export interface WebPushPermissionState {
   // Current permission status

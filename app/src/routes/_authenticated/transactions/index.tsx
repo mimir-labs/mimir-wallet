@@ -1,11 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { RouteMetadata } from '@/hooks/usePageTitle';
 
-import PageTransactions from '@/pages/transactions';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
+
+import PageTransactions from '@/pages/transactions';
 
 /**
  * Transactions List Route

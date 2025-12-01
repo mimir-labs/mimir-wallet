@@ -1,20 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { MultiTransferData } from './types';
+
+import { type FunctionCallHandler, isFunctionCallArray, toFunctionCallString } from '@mimir-wallet/ai-assistant';
+import { isValidAddress, NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { Button, Divider } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import { useCallback, useState } from 'react';
+
+import MultiTransferContent from './MultiTransferContent';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { Link } from '@tanstack/react-router';
-import { useCallback, useState } from 'react';
-
-import { type FunctionCallHandler, isFunctionCallArray, toFunctionCallString } from '@mimir-wallet/ai-assistant';
-import { isValidAddress, NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
-
-import MultiTransferContent from './MultiTransferContent';
 
 function MultiTransfer() {
   const { current } = useAccount();

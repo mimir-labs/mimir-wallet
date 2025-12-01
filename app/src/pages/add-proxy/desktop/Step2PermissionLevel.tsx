@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DelayType } from '../types';
-
-import PureIcon from '@/assets/images/pure-icon.svg';
-import { AddressCell, ProxyControls } from '@/components';
-import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 import { Alert, AlertTitle, Button, Divider, Switch } from '@mimir-wallet/ui';
 
 import DelayItem from '../components/DelayItem';
 import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
 import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
+
+import PureIcon from '@/assets/images/pure-icon.svg';
+import { AddressCell, ProxyControls } from '@/components';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface Step2PermissionLevelProps {
   network: string;

@@ -1,22 +1,23 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Call } from '@polkadot/types/interfaces';
 import type { CallProps } from './types';
-
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { ellipsisMixin } from '@/components/utils';
-import { Call as CallComp, FunctionArgs } from '@/params';
-import { isArray } from '@polkadot/util';
-import React, { forwardRef, useMemo, useState } from 'react';
+import type { Call } from '@polkadot/types/interfaces';
 
 import { findAction } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
+import { isArray } from '@polkadot/util';
+import React, { forwardRef, useMemo, useState } from 'react';
 
 import CallDisplayDetail from '../CallDisplay/CallDisplayDetail';
 import CallDisplayDetailMinor from '../CallDisplay/CallDisplayDetailMinor';
 import CallDisplaySection from '../CallDisplay/CallDisplaySection';
+
 import { mergeClasses } from './utils';
+
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import { ellipsisMixin } from '@/components/utils';
+import { Call as CallComp, FunctionArgs } from '@/params';
 
 function Item({
   from,

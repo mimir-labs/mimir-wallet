@@ -1,9 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useMedia } from 'react-use';
 
 import { DappCell } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
-import { useMedia } from 'react-use';
 
 function AppList() {
   const { addFavorite, dapps, isFavorite, removeFavorite } = useDapps();

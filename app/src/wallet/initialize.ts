@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { WalletAccount } from './types';
-
-import { walletConfig } from '@/config';
-import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@/constants';
-import { documentReadyPromise } from '@/utils/document';
 
 import { addressEq } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { useWallet } from './useWallet';
 import { enableWallet, loadWallet } from './utils';
+
+import { walletConfig } from '@/config';
+import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@/constants';
+import { documentReadyPromise } from '@/utils/document';
 
 async function _initialize(wallet: string) {
   if (window.injectedWeb3?.[walletConfig[wallet]?.key || '']) {

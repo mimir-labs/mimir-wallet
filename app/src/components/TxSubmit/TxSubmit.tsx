@@ -1,9 +1,30 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TxSubmitProps } from './types';
 import type { AccountData, FilterPath } from '@/hooks/types';
 import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
-import type { TxSubmitProps } from './types';
+
+import { addressEq, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
+import { useNavigate } from '@tanstack/react-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import CustomGasFeeSelect from '../CustomGasFeeSelect';
+import Input from '../Input';
+
+import AddressChain from './AddressChain';
+import Chopsticks from './analytics/Chopsticks';
+import DryRun from './analytics/DryRun';
+import Call from './Call';
+import Confirmations from './Confirmations';
+import { useBuildTx } from './hooks/useBuildTx';
+import { useCloseWhenPathChange } from './hooks/useCloseWhenPathChange';
+import { useHighlightTab } from './hooks/useHighlightTab';
+import LockInfo from './LockInfo';
+import ProposeTx from './ProposeTx';
+import SendTx from './SendTx';
+import TxInfo from './TxInfo';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
@@ -17,26 +38,6 @@ import { useSupportsDryRun } from '@/hooks/useChainCapabilities';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useGasFeeEstimate } from '@/hooks/useGasFeeEstimate';
 import { useRegistry } from '@/hooks/useRegistry';
-import { useNavigate } from '@tanstack/react-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-
-import { addressEq, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
-
-import CustomGasFeeSelect from '../CustomGasFeeSelect';
-import Input from '../Input';
-import Chopsticks from './analytics/Chopsticks';
-import DryRun from './analytics/DryRun';
-import { useBuildTx } from './hooks/useBuildTx';
-import { useCloseWhenPathChange } from './hooks/useCloseWhenPathChange';
-import { useHighlightTab } from './hooks/useHighlightTab';
-import AddressChain from './AddressChain';
-import Call from './Call';
-import Confirmations from './Confirmations';
-import LockInfo from './LockInfo';
-import ProposeTx from './ProposeTx';
-import SendTx from './SendTx';
-import TxInfo from './TxInfo';
 
 interface Props extends Omit<TxSubmitProps, 'accountId'> {
   accountData: AccountData;
@@ -212,12 +213,14 @@ function TxSubmit({
           {!hasPermission ? (
             <Alert variant='destructive'>
               <AlertTitle>
-                You are currently not a member of this Account and won't be able to submit this transaction.
+                {`You are currently not a member of this Account and won't be able to submit this transaction.`}
               </AlertTitle>
             </Alert>
           ) : filterPaths.length === 0 ? (
             <Alert variant='destructive'>
-              <AlertTitle>This account doesn't exist on {chain.name}</AlertTitle>
+              <AlertTitle>
+                {`This account doesn't exist on`} {chain.name}
+              </AlertTitle>
             </Alert>
           ) : null}
 

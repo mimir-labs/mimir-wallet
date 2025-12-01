@@ -1,10 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { Spinner, Tab, Tabs } from '@mimir-wallet/ui';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { lazy, Suspense, useTransition } from 'react';
-
-import { Spinner, Tab, Tabs } from '@mimir-wallet/ui';
 
 import WalletConnectExample from './WalletConnectExample';
 

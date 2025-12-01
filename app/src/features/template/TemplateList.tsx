@@ -1,11 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
-
-import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
-import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { Empty, InputNetwork } from '@/components';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
@@ -13,6 +9,10 @@ import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 import TemplateItem from './TemplateItem';
 import TemplateMigrationAlert from './TemplateMigrationAlert';
 import { useSavedTemplate } from './useSavedTemplate';
+
+import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
+import { Empty, InputNetwork } from '@/components';
 
 function TemplateList({
   onAdd,

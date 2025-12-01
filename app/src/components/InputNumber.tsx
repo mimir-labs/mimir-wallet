@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { InputNumberProps } from './types';
 
-import { useInputNumber } from '@/hooks/useInputNumber';
-import React, { useCallback, useMemo } from 'react';
-
 import { Button } from '@mimir-wallet/ui';
+import React, { useCallback, useMemo } from 'react';
 
 import FormatBalance from './FormatBalance';
 import Input from './Input';
+
+import { useInputNumber } from '@/hooks/useInputNumber';
 
 function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...props }: InputNumberProps) {
   const _defaultValue = useMemo(() => defaultValue?.toString(), [defaultValue]);

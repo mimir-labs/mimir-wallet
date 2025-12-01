@@ -1,15 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { useState } from 'react';
+
+import AddProxy from './AddProxy';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useState } from 'react';
-
-import { NetworkProvider, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Spinner } from '@mimir-wallet/ui';
-
-import AddProxy from './AddProxy';
 
 function PageAddProxy({ pure }: { pure?: boolean }) {
   const { current } = useAccount();
@@ -46,17 +45,6 @@ function AddProxyContent({
   proxied: string | undefined;
   setProxied: (proxied: string | undefined) => void;
 }) {
-  const { chain } = useNetwork();
-  const { isApiReady } = useChainStatus(network);
-
-  if (!isApiReady) {
-    return (
-      <div className='bg-content1 mx-auto my-0 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
-        <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-      </div>
-    );
-  }
-
   return <AddProxy pure={pure} network={network} setNetwork={setNetwork} proxied={proxied} setProxied={setProxied} />;
 }
 

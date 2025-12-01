@@ -1,7 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { MultiTransferData } from './types';
+
+import { ApiManager, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button, Chip, Divider } from '@mimir-wallet/ui';
+import { isHex } from '@polkadot/util';
+import React, { useCallback, useMemo, useState } from 'react';
+
+import { parseCsv } from './parse';
+import Upload from './Upload';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
@@ -9,14 +17,6 @@ import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import { Input, InputAddress, InputNetwork, InputToken, TxButton } from '@/components';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { isValidNumber, parseUnits } from '@/utils';
-import { isHex } from '@polkadot/util';
-import React, { useCallback, useMemo, useState } from 'react';
-
-import { ApiManager, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, Chip, Divider } from '@mimir-wallet/ui';
-
-import { parseCsv } from './parse';
-import Upload from './Upload';
 
 interface Props {
   data: MultiTransferData[];

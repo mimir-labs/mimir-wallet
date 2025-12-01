@@ -1,10 +1,21 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { PrepareFlexible } from '../types';
 import type { ApiPromise } from '@polkadot/api';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
-import type { PrepareFlexible } from '../types';
+
+import { addressToHex, ApiManager, signAndSend, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Button, buttonSpinner, Divider, Tooltip } from '@mimir-wallet/ui';
+import { u8aEq } from '@polkadot/util';
+import { encodeMultiAddress } from '@polkadot/util-crypto';
+import React, { useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
+
+import AccountVisibility from '../components/AccountVisibility';
+import CreateSuccess from '../components/CreateSuccess';
 
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@/components';
@@ -15,17 +26,6 @@ import { addTxToast } from '@/hooks/useTxQueue';
 import { sleep } from '@/utils';
 import { accountSource, useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
-import { u8aEq } from '@polkadot/util';
-import { encodeMultiAddress } from '@polkadot/util-crypto';
-import React, { useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { addressToHex, ApiManager, signAndSend, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Button, buttonSpinner, Divider, Tooltip } from '@mimir-wallet/ui';
-
-import AccountVisibility from '../components/AccountVisibility';
-import CreateSuccess from '../components/CreateSuccess';
 
 interface Props {
   prepare: PrepareFlexible;
@@ -280,8 +280,8 @@ function CreateFlexible({
                     content={
                       <span>
                         Flexible Multisig is a Pure Proxy. In <b>‘set signers’</b> step, you add the multisig account as
-                        its proxy and remove the creator's proxy, making the multi-signature its only controller. Then
-                        transfer some funds to keep Flexible alive.
+                        its proxy and remove the creator&apos;s proxy, making the multi-signature its only controller.
+                        Then transfer some funds to keep Flexible alive.
                       </span>
                     }
                   >

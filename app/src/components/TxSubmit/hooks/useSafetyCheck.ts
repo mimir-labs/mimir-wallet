@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SafetyLevel } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
-import { useToggle } from '@/hooks/useToggle';
-import { useEffect, useState } from 'react';
-
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
+import { useEffect, useState } from 'react';
+
+import { useToggle } from '@/hooks/useToggle';
 
 export function useSafetyCheck(call: IMethod) {
   const { network } = useNetwork();

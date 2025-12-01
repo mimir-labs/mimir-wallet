@@ -1,14 +1,5 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import IconNotification from '@/assets/svg/icon-notification.svg?react';
-import { AddressRow } from '@/components';
-import { type NotificationMessage, useNotifications } from '@/hooks/useNotifications';
-import { formatAgo } from '@/utils';
-import { Link, useNavigate } from '@tanstack/react-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
-import { useToggle } from 'react-use';
 
 import { getChainIcon, useChains } from '@mimir-wallet/polkadot-core';
 import {
@@ -26,6 +17,15 @@ import {
   SelectValue,
   Tooltip
 } from '@mimir-wallet/ui';
+import { Link, useNavigate } from '@tanstack/react-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import { useToggle } from 'react-use';
+
+import IconNotification from '@/assets/svg/icon-notification.svg?react';
+import { AddressRow } from '@/components';
+import { type NotificationMessage, useNotifications } from '@/hooks/useNotifications';
+import { formatAgo } from '@/utils';
 
 // Function to get notification status color classes
 function getNotificationStatusColor(status: NotificationMessage['status']) {
@@ -306,7 +306,7 @@ function NotificationButton() {
                 search={{ tabs: 'notification' }}
                 onClick={toggleOpen}
               >
-                Don't want miss information? Try Email→
+                {`Don't want miss information? Try Email→`}
               </Link>
             </div>
           </div>

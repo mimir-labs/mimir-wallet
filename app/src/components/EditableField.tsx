@@ -1,8 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import React, { useEffect, useRef, useState } from 'react';
+
+import IconEdit from '@/assets/svg/icon-edit.svg?react';
 
 interface EditableFieldProps {
   value: string;

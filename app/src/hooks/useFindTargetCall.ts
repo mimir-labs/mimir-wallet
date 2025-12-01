@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IMethod } from '@polkadot/types/types';
@@ -95,22 +95,23 @@ export function useFindTargetCallFromMethod(
   address: string,
   call: IMethod | null | undefined
 ): UseFindTargetCallResult {
+  const callHex = call?.toHex();
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ['find-target-call-method', network, address, call?.toHex()] as const,
-    queryFn: async () => {
-      if (!call) {
+    queryKey: ['find-target-call-method', network, address, callHex] as const,
+    queryFn: async ({ queryKey: [, network, address, callHex] }) => {
+      if (!callHex) {
         return [address, null] as [string, IMethod | null];
       }
 
       const api = await ApiManager.getInstance().getApi(network);
 
-      if (!api) {
-        return [address, null] as [string, IMethod | null];
-      }
+      // Recreate call from hex since IMethod can't be used in queryKey
+      const parsedCall = api.registry.createTypeUnsafe<IMethod>('Call', [callHex]);
 
-      return findTargetCall(api, address, call);
+      return findTargetCall(api, address, parsedCall);
     },
-    enabled: !!network && !!address && !!call,
+    enabled: !!network && !!address && !!callHex,
     staleTime: Infinity,
     retry: false
   });

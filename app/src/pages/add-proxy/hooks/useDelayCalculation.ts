@@ -1,9 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useMemo } from 'react';
 
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@/constants';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
-import { useMemo } from 'react';
 
 export type DelayType = 'hour' | 'day' | 'week' | 'custom';
 

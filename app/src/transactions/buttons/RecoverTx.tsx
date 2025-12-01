@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { addressToHex, useNetwork } from '@mimir-wallet/polkadot-core';
+import { service, useMutation } from '@mimir-wallet/service';
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { blake2AsHex } from '@polkadot/util-crypto';
+import { useQueryClient } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Hash, Input } from '@/components';
 import { toastError } from '@/components/utils';
 import { type Transaction, TransactionType } from '@/hooks/types';
 import { useRegistry } from '@/hooks/useRegistry';
-import { blake2AsHex } from '@polkadot/util-crypto';
-import { useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-
-import { addressToHex, useNetwork } from '@mimir-wallet/polkadot-core';
-import { service, useMutation } from '@mimir-wallet/service';
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 
 function RecoverTx({
   transaction,

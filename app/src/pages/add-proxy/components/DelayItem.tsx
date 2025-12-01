@@ -1,12 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DelayType } from '../types';
 
-import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useMemo } from 'react';
 
 import { estimateTimeFromBlocks } from '../utils';
+
+import { useBlockInterval } from '@/hooks/useBlockInterval';
 
 interface Props {
   network: string;

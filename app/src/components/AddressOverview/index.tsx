@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, DelegateeProp, MultisigAccountData } from '@/hooks/types';
 import type { EdgeData, NodeData, Props } from './context';
+import type { AccountData, DelegateeProp, MultisigAccountData } from '@/hooks/types';
 
+import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { Controls, type Edge, MiniMap, type Node, ReactFlow, useEdgesState, useNodesState } from '@xyflow/react';
 import React, { useEffect, useMemo } from 'react';
 
-import { addressToHex } from '@mimir-wallet/polkadot-core';
-
 import AddressEdge from '../AddressEdge';
 import { getLayoutedElements } from '../utils';
+
 import AddressNode from './AddressNode';
 import { context } from './context';
 

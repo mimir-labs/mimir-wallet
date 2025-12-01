@@ -1,7 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TransferToken } from './types';
+
+import { remoteProxyRelations, useChain, useChains } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Avatar, Button, Chip, Skeleton, Switch } from '@mimir-wallet/ui';
+import { BN } from '@polkadot/util';
+import React, { useEffect, useMemo } from 'react';
+
+import { useTransferBalance } from './useTransferBalances';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
@@ -10,13 +17,6 @@ import { MigrationTip } from '@/features/assethub-migration';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
 import { formatUnits } from '@/utils';
-import { BN } from '@polkadot/util';
-import React, { useEffect, useMemo } from 'react';
-
-import { remoteProxyRelations, useChain, useChains } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Avatar, Button, Chip, Skeleton, Switch } from '@mimir-wallet/ui';
-
-import { useTransferBalance } from './useTransferBalances';
 
 function TransferContent({
   token,
@@ -158,7 +158,7 @@ function TransferContent({
           <div className='flex items-center justify-between'>
             Amount
             {!isSendingFetched ? (
-              <Skeleton className='h-[14px] w-[50px] rounded-[5px]' />
+              <Skeleton className='h-3.5 w-24 rounded-[5px]' />
             ) : (
               <span className='opacity-50'>
                 Balance: <FormatBalance format={format} value={sendingBalances} />

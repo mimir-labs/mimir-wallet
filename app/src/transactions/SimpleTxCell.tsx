@@ -1,7 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubscanExtrinsic } from '@/hooks/types';
+
+import { chainLinks, useChain } from '@mimir-wallet/polkadot-core';
+import { Button, Tooltip } from '@mimir-wallet/ui';
+import moment from 'moment';
+import React, { useState } from 'react';
 
 import IconFailed from '@/assets/svg/icon-failed-fill.svg?react';
 import IconLink from '@/assets/svg/icon-link.svg?react';
@@ -10,11 +15,6 @@ import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
 import { AppName } from '@/components';
 import { CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
-import moment from 'moment';
-import React, { useState } from 'react';
-
-import { chainLinks, useChain } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip } from '@mimir-wallet/ui';
 
 interface Props {
   transaction: SubscanExtrinsic;

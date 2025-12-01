@@ -1,11 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { useMemo } from 'react';
 
 import { TransactionStatus } from '@/hooks/types';
 import { usePendingTransactions } from '@/hooks/useTransactions';
-import { useMemo } from 'react';
-
-import { useNetwork } from '@mimir-wallet/polkadot-core';
 
 export function usePendingTx(address: string, url: string) {
   const { network } = useNetwork();

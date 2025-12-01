@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
+
+import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
+import { Tooltip } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconFailed from '@/assets/svg/icon-failed-outlined.svg?react';
 import { TxButton } from '@/components';
 import { TransactionType } from '@/hooks/types';
-import React, { useMemo } from 'react';
-
-import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
-import { Tooltip } from '@mimir-wallet/ui';
 
 async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, string, string, string] }) {
   const [, network, address, callHash] = queryKey;

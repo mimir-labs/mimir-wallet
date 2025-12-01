@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
 
 import EmptyAccount from '@/assets/images/empty-account.svg';
 import EmptyFavoriteDapp from '@/assets/images/empty-favorite-dapp.svg';
 import EmptyPendingTransactions from '@/assets/images/empty-pending-transactions.svg';
 import EmptySelectAccount from '@/assets/images/empty-select-account.svg';
 import NullImg from '@/assets/images/Null.png';
-import { Link } from '@tanstack/react-router';
-
-import { Button } from '@mimir-wallet/ui';
 
 interface Props {
   label?: string;
@@ -27,7 +27,7 @@ function Empty({ height, label, variant = 'default', className = '' }: Props) {
           <>
             <img src={EmptyFavoriteDapp} />
             <div className='text-center'>
-              <h6>You haven't favorited any apps yet.</h6>
+              <h6>{`You haven't favorited any apps yet.`}</h6>
               <p className='text-foreground/50 text-sm'>You can go to the App page to add them to your favorites.</p>
             </div>
             <Button asChild size='sm' color='primary' variant='ghost' radius='full'>

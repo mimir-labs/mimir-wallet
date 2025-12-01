@@ -1,18 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 'use client';
 
 import type { ComponentProps, HTMLAttributes, ReactNode } from 'react';
 
+import { Button, cn } from '@mimir-wallet/ui';
 import { CheckIcon, CopyIcon } from 'lucide-react';
 import { createContext, useContext, useState } from 'react';
 import { Prism as SyntaxHighlighterComponent } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const SyntaxHighlighter = SyntaxHighlighterComponent as any;
-
-import { Button, cn } from '@mimir-wallet/ui';
 
 type CodeBlockContextType = {
   code: string;

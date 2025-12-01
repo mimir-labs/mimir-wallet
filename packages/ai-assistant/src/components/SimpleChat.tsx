@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ToolState } from '../hooks/chat.types.js';
 
-import { useCallback, useImperativeHandle, useRef, useState } from 'react';
-
 import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
+import { useCallback, useImperativeHandle, useRef, useState } from 'react';
 
 import { useChat } from '../hooks/useChat.js';
 import { useFrontendAction } from '../hooks/useFrontendAction.js';
+
 import { Conversation, ConversationContent, ScrollController } from './conversation.js';
 import { Loader } from './Loader.js';
 import { Message, MessageContent } from './message.js';

@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
@@ -7,12 +7,12 @@ import type { PalletIdentityJudgement, PalletIdentityRegistration } from '@polka
 import type { ITuple } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { dataToUtf8 } from '@/utils';
+import { addressToHex, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
 import { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
 
-import { addressToHex, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
+import { dataToUtf8 } from '@/utils';
 
 type AccountInfo = {
   display: string | undefined;

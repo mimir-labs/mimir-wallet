@@ -1,5 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { NetworkProvider, useChains } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
+import { useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import { useAccount } from '@/accounts/useAccount';
 import TransferAction from '@/apps/transfer/TransferAction';
@@ -9,11 +14,6 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { useWallet } from '@/wallet/useWallet';
-import { useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { NetworkProvider, useChains, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, Spinner } from '@mimir-wallet/ui';
 
 interface FundContentProps {
   filterSending: string[];
@@ -23,8 +23,6 @@ interface FundContentProps {
 }
 
 function FundContent({ filterSending, receipt, network, setNetwork }: FundContentProps) {
-  const { chain } = useNetwork();
-  const { isApiReady } = useChainStatus(network);
   const [sending, setSending] = useState<string>(filterSending.at(0) || '');
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
@@ -36,14 +34,6 @@ function FundContent({ filterSending, receipt, network, setNetwork }: FundConten
     return foundAsset;
   }, [assetId, assets]);
   const [error, setError] = useState<string | null>(null);
-
-  if (!isApiReady) {
-    return (
-      <div className='bg-content1 mx-auto mt-16 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
-        <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-      </div>
-    );
-  }
 
   return (
     <div className='mx-auto w-full max-w-[500px] p-4 sm:p-5'>

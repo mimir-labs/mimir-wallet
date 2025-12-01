@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
 
-import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { useImperativeHandle } from 'react';
-
-import { NetworkProvider, useChainStatus } from '@mimir-wallet/polkadot-core';
 
 import AddTemplate from './AddTemplate';
 import TemplateList from './TemplateList';
 import { useTemplateState } from './useTemplateState';
+
+import { useInputNetwork } from '@/hooks/useInputNetwork';
 
 // Template ref interface for external control
 export interface TemplateRef {
@@ -31,12 +31,6 @@ function TemplateContent({
   setNetwork: (network: string) => void;
   templateState: ReturnType<typeof useTemplateState>;
 }) {
-  const { isApiReady } = useChainStatus(network);
-
-  if (!isApiReady) {
-    return null;
-  }
-
   if (templateState.isAddView) {
     return (
       <AddTemplate

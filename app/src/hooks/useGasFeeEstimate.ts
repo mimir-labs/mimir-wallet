@@ -1,11 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 
-import { useMemo } from 'react';
-
 import { useQuery } from '@mimir-wallet/service';
+import { useMemo } from 'react';
 
 /**
  * Hook to estimate gas fee for a transaction with a specific asset
@@ -18,7 +17,7 @@ export function useGasFeeEstimate(
 
   // Query gas fee in native token
   const { data: gasFeeData } = useQuery({
-    // Use extrinsicHex as identifier instead of the large extrinsic object
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- extrinsic is represented by extrinsicHex
     queryKey: ['gas-fee-estimate', extrinsicHex, signer] as const,
     queryFn: async (): Promise<{ partialFee: any; weight: any }> => {
       if (!extrinsic || !signer) {

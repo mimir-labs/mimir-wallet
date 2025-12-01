@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { FilterPath, Transaction } from '@/hooks/types';
@@ -6,14 +6,14 @@ import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { useTxQueue } from '@/hooks/useTxQueue';
-import { useWallet } from '@/wallet/useWallet';
-import React, { forwardRef, useCallback } from 'react';
-
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, type ButtonProps } from '@mimir-wallet/ui';
+import React, { forwardRef, useCallback } from 'react';
 
 import { toastError } from './utils';
+
+import { useTxQueue } from '@/hooks/useTxQueue';
+import { useWallet } from '@/wallet/useWallet';
 
 interface Props extends Omit<ButtonProps, 'onClick' | 'startContent' | 'endContent'> {
   startContent?: React.ReactNode;
@@ -123,5 +123,7 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
     );
   }
 );
+
+TxButton.displayName = 'TxButton';
 
 export default React.memo(TxButton);

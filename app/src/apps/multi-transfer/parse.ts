@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 import type { MultiTransferData } from './types';
-
-import { isValidNumber } from '@/utils';
-import Papa from 'papaparse';
+import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
 import { isPolkadotAddress } from '@mimir-wallet/polkadot-core';
+import Papa from 'papaparse';
+
+import { isValidNumber } from '@/utils';
 
 export function parseCsv(
   file: File,

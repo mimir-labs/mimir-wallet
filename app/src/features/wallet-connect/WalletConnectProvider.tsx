@@ -1,21 +1,21 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SignerPayloadJSON } from '@polkadot/types/types';
 import type { SessionTypes } from '@walletconnect/types';
 import type { Web3WalletTypes } from '@walletconnect/web3wallet';
 
-import { useAccount } from '@/accounts/useAccount';
-import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
-import { useTxQueue } from '@/hooks/useTxQueue';
+import { encodeAddress, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { getSdkError } from '@walletconnect/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { encodeAddress, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
 
 import { SESSION_ADD_EVENT } from './constants';
 import { WalletConnectContext } from './context';
 import { getActiveSessions, init, sendSessionError, sendSessionResponse, web3Wallet } from './wallet-connect';
+
+import { useAccount } from '@/accounts/useAccount';
+import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
+import { useTxQueue } from '@/hooks/useTxQueue';
 
 function WalletConnectProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setReady] = useState(false);

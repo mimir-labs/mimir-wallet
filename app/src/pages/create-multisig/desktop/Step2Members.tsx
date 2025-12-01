@@ -1,12 +1,5 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { useAccount } from '@/accounts/useAccount';
-import DeleteIcon from '@/assets/svg/icon-delete.svg?react';
-import { Empty, InputAddress } from '@/components';
-import AddressRow from '@/components/AddressRow';
-import { useSupportsProxy } from '@/hooks/useChainCapabilities';
-import { useState } from 'react';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import {
@@ -21,6 +14,13 @@ import {
   SelectTrigger,
   SelectValue
 } from '@mimir-wallet/ui';
+import { useState } from 'react';
+
+import { useAccount } from '@/accounts/useAccount';
+import DeleteIcon from '@/assets/svg/icon-delete.svg?react';
+import { Empty, InputAddress } from '@/components';
+import AddressRow from '@/components/AddressRow';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface Step2MembersProps {
   members: string[];

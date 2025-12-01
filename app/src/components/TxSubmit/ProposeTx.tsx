@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IMethod } from '@polkadot/types/types';
 
-import { walletConfig } from '@/config';
-import { CONNECT_ORIGIN } from '@/constants';
-import { accountSource } from '@/wallet/useWallet';
-import React, { useState } from 'react';
-
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, buttonSpinner } from '@mimir-wallet/ui';
+import React, { useState } from 'react';
 
 import { toastError } from '../utils';
+
+import { walletConfig } from '@/config';
+import { CONNECT_ORIGIN } from '@/constants';
+import { accountSource } from '@/wallet/useWallet';
 
 function ProposeTx({
   call,

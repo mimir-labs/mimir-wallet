@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useLocalStore } from '@mimir-wallet/service';
+import { Modal, ModalBody, ModalContent, ModalHeader, Tab, Tabs } from '@mimir-wallet/ui';
 
 import { analyticsActions } from '@/analytics';
 import { NEW_FEATURE_TIP_KEY } from '@/constants';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-
-import { useLocalStore } from '@mimir-wallet/service';
-import { Modal, ModalBody, ModalContent, ModalHeader, Tab, Tabs } from '@mimir-wallet/ui';
 
 function OmniChainUpgradeTip() {
   const [isRead, setIsRead] = useLocalStore<boolean>(NEW_FEATURE_TIP_KEY, false);

@@ -1,11 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HistoryTransaction, SubscanExtrinsic, Transaction } from './types';
-
-import { events } from '@/events';
-import { isEqual } from 'lodash-es';
-import { useEffect, useMemo } from 'react';
 
 import {
   addressToHex,
@@ -17,6 +13,10 @@ import {
   useSs58Format
 } from '@mimir-wallet/polkadot-core';
 import { API_CLIENT_GATEWAY, fetcher, service, useInfiniteQuery, useQueries, useQuery } from '@mimir-wallet/service';
+import { isEqual } from 'lodash-es';
+import { useEffect, useMemo } from 'react';
+
+import { events } from '@/events';
 
 function transformTransaction(chainSS58: number, transaction: Transaction): Transaction {
   const tx = { ...transaction };
@@ -84,7 +84,7 @@ export function useMultichainPendingTransactions(networks: string[], address?: s
   const { ss58: chainSS58 } = useSs58Format();
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
 
-  const data = useQueries({
+  return useQueries({
     queries: networks.map((network) => ({
       queryKey: ['pending-transactions', network, addressHex, txId] as const,
       // Only enable query when address is provided
@@ -112,10 +112,9 @@ export function useMultichainPendingTransactions(networks: string[], address?: s
 
         return data.map((item: any) => ({ ...item, network }));
       }
-    }))
+    })),
+    combine: (results) => results.map((item) => ({ ...item, data: item.data || [] }))
   });
-
-  return useMemo(() => data.map((item) => ({ ...item, data: item.data || [] })), [data]);
 }
 
 export function useHistoryTransactions(

@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ChatRequest, FrontendState } from '../chat-types.js';
@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CONVERSATION_ID_HEADER } from '../chat-types.js';
 import { useAIContext } from '../store/aiContext.js';
 import { ChatAPIClient } from '../utils/ChatAPIClient.js';
+
 import { useFrontendAction } from './useFrontendAction.js';
 import { useSSEProcessor } from './useSSEProcessor.js';
 

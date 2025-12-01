@@ -1,5 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { NetworkProvider, useChains } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
@@ -8,21 +13,6 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { useWallet } from '@/wallet/useWallet';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { NetworkProvider, useChains, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
-import {
-  Alert,
-  AlertTitle,
-  Button,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner
-} from '@mimir-wallet/ui';
 
 interface Props {
   defaultNetwork?: string;
@@ -50,9 +40,6 @@ function FundContent({
   network: string;
   setNetwork: (network: string) => void;
 }) {
-  const { chain } = useNetwork();
-  const { isApiReady } = useChainStatus(network);
-
   const [sending, setSending] = useState<string>(filterSending.at(0) || '');
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber(defaultValue?.toString() || '', false, 0);
@@ -79,19 +66,6 @@ function FundContent({
 
     prevOpenRef.current = open;
   }, [open, setAmount, toggleKeepAlive]);
-
-  // Show loading state when API is not ready
-  if (!isApiReady && open) {
-    return (
-      <Modal size='lg' onClose={onClose} isOpen={open}>
-        <ModalContent>
-          <ModalBody>
-            <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-    );
-  }
 
   return (
     <Modal size='lg' onClose={onClose} isOpen={open}>

@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { PrepareFlexible } from '../types';
 
+import { encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import { useToggle } from 'react-use';
+
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { AddressRow } from '@/components';
 import { useCacheMultisig } from '@/hooks/useCacheMultisig';
-import { useToggle } from 'react-use';
-
-import { encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 function Prepare({ onSelect }: { onSelect: (data: PrepareFlexible) => void }) {
   const { chain, network } = useNetwork();

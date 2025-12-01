@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { State } from '@/communicator/types';
@@ -10,9 +10,9 @@ import type {
 import type { Message } from '@polkadot/extension-base/types';
 import type { MutableRefObject } from 'react';
 
-import { MESSAGE_ORIGIN_WALLET } from '@/constants';
-
 import { Communicator } from './communicator';
+
+import { MESSAGE_ORIGIN_WALLET } from '@/constants';
 
 export class IframeCommunicator extends Communicator {
   private iframeRef: MutableRefObject<HTMLIFrameElement | null>;

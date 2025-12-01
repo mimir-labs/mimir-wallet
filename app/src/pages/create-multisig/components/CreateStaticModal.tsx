@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { useAccount } from '@/accounts/useAccount';
-import { toastError } from '@/components/utils';
-import { utm } from '@/config';
-import { u8aToHex } from '@polkadot/util';
-import { createKeyMulti } from '@polkadot/util-crypto';
-import React, { useState } from 'react';
 
 import { addressToHex, encodeAddress, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { u8aToHex } from '@polkadot/util';
+import { createKeyMulti } from '@polkadot/util-crypto';
+import React, { useState } from 'react';
+
+import { useAccount } from '@/accounts/useAccount';
+import { toastError } from '@/components/utils';
+import { utm } from '@/config';
 
 interface Props {
   name: string;
@@ -78,8 +78,8 @@ function CreateStaticModal({ name, signatories, threshold, isOpen, onClose, onSu
         <ModalHeader>Create Static Multisig</ModalHeader>
         <ModalBody>
           <ul>
-            <li>You're creating a non-Flexible multisig, members and threshold can't be modified.</li>
-            <li>You need to submit signature to confirm your identity; this isn't a transaction.</li>
+            <li>{`You're creating a non-Flexible multisig, members and threshold can't be modified.`}</li>
+            <li>{`You need to submit signature to confirm your identity; this isn't a transaction.`}</li>
           </ul>
         </ModalBody>
         <ModalFooter>

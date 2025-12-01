@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
+
+import { Divider } from '@mimir-wallet/ui';
+import moment from 'moment';
+import React from 'react';
 
 import { AppName } from '@/components';
 import { TransactionStatus } from '@/hooks/types';
 import { CallDisplaySection } from '@/params';
 import { formatTransactionId, Status } from '@/transactions';
-import moment from 'moment';
-import React from 'react';
-
-import { Divider } from '@mimir-wallet/ui';
 
 function Summary({ transaction }: { transaction: Transaction }) {
   return (

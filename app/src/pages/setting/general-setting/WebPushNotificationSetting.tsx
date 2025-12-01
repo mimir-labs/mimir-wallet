@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
 
-import { useWebPush } from '@/hooks/useWebPush';
+import { Alert, AlertDescription, Button, Card, Spinner, Switch } from '@mimir-wallet/ui';
 import { useCallback } from 'react';
 
-import { Alert, AlertDescription, Button, Card, Spinner, Switch } from '@mimir-wallet/ui';
+import { useWebPush } from '@/hooks/useWebPush';
 
 interface WebPushNotificationSettingProps {
   address: HexString;

@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { type AccountData, type Transaction, TransactionStatus } from '@/hooks/types';
-import React from 'react';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import React from 'react';
 
 import HistoryTxOverview from './HistoryTxOverview';
 import PendingTxOverview from './PendingTxOverview';
+
+import { type AccountData, type Transaction, TransactionStatus } from '@/hooks/types';
 
 interface Props {
   account: AccountData;

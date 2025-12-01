@@ -1,20 +1,5 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import IconQrcode from '@/assets/svg/icon-qr.svg?react';
-import IconStar from '@/assets/svg/icon-star.svg?react';
-import { Address, CopyButton, ExplorerLink } from '@/components';
-import { toastSuccess } from '@/components/utils';
-import { SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY } from '@/constants';
-import { useCopyAddress } from '@/hooks/useCopyAddress';
-import { useCopyClipboard } from '@/hooks/useCopyClipboard';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useQrAddress } from '@/hooks/useQrAddress';
-import { groupNetworksByChain } from '@/utils/networkGrouping';
-import { type ReactNode, useMemo, useRef } from 'react';
-import { useEffectOnce } from 'react-use';
-import { toast } from 'sonner';
 
 import { encodeAddress, type Network, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { useLocalStore } from '@mimir-wallet/service';
@@ -31,6 +16,21 @@ import {
   ModalFooter,
   Switch
 } from '@mimir-wallet/ui';
+import { type ReactNode, useMemo, useRef } from 'react';
+import { useEffectOnce } from 'react-use';
+import { toast } from 'sonner';
+
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import IconQrcode from '@/assets/svg/icon-qr.svg?react';
+import IconStar from '@/assets/svg/icon-star.svg?react';
+import { Address, CopyButton, ExplorerLink } from '@/components';
+import { toastSuccess } from '@/components/utils';
+import { SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY } from '@/constants';
+import { useCopyAddress } from '@/hooks/useCopyAddress';
+import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useQrAddress } from '@/hooks/useQrAddress';
+import { groupNetworksByChain } from '@/utils/networkGrouping';
 
 function Item({ endpoint, address }: { endpoint: Network; address: string }) {
   const [, copy] = useCopyClipboard();

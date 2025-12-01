@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HexString } from '@polkadot/util/types';
 import type { AccountData, AddressMeta } from '../hooks/types';
-
-import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
-import { u8aToHex } from '@polkadot/util';
+import type { HexString } from '@polkadot/util/types';
 
 import { addressToHex, decodeAddress } from '@mimir-wallet/polkadot-core';
+import { u8aToHex } from '@polkadot/util';
+
+import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 
 export function deriveAccountMeta(account: AccountData, metas: Record<string, AddressMeta>) {
   const addressHex = addressToHex(account.address);

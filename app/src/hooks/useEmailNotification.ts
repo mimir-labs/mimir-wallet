@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { EmailSubscriptionResponseDto } from '@mimir-wallet/service';
 
-import { createEmailBindSignature, createEmailUnbindSignature, validateEmail } from '@/utils/emailSignatureUtils';
-import { useWallet } from '@/wallet/useWallet';
+import { service } from '@mimir-wallet/service';
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
-import { service } from '@mimir-wallet/service';
+import { createEmailBindSignature, createEmailUnbindSignature, validateEmail } from '@/utils/emailSignatureUtils';
+import { useWallet } from '@/wallet/useWallet';
 
 export interface UseEmailNotificationResult {
   // Subscription data
@@ -154,21 +154,25 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
     }
   });
 
+  // Destructure mutateAsync for stable references
+  const { mutateAsync: bindMutateAsync } = bindMutation;
+  const { mutateAsync: unbindMutateAsync } = unbindMutation;
+
   // Action functions
   const bindEmail = useCallback(
-    async (value: Parameters<typeof bindMutation.mutateAsync>['0']) => {
+    async (value: { email: string; signer: string }) => {
       clearError();
-      await bindMutation.mutateAsync(value);
+      await bindMutateAsync(value);
     },
-    [bindMutation, clearError]
+    [bindMutateAsync, clearError]
   );
 
   const unbindEmail = useCallback(
-    async (value: Parameters<typeof unbindMutation.mutateAsync>['0']) => {
+    async (value: { signer: string }) => {
       clearError();
-      await unbindMutation.mutateAsync(value);
+      await unbindMutateAsync(value);
     },
-    [unbindMutation, clearError]
+    [unbindMutateAsync, clearError]
   );
 
   return {

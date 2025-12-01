@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
-import { useElementWidth } from '@/hooks/useElementWidth';
+import { type Endpoint, useChains } from '@mimir-wallet/polkadot-core';
+import { Avatar, Chip, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
 import { clsx } from 'clsx';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
-import { type Endpoint, useChains } from '@mimir-wallet/polkadot-core';
-import { Avatar, Chip, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
+import { useElementWidth } from '@/hooks/useElementWidth';
 
 interface Props {
   showAllNetworks?: boolean;

@@ -1,15 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 'use client';
 
 import type { ComponentProps } from 'react';
 
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@mimir-wallet/ui';
 import { useControllableState } from '@radix-ui/react-use-controllable-state';
 import { BrainIcon, ChevronDownIcon } from 'lucide-react';
 import { createContext, memo, useContext, useEffect, useState } from 'react';
-
-import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@mimir-wallet/ui';
 
 import { Response } from './response.js';
 

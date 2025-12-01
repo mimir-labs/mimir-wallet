@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Compact } from '@polkadot/types';
 import type { BN } from '@polkadot/util';
 
-import { formatDisplay, formatUnits } from '@/utils';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import React, { useMemo } from 'react';
 
-import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { formatDisplay, formatUnits } from '@/utils';
 
 interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
   format?: [decimals: number, symbol: string];

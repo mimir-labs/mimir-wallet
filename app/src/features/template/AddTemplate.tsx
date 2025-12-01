@@ -1,7 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Divider } from '@mimir-wallet/ui';
+import { useEffect, useMemo, useRef } from 'react';
+
+import DotConsoleButton from '../call-data-view/DotConsoleButton';
+import DotConsoleLink from '../call-data-view/DotConsoleLink';
+import { decodeCallData } from '../call-data-view/utils';
+import { ErrorDisplay } from '../shared/ErrorDisplay';
+
+import { useSavedTemplate } from './useSavedTemplate';
 
 import { analyticsActions } from '@/analytics';
 import IconArrowLeft from '@/assets/svg/icon-arrow-left.svg?react';
@@ -9,16 +20,6 @@ import { Input, InputNetwork } from '@/components';
 import JsonView from '@/components/JsonView';
 import { useInput } from '@/hooks/useInput';
 import { useRegistry } from '@/hooks/useRegistry';
-import { useEffect, useMemo, useRef } from 'react';
-
-import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
-
-import DotConsoleButton from '../call-data-view/DotConsoleButton';
-import DotConsoleLink from '../call-data-view/DotConsoleLink';
-import { decodeCallData } from '../call-data-view/utils';
-import { ErrorDisplay } from '../shared/ErrorDisplay';
-import { useSavedTemplate } from './useSavedTemplate';
 
 function AddTemplate({
   isView = false,

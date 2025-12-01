@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
+import { Avatar, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton } from '@mimir-wallet/ui';
+import React, { useEffect, useMemo } from 'react';
+
 import { FormatBalance } from '@/components';
 import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { useCustomGasFee } from '@/hooks/useCustomGasFee';
-import React, { useEffect, useMemo } from 'react';
-
-import { Avatar, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton } from '@mimir-wallet/ui';
 
 interface CustomGasFeeSelectProps {
   network: string;
@@ -150,7 +150,7 @@ function CustomGasFeeSelect({
           </span>
         </div>
       ) : (
-        <Skeleton className='mt-[5px] ml-auto h-[16px] w-16' />
+        <Skeleton className='mt-[5px] ml-auto h-[20px] w-32' />
       )}
     </div>
   );

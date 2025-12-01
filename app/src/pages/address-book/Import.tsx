@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { isPolkadotAddress } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
+import { parse } from 'papaparse';
+import { useRef } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconDownload from '@/assets/svg/icon-download.svg?react';
 import { toastError, toastSuccess } from '@/components/utils';
-import { parse } from 'papaparse';
-import { useRef } from 'react';
-
-import { isPolkadotAddress } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
 
 function Import() {
   const { addAddress } = useAccount();

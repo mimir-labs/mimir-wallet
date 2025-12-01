@@ -1,10 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button } from '@mimir-wallet/ui';
 
 import IconQr from '@/assets/svg/icon-qr.svg?react';
 import { useQrAddress } from '@/hooks/useQrAddress';
-
-import { Button } from '@mimir-wallet/ui';
 
 interface ShowQRCodeProps {
   eventId: string;

@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type {
@@ -12,14 +12,7 @@ import type {
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import IconCancel from '@/assets/svg/icon-cancel.svg?react';
-import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
-import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
-import IconSuccessOutlined from '@/assets/svg/icon-success-outlined.svg?react';
-import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
-import { TransactionStatus, TransactionType } from '@/hooks/types';
-import { filterPathId } from '@/hooks/useFilterPaths';
-import { useAccountSource } from '@/wallet/useWallet';
+import { addressEq, addressToHex, ApiManager } from '@mimir-wallet/polkadot-core';
 import {
   Controls,
   type Edge,
@@ -33,12 +26,19 @@ import {
 } from '@xyflow/react';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 
-import { addressEq, addressToHex, ApiManager } from '@mimir-wallet/polkadot-core';
-
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
 import TxButton from '../TxButton';
 import { getLayoutedElements } from '../utils';
+
+import IconCancel from '@/assets/svg/icon-cancel.svg?react';
+import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
+import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
+import IconSuccessOutlined from '@/assets/svg/icon-success-outlined.svg?react';
+import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
+import { TransactionStatus, TransactionType } from '@/hooks/types';
+import { filterPathId } from '@/hooks/useFilterPaths';
+import { useAccountSource } from '@/wallet/useWallet';
 
 interface State {
   network: string;
@@ -172,6 +172,8 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
     </>
   );
 });
+
+AddressNode.displayName = 'AddressNode';
 
 // Define node and edge types outside component to prevent recreation
 const NODE_TYPES = {

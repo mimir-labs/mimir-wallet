@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TemplateInfo } from './types';
+import type { Network } from '@mimir-wallet/polkadot-core';
 import type { ApiPromise } from '@polkadot/api';
 import type { Registry } from '@polkadot/types/types';
-import type { Network } from '@mimir-wallet/polkadot-core';
-import type { TemplateInfo } from './types';
-
-import { CopyButton } from '@/components';
-import { useEffect, useMemo, useState } from 'react';
 
 import { ApiManager, createBlockRegistry, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useSavedTemplate } from './useSavedTemplate';
+
+import { CopyButton } from '@/components';
 
 interface TemplateMigrationModalProps {
   isOpen: boolean;
@@ -187,7 +187,7 @@ export function TemplateMigrationModal({
   block,
   onMigrate
 }: TemplateMigrationModalProps) {
-  const { chains: networks, enableNetwork } = useChains();
+  const { chains: networks } = useChains();
   const { isApiReady: sourceReady } = useChainStatus(sourceChain);
   const { isApiReady: destReady } = useChainStatus(destChain);
   const [sourceApi, setSourceApi] = useState<ApiPromise | null>(null);
@@ -196,13 +196,6 @@ export function TemplateMigrationModal({
 
   const sourceNetwork = networks.find((network) => network.key === sourceChain);
   const destNetwork = networks.find((network) => network.key === destChain);
-
-  useEffect(() => {
-    if (isOpen) {
-      enableNetwork(sourceChain);
-      enableNetwork(destChain);
-    }
-  }, [enableNetwork, sourceChain, destChain, isOpen]);
 
   // Load APIs
   useEffect(() => {

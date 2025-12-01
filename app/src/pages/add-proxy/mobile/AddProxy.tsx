@@ -1,17 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ProxyArgs } from '../types';
-
-import { useAccount } from '@/accounts/useAccount';
-import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
-import { Input, InputAddress, InputNetwork, Label } from '@/components';
-import { ONE_DAY, ONE_HOUR } from '@/constants';
-import { useBlockInterval } from '@/hooks/useBlockInterval';
-import { useInput } from '@/hooks/useInput';
-import { useProxyTypes } from '@/hooks/useProxyTypes';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
 
 import { addressEq, ApiManager, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
@@ -29,14 +19,25 @@ import {
   Switch,
   Tooltip
 } from '@mimir-wallet/ui';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
 import { filterAccountsByNetwork } from '../utils';
+
 import AddProxyButton from './AddProxyButton';
 import ProxyInfo from './ProxyInfo';
 import PureCell from './PureCell';
 import SubmitProxy from './SubmitProxy';
 import SubmitPure from './SubmitPure';
+
+import { useAccount } from '@/accounts/useAccount';
+import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
+import { Input, InputAddress, InputNetwork, Label } from '@/components';
+import { ONE_DAY, ONE_HOUR } from '@/constants';
+import { useBlockInterval } from '@/hooks/useBlockInterval';
+import { useInput } from '@/hooks/useInput';
+import { useProxyTypes } from '@/hooks/useProxyTypes';
 
 async function fetchProxiesForAddress({ queryKey }: { queryKey: readonly [string, string, string] }) {
   const [, network, address] = queryKey;

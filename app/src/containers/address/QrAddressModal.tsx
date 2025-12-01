@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { encodeAddress, NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Avatar, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import qrcode from 'qrcode-generator';
+import React, { useEffect, useRef } from 'react';
 
 import { CopyButton, InputNetwork } from '@/components';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useQrAddress } from '@/hooks/useQrAddress';
-import qrcode from 'qrcode-generator';
-import React, { useEffect, useRef } from 'react';
-
-import { encodeAddress, NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Avatar, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 function Content({
   value,

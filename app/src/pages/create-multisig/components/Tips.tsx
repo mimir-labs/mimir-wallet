@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { allEndpoints, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertDescription, AlertTitle } from '@mimir-wallet/ui';
+import { useMemo } from 'react';
 
 import { FormatBalance } from '@/components';
 import { REMOTE_PROXY_DOC_URL } from '@/constants';
 import { useProxyDeposit } from '@/hooks/useProxyDeposit';
-import { useMemo } from 'react';
-
-import { allEndpoints, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertDescription, AlertTitle } from '@mimir-wallet/ui';
 
 function Tips({ flexible }: { flexible: boolean }) {
   const { chain, network } = useNetwork();

@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { InjectedAccount } from '@polkadot/extension-inject/types';
 import type { WalletAccount } from './types';
+import type { InjectedAccount } from '@polkadot/extension-inject/types';
+
+import { addressEq, encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { useEffect } from 'react';
+
+import { useWallet } from './useWallet';
 
 import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
-import { useEffect } from 'react';
-
-import { addressEq, encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
-
-import { useWallet } from './useWallet';
 
 function combineWalletAccounts(
   walletAccounts: WalletAccount[],

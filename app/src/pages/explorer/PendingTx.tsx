@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
+
+import { usePendingTx } from './usePendingTx';
 
 import ExpandArrow from '@/assets/svg/expand-arrow.svg?react';
 import { useToggle } from '@/hooks/useToggle';
 import { GroupedTransactions } from '@/transactions';
 import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
-import React, { useMemo } from 'react';
-
-import { Button } from '@mimir-wallet/ui';
-
-import { usePendingTx } from './usePendingTx';
 
 interface Props {
   address: string;

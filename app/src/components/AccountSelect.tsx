@@ -1,13 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useSelectedAccount } from '@/accounts/useSelectedAccount';
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import React, { useState } from 'react';
 
 import AccountMenu from './account-menu';
 import AddressCell from './AddressCell';
+
+import { useSelectedAccount } from '@/accounts/useSelectedAccount';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 function AccountSelect() {
   const selected = useSelectedAccount();

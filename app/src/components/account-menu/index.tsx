@@ -1,7 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, AddressMeta } from '@/hooks/types';
+
+import { addressEq, addressToHex, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Button, Divider, Drawer, DrawerContent, DrawerFooter, DrawerHeader } from '@mimir-wallet/ui';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
+import AccountCell from './AccountCell';
+import CreateMultisig from './CreateMultisig';
+import Search from './Search';
+import VirtualAccountCell from './VirtualAccountCell';
 
 import { useAccount } from '@/accounts/useAccount';
 import { groupAccounts } from '@/accounts/utils';
@@ -16,16 +26,6 @@ import IconWatch from '@/assets/svg/icon-watch.svg?react';
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { usePinAccounts } from '@/hooks/usePinAccounts';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-
-import { addressEq, addressToHex, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Button, Divider, Drawer, DrawerContent, DrawerFooter, DrawerHeader } from '@mimir-wallet/ui';
-
-import AccountCell from './AccountCell';
-import CreateMultisig from './CreateMultisig';
-import Search from './Search';
-import VirtualAccountCell from './VirtualAccountCell';
 
 interface Props {
   open: boolean;

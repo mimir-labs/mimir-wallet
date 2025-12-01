@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 
-import kusamaChains from './chains/kusama.json' with { type: 'json' };
-import paseoChains from './chains/paseo.json' with { type: 'json' };
-import polkadotChains from './chains/polkadot.json' with { type: 'json' };
-import solochainChains from './chains/solochain.json' with { type: 'json' };
-import westendChains from './chains/westend.json' with { type: 'json' };
+import kusamaChains from '../chains/kusama.json' with { type: 'json' };
+import paseoChains from '../chains/paseo.json' with { type: 'json' };
+import polkadotChains from '../chains/polkadot.json' with { type: 'json' };
+import solochainChains from '../chains/solochain.json' with { type: 'json' };
+import westendChains from '../chains/westend.json' with { type: 'json' };
 
 /**
  * Union type of all chain configurations from JSON files

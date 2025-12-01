@@ -1,21 +1,22 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useChains } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
+import { Link, useLocation } from '@tanstack/react-router';
+
+import ChainSelect from '../chain-select';
+
+import BatchButton from './BatchButton';
+import NotificationButton from './NotificationButton';
+import TemplateButton from './TemplateButton';
+import WalletConnect from './WalletConnect';
 
 import { analyticsActions } from '@/analytics';
 import Logo from '@/assets/images/logo.png';
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import { AccountSelect } from '@/components';
-import { Link, useLocation } from '@tanstack/react-router';
-
-import { useChains } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
-
-import ChainSelect from '../chain-select';
-import BatchButton from './BatchButton';
-import NotificationButton from './NotificationButton';
-import TemplateButton from './TemplateButton';
-import WalletConnect from './WalletConnect';
 
 function TopBar() {
   const { mode, setNetworkMode } = useChains();

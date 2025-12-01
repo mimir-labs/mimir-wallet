@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ProxyArgs } from '../types';
 
-import { Address, TxButton } from '@/components';
-import { toastSuccess } from '@/components/utils';
-import { useTxQueue } from '@/hooks/useTxQueue';
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Link } from '@tanstack/react-router';
 import React, { useCallback, useState } from 'react';
 import { useAsyncFn, useToggle } from 'react-use';
 
-import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
-
 import SafetyWarningModal from '../components/SafetyWarningModal';
 import { useProxySafetyCheck } from '../hooks/useProxySafetyCheck';
+
+import { Address, TxButton } from '@/components';
+import { toastSuccess } from '@/components/utils';
+import { useTxQueue } from '@/hooks/useTxQueue';
 
 function SubmitProxy({
   proxied,

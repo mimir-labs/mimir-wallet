@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type {
@@ -11,6 +11,7 @@ import type {
 import { EventEmitter } from 'eventemitter3';
 
 import { getStaticRouteRequirement } from '../config/routeConfig.js';
+
 import { handlerMetadataRegistry } from './handlerMetadataRegistry.js';
 
 // ============================================================================

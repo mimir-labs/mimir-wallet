@@ -1,7 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TemplateInfo } from './types';
+
+import { useChains } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
+import { useState } from 'react';
+
+import TemplateMigrationModal from './TemplateMigrationModal';
 
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { toastSuccess } from '@/components/utils';
@@ -9,12 +15,6 @@ import {
   useNetworkMigrationCompleted,
   useTemplateMigrationStatus
 } from '@/features/assethub-migration/useMigrationStatus';
-import { useState } from 'react';
-
-import { useChains } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
-
-import TemplateMigrationModal from './TemplateMigrationModal';
 
 interface TemplateMigrationAlertProps {
   chain: string;

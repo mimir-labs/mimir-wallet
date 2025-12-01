@@ -1,8 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AddressMeta } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
+
+import { addressEq, addressToHex, isPolkadotAddress, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { Button, Tooltip } from '@mimir-wallet/ui';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
@@ -11,10 +15,6 @@ import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconSearch from '@/assets/svg/icon-search.svg?react';
 import { AddressRow, Empty, Input } from '@/components';
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
-import React, { useCallback, useMemo, useState } from 'react';
-
-import { addressEq, addressToHex, isPolkadotAddress, zeroAddress } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip } from '@mimir-wallet/ui';
 
 interface Props {
   withSearch?: boolean;

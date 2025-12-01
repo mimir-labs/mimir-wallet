@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IMethod, Registry } from '@polkadot/types/types';
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Avatar, Skeleton } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
 
 import { FormatBalance } from '@/components';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
 import { dataToUtf8 } from '@/utils';
-import React, { useMemo } from 'react';
-
-import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Avatar, Skeleton } from '@mimir-wallet/ui';
 
 function TransferDetail({
   from: propsFrom,
@@ -61,7 +61,10 @@ function TransferDetail({
       </div>
     )
   ) : (
-    <Skeleton style={{ width: 50, height: 16 }} />
+    <div className='flex items-center gap-1'>
+      <Skeleton className='h-5 w-5 rounded-full' />
+      <Skeleton className='h-4 w-16' />
+    </div>
   );
 }
 

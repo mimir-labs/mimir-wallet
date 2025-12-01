@@ -1,9 +1,8 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
 import { useChains } from '@mimir-wallet/polkadot-core';
+import { useMemo } from 'react';
 
 interface SwitchNetworksProps {
   eventId: string;
@@ -31,7 +30,7 @@ function SwitchNetworks({ networks }: SwitchNetworksProps) {
     return result;
   }, [networks, allNetworks]);
 
-  return networkList.map((network) => <NetworkItem {...network} />);
+  return networkList.map(({ key, ...network }) => <NetworkItem key={key} {...network} />);
 }
 
 // Individual network item component

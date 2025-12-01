@@ -1,7 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DappOption } from '@/config';
+
+import { Button, Tooltip } from '@mimir-wallet/ui';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import SupportedChains from './SupportedChains';
 
 import { analyticsActions } from '@/analytics';
 import IconMatrix from '@/assets/images/matrix.svg?react';
@@ -12,11 +17,6 @@ import IconStar from '@/assets/svg/icon-star.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
 import IconX from '@/assets/svg/icon-x.svg?react';
 import { useOpenDapp } from '@/hooks/useOpenDapp';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { Button, Tooltip } from '@mimir-wallet/ui';
-
-import SupportedChains from './SupportedChains';
 
 interface Props extends DappOption {
   size?: 'sm' | 'md';

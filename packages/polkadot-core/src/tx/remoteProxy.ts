@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
@@ -7,8 +7,8 @@ import type { IMethod } from '@polkadot/types/types';
 import { GenericExtrinsic } from '@polkadot/types';
 import { blake2AsU8a, encodeMultiAddress } from '@polkadot/util-crypto';
 
-import { ApiManager } from './api/ApiManager.js';
-import { remoteProxyRelations } from './config.js';
+import { ApiManager } from '../api/ApiManager.js';
+import { remoteProxyRelations } from '../chains/config.js';
 
 function hasRemoteProxy(api: ApiPromise, tx: IMethod) {
   if (!api.tx.remoteProxyRelayChain) {

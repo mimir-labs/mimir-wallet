@@ -1,7 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
+
+import { Sidebar, SidebarContent, SidebarHeader, Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
+import { useCallback, useEffect } from 'react';
+
+import { layoutHelpers } from '../constants';
 
 import Batch from '@/apps/batch';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
@@ -10,11 +15,6 @@ import CallDataView, { type CallDataViewRef } from '@/features/call-data-view';
 import Template, { type TemplateRef } from '@/features/template';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useRefControl } from '@/hooks/useRefControl';
-import { useCallback, useEffect } from 'react';
-
-import { Sidebar, SidebarContent, SidebarHeader, Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
-
-import { layoutHelpers } from '../constants';
 
 function RightSideBar() {
   const { rightSidebarOpen, openRightSidebar, closeRightSidebar, rightSidebarState, setRightSidebarTab } =

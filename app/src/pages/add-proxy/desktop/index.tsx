@@ -1,15 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TransactionResult } from '../types';
-
-import { useAccount } from '@/accounts/useAccount';
-import { StepIndicator } from '@/components';
-import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
-import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useWizardState } from '@/hooks/useWizardState';
-import { useCallback, useState } from 'react';
-import { useToggle } from 'react-use';
 
 import {
   type FunctionCallHandler,
@@ -17,13 +9,21 @@ import {
   toFunctionCallBoolean,
   toFunctionCallString
 } from '@mimir-wallet/ai-assistant';
-import { NetworkProvider, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider, Spinner } from '@mimir-wallet/ui';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
+import { useCallback, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import Step1ConfigureAccess from './Step1ConfigureAccess';
 import Step2PermissionLevel from './Step2PermissionLevel';
 import Step3Review from './Step3Review';
 import SuccessModal from './SuccessModal';
+
+import { useAccount } from '@/accounts/useAccount';
+import { StepIndicator } from '@/components';
+import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { useWizardState } from '@/hooks/useWizardState';
 
 interface ProxyWizardData {
   // Step 1: Configure Access
@@ -228,17 +228,7 @@ function AddProxyContent({
   toggleSuccess,
   transactionData
 }: AddProxyContentProps) {
-  const { chain } = useNetwork();
-  const { isApiReady } = useChainStatus(network);
   const { goToStep } = wizardActions;
-
-  if (!isApiReady) {
-    return (
-      <div className='bg-content1 mx-auto my-0 flex w-[800px] max-w-full items-center justify-center rounded-[20px] py-10'>
-        <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-      </div>
-    );
-  }
 
   return (
     <>

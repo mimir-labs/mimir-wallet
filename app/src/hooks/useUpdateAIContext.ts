@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { useAccount } from '@/accounts/useAccount';
-import { dapps } from '@/config';
-import { useLocation } from '@tanstack/react-router';
-import { useEffect } from 'react';
 
 import { useAIContext } from '@mimir-wallet/ai-assistant';
 import { addressToHex, encodeAddress, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { useLocation } from '@tanstack/react-router';
+import { useEffect } from 'react';
+
+import { useAccount } from '@/accounts/useAccount';
+import { dapps } from '@/config';
 
 export function useUpdateAIContext() {
   const { chains } = useChains();

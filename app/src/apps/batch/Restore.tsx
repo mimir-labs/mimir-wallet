@@ -1,5 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Alert, AlertTitle, Button, buttonSpinner, Checkbox, Spinner } from '@mimir-wallet/ui';
+import { useState } from 'react';
+import { useToggle } from 'react-use';
+
+import BatchItem from './BatchItem';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
@@ -13,14 +21,6 @@ import { useProposersAndMembersFilter } from '@/hooks/useProposeFilter';
 import { useRegistry } from '@/hooks/useRegistry';
 import { CallDisplaySection } from '@/params';
 import { accountSource } from '@/wallet/useWallet';
-import { useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Alert, AlertTitle, Button, buttonSpinner, Checkbox, Spinner } from '@mimir-wallet/ui';
-
-import BatchItem from './BatchItem';
 
 function Restore({ onClose }: { onClose: () => void }) {
   const { network } = useNetwork();

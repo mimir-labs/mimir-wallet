@@ -1,23 +1,8 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SortDescriptor } from '@react-types/shared';
 import type { AccountEnhancedAssetBalance } from '@mimir-wallet/polkadot-core';
-
-import { useAccount } from '@/accounts/useAccount';
-import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
-import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
-import IconSend from '@/assets/svg/icon-send-fill.svg?react';
-import { Empty, FormatBalance } from '@/components';
-import { toastError, toastSuccess } from '@/components/utils';
-import { StakingApp } from '@/config';
-import { MigrationTip, useAssetsMigrationStatus, useMigrationNetworks } from '@/features/assethub-migration';
-import { useAllChainBalances } from '@/hooks/useChainBalances';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { formatDisplay, formatUnits } from '@/utils';
-import { useQueryClient } from '@tanstack/react-query';
-import { Link } from '@tanstack/react-router';
-import { useCallback, useMemo, useState, useTransition } from 'react';
+import type { SortDescriptor } from '@react-types/shared';
 
 import { useChains } from '@mimir-wallet/polkadot-core';
 import {
@@ -33,6 +18,21 @@ import {
   TableRow,
   Tooltip
 } from '@mimir-wallet/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
+import { useCallback, useMemo, useState, useTransition } from 'react';
+
+import { useAccount } from '@/accounts/useAccount';
+import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
+import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
+import IconSend from '@/assets/svg/icon-send-fill.svg?react';
+import { Empty, FormatBalance } from '@/components';
+import { toastError, toastSuccess } from '@/components/utils';
+import { StakingApp } from '@/config';
+import { MigrationTip, useAssetsMigrationStatus, useMigrationNetworks } from '@/features/assethub-migration';
+import { useAllChainBalances } from '@/hooks/useChainBalances';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { formatDisplay, formatUnits } from '@/utils';
 
 function MigrationTips() {
   const { data: migrationNetworks } = useMigrationNetworks();
@@ -216,6 +216,7 @@ function Assets() {
               <Spinner size='sm' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
             </>
           }
+          isLoading={!done}
           emptyContent={done ? <Empty className='text-foreground' height='150px' label='No assets' /> : null}
         >
           {(item) => {

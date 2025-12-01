@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
-import { AddressCell, Bytes, Hash } from '@/components';
-import { useFindTargetCallFromMethod } from '@/hooks/useFindTargetCall';
-import { useParseCall } from '@/hooks/useParseCall';
-import { FunctionArgs } from '@/params';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertDescription, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 import moment from 'moment';
 import React from 'react';
 import { useToggle } from 'react-use';
 
-import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertDescription, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
+import { AddressCell, Bytes, Hash } from '@/components';
+import { useFindTargetCallFromMethod } from '@/hooks/useFindTargetCall';
+import { useParseCall } from '@/hooks/useParseCall';
+import { FunctionArgs } from '@/params';
 
 function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
@@ -47,7 +47,7 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
         <Alert variant='warning'>
           <AlertTitle>Warning</AlertTitle>
           <AlertDescription>
-            This transaction wasn't initiated from Mimir. Please confirm the security of this transaction.
+            {`This transaction wasn't initiated from Mimir. Please confirm the security of this transaction.`}
           </AlertDescription>
         </Alert>
       )}

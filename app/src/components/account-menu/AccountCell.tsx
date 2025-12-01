@@ -1,5 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { Button, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import React, { useCallback, useMemo } from 'react';
+
+import AddressCell from '../AddressCell';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
@@ -8,13 +15,6 @@ import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { usePinAccounts } from '@/hooks/usePinAccounts';
 import { formatDisplay } from '@/utils';
 import { useAccountSource } from '@/wallet/useWallet';
-import { Link } from '@tanstack/react-router';
-import React, { useCallback, useMemo } from 'react';
-
-import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { Button, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
-
-import AddressCell from '../AddressCell';
 
 function AccountCell({
   onClose,

@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
 
-import IconLink from '@/assets/svg/icon-link.svg?react';
-import React from 'react';
-
 import { chainLinks, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
+import React from 'react';
 
 import CopyButton from './CopyButton';
+
+import IconLink from '@/assets/svg/icon-link.svg?react';
 
 interface Props {
   value?: string | HexString;

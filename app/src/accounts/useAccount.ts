@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AddressMeta } from '@/hooks/types';
 
-import { SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
-import { useAddressStore } from '@/hooks/useAddressStore';
+import { addressEq, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { store } from '@mimir-wallet/service';
 import { useNavigate } from '@tanstack/react-router';
 import { merge } from 'lodash-es';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
-import { addressEq, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
-import { store } from '@mimir-wallet/service';
-
 import { addAddressBook, deleteAddress, hideAccount, resync, setAccountName, setName, showAccount } from './actions';
 import { AccountContext } from './context';
+
+import { SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
+import { useAddressStore } from '@/hooks/useAddressStore';
 
 export const AddressMetaContext = createContext<Record<`0x${string}`, AddressMeta>>({});
 

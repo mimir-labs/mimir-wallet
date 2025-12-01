@@ -1,7 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { LayoutOptions } from '@/router';
+
+import { SidebarProvider } from '@mimir-wallet/ui';
+import { createFileRoute, Navigate, Outlet, useLocation, useMatches } from '@tanstack/react-router';
+import { useCallback, useState } from 'react';
+
+import { useAccount } from '../accounts/useAccount';
+import { AddressModalsProvider } from '../containers/address';
+import { CSS_VARS, layoutHelpers } from '../containers/constants';
+import CookieConsent from '../containers/CookieConsent';
+import { AppSidebar, RightSideBar } from '../containers/sidebar';
+import ToggleAlert from '../containers/ToggleAlert';
+import TopBar from '../containers/topbar';
+import Version from '../containers/Version';
 
 import { TxSubmit } from '@/components';
 import { MigrationAlert } from '@/features/assethub-migration';
@@ -9,28 +22,12 @@ import { useAIFunctionCall } from '@/hooks/useAIFunctionCall';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { useUpdateAIContext } from '@/hooks/useUpdateAIContext';
-import { useWallet } from '@/wallet/useWallet';
-import { createFileRoute, Navigate, Outlet, useLocation, useMatches } from '@tanstack/react-router';
-import { useCallback, useState } from 'react';
-
-import { SidebarProvider } from '@mimir-wallet/ui';
-
-import { useAccount } from '../accounts/useAccount';
-import { AddressModalsProvider } from '../containers/address';
-import { CSS_VARS, layoutHelpers } from '../containers/constants';
-import CookieConsent from '../containers/CookieConsent';
-import Initializing from '../containers/Initializing';
-import { AppSidebar, RightSideBar } from '../containers/sidebar';
-import ToggleAlert from '../containers/ToggleAlert';
-import TopBar from '../containers/topbar';
-import Version from '../containers/Version';
 
 /**
  * Authenticated Layout Route
  *
  * This layout route handles:
  * - Authentication check via beforeLoad (moved to component for now)
- * - Initialization state (API, Wallet, Multisig sync)
  * - Common UI components (sidebar, topbar, alerts)
  *
  * Note: Authentication check is performed in the component itself
@@ -39,12 +36,6 @@ import Version from '../containers/Version';
 export const Route = createFileRoute('/_authenticated')({
   component: AuthenticatedLayout
 });
-
-// Helper function to determine if main content should be shown
-// Note: isApiReady check removed - ApiManager.getApi() handles API readiness internally
-const shouldShowMainContent = (skipConnect: boolean, isWalletReady: boolean, isMultisigSyned: boolean): boolean => {
-  return skipConnect || (isWalletReady && isMultisigSyned);
-};
 
 // Top section component (TopBar + Alert)
 interface TopSectionProps {
@@ -64,7 +55,7 @@ const TopSection = ({ current, setAlertOpen }: TopSectionProps) => {
   return (
     <>
       <TopBar />
-      <div className='fixed top-[56px] right-0 left-0 z-50 flex w-full flex-col gap-2.5 p-2.5'>
+      <div className='fixed top-14 right-0 left-0 z-50 flex w-full flex-col gap-2.5 p-2.5'>
         {current && <ToggleAlert address={current} setAlertOpen={handleSetAlertOpen} />}
         <MigrationAlert onMigrationCounts={setAlertCounts} />
       </div>
@@ -160,10 +151,9 @@ function AuthenticatedLayout() {
     ? ((matchWithOptions.context as any)?.layoutOptions as LayoutOptions)
     : undefined;
 
-  const { skipConnect = false, withPadding = true } = layoutOptions || {};
+  const { withPadding = true } = layoutOptions || {};
 
-  const { isWalletReady } = useWallet();
-  const { current, isMultisigSyned } = useAccount();
+  const { current } = useAccount();
   const { pathname } = useLocation();
   const { queue } = useTxQueue();
   const [, setAlertOpen] = useState<boolean>(true);
@@ -184,9 +174,6 @@ function AuthenticatedLayout() {
     return null;
   }
 
-  // Check if main content should be displayed
-  const showMainContent = shouldShowMainContent(skipConnect, isWalletReady, isMultisigSyned);
-
   // Sidebar provider styles
   const sidebarProviderStyle = {
     [CSS_VARS.HEADER_HEIGHT]: `${layoutHelpers.getTotalHeaderHeight()}px`
@@ -204,14 +191,8 @@ function AuthenticatedLayout() {
         {/* Top Section: TopBar + Alert */}
         <TopSection current={current} setAlertOpen={setAlertOpen} />
 
-        {/* Main Content or Initialization */}
-        {showMainContent ? (
-          <MainContent withPadding={withPadding} queue={queue} />
-        ) : (
-          <div className='flex flex-1 items-center justify-center'>
-            <Initializing />
-          </div>
-        )}
+        {/* Main Content */}
+        <MainContent withPadding={withPadding} queue={queue} />
       </SidebarProvider>
     </>
   );

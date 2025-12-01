@@ -1,17 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, ProposeTransaction, ProxyTransaction, Transaction } from '@/hooks/types';
 
-import { AddressCell, Empty } from '@/components';
-import { TransactionStatus, TransactionType } from '@/hooks/types';
-import { useBlockInterval } from '@/hooks/useBlockInterval';
-import { useFilterPaths } from '@/hooks/useFilterPaths';
-import { autoFormatTimeStr } from '@/utils';
-import React, { useMemo } from 'react';
-
 import { addressEq, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, cn, Divider } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
 
 import Approve from './buttons/Approve';
 import Cancel from './buttons/Cancel';
@@ -21,6 +15,12 @@ import RemovePropose from './buttons/RemovePropose';
 import ViewPending from './buttons/ViewPending';
 import { useAnnouncementProgress } from './hooks/useAnnouncementProgress';
 import { approvalCounts } from './utils';
+
+import { AddressCell, Empty } from '@/components';
+import { TransactionStatus, TransactionType } from '@/hooks/types';
+import { useBlockInterval } from '@/hooks/useBlockInterval';
+import { useFilterPaths } from '@/hooks/useFilterPaths';
+import { autoFormatTimeStr } from '@/utils';
 
 interface Props {
   className?: string;

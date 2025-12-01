@@ -1,10 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { useMemo } from 'react';
 
 import { addressToHex, useChains } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
+import { useMemo } from 'react';
 
 export function useMultiChainStats(
   address?: string | null

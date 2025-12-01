@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IMethod } from '@polkadot/types/types';
 
-import IconFailed from '@/assets/svg/icon-failed-fill.svg?react';
-import IconSuccess from '@/assets/svg/icon-success.svg?react';
-import React, { useState } from 'react';
-
 import { ApiManager, simulate, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, buttonSpinner } from '@mimir-wallet/ui';
+import React, { useState } from 'react';
 
 import Cell from './Cell';
+
+import IconFailed from '@/assets/svg/icon-failed-fill.svg?react';
+import IconSuccess from '@/assets/svg/icon-success.svg?react';
 
 const EMPTY_SIMULATION = {
   isDone: false,

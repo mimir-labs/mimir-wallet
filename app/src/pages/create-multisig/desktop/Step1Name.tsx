@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { StepProps } from './types';
-
-import { Input, InputNetwork } from '@/components';
-import { MigrationTip } from '@/features/assethub-migration';
-import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 
 import AddPureProxy from '../components/AddPureProxy';
 import Tips from '../components/Tips';
+
+import { Input, InputNetwork } from '@/components';
+import { MigrationTip } from '@/features/assethub-migration';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface Step1NameProps extends StepProps {
   name: string;

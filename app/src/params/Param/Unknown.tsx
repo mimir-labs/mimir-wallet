@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ParamProps } from './types';
 
-import { Bytes } from '@/components';
-import JsonView from '@/components/JsonView';
+import { Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 import { isHex, isString } from '@polkadot/util';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
-import { Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import { Bytes } from '@/components';
+import JsonView from '@/components/JsonView';
 
 function Unknown({ name, value }: ParamProps) {
   const [open, toggleOpen] = useToggle(false);

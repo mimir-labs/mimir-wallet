@@ -1,10 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { RouteMetadata } from '@/hooks/usePageTitle';
 
-import PageCreateMultisig from '@/pages/create-multisig';
 import { createFileRoute } from '@tanstack/react-router';
+
+import PageCreateMultisig from '@/pages/create-multisig';
 
 /**
  * Create Multisig Route (/create-multisig)

@@ -1,16 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button, Tooltip } from '@mimir-wallet/ui';
+import { useState } from 'react';
+
+import AddressRow from '../AddressRow';
+
+import MimoLogo from './MimoLogo';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconChatSlash from '@/assets/svg/icon-chat-slash.svg?react';
 import IconMinimize from '@/assets/svg/icon-minimize.svg?react';
 import { getKeyboardShortcut } from '@/utils/common';
-import { useState } from 'react';
-
-import { Button, Tooltip } from '@mimir-wallet/ui';
-
-import AddressRow from '../AddressRow';
-import MimoLogo from './MimoLogo';
 
 export function AccountInfo() {
   const { current } = useAccount();

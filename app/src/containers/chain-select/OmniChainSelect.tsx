@@ -1,32 +1,34 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { type Network, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
+import { Avatar, Badge, Button, Popover, PopoverContent, PopoverTrigger, Switch, Tooltip } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconWebsite from '@/assets/svg/icon-website.svg?react';
-import { Link } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
 
-import { type Network, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
-import { Avatar, Badge, Button, Popover, PopoverContent, PopoverTrigger, Switch, Tooltip } from '@mimir-wallet/ui';
-
-function Status({ network }: { network: Network }) {
-  const { isApiReady, isApiInitialized, apiError } = useChainStatus(network.key);
-
-  if (!isApiInitialized) {
-    return <Avatar src={network.icon} style={{ width: 32, height: 32, backgroundColor: 'transparent' }} />;
-  }
+const Status = React.memo(function Status({ network }: { network: Network }) {
+  const { isApiReady, apiError } = useChainStatus(network.key);
 
   return (
     <Tooltip content={isApiReady ? 'Connected' : apiError ? apiError || 'Connect Failed' : 'Connecting...'}>
-      <Badge color={isApiReady ? 'success' : apiError ? 'danger' : 'warning'} content='' shape='circle' size='sm'>
+      <Badge
+        hidden={!network.enabled && !isApiReady}
+        color={isApiReady ? 'success' : apiError ? 'danger' : 'warning'}
+        content=''
+        shape='circle'
+        size='sm'
+      >
         <Avatar src={network.icon} style={{ width: 32, height: 32, backgroundColor: 'transparent' }} />
       </Badge>
     </Tooltip>
   );
-}
+});
 
-function GroupedEndpoints({
+const GroupedEndpoints = React.memo(function GroupedEndpoints({
   group,
   endpoints,
   enableNetworks,
@@ -119,7 +121,7 @@ function GroupedEndpoints({
       </div>
     </div>
   );
-}
+});
 
 function OmniChainSelect() {
   const { chains, enableNetwork, disableNetwork } = useChains();
@@ -146,12 +148,22 @@ function OmniChainSelect() {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleEnableNetworks = useCallback(
+    (networks: string[]) => networks.forEach((network) => enableNetwork(network)),
+    [enableNetwork]
+  );
+
+  const handleDisableNetworks = useCallback(
+    (networks: string[]) => networks.forEach((network) => disableNetwork(network)),
+    [disableNetwork]
+  );
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
           variant='bordered'
-          className='border-secondary text-primary sm:text-foreground bg-secondary h-[32px] shrink-0 gap-1 px-2.5 sm:h-[42px] sm:gap-2 sm:bg-transparent sm:px-3'
+          className='border-secondary text-primary sm:text-foreground bg-secondary h-8 shrink-0 gap-1 px-2.5 sm:h-[42px] sm:gap-2 sm:bg-transparent sm:px-3'
           radius='md'
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -166,17 +178,17 @@ function OmniChainSelect() {
                     src={enabledNetworks[0].icon}
                   />
                   <Avatar
-                    className='ml-[-10px] bg-transparent select-none'
+                    className='-ml-2.5 bg-transparent select-none'
                     style={{ width: 20, height: 20 }}
                     src={enabledNetworks[1].icon}
                   />
                   <Avatar
-                    className='ml-[-10px] bg-transparent select-none'
+                    className='-ml-2.5 bg-transparent select-none'
                     style={{ width: 20, height: 20 }}
                     src={enabledNetworks[2].icon}
                   />
                   <Avatar
-                    className='bg-primary border-divider-300 ml-[-10px] border-1 select-none'
+                    className='bg-primary border-divider-300 -ml-2.5 border-1 select-none'
                     style={{ width: 20, height: 20 }}
                     showFallback
                     fallback={
@@ -225,8 +237,8 @@ function OmniChainSelect() {
                 key={`group-${group}`}
                 group={group}
                 endpoints={groupedEndpoints[group]}
-                enableNetworks={(networks) => networks.forEach((network) => enableNetwork(network))}
-                disableNetworks={(networks) => networks.forEach((network) => disableNetwork(network))}
+                enableNetworks={handleEnableNetworks}
+                disableNetworks={handleDisableNetworks}
               />
             ))}
           </div>

@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useChains } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
+import { useEffect, useState } from 'react';
+
+import MigrationModal from './MigrationModal';
+import { useMigrationNetworks, useMigrationStatus } from './useMigrationStatus';
 
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { MIGRATION_NOTICE_DOCS_URL } from '@/constants';
-import { useEffect, useState } from 'react';
-
-import { useChains } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
-
-import MigrationModal from './MigrationModal';
-import { useMigrationNetworks, useMigrationStatus } from './useMigrationStatus';
 
 function Item({
   isCompleted,
@@ -54,7 +54,7 @@ function Item({
                 <span>
                   {destNetwork?.name} Migration on {sourceNetwork?.name} has been completed — check out{' '}
                 </span>
-                <a target='_blank' href={MIGRATION_NOTICE_DOCS_URL} className='text-white underline'>
+                <a target='_blank' href={MIGRATION_NOTICE_DOCS_URL} className='text-white underline' rel='noreferrer'>
                   what&apos;s changed
                 </a>
                 <span> and </span>
@@ -67,7 +67,7 @@ function Item({
                 The Assethub Migration starts on {sourceNetwork?.name} on{' '}
                 {sourceChain === 'polkadot' ? 'November 7' : sourceChain === 'kusama' ? 'October 7' : 'July 7'}. After
                 the migration, all multisig/proxy on {sourceNetwork?.name} will be moved to {destNetwork?.name}.
-                <a target='_blank' href={MIGRATION_NOTICE_DOCS_URL} className='text-white underline'>
+                <a target='_blank' href={MIGRATION_NOTICE_DOCS_URL} className='text-white underline' rel='noreferrer'>
                   View Details
                 </a>
               </p>

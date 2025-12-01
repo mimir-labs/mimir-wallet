@@ -1,12 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
 
-import { BN, BN_THOUSAND, BN_TWO, bnMin } from '@polkadot/util';
-
 import { ApiManager } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
+import { BN, BN_THOUSAND, BN_TWO, bnMin } from '@polkadot/util';
 
 import { A_DAY } from './useBlocksPerDays';
 

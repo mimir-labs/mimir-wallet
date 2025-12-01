@@ -1,20 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAccountMeta } from '@/accounts/useAccountMeta';
-import { useSelectedAccount } from '@/accounts/useSelectedAccount';
-import { analyticsActions } from '@/analytics';
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { useValidTransactionNetworks } from '@/hooks/useTransactions';
-import { getChainsWithSubscanSupport } from '@/utils/networkGrouping';
-import { getRouteApi, useNavigate } from '@tanstack/react-router';
-import { lazy, Suspense, useEffect, useMemo, useState, useTransition } from 'react';
-
 import { useChains } from '@mimir-wallet/polkadot-core';
-
-const routeApi = getRouteApi('/_authenticated/transactions/');
-
 import {
   Avatar,
   Button,
@@ -30,6 +17,18 @@ import {
   Tabs,
   Tooltip
 } from '@mimir-wallet/ui';
+import { getRouteApi, useNavigate } from '@tanstack/react-router';
+import { lazy, Suspense, useEffect, useMemo, useState, useTransition } from 'react';
+
+import { useAccountMeta } from '@/accounts/useAccountMeta';
+import { useSelectedAccount } from '@/accounts/useSelectedAccount';
+import { analyticsActions } from '@/analytics';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
+import { useValidTransactionNetworks } from '@/hooks/useTransactions';
+import { getChainsWithSubscanSupport } from '@/utils/networkGrouping';
+
+const routeApi = getRouteApi('/_authenticated/transactions/');
 
 // Lazy load transaction list components for better code splitting
 const HistoryTransactions = lazy(() => import('./HistoryTransactions'));

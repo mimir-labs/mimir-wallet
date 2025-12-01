@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
@@ -7,7 +7,7 @@ import type { IMethod, Registry } from '@polkadot/types/types';
 
 import { createKeyMulti } from '@polkadot/util-crypto';
 
-import { encodeAddress } from './defaults.js';
+import { encodeAddress } from '../utils/defaults.js';
 
 // LRU cache for parsed calls to avoid repeated parsing
 class CallCache {

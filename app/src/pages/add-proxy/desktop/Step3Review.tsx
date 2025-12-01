@@ -1,24 +1,25 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ProxyArgs, TransactionResult } from '../types';
 
-import PureIcon from '@/assets/images/pure-icon.svg';
-import { AddressCell, ProxyControls } from '@/components';
-import { toastError } from '@/components/utils';
-import { useSupportsProxy } from '@/hooks/useChainCapabilities';
-import { useCallback, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
-
 import { allEndpoints, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
+import { useCallback, useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import SafetyWarningModal from '../components/SafetyWarningModal';
 import { useDelayCalculation } from '../hooks/useDelayCalculation';
 import { useProxySafetyCheck } from '../hooks/useProxySafetyCheck';
 import { useProxyTransaction } from '../hooks/useProxyTransaction';
 import { DEFAULT_PURE_ACCOUNT_NAME, proxyTypeDescriptions } from '../utils';
+
 import ProxyAccountStructure from './ProxyAccountStructure';
+
+import PureIcon from '@/assets/images/pure-icon.svg';
+import { AddressCell, ProxyControls } from '@/components';
+import { toastError } from '@/components/utils';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface ProxyWizardData {
   proxied: string | undefined;

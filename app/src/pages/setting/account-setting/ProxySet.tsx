@@ -1,21 +1,5 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { useAccount } from '@/accounts/useAccount';
-import { useQueryAccount } from '@/accounts/useQueryAccount';
-import IconClock from '@/assets/svg/icon-clock.svg?react';
-import IconDelete from '@/assets/svg/icon-delete.svg?react';
-import { Address, AddressCell, Empty, FormatBalance, InputNetwork, TxButton } from '@/components';
-import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
-import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
-import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useProxies } from '@/hooks/useProxies';
-import { useTxQueue } from '@/hooks/useTxQueue';
-import { useXcmAsset } from '@/hooks/useXcmAssets';
-import { BN_ZERO } from '@polkadot/util';
-import { Link as RouterLink } from '@tanstack/react-router';
-import { memo, useMemo } from 'react';
-import { useToggle } from 'react-use';
 
 import { ApiManager, NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
 import {
@@ -34,6 +18,22 @@ import {
   Spinner,
   Tooltip
 } from '@mimir-wallet/ui';
+import { BN_ZERO } from '@polkadot/util';
+import { Link as RouterLink } from '@tanstack/react-router';
+import { memo, useMemo } from 'react';
+import { useToggle } from 'react-use';
+
+import { useAccount } from '@/accounts/useAccount';
+import { useQueryAccount } from '@/accounts/useQueryAccount';
+import IconClock from '@/assets/svg/icon-clock.svg?react';
+import IconDelete from '@/assets/svg/icon-delete.svg?react';
+import { Address, AddressCell, Empty, FormatBalance, InputNetwork, TxButton } from '@/components';
+import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
+import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { useProxies } from '@/hooks/useProxies';
+import { useTxQueue } from '@/hooks/useTxQueue';
+import { useXcmAsset } from '@/hooks/useXcmAssets';
 
 function Content({
   address,

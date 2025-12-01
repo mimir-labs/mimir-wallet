@@ -1,5 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { type FunctionCallHandler, toFunctionCallString } from '@mimir-wallet/ai-assistant';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
+import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
+import { useCallback, useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
+
+import TransferAction from './TransferAction';
+import TransferContent from './TransferContent';
 
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
@@ -8,18 +18,8 @@ import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
-import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
-import { useCallback, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
 
 const routeApi = getRouteApi('/_authenticated/explorer/$url');
-
-import { type FunctionCallHandler, toFunctionCallString } from '@mimir-wallet/ai-assistant';
-import { NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
-
-import TransferAction from './TransferAction';
-import TransferContent from './TransferContent';
 
 function PageTransfer() {
   const selected = useSelectedAccount();

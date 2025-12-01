@@ -1,7 +1,22 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BatchTxItem } from '@/hooks/types';
+
+import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Avatar, Button } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { useToggle } from 'react-use';
+
+import Actions from './Actions';
+import BatchItemDrag from './BatchItemDrag';
+import BatchMigrationAlert from './BatchMigrationAlert';
+import EmptyBatch from './EmptyBatch';
+import LazyRestore from './LazyRestore';
+import { calculateSelectionConstraints } from './utils';
 
 import { useAccount } from '@/accounts/useAccount';
 import { analyticsActions } from '@/analytics';
@@ -11,21 +26,6 @@ import { InputNetwork } from '@/components';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useRegistry } from '@/hooks/useRegistry';
-import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { Link } from '@tanstack/react-router';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button } from '@mimir-wallet/ui';
-
-import Actions from './Actions';
-import BatchItemDrag from './BatchItemDrag';
-import BatchMigrationAlert from './BatchMigrationAlert';
-import EmptyBatch from './EmptyBatch';
-import LazyRestore from './LazyRestore';
-import { calculateSelectionConstraints } from './utils';
 
 function Content({
   address,
@@ -250,17 +250,15 @@ function Batch({
         </div>
       ) : null}
 
-      {isRestore ? (
-        <NetworkProvider network={network}>
+      <NetworkProvider network={network}>
+        {isRestore ? (
           <LazyRestore onClose={toggleRestore} />
-        </NetworkProvider>
-      ) : txs.length === 0 ? (
-        <EmptyBatch onAdd={toggleOpen} onClose={onClose} onHandleRestore={toggleRestore} />
-      ) : (
-        <NetworkProvider network={network}>
+        ) : txs.length === 0 ? (
+          <EmptyBatch onAdd={toggleOpen} onClose={onClose} onHandleRestore={toggleRestore} />
+        ) : (
           <Content address={address} txs={txs} addTx={addTx} deleteTx={deleteTx} setTxs={setTxs} onClose={onClose} />
-        </NetworkProvider>
-      )}
+        )}
+      </NetworkProvider>
     </div>
   );
 }

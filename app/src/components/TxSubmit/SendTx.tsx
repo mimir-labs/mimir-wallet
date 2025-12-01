@@ -1,24 +1,25 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { BuildTx } from './hooks/useBuildTx';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { ExtrinsicPayloadValue, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
-import type { BuildTx } from './hooks/useBuildTx';
+
+import { ApiManager, sign, signAndSend, TxEvents, useNetwork } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Alert, AlertTitle, Button, buttonSpinner } from '@mimir-wallet/ui';
+import React, { useState } from 'react';
+
+import { toastError } from '../utils';
+
+import { useDryRunResult } from './hooks/useDryRunResult';
 
 import { analyticsActions } from '@/analytics';
 import { CONNECT_ORIGIN } from '@/constants';
 import { addTxToast } from '@/hooks/useTxQueue';
 import { useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
-import React, { useState } from 'react';
-
-import { ApiManager, sign, signAndSend, TxEvents, useNetwork } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Alert, AlertTitle, Button, buttonSpinner } from '@mimir-wallet/ui';
-
-import { toastError } from '../utils';
-import { useDryRunResult } from './hooks/useDryRunResult';
 
 function SendTx({
   disabled,

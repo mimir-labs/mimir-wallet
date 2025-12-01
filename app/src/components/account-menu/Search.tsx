@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconSearch from '@/assets/svg/icon-search.svg?react';
+import { Spinner } from '@mimir-wallet/ui';
 import React from 'react';
 
-import { Spinner } from '@mimir-wallet/ui';
-
 import Input from '../Input';
+
+import IconSearch from '@/assets/svg/icon-search.svg?react';
 
 function Search({
   onChange,

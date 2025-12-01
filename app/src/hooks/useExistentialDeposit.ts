@@ -1,11 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { BN, BN_ZERO } from '@polkadot/util';
-import { useMemo } from 'react';
 
 import { ApiManager, useChainStatus } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
+import { BN, BN_ZERO } from '@polkadot/util';
+import { useMemo } from 'react';
 
 export interface ExistentialDepositResult {
   existentialDeposit: BN;

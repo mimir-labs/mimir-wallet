@@ -1,19 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
+import React, { useImperativeHandle, useMemo, useState } from 'react';
+
+import { handleDecodeError } from '../shared/error-handling';
+import { ErrorDisplay } from '../shared/ErrorDisplay';
+
+import DotConsoleButton from './DotConsoleButton';
 
 import { Input, InputNetwork } from '@/components';
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useParseCall } from '@/hooks/useParseCall';
-import React, { useImperativeHandle, useMemo, useState } from 'react';
-
-import { NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
-
-import { handleDecodeError } from '../shared/error-handling';
-import { ErrorDisplay } from '../shared/ErrorDisplay';
-import DotConsoleButton from './DotConsoleButton';
 
 // CallDataView ref interface for external control
 export interface CallDataViewRef {

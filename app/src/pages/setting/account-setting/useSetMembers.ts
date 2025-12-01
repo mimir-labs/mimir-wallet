@@ -1,11 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type React from 'react';
 
+import { useCallback, useMemo, useState } from 'react';
+
 import { useAccount } from '@/accounts/useAccount';
 import { accountSource } from '@/wallet/useWallet';
-import { useCallback, useMemo, useState } from 'react';
 
 interface UseSetMembers {
   unselected: string[];

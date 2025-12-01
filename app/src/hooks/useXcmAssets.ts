@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
 
-import { findAsset } from '@/config/tokens';
+import { getChainIcon } from '@mimir-wallet/polkadot-core';
+import { type CompleteEnhancedAssetInfo, service, useQuery } from '@mimir-wallet/service';
 import { isEqual } from 'lodash-es';
 import { useMemo } from 'react';
 
-import { getChainIcon } from '@mimir-wallet/polkadot-core';
-import { type CompleteEnhancedAssetInfo, service, useQuery } from '@mimir-wallet/service';
+import { findAsset } from '@/config/tokens';
 
 export const queryXcmAssetKey = (chain: string, identifier: string) => ['query-xcm-asset', chain, identifier];
 

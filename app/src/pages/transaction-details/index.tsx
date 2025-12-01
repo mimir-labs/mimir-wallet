@@ -1,7 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
+
+import { NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Spinner } from '@mimir-wallet/ui';
+import { useParams } from '@tanstack/react-router';
+import { useMemo, useState } from 'react';
+
+import Summary from './Summary';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -10,13 +17,6 @@ import { useTransactionDetail } from '@/hooks/useTransactions';
 import { GroupedTransactions, TxProgress } from '@/transactions';
 import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
 import Extrinsic from '@/transactions/TxCell/Extrinsic';
-import { useParams } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
-
-import { NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Spinner } from '@mimir-wallet/ui';
-
-import Summary from './Summary';
 
 function SmPage({ transaction: propsTransaction }: { transaction: Transaction }) {
   const { network } = useNetwork();

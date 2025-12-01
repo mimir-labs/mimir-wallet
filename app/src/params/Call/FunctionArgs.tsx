@@ -1,14 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TypeDef } from '@polkadot/types/types';
 import type { CallProps } from './types';
+import type { TypeDef } from '@polkadot/types/types';
 
 import { getTypeDef } from '@polkadot/types';
 import React, { forwardRef, useMemo } from 'react';
 
 import Param from '../Param';
 import Item from '../Param/Item';
+
 import { mergeClasses } from './utils';
 
 const FunctionArgs = forwardRef<HTMLDivElement | null, CallProps>(({ registry, call, displayType, className }, ref) => {

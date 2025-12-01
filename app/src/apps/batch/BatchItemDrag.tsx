@@ -1,8 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BatchTxItem } from '@/hooks/types';
 import type { Registry } from '@polkadot/types/types';
+
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { parseCall } from '@mimir-wallet/polkadot-core';
+import { Button, Checkbox, Tooltip } from '@mimir-wallet/ui';
+import React, { useCallback, useMemo } from 'react';
+import { useToggle } from 'react-use';
 
 import Drag from '@/assets/images/drag.svg';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
@@ -10,13 +17,6 @@ import IconCopy from '@/assets/svg/icon-add-copy.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import { AppName } from '@/components';
 import { Call, CallDisplayDetail } from '@/params';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import React, { useCallback, useMemo } from 'react';
-import { useToggle } from 'react-use';
-
-import { parseCall } from '@mimir-wallet/polkadot-core';
-import { Button, Checkbox, Tooltip } from '@mimir-wallet/ui';
 
 export type Props = BatchTxItem & {
   from: string;

@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { allEndpoints, type Network, useChains, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
+import { useMemo } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { internalToUrlNetwork } from '@/utils/networkMapping';
-import { useMemo } from 'react';
-
-import { allEndpoints, type Network, useChains, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
 
 function SoloChainSelect() {
   const { current } = useAccount();
@@ -46,21 +46,19 @@ function SoloChainSelect() {
             radius='md'
             className='border-secondary bg-secondary h-[32px] font-bold sm:h-[42px] sm:bg-transparent'
           >
-            <div className='hidden sm:block'>
-              {isApiReady ? (
-                <img alt='' src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} />
-              ) : (
-                <Spinner size='sm' />
-              )}
-            </div>
-            <div className='hidden sm:block'>{!isApiReady ? 'Connecting...' : endpoint?.name}</div>
-            <div className='block sm:hidden'>
-              {!isApiReady ? (
-                'Connecting...'
-              ) : (
-                <img alt='' src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} />
-              )}
-            </div>
+            {isApiReady ? (
+              <>
+                <img alt='' src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} className='hidden sm:block' />
+                <span className='hidden sm:block'>{endpoint?.name}</span>
+                <img alt='' src={endpoint?.icon} style={{ borderRadius: 10 }} width={20} className='block sm:hidden' />
+              </>
+            ) : (
+              <>
+                <Spinner size='sm' className='hidden sm:block' />
+                <span className='hidden sm:block'>Connecting...</span>
+                <span className='block sm:hidden'>Connecting...</span>
+              </>
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent side='bottom' align='end' className='rounded-[20px] p-2.5'>

@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TransferToken } from './types';
 
-import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { BN, BN_ZERO } from '@polkadot/util';
 
-import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 
 export function useTransferBalance(
   token?: TransferToken,

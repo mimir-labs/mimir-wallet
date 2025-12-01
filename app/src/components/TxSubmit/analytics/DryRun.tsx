@@ -1,14 +1,8 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@mimir-wallet/service';
-
-import { FormatBalance } from '@/components';
-import CopyButton from '@/components/CopyButton';
-import { findToken } from '@/config';
-import { useXcmAsset } from '@/hooks/useXcmAssets';
-import React, { useCallback, useEffect, useState } from 'react';
+import type { IMethod } from '@polkadot/types/types';
 
 import {
   addressEq,
@@ -18,10 +12,15 @@ import {
   dryRunWithXcm,
   NetworkProvider,
   useChains,
-  useChainStatus,
   useNetwork
 } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import { FormatBalance } from '@/components';
+import CopyButton from '@/components/CopyButton';
+import { findToken } from '@/config';
+import { useXcmAsset } from '@/hooks/useXcmAssets';
 
 const EMPTY_SIMULATION = {
   isDone: false,
@@ -40,9 +39,6 @@ function OperationItemContent({
   amount: bigint;
   assetId: string;
 }) {
-  const { network } = useNetwork();
-  const { isApiReady } = useChainStatus(network);
-
   const getActionEmoji = () => {
     switch (type) {
       case 'Receive':
@@ -57,10 +53,6 @@ function OperationItemContent({
         return '';
     }
   };
-
-  if (!isApiReady) {
-    return <Spinner variant='wave' size='sm' />;
-  }
 
   return (
     <div className='bg-secondary flex items-center justify-between rounded-[5px] p-[5px] text-xs'>

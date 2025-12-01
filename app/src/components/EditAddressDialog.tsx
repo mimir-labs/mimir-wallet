@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import React from 'react';
-
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import React from 'react';
 
 import Input from './Input';
 import { toastSuccess } from './utils';
+
+import { useAddressMeta } from '@/accounts/useAddressMeta';
 
 function Content({ address, onClose }: { address: string; onClose?: () => void }) {
   const { name, saveName, setName } = useAddressMeta(address);

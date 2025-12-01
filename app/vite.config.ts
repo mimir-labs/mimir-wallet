@@ -1,10 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { readFileSync } from 'node:fs';
+import path, { join } from 'node:path';
 
 import tanstackRouter from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
-import { readFileSync } from 'node:fs';
-import path, { join } from 'node:path';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';

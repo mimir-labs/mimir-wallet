@@ -1,10 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 'use client';
 
-import { events } from '@/events';
 import { create } from 'zustand';
+
+import { events } from '@/events';
 
 type RightSidebarTab = 'batch' | 'template' | 'decoder';
 

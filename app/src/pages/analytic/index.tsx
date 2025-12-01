@@ -1,20 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// Copyright 2023-2024 dev.mimir authors & contributors
-// SPDX-License-Identifier: Apache-2.0
 import type { ChartData } from 'chart.js';
-
-import { useAccount } from '@/accounts/useAccount';
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import IconSafe from '@/assets/svg/icon-safe.svg?react';
-import { AddressRow, Empty, FormatBalance } from '@/components';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useMultiChainStats, useQueryStats } from '@/hooks/useQueryStats';
-import { Link } from '@tanstack/react-router';
-import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
-import { Bar, Doughnut } from 'react-chartjs-2';
 
 import { NetworkProvider, useChains } from '@mimir-wallet/polkadot-core';
 import {
@@ -33,6 +20,17 @@ import {
   TableHeader,
   TableRow
 } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import dayjs from 'dayjs';
+import { useMemo, useState } from 'react';
+import { Bar, Doughnut } from 'react-chartjs-2';
+
+import { useAccount } from '@/accounts/useAccount';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import IconSafe from '@/assets/svg/icon-safe.svg?react';
+import { AddressRow, Empty, FormatBalance } from '@/components';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useMultiChainStats, useQueryStats } from '@/hooks/useQueryStats';
 
 const options = {
   maintainAspectRatio: false,

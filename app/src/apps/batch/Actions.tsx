@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BatchTxItem } from '@/hooks/types';
 import type { Registry } from '@polkadot/types/types';
 
-import { analyticsActions } from '@/analytics';
-import { TxButton } from '@/components';
-import React, { useMemo } from 'react';
-
 import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
 
 import { filterOutBatchAllTransactions } from './utils';
+
+import { analyticsActions } from '@/analytics';
+import { TxButton } from '@/components';
 
 function Actions({
   address,

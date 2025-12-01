@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
+import { Button, Tooltip } from '@mimir-wallet/ui';
+import { blake2AsHex } from '@polkadot/util-crypto';
+import React, { useMemo } from 'react';
+import { useToggle } from 'react-use';
+
+import RecoverTx from './RecoverTx';
 
 import IconSuccess from '@/assets/svg/icon-success-outlined.svg?react';
 import { toastError } from '@/components/utils';
 import { type AccountData, type FilterPath, type Transaction, TransactionType } from '@/hooks/types';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { blake2AsHex } from '@polkadot/util-crypto';
-import React, { useMemo } from 'react';
-import { useToggle } from 'react-use';
-
-import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
-import { Button, Tooltip } from '@mimir-wallet/ui';
-
-import RecoverTx from './RecoverTx';
 
 async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, string, string, string] }) {
   const [, network, address, callHash] = queryKey;

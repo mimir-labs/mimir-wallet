@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { InputNetwork } from '@/components';
-import { isValidWsUrl } from '@/utils';
-import { WsProvider } from '@polkadot/api';
-import { useState } from 'react';
-import { useAsyncFn } from 'react-use';
 
 import { type Endpoint, NETWORK_RPC_PREFIX, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 import { Alert, AlertTitle, Button, buttonSpinner, Combobox, type ComboboxOption, Divider } from '@mimir-wallet/ui';
+import { WsProvider } from '@polkadot/api';
+import { useState } from 'react';
+import { useAsyncFn } from 'react-use';
+
+import { InputNetwork } from '@/components';
+import { isValidWsUrl } from '@/utils';
 
 function Content({ chain }: { chain: Endpoint }) {
   const [url, setUrl] = useState(

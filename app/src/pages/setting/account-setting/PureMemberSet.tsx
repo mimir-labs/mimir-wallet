@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { PureAccountData } from '@/hooks/types';
 
-import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { usePendingTransactions } from '@/hooks/useTransactions';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
 import { memo, useCallback, useMemo } from 'react';
 
-import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
-
 import MemberSet from './MemberSet';
+
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
+import { usePendingTransactions } from '@/hooks/useTransactions';
 
 function PureMemberSet({ account }: { account: PureAccountData }) {
   const { network } = useNetwork();

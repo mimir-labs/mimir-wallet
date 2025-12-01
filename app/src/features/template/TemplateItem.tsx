@@ -1,20 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import { useMemo, useState } from 'react';
+
+import { decodeCallSection } from './utils';
 
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import IconEdit from '@/assets/svg/icon-edit.svg?react';
 import { CopyButton } from '@/components';
 import { DotConsoleApp } from '@/config';
 import { useRegistry } from '@/hooks/useRegistry';
-import { Link } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
-
-import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip } from '@mimir-wallet/ui';
-
-import { decodeCallSection } from './utils';
 
 function DotConsoleButton({ network, call }: { network: string; call: string }) {
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);

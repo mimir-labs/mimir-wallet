@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import { AccessCredentials, initializePlutonicationDAppClientWithModal } from '@plutonication/plutonication';
+import React, { useMemo } from 'react';
+
+import { toastError } from './utils';
+import WalletIcon from './WalletIcon';
 
 import { analyticsActions } from '@/analytics';
 import { walletConfig } from '@/config';
 import { connectWallet, disconnectWallet } from '@/wallet/connect';
 import { useWallet } from '@/wallet/useWallet';
-import { AccessCredentials, initializePlutonicationDAppClientWithModal } from '@plutonication/plutonication';
-import React, { useMemo } from 'react';
-
-import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
-
-import { toastError } from './utils';
-import WalletIcon from './WalletIcon';
 
 function WalletCell({
   downloadUrl,

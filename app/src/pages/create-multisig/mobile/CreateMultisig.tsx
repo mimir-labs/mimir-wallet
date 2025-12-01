@@ -1,22 +1,23 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { PrepareFlexible } from '../types';
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
-import { Input, InputNetwork } from '@/components';
+import { Button, Divider, Switch } from '@mimir-wallet/ui';
 import { encodeMultiAddress } from '@polkadot/util-crypto';
 import { useCallback, useMemo, useState } from 'react';
 
-import { Button, Divider, Switch } from '@mimir-wallet/ui';
-
 import Prepare from '../components/Prepare';
 import Tips from '../components/Tips';
+
 import AccountSelect from './AccountSelect';
 import CreateFlexible from './CreateFlexible';
 import CreateStatic from './CreateStatic';
 import { useSelectMultisig } from './useSelectMultisig';
+
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
+import { Input, InputNetwork } from '@/components';
 
 function checkError(
   signatories: string[],

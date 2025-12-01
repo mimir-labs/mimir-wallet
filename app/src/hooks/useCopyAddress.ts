@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { encodeAddress, isPolkadotEvmAddress, sub2Eth, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { create } from 'zustand';
+
+import { useCopyClipboard } from './useCopyClipboard';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { toastSuccess } from '@/components/utils';
-import { create } from 'zustand';
-
-import { encodeAddress, isPolkadotEvmAddress, sub2Eth, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
-
-import { useCopyClipboard } from './useCopyClipboard';
 
 export const useCopyAddress = create<{
   isOpen: boolean;

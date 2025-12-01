@@ -1,9 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { BN } from '@polkadot/util';
+
+import { encodeAddress, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { Button, Spinner, Tooltip } from '@mimir-wallet/ui';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { useToggle } from 'react-use';
+
+import AddressName from './AddressName';
+import FormatBalance from './FormatBalance';
+import Fund from './Fund';
 
 import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
 import IconLock from '@/assets/svg/icon-lock.svg?react';
@@ -13,15 +22,6 @@ import IconUnLock from '@/assets/svg/icon-unlock.svg?react';
 import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { useExistentialDeposit } from '@/hooks/useExistentialDeposit';
 import { formatUnits } from '@/utils';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { useToggle } from 'react-use';
-
-import { encodeAddress, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
-import { Button, Spinner, Tooltip } from '@mimir-wallet/ui';
-
-import AddressName from './AddressName';
-import FormatBalance from './FormatBalance';
-import Fund from './Fund';
 
 interface Props {
   isUnLock?: boolean;
@@ -81,7 +81,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
         </div>
         <div className='flex items-center gap-[5px] sm:gap-2.5'>
           {!isUnLock && isEnought === false && (
-            <Button color='primary' variant='bordered' onClick={toggleOpen} size='sm' className='h-[20px]'>
+            <Button color='primary' variant='bordered' onClick={toggleOpen} size='sm' className='h-5'>
               Fund
             </Button>
           )}
@@ -107,5 +107,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 export const LockContainer = React.memo(({ children }: { children: React.ReactNode }) => {
   return <div className='bg-secondary space-y-2.5 rounded-[10px] p-2.5'>{children}</div>;
 });
+
+LockContainer.displayName = 'LockContainer';
 
 export default React.memo(LockItem);

@@ -1,19 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { MultisigAccountData, PureAccountData } from '@/hooks/types';
 
-import { Input, TxButton } from '@/components';
+import { allEndpoints, ApiManager, remoteProxyRelations, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Alert, AlertDescription, AlertTitle, Avatar } from '@mimir-wallet/ui';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import { memo, useCallback, useMemo, useState } from 'react';
 
-import { allEndpoints, ApiManager, remoteProxyRelations, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Alert, AlertDescription, AlertTitle, Avatar } from '@mimir-wallet/ui';
-
 import AccountSelect from '../../create-multisig/mobile/AccountSelect';
+
 import { useSetMembers } from './useSetMembers';
+
+import { Input, TxButton } from '@/components';
 
 function checkError(
   signatories: string[],
@@ -75,7 +76,7 @@ function MemberSet({
   return (
     <div className='space-y-5'>
       {!pureAccount && (
-        <div className='text-warning font-bold'>Multisig account can's change threshold and members</div>
+        <div className='text-warning font-bold'>{`Multisig account can's change threshold and members`}</div>
       )}
       <div
         className='space-y-5'
@@ -136,7 +137,12 @@ function MemberSet({
                     src={remoteProxyChain.icon}
                   />{' '}
                   {remoteProxyChain.name} due to{' '}
-                  <a className='underline' target='_blank' href='https://blog.kchr.de/ecosystem-proxy/'>
+                  <a
+                    className='underline'
+                    target='_blank'
+                    href='https://blog.kchr.de/ecosystem-proxy/'
+                    rel='noreferrer'
+                  >
                     Remote Proxy
                   </a>
                 </li>

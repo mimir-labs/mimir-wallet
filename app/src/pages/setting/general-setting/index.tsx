@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAccount } from '@/accounts/useAccount';
-import { getRouteApi, useNavigate } from '@tanstack/react-router';
-
 import { Tab, Tabs } from '@mimir-wallet/ui';
+import { getRouteApi, useNavigate } from '@tanstack/react-router';
 
 import AccountDisplay from './account-display';
 import NetworkSetting from './network';
 import NotificationSetting from './notification-setting';
+
+import { useAccount } from '@/accounts/useAccount';
 
 const routeApi = getRouteApi('/_authenticated/setting');
 

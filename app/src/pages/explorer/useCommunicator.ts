@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { State } from '@/communicator/types';
 import type { SignerPayloadJSON } from '@polkadot/types/types';
+
+import { encodeAddress, remoteProxyRelations, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { type MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { IframeCommunicator } from '@/communicator';
 import { useTxQueue } from '@/hooks/useTxQueue';
-import { type MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
-
-import { encodeAddress, remoteProxyRelations, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
 
 export function useCommunicator(
   iframeRef: MutableRefObject<HTMLIFrameElement | null>,

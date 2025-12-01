@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HexString } from '@polkadot/util/types';
 import type { AccountData } from './types';
-
-import { HIDE_ACCOUNT_HEX_KEY } from '@/constants';
-import { create } from 'zustand';
+import type { HexString } from '@polkadot/util/types';
 
 import { store } from '@mimir-wallet/service';
+import { create } from 'zustand';
+
+import { HIDE_ACCOUNT_HEX_KEY } from '@/constants';
 
 export interface AddressState {
   accounts: AccountData[];

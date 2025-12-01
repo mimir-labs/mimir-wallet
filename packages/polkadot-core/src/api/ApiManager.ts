@@ -1,21 +1,21 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ApiConnection, ApiManagerListener, ChainStatus, Endpoint } from '../types/types.js';
 import type { HexString } from '@polkadot/util/types';
-import type { ApiConnection, ApiManagerListener, ChainStatus, Endpoint } from '../types.js';
 
+import { store } from '@mimir-wallet/service';
 import { ApiPromise } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { isHex } from '@polkadot/util';
 
-import { store } from '@mimir-wallet/service';
+import { allEndpoints } from '../chains/config.js';
+import { typesBundle } from '../types/api-types/index.js';
+import { DEFAULT_AUX, NETWORK_RPC_PREFIX } from '../utils/defaults.js';
+import { getMetadata, saveMetadata } from '../utils/metadata.js';
+import { StoredRegistry } from '../utils/registry.js';
 
-import { typesBundle } from '../api-types/index.js';
-import { ApiProvider } from '../ApiProvider.js';
-import { allEndpoints } from '../config.js';
-import { DEFAULT_AUX, NETWORK_RPC_PREFIX } from '../defaults.js';
-import { getMetadata, saveMetadata } from '../metadata.js';
-import { StoredRegistry } from '../registry.js';
+import { ApiProvider } from './ApiProvider.js';
 
 /**
  * Singleton class for managing all blockchain API connections
@@ -301,21 +301,6 @@ export class ApiManager {
   }
 
   /**
-   * Get API instance synchronously (only if already ready)
-   * Returns null if API is not ready
-   * Use this when you need immediate access and can handle null
-   */
-  getApiSync(networkOrGenesisHash: string): ApiPromise | null {
-    const connection = this._resolveConnection(networkOrGenesisHash);
-
-    if (connection?.api && connection.status.isApiReady) {
-      return connection.api;
-    }
-
-    return null;
-  }
-
-  /**
    * Get chain status by network key or genesis hash
    */
   getStatus(networkOrGenesisHash: string): ChainStatus {
@@ -401,18 +386,5 @@ export class ApiManager {
     const identityNetwork = ApiManager.getIdentityNetwork(network);
 
     return this.getApi(identityNetwork);
-  }
-
-  /**
-   * Get API instance for identity queries synchronously (only if already ready)
-   * Returns null if API is not ready
-   *
-   * @param network - Network key to get identity API for
-   * @returns ApiPromise for identity queries, or null if not ready
-   */
-  getIdentityApiSync(network: string): ApiPromise | null {
-    const identityNetwork = ApiManager.getIdentityNetwork(network);
-
-    return this.getApiSync(identityNetwork);
   }
 }

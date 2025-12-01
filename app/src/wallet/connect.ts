@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { walletConfig } from '@/config';
-import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@/constants';
 
 import { addressEq } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
 import { useWallet } from './useWallet';
 import { loadWallet } from './utils';
+
+import { walletConfig } from '@/config';
+import { CONNECT_ORIGIN, CONNECTED_WALLETS_KEY } from '@/constants';
 
 /**
  * Connect to a specific wallet by name

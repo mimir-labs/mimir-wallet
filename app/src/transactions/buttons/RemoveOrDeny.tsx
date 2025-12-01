@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
+
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Tooltip } from '@mimir-wallet/ui';
+import React from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconFailed from '@/assets/svg/icon-failed-outlined.svg?react';
 import { TxButton } from '@/components';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
-import React from 'react';
-
-import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Tooltip } from '@mimir-wallet/ui';
 
 function RemoveOrDeny({ isIcon = false, transaction }: { isIcon?: boolean; transaction: Transaction }) {
   const { network } = useNetwork();

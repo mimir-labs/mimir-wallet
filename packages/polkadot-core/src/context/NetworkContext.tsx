@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 /* eslint-disable react-refresh/only-export-components */
 
+import type { Endpoint } from '../types/types.js';
 import type { ReactNode } from 'react';
-import type { Endpoint } from './types.js';
 
 import { createContext, useContext, useMemo } from 'react';
 
-import { useChain } from './api/index.js';
+import { useChain } from '../api/index.js';
 
 const DEFAULT_NETWORK = 'polkadot';
 

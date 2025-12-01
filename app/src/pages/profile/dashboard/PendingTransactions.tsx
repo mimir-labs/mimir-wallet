@@ -1,5 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
+import { useNavigate } from '@tanstack/react-router';
+import React, { useMemo } from 'react';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
@@ -23,11 +28,6 @@ import {
   RemoveOrDenyButton
 } from '@/transactions';
 import { useAnnouncementStatus } from '@/transactions/hooks/useAnnouncementStatus';
-import { useNavigate } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
-
-import { NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
 
 function CallDetail({ value }: { value?: string | null }) {
   const { network } = useNetwork();
@@ -118,10 +118,10 @@ function PendingTransactions({ address }: { address: string }) {
   if (showSkeleton) {
     return (
       <div className='bg-content1 shadow-medium flex h-[260px] flex-col gap-5 rounded-[20px] p-5'>
-        <Skeleton className='h-[40px] w-full rounded-lg' />
-        <Skeleton className='h-[40px] w-full rounded-lg' />
-        <Skeleton className='h-[40px] w-full rounded-lg' />
-        <Skeleton className='h-[40px] w-full rounded-lg' />
+        <Skeleton className='h-[45px] w-full rounded-lg' />
+        <Skeleton className='h-[45px] w-full rounded-lg' />
+        <Skeleton className='h-[45px] w-full rounded-lg' />
+        <Skeleton className='h-[45px] w-full rounded-lg' />
       </div>
     );
   }

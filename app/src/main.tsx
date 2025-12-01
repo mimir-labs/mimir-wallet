@@ -1,10 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import '@xyflow/react/dist/style.css';
 import './style.css';
 import '@mimir-wallet/polkadot-core/augment';
 
+import { getNetworkMode, NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { API_CLIENT_GATEWAY, initService, QueryProvider } from '@mimir-wallet/service';
 import { RouterProvider } from '@tanstack/react-router';
 import {
   ArcElement,
@@ -23,15 +25,12 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 
-import { getNetworkMode, NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { API_CLIENT_GATEWAY, initService, QueryProvider } from '@mimir-wallet/service';
-
 import { initializeAccount } from './accounts/initialize';
-import { initializeWallet } from './wallet/initialize';
 import { initAnalytics } from './analytics';
 import { initFavoriteDapps, initMimir } from './initMimir';
 import { router } from './router';
 import { upgradeAddresBook } from './upgrade';
+import { initializeWallet } from './wallet/initialize';
 
 // Set default date-time format for the entire application
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';

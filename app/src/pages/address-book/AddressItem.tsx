@@ -1,5 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import React from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
@@ -13,10 +17,6 @@ import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { useToggle } from '@/hooks/useToggle';
-import { Link } from '@tanstack/react-router';
-import React from 'react';
-
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
 
 function Icons({ address }: { address: string }) {
   const [deleteOpen, toggleDeleteOpen] = useToggle();

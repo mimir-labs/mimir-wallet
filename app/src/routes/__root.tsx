@@ -1,24 +1,24 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConnectWalletModal, ToastRoot, TxToast } from '@/components';
-import { DraggableChatWithFAB } from '@/components/DraggableChat';
-import { WalletConnectProvider } from '@/features/wallet-connect';
-import WalletConsumer from '@/wallet/Consumer';
-import { useWallet } from '@/wallet/useWallet';
+import { TransactionSocketProvider } from '@mimir-wallet/service';
+import { HeroUIProvider } from '@mimir-wallet/ui';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRoute, Outlet, retainSearchParams, useRouter } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { zodValidator } from '@tanstack/zod-adapter';
 import { z } from 'zod';
 
-import { TransactionSocketProvider } from '@mimir-wallet/service';
-import { HeroUIProvider } from '@mimir-wallet/ui';
-
 import AccountConsumer from '../accounts/Consumer';
 import AddAddressBook from '../containers/AddAddressBook';
 import OmniChainUpgradeTip from '../containers/OmniChainUpgradeTip';
 import SubscribeNotification from '../containers/SubscribeNotification';
+
+import { ConnectWalletModal, ToastRoot, TxToast } from '@/components';
+import { DraggableChatWithFAB } from '@/components/DraggableChat';
+import { WalletConnectProvider } from '@/features/wallet-connect';
+import WalletConsumer from '@/wallet/Consumer';
+import { useWallet } from '@/wallet/useWallet';
 
 const searchSchema = z.looseObject({
   address: z.string().optional(),

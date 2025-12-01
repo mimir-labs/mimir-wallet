@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { HIDE_ACCOUNT_HEX_KEY } from '@/constants';
-import { useAddressStore } from '@/hooks/useAddressStore';
-import { useWallet } from '@/wallet/useWallet';
+import { addressEq, addressToHex, decodeAddress } from '@mimir-wallet/polkadot-core';
+import { store } from '@mimir-wallet/service';
 import { u8aToHex } from '@polkadot/util';
 import { isEqual } from 'lodash-es';
 
-import { addressEq, addressToHex, decodeAddress } from '@mimir-wallet/polkadot-core';
-import { store } from '@mimir-wallet/service';
-
 import { sync } from './sync';
+
+import { HIDE_ACCOUNT_HEX_KEY } from '@/constants';
+import { useAddressStore } from '@/hooks/useAddressStore';
+import { useWallet } from '@/wallet/useWallet';
 
 // Overload signatures
 export async function resync(isOmni: true, chainSS58: number): Promise<void>;

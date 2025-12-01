@@ -1,18 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button, Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@mimir-wallet/ui';
+import { Link, useLocation } from '@tanstack/react-router';
+import { memo, useCallback, useMemo } from 'react';
+import { useToggle } from 'react-use';
+
+import { LAYOUT } from '../constants';
+
+import { AccountInfo, NavigationMenu, WalletSelector } from './components';
 
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { AccountMenu } from '@/components';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useWallet } from '@/wallet/useWallet';
-import { Link, useLocation } from '@tanstack/react-router';
-import { memo, useCallback, useMemo } from 'react';
-import { useToggle } from 'react-use';
-
-import { Button, Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@mimir-wallet/ui';
-
-import { LAYOUT } from '../constants';
-import { AccountInfo, NavigationMenu, WalletSelector } from './components';
 
 /**
  * Main application sidebar component

@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Avatar, Badge, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
+import { useContext, useEffect, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import { analyticsActions } from '@/analytics';
 import IconWalletConnect from '@/assets/svg/icon-wallet-connect.svg?react';
 import { events } from '@/events';
 import { WalletConnectContext, WalletConnectModal } from '@/features/wallet-connect';
-import { useContext, useEffect, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { Avatar, Badge, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
 
 function BadgeContent({ size, icon }: { size: number; icon?: string }) {
   const [showFallback, setShowFallback] = useState(false);

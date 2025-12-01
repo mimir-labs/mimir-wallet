@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 'use client';
@@ -8,6 +8,7 @@ import { SearchIcon } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '../lib/utils.js';
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './dialog.js';
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {

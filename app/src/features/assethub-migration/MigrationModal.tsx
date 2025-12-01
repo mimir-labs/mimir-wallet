@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { addressToHex, useChains } from '@mimir-wallet/polkadot-core';
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { useMemo } from 'react';
+
+import IdentityIcon from '../../components/IdentityIcon';
 
 import { useAccount } from '@/accounts/useAccount';
 import { Address, AddressName } from '@/components';
 import { MIGRATION_DOCS_URL } from '@/constants';
 import { useCopyAddress } from '@/hooks/useCopyAddress';
-import { useMemo } from 'react';
-
-import { addressToHex, useChains } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
-
-import IdentityIcon from '../../components/IdentityIcon';
 
 interface MigratedAccount {
   address: string;
@@ -97,7 +97,7 @@ function MigrationModal({ isOpen, onClose, destChain, accounts = [] }: Props) {
         <ModalBody className='py-0'>
           <div className='flex flex-col gap-4'>
             <p className='text-small'>
-              Due to the Asset Hub Migration, the following accounts's asset migrated to Asset Hub. Please use them on{' '}
+              {`Due to the Asset Hub Migration, the following accounts's asset migrated to Asset Hub. Please use them on`}{' '}
               {destNetwork?.name} instead.
             </p>
 
@@ -114,8 +114,8 @@ function MigrationModal({ isOpen, onClose, destChain, accounts = [] }: Props) {
             </div>
 
             <Divider />
-            <a className='text-inherit underline' target='_blank' href={MIGRATION_DOCS_URL}>
-              What's Assethub Migration?
+            <a className='text-inherit underline' target='_blank' href={MIGRATION_DOCS_URL} rel='noreferrer'>
+              {`What's Assethub Migration?`}
             </a>
           </div>
         </ModalBody>

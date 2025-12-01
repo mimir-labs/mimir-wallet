@@ -1,23 +1,23 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import { useAccount } from '@/accounts/useAccount';
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
-import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
-import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
-import React, { useMemo } from 'react';
-
 import { addressEq, encodeAddress, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
 import { Button, Chip } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
 import AddressNetworks from './AddressNetworks';
 import CopyAddress from './CopyAddress';
 import IdentityIcon from './IdentityIcon';
+
+import { useAccount } from '@/accounts/useAccount';
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
+import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 
 interface Props {
   defaultName?: string;
@@ -83,7 +83,7 @@ function AddressCell({
   return (
     <div className={`AddressCell flex min-w-0 flex-1 items-center gap-2.5 ${className}`} style={style}>
       <IdentityIcon className='AddressCell-Icon' size={iconSize} value={address} withBorder={withIconBorder} />
-      <div className='AddressCell-Content flex min-w-0 flex-1 flex-col gap-y-[2px]'>
+      <div className='AddressCell-Content flex min-w-0 flex-1 flex-col gap-y-0.5'>
         <div className='flex min-w-0 items-center gap-1 overflow-hidden'>
           <span
             className='AddressCell-Name min-w-0 overflow-hidden text-left font-bold text-ellipsis whitespace-nowrap'
@@ -113,7 +113,7 @@ function AddressCell({
           )}
         </div>
 
-        <div className='AddressCell-Address text-foreground/50 flex h-[16px] min-w-0 items-center text-xs'>
+        <div className='AddressCell-Address text-foreground/50 flex h-4 min-w-0 items-center text-xs'>
           {showNetworkProxied && (
             <div className='mr-1 flex items-center gap-1'>
               <AddressNetworks address={address} avatarSize={12} meta={meta} />
@@ -122,7 +122,7 @@ function AddressCell({
           <span onClick={addressCopyDisabled ? undefined : () => copyAddress} className='min-w-0 truncate'>
             <AddressComp shorten={shorten} value={address} />
           </span>
-          {withCopy && <CopyAddress size='sm' address={address} className='flex-shrink-0 opacity-50' />}
+          {withCopy && <CopyAddress size='sm' address={address} className='shrink-0 opacity-50' />}
           {withAddressBook &&
             address &&
             !isLocalAccount(address) &&
@@ -135,12 +135,12 @@ function AddressCell({
                 }}
                 variant='light'
                 size='sm'
-                className='text-foreground/50 h-[18px] w-[18px] flex-shrink-0 opacity-50'
+                className='text-foreground/50 h-[18px] w-[18px] shrink-0 opacity-50'
               >
                 <IconAddressBook className='h-3 w-3' />
               </Button>
             )}
-          {icons && <div className='flex-shrink-0'>{icons}</div>}
+          {icons && <div className='shrink-0'>{icons}</div>}
         </div>
       </div>
     </div>

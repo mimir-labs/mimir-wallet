@@ -1,19 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DryRunResult } from './types.js';
+import type { SupportXcmChainConfig } from '../xcm/types.js';
 import type { Vec } from '@polkadot/types';
 import type { XcmVersionedLocation, XcmVersionedXcm } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
-import type { SupportXcmChainConfig } from '../xcm/types.js';
-import type { DryRunResult } from './types.js';
 
 import { ApiPromise } from '@polkadot/api';
 import { assertReturn } from '@polkadot/util';
 
 import { ApiManager } from '../api/ApiManager.js';
-import { allEndpoints } from '../config.js';
-import { assetXcmV5TraitsError } from '../dispatch-error.js';
+import { allEndpoints } from '../chains/config.js';
+import { assetXcmV5TraitsError } from '../tx/dispatch-error.js';
 import { findDestChain } from '../xcm/parseLocation.js';
+
 import { parseBalancesChange } from './parse-balances-change.js';
 
 /**

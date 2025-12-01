@@ -1,7 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IMethod } from '@polkadot/types/types';
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, cn, Divider, Tooltip } from '@mimir-wallet/ui';
+import React, { useMemo, useRef } from 'react';
 
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import IconTemplate from '@/assets/svg/icon-template.svg?react';
@@ -9,10 +13,6 @@ import { events } from '@/events';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useFindTargetCallFromMethod } from '@/hooks/useFindTargetCall';
 import { Call as CallComp, FunctionArgs } from '@/params';
-import React, { useMemo, useRef } from 'react';
-
-import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, cn, Divider, Tooltip } from '@mimir-wallet/ui';
 
 function CallInfo({ isMobile = false, address, call }: { isMobile?: boolean; address: string; call: IMethod }) {
   const { network } = useNetwork();

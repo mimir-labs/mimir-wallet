@@ -1,12 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DappOption } from '@/config';
 
+import { useChains } from '@mimir-wallet/polkadot-core';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useMemo } from 'react';
-
-import { useChains } from '@mimir-wallet/polkadot-core';
 
 import { useMimirLayout } from './useMimirLayout';
 

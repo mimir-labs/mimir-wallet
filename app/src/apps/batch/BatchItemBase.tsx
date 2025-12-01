@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { Call, CallDisplayDetail } from '@/params';
-import React, { useMemo } from 'react';
-
 import { parseCall } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
+
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import { Call, CallDisplayDetail } from '@/params';
 
 interface BatchItemBaseProps {
   children: React.ReactNode;

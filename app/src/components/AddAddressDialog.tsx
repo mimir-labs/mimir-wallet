@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { useAccount } from '@/accounts/useAccount';
-import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { addressEq, decodeAddress, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Input from './Input';
+
+import { useAccount } from '@/accounts/useAccount';
+import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
 
 function Content({
   defaultAddress,

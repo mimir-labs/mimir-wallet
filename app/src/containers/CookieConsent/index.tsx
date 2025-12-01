@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { CookieConsentConfig, CookieConsentState, CookiePreference } from './types';
 
-import { COOKIE_CONSENT_STORAGE_KEY } from '@/constants';
-import React, { useCallback, useState } from 'react';
-
 import { useLocalStore } from '@mimir-wallet/service';
 import { Button, cn } from '@mimir-wallet/ui';
+import React, { useCallback, useState } from 'react';
 
 import { PreferencePopover } from './PreferencePopover';
+
+import { COOKIE_CONSENT_STORAGE_KEY } from '@/constants';
 
 interface CookieConsentProps extends CookieConsentConfig {
   /**

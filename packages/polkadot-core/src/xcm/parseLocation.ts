@@ -1,6 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Junctions, LocationInfo, SupportXcmChainConfig, XcmChainConfig } from './types.js';
 import type {
   StagingXcmV4Junctions,
   StagingXcmV5Junctions,
@@ -8,9 +9,8 @@ import type {
   XcmVersionedLocation
 } from '@polkadot/types/lookup';
 import type { HexString } from '@polkadot/util/types';
-import type { Junctions, LocationInfo, SupportXcmChainConfig, XcmChainConfig } from './types.js';
 
-import { allEndpoints } from '../config.js';
+import { allEndpoints } from '../chains/config.js';
 
 const PARENT_CHAIN_JUMP_LIMIT = 1;
 const SUPPORTED_XCM_VERSIONS = ['V3', 'V4', 'V5'] as const;

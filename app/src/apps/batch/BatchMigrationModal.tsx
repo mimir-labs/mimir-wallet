@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BatchTxItem } from '@/hooks/types';
+import type { Network } from '@mimir-wallet/polkadot-core';
 import type { ApiPromise } from '@polkadot/api';
 import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
-import type { Network } from '@mimir-wallet/polkadot-core';
-
-import { CopyButton } from '@/components';
-import { useBatchTxs } from '@/hooks/useBatchTxs';
-import { useEffect, useMemo, useState } from 'react';
 
 import { ApiManager, createBlockRegistry, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
+import { useEffect, useMemo, useState } from 'react';
+
+import { CopyButton } from '@/components';
+import { useBatchTxs } from '@/hooks/useBatchTxs';
 
 interface BatchMigrationModalProps {
   isOpen: boolean;
@@ -190,7 +190,7 @@ export function BatchMigrationModal({
   onMigrate,
   address
 }: BatchMigrationModalProps) {
-  const { chains, enableNetwork } = useChains();
+  const { chains } = useChains();
   const sourceStatus = useChainStatus(sourceChain);
   const destStatus = useChainStatus(destChain);
   const [registry, setRegistry] = useState<Registry | null>(null);
@@ -201,13 +201,6 @@ export function BatchMigrationModal({
 
   const sourceNetwork = chains.find((network) => network.key === sourceChain);
   const destNetwork = chains.find((network) => network.key === destChain);
-
-  useEffect(() => {
-    if (isOpen) {
-      enableNetwork(sourceChain);
-      enableNetwork(destChain);
-    }
-  }, [enableNetwork, sourceChain, destChain, isOpen]);
 
   // Get dest API async
   useEffect(() => {

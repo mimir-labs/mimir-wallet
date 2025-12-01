@@ -1,15 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 'use client';
 
 import type { ComponentProps } from 'react';
 
+import { Button, cn } from '@mimir-wallet/ui';
 import { ArrowDownIcon } from 'lucide-react';
 import { createContext, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom';
-
-import { Button, cn } from '@mimir-wallet/ui';
 
 export interface ConversationRef {
   scrollToBottom: () => void;

@@ -1,11 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
-import React, { forwardRef, useMemo } from 'react';
-
 import { encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
+import React, { forwardRef, useMemo } from 'react';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';

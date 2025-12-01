@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 /**
@@ -30,11 +30,11 @@
 
 import type { AddressMeta } from '@/hooks/types';
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { memo, useMemo } from 'react';
-
 import { useChains } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
+import { memo, useMemo } from 'react';
+
+import { useAddressMeta } from '@/accounts/useAddressMeta';
 
 interface AddressNetworksProps {
   /**

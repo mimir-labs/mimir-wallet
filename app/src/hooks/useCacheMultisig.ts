@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { CacheMultisig } from './types';
 
-import { useWallet } from '@/wallet/useWallet';
-import { isEqual } from 'lodash-es';
-
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
+import { isEqual } from 'lodash-es';
+
+import { useWallet } from '@/wallet/useWallet';
 
 /**
  * Hook to get cached multisig data for a specific network

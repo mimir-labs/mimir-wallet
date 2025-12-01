@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 /**
@@ -15,10 +15,11 @@
  * - supportsProxy (checks if api.tx.proxy pallet exists)
  */
 
-import { ApiPromise, WsProvider } from '@polkadot/api';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { ApiPromise, WsProvider } from '@polkadot/api';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

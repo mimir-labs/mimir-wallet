@@ -1,21 +1,21 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, AddressMeta } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
+import { useNetwork, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import React, { useEffect, useState } from 'react';
+import { useToggle } from 'react-use';
+
+import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
+
 import { AddressMetaContext } from '@/accounts/useAccount';
 import { transformAccount } from '@/accounts/useQueryAccount';
 import { AddressOverview } from '@/components';
 import { toastError } from '@/components/utils';
-import React, { useEffect, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { useNetwork, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
-
-import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
 
 interface ProxyAccountStructureProps {
   proxy: string;
