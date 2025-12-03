@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.0.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.39.0...polkadot-core-v3.0.0) (2025-12-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **polkadot-core:** API access pattern changed from useApi() hook to ApiManager.getInstance().getApi(network) async method
+
+### Code Refactoring
+
+* **polkadot-core:** migrate to ApiManager singleton architecture ([#354](https://github.com/mimir-labs/mimir-wallet/issues/354)) ([51650e8](https://github.com/mimir-labs/mimir-wallet/commit/51650e839ae102ee57a175b6abdf5def6b465281))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 3.0.0
+
 ## [2.39.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v2.38.1...polkadot-core-v2.39.0) (2025-11-30)
 
 
