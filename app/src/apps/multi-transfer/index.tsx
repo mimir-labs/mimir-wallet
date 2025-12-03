@@ -19,21 +19,11 @@ import { useInputNetwork } from '@/hooks/useInputNetwork';
 function MultiTransfer() {
   const { current } = useAccount();
   const [network, setNetwork] = useInputNetwork();
-  const [sending, setSending] = useState(current || '');
   const [data, setData] = useState<MultiTransferData[]>([['', '', '']]);
 
   const handleBatchTransferForm = useCallback<FunctionCallHandler>(
     (event) => {
       // No need to check event.name - only 'batchTransferForm' events arrive here
-
-      // Validate sending address
-      const sendingAddress = toFunctionCallString(event.arguments.sending);
-
-      if (sendingAddress && !isValidAddress(sendingAddress)) {
-        console.error(`Invalid sending address format ${sendingAddress}`);
-
-        return;
-      }
 
       // Validate recipient addresses
       const addRecipient = event.arguments.addRecipient;
@@ -59,11 +49,6 @@ function MultiTransfer() {
 
           return;
         }
-      }
-
-      // Update sending address
-      if (sendingAddress) {
-        setSending(sendingAddress);
       }
 
       // Update recipients
@@ -142,9 +127,8 @@ function MultiTransfer() {
 
           <MultiTransferContent
             data={data}
-            sending={sending}
+            sending={current || ''}
             network={network}
-            setSending={setSending}
             setNetwork={setNetwork}
             setData={setData}
           />

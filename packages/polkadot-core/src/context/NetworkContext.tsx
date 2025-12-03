@@ -6,9 +6,9 @@
 import type { Endpoint } from '../types/types.js';
 import type { ReactNode } from 'react';
 
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext } from 'react';
 
-import { useChain } from '../api/index.js';
+import { useChain, useChains } from '../api/index.js';
 
 const DEFAULT_NETWORK = 'polkadot';
 
@@ -36,14 +36,17 @@ interface NetworkProviderProps {
  */
 export function NetworkProvider({ network, children }: NetworkProviderProps) {
   const chain = useChain(network);
+  const { mode } = useChains();
+  const context = useContext(NetworkContext);
 
-  const value = useMemo(
-    () => ({
-      network,
-      chain: chain
-    }),
-    [network, chain]
-  );
+  const value = {
+    network,
+    chain: chain
+  };
+
+  if (mode === 'solo') {
+    return context ? children : <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>;
+  }
 
   return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>;
 }

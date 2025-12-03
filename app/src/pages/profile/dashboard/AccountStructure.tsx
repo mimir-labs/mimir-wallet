@@ -12,10 +12,11 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface RelationProps {
   address: string;
+  supportedNetworks?: string[];
   setNetwork: (network: string) => void;
 }
 
-function Relation({ address, setNetwork }: RelationProps) {
+function Relation({ address, supportedNetworks, setNetwork }: RelationProps) {
   const { network } = useNetwork();
   const [account] = useQueryAccount(address);
   const ref = useRef<HTMLDivElement>(null);
@@ -32,7 +33,7 @@ function Relation({ address, setNetwork }: RelationProps) {
           Overview
         </Button>
         <div className='bg-content1 absolute top-4 right-4 z-1 w-[200px]'>
-          <InputNetwork network={network} setNetwork={setNetwork} />
+          <InputNetwork network={network} supportedNetworks={supportedNetworks} setNetwork={setNetwork} />
         </div>
         <AddressOverview key={account?.address || 'none'} account={account} showControls={upSm} showMiniMap={false} />
       </div>

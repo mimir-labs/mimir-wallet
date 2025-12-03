@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NetworkProvider, useChains } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
 import { useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
@@ -19,10 +19,11 @@ interface FundContentProps {
   filterSending: string[];
   receipt: string;
   network: string;
+  supportedNetworks?: string[];
   setNetwork: (network: string) => void;
 }
 
-function FundContent({ filterSending, receipt, network, setNetwork }: FundContentProps) {
+function FundContent({ filterSending, receipt, network, supportedNetworks, setNetwork }: FundContentProps) {
   const [sending, setSending] = useState<string>(filterSending.at(0) || '');
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
@@ -54,6 +55,7 @@ function FundContent({ filterSending, receipt, network, setNetwork }: FundConten
             sending={sending}
             recipient={receipt}
             network={network}
+            supportedNetworks={supportedNetworks}
             setSending={setSending}
             setNetwork={setNetwork}
             setAmount={setAmount}
@@ -93,7 +95,6 @@ function FundContent({ filterSending, receipt, network, setNetwork }: FundConten
 function PageFund() {
   const { walletAccounts } = useWallet();
   const { current: receipt } = useAccount();
-  const { enableNetwork } = useChains();
 
   const filterSending = walletAccounts.map((item) => item.address);
   const supportedNetworks = useAddressSupportedNetworks(receipt);
@@ -104,7 +105,6 @@ function PageFund() {
 
   // Enable network when it changes
   const handleSetNetwork = (newNetwork: string) => {
-    enableNetwork(newNetwork);
     setNetwork(newNetwork);
   };
 
@@ -114,7 +114,13 @@ function PageFund() {
 
   return (
     <NetworkProvider network={network}>
-      <FundContent filterSending={filterSending} receipt={receipt} network={network} setNetwork={handleSetNetwork} />
+      <FundContent
+        filterSending={filterSending}
+        receipt={receipt}
+        network={network}
+        supportedNetworks={supportedNetworks?.map((item) => item.key)}
+        setNetwork={handleSetNetwork}
+      />
     </NetworkProvider>
   );
 }

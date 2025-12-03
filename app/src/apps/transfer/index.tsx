@@ -11,7 +11,7 @@ import { useToggle } from 'react-use';
 import TransferAction from './TransferAction';
 import TransferContent from './TransferContent';
 
-import { useSelectedAccount } from '@/accounts/useSelectedAccount';
+import { useAccount } from '@/accounts/useAccount';
 import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
@@ -22,10 +22,9 @@ import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 const routeApi = getRouteApi('/_authenticated/explorer/$url');
 
 function PageTransfer() {
-  const selected = useSelectedAccount();
+  const { current } = useAccount();
   const navigate = useNavigate();
   const search = routeApi.useSearch();
-  const fromParam = search.from;
   const assetId = search.assetId || 'native';
   const assetNetwork = search.asset_network;
   const toParam = search.to;
@@ -38,9 +37,8 @@ function PageTransfer() {
     });
   };
 
-  const [sending, setSending] = useState<string>(fromParam || selected || '');
   const [recipient, setRecipient] = useState<string>(toParam || '');
-  const supportedNetworks = useAddressSupportedNetworks(sending);
+  const supportedNetworks = useAddressSupportedNetworks(current);
   const [network, setNetwork] = useInputNetwork(
     assetNetwork,
     supportedNetworks?.map((item) => item.key)
@@ -57,13 +55,6 @@ function PageTransfer() {
   const handleTransferForm = useCallback<FunctionCallHandler>(
     (event) => {
       // No need to check event.name - only 'transferForm' events arrive here
-
-      // Safe type conversion for sending
-      const sendingValue = toFunctionCallString(event.arguments.sending);
-
-      if (sendingValue) {
-        setSending(sendingValue);
-      }
 
       // Safe type conversion for recipient
       const recipientValue = toFunctionCallString(event.arguments.recipient);
@@ -119,15 +110,16 @@ function PageTransfer() {
               </Button>
             </div>
             <TransferContent
+              disabledSending
               amount={amount}
               isAmountValid={isAmountValid}
               keepAlive={keepAlive}
               token={token}
-              sending={sending}
+              sending={current || ''}
               recipient={recipient}
               identifier={assetId}
               network={network}
-              setSending={setSending}
+              supportedNetworks={supportedNetworks?.map((item) => item.key)}
               setNetwork={setNetwork}
               setRecipient={setRecipient}
               setAmount={setAmount}
@@ -140,7 +132,7 @@ function PageTransfer() {
               amount={amount}
               isAmountValid={isAmountValid}
               keepAlive={keepAlive}
-              sending={sending}
+              sending={current || ''}
               recipient={recipient}
             >
               Review

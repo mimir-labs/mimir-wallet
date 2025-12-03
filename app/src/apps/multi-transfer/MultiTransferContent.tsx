@@ -14,7 +14,8 @@ import Upload from './Upload';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
-import { Input, InputAddress, InputNetwork, InputToken, TxButton } from '@/components';
+import { AddressCell, Input, InputAddress, InputNetwork, InputToken, TxButton } from '@/components';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { isValidNumber, parseUnits } from '@/utils';
 
@@ -22,14 +23,14 @@ interface Props {
   data: MultiTransferData[];
   sending: string;
   network: string;
-  setSending: (value: string) => void;
   setNetwork: (value: string) => void;
   setData: React.Dispatch<React.SetStateAction<MultiTransferData[]>>;
 }
 
-function MultiTransferContent({ data, sending, network, setSending, setNetwork, setData }: Props) {
+function MultiTransferContent({ data, sending, network, setNetwork, setData }: Props) {
   const { network: currentNetwork, chain } = useNetwork();
   const genesisHash = chain.genesisHash;
+  const upSm = useMediaQuery('sm');
   const [assets, , , assetsPromise] = useChainXcmAsset(network);
   const [invalidAssetIds, setInvalidAssetIds] = useState<string[]>([]);
 
@@ -131,7 +132,12 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
       />
 
       {/* sending */}
-      <InputAddress isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} />
+      <div className='flex flex-col gap-2'>
+        <p className='text-sm font-bold'>Sending From</p>
+        <div className='bg-secondary rounded-[10px] p-2'>
+          <AddressCell shorten={!upSm} showType value={sending} withCopy withAddressBook />
+        </div>
+      </div>
 
       {/* upload file */}
       <Upload

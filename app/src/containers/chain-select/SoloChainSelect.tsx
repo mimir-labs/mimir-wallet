@@ -12,6 +12,7 @@ import { internalToUrlNetwork } from '@/utils/networkMapping';
 function SoloChainSelect() {
   const { current } = useAccount();
   const { network } = useNetwork();
+
   const { chains } = useChains();
   const { isApiReady } = useChainStatus(network);
   const [account] = useQueryAccount(current);

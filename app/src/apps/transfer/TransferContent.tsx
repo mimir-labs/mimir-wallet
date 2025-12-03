@@ -26,7 +26,9 @@ function TransferContent({
   recipient,
   identifier,
   network,
+  supportedNetworks,
   keepAlive,
+  disabledSending,
   disabledRecipient,
   filterSending,
   setNetwork,
@@ -42,11 +44,13 @@ function TransferContent({
   sending: string;
   recipient: string;
   network: string;
+  supportedNetworks?: string[];
   keepAlive: boolean;
+  disabledSending?: boolean;
   disabledRecipient?: boolean;
   identifier?: string;
   filterSending?: string[];
-  setSending: (sending: string) => void;
+  setSending?: (sending: string) => void;
   setNetwork: (network: string) => void;
   setAmount: (amount: string) => void;
   toggleKeepAlive: (keepAlive: boolean) => void;
@@ -94,14 +98,23 @@ function TransferContent({
 
   return (
     <>
-      <InputAddress
-        isSign
-        filtered={filterSending}
-        label='Sending From'
-        onChange={setSending}
-        placeholder='Sender'
-        value={sending}
-      />
+      {disabledSending ? (
+        <div className='flex flex-col gap-2'>
+          <p className='text-sm font-bold'>Sending From</p>
+          <div className='bg-secondary rounded-[10px] p-2'>
+            <AddressCell shorten={!upSm} showType value={sending} withCopy withAddressBook />
+          </div>
+        </div>
+      ) : (
+        <InputAddress
+          isSign
+          filtered={filterSending}
+          label='Sending From'
+          onChange={setSending}
+          placeholder='Sender'
+          value={sending}
+        />
+      )}
 
       {disabledRecipient ? (
         <div className='flex flex-col gap-2'>
@@ -117,6 +130,7 @@ function TransferContent({
       <InputNetwork
         label='Select Network'
         network={network}
+        supportedNetworks={supportedNetworks}
         setNetwork={setNetwork}
         endContent={
           sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt]

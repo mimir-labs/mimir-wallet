@@ -7,12 +7,6 @@ import { useCallback, useSyncExternalStore } from 'react';
 
 import { ApiManager } from './ApiManager.js';
 
-// Stable subscribe function at module level to avoid infinite re-subscription loops
-// useSyncExternalStore requires a stable reference for the subscribe function
-function subscribeToManager(onStoreChange: () => void): () => void {
-  return ApiManager.getInstance().subscribe(() => onStoreChange());
-}
-
 // Cache for ChainStatus to avoid unnecessary re-renders
 // Key: chain identifier, Value: cached status object
 const statusCache = new Map<string, ChainStatus>();
@@ -64,6 +58,7 @@ function getCachedStatus(chain: string): ChainStatus {
 
 /**
  * Hook to get chain connection status from ApiManager
+ * Uses subscribeToChain for efficient single-chain subscription
  *
  * @param chain - Network key (e.g., 'polkadot') or genesis hash
  * @returns ChainStatus object with connection state
@@ -80,7 +75,15 @@ function getCachedStatus(chain: string): ChainStatus {
  * ```
  */
 export function useChainStatus(chain: string): ChainStatus {
+  // Subscribe to specific chain only - more efficient than global subscribe
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      return ApiManager.getInstance().subscribeToChain(chain, () => onStoreChange());
+    },
+    [chain]
+  );
+
   const getSnapshot = useCallback(() => getCachedStatus(chain), [chain]);
 
-  return useSyncExternalStore(subscribeToManager, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }

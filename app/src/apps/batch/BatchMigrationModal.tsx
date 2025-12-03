@@ -7,7 +7,7 @@ import type { ApiPromise } from '@polkadot/api';
 import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { ApiManager, createBlockRegistry, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
+import { ApiManager, createBlockRegistry, useChains } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -191,33 +191,26 @@ export function BatchMigrationModal({
   address
 }: BatchMigrationModalProps) {
   const { chains } = useChains();
-  const sourceStatus = useChainStatus(sourceChain);
-  const destStatus = useChainStatus(destChain);
   const [registry, setRegistry] = useState<Registry | null>(null);
   const [destApi, setDestApi] = useState<ApiPromise | null>(null);
-
-  const sourceReady = sourceStatus.isApiReady;
-  const destReady = destStatus.isApiReady;
 
   const sourceNetwork = chains.find((network) => network.key === sourceChain);
   const destNetwork = chains.find((network) => network.key === destChain);
 
   // Get dest API async
   useEffect(() => {
-    if (destReady) {
-      ApiManager.getInstance()
-        .getApi(destChain)
-        .then((api) => {
-          if (api) {
-            setDestApi(api);
-          }
-        });
-    }
-  }, [destChain, destReady]);
+    ApiManager.getInstance()
+      .getApi(destChain)
+      .then((api) => {
+        if (api) {
+          setDestApi(api);
+        }
+      });
+  }, [destChain]);
 
   // Create registry for parsing calls
   useEffect(() => {
-    if (block && sourceReady) {
+    if (block) {
       ApiManager.getInstance()
         .getApi(sourceChain)
         .then((api) => {
@@ -228,7 +221,7 @@ export function BatchMigrationModal({
           }
         });
     }
-  }, [block, sourceChain, sourceReady]);
+  }, [block, sourceChain]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size='xl'>
@@ -244,7 +237,7 @@ export function BatchMigrationModal({
         </ModalHeader>
 
         <ModalBody>
-          {sourceReady && sourceNetwork && destReady && destNetwork && destApi && registry ? (
+          {sourceNetwork && destNetwork && destApi && registry ? (
             <Content
               sourceNetwork={sourceNetwork}
               sourceRegistry={registry}

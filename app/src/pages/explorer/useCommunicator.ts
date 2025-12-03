@@ -23,7 +23,7 @@ export function useCommunicator(
   const { chain, network: currentNetwork } = useNetwork();
   const genesisHash = chain.genesisHash;
   const { ss58: chainSS58 } = useSs58Format();
-  const { chains: networks, enableNetwork, mode } = useChains();
+  const { chains: networks, mode } = useChains();
   const { addQueue } = useTxQueue();
   const { current } = useAccount();
   const { meta } = useAddressMeta(current);
@@ -62,8 +62,6 @@ export function useCommunicator(
         }
 
         return new Promise((resolve, reject) => {
-          if (mode === 'omni') enableNetwork(network);
-
           const website = new URL(url);
           const { withSignedTransaction } = payload;
 
@@ -100,21 +98,7 @@ export function useCommunicator(
         ];
       }
     }),
-    [
-      genesisHash,
-      promise,
-      mode,
-      networks,
-      currentNetwork,
-      enableNetwork,
-      url,
-      chainSS58,
-      addQueue,
-      iconUrl,
-      appName,
-      current,
-      meta
-    ]
+    [genesisHash, promise, mode, networks, currentNetwork, url, chainSS58, addQueue, iconUrl, appName, current, meta]
   );
   const stateRef = useRef<State>(state);
 

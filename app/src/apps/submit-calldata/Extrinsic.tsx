@@ -32,10 +32,12 @@ function Extrinsic({
   sending,
   setSending,
   network,
+  supportedNetworks,
   setNetwork
 }: {
   sending: string;
   network: string;
+  supportedNetworks?: string[];
   setSending: (sending: string) => void;
   setNetwork: (network: string) => void;
 }) {
@@ -59,7 +61,12 @@ function Extrinsic({
       <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-5'>
         <h3>Submit Extrinsic</h3>
 
-        <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
+        <InputNetwork
+          label='Select Network'
+          network={network}
+          supportedNetworks={supportedNetworks}
+          setNetwork={setNetwork}
+        />
 
         <InputAddress isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} />
 

@@ -5,7 +5,7 @@ import type { DappOption } from '@/config';
 
 import { useChains } from '@mimir-wallet/polkadot-core';
 import { useNavigate } from '@tanstack/react-router';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { useMimirLayout } from './useMimirLayout';
 
@@ -42,11 +42,7 @@ import { useMimirLayout } from './useMimirLayout';
 export function useOpenDapp(dapp: DappOption) {
   const { openRightSidebar, setRightSidebarTab } = useMimirLayout();
   const { chains } = useChains();
-  const defaultNetwork = useMemo(() => {
-    const enabled = chains.find((c) => c.enabled);
-
-    return enabled?.key || 'polkadot';
-  }, [chains]);
+  const defaultNetwork = chains[0].key;
   const navigate = useNavigate();
 
   return useCallback(

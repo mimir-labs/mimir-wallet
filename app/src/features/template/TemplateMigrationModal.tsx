@@ -6,7 +6,7 @@ import type { Network } from '@mimir-wallet/polkadot-core';
 import type { ApiPromise } from '@polkadot/api';
 import type { Registry } from '@polkadot/types/types';
 
-import { ApiManager, createBlockRegistry, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
+import { ApiManager, createBlockRegistry, useChains } from '@mimir-wallet/polkadot-core';
 import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -188,8 +188,6 @@ export function TemplateMigrationModal({
   onMigrate
 }: TemplateMigrationModalProps) {
   const { chains: networks } = useChains();
-  const { isApiReady: sourceReady } = useChainStatus(sourceChain);
-  const { isApiReady: destReady } = useChainStatus(destChain);
   const [sourceApi, setSourceApi] = useState<ApiPromise | null>(null);
   const [destApi, setDestApi] = useState<ApiPromise | null>(null);
   const [registry, setRegistry] = useState<Registry | null>(null);
@@ -199,24 +197,20 @@ export function TemplateMigrationModal({
 
   // Load APIs
   useEffect(() => {
-    if (sourceReady) {
-      ApiManager.getInstance()
-        .getApi(sourceChain)
-        .then((api) => {
-          if (api) setSourceApi(api);
-        });
-    }
-  }, [sourceChain, sourceReady]);
+    ApiManager.getInstance()
+      .getApi(sourceChain)
+      .then((api) => {
+        if (api) setSourceApi(api);
+      });
+  }, [sourceChain]);
 
   useEffect(() => {
-    if (destReady) {
-      ApiManager.getInstance()
-        .getApi(destChain)
-        .then((api) => {
-          if (api) setDestApi(api);
-        });
-    }
-  }, [destChain, destReady]);
+    ApiManager.getInstance()
+      .getApi(destChain)
+      .then((api) => {
+        if (api) setDestApi(api);
+      });
+  }, [destChain]);
 
   // Create registry for parsing calls
   useEffect(() => {
@@ -241,7 +235,7 @@ export function TemplateMigrationModal({
         </ModalHeader>
 
         <ModalBody>
-          {sourceReady && sourceNetwork && destReady && destNetwork && destApi && registry ? (
+          {sourceNetwork && destNetwork && destApi && registry ? (
             <Content
               sourceNetwork={sourceNetwork}
               sourceRegistry={registry}

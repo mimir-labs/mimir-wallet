@@ -7,7 +7,7 @@ import type { PalletIdentityJudgement, PalletIdentityRegistration } from '@polka
 import type { ITuple } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { addressToHex, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
+import { addressToHex, ApiManager, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
@@ -148,12 +148,14 @@ export function useDeriveAccountInfo(
   value?: string | null
 ): [data: AccountInfo | undefined, isFetched: boolean, isFetching: boolean] {
   const { network } = useNetwork();
+  const { mode } = useChains();
+  const { chainInfo } = useSs58Format();
 
   const address = value ? value.toString() : '';
   const addressHex = useMemo(() => (address ? addressToHex(address) : '0x'), [address]);
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: ['identity-info', network, addressHex] as const,
+    queryKey: ['identity-info', mode === 'omni' ? chainInfo.key : network, addressHex] as const,
     refetchInterval: 12000,
     refetchOnMount: false,
     queryFn: fetchIdentityInfo,

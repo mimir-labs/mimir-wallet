@@ -21,31 +21,16 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
 
   return (
     <NetworkProvider network={network}>
-      <AddProxyContent
+      <AddProxy
         pure={pure}
         network={network}
+        supportedNetworks={supportedNetworks?.map((item) => item.key)}
         setNetwork={setNetwork}
         proxied={proxied}
         setProxied={setProxied}
       />
     </NetworkProvider>
   );
-}
-
-function AddProxyContent({
-  pure,
-  network,
-  setNetwork,
-  proxied,
-  setProxied
-}: {
-  pure?: boolean;
-  network: string;
-  setNetwork: (network: string) => void;
-  proxied: string | undefined;
-  setProxied: (proxied: string | undefined) => void;
-}) {
-  return <AddProxy pure={pure} network={network} setNetwork={setNetwork} proxied={proxied} setProxied={setProxied} />;
 }
 
 export default PageAddProxy;

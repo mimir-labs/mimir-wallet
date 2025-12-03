@@ -3,7 +3,7 @@
 
 import type { Endpoint } from '@mimir-wallet/polkadot-core';
 
-import { ApiManager, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 export interface ChainInfo {
@@ -27,19 +27,11 @@ export interface UseChainInfoResult {
 async function fetchChainInfo({
   queryKey
 }: {
-  queryKey: readonly [string, string, Endpoint | undefined, boolean];
+  queryKey: readonly [string, string, Endpoint | undefined];
 }): Promise<ChainInfo | undefined> {
-  const [, network, chain, isApiReady] = queryKey;
-
-  if (!isApiReady || !chain) {
-    return undefined;
-  }
+  const [, network, chain] = queryKey;
 
   const api = await ApiManager.getInstance().getApi(network);
-
-  if (!api) {
-    return undefined;
-  }
 
   try {
     const chainInfo: ChainInfo = {
@@ -86,12 +78,11 @@ async function fetchChainInfo({
  */
 export function useChainInfo(): UseChainInfoResult {
   const { network, chain } = useNetwork();
-  const { isApiReady } = useChainStatus(network);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['chain-info', network, chain, isApiReady] as const,
+    queryKey: ['chain-info', network, chain] as const,
     queryFn: fetchChainInfo,
-    enabled: !!network && !!chain && isApiReady,
+    enabled: !!network && !!chain,
     staleTime: Infinity, // Chain info doesn't change frequently
     retry: false
   });

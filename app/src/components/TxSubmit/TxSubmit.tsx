@@ -6,7 +6,7 @@ import type { AccountData, FilterPath } from '@/hooks/types';
 import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
 import { addressEq, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Button, Divider, Skeleton } from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -197,14 +197,40 @@ function TxSubmit({
 
           <Divider />
 
-          {call && <Call account={accountData.address} method={call} transaction={transaction} />}
+          {call ? (
+            <>
+              <Call account={accountData.address} method={call} transaction={transaction} />
+              {supportsDryRun ? (
+                <DryRun call={call} account={accountData.address} />
+              ) : (
+                <Chopsticks call={call} account={accountData.address} />
+              )}
+            </>
+          ) : (
+            <div className='flex flex-col gap-5'>
+              {/* Call element skeleton */}
+              <div className='flex flex-col gap-2'>
+                <Skeleton className='h-5 w-24 rounded-lg' />
+                <Skeleton className='h-12 w-full rounded-lg' />
+              </div>
 
-          {call &&
-            (supportsDryRun ? (
-              <DryRun call={call} account={accountData.address} />
-            ) : (
-              <Chopsticks call={call} account={accountData.address} />
-            ))}
+              <Divider />
+
+              {/* CallInfo skeleton */}
+              <div className='flex flex-col gap-2'>
+                <Skeleton className='h-5 w-32 rounded-lg' />
+                <Skeleton className='bg-secondary h-16 w-full rounded-[10px]' />
+              </div>
+
+              {/* TransactionInfo skeleton */}
+              <div className='flex flex-col gap-2'>
+                <Skeleton className='h-5 w-24 rounded-lg' />
+              </div>
+
+              {/* DryRun skeleton */}
+              <Skeleton className='bg-secondary h-12 w-full rounded-[10px]' />
+            </div>
+          )}
 
           {/* <SafetyCheck safetyCheck={safetyCheck} /> */}
         </div>

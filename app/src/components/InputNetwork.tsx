@@ -1,8 +1,8 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { type Endpoint, useChains } from '@mimir-wallet/polkadot-core';
-import { Avatar, Chip, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
+import { type Endpoint, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
+import { Avatar, Chip, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
 import { clsx } from 'clsx';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
@@ -14,6 +14,7 @@ import { useElementWidth } from '@/hooks/useElementWidth';
 
 interface Props {
   showAllNetworks?: boolean;
+  supportedNetworks?: string[];
   isIconOnly?: boolean;
   radius?: 'sm' | 'md' | 'lg' | 'full' | 'none';
   disabled?: boolean;
@@ -42,6 +43,9 @@ function NetworkItem({
   isMigrationCompleted: boolean;
   endContent?: React.ReactNode;
 }) {
+  const { isApiReady, isApiConnected, apiError } = useChainStatus(item.key);
+  const isConnecting = (!isApiReady && !apiError) || !isApiConnected;
+
   return (
     <li
       onClick={onSelect}
@@ -58,6 +62,7 @@ function NetworkItem({
             Migrated
           </Chip>
         )}
+        {isConnecting && <Spinner size='sm' />}
       </div>
     </li>
   );
@@ -65,6 +70,7 @@ function NetworkItem({
 
 function OmniChainInputNetwork({
   showAllNetworks,
+  supportedNetworks,
   isIconOnly,
   radius = 'md',
   disabled,
@@ -82,9 +88,17 @@ function OmniChainInputNetwork({
 
   const [isOpen, toggleOpen] = useToggle(false);
 
-  // Filter networks: show all or only ready ones based on showAllNetworks prop
+  // Filter networks based on supportedNetworks or showAllNetworks/enabled
   const options = networks
-    .filter((item) => showAllNetworks || item.enabled)
+    .filter((item) => {
+      // If supportedNetworks is specified, only show networks in the list
+      if (supportedNetworks && supportedNetworks.length > 0) {
+        return supportedNetworks.includes(item.key);
+      }
+
+      // Otherwise use original logic
+      return showAllNetworks || item.enabled;
+    })
     .map((item) => ({
       ...item,
       endContent: endContent?.[item.key] || endContent?.[item.genesisHash]

@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ApiManager, NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
+import { ApiManager, NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
 import {
   Alert,
   AlertDescription,
@@ -38,10 +38,12 @@ import { useXcmAsset } from '@/hooks/useXcmAssets';
 function Content({
   address,
   network,
+  supportedNetworks,
   setNetwork
 }: {
   address: string;
   network: string;
+  supportedNetworks?: string[];
   setNetwork: (network: string) => void;
 }) {
   const { chain } = useNetwork();
@@ -59,7 +61,7 @@ function Content({
   return (
     <>
       <div className='space-y-5'>
-        <InputNetwork network={network} setNetwork={setNetwork} />
+        <InputNetwork network={network} supportedNetworks={supportedNetworks} setNetwork={setNetwork} />
 
         <div className='bg-secondary rounded-[10px] p-2.5'>
           <div className='font-bold'>Proxy Account</div>
@@ -250,20 +252,23 @@ function Content({
 
 function ProxySet({ address }: { address: string }) {
   const supportedNetworks = useAddressSupportedNetworks(address);
-  const { enableNetwork } = useChains();
   const [network, setNetwork] = useInputNetwork(
     undefined,
     supportedNetworks?.map((item) => item.key)
   );
 
   const handleSetNetwork = (newNetwork: string) => {
-    enableNetwork(newNetwork);
     setNetwork(newNetwork);
   };
 
   return (
     <NetworkProvider network={network}>
-      <Content address={address} network={network} setNetwork={handleSetNetwork} />
+      <Content
+        address={address}
+        network={network}
+        setNetwork={handleSetNetwork}
+        supportedNetworks={supportedNetworks?.map((item) => item.key)}
+      />
     </NetworkProvider>
   );
 }

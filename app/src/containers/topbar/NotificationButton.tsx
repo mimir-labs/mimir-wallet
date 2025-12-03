@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getChainIcon, useChains } from '@mimir-wallet/polkadot-core';
+import { getChainIcon } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Badge,
@@ -159,7 +159,6 @@ function NotificationButton() {
   const [shouldShake, setShouldShake] = useState(false);
   const prevUnreadCountRef = useRef<number>(0);
   const navigate = useNavigate();
-  const { enableNetwork } = useChains();
 
   const unreadCount = getUnreadCount();
 
@@ -193,11 +192,10 @@ function NotificationButton() {
 
   const handleSelect = useCallback(
     (notification: NotificationMessage) => {
-      enableNetwork(notification.genesisHash);
       navigate({ to: '/transactions/$id', params: { id: notification.transactionId.toString() } });
       toggleOpen(false);
     },
-    [enableNetwork, navigate, toggleOpen]
+    [navigate, toggleOpen]
   );
 
   // Mark viewed notifications as read when popover closes

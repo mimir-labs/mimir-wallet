@@ -221,10 +221,13 @@ export function useMultiChainTransactionCounts(
   address?: string | null
 ): [data: Record<string, { pending: number; history: number }>, isFetched: boolean, isFetching: boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
-  const { chains } = useChains();
+  const { chains, mode } = useChains();
 
   // Get enabled network keys
-  const enabledNetworks = useMemo(() => new Set(chains.filter((c) => c.enabled).map((c) => c.key)), [chains]);
+  const enabledNetworks = useMemo(
+    () => new Map(chains.filter((item) => (mode === 'omni' ? true : item.enabled)).map((c) => [c.key, c])),
+    [chains, mode]
+  );
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['transaction-counts', addressHex] as const,
@@ -260,11 +263,14 @@ export function useMultiChainTransactionCounts(
 }
 
 export function useValidTransactionNetworks(address?: string | null) {
-  const { chains } = useChains();
+  const { chains, mode } = useChains();
   const [transactionCounts, isFetched, isFetching] = useMultiChainTransactionCounts(address);
 
   // Create a map from network key to chain info for enabled networks
-  const enabledChainsMap = useMemo(() => new Map(chains.filter((c) => c.enabled).map((c) => [c.key, c])), [chains]);
+  const chainsMap = useMemo(
+    () => new Map(chains.filter((item) => (mode === 'omni' ? true : item.enabled)).map((c) => [c.key, c])),
+    [chains, mode]
+  );
 
   const [validPendingNetworks, validHistoryNetworks] = useMemo(() => {
     const validPendingNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
@@ -274,7 +280,7 @@ export function useValidTransactionNetworks(address?: string | null) {
     const networkOrderMap = new Map(allEndpoints.map((endpoint, index) => [endpoint.key, index]));
 
     Object.entries(transactionCounts || {}).forEach(([network, counts]) => {
-      const chain = enabledChainsMap.get(network);
+      const chain = chainsMap.get(network);
 
       if (counts.pending > 0 && chain) {
         validPendingNetworks.push({
@@ -305,7 +311,7 @@ export function useValidTransactionNetworks(address?: string | null) {
       validPendingNetworks.filter((item) => networkOrderMap.has(item.network)).sort(sortByConfigOrder),
       validHistoryNetworks.filter((item) => networkOrderMap.has(item.network)).sort(sortByConfigOrder)
     ];
-  }, [enabledChainsMap, transactionCounts]);
+  }, [chainsMap, transactionCounts]);
 
   return [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] as const;
 }

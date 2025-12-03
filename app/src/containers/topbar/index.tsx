@@ -3,7 +3,7 @@
 
 import { useChains } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
-import { Link, useLocation } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 
 import ChainSelect from '../chain-select';
 
@@ -16,12 +16,9 @@ import { analyticsActions } from '@/analytics';
 import Logo from '@/assets/images/logo.png';
 import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
-import { AccountSelect } from '@/components';
 
 function TopBar() {
   const { mode, setNetworkMode } = useChains();
-  const { pathname } = useLocation();
-  const isInAppPage = pathname.startsWith('/explorer');
 
   return (
     <div className='bg-content1/70 border-secondary sticky top-0 z-50 flex h-[56px] w-full items-center justify-between gap-2 border-b px-4 backdrop-blur-lg backdrop-saturate-150 sm:gap-2.5 sm:px-6'>
@@ -46,7 +43,6 @@ function TopBar() {
       </div>
 
       <div className='flex items-center gap-2 sm:gap-5'>
-        {isInAppPage && <AccountSelect />}
         {/* <Notification /> */}
         <NotificationButton />
         <WalletConnect />

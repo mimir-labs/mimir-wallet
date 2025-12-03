@@ -19,7 +19,13 @@ function SubmitCalldata() {
 
   return (
     <NetworkProvider network={network}>
-      <Extrinsic sending={sending} setSending={setSending} network={network} setNetwork={setNetwork} />
+      <Extrinsic
+        sending={sending}
+        setSending={setSending}
+        network={network}
+        supportedNetworks={supportedNetworksKeys}
+        setNetwork={setNetwork}
+      />
     </NetworkProvider>
   );
 }

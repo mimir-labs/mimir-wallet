@@ -3,7 +3,7 @@
 
 import type { ProxyArgs } from '../types';
 
-import { addressEq, ApiManager, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
+import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import {
   Alert,
@@ -58,19 +58,20 @@ async function fetchProxiesForAddress({ queryKey }: { queryKey: readonly [string
 function AddProxy({
   pure,
   network,
+  supportedNetworks,
   proxied,
   setNetwork,
   setProxied
 }: {
   pure?: boolean;
   network: string;
+  supportedNetworks?: string[];
   proxied: string | undefined;
   setNetwork: (network: string) => void;
   setProxied: (proxied: string | undefined) => void;
 }) {
   const { chain } = useNetwork();
   const genesisHash = chain.genesisHash;
-  const { isApiReady } = useChainStatus(network);
   const { accounts, addresses, current } = useAccount();
 
   // filter accounts by network
@@ -97,7 +98,7 @@ function AddProxy({
 
   const { data: proxies } = useQuery({
     queryKey: ['proxies', network, proxied || ''] as const,
-    enabled: !!isApiReady && !pure && !!proxied,
+    enabled: !pure && !!proxied,
     queryFn: fetchProxiesForAddress
   });
 
@@ -179,7 +180,12 @@ function AddProxy({
               />
             </div>
 
-            <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
+            <InputNetwork
+              label='Select Network'
+              network={network}
+              supportedNetworks={supportedNetworks}
+              setNetwork={setNetwork}
+            />
 
             {pure && <Input label='Name' value={name} onChange={setName} />}
 

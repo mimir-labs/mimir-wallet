@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getChainIcon, useChains } from '@mimir-wallet/polkadot-core';
+import { getChainIcon } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Skeleton, Tooltip } from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
 import moment from 'moment';
@@ -38,7 +38,6 @@ function NetworkIcon({ network }: { network: string }) {
 
 // Transaction item component matching Figma design exactly
 function TransactionItem({ transaction, address }: { transaction: Transaction; address: string }) {
-  const { enableNetwork } = useChains();
   const navigate = useNavigate();
   // Use state to track current time for time-ago display
   const [now, setNow] = useState(() => Date.now());
@@ -59,8 +58,6 @@ function TransactionItem({ transaction, address }: { transaction: Transaction; a
 
   const handleViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Ensure the network is enabled before navigating
-    enableNetwork(transaction.network);
     navigate({
       to: '/transactions/$id',
       params: {

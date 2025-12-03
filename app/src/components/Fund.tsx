@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NetworkProvider, useChains } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
@@ -30,6 +30,7 @@ function FundContent({
   receipt,
   filterSending,
   network,
+  supportedNetworks,
   setNetwork
 }: {
   defaultValue?: string | { toString: () => string };
@@ -38,6 +39,7 @@ function FundContent({
   receipt?: string;
   filterSending: string[];
   network: string;
+  supportedNetworks?: string[];
   setNetwork: (network: string) => void;
 }) {
   const [sending, setSending] = useState<string>(filterSending.at(0) || '');
@@ -85,6 +87,7 @@ function FundContent({
               sending={sending}
               recipient={receipt}
               network={network}
+              supportedNetworks={supportedNetworks}
               setSending={setSending}
               setNetwork={setNetwork}
               setAmount={setAmount}
@@ -132,7 +135,6 @@ function FundContent({
 }
 
 function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
-  const { enableNetwork } = useChains();
   const { walletAccounts } = useWallet();
   const filterSending = walletAccounts.map((item) => item.address);
   const supportedNetworks = useAddressSupportedNetworks(receipt);
@@ -140,10 +142,6 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
     defaultNetwork,
     supportedNetworks?.map((item) => item.key)
   );
-
-  useEffect(() => {
-    if (open) enableNetwork(network);
-  }, [enableNetwork, network, open]);
 
   return (
     <NetworkProvider network={network}>
@@ -154,6 +152,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
         receipt={receipt}
         filterSending={filterSending}
         network={network}
+        supportedNetworks={supportedNetworks?.map((item) => item.key)}
         setNetwork={setNetwork}
       />
     </NetworkProvider>

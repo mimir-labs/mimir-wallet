@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NetworkProvider, useChains, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
@@ -94,21 +94,7 @@ function Operation({ transaction, address }: { transaction: Transaction; address
   );
 }
 
-function NetworkWrapper({
-  network,
-  children,
-  skeleton
-}: {
-  network: string;
-  children: React.ReactNode;
-  skeleton?: React.ReactNode;
-}) {
-  const { isApiReady } = useChainStatus(network);
-
-  if (!isApiReady) {
-    return skeleton ?? <Skeleton className='h-[20px] w-[60px]' />;
-  }
-
+function NetworkWrapper({ network, children }: { network: string; children: React.ReactNode }) {
   return <NetworkProvider network={network}>{children}</NetworkProvider>;
 }
 
@@ -118,7 +104,7 @@ function PendingTransactions({ address }: { address: string }) {
     validPendingNetworks.map((item) => item.network),
     address
   );
-  const { enableNetwork } = useChains();
+
   const navigate = useNavigate();
 
   const transactions = useMemo(() => {
@@ -181,7 +167,6 @@ function PendingTransactions({ address }: { address: string }) {
               key={item.id}
               className='[&:hover>td]:bg-secondary border-secondary [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px]'
               onClick={() => {
-                enableNetwork(item.network);
                 navigate({
                   to: `/transactions/$id`,
                   params: {
@@ -216,7 +201,7 @@ function PendingTransactions({ address }: { address: string }) {
                 </NetworkWrapper>
               </TableCell>
               <TableCell className='w-[180px]'>
-                <NetworkWrapper network={item.network} skeleton={<Skeleton className='ml-auto h-[20px] w-[60px]' />}>
+                <NetworkWrapper network={item.network}>
                   <span className='status'>
                     <Status address={address} transaction={item} />
                   </span>

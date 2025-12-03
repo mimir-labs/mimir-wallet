@@ -25,7 +25,7 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
   const { current } = useAccount();
   const [, , , , promise] = useQueryAccountOmniChain(current);
   const handlerRef = useRef<((event: Web3WalletTypes.SessionRequest) => void) | undefined>(undefined);
-  const { chains: networks, mode, enableNetwork } = useChains();
+  const { chains: networks, mode } = useChains();
   const { chain, network: currentNetwork } = useNetwork();
   const { ss58: chainSS58 } = useSs58Format();
   const genesisHash = chain.genesisHash;
@@ -65,8 +65,6 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
 
             network = currentNetwork;
           }
-
-          if (mode === 'omni') enableNetwork(network);
 
           addQueue({
             call: payload.method,

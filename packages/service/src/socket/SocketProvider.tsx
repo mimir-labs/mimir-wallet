@@ -45,8 +45,6 @@ const SocketProvider = ({
   }, []);
 
   const subscribe = useCallback((topic: string) => {
-    console.log(`Subscribing to topic: ${topic}`);
-
     const socket = socketRef.current;
 
     if (socket?.connected) {
@@ -55,8 +53,6 @@ const SocketProvider = ({
   }, []);
 
   const unsubscribe = useCallback((topic: string) => {
-    console.log(`Unsubscribing from topic: ${topic}`);
-
     const socket = socketRef.current;
 
     if (socket?.connected) {

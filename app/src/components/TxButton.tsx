@@ -7,8 +7,8 @@ import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkad
 import type { HexString } from '@polkadot/util/types';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, type ButtonProps } from '@mimir-wallet/ui';
-import React, { forwardRef, useCallback } from 'react';
+import { Button, type ButtonProps, Spinner } from '@mimir-wallet/ui';
+import React, { forwardRef, useState } from 'react';
 
 import { toastError } from './utils';
 
@@ -40,7 +40,7 @@ interface Props extends Omit<ButtonProps, 'onClick' | 'startContent' | 'endConte
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
   getCall?: () => IMethod | string | Promise<IMethod | string>;
   onDone?: () => void;
-  overrideAction?: () => void;
+  overrideAction?: () => void | Promise<void>;
 }
 
 const TxButton = forwardRef<HTMLButtonElement, Props>(
@@ -70,52 +70,48 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
     const { network } = useNetwork();
     const { addQueue } = useTxQueue();
     const { walletAccounts } = useWallet();
+    const [isLoading, setIsLoading] = useState(false);
     const address = accountId || transaction?.address || walletAccounts.at(0)?.address;
-    const handleClick = useCallback(async () => {
-      if (getCall) {
-        const call = await getCall();
 
-        if (!address) {
-          toastError('Please select an account');
+    const handleClick = async () => {
+      setIsLoading(true);
 
-          return;
+      try {
+        if (overrideAction) {
+          await overrideAction();
+        } else if (getCall) {
+          const call = await getCall();
+
+          if (!address) {
+            toastError('Please select an account');
+          } else {
+            addQueue({
+              accountId: address,
+              transaction: transaction || undefined,
+              call,
+              website,
+              appName,
+              iconUrl,
+              filterPaths,
+              relatedBatches,
+              onResults: (result) => onResults?.(result),
+              beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
+              network,
+              onError
+            });
+            onDone?.();
+          }
         }
-
-        addQueue({
-          accountId: address,
-          transaction: transaction || undefined,
-          call,
-          website,
-          appName,
-          iconUrl,
-          filterPaths,
-          relatedBatches,
-          onResults: (result) => onResults?.(result),
-          beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
-          network,
-          onError
-        });
-        onDone?.();
+      } catch (error) {
+        toastError(error);
+      } finally {
+        setIsLoading(false);
       }
-    }, [
-      getCall,
-      onDone,
-      address,
-      addQueue,
-      transaction,
-      website,
-      appName,
-      iconUrl,
-      filterPaths,
-      relatedBatches,
-      network,
-      onError,
-      onResults,
-      beforeSend
-    ]);
+    };
 
     return (
-      <Button {...props} ref={ref} disabled={disabled} onClick={overrideAction || handleClick}>
+      <Button {...props} ref={ref} disabled={disabled || isLoading} onClick={handleClick}>
+        {isLoading && <Spinner size='sm' />}
         {startContent}
         {children}
         {endContent}

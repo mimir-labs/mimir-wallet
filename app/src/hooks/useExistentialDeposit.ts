@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ApiManager, useChainStatus } from '@mimir-wallet/polkadot-core';
+import { ApiManager } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
@@ -15,10 +15,6 @@ export interface ExistentialDepositResult {
 
 async function fetchExistentialDeposit(network: string): Promise<{ bn: BN; bigint: bigint }> {
   const api = await ApiManager.getInstance().getApi(network);
-
-  if (!api) {
-    throw new Error(`Failed to get API for network: ${network}`);
-  }
 
   const ed = api.consts.balances.existentialDeposit;
 
@@ -49,12 +45,10 @@ async function fetchExistentialDeposit(network: string): Promise<{ bn: BN; bigin
  * ```
  */
 export function useExistentialDeposit(network: string): ExistentialDepositResult {
-  const { isApiReady } = useChainStatus(network);
-
   const { data, isLoading, error } = useQuery({
     queryKey: ['existentialDeposit', network] as const,
     queryFn: ({ queryKey }) => fetchExistentialDeposit(queryKey[1]),
-    enabled: !!network && isApiReady,
+    enabled: !!network,
     staleTime: Infinity,
     retry: false
   });

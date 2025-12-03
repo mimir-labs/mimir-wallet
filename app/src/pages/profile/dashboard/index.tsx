@@ -130,7 +130,11 @@ function DashboardV2({ address }: { address: string }) {
         <div className='col-span-8'>
           <Title>Account Strucuture</Title>
           <NetworkProvider network={network}>
-            <AccountStructure address={address} setNetwork={setNetwork} />
+            <AccountStructure
+              address={address}
+              supportedNetworks={supportedNetworks?.map((n) => n.key)}
+              setNetwork={setNetwork}
+            />
           </NetworkProvider>
         </div>
       </div>

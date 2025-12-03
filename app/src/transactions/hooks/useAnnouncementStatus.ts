@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { addressEq, ApiManager, useChainStatus, useNetwork } from '@mimir-wallet/polkadot-core';
+import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
@@ -40,7 +40,6 @@ export function useAnnouncementStatus(
   account: AccountData
 ): [status: AnnouncementStatus, isFetching: boolean] {
   const { network } = useNetwork();
-  const { isApiReady } = useChainStatus(network);
 
   const status = transaction.status;
   const type = transaction.type;
@@ -56,8 +55,7 @@ export function useAnnouncementStatus(
     isFetching: isFetchingResult
   } = useQuery({
     queryKey: ['announcement-status', network, transaction.delegate || ''] as const,
-    enabled:
-      isApiReady && !!transaction.delegate && status === TransactionStatus.Pending && type === TransactionType.Announce,
+    enabled: !!transaction.delegate && status === TransactionStatus.Pending && type === TransactionType.Announce,
     refetchOnMount: false,
     queryFn: fetchAnnouncementsForStatus
   });

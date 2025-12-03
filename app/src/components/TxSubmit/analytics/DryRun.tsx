@@ -11,7 +11,6 @@ import {
   dryRun,
   dryRunWithXcm,
   NetworkProvider,
-  useChains,
   useNetwork
 } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
@@ -77,12 +76,6 @@ function OperationItem({
   amount: bigint;
   assetId: string;
 }) {
-  const { enableNetwork } = useChains();
-
-  useEffect(() => {
-    enableNetwork(genesisHash);
-  }, [enableNetwork, genesisHash]);
-
   return (
     <NetworkProvider network={genesisHash}>
       <OperationItemContent type={type} amount={amount} assetId={assetId} />

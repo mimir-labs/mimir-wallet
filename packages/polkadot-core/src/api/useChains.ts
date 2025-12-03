@@ -7,6 +7,7 @@ import { store } from '@mimir-wallet/service';
 import { useSyncExternalStore } from 'react';
 
 import { allEndpoints } from '../chains/config.js';
+import { useNetwork } from '../context/NetworkContext.js';
 
 import { ApiManager } from './ApiManager.js';
 
@@ -110,6 +111,7 @@ function enableNetwork(key: string): void {
 
   // Add user reference when enabling network
   ApiManager.getInstance().addReference(target.key, 'user');
+  ApiManager.getInstance().initialize(target);
 
   persistNetworks();
   updateSnapshot();
@@ -180,9 +182,15 @@ const stableActions = {
  */
 export function useChains(): ChainsControl {
   const state = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const { network } = useNetwork();
 
   return {
-    chains: state.networks,
+    chains: state.networks.map(
+      (item): Network => ({
+        ...item,
+        enabled: mode === 'omni' ? item.enabled : item.key === network
+      })
+    ),
     mode: state.mode,
     ...stableActions
   };

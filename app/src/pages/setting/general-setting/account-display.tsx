@@ -31,7 +31,7 @@ function AccountDisplay() {
 
         return (
           <div className='flex items-center justify-between' key={item.address}>
-            <AddressCell shorten={!upSm} value={item.address} />
+            <AddressCell showNetworkProxied withIconBorder shorten={!upSm} value={item.address} />
             <Button variant='ghost' onClick={() => (isHide ? showAccount(item.address) : hideAccount(item.address))}>
               {isHide ? 'Unhide' : 'Hide'}
             </Button>

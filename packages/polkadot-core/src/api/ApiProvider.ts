@@ -111,6 +111,10 @@ export class ApiProvider implements ProviderInterface {
   readonly #connectionTimeout: number;
   #connectionTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // Track attempted endpoints to emit error only after all endpoints fail
+  #attemptedEndpoints: Set<number> = new Set();
+  #lastErrors: Error[] = [];
+
   /**
    * @param {string | string[]} endpoint The endpoint url. Usually `ws://ip:9944` or `wss://ip:9944`, may provide an array of endpoint strings.
    * @param {number | false} autoConnectMs Whether to connect automatically or not (default). Provided value is used as a delay between retries.
@@ -244,8 +248,6 @@ export class ApiProvider implements ProviderInterface {
     } catch (error) {
       this.#clearConnectionTimer();
       l.error(error);
-
-      this.#emit('error', error);
 
       throw error;
     }
@@ -512,6 +514,21 @@ export class ApiProvider implements ProviderInterface {
     // Reset stats for active endpoint
     this.#endpointStats = defaultEndpointStats();
 
+    // Track this endpoint as attempted
+    this.#attemptedEndpoints.add(this.#endpointIndex);
+
+    // Check if all endpoints have been tried
+    if (this.#attemptedEndpoints.size >= this.#endpoints.length) {
+      // All endpoints failed, emit a concise error
+      const finalError = new Error(`Failed to connect: all ${this.#endpoints.length} endpoints unavailable`);
+
+      this.#emit('error', finalError);
+
+      // Reset attempt tracking for next round of retries
+      this.#attemptedEndpoints.clear();
+      this.#lastErrors = [];
+    }
+
     this.#emit('disconnected');
 
     if (this.#autoConnectMs > 0) {
@@ -550,7 +567,10 @@ export class ApiProvider implements ProviderInterface {
 
     const error = new Error(errorMessage);
 
-    this.#emit('error', error);
+    // Store error instead of emitting immediately
+    // Error will be emitted after all endpoints have been tried
+    this.#lastErrors.push(error);
+    l.error(error.message);
   };
 
   #onSocketMessage = (message: MessageEvent<string>): void => {
@@ -652,6 +672,10 @@ export class ApiProvider implements ProviderInterface {
 
     // Clear connection timeout timer on successful connection
     this.#clearConnectionTimer();
+
+    // Clear attempt tracking on successful connection
+    this.#attemptedEndpoints.clear();
+    this.#lastErrors = [];
 
     this.#resubscribe();
 

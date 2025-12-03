@@ -8,7 +8,6 @@ export { default as SuccessAnimation } from './animation/Success';
 export { default as WaitingAnimation } from './animation/Waiting';
 export { default as MimirLoading } from './animation/MimirLoading';
 export { default as AccountMenu } from './account-menu';
-export { default as AccountSelect } from './AccountSelect';
 export { default as AddAddressDialog } from './AddAddressDialog';
 export { default as Address } from './Address';
 export { default as AddressCell } from './AddressCell';

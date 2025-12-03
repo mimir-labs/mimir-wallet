@@ -1,23 +1,19 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useChains } from '@mimir-wallet/polkadot-core';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useChains, useNetwork } from '@mimir-wallet/polkadot-core';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: string[]) {
-  const { chains, enableNetwork, mode } = useChains();
+  const { chains, mode } = useChains();
+  const { network: initialNetwork } = useNetwork();
 
   // Get enabled network keys as a Set for fast lookup
   const enabledNetworks = useMemo(() => new Set(chains.filter((c) => c.enabled).map((c) => c.key)), [chains]);
 
-  // Get first enabled network as default fallback
-  const firstEnabledNetwork = useMemo(() => {
-    const enabled = chains.find((c) => c.enabled);
-
-    return enabled?.key || 'polkadot';
-  }, [chains]);
-
-  const [network, setNetwork] = useState(supportedNetworks?.at(0) || defaultNetwork || firstEnabledNetwork);
+  const [network, setNetwork] = useState(
+    supportedNetworks?.at(0) || defaultNetwork || enabledNetworks.values().next().value || initialNetwork
+  );
 
   const enabledNetworksRef = useRef(enabledNetworks);
 
@@ -30,7 +26,7 @@ export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: str
       if (mode === 'omni') {
         if (!supportedNetworks || supportedNetworks.length === 0) {
           if (!enabledNetworksRef.current.has(network)) {
-            setNetwork(firstEnabledNetwork);
+            setNetwork(initialNetwork);
           }
         } else {
           if (!supportedNetworks.includes(network)) {
@@ -41,23 +37,14 @@ export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: str
         }
       }
     });
-  }, [network, supportedNetworks, mode, firstEnabledNetwork]);
-
-  useEffect(() => {
-    if (mode === 'omni' && !enabledNetworksRef.current.has(network)) {
-      enableNetwork(network);
-    }
-  }, [network, enableNetwork, mode]);
+  }, [network, supportedNetworks, mode, initialNetwork]);
 
   return [
     network,
-    useCallback(
-      (newNetwork: string) => {
-        if (mode === 'omni') {
-          setNetwork(newNetwork);
-        }
-      },
-      [mode]
-    )
+    (newNetwork: string) => {
+      if (mode === 'omni' && (!supportedNetworks || supportedNetworks.includes(newNetwork))) {
+        setNetwork(newNetwork);
+      }
+    }
   ] as const;
 }

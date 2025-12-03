@@ -12,7 +12,7 @@ export function useMultiChainStats(
   const { chains } = useChains();
 
   // Get enabled network keys
-  const enabledNetworks = useMemo(() => new Set(chains.filter((c) => c.enabled).map((c) => c.key)), [chains]);
+  const chainsSet = useMemo(() => new Set(chains.map((c) => c.key)), [chains]);
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['multi-chain-stats', addressHex] as const,
@@ -25,9 +25,9 @@ export function useMultiChainStats(
     useMemo(
       () =>
         Object.fromEntries(
-          Object.entries(data || {}).filter(([network, enabled]) => enabledNetworks.has(network) && enabled)
+          Object.entries(data || {}).filter(([network, enabled]) => chainsSet.has(network) && enabled)
         ),
-      [data, enabledNetworks]
+      [data, chainsSet]
     ),
     isFetched,
     isFetching

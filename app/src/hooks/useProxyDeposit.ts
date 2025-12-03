@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ApiManager, useChainStatus } from '@mimir-wallet/polkadot-core';
+import { ApiManager } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useMemo } from 'react';
@@ -25,10 +25,6 @@ interface ProxyDepositData {
 
 async function fetchProxyDeposit(network: string): Promise<ProxyDepositData> {
   const api = await ApiManager.getInstance().getApi(network);
-
-  if (!api) {
-    throw new Error(`Failed to get API for network: ${network}`);
-  }
 
   if (!api.consts.proxy) {
     throw new Error(`Proxy pallet not available for network: ${network}`);
@@ -65,12 +61,10 @@ async function fetchProxyDeposit(network: string): Promise<ProxyDepositData> {
  * ```
  */
 export function useProxyDeposit(network: string): ProxyDepositResult {
-  const { isApiReady } = useChainStatus(network);
-
   const { data, isLoading, error } = useQuery({
     queryKey: ['proxyDeposit', network] as const,
     queryFn: ({ queryKey }) => fetchProxyDeposit(queryKey[1]),
-    enabled: !!network && isApiReady,
+    enabled: !!network,
     staleTime: Infinity,
     retry: false
   });
