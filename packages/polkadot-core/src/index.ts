@@ -30,13 +30,18 @@ export { allEndpoints, remoteProxyRelations, getChainIcon } from './chains/index
 export {
   ApiManager,
   useAllChainStatuses,
+  useAllChainsConnected,
+  useApiStore,
   useChain,
   useChains,
   useChainStatus,
   useSs58Format,
-  getNetworkMode
+  getNetworkMode,
+  getSs58Chain,
+  getSs58ChainInfo,
+  setSs58ChainExternal
 } from './api/index.js';
-export type { ChainsControl } from './api/index.js';
+export type { ApiState, ChainsControl } from './api/index.js';
 
 // Network context exports
 export { NetworkProvider, useNetwork, useNetworkOptional } from './context/index.js';

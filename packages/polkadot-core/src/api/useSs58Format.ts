@@ -3,78 +3,13 @@
 
 import type { Ss58FormatControl } from '../types/types.js';
 
-import { store } from '@mimir-wallet/service';
-import { useSyncExternalStore } from 'react';
+import { useMemo } from 'react';
+import { useShallow } from 'zustand/shallow';
 
 import { allEndpoints } from '../chains/config.js';
-import { DEFAULE_SS58_CHAIN_KEY } from '../utils/defaults.js';
 
 import { ApiManager } from './ApiManager.js';
-
-// Internal state
-let ss58Chain: string = initSs58Chain();
-const listeners = new Set<() => void>();
-
-function initSs58Chain(): string {
-  const stored = store.get(DEFAULE_SS58_CHAIN_KEY) as string | undefined;
-
-  // Validate stored value against available endpoints
-  if (stored && allEndpoints.some((e) => e.key === stored)) {
-    return stored;
-  }
-
-  // Default to first endpoint
-  const defaultChain = allEndpoints[0]?.key ?? 'polkadot';
-
-  store.set(DEFAULE_SS58_CHAIN_KEY, defaultChain);
-
-  return defaultChain;
-}
-
-function notifyListeners() {
-  listeners.forEach((listener) => listener());
-}
-
-// Snapshot for useSyncExternalStore
-let snapshot = createSnapshot();
-
-function createSnapshot() {
-  const chainInfo = ApiManager.resolveChain(ss58Chain) ?? allEndpoints[0];
-
-  return {
-    ss58: chainInfo.ss58Format,
-    ss58Chain,
-    chainInfo
-  };
-}
-
-function getSnapshot() {
-  return snapshot;
-}
-
-function updateSnapshot() {
-  snapshot = createSnapshot();
-}
-
-// Stable subscribe function at module level
-function subscribe(onStoreChange: () => void): () => void {
-  listeners.add(onStoreChange);
-
-  return () => listeners.delete(onStoreChange);
-}
-
-// Stable action function at module level
-function setSs58Chain(chain: string): void {
-  // Validate chain exists
-  const target = allEndpoints.find((e) => e.key === chain || e.genesisHash === chain);
-
-  if (!target) return;
-
-  ss58Chain = target.key;
-  store.set(DEFAULE_SS58_CHAIN_KEY, ss58Chain);
-  updateSnapshot();
-  notifyListeners();
-}
+import { useApiStore } from './useApiStore.js';
 
 /**
  * Hook to control SS58 format for address display
@@ -96,33 +31,22 @@ function setSs58Chain(chain: string): void {
  * ```
  */
 export function useSs58Format(): Ss58FormatControl {
-  const state = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const { ss58Chain, setSs58Chain } = useApiStore(
+    useShallow((state) => ({
+      ss58Chain: state.ss58Chain,
+      setSs58Chain: state.setSs58Chain
+    }))
+  );
+
+  const chainInfo = useMemo(() => ApiManager.resolveChain(ss58Chain) ?? allEndpoints[0], [ss58Chain]);
 
   return {
-    ss58: state.ss58,
-    ss58Chain: state.ss58Chain,
-    chainInfo: state.chainInfo,
+    ss58: chainInfo.ss58Format,
+    ss58Chain,
+    chainInfo,
     setSs58Chain
   };
 }
 
-/**
- * Get current SS58 chain (for use outside of React components)
- */
-export function getSs58Chain(): string {
-  return ss58Chain;
-}
-
-/**
- * Set SS58 chain (for use outside of React components)
- */
-export function setSs58ChainExternal(chain: string): void {
-  const target = allEndpoints.find((e) => e.key === chain || e.genesisHash === chain);
-
-  if (!target) return;
-
-  ss58Chain = target.key;
-  store.set(DEFAULE_SS58_CHAIN_KEY, ss58Chain);
-  updateSnapshot();
-  notifyListeners();
-}
+// Re-export external access functions from useApiStore for backward compatibility
+export { getSs58Chain, setSs58ChainExternal } from './useApiStore.js';
