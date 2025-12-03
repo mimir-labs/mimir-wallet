@@ -1,19 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData } from '@/hooks/types';
 
-import IconDelete from '@/assets/svg/icon-delete.svg?react';
-import { AddressRow, Empty, InputAddress } from '@/components';
-import { toastError } from '@/components/utils';
-import { walletConfig } from '@/config';
-import { CONNECT_ORIGIN } from '@/constants';
-import { useManageProposerFilter } from '@/hooks/useProposeFilter';
-import { accountSource } from '@/wallet/useWallet';
-import { memo, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import {
   Button,
@@ -31,6 +21,16 @@ import {
   TableHeader,
   TableRow
 } from '@mimir-wallet/ui';
+import { memo, useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
+
+import IconDelete from '@/assets/svg/icon-delete.svg?react';
+import { AddressRow, Empty, InputAddress } from '@/components';
+import { toastError } from '@/components/utils';
+import { walletConfig } from '@/config';
+import { CONNECT_ORIGIN } from '@/constants';
+import { useManageProposerFilter } from '@/hooks/useProposeFilter';
+import { accountSource } from '@/wallet/useWallet';
 
 function AddModal({
   type,
@@ -47,7 +47,8 @@ function AddModal({
   onClose: () => void;
   refetch: () => void;
 }) {
-  const { genesisHash, network } = useApi();
+  const { chain, network } = useNetwork();
+  const genesisHash = chain.genesisHash;
   const [proposer, setProposer] = useState<string | undefined>();
   const [signer, setSigner] = useState<string | undefined>();
   const filtered = useManageProposerFilter(account);

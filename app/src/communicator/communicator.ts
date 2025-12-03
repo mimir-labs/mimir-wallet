@@ -1,16 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { State } from './types';
 import type { MessageTypes, ResponseTypes, TransportRequestMessage } from '@polkadot/extension-base/background/types';
 import type { SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { MutableRefObject } from 'react';
-import type { State } from './types';
-
-import { assert } from '@polkadot/util';
 
 import { allEndpoints } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
+import { assert } from '@polkadot/util';
 
 declare module '@polkadot/extension-base/background/types' {
   export interface RequestSignatures {

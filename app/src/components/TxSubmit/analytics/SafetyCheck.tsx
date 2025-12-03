@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SafetyLevel } from '@/hooks/types';
+
+import { Spinner } from '@mimir-wallet/ui';
+import React from 'react';
+
+import Cell from './Cell';
 
 import Logo from '@/assets/images/logo.png';
 import IconFailed from '@/assets/svg/icon-failed-fill.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success.svg?react';
-import React from 'react';
-
-import { Spinner } from '@mimir-wallet/ui';
-
-import Cell from './Cell';
 
 function SafetyCheck({ safetyCheck }: { safetyCheck?: SafetyLevel }) {
   if (safetyCheck && safetyCheck.severity === 'none') {

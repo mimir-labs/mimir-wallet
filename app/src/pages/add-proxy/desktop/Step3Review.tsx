@@ -1,23 +1,25 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ProxyArgs, TransactionResult } from '../types';
 
-import PureIcon from '@/assets/images/pure-icon.svg';
-import { AddressCell, ProxyControls } from '@/components';
-import { toastError } from '@/components/utils';
+import { allEndpoints, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
 import { useCallback, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
-
-import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
 
 import SafetyWarningModal from '../components/SafetyWarningModal';
 import { useDelayCalculation } from '../hooks/useDelayCalculation';
 import { useProxySafetyCheck } from '../hooks/useProxySafetyCheck';
 import { useProxyTransaction } from '../hooks/useProxyTransaction';
 import { DEFAULT_PURE_ACCOUNT_NAME, proxyTypeDescriptions } from '../utils';
+
 import ProxyAccountStructure from './ProxyAccountStructure';
+
+import PureIcon from '@/assets/images/pure-icon.svg';
+import { AddressCell, ProxyControls } from '@/components';
+import { toastError } from '@/components/utils';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface ProxyWizardData {
   proxied: string | undefined;
@@ -37,24 +39,27 @@ interface Step3ReviewProps {
   onConfirm: (result: TransactionResult) => void;
 }
 
-function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
-  const { api, chain, genesisHash, network } = useApi();
-  const isProxyModuleSupported = !!api.tx.proxy;
+function Step3Review({ wizardData, network, onBack, onConfirm }: Step3ReviewProps) {
+  const { chain } = useNetwork();
+  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(network);
   const [alertOpen, toggleAlertOpen] = useToggle(false);
   const [detectedControllers, setDetectedControllers] = useState<string[]>([]);
 
+  const genesisHash = chain.genesisHash;
+
   // Use delay calculation hook
   const { delayInBlocks, delayDisplay } = useDelayCalculation({
+    network,
     delayType: wizardData.delayType,
     customBlocks: wizardData.customBlocks,
     hasDelay: wizardData.hasDelay
   });
 
   // Use safety check hook
-  const { checkSafety, result: safetyResult } = useProxySafetyCheck();
+  const { checkSafety, result: safetyResult } = useProxySafetyCheck(network);
 
   // Use proxy transaction hook
-  const { submitPureProxy, submitProxyAddition, isLoading: isTransactionLoading } = useProxyTransaction();
+  const { submitPureProxy, submitProxyAddition, isLoading: isTransactionLoading } = useProxyTransaction(network);
 
   const remoteProxyChain = useMemo(
     () =>
@@ -159,7 +164,7 @@ function Step3Review({ wizardData, onBack, onConfirm }: Step3ReviewProps) {
 
           <ProxyControls
             proxyType={wizardData.proxyType.toUpperCase()}
-            className='!absolute inset-x-auto inset-y-0 z-10 m-auto'
+            className='absolute! inset-x-auto inset-y-0 z-10 m-auto'
           />
 
           {/* Proxied Account / Pure Proxy (Lower) */}

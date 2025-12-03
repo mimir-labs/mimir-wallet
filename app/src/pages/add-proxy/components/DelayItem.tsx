@@ -1,14 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DelayType } from '../types';
 
-import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useMemo } from 'react';
 
 import { estimateTimeFromBlocks } from '../utils';
 
+import { useBlockInterval } from '@/hooks/useBlockInterval';
+
 interface Props {
+  network: string;
   delayType: DelayType;
   isSelected: boolean;
   onSelect: (value: DelayType) => void;
@@ -39,8 +41,8 @@ function getLabel(delayType: DelayType) {
   return label;
 }
 
-function EstimateCustom({ customBlocks }: { customBlocks: string }) {
-  const blockInterval = useBlockInterval().toNumber();
+function EstimateCustom({ network, customBlocks }: { network: string; customBlocks: string }) {
+  const blockInterval = useBlockInterval(network).toNumber();
 
   // Use utility function for time estimation
   return useMemo(() => {
@@ -48,7 +50,7 @@ function EstimateCustom({ customBlocks }: { customBlocks: string }) {
   }, [customBlocks, blockInterval]);
 }
 
-function DelayItem({ isSelected, delayType, customBlocks = '', onCustomBlockChange, onSelect }: Props) {
+function DelayItem({ network, isSelected, delayType, customBlocks = '', onCustomBlockChange, onSelect }: Props) {
   const handleClick = () => {
     onSelect(delayType);
   };
@@ -73,7 +75,7 @@ function DelayItem({ isSelected, delayType, customBlocks = '', onCustomBlockChan
             className='text-foreground border-divider-300 bg-primary-foreground h-[27px] flex-shrink flex-grow rounded-full border-1 px-2.5 outline-none'
           />
           <span className='text-nowrap'>
-            Blocks ( <EstimateCustom customBlocks={customBlocks} /> )
+            Blocks ( <EstimateCustom network={network} customBlocks={customBlocks} /> )
           </span>
         </>
       ) : (

@@ -1,13 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { FunctionCallHandler } from '@mimir-wallet/ai-assistant';
 
+import { NavigationMiddleware } from '@mimir-wallet/ai-assistant';
+import { useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect } from 'react';
-
-import { NavigationMiddleware } from '@mimir-wallet/ai-assistant';
-import { useApi, useNetworks } from '@mimir-wallet/polkadot-core';
 
 import { useFunctionCallHandler } from './useFunctionCallHandler';
 
@@ -106,7 +105,7 @@ function useNavigateCallHandler() {
  * Handler for 'showComponent' with 'switchNetworks' type
  */
 function useSwitchNetworksHandler() {
-  const { enableNetwork, disableNetwork } = useNetworks();
+  const { enableNetwork, disableNetwork } = useChains();
 
   const handler = useCallback<FunctionCallHandler>(
     (event) => {
@@ -137,7 +136,7 @@ function useSwitchNetworksHandler() {
  * Handler for 'showComponent' with 'setSs58Chain' type
  */
 function useSetSs58ChainHandler() {
-  const { setSs58Chain } = useApi();
+  const { setSs58Chain } = useSs58Format();
 
   const handler = useCallback<FunctionCallHandler>(
     (event) => {

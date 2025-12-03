@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { Circle } from '@polkadot/ui-shared/icons/types';
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import { walletConfig } from '@/config';
-import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
+import { addressEq, encodeAddress, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { Avatar } from '@mimir-wallet/ui';
 import { polkadotIcon } from '@polkadot/ui-shared';
 import React, { useCallback, useMemo } from 'react';
 
-import { addressEq, encodeAddress, useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
-import { Avatar } from '@mimir-wallet/ui';
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import { walletConfig } from '@/config';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 
 interface Props {
   className?: string;
@@ -27,7 +27,7 @@ function renderCircle({ cx, cy, fill, r }: Circle, index: number) {
 }
 
 function IdentityIcon({ className, prefix, size = 30, value, withBorder = false, showMultisigBadge = true }: Props) {
-  const { chainSS58 } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
   const address = encodeAddress(value, prefix ?? chainSS58);
   const { meta } = useAddressMeta(value?.toString());
   const copyAddress = useCopyAddressToClipboard(address);

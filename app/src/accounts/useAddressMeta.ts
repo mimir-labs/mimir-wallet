@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AddressMeta } from '@/hooks/types';
 
-import { toastError } from '@/components/utils';
+import { addressToHex, useNetwork } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 import { useCallback, useMemo, useState } from 'react';
 
-import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-
 import { useAccount } from './useAccount';
+
+import { toastError } from '@/components/utils';
 
 interface UseAddressMeta {
   meta: AddressMeta;
@@ -19,7 +19,7 @@ interface UseAddressMeta {
 }
 
 export function useAddressMeta(value?: string | null): UseAddressMeta {
-  const { network } = useApi();
+  const { network } = useNetwork();
   const { metas, addAddress, setAccountName } = useAccount();
   const addressHex = useMemo(() => (value ? addressToHex(value) : '0x'), [value]);
   const _meta = metas[addressHex];

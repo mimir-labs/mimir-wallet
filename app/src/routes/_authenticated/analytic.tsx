@@ -1,11 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import PageAnalytic from '@/pages/analytic';
-import { createFileRoute } from '@tanstack/react-router';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { queryClient, service, STALE_TIMES } from '@mimir-wallet/service';
+import { createFileRoute } from '@tanstack/react-router';
+
+import PageAnalytic from '@/pages/analytic';
 
 /**
  * Analytics Dashboard Route (/analytic)

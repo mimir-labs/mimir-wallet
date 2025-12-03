@@ -1,7 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, ProxyTransaction, Transaction } from '@/hooks/types';
+
+import { Button, Spinner } from '@mimir-wallet/ui';
+import { useMemo } from 'react';
+
+import { useAnnouncementStatus } from './hooks/useAnnouncementStatus';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
@@ -10,11 +15,6 @@ import IconMember from '@/assets/svg/icon-member-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
 import { TransactionStatus } from '@/hooks/types';
-import { useMemo } from 'react';
-
-import { Button, Spinner } from '@mimir-wallet/ui';
-
-import { useAnnouncementStatus } from './hooks/useAnnouncementStatus';
 
 export function AnnouncementStatus({ account, transaction }: { account: AccountData; transaction: ProxyTransaction }) {
   const [status, isFetching] = useAnnouncementStatus(transaction, account);

@@ -1,25 +1,25 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@mimir-wallet/service';
+import type { IMethod } from '@polkadot/types/types';
+
+import {
+  addressEq,
+  ApiManager,
+  type BalanceChange,
+  dryRun,
+  dryRunWithXcm,
+  NetworkProvider,
+  useNetwork
+} from '@mimir-wallet/polkadot-core';
+import { Avatar, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { FormatBalance } from '@/components';
 import CopyButton from '@/components/CopyButton';
 import { findToken } from '@/config';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
-import React, { useCallback, useEffect, useState } from 'react';
-
-import {
-  addressEq,
-  type BalanceChange,
-  dryRun,
-  dryRunWithXcm,
-  SubApiRoot,
-  useApi,
-  useNetworks
-} from '@mimir-wallet/polkadot-core';
-import { Avatar, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
 
 const EMPTY_SIMULATION = {
   isDone: false,
@@ -28,20 +28,16 @@ const EMPTY_SIMULATION = {
   isLoading: false
 };
 
-// Operation Item Component matching Figma design
-function OperationItem({
+// Inner content that requires API to be ready
+function OperationItemContent({
   type,
-  genesisHash,
   amount,
   assetId
 }: {
   type: 'Receive' | 'Send' | 'Lock' | 'Unlock';
-  genesisHash: HexString;
   amount: bigint;
   assetId: string;
 }) {
-  const { enableNetwork } = useNetworks();
-
   const getActionEmoji = () => {
     switch (type) {
       case 'Receive':
@@ -57,28 +53,41 @@ function OperationItem({
     }
   };
 
-  useEffect(() => {
-    enableNetwork(genesisHash);
-  }, [enableNetwork, genesisHash]);
-
   return (
-    <SubApiRoot network={genesisHash} Fallback={() => <Spinner variant='wave' size='sm' />}>
-      <div className='bg-secondary flex items-center justify-between rounded-[5px] p-[5px] text-xs'>
-        <div className='text-foreground'>
-          {type}
-          {getActionEmoji()}
-        </div>
-        {assetId === 'native' ? <NativeToken amount={amount} /> : <AssetToken assetId={assetId} amount={amount} />}
+    <div className='bg-secondary flex items-center justify-between rounded-[5px] p-[5px] text-xs'>
+      <div className='text-foreground'>
+        {type}
+        {getActionEmoji()}
       </div>
-    </SubApiRoot>
+      {assetId === 'native' ? <NativeToken amount={amount} /> : <AssetToken assetId={assetId} amount={amount} />}
+    </div>
+  );
+}
+
+// Operation Item Component matching Figma design
+function OperationItem({
+  type,
+  genesisHash,
+  amount,
+  assetId
+}: {
+  type: 'Receive' | 'Send' | 'Lock' | 'Unlock';
+  genesisHash: HexString;
+  amount: bigint;
+  assetId: string;
+}) {
+  return (
+    <NetworkProvider network={genesisHash}>
+      <OperationItemContent type={type} amount={amount} assetId={assetId} />
+    </NetworkProvider>
   );
 }
 
 function NativeToken({ amount }: { amount: bigint }) {
-  const { api, chain, genesisHash } = useApi();
-  const symbol = api.registry.chainTokens[0] || 'Native';
-  const decimals = api.registry.chainDecimals[0] || 1;
-  const icon = findToken(genesisHash).Icon;
+  const { chain } = useNetwork();
+  const symbol = chain.nativeToken || 'Native';
+  const decimals = chain.nativeDecimals || 10;
+  const icon = findToken(chain.genesisHash).Icon;
 
   return (
     <Tooltip
@@ -113,7 +122,7 @@ function NativeToken({ amount }: { amount: bigint }) {
 }
 
 function AssetToken({ assetId, amount }: { assetId: string; amount: bigint }) {
-  const { network, chain } = useApi();
+  const { network, chain } = useNetwork();
   const [assetInfo] = useXcmAsset(network, assetId);
 
   if (!assetInfo) {
@@ -315,75 +324,86 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
     isLoading: boolean;
   }>(EMPTY_SIMULATION);
   const [balancesChanges, setBalancesChanges] = useState<SelfBalanceChange[]>([]);
-  const { api } = useApi();
+  const { network } = useNetwork();
   const [rawEvents, setRawEvents] = useState<any>();
   const [hasXcm, setHasXcm] = useState(false);
 
-  const handleSimulate = useCallback(() => {
+  const handleSimulate = useCallback(async () => {
     if (account && call) {
       setSimulation({ ...EMPTY_SIMULATION, isLoading: true });
       setCrossChainSimulation({ ...EMPTY_SIMULATION, isLoading: true });
       setBalancesChanges([]);
       setHasXcm(false);
 
-      dryRun(api, call, account)
-        .then((result) => {
-          setRawEvents(result.rawEvents);
+      try {
+        const api = await ApiManager.getInstance().getApi(network);
 
-          if (result.success) {
-            const balancesChanges = result.balancesChanges;
+        if (!api) {
+          throw new Error('API not ready');
+        }
 
-            setBalancesChanges(extraBalancesChange(account, balancesChanges));
-            setSimulation({ isDone: true, success: true, error: null, isLoading: false });
+        const result = await dryRun(api, call, account);
 
-            if (result.forwardedXcms.length > 0) {
-              setHasXcm(true);
-              dryRunWithXcm(api, result.forwardedXcms)
-                .then((result) => {
-                  const errorResult = result.find((item) => !item.success);
+        setRawEvents(result.rawEvents);
 
-                  if (errorResult) {
-                    setCrossChainSimulation({
-                      isDone: true,
-                      success: false,
-                      error: errorResult.error.message,
-                      isLoading: false
-                    });
-                  } else {
-                    setBalancesChanges(
-                      extraBalancesChange(
-                        account,
-                        balancesChanges.concat(result.map((item) => (item.success ? item.balancesChanges : [])).flat())
-                      )
-                    );
+        if (result.success) {
+          const balancesChanges = result.balancesChanges;
 
-                    setCrossChainSimulation({ isDone: true, success: true, error: null, isLoading: false });
-                  }
-                })
-                .catch((error) => {
-                  console.error(error);
-                  setCrossChainSimulation({
-                    isDone: true,
-                    success: false,
-                    error: error.message || 'Unknown Error',
-                    isLoading: false
-                  });
+          setBalancesChanges(extraBalancesChange(account, balancesChanges));
+          setSimulation({ isDone: true, success: true, error: null, isLoading: false });
+
+          if (result.forwardedXcms.length > 0) {
+            setHasXcm(true);
+
+            try {
+              const xcmResult = await dryRunWithXcm(api, result.forwardedXcms);
+              const errorResult = xcmResult.find((item) => !item.success);
+
+              if (errorResult) {
+                setCrossChainSimulation({
+                  isDone: true,
+                  success: false,
+                  error: errorResult.error.message,
+                  isLoading: false
                 });
-            } else {
-              setCrossChainSimulation({ isDone: true, success: true, error: null, isLoading: false });
+              } else {
+                setBalancesChanges(
+                  extraBalancesChange(
+                    account,
+                    balancesChanges.concat(xcmResult.map((item) => (item.success ? item.balancesChanges : [])).flat())
+                  )
+                );
+
+                setCrossChainSimulation({ isDone: true, success: true, error: null, isLoading: false });
+              }
+            } catch (error) {
+              console.error(error);
+              setCrossChainSimulation({
+                isDone: true,
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown Error',
+                isLoading: false
+              });
             }
           } else {
-            setSimulation({ isDone: true, success: false, error: result.error.message, isLoading: false });
-            setCrossChainSimulation({ ...EMPTY_SIMULATION, isLoading: true });
+            setCrossChainSimulation({ isDone: true, success: true, error: null, isLoading: false });
           }
-        })
-        .catch((error) => {
-          console.error(error);
-          setSimulation({ isDone: true, success: false, error: error.message || 'Unknown Error', isLoading: false });
+        } else {
+          setSimulation({ isDone: true, success: false, error: result.error.message, isLoading: false });
           setCrossChainSimulation({ ...EMPTY_SIMULATION, isLoading: true });
+        }
+      } catch (error) {
+        console.error(error);
+        setSimulation({
+          isDone: true,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown Error',
+          isLoading: false
         });
+        setCrossChainSimulation({ ...EMPTY_SIMULATION, isLoading: true });
+      }
     }
-  }, [account, api, call]);
+  }, [account, call, network]);
 
   useEffect(() => {
     if (!simulation.isDone && !simulation.isLoading) {

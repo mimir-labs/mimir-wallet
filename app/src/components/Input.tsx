@@ -1,11 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { InputProps } from './types';
 
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-
 import { cn, Input as ShadcnInput } from '@mimir-wallet/ui';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (

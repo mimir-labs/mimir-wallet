@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ErrorInfo, ReactNode } from 'react';
 import type { Endpoint } from '@mimir-wallet/polkadot-core';
+import type { ErrorInfo, ReactNode } from 'react';
+
+import { Alert, AlertDescription, AlertTitle, Button, Card } from '@mimir-wallet/ui';
+import { Component } from 'react';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import Bytes from '@/components/Bytes';
 import Hash from '@/components/Hash';
-import { Component, useEffect, useState } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertDescription, AlertTitle, Button, Card } from '@mimir-wallet/ui';
+import { useChainInfo } from '@/hooks/useChainInfo';
 
 interface ChainInfo {
   metadataHash?: string;
@@ -212,37 +212,7 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
 
 // Wrapper component that captures API context and injects it into the error boundary
 function TxSubmitErrorBoundaryWrapper({ children, onError }: Omit<TxSubmitErrorBoundaryProps, 'chainInfo'>) {
-  const { api, chain, isApiReady } = useApi();
-  const [chainInfo, setChainInfo] = useState<ChainInfo | undefined>(undefined);
-
-  useEffect(() => {
-    if (!isApiReady || !api || !chain) return;
-
-    queueMicrotask(() => {
-      try {
-        const newChainInfo: ChainInfo = {
-          chainInfo: chain,
-          runtimeChainName: api.runtimeChain?.toString(),
-          specName: api.runtimeVersion?.specName?.toString(),
-          specVersion: api.runtimeVersion?.specVersion?.toNumber()
-        };
-
-        // Get metadata hash if available
-        if (api.runtimeMetadata) {
-          try {
-            newChainInfo.metadataHash = api.runtimeMetadata.hash.toHex();
-            newChainInfo.metadata = api.runtimeMetadata.toHex();
-          } catch (e) {
-            console.warn('Failed to get metadata hash:', e);
-          }
-        }
-
-        setChainInfo(newChainInfo);
-      } catch (e) {
-        console.warn('Failed to capture chain info:', e);
-      }
-    });
-  }, [api, chain, isApiReady]);
+  const { chainInfo } = useChainInfo();
 
   return (
     <TxSubmitErrorBoundary onError={onError} chainInfo={chainInfo}>

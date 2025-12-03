@@ -1,13 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useMemo } from 'react';
 
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '@/constants';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
-import { useMemo } from 'react';
 
 export type DelayType = 'hour' | 'day' | 'week' | 'custom';
 
 interface DelayCalculationOptions {
+  network: string;
   delayType: DelayType;
   customBlocks?: string;
   hasDelay?: boolean;
@@ -23,11 +25,12 @@ interface DelayCalculationResult {
  * Handles conversion between time units and blockchain blocks
  */
 export function useDelayCalculation({
+  network,
   delayType,
   customBlocks = '0',
   hasDelay = true
 }: DelayCalculationOptions): DelayCalculationResult {
-  const blockInterval = useBlockInterval().toNumber();
+  const blockInterval = useBlockInterval(network).toNumber();
 
   const delayInBlocks = useMemo(() => {
     if (!hasDelay) return 0;

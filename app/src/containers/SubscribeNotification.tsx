@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
+
+import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { useSocket } from '@mimir-wallet/service';
+import { Link } from '@tanstack/react-router';
+import { useEffect, useMemo } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import { Address } from '@/components';
 import { toastError, toastSuccess } from '@/components/utils';
 import { type NotificationMessage, notificationStore } from '@/hooks/useNotifications';
 import { formatTransactionId } from '@/transactions';
-import { Link } from '@tanstack/react-router';
-import { useEffect, useMemo } from 'react';
-
-import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { useSocket } from '@mimir-wallet/service';
 
 const handler = (message: NotificationMessage) => {
   notificationStore.getState().put([message]);

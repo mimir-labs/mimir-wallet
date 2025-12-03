@@ -1,0 +1,121 @@
+[
+  {
+    "key": "vara",
+    "icon": "/chain-icons/vara.png",
+    "tokenIcon": "/token-icons/vara.png",
+    "name": "Vara",
+    "wsUrl": {
+      "Gear": "wss://rpc.vara.network"
+    },
+    "genesisHash": "0xfe1b4c55fd4d668101126434206571a7838a8b6b93a6d1b95d607e78e6c53763",
+    "ss58Format": 137,
+    "explorerUrl": "https://vara.subscan.io/",
+    "nativeDecimals": 12,
+    "nativeToken": "VARA",
+    "supportsDryRun": false,
+    "supportsProxy": true
+  },
+  {
+    "key": "crust",
+    "icon": "/chain-icons/crust.svg",
+    "tokenIcon": "/token-icons/cru.svg",
+    "name": "Crust",
+    "wsUrl": {
+      "Crust Network": "wss://rpc.crust.network",
+      "Crust Network APP": "wss://rpc.crustnetwork.app",
+      "Crust Network CC": "wss://rpc.crustnetwork.cc",
+      "Crust Network XYZ": "wss://rpc.crustnetwork.xyz",
+      "OnFinality": "wss://crust.api.onfinality.io/public-ws"
+    },
+    "genesisHash": "0x8b404e7ed8789d813982b9cb4c8b664c05b3fbf433309f603af014ec9ce56a8c",
+    "ss58Format": 66,
+    "explorerUrl": "https://crust.subscan.io/",
+    "nativeDecimals": 12,
+    "nativeToken": "CRU",
+    "supportsDryRun": false,
+    "supportsProxy": false
+  },
+  {
+    "key": "avail",
+    "icon": "/chain-icons/avail.png",
+    "tokenIcon": "/token-icons/avail.png",
+    "name": "Avail",
+    "wsUrl": {
+      "OnFinality": "wss://avail.api.onfinality.io/public-ws",
+      "Avail": "wss://mainnet-rpc.avail.so/ws"
+    },
+    "genesisHash": "0xb91746b45e0346cc2f815a520b9c6cb4d5c0902af848db0a80f85932d2e8276a",
+    "ss58Format": 42,
+    "explorerUrl": "https://avail.subscan.io/",
+    "nativeDecimals": 18,
+    "nativeToken": "AVAIL",
+    "supportsDryRun": false,
+    "supportsProxy": true
+  },
+  {
+    "key": "avail-turing",
+    "icon": "/chain-icons/avail.png",
+    "tokenIcon": "/token-icons/avail.png",
+    "name": "Avail Turing",
+    "isTestnet": true,
+    "wsUrl": {
+      "Avail": "wss://turing-rpc.avail.so/ws"
+    },
+    "genesisHash": "0xd3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70",
+    "ss58Format": 42,
+    "explorerUrl": "https://avail-turing.subscan.io/",
+    "nativeDecimals": 18,
+    "nativeToken": "AVAIL",
+    "supportsDryRun": false,
+    "supportsProxy": true
+  },
+  {
+    "key": "zkverify",
+    "icon": "/chain-icons/zkverify.svg",
+    "tokenIcon": "/token-icons/VFY.svg",
+    "name": "zkVerify Mainnet",
+    "wsUrl": {
+      "zkVerify": "wss://zkverify-rpc.zkverify.io/"
+    },
+    "genesisHash": "0x060e3dd3fa2904d031206bb913c954687a2bcc350e5a83d33d9e273ad21460f1",
+    "ss58Format": 8741,
+    "explorerUrl": "https://zkverify.subscan.io/",
+    "nativeDecimals": 18,
+    "nativeToken": "VFY",
+    "supportsDryRun": false,
+    "supportsProxy": true
+  },
+  {
+    "key": "zkverify-testnet",
+    "icon": "/chain-icons/zkverify.svg",
+    "tokenIcon": "/token-icons/VFY.svg",
+    "name": "zkVerify Volta",
+    "isTestnet": true,
+    "wsUrl": {
+      "zkVerify": "wss://zkverify-volta-rpc.zkverify.io"
+    },
+    "genesisHash": "0xff7fe5a610f15fe7a0c52f94f86313fb7db7d3786e7f8acf2b66c11d5be7c242",
+    "ss58Format": 251,
+    "explorerUrl": "https://zkverify-testnet.subscan.io/",
+    "nativeDecimals": 18,
+    "nativeToken": "tVFY",
+    "supportsDryRun": false,
+    "supportsProxy": true
+  },
+  {
+    "key": "tanssi",
+    "icon": "/chain-icons/tanssi.webp",
+    "tokenIcon": "/token-icons/tanssi.webp",
+    "name": "Tanssi",
+    "wsUrl": {
+      "Tanssi Foundation": "wss://services.tanssi-mainnet.network/tanssi"
+    },
+    "genesisHash": "0xdd6d086f75ec041b66e20c4186d327b23c8af244c534a2418de6574e8c041a60",
+    "ss58Format": 42,
+    "explorerUrl": "https://tanssi.subscan.io/",
+    "nativeDecimals": 12,
+    "nativeToken": "TANSSI",
+    "supportsDryRun": true,
+    "supportsProxy": true
+  }
+]

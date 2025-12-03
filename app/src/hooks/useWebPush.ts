@@ -1,7 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { WebPushSubscription } from '@mimir-wallet/service';
+
+import { service } from '@mimir-wallet/service';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
+
+import { useWebPushPermission } from './useWebPushPermission';
 
 import {
   generateDeviceIdentifier,
@@ -11,12 +17,6 @@ import {
   subscriptionToJson,
   unsubscribeFromPush
 } from '@/utils/webPushUtils';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useState } from 'react';
-
-import { service } from '@mimir-wallet/service';
-
-import { useWebPushPermission } from './useWebPushPermission';
 
 export interface WebPushState {
   // Permission management
@@ -230,6 +230,10 @@ export function useWebPush(address: string): WebPushState {
     }
   });
 
+  // Destructure mutateAsync for stable references
+  const { mutateAsync: subscribeMutateAsync } = subscribeMutation;
+  const { mutateAsync: unsubscribeMutateAsync } = unsubscribeMutation;
+
   // Main functions
   const subscribe = useCallback(async (): Promise<boolean> => {
     if (!address) {
@@ -246,7 +250,7 @@ export function useWebPush(address: string): WebPushState {
     }
 
     try {
-      await subscribeMutation.mutateAsync();
+      await subscribeMutateAsync();
 
       return true;
     } catch (error) {
@@ -254,11 +258,11 @@ export function useWebPush(address: string): WebPushState {
 
       return false;
     }
-  }, [address, permissionState, subscribeMutation]);
+  }, [address, permissionState, subscribeMutateAsync]);
 
   const unsubscribe = useCallback(async (): Promise<boolean> => {
     try {
-      await unsubscribeMutation.mutateAsync();
+      await unsubscribeMutateAsync();
 
       return true;
     } catch (error) {
@@ -266,7 +270,7 @@ export function useWebPush(address: string): WebPushState {
 
       return false;
     }
-  }, [unsubscribeMutation]);
+  }, [unsubscribeMutateAsync]);
 
   // Derived states
   // Check if we're truly subscribed by verifying:

@@ -1,13 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { useAccount } from '@/accounts/useAccount';
-import { motion, useDragControls } from 'framer-motion';
-import React, { useImperativeHandle, useMemo, useRef } from 'react';
-import { createPortal } from 'react-dom';
 
 import { SimpleChat, type SimpleChatRef, type ToolData } from '@mimir-wallet/ai-assistant';
 import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { motion, useDragControls } from 'framer-motion';
+import React, { useImperativeHandle, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 import AddToWatchlist from './AddToWatchlist';
 import { AccountInfo, ChatTitle } from './ChatHeader';
@@ -22,6 +20,8 @@ import { useDraggableChat } from './useDraggableChat';
 import ViewOnExplorer from './ViewOnExplorer';
 import ViewPendingTransactions from './ViewPendingTransactions';
 import WalletConnect from './WalletConnect';
+
+import { useAccount } from '@/accounts/useAccount';
 
 export interface DraggableChatProps {
   isOpen: boolean;

@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ReactNode } from 'react';
@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 import { API_CLIENT_WS_GATEWAY } from '../config.js';
+
 import { SocketContext } from './context.js';
 
 interface SocketProviderProps {
@@ -44,8 +45,6 @@ const SocketProvider = ({
   }, []);
 
   const subscribe = useCallback((topic: string) => {
-    console.log(`Subscribing to topic: ${topic}`);
-
     const socket = socketRef.current;
 
     if (socket?.connected) {
@@ -54,8 +53,6 @@ const SocketProvider = ({
   }, []);
 
   const unsubscribe = useCallback((topic: string) => {
-    console.log(`Unsubscribing from topic: ${topic}`);
-
     const socket = socketRef.current;
 
     if (socket?.connected) {

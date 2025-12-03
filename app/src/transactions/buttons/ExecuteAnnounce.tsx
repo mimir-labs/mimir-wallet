@@ -1,7 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, Transaction } from '@/hooks/types';
+
+import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
+import { buttonSpinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
+import React, { useState } from 'react';
+import { useToggle } from 'react-use';
+
+import { useAnnouncementStatus } from '../hooks/useAnnouncementStatus';
 
 import IconSuccess from '@/assets/svg/icon-success-outlined.svg?react';
 import { Input, TxButton } from '@/components';
@@ -9,13 +16,6 @@ import { toastError } from '@/components/utils';
 import { TransactionType } from '@/hooks/types';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { useWallet } from '@/wallet/useWallet';
-import React, { useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { buttonSpinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
-
-import { useAnnouncementStatus } from '../hooks/useAnnouncementStatus';
 
 function ExecuteAnnounce({
   isIcon = false,
@@ -26,7 +26,7 @@ function ExecuteAnnounce({
   account: AccountData;
   transaction: Transaction;
 }) {
-  const { api, network } = useApi();
+  const { network } = useNetwork();
   const { addQueue } = useTxQueue();
   const { walletAccounts } = useWallet();
   const [status] = useAnnouncementStatus(transaction, account);
@@ -56,6 +56,7 @@ function ExecuteAnnounce({
     setLoading(true);
 
     try {
+      const api = await ApiManager.getInstance().getApi(network);
       let call: string;
 
       if (transaction.call) {

@@ -1,11 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { CallProps } from './types';
 
-import React, { forwardRef, useMemo, useRef } from 'react';
-
 import { findAction } from '@mimir-wallet/polkadot-core';
+import React, { forwardRef, useMemo, useRef } from 'react';
 
 import BatchCall from './BatchCall';
 import CancelAsMulti from './CancelAsMulti';

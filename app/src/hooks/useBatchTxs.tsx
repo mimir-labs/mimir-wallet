@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HexString } from '@polkadot/util/types';
 import type { BatchTxItem } from './types';
+import type { HexString } from '@polkadot/util/types';
 
-import IconBatch from '@/assets/svg/icon-batch.svg?react';
-import { BATCH_TX_V2_PREFIX } from '@/constants';
+import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { useLocalStore } from '@mimir-wallet/service';
 import { randomAsNumber } from '@polkadot/util-crypto';
 import { useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 
-import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { useLocalStore } from '@mimir-wallet/service';
-
 import { useMimirLayout } from './useMimirLayout';
+
+import IconBatch from '@/assets/svg/icon-batch.svg?react';
+import { BATCH_TX_V2_PREFIX } from '@/constants';
 
 type BatchTxs = Record<HexString, BatchTxItem[]>; // addressHex => BatchTxItem[]
 

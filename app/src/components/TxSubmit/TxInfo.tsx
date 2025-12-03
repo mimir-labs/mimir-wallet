@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconCopy from '@/assets/svg/icon-copy.svg?react';
-import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
-import React from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Avatar } from '@mimir-wallet/ui';
+import React from 'react';
 
 import Address from '../Address';
 import AddressName from '../AddressName';
 import AppName from '../AppName';
 import IdentityIcon from '../IdentityIcon';
+
+import IconCopy from '@/assets/svg/icon-copy.svg?react';
+import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 
 interface Props {
   address: string;
@@ -21,7 +21,7 @@ interface Props {
 }
 
 function TxInfo({ address, website, iconUrl, appName }: Props) {
-  const { chain } = useApi();
+  const { chain } = useNetwork();
   const copyAddress = useCopyAddressToClipboard(address);
 
   return (

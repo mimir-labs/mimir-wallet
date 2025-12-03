@@ -1,23 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAccount } from '@/accounts/useAccount';
-import { useQueryAccount } from '@/accounts/useQueryAccount';
-import IconClock from '@/assets/svg/icon-clock.svg?react';
-import IconDelete from '@/assets/svg/icon-delete.svg?react';
-import { Address, AddressCell, Empty, FormatBalance, InputNetwork, TxButton } from '@/components';
-import { findToken } from '@/config';
-import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
-import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
-import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useProxies } from '@/hooks/useProxies';
-import { useTxQueue } from '@/hooks/useTxQueue';
-import { BN_ZERO } from '@polkadot/util';
-import { Link as RouterLink } from '@tanstack/react-router';
-import { memo, useMemo } from 'react';
-import { useToggle } from 'react-use';
-
-import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
 import {
   Alert,
   AlertDescription,
@@ -34,22 +18,40 @@ import {
   Spinner,
   Tooltip
 } from '@mimir-wallet/ui';
+import { BN_ZERO } from '@polkadot/util';
+import { Link as RouterLink } from '@tanstack/react-router';
+import { memo, useMemo } from 'react';
+import { useToggle } from 'react-use';
+
+import { useAccount } from '@/accounts/useAccount';
+import { useQueryAccount } from '@/accounts/useQueryAccount';
+import IconClock from '@/assets/svg/icon-clock.svg?react';
+import IconDelete from '@/assets/svg/icon-delete.svg?react';
+import { Address, AddressCell, Empty, FormatBalance, InputNetwork, TxButton } from '@/components';
+import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
+import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { useProxies } from '@/hooks/useProxies';
+import { useTxQueue } from '@/hooks/useTxQueue';
+import { useXcmAsset } from '@/hooks/useXcmAssets';
 
 function Content({
   address,
   network,
+  supportedNetworks,
   setNetwork
 }: {
   address: string;
   network: string;
+  supportedNetworks?: string[];
   setNetwork: (network: string) => void;
 }) {
-  const { api } = useApi();
+  const { chain } = useNetwork();
   const { isLocalAccount } = useAccount();
   const { addQueue } = useTxQueue();
   const [isOpen, toggleOpen] = useToggle(false);
   const [isAlertOpen, toggleAlertOpen] = useToggle(false);
-  const token = useMemo(() => findToken(api.genesisHash.toHex()), [api]);
+  const [token] = useXcmAsset(network, 'native');
   const [allBalances] = useBalanceByIdentifier(network, address, 'native');
   const [proxies, isFetched, isFetching] = useProxies(address);
   const [account] = useQueryAccount(address);
@@ -59,7 +61,7 @@ function Content({
   return (
     <>
       <div className='space-y-5'>
-        <InputNetwork network={network} setNetwork={setNetwork} />
+        <InputNetwork network={network} supportedNetworks={supportedNetworks} setNetwork={setNetwork} />
 
         <div className='bg-secondary rounded-[10px] p-2.5'>
           <div className='font-bold'>Proxy Account</div>
@@ -87,13 +89,15 @@ function Content({
                       color='danger'
                       size='sm'
                       variant='light'
-                      className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
+                      className='h-[26px] min-h-0 w-[26px] min-w-0'
                       accountId={address}
                       website='mimir://internal/setup'
                       overrideAction={
                         proxies[0].length === 1 && account?.type === 'pure'
                           ? toggleAlertOpen
-                          : () => {
+                          : async () => {
+                              const api = await ApiManager.getInstance().getApi(network);
+
                               addQueue({
                                 accountId: address,
                                 call:
@@ -144,7 +148,11 @@ function Content({
             color='danger'
             accountId={address}
             website='mimir://internal/remove-proxies'
-            getCall={() => api.tx.proxy.removeProxies()}
+            getCall={async () => {
+              const api = await ApiManager.getInstance().getApi(network);
+
+              return api.tx.proxy.removeProxies();
+            }}
           >
             Delete All
           </TxButton>
@@ -174,18 +182,20 @@ function Content({
 
               <div className='flex flex-row items-center gap-[5px]'>
                 <span>Balance:</span>
-                <Avatar
-                  alt={api.runtimeChain.toString()}
-                  src={token.Icon}
-                  draggable={false}
-                  style={{
-                    width: '1em',
-                    height: '1em',
-                    verticalAlign: 'middle',
-                    backgroundColor: 'transparent',
-                    userSelect: 'none'
-                  }}
-                />
+                {token && (
+                  <Avatar
+                    alt={chain.nativeToken}
+                    src={token.logoUri}
+                    draggable={false}
+                    style={{
+                      width: '1em',
+                      height: '1em',
+                      verticalAlign: 'middle',
+                      backgroundColor: 'transparent',
+                      userSelect: 'none'
+                    }}
+                  />
+                )}
                 <span className='text-foreground/50'>
                   <FormatBalance withCurrency value={allBalances?.total} />
                 </span>
@@ -198,15 +208,17 @@ function Content({
                 color='danger'
                 accountId={account.address}
                 website='mimir://internal/remove-account'
-                getCall={() =>
-                  api.tx.proxy.killPure(
+                getCall={async () => {
+                  const api = await ApiManager.getInstance().getApi(network);
+
+                  return api.tx.proxy.killPure(
                     account.creator,
                     'Any',
                     account.disambiguationIndex,
                     account.createdBlock,
                     account.createdExtrinsicIndex
-                  )
-                }
+                  );
+                }}
                 onDone={() => toggleOpen(false)}
               >
                 Continue
@@ -245,18 +257,19 @@ function ProxySet({ address }: { address: string }) {
     supportedNetworks?.map((item) => item.key)
   );
 
+  const handleSetNetwork = (newNetwork: string) => {
+    setNetwork(newNetwork);
+  };
+
   return (
-    <SubApiRoot
-      network={network}
-      supportedNetworks={supportedNetworks?.map((item) => item.key)}
-      Fallback={({ apiState: { chain } }) => (
-        <div className='bg-content1 mx-auto my-0 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
-          <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-        </div>
-      )}
-    >
-      <Content address={address} network={network} setNetwork={setNetwork} />
-    </SubApiRoot>
+    <NetworkProvider network={network}>
+      <Content
+        address={address}
+        network={network}
+        setNetwork={handleSetNetwork}
+        supportedNetworks={supportedNetworks?.map((item) => item.key)}
+      />
+    </NetworkProvider>
   );
 }
 

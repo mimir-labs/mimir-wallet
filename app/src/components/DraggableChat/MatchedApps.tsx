@@ -1,11 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button, Chip } from '@mimir-wallet/ui';
+import { useMemo } from 'react';
 
 import { type DappOption, dapps } from '@/config';
 import { useOpenDapp } from '@/hooks/useOpenDapp';
-import { useMemo } from 'react';
-
-import { Button, Chip } from '@mimir-wallet/ui';
 
 // MatchedApps component based on Figma design
 function MatchedApps({ apps, network }: { eventId: string; network: string; apps: { id: string; path?: string }[] }) {

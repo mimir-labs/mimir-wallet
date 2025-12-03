@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
 
-import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { useImperativeHandle } from 'react';
-
-import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
 
 import AddTemplate from './AddTemplate';
 import TemplateList from './TemplateList';
 import { useTemplateState } from './useTemplateState';
+
+import { useInputNetwork } from '@/hooks/useInputNetwork';
 
 // Template ref interface for external control
 export interface TemplateRef {
@@ -21,13 +21,55 @@ export interface TemplateRef {
   setNetwork: (network: string) => void;
 }
 
+// Inner content component that uses network context
+function TemplateContent({
+  network,
+  setNetwork,
+  templateState
+}: {
+  network: string;
+  setNetwork: (network: string) => void;
+  templateState: ReturnType<typeof useTemplateState>;
+}) {
+  if (templateState.isAddView) {
+    return (
+      <AddTemplate
+        key={network}
+        defaultCallData={templateState.defaultCallData}
+        onBack={templateState.actions.showList}
+        setNetwork={setNetwork}
+      />
+    );
+  }
+
+  if (templateState.isViewTemplate) {
+    return (
+      <AddTemplate
+        key={network}
+        isView
+        defaultCallData={templateState.viewTemplate}
+        defaultName={templateState.viewTemplateName}
+        onBack={templateState.actions.showList}
+      />
+    );
+  }
+
+  return (
+    <TemplateList
+      key={network}
+      onAdd={() => templateState.actions.showAdd()}
+      onView={templateState.actions.showView}
+      setNetwork={setNetwork}
+    />
+  );
+}
+
 interface TemplateProps {
   ref?: React.Ref<TemplateRef>;
 }
 
 function Template({ ref }: TemplateProps) {
   const [network, setNetwork] = useInputNetwork();
-  const { api } = useApi();
 
   // Internal state management
   const templateState = useTemplateState({
@@ -47,45 +89,11 @@ function Template({ ref }: TemplateProps) {
     [templateState.actions, setNetwork]
   );
 
-  // Render based on current view state
-  const renderContent = () => {
-    if (templateState.isAddView) {
-      return (
-        <AddTemplate
-          key={network}
-          defaultCallData={templateState.defaultCallData}
-          onBack={templateState.actions.showList}
-          setNetwork={setNetwork}
-          registry={api.registry}
-        />
-      );
-    }
-
-    if (templateState.isViewTemplate) {
-      return (
-        <AddTemplate
-          key={network}
-          isView
-          defaultCallData={templateState.viewTemplate}
-          registry={api.registry}
-          defaultName={templateState.viewTemplateName}
-          onBack={templateState.actions.showList}
-        />
-      );
-    }
-
-    return (
-      <TemplateList
-        key={network}
-        onAdd={() => templateState.actions.showAdd()}
-        onView={templateState.actions.showView}
-        setNetwork={setNetwork}
-        registry={api.registry}
-      />
-    );
-  };
-
-  return <SubApiRoot network={network}>{renderContent()}</SubApiRoot>;
+  return (
+    <NetworkProvider network={network}>
+      <TemplateContent network={network} setNetwork={setNetwork} templateState={templateState} />
+    </NetworkProvider>
+  );
 }
 
 Template.displayName = 'Template';

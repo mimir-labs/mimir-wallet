@@ -1,16 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { NodeData } from './context';
 
-import { useAccount } from '@/accounts/useAccount';
-import PureIcon from '@/assets/images/pure-icon.svg';
-import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
-import IconView from '@/assets/svg/icon-view.svg?react';
+import { Avatar, Button, Chip } from '@mimir-wallet/ui';
 import { Handle, type Node, type NodeProps, Position } from '@xyflow/react';
 import React, { useContext } from 'react';
-
-import { Avatar, Button, Chip } from '@mimir-wallet/ui';
 
 import Address from '../Address';
 import AddressCell from '../AddressCell';
@@ -18,7 +13,13 @@ import AddressName from '../AddressName';
 import AddressNetworks from '../AddressNetworks';
 import CopyAddress from '../CopyAddress';
 import IdentityIcon from '../IdentityIcon';
+
 import { context } from './context';
+
+import { useAccount } from '@/accounts/useAccount';
+import PureIcon from '@/assets/images/pure-icon.svg';
+import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
+import IconView from '@/assets/svg/icon-view.svg?react';
 
 const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
@@ -192,5 +193,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
     </>
   );
 });
+
+AddressNode.displayName = 'AddressNode';
 
 export default React.memo(AddressNode);

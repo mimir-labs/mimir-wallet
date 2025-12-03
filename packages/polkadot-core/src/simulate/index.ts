@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Block } from '@acala-network/chopsticks-core';
@@ -12,7 +12,8 @@ import DiffMatchPatch from 'diff-match-patch';
 import { create } from 'jsondiffpatch';
 import { cloneDeep, template } from 'lodash-es';
 
-import { typesBundle } from '../api-types/index.js';
+import { typesBundle } from '../types/api-types/index.js';
+
 import { IdbDatabase } from './db.js';
 import { simulateTemplate } from './template.js';
 

@@ -1,11 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, Transaction } from '@/hooks/types';
 
-import { TransactionStatus, TransactionType } from '@/hooks/types';
-
 import { addressEq } from '@mimir-wallet/polkadot-core';
+
+import { TransactionStatus, TransactionType } from '@/hooks/types';
 
 export function approvalCounts(account: AccountData, transaction: Transaction): [counts: number, threshold: number] {
   if (account.type !== 'multisig') {

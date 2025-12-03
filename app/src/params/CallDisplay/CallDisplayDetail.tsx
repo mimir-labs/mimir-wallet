@@ -1,17 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IMethod, Registry } from '@polkadot/types/types';
 
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Avatar, Skeleton } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
+
 import { FormatBalance } from '@/components';
-import { findToken } from '@/config';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
 import { dataToUtf8 } from '@/utils';
-import React, { useMemo } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, Skeleton } from '@mimir-wallet/ui';
 
 function TransferDetail({
   from: propsFrom,
@@ -22,7 +21,7 @@ function TransferDetail({
   registry: Registry;
   call: IMethod | null;
 }) {
-  const { network, genesisHash } = useApi();
+  const { network, chain } = useNetwork();
   const results = useParseTransfer(registry, propsFrom, call);
   const [assetInfo] = useXcmAsset(network, results?.[0]);
 
@@ -37,7 +36,7 @@ function TransferDetail({
       'All'
     ) : (
       <div className='flex items-center gap-1'>
-        <Avatar alt='Token' src={findToken(genesisHash).Icon} style={{ width: 20, height: 20 }} />
+        <Avatar alt='Token' src={chain.tokenIcon} style={{ width: 20, height: 20 }} />
         <p>
           -<FormatBalance value={value} withCurrency />
         </p>
@@ -62,7 +61,10 @@ function TransferDetail({
       </div>
     )
   ) : (
-    <Skeleton style={{ width: 50, height: 16 }} />
+    <div className='flex items-center gap-1'>
+      <Skeleton className='h-5 w-5 rounded-full' />
+      <Skeleton className='h-4 w-16' />
+    </div>
   );
 }
 

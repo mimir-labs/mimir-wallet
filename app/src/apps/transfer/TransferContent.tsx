@@ -1,7 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TransferToken } from './types';
+
+import { remoteProxyRelations, useChain, useChains } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Avatar, Button, Chip, Skeleton, Switch } from '@mimir-wallet/ui';
+import { BN } from '@polkadot/util';
+import React, { useEffect, useMemo } from 'react';
+
+import { useTransferBalance } from './useTransferBalances';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
@@ -10,13 +17,6 @@ import { MigrationTip } from '@/features/assethub-migration';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
 import { formatUnits } from '@/utils';
-import { BN } from '@polkadot/util';
-import React, { useEffect, useMemo } from 'react';
-
-import { remoteProxyRelations, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Avatar, Button, Chip, Skeleton, Switch } from '@mimir-wallet/ui';
-
-import { useTransferBalance } from './useTransferBalances';
 
 function TransferContent({
   token,
@@ -26,7 +26,9 @@ function TransferContent({
   recipient,
   identifier,
   network,
+  supportedNetworks,
   keepAlive,
+  disabledSending,
   disabledRecipient,
   filterSending,
   setNetwork,
@@ -42,19 +44,23 @@ function TransferContent({
   sending: string;
   recipient: string;
   network: string;
+  supportedNetworks?: string[];
   keepAlive: boolean;
+  disabledSending?: boolean;
   disabledRecipient?: boolean;
   identifier?: string;
   filterSending?: string[];
-  setSending: (sending: string) => void;
+  setSending?: (sending: string) => void;
   setNetwork: (network: string) => void;
   setAmount: (amount: string) => void;
   toggleKeepAlive: (keepAlive: boolean) => void;
   setToken: (token: string) => void;
   setRecipient?: (recipient: string) => void;
 }) {
-  const { api, chain, genesisHash } = useApi();
-  const { networks } = useNetworks();
+  const chain = useChain(network);
+  const genesisHash = chain.genesisHash;
+  const { chains } = useChains();
+
   const upSm = useMediaQuery('sm');
   const [format, sendingBalances, isSendingFetched] = useTransferBalance(token, sending);
   const [assetInfo] = useXcmAsset(network, token?.isNative ? 'native' : token?.key);
@@ -63,7 +69,7 @@ function TransferContent({
   const [recipientAccount] = useQueryAccountOmniChain(recipient);
   const recipientNetwork =
     recipientAccount?.type === 'pure'
-      ? networks.find((item) => item.genesisHash === recipientAccount.network)
+      ? chains.find((item) => item.genesisHash === recipientAccount.network)
       : undefined;
 
   // for migration tip
@@ -75,11 +81,16 @@ function TransferContent({
       : true;
   }, [recipientAccount, chain]);
 
-  const existentialDeposit = token?.isNative
-    ? api.consts.balances.existentialDeposit
-    : assetInfo?.existentialDeposit
-      ? new BN(assetInfo.existentialDeposit.toString())
-      : new BN(0);
+  // Determine existential deposit based on token type
+  const existentialDeposit = useMemo(() => {
+    if (token?.isNative) {
+      return new BN(token.existentialDeposit);
+    } else if (assetInfo?.existentialDeposit) {
+      return new BN(assetInfo.existentialDeposit.toString());
+    }
+
+    return new BN(0);
+  }, [token, assetInfo]);
 
   useEffect(() => {
     setAmount('');
@@ -87,14 +98,23 @@ function TransferContent({
 
   return (
     <>
-      <InputAddress
-        isSign
-        filtered={filterSending}
-        label='Sending From'
-        onChange={setSending}
-        placeholder='Sender'
-        value={sending}
-      />
+      {disabledSending ? (
+        <div className='flex flex-col gap-2'>
+          <p className='text-sm font-bold'>Sending From</p>
+          <div className='bg-secondary rounded-[10px] p-2'>
+            <AddressCell shorten={!upSm} showType value={sending} withCopy withAddressBook />
+          </div>
+        </div>
+      ) : (
+        <InputAddress
+          isSign
+          filtered={filterSending}
+          label='Sending From'
+          onChange={setSending}
+          placeholder='Sender'
+          value={sending}
+        />
+      )}
 
       {disabledRecipient ? (
         <div className='flex flex-col gap-2'>
@@ -110,6 +130,7 @@ function TransferContent({
       <InputNetwork
         label='Select Network'
         network={network}
+        supportedNetworks={supportedNetworks}
         setNetwork={setNetwork}
         endContent={
           sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt]
@@ -151,7 +172,7 @@ function TransferContent({
           <div className='flex items-center justify-between'>
             Amount
             {!isSendingFetched ? (
-              <Skeleton className='h-[14px] w-[50px] rounded-[5px]' />
+              <Skeleton className='h-3.5 w-24 rounded-[5px]' />
             ) : (
               <span className='opacity-50'>
                 Balance: <FormatBalance format={format} value={sendingBalances} />

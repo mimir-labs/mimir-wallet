@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAccount } from '@/accounts/useAccount';
-import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { Empty } from '@/components';
+import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useTransition } from 'react';
-
-import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
 
 import AddAddress from './AddAddress';
 import AddressItem from './AddressItem';
 import Export from './Export';
 import Import from './Import';
+
+import { useAccount } from '@/accounts/useAccount';
+import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
+import { Empty } from '@/components';
 
 function PageAddressBook() {
   const { addresses } = useAccount();

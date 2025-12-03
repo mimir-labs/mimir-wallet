@@ -109,6 +109,18 @@
   }
 }
 
+/* CSS Houdini property for border spin animation */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-spin {
+  0% { --border-angle: 0deg; }
+  100% { --border-angle: 360deg; }
+}
+
 @layer base {
   .animate-dots::after {
     content: '';

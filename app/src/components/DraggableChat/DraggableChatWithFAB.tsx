@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useLocalStore } from '@mimir-wallet/service';
+import { useDraggable } from '@mimir-wallet/ui';
+import { AnimatePresence, motion, useDragControls } from 'framer-motion';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+
+import DraggableChatWindow, { type DraggableChatWindowRef } from './DraggableChatWindow';
+import MimoLogo from './MimoLogo';
 
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { SUGGESTIONS_DISMISSED_KEY } from '@/constants';
 import { events } from '@/events';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
-import { AnimatePresence, motion, useDragControls } from 'framer-motion';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-
-import { useLocalStore } from '@mimir-wallet/service';
-import { useDraggable } from '@mimir-wallet/ui';
-
-import DraggableChatWindow, { type DraggableChatWindowRef } from './DraggableChatWindow';
-import MimoLogo from './MimoLogo';
 
 export interface DraggableChatWithFABProps {
   // FAB button position

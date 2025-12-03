@@ -1,19 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ProxyArgs } from '../types';
 
-import { useAccount } from '@/accounts/useAccount';
-import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
-import { Input, InputAddress, InputNetwork, Label } from '@/components';
-import { ONE_DAY, ONE_HOUR } from '@/constants';
-import { useBlockInterval } from '@/hooks/useBlockInterval';
-import { useInput } from '@/hooks/useInput';
-import { useProxyTypes } from '@/hooks/useProxyTypes';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
+import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import {
   Alert,
@@ -29,14 +19,25 @@ import {
   Switch,
   Tooltip
 } from '@mimir-wallet/ui';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
 import { filterAccountsByNetwork } from '../utils';
+
 import AddProxyButton from './AddProxyButton';
 import ProxyInfo from './ProxyInfo';
 import PureCell from './PureCell';
 import SubmitProxy from './SubmitProxy';
 import SubmitPure from './SubmitPure';
+
+import { useAccount } from '@/accounts/useAccount';
+import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
+import { Input, InputAddress, InputNetwork, Label } from '@/components';
+import { ONE_DAY, ONE_HOUR } from '@/constants';
+import { useBlockInterval } from '@/hooks/useBlockInterval';
+import { useInput } from '@/hooks/useInput';
+import { useProxyTypes } from '@/hooks/useProxyTypes';
 
 async function fetchProxiesForAddress({ queryKey }: { queryKey: readonly [string, string, string] }) {
   const [, network, address] = queryKey;
@@ -45,8 +46,7 @@ async function fetchProxiesForAddress({ queryKey }: { queryKey: readonly [string
     throw new Error('Invalid proxy address');
   }
 
-  const allApis = useAllApis.getState().chains;
-  const api = allApis[network]?.api;
+  const api = await ApiManager.getInstance().getApi(network);
 
   if (!api) {
     throw new Error(`API not available for network: ${network}`);
@@ -58,17 +58,20 @@ async function fetchProxiesForAddress({ queryKey }: { queryKey: readonly [string
 function AddProxy({
   pure,
   network,
+  supportedNetworks,
   proxied,
   setNetwork,
   setProxied
 }: {
   pure?: boolean;
   network: string;
+  supportedNetworks?: string[];
   proxied: string | undefined;
   setNetwork: (network: string) => void;
   setProxied: (proxied: string | undefined) => void;
 }) {
-  const { genesisHash, isApiReady } = useApi();
+  const { chain } = useNetwork();
+  const genesisHash = chain.genesisHash;
   const { accounts, addresses, current } = useAccount();
 
   // filter accounts by network
@@ -78,12 +81,12 @@ function AddProxy({
 
     return [filteredProxied, filteredProxy];
   }, [accounts, addresses, genesisHash]);
-  const proxyTypes = useProxyTypes();
+  const proxyTypes = useProxyTypes(network);
   const [proxyType, setProxyType] = useState<string>(proxyTypes?.[0]?.text || 'Any');
   const [name, setName] = useInput('');
   const [advanced, toggleAdvanced] = useToggle(false);
   const [custom, setCustom] = useState<string>('');
-  const blockInterval = useBlockInterval().toNumber();
+  const blockInterval = useBlockInterval(network).toNumber();
   const reviewWindows = {
     [(ONE_DAY * 1000) / blockInterval]: '1 Day',
     [(ONE_DAY * 7 * 1000) / blockInterval]: '1 Week',
@@ -95,7 +98,7 @@ function AddProxy({
 
   const { data: proxies } = useQuery({
     queryKey: ['proxies', network, proxied || ''] as const,
-    enabled: !!isApiReady && !pure && !!proxied,
+    enabled: !pure && !!proxied,
     queryFn: fetchProxiesForAddress
   });
 
@@ -177,11 +180,17 @@ function AddProxy({
               />
             </div>
 
-            <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
+            <InputNetwork
+              label='Select Network'
+              network={network}
+              supportedNetworks={supportedNetworks}
+              setNetwork={setNetwork}
+            />
 
             {pure && <Input label='Name' value={name} onChange={setName} />}
 
             <ProxyPermissionSelector
+              network={network}
               value={proxyType}
               onChange={setProxyType}
               label='Authorize'
@@ -262,6 +271,7 @@ function AddProxy({
               proxyArgs.map((arg, index) => (
                 <ProxyInfo
                   key={index}
+                  network={network}
                   proxied={proxied}
                   delegate={arg.delegate}
                   delay={arg.delay}
@@ -296,6 +306,7 @@ function AddProxy({
                 {existsProxies.map((proxy, index) => (
                   <ProxyInfo
                     key={`proxy_${index}`}
+                    network={network}
                     proxied={proxy.proxied}
                     delegate={proxy.delegate}
                     delay={proxy.delay}

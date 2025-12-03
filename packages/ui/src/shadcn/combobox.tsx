@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 'use client';
@@ -7,6 +7,7 @@ import { CheckIcon } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '../lib/utils.js';
+
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command.js';
 import { Popover, PopoverContent, PopoverTrigger } from './popover.js';
 

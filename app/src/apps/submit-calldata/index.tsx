@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { useMemo, useState } from 'react';
+
+import Extrinsic from './Extrinsic';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useMemo, useState } from 'react';
-
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-
-import Extrinsic from './Extrinsic';
 
 function SubmitCalldata() {
   const { current } = useAccount();
@@ -18,9 +18,15 @@ function SubmitCalldata() {
   const [network, setNetwork] = useInputNetwork(undefined, supportedNetworksKeys);
 
   return (
-    <SubApiRoot network={network} supportedNetworks={supportedNetworksKeys}>
-      <Extrinsic sending={sending} setSending={setSending} network={network} setNetwork={setNetwork} />
-    </SubApiRoot>
+    <NetworkProvider network={network}>
+      <Extrinsic
+        sending={sending}
+        setSending={setSending}
+        network={network}
+        supportedNetworks={supportedNetworksKeys}
+        setNetwork={setNetwork}
+      />
+    </NetworkProvider>
   );
 }
 

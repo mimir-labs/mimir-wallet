@@ -25,6 +25,8 @@
     "build": "turbo run build",
     "check-types": "turbo run check-types",
     "dev": "turbo run dev",
+    "test": "turbo run test --concurrency=100",
+    "test:cov": "turbo run test:cov --concurrency=100",
     "commit": "cz",
     "preinstall": "npx only-allow yarn",
     "postinstall": "husky"
@@ -38,7 +40,7 @@
     "lint-staged": "^15.2.9",
     "npm-run-all2": "^7.0.2",
     "release-please": "^16.18.0",
-    "tsx": "^4.19.3",
+    "tsx": "^4.20.6",
     "turbo": "^2.4.4"
   },
   "resolutions": {

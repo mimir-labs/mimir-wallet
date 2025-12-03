@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData } from '@/hooks/types';
@@ -7,16 +7,16 @@ import type { SessionTypes } from '@walletconnect/types';
 import type { Web3WalletTypes } from '@walletconnect/web3wallet';
 import type Web3WalletType from '@walletconnect/web3wallet';
 
-import { LS_NAMESPACE, WALLET_CONNECT_PROJECT_ID } from '@/constants';
+import { allEndpoints } from '@mimir-wallet/polkadot-core';
 import { assert } from '@polkadot/util';
 import { Core } from '@walletconnect/core';
 import { getSdkError } from '@walletconnect/utils';
 import { Web3Wallet } from '@walletconnect/web3wallet';
 
-import { allEndpoints } from '@mimir-wallet/polkadot-core';
-
 import { MIMIR_WALLET_METADATA, PolkadotMethods, SESSION_ADD_EVENT, SESSION_REJECT_EVENT } from './constants';
 import { getPolkadotChain, POLKADOT_NAMESPACE } from './utils';
+
+import { LS_NAMESPACE, WALLET_CONNECT_PROJECT_ID } from '@/constants';
 
 export let web3Wallet: Web3WalletType;
 

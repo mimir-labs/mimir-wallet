@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
+import { Link, useNavigate } from '@tanstack/react-router';
+import React, { useRef, useState } from 'react';
 
 import IconAddFill from '@/assets/svg/icon-add-fill.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { useElementWidth } from '@/hooks/useElementWidth';
-import { Link, useNavigate } from '@tanstack/react-router';
-import React, { useRef, useState } from 'react';
-
-import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
 
 function CreateMultisig({ onClose }: { onClose?: () => void }) {
   const navigate = useNavigate();

@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX, FAVORITE_DAPP_KEY } from '@/constants';
-import { internalToUrlNetwork, urlToInternalNetwork } from '@/utils/networkMapping';
-import { encodeAddress } from '@polkadot/util-crypto';
 
 import { addressToHex, allEndpoints, CURRENT_NETWORK_KEY, isPolkadotAddress } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
+import { encodeAddress } from '@polkadot/util-crypto';
+
+import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX, FAVORITE_DAPP_KEY } from '@/constants';
+import { internalToUrlNetwork, urlToInternalNetwork } from '@/utils/networkMapping';
 
 export function initMimir(omni: boolean) {
   const search = new URLSearchParams(window.location.search);

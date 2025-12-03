@@ -1,17 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { chainLinks, type Network, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { Avatar, Divider, Drawer, DrawerContent, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import { useMemo, useRef } from 'react';
+import { useEffectOnce } from 'react-use';
 
 import { Address, ExplorerLink } from '@/components';
 import { useAddressExplorer } from '@/hooks/useAddressExplorer';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useMemo, useRef } from 'react';
-import { useEffectOnce } from 'react-use';
-
-import { chainLinks, type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Divider, Drawer, DrawerContent, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 function Item({ endpoint, address }: { endpoint: Network; address: string }) {
-  const { ss58Chain } = useApi();
+  const { ss58Chain } = useSs58Format();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffectOnce(() => {
@@ -83,11 +83,11 @@ function GroupedNetwork({ address, group, endpoints }: { address: string; group:
 
 function ExplorerAddressModal() {
   const { isOpen, close, address } = useAddressExplorer();
-  const { networks } = useNetworks();
+  const { chains } = useChains();
   const upMd = useMediaQuery('md');
 
   const groupedEndpoints = useMemo(() => {
-    const groupedEndpoints = networks.reduce(
+    const groupedEndpoints = chains.reduce(
       (acc, network) => {
         if (network.isRelayChain) {
           acc[network.key] = [network, ...(acc[network.key] || [])];
@@ -103,7 +103,7 @@ function ExplorerAddressModal() {
     );
 
     return groupedEndpoints;
-  }, [networks]);
+  }, [chains]);
 
   if (!isOpen || !address) {
     return null;

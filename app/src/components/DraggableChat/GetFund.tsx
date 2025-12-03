@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAccount } from '@/accounts/useAccount';
+import { Button } from '@mimir-wallet/ui';
 import { useToggle } from 'react-use';
 
-import { Button } from '@mimir-wallet/ui';
-
 import Fund from '../Fund';
+
+import { useAccount } from '@/accounts/useAccount';
 
 interface GetFundProps {
   eventId: string;
 }
 
-function GetFund({ eventId }: GetFundProps) {
+function GetFund({ eventId: _eventId }: GetFundProps) {
   const [open, toggleOpen] = useToggle(false);
   const { current } = useAccount();
 

@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useSelectedAccount } from '@/accounts/useSelectedAccount';
-import { AppIframe } from '@/components';
-import { useMemo, useRef, useState } from 'react';
-
 import { Spinner } from '@mimir-wallet/ui';
+import { useMemo, useRef, useState } from 'react';
 
 import PendingTx from './PendingTx';
 import { useCommunicator } from './useCommunicator';
+
+import { useSelectedAccount } from '@/accounts/useSelectedAccount';
+import { AppIframe } from '@/components';
 
 function AppFrame({ url, iconUrl, appName }: { url: string; iconUrl?: string; appName?: string }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);

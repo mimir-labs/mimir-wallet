@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
 
-import { findAsset } from '@/config/tokens';
+import { allEndpoints, getChainIcon } from '@mimir-wallet/polkadot-core';
+import { type CompleteEnhancedAssetInfo, service, useQuery } from '@mimir-wallet/service';
 import { isEqual } from 'lodash-es';
 import { useMemo } from 'react';
 
-import { getChainIcon } from '@mimir-wallet/polkadot-core';
-import { type CompleteEnhancedAssetInfo, service, useQuery } from '@mimir-wallet/service';
+import { findAsset } from '@/config/tokens';
 
 export const queryXcmAssetKey = (chain: string, identifier: string) => ['query-xcm-asset', chain, identifier];
 
@@ -39,14 +39,16 @@ export function useXcmAsset(
   chain?: string,
   identifier?: 'native' | HexString | string | null
 ): [data: CompleteEnhancedAssetInfo | undefined, isFetched: boolean, isFetching: boolean] {
+  const chainKey = allEndpoints.find((item) => item.genesisHash === chain || item.key === chain)?.key;
+
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: queryXcmAssetKey(chain || '', identifier || ''),
-    queryFn: async (): Promise<CompleteEnhancedAssetInfo> => {
-      if (!identifier || !chain) {
+    queryKey: queryXcmAssetKey(chainKey || '', identifier || ''),
+    queryFn: async ({ queryKey: [, chainKey, identifier] }): Promise<CompleteEnhancedAssetInfo> => {
+      if (!identifier || !chainKey) {
         throw new Error('identifier is required');
       }
 
-      return service.asset.getXcmAsset(chain, identifier);
+      return service.asset.getXcmAsset(chainKey, identifier);
     },
     refetchInterval: 60 * 1000,
     refetchOnMount: false,
@@ -97,8 +99,14 @@ export function useAllXcmAsset() {
 
 export function useChainXcmAsset(network: string) {
   const [data, isFetched, isFetching, promise] = useAllXcmAsset();
+  const chainKey = allEndpoints.find((item) => item.genesisHash === network || item.key === network)?.key;
 
   return useMemo(() => {
-    return [data?.[network] || [], isFetched, isFetching, () => promise.then((data) => data[network] ?? [])] as const;
-  }, [data, isFetched, isFetching, network, promise]);
+    return [
+      chainKey ? (data?.[chainKey] ?? []) : [],
+      isFetched,
+      isFetching,
+      () => (chainKey ? promise.then((data) => data[chainKey] ?? []) : [])
+    ] as const;
+  }, [data, isFetched, isFetching, chainKey, promise]);
 }

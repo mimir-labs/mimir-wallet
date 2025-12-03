@@ -1,14 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Input, InputNetwork } from '@/components';
-import AddressRow from '@/components/AddressRow';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 
 import AddPureProxy from '../components/AddPureProxy';
+
 import AccountStructure from './AccountStructure';
+
+import { Input, InputNetwork } from '@/components';
+import AddressRow from '@/components/AddressRow';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface Step3ReviewProps {
   name: string;
@@ -35,8 +37,9 @@ function Step3Review({
   onPureProxyChange,
   threshold
 }: Step3ReviewProps) {
-  const { api } = useApi();
-  const isProxyModuleSupported = !!api.tx.proxy;
+  const currentNetwork = useNetwork();
+  const targetNetwork = isPureProxy ? network : currentNetwork.network;
+  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(targetNetwork);
 
   return (
     <div className='flex flex-col gap-4'>

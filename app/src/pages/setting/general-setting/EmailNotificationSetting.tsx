@@ -1,26 +1,26 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
+
+import { encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button, Card } from '@mimir-wallet/ui';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
+
+import AccountSelectionModal from './AccountSelectionModal';
 
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
 import { AddressRow, Input, InputAddress } from '@/components';
 import { useEmailNotification } from '@/hooks/useEmailNotification';
 import { sanitizeEmail } from '@/utils/emailSignatureUtils';
-import { useCallback, useState } from 'react';
-import { toast } from 'sonner';
-
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, Card } from '@mimir-wallet/ui';
-
-import AccountSelectionModal from './AccountSelectionModal';
 
 interface EmailNotificationSettingProps {
   address: HexString;
 }
 
 function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSettingProps) {
-  const { chainSS58 } = useApi();
+  const { ss58 } = useSs58Format();
   const [email, setEmail] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<'bind' | 'unbind' | null>(null);
@@ -109,7 +109,7 @@ function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSe
               label={<span className='font-normal'>Subscribe this account</span>}
               wrapperClassName='h-[36px]'
               value={address}
-              onChange={(value) => setAddress(encodeAddress(value, chainSS58))}
+              onChange={(value) => setAddress(encodeAddress(value, ss58))}
               placeholder='Please select account'
               helper='You will receive email notification once your account got new transaction information.'
             />

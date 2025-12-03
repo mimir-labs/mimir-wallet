@@ -1,12 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 'use client';
 
+import { cn } from '@mimir-wallet/ui';
 import { type ComponentProps, memo } from 'react';
 import { Streamdown } from 'streamdown';
-
-import { cn } from '@mimir-wallet/ui';
 
 type ResponseProps = ComponentProps<typeof Streamdown>;
 

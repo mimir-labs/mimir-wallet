@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button } from '@mimir-wallet/ui';
+import { isAddress } from '@polkadot/util-crypto';
 
 import IconGlobal from '@/assets/svg/icon-global.svg?react';
 import { useAddressExplorer } from '@/hooks/useAddressExplorer';
-import { isAddress } from '@polkadot/util-crypto';
-
-import { Button } from '@mimir-wallet/ui';
 
 interface ViewOnExplorerProps {
   eventId: string;
   address: string;
 }
 
-function ViewOnExplorer({ eventId, address }: ViewOnExplorerProps) {
+function ViewOnExplorer({ eventId: _eventId, address }: ViewOnExplorerProps) {
   const addressExplorer = useAddressExplorer();
   const isValidAddress = isAddress(address);
 

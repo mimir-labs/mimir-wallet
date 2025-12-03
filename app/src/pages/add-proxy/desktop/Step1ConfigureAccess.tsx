@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAccount } from '@/accounts/useAccount';
-import PureIcon from '@/assets/images/pure-icon.svg';
-import { AddressName, EditableField, InputAddress, InputNetwork, ProxyControls } from '@/components';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider, Switch } from '@mimir-wallet/ui';
 
 import Tips from '../components/Tips';
 import { useProxyValidation } from '../hooks/useProxyValidation';
 import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
+
+import { useAccount } from '@/accounts/useAccount';
+import PureIcon from '@/assets/images/pure-icon.svg';
+import { AddressName, EditableField, InputAddress, InputNetwork, ProxyControls } from '@/components';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface Step1ConfigureAccessProps {
   network: string;
@@ -38,9 +38,8 @@ function Step1ConfigureAccess({
   onNext,
   onDataChange
 }: Step1ConfigureAccessProps) {
-  const { api } = useApi();
+  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(network);
   const { current } = useAccount();
-  const isProxyModuleSupported = !!api.tx.proxy;
 
   // Use validation hook for account filtering and validation
   const validationResult = useProxyValidation({
@@ -125,7 +124,7 @@ function Step1ConfigureAccess({
       </div>
 
       {/* Notice Alert */}
-      <Tips pure={isPureProxy} proxied={proxied} proxy={proxy} />
+      <Tips network={network} pure={isPureProxy} proxied={proxied} proxy={proxy} />
 
       {/* Divider */}
       <Divider />
@@ -139,8 +138,8 @@ function Step1ConfigureAccess({
 
       {/* Action Button */}
       <div className='flex flex-col gap-2.5'>
-        {validationResult.visibleErrors.map((error) => (
-          <Alert variant='destructive'>
+        {validationResult.visibleErrors.map((error, index) => (
+          <Alert key={index} variant='destructive'>
             <AlertTitle>{error}</AlertTitle>
           </Alert>
         ))}

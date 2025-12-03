@@ -1,19 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
-import { useElementWidth } from '@/hooks/useElementWidth';
+import { type Endpoint, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
+import { Avatar, Chip, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
 import { clsx } from 'clsx';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
-import { type Endpoint, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Chip, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
+import { useElementWidth } from '@/hooks/useElementWidth';
 
 interface Props {
   showAllNetworks?: boolean;
+  supportedNetworks?: string[];
   isIconOnly?: boolean;
   radius?: 'sm' | 'md' | 'lg' | 'full' | 'none';
   disabled?: boolean;
@@ -31,8 +32,45 @@ type Options = Endpoint & {
   endContent?: React.ReactNode;
 };
 
+function NetworkItem({
+  item,
+  onSelect,
+  isMigrationCompleted,
+  endContent
+}: {
+  item: Endpoint;
+  onSelect: () => void;
+  isMigrationCompleted: boolean;
+  endContent?: React.ReactNode;
+}) {
+  const { isApiReady, isApiConnected, apiError } = useChainStatus(item.key);
+  const isConnecting = (!isApiReady && !apiError) || !isApiConnected;
+
+  return (
+    <li
+      onClick={onSelect}
+      className={clsx(
+        'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5'
+      )}
+    >
+      <Avatar alt={item.name} src={item.icon} style={{ width: 20, height: 20, background: 'transparent' }}></Avatar>
+      <div className='flex-1'>{item.name}</div>
+      <div className='flex items-center gap-2'>
+        {endContent}
+        {isMigrationCompleted && (
+          <Chip color='secondary' size='sm'>
+            Migrated
+          </Chip>
+        )}
+        {isConnecting && <Spinner size='sm' />}
+      </div>
+    </li>
+  );
+}
+
 function OmniChainInputNetwork({
   showAllNetworks,
+  supportedNetworks,
   isIconOnly,
   radius = 'md',
   disabled,
@@ -44,24 +82,40 @@ function OmniChainInputNetwork({
   setNetwork,
   endContent
 }: Props) {
-  const { allApis } = useApi();
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const popoverWidth = useElementWidth(wrapperRef, 200);
 
   const [isOpen, toggleOpen] = useToggle(false);
+
+  // Filter networks based on supportedNetworks or showAllNetworks/enabled
   const options = networks
-    .filter((item) => (showAllNetworks ? true : !!allApis[item.key]))
+    .filter((item) => {
+      // If supportedNetworks is specified, only show networks in the list
+      if (supportedNetworks && supportedNetworks.length > 0) {
+        return supportedNetworks.includes(item.key);
+      }
+
+      // Otherwise use original logic
+      return showAllNetworks || item.enabled;
+    })
     .map((item) => ({
       ...item,
       endContent: endContent?.[item.key] || endContent?.[item.genesisHash]
     }));
+
   const { data: migrationNetworks } = useMigrationNetworks();
   const completedMigrationNetworks = migrationNetworks
     ?.filter((item) => item.status === 'completed')
     .map((item) => item.chain);
 
-  const chain: Options | undefined = options.find((item) => item.key === network);
+  // For selected chain display, look in all networks (not filtered options)
+  const chain: Options | undefined = networks
+    .map((item) => ({
+      ...item,
+      endContent: endContent?.[item.key] || endContent?.[item.genesisHash]
+    }))
+    .find((item) => item.key === network);
 
   const handleOpen = () => {
     toggleOpen(true);
@@ -98,7 +152,7 @@ function OmniChainInputNetwork({
           <div
             ref={wrapperRef}
             className={twMerge([
-              'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 relative inline-flex h-11 min-h-11 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all !duration-150 motion-reduce:transition-none',
+              'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 relative inline-flex h-11 min-h-11 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
               radius === 'full'
                 ? 'rounded-full'
                 : radius === 'lg'
@@ -133,40 +187,19 @@ function OmniChainInputNetwork({
             <div autoFocus className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
               <ul className={clsx('flex list-none flex-col')}>
                 {options.map((item) => {
-                  const isApiReady = !!allApis[item.key]?.isApiReady;
                   const isMigrationCompleted = !!completedMigrationNetworks?.includes(item.key);
 
                   return (
-                    <li
+                    <NetworkItem
                       key={item.key}
-                      onClick={
-                        (showAllNetworks ? true : isApiReady)
-                          ? () => {
-                              setNetwork(item.key);
-                              handleClose();
-                            }
-                          : undefined
-                      }
-                      className={clsx(
-                        'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5'
-                      )}
-                    >
-                      <Avatar
-                        alt={item.name}
-                        src={item.icon}
-                        style={{ width: 20, height: 20, background: 'transparent' }}
-                      ></Avatar>
-                      <div className='flex-1'>{item.name}</div>
-                      <div className='flex items-center gap-2'>
-                        {item.endContent}
-                        {isMigrationCompleted && (
-                          <Chip color='secondary' size='sm'>
-                            Migrated
-                          </Chip>
-                        )}
-                        {showAllNetworks ? null : !isApiReady ? <Spinner size='sm' /> : null}
-                      </div>
-                    </li>
+                      item={item}
+                      onSelect={() => {
+                        setNetwork(item.key);
+                        handleClose();
+                      }}
+                      isMigrationCompleted={isMigrationCompleted}
+                      endContent={item.endContent}
+                    />
                   );
                 })}
               </ul>
@@ -183,7 +216,7 @@ function OmniChainInputNetwork({
 }
 
 function InputNetwork(props: Props) {
-  const { mode } = useNetworks();
+  const { mode } = useChains();
 
   if (mode === 'omni') {
     return <OmniChainInputNetwork {...props} />;

@@ -1,21 +1,21 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, AddressMeta, MultisigAccountData } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { AddressMetaContext } from '@/accounts/useAccount';
-import { transformAccount } from '@/accounts/useQueryAccount';
-import { AddressOverview } from '@/components';
-import { toastError } from '@/components/utils';
+import { useNetwork, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import React, { useEffect, useState } from 'react';
 import { useToggle } from 'react-use';
 
-import { useApi, zeroAddress } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import { AddressMetaContext } from '@/accounts/useAccount';
+import { transformAccount } from '@/accounts/useQueryAccount';
+import { AddressOverview } from '@/components';
+import { toastError } from '@/components/utils';
 
 interface AccountStructureProps {
   name: string;
@@ -25,7 +25,9 @@ interface AccountStructureProps {
 }
 
 function AccountStructure({ members, name, threshold, isPureProxy }: AccountStructureProps) {
-  const { genesisHash, chainSS58 } = useApi();
+  const { chain } = useNetwork();
+  const genesisHash = chain.genesisHash;
+  const { ss58: chainSS58 } = useSs58Format();
   const [multisigAccount, setMultisigAccount] = React.useState<AccountData>();
   const [fullAccount, setFullAccount] = React.useState<AccountData>();
   const [isFetching, setIsFetching] = React.useState(false);

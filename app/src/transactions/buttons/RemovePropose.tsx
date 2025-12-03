@@ -1,20 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, ProposeTransaction, Transaction } from '@/hooks/types';
 
-import { InputAddress } from '@/components';
-import { toastError } from '@/components/utils';
-import { walletConfig } from '@/config';
-import { CONNECT_ORIGIN } from '@/constants';
-import { events } from '@/events';
-import { TransactionType } from '@/hooks/types';
-import { useProposeFilterForRemove } from '@/hooks/useProposeFilter';
-import { accountSource } from '@/wallet/useWallet';
-import React, { useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import {
   Alert,
@@ -28,6 +17,17 @@ import {
   ModalFooter,
   ModalHeader
 } from '@mimir-wallet/ui';
+import React, { useState } from 'react';
+import { useToggle } from 'react-use';
+
+import { InputAddress } from '@/components';
+import { toastError } from '@/components/utils';
+import { walletConfig } from '@/config';
+import { CONNECT_ORIGIN } from '@/constants';
+import { events } from '@/events';
+import { TransactionType } from '@/hooks/types';
+import { useProposeFilterForRemove } from '@/hooks/useProposeFilter';
+import { accountSource } from '@/wallet/useWallet';
 
 function Content({
   filtered,
@@ -38,12 +38,14 @@ function Content({
   transaction: ProposeTransaction;
   onRemove: () => void;
 }) {
-  const { genesisHash, network } = useApi();
+  const { network, chain } = useNetwork();
   const [signer, setSigner] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
+  const genesisHash = chain.genesisHash;
+
   const handleConfirm = async () => {
-    if (!signer) {
+    if (!signer || !genesisHash) {
       toastError('Please select a valid signer address');
 
       return;

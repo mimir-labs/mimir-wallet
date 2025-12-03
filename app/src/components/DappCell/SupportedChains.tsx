@@ -1,34 +1,34 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DappOption } from '@/config';
+import type { Endpoint } from '@mimir-wallet/polkadot-core';
 
+import { useChains } from '@mimir-wallet/polkadot-core';
+import { Avatar, AvatarGroup, Tooltip } from '@mimir-wallet/ui';
 import { useMemo } from 'react';
 
-import { useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, AvatarGroup, Tooltip } from '@mimir-wallet/ui';
-
 function SupportedChains({ app }: { app: DappOption }) {
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
 
-  const supportedNetworks = useMemo(() => {
+  const supportedNetworks = useMemo((): Endpoint[] => {
     const supportedChains = app.supportedChains;
 
     if (supportedChains === true) {
       return networks;
     }
 
-    return networks.filter((network) => supportedChains.includes(network.key));
+    return networks.filter((network: Endpoint) => supportedChains.includes(network.key));
   }, [app.supportedChains, networks]);
 
   return (
     <Tooltip
       classNames={{ content: 'max-w-[300px]' }}
       color='foreground'
-      content={supportedNetworks.map((network) => network.name).join(', ')}
+      content={supportedNetworks.map((network: Endpoint) => network.name).join(', ')}
     >
       <AvatarGroup max={3} renderCount={(count) => <p className='text-foreground/50 !ms-1 text-xs'>+{count}</p>}>
-        {supportedNetworks.map((network, index) => (
+        {supportedNetworks.map((network: Endpoint, index: number) => (
           <Avatar
             classNames={{ base: 'data-[hover=true]:translate-none' }}
             style={{ width: 20, height: 20, backgroundColor: 'transparent', marginInlineStart: index ? -4 : 0 }}

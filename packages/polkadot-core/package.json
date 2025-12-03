@@ -36,9 +36,16 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc --build",
-    "check-types": "tsc --noEmit",
-    "dev": "tsc --watch"
+    "build": "tsc -p tsconfig.app.json",
+    "check-types": "tsc -b --noEmit",
+    "dev": "tsc -p tsconfig.app.json --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:watch": "vitest watch",
+    "test:ui": "vitest --ui",
+    "test:cov": "vitest run --coverage",
+    "fetch-chain-info": "tsx scripts/fetch-chain-info.ts"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -60,10 +67,14 @@
     "jsondiffpatch": "^0.6.0"
   },
   "devDependencies": {
+    "@mimir-wallet/dev": "workspace:^",
     "@mimir-wallet/service": "workspace:^",
     "@polkadot/extension-base": "^0.62.5",
     "@polkadot/extension-inject": "^0.62.5",
+    "fake-indexeddb": "^6.2.5",
     "npm-run-all2": "^7.0.2",
-    "typescript": "^5.9.3"
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
   }
 }

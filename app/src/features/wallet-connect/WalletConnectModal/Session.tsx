@@ -1,20 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Web3WalletTypes } from '@walletconnect/web3wallet';
+
+import { Alert, AlertTitle, Avatar, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
+import { useContext, useState } from 'react';
+import { useAsyncFn } from 'react-use';
+
+import { WalletConnectContext } from '../context';
+import { approveSession, rejectSession } from '../wallet-connect';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { analyticsActions } from '@/analytics';
 import { AddressCell } from '@/components';
 import { toastError } from '@/components/utils';
-import { useContext, useState } from 'react';
-import { useAsyncFn } from 'react-use';
-
-import { Alert, AlertTitle, Avatar, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
-
-import { WalletConnectContext } from '../context';
-import { approveSession, rejectSession } from '../wallet-connect';
 
 function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionProposal; onClose: () => void }) {
   const { current } = useAccount();

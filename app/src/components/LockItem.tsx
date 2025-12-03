@@ -1,8 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Compact } from '@polkadot/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
+import type { BN } from '@polkadot/util';
+
+import { encodeAddress, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { Button, Spinner, Tooltip } from '@mimir-wallet/ui';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { useToggle } from 'react-use';
+
+import AddressName from './AddressName';
+import FormatBalance from './FormatBalance';
+import Fund from './Fund';
 
 import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
 import IconLock from '@/assets/svg/icon-lock.svg?react';
@@ -10,17 +20,8 @@ import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconUnLock from '@/assets/svg/icon-unlock.svg?react';
 import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
+import { useExistentialDeposit } from '@/hooks/useExistentialDeposit';
 import { formatUnits } from '@/utils';
-import { BN } from '@polkadot/util';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { useToggle } from 'react-use';
-
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Spinner, Tooltip } from '@mimir-wallet/ui';
-
-import AddressName from './AddressName';
-import FormatBalance from './FormatBalance';
-import Fund from './Fund';
 
 interface Props {
   isUnLock?: boolean;
@@ -31,23 +32,25 @@ interface Props {
 }
 
 function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
-  const { api, chainSS58, network } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
+  const { network, chain } = useNetwork();
   const [allBalances] = useBalanceByIdentifier(network, address.toString(), 'native');
   const [open, toggleOpen] = useToggle(false);
   const onEnoughtStateRef = useRef(onEnoughtState);
+  const { existentialDepositBigInt } = useExistentialDeposit(network);
 
   onEnoughtStateRef.current = onEnoughtState;
 
   const isEnought = useMemo(() => {
-    if (allBalances) {
+    if (allBalances && existentialDepositBigInt > 0n) {
       return (
-        allBalances.transferrable >= BigInt(value.toString()) + api.consts.balances.existentialDeposit.toBigInt() &&
+        allBalances.transferrable >= BigInt(value.toString()) + existentialDepositBigInt &&
         allBalances.free >= allBalances.locked + BigInt(value.toString())
       );
     }
 
     return 'pending';
-  }, [allBalances, api, value]);
+  }, [allBalances, existentialDepositBigInt, value]);
 
   useEffect(() => {
     onEnoughtStateRef.current?.(encodeAddress(address.toString(), chainSS58), isEnought);
@@ -62,7 +65,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
       {value && address && (
         <Fund
           defaultNetwork={network}
-          defaultValue={formatUnits(value, api.registry.chainDecimals[0])}
+          defaultValue={formatUnits(value, chain.nativeDecimals)}
           onClose={() => toggleOpen(false)}
           open={open}
           receipt={address.toString()}
@@ -78,7 +81,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
         </div>
         <div className='flex items-center gap-[5px] sm:gap-2.5'>
           {!isUnLock && isEnought === false && (
-            <Button color='primary' variant='bordered' onClick={toggleOpen} size='sm' className='h-[20px]'>
+            <Button color='primary' variant='bordered' onClick={toggleOpen} size='sm' className='h-5'>
               Fund
             </Button>
           )}
@@ -104,5 +107,7 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 export const LockContainer = React.memo(({ children }: { children: React.ReactNode }) => {
   return <div className='bg-secondary space-y-2.5 rounded-[10px] p-2.5'>{children}</div>;
 });
+
+LockContainer.displayName = 'LockContainer';
 
 export default React.memo(LockItem);

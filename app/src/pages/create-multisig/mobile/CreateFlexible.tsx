@@ -1,30 +1,31 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { PrepareFlexible } from '../types';
 import type { ApiPromise } from '@polkadot/api';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
-import type { PrepareFlexible } from '../types';
+
+import { addressToHex, ApiManager, signAndSend, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Button, buttonSpinner, Divider, Tooltip } from '@mimir-wallet/ui';
+import { u8aEq } from '@polkadot/util';
+import { encodeMultiAddress } from '@polkadot/util-crypto';
+import React, { useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
+
+import AccountVisibility from '../components/AccountVisibility';
+import CreateSuccess from '../components/CreateSuccess';
 
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@/components';
 import { utm } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
+import { useProxyDeposit } from '@/hooks/useProxyDeposit';
 import { addTxToast } from '@/hooks/useTxQueue';
 import { sleep } from '@/utils';
 import { accountSource, useAccountSource } from '@/wallet/useWallet';
 import { enableWallet } from '@/wallet/utils';
-import { BN_ZERO, u8aEq } from '@polkadot/util';
-import { encodeMultiAddress } from '@polkadot/util-crypto';
-import React, { useCallback, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { addressToHex, signAndSend, useApi } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Button, buttonSpinner, Divider, Tooltip } from '@mimir-wallet/ui';
-
-import AccountVisibility from '../components/AccountVisibility';
-import CreateSuccess from '../components/CreateSuccess';
 
 interface Props {
   prepare: PrepareFlexible;
@@ -76,7 +77,9 @@ function CreateFlexible({
     who
   }
 }: Props) {
-  const { api, network, chain } = useApi();
+  const { network, chain } = useNetwork();
+  const { ss58 } = useSs58Format();
+  const { proxyDepositBase, proxyDepositFactor } = useProxyDeposit(network);
   const [signer, setSigner] = useState<string>(creator || '');
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
   const [blockNumber, setBlockNumber] = useState<number | null | undefined>(_blockNumber);
@@ -90,15 +93,17 @@ function CreateFlexible({
   const [isOpen, toggleOpen] = useToggle(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Calculate reserved amount: 3 * proxyDepositFactor + 2 * proxyDepositBase
   const reservedAmount = useMemo(
-    () =>
-      api.consts.proxy
-        ? api.consts.proxy.proxyDepositFactor.muln(3).add(api.consts.proxy.proxyDepositBase.muln(2))
-        : BN_ZERO,
-    [api]
+    () => proxyDepositFactor.muln(3).add(proxyDepositBase.muln(2)),
+    [proxyDepositBase, proxyDepositFactor]
   );
 
-  const createMembers = (pure: string, who: string[], signer: string, source: string, threshold: number) => {
+  const createMembers = async (pure: string, who: string[], signer: string, source: string, threshold: number) => {
+    const api = await ApiManager.getInstance().getApi(network);
+
+    if (!api) return;
+
     const extrinsic = api.tx.utility.batchAll([
       ...(api.consts.proxy
         ? [
@@ -111,7 +116,7 @@ function CreateFlexible({
       api.tx.proxy.proxy(
         pure,
         'Any',
-        api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, api.registry.chainSS58), 'Any', 0).method.toU8a()
+        api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, ss58), 'Any', 0).method.toU8a()
       ),
       api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0).method.toU8a())
     ]);
@@ -153,9 +158,13 @@ function CreateFlexible({
     events.once('error', () => setLoadingSecond(false));
   };
 
-  const createPure = () => {
+  const createPure = async () => {
     if (!signer) return;
     if (!source) return;
+
+    const api = await ApiManager.getInstance().getApi(network);
+
+    if (!api) return;
 
     const extrinsic = api.tx.proxy.createPure('Any', 0, 0);
     const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
@@ -200,31 +209,32 @@ function CreateFlexible({
     });
   };
 
-  const killPure = useCallback(
-    (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
-      if (!source) return;
+  const killPure = async (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
+    if (!source) return;
 
-      const extrinsic = api.tx.proxy.proxy(
-        pure,
-        'Any',
-        api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex).method.toU8a()
-      );
+    const api = await ApiManager.getInstance().getApi(network);
 
-      const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
-        checkProxy: true
-      });
+    if (!api) return;
 
-      addTxToast({ events });
+    const extrinsic = api.tx.proxy.proxy(
+      pure,
+      'Any',
+      api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex).method.toU8a()
+    );
 
+    const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
+      checkProxy: true
+    });
+
+    addTxToast({ events });
+
+    setLoadingCancel(true);
+    events.once('inblock', () => {
       setLoadingCancel(true);
-      events.once('inblock', () => {
-        setLoadingCancel(true);
-        onCancel();
-      });
-      events.once('error', () => setLoadingCancel(false));
-    },
-    [source, api, onCancel]
-  );
+      onCancel();
+    });
+    events.once('error', () => setLoadingCancel(false));
+  };
 
   return (
     <>
@@ -270,8 +280,8 @@ function CreateFlexible({
                     content={
                       <span>
                         Flexible Multisig is a Pure Proxy. In <b>‘set signers’</b> step, you add the multisig account as
-                        its proxy and remove the creator's proxy, making the multi-signature its only controller. Then
-                        transfer some funds to keep Flexible alive.
+                        its proxy and remove the creator&apos;s proxy, making the multi-signature its only controller.
+                        Then transfer some funds to keep Flexible alive.
                       </span>
                     }
                   >
@@ -374,7 +384,7 @@ function CreateFlexible({
               setIsSuccess(true);
             }}
             pureAddress={pure}
-            multisigAddress={encodeMultiAddress(who, threshold, api.registry.chainSS58)}
+            multisigAddress={encodeMultiAddress(who, threshold, ss58)}
           />
           <CreateSuccess isOpen={isSuccess} onClose={() => setIsSuccess(false)} address={pure} />
         </>

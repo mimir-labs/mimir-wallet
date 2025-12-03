@@ -1,11 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { RouteMetadata } from '@/hooks/usePageTitle';
 
-import PageSetting from '@/pages/setting';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
+
+import PageSetting from '@/pages/setting';
 
 /**
  * Settings Route (/setting)
@@ -22,19 +23,6 @@ const settingSearchSchema = z.object({
 
 export const Route = createFileRoute('/_authenticated/setting')({
   validateSearch: settingSearchSchema,
-  beforeLoad: ({ search }) => {
-    // Skip connection checks for general settings
-    // - type=general with tabs=network: network configuration (no wallet needed)
-    // - type=general with other tabs or no tabs: general settings (no wallet needed)
-    // Account settings (type=account) require full connection
-    const shouldSkipConnect = search.type === 'general';
-
-    return {
-      layoutOptions: {
-        skipConnect: shouldSkipConnect
-      }
-    };
-  },
   staticData: {
     title: 'Setting'
   } as RouteMetadata,

@@ -1,23 +1,23 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
-import { toastError, toastSuccess } from '@/components/utils';
-import { useAddressStructureNetworks } from '@/hooks/useAddressStructureNetworks';
-import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
-import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { Button, Tooltip } from '@mimir-wallet/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import React, { useCallback, useState } from 'react';
-
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip } from '@mimir-wallet/ui';
 
 import AccountStructure from './AccountStructure';
 import Assets from './Assets';
 import FavoriteDapps from './FavoriteDapps';
 import Hero from './Hero';
 import PendingTransactions from './PendingTransactions';
+
+import IconArrowClockWise from '@/assets/svg/icon-arrow-clock-wise.svg?react';
+import { toastError, toastSuccess } from '@/components/utils';
+import { useAddressStructureNetworks } from '@/hooks/useAddressStructureNetworks';
+import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
 
 function Title({ endContent, children }: { endContent?: React.ReactNode; children?: React.ReactNode }) {
   return (
@@ -129,9 +129,13 @@ function DashboardV2({ address }: { address: string }) {
         {/* Account Structure */}
         <div className='col-span-8'>
           <Title>Account Strucuture</Title>
-          <SubApiRoot network={network} supportedNetworks={supportedNetworks?.map((n) => n.key)}>
-            <AccountStructure address={address} setNetwork={setNetwork} />
-          </SubApiRoot>
+          <NetworkProvider network={network}>
+            <AccountStructure
+              address={address}
+              supportedNetworks={supportedNetworks?.map((n) => n.key)}
+              setNetwork={setNetwork}
+            />
+          </NetworkProvider>
         </div>
       </div>
     </div>

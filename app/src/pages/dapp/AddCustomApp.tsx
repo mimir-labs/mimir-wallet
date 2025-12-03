@@ -1,14 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { CustomDappOption } from '@/config';
-
-import IconEdit from '@/assets/svg/icon-edit.svg?react';
-import { Input } from '@/components';
-import { useDapps } from '@/hooks/useDapp';
-import { useDebounceFn } from '@/hooks/useDebounceFn';
-import { fetchAppMetadata, isValidURL } from '@/utils';
-import React, { useCallback, useRef, useState } from 'react';
 
 import {
   Alert,
@@ -23,6 +16,13 @@ import {
   ModalHeader,
   Spinner
 } from '@mimir-wallet/ui';
+import React, { useCallback, useRef, useState } from 'react';
+
+import IconEdit from '@/assets/svg/icon-edit.svg?react';
+import { Input } from '@/components';
+import { useDapps } from '@/hooks/useDapp';
+import { useDebounceFn } from '@/hooks/useDebounceFn';
+import { fetchAppMetadata, isValidURL } from '@/utils';
 
 function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [error, setError] = useState<Error>();

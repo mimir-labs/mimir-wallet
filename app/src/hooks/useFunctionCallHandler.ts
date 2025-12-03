@@ -1,11 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { FunctionCallHandler, HandlerRegistrationOptions, RouteRequirement } from '@mimir-wallet/ai-assistant';
 
-import { useCallback, useEffect } from 'react';
-
 import { functionCallManager } from '@mimir-wallet/ai-assistant';
+import { useCallback, useEffect } from 'react';
 
 /**
  * Hook to register a simple function call handler (no route requirement)

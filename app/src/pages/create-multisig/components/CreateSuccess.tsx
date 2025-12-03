@@ -1,15 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { addressToHex } from '@mimir-wallet/polkadot-core';
+import { Button, Modal, ModalBody, ModalContent, Tooltip } from '@mimir-wallet/ui';
+import { useNavigate } from '@tanstack/react-router';
+import { useEffect, useMemo } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { AddressCell } from '@/components';
-import { useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo } from 'react';
-
-import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { Button, Modal, ModalBody, ModalContent, Tooltip } from '@mimir-wallet/ui';
 
 interface Props {
   address: string;

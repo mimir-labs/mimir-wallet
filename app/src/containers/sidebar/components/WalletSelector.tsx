@@ -1,10 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useMemo } from 'react';
 
 import { WalletIcon } from '@/components';
 import { walletConfig } from '@/config';
 import { useWallet } from '@/wallet/useWallet';
-import { useMemo } from 'react';
 
 export function WalletSelector() {
   const { connectedWallets, openWallet, wallets } = useWallet();

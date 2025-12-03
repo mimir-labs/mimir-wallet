@@ -1,25 +1,40 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TxBundle } from '../utils';
 
-import { useEffect, useState } from 'react';
+import { ApiManager, dryRun, type DryRunResult, useNetwork } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
 
-import { dryRun, type DryRunResult, useApi } from '@mimir-wallet/polkadot-core';
+import { useSupportsDryRun } from '@/hooks/useChainCapabilities';
 
 export function useDryRunResult(txBundle: TxBundle | null) {
   const method = txBundle?.tx.method.toHex() || null;
   const address = txBundle?.signer || null;
-  const { api, isApiReady } = useApi();
-  const [dryRunResult, setDryRunResult] = useState<DryRunResult>();
+  const { network } = useNetwork();
+  const { supportsDryRun } = useSupportsDryRun(network);
 
-  useEffect(() => {
-    if (method && address && isApiReady && !!api.call.dryRunApi?.dryRunCall) {
-      dryRun(api, method, address).then(setDryRunResult);
-    }
-  }, [address, api, isApiReady, method]);
+  const { data: dryRunResult } = useQuery({
+    queryKey: ['dry-run-result', network, method, address] as const,
+    queryFn: async () => {
+      if (!method || !address) {
+        return undefined;
+      }
+
+      const api = await ApiManager.getInstance().getApi(network);
+
+      if (!api) {
+        return undefined;
+      }
+
+      return dryRun(api, method, address);
+    },
+    enabled: !!network && !!method && !!address && supportsDryRun,
+    staleTime: 0, // Always refetch for new transactions
+    retry: false
+  });
 
   return {
-    dryRunResult
+    dryRunResult: dryRunResult as DryRunResult | undefined
   };
 }

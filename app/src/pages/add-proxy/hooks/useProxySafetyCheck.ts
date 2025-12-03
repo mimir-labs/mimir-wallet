@@ -1,9 +1,8 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback, useMemo, useState } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager } from '@mimir-wallet/polkadot-core';
+import { useCallback, useState } from 'react';
 
 import { createProxySafetyService, type SafetyCheckResult } from '../services/proxySafetyService';
 
@@ -16,10 +15,7 @@ interface ExtendedSafetyCheckResult extends SafetyCheckResult {
  * Enhanced hook for performing comprehensive proxy safety checks
  * Uses the centralized ProxySafetyService for unified logic
  */
-export function useProxySafetyCheck() {
-  const { api } = useApi();
-  const safetyService = useMemo(() => createProxySafetyService(api), [api]);
-
+export function useProxySafetyCheck(network: string) {
   const [result, setResult] = useState<ExtendedSafetyCheckResult>({
     hasWarnings: false,
     indirectControllers: [],
@@ -50,6 +46,13 @@ export function useProxySafetyCheck() {
       setResult((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
+        const api = await ApiManager.getInstance().getApi(network);
+
+        if (!api) {
+          throw new Error('API is not ready');
+        }
+
+        const safetyService = createProxySafetyService(api);
         const safetyResult = await safetyService.checkIndirectControllers(proxyAddress);
 
         const finalResult: ExtendedSafetyCheckResult = {
@@ -76,7 +79,7 @@ export function useProxySafetyCheck() {
         return errorResult;
       }
     },
-    [safetyService]
+    [network]
   );
 
   return {

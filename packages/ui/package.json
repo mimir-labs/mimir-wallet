@@ -79,6 +79,7 @@
     "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@mimir-wallet/dev": "workspace:^",
     "@tailwindcss/cli": "^4.1.16",
     "npm-run-all2": "^7.0.2",
     "tailwind-variants": "^3.1.1",

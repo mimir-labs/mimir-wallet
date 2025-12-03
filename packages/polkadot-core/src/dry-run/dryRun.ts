@@ -1,17 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DryRunResult } from './types.js';
 import type { ApiPromise } from '@polkadot/api';
 import type { Result } from '@polkadot/types';
 import type { XcmRuntimeApisDryRunCallDryRunEffects, XcmRuntimeApisDryRunError } from '@polkadot/types/lookup';
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
-import type { DryRunResult } from './types.js';
 
 import { isHex, isU8a } from '@polkadot/util';
 
-import { assetDispatchError } from '../dispatch-error.js';
-import { buildRemoteProxy } from '../remoteProxy.js';
+import { assetDispatchError } from '../tx/dispatch-error.js';
+import { buildRemoteProxy } from '../tx/remoteProxy.js';
+
 import { parseBalancesChange } from './parse-balances-change.js';
 
 // Constants for configuration

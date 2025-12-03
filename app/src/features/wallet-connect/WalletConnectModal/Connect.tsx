@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SessionTypes } from '@walletconnect/types';
+
+import { Alert, AlertTitle, Avatar, Button, buttonSpinner, Divider, Spinner } from '@mimir-wallet/ui';
+import { useCallback, useState } from 'react';
+import { useAsyncFn } from 'react-use';
+
+import { isPairingUri } from '../utils';
+import { connect, disconnectSession } from '../wallet-connect';
 
 import { analyticsActions } from '@/analytics';
 import { Input } from '@/components';
 import { useInput } from '@/hooks/useInput';
 import { asError } from '@/utils';
-import { useCallback, useState } from 'react';
-import { useAsyncFn } from 'react-use';
-
-import { Alert, AlertTitle, Avatar, Button, buttonSpinner, Divider, Spinner } from '@mimir-wallet/ui';
-
-import { isPairingUri } from '../utils';
-import { connect, disconnectSession } from '../wallet-connect';
 
 function ConnectSession({ session }: { session: SessionTypes.Struct }) {
   const [state, disconnect] = useAsyncFn((session: SessionTypes.Struct) => {

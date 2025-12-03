@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Address } from '@/components';
-import AddressRow from '@/components/AddressRow';
+import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
 import { memo } from 'react';
 import { useToggle } from 'react-use';
 
-import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { Address } from '@/components';
+import AddressRow from '@/components/AddressRow';
 
 export interface SafetyWarningModalProps {
   isOpen: boolean;

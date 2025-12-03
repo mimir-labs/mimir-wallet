@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { encodeAddress, NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Avatar, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import qrcode from 'qrcode-generator';
+import React, { useEffect, useRef } from 'react';
 
 import { CopyButton, InputNetwork } from '@/components';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useQrAddress } from '@/hooks/useQrAddress';
-import qrcode from 'qrcode-generator';
-import React, { useEffect, useRef } from 'react';
-
-import { encodeAddress, SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 function Content({
   value,
@@ -19,7 +19,7 @@ function Content({
   network: string;
   setNetwork: (network: string) => void;
 }) {
-  const { chain } = useApi();
+  const { chain } = useNetwork();
   const qr = useRef(qrcode(0, 'M'));
   const container = useRef<HTMLDivElement>(null);
 
@@ -68,9 +68,9 @@ function QrcodeAddressModal() {
     <Modal hideCloseButton onClose={close} isOpen={isOpen} size='sm'>
       <ModalContent>
         <ModalBody>
-          <SubApiRoot network={network}>
+          <NetworkProvider network={network}>
             <Content value={address} network={network} setNetwork={setNetwork} />
-          </SubApiRoot>
+          </NetworkProvider>
         </ModalBody>
       </ModalContent>
     </Modal>

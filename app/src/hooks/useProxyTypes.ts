@@ -1,12 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { KitchensinkRuntimeProxyType } from '@polkadot/types/lookup';
 import type { Registry } from '@polkadot/types/types';
 
-import { useMemo } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
 
 export function getProxyTypeInstance(registry: Registry, index = 0): KitchensinkRuntimeProxyType {
   // This is not perfect, but should work for `{Kusama, Node, Polkadot}RuntimeProxyType`
@@ -25,8 +24,30 @@ export function getProxyOptions(registry: Registry): { text: string; value: numb
   );
 }
 
-export function useProxyTypes() {
-  const { api } = useApi();
+async function fetchProxyTypes({
+  queryKey
+}: {
+  queryKey: readonly [string, string];
+}): Promise<{ text: string; value: number }[]> {
+  const [, network] = queryKey;
 
-  return useMemo(() => getProxyOptions(api.registry), [api.registry]);
+  const api = await ApiManager.getInstance().getApi(network);
+
+  return getProxyOptions(api.registry);
+}
+
+/**
+ * Hook to get proxy type options for a specific network
+ * @param network - The network key to query
+ * @returns Array of proxy type options
+ */
+export function useProxyTypes(network: string): { text: string; value: number }[] {
+  const { data } = useQuery({
+    queryKey: ['proxy-types', network] as const,
+    queryFn: fetchProxyTypes,
+    enabled: !!network,
+    staleTime: Infinity // Proxy types don't change
+  });
+
+  return data ?? [];
 }

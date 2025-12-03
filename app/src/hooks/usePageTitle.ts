@@ -1,10 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useChains } from '@mimir-wallet/polkadot-core';
 import { useMatches } from '@tanstack/react-router';
 import { useEffect } from 'react';
-
-import { useNetworks } from '@mimir-wallet/polkadot-core';
 
 /**
  * Route metadata interface for page title
@@ -47,7 +46,7 @@ export interface RouteMetadata {
  */
 export function usePageTitle() {
   const matches = useMatches();
-  const { mode } = useNetworks();
+  const { mode } = useChains();
 
   const PREFIX =
     mode === 'omni' ? 'Mimir|Your Ultimate Omni Web3 Multisig Wallet' : 'Mimir|Your Ultimate Web3 Multisig Wallet';

@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ProxyAddedEvent, ProxyArgs, PureCreatedEvent, TransactionResult } from '../types';
 import type { ApiPromise } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { ISubmittableResult } from '@polkadot/types/types';
-import type { ProxyAddedEvent, ProxyArgs, PureCreatedEvent, TransactionResult } from '../types';
 
-import { useTxQueue } from '@/hooks/useTxQueue';
-import { u8aToHex } from '@polkadot/util';
-import { useCallback, useMemo, useState } from 'react';
-
-import { decodeAddress, useApi } from '@mimir-wallet/polkadot-core';
+import { ApiManager, decodeAddress } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
+import { u8aToHex } from '@polkadot/util';
+import { useCallback, useState } from 'react';
 
 import { createProxyTransactionService } from '../services/proxyTransactionService';
+
+import { useTxQueue } from '@/hooks/useTxQueue';
 
 /**
  * Parse PureCreated events from transaction result
@@ -75,10 +75,8 @@ export interface TransactionState {
  * Hook for handling proxy transactions with unified logic
  * Supports both pure proxy creation and regular proxy addition
  */
-export function useProxyTransaction() {
-  const { api } = useApi();
+export function useProxyTransaction(network: string) {
   const { addQueue } = useTxQueue();
-  const transactionService = useMemo(() => createProxyTransactionService(api), [api]);
 
   const [state, setState] = useState<TransactionState>({
     isLoading: false,
@@ -97,6 +95,14 @@ export function useProxyTransaction() {
       setState({ isLoading: true, error: null });
 
       try {
+        const api = await ApiManager.getInstance().getApi(network);
+
+        if (!api) {
+          throw new Error('API is not ready');
+        }
+
+        const transactionService = createProxyTransactionService(api);
+
         const transaction = transactionService.buildCreatePureProxyTransaction({
           proxyType: config.proxyType,
           delay: config.delay
@@ -161,7 +167,7 @@ export function useProxyTransaction() {
         config.onError?.(err);
       }
     },
-    [transactionService, addQueue, api]
+    [network, addQueue]
   );
 
   /**
@@ -178,6 +184,14 @@ export function useProxyTransaction() {
       setState({ isLoading: true, error: null });
 
       try {
+        const api = await ApiManager.getInstance().getApi(network);
+
+        if (!api) {
+          throw new Error('API is not ready');
+        }
+
+        const transactionService = createProxyTransactionService(api);
+
         // Validate all proxy arguments
         const validation = transactionService.validateBatchProxyArgs([proxyArgs]);
 
@@ -232,7 +246,7 @@ export function useProxyTransaction() {
         config.onError?.(err);
       }
     },
-    [transactionService, addQueue, api]
+    [network, addQueue]
   );
 
   return {

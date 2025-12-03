@@ -1,17 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 
-import { AddressCell, Bytes, Hash } from '@/components';
-import { FunctionArgs } from '@/params';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertDescription, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useToggle } from 'react-use';
 
-import { findTargetCall, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertDescription, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
+import { AddressCell, Bytes, Hash } from '@/components';
+import { useFindTargetCallFromMethod } from '@/hooks/useFindTargetCall';
+import { useParseCall } from '@/hooks/useParseCall';
+import { FunctionArgs } from '@/params';
 
 function Item({ content, title }: { title?: React.ReactNode; content?: React.ReactNode }) {
   return (
@@ -24,10 +26,12 @@ function Item({ content, title }: { title?: React.ReactNode; content?: React.Rea
 }
 
 function Target({ call, address }: { address: string; call?: IMethod | null }) {
-  const { api } = useApi();
-  const [from, targetCall] = useMemo(() => findTargetCall(api, address, call), [address, api, call]);
+  const { network } = useNetwork();
 
-  if (!call) {
+  // Find target call using async hook
+  const { from, targetCall, isLoading } = useFindTargetCallFromMethod(network, address, call);
+
+  if (!call || isLoading) {
     return null;
   }
 
@@ -36,14 +40,14 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
       <Item title='From' content={<AddressCell iconSize={40} withCopy value={from} />} />
 
       {targetCall ? (
-        <FunctionArgs displayType='vertical' from={from} registry={api.registry} call={targetCall} />
+        <FunctionArgs displayType='vertical' from={from} registry={targetCall.registry} call={targetCall} />
       ) : null}
 
       {!call && (
         <Alert variant='warning'>
           <AlertTitle>Warning</AlertTitle>
           <AlertDescription>
-            This transaction wasn't initiated from Mimir. Please confirm the security of this transaction.
+            {`This transaction wasn't initiated from Mimir. Please confirm the security of this transaction.`}
           </AlertDescription>
         </Alert>
       )}
@@ -52,18 +56,11 @@ function Target({ call, address }: { address: string; call?: IMethod | null }) {
 }
 
 function Details({ transaction }: { transaction: Transaction }) {
-  const { api } = useApi();
+  const { network } = useNetwork();
   const [isOpen, toggleOpen] = useToggle(false);
 
-  const call = useMemo(() => {
-    if (!transaction.call) return null;
-
-    try {
-      return api.createType('Call', transaction.call);
-    } catch {
-      return null;
-    }
-  }, [api, transaction.call]);
+  // Parse call data using async hook
+  const { call } = useParseCall(network, transaction.call);
 
   return (
     <div className='bg-content1 border-secondary shadow-medium space-y-2.5 rounded-[20px] border-1 p-4'>

@@ -1,22 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// Copyright 2023-2024 dev.mimir authors & contributors
-// SPDX-License-Identifier: Apache-2.0
 import type { ChartData } from 'chart.js';
 
-import { useAccount } from '@/accounts/useAccount';
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import IconSafe from '@/assets/svg/icon-safe.svg?react';
-import { AddressRow, Empty, FormatBalance } from '@/components';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useMultiChainStats, useQueryStats } from '@/hooks/useQueryStats';
-import { Link } from '@tanstack/react-router';
-import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
-import { Bar, Doughnut } from 'react-chartjs-2';
-
-import { SubApiRoot, useNetworks } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useChains } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Button,
@@ -33,6 +20,17 @@ import {
   TableHeader,
   TableRow
 } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import dayjs from 'dayjs';
+import { useMemo, useState } from 'react';
+import { Bar, Doughnut } from 'react-chartjs-2';
+
+import { useAccount } from '@/accounts/useAccount';
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import IconSafe from '@/assets/svg/icon-safe.svg?react';
+import { AddressRow, Empty, FormatBalance } from '@/components';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useMultiChainStats, useQueryStats } from '@/hooks/useQueryStats';
 
 const options = {
   maintainAspectRatio: false,
@@ -188,7 +186,7 @@ function Chart({
 function Transaction({ chains, address }: { chains: string[]; address: string }) {
   const [selectedChain, setSelectedChain] = useState<string>(chains[0]);
   const [data] = useQueryStats(selectedChain, address);
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
 
   const callOverview = useMemo(
     () =>
@@ -210,7 +208,7 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
   }, [networks, selectedChain]);
 
   return (
-    <SubApiRoot network={selectedChain}>
+    <NetworkProvider network={selectedChain}>
       <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
         <div className='col-span-2 flex gap-5'>
           <div className='bg-background shadow-medium col-span-2 flex w-full flex-col items-stretch justify-between gap-3 rounded-[20px] p-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:p-5 sm:px-12 sm:py-5'>
@@ -323,7 +321,7 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
 
         <Chart txDaily={data?.transactionCounts} callOverview={data?.callOverview} />
       </div>
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

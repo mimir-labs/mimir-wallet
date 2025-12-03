@@ -1,18 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
 
-import { useQueryAccount } from '@/accounts/useQueryAccount';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useTransactionDetail } from '@/hooks/useTransactions';
-import React, { useState } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
+import React, { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 import TxItems from './TxItems';
 import TxItemsSmall from './TxItemsSmall';
+
+import { useQueryAccount } from '@/accounts/useQueryAccount';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useTransactionDetail } from '@/hooks/useTransactions';
 
 interface Props {
   withDetails?: boolean;
@@ -23,8 +24,11 @@ interface Props {
 
 function TxCell({ withDetails, defaultOpen, address, transaction: propsTransaction }: Props) {
   const upSm = useMediaQuery('sm');
-  const { network, isApiReady } = useApi();
-  const [account] = useQueryAccount(address);
+  const { network } = useNetwork();
+
+  // Only fetch account data when component is visible
+  const { ref, inView } = useInView({ triggerOnce: true });
+  const [account] = useQueryAccount(inView ? address : undefined);
 
   // State for loading full transaction details
   const [shouldLoadDetails, setShouldLoadDetails] = useState(false);
@@ -39,23 +43,29 @@ function TxCell({ withDetails, defaultOpen, address, transaction: propsTransacti
   // Check if transaction has large calls
   const hasLargeCalls = !!transaction.isLargeCall;
 
-  return isApiReady && account ? (
-    upSm ? (
-      <TxItems
-        withDetails={withDetails}
-        defaultOpen={defaultOpen}
-        account={account}
-        transaction={transaction}
-        hasLargeCalls={hasLargeCalls}
-        shouldLoadDetails={shouldLoadDetails}
-        onLoadDetails={() => setShouldLoadDetails(true)}
-      />
-    ) : (
-      <TxItemsSmall transaction={transaction} />
-    )
-  ) : (
-    <div className='flex h-[100px] items-center justify-center'>
-      <Spinner size='lg' variant='wave' />
+  if (!account) {
+    return (
+      <div ref={ref} className='flex h-[100px] items-center justify-center'>
+        <Spinner size='lg' variant='wave' />
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref}>
+      {upSm ? (
+        <TxItems
+          withDetails={withDetails}
+          defaultOpen={defaultOpen}
+          account={account}
+          transaction={transaction}
+          hasLargeCalls={hasLargeCalls}
+          shouldLoadDetails={shouldLoadDetails}
+          onLoadDetails={() => setShouldLoadDetails(true)}
+        />
+      ) : (
+        <TxItemsSmall transaction={transaction} />
+      )}
     </div>
   );
 }

@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Spinner } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
 
 import { useSimpleHistory } from '@/hooks/useTransactions';
 import SimpleTxCell from '@/transactions/SimpleTxCell';
 import { groupSubscanExtrinsicsByDate } from '@/transactions/transactionDateGrouping';
-import React, { useMemo } from 'react';
-
-import { Spinner } from '@mimir-wallet/ui';
 
 function AllHistoryTransactions({
   isFetched: propsIsFetched,

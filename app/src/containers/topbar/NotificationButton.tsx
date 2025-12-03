@@ -1,16 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconNotification from '@/assets/svg/icon-notification.svg?react';
-import { AddressRow } from '@/components';
-import { type NotificationMessage, useNotifications } from '@/hooks/useNotifications';
-import { formatAgo } from '@/utils';
-import { Link, useNavigate } from '@tanstack/react-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
-import { useToggle } from 'react-use';
-
-import { getChainIcon, useNetworks } from '@mimir-wallet/polkadot-core';
+import { getChainIcon } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Badge,
@@ -26,6 +17,15 @@ import {
   SelectValue,
   Tooltip
 } from '@mimir-wallet/ui';
+import { Link, useNavigate } from '@tanstack/react-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import { useToggle } from 'react-use';
+
+import IconNotification from '@/assets/svg/icon-notification.svg?react';
+import { AddressRow } from '@/components';
+import { type NotificationMessage, useNotifications } from '@/hooks/useNotifications';
+import { formatAgo } from '@/utils';
 
 // Function to get notification status color classes
 function getNotificationStatusColor(status: NotificationMessage['status']) {
@@ -159,7 +159,6 @@ function NotificationButton() {
   const [shouldShake, setShouldShake] = useState(false);
   const prevUnreadCountRef = useRef<number>(0);
   const navigate = useNavigate();
-  const { enableNetwork } = useNetworks();
 
   const unreadCount = getUnreadCount();
 
@@ -193,11 +192,10 @@ function NotificationButton() {
 
   const handleSelect = useCallback(
     (notification: NotificationMessage) => {
-      enableNetwork(notification.genesisHash);
       navigate({ to: '/transactions/$id', params: { id: notification.transactionId.toString() } });
       toggleOpen(false);
     },
-    [enableNetwork, navigate, toggleOpen]
+    [navigate, toggleOpen]
   );
 
   // Mark viewed notifications as read when popover closes
@@ -306,7 +304,7 @@ function NotificationButton() {
                 search={{ tabs: 'notification' }}
                 onClick={toggleOpen}
               >
-                Don't want miss information? Try Email→
+                {`Don't want miss information? Try Email→`}
               </Link>
             </div>
           </div>

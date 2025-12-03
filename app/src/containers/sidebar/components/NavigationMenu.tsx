@@ -1,5 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import React, { memo, useMemo } from 'react';
 
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import IconAnalytic from '@/assets/svg/icon-analytic.svg?react';
@@ -9,10 +13,6 @@ import IconHome from '@/assets/svg/icon-home.svg?react';
 import IconSetting from '@/assets/svg/icon-set.svg?react';
 import IconTransaction from '@/assets/svg/icon-transaction.svg?react';
 import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
-import { Link } from '@tanstack/react-router';
-import React, { memo, useMemo } from 'react';
-
-import { Button } from '@mimir-wallet/ui';
 
 interface NavLinkProps {
   to: string;

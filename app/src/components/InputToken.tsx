@@ -1,16 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountEnhancedAssetBalance } from '@mimir-wallet/polkadot-core';
-
-import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
-import { useChainBalances } from '@/hooks/useChainBalances';
-import { useElementWidth } from '@/hooks/useElementWidth';
-import { useChainXcmAsset } from '@/hooks/useXcmAssets';
-import { clsx } from 'clsx';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useToggle } from 'react-use';
-import { twMerge } from 'tailwind-merge';
 
 import {
   Avatar,
@@ -22,8 +13,17 @@ import {
   TooltipTrigger,
   TooltipWrapper
 } from '@mimir-wallet/ui';
+import { clsx } from 'clsx';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useToggle } from 'react-use';
+import { twMerge } from 'tailwind-merge';
 
 import FormatBalance from './FormatBalance';
+
+import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
+import { useChainBalances } from '@/hooks/useChainBalances';
+import { useElementWidth } from '@/hooks/useElementWidth';
+import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 
 interface Props {
   radius?: 'sm' | 'md' | 'lg' | 'full' | 'none';
@@ -180,7 +180,7 @@ function InputToken({
                   const identifier = item.isNative ? 'native' : item.key;
 
                   return (
-                    <TooltipWrapper>
+                    <TooltipWrapper key={identifier}>
                       <TooltipTrigger asChild>
                         <li
                           onClick={() => {

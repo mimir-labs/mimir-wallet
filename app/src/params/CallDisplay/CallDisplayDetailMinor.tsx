@@ -1,12 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Option } from '@polkadot/types';
 import type { KitchensinkRuntimeProxyType } from '@polkadot/types/lookup';
 import type { IMethod, Registry } from '@polkadot/types/types';
 
-import { AddressRow } from '@/components';
 import React, { useMemo } from 'react';
+
+import { AddressRow } from '@/components';
 
 function CallDisplayDetailMinor({ registry, call }: { registry: Registry; call?: IMethod | null }) {
   let comp: React.ReactNode;

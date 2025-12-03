@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button } from '@mimir-wallet/ui';
+import { useMedia, useToggle } from 'react-use';
+
+import AddCustomApp from './AddCustomApp';
 
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import { DappCell } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
-import { useMedia, useToggle } from 'react-use';
-
-import { Button } from '@mimir-wallet/ui';
-
-import AddCustomApp from './AddCustomApp';
 
 function CustomApps() {
   const [isOpen, toggleOpen] = useToggle(false);

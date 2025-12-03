@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TransactionResult } from '../types';
+
+import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
+import { useNavigate } from '@tanstack/react-router';
+import { memo } from 'react';
+
+import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
 
 import { useAccount } from '@/accounts/useAccount';
 import PureIcon from '@/assets/images/pure-icon.svg';
 import { AddressCell, ProxyControls } from '@/components';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
-import { useNavigate } from '@tanstack/react-router';
-import { memo } from 'react';
-
-import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
-
-import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
 
 interface SuccessModalProps {
   isOpen: boolean;

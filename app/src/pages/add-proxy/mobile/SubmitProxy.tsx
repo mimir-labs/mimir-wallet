@@ -1,19 +1,19 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ProxyArgs } from '../types';
 
-import { Address, TxButton } from '@/components';
-import { toastSuccess } from '@/components/utils';
-import { useTxQueue } from '@/hooks/useTxQueue';
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Link } from '@tanstack/react-router';
 import React, { useCallback, useState } from 'react';
 import { useAsyncFn, useToggle } from 'react-use';
 
-import { useApi } from '@mimir-wallet/polkadot-core';
-
 import SafetyWarningModal from '../components/SafetyWarningModal';
 import { useProxySafetyCheck } from '../hooks/useProxySafetyCheck';
+
+import { Address, TxButton } from '@/components';
+import { toastSuccess } from '@/components/utils';
+import { useTxQueue } from '@/hooks/useTxQueue';
 
 function SubmitProxy({
   proxied,
@@ -24,16 +24,22 @@ function SubmitProxy({
   proxyArgs: ProxyArgs[];
   setProxyArgs: React.Dispatch<React.SetStateAction<ProxyArgs[]>>;
 }) {
-  const { api, network } = useApi();
+  const { network } = useNetwork();
   const [alertOpen, toggleAlertOpen] = useToggle(false);
   const { addQueue } = useTxQueue();
   const [detectedControllers, setDetectedControllers] = useState<string[]>([]);
 
   // Use proxy safety check hook
-  const { checkSafety } = useProxySafetyCheck();
+  const { checkSafety } = useProxySafetyCheck(network);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (!(proxyArgs.length && proxied)) {
+      return;
+    }
+
+    const api = await ApiManager.getInstance().getApi(network);
+
+    if (!api) {
       return;
     }
 
@@ -76,7 +82,7 @@ function SubmitProxy({
         }
       }
     });
-  }, [addQueue, api, network, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
+  }, [addQueue, network, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
 
   const handleClickAction = useAsyncFn(async () => {
     // Check all proxy delegates for safety issues

@@ -1,8 +1,8 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountId32 } from '@polkadot/types/interfaces';
 import type { CallProps } from './types';
+import type { AccountId32 } from '@polkadot/types/interfaces';
 
 import { getTypeDef, type Vec } from '@polkadot/types';
 import { createKeyMulti } from '@polkadot/util-crypto';
@@ -10,6 +10,7 @@ import React, { forwardRef, useMemo } from 'react';
 
 import Param from '../Param';
 import Item from '../Param/Item';
+
 import { mergeClasses } from './utils';
 
 const CancelAsMulti = forwardRef<HTMLDivElement | null, CallProps>(

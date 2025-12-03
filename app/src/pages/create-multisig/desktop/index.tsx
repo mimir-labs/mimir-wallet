@@ -1,15 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { PrepareFlexible } from '../types';
-
-import { useAccount } from '@/accounts/useAccount';
-import { StepIndicator } from '@/components';
-import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
-import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useWizardState } from '@/hooks/useWizardState';
-import { useCallback, useState } from 'react';
-import { useToggle } from 'react-use';
 
 import {
   type FunctionCallHandler,
@@ -17,16 +9,25 @@ import {
   toFunctionCallString,
   toFunctionCallStringArray
 } from '@mimir-wallet/ai-assistant';
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
+import { useCallback, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import CreateStaticModal from '../components/CreateStaticModal';
 import CreateSuccess from '../components/CreateSuccess';
 import Prepare from '../components/Prepare';
 import CreateFlexible from '../mobile/CreateFlexible';
+
 import Step1Name from './Step1Name';
 import Step2Members from './Step2Members';
 import Step3Review from './Step3Review';
+
+import { useAccount } from '@/accounts/useAccount';
+import { StepIndicator } from '@/components';
+import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
+import { useInputNetwork } from '@/hooks/useInputNetwork';
+import { useWizardState } from '@/hooks/useWizardState';
 
 interface MultisigData {
   name: string;
@@ -131,7 +132,7 @@ function DesktopCreateMultisig() {
   };
 
   return (
-    <SubApiRoot network={network}>
+    <NetworkProvider network={network}>
       {prepare ? (
         <CreateFlexible prepare={prepare} onCancel={() => setPrepare(undefined)} />
       ) : (
@@ -210,7 +211,7 @@ function DesktopCreateMultisig() {
       {completedAddress && (
         <CreateSuccess isOpen={isSuccess} onClose={() => toggleSuccess(false)} address={completedAddress} />
       )}
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

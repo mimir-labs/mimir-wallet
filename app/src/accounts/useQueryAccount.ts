@@ -1,13 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, DelegateeProp, MultisigAccountData } from '@/hooks/types';
 
+import { addressEq, addressToHex, encodeAddress, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
+import { service, useQuery } from '@mimir-wallet/service';
 import { isEqual } from 'lodash-es';
 import { useEffect, useMemo } from 'react';
-
-import { addressEq, addressToHex, encodeAddress, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { service, useQuery } from '@mimir-wallet/service';
 
 import { useAccount } from './useAccount';
 
@@ -225,7 +224,9 @@ function useAccountMetaUpdater(accountData: AccountData | null | undefined): voi
 export function useQueryAccount(
   address?: string | null
 ): [AccountData | null | undefined, isFetched: boolean, isFetching: boolean, refetch: () => void] {
-  const { chainSS58, genesisHash } = useApi();
+  const { chain } = useNetwork();
+  const chainSS58 = chain.ss58Format;
+  const genesisHash = chain.genesisHash;
 
   // Reuse omni-chain data to avoid duplicate requests
   const [omniChainData, isFetched, isFetching, refetch] = useQueryAccountOmniChain(address);
@@ -267,7 +268,8 @@ export function useQueryAccountOmniChain(
   refetch: () => void,
   promise: Promise<AccountData | null>
 ] {
-  const { chainSS58 } = useApi();
+  const { chain } = useNetwork();
+  const chainSS58 = chain.ss58Format;
 
   // Convert address to hex format for querying
   const addressHex: string = address ? addressToHex(address) : '';

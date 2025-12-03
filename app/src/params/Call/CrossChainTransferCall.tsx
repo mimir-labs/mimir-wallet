@@ -1,7 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { CallProps } from './types';
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Avatar, cn, Popover, PopoverContent, PopoverTrigger, Skeleton, TextEllipsis, Tooltip } from '@mimir-wallet/ui';
+import React, { forwardRef } from 'react';
+import { useToggle } from 'react-use';
+
+import FunctionArgs from './FunctionArgs';
+import { mergeClasses } from './utils';
 
 import { Address, AddressName, AddressRow, CopyAddress, FormatBalance, IdentityIcon } from '@/components';
 import { findAsset } from '@/config';
@@ -12,14 +20,6 @@ import {
   useParseCrossChainTransfer
 } from '@/hooks/useParseCrossChainTransfer';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
-import React, { forwardRef } from 'react';
-import { useToggle } from 'react-use';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, cn, Popover, PopoverContent, PopoverTrigger, Skeleton, TextEllipsis, Tooltip } from '@mimir-wallet/ui';
-
-import FunctionArgs from './FunctionArgs';
-import { mergeClasses } from './utils';
 
 const AddressDisplay = React.memo(({ reverse, address }: { reverse: boolean; address?: string | null }) => {
   const copyAddress = useCopyAddressToClipboard(address || '');
@@ -68,6 +68,8 @@ const AddressDisplay = React.memo(({ reverse, address }: { reverse: boolean; add
   );
 });
 
+AddressDisplay.displayName = 'AddressDisplay';
+
 const ChainIcon = React.memo(
   ({ chainInfo, side }: { chainInfo: CrossChainTransferInfo['destination']; side: 'left' | 'right' }) => {
     const className = `h-6 w-6 @max-lg:h-5 @max-lg:w-5 cursor-help ${side === 'left' ? 'mr-2.5' : 'ml-2.5'}`;
@@ -90,6 +92,8 @@ const ChainIcon = React.memo(
   }
 );
 
+ChainIcon.displayName = 'ChainIcon';
+
 function AmountDisplay({ asset }: { asset: AssetTransfer }) {
   const [data, isFetched, isFetching] = useXcmAsset(
     asset.chain.isSupport ? asset.chain.key : '',
@@ -101,7 +105,7 @@ function AmountDisplay({ asset }: { asset: AssetTransfer }) {
   }
 
   if (!data || (!isFetched && isFetching)) {
-    return <Skeleton style={{ width: 50, height: 12 }} />;
+    return <Skeleton className='h-3.5 w-20 rounded-full' />;
   }
 
   const icon = !data.isNative
@@ -129,7 +133,7 @@ const CrossChainTransferCall = forwardRef<HTMLDivElement | null, CallProps>((pro
     showFallback,
     fallbackComponent: FallbackComponent = FunctionArgs
   } = props;
-  const { chain } = useApi();
+  const { chain } = useNetwork();
   const results = useParseCrossChainTransfer(registry, chain, call);
   const [open, toggleOpen] = useToggle(false);
   const asset0 = results?.assets.at(0);

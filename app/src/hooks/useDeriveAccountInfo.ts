@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
@@ -7,12 +7,12 @@ import type { PalletIdentityJudgement, PalletIdentityRegistration } from '@polka
 import type { ITuple } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { dataToUtf8 } from '@/utils';
+import { addressToHex, ApiManager, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
 import { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
 
-import { addressToHex, useAllApis, useIdentityApi } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
+import { dataToUtf8 } from '@/utils';
 
 type AccountInfo = {
   display: string | undefined;
@@ -133,19 +133,11 @@ async function getIdentityInfo({
   };
 }
 
-async function fetchIdentityInfo({ queryKey }: { queryKey: readonly [string, string | undefined, string] }) {
+async function fetchIdentityInfo({ queryKey }: { queryKey: readonly [string, string, string] }) {
   const [, network, addressHex] = queryKey;
 
-  if (!network) {
-    throw new Error('Network is required');
-  }
-
-  const allApis = useAllApis.getState().chains;
-  const api = allApis[network]?.api;
-
-  if (!api) {
-    throw new Error(`API not available for network: ${network}`);
-  }
+  // getIdentityApi resolves the identity network internally
+  const api = await ApiManager.getInstance().getIdentityApi(network);
 
   return getIdentityInfo({ queryKey: [api, addressHex] });
 }
@@ -154,21 +146,20 @@ export const useIdentityStore = create<Record<HexString, string>>()(() => ({}));
 
 export function useDeriveAccountInfo(
   value?: string | null
-): [data: AccountInfo | undefined, isFetched: boolean, isFetching: boolean, identityEnabled: boolean] {
-  const identityApi = useIdentityApi();
+): [data: AccountInfo | undefined, isFetched: boolean, isFetching: boolean] {
+  const { network } = useNetwork();
+  const { mode } = useChains();
+  const { chainInfo } = useSs58Format();
 
   const address = value ? value.toString() : '';
   const addressHex = useMemo(() => (address ? addressToHex(address) : '0x'), [address]);
 
-  const enabled =
-    !!identityApi && !!identityApi.isApiReady && !!identityApi.api?.query?.identity?.identityOf && !!address;
-
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: ['identity-info', identityApi?.network, addressHex] as const,
+    queryKey: ['identity-info', mode === 'omni' ? chainInfo.key : network, addressHex] as const,
     refetchInterval: 12000,
     refetchOnMount: false,
     queryFn: fetchIdentityInfo,
-    enabled: enabled
+    enabled: !!address
   });
 
   useEffect(() => {
@@ -181,5 +172,5 @@ export function useDeriveAccountInfo(
     }
   }, [data, value, addressHex]);
 
-  return [data, isFetched, isFetching, !!identityApi] as const;
+  return [data, isFetched, isFetching] as const;
 }

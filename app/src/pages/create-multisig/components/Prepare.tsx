@@ -1,21 +1,21 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { PrepareFlexible } from '../types';
 
+import { encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import { useToggle } from 'react-use';
+
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { AddressRow } from '@/components';
 import { useCacheMultisig } from '@/hooks/useCacheMultisig';
-import { useToggle } from 'react-use';
-
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
 
 function Prepare({ onSelect }: { onSelect: (data: PrepareFlexible) => void }) {
-  const { chainSS58 } = useApi();
+  const { chain, network } = useNetwork();
 
   // prepare multisigs
-  const [prepares] = useCacheMultisig();
+  const [prepares] = useCacheMultisig(network);
   // flexible
   const [open, toggleOpen] = useToggle(false);
 
@@ -39,11 +39,11 @@ function Prepare({ onSelect }: { onSelect: (data: PrepareFlexible) => void }) {
                   if (item.pure) {
                     onSelect({
                       creator: item.creator,
-                      who: item.who.map((address) => encodeAddress(address, chainSS58)),
+                      who: item.who.map((address) => encodeAddress(address, chain.ss58Format)),
                       threshold: item.threshold,
                       name: item.name,
                       multisigName: item.multisigName,
-                      pure: item.pure ? encodeAddress(item.pure, chainSS58) : null,
+                      pure: item.pure ? encodeAddress(item.pure, chain.ss58Format) : null,
                       blockNumber: item.blockNumber,
                       extrinsicIndex: item.extrinsicIndex
                     });

@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ProxyArgs } from '../types';
 
-import { toastWarn } from '@/components/utils';
+import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, buttonSpinner } from '@mimir-wallet/ui';
 import React from 'react';
 import { useAsyncFn } from 'react-use';
 
-import { addressEq, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, buttonSpinner } from '@mimir-wallet/ui';
+import { toastWarn } from '@/components/utils';
 
 function AddProxyButton({
   proxied,
@@ -27,10 +27,16 @@ function AddProxyButton({
   proxyType: string;
   setProxyArgs: React.Dispatch<React.SetStateAction<ProxyArgs[]>>;
 }) {
-  const { api } = useApi();
+  const { network } = useNetwork();
 
   const [state, onAdd] = useAsyncFn(async () => {
     if (!(proxy && proxied)) {
+      return;
+    }
+
+    const api = await ApiManager.getInstance().getApi(network);
+
+    if (!api) {
       return;
     }
 
@@ -63,7 +69,7 @@ function AddProxyButton({
     }
 
     setProxyArgs([...proxyArgs, { delegate: proxy, proxyType, delay }]);
-  }, [api, custom, proxied, proxy, proxyArgs, proxyType, reviewWindow, setProxyArgs]);
+  }, [custom, network, proxied, proxy, proxyArgs, proxyType, reviewWindow, setProxyArgs]);
 
   return (
     <Button disabled={state.loading || !(proxied && proxy)} fullWidth variant='ghost' onClick={onAdd}>

@@ -1,13 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { CallProps } from './types';
 
-import { FormatBalance } from '@/components';
 import React, { forwardRef, useMemo } from 'react';
 
 import FunctionArgs from './FunctionArgs';
 import { mergeClasses } from './utils';
+
+import { FormatBalance } from '@/components';
 
 interface VoteInfo {
   pollIndex: string;

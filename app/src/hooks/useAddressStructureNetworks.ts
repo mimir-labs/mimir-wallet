@@ -1,10 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
+import { remoteProxyRelations, useChains } from '@mimir-wallet/polkadot-core';
 import { useMemo } from 'react';
 
-import { remoteProxyRelations, useNetworks } from '@mimir-wallet/polkadot-core';
+import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 
 /**
  * Get structure-related networks for an account based on its delegatees
@@ -20,7 +20,7 @@ import { remoteProxyRelations, useNetworks } from '@mimir-wallet/polkadot-core';
  * 3. Other cases → returns undefined (support all networks)
  */
 export function useAddressStructureNetworks(address?: string | null) {
-  const { networks } = useNetworks();
+  const { chains } = useChains();
   const [account] = useQueryAccountOmniChain(address);
 
   const structureNetworks = useMemo(() => {
@@ -46,14 +46,14 @@ export function useAddressStructureNetworks(address?: string | null) {
       });
 
       // Filter and return networks
-      const supported = networks.filter((item) => genesisHashes.has(item.genesisHash));
+      const supported = chains.filter((item) => genesisHashes.has(item.genesisHash));
 
       return supported.length > 0 ? supported : undefined;
     }
 
     // 3. Other cases: support all networks
     return undefined;
-  }, [account, networks]);
+  }, [account, chains]);
 
   return structureNetworks;
 }

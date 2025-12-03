@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button } from '@mimir-wallet/ui';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
-import { useEffect, useMemo, useState } from 'react';
-
-import { Button } from '@mimir-wallet/ui';
 
 function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();

@@ -1,11 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
+import { encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
 import React, { forwardRef, useMemo } from 'react';
-
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
 
 import AddressComp from './Address';
 import AddressName from './AddressName';
@@ -40,7 +39,7 @@ const AddressRow = forwardRef<HTMLDivElement, Props>(
     }: Props,
     ref
   ) => {
-    const { chainSS58 } = useApi();
+    const { ss58: chainSS58 } = useSs58Format();
     const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
     return (

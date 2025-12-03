@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DappOption } from '@/config';
 
+import { Avatar, Button, Tooltip } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
+
 import { Empty } from '@/components';
 import { useDapps } from '@/hooks/useDapp';
 import { useOpenDapp } from '@/hooks/useOpenDapp';
-import React, { useMemo } from 'react';
-
-import { Avatar, Button, Tooltip } from '@mimir-wallet/ui';
 
 function DappItem({ removeFavorite, ...dapp }: DappOption & { removeFavorite: (id: string | number) => void }) {
   const openDapp = useOpenDapp(dapp);
@@ -77,7 +77,7 @@ function FavoriteDapps() {
   return (
     <div className='group'>
       <div className='border-secondary bg-content1 scroll-hover-show shadow-medium h-[210px] overflow-y-auto rounded-[20px] border-1 p-4 sm:p-5'>
-        <div className='grid grid-cols-[repeat(auto-fill,_minmax(54px,1fr))] gap-2 lg:gap-3'>
+        <div className='grid grid-cols-[repeat(auto-fill,minmax(54px,1fr))] gap-2 lg:gap-3'>
           {favoriteDapps.map((dapp) => (
             <DappItem key={dapp.id} {...dapp} removeFavorite={removeFavorite} />
           ))}

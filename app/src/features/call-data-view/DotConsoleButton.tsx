@@ -1,10 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { DotConsoleApp, PolkadotJsApp } from '@/config';
+import { Button, type ButtonProps } from '@mimir-wallet/ui';
 import { Link } from '@tanstack/react-router';
 
-import { Button, type ButtonProps } from '@mimir-wallet/ui';
+import { DotConsoleApp, PolkadotJsApp } from '@/config';
 
 function DotConsoleButton({ call, network, ...props }: { call: string; network: string } & ButtonProps) {
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);

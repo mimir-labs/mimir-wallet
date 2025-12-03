@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 'use client';
@@ -11,7 +11,7 @@ export type SuggestionsProps = ComponentProps<'div'>;
 
 export const Suggestions = ({ children, ...props }: SuggestionsProps) => (
   <div className='flex w-full flex-wrap gap-2.5' {...props}>
-    <p>Hey there! i'm Mimo, What do you want today?</p>
+    <p>{`Hey there! i'm Mimo, What do you want today?`}</p>
     {children}
   </div>
 );

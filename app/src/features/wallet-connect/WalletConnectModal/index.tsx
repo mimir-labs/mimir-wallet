@@ -1,11 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { Modal, ModalBody, ModalContent, ModalHeader, VisuallyHidden } from '@mimir-wallet/ui';
 import React, { useContext } from 'react';
 
-import { Modal, ModalBody, ModalContent, ModalHeader, VisuallyHidden } from '@mimir-wallet/ui';
-
 import { WalletConnectContext } from '../context';
+
 import Connect from './Connect';
 import Session from './Session';
 

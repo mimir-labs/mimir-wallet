@@ -1,24 +1,25 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AddressMeta } from '@/hooks/types';
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import type { PalletIdentityJudgement } from '@polkadot/types/lookup';
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import IconIdentity from '@/assets/svg/identity.svg?react';
-import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
-import React, { useMemo } from 'react';
-
 import {
   addressEq,
   encodeAddress,
   isPolkadotEvmAddress,
   sub2Eth,
-  useApi,
+  useSs58Format,
   zeroAddress
 } from '@mimir-wallet/polkadot-core';
 import { Tooltip } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
+import { useInView } from 'react-intersection-observer';
+
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import IconIdentity from '@/assets/svg/identity.svg?react';
+import { useDeriveAccountInfo } from '@/hooks/useDeriveAccountInfo';
 
 interface Props {
   defaultName?: string;
@@ -65,10 +66,15 @@ function extractIdentity(
 }
 
 function AddressName({ defaultName, value, meta: propMeta }: Props): React.ReactElement<Props> {
-  const { chainSS58 } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
   const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
 
-  const [identity, isFetched, isFetching, identityEnabled] = useDeriveAccountInfo(address);
+  // Track visibility to defer identity fetching until component is in viewport
+  // triggerOnce ensures inView stays true after first intersection
+  const { ref, inView } = useInView({ triggerOnce: true });
+
+  // Only fetch identity when component has been visible
+  const [identity, isFetched, isFetching] = useDeriveAccountInfo(inView ? address : undefined);
   // Use prop meta if provided, otherwise fetch it (for backward compatibility)
   const { meta: fetchedMeta } = useAddressMeta(propMeta ? undefined : address);
   const meta = propMeta || fetchedMeta;
@@ -100,7 +106,7 @@ function AddressName({ defaultName, value, meta: propMeta }: Props): React.React
   }
 
   return (
-    <span data-loading={identityEnabled && !isFetched && !isFetching} className='data-[loading=true]:animate-pulse'>
+    <span ref={ref} data-loading={!isFetched && isFetching} className='data-[loading=true]:animate-pulse'>
       {chainName || meta?.name || defaultName || fallbackName}
     </span>
   );

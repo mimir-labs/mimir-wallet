@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Avatar } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
 
 import LogoCircle from '@/assets/images/logo-circle.png';
 import IconExternal from '@/assets/svg/icon-external-app.svg?react';
 import { useDapp } from '@/hooks/useDapp';
-import React, { useMemo } from 'react';
-
-import { Avatar } from '@mimir-wallet/ui';
 
 function AppName({
   website,

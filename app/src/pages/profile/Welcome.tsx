@@ -1,7 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData } from '@/hooks/types';
+
+import { addressEq, isPolkadotAddress } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Button, Divider, Spinner } from '@mimir-wallet/ui';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import { groupAccounts } from '@/accounts/utils';
@@ -13,13 +19,6 @@ import { AddressCell, Input } from '@/components';
 import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { formatDisplay } from '@/utils';
 import { useWallet } from '@/wallet/useWallet';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
-import { useEffectOnce } from 'react-use';
-
-import { addressEq, isPolkadotAddress, useNetworks } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Button, Divider, Spinner } from '@mimir-wallet/ui';
 
 const exampleAccounts = [
   '12pzUmpZrXmfjSjRksWrKZkD8jf6UXZXWTkhmA4ccR1Seppv',
@@ -247,11 +246,6 @@ function Welcome() {
   const [keywords, setKeywords] = useState<string>('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchAccount, setSearchAccount] = useState<AccountData>();
-  const { enableNetwork, networks } = useNetworks();
-
-  useEffectOnce(() => {
-    enableNetwork(networks[0].key);
-  });
 
   return (
     <div

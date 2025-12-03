@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Badge, Button, Tooltip } from '@mimir-wallet/ui';
+import React, { useRef } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import { analyticsActions } from '@/analytics';
 import IconBatch from '@/assets/svg/icon-batch.svg?react';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useMimirLayout } from '@/hooks/useMimirLayout';
-import React, { useRef } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Badge, Button, Tooltip } from '@mimir-wallet/ui';
 
 function BatchButton() {
-  const { network } = useApi();
+  const { network } = useNetwork();
   const { current } = useAccount();
   const [txs] = useBatchTxs(network, current);
   const { openRightSidebar, closeRightSidebar, rightSidebarOpen, setRightSidebarTab } = useMimirLayout();

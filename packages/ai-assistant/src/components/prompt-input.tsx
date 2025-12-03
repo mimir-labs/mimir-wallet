@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 'use client';
@@ -10,10 +10,9 @@ import type { ComponentProps, HTMLAttributes, KeyboardEventHandler } from 'react
  */
 export type ChatStatus = 'submitted' | 'streaming' | 'ready' | 'error';
 
+import { Button, cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from '@mimir-wallet/ui';
 import { ArrowUp, Loader2Icon } from 'lucide-react';
 import { Children } from 'react';
-
-import { Button, cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from '@mimir-wallet/ui';
 
 export type PromptInputProps = HTMLAttributes<HTMLFormElement>;
 

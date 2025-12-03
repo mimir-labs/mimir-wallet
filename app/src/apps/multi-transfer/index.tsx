@@ -1,39 +1,29 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { MultiTransferData } from './types';
+
+import { type FunctionCallHandler, isFunctionCallArray, toFunctionCallString } from '@mimir-wallet/ai-assistant';
+import { isValidAddress, NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { Button, Divider } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import { useCallback, useState } from 'react';
+
+import MultiTransferContent from './MultiTransferContent';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { Link } from '@tanstack/react-router';
-import { useCallback, useState } from 'react';
-
-import { type FunctionCallHandler, isFunctionCallArray, toFunctionCallString } from '@mimir-wallet/ai-assistant';
-import { isValidAddress, SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Spinner } from '@mimir-wallet/ui';
-
-import MultiTransferContent from './MultiTransferContent';
 
 function MultiTransfer() {
   const { current } = useAccount();
   const [network, setNetwork] = useInputNetwork();
-  const [sending, setSending] = useState(current || '');
   const [data, setData] = useState<MultiTransferData[]>([['', '', '']]);
 
   const handleBatchTransferForm = useCallback<FunctionCallHandler>(
     (event) => {
       // No need to check event.name - only 'batchTransferForm' events arrive here
-
-      // Validate sending address
-      const sendingAddress = toFunctionCallString(event.arguments.sending);
-
-      if (sendingAddress && !isValidAddress(sendingAddress)) {
-        console.error(`Invalid sending address format ${sendingAddress}`);
-
-        return;
-      }
 
       // Validate recipient addresses
       const addRecipient = event.arguments.addRecipient;
@@ -59,11 +49,6 @@ function MultiTransfer() {
 
           return;
         }
-      }
-
-      // Update sending address
-      if (sendingAddress) {
-        setSending(sendingAddress);
       }
 
       // Update recipients
@@ -115,14 +100,7 @@ function MultiTransfer() {
   );
 
   return (
-    <SubApiRoot
-      network={network}
-      Fallback={({ apiState: { chain } }) => (
-        <div className='bg-content1 mx-auto mt-16 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
-          <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-        </div>
-      )}
-    >
+    <NetworkProvider network={network}>
       <div className='mx-auto w-full max-w-[900px] p-4 sm:p-5'>
         <Button onClick={() => window.history.back()} variant='ghost'>
           {'<'} Back
@@ -149,15 +127,14 @@ function MultiTransfer() {
 
           <MultiTransferContent
             data={data}
-            sending={sending}
+            sending={current || ''}
             network={network}
-            setSending={setSending}
             setNetwork={setNetwork}
             setData={setData}
           />
         </div>
       </div>
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

@@ -1,40 +1,57 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import js from '@eslint/js';
+import pluginQuery from '@tanstack/eslint-plugin-query';
 import { defineConfig } from 'eslint/config';
 import headers from 'eslint-plugin-headers';
-import importPlugin from 'eslint-plugin-import';
+import { importX } from 'eslint-plugin-import-x';
 import prettier from 'eslint-plugin-prettier/recommended';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
   { ignores: ['dist/*', 'build/*', '**/dist/*', '**/build/*', '.turbo/*', '**/.turbo', '.yarn/*'] },
+
+  // Base JS config
+  js.configs.recommended,
+
+  // TypeScript configs
+  tseslint.configs.recommended,
+
+  reactRefresh.configs.vite,
+
+  // TanStack Query
+  ...pluginQuery.configs['flat/recommended'],
   {
-    extends: [
-      js.configs.recommended,
-      prettier,
-      ...tseslint.configs.recommended,
-      reactRefresh.configs.vite,
-      importPlugin.flatConfigs.recommended
-    ],
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx}'],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser
+      globals: {
+        ...globals.browser,
+        ...globals.es2024
+      },
+      parserOptions: {
+        ecmaFeatures: { jsx: true }
+      }
     },
     plugins: {
       'react-hooks': reactHooks,
       react: react,
-      'simple-import-sort': simpleImportSort,
+      'import-x': importX,
       headers
     },
+    settings: {
+      react: { version: 'detect' }
+    },
     rules: {
+      // React
+      ...react.configs.recommended.rules,
+      ...react.configs['jsx-runtime'].rules,
+      'react/prop-types': 'off',
+      // React Hooks (includes React Compiler rules in v7+)
       ...reactHooks.configs.recommended.rules,
       '@typescript-eslint/naming-convention': 'off',
       '@typescript-eslint/padding-line-between-statements': 'off',
@@ -60,12 +77,6 @@ export default defineConfig(
           additionalHooks: '(useAsyncFn|useDebounceFn)'
         }
       ],
-      'import/no-deprecated': 'error',
-      'import/no-unresolved': 'off',
-      'import/no-cycle': [
-        'error',
-        { maxDepth: Infinity, ignoreExternal: true, allowUnsafeDynamicCyclicDependency: false }
-      ],
       'padding-line-between-statements': [
         'error',
         { blankLine: 'always', prev: ['const', 'let', 'var'], next: '*' },
@@ -81,18 +92,22 @@ export default defineConfig(
         { blankLine: 'always', prev: 'import', next: '*' },
         { blankLine: 'any', prev: 'import', next: 'import' }
       ],
-      'simple-import-sort/imports': [
-        2,
+      // Import sorting and organization
+      'import-x/no-deprecated': 'error',
+      'import-x/no-unresolved': 'off',
+      'import-x/no-cycle': [
+        'error',
+        { maxDepth: Infinity, ignoreExternal: true, allowUnsafeDynamicCyclicDependency: false }
+      ],
+      'import-x/order': [
+        'error',
         {
-          groups: [
-            ['^\u0000'], // all side-effects (0 at start)
-            ['\u0000$', '^@mimir-wallet.*\u0000$', '^\\..*\u0000$'], // types (0 at end)
-            ['^[^/\\.]'], // non-mimir-wallet
-            ['^@mimir-wallet'], // mimir-wallet
-            ['^\\.\\.(?!/?$)', '^\\.\\./?$', '^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'] // local (. last)
-          ]
+          groups: ['type', 'builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true }
         }
       ],
+      'import-x/no-duplicates': 'error',
       'headers/header-format': [
         'error',
         {
@@ -103,10 +118,11 @@ export default defineConfig(
           trailingNewlines: 2,
           variables: {
             startYear: '2023',
-            endYear: '2024'
+            endYear: '2025'
           }
         }
       ]
     }
-  }
+  },
+  prettier
 );

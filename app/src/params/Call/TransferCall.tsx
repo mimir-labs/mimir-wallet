@@ -1,20 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { CallProps } from './types';
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Avatar, cn, Skeleton, TextEllipsis } from '@mimir-wallet/ui';
+import React, { forwardRef } from 'react';
+
+import FunctionArgs from './FunctionArgs';
+import { mergeClasses } from './utils';
 
 import { Address, AddressName, AddressRow, CopyAddress, FormatBalance, IdentityIcon } from '@/components';
 import { findAsset } from '@/config';
 import { useCopyAddressToClipboard } from '@/hooks/useCopyAddress';
 import { useParseTransfer } from '@/hooks/useParseTransfer';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
-import React, { forwardRef } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Avatar, cn, Skeleton, TextEllipsis } from '@mimir-wallet/ui';
-
-import FunctionArgs from './FunctionArgs';
-import { mergeClasses } from './utils';
 
 const AddressDisplay = React.memo(({ reverse, address }: { reverse: boolean; address?: string | null }) => {
   const copyAddress = useCopyAddressToClipboard(address || '');
@@ -63,6 +63,8 @@ const AddressDisplay = React.memo(({ reverse, address }: { reverse: boolean; add
   );
 });
 
+AddressDisplay.displayName = 'TransferCall.AddressDisplay';
+
 const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
   const {
     from: propFrom,
@@ -72,7 +74,7 @@ const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) =
     showFallback,
     fallbackComponent: FallbackComponent = FunctionArgs
   } = props;
-  const { network, chain } = useApi();
+  const { network, chain } = useNetwork();
   const results = useParseTransfer(registry, propFrom, call);
 
   const [assetInfo] = useXcmAsset(network, results?.[0]);
@@ -158,7 +160,7 @@ const TransferCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) =
                 />
               )
             ) : (
-              <Skeleton style={{ width: 50 }} />
+              <Skeleton className='h-3.5 w-20 rounded-full' />
             )
           ) : isAll ? (
             'All'

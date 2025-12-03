@@ -1,5 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import { memo, useCallback } from 'react';
 
 import ArrowRight from '@/assets/svg/ArrowRight.svg?react';
 import IconLink from '@/assets/svg/icon-link.svg?react';
@@ -10,10 +14,6 @@ import { useAddressExplorer } from '@/hooks/useAddressExplorer';
 import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { useQrAddress } from '@/hooks/useQrAddress';
 import { formatDisplay } from '@/utils';
-import { Link } from '@tanstack/react-router';
-import { memo, useCallback } from 'react';
-
-import { Button, Divider, Tooltip } from '@mimir-wallet/ui';
 
 interface AccountInfoProps {
   /** Selected account address */

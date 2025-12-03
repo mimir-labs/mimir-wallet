@@ -1,19 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DryRunResult } from './types.js';
+import type { SupportXcmChainConfig } from '../xcm/types.js';
 import type { Vec } from '@polkadot/types';
 import type { XcmVersionedLocation, XcmVersionedXcm } from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
-import type { SupportXcmChainConfig } from '../xcm/types.js';
-import type { DryRunResult } from './types.js';
 
 import { ApiPromise } from '@polkadot/api';
 import { assertReturn } from '@polkadot/util';
 
-import { allEndpoints } from '../config.js';
-import { assetXcmV5TraitsError } from '../dispatch-error.js';
-import { createApi } from '../initialize.js';
+import { ApiManager } from '../api/ApiManager.js';
+import { allEndpoints } from '../chains/config.js';
+import { assetXcmV5TraitsError } from '../tx/dispatch-error.js';
 import { findDestChain } from '../xcm/parseLocation.js';
+
 import { parseBalancesChange } from './parse-balances-change.js';
 
 /**
@@ -70,7 +71,6 @@ export async function dryRunWithXcm(
   let originParents = 0;
   let originInterior: Record<string, any>;
   const xcmDryRunResult: DryRunResult[] = [];
-  const openApis: ApiPromise[] = [];
 
   for (let i = 0; i < forwardedXcms.length; i++) {
     const xcm = forwardedXcms[i];
@@ -81,7 +81,7 @@ export async function dryRunWithXcm(
     });
 
     try {
-      const { chainApi, originInfo } = await processXcmLocation(xcm[0], { isSupport: true, ...initialChain }, openApis);
+      const { chainApi, originInfo } = await processXcmLocation(xcm[0], { isSupport: true, ...initialChain });
 
       originParents = originInfo.parents;
       originInterior = originInfo.interior;
@@ -113,22 +113,6 @@ export async function dryRunWithXcm(
     }
   }
 
-  // Clean up all API connections
-  logXcmOperation('Cleanup', {
-    connections: openApis.length,
-    duration: `${Date.now() - startTime}ms`
-  });
-
-  await Promise.allSettled(
-    openApis.map(async (apiInstance) => {
-      try {
-        await apiInstance.disconnect();
-      } catch {
-        // Ignore disconnect errors as they don't affect the results
-      }
-    })
-  );
-
   logXcmOperation('Completed', {
     results: xcmDryRunResult.length,
     success: xcmDryRunResult.filter((r) => r.success).length,
@@ -147,8 +131,7 @@ export async function dryRunWithXcm(
  */
 async function processXcmLocation(
   location: XcmVersionedLocation,
-  initialChain: SupportXcmChainConfig,
-  openApis: ApiPromise[]
+  initialChain: SupportXcmChainConfig
 ): Promise<{
   chainApi: ApiPromise;
   originInfo: {
@@ -162,20 +145,7 @@ async function processXcmLocation(
     throw new Error(`Chain not supported ${chain}`);
   }
 
-  let chainApi: ApiPromise;
-  const exists = openApis.find((item) => item.genesisHash.toHex() === chain.genesisHash);
-
-  if (exists) {
-    chainApi = exists;
-  } else {
-    [chainApi] = await createApi(Object.values(chain.wsUrl), chain.key);
-  }
-
-  await chainApi.isReady;
-
-  if (!exists) {
-    openApis.push(chainApi);
-  }
+  const chainApi: ApiPromise = await ApiManager.getInstance().getApi(chain.genesisHash);
 
   if (!chainApi.call.dryRunApi?.dryRunXcm) {
     const errorMsg = `Chain ${chain.name} does not support XCM dry run API`;

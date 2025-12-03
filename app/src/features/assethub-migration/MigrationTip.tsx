@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconClose from '@/assets/svg/icon-close.svg?react';
-
-import { useNetworks } from '@mimir-wallet/polkadot-core';
+import { useChains } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
 
 import { useNetworkMigrationCompleted } from './useMigrationStatus';
+
+import IconClose from '@/assets/svg/icon-close.svg?react';
 
 type Props = React.ComponentProps<typeof Alert> & {
   type: 'transfer' | 'create-multisig';
@@ -15,7 +15,7 @@ type Props = React.ComponentProps<typeof Alert> & {
 };
 
 function MigrationTip({ type, chain, onClose, ...props }: Props) {
-  const { networks } = useNetworks();
+  const { chains: networks } = useChains();
   const migrationCompleted = useNetworkMigrationCompleted(chain);
 
   if (!migrationCompleted.completed) {

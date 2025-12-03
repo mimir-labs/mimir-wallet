@@ -1,22 +1,7 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import IconQrcode from '@/assets/svg/icon-qr.svg?react';
-import IconStar from '@/assets/svg/icon-star.svg?react';
-import { Address, CopyButton, ExplorerLink } from '@/components';
-import { toastSuccess } from '@/components/utils';
-import { SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY } from '@/constants';
-import { useCopyAddress } from '@/hooks/useCopyAddress';
-import { useCopyClipboard } from '@/hooks/useCopyClipboard';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useQrAddress } from '@/hooks/useQrAddress';
-import { groupNetworksByChain } from '@/utils/networkGrouping';
-import { type ReactNode, useMemo, useRef } from 'react';
-import { useEffectOnce } from 'react-use';
-import { toast } from 'sonner';
-
-import { encodeAddress, type Network, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
+import { encodeAddress, type Network, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
 import { useLocalStore } from '@mimir-wallet/service';
 import {
   Avatar,
@@ -31,11 +16,26 @@ import {
   ModalFooter,
   Switch
 } from '@mimir-wallet/ui';
+import { type ReactNode, useMemo, useRef } from 'react';
+import { useEffectOnce } from 'react-use';
+import { toast } from 'sonner';
+
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import IconQrcode from '@/assets/svg/icon-qr.svg?react';
+import IconStar from '@/assets/svg/icon-star.svg?react';
+import { Address, CopyButton, ExplorerLink } from '@/components';
+import { toastSuccess } from '@/components/utils';
+import { SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY } from '@/constants';
+import { useCopyAddress } from '@/hooks/useCopyAddress';
+import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useQrAddress } from '@/hooks/useQrAddress';
+import { groupNetworksByChain } from '@/utils/networkGrouping';
 
 function Item({ endpoint, address }: { endpoint: Network; address: string }) {
   const [, copy] = useCopyClipboard();
   const upSm = useMediaQuery('sm');
-  const { ss58Chain, setSs58Chain } = useApi();
+  const { ss58Chain, setSs58Chain } = useSs58Format();
   const { open: openQr } = useQrAddress();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -115,8 +115,8 @@ function GroupedNetwork({ address, group, endpoints }: { address: string; group:
 
 function CopyAddressModal() {
   const { isOpen, close, address } = useCopyAddress();
-  const { networks } = useNetworks();
-  const { ss58Chain } = useApi();
+  const { chains } = useChains();
+  const { ss58Chain } = useSs58Format();
   const upMd = useMediaQuery('md');
   const { meta } = useAddressMeta(address);
   const [showAll, setShowAll] = useLocalStore(SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY, false);
@@ -127,8 +127,8 @@ function CopyAddressModal() {
       return {};
     }
 
-    return groupNetworksByChain(networks, showAll, ss58Chain);
-  }, [isOpen, networks, showAll, ss58Chain]);
+    return groupNetworksByChain(chains, showAll, ss58Chain);
+  }, [isOpen, chains, showAll, ss58Chain]);
 
   if (!isOpen || !address) {
     return null;
@@ -137,7 +137,7 @@ function CopyAddressModal() {
   let content: ReactNode;
 
   if (meta.isPure) {
-    const network = networks.find((network) => network.genesisHash === meta.pureCreatedAt);
+    const network = chains.find((chain) => chain.genesisHash === meta.pureCreatedAt);
 
     if (!network) {
       return null;

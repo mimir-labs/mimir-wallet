@@ -1,13 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@/hooks/types';
-import { useProxyBestBlock } from '@/hooks/useProxyBestBlock';
+import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
+import { useQuery } from '@mimir-wallet/service';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
-import { addressEq, useAllApis, useApi } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
+import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@/hooks/types';
+import { useProxyBestBlock } from '@/hooks/useProxyBestBlock';
 
 type AnnouncementStatus =
   | 'reviewing'
@@ -26,8 +26,7 @@ async function fetchAnnouncementsForStatus({ queryKey }: { queryKey: readonly [s
     throw new Error('Invalid delegate');
   }
 
-  const allApis = useAllApis.getState().chains;
-  const api = allApis[network]?.api;
+  const api = await ApiManager.getInstance().getApi(network);
 
   if (!api) {
     throw new Error(`API not available for network: ${network}`);
@@ -40,7 +39,7 @@ export function useAnnouncementStatus(
   transaction: Transaction,
   account: AccountData
 ): [status: AnnouncementStatus, isFetching: boolean] {
-  const { isApiReady, network, api } = useApi();
+  const { network } = useNetwork();
 
   const status = transaction.status;
   const type = transaction.type;
@@ -49,19 +48,14 @@ export function useAnnouncementStatus(
     [account.delegatees, transaction.delegate]
   );
 
-  const [bestBlock, isFetched, isFetching] = useProxyBestBlock();
+  const [bestBlock, isFetched, isFetching] = useProxyBestBlock(network);
   const {
     data: result,
     isFetched: isFetchedResult,
     isFetching: isFetchingResult
   } = useQuery({
     queryKey: ['announcement-status', network, transaction.delegate || ''] as const,
-    enabled:
-      isApiReady &&
-      !!api?.query.proxy?.announcements &&
-      !!transaction.delegate &&
-      status === TransactionStatus.Pending &&
-      type === TransactionType.Announce,
+    enabled: !!transaction.delegate && status === TransactionStatus.Pending && type === TransactionType.Announce,
     refetchOnMount: false,
     queryFn: fetchAnnouncementsForStatus
   });

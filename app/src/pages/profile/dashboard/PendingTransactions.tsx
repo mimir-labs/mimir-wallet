@@ -1,5 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
+import { useNavigate } from '@tanstack/react-router';
+import React, { useMemo } from 'react';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
@@ -12,6 +17,7 @@ import {
   TransactionType
 } from '@/hooks/types';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
+import { useParseCall } from '@/hooks/useParseCall';
 import { useMultichainPendingTransactions, useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { CallDisplayDetail } from '@/params';
 import {
@@ -22,33 +28,22 @@ import {
   RemoveOrDenyButton
 } from '@/transactions';
 import { useAnnouncementStatus } from '@/transactions/hooks/useAnnouncementStatus';
-import { useNavigate } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
-
-import { SubApiRoot, useApi } from '@mimir-wallet/polkadot-core';
-import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
 
 function CallDetail({ value }: { value?: string | null }) {
-  const { api, isApiReady } = useApi();
+  const { network } = useNetwork();
 
-  const call = useMemo(() => {
-    if (!isApiReady) return null;
+  const { call, isLoading } = useParseCall(network, value);
 
-    try {
-      return api.registry.createType('Call', value);
-    } catch {
-      return null;
-    }
-  }, [api.registry, isApiReady, value]);
+  if (isLoading || !call) return null;
 
-  return <CallDisplayDetail fallbackWithName registry={api.registry} call={call} />;
+  return <CallDisplayDetail fallbackWithName registry={call.registry} call={call} />;
 }
 
 function AnnouncementStatus({ account, transaction }: { account: AccountData; transaction: ProxyTransaction }) {
   const [status, isFetching] = useAnnouncementStatus(transaction, account);
 
   if (isFetching) {
-    return <Skeleton className='h-[20px] w-[60px]' />;
+    return <Skeleton className='ml-auto h-[20px] w-[60px]' />;
   }
 
   if (status === 'indexing') return 'Indexing';
@@ -71,7 +66,7 @@ function Status({ transaction, address }: { transaction: Transaction; address: s
   const [account] = useQueryAccount(address);
 
   if (!account) {
-    return <Skeleton className='h-[20px] w-[60px]' />;
+    return <Skeleton className='ml-auto h-[20px] w-[60px]' />;
   }
 
   if (transaction.type === TransactionType.Announce) {
@@ -100,7 +95,7 @@ function Operation({ transaction, address }: { transaction: Transaction; address
 }
 
 function NetworkWrapper({ network, children }: { network: string; children: React.ReactNode }) {
-  return <SubApiRoot network={network}>{children}</SubApiRoot>;
+  return <NetworkProvider network={network}>{children}</NetworkProvider>;
 }
 
 function PendingTransactions({ address }: { address: string }) {
@@ -109,7 +104,7 @@ function PendingTransactions({ address }: { address: string }) {
     validPendingNetworks.map((item) => item.network),
     address
   );
-  const { setNetwork } = useApi();
+
   const navigate = useNavigate();
 
   const transactions = useMemo(() => {
@@ -124,10 +119,10 @@ function PendingTransactions({ address }: { address: string }) {
   if (showSkeleton) {
     return (
       <div className='bg-content1 shadow-medium flex h-[260px] flex-col gap-5 rounded-[20px] p-5'>
-        <Skeleton className='h-[40px] w-full rounded-lg' />
-        <Skeleton className='h-[40px] w-full rounded-lg' />
-        <Skeleton className='h-[40px] w-full rounded-lg' />
-        <Skeleton className='h-[40px] w-full rounded-lg' />
+        <Skeleton className='h-[45px] w-full rounded-lg' />
+        <Skeleton className='h-[45px] w-full rounded-lg' />
+        <Skeleton className='h-[45px] w-full rounded-lg' />
+        <Skeleton className='h-[45px] w-full rounded-lg' />
       </div>
     );
   }
@@ -172,7 +167,6 @@ function PendingTransactions({ address }: { address: string }) {
               key={item.id}
               className='[&:hover>td]:bg-secondary border-secondary [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px]'
               onClick={() => {
-                setNetwork(item.network);
                 navigate({
                   to: `/transactions/$id`,
                   params: {

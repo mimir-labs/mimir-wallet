@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TemplateInfo } from './types';
+import type { Network } from '@mimir-wallet/polkadot-core';
 import type { ApiPromise } from '@polkadot/api';
 import type { Registry } from '@polkadot/types/types';
-import type { Network } from '@mimir-wallet/polkadot-core';
-import type { TemplateInfo } from './types';
 
-import { CopyButton } from '@/components';
+import { ApiManager, createBlockRegistry, useChains } from '@mimir-wallet/polkadot-core';
+import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
 import { useEffect, useMemo, useState } from 'react';
 
-import { createBlockRegistry, useAllApis, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
-
 import { useSavedTemplate } from './useSavedTemplate';
+
+import { CopyButton } from '@/components';
 
 interface TemplateMigrationModalProps {
   isOpen: boolean;
@@ -187,34 +187,39 @@ export function TemplateMigrationModal({
   block,
   onMigrate
 }: TemplateMigrationModalProps) {
-  const { networks, enableNetwork } = useNetworks();
-  const { chains } = useAllApis();
+  const { chains: networks } = useChains();
+  const [sourceApi, setSourceApi] = useState<ApiPromise | null>(null);
+  const [destApi, setDestApi] = useState<ApiPromise | null>(null);
   const [registry, setRegistry] = useState<Registry | null>(null);
-
-  const sourceReady = !!chains[sourceChain]?.isApiReady;
-  const destReady = !!chains[destChain]?.isApiReady;
-  const destApi = chains[destChain]?.api;
 
   const sourceNetwork = networks.find((network) => network.key === sourceChain);
   const destNetwork = networks.find((network) => network.key === destChain);
 
+  // Load APIs
   useEffect(() => {
-    if (isOpen) {
-      enableNetwork(sourceChain);
-      enableNetwork(destChain);
-    }
-  }, [enableNetwork, sourceChain, destChain, isOpen]);
+    ApiManager.getInstance()
+      .getApi(sourceChain)
+      .then((api) => {
+        if (api) setSourceApi(api);
+      });
+  }, [sourceChain]);
+
+  useEffect(() => {
+    ApiManager.getInstance()
+      .getApi(destChain)
+      .then((api) => {
+        if (api) setDestApi(api);
+      });
+  }, [destChain]);
 
   // Create registry for parsing calls
   useEffect(() => {
-    if (block && chains[sourceChain]?.api) {
-      const api = chains[sourceChain].api!;
-
-      createBlockRegistry(api, block).then((registry) => {
+    if (block && sourceApi) {
+      createBlockRegistry(sourceApi, block).then((registry) => {
         setRegistry(registry);
       });
     }
-  }, [block, sourceChain, destChain, chains]);
+  }, [block, sourceApi]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size='lg'>
@@ -230,7 +235,7 @@ export function TemplateMigrationModal({
         </ModalHeader>
 
         <ModalBody>
-          {sourceReady && sourceNetwork && destReady && destNetwork && destApi && registry ? (
+          {sourceNetwork && destNetwork && destApi && registry ? (
             <Content
               sourceNetwork={sourceNetwork}
               sourceRegistry={registry}

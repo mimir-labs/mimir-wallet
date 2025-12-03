@@ -1,28 +1,28 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Divider } from '@mimir-wallet/ui';
+import { useEffect, useMemo, useRef } from 'react';
+
+import DotConsoleButton from '../call-data-view/DotConsoleButton';
+import DotConsoleLink from '../call-data-view/DotConsoleLink';
+import { decodeCallData } from '../call-data-view/utils';
+import { ErrorDisplay } from '../shared/ErrorDisplay';
+
+import { useSavedTemplate } from './useSavedTemplate';
 
 import { analyticsActions } from '@/analytics';
 import IconArrowLeft from '@/assets/svg/icon-arrow-left.svg?react';
 import { Input, InputNetwork } from '@/components';
 import JsonView from '@/components/JsonView';
 import { useInput } from '@/hooks/useInput';
-import { useEffect, useMemo, useRef } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
-
-import DotConsoleButton from '../call-data-view/DotConsoleButton';
-import DotConsoleLink from '../call-data-view/DotConsoleLink';
-import { decodeCallData } from '../call-data-view/utils';
-import { ErrorDisplay } from '../shared/ErrorDisplay';
-import { useSavedTemplate } from './useSavedTemplate';
+import { useRegistry } from '@/hooks/useRegistry';
 
 function AddTemplate({
   isView = false,
-  registry,
   onBack,
   defaultCallData,
   defaultName,
@@ -31,11 +31,11 @@ function AddTemplate({
   isView?: boolean;
   defaultCallData?: HexString;
   defaultName?: string;
-  registry: Registry;
   onBack: () => void;
   setNetwork?: (network: string) => void;
 }) {
-  const { network } = useApi();
+  const { network } = useNetwork();
+  const { registry } = useRegistry(network);
   const { addTemplate } = useSavedTemplate(network);
   const [name, setName] = useInput(defaultName || '');
   const [callData, setCallData] = useInput(defaultCallData || '');
@@ -43,6 +43,8 @@ function AddTemplate({
 
   // Derive parsed call data and error from registry and callData
   const [parsedCallData, callDataError] = useMemo(() => {
+    if (!registry) return [null, null];
+
     return decodeCallData(registry, callData);
   }, [registry, callData]);
 

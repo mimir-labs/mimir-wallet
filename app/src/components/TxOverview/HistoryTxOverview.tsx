@@ -1,13 +1,8 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@/hooks/types';
 
-import IconCancel from '@/assets/svg/icon-cancel.svg?react';
-import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
-import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
-import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
-import { TransactionStatus, TransactionType } from '@/hooks/types';
 import {
   Controls,
   type Edge,
@@ -24,6 +19,12 @@ import React, { createContext, useEffect, useMemo } from 'react';
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
 import { getLayoutedElements } from '../utils';
+
+import IconCancel from '@/assets/svg/icon-cancel.svg?react';
+import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
+import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
+import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
+import { TransactionStatus, TransactionType } from '@/hooks/types';
 
 interface Props {
   transaction: Transaction;
@@ -179,6 +180,8 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
     }
   });
 }
+
+AddressNode.displayName = 'AddressNode';
 
 function HistoryTxOverview({ transaction, ...props }: Props) {
   // Memoize the context value

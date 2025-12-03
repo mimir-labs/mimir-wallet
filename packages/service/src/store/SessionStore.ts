@@ -1,8 +1,8 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SessionStorage } from './store/SessionStorage.js';
 import { BaseStore } from './BaseStore.js';
+import { SessionStorage } from './store/SessionStorage.js';
 
 export class SessionStore extends BaseStore {
   #session: SessionStorage;

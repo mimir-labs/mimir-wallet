@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type {
@@ -10,11 +10,11 @@ import type {
   Transaction
 } from '@/hooks/types';
 
-import { TransactionStatus, TransactionType } from '@/hooks/types';
-import { accountSource } from '@/wallet/useWallet';
+import { addressEq, addressToHex } from '@mimir-wallet/polkadot-core';
 import { useMemo } from 'react';
 
-import { addressEq, addressToHex } from '@mimir-wallet/polkadot-core';
+import { TransactionStatus, TransactionType } from '@/hooks/types';
+import { accountSource } from '@/wallet/useWallet';
 
 export function filterPathId(_deep: number, filterPath: FilterPathWithoutId) {
   if (filterPath.type === 'proxy') {

@@ -1,5 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Alert, AlertTitle, Button, buttonSpinner, Checkbox, Spinner } from '@mimir-wallet/ui';
+import { useState } from 'react';
+import { useToggle } from 'react-use';
+
+import BatchItem from './BatchItem';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
@@ -10,19 +18,13 @@ import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
 import { useBatchSync } from '@/hooks/useBatchSync';
 import { useProposersAndMembersFilter } from '@/hooks/useProposeFilter';
+import { useRegistry } from '@/hooks/useRegistry';
 import { CallDisplaySection } from '@/params';
 import { accountSource } from '@/wallet/useWallet';
-import { useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Alert, AlertTitle, Button, buttonSpinner, Checkbox, Spinner } from '@mimir-wallet/ui';
-
-import BatchItem from './BatchItem';
 
 function Restore({ onClose }: { onClose: () => void }) {
-  const { network, api } = useApi();
+  const { network } = useNetwork();
+  const { registry } = useRegistry(network);
   const { current } = useAccount();
   const [isOpen, toggleOpen] = useToggle(true);
   const [selected, setSelected] = useState<number[]>([]);
@@ -105,7 +107,7 @@ Timestamp: ${time}`;
             </Alert>
 
             {txs?.map((item) => (
-              <BatchItem key={item.id} from={current} calldata={item.call} registry={api.registry}>
+              <BatchItem key={item.id} from={current} calldata={item.call} registry={registry}>
                 <div className='col-span-1 flex items-center'>
                   <Checkbox
                     size='sm'
@@ -139,7 +141,7 @@ Timestamp: ${time}`;
                   from={current}
                   calldata={item.call}
                   bgcolor='var(--color-main-bg)'
-                  registry={api.registry}
+                  registry={registry}
                 >
                   <div className='col-span-1 flex items-center'>{item.id}</div>
                   <div className='col-span-2 flex items-center'>

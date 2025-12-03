@@ -1,16 +1,16 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { FilterPath } from '@/hooks/types';
 
-import IconClock from '@/assets/svg/icon-clock.svg?react';
-import { useElementWidth } from '@/hooks/useElementWidth';
+import { Chip, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
 
-import { Chip, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
-
 import AddressCell from './AddressCell';
+
+import IconClock from '@/assets/svg/icon-clock.svg?react';
+import { useElementWidth } from '@/hooks/useElementWidth';
 
 interface Props {
   label?: React.ReactNode;

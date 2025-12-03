@@ -1,8 +1,15 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { PalletIdentityLegacyIdentityInfo } from '@polkadot/types/lookup';
 import type { CallProps } from './types';
+import type { PalletIdentityLegacyIdentityInfo } from '@polkadot/types/lookup';
+
+import { findAction } from '@mimir-wallet/polkadot-core';
+import { Avatar, Tooltip } from '@mimir-wallet/ui';
+import React, { forwardRef, useMemo } from 'react';
+
+import FunctionArgs from './FunctionArgs';
+import { mergeClasses } from './utils';
 
 import IconDiscord from '@/assets/images/discord.svg';
 import IconEmail from '@/assets/images/email.svg';
@@ -12,13 +19,6 @@ import IconTwitter from '@/assets/images/x.svg';
 import { Address, CopyAddress, IdentityIcon } from '@/components';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { dataToUtf8 } from '@/utils';
-import React, { forwardRef, useMemo } from 'react';
-
-import { findAction } from '@mimir-wallet/polkadot-core';
-import { Avatar, Tooltip } from '@mimir-wallet/ui';
-
-import FunctionArgs from './FunctionArgs';
-import { mergeClasses } from './utils';
 
 const Item = React.memo(({ icon, value }: { icon: string; value: string }) => {
   const [copied, copy] = useCopyClipboard();
@@ -29,6 +29,8 @@ const Item = React.memo(({ icon, value }: { icon: string; value: string }) => {
     </Tooltip>
   );
 });
+
+Item.displayName = 'SetIdentity.Item';
 
 const IdentityDisplay = React.memo(
   ({
@@ -74,6 +76,8 @@ const IdentityDisplay = React.memo(
     );
   }
 );
+
+IdentityDisplay.displayName = 'SetIdentity.IdentityDisplay';
 
 const SetIdentity = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
   const { from, registry, call, className, showFallback, fallbackComponent: FallbackComponent = FunctionArgs } = props;

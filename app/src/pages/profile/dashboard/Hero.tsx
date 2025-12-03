@@ -1,5 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
@@ -14,12 +20,6 @@ import { Fund } from '@/components';
 import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
 import { formatDisplay } from '@/utils';
-import { Link } from '@tanstack/react-router';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip } from '@mimir-wallet/ui';
 
 function SubsquareLink({ network, address }: { network: string; address: string }) {
   const isSupported = SubsquareApp.supportedChains.includes(network);
@@ -42,7 +42,7 @@ function SubsquareLink({ network, address }: { network: string; address: string 
 }
 
 function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string | number; changes: number }) {
-  const { network } = useApi();
+  const { network } = useNetwork();
   const [open, toggleOpen] = useToggle(false);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [account] = useQueryAccount(address);

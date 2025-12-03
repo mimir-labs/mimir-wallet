@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { WalletState } from './types';
 
-import { CONNECTED_WALLETS_KEY } from '@/constants';
+import { addressEq } from '@mimir-wallet/polkadot-core';
+import { store } from '@mimir-wallet/service';
 import { useMemo } from 'react';
 import { create } from 'zustand';
 
-import { addressEq } from '@mimir-wallet/polkadot-core';
-import { store } from '@mimir-wallet/service';
+import { CONNECTED_WALLETS_KEY } from '@/constants';
 
 export const useWallet = create<WalletState>()((set) => ({
   // Initial state properties

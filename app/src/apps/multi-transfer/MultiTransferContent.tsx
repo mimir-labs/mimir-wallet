@@ -1,34 +1,36 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { MultiTransferData } from './types';
 
-import { useAddressMeta } from '@/accounts/useAddressMeta';
-import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
-import IconDelete from '@/assets/svg/icon-delete.svg?react';
-import { Input, InputAddress, InputNetwork, InputToken, TxButton } from '@/components';
-import { useChainXcmAsset } from '@/hooks/useXcmAssets';
-import { isValidNumber, parseUnits } from '@/utils';
+import { ApiManager, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button, Chip, Divider } from '@mimir-wallet/ui';
 import { isHex } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, Chip, Divider } from '@mimir-wallet/ui';
-
 import { parseCsv } from './parse';
 import Upload from './Upload';
+
+import { useAddressMeta } from '@/accounts/useAddressMeta';
+import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
+import IconDelete from '@/assets/svg/icon-delete.svg?react';
+import { AddressCell, Input, InputAddress, InputNetwork, InputToken, TxButton } from '@/components';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useChainXcmAsset } from '@/hooks/useXcmAssets';
+import { isValidNumber, parseUnits } from '@/utils';
 
 interface Props {
   data: MultiTransferData[];
   sending: string;
   network: string;
-  setSending: (value: string) => void;
   setNetwork: (value: string) => void;
   setData: React.Dispatch<React.SetStateAction<MultiTransferData[]>>;
 }
 
-function MultiTransferContent({ data, sending, network, setSending, setNetwork, setData }: Props) {
-  const { api, genesisHash } = useApi();
+function MultiTransferContent({ data, sending, network, setNetwork, setData }: Props) {
+  const { network: currentNetwork, chain } = useNetwork();
+  const genesisHash = chain.genesisHash;
+  const upSm = useMediaQuery('sm');
   const [assets, , , assetsPromise] = useChainXcmAsset(network);
   const [invalidAssetIds, setInvalidAssetIds] = useState<string[]>([]);
 
@@ -60,9 +62,15 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
   }, [data]);
 
   // Create batch transfer calls
-  const getBatchCalls = useCallback(() => {
+  const getBatchCalls = useCallback(async () => {
     if (!isDataValid || !assets) {
       throw new Error('Invalid transfer data');
+    }
+
+    const api = await ApiManager.getInstance().getApi(currentNetwork);
+
+    if (!api) {
+      throw new Error('API not ready');
     }
 
     const calls = data.map(([address, assetId, amount]) => {
@@ -95,7 +103,7 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
     });
 
     return api.tx.utility.batchAll(calls).method;
-  }, [api, assets, data, isDataValid]);
+  }, [currentNetwork, assets, data, isDataValid]);
 
   return (
     <>
@@ -124,7 +132,12 @@ function MultiTransferContent({ data, sending, network, setSending, setNetwork, 
       />
 
       {/* sending */}
-      <InputAddress isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} />
+      <div className='flex flex-col gap-2'>
+        <p className='text-sm font-bold'>Sending From</p>
+        <div className='bg-secondary rounded-[10px] p-2'>
+          <AddressCell shorten={!upSm} showType value={sending} withCopy withAddressBook />
+        </div>
+      </div>
 
       {/* upload file */}
       <Upload

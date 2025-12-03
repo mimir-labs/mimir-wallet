@@ -1,7 +1,13 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BatchTxItem } from '@/hooks/types';
+
+import { type Network, useChains } from '@mimir-wallet/polkadot-core';
+import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
+import { useState } from 'react';
+
+import { BatchMigrationModal } from './BatchMigrationModal';
 
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import { toastSuccess } from '@/components/utils';
@@ -9,12 +15,6 @@ import {
   useBatchMigrationStatus,
   useNetworkMigrationCompleted
 } from '@/features/assethub-migration/useMigrationStatus';
-import { useState } from 'react';
-
-import { useNetworks } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
-
-import { BatchMigrationModal } from './BatchMigrationModal';
 
 function BatchMigrationAlert({
   chain,
@@ -30,14 +30,14 @@ function BatchMigrationAlert({
   const { isAlertVisible, dismissAlert } = useBatchMigrationStatus(chain, address);
 
   const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false);
-  const { networks } = useNetworks();
+  const { chains } = useChains();
   const migrationCompleted = useNetworkMigrationCompleted(chain);
 
   if (!isAlertVisible || !migrationCompleted.completed || !migrationCompleted.block || !migrationCompleted.destChain) {
     return null;
   }
 
-  const destNetwork = networks.find((network) => network.key === migrationCompleted.destChain);
+  const destNetwork = chains.find((network: Network) => network.key === migrationCompleted.destChain);
 
   const handleMigrationComplete = () => {
     dismissAlert();

@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { TxButton } from '@/components';
+import { ApiManager, decodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
 import { u8aToHex } from '@polkadot/util';
 import React from 'react';
 
-import { decodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
+import { TxButton } from '@/components';
 
 function SubmitPure({
   proxy,
@@ -21,7 +21,7 @@ function SubmitPure({
   custom: string;
   proxyType: string;
 }) {
-  const { api, network } = useApi();
+  const { network } = useNetwork();
 
   return (
     <TxButton
@@ -30,7 +30,13 @@ function SubmitPure({
       disabled={!(proxy && name)}
       accountId={proxy}
       website='mimir://internal/create-pure'
-      getCall={() => {
+      getCall={async () => {
+        const api = await ApiManager.getInstance().getApi(network);
+
+        if (!api) {
+          throw new Error('API not ready');
+        }
+
         const delay = reviewWindow === -1 ? Number(custom) : reviewWindow;
 
         return api.tx.proxy.createPure(proxyType as any, delay, 0).method;

@@ -1,10 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { LocationInfo, SupportXcmChainConfig, XcmChainConfig } from './types.js';
+import type { HexString } from '@mimir-wallet/service';
 import type { Enum } from '@polkadot/types';
 import type { StagingXcmV4Asset, StagingXcmV5Asset, XcmV3MultiAsset, XcmVersionedAssets } from '@polkadot/types/lookup';
-import type { HexString } from '@mimir-wallet/service';
-import type { LocationInfo, SupportXcmChainConfig, XcmChainConfig } from './types.js';
 
 import { loopLocation, parseJunctions } from './parseLocation.js';
 

@@ -1,22 +1,23 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import React, { useRef } from 'react';
+import { useToggle } from 'react-use';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { AddressOverview, InputNetwork } from '@/components';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import React, { useRef } from 'react';
-import { useToggle } from 'react-use';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
 
 interface RelationProps {
   address: string;
+  supportedNetworks?: string[];
   setNetwork: (network: string) => void;
 }
 
-function Relation({ address, setNetwork }: RelationProps) {
-  const { network } = useApi();
+function Relation({ address, supportedNetworks, setNetwork }: RelationProps) {
+  const { network } = useNetwork();
   const [account] = useQueryAccount(address);
   const ref = useRef<HTMLDivElement>(null);
   const upSm = useMediaQuery('sm');
@@ -32,7 +33,7 @@ function Relation({ address, setNetwork }: RelationProps) {
           Overview
         </Button>
         <div className='bg-content1 absolute top-4 right-4 z-1 w-[200px]'>
-          <InputNetwork network={network} setNetwork={setNetwork} />
+          <InputNetwork network={network} supportedNetworks={supportedNetworks} setNetwork={setNetwork} />
         </div>
         <AddressOverview key={account?.address || 'none'} account={account} showControls={upSm} showMiniMap={false} />
       </div>

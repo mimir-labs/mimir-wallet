@@ -1,19 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { MultisigAccountData, PureAccountData } from '@/hooks/types';
 
-import { Input, TxButton } from '@/components';
+import { allEndpoints, ApiManager, remoteProxyRelations, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import { service } from '@mimir-wallet/service';
+import { Alert, AlertDescription, AlertTitle, Avatar } from '@mimir-wallet/ui';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
 import { memo, useCallback, useMemo, useState } from 'react';
 
-import { allEndpoints, remoteProxyRelations, useApi } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
-import { Alert, AlertDescription, AlertTitle, Avatar } from '@mimir-wallet/ui';
-
 import AccountSelect from '../../create-multisig/mobile/AccountSelect';
+
 import { useSetMembers } from './useSetMembers';
+
+import { Input, TxButton } from '@/components';
 
 function checkError(
   signatories: string[],
@@ -39,7 +40,10 @@ function MemberSet({
   pureAccount?: PureAccountData;
   disabled?: boolean;
 }) {
-  const { api, chainSS58, genesisHash, network, chain } = useApi();
+  const { chain, network } = useNetwork();
+  const genesisHash = chain.genesisHash;
+  const { ss58: chainSS58 } = useSs58Format();
+
   const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
     useSetMembers(
       account.members.map((item) => item.address),
@@ -72,7 +76,7 @@ function MemberSet({
   return (
     <div className='space-y-5'>
       {!pureAccount && (
-        <div className='text-warning font-bold'>Multisig account can's change threshold and members</div>
+        <div className='text-warning font-bold'>{`Multisig account can's change threshold and members`}</div>
       )}
       <div
         className='space-y-5'
@@ -133,7 +137,12 @@ function MemberSet({
                     src={remoteProxyChain.icon}
                   />{' '}
                   {remoteProxyChain.name} due to{' '}
-                  <a className='underline' target='_blank' href='https://blog.kchr.de/ecosystem-proxy/'>
+                  <a
+                    className='underline'
+                    target='_blank'
+                    href='https://blog.kchr.de/ecosystem-proxy/'
+                    rel='noreferrer'
+                  >
                     Remote Proxy
                   </a>
                 </li>
@@ -146,7 +155,7 @@ function MemberSet({
           fullWidth
           color='primary'
           accountId={pureAccount?.address}
-          getCall={() => {
+          getCall={async () => {
             if (!checkField()) {
               throw new Error('Please fill in all fields');
             }
@@ -157,6 +166,8 @@ function MemberSet({
 
             const oldMultiAddress = account.address;
             const newMultiAddress = encodeMultiAddress(signatories, threshold, chainSS58);
+
+            const api = await ApiManager.getInstance().getApi(network);
 
             return api.tx.utility.batchAll([
               api.tx.proxy.addProxy(newMultiAddress, 0, 0).method.toU8a(),

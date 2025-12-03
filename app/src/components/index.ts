@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 export { default as CongratsAnimation } from './animation/Congrats';
@@ -8,7 +8,6 @@ export { default as SuccessAnimation } from './animation/Success';
 export { default as WaitingAnimation } from './animation/Waiting';
 export { default as MimirLoading } from './animation/MimirLoading';
 export { default as AccountMenu } from './account-menu';
-export { default as AccountSelect } from './AccountSelect';
 export { default as AddAddressDialog } from './AddAddressDialog';
 export { default as Address } from './Address';
 export { default as AddressCell } from './AddressCell';

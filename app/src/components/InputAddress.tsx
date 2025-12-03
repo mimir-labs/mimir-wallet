@@ -1,8 +1,28 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AddressMeta } from '@/hooks/types';
 import type { InputAddressProps } from './types';
+import type { AccountData, AddressMeta } from '@/hooks/types';
+
+import {
+  addressToHex,
+  evm2Ss58,
+  isEthAddress,
+  isPolkadotAddress,
+  isPolkadotEvmAddress,
+  isValidAddress as isValidAddressUtil,
+  useNetwork,
+  useSs58Format,
+  zeroAddress
+} from '@mimir-wallet/polkadot-core';
+import { Divider, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { clsx } from 'clsx';
+import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useToggle } from 'react-use';
+
+import AddressCell from './AddressCell';
+import AddressRow from './AddressRow';
 
 import { useAccount } from '@/accounts/useAccount';
 import { sortAccounts } from '@/accounts/utils';
@@ -12,25 +32,6 @@ import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { clsx } from 'clsx';
-import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import {
-  addressToHex,
-  evm2Ss58,
-  isEthAddress,
-  isPolkadotAddress,
-  isPolkadotEvmAddress,
-  isValidAddress as isValidAddressUtil,
-  useApi,
-  zeroAddress
-} from '@mimir-wallet/polkadot-core';
-import { Divider, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
-
-import AddressCell from './AddressCell';
-import AddressRow from './AddressRow';
 
 function createOptions(
   accounts: AccountData[],
@@ -133,10 +134,9 @@ function InputAddress({
   withZeroAddress = false
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
-  const {
-    chainSS58,
-    chain: { polkavm }
-  } = useApi();
+  const { ss58: chainSS58 } = useSs58Format();
+  const { chain } = useNetwork();
+  const polkavm = chain.polkavm;
   const { accounts, addresses, isLocalAccount, isLocalAddress, addAddressBook, metas } = useAccount();
   const [value, setValue] = useState<string>(
     isValidAddressUtil(propsValue || defaultValue, polkavm) ? propsValue || defaultValue || '' : ''

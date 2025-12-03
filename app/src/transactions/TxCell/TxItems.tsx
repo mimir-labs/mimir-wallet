@@ -1,27 +1,28 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ApiPromise } from '@polkadot/api';
 import type { IMethod } from '@polkadot/types/types';
+
+import { encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Tooltip, TooltipContent, TooltipTrigger, TooltipWrapper } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import moment from 'moment';
+import React, { useState } from 'react';
+
+import Progress from '../Progress';
+import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
+
+import Extrinsic from './Extrinsic';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconShare from '@/assets/svg/icon-share.svg?react';
 import { AppName, TxOverviewDialog } from '@/components';
 import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@/hooks/types';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
+import { useParseCall } from '@/hooks/useParseCall';
 import { useToggle } from '@/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@/params';
 import { formatAgo } from '@/utils';
-import { Link } from '@tanstack/react-router';
-import moment from 'moment';
-import React, { useMemo, useState } from 'react';
-
-import { encodeAddress, useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip, TooltipContent, TooltipTrigger, TooltipWrapper } from '@mimir-wallet/ui';
-
-import Progress from '../Progress';
-import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
-import Extrinsic from './Extrinsic';
 
 function AppCell({ transaction }: { transaction: Transaction }) {
   return <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />;
@@ -31,8 +32,10 @@ function ActionTextCell({ section, method }: { section?: string; method?: string
   return <CallDisplaySection section={section} method={method} />;
 }
 
-function ActionDisplayCell({ api, call }: { api: ApiPromise; call?: IMethod | null }) {
-  return <CallDisplayDetail registry={api.registry} call={call} />;
+function ActionDisplayCell({ call }: { call?: IMethod | null }) {
+  if (!call) return null;
+
+  return <CallDisplayDetail registry={call.registry} call={call} />;
 }
 
 function TimeCell({ time }: { time?: number }) {
@@ -56,12 +59,12 @@ function ActionsCell({
   transaction: Transaction;
   detailOpen: boolean;
 }) {
-  const { network, chainSS58 } = useApi();
+  const { network, chain } = useNetwork();
   const [isCopied, copy] = useCopyClipboard(2000);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const handleCopyUrl = () => {
-    const url = `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chainSS58)}`;
+    const url = `${window.location.origin}/transactions/${transaction.id}?network=${network}&address=${encodeAddress(transaction.address, chain.ss58Format)}`;
 
     copy(url);
     setTooltipOpen(true);
@@ -113,19 +116,12 @@ function TxItems({
   shouldLoadDetails?: boolean;
   onLoadDetails?: () => void;
 }) {
-  const { api } = useApi();
+  const { network } = useNetwork();
   const [detailOpen, toggleDetailOpen] = useToggle(defaultOpen);
-
   const [overviewOpen, toggleOverviewOpen] = useToggle();
-  const call = useMemo(() => {
-    if (!transaction.call) return null;
 
-    try {
-      return api.registry.createTypeUnsafe('Call', [transaction.call]) as IMethod;
-    } catch {
-      return null;
-    }
-  }, [api, transaction.call]);
+  // Parse call data using async hook
+  const { call } = useParseCall(network, transaction.call);
 
   return (
     <>
@@ -141,7 +137,7 @@ function TxItems({
             <ActionTextCell section={transaction.section} method={transaction.method} />
           </div>
           <div className='col-span-3 hidden lg:flex'>
-            <ActionDisplayCell api={api} call={call} />
+            <ActionDisplayCell call={call} />
           </div>
           <div className='col-span-2 hidden md:flex'>
             <TimeCell

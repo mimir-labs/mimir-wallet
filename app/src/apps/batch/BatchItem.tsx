@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Registry } from '@polkadot/types/types';
@@ -13,7 +13,7 @@ interface Props {
   children: React.ReactNode;
   actions?: React.ReactNode;
   calldata: HexString;
-  registry: Registry;
+  registry: Registry | null;
   from: string;
   bgcolor?: string;
 }

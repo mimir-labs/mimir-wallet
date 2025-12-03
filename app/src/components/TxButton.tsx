@@ -1,4 +1,4 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { FilterPath, Transaction } from '@/hooks/types';
@@ -6,14 +6,14 @@ import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { useTxQueue } from '@/hooks/useTxQueue';
-import { useWallet } from '@/wallet/useWallet';
-import React, { forwardRef, useCallback } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, type ButtonProps } from '@mimir-wallet/ui';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, type ButtonProps, Spinner } from '@mimir-wallet/ui';
+import React, { forwardRef, useState } from 'react';
 
 import { toastError } from './utils';
+
+import { useTxQueue } from '@/hooks/useTxQueue';
+import { useWallet } from '@/wallet/useWallet';
 
 interface Props extends Omit<ButtonProps, 'onClick' | 'startContent' | 'endContent'> {
   startContent?: React.ReactNode;
@@ -38,9 +38,9 @@ interface Props extends Omit<ButtonProps, 'onClick' | 'startContent' | 'endConte
     payload: ExtrinsicPayloadValue
   ) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
-  getCall?: () => IMethod | string;
+  getCall?: () => IMethod | string | Promise<IMethod | string>;
   onDone?: () => void;
-  overrideAction?: () => void;
+  overrideAction?: () => void | Promise<void>;
 }
 
 const TxButton = forwardRef<HTMLButtonElement, Props>(
@@ -67,55 +67,51 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
     },
     ref
   ) => {
-    const { network } = useApi();
+    const { network } = useNetwork();
     const { addQueue } = useTxQueue();
     const { walletAccounts } = useWallet();
+    const [isLoading, setIsLoading] = useState(false);
     const address = accountId || transaction?.address || walletAccounts.at(0)?.address;
-    const handleClick = useCallback(() => {
-      if (getCall) {
-        const call = getCall();
 
-        if (!address) {
-          toastError('Please select an account');
+    const handleClick = async () => {
+      setIsLoading(true);
 
-          return;
+      try {
+        if (overrideAction) {
+          await overrideAction();
+        } else if (getCall) {
+          const call = await getCall();
+
+          if (!address) {
+            toastError('Please select an account');
+          } else {
+            addQueue({
+              accountId: address,
+              transaction: transaction || undefined,
+              call,
+              website,
+              appName,
+              iconUrl,
+              filterPaths,
+              relatedBatches,
+              onResults: (result) => onResults?.(result),
+              beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
+              network,
+              onError
+            });
+            onDone?.();
+          }
         }
-
-        addQueue({
-          accountId: address,
-          transaction: transaction || undefined,
-          call,
-          website,
-          appName,
-          iconUrl,
-          filterPaths,
-          relatedBatches,
-          onResults: (result) => onResults?.(result),
-          beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
-          network,
-          onError
-        });
-        onDone?.();
+      } catch (error) {
+        toastError(error);
+      } finally {
+        setIsLoading(false);
       }
-    }, [
-      getCall,
-      onDone,
-      address,
-      addQueue,
-      transaction,
-      website,
-      appName,
-      iconUrl,
-      filterPaths,
-      relatedBatches,
-      network,
-      onError,
-      onResults,
-      beforeSend
-    ]);
+    };
 
     return (
-      <Button {...props} ref={ref} disabled={disabled} onClick={overrideAction || handleClick}>
+      <Button {...props} ref={ref} disabled={disabled || isLoading} onClick={handleClick}>
+        {isLoading && <Spinner size='sm' />}
         {startContent}
         {children}
         {endContent}
@@ -123,5 +119,7 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
     );
   }
 );
+
+TxButton.displayName = 'TxButton';
 
 export default React.memo(TxButton);

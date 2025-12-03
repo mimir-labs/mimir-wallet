@@ -5,9 +5,9 @@
 ![Mimir Wallet](./app/src/assets/images/logo.png)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18.3-blue)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-6.3-blue)](https://vitejs.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19.2-blue)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.2-blue)](https://vitejs.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-20%2B-green)](https://nodejs.org/)
 [![Yarn](https://img.shields.io/badge/Yarn-4.7-blue)](https://yarnpkg.com/)
 [![GitHub Stars](https://img.shields.io/github/stars/mimir-labs/mimir-wallet.svg)](https://github.com/mimir-labs/mimir-wallet/stargazers)
@@ -29,7 +29,7 @@ Mimir Wallet is a state-of-the-art Progressive Web Application (PWA) designed fo
 - **Enterprise-Ready**: Production-grade multi-signature management with advanced security features
 - **Cross-Chain Support**: Native support for Polkadot, Kusama, and all Substrate-based chains
 - **Progressive Web App**: Installable app with offline capabilities and native-like experience
-- **Modern Architecture**: Built with React 18, TypeScript 5.6, and Vite 6.3 for optimal performance
+- **Modern Architecture**: Built with React 19, TypeScript 5.9, and Vite 7 for optimal performance
 - **Monorepo Structure**: Scalable Turbo-powered architecture with modular packages
 
 ---
@@ -140,7 +140,7 @@ mimir-wallet/
 ### 🏠 Main Application
 
 **[`app/`](./app/)** - The primary Mimir Wallet application
-- **Framework**: React 18.3 + TypeScript 5.6 + Vite 6.3
+- **Framework**: React 19.2 + TypeScript 5.9 + Vite 7.2
 - **Features**: PWA support, multi-chain wallet interface, responsive design
 - **Build Output**: Optimized production build with code splitting
 
@@ -148,11 +148,12 @@ mimir-wallet/
 
 #### [`@mimir-wallet/polkadot-core`](./packages/polkadot-core/)
 The foundational blockchain integration package
-- **Polkadot.js API** v16.2.2 integration
+- **Polkadot.js API** v16.5.2 integration
 - **Multi-chain API management** for Polkadot ecosystem
 - **Transaction processing** with dry-run capabilities
 - **Chopsticks integration** for fork simulation and testing
 - **React hooks** for seamless blockchain state management
+- **Comprehensive testing**: 202 unit tests + 64 integration tests (Paseo testnet)
 
 #### [`@mimir-wallet/service`](./packages/service/)
 Service layer and data management
@@ -184,26 +185,26 @@ Development tooling and shared configurations
 ### Frontend & UI
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **React** | 18.3 | UI framework with concurrent features |
-| **TypeScript** | 5.6 | Type-safe development |
-| **Vite** | 6.3 | Fast build tool and dev server |
+| **React** | 19.2 | UI framework with concurrent features |
+| **TypeScript** | 5.9 | Type-safe development |
+| **Vite** | 7.2 | Fast build tool and dev server |
 | **HeroUI + ShadCN/UI** | v2 + Latest | Hybrid accessible component library |
-| **Tailwind CSS** | 3.4 | Utility-first styling |
+| **Tailwind CSS** | 4.1 | Utility-first styling |
 | **Framer Motion** | 12.12 | Smooth animations |
 
 ### Blockchain Integration
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Polkadot.js API** | 16.2.2 | Substrate blockchain interaction |
+| **Polkadot.js API** | 16.5.2 | Substrate blockchain interaction |
 | **Chopsticks** | 1.0.1 | Fork simulation for testing |
 | **WalletConnect** | 2.15.1 | Cross-wallet compatibility |
 
 ### State Management & Data
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **React Query** | Latest | Server state management |
+| **TanStack Query** | 5.x | Server state management |
 | **Zustand** | 5.0 | Client state management |
-| **React Router** | 6.28 | Client-side routing |
+| **TanStack Router** | 1.134 | Type-safe client-side routing |
 | **Socket.io Client** | Latest | Real-time communication |
 
 ### Build & Development
@@ -212,14 +213,14 @@ Development tooling and shared configurations
 | **Turbo** | 2.4.4 | Monorepo build system |
 | **Yarn** | 4.7.0 | Package management with PnP |
 | **ESLint** | 9.21 | Code linting and formatting |
-| **Vitest** | 3.1.4 | Unit testing framework |
+| **Vitest** | 4.0 | Unit & integration testing framework |
 | **Cypress** | 13.13 | End-to-end testing |
 
 ### PWA & Performance
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Vite PWA** | 1.0.0 | Progressive Web App features |
-| **Workbox** | 7.1.0 | Service worker management |
+| **Vite PWA** | 1.1.0 | Progressive Web App features |
+| **Workbox** | 7.3.0 | Service worker management |
 | **Chart.js** | 4.4.9 | Data visualization |
 
 ---
@@ -262,13 +263,17 @@ yarn check-types      # Check TypeScript types
 
 ### 🧪 Testing
 ```bash
-# Unit Testing
-yarn test             # Run all unit tests
-yarn test:watch       # Run tests in watch mode
-yarn test:coverage    # Generate coverage report
+# Run all tests (from root)
+yarn test             # Run all tests across packages (via Turbo)
+yarn test:cov         # Run all tests with coverage report
 
-# E2E Testing
-cd app/
+# Package-specific testing (from packages/polkadot-core/)
+yarn test             # Run unit tests
+yarn test:unit        # Run unit tests (explicit)
+yarn test:integration # Run integration tests (connects to Paseo testnet)
+yarn test:watch       # Run tests in watch mode
+
+# E2E Testing (from app/)
 yarn cypress:open     # Open Cypress test runner
 yarn cypress:run      # Run Cypress tests headlessly
 ```

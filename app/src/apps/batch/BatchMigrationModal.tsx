@@ -1,18 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BatchTxItem } from '@/hooks/types';
+import type { Network } from '@mimir-wallet/polkadot-core';
 import type { ApiPromise } from '@polkadot/api';
 import type { Registry } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
-import type { Network } from '@mimir-wallet/polkadot-core';
+
+import { ApiManager, createBlockRegistry, useChains } from '@mimir-wallet/polkadot-core';
+import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
+import { useEffect, useMemo, useState } from 'react';
 
 import { CopyButton } from '@/components';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
-import { useEffect, useMemo, useState } from 'react';
-
-import { createBlockRegistry, useAllApis, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@mimir-wallet/ui';
 
 interface BatchMigrationModalProps {
   isOpen: boolean;
@@ -190,34 +190,38 @@ export function BatchMigrationModal({
   onMigrate,
   address
 }: BatchMigrationModalProps) {
-  const { networks, enableNetwork } = useNetworks();
-  const { chains } = useAllApis();
+  const { chains } = useChains();
   const [registry, setRegistry] = useState<Registry | null>(null);
+  const [destApi, setDestApi] = useState<ApiPromise | null>(null);
 
-  const sourceReady = !!chains[sourceChain]?.isApiReady;
-  const destReady = !!chains[destChain]?.isApiReady;
-  const destApi = chains[destChain]?.api;
+  const sourceNetwork = chains.find((network) => network.key === sourceChain);
+  const destNetwork = chains.find((network) => network.key === destChain);
 
-  const sourceNetwork = networks.find((network) => network.key === sourceChain);
-  const destNetwork = networks.find((network) => network.key === destChain);
-
+  // Get dest API async
   useEffect(() => {
-    if (isOpen) {
-      enableNetwork(sourceChain);
-      enableNetwork(destChain);
-    }
-  }, [enableNetwork, sourceChain, destChain, isOpen]);
+    ApiManager.getInstance()
+      .getApi(destChain)
+      .then((api) => {
+        if (api) {
+          setDestApi(api);
+        }
+      });
+  }, [destChain]);
 
   // Create registry for parsing calls
   useEffect(() => {
-    if (block && chains[sourceChain]?.api) {
-      const api = chains[sourceChain].api!;
-
-      createBlockRegistry(api, block).then((registry) => {
-        setRegistry(registry);
-      });
+    if (block) {
+      ApiManager.getInstance()
+        .getApi(sourceChain)
+        .then((api) => {
+          if (api) {
+            createBlockRegistry(api, block).then((reg) => {
+              setRegistry(reg);
+            });
+          }
+        });
     }
-  }, [block, sourceChain, destChain, chains]);
+  }, [block, sourceChain]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size='xl'>
@@ -233,7 +237,7 @@ export function BatchMigrationModal({
         </ModalHeader>
 
         <ModalBody>
-          {sourceReady && sourceNetwork && destReady && destNetwork && destApi && registry ? (
+          {sourceNetwork && destNetwork && destApi && registry ? (
             <Content
               sourceNetwork={sourceNetwork}
               sourceRegistry={registry}

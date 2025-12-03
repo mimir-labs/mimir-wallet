@@ -1,14 +1,14 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountData, Transaction } from '@/hooks/types';
 
+import { addressEq } from '@mimir-wallet/polkadot-core';
+import { useMemo } from 'react';
+
 import { reduceAccount } from '@/accounts/utils';
 import { TransactionType } from '@/hooks/types';
 import { useWallet } from '@/wallet/useWallet';
-import { useMemo } from 'react';
-
-import { addressEq } from '@mimir-wallet/polkadot-core';
 
 export function useProposeFilterForRemove(account: AccountData, transaction: Transaction) {
   const { walletAccounts } = useWallet();

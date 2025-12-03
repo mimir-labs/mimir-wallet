@@ -1,9 +1,10 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconClock from '@/assets/svg/icon-clock.svg?react';
 import { BaseEdge, type Edge, EdgeLabelRenderer, type EdgeProps, getSmoothStepPath } from '@xyflow/react';
 import React, { useMemo } from 'react';
+
+import IconClock from '@/assets/svg/icon-clock.svg?react';
 
 function AddressEdge({
   id,

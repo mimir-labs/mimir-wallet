@@ -1,31 +1,30 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useSelectedAccount } from '@/accounts/useSelectedAccount';
+import { type FunctionCallHandler, toFunctionCallString } from '@mimir-wallet/ai-assistant';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { Button } from '@mimir-wallet/ui';
+import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
+import { useCallback, useMemo, useState } from 'react';
+import { useToggle } from 'react-use';
+
+import TransferAction from './TransferAction';
+import TransferContent from './TransferContent';
+
+import { useAccount } from '@/accounts/useAccount';
 import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
-import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
-import { useCallback, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
 
 const routeApi = getRouteApi('/_authenticated/explorer/$url');
 
-import { type FunctionCallHandler, toFunctionCallString } from '@mimir-wallet/ai-assistant';
-import { SubApiRoot } from '@mimir-wallet/polkadot-core';
-import { Button, Spinner } from '@mimir-wallet/ui';
-
-import TransferAction from './TransferAction';
-import TransferContent from './TransferContent';
-
 function PageTransfer() {
-  const selected = useSelectedAccount();
+  const { current } = useAccount();
   const navigate = useNavigate();
   const search = routeApi.useSearch();
-  const fromParam = search.from;
   const assetId = search.assetId || 'native';
   const assetNetwork = search.asset_network;
   const toParam = search.to;
@@ -38,9 +37,8 @@ function PageTransfer() {
     });
   };
 
-  const [sending, setSending] = useState<string>(fromParam || selected || '');
   const [recipient, setRecipient] = useState<string>(toParam || '');
-  const supportedNetworks = useAddressSupportedNetworks(sending);
+  const supportedNetworks = useAddressSupportedNetworks(current);
   const [network, setNetwork] = useInputNetwork(
     assetNetwork,
     supportedNetworks?.map((item) => item.key)
@@ -57,13 +55,6 @@ function PageTransfer() {
   const handleTransferForm = useCallback<FunctionCallHandler>(
     (event) => {
       // No need to check event.name - only 'transferForm' events arrive here
-
-      // Safe type conversion for sending
-      const sendingValue = toFunctionCallString(event.arguments.sending);
-
-      if (sendingValue) {
-        setSending(sendingValue);
-      }
 
       // Safe type conversion for recipient
       const recipientValue = toFunctionCallString(event.arguments.recipient);
@@ -96,15 +87,7 @@ function PageTransfer() {
   });
 
   return (
-    <SubApiRoot
-      network={network}
-      supportedNetworks={supportedNetworks?.map((item) => item.key)}
-      Fallback={({ apiState: { chain } }) => (
-        <div className='bg-content1 mx-auto mt-16 flex w-[500px] max-w-full items-center justify-center rounded-[20px] py-10'>
-          <Spinner size='lg' variant='wave' label={`Connecting to the ${chain.name}...`} />
-        </div>
-      )}
-    >
+    <NetworkProvider network={network}>
       <div className='mx-auto w-full max-w-[500px] p-4 sm:p-5'>
         <Button onClick={() => window.history.back()} variant='ghost'>
           {'<'} Back
@@ -127,15 +110,16 @@ function PageTransfer() {
               </Button>
             </div>
             <TransferContent
+              disabledSending
               amount={amount}
               isAmountValid={isAmountValid}
               keepAlive={keepAlive}
               token={token}
-              sending={sending}
+              sending={current || ''}
               recipient={recipient}
               identifier={assetId}
               network={network}
-              setSending={setSending}
+              supportedNetworks={supportedNetworks?.map((item) => item.key)}
               setNetwork={setNetwork}
               setRecipient={setRecipient}
               setAmount={setAmount}
@@ -148,7 +132,7 @@ function PageTransfer() {
               amount={amount}
               isAmountValid={isAmountValid}
               keepAlive={keepAlive}
-              sending={sending}
+              sending={current || ''}
               recipient={recipient}
             >
               Review
@@ -156,7 +140,7 @@ function PageTransfer() {
           </div>
         </div>
       </div>
-    </SubApiRoot>
+    </NetworkProvider>
   );
 }
 

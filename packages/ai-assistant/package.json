@@ -48,6 +48,7 @@
     "zustand": ">=5"
   },
   "dependencies": {
+    "@mimir-wallet/dev": "workspace:^",
     "@mimir-wallet/polkadot-core": "workspace:^",
     "@mimir-wallet/ui": "workspace:^",
     "@radix-ui/react-use-controllable-state": "^1.2.2",

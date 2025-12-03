@@ -1,12 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { HexString } from '@polkadot/util/types';
 
-import { useCallback, useMemo } from 'react';
-
 import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
+import { useCallback, useMemo } from 'react';
 
 import { useBatchTxs } from './useBatchTxs';
 

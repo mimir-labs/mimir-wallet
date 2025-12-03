@@ -1,17 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { addressToHex, useNetwork } from '@mimir-wallet/polkadot-core';
+import { service, useMutation } from '@mimir-wallet/service';
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { blake2AsHex } from '@polkadot/util-crypto';
+import { useQueryClient } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 import { Hash, Input } from '@/components';
 import { toastError } from '@/components/utils';
 import { type Transaction, TransactionType } from '@/hooks/types';
-import { blake2AsHex } from '@polkadot/util-crypto';
-import { useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-
-import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
-import { service, useMutation } from '@mimir-wallet/service';
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import { useRegistry } from '@/hooks/useRegistry';
 
 function RecoverTx({
   transaction,
@@ -24,7 +25,8 @@ function RecoverTx({
   onClose: () => void;
   handleRecover: (calldata: string) => void;
 }) {
-  const { api, network } = useApi();
+  const { network } = useNetwork();
+  const { registry } = useRegistry(network);
   const queryClient = useQueryClient();
   const [calldata, setCalldata] = useState('');
 
@@ -45,12 +47,12 @@ function RecoverTx({
   });
 
   const error = useMemo(() => {
-    if (!calldata) {
+    if (!calldata || !registry) {
       return null;
     }
 
     try {
-      const call = api.createType('Call', calldata);
+      const call = registry.createType('Call', calldata);
 
       if (
         (transaction.type === TransactionType.Multisig ? blake2AsHex(call.toU8a()) : call.hash.toHex()) !==
@@ -63,7 +65,9 @@ function RecoverTx({
     } catch {
       return new Error('Invalid call data');
     }
-  }, [api, calldata, transaction.callHash, transaction.type]);
+  }, [registry, calldata, transaction.callHash, transaction.type]);
+
+  if (!registry) return null;
 
   return (
     <Modal size='2xl' onClose={onClose} isOpen={isOpen}>

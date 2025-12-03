@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import IconDownload from '@/assets/svg/icon-download.svg?react';
+import { Button } from '@mimir-wallet/ui';
 import React, { useCallback, useState } from 'react';
 
-import { Button } from '@mimir-wallet/ui';
-
 import { generateExampleCsv } from './parse';
+
+import IconDownload from '@/assets/svg/icon-download.svg?react';
 
 interface FileUploadProps {
   onUpload: (files: File[]) => void;

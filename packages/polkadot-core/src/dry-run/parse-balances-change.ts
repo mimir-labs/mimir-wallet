@@ -1,11 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { BalanceChange } from './types.js';
 import type { Event } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
-import type { BalanceChange } from './types.js';
 
-import { encodeAddress } from '../defaults.js';
+import { encodeAddress } from '../utils/defaults.js';
 
 // Constants
 const ZERO_ADDRESS_HEX = '0x0000000000000000000000000000000000000000000000000000000000000000';

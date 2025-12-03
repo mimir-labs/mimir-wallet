@@ -1,16 +1,17 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { StepProps } from './types';
 
-import { Input, InputNetwork } from '@/components';
-import { MigrationTip } from '@/features/assethub-migration';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
+import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 
 import AddPureProxy from '../components/AddPureProxy';
 import Tips from '../components/Tips';
+
+import { Input, InputNetwork } from '@/components';
+import { MigrationTip } from '@/features/assethub-migration';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface Step1NameProps extends StepProps {
   name: string;
@@ -29,8 +30,9 @@ function Step1Name({
   onNext,
   onPureProxyChange
 }: Step1NameProps) {
-  const { api } = useApi();
-  const isProxyModuleSupported = !!api.tx.proxy;
+  const currentNetwork = useNetwork();
+  const targetNetwork = isPureProxy ? network : currentNetwork.network;
+  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(targetNetwork);
 
   return (
     <div className='flex flex-col gap-4'>

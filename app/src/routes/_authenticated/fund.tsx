@@ -1,8 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import PageFund from '@/pages/fund';
 import { createFileRoute } from '@tanstack/react-router';
+
+import PageFund from '@/pages/fund';
 
 /**
  * Fund Account Route (/fund)

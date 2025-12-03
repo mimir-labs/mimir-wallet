@@ -1,19 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DelayType } from '../types';
 
-import PureIcon from '@/assets/images/pure-icon.svg';
-import { AddressCell, ProxyControls } from '@/components';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider, Switch } from '@mimir-wallet/ui';
 
 import DelayItem from '../components/DelayItem';
 import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
 import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
 
+import PureIcon from '@/assets/images/pure-icon.svg';
+import { AddressCell, ProxyControls } from '@/components';
+import { useSupportsProxy } from '@/hooks/useChainCapabilities';
+
 interface Step2PermissionLevelProps {
+  network: string;
   proxyType: string;
   hasDelay: boolean;
   delayType: DelayType;
@@ -33,6 +34,7 @@ interface Step2PermissionLevelProps {
 }
 
 function Step2PermissionLevel({
+  network,
   proxyType,
   hasDelay,
   delayType,
@@ -45,8 +47,7 @@ function Step2PermissionLevel({
   onBack,
   onDataChange
 }: Step2PermissionLevelProps) {
-  const { api } = useApi();
-  const isProxyModuleSupported = !!api.tx.proxy;
+  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(network);
 
   const handleDelayTypeChange = (type: DelayType) => {
     onDataChange({ delayType: type });
@@ -81,6 +82,7 @@ function Step2PermissionLevel({
 
       {/* Permission Level */}
       <ProxyPermissionSelector
+        network={network}
         value={proxyType}
         onChange={(value) => onDataChange({ proxyType: value })}
         label='Permission Level'
@@ -103,10 +105,26 @@ function Step2PermissionLevel({
           <div className='mt-3 flex flex-col gap-3'>
             <label className='text-foreground text-sm font-bold'>Delay Time</label>
             <div className='flex gap-2'>
-              <DelayItem isSelected={delayType === 'hour'} delayType='hour' onSelect={handleDelayTypeChange} />
-              <DelayItem isSelected={delayType === 'day'} delayType='day' onSelect={handleDelayTypeChange} />
-              <DelayItem isSelected={delayType === 'week'} delayType='week' onSelect={handleDelayTypeChange} />
               <DelayItem
+                network={network}
+                isSelected={delayType === 'hour'}
+                delayType='hour'
+                onSelect={handleDelayTypeChange}
+              />
+              <DelayItem
+                network={network}
+                isSelected={delayType === 'day'}
+                delayType='day'
+                onSelect={handleDelayTypeChange}
+              />
+              <DelayItem
+                network={network}
+                isSelected={delayType === 'week'}
+                delayType='week'
+                onSelect={handleDelayTypeChange}
+              />
+              <DelayItem
+                network={network}
                 isSelected={delayType === 'custom'}
                 delayType='custom'
                 onSelect={handleDelayTypeChange}

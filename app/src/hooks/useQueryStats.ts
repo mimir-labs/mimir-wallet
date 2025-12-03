@@ -1,16 +1,18 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
-import { addressToHex, useApi } from '@mimir-wallet/polkadot-core';
+import { addressToHex, useChains } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
+import { useMemo } from 'react';
 
 export function useMultiChainStats(
   address?: string | null
 ): [data: Record<string, boolean>, isFetched: boolean, isFetching: boolean] {
   const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
-  const { allApis } = useApi();
+  const { chains } = useChains();
+
+  // Get enabled network keys
+  const chainsSet = useMemo(() => new Set(chains.map((c) => c.key)), [chains]);
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['multi-chain-stats', addressHex] as const,
@@ -21,8 +23,11 @@ export function useMultiChainStats(
 
   return [
     useMemo(
-      () => Object.fromEntries(Object.entries(data || {}).filter(([network, enabled]) => allApis[network] && enabled)),
-      [data, allApis]
+      () =>
+        Object.fromEntries(
+          Object.entries(data || {}).filter(([network, enabled]) => chainsSet.has(network) && enabled)
+        ),
+      [data, chainsSet]
     ),
     isFetched,
     isFetching

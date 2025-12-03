@@ -1,19 +1,20 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Call } from '@polkadot/types/interfaces';
 import type { Registry } from '@polkadot/types/types';
 
+import { useNetwork } from '@mimir-wallet/polkadot-core';
+import { Button, Divider } from '@mimir-wallet/ui';
+import { useRouter } from '@tanstack/react-router';
+import { useMemo, useState } from 'react';
+
 import { ErrorBoundary, Input, InputAddress, InputNetwork, TxButton } from '@/components';
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInput } from '@/hooks/useInput';
+import { useRegistry } from '@/hooks/useRegistry';
 import { Call as CallComp } from '@/params';
-import { useRouter } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
-
-import { useApi } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
 
 function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {
   if (!callData) return [null, null];
@@ -31,22 +32,25 @@ function Extrinsic({
   sending,
   setSending,
   network,
+  supportedNetworks,
   setNetwork
 }: {
   sending: string;
   network: string;
+  supportedNetworks?: string[];
   setSending: (sending: string) => void;
   setNetwork: (network: string) => void;
 }) {
-  const { api } = useApi();
+  const { network: currentNetwork } = useNetwork();
+  const { registry } = useRegistry(currentNetwork);
   const [callData, setCallData] = useInput('');
   const [showDetail, setShowDetail] = useState(false);
   const router = useRouter();
 
   // Derive parsed call data and error directly from callData
   const [parsedCallData, callDataError] = useMemo(
-    () => decodeCallData(api.registry, callData),
-    [api.registry, callData]
+    () => (registry ? decodeCallData(registry, callData) : [null, null]),
+    [registry, callData]
   );
 
   return (
@@ -57,7 +61,12 @@ function Extrinsic({
       <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-5'>
         <h3>Submit Extrinsic</h3>
 
-        <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />
+        <InputNetwork
+          label='Select Network'
+          network={network}
+          supportedNetworks={supportedNetworks}
+          setNetwork={setNetwork}
+        />
 
         <InputAddress isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} />
 
@@ -110,7 +119,7 @@ function Extrinsic({
 
             <div className='border-divider-300 @container rounded-[10px] border-1 p-2.5'>
               <ErrorBoundary>
-                <CallComp showFallback registry={api.registry} from={sending} call={parsedCallData} />
+                {registry && <CallComp showFallback registry={registry} from={sending} call={parsedCallData} />}
               </ErrorBoundary>
             </div>
 

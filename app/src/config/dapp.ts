@@ -1,11 +1,11 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
+import { allEndpoints } from '@mimir-wallet/polkadot-core';
 
 import Failed from '@/assets/images/failed.svg';
 import LogoCircle from '@/assets/svg/logo-circle.svg';
 import TemplateIcon from '@/assets/svg/template.svg';
-
-import { allEndpoints } from '@mimir-wallet/polkadot-core';
 
 export interface CustomDappOption {
   id: string;

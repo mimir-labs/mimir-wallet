@@ -1,7 +1,22 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BatchTxItem } from '@/hooks/types';
+
+import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
+import { Avatar, Button } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { useToggle } from 'react-use';
+
+import Actions from './Actions';
+import BatchItemDrag from './BatchItemDrag';
+import BatchMigrationAlert from './BatchMigrationAlert';
+import EmptyBatch from './EmptyBatch';
+import LazyRestore from './LazyRestore';
+import { calculateSelectionConstraints } from './utils';
 
 import { useAccount } from '@/accounts/useAccount';
 import { analyticsActions } from '@/analytics';
@@ -10,21 +25,7 @@ import IconClose from '@/assets/svg/icon-close.svg?react';
 import { InputNetwork } from '@/components';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { Link } from '@tanstack/react-router';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { useToggle } from 'react-use';
-
-import { SubApiRoot, useApi, useNetworks } from '@mimir-wallet/polkadot-core';
-import { Avatar, Button } from '@mimir-wallet/ui';
-
-import Actions from './Actions';
-import BatchItemDrag from './BatchItemDrag';
-import BatchMigrationAlert from './BatchMigrationAlert';
-import EmptyBatch from './EmptyBatch';
-import LazyRestore from './LazyRestore';
-import { calculateSelectionConstraints } from './utils';
+import { useRegistry } from '@/hooks/useRegistry';
 
 function Content({
   address,
@@ -41,7 +42,8 @@ function Content({
   setTxs: (txs: BatchTxItem[]) => void;
   onClose?: () => void;
 }) {
-  const { api, network } = useApi();
+  const { network } = useNetwork();
+  const { registry } = useRegistry(network);
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [relatedBatches, setRelatedBatches] = useState<number[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -142,30 +144,31 @@ function Content({
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={sortableItems} strategy={verticalListSortingStrategy}>
               <div className='space-y-2.5'>
-                {txs.map((item, index) => {
-                  const { isDisabled, disabledReason } = calculateSelectionConstraints(
-                    item,
-                    selectedTxs,
-                    api.registry,
-                    selected.includes(item.id)
-                  );
+                {registry &&
+                  txs.map((item, index) => {
+                    const { isDisabled, disabledReason } = calculateSelectionConstraints(
+                      item,
+                      selectedTxs,
+                      registry,
+                      selected.includes(item.id)
+                    );
 
-                  return (
-                    <BatchItemDrag
-                      key={item.id}
-                      {...item}
-                      index={index}
-                      from={address}
-                      selected={selected}
-                      registry={api.registry}
-                      isSelectionDisabled={isDisabled}
-                      disabledReason={disabledReason}
-                      onSelected={isDisabled ? () => {} : handleItemSelection(item.id, item.relatedBatch)}
-                      onDelete={handleItemDelete(item.id)}
-                      onCopy={handleItemCopy(item)}
-                    />
-                  );
-                })}
+                    return (
+                      <BatchItemDrag
+                        key={item.id}
+                        {...item}
+                        index={index}
+                        from={address}
+                        selected={selected}
+                        registry={registry}
+                        isSelectionDisabled={isDisabled}
+                        disabledReason={disabledReason}
+                        onSelected={isDisabled ? () => {} : handleItemSelection(item.id, item.relatedBatch)}
+                        onDelete={handleItemDelete(item.id)}
+                        onCopy={handleItemCopy(item)}
+                      />
+                    );
+                  })}
               </div>
             </SortableContext>
           </DndContext>
@@ -189,6 +192,7 @@ function Content({
         txs={txs}
         selected={selected}
         relatedBatches={relatedBatches}
+        registry={registry}
         setTxs={setTxs}
         deleteTx={deleteTx}
         setSelected={setSelected}
@@ -212,11 +216,11 @@ function Batch({
 }) {
   const [, toggleOpen] = useToggle(false);
   const [isRestore, toggleRestore] = useToggle(false);
-  const { networks } = useNetworks();
+  const { chains } = useChains();
 
   const [txs, addTx, deleteTx, setTxs] = useBatchTxs(network, address);
 
-  const networkChain = useMemo(() => networks.find((n) => n.key === network), [networks, network]);
+  const networkChain = useMemo(() => chains.find((n) => n.key === network), [chains, network]);
 
   return (
     <div className='flex h-full w-full flex-col gap-5'>
@@ -246,17 +250,15 @@ function Batch({
         </div>
       ) : null}
 
-      {isRestore ? (
-        <SubApiRoot network={network}>
+      <NetworkProvider network={network}>
+        {isRestore ? (
           <LazyRestore onClose={toggleRestore} />
-        </SubApiRoot>
-      ) : txs.length === 0 ? (
-        <EmptyBatch onAdd={toggleOpen} onClose={onClose} onHandleRestore={toggleRestore} />
-      ) : (
-        <SubApiRoot network={network}>
+        ) : txs.length === 0 ? (
+          <EmptyBatch onAdd={toggleOpen} onClose={onClose} onHandleRestore={toggleRestore} />
+        ) : (
           <Content address={address} txs={txs} addTx={addTx} deleteTx={deleteTx} setTxs={setTxs} onClose={onClose} />
-        </SubApiRoot>
-      )}
+        )}
+      </NetworkProvider>
     </div>
   );
 }

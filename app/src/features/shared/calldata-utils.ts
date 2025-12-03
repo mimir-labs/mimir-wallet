@@ -1,9 +1,9 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DecodeResult } from './error-handling';
 import type { Call } from '@polkadot/types/interfaces';
 import type { Registry } from '@polkadot/types/types';
-import type { DecodeResult } from './error-handling';
 
 import { handleValidationError, safeExecute } from './error-handling';
 

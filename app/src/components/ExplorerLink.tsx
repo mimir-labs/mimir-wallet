@@ -1,12 +1,12 @@
-// Copyright 2023-2024 dev.mimir authors & contributors
+// Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import StatescanImg from '@/assets/images/statescan.svg';
-import SubscanImg from '@/assets/images/subscan.svg';
-import { useMemo } from 'react';
 
 import { chainLinks, type Endpoint } from '@mimir-wallet/polkadot-core';
 import { Avatar, Tooltip } from '@mimir-wallet/ui';
+import { useMemo } from 'react';
+
+import StatescanImg from '@/assets/images/statescan.svg';
+import SubscanImg from '@/assets/images/subscan.svg';
 
 interface ExplorerLinkProps {
   address: string;
