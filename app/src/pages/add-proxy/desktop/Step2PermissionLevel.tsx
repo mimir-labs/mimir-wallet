@@ -93,7 +93,7 @@ function Step2PermissionLevel({
       <div className='flex flex-col gap-1'>
         <div className='flex items-center justify-between'>
           <label className='text-foreground text-sm font-bold'>{hasDelay ? 'Delay' : 'Time Delay'}</label>
-          <Switch size='sm' isSelected={hasDelay} onValueChange={(checked) => onDataChange({ hasDelay: checked })} />
+          <Switch checked={hasDelay} onCheckedChange={(checked) => onDataChange({ hasDelay: checked })} />
         </div>
         <p className='text-foreground/50 text-xs'>
           {hasDelay

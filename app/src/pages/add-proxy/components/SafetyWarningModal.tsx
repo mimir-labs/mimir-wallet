@@ -127,9 +127,10 @@ function SafetyWarningModal({
 
         <ModalFooter>
           <div className='flex w-full flex-col gap-4'>
-            <Checkbox size='sm' isSelected={acknowledged} onValueChange={toggleAcknowledged}>
-              <span className='text-sm'>{confirmText} and accept the security risks</span>
-            </Checkbox>
+            <label className='inline-flex cursor-pointer items-center gap-2'>
+              <Checkbox checked={acknowledged} onCheckedChange={(checked) => toggleAcknowledged(!!checked)} />
+              <span>{confirmText} and accept the security risks</span>
+            </label>
 
             <div className='flex gap-2'>
               <Button fullWidth variant='ghost' color={getSeverityColor()} onClick={handleClose}>

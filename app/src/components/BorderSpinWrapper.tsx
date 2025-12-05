@@ -23,11 +23,11 @@ export function BorderSpinWrapper({ children, loading = true, className = '', ..
         background: loading
           ? `conic-gradient(
               from var(--border-angle, 0deg),
-              hsl(var(--heroui-primary)) 0%,
-              hsl(var(--heroui-primary) / 0.3) 25%,
+              var(--primary) 0%,
+              var(--color-primary-200) 25%,
               transparent 50%,
-              hsl(var(--heroui-primary) / 0.3) 75%,
-              hsl(var(--heroui-primary)) 100%
+              var(--color-primary-200) 75%,
+              var(--primary) 100%
             )`
           : 'transparent',
         animation: loading ? 'border-spin 1.5s linear infinite' : 'none'

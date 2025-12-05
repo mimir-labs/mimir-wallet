@@ -14,7 +14,7 @@ const MobileCreateMultisig = lazy(() => import('./mobile'));
 function CreateMultisigFallback() {
   return (
     <div className='flex h-screen items-center justify-center'>
-      <Spinner variant='wave' />
+      <Spinner variant='ellipsis' />
     </div>
   );
 }

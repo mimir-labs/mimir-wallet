@@ -30,7 +30,6 @@ function SupportedChains({ app }: { app: DappOption }) {
       <AvatarGroup max={3} renderCount={(count) => <p className='text-foreground/50 !ms-1 text-xs'>+{count}</p>}>
         {supportedNetworks.map((network: Endpoint, index: number) => (
           <Avatar
-            classNames={{ base: 'data-[hover=true]:translate-none' }}
             style={{ width: 20, height: 20, backgroundColor: 'transparent', marginInlineStart: index ? -4 : 0 }}
             key={network.key}
             src={network.icon}

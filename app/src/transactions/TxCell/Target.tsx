@@ -37,7 +37,7 @@ function CallInfo({ isMobile = false, address, call }: { isMobile?: boolean; add
       data-mobile={isMobile}
       className={cn(
         'flex w-full flex-col items-start justify-start gap-[5px]',
-        'data-[mobile=true]:bg-background data-[mobile=true]:shadow-medium data-[mobile=true]:rounded-[20px] data-[mobile=true]:p-[15px]'
+        'data-[mobile=true]:bg-background data-[mobile=true]:rounded-[20px] data-[mobile=true]:p-[15px] data-[mobile=true]:shadow-md'
       )}
     >
       <div className='flex w-full shrink-0 flex-row items-center justify-start gap-2.5'>
@@ -88,7 +88,7 @@ function Target({ isMobile = false, call, address }: { isMobile?: boolean; addre
   const Wrapper = isMobile ? 'div' : React.Fragment;
 
   const callElement = targetCall ? (
-    <Wrapper className='bg-background shadow-medium rounded-[20px] p-[15px]'>
+    <Wrapper className='bg-background rounded-[20px] p-[15px] shadow-md'>
       <CallComp ref={ref} from={from} registry={targetCall.registry} call={targetCall} />
     </Wrapper>
   ) : null;

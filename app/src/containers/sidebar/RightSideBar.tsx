@@ -3,7 +3,7 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { Sidebar, SidebarContent, SidebarHeader, Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
+import { Sidebar, SidebarContent, SidebarHeader, Tabs, Tooltip } from '@mimir-wallet/ui';
 import { useCallback, useEffect } from 'react';
 
 import { layoutHelpers } from '../constants';
@@ -83,62 +83,56 @@ function RightSideBar() {
       className='top-(--header-height) h-[calc(100svh-var(--header-height))]!'
       sideBarWidth={sidebarWidth}
     >
-      <SidebarHeader className='mb-3 px-4'>
+      <SidebarHeader className='border-b-divider mb-3 border-b px-4 pb-[5px]'>
         <Tabs
-          color='primary'
           variant='underlined'
-          classNames={{
-            base: 'border-b-1 border-b-divider-300',
-            tabList: 'rounded-none p-0',
-            panel: 'hidden',
-            cursor: 'w-full'
-          }}
+          tabs={[
+            {
+              key: 'batch',
+              label: (
+                <span className='flex items-center gap-1'>
+                  Batch
+                  <Tooltip
+                    classNames={{ content: 'max-w-[300px]' }}
+                    content={'Send multiple actions within a single transaction.'}
+                  >
+                    <IconQuestion className='text-foreground/50' />
+                  </Tooltip>
+                </span>
+              )
+            },
+            {
+              key: 'template',
+              label: (
+                <span className='flex items-center gap-1'>
+                  Template
+                  <Tooltip
+                    classNames={{ content: 'max-w-[300px]' }}
+                    content={'Save frequent transactions as templates for future use.'}
+                  >
+                    <IconQuestion className='text-foreground/50' />
+                  </Tooltip>
+                </span>
+              )
+            },
+            {
+              key: 'decoder',
+              label: (
+                <span className='flex items-center gap-1'>
+                  Decoder
+                  <Tooltip
+                    classNames={{ content: 'max-w-[300px]' }}
+                    content={'Decode call data to show raw information.'}
+                  >
+                    <IconQuestion className='text-foreground/50' />
+                  </Tooltip>
+                </span>
+              )
+            }
+          ]}
           selectedKey={rightSidebarState.tab}
-          onSelectionChange={(key) => setRightSidebarTab(key.toString() as any)}
-        >
-          <Tab
-            key='batch'
-            title={
-              <span className='flex items-center gap-1'>
-                Batch
-                <Tooltip
-                  classNames={{ content: 'max-w-[300px]' }}
-                  content={'Send multiple actions within a single transaction.'}
-                >
-                  <IconQuestion className='text-foreground/50' />
-                </Tooltip>
-              </span>
-            }
-          />
-          <Tab
-            key='template'
-            title={
-              <span className='flex items-center gap-1'>
-                Template
-                <Tooltip
-                  classNames={{ content: 'max-w-[300px]' }}
-                  content={'Save frequent transactions as templates for future use.'}
-                >
-                  <IconQuestion className='text-foreground/50' />
-                </Tooltip>
-              </span>
-            }
-          />
-          <Tab
-            key='decoder'
-            title={
-              <span className='flex items-center gap-1'>
-                Decoder
-                <Tooltip
-                  classNames={{ content: 'max-w-[300px]' }}
-                  content={'Decode call data to show raw information.'}
-                >
-                  <IconQuestion className='text-foreground/50' />
-                </Tooltip>
-              </span>
-            }
-          />
-        </Tabs>
+          onSelectionChange={(key) => setRightSidebarTab(key as any)}
+        />
       </SidebarHeader>
 
       <SidebarContent className='px-4 pb-4'>

@@ -20,7 +20,7 @@ function CustomApps() {
       <div className={isMobile ? 'flex flex-col gap-4' : 'grid grid-cols-[repeat(auto-fill,minmax(258px,1fr))] gap-6'}>
         <div
           key='add-custom-app'
-          className='bg-content1 border-secondary shadow-medium relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-5 rounded-[20px] border-1 p-5'
+          className='bg-background border-secondary relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-5 rounded-[20px] border-1 p-5 shadow-md'
           onClick={toggleOpen}
         >
           <Button className='h-16 w-16' variant='light' isIconOnly size='lg' radius='full' onClick={toggleOpen}>

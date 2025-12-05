@@ -1,6 +1,8 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TabItem } from '@mimir-wallet/ui';
+
 import { useChains } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
@@ -13,7 +15,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   Spinner,
-  Tab,
   Tabs,
   Tooltip
 } from '@mimir-wallet/ui';
@@ -39,7 +40,7 @@ const AllHistoryTransactions = lazy(() => import('./AllHistoryTransactions'));
 function TransactionListFallback() {
   return (
     <div className='flex h-64 items-center justify-center'>
-      <Spinner variant='wave' />
+      <Spinner variant='ellipsis' />
     </div>
   );
 }
@@ -163,8 +164,13 @@ function Content({ address }: { address: string }) {
       <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
         <div className='w-full sm:flex-1'>
           <Tabs
-            color='primary'
-            aria-label='Transaction'
+            tabs={
+              [
+                { key: 'pending', label: 'Pending' },
+                { key: 'history', label: 'History' },
+                showAllHistoryTab ? { key: 'all-history', label: 'All History' } : null
+              ].filter(Boolean) as TabItem[]
+            }
             selectedKey={status}
             onSelectionChange={(key) => {
               const viewType = key.toString();
@@ -173,19 +179,16 @@ function Content({ address }: { address: string }) {
               // Track transactions view
               analyticsActions.transactionsView(viewType as 'pending' | 'history');
             }}
-          >
-            <Tab key='pending' title='Pending' />
-            <Tab key='history' title='History' />
-            {showAllHistoryTab && <Tab key='all-history' title='All History' />}
-          </Tabs>
+          />
         </div>
 
         <div className='flex items-center justify-between gap-2'>
           {status === 'pending' && (
             <span className='inline-flex items-center gap-2'>
-              <Checkbox size='sm' isSelected={showDiscarded} onValueChange={setShowDiscarded}>
+              <label className='inline-flex cursor-pointer items-center gap-2'>
+                <Checkbox checked={showDiscarded} onCheckedChange={(checked) => setShowDiscarded(!!checked)} />
                 <span className='flex items-center gap-1'>Discarded Transactions({discardedCounts})</span>
-              </Checkbox>
+              </label>
               <Tooltip
                 content={
                   <div>
@@ -210,7 +213,7 @@ function Content({ address }: { address: string }) {
                   <Button
                     radius='md'
                     variant='bordered'
-                    className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                    className='border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
                   >
                     <Avatar src={selectedPendingNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
                     {selectedPendingNetworks.length > 1 ? (
@@ -255,7 +258,7 @@ function Content({ address }: { address: string }) {
               <Button
                 radius='md'
                 variant='bordered'
-                className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                className='border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
               >
                 <Avatar src={validPendingNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
                 {validPendingNetworks[0].chain.name}({validPendingNetworks[0].counts})
@@ -269,7 +272,7 @@ function Content({ address }: { address: string }) {
                   <Button
                     radius='md'
                     variant='bordered'
-                    className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                    className='border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
                   >
                     <Avatar src={selectedHistoryNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
                     {selectedHistoryNetwork?.chain.name}({selectedHistoryNetwork?.counts})
@@ -299,7 +302,7 @@ function Content({ address }: { address: string }) {
               <Button
                 radius='md'
                 variant='bordered'
-                className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                className='border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
               >
                 <Avatar src={validHistoryNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
                 {validHistoryNetworks[0].chain.name}({validHistoryNetworks[0].counts})
@@ -314,7 +317,7 @@ function Content({ address }: { address: string }) {
                   <Button
                     radius='md'
                     variant='bordered'
-                    className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                    className='border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
                   >
                     <Avatar
                       src={subscanChains.find((c) => c.network === selectedAllHistoryNetwork)?.chain.icon}
@@ -347,7 +350,7 @@ function Content({ address }: { address: string }) {
               <Button
                 radius='md'
                 variant='bordered'
-                className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                className='border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
               >
                 <Avatar src={subscanChains[0].chain.icon} className='h-4 w-4 bg-transparent' />
                 {subscanChains[0].chain.name}

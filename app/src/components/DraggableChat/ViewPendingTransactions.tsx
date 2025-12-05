@@ -71,7 +71,7 @@ function TransactionItem({ transaction, address }: { transaction: Transaction; a
   };
 
   return (
-    <div className='border-divider-300 flex items-center gap-2.5 rounded-[10px] border p-2.5'>
+    <div className='border-divider flex items-center gap-2.5 rounded-[10px] border p-2.5'>
       <NetworkIcon network={transaction.network} />
 
       <div className='min-w-0 flex-1 gap-[5px]'>

@@ -189,7 +189,7 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
         </div>
       </PopoverTrigger>
       <PopoverContent
-        className={cn('border-divider-300 w-(--radix-popover-trigger-width) border-1 p-[5px]', contentClassName)}
+        className={cn('border-divider w-(--radix-popover-trigger-width) border-1 p-[5px]', contentClassName)}
         align='start'
         onOpenAutoFocus={(e) => e.preventDefault()}
       >

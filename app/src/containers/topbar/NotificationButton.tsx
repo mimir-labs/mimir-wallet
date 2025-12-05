@@ -4,7 +4,7 @@
 import { getChainIcon } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
-  Badge,
+  BadgeIndicator,
   Button,
   cn,
   Popover,
@@ -240,28 +240,22 @@ function NotificationButton() {
                 radius='md'
                 onClick={toggleOpen}
               >
-                <IconNotification className={shouldShake ? 'origin-top animate-[swing_1s_ease-in-out]' : ''} />
-                <Badge
-                  size='sm'
-                  isOneChar
+                <BadgeIndicator
                   isInvisible={!unreadCount}
-                  shape='circle'
                   color='danger'
-                  classNames={{
-                    base: 'flex-[0_0_auto]',
-                    badge:
-                      'w-1.5 h-1.5 min-w-1.5 min-h-1.5 border-0 translate-x-0.5 -translate-y-2 sm:translate-x-0.5 sm:-translate-y-2.5 pointer-events-none'
-                  }}
+                  isDot
+                  placement='top-right'
+                  badgeClassName='size-1.5 min-w-1.5 min-h-1.5'
                 >
-                  {' '}
-                </Badge>
+                  <IconNotification className={shouldShake ? 'origin-top animate-[swing_1s_ease-in-out]' : ''} />
+                </BadgeIndicator>
               </Button>
             </Tooltip>
           </div>
         </PopoverTrigger>
         <PopoverContent
           className={cn(
-            'shadow-medium w-[360px] max-w-full rounded-[20px] p-4 px-2 sm:p-5 sm:px-3',
+            'w-[360px] max-w-full rounded-[20px] p-4 px-2 shadow-md sm:p-5 sm:px-3',
             'border-primary/5 border border-solid'
           )}
           sideOffset={8}

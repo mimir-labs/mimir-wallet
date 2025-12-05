@@ -80,7 +80,7 @@ function SimpleTxCell({ transaction, network }: Props) {
 
       {/* Time (Hidden on small) */}
       <div className='col-span-2 hidden md:flex'>
-        <div className='text-small text-foreground/70'>
+        <div className='text-foreground/70 text-sm'>
           <TimeCell timestamp={transaction.block_timestamp} />
         </div>
       </div>

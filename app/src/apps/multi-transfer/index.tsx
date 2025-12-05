@@ -105,7 +105,7 @@ function MultiTransfer() {
         <Button onClick={() => window.history.back()} variant='ghost'>
           {'<'} Back
         </Button>
-        <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-4 sm:p-5'>
+        <div className='border-secondary bg-background mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
           <div className='flex flex-col gap-5'>
             <div className='flex items-center justify-between'>
               <h3>Multi Transfer</h3>

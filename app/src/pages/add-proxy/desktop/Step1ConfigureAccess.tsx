@@ -113,8 +113,8 @@ function Step1ConfigureAccess({
           </span>
         </div>
         <Switch
-          isSelected={isPureProxy}
-          onValueChange={(checked) => {
+          checked={isPureProxy}
+          onCheckedChange={(checked) => {
             onDataChange({
               isPureProxy: checked,
               proxied: checked ? current : proxied

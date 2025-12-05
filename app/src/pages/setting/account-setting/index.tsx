@@ -109,7 +109,7 @@ function AccountSetting() {
     <div className='mx-auto my-0 w-[500px] max-w-full space-y-5'>
       <div ref={nameRef} id='name'>
         <h6 className='text-foreground/50 mb-2.5 text-sm'>Name</h6>
-        <div className='border-secondary bg-content1 shadow-medium space-y-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
+        <div className='border-secondary bg-background space-y-2.5 rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
           <Input
             label='Name'
             onChange={handleNameChange}
@@ -137,7 +137,7 @@ function AccountSetting() {
               Multisig Information
             </Label>
           </h6>
-          <div className='bg-content1 border-secondary shadow-medium space-y-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
+          <div className='bg-background border-secondary space-y-2.5 rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
             <MemberSet account={account} disabled />
           </div>
         </div>
@@ -152,7 +152,7 @@ function AccountSetting() {
           <h6 className='text-foreground/50 mb-2.5 inline-flex items-center gap-1 text-sm'>
             <Label tooltip='The following accounts will be granted control over this account.'>Proxy Information</Label>
           </h6>
-          <div className='border-secondary bg-content1 shadow-medium rounded-[20px] border-1 p-5'>
+          <div className='border-secondary bg-background rounded-[20px] border-1 p-5 shadow-md'>
             <ProxySet address={address} />
           </div>
         </div>
@@ -165,7 +165,7 @@ function AccountSetting() {
               Proposer
             </Label>
           </h6>
-          <div className='border-secondary bg-content1 shadow-medium space-y-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
+          <div className='border-secondary bg-background space-y-2.5 rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
             <ProposerSet account={account} refetch={refetch} />
           </div>
         </div>

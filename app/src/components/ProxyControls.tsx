@@ -105,7 +105,7 @@ function ProxyControls({ proxyType, className = '', tiny = false, variant, onSwi
         style={{
           fontSize: '10px'
         }}
-        className='border-primary bg-content1 text-primary relative z-10 flex h-[17px] items-center justify-center rounded-r-full border-1 border-l-0 px-2.5 uppercase'
+        className='border-primary bg-background text-primary relative z-10 flex h-[17px] items-center justify-center rounded-r-full border-1 border-l-0 px-2.5 uppercase'
       >
         <svg
           xmlns='http://www.w3.org/2000/svg'

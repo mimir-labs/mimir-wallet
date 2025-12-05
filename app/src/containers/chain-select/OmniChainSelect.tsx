@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { type Network, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
-import { Badge, Button, Popover, PopoverContent, PopoverTrigger, Switch, Tooltip } from '@mimir-wallet/ui';
+import { BadgeIndicator, Button, Popover, PopoverContent, PopoverTrigger, Switch, Tooltip } from '@mimir-wallet/ui';
 import { Link } from '@tanstack/react-router';
 import React, { useCallback, useMemo, useState } from 'react';
 
@@ -17,15 +17,15 @@ const Status = React.memo(function Status({ network }: { network: Network }) {
 
   return (
     <Tooltip content={isApiReady ? 'Connected' : apiError ? apiError || 'Connect Failed' : 'Connecting...'}>
-      <Badge
-        hidden={!network.enabled && !isApiReady}
+      <BadgeIndicator
+        isInvisible={!network.enabled && !isApiReady}
         color={isApiReady && isApiConnected ? 'success' : apiError ? 'danger' : 'warning'}
-        content=''
-        shape='circle'
-        size='sm'
+        isDot
+        placement='top-right'
+        badgeClassName='top-1 right-1 border-2 border-white w-3 h-3'
       >
         <img src={network.icon} className='h-8 w-8 rounded-full bg-transparent' />
-      </Badge>
+      </BadgeIndicator>
     </Tooltip>
   );
 });
@@ -56,9 +56,8 @@ const GroupedEndpoints = React.memo(function GroupedEndpoints({
         {group}
 
         <Switch
-          size='sm'
-          isSelected={isAllEnabled}
-          onValueChange={(state) => {
+          checked={isAllEnabled}
+          onCheckedChange={(state) => {
             if (state) {
               enableNetworks(endpoints.filter((item) => !item.enabled).map((item) => item.key));
             } else {
@@ -78,7 +77,7 @@ const GroupedEndpoints = React.memo(function GroupedEndpoints({
               radius='sm'
               color='secondary'
               size='lg'
-              className='text-foreground bg-divider-300/30 data-[completed-migration=true]:text-foreground/30 data-[completed-migration=true]:hover:bg-divider-300/30 h-[52px] justify-start rounded-[10px] p-2.5 text-left font-bold shadow-none'
+              className='text-foreground bg-divider/30 data-[completed-migration=true]:text-foreground/30 data-[completed-migration=true]:hover:bg-divider/30 h-[52px] justify-start rounded-[10px] p-2.5 text-left font-bold shadow-none'
               style={{
                 background: !endpoint.isRelayChain ? 'var(--color-main-bg)' : undefined
               }}
@@ -106,9 +105,8 @@ const GroupedEndpoints = React.memo(function GroupedEndpoints({
                 )}
 
                 <Switch
-                  size='sm'
-                  isSelected={endpoint.enabled}
-                  onValueChange={(state) => {
+                  checked={endpoint.enabled}
+                  onCheckedChange={(state) => {
                     if (state) {
                       enableNetworks([endpoint.key]);
                     } else {
@@ -176,7 +174,7 @@ function OmniChainSelect() {
               <img className='h-5 w-5 bg-transparent select-none' src={enabledNetworks[0].icon} />
               <img className='-ml-2.5 h-5 w-5 bg-transparent select-none' src={enabledNetworks[1].icon} />
               <img className='-ml-2.5 h-5 w-5 bg-transparent select-none' src={enabledNetworks[2].icon} />
-              <div className='bg-primary border-divider-300 -ml-2.5 flex h-5 w-5 items-center justify-center rounded-full border-1 select-none'>
+              <div className='bg-primary border-divider -ml-2.5 flex h-5 w-5 items-center justify-center rounded-full border-1 select-none'>
                 <svg xmlns='http://www.w3.org/2000/svg' width='11' height='2' viewBox='0 0 11 2' fill='none'>
                   <path
                     fillRule='evenodd'

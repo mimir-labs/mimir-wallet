@@ -70,13 +70,13 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
       const chainInfo = this.props.chainInfo;
 
       return (
-        <div className='bg-content1 border-divider-300 shadow-small relative w-full max-w-4xl overflow-hidden rounded-[20px] border'>
+        <div className='bg-background border-divider relative w-full max-w-4xl overflow-hidden rounded-[20px] border shadow-md'>
           {/* Abstract graphic design element */}
           <div className='bg-danger-500/10 absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl'></div>
           <div className='bg-danger-500/10 absolute bottom-0 left-0 h-48 w-48 -translate-x-1/3 translate-y-1/3 rounded-full blur-3xl'></div>
 
           {/* Header */}
-          <div className='border-divider-300 relative border-b p-4 pb-6'>
+          <div className='border-divider relative border-b p-4 pb-6'>
             <h2 className='text-foreground text-2xl font-bold'>Transaction Submission Error</h2>
             <p className='text-foreground/80 mt-2'>
               The transaction submission encountered an unexpected error ({errorName})
@@ -96,7 +96,7 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
 
               {/* Chain Information */}
               {chainInfo && (
-                <Card className='border-divider-300'>
+                <Card className='border-divider'>
                   <div className='p-4'>
                     <h3 className='text-foreground mb-3 text-lg font-semibold'>Chain Information</h3>
                     <div className='space-y-3 text-sm'>
@@ -141,7 +141,7 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
 
               {/* Runtime Metadata */}
               {chainInfo?.metadata && (
-                <details className='group border-divider-300 overflow-hidden rounded-lg border'>
+                <details className='group border-divider overflow-hidden rounded-lg border'>
                   <summary className='bg-content2 hover:bg-content3 flex cursor-pointer items-center px-4 py-3'>
                     <h3 className='text-foreground text-sm font-medium'>Runtime Metadata</h3>
                     <div className='ml-auto flex items-center gap-2'>
@@ -149,7 +149,7 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
                       <ArrowDown className='text-foreground transform transition-transform group-open:rotate-180' />
                     </div>
                   </summary>
-                  <div className='bg-content1 rounded-b-lg'>
+                  <div className='bg-background rounded-b-lg'>
                     <pre className='text-foreground max-h-64 overflow-x-auto overflow-y-auto p-4 font-mono text-xs break-all'>
                       {chainInfo.metadata}
                     </pre>
@@ -158,7 +158,7 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
               )}
 
               {/* Error Stack */}
-              <details className='group border-divider-300 overflow-hidden rounded-lg border' open>
+              <details className='group border-divider overflow-hidden rounded-lg border' open>
                 <summary className='bg-danger-50 flex cursor-pointer items-center px-4 py-3'>
                   <div className='bg-danger-500 mr-2 h-1.5 w-1.5 rounded-full'></div>
                   <h3 className='text-danger-700 text-sm font-medium'>Stack Trace</h3>
@@ -166,7 +166,7 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
                     <ArrowDown className='text-danger transform transition-transform group-open:rotate-180' />
                   </div>
                 </summary>
-                <div className='bg-content1 rounded-b-lg'>
+                <div className='bg-background rounded-b-lg'>
                   <pre className='text-danger max-h-64 overflow-x-auto overflow-y-auto p-4 font-mono text-xs break-words whitespace-pre-wrap'>
                     {errorStack || 'Stack trace not available'}
                   </pre>
@@ -175,7 +175,7 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
 
               {/* Component Stack Trace */}
               {componentStack && (
-                <details className='group border-divider-300 overflow-hidden rounded-lg border'>
+                <details className='group border-divider overflow-hidden rounded-lg border'>
                   <summary className='bg-danger-50 flex cursor-pointer items-center px-4 py-3'>
                     <div className='bg-danger-500 mr-2 h-1.5 w-1.5 rounded-full'></div>
                     <h3 className='text-danger-700 text-sm font-medium'>Component Stack Trace</h3>
@@ -183,7 +183,7 @@ class TxSubmitErrorBoundary extends Component<TxSubmitErrorBoundaryProps, TxSubm
                       <ArrowDown className='text-danger transform transition-transform group-open:rotate-180' />
                     </div>
                   </summary>
-                  <div className='bg-content1 rounded-b-lg'>
+                  <div className='bg-background rounded-b-lg'>
                     <pre className='text-danger max-h-64 overflow-x-auto overflow-y-auto p-4 font-mono text-xs break-words whitespace-pre-wrap'>
                       {componentStack}
                     </pre>

@@ -118,7 +118,7 @@ function PendingTransactions({ address }: { address: string }) {
 
   if (showSkeleton) {
     return (
-      <div className='bg-content1 shadow-medium flex h-[260px] flex-col gap-5 rounded-[20px] p-5'>
+      <div className='bg-background flex h-[260px] flex-col gap-5 rounded-[20px] p-5 shadow-md'>
         <Skeleton className='h-[45px] w-full rounded-lg' />
         <Skeleton className='h-[45px] w-full rounded-lg' />
         <Skeleton className='h-[45px] w-full rounded-lg' />
@@ -129,7 +129,7 @@ function PendingTransactions({ address }: { address: string }) {
 
   if (!transactions.length) {
     return (
-      <div className='bg-content1 shadow-medium flex h-[260px] flex-col items-center justify-center gap-5 rounded-[20px] p-5'>
+      <div className='bg-background flex h-[260px] flex-col items-center justify-center gap-5 rounded-[20px] p-5 shadow-md'>
         <Empty variant='pending-transaction' height='200px' />
       </div>
     );
@@ -137,82 +137,74 @@ function PendingTransactions({ address }: { address: string }) {
 
   return (
     <Table
-      isHeaderSticky
-      classNames={{
-        base: 'py-0 group',
-        wrapper:
-          'rounded-[20px] p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1 shadow-medium',
-        thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
-        th: 'bg-transparent text-xs h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
-        td: 'text-sm px-2',
-        loadingWrapper: 'relative h-10 table-cell px-2'
-      }}
+      stickyHeader
+      containerClassName='border-secondary bg-background shadow-md rounded-[20px] border'
+      scrollClassName='h-auto sm:h-[260px] px-2 sm:px-3'
     >
       <TableHeader>
-        <TableColumn className='w-[140px]' key='id'>
-          Transaction ID
-        </TableColumn>
-        <TableColumn className='w-[240px]' key='call'>
-          Call
-        </TableColumn>
-        <TableColumn className='w-[180px]' align='end' key='status'>
-          Status
-        </TableColumn>
+        <TableRow className='border-0'>
+          <TableColumn className='w-[140px] pt-5 pb-2' key='id'>
+            Transaction ID
+          </TableColumn>
+          <TableColumn className='w-[240px] pt-5 pb-2' key='call'>
+            Call
+          </TableColumn>
+          <TableColumn className='w-[180px] pt-5 pb-2 text-right' key='status'>
+            Status
+          </TableColumn>
+        </TableRow>
       </TableHeader>
-
-      <TableBody items={transactions}>
-        {(item) => {
-          return (
-            <TableRow
-              key={item.id}
-              className='[&:hover>td]:bg-secondary border-secondary [&>td]:last:rounded-r-medium cursor-pointer border-b-1 [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px]'
-              onClick={() => {
-                navigate({
-                  to: `/transactions/$id`,
-                  params: {
-                    id: item.id.toString()
-                  },
-                  search: {
-                    network: item.network,
-                    address: address
-                  }
-                });
-              }}
-            >
-              <TableCell>
-                <div className='flex min-w-max items-center gap-[5px] text-nowrap'>
-                  <AppName
-                    website={item.website}
-                    iconSize={16}
-                    hiddenName
-                    iconUrl={item.iconUrl}
-                    appName={item.appName}
-                  />
-                  {item.type === TransactionType.Propose ? (
-                    <p>Propose {item.id}</p>
-                  ) : (
-                    <p>No {formatTransactionId(item.id)}</p>
-                  )}
+      <TableBody>
+        {transactions.map((item) => (
+          <TableRow
+            key={item.id}
+            className='[&:hover>td]:bg-secondary cursor-pointer [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]'
+            onClick={() => {
+              navigate({
+                to: `/transactions/$id`,
+                params: {
+                  id: item.id.toString()
+                },
+                search: {
+                  network: item.network,
+                  address: address
+                }
+              });
+            }}
+          >
+            <TableCell>
+              <div className='flex min-w-max items-center gap-[5px] text-nowrap'>
+                <AppName
+                  website={item.website}
+                  iconSize={16}
+                  hiddenName
+                  iconUrl={item.iconUrl}
+                  appName={item.appName}
+                />
+                {item.type === TransactionType.Propose ? (
+                  <p>Propose {item.id}</p>
+                ) : (
+                  <p>No {formatTransactionId(item.id)}</p>
+                )}
+              </div>
+            </TableCell>
+            <TableCell>
+              <NetworkWrapper network={item.network}>
+                <CallDetail value={item.call} />
+              </NetworkWrapper>
+            </TableCell>
+            <TableCell className='text-right'>
+              <NetworkWrapper network={item.network}>
+                <span className='status'>
+                  <Status address={address} transaction={item} />
+                </span>
+                <div className='operation hidden flex-row-reverse items-center gap-[5px]'>
+                  <Operation address={address} transaction={item} />
                 </div>
-              </TableCell>
-              <TableCell>
-                <NetworkWrapper network={item.network}>
-                  <CallDetail value={item.call} />
-                </NetworkWrapper>
-              </TableCell>
-              <TableCell className='w-[180px]'>
-                <NetworkWrapper network={item.network}>
-                  <span className='status'>
-                    <Status address={address} transaction={item} />
-                  </span>
-                  <div className='operation hidden flex-row-reverse items-center gap-[5px]'>
-                    <Operation address={address} transaction={item} />
-                  </div>
-                </NetworkWrapper>
-              </TableCell>
-            </TableRow>
-          );
-        }}
+              </NetworkWrapper>
+            </TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );

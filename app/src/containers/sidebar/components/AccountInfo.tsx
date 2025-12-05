@@ -58,6 +58,7 @@ function AccountInfoComponent({ address, onAccountOpen }: AccountInfoProps) {
       </div>
 
       <Divider className='mx-2.5 w-auto' />
+      <Divider className='mx-2.5 w-auto' />
 
       {/* Balance display */}
       <p className='text-foreground/65 p-2.5 text-xs'>

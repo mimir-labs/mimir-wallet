@@ -132,7 +132,7 @@ function DappCell({
       </div>
     ) : size === 'sm' ? (
       <div
-        className='bg-content1 border-secondary hover:bg-secondary transition-background shadow-medium relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] rounded-[20px] border-1 p-5'
+        className='bg-background border-secondary hover:bg-secondary transition-background relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] rounded-[20px] border-1 p-5 shadow-md'
         onClick={(e) => {
           e.stopPropagation();
           handleOpenDapp();
@@ -169,7 +169,7 @@ function DappCell({
     ) : (
       <div
         data-focus={isFocus}
-        className='bg-content1 border-secondary shadow-medium relative aspect-square cursor-pointer rounded-[20px] border-1 p-5 transition-transform duration-300 data-[focus=true]:scale-x-[-1]'
+        className='bg-background border-secondary relative aspect-square cursor-pointer rounded-[20px] border-1 p-5 shadow-md transition-transform duration-300 data-[focus=true]:scale-x-[-1]'
         onClick={(e) => {
           e.stopPropagation();
 

@@ -243,12 +243,12 @@ function CreateFlexible({
           {'<'} Back
         </Button>
 
-        <div className='bg-content1 border-secondary shadow-medium rounded-[20px] border-1 p-4 sm:p-5'>
+        <div className='bg-background border-secondary rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
           <div className='space-y-4'>
             <h2>Add Pure Proxy</h2>
             <p>Please complete both steps to avoid unnecessary asset loss.</p>
             <Divider />
-            <div className='bg-secondary shadow-small flex items-center gap-2 rounded-[20px] p-2.5'>
+            <div className='bg-secondary flex items-center gap-2 rounded-[20px] p-2.5 shadow-md'>
               <ItemStep step={1}>
                 <div className='flex items-center justify-between gap-2'>
                   {pure ? (
@@ -269,7 +269,7 @@ function CreateFlexible({
               </ItemStep>
             </div>
 
-            <div className='bg-secondary shadow-small space-y-2.5 rounded-[20px] p-2.5'>
+            <div className='bg-secondary space-y-2.5 rounded-[20px] p-2.5 shadow-md'>
               <div className='flex items-center gap-2'>
                 <ItemStep disabled={!pure} step={2}>
                   <b>

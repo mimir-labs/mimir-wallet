@@ -58,10 +58,9 @@ function WebPushNotificationSetting({ address }: WebPushNotificationSettingProps
         <div className='flex items-center justify-between'>
           <b>Push Notification</b>
           <Switch
-            size='sm'
-            isSelected={isNotificationEnabled}
-            onValueChange={handleToggleNotifications}
-            isDisabled={webPush.subscription.isSubscribing || webPush.subscription.isUnsubscribing}
+            checked={isNotificationEnabled}
+            onCheckedChange={handleToggleNotifications}
+            disabled={webPush.subscription.isSubscribing || webPush.subscription.isUnsubscribing}
           />
         </div>
 

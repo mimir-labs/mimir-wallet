@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Spinner, Tab, Tabs } from '@mimir-wallet/ui';
+import { Spinner, Tabs } from '@mimir-wallet/ui';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { lazy, Suspense, useTransition } from 'react';
 
@@ -13,7 +13,7 @@ const GeneralSetting = lazy(() => import('./general-setting'));
 function SettingFallback() {
   return (
     <div className='flex h-64 items-center justify-center'>
-      <Spinner variant='wave' />
+      <Spinner variant='ellipsis' />
     </div>
   );
 }
@@ -28,8 +28,8 @@ function Setting() {
   // Use React 19 useTransition for non-blocking tab switches
   const [, startTransition] = useTransition();
 
-  const handleTypeChange = (key: string | number) => {
-    const newType = key.toString() as 'account' | 'general';
+  const handleTypeChange = (key: string) => {
+    const newType = key as 'account' | 'general';
 
     // Wrap tab navigation in transition for smooth switching
     startTransition(() => {
@@ -42,18 +42,25 @@ function Setting() {
 
   return (
     <div className='mx-auto flex w-[500px] max-w-full flex-col items-stretch gap-5'>
-      <Tabs color='primary' aria-label='Setting' selectedKey={type as string} onSelectionChange={handleTypeChange}>
-        <Tab key='account' title='Wallet Setting'>
-          <Suspense fallback={<SettingFallback />}>
-            <AccountSetting />
-          </Suspense>
-        </Tab>
-        <Tab key='general' title='General Setting'>
-          <Suspense fallback={<SettingFallback />}>
-            <GeneralSetting />
-          </Suspense>
-        </Tab>
-      </Tabs>
+      <Tabs
+        tabs={[
+          { key: 'account', label: 'Wallet Setting' },
+          { key: 'general', label: 'General Setting' }
+        ]}
+        selectedKey={type as string}
+        onSelectionChange={handleTypeChange}
+      />
+
+      {type === 'account' && (
+        <Suspense fallback={<SettingFallback />}>
+          <AccountSetting />
+        </Suspense>
+      )}
+      {type === 'general' && (
+        <Suspense fallback={<SettingFallback />}>
+          <GeneralSetting />
+        </Suspense>
+      )}
 
       <div className='h-5' />
     </div>

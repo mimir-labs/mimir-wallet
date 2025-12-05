@@ -24,7 +24,7 @@ export type ToolState =
 export type ToolProps = ComponentProps<'div'>;
 
 export const Tool = ({ className, ...props }: ToolProps) => (
-  <div className={cn('not-prose border-divider-300 mb-4 w-full rounded-[10px] border', className)} {...props} />
+  <div className={cn('not-prose border-divider mb-4 w-full rounded-[10px] border', className)} {...props} />
 );
 
 export type ToolHeaderProps = ComponentProps<'div'> & {
@@ -72,7 +72,7 @@ export const ToolHeader = ({ className, title, type, state, onRetry, ...divProps
     <div
       data-retry={!!onRetry}
       className={cn(
-        'data-[retry=true]:hover:border-primary not-prose border-divider-300 mb-4 flex w-full items-center justify-between gap-4 rounded-[10px] border p-2 data-[retry=true]:cursor-pointer',
+        'data-[retry=true]:hover:border-primary not-prose border-divider mb-4 flex w-full items-center justify-between gap-4 rounded-[10px] border p-2 data-[retry=true]:cursor-pointer',
         className
       )}
       onClick={onRetry}

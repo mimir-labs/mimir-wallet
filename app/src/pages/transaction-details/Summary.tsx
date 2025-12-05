@@ -14,7 +14,7 @@ import { formatTransactionId, Status } from '@/transactions';
 
 function Summary({ transaction }: { transaction: Transaction }) {
   return (
-    <div className='bg-content1 border-secondary shadow-medium space-y-2.5 rounded-[20px] border-1 p-4'>
+    <div className='bg-background border-secondary space-y-2.5 rounded-[20px] border-1 p-4 shadow-md'>
       <p>
         {transaction.status < TransactionStatus.Success
           ? moment(transaction.createdAt).format()

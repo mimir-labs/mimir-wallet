@@ -81,7 +81,7 @@ function Icon({
       }}
     >
       <img
-        className='animate-fade-out select-none'
+        className='animate-fade-out rounded-full select-none'
         src={migrationIcon}
         alt={migrationName}
         draggable={false}
@@ -92,7 +92,7 @@ function Icon({
         }}
       />
       <img
-        className='animate-fade-in animation absolute top-0 left-0 z-1 select-none'
+        className='animate-fade-in animation absolute top-0 left-0 z-1 rounded-full select-none'
         src={icon}
         alt={name}
         draggable={false}
@@ -108,6 +108,7 @@ function Icon({
       src={icon}
       alt={name}
       draggable={false}
+      className='rounded-full'
       style={{
         width: size,
         height: size,

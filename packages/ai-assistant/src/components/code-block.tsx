@@ -39,7 +39,7 @@ export const CodeBlock = ({
   <CodeBlockContext.Provider value={{ code }}>
     <div
       className={cn(
-        'bg-background text-foreground border-divider-300 relative w-full overflow-hidden rounded-[10px] border',
+        'bg-background text-foreground border-divider relative w-full overflow-hidden rounded-[10px] border',
         className
       )}
       {...props}
@@ -74,7 +74,7 @@ export const CodeBlock = ({
             margin: 0,
             padding: '1rem',
             fontSize: '0.875rem',
-            color: 'hsl(var(--foreground))'
+            color: 'var(--foreground)'
           }}
           language={language}
           lineNumberStyle={{

@@ -140,7 +140,7 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
           variant='ghost'
           color='primary'
           radius='full'
-          className='bg-content1 absolute top-2.5 left-2.5 z-10'
+          className='bg-background absolute top-2.5 left-2.5 z-10'
           onClick={fetchFullStructure}
         >
           {isFetching ? buttonSpinner : null}

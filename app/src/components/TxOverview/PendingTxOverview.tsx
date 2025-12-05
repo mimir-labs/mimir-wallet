@@ -102,16 +102,16 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
   const borderColor = transaction
     ? transaction.status < TransactionStatus.Success
       ? source
-        ? 'hsl(var(--heroui-primary-50))'
-        : 'hsl(var(--heroui-divider-300))'
+        ? 'var(--color-primary-100)'
+        : 'var(--border)'
       : transaction.status === TransactionStatus.Success
-        ? 'hsl(var(--heroui-success))'
+        ? 'var(--success)'
         : transaction.status === TransactionStatus.Cancelled
-          ? 'hsl(var(--heroui-danger))'
-          : 'hsl(var(--heroui-danger))'
+          ? 'var(--danger)'
+          : 'var(--danger)'
     : source
-      ? 'hsl(var(--heroui-primary-50))'
-      : 'hsl(var(--heroui-divider-300))';
+      ? 'var(--color-primary-100)'
+      : 'var(--border)';
 
   return (
     <>
@@ -120,17 +120,17 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
           isConnectable={isConnectable}
           position={Position.Left}
           style={{ zIndex: 1, top: 22, left: 0, width: 0, height: 0 }}
-          className='bg-divider-300'
+          className='bg-divider'
           type='source'
         />
       )}
       <div
-        className='bg-content1 rounded-[10px]'
+        className='bg-background rounded-[10px]'
         style={{
-          border: '1px solid hsl(var(--heroui-divider-300))',
+          border: '1px solid var(--border)',
           borderColor,
-          backgroundColor: source ? 'hsl(var(--heroui-secondary))' : undefined,
-          boxShadow: source ? 'var(--heroui-box-shadow-small)' : undefined
+          backgroundColor: source ? 'var(--secondary)' : undefined,
+          boxShadow: source ? 'var(--shadow-md)' : undefined
         }}
       >
         <div className='flex w-[220px] items-center justify-between p-2.5 px-2.5 py-[3px]'>
@@ -165,7 +165,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
           isConnectable={isConnectable}
           position={Position.Right}
           style={{ zIndex: 1, top: 22, right: 0, width: 0, height: 0 }}
-          className='bg-divider-300'
+          className='bg-divider'
           type='target'
         />
       )}

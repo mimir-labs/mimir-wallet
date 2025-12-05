@@ -163,7 +163,7 @@ function TxItems({
         </div>
 
         {withDetails && detailOpen && (
-          <div className='bg-content1 mt-3 flex flex-row gap-3 md:gap-4'>
+          <div className='bg-background mt-3 flex flex-row gap-3 md:gap-4'>
             <Extrinsic
               transaction={transaction}
               call={call}

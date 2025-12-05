@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { type Endpoint, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
-import { Avatar, Chip, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
+import { Avatar, Badge, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
 import { clsx } from 'clsx';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
@@ -57,11 +57,7 @@ function NetworkItem({
       <div className='flex-1'>{item.name}</div>
       <div className='flex items-center gap-2'>
         {endContent}
-        {isMigrationCompleted && (
-          <Chip color='secondary' size='sm'>
-            Migrated
-          </Chip>
-        )}
+        {isMigrationCompleted && <Badge variant='secondary'>Migrated</Badge>}
         {isConnecting && <Spinner size='sm' />}
       </div>
     </li>
@@ -152,7 +148,7 @@ function OmniChainInputNetwork({
           <div
             ref={wrapperRef}
             className={twMerge([
-              'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 relative inline-flex h-11 min-h-11 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
+              'group tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 relative inline-flex h-11 min-h-11 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
               radius === 'full'
                 ? 'rounded-full'
                 : radius === 'lg'
@@ -182,7 +178,7 @@ function OmniChainInputNetwork({
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent style={{ width: popoverWidth, minWidth: 200 }} className='border-divider-300 border-1 p-[5px]'>
+        <PopoverContent style={{ width: popoverWidth, minWidth: 200 }} className='border-divider border-1 p-[5px]'>
           {options.length > 0 ? (
             <div autoFocus className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
               <ul className={clsx('flex list-none flex-col')}>

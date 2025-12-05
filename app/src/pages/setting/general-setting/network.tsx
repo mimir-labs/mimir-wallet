@@ -123,7 +123,7 @@ function NetworkSetting() {
   const chain = networks.find((item) => item.key === network);
 
   return (
-    <div className='bg-content1 shadow-medium flex flex-col gap-5 rounded-[20px] p-5'>
+    <div className='bg-background flex flex-col gap-5 rounded-[20px] p-5 shadow-md'>
       <InputNetwork showAllNetworks label='Select Network' network={network} setNetwork={setNetwork} />
 
       {chain && <Content key={chain.key} chain={chain} />}

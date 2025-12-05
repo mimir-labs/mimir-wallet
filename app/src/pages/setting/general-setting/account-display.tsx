@@ -25,7 +25,7 @@ function AccountDisplay() {
   }, [accounts, hideAccountHex, walletAccounts]);
 
   return (
-    <div className='bg-content1 border-secondary shadow-medium flex flex-col gap-5 rounded-[20px] border-1 p-5'>
+    <div className='bg-background border-secondary flex flex-col gap-5 rounded-[20px] border-1 p-5 shadow-md'>
       {list.map((item) => {
         const isHide = hideAccountHex.includes(addressToHex(item.address));
 

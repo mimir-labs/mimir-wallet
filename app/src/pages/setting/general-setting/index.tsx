@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Tab, Tabs } from '@mimir-wallet/ui';
+import { Tabs } from '@mimir-wallet/ui';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
 
 import AccountDisplay from './account-display';
@@ -18,8 +18,8 @@ function GeneralSetting() {
   const search = routeApi.useSearch();
   const tabs = search.tabs || 'network';
 
-  const handleTabChange = (key: string | number) => {
-    const newTab = key.toString() as 'network' | 'account-display' | 'notification';
+  const handleTabChange = (key: string) => {
+    const newTab = key as 'network' | 'account-display' | 'notification';
 
     navigate({
       to: '.',
@@ -30,24 +30,26 @@ function GeneralSetting() {
   return (
     <div className='flex flex-col items-stretch gap-5'>
       <Tabs
-        color='primary'
-        aria-label='General Setting'
         variant='underlined'
+        tabs={
+          current
+            ? [
+                { key: 'network', label: 'Network' },
+                { key: 'account-display', label: 'Account Display' },
+                { key: 'notification', label: 'Notification' }
+              ]
+            : [
+                { key: 'network', label: 'Network' },
+                { key: 'account-display', label: 'Account Display' }
+              ]
+        }
         selectedKey={tabs}
         onSelectionChange={handleTabChange}
-      >
-        <Tab key='network' title='Network'>
-          <NetworkSetting />
-        </Tab>
-        <Tab key='account-display' title='Account Display'>
-          <AccountDisplay />
-        </Tab>
-        {current ? (
-          <Tab key='notification' title='Notification'>
-            <NotificationSetting address={current as `0x${string}`} />
-          </Tab>
-        ) : null}
-      </Tabs>
+      />
+
+      {tabs === 'network' && <NetworkSetting />}
+      {tabs === 'account-display' && <AccountDisplay />}
+      {tabs === 'notification' && current && <NotificationSetting address={current as `0x${string}`} />}
     </div>
   );
 }

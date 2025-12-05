@@ -106,7 +106,7 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           )}
 
           {findApp && (
-            <div className='border-secondary shadow-medium flex items-center gap-5 rounded-[10px] border-1 p-5'>
+            <div className='border-secondary flex items-center gap-5 rounded-[10px] border-1 p-5 shadow-md'>
               <Avatar src={findApp.icon} className='h-[50px] w-[50px] flex-shrink-0 bg-transparent' radius='none' />
               <div>
                 <div className='flex items-center gap-2'>

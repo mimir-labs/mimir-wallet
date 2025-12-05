@@ -126,7 +126,7 @@ function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSe
           {emailNotification.subscriptions.length > 0 && (
             <div className='flex flex-col gap-[5px]'>
               <b className='text-sm'>My Subscription</b>
-              <div className='border-divider-300 flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5'>
+              <div className='border-divider flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5'>
                 {emailNotification.subscriptions.map((subscription) => (
                   <div key={subscription.id} className='bg-secondary flex items-center gap-[5px] rounded-[5px] p-[5px]'>
                     <AddressRow iconSize={20} value={subscription.signer} />

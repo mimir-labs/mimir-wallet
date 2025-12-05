@@ -42,7 +42,7 @@ function Content({
       <div className='relative'>
         <div className='mx-auto my-0 flex h-[300px] w-[300px] items-center justify-center' ref={container} />
         <Avatar
-          className='bg-content1 absolute top-0 right-0 bottom-0 left-0 m-auto'
+          className='bg-background absolute top-0 right-0 bottom-0 left-0 m-auto'
           src={chain.icon}
           style={{ width: 50, height: 50 }}
         />

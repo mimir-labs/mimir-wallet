@@ -17,7 +17,7 @@ function WalletConnect({ eventId: _eventId }: WalletConnectProps) {
   return (
     <div
       onClick={handleWalletConnect}
-      className='border-divider-300 hover:border-primary focus-visible:border-primary focus-visible:ring-primary/30 flex w-full cursor-pointer items-center justify-between rounded-[10px] border bg-white p-[10px] transition-colors focus-visible:ring-2 focus-visible:outline-none'
+      className='border-divider hover:border-primary focus-visible:border-primary focus-visible:ring-primary/30 flex w-full cursor-pointer items-center justify-between rounded-[10px] border bg-white p-[10px] transition-colors focus-visible:ring-2 focus-visible:outline-none'
     >
       {/* Left side: Icon and title */}
       <div className='flex items-center gap-2.5'>

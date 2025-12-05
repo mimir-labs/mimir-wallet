@@ -78,7 +78,7 @@ function TransactionInfo({
         <ArrowDown className='transform transition-transform group-open:rotate-180' />
       </summary>
 
-      <div className='border-divider-300 mt-[5px] flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5'>
+      <div className='border-divider mt-[5px] flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5'>
         <Item title='Call Hash' content={<Hash value={callHash} withCopy />} />
         <Item
           title='Call Data'

@@ -46,7 +46,7 @@ function TxCell({ withDetails, defaultOpen, address, transaction: propsTransacti
   if (!account) {
     return (
       <div ref={ref} className='flex h-[100px] items-center justify-center'>
-        <Spinner size='lg' variant='wave' />
+        <Spinner size='lg' variant='ellipsis' />
       </div>
     );
   }

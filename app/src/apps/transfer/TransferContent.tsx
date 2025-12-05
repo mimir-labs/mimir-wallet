@@ -4,7 +4,7 @@
 import type { TransferToken } from './types';
 
 import { remoteProxyRelations, useChain, useChains } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Avatar, Button, Chip, Skeleton, Switch } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Avatar, Badge, Button, Skeleton, Switch } from '@mimir-wallet/ui';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo } from 'react';
 
@@ -135,11 +135,7 @@ function TransferContent({
         endContent={
           sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt]
             ? {
-                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: (
-                  <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
-                    Remote Proxy
-                  </Chip>
-                )
+                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: <Badge variant='purple'>Remote Proxy</Badge>
               }
             : undefined
         }
@@ -201,11 +197,10 @@ function TransferContent({
         }
       />
 
-      <div className='flex justify-end'>
-        <Switch size='sm' isSelected={keepAlive} onValueChange={(value) => toggleKeepAlive(value)}>
-          Keep Sender Alive
-        </Switch>
-      </div>
+      <label className='flex items-center justify-end gap-2'>
+        <Switch checked={keepAlive} onCheckedChange={(value) => toggleKeepAlive(value)} />
+        <span className='text-sm'>Keep Sender Alive</span>
+      </label>
 
       {!isRecipientSupported && (
         <Alert variant='destructive'>

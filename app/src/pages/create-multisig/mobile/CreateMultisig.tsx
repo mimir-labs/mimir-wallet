@@ -93,7 +93,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
           </Button>
           <Prepare onSelect={setPrepare} />
         </div>
-        <div className='bg-content1 border-secondary shadow-medium mt-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
+        <div className='bg-background border-secondary mt-2.5 rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
           <div className='space-y-4'>
             <div className='flex justify-between'>
               <h3 className='text-base'>Create Multisig</h3>
@@ -137,7 +137,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
             <div>
               <div className='flex items-center justify-between'>
                 <div className='font-bold'>Add Pure Proxy</div>
-                <Switch isSelected={flexible} onValueChange={(checked) => setFlexible(checked)} />
+                <Switch checked={flexible} onCheckedChange={(checked) => setFlexible(checked)} />
               </div>
               <p className='text-foreground/50 mt-1 text-xs font-normal'>
                 Flexible Multisig allows you to change members and thresholds

@@ -108,7 +108,7 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
   return (
     <>
-      <div className='border-secondary bg-content1 shadow-medium relative flex h-auto w-full flex-col items-start justify-between gap-[5px] rounded-[20px] border-1 p-4 sm:p-5 md:h-[210px]'>
+      <div className='border-secondary bg-background relative flex h-auto w-full flex-col items-start justify-between gap-[5px] rounded-[20px] border-1 p-4 shadow-md sm:p-5 md:h-[210px]'>
         <Button
           className='absolute top-4 right-4 flex rotate-0 transition-transform! duration-300! hover:rotate-180'
           asChild

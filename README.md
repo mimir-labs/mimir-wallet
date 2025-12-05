@@ -62,7 +62,7 @@ Mimir Wallet is a state-of-the-art Progressive Web Application (PWA) designed fo
 - **Modern Development Stack**
   - TypeScript-first development with strict type safety
   - Comprehensive React hooks for blockchain interactions
-  - Modular component library with HeroUI v2
+  - Modular component library with ShadCN/UI + Radix UI
   - Extensive testing coverage with Vitest and Cypress
 
 ### 🎨 User Experience
@@ -148,7 +148,7 @@ mimir-wallet/
 
 #### [`@mimir-wallet/polkadot-core`](./packages/polkadot-core/)
 The foundational blockchain integration package
-- **Polkadot.js API** v16.5.2 integration
+- **Polkadot.js API** v16.x integration
 - **Multi-chain API management** for Polkadot ecosystem
 - **Transaction processing** with dry-run capabilities
 - **Chopsticks integration** for fork simulation and testing
@@ -163,9 +163,9 @@ Service layer and data management
 - **WebSocket support** for real-time blockchain updates
 
 #### [`@mimir-wallet/ui`](./packages/ui/)
-Hybrid React UI component library with modern architecture
-- **HeroUI v2 + ShadCN/UI** hybrid component system for gradual migration
-- **Radix UI primitives** for enhanced accessibility and customization
+Modern React UI component library built on ShadCN/UI architecture
+- **ShadCN/UI + Radix UI** unstyled, accessible components as foundation
+- **Radix UI primitives** for industry-leading accessibility
 - **Tailwind CSS v4.1** for utility-first styling with modern features
 - **Class Variance Authority (CVA)** for type-safe component variants
 - **TypeScript-first** design system with strict typing
@@ -188,7 +188,7 @@ Development tooling and shared configurations
 | **React** | 19.2 | UI framework with concurrent features |
 | **TypeScript** | 5.9 | Type-safe development |
 | **Vite** | 7.2 | Fast build tool and dev server |
-| **HeroUI + ShadCN/UI** | v2 + Latest | Hybrid accessible component library |
+| **ShadCN/UI + Radix UI** | Latest | Accessible component library |
 | **Tailwind CSS** | 4.1 | Utility-first styling |
 | **Framer Motion** | 12.12 | Smooth animations |
 

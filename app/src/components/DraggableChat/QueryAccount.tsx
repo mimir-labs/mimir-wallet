@@ -4,7 +4,7 @@
 import type { AccountData, DelegateeProp } from '@/hooks/types';
 
 import { allEndpoints } from '@mimir-wallet/polkadot-core';
-import { Chip, Tooltip } from '@mimir-wallet/ui';
+import { Badge, Tooltip } from '@mimir-wallet/ui';
 import { useMemo } from 'react';
 
 import AddressCell from '../AddressCell';
@@ -25,17 +25,13 @@ function ProxyTypeTag({ proxyType, network }: { proxyType: string; network?: str
     return endpoint?.name || 'Unknown Network';
   }, [network]);
 
-  const chip = (
-    <Chip size='sm' color='secondary'>
-      {proxyType}
-    </Chip>
-  );
+  const badge = <Badge variant='secondary'>{proxyType}</Badge>;
 
   if (networkName) {
-    return <Tooltip content={`Network: ${networkName}`}>{chip}</Tooltip>;
+    return <Tooltip content={`Network: ${networkName}`}>{badge}</Tooltip>;
   }
 
-  return chip;
+  return badge;
 }
 
 // Reusable AccountCard component for individual address display
@@ -51,7 +47,7 @@ function AccountCard({
   network?: string;
 }) {
   return (
-    <div className='border-divider-300 flex w-full items-center gap-2.5 rounded-[10px] border p-[10px]'>
+    <div className='border-divider flex w-full items-center gap-2.5 rounded-[10px] border p-[10px]'>
       <div className='flex-1'>
         <AddressCell value={address} />
       </div>

@@ -7,8 +7,8 @@ import {
   AlertDescription,
   AlertTitle,
   Avatar,
+  Badge,
   Button,
-  Chip,
   Divider,
   Modal,
   ModalBody,
@@ -72,7 +72,7 @@ function Content({
               proxies[0].map((proxy, index) => (
                 <div
                   key={index}
-                  className='bg-content1 flex items-center justify-between gap-[5px] rounded-[10px] p-[5px]'
+                  className='bg-background flex items-center justify-between gap-[5px] rounded-[10px] p-[5px]'
                 >
                   <div className='flex-1'>
                     <AddressCell shorten value={proxy.delegate.toString()} />
@@ -82,7 +82,7 @@ function Content({
                       <IconClock className='h-4 w-4 opacity-70' />
                     </Tooltip>
                   ) : null}
-                  <Chip color='secondary'>{proxy.proxyType.toString()}</Chip>
+                  <Badge variant='secondary'>{proxy.proxyType.toString()}</Badge>
                   {!isReadOnly && (
                     <TxButton
                       isIconOnly

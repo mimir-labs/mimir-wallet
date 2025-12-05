@@ -109,7 +109,7 @@ function Step2Members({
       {/* Multisig Signers List */}
       <div className='flex flex-col gap-1'>
         <label className='text-foreground text-sm font-bold'>Multisig Signers</label>
-        <div className='border-divider-300 flex flex-col gap-2.5 rounded-[10px] border p-2.5'>
+        <div className='border-divider flex flex-col gap-2.5 rounded-[10px] border p-2.5'>
           {members.length > 0 ? (
             members.map((member) => (
               <div key={member} className='bg-secondary flex items-center gap-1 rounded-[5px] px-1 py-1'>

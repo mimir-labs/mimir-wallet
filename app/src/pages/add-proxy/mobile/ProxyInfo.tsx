@@ -53,7 +53,7 @@ function ProxyInfo({
         )}
       </div>
 
-      <div className='[&>.AddressCell]:bg-content1 flex flex-col items-center gap-2.5 sm:flex-row [&>.AddressCell]:w-full [&>.AddressCell]:rounded-[10px] [&>.AddressCell]:px-2.5 [&>.AddressCell]:py-1'>
+      <div className='[&>.AddressCell]:bg-background flex flex-col items-center gap-2.5 sm:flex-row [&>.AddressCell]:w-full [&>.AddressCell]:rounded-[10px] [&>.AddressCell]:px-2.5 [&>.AddressCell]:py-1'>
         <AddressCell withCopy value={proxied} withAddressBook />
         <IconArrow className='text-primary h-3.5 w-3.5 rotate-90 sm:transform-none' />
         <AddressCell withCopy value={delegate} withAddressBook />

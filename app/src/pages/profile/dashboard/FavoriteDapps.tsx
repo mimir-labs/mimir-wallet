@@ -68,7 +68,7 @@ function FavoriteDapps() {
 
   if (favoriteDapps.length === 0) {
     return (
-      <div className='border-secondary bg-content1 shadow-medium h-auto rounded-[20px] border-1 p-4 sm:p-5 lg:h-[210px]'>
+      <div className='border-secondary bg-background h-auto rounded-[20px] border-1 p-4 shadow-md sm:p-5 lg:h-[210px]'>
         <Empty variant='favorite-dapps' height='170px' />
       </div>
     );
@@ -76,7 +76,7 @@ function FavoriteDapps() {
 
   return (
     <div className='group'>
-      <div className='border-secondary bg-content1 scroll-hover-show shadow-medium h-[210px] overflow-y-auto rounded-[20px] border-1 p-4 sm:p-5'>
+      <div className='border-secondary bg-background scroll-hover-show h-[210px] overflow-y-auto rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
         <div className='grid grid-cols-[repeat(auto-fill,minmax(54px,1fr))] gap-2 lg:gap-3'>
           {favoriteDapps.map((dapp) => (
             <DappItem key={dapp.id} {...dapp} removeFavorite={removeFavorite} />

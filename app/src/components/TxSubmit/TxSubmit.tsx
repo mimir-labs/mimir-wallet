@@ -186,8 +186,8 @@ function TxSubmit({
         </Alert>
       )}
 
-      <div className='md:bg-content1 md:shadow-medium flex w-full flex-1 flex-col gap-5 overflow-y-auto rounded-[20px] bg-transparent p-0 shadow-none md:flex-row md:p-5'>
-        <div className='bg-content1 shadow-medium @container flex w-full flex-col gap-5 rounded-[20px] p-4 md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
+      <div className='md:bg-background flex w-full flex-1 flex-col gap-5 overflow-y-auto rounded-[20px] bg-transparent p-0 shadow-none md:flex-row md:p-5 md:shadow-md'>
+        <div className='bg-background @container flex w-full flex-col gap-5 rounded-[20px] p-4 shadow-md md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
           <TxInfo
             address={accountData.address}
             website={transaction?.website || website}
@@ -235,7 +235,7 @@ function TxSubmit({
           {/* <SafetyCheck safetyCheck={safetyCheck} /> */}
         </div>
 
-        <div className='bg-content1 shadow-medium sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start rounded-[20px] p-4 sm:p-5 md:w-[40%]'>
+        <div className='bg-background sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start rounded-[20px] p-4 shadow-md sm:p-5 md:w-[40%]'>
           {!hasPermission ? (
             <Alert variant='destructive'>
               <AlertTitle>

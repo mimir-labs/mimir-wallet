@@ -169,7 +169,7 @@ function Chart({
     );
 
   return (
-    <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:p-5'>
+    <div className='bg-background col-span-2 flex flex-col gap-5 rounded-[20px] p-3 shadow-md sm:p-5'>
       <p className='text-foreground text-base font-bold'>Transaction Statistic</p>
       <div className='grid grid-cols-1 gap-2.5 lg:grid-cols-2'>
         <div className='col-span-1'>
@@ -211,7 +211,7 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
     <NetworkProvider network={selectedChain}>
       <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
         <div className='col-span-2 flex gap-5'>
-          <div className='bg-background shadow-medium col-span-2 flex w-full flex-col items-stretch justify-between gap-3 rounded-[20px] p-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:p-5 sm:px-12 sm:py-5'>
+          <div className='bg-background col-span-2 flex w-full flex-col items-stretch justify-between gap-3 rounded-[20px] p-3 px-4 py-3 shadow-md sm:flex-row sm:items-center sm:gap-10 sm:p-5 sm:px-12 sm:py-5'>
             <div className='flex flex-grow items-center justify-between'>
               <div className='text-foreground flex items-center gap-2.5 text-sm sm:text-base'>
                 <IconSafe className='text-primary' />
@@ -227,7 +227,7 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
               <Button
                 radius='md'
                 variant='bordered'
-                className='shadow-medium bg-content1 h-full w-auto min-w-[160px] rounded-[20px] border-transparent text-inherit'
+                className='bg-background h-full w-auto min-w-[160px] rounded-[20px] border-transparent text-inherit shadow-md'
               >
                 <Avatar src={selectedHistoryNetwork?.icon} className='h-4 w-4 bg-transparent' />
                 {selectedHistoryNetwork?.name}
@@ -251,69 +251,77 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
           </DropdownMenu>
         </div>
 
-        <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:col-span-1 sm:p-5'>
+        <div className='bg-background col-span-2 flex flex-col gap-5 rounded-[20px] p-3 shadow-md sm:col-span-1 sm:p-5'>
           <p className='text-foreground text-base font-bold'>Transaction Category</p>
-          <Table
-            removeWrapper
-            classNames={{
-              th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
-              td: ['text-foreground']
-            }}
-          >
+          <Table containerClassName='shadow-none bg-transparent'>
             <TableHeader>
-              <TableColumn>Order</TableColumn>
-              <TableColumn>Call</TableColumn>
-              <TableColumn>Transaction Count</TableColumn>
+              <TableRow>
+                <TableColumn>Order</TableColumn>
+                <TableColumn>Call</TableColumn>
+                <TableColumn>Transaction Count</TableColumn>
+              </TableRow>
             </TableHeader>
-            <TableBody items={callOverview} emptyContent={<Empty label='No items' height={150} />}>
-              {(item) => (
-                <TableRow key={item.order}>
-                  <TableCell>{item.order}</TableCell>
-                  <TableCell>{item.action}</TableCell>
-                  <TableCell>{item.count}</TableCell>
+            <TableBody>
+              {callOverview.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3}>
+                    <Empty label='No items' height={150} />
+                  </TableCell>
                 </TableRow>
+              ) : (
+                callOverview.map((item) => (
+                  <TableRow key={item.order}>
+                    <TableCell>{item.order}</TableCell>
+                    <TableCell>{item.action}</TableCell>
+                    <TableCell>{item.count}</TableCell>
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>
         </div>
 
-        <div className='bg-background shadow-medium col-span-2 flex flex-col gap-5 rounded-[20px] p-3 sm:col-span-1 sm:p-5'>
+        <div className='bg-background col-span-2 flex flex-col gap-5 rounded-[20px] p-3 shadow-md sm:col-span-1 sm:p-5'>
           <p className='text-foreground text-base font-bold'>Recipients</p>
-          <Table
-            removeWrapper
-            classNames={{
-              th: ['bg-transparent', 'text-xs', 'text-foreground/50'],
-              td: ['text-foreground']
-            }}
-          >
+          <Table containerClassName='shadow-none bg-transparent'>
             <TableHeader>
-              <TableColumn>Order</TableColumn>
-              <TableColumn>Address</TableColumn>
-              <TableColumn>Amount</TableColumn>
-              <TableColumn align='end'>Operation</TableColumn>
+              <TableRow>
+                <TableColumn>Order</TableColumn>
+                <TableColumn>Address</TableColumn>
+                <TableColumn>Amount</TableColumn>
+                <TableColumn className='text-right'>Operation</TableColumn>
+              </TableRow>
             </TableHeader>
-            <TableBody items={transferBook} emptyContent={<Empty label='No items' height={150} />}>
-              {(item) => (
-                <TableRow key={item.to}>
-                  <TableCell>{item.order}</TableCell>
-                  <TableCell className='whitespace-nowrap'>
-                    <AddressRow value={item.to} />
-                  </TableCell>
-                  <TableCell>
-                    <FormatBalance value={item.amount} withCurrency />
-                  </TableCell>
-                  <TableCell align='right'>
-                    <Button asChild variant='bordered' color='primary' size='sm'>
-                      <Link
-                        to='/explorer/$url'
-                        params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}
-                        search={{ asset_network: selectedChain, to: item.to }}
-                      >
-                        Transfer
-                      </Link>
-                    </Button>
+            <TableBody>
+              {transferBook.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4}>
+                    <Empty label='No items' height={150} />
                   </TableCell>
                 </TableRow>
+              ) : (
+                transferBook.map((item) => (
+                  <TableRow key={item.to}>
+                    <TableCell>{item.order}</TableCell>
+                    <TableCell className='whitespace-nowrap'>
+                      <AddressRow value={item.to} />
+                    </TableCell>
+                    <TableCell>
+                      <FormatBalance value={item.amount} withCurrency />
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      <Button asChild variant='bordered' color='primary' size='sm'>
+                        <Link
+                          to='/explorer/$url'
+                          params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}
+                          search={{ asset_network: selectedChain, to: item.to }}
+                        >
+                          Transfer
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>
@@ -333,10 +341,10 @@ function Analytic() {
   if (!isFetched && isFetching)
     return (
       <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
-        <Skeleton className='bg-content1 shadow-medium col-span-2 h-[80px] rounded-[20px]' />
-        <Skeleton className='bg-content1 shadow-medium col-span-1 h-[300px] rounded-[20px]' />
-        <Skeleton className='bg-content1 shadow-medium col-span-1 h-[300px] rounded-[20px]' />
-        <Skeleton className='bg-content1 shadow-medium col-span-2 h-[500px] rounded-[20px]' />
+        <Skeleton className='bg-background col-span-2 h-[80px] rounded-[20px] shadow-md' />
+        <Skeleton className='bg-background col-span-1 h-[300px] rounded-[20px] shadow-md' />
+        <Skeleton className='bg-background col-span-1 h-[300px] rounded-[20px] shadow-md' />
+        <Skeleton className='bg-background col-span-2 h-[500px] rounded-[20px] shadow-md' />
       </div>
     );
 

@@ -105,25 +105,31 @@ function BatchItemDrag({
           {disabledReason ? (
             <Tooltip content={disabledReason}>
               <div>
-                <Checkbox
-                  size='sm'
-                  isSelected={isSelected}
-                  isDisabled={isSelectionDisabled}
-                  onValueChange={handleSelection}
+                <label
+                  className='inline-flex cursor-pointer items-center gap-2 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50'
+                  data-disabled={isSelectionDisabled || undefined}
                 >
-                  {index + 1}
-                </Checkbox>
+                  <Checkbox
+                    checked={isSelected}
+                    disabled={isSelectionDisabled}
+                    onCheckedChange={(checked) => handleSelection(!!checked)}
+                  />
+                  <span>{index + 1}</span>
+                </label>
               </div>
             </Tooltip>
           ) : (
-            <Checkbox
-              size='sm'
-              isSelected={isSelected}
-              isDisabled={isSelectionDisabled}
-              onValueChange={handleSelection}
+            <label
+              className='inline-flex cursor-pointer items-center gap-2 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50'
+              data-disabled={isSelectionDisabled || undefined}
             >
-              {index + 1}
-            </Checkbox>
+              <Checkbox
+                checked={isSelected}
+                disabled={isSelectionDisabled}
+                onCheckedChange={(checked) => handleSelection(!!checked)}
+              />
+              <span>{index + 1}</span>
+            </label>
           )}
         </div>
 
@@ -165,7 +171,7 @@ function BatchItemDrag({
       </div>
 
       {isOpen ? (
-        <div className='bg-content1 @container mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
+        <div className='bg-background @container mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
           {registry ? <Call showFallback from={from} call={call} registry={registry} /> : null}
         </div>
       ) : null}

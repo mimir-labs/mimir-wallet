@@ -20,7 +20,7 @@ function Search({
   return (
     <Input
       fullWidth
-      endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider-300' />}
+      endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider' />}
       onChange={onChange}
       placeholder='Please input address'
       value={value}

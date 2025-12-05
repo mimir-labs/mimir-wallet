@@ -29,7 +29,7 @@ const buttonVariants = cva(
     'touch-manipulation',
     'transform-gpu active:scale-[0.97]',
     'transition-transform-colors-opacity motion-reduce:transition-none',
-    'disabled:pointer-events-none disabled:not-has-[.button-spinner]:bg-divider-300 disabled:not-has-[.button-spinner]:border-divider-300 disabled:not-has-[.button-spinner]:text-white'
+    'disabled:pointer-events-none disabled:not-has-[.button-spinner]:bg-divider disabled:not-has-[.button-spinner]:border-divider disabled:not-has-[.button-spinner]:text-white'
   ],
   {
     variants: {

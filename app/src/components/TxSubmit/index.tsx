@@ -17,7 +17,7 @@ function Content({ accountId, ...props }: TxSubmitProps) {
   if (!accountData) {
     return (
       <div className='flex h-auto w-full flex-col items-center justify-center gap-5 p-4 sm:p-5 md:h-[calc(100dvh-160px)]'>
-        <Spinner size='lg' variant='wave' label={'Fetching account data...'} />
+        <Spinner size='lg' variant='ellipsis' label={'Fetching account data...'} />
       </div>
     );
   }

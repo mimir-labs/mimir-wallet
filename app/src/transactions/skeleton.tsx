@@ -7,7 +7,7 @@ export const skeleton = (
   <div className='space-y-5'>
     {Array.from({ length: 3 }).map((_, index) => (
       <div
-        className='bg-background shadow-small border-secondary flex flex-col gap-3 rounded-[20px] border-1 p-5'
+        className='bg-background border-secondary flex flex-col gap-3 rounded-[20px] border-1 p-5 shadow-md'
         key={index}
       >
         {/* Date label skeleton */}

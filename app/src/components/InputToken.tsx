@@ -107,11 +107,7 @@ function InputToken({
       <div data-disabled={disabled} className='data-[disabled=true]:text-foreground/50 flex items-center gap-2.5'>
         <Avatar
           alt={token.name}
-          fallback={
-            <div className='bg-divider-300 text-content1 flex h-5 w-5 items-center justify-center rounded-full text-base font-bold'>
-              {token.symbol.slice(0, 1)}
-            </div>
-          }
+          fallback={token.symbol.slice(0, 1)}
           src={token.logoUri}
           style={{ width: 20, height: 20 }}
         >
@@ -124,7 +120,7 @@ function InputToken({
         )}
       </div>
     ) : (
-      <span className='text-foreground-500'>{placeholder}</span>
+      <span className='text-foreground/50'>{placeholder}</span>
     );
 
   return (
@@ -141,7 +137,7 @@ function InputToken({
           <div
             ref={wrapperRef}
             className={twMerge([
-              'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none',
+              'group tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none',
               radius === 'full'
                 ? 'rounded-full'
                 : radius === 'lg'
@@ -171,7 +167,7 @@ function InputToken({
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent style={{ width: popoverWidth, minWidth: 200 }} className='border-divider-300 border-1 p-[5px]'>
+        <PopoverContent style={{ width: popoverWidth, minWidth: 200 }} className='border-divider border-1 p-[5px]'>
           {options.length > 0 ? (
             <div className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
               <ul className={clsx('flex list-none flex-col')}>
@@ -194,11 +190,7 @@ function InputToken({
                           <Avatar
                             alt={name}
                             className='shrink-0'
-                            fallback={
-                              <div className='bg-divider-300 text-content1 flex h-5 w-5 items-center justify-center rounded-full text-base font-bold'>
-                                {symbol.slice(0, 1)}
-                              </div>
-                            }
+                            fallback={symbol.slice(0, 1)}
                             src={logoUri}
                             style={{ width: 20, height: 20 }}
                           >

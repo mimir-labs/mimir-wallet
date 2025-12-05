@@ -47,25 +47,24 @@ function Actions({
   return (
     <div className='flex gap-5'>
       <div className='flex flex-1 items-center pl-2'>
-        <Checkbox
-          size='sm'
-          isSelected={isCheckAll || isCheckSome}
-          isIndeterminate={isCheckSome}
-          onValueChange={(checked) => {
-            if (checked) {
-              // Track batch interacted when selecting all
-              analyticsActions.batchInteracted();
-              // Only select non-batchAll transactions
-              setSelected(selectableTxs.map((item) => item.id));
-              setRelatedBatches(selectableTxs.map((item) => item.relatedBatch).filter((item) => item !== undefined));
-            } else {
-              setSelected([]);
-              setRelatedBatches([]);
-            }
-          }}
-        >
-          All
-        </Checkbox>
+        <label className='inline-flex cursor-pointer items-center gap-2'>
+          <Checkbox
+            checked={isCheckSome ? 'indeterminate' : isCheckAll}
+            onCheckedChange={(checked) => {
+              if (checked) {
+                // Track batch interacted when selecting all
+                analyticsActions.batchInteracted();
+                // Only select non-batchAll transactions
+                setSelected(selectableTxs.map((item) => item.id));
+                setRelatedBatches(selectableTxs.map((item) => item.relatedBatch).filter((item) => item !== undefined));
+              } else {
+                setSelected([]);
+                setRelatedBatches([]);
+              }
+            }}
+          />
+          <span>All</span>
+        </label>
       </div>
       <Button
         disabled={selected.length === 0}

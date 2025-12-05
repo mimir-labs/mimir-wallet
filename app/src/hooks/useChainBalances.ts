@@ -11,7 +11,7 @@ import {
   fetchSingleAssetBalance,
   useChains
 } from '@mimir-wallet/polkadot-core';
-import { useQueries, useQuery } from '@mimir-wallet/service';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { isEqual } from 'lodash-es';
 import { useMemo } from 'react';
 

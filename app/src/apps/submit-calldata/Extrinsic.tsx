@@ -58,7 +58,7 @@ function Extrinsic({
       <Button onClick={() => router.history.back()} variant='ghost'>
         {'<'} Back
       </Button>
-      <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-5'>
+      <div className='border-secondary bg-background mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-5 shadow-md'>
         <h3>Submit Extrinsic</h3>
 
         <InputNetwork
@@ -117,7 +117,7 @@ function Extrinsic({
               </button>
             </div>
 
-            <div className='border-divider-300 @container rounded-[10px] border-1 p-2.5'>
+            <div className='border-divider @container rounded-[10px] border-1 p-2.5'>
               <ErrorBoundary>
                 {registry && <CallComp showFallback registry={registry} from={sending} call={parsedCallData} />}
               </ErrorBoundary>

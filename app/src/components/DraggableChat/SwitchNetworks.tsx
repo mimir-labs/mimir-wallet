@@ -38,7 +38,7 @@ function NetworkItem(network: { key: string; name: string; icon: string; isEnabl
   const { name, icon, isEnabled } = network;
 
   return (
-    <div className='border-divider-300 flex w-full items-center justify-between rounded-[10px] border p-[10px]'>
+    <div className='border-divider flex w-full items-center justify-between rounded-[10px] border p-[10px]'>
       {/* Left side: Icon and name */}
       <div className='flex items-center gap-2.5'>
         <img src={icon} alt={name} className='h-[30px] w-[30px] rounded-full' />

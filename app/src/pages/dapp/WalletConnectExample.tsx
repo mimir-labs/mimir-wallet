@@ -33,7 +33,7 @@ function WalletConnectExample() {
 
   return (
     <>
-      <div className='border-secondary bg-background shadow-medium flex w-full flex-col items-center justify-between gap-3 rounded-[20px] border-1 p-5 sm:flex-row'>
+      <div className='border-secondary bg-background flex w-full flex-col items-center justify-between gap-3 rounded-[20px] border-1 p-5 shadow-md sm:flex-row'>
         <div className='flex flex-1 items-center gap-2.5'>
           <Avatar src='/images/wallet-connect.webp' style={{ width: 40, height: 40 }} className='flex-shrink-0' />
           <div>
@@ -47,7 +47,7 @@ function WalletConnectExample() {
                 </Tooltip>
               ))}
             </div>
-            <p className='text-divider-300 mt-1 text-xs'>
+            <p className='text-divider mt-1 text-xs'>
               Connect to any other Dapp supports wallet connect. And also you can connect to Mimir.
             </p>
           </div>

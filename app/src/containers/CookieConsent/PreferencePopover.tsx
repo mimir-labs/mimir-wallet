@@ -47,7 +47,7 @@ const PreferenceOption: React.FC<{
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'border-divider-300 flex w-full items-center justify-between gap-3 rounded-[10px] border px-[15px] py-[5px] text-left transition-colors',
+        'border-divider flex w-full items-center justify-between gap-3 rounded-[10px] border px-[15px] py-[5px] text-left transition-colors',
         'hover:bg-secondary focus:bg-secondary focus:outline-none'
       )}
     >
@@ -59,7 +59,7 @@ const PreferenceOption: React.FC<{
         {selected ? (
           <IconCheck className='text-success h-[20px] w-[20px]' />
         ) : (
-          <div className='border-divider-300 mr-[2px] h-4 w-4 rounded-full border' />
+          <div className='border-divider mr-[2px] h-4 w-4 rounded-full border' />
         )}
       </div>
     </button>
@@ -101,7 +101,7 @@ export const PreferencePopover: React.FC<PreferencePopoverProps> = ({
       <PopoverTrigger asChild>{children}</PopoverTrigger>
 
       <PopoverContent
-        className={cn('border-secondary rounded-[20px] border p-[10px]', 'shadow-medium w-[171px]')}
+        className={cn('border-secondary rounded-[20px] border p-[10px]', 'w-[171px] shadow-md')}
         align='end'
         sideOffset={8}
       >

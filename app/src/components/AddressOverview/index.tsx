@@ -121,11 +121,7 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
         nodeId,
         node.from === 'delegate' ? node.value.proxyType : node.from === 'member' ? 'multisig' : '',
         node.from === 'delegate' ? node.value.proxyDelay : undefined,
-        node.from === 'delegate'
-          ? '#B700FF'
-          : node.from === 'member'
-            ? 'hsl(var(--heroui-primary))'
-            : 'hsl(var(--heroui-divider-300))',
+        node.from === 'delegate' ? '#B700FF' : node.from === 'member' ? 'var(--primary)' : 'var(--border)',
         node.from === 'delegate' && !!node.value.isRemoteProxy
       );
     }

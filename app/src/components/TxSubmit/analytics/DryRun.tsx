@@ -126,7 +126,7 @@ function AssetToken({ assetId, amount }: { assetId: string; amount: bigint }) {
   const [assetInfo] = useXcmAsset(network, assetId);
 
   if (!assetInfo) {
-    return <Spinner variant='wave' size='sm' />;
+    return <Spinner variant='ellipsis' size='sm' />;
   }
 
   return (
@@ -198,7 +198,7 @@ function DryRunSuccess({
   balancesChanges: SelfBalanceChange[];
 }) {
   return (
-    <div className='border-divider-300 flex items-start justify-between gap-2.5 rounded-[10px] border p-2.5'>
+    <div className='border-divider flex items-start justify-between gap-2.5 rounded-[10px] border p-2.5'>
       {/* Header with left-right layout */}
       <div className='flex flex-1 items-center gap-2.5'>
         <svg
@@ -248,7 +248,7 @@ function DryRunSuccess({
 
 function DryRunFailed({ title, error }: { title: string; error?: string | null }) {
   return (
-    <div className='border-divider-300 flex items-center justify-between gap-2.5 rounded-[10px] border p-2.5'>
+    <div className='border-divider flex items-center justify-between gap-2.5 rounded-[10px] border p-2.5'>
       <div className='flex items-center gap-2.5'>
         <div className='flex h-6 w-6 items-center justify-center'>
           <svg

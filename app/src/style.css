@@ -1,171 +1,329 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@plugin '@mimir-wallet/ui/hero';
-@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@import 'tailwindcss';
+@import 'tw-animate-css';
 @source '../../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
 @source '../../node_modules/@mimir-wallet/ai-assistant/build/**/*.{js,ts,jsx,tsx}';
 @source '../index.html';
 @source '../src/**/*.{js,ts,jsx,tsx,mdx}';
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * =============================================================================
+ * THEME CONFIGURATION
+ * =============================================================================
+ * Static design tokens - color scales, shadows, fonts
+ * These values are fixed and don't depend on CSS custom properties
+ */
 @theme {
-  --color-popover: oklch(1 0 0);
-  --color-popover-foreground: oklch(0.145 0 0);
-  --color-border: #D9D9D9;
-  --color-input: #D9D9D9;
-  --color-muted: #D9D9D9;
-  --color-card: #FFF;
-  --color-sidebar-foreground: inherit;
-  --color-sidebar: #FFF;
-  --color-sidebar-border: #f4f2ff;
-  --color-main-bg: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
-  --text-6xl: 2.25rem;
-  --text-5xl: 2rem;
-  --text-4xl: 1.75rem;
-  --text-3xl: 1.5rem;
-  --text-2xl: 1.25rem;
-  --font-sans: "Sofia Sans Semi Condensed", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --animate-fade-out: fade-out 2s 1;
-  @keyframes fade-out {
-    0% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-  --animate-fade-in: fade-in 2s 1;
-  @keyframes fade-in {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  --animate-blink-bg: blink-bg 1s 3;
-  @keyframes blink-bg {
-    0% {
-      background: var(--color-main-bg);
-    }
-    50% {
-      background: hsl(var(--heroui-primary-100));
-    }
-    100% {
-      background: var(--color-main-bg);
-    }
-  }
-  --animate-hourglass-flip: hourglassFlip 1.5s ease-in-out infinite;
-  @keyframes hourglassFlip {
-    0% {
-      transform: rotate(0deg);
-    }
-    15% {
-      transform: rotate(180deg);
-    }
-    50% {
-      transform: rotate(180deg);
-    }
-    65% {
-      transform: rotate(360deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-  --animate-dots: dots 1.5s ease-in-out infinite;
-  --animate-swing: swing 1s ease-in-out;
-  @keyframes swing {
-    0% {
-      transform: rotate(0deg);
-    }
-    10% {
-      transform: rotate(10deg);
-    }
-    30% {
-      transform: rotate(-10deg);
-    }
-    50% {
-      transform: rotate(10deg);
-    }
-    70% {
-      transform: rotate(-5deg);
-    }
-    90% {
-      transform: rotate(2deg);
-    }
-    100% {
-      transform: rotate(0deg);
-    }
-  }
-  --animate-highlight: highlight 1.5s ease-in-out 2;
-  @keyframes highlight {
-    0%, 100% {
-      box-shadow: 0 0 0 0 transparent;
-    }
-    50% {
-      box-shadow: 0 0 0 4px hsl(var(--heroui-primary) / 0.3);
-    }
-  }
+  /* Primary color scale - Deep Indigo */
+  --color-primary-50: oklch(0.966 0.017 289.69);
+  --color-primary-100: oklch(0.933 0.034 287.6);
+  --color-primary-200: oklch(0.858 0.073 285.62);
+  --color-primary-300: oklch(0.791 0.11 284.77);
+  --color-primary-400: oklch(0.725 0.147 283.42);
+  --color-primary-500: oklch(0.652 0.19 281.45);
+  --color-primary-600: oklch(0.589 0.228 278.72);
+  --color-primary-700: oklch(0.527 0.266 274.81);
+  --color-primary-800: oklch(0.461 0.307 268.24);
+  --color-primary-900: oklch(0.309 0.206 268.21);
+  --color-primary-950: oklch(0.226 0.15 268.34);
+
+  /* Success color scale - Teal */
+  --color-success-50: oklch(0.958 0.061 167.77);
+  --color-success-100: oklch(0.926 0.113 167.23);
+  --color-success-200: oklch(0.848 0.172 167.8);
+  --color-success-300: oklch(0.791 0.161 167.51);
+  --color-success-400: oklch(0.698 0.142 167.64);
+  --color-success-500: oklch(0.606 0.123 167.51);
+  --color-success-600: oklch(0.512 0.104 168.01);
+  --color-success-700: oklch(0.412 0.084 167.91);
+  --color-success-800: oklch(0.32 0.065 167.59);
+  --color-success-900: oklch(0.227 0.046 167.8);
+  --color-success-950: oklch(0.182 0.037 168.6);
+
+  /* Warning color scale - Amber */
+  --color-warning-50: oklch(0.968 0.017 44.86);
+  --color-warning-100: oklch(0.934 0.035 41.97);
+  --color-warning-200: oklch(0.877 0.071 46.09);
+  --color-warning-300: oklch(0.811 0.12 50.84);
+  --color-warning-400: oklch(0.752 0.178 58.44);
+  --color-warning-500: oklch(0.65 0.154 58.7);
+  --color-warning-600: oklch(0.544 0.13 58.25);
+  --color-warning-700: oklch(0.448 0.107 58.53);
+  --color-warning-800: oklch(0.343 0.082 58.51);
+  --color-warning-900: oklch(0.246 0.059 57.63);
+  --color-warning-950: oklch(0.192 0.046 58.17);
+
+  /* Danger color scale - Coral */
+  --color-danger-50: oklch(0.96 0.02 25.25);
+  --color-danger-100: oklch(0.918 0.042 25.26);
+  --color-danger-200: oklch(0.838 0.089 26.77);
+  --color-danger-300: oklch(0.758 0.145 29.98);
+  --color-danger-400: oklch(0.674 0.218 37.41);
+  --color-danger-500: oklch(0.591 0.194 37.9);
+  --color-danger-600: oklch(0.5 0.164 37.97);
+  --color-danger-700: oklch(0.411 0.136 37.63);
+  --color-danger-800: oklch(0.322 0.105 37.99);
+  --color-danger-900: oklch(0.231 0.076 37.81);
+  --color-danger-950: oklch(0.182 0.061 37.05);
 }
 
-/* CSS Houdini property for border spin animation */
+/*
+ * =============================================================================
+ * DYNAMIC THEME TOKENS
+ * =============================================================================
+ * Values that reference CSS custom properties from :root
+ * Use @theme inline for runtime-dependent values
+ */
+@theme inline {
+  /* Radius tokens */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  /* Animation timing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+
+  /* Semantic color mappings - reference :root variables */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-divider: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Chart colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Status color mappings */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+
+  /* Shadows */
+  --shadow-sm: 0 0 5px 0 rgba(21, 31, 52, 0.06);
+  --shadow: var(--shadow-md);
+  --shadow-md: 0 0 10px 0 rgba(21, 31, 52, 0.06);
+  --shadow-lg: 0 0 15px 0px rgba(21, 31, 52, 0.09);
+  --shadow-xl: 0 0 20px 0 rgba(21, 31, 52, 0.12);
+
+  /* Gradients */
+  --color-main-bg: linear-gradient(245deg, #F4F2FF 0%, #FBFDFF 100%);
+
+  /* Typography */
+  --font-sans:
+    'Sofia Sans Semi Condensed', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-heading: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* Animation definitions */
+  --animate-fade-out: fade-out 2s 1;
+  --animate-fade-in: fade-in 2s 1;
+  --animate-blink-bg: blink-bg 1s 3;
+  --animate-hourglass-flip: hourglass-flip 1.5s ease-in-out infinite;
+  --animate-dots: dots 1.5s ease-in-out infinite;
+  --animate-swing: swing 1s ease-in-out;
+  --animate-highlight: highlight 1.5s ease-in-out 2;
+  --animate-border-spin: border-spin 1.5s linear infinite;
+}
+
+/*
+ * =============================================================================
+ * KEYFRAME ANIMATIONS
+ * =============================================================================
+ */
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes blink-bg {
+  0%, 100% { background: var(--color-main-bg); }
+  50% { background: var(--color-primary-100); }
+}
+
+@keyframes hourglass-flip {
+  0%, 100% { transform: rotate(360deg); }
+  15%, 50% { transform: rotate(180deg); }
+  65% { transform: rotate(360deg); }
+}
+
+@keyframes swing {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(10deg); }
+  30% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+  70% { transform: rotate(-5deg); }
+  90% { transform: rotate(2deg); }
+}
+
+@keyframes highlight {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50% { box-shadow: 0 0 0 4px var(--color-primary-300); }
+}
+
+@keyframes dots {
+  0%, 20% { content: ''; }
+  25%, 45% { content: '.'; }
+  50%, 70% { content: '..'; }
+  75%, 100% { content: '...'; }
+}
+
+@keyframes border-spin {
+  from { --border-angle: 0deg; }
+  to { --border-angle: 360deg; }
+}
+
+/*
+ * =============================================================================
+ * CSS CUSTOM PROPERTIES
+ * =============================================================================
+ * Base semantic variables for light theme
+ * These can be overridden for dark mode
+ */
+:root {
+  --radius: 0.75rem;
+
+  /* Base colors */
+  --background: white;
+  --foreground: #151F34;
+
+  /* Surface colors */
+  --card: white;
+  --card-foreground: #151F34;
+  --popover: white;
+  --popover-foreground: #151F34;
+
+  /* Primary - Deep Indigo */
+  --primary: oklch(46.10% 0.307 268.24);
+  --primary-foreground: #FFF;
+
+  /* Secondary - Cool Slate */
+  --secondary: #f4f2ff;
+  --secondary-foreground: oklch(46.10% 0.307 268.24);
+
+  /* Muted - Soft Lavender Gray */
+  --muted: oklch(0.94 0.012 270);
+  --muted-foreground: oklch(0.5 0.03 270);
+
+  /* Accent - Electric Cyan */
+  --accent: oklch(0.72 0.15 185);
+  --accent-foreground: oklch(0.12 0.04 185);
+
+  /* Destructive - Warm Coral */
+  --destructive: #FF5310;
+  --destructive-foreground: #FFF;
+
+  /* Border & Input */
+  --border: #D9D9D9;
+  --input: #D9D9D9;
+  --ring: oklch(46.10% 0.307 268.24);
+
+  /* Chart colors */
+  --chart-1: oklch(0.45 0.18 270);
+  --chart-2: oklch(0.72 0.15 185);
+  --chart-3: oklch(0.65 0.16 320);
+  --chart-4: oklch(0.7 0.14 140);
+  --chart-5: oklch(0.6 0.2 25);
+
+  /* Status colors */
+  --success: #00DBA6;
+  --success-foreground: #FFF;
+  --warning: #FF8D07;
+  --warning-foreground: #FFF;
+  --info: oklch(0.72 0.15 185);
+  --info-foreground: oklch(0.15 0.04 185);
+  --danger: #FF5310;
+  --danger-foreground: #FFF;
+
+  /* Sidebar */
+  --sidebar: white;
+  --sidebar-foreground: #151F34;
+  --sidebar-primary: oklch(46.10% 0.307 268.24);
+  --sidebar-primary-foreground: #FFF;
+  --sidebar-accent: oklch(0.94 0.008 270);
+  --sidebar-accent-foreground: oklch(0.35 0.06 270);
+  --sidebar-border: #f4f2ff;
+  --sidebar-ring: oklch(46.10% 0.307 268.24);
+}
+
+/*
+ * =============================================================================
+ * CSS HOUDINI PROPERTIES
+ * =============================================================================
+ * Custom properties for advanced animations
+ */
 @property --border-angle {
   syntax: '<angle>';
   initial-value: 0deg;
   inherits: false;
 }
 
-@keyframes border-spin {
-  0% { --border-angle: 0deg; }
-  100% { --border-angle: 360deg; }
-}
-
+/*
+ * =============================================================================
+ * BASE LAYER STYLES
+ * =============================================================================
+ */
 @layer base {
-  .animate-dots::after {
-    content: '';
-    animation: dots 1.5s ease-in-out infinite;
-  }
-
-  @keyframes dots {
-    0%, 20% {
-      content: '';
-    }
-    25%, 45% {
-      content: '.';
-    }
-    50%, 70% {
-      content: '..';
-    }
-    75%, 100% {
-      content: '...';
-    }
-  }
-
+  /* Typography */
   p {
-    @apply text-inherit leading-inherit font-normal;
-  }
-  h1 {
-    @apply text-4xl leading-[1.2] font-bold;
-  }
-  h2 {
-    @apply text-3xl leading-[1.2] font-bold;
-  }
-  h3 {
-    @apply text-2xl leading-[1.2] font-bold;
-  }
-  h4 {
-    @apply text-xl leading-[1.2] font-bold;
-  }
-  h5 {
-    @apply text-lg leading-[1.2] font-bold;
-  }
-  h6 {
-    @apply text-base leading-[1.2] font-bold;
+    @apply text-inherit leading-[inherit] font-normal;
   }
 
+  h1 { @apply text-4xl leading-[1.2] font-bold; }
+  h2 { @apply text-3xl leading-[1.2] font-bold; }
+  h3 { @apply text-2xl leading-[1.2] font-bold; }
+  h4 { @apply text-xl leading-[1.2] font-bold; }
+  h5 { @apply text-lg leading-[1.2] font-bold; }
+  h6 { @apply text-base leading-[1.2] font-bold; }
+
+  /* Form elements */
   input::placeholder {
-    @apply text-foreground-500;
+    @apply text-foreground/50;
   }
 
   button {
@@ -173,12 +331,12 @@
     touch-action: manipulation;
   }
 
-  /* Optimize mobile touch response for interactive elements */
+  /* Touch optimization for interactive elements */
   a, button, input, select, textarea, [role="button"], [role="menuitem"] {
     touch-action: manipulation;
   }
 
-  /* custom styles */
+  /* Global styles */
   html {
     -webkit-font-smoothing: antialiased;
     font-feature-settings: normal;
@@ -193,13 +351,10 @@
   }
 
   body {
-    font-size: 0.875rem;
-    line-height: 1.2;
-    color: hsl(var(--heroui-foreground));
-    font-family: var(--default-font-family);
+    @apply bg-background text-foreground text-sm selection:bg-primary/20 selection:text-primary font-sans antialiased;
   }
 
-  html,body,#root {
+  html, body, #root {
     min-height: 100dvh;
   }
 
@@ -208,6 +363,7 @@
     margin: 0;
   }
 
+  /* Number input styling */
   input[type=number] {
     -moz-appearance: textfield;
     appearance: textfield;
@@ -219,36 +375,77 @@
     margin: 0;
   }
 
+  /* Link styling */
   a {
-    @apply text-primary text-[length:inherit] no-underline hover:opacity-70 active:opacity-50 transition-colors-opacity;
+    @apply text-primary text-[length:inherit] no-underline hover:opacity-70 active:opacity-50;
   }
 
+  /* Scrollbar styling */
   ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
     background: transparent;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
     border-radius: 5px;
   }
+
   ::-webkit-scrollbar-thumb {
     background: #d9d9d9;
     border-radius: 5px;
   }
+
   ::-webkit-scrollbar-thumb:hover {
     background: #d9d9d9;
   }
 
-  .scroll-hover-show {
-    @apply [&::-webkit-scrollbar]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[#d9d9d9] group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-[#d9d9d9];
-  }
+}
 
-  .bg-home-main {
-    background: linear-gradient(90deg, #2700FF 0%, #0094FF 100%);
+/*
+ * =============================================================================
+ * CUSTOM UTILITIES
+ * =============================================================================
+ * Simple utilities that don't need variant support
+ */
+@utility bg-home-main {
+  background: linear-gradient(90deg, #2700FF 0%, #0094FF 100%);
+}
+
+@utility animate-dots {
+  &::after {
+    content: '';
+    animation: dots 1.5s ease-in-out infinite;
   }
 }
 
+/*
+ * =============================================================================
+ * CUSTOM COMPONENTS
+ * =============================================================================
+ * Complex styles that need variant support (like group-hover)
+ */
+@layer components {
+  .scroll-hover-show {
+    &::-webkit-scrollbar {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+  }
+
+  .group:hover .scroll-hover-show::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+  }
+}
+
+/*
+ * =============================================================================
+ * THIRD-PARTY OVERRIDES
+ * =============================================================================
+ */
 [data-sonner-toast][data-styled=true] [data-icon] {
   width: auto !important;
   height: auto !important;

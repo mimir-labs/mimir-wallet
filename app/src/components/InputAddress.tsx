@@ -287,7 +287,7 @@ function InputAddress({
             <div
               ref={wrapperRef}
               data-error={!isValidAddress && !!inputValue}
-              className={`input-address-content tap-highlight-transparent border-divider-300 data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden rounded-[10px] border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none ${wrapperClassName || ''}`}
+              className={`input-address-content tap-highlight-transparent border-divider data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden rounded-[10px] border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none ${wrapperClassName || ''}`}
             >
               {element}
               <input
@@ -308,7 +308,7 @@ function InputAddress({
               {value && !isLocalAccount(value) && !isLocalAddress(value) ? (
                 <Tooltip color='foreground' content='Add to address book'>
                   <IconAddressBook
-                    className='text-divider-300 hover:text-primary absolute top-1/2 right-8 -translate-y-1/2 cursor-pointer transition-colors'
+                    className='text-divider hover:text-primary absolute top-1/2 right-8 -translate-y-1/2 cursor-pointer transition-colors'
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -328,7 +328,7 @@ function InputAddress({
           </PopoverTrigger>
           <PopoverContent
             style={{ width: wrapperRef.current?.clientWidth }}
-            className='border-divider-300 border-1 p-[5px]'
+            className='border-divider border-1 p-[5px]'
           >
             {options.length > 0 ? (
               <div ref={scrollContainerRef} className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>

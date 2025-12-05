@@ -97,7 +97,7 @@ function GroupedTransactions({
   const defaultRenderGroup = (group: GroupedTransactionsType, _groupIndex: number, transactions: React.ReactNode[]) => (
     <div
       key={group.date}
-      className={`bg-background shadow-small border-secondary flex flex-col gap-3 rounded-[20px] border-1 ${variantClasses[variant]}`}
+      className={`bg-background border-secondary flex flex-col gap-3 rounded-[20px] border-1 shadow-md ${variantClasses[variant]}`}
     >
       <h6 className='text-primary'>{group.label}</h6>
       <div className='space-y-3'>{transactions}</div>

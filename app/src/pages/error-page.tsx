@@ -74,7 +74,7 @@ class ErrorPage extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             </p>
           </div>
 
-          <div className='bg-background border-foreground/10 shadow-medium overflow-hidden rounded-[20px] border'>
+          <div className='bg-background border-foreground/10 overflow-hidden rounded-[20px] border shadow-md'>
             <div className='p-6'>
               <h3 className='text-foreground/80 mb-4 flex items-center text-lg font-semibold'>
                 <span className='bg-foreground/5 mr-3 flex h-8 w-8 items-center justify-center rounded-full'>

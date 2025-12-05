@@ -50,7 +50,7 @@ function Item({
             </div>
 
             {isCompleted ? (
-              <p className='text-small flex-1 text-left leading-normal font-bold text-white'>
+              <p className='flex-1 text-left text-sm leading-normal font-bold text-white'>
                 <span>
                   {destNetwork?.name} Migration on {sourceNetwork?.name} has been completed — check out{' '}
                 </span>
@@ -63,7 +63,7 @@ function Item({
                 </button>
               </p>
             ) : (
-              <p className='text-small flex-1 text-left leading-normal font-bold text-white'>
+              <p className='flex-1 text-left text-sm leading-normal font-bold text-white'>
                 The Assethub Migration starts on {sourceNetwork?.name} on{' '}
                 {sourceChain === 'polkadot' ? 'November 7' : sourceChain === 'kusama' ? 'October 7' : 'July 7'}. After
                 the migration, all multisig/proxy on {sourceNetwork?.name} will be moved to {destNetwork?.name}.

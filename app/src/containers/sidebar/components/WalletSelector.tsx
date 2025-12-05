@@ -27,7 +27,7 @@ export function WalletSelector() {
 
   return (
     <div
-      className='bg-content1 border-t-secondary grid w-full cursor-pointer grid-cols-5 gap-2.5 border-t-1 pt-2.5'
+      className='bg-background border-t-secondary grid w-full cursor-pointer grid-cols-5 gap-2.5 border-t-1 pt-2.5'
       onClick={() => {
         openWallet();
       }}

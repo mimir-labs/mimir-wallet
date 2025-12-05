@@ -54,12 +54,13 @@ function Item({
 
   return (
     <div key={id} className='bg-primary/5 flex items-center gap-2.5 rounded-[10px] p-4'>
-      <Checkbox isSelected={isSelected} onValueChange={(selected) => onSelect(id, selected)}>
+      <label className='inline-flex cursor-pointer items-center gap-2'>
+        <Checkbox checked={isSelected} onCheckedChange={(selected) => onSelect(id, !!selected)} />
         <div className='flex items-center gap-2.5'>
           <img src={sourceNetwork?.icon} alt={sourceNetwork?.name} className='inline h-5 w-5' />
           {call.section}.{call.method}
         </div>
-      </Checkbox>
+      </label>
       <CopyButton value={calldata} size='sm' />
     </div>
   );
@@ -168,9 +169,13 @@ function Content({
       <Divider />
 
       {/* Select All */}
-      <Checkbox isSelected={isCheckAll || isCheckSome} isIndeterminate={isCheckSome} onValueChange={handleSelectAll}>
-        All
-      </Checkbox>
+      <label className='inline-flex cursor-pointer items-center gap-2'>
+        <Checkbox
+          checked={isCheckSome ? 'indeterminate' : isCheckAll}
+          onCheckedChange={(checked) => handleSelectAll(!!checked)}
+        />
+        <span>All</span>
+      </label>
 
       {/* Migrate Button */}
       <Button color='primary' disabled={selected.length === 0} fullWidth onClick={handleMigrate}>
@@ -229,7 +234,7 @@ export function BatchMigrationModal({
         <ModalHeader>
           <div className='flex flex-col gap-2.5'>
             <h2 className='text-[20px] font-extrabold'>Fast Copy Batch</h2>
-            <p className='text-small'>
+            <p className='text-sm'>
               Due to Assethub Migration, some of batch couldn&apos;t be used any more. You can migrate them to{' '}
               {destNetwork?.name}.
             </p>

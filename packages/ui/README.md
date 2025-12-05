@@ -1,54 +1,48 @@
 # @mimir-wallet/ui
 
-A modern, hybrid React UI component library built for Mimir Wallet, featuring both HeroUI and ShadCN/UI components in a unified system designed for enterprise blockchain applications.
+A modern React UI component library built for Mimir Wallet, featuring ShadCN/UI components with Radix UI primitives, designed for enterprise blockchain applications.
 
 ## Overview
 
-This package provides a comprehensive set of React components using a **hybrid architecture** that combines the best of both HeroUI v2 and ShadCN/UI. This approach enables gradual migration while maintaining backward compatibility and leveraging modern component patterns.
-
-## Architecture Strategy
-
-### 🔄 Hybrid Component System
-
-We employ a **dual-library approach** that allows developers to choose the most appropriate component for each use case:
-
-- **HeroUI v2 Components**: Mature, blockchain-specialized components (Avatar, Card, Table, Tabs)
-- **ShadCN/UI Components**: Modern, highly customizable components (Button, Input, Dialog, Alert)
-- **Unified Export**: All components exported through a single `@mimir-wallet/ui` package
-- **Compatibility Layer**: Seamless transition with compatibility wrappers (e.g., `modal-compat.tsx`)
+This package provides a comprehensive set of React components using **ShadCN/UI architecture** - unstyled, accessible components built on Radix UI primitives with Tailwind CSS styling.
 
 ## Features
 
-### 🎨 Modern Design System
-- **Hybrid UI Foundation** - Best of HeroUI + ShadCN/UI components
-- **Radix UI Primitives** - Unstyled, accessible components as building blocks
+### Modern Design System
+- **ShadCN/UI Foundation** - Unstyled, accessible components built on Radix UI
+- **Radix UI Primitives** - Industry-leading accessibility as building blocks
 - **Class Variance Authority (CVA)** - Type-safe component variants
 - **Tailwind CSS v4.1** - Modern utility-first styling with latest features
-- **Dark/Light Theme Support** - Consistent theming across both component systems
+- **Dark/Light Theme Support** - Consistent theming across components
 
-### ♿ Enhanced Accessibility
-- **Radix UI Accessibility** - Industry-leading accessibility for ShadCN components
-- **HeroUI ARIA Support** - Comprehensive ARIA implementation
+### Enhanced Accessibility
+- **Radix UI Accessibility** - Industry-leading accessibility for all components
 - **Keyboard Navigation** - Full keyboard support across all components
 - **Screen Reader Optimized** - Enhanced assistive technology support
+- **ARIA Support** - Comprehensive ARIA implementation
 
-### 🧩 Component Categories
+### Component Categories
 
-#### ShadCN/UI Components (Preferred for new development)
-- **Form Controls**: Button, Input, Select, Checkbox
-- **Overlays**: Dialog, Drawer, Popover, Tooltip, DropdownMenu
-- **Feedback**: Alert, AlertTitle, AlertDescription
+#### Form Controls
+- Button, Input, Textarea, Select, Checkbox, Switch, Combobox, Autocomplete
 
-#### HeroUI Components (Continued use)
-- **Data Display**: Avatar, Card, Table, Badge, Chip
-- **Navigation**: Tabs, Autocomplete
-- **Layout**: Divider, Spinner, Skeleton
+#### Overlays & Dialogs
+- Dialog, Drawer, Popover, Tooltip, DropdownMenu
 
-### 🔧 Developer Experience
+#### Feedback
+- Alert, AlertTitle, AlertDescription, Spinner, Skeleton
+
+#### Data Display
+- Table, Avatar, Badge, Card, Tabs
+
+#### Layout
+- Divider, ScrollArea, Collapsible, Sidebar
+
+### Developer Experience
 - **TypeScript First** - Full type safety with inference
 - **Tree Shaking** - Optimized bundle size
 - **Component Variants** - Type-safe styling variants with CVA
-- **Utility Functions** - `cn()` for class merging, colorVariants for theming
+- **Utility Functions** - `cn()` for class merging
 
 ## Installation
 
@@ -60,12 +54,9 @@ yarn add @mimir-wallet/ui
 
 ### Dependencies
 
-The package includes both UI systems:
-
 ```json
 {
   "dependencies": {
-    "@heroui/*": "^2.x",
     "@radix-ui/*": "^1.x",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -82,56 +73,27 @@ The package includes both UI systems:
 import '@mimir-wallet/ui/styles.css';
 ```
 
-### Provider Setup
+## Usage
 
-```typescript
-import { HeroUIProvider } from '@mimir-wallet/ui';
-
-function App() {
-  return (
-    <HeroUIProvider>
-      <YourApp />
-    </HeroUIProvider>
-  );
-}
-```
-
-## Usage Guide
-
-### Component Selection Strategy
-
-#### 🟢 Use ShadCN Components For:
-- **Buttons**: Enhanced variant system with CVA
-- **Form Inputs**: Better customization and validation
-- **Dialogs/Modals**: Modern API with improved accessibility
-- **Alerts**: Rich content support with title/description
-- **Select Dropdowns**: Better performance and customization
-
-#### 🔵 Use HeroUI Components For:
-- **Data Tables**: Mature table implementation with sorting/selection
-- **Avatars**: Specialized avatar components with fallbacks
-- **Cards**: Well-established card layouts
-- **Navigation Tabs**: Proven tab implementation
-- **Badges/Chips**: Existing design patterns
-
-### ShadCN Component Usage
+### Basic Components
 
 ```typescript
 import {
   Button,
   Input,
   Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   Alert,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   cn
 } from '@mimir-wallet/ui';
 
-// Modern Button with CVA variants
+// Button with CVA variants
 <Button
   variant="ghost"
   size="sm"
@@ -142,14 +104,14 @@ import {
   Action
 </Button>
 
-// Enhanced Input with better validation
+// Input
 <Input
   placeholder="Enter amount"
   type="number"
   className="w-full"
 />
 
-// Modern Dialog system
+// Dialog
 <Dialog open={isOpen} onOpenChange={setIsOpen}>
   <DialogContent>
     <DialogHeader>
@@ -159,19 +121,17 @@ import {
   </DialogContent>
 </Dialog>
 
-// DropdownMenu with multi-select (no auto-close)
+// DropdownMenu with multi-select
 <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
   <DropdownMenuTrigger asChild>
-    <Button variant="bordered">
-      Select Networks
-    </Button>
+    <Button variant="bordered">Select Networks</Button>
   </DropdownMenuTrigger>
   <DropdownMenuContent>
     {options.map((option) => (
       <DropdownMenuCheckboxItem
         key={option.id}
         checked={selected.includes(option.id)}
-        onSelect={(e) => e.preventDefault()} // Prevent auto-close
+        onSelect={(e) => e.preventDefault()}
         onCheckedChange={(checked) => {
           // Handle selection logic
         }}
@@ -181,44 +141,30 @@ import {
     ))}
   </DropdownMenuContent>
 </DropdownMenu>
-
-// DropdownMenu with single select (auto-close)
-<DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="bordered">Select Chain</Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent>
-    <DropdownMenuRadioGroup value={selected} onValueChange={setSelected}>
-      {chains.map((chain) => (
-        <DropdownMenuRadioItem key={chain.id} value={chain.id}>
-          {chain.name}
-        </DropdownMenuRadioItem>
-      ))}
-    </DropdownMenuRadioGroup>
-  </DropdownMenuContent>
-</DropdownMenu>
 ```
 
-### HeroUI Component Usage
+### Data Display
 
 ```typescript
-import { Card, CardHeader, CardTitle, CardContent, Table, Avatar, Tabs } from '@mimir-wallet/ui';
+import { Table, TableHeader, TableBody, TableRow, TableCell, Avatar, Card, CardHeader, CardTitle, CardContent } from '@mimir-wallet/ui';
 
-// Mature data display components
+// Table
 <Table>
   <TableHeader>
-    <TableColumn>Address</TableColumn>
-    <TableColumn>Balance</TableColumn>
+    <TableRow>
+      <TableCell>Address</TableCell>
+      <TableCell>Balance</TableCell>
+    </TableRow>
   </TableHeader>
   <TableBody>
     {/* rows */}
   </TableBody>
 </Table>
 
-// Specialized blockchain components
+// Card with Avatar
 <Card>
   <CardHeader>
-    <CardTitle>Title</CardTitle>
+    <CardTitle>Account Info</CardTitle>
   </CardHeader>
   <CardContent>
     <Avatar src={account.avatar} name={account.name} />
@@ -244,68 +190,59 @@ const className = cn(
 );
 ```
 
-
 ## Architecture
 
 ```
 @mimir-wallet/ui/
 ├── src/
 │   ├── shadcn/              # ShadCN/UI components
-│   │   ├── button.tsx       # Modern button with CVA
-│   │   ├── input.tsx        # Enhanced input component
-│   │   ├── dialog.tsx       # Modern dialog system
-│   │   ├── alert.tsx        # Rich alert component
-│   │   ├── dropdown-menu.tsx # Dropdown menu with multi-select
-│   │   └── modal-compat.tsx # HeroUI → ShadCN compatibility
+│   │   ├── button.tsx       # Button with CVA variants
+│   │   ├── input.tsx        # Input component
+│   │   ├── dialog.tsx       # Dialog system
+│   │   ├── alert.tsx        # Alert component
+│   │   ├── dropdown-menu.tsx # Dropdown menu
+│   │   ├── table.tsx        # Table component
+│   │   ├── tabs.tsx         # Tabs component
+│   │   ├── avatar.tsx       # Avatar component
+│   │   └── ...              # Other components
 │   ├── lib/                 # Utility functions
-│   │   ├── utils.ts         # cn() class merger
-│   │   └── variants.ts      # Color variant definitions
-│   ├── [component]/         # HeroUI component wrappers
-│   └── index.ts             # Unified export system
+│   │   └── utils.ts         # cn() class merger
+│   ├── hooks/               # Custom hooks
+│   └── index.ts             # Unified exports
 ```
 
 ## Best Practices
 
-### Component Selection
+### Styling
 ```typescript
-// ✅ Good: Choose appropriate component for use case
-import { Button } from '@mimir-wallet/ui'; // ShadCN Button
-import { Table } from '@mimir-wallet/ui';  // HeroUI Table
-
-// ❌ Avoid: Mixing similar components unnecessarily
-```
-
-### Styling Consistency
-```typescript
-// ✅ Good: Use cn() for class merging
+// Use cn() for class merging
 import { cn } from '@mimir-wallet/ui';
 const className = cn("base-classes", conditionalClass, props.className);
 
-// ✅ Good: Leverage component variants
+// Leverage component variants
 <Button variant="ghost" size="sm" color="primary" />
 
-// ❌ Avoid: Custom styling that breaks design system
-<Button className="h-12 px-8 bg-blue-500" />
+// Avoid custom styling that breaks design system
+// <Button className="h-12 px-8 bg-blue-500" /> // Not recommended
 ```
 
-### Future-Proofing
+### Imports
 ```typescript
-// ✅ Good: Import from unified package
-import { Button, Card } from '@mimir-wallet/ui';
+// Import from unified package
+import { Button, Card, Table } from '@mimir-wallet/ui';
 
-// ❌ Avoid: Direct library imports
-import { Button } from '@heroui/button';
-import { Alert } from '@shadcn/ui';
+// Avoid direct Radix imports in application code
+// import { Button } from '@radix-ui/react-button'; // Not recommended
 ```
 
 ## Contributing
 
 When contributing to this package:
 
-1. **New Components**: Default to ShadCN/UI implementation
-2. **Updates**: Enhance existing HeroUI components as needed
-3. **Breaking Changes**: Always provide compatibility layer
-4. **Testing**: Ensure both component systems work correctly
+1. **New Components**: Follow ShadCN/UI patterns with Radix UI primitives
+2. **Styling**: Use Tailwind CSS and CVA for variants
+3. **Accessibility**: Ensure full keyboard and screen reader support
+4. **Testing**: Ensure components work correctly across themes
 
 ## License
 

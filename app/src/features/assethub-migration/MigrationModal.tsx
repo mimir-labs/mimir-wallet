@@ -30,7 +30,7 @@ function AccountItem({ account }: { account: MigratedAccount }) {
   const { open } = useCopyAddress();
 
   return (
-    <div className='border-divider-300 flex h-10 w-full items-center gap-[5px] rounded-[10px] border bg-white px-2.5'>
+    <div className='border-divider flex h-10 w-full items-center gap-[5px] rounded-[10px] border bg-white px-2.5'>
       {/* Account Icon */}
       <div className='h-5 w-5 flex-shrink-0'>
         <IdentityIcon value={account.address} size={20} />
@@ -42,7 +42,7 @@ function AccountItem({ account }: { account: MigratedAccount }) {
       </div>
 
       {/* Address */}
-      <div className='text-small min-w-0 flex-1 text-right' onClick={() => open(account.address)}>
+      <div className='min-w-0 flex-1 text-right text-sm' onClick={() => open(account.address)}>
         <Address value={account.address} shorten />
       </div>
     </div>
@@ -96,7 +96,7 @@ function MigrationModal({ isOpen, onClose, destChain, accounts = [] }: Props) {
 
         <ModalBody className='py-0'>
           <div className='flex flex-col gap-4'>
-            <p className='text-small'>
+            <p className='text-sm'>
               {`Due to the Asset Hub Migration, the following accounts's asset migrated to Asset Hub. Please use them on`}{' '}
               {destNetwork?.name} instead.
             </p>

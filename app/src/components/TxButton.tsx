@@ -7,7 +7,7 @@ import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkad
 import type { HexString } from '@polkadot/util/types';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, type ButtonProps, Spinner } from '@mimir-wallet/ui';
+import { Button, type ButtonProps, buttonSpinner } from '@mimir-wallet/ui';
 import React, { forwardRef, useState } from 'react';
 
 import { toastError } from './utils';
@@ -111,7 +111,7 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
 
     return (
       <Button {...props} ref={ref} disabled={disabled || isLoading} onClick={handleClick}>
-        {isLoading && <Spinner size='sm' />}
+        {isLoading && buttonSpinner}
         {startContent}
         {children}
         {endContent}

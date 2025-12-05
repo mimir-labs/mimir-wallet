@@ -239,7 +239,7 @@ function AddProxyContent({
           </Button>
         </div>
 
-        <Card className='shadow-small mx-auto w-full max-w-[800px]'>
+        <Card className='mx-auto w-full max-w-[800px] shadow-md'>
           <CardHeader className='gap-4'>
             <CardTitle className='text-foreground text-center text-xl font-extrabold'>
               Proxy Authorization Setup

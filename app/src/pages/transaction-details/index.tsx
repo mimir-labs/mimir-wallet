@@ -52,7 +52,7 @@ function SmPage({ transaction: propsTransaction }: { transaction: Transaction })
       <TxProgress
         account={account}
         transaction={transaction}
-        className='bg-background shadow-medium rounded-[20px] p-[15px]'
+        className='bg-background rounded-[20px] p-[15px] shadow-md'
       />
     </div>
   );
@@ -68,7 +68,7 @@ function PageTransactionDetails() {
   }, [transaction]);
 
   if (isFetching && !isFetched) {
-    return <Spinner size='lg' variant='wave' />;
+    return <Spinner size='lg' variant='ellipsis' />;
   }
 
   if (!transaction) {

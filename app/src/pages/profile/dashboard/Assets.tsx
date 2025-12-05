@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AccountEnhancedAssetBalance } from '@mimir-wallet/polkadot-core';
-import type { SortDescriptor } from '@react-types/shared';
+import type { SortDescriptor } from '@mimir-wallet/ui';
 
 import { useChains } from '@mimir-wallet/polkadot-core';
 import {
@@ -30,7 +30,7 @@ import { formatDisplay, formatUnits } from '@/utils';
 function Assets({ address }: { address: string }) {
   const allChainBalances = useAllChainBalances(address);
   const { chains: networks } = useChains();
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+  const [sortDescriptor] = useState<SortDescriptor>({
     column: 'balanceUsd',
     direction: 'descending'
   });
@@ -110,152 +110,143 @@ function Assets({ address }: { address: string }) {
 
   return (
     <Table
-      isHeaderSticky
-      classNames={{
-        base: 'py-0 group',
-        wrapper:
-          'rounded-[20px] p-2 sm:p-3 h-auto sm:h-[260px] py-0 sm:py-0 scroll-hover-show border-1 border-secondary bg-content1 shadow-medium',
-        thead: '[&>tr]:first:shadow-none bg-content1/70 backdrop-saturate-150 backdrop-blur-sm',
-        th: 'bg-transparent text-xs h-auto pt-5 pb-2 px-2 text-foreground/50 first:rounded-none last:rounded-none',
-        td: 'text-sm px-2',
-        loadingWrapper: 'relative h-10 table-cell px-2'
-      }}
-      sortDescriptor={sortDescriptor}
-      onSortChange={setSortDescriptor}
+      stickyHeader
+      containerClassName='border-secondary bg-background shadow-md rounded-[20px] border'
+      scrollClassName='h-auto sm:h-[260px] px-2 sm:px-3'
     >
       <TableHeader>
-        <TableColumn className='w-[33%]'>Token</TableColumn>
-        <TableColumn key='total' allowsSorting className='w-[33%]'>
-          Amount
-        </TableColumn>
-        <TableColumn key='balanceUsd' allowsSorting className='w-[33%]'>
-          USD Value
-        </TableColumn>
+        <TableRow>
+          <TableColumn className='w-[33%] pt-5 pb-2'>Token</TableColumn>
+          <TableColumn className='w-[33%] pt-5 pb-2'>Amount</TableColumn>
+          <TableColumn className='w-[33%] pt-5 pb-2'>USD Value</TableColumn>
+        </TableRow>
       </TableHeader>
 
-      <TableBody
-        items={list}
-        loadingContent={
-          <>
-            <Skeleton className='h-10 w-full rounded-[10px]' />
-          </>
-        }
-        isLoading={!done}
-        emptyContent={done ? <Empty className='text-foreground' height='150px' label='No assets' /> : null}
-      >
-        {(item) => {
-          const isNative = item.isNative;
-          const icon = item.logoUri;
-          const symbol = item.symbol;
-          const total = item.total;
-          const transferrable = item.transferrable;
-          const locked = item.locked;
-          const reserved = item.reserved;
-          const price = item.price || 0;
-          const decimals = item.decimals;
-          const format: [number, string] = [decimals, symbol];
-          const chainIcon = networks.find((network) => network.key === item.network)?.icon;
-          const balanceUsd = formatDisplay(
-            formatUnits((total * BigInt((price * 1e8).toFixed(0))) / BigInt(1e8), decimals)
-          );
-          const network = item.network;
+      <TableBody>
+        {done && list.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={3}>
+              <Empty className='text-foreground' height='150px' label='No assets' />
+            </TableCell>
+          </TableRow>
+        ) : (
+          list.map((item) => {
+            const isNative = item.isNative;
+            const icon = item.logoUri;
+            const symbol = item.symbol;
+            const total = item.total;
+            const transferrable = item.transferrable;
+            const locked = item.locked;
+            const reserved = item.reserved;
+            const price = item.price || 0;
+            const decimals = item.decimals;
+            const format: [number, string] = [decimals, symbol];
+            const chainIcon = networks.find((network) => network.key === item.network)?.icon;
+            const balanceUsd = formatDisplay(
+              formatUnits((total * BigInt((price * 1e8).toFixed(0))) / BigInt(1e8), decimals)
+            );
+            const network = item.network;
 
-          return (
-            <TableRow
-              key={`asset-balance-${isNative ? 'native' : item.key}-${network}`}
-              className='[&:hover>td]:bg-secondary [&:hover_.operation]:flex [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]'
-            >
-              <TableCell>
-                <div className='flex items-center gap-1'>
-                  <div className='relative'>
-                    <Avatar
-                      alt='Token'
-                      fallback={
-                        <div className='bg-divider-300 text-content1 flex h-[30px] w-[30px] items-center justify-center rounded-full text-lg font-bold'>
-                          {symbol.slice(0, 1)}
-                        </div>
-                      }
-                      src={icon}
-                      style={{ width: 30, height: 30 }}
-                      className='bg-content1'
-                    />
-                    <Avatar
-                      alt='Chain'
-                      src={chainIcon}
-                      className='absolute right-0 bottom-0 h-[14px] w-[14px] border-black bg-transparent'
-                    />
-                  </div>
-
-                  <div className='flex flex-col items-start gap-0'>
-                    <span>{symbol}</span>
-
-                    {!isNative && !!item.assetId ? (
-                      <small className='text-foreground/50 text-[10px] sm:text-xs'>{item.assetId}</small>
-                    ) : null}
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Tooltip
-                  classNames={{ content: 'border-secondary border-1 p-2.5 min-w-[163px]' }}
-                  content={
-                    <div className='w-full space-y-2.5 [&_div]:flex [&_div]:items-center [&_div]:justify-between [&_div]:gap-x-4'>
-                      <div>
-                        <span>Transferable</span>
-                        <FormatBalance format={format} value={transferrable} />
-                      </div>
-                      <div>
-                        <span>Reserved</span>
-                        <FormatBalance format={format} value={reserved} />
-                      </div>
-                      <div>
-                        <span>Locked</span>
-                        <FormatBalance format={format} value={locked} />
-                      </div>
+            return (
+              <TableRow
+                key={`asset-balance-${isNative ? 'native' : item.key}-${network}`}
+                className='[&:hover>td]:bg-secondary [&:hover_.operation]:flex [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]'
+              >
+                <TableCell>
+                  <div className='flex items-center gap-1'>
+                    <div className='relative'>
+                      <Avatar
+                        alt='Token'
+                        fallback={symbol.slice(0, 1)}
+                        src={icon}
+                        style={{ width: 30, height: 30 }}
+                        className='bg-background'
+                      />
+                      <Avatar
+                        alt='Chain'
+                        src={chainIcon}
+                        className='absolute right-0 bottom-0 h-[14px] w-[14px] border-black bg-transparent'
+                      />
                     </div>
-                  }
-                >
-                  <span>
-                    <FormatBalance format={format} value={total} />
-                  </span>
-                </Tooltip>
-              </TableCell>
-              <TableCell>
-                <div className='flex items-center justify-between gap-[5px]'>
-                  <span className='text-nowrap'>
-                    ${balanceUsd[0]}
-                    {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
-                    {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
-                  </span>
 
-                  <div className='operation hidden flex-row-reverse items-center gap-0 sm:gap-[5px]'>
-                    <Tooltip content='Transfer'>
-                      <Button asChild isIconOnly variant='light' size='sm'>
-                        <Link
-                          to='/explorer/$url'
-                          params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}
-                          search={{ assetId: item.isNative ? 'native' : item.key, asset_network: network }}
-                        >
-                          <IconSend className='h-[14px] w-[14px]' />
-                        </Link>
-                      </Button>
-                    </Tooltip>
+                    <div className='flex flex-col items-start gap-0'>
+                      <span>{symbol}</span>
 
-                    {isNative && network === 'polkadot' && (
-                      <Tooltip content='Stake'>
+                      {!isNative && !!item.assetId ? (
+                        <small className='text-foreground/50 text-[10px] sm:text-xs'>{item.assetId}</small>
+                      ) : null}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Tooltip
+                    classNames={{ content: 'border-secondary border-1 p-2.5 min-w-[163px]' }}
+                    content={
+                      <div className='w-full space-y-2.5 [&_div]:flex [&_div]:items-center [&_div]:justify-between [&_div]:gap-x-4'>
+                        <div>
+                          <span>Transferable</span>
+                          <FormatBalance format={format} value={transferrable} />
+                        </div>
+                        <div>
+                          <span>Reserved</span>
+                          <FormatBalance format={format} value={reserved} />
+                        </div>
+                        <div>
+                          <span>Locked</span>
+                          <FormatBalance format={format} value={locked} />
+                        </div>
+                      </div>
+                    }
+                  >
+                    <span>
+                      <FormatBalance format={format} value={total} />
+                    </span>
+                  </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <div className='flex items-center justify-between gap-[5px]'>
+                    <span className='text-nowrap'>
+                      ${balanceUsd[0]}
+                      {balanceUsd[1] ? `.${balanceUsd[1]}` : ''}
+                      {balanceUsd[2] ? ` ${balanceUsd[2]}` : ''}
+                    </span>
+
+                    <div className='operation hidden flex-row-reverse items-center gap-0 sm:gap-[5px]'>
+                      <Tooltip content='Transfer'>
                         <Button asChild isIconOnly variant='light' size='sm'>
-                          <Link to='/explorer/$url' params={{ url: `${StakingApp.url}` }}>
-                            <IconAdd className='h-[14px] w-[14px]' />
+                          <Link
+                            to='/explorer/$url'
+                            params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}
+                            search={{ assetId: item.isNative ? 'native' : item.key, asset_network: network }}
+                          >
+                            <IconSend className='h-[14px] w-[14px]' />
                           </Link>
                         </Button>
                       </Tooltip>
-                    )}
+
+                      {isNative && network === 'polkadot' && (
+                        <Tooltip content='Stake'>
+                          <Button asChild isIconOnly variant='light' size='sm'>
+                            <Link to='/explorer/$url' params={{ url: `${StakingApp.url}` }}>
+                              <IconAdd className='h-[14px] w-[14px]' />
+                            </Link>
+                          </Button>
+                        </Tooltip>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </TableCell>
-            </TableRow>
-          );
-        }}
+                </TableCell>
+              </TableRow>
+            );
+          })
+        )}
+        {!done && (
+          <TableRow>
+            <TableCell colSpan={3}>
+              <Skeleton className='h-10 w-full rounded-[10px]' />
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   );

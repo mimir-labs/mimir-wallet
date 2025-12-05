@@ -59,15 +59,7 @@ function AccountVisibility({ isOpen, onConfirm, pureAddress, multisigAddress }: 
           <div className='space-y-[5px]'>
             <div className='flex items-center justify-between gap-6'>
               <b className='text-foreground text-sm'>Hide Multisig</b>
-              <Switch
-                classNames={{
-                  wrapper: 'bg-primary/5 data-[selected=true]:bg-primary',
-                  thumb: 'bg-white'
-                }}
-                size='sm'
-                isSelected={hide}
-                onValueChange={setHide}
-              />
+              <Switch className='data-[state=unchecked]:bg-primary/5' checked={hide} onCheckedChange={setHide} />
             </div>
 
             <span className='text-foreground/50 text-xs'>Hide from account list (can unhide in Settings anytime).</span>

@@ -72,7 +72,7 @@ function DelayItem({ network, isSelected, delayType, customBlocks = '', onCustom
             min={0}
             value={customBlocks}
             onChange={onCustomBlockChange && ((e) => onCustomBlockChange(e.target.value))}
-            className='text-foreground border-divider-300 bg-primary-foreground h-[27px] flex-shrink flex-grow rounded-full border-1 px-2.5 outline-none'
+            className='text-foreground border-divider bg-primary-foreground h-[27px] flex-shrink flex-grow rounded-full border-1 px-2.5 outline-none'
           />
           <span className='text-nowrap'>
             Blocks ( <EstimateCustom network={network} customBlocks={customBlocks} /> )

@@ -4,7 +4,7 @@
 import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 
 import { addressEq, encodeAddress, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
-import { Button, Chip } from '@mimir-wallet/ui';
+import { Badge, Button } from '@mimir-wallet/ui';
 import React, { useMemo } from 'react';
 
 import AddressComp from './Address';
@@ -94,17 +94,9 @@ function AddressCell({
             <AddressName defaultName={defaultName} value={value} meta={meta} />
           </span>
 
-          {showType && isMultisig && (
-            <Chip color='secondary' size='sm'>
-              Multisig
-            </Chip>
-          )}
+          {showType && isMultisig && <Badge variant='secondary'>Multisig</Badge>}
 
-          {showType && (isPure || isProxied) && (
-            <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
-              {isPure ? 'Pure' : 'Proxied'}
-            </Chip>
-          )}
+          {showType && (isPure || isProxied) && <Badge variant='purple'>{isPure ? 'Pure' : 'Proxied'}</Badge>}
 
           {withPendingTxCounts && !!totalCounts && (
             <div className='flex h-4 w-4 items-center justify-center rounded-full bg-[#FF8C00] text-[10px] text-white'>

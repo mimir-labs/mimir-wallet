@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Avatar, Badge, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
+import { Avatar, Badge, BadgeIndicator, Button, Spinner, Tooltip } from '@mimir-wallet/ui';
 import { useContext, useEffect, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -14,7 +14,7 @@ function BadgeContent({ size, icon }: { size: number; icon?: string }) {
   const [showFallback, setShowFallback] = useState(false);
 
   if (size > 1) {
-    return size;
+    return <Badge className='h-4 min-w-4 rounded-full px-1 tabular-nums'>{size}</Badge>;
   }
 
   return (
@@ -57,18 +57,17 @@ function WalletConnect() {
 
   return (
     <>
-      <Badge
+      <BadgeIndicator
         isInvisible={sessions.length === 0}
         content={<BadgeContent size={sessions.length} icon={sessions?.[0]?.peer?.metadata?.icons?.[0]} />}
         color='primary'
         placement='bottom-right'
-        size='sm'
-        classNames={{
-          base: 'flex-[0_0_auto]',
-          badge: (sessions.length === 1 ? ['bg-transparent p-0 border-none'] : []).concat([
-            'bottom-0.5 right-1 translate-x-0 -translate-y-0 pointer-events-none'
-          ])
-        }}
+        className='shrink-0'
+        badgeClassName={
+          sessions.length === 1
+            ? 'bg-transparent p-0 border-none bottom-0.5 right-1 translate-x-0 -translate-y-0'
+            : 'bottom-0.5 right-1 translate-x-0 -translate-y-0'
+        }
       >
         <Tooltip color='default' content='WalletConnect'>
           <Button
@@ -86,7 +85,7 @@ function WalletConnect() {
             <IconWalletConnect />
           </Button>
         </Tooltip>
-      </Badge>
+      </BadgeIndicator>
 
       <WalletConnectModal isOpen={isOpen} onClose={toggleOpen} />
     </>

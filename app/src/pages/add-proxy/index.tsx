@@ -14,7 +14,7 @@ const MobileAddProxy = lazy(() => import('./mobile'));
 function AddProxyFallback() {
   return (
     <div className='flex h-screen items-center justify-center'>
-      <Spinner variant='wave' />
+      <Spinner variant='ellipsis' />
     </div>
   );
 }

@@ -212,7 +212,7 @@ export function Autocomplete({
         </div>
       </PopoverTrigger>
       <PopoverContent
-        className='border-divider-300 w-[var(--radix-popover-trigger-width)] border-1 p-[5px]'
+        className='border-divider w-[var(--radix-popover-trigger-width)] border-1 p-[5px]'
         align='start'
         onOpenAutoFocus={(e) => e.preventDefault()}
       >

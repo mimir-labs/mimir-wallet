@@ -7,7 +7,6 @@ import { cn } from '../lib/utils.js';
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './dialog.js';
 
-// Size mapping from HeroUI to Tailwind classes
 const sizeClassNames = {
   xs: 'max-w-xs',
   sm: 'max-w-sm',

@@ -48,7 +48,7 @@ function AllHistoryTransactions({
       {groupedExtrinsics.map((group) => (
         <div
           key={group.date}
-          className='bg-background shadow-small border-secondary flex flex-col gap-3 rounded-[20px] border-1 p-5'
+          className='bg-background border-secondary flex flex-col gap-3 rounded-[20px] border-1 p-5 shadow-md'
         >
           <h6 className='text-primary'>{group.label}</h6>
           <div className='space-y-3'>

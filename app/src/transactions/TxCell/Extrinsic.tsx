@@ -124,7 +124,7 @@ function Extrinsic({
             <div
               data-mobile={isMobile}
               className={cn(
-                'border-divider-300 mt-[5px] flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5',
+                'border-divider mt-[5px] flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5',
                 'data-[mobile=true]:bg-background'
               )}
             >

@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TransactionSocketProvider } from '@mimir-wallet/service';
-import { HeroUIProvider } from '@mimir-wallet/ui';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { createRootRoute, Outlet, retainSearchParams, useRouter } from '@tanstack/react-router';
+import { createRootRoute, Outlet, retainSearchParams } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { zodValidator } from '@tanstack/zod-adapter';
 import { z } from 'zod';
@@ -74,26 +73,16 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  // Note: HeroUIProvider from @heroui/system may expect navigate/useHref props
-  // If it does, we'll need to provide TanStack Router equivalents
-  // For now, we'll use it without those props and see if it works
-  const router = useRouter();
-
   return (
-    <HeroUIProvider
-      navigate={(to, options: unknown) => router.navigate({ to, ...(options as object) })}
-      useHref={(to) => router.buildLocation({ to }).href}
-    >
-      <AccountConsumer>
-        <WalletConnectProvider>
-          <TransactionSocketProvider path='/notification-push'>
-            <Outlet />
-            <GlobalModalsAndComponents />
-            {import.meta.env.DEV && <TanStackRouterDevtools />}
-            {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
-          </TransactionSocketProvider>
-        </WalletConnectProvider>
-      </AccountConsumer>
-    </HeroUIProvider>
+    <AccountConsumer>
+      <WalletConnectProvider>
+        <TransactionSocketProvider path='/notification-push'>
+          <Outlet />
+          <GlobalModalsAndComponents />
+          {import.meta.env.DEV && <TanStackRouterDevtools />}
+          {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+        </TransactionSocketProvider>
+      </WalletConnectProvider>
+    </AccountConsumer>
   );
 }

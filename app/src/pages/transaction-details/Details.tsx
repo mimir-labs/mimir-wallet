@@ -63,7 +63,7 @@ function Details({ transaction }: { transaction: Transaction }) {
   const { call } = useParseCall(network, transaction.call);
 
   return (
-    <div className='bg-content1 border-secondary shadow-medium space-y-2.5 rounded-[20px] border-1 p-4'>
+    <div className='bg-background border-secondary space-y-2.5 rounded-[20px] border-1 p-4 shadow-md'>
       <h6 className='text-primary'>Detail</h6>
       <Divider />
 

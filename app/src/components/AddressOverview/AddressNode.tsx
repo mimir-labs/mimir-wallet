@@ -3,7 +3,7 @@
 
 import type { NodeData } from './context';
 
-import { Avatar, Button, Chip } from '@mimir-wallet/ui';
+import { Avatar, Badge, Button } from '@mimir-wallet/ui';
 import { Handle, type Node, type NodeProps, Position } from '@xyflow/react';
 import React, { useContext } from 'react';
 
@@ -32,7 +32,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
 
   if (data.account.type === 'pure' && data.account.isUnknownPure) {
     cell = data.isTop ? (
-      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
+      <div className='bg-background border-primary/5 relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5 shadow-md'>
         <div className='bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full' />
         <div className='z-10 flex h-full w-full flex-col items-center gap-[5px]'>
           <Avatar src={PureIcon} style={{ width: 40 }} />
@@ -41,7 +41,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
         </div>
       </div>
     ) : (
-      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
+      <div className='bg-background border-primary/5 relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5 shadow-md'>
         <div className={`flex min-w-0 flex-1 items-center gap-2.5`}>
           <Avatar src={PureIcon} style={{ width: 30 }} />
           <div className='flex min-w-0 flex-1 flex-col gap-y-[2px]'>
@@ -56,7 +56,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
     );
   } else {
     cell = data.isTop ? (
-      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
+      <div className='bg-background border-primary/5 relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5 shadow-md'>
         <div className='bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full' />
         <div className='z-10 flex h-full w-full flex-col items-center gap-[5px]'>
           <IdentityIcon value={data.account.address} size={40} />
@@ -106,21 +106,13 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
           </div>
 
           <div className='flex items-center'>
-            {isMultisig && (
-              <Chip color='secondary' size='sm'>
-                Multisig
-              </Chip>
-            )}
-            {(isPure || isProxied) && (
-              <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
-                {isPure ? 'Pure' : 'Proxied'}
-              </Chip>
-            )}
+            {isMultisig && <Badge variant='secondary'>Multisig</Badge>}
+            {(isPure || isProxied) && <Badge variant='purple'>{isPure ? 'Pure' : 'Proxied'}</Badge>}
           </div>
         </div>
       </div>
     ) : (
-      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
+      <div className='bg-background border-primary/5 relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5 shadow-md'>
         <AddressCell
           value={data.account.address}
           withAddressBook={showAddressNodeOperations}
@@ -158,12 +150,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
             height: 18,
             left: 2.5,
             borderRadius: '10px',
-            background:
-              isPure || isProxied
-                ? '#B700FF'
-                : isMultisig
-                  ? 'hsl(var(--heroui-primary))'
-                  : 'hsl(var(--heroui-divider-300))'
+            background: isPure || isProxied ? '#B700FF' : isMultisig ? 'var(--primary)' : 'var(--border)'
           }}
           type='source'
         />
@@ -181,11 +168,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
             right: 2.5,
             borderRadius: '10px',
             background:
-              data.type === 'proxy'
-                ? '#B700FF'
-                : data.type === 'multisig'
-                  ? 'hsl(var(--heroui-primary))'
-                  : 'hsl(var(--heroui-divider-300))'
+              data.type === 'proxy' ? '#B700FF' : data.type === 'multisig' ? 'var(--primary)' : 'var(--border)'
           }}
           type='target'
         />

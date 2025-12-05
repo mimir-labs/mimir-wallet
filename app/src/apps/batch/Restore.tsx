@@ -97,7 +97,7 @@ Timestamp: ${time}`;
     <div className='flex h-full flex-1 flex-col gap-5 overflow-hidden'>
       {isFetched && !txs?.length && <Empty label='No batch found' height='300px' />}
 
-      {!isFetched && isFetching && <Spinner variant='wave' />}
+      {!isFetched && isFetching && <Spinner variant='ellipsis' />}
 
       <div className='scrollbar-hide flex-1 space-y-2.5 overflow-y-auto'>
         {current && !!txs?.length && (
@@ -109,15 +109,15 @@ Timestamp: ${time}`;
             {txs?.map((item) => (
               <BatchItem key={item.id} from={current} calldata={item.call} registry={registry}>
                 <div className='col-span-1 flex items-center'>
-                  <Checkbox
-                    size='sm'
-                    isSelected={selected.includes(item.id)}
-                    onValueChange={(state) => {
-                      setSelected((values) => (state ? [...values, item.id] : values.filter((v) => item.id !== v)));
-                    }}
-                  >
-                    {item.id}
-                  </Checkbox>
+                  <label className='inline-flex cursor-pointer items-center gap-2'>
+                    <Checkbox
+                      checked={selected.includes(item.id)}
+                      onCheckedChange={(state) => {
+                        setSelected((values) => (state ? [...values, item.id] : values.filter((v) => item.id !== v)));
+                      }}
+                    />
+                    <span>{item.id}</span>
+                  </label>
                 </div>
                 <div className='col-span-2 flex items-center'>
                   <CallDisplaySection section={item.section} method={item.method} />
@@ -155,20 +155,19 @@ Timestamp: ${time}`;
 
       <div className='flex gap-5'>
         <div className='flex flex-1 items-center pl-2'>
-          <Checkbox
-            size='sm'
-            isSelected={isCheckAll || isCheckSome}
-            isIndeterminate={isCheckSome}
-            onValueChange={(checked) => {
-              if (checked) {
-                setSelected(txs.map((item) => item.id));
-              } else {
-                setSelected([]);
-              }
-            }}
-          >
-            All
-          </Checkbox>
+          <label className='inline-flex cursor-pointer items-center gap-2'>
+            <Checkbox
+              checked={isCheckSome ? 'indeterminate' : isCheckAll}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  setSelected(txs.map((item) => item.id));
+                } else {
+                  setSelected([]);
+                }
+              }}
+            />
+            <span>All</span>
+          </label>
         </div>
 
         <Button

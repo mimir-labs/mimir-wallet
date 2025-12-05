@@ -177,47 +177,48 @@ function ProposerSet({ account, refetch }: { account: AccountData; refetch: () =
   return (
     <>
       <div className='space-y-5'>
-        <Table
-          removeWrapper
-          classNames={{
-            th: 'bg-transparent text-sm font-bold',
-            td: 'text-sm'
-          }}
-        >
+        <Table>
           <TableHeader>
-            <TableColumn>Proposer</TableColumn>
-            <TableColumn>Creator</TableColumn>
-            <TableColumn align='end'>Operation</TableColumn>
+            <TableRow>
+              <TableColumn className='text-sm font-bold'>Proposer</TableColumn>
+              <TableColumn className='text-sm font-bold'>Creator</TableColumn>
+              <TableColumn className='text-right text-sm font-bold'>Operation</TableColumn>
+            </TableRow>
           </TableHeader>
 
-          <TableBody
-            items={proposers}
-            emptyContent={<Empty className='text-foreground' height='150px' label='No proposers' />}
-          >
-            {(item) => (
-              <TableRow key={item.proposer}>
-                <TableCell>
-                  <AddressRow shorten withCopy iconSize={20} value={item.proposer} />
-                </TableCell>
-                <TableCell>
-                  <AddressRow shorten withCopy iconSize={20} value={item.creator} />
-                </TableCell>
-                <TableCell align='right'>
-                  <Button
-                    isIconOnly
-                    size='sm'
-                    variant='light'
-                    color='danger'
-                    onClick={() => {
-                      toggleOpen(true);
-                      setDeleteProposer(item.proposer);
-                      setType('delete');
-                    }}
-                  >
-                    <IconDelete />
-                  </Button>
+          <TableBody>
+            {!proposers || proposers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3}>
+                  <Empty className='text-foreground' height='150px' label='No proposers' />
                 </TableCell>
               </TableRow>
+            ) : (
+              proposers.map((item) => (
+                <TableRow key={item.proposer}>
+                  <TableCell>
+                    <AddressRow shorten withCopy iconSize={20} value={item.proposer} />
+                  </TableCell>
+                  <TableCell>
+                    <AddressRow shorten withCopy iconSize={20} value={item.creator} />
+                  </TableCell>
+                  <TableCell className='text-right'>
+                    <Button
+                      isIconOnly
+                      size='sm'
+                      variant='light'
+                      color='danger'
+                      onClick={() => {
+                        toggleOpen(true);
+                        setDeleteProposer(item.proposer);
+                        setType('delete');
+                      }}
+                    >
+                      <IconDelete />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>

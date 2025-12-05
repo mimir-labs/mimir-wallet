@@ -139,7 +139,7 @@ function AddProxy({
             {'<'} Back
           </Button>
         </div>
-        <div className='bg-content1 border-secondary shadow-medium mt-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
+        <div className='bg-background border-secondary mt-2.5 rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
           <div className='space-y-5'>
             <div className='flex justify-between'>
               <h3>{pure ? 'Create New Pure Proxy' : 'Add Proxy'}</h3>
@@ -200,8 +200,8 @@ function AddProxy({
             <div className='flex items-center justify-between'>
               <div className='font-bold'>Advanced Setting</div>
               <Switch
-                isSelected={advanced}
-                onValueChange={(checked) => {
+                checked={advanced}
+                onCheckedChange={(checked) => {
                   toggleAdvanced(checked);
                 }}
               />

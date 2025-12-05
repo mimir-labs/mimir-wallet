@@ -23,7 +23,7 @@ function AppFrame({ url, iconUrl, appName }: { url: string; iconUrl?: string; ap
 
   return (
     <div key={selected || 'none'} className='relative h-full'>
-      {loading && <Spinner size='lg' variant='wave' className='absolute top-0 right-0 bottom-0 left-0 m-auto' />}
+      {loading && <Spinner size='lg' variant='ellipsis' className='absolute top-0 right-0 bottom-0 left-0 m-auto' />}
       {url && <AppIframe appUrl={appUrl} iframeRef={iframeRef} key={url} onLoad={() => setLoading(false)} />}
       {url && selected && <PendingTx address={selected} url={url} />}
     </div>

@@ -113,11 +113,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false,
               borderRadius: `${Math.max(12, size / 2.5) / 2}px`,
               fontWeight: 700,
               fontSize: size / 3,
-              background: withBorder
-                ? isProxied
-                  ? '#B700FF'
-                  : 'hsl(var(--heroui-primary))'
-                : 'hsl(var(--heroui-primary))'
+              background: withBorder ? (isProxied ? '#B700FF' : 'var(--primary)') : 'var(--primary)'
             }}
           >
             {who && who.length > 0 ? `${threshold}/${who.length}` : 'Multi'}
@@ -138,7 +134,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false,
           <div
             style={{
               zIndex: 1,
-              borderColor: isProxied ? '#B700FF' : 'hsl(var(--heroui-primary))',
+              borderColor: isProxied ? '#B700FF' : 'var(--primary)',
               position: 'absolute',
               top: -3,
               right: -3,

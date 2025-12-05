@@ -79,7 +79,7 @@ function AddressItem({ address }: { address: string }) {
   return (
     <>
       {!upSm && (
-        <div className='border-secondary bg-content1 shadow-medium rounded-[20px] border-1 p-4 [&_.AddressCell-Address]:!mt-2.5 [&_.AddressCell-Address]:text-sm [&_.AddressCell-Content]:ml-2.5 [&_.AddressCell-Name]:text-lg'>
+        <div className='border-secondary bg-background rounded-[20px] border-1 p-4 shadow-md [&_.AddressCell-Address]:!mt-2.5 [&_.AddressCell-Address]:text-sm [&_.AddressCell-Content]:ml-2.5 [&_.AddressCell-Name]:text-lg'>
           <AddressCell iconSize={50} icons={<Icons address={address} />} shorten value={address} withCopy={false} />
           <div className='mt-5 flex gap-2.5'>
             <Button onClick={toggleOpen} variant='ghost' className='ml-16'>
@@ -95,7 +95,7 @@ function AddressItem({ address }: { address: string }) {
         </div>
       )}
       {upSm && (
-        <div className='bg-content1 shadow-medium relative flex items-center gap-10 rounded-[20px] p-6'>
+        <div className='bg-background relative flex items-center gap-10 rounded-[20px] p-6 shadow-md'>
           <div className='flex flex-[1] items-center gap-2.5'>
             <p className='text-lg font-bold'>{meta?.name}</p>
           </div>

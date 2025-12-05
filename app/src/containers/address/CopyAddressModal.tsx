@@ -167,17 +167,10 @@ function CopyAddressModal() {
         <DrawerContent>
           <div className='flex flex-col gap-2.5 overflow-y-auto p-4'>{content}</div>
           <DrawerFooter>
-            <Switch
-              className='w-full max-w-full flex-row-reverse justify-between'
-              size='sm'
-              classNames={{
-                label: 'm-0'
-              }}
-              isSelected={showAll}
-              onValueChange={setShowAll}
-            >
-              Show All Networks
-            </Switch>
+            <label className='flex w-full items-center justify-between'>
+              <span className='text-sm'>Show All Networks</span>
+              <Switch checked={showAll} onCheckedChange={setShowAll} />
+            </label>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
@@ -189,17 +182,10 @@ function CopyAddressModal() {
       <ModalContent>
         <ModalBody>{content}</ModalBody>
         <ModalFooter>
-          <Switch
-            className='w-full max-w-full flex-row-reverse justify-between'
-            size='sm'
-            classNames={{
-              label: 'm-0'
-            }}
-            isSelected={showAll}
-            onValueChange={setShowAll}
-          >
-            Show All Networks
-          </Switch>
+          <label className='flex w-full items-center justify-between'>
+            <span className='text-sm'>Show All Networks</span>
+            <Switch checked={showAll} onCheckedChange={setShowAll} />
+          </label>
         </ModalFooter>
       </ModalContent>
     </Modal>

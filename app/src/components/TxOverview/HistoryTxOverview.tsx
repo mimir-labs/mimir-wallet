@@ -65,12 +65,12 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
           isConnectable={isConnectable}
           position={Position.Left}
           style={{ zIndex: 1, top: 22, left: 0, width: 0, height: 0 }}
-          className='bg-divider-300'
+          className='bg-divider'
           type='source'
         />
       )}
       <div>
-        <div className='bg-content1 border-divider-300 flex w-[220px] items-center justify-between rounded-[10px] border-1 px-2.5 py-[3px]'>
+        <div className='bg-background border-divider flex w-[220px] items-center justify-between rounded-[10px] border-1 px-2.5 py-[3px]'>
           <AddressCell value={data.transaction.address} withCopy withAddressBook />
           {icon}
         </div>
@@ -80,7 +80,7 @@ const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData
           isConnectable={isConnectable}
           position={Position.Right}
           style={{ zIndex: 1, top: 22, right: 0, width: 0, height: 0 }}
-          className='bg-divider-300'
+          className='bg-divider'
           type='target'
         />
       )}

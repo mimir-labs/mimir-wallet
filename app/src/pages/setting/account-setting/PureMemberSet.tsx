@@ -4,9 +4,9 @@
 import type { PureAccountData } from '@/hooks/types';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
+import { Tabs, Tooltip } from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import MemberSet from './MemberSet';
 
@@ -16,6 +16,7 @@ import { usePendingTransactions } from '@/hooks/useTransactions';
 function PureMemberSet({ account }: { account: PureAccountData }) {
   const { network } = useNetwork();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('0');
 
   // Memoize filtered delegatees to avoid recalculation on every render
   const multisigDelegatees = useMemo(
@@ -36,6 +37,9 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
     return null;
   }
 
+  const activeIndex = parseInt(activeTab, 10);
+  const activeAccount = multisigDelegatees[activeIndex] || multisigDelegatees[0];
+
   return (
     <div>
       <h6 className='text-foreground/50 mb-2.5 inline-flex items-center gap-1 text-sm'>
@@ -47,7 +51,7 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
           <IconQuestion className='text-primary' />
         </Tooltip>
       </h6>
-      <div className='border-secondary bg-content1 shadow-medium rounded-[20px] border-1 p-4 sm:p-5'>
+      <div className='border-secondary bg-background rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
         {txs.length > 0 && (
           <div className='text-primary mb-5 cursor-pointer font-bold' onClick={handleNavigateToTransactions}>
             Please process {txs.length} Pending Transaction first
@@ -58,16 +62,15 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
           <>
             <Tabs
               className='mb-2.5'
-              classNames={{ tabList: 'p-0 rounded-none', tab: 'px-2 h-10', cursor: 'w-full' }}
               variant='underlined'
-              color='primary'
-            >
-              {multisigDelegatees.map((item, index) => (
-                <Tab title={`Members Set${index + 1}`} value={String(index)} key={index}>
-                  <MemberSet account={item} pureAccount={account} disabled={!!txs.length} />
-                </Tab>
-              ))}
-            </Tabs>
+              tabs={multisigDelegatees.map((_, index) => ({
+                key: String(index),
+                label: `Members Set${index + 1}`
+              }))}
+              selectedKey={activeTab}
+              onSelectionChange={setActiveTab}
+            />
+            <MemberSet account={activeAccount} pureAccount={account} disabled={!!txs.length} />
           </>
         ) : (
           <MemberSet account={multisigDelegatees[0]} pureAccount={account} disabled={!!txs.length} />

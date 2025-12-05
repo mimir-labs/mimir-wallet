@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, Chip } from '@mimir-wallet/ui';
+import { Badge, Button } from '@mimir-wallet/ui';
 import { useMemo } from 'react';
 
 import { type DappOption, dapps } from '@/config';
@@ -46,14 +46,14 @@ function MatchedAppItem(dapp: DappOption & { path?: string; network?: string }) 
   return (
     <div
       onClick={() => openDapp(path, network)}
-      className='border-divider-300 hover:border-primary focus-visible:border-primary focus-visible:ring-primary/30 flex w-full cursor-pointer items-center justify-between rounded-[10px] border p-2.5 transition-colors focus-visible:ring-2 focus-visible:outline-none'
+      className='border-divider hover:border-primary focus-visible:border-primary focus-visible:ring-primary/30 flex w-full cursor-pointer items-center justify-between rounded-[10px] border p-2.5 transition-colors focus-visible:ring-2 focus-visible:outline-none'
     >
       {/* Left side: Icon and name */}
       <div className='flex items-center gap-2.5'>
         <img src={icon} alt={name} className='h-[30px] w-[30px] rounded-full' />
         <div className='text-foreground text-[14px] font-bold'>{name}</div>
       </div>
-      {tag && <Chip color='secondary'>{tag}</Chip>}
+      {tag && <Badge variant='secondary'>{tag}</Badge>}
 
       {/* Right side: View button */}
       <Button

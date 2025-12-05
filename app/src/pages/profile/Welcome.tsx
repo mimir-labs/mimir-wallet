@@ -152,7 +152,7 @@ function Accounts({
 
   if (!isConnected) {
     return (
-      <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
+      <div className='bg-background w-full space-y-4 rounded-[20px] p-5 shadow-md'>
         <h3 className='font-extrabold'>Your Account</h3>
 
         {description}
@@ -173,7 +173,7 @@ function Accounts({
   }
 
   return (
-    <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
+    <div className='bg-background w-full space-y-4 rounded-[20px] p-5 shadow-md'>
       <div className='flex items-center justify-between gap-2.5'>
         <h3 className='flex-1 font-extrabold'>Your Account</h3>
         <Button asChild size='sm' color='primary' variant='ghost'>
@@ -220,7 +220,7 @@ function ExampleAccount() {
   const [exampleAccounts, setExampleAccounts] = useState<string[]>(nextExampleAccount());
 
   return (
-    <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
+    <div className='bg-background w-full space-y-4 rounded-[20px] p-5 shadow-md'>
       <div className='flex items-center'>
         <h3 className='font-extrabold'>Example Account</h3>
         <Button
@@ -276,7 +276,7 @@ function Welcome() {
         <Input
           fullWidth
           className='[&_input]:bg-background w-full [&_input]:rounded-full'
-          endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider-300 h-4 w-4' />}
+          endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider h-4 w-4' />}
           onChange={setKeywords}
           placeholder='Please input address'
           value={keywords}

@@ -142,10 +142,10 @@ function AccountSelect({ withSearch, accounts, ignoreAccounts = [], onClick, tit
     <div className='flex flex-1 flex-col gap-3'>
       <b>{title}</b>
 
-      <div className='border-divider-300 bg-content1 relative mt-1 flex-1 space-y-2.5 overflow-y-auto rounded-[10px] border-1 p-2.5'>
+      <div className='border-divider bg-background relative mt-1 flex-1 space-y-2.5 overflow-y-auto rounded-[10px] border-1 p-2.5'>
         {withSearch && (
           <Input
-            className='bg-content1 sticky top-0 z-10'
+            className='bg-background sticky top-0 z-10'
             endAdornment={<IconSearch />}
             onChange={setKeywords}
             placeholder='search or input address'

@@ -4,7 +4,7 @@
 import type { MultiTransferData } from './types';
 
 import { ApiManager, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, Chip, Divider } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Badge, Button, Divider } from '@mimir-wallet/ui';
 import { isHex } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
 
@@ -114,11 +114,7 @@ function MultiTransferContent({ data, sending, network, setNetwork, setData }: P
         endContent={
           sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt]
             ? {
-                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: (
-                  <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
-                    Remote Proxy
-                  </Chip>
-                )
+                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: <Badge variant='purple'>Remote Proxy</Badge>
               }
             : undefined
         }

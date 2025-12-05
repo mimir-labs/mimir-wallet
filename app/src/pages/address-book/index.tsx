@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
+import { Tabs, Tooltip } from '@mimir-wallet/ui';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useTransition } from 'react';
 
@@ -25,11 +25,11 @@ function PageAddressBook() {
   const contactAddresses = addresses.filter((address) => !address.watchlist);
   const watchlistAddresses = addresses.filter((address) => address.watchlist);
 
-  const handleTabChange = (key: React.Key) => {
+  const handleTabChange = (key: string) => {
     // Wrap tab navigation in transition for smooth switching
     startTransition(() => {
       navigate({
-        search: ((prev: any) => ({ ...prev, tab: key.toString() })) as any,
+        search: ((prev: any) => ({ ...prev, tab: key })) as any,
         replace: true
       });
     });
@@ -37,20 +37,24 @@ function PageAddressBook() {
 
   return (
     <>
-      <Tabs color='primary' aria-label='Address Book' selectedKey={selectedTab} onSelectionChange={handleTabChange}>
-        <Tab key='contacts' title='Contacts' />
-        <Tab
-          key='watchlist'
-          title={
-            <div className='flex items-center gap-1'>
-              <span>Watchlist</span>
-              <Tooltip content='You can view watchlist in account side bar'>
-                <IconQuestion className='h-4 w-4 opacity-70' />
-              </Tooltip>
-            </div>
+      <Tabs
+        tabs={[
+          { key: 'contacts', label: 'Contacts' },
+          {
+            key: 'watchlist',
+            label: (
+              <div className='flex items-center gap-1'>
+                <span>Watchlist</span>
+                <Tooltip content='You can view watchlist in account side bar'>
+                  <IconQuestion className='h-4 w-4 opacity-70' />
+                </Tooltip>
+              </div>
+            )
           }
-        />
-      </Tabs>
+        ]}
+        selectedKey={selectedTab}
+        onSelectionChange={handleTabChange}
+      />
 
       <div className='mt-5 flex justify-between gap-2.5'>
         <AddAddress isWatchlist={selectedTab === 'watchlist'} />

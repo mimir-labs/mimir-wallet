@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Spinner, Tab, Tabs } from '@mimir-wallet/ui';
+import { Spinner, Tabs } from '@mimir-wallet/ui';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { lazy, Suspense, useTransition } from 'react';
 
@@ -15,7 +15,7 @@ const CustomApps = lazy(() => import('./CustomApps'));
 function DappListFallback() {
   return (
     <div className='flex h-64 items-center justify-center'>
-      <Spinner variant='wave' />
+      <Spinner variant='ellipsis' />
     </div>
   );
 }
@@ -30,8 +30,8 @@ function PageDapp() {
   // Use React 19 useTransition for non-blocking tab switches
   const [, startTransition] = useTransition();
 
-  const handleTabChange = (key: string | number) => {
-    const newTab = key.toString() as 'apps' | 'custom';
+  const handleTabChange = (key: string) => {
+    const newTab = key as 'apps' | 'custom';
 
     // Wrap tab navigation in transition for smooth switching
     startTransition(() => {
@@ -47,28 +47,24 @@ function PageDapp() {
       <WalletConnectExample />
 
       <Tabs
-        color='primary'
-        variant='solid'
-        aria-label='Tabs'
+        tabs={[
+          { key: 'apps', label: 'Apps' },
+          { key: 'custom', label: 'Custom Apps' }
+        ]}
         selectedKey={tab}
         onSelectionChange={handleTabChange}
-        classNames={{
-          tabList: ['bg-white', 'shadow-medium', 'rounded-[20px]', 'p-2.5'],
-          tabContent: ['text-primary/50', 'font-bold'],
-          cursor: ['rounded-[10px]']
-        }}
-      >
-        <Tab key='apps' title='Apps'>
-          <Suspense fallback={<DappListFallback />}>
-            <AppList />
-          </Suspense>
-        </Tab>
-        <Tab key='custom' title='Custom Apps'>
-          <Suspense fallback={<DappListFallback />}>
-            <CustomApps />
-          </Suspense>
-        </Tab>
-      </Tabs>
+      />
+
+      {tab === 'apps' && (
+        <Suspense fallback={<DappListFallback />}>
+          <AppList />
+        </Suspense>
+      )}
+      {tab === 'custom' && (
+        <Suspense fallback={<DappListFallback />}>
+          <CustomApps />
+        </Suspense>
+      )}
     </div>
   );
 }

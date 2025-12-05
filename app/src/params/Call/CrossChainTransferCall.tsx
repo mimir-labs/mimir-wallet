@@ -197,7 +197,7 @@ const CrossChainTransferCall = forwardRef<HTMLDivElement | null, CallProps>((pro
           <PopoverContent className='flex flex-col gap-2.5'>
             <h6>Asset List</h6>
             {results.assets.map((asset, index) => (
-              <div key={index} className='border-divider-300 rounded-[10px] border-1 px-5 py-2.5 text-center'>
+              <div key={index} className='border-divider rounded-[10px] border-1 px-5 py-2.5 text-center'>
                 <AmountDisplay asset={asset} key={index} />
               </div>
             ))}
