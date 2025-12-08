@@ -22,7 +22,8 @@
   "scripts": {
     "dev": "vite",
     "check-types": "tsc -b --noEmit",
-    "build": "tsc -b && vite build"
+    "build": "tsc -b && vite build",
+    "lint": "mimir-lint"
   },
   "peerDependencies": {
     "@polkadot/api": "*",

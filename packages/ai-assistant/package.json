@@ -16,35 +16,15 @@
   "type": "module",
   "name": "@mimir-wallet/ai-assistant",
   "version": "2.24.1",
-  "main": "build/index.js",
-  "module": "build/index.js",
-  "types": "build/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "import": {
-        "@mimir-wallet/source": "./src/index.ts",
-        "types": "./build/index.d.ts",
-        "default": "./build/index.js"
-      }
-    },
-    "./SimpleChat": {
-      "import": {
-        "@mimir-wallet/source": "./src/SimpleChat.ts",
-        "types": "./build/SimpleChat.d.ts",
-        "default": "./build/SimpleChat.js"
-      }
-    },
+    ".": "./src/index.ts",
+    "./SimpleChat": "./src/SimpleChat.ts",
     "./styles.css": "./styles.css"
   },
-  "files": [
-    "build",
-    "LICENSE"
-  ],
   "scripts": {
-    "build": "tsc --build",
     "check-types": "tsc --noEmit",
-    "dev": "tsc --watch"
+    "lint": "mimir-lint"
   },
   "peerDependencies": {
     "react": ">=18",

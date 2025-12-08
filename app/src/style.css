@@ -1,6 +1,6 @@
 @import '@xyflow/react/dist/style.css';
 @import '@mimir-wallet/ui/styles.css';
-@source '../node_modules/@mimir-wallet/ui/build/**/*.{js,ts,jsx,tsx}';
-@source '../node_modules/@mimir-wallet/ai-assistant/build/**/*.{js,ts,jsx,tsx}';
+@source '../../packages/ui/src/**/*.{js,ts,jsx,tsx}';
+@source '../../packages/ai-assistant/src/**/*.{js,ts,jsx,tsx}';
 @source '../index.html';
 @source '../src/**/*.{js,ts,jsx,tsx,mdx}';

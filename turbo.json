@@ -1,21 +1,18 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "ui": "stream",
+  "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
       "outputs": ["dist/**", "build/**"]
     },
     "check-types": {},
+    "lint": {},
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "test": {
-      "dependsOn": ["build"]
-    },
+    "test": {},
     "test:cov": {
-      "dependsOn": ["build"],
       "outputs": ["coverage/**"]
     }
   }

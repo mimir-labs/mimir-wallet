@@ -16,16 +16,17 @@
   "type": "module",
   "name": "@mimir-wallet/dev",
   "version": "1.24.0",
+  "bin": {
+    "mimir-lint": "./bin/lint.js"
+  },
   "exports": {
     "./tsconfig.base.json": "./tsconfig.base.json",
     "./eslint.js": "./eslint.js",
     "./prettier.js": "./prettier.js",
-    "./vitest.config.base.js": "./dist/vitest.config.base.js"
+    "./vitest.config.base.js": "./vitest.config.base.ts"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "check-types": "tsc -b --noEmit",
-    "dev": "tsc -p tsconfig.json --watch"
+    "check-types": "tsc -b --noEmit"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

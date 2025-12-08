@@ -210,7 +210,7 @@ Development tooling and shared configurations
 ### Build & Development
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Turbo** | 2.4.4 | Monorepo build system |
+| **Turbo** | 2.6.3 | Monorepo build system |
 | **pnpm** | 10.24 | Package management |
 | **ESLint** | 9.21 | Code linting and formatting |
 | **Vitest** | 4.0 | Unit & integration testing framework |

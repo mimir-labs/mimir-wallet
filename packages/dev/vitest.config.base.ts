@@ -35,7 +35,7 @@ export const vitestConfig = defineConfig({
       'src/**/__tests__/**/*.{ts,tsx}',
     ],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
-  },
+  }
 });
 
 export default vitestConfig;

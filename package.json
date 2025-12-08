@@ -21,10 +21,10 @@
     "packages/*"
   ],
   "scripts": {
-    "lint": "eslint --cache",
-    "build": "turbo run build",
-    "check-types": "turbo run check-types",
-    "dev": "turbo run dev",
+    "lint": "turbo run lint --concurrency=100",
+    "build": "turbo run build --concurrency=100",
+    "check-types": "turbo run check-types --concurrency=100",
+    "dev": "turbo run dev --concurrency=100",
     "test": "turbo run test --concurrency=100",
     "test:cov": "turbo run test:cov --concurrency=100",
     "commit": "cz",
