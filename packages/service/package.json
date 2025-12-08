@@ -2,7 +2,7 @@
   "author": "dev.mimir",
   "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/service#readme",
   "license": "Apache-2.0",
@@ -16,27 +16,13 @@
   "type": "module",
   "name": "@mimir-wallet/service",
   "version": "3.0.0",
-  "main": "build/index.js",
-  "module": "build/index.js",
-  "types": "build/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "import": {
-        "@mimir-wallet/source": "./src/index.ts",
-        "types": "./build/index.d.ts",
-        "default": "./build/index.js"
-      }
-    }
+    ".": "./src/index.ts"
   },
-  "files": [
-    "build",
-    "LICENSE"
-  ],
   "scripts": {
-    "build": "tsc --build",
-    "check-types": "tsc --noEmit",
-    "dev": "tsc --watch"
+    "check-types": "tsc -b --noEmit",
+    "lint": "mimir-lint"
   },
   "peerDependencies": {
     "react": ">=18",

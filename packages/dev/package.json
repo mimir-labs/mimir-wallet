@@ -2,7 +2,7 @@
   "author": "dev.mimir",
   "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/dev#readme",
   "license": "Apache-2.0",
@@ -16,16 +16,14 @@
   "type": "module",
   "name": "@mimir-wallet/dev",
   "version": "1.24.0",
+  "bin": {
+    "mimir-lint": "./bin/lint.js"
+  },
   "exports": {
     "./tsconfig.base.json": "./tsconfig.base.json",
     "./eslint.js": "./eslint.js",
     "./prettier.js": "./prettier.js",
-    "./vitest.config.base.js": "./dist/vitest.config.base.js"
-  },
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "check-types": "tsc -b --noEmit",
-    "dev": "tsc -p tsconfig.json --watch"
+    "./vitest.config.base.js": "./vitest.config.base.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

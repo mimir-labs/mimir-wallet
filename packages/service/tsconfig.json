@@ -1,15 +1,7 @@
 {
-  "extends": "@mimir-wallet/dev/tsconfig.base.json",
-  "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
-    "composite": true,
-    "outDir": "./build",
-    "rootDir": "./src",
-    "types": [
-      "vite/client"
-    ]
-  },
-  "include": ["src"],
-  "exclude": ["build/**/*", "**/*.spec.ts", "**/test/**/*"],
-  "references": []
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.test.json" }
+  ]
 }

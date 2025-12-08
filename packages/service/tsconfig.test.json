@@ -1,0 +1,12 @@
+{
+  "extends": "@mimir-wallet/dev/tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": [
+      "vite/client"
+    ]
+  },
+  "include": ["src/**/__tests__/**/*", "src/**/*.test.ts", "src/**/*.test.tsx", "src", "tests"]
+}

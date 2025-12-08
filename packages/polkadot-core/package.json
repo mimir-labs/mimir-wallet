@@ -2,7 +2,7 @@
   "author": "dev.mimir",
   "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/polkadot-core#readme",
   "license": "Apache-2.0",
@@ -16,35 +16,15 @@
   "type": "module",
   "name": "@mimir-wallet/polkadot-core",
   "version": "3.0.0",
-  "main": "build/index.js",
-  "module": "build/index.js",
-  "types": "build/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     "./augment": "./augment.d.ts",
-    ".": {
-      "import": {
-        "@mimir-wallet/source": "./src/index.ts",
-        "types": "./build/index.d.ts",
-        "default": "./build/index.js"
-      }
-    },
-    "./simulate": {
-      "import": {
-        "@mimir-wallet/source": "./src/simulate/index.ts",
-        "types": "./build/simulate/index.d.ts",
-        "default": "./build/simulate/index.js"
-      }
-    }
+    ".": "./src/index.ts",
+    "./simulate": "./src/simulate/index.ts"
   },
-  "files": [
-    "build",
-    "LICENSE"
-  ],
   "scripts": {
-    "build": "tsc -p tsconfig.app.json",
     "check-types": "tsc -b --noEmit",
-    "dev": "tsc -p tsconfig.app.json --watch",
+    "lint": "mimir-lint",
     "test": "vitest run",
     "test:unit": "vitest run --config vitest.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
