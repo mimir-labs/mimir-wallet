@@ -47,7 +47,7 @@ function RemoveOrDeny({
           accountId={delegate}
           website="mimir://internal/remove-announcement"
           getCall={async () => {
-            const api = await ApiManager.getInstance().getApi(network);
+            const api = await ApiManager.getInstance().getApi(network, true);
 
             return api.tx.proxy.removeAnnouncement(
               transaction.address,
@@ -73,7 +73,7 @@ function RemoveOrDeny({
           accountId={transaction.address}
           website="mimir://internal/deny-announcement"
           getCall={async () => {
-            const api = await ApiManager.getInstance().getApi(network);
+            const api = await ApiManager.getInstance().getApi(network, true);
 
             return api.tx.proxy.rejectAnnouncement(
               delegate,

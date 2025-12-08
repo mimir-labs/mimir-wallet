@@ -65,7 +65,7 @@ function TransferAction({
     : sendingBalances.lt(new BN(parseUnits(amount, format[0]).toString()));
 
   const getCall = useCallback(async () => {
-    const api = await ApiManager.getInstance().getApi(currentNetwork);
+    const api = await ApiManager.getInstance().getApi(currentNetwork, true);
 
     if (recipient && sending && amount && token) {
       if (!isAmountValid) {

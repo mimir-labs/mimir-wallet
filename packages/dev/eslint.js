@@ -59,27 +59,16 @@ export default defineConfig(
       // React
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
-      'react/prop-types': 'off',
+      'react/prop-types': 'off', // TypeScript handles prop validation
       // React Hooks (includes React Compiler rules in v7+)
       ...reactHooks.configs.recommended.rules,
-      '@typescript-eslint/naming-convention': 'off',
-      '@typescript-eslint/padding-line-between-statements': 'off',
-      '@typescript-eslint/prefer-enum-initializers': 'off',
-      '@typescript-eslint/prefer-readonly-parameter-types': 'off',
-      '@typescript-eslint/prefer-regexp-exec': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/init-declarations': 'off',
-      '@typescript-eslint/non-nullable-type-assertion-style': 'off',
-      '@typescript-eslint/strict-boolean-expressions': 'off',
-      '@typescript-eslint/no-implicit-any-catch': 'off',
-      '@typescript-eslint/member-ordering': 'off',
-      '@typescript-eslint/prefer-includes': 'off',
-      '@typescript-eslint/no-restricted-imports': 'off',
-      '@typescript-eslint/no-shadow': 'off',
-      '@typescript-eslint/no-use-before-define': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-expressions': 'off',
+      // TypeScript
       '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-expressions': [
+        'error',
+        { allowShortCircuit: true, allowTernary: true },
+      ],
       'react-hooks/exhaustive-deps': [
         'error',
         {
@@ -107,7 +96,6 @@ export default defineConfig(
       ],
       // Import sorting and organization
       'import-x/no-deprecated': 'error',
-      'import-x/no-unresolved': 'off',
       'import-x/no-cycle': [
         'error',
         {

@@ -88,7 +88,7 @@ function Cancel({
         accountId={depositor}
         website="mimir://internal/cancel"
         getCall={async () => {
-          const api = await ApiManager.getInstance().getApi(network);
+          const api = await ApiManager.getInstance().getApi(network, true);
 
           return api.tx.multisig.cancelAsMulti(
             multisigTx.threshold,

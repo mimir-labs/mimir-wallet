@@ -7,6 +7,7 @@ import type { TypeDef } from '@polkadot/types/types';
 import { getTypeDef } from '@polkadot/types';
 import React, { forwardRef, useMemo } from 'react';
 
+import { balanceCalls, balanceCallsOverrides } from '../overrides';
 import Param from '../Param';
 import Item from '../Param/Item';
 
@@ -14,17 +15,23 @@ import { mergeClasses } from './utils';
 
 const FunctionArgs = forwardRef<HTMLDivElement | null, CallProps>(
   ({ registry, call, displayType, className }, ref) => {
-    // Derive args from registry and call
-    const args = useMemo<[string, TypeDef][] | undefined>(() => {
+    // Derive args and overrides from registry and call
+    const { args, overrides } = useMemo(() => {
       try {
         const callFunction = registry.findMetaCall(call.callIndex);
+        const action = `${callFunction.section}.${callFunction.method}`;
 
-        return callFunction.meta.args.map((item) => [
-          item.name.toString(),
-          getTypeDef(item.type.toString()),
-        ]);
+        return {
+          args: callFunction.meta.args.map((item): [string, TypeDef] => [
+            item.name.toString(),
+            getTypeDef(item.type.toString()),
+          ]),
+          overrides: balanceCalls.includes(action)
+            ? balanceCallsOverrides
+            : undefined,
+        };
       } catch {
-        return undefined;
+        return { args: undefined, overrides: undefined };
       }
     }, [registry, call]);
 
@@ -48,6 +55,7 @@ const FunctionArgs = forwardRef<HTMLDivElement | null, CallProps>(
                   <Param
                     displayType={displayType}
                     name={name}
+                    overrides={overrides}
                     registry={registry}
                     type={type}
                     value={call.args[index]}

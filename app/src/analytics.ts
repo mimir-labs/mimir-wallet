@@ -38,12 +38,6 @@ const analyticsState = {
   initResolve: null as (() => void) | null,
 };
 
-// Format string for consistent event naming
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const formatString = (str: string) => {
-  return str.toLowerCase().replace(/[^a-z0-9_]/g, '');
-};
-
 // ============================================
 // Event Types and Constants
 // ============================================
@@ -194,7 +188,7 @@ export function initAnalytics() {
 // Analytics action functions - waits for initialization
 export async function gaAction(
   action: string,
-  parameters?: Record<string, any>,
+  parameters?: Record<string, unknown>,
 ) {
   const state = await waitForAnalytics();
 

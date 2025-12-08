@@ -9,8 +9,18 @@ import findComponent from './findComponent';
 
 import { ErrorBoundary } from '@/components';
 
-function Param({ registry, displayType, value, type, name }: ParamProps) {
-  const Comp = useMemo(() => findComponent(registry, type), [type, registry]);
+function Param({
+  registry,
+  displayType,
+  value,
+  type,
+  name,
+  overrides,
+}: ParamProps) {
+  const Comp = useMemo(
+    () => findComponent(registry, type, overrides),
+    [type, registry, overrides],
+  );
 
   return (
     <ErrorBoundary>
