@@ -10,7 +10,7 @@ import {
   EmailNotificationService,
   MultisigService,
   TransactionService,
-  WebPushService
+  WebPushService,
 } from './services/index.js';
 
 export type ClientServiceOptions = BaseServiceOptions;
@@ -27,14 +27,17 @@ export class ClientService {
 
   constructor(
     private readonly clientGateway: string,
-    options: ClientServiceOptions = {}
+    options: ClientServiceOptions = {},
   ) {
     this.version = options.version || 'v1';
 
     this.account = new AccountService(clientGateway, options);
     this.asset = new AssetService(clientGateway, options);
     this.chain = new ChainService(clientGateway, options);
-    this.emailNotification = new EmailNotificationService(clientGateway, options);
+    this.emailNotification = new EmailNotificationService(
+      clientGateway,
+      options,
+    );
     this.multisig = new MultisigService(clientGateway, options);
     this.transaction = new TransactionService(clientGateway, options);
     this.webPush = new WebPushService(clientGateway, options);
@@ -46,7 +49,10 @@ export class ClientService {
 
   public getClientUrl(path: string, version?: ApiVersion) {
     const apiVersion = version || this.version;
-    const url = new URL(`/${apiVersion}/` + (path.startsWith('/') ? path.slice(1) : path), this.clientGateway);
+    const url = new URL(
+      `/${apiVersion}/` + (path.startsWith('/') ? path.slice(1) : path),
+      this.clientGateway,
+    );
 
     return url.toString();
   }

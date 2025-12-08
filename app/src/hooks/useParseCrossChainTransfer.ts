@@ -11,7 +11,7 @@ import {
   findDestChain,
   parseAccountFromLocation,
   parseAssets,
-  type XcmChainConfig
+  type XcmChainConfig,
 } from '@mimir-wallet/polkadot-core';
 import { useMemo } from 'react';
 
@@ -28,18 +28,24 @@ export interface CrossChainTransferInfo {
   assets: AssetTransfer[];
 }
 
-function parseXcmAssets(assets: Codec, initialChain: Endpoint): AssetTransfer[] {
+function parseXcmAssets(
+  assets: Codec,
+  initialChain: Endpoint,
+): AssetTransfer[] {
   return parseAssets(assets as any, { isSupport: true, ...initialChain });
 }
 
 function parseDestChain(destination: Codec, initialChain: Endpoint) {
-  return findDestChain(destination as XcmVersionedLocation, { isSupport: true, ...initialChain }).chain;
+  return findDestChain(destination as XcmVersionedLocation, {
+    isSupport: true,
+    ...initialChain,
+  }).chain;
 }
 
 export function useParseCrossChainTransfer(
   registry: Registry,
   chain: Endpoint,
-  call?: IMethod | null
+  call?: IMethod | null,
 ): CrossChainTransferInfo | null {
   const results = useMemo((): CrossChainTransferInfo | null => {
     try {
@@ -71,7 +77,7 @@ export function useParseCrossChainTransfer(
           return {
             destination: parseDestChain(destination, chain),
             beneficiary: parseAccountFromLocation(beneficiary as any),
-            assets: parseXcmAssets(assets, chain)
+            assets: parseXcmAssets(assets, chain),
           };
         }
       } else if (section === 'xTokens' || section === 'ormlXTokens') {
@@ -84,9 +90,19 @@ export function useParseCrossChainTransfer(
           return {
             destination: parseDestChain(dest, chain),
             beneficiary: parseAccountFromLocation(dest as any),
-            assets: [{ chain: { isSupport: true, ...chain }, isNative: false, assetKey: currencyId, amount }]
+            assets: [
+              {
+                chain: { isSupport: true, ...chain },
+                isNative: false,
+                assetKey: currencyId,
+                amount,
+              },
+            ],
           };
-        } else if (method === 'transferMultiasset' || method === 'transferMultiassetWithFee') {
+        } else if (
+          method === 'transferMultiasset' ||
+          method === 'transferMultiassetWithFee'
+        ) {
           // xTokens.transferMultiasset(asset, dest, dest_weight)
           const asset = call.args[0];
           const dest = call.args[1];
@@ -94,7 +110,7 @@ export function useParseCrossChainTransfer(
           return {
             destination: parseDestChain(dest, chain),
             beneficiary: parseAccountFromLocation(dest as any),
-            assets: parseXcmAssets(asset, chain)
+            assets: parseXcmAssets(asset, chain),
           };
         } else if (method === 'transferMultiassets') {
           // xTokens.transferMultiassets(assets, fee_item, dest, dest_weight)
@@ -104,7 +120,7 @@ export function useParseCrossChainTransfer(
           return {
             destination: parseDestChain(dest, chain),
             beneficiary: parseAccountFromLocation(dest as any),
-            assets: parseXcmAssets(assets, chain)
+            assets: parseXcmAssets(assets, chain),
           };
         }
       }

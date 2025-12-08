@@ -32,7 +32,8 @@ export async function enableWallet(source: string, origin: string) {
 
     await sleep(50);
 
-    const injected = await window.injectedWeb3[walletConfig[source].key].enable(origin);
+    const injected =
+      await window.injectedWeb3[walletConfig[source].key].enable(origin);
 
     return injected;
   } catch (error) {

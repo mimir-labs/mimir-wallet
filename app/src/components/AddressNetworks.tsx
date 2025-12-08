@@ -63,7 +63,7 @@ function Icon({
   name,
   showTooltip,
   migrationIcon,
-  migrationName
+  migrationName,
 }: {
   size: string | number;
   showTooltip: boolean;
@@ -74,32 +74,32 @@ function Icon({
 }) {
   const avatar = migrationIcon ? (
     <div
-      className='relative'
+      className="relative"
       style={{
         width: size,
-        height: size
+        height: size,
       }}
     >
       <img
-        className='animate-fade-out select-none'
+        className="animate-fade-out rounded-full select-none"
         src={migrationIcon}
         alt={migrationName}
         draggable={false}
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: 'transparent'
+          backgroundColor: 'transparent',
         }}
       />
       <img
-        className='animate-fade-in animation absolute top-0 left-0 z-1 select-none'
+        className="animate-fade-in animation absolute top-0 left-0 z-1 rounded-full select-none"
         src={icon}
         alt={name}
         draggable={false}
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: 'transparent'
+          backgroundColor: 'transparent',
         }}
       />
     </div>
@@ -108,10 +108,11 @@ function Icon({
       src={icon}
       alt={name}
       draggable={false}
+      className="rounded-full"
       style={{
         width: size,
         height: size,
-        userSelect: 'none'
+        userSelect: 'none',
       }}
     />
   );
@@ -119,7 +120,7 @@ function Icon({
   // Wrap with tooltip if enabled
   if (showTooltip) {
     return (
-      <Tooltip color='foreground' content={name}>
+      <Tooltip color="foreground" content={name}>
         {avatar}
       </Tooltip>
     );
@@ -137,7 +138,7 @@ function AddressNetworksComponent({
   address,
   avatarSize = 20,
   showTooltip = true,
-  meta: propMeta
+  meta: propMeta,
 }: AddressNetworksProps) {
   // Use prop meta if provided, otherwise fetch it (for backward compatibility)
   const { meta: fetchedMeta } = useAddressMeta(propMeta ? undefined : address);
@@ -147,16 +148,24 @@ function AddressNetworksComponent({
   // Get the networks where this address has proxy relationships
   const proxyNetworks = useMemo(() => {
     const genesisHashes = Array.from(
-      new Set((meta.pureCreatedAt ? [meta.pureCreatedAt] : []).concat(...(meta.proxyNetworks || [])))
+      new Set(
+        (meta.pureCreatedAt ? [meta.pureCreatedAt] : []).concat(
+          ...(meta.proxyNetworks || []),
+        ),
+      ),
     );
 
     // Filter networks to only include those that exist in the proxy networks
-    return networks.filter((network) => genesisHashes.includes(network.genesisHash));
+    return networks.filter((network) =>
+      genesisHashes.includes(network.genesisHash),
+    );
   }, [meta.proxyNetworks, meta.pureCreatedAt, networks]);
 
   const migrationNetwork = useMemo(() => {
     if (meta.pureCreatedAt && meta.migrationNetwork) {
-      return networks.find((network) => network.genesisHash === meta.migrationNetwork);
+      return networks.find(
+        (network) => network.genesisHash === meta.migrationNetwork,
+      );
     }
 
     return undefined;

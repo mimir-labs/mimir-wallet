@@ -8,7 +8,7 @@ import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 import { addressEq, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider, Skeleton } from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 
 import CustomGasFeeSelect from '../CustomGasFeeSelect';
 import Input from '../Input';
@@ -60,7 +60,7 @@ function TxSubmit({
   onFinalized,
   onError,
   onSignature,
-  beforeSend
+  beforeSend,
 }: Props) {
   const { current } = useAccount();
   const { chain, network } = useNetwork();
@@ -79,38 +79,63 @@ function TxSubmit({
   // const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
   const [note, setNote] = useState<string>(transaction?.note || '');
   const filterPaths = useFilterPaths(accountData, transaction);
-  const [addressChain, setAddressChain] = useState<FilterPath[]>(propsFilterPaths || []);
+  const [addressChain, setAddressChain] = useState<FilterPath[]>(
+    propsFilterPaths || [],
+  );
   const [, addTx] = useBatchTxs(network, accountData.address);
   const navigate = useNavigate();
   const isPropose = useMemo(
-    () => addressChain.length > 0 && addressChain.some((item) => item.type === 'proposer'),
-    [addressChain]
+    () =>
+      addressChain.length > 0 &&
+      addressChain.some((item) => item.type === 'proposer'),
+    [addressChain],
   );
-  const buildTx = useBuildTx(network, call ?? undefined, addressChain, transaction);
+  const buildTx = useBuildTx(
+    network,
+    call ?? undefined,
+    addressChain,
+    transaction,
+  );
 
   // Gas fee calculation state
-  const nativeGasFee = useGasFeeEstimate(buildTx.txBundle?.tx || null, buildTx.txBundle?.signer);
-  const [selectedFeeAsset, setSelectedFeeAsset] = useState<CompleteEnhancedAssetInfo | null>(null);
-  const convertedFee = useAssetConversion(network, nativeGasFee, selectedFeeAsset);
+  const nativeGasFee = useGasFeeEstimate(
+    buildTx.txBundle?.tx || null,
+    buildTx.txBundle?.signer,
+  );
+  const [selectedFeeAsset, setSelectedFeeAsset] =
+    useState<CompleteEnhancedAssetInfo | null>(null);
+  const convertedFee = useAssetConversion(
+    network,
+    nativeGasFee,
+    selectedFeeAsset,
+  );
 
   const gasFeeInfo = useMemo(() => {
-    if (convertedFee === undefined || convertedFee === null || !selectedFeeAsset) {
+    if (
+      convertedFee === undefined ||
+      convertedFee === null ||
+      !selectedFeeAsset
+    ) {
       return null;
     }
 
     return {
       amount: convertedFee,
       symbol: selectedFeeAsset.symbol,
-      decimals: selectedFeeAsset.decimals
+      decimals: selectedFeeAsset.decimals,
     };
   }, [convertedFee, selectedFeeAsset]);
 
   const [assetBalance] = useBalanceByIdentifier(
     network,
     buildTx.txBundle?.signer,
-    selectedFeeAsset?.isNative ? 'native' : selectedFeeAsset?.assetId
+    selectedFeeAsset?.isNative ? 'native' : selectedFeeAsset?.assetId,
   );
-  const [nativeBalance] = useBalanceByIdentifier(network, buildTx.txBundle?.signer, 'native');
+  const [nativeBalance] = useBalanceByIdentifier(
+    network,
+    buildTx.txBundle?.signer,
+    'native',
+  );
 
   const gasFeeWarning = useMemo(() => {
     if (!selectedFeeAsset) {
@@ -122,7 +147,9 @@ function TxSubmit({
         return false;
       }
 
-      return nativeBalance ? nativeBalance.transferrable <= nativeGasFee : false;
+      return nativeBalance
+        ? nativeBalance.transferrable <= nativeGasFee
+        : false;
     } else {
       if (!convertedFee) {
         return false;
@@ -130,7 +157,13 @@ function TxSubmit({
 
       return assetBalance ? assetBalance.transferrable <= convertedFee : false;
     }
-  }, [assetBalance, convertedFee, nativeBalance, nativeGasFee, selectedFeeAsset]);
+  }, [
+    assetBalance,
+    convertedFee,
+    nativeBalance,
+    nativeGasFee,
+    selectedFeeAsset,
+  ]);
 
   const { isLocalAccount } = useAccount();
 
@@ -144,8 +177,8 @@ function TxSubmit({
         calldata: call.toHex(),
         website,
         iconUrl,
-        appName
-      }
+        appName,
+      },
     ]);
     onClose?.();
   }, [addTx, appName, call, iconUrl, onClose, website]);
@@ -164,30 +197,30 @@ function TxSubmit({
   useCloseWhenPathChange(onClose);
 
   return (
-    <div className='flex h-[calc(100dvh-60px)] w-full flex-col gap-5 p-4 sm:p-5'>
-      <div className='flex items-center justify-between'>
+    <div className="flex h-[calc(100dvh-60px)] w-full flex-col gap-5 p-4 sm:p-5">
+      <div className="flex items-center justify-between">
         <h4>Submit Transaction</h4>
         <Button
           isIconOnly
-          variant='light'
-          className='text-inherit'
+          variant="light"
+          className="text-inherit"
           onClick={() => {
             onClose?.();
             onReject?.();
           }}
         >
-          <IconClose className='h-4 w-4' />
+          <IconClose className="h-4 w-4" />
         </Button>
       </div>
 
       {alert && (
-        <Alert className='grow-0'>
+        <Alert className="grow-0">
           <AlertTitle>{alert}</AlertTitle>
         </Alert>
       )}
 
-      <div className='md:bg-content1 md:shadow-medium flex w-full flex-1 flex-col gap-5 overflow-y-auto rounded-[20px] bg-transparent p-0 shadow-none md:flex-row md:p-5'>
-        <div className='bg-content1 shadow-medium @container flex w-full flex-col gap-5 rounded-[20px] p-4 md:w-[60%] md:bg-transparent md:p-0 md:shadow-none'>
+      <div className="md:card-root flex w-full flex-1 flex-col gap-5 overflow-y-auto bg-transparent p-0 md:flex-row md:p-5">
+        <div className="bg-background @container flex w-full flex-col gap-5 rounded-[20px] p-4 shadow-md md:w-[60%] md:bg-transparent md:p-0 md:shadow-none">
           <TxInfo
             address={accountData.address}
             website={transaction?.website || website}
@@ -199,51 +232,61 @@ function TxSubmit({
 
           {call ? (
             <>
-              <Call account={accountData.address} method={call} transaction={transaction} />
+              <Call
+                account={accountData.address}
+                method={call}
+                transaction={transaction}
+              />
               {supportsDryRun ? (
                 <DryRun call={call} account={accountData.address} />
               ) : (
-                <Chopsticks call={call} account={accountData.address} />
+                <Suspense
+                  fallback={
+                    <Skeleton className="bg-secondary h-12 w-full rounded-[10px]" />
+                  }
+                >
+                  <Chopsticks call={call} account={accountData.address} />
+                </Suspense>
               )}
             </>
           ) : (
-            <div className='flex flex-col gap-5'>
+            <div className="flex flex-col gap-5">
               {/* Call element skeleton */}
-              <div className='flex flex-col gap-2'>
-                <Skeleton className='h-5 w-24 rounded-lg' />
-                <Skeleton className='h-12 w-full rounded-lg' />
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-5 w-24 rounded-lg" />
+                <Skeleton className="h-12 w-full rounded-lg" />
               </div>
 
               <Divider />
 
               {/* CallInfo skeleton */}
-              <div className='flex flex-col gap-2'>
-                <Skeleton className='h-5 w-32 rounded-lg' />
-                <Skeleton className='bg-secondary h-16 w-full rounded-[10px]' />
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-5 w-32 rounded-lg" />
+                <Skeleton className="bg-secondary h-16 w-full rounded-[10px]" />
               </div>
 
               {/* TransactionInfo skeleton */}
-              <div className='flex flex-col gap-2'>
-                <Skeleton className='h-5 w-24 rounded-lg' />
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-5 w-24 rounded-lg" />
               </div>
 
               {/* DryRun skeleton */}
-              <Skeleton className='bg-secondary h-12 w-full rounded-[10px]' />
+              <Skeleton className="bg-secondary h-12 w-full rounded-[10px]" />
             </div>
           )}
 
           {/* <SafetyCheck safetyCheck={safetyCheck} /> */}
         </div>
 
-        <div className='bg-content1 shadow-medium sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start rounded-[20px] p-4 sm:p-5 md:w-[40%]'>
+        <div className="sticky top-0 flex h-auto w-full flex-col gap-y-5 self-start card-root p-4 sm:p-5 md:w-[40%]">
           {!hasPermission ? (
-            <Alert variant='destructive'>
+            <Alert variant="destructive">
               <AlertTitle>
                 {`You are currently not a member of this Account and won't be able to submit this transaction.`}
               </AlertTitle>
             </Alert>
           ) : filterPaths.length === 0 ? (
-            <Alert variant='destructive'>
+            <Alert variant="destructive">
               <AlertTitle>
                 {`This account doesn't exist on`} {chain.name}
               </AlertTitle>
@@ -252,7 +295,12 @@ function TxSubmit({
 
           {hasPermission && filterPaths.length > 0 && (
             <>
-              {transaction && <Confirmations account={accountData} transaction={transaction} />}
+              {transaction && (
+                <Confirmations
+                  account={accountData}
+                  transaction={transaction}
+                />
+              )}
 
               <AddressChain
                 deep={0}
@@ -261,7 +309,12 @@ function TxSubmit({
                 setAddressChain={setAddressChain}
               />
 
-              <Input label='Note(Optional)' onChange={setNote} value={note} placeholder='Please note' />
+              <Input
+                label="Note(Optional)"
+                onChange={setNote}
+                value={note}
+                placeholder="Please note"
+              />
 
               {/* {safetyCheck && safetyCheck.severity === 'warning' && (
                 <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
@@ -281,8 +334,10 @@ function TxSubmit({
               ) : null}
 
               {gasFeeWarning && (
-                <Alert variant='warning'>
-                  <AlertTitle>The selected asset is not enough to pay the gas fee.</AlertTitle>
+                <Alert variant="warning">
+                  <AlertTitle>
+                    The selected asset is not enough to pay the gas fee.
+                  </AlertTitle>
                 </Alert>
               )}
 
@@ -319,7 +374,10 @@ function TxSubmit({
                 <ProposeTx
                   call={call}
                   account={accountData.address}
-                  proposer={addressChain.find((item) => item.type === 'proposer')?.address}
+                  proposer={
+                    addressChain.find((item) => item.type === 'proposer')
+                      ?.address
+                  }
                   website={website}
                   iconUrl={iconUrl}
                   appName={appName}
@@ -328,7 +386,11 @@ function TxSubmit({
                     onClose?.();
 
                     if (onlySign) {
-                      onError?.(new Error('This transaction is proposed, please wait for it to be initialized.'));
+                      onError?.(
+                        new Error(
+                          'This transaction is proposed, please wait for it to be initialized.',
+                        ),
+                      );
                     } else {
                       navigate({ to: '/transactions' });
                     }
@@ -337,14 +399,24 @@ function TxSubmit({
               )}
 
               {!transaction && addressEq(current, accountData.address) && (
-                <Button fullWidth onClick={handleAddBatch} color='primary' variant='ghost'>
+                <Button
+                  fullWidth
+                  onClick={handleAddBatch}
+                  color="primary"
+                  variant="ghost"
+                >
                   <IconBatch />
                   Add To Batch
                 </Button>
               )}
 
               {!transaction && (
-                <Button fullWidth onClick={handleAddTemplate} color='primary' variant='ghost'>
+                <Button
+                  fullWidth
+                  onClick={handleAddTemplate}
+                  color="primary"
+                  variant="ghost"
+                >
                   <IconTemplate />
                   Add To Template
                 </Button>

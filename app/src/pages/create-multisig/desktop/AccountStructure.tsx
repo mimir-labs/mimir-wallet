@@ -1,21 +1,38 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AddressMeta, MultisigAccountData } from '@/hooks/types';
+import type {
+  AccountData,
+  AddressMeta,
+  MultisigAccountData,
+} from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { useNetwork, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
+import {
+  useNetwork,
+  useSs58Format,
+  zeroAddress,
+} from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import {
+  Button,
+  buttonSpinner,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+} from '@mimir-wallet/ui';
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeMultiAddress } from '@polkadot/util-crypto';
-import React, { useEffect, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { AddressMetaContext } from '@/accounts/useAccount';
 import { transformAccount } from '@/accounts/useQueryAccount';
-import { AddressOverview } from '@/components';
+import { FlowSkeleton } from '@/components';
 import { toastError } from '@/components/utils';
+
+const AddressOverview = lazy(() => import('@/components/AddressOverview'));
 
 interface AccountStructureProps {
   name: string;
@@ -24,14 +41,21 @@ interface AccountStructureProps {
   isPureProxy: boolean;
 }
 
-function AccountStructure({ members, name, threshold, isPureProxy }: AccountStructureProps) {
+function AccountStructure({
+  members,
+  name,
+  threshold,
+  isPureProxy,
+}: AccountStructureProps) {
   const { chain } = useNetwork();
   const genesisHash = chain.genesisHash;
   const { ss58: chainSS58 } = useSs58Format();
   const [multisigAccount, setMultisigAccount] = React.useState<AccountData>();
   const [fullAccount, setFullAccount] = React.useState<AccountData>();
   const [isFetching, setIsFetching] = React.useState(false);
-  const [overrideMetas, setOverrideMetas] = useState<Record<HexString, AddressMeta>>({});
+  const [overrideMetas, setOverrideMetas] = useState<
+    Record<HexString, AddressMeta>
+  >({});
   const [isOpen, toggleOpen] = useToggle(false);
 
   useEffect(() => {
@@ -42,11 +66,16 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
       const multisigAccount: MultisigAccountData = {
         type: 'multisig',
         name: name,
-        members: members.map((member) => ({ type: 'account', address: member, delegatees: [], createdAt: 0 })),
+        members: members.map((member) => ({
+          type: 'account',
+          address: member,
+          delegatees: [],
+          createdAt: 0,
+        })),
         address: encodeMultiAddress(members, threshold),
         threshold: threshold,
         createdAt: 0,
-        delegatees: []
+        delegatees: [],
       };
 
       if (isPureProxy) {
@@ -56,14 +85,21 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
           name: name,
           address: zeroAddress,
           createdAt: 0,
-          delegatees: [{ ...multisigAccount, proxyDelay: 0, proxyNetwork: genesisHash, proxyType: 'Any' }],
+          delegatees: [
+            {
+              ...multisigAccount,
+              proxyDelay: 0,
+              proxyNetwork: genesisHash,
+              proxyType: 'Any',
+            },
+          ],
           createdBlock: '0',
           createdBlockHash: '0x',
           createdExtrinsicHash: '0x',
           createdExtrinsicIndex: 1,
           creator: '0x',
           disambiguationIndex: 0,
-          network: genesisHash
+          network: genesisHash,
         });
       } else {
         setMultisigAccount(multisigAccount);
@@ -74,8 +110,8 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
           isMultisig: true,
           name: name,
           threshold: threshold,
-          who: members
-        }
+          who: members,
+        },
       });
     });
   }, [genesisHash, isPureProxy, members, name, threshold]);
@@ -88,8 +124,10 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
         members.map((item) =>
           service.account
             .getOmniChainDetails(item)
-            .then((account) => transformAccount(chainSS58, account, true, genesisHash))
-        )
+            .then((account) =>
+              transformAccount(chainSS58, account, true, genesisHash),
+            ),
+        ),
       );
 
       const multisigAccount: AccountData = {
@@ -99,7 +137,7 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
         address: encodeMultiAddress(members, threshold),
         threshold: threshold,
         createdAt: 0,
-        delegatees: []
+        delegatees: [],
       };
 
       if (isPureProxy) {
@@ -109,14 +147,21 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
           name: name,
           address: zeroAddress,
           createdAt: 0,
-          delegatees: [{ ...multisigAccount, proxyDelay: 0, proxyNetwork: genesisHash, proxyType: 'Any' }],
+          delegatees: [
+            {
+              ...multisigAccount,
+              proxyDelay: 0,
+              proxyNetwork: genesisHash,
+              proxyType: 'Any',
+            },
+          ],
           createdBlock: '0',
           createdBlockHash: '0x',
           createdExtrinsicHash: '0x',
           createdExtrinsicIndex: 1,
           creator: '0x',
           disambiguationIndex: 0,
-          network: genesisHash
+          network: genesisHash,
         });
       } else {
         setFullAccount(multisigAccount);
@@ -132,15 +177,15 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
 
   return (
     <>
-      <div className='bg-secondary relative h-[250px] rounded-[10px] pt-10'>
+      <div className="bg-secondary relative h-[250px] rounded-[10px] pt-10">
         {/* View Full Structure Button */}
         <Button
           disabled={isFetching}
-          size='sm'
-          variant='ghost'
-          color='primary'
-          radius='full'
-          className='bg-content1 absolute top-2.5 left-2.5 z-10'
+          size="sm"
+          variant="ghost"
+          color="primary"
+          radius="full"
+          className="bg-background absolute top-2.5 left-2.5 z-10"
           onClick={fetchFullStructure}
         >
           {isFetching ? buttonSpinner : null}
@@ -149,19 +194,33 @@ function AccountStructure({ members, name, threshold, isPureProxy }: AccountStru
 
         {/* Simple visualization - can be enhanced with actual diagram */}
         <AddressMetaContext.Provider value={overrideMetas}>
-          <div className='flex h-full items-center justify-center'>
-            {multisigAccount ? <AddressOverview showAddressNodeOperations={false} account={multisigAccount} /> : null}
+          <div className="flex h-full items-center justify-center">
+            {multisigAccount ? (
+              <Suspense fallback={<FlowSkeleton />}>
+                <AddressOverview
+                  showAddressNodeOperations={false}
+                  account={multisigAccount}
+                />
+              </Suspense>
+            ) : null}
           </div>
         </AddressMetaContext.Provider>
       </div>
 
       {fullAccount && (
-        <Modal size='5xl' isOpen={isOpen} onClose={() => toggleOpen(false)}>
+        <Modal size="5xl" isOpen={isOpen} onClose={() => toggleOpen(false)}>
           <ModalContent>
             <ModalHeader>Full Structure</ModalHeader>
             <ModalBody>
-              <div className='bg-secondary h-[50dvh] rounded-[10px]'>
-                {isOpen ? <AddressOverview showAddressNodeOperations={false} account={fullAccount} /> : null}
+              <div className="bg-secondary h-[50dvh] rounded-[10px]">
+                {isOpen ? (
+                  <Suspense fallback={<FlowSkeleton />}>
+                    <AddressOverview
+                      showAddressNodeOperations={false}
+                      account={fullAccount}
+                    />
+                  </Suspense>
+                ) : null}
               </div>
             </ModalBody>
           </ModalContent>

@@ -20,7 +20,7 @@ describe('Transaction Integration Tests', () => {
         expect(tx.method.section).toBe('system');
         expect(tx.method.method).toBe('remark');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -29,13 +29,16 @@ describe('Transaction Integration Tests', () => {
         skipIfNotConnected(paseoApi, 'balances.transferKeepAlive construction');
 
         const amount = BigInt(1_000_000_0000); // 1 PAS
-        const tx = paseoApi.tx.balances.transferKeepAlive(TEST_ADDRESSES.bob, amount);
+        const tx = paseoApi.tx.balances.transferKeepAlive(
+          TEST_ADDRESSES.bob,
+          amount,
+        );
 
         expect(tx).toBeDefined();
         expect(tx.method.section).toBe('balances');
         expect(tx.method.method).toBe('transferKeepAlive');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -51,7 +54,7 @@ describe('Transaction Integration Tests', () => {
         expect(tx.method.section).toBe('utility');
         expect(tx.method.method).toBe('batch');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -67,7 +70,7 @@ describe('Transaction Integration Tests', () => {
         expect(tx.method.section).toBe('utility');
         expect(tx.method.method).toBe('batchAll');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -82,7 +85,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(hex).toMatch(/^0x[a-f0-9]+$/i);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -95,7 +98,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(callHex).toMatch(/^0x[a-f0-9]+$/i);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -111,7 +114,7 @@ describe('Transaction Integration Tests', () => {
         expect(deserializedCall.section).toBe('system');
         expect(deserializedCall.method).toBe('remark');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -128,7 +131,7 @@ describe('Transaction Integration Tests', () => {
         expect(paymentInfo.partialFee).toBeDefined();
         expect(paymentInfo.weight).toBeDefined();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -137,7 +140,10 @@ describe('Transaction Integration Tests', () => {
         skipIfNotConnected(paseoApi, 'payment info transfer');
 
         const amount = BigInt(1_000_000_0000);
-        const tx = paseoApi.tx.balances.transferKeepAlive(TEST_ADDRESSES.bob, amount);
+        const tx = paseoApi.tx.balances.transferKeepAlive(
+          TEST_ADDRESSES.bob,
+          amount,
+        );
         const paymentInfo = await tx.paymentInfo(TEST_ADDRESSES.alice);
 
         expect(paymentInfo).toBeDefined();
@@ -148,7 +154,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(fee).toBeGreaterThan(0n);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -165,7 +171,7 @@ describe('Transaction Integration Tests', () => {
         expect(paymentInfo).toBeDefined();
         expect(paymentInfo.partialFee).toBeDefined();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -179,7 +185,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(hasProxyModule).toBe(true);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -191,7 +197,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(hasProxyExtrinsic).toBe(true);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -203,7 +209,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(hasProxyModule).toBe(true);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -217,7 +223,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(hasMultisigModule).toBe(true);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -229,7 +235,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(hasAsMulti).toBe(true);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -239,13 +245,15 @@ describe('Transaction Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'query proxies');
 
-        const proxies = await paseoApi.query.proxy.proxies(TEST_ADDRESSES.alice);
+        const proxies = await paseoApi.query.proxy.proxies(
+          TEST_ADDRESSES.alice,
+        );
 
         expect(proxies).toBeDefined();
         // proxies returns a tuple [Vec<ProxyDefinition>, Balance]
         expect(Array.isArray(proxies)).toBe(true);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -262,7 +270,7 @@ describe('Transaction Integration Tests', () => {
         expect(paymentInfo.weight.refTime).toBeDefined();
         expect(paymentInfo.weight.proofSize).toBeDefined();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -277,7 +285,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(hasTransactionPayment).toBe(true);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -289,7 +297,7 @@ describe('Transaction Integration Tests', () => {
 
         expect(blockWeights).toBeDefined();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 });

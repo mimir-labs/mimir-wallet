@@ -11,22 +11,27 @@ import { useMimirLayout } from '@/hooks/useMimirLayout';
 // Component styles
 const BUTTON_STYLES = {
   base: 'border-secondary bg-secondary h-[32px] w-[32px] flex-[0_0_auto] sm:h-[42px] sm:w-[42px] sm:bg-transparent',
-  icon: 'h-[14px] w-[14px] sm:h-[19px] sm:w-[19px]'
+  icon: 'h-[14px] w-[14px] sm:h-[19px] sm:w-[19px]',
 } as const;
 
 function TemplateButton() {
-  const { rightSidebarOpen, rightSidebarState, openRightSidebar, closeRightSidebar, setRightSidebarTab } =
-    useMimirLayout();
+  const {
+    rightSidebarOpen,
+    rightSidebarState,
+    openRightSidebar,
+    closeRightSidebar,
+    setRightSidebarTab,
+  } = useMimirLayout();
   const isOpen = rightSidebarOpen && rightSidebarState.tab === 'template';
 
   return (
-    <Tooltip content='Template'>
+    <Tooltip content="Template">
       <Button
         isIconOnly
         className={BUTTON_STYLES.base}
-        color='primary'
-        variant='ghost'
-        radius='md'
+        color="primary"
+        variant="ghost"
+        radius="md"
         onClick={() => {
           // Track template started when opening
           analyticsActions.templateStarted();

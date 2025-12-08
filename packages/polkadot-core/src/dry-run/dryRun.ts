@@ -4,7 +4,10 @@
 import type { DryRunResult } from './types.js';
 import type { ApiPromise } from '@polkadot/api';
 import type { Result } from '@polkadot/types';
-import type { XcmRuntimeApisDryRunCallDryRunEffects, XcmRuntimeApisDryRunError } from '@polkadot/types/lookup';
+import type {
+  XcmRuntimeApisDryRunCallDryRunEffects,
+  XcmRuntimeApisDryRunError,
+} from '@polkadot/types/lookup';
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
@@ -32,7 +35,11 @@ interface DryRunOrigin {
  * @param data - The data to log
  * @param level - Log level (debug, info, warn, error)
  */
-function logDebugInfo(label: string, data: unknown, level: 'debug' | 'info' | 'warn' | 'error' = 'debug'): void {
+function logDebugInfo(
+  label: string,
+  data: unknown,
+  level: 'debug' | 'info' | 'warn' | 'error' = 'debug',
+): void {
   switch (level) {
     case 'error':
       console.error('[DRY-RUN]', label, data);
@@ -54,10 +61,18 @@ function logDebugInfo(label: string, data: unknown, level: 'debug' | 'info' | 'w
  * @param startTime - Start time in milliseconds
  * @param success - Whether the operation was successful
  */
-function logPerformanceMetrics(operation: string, startTime: number, success: boolean): void {
+function logPerformanceMetrics(
+  operation: string,
+  startTime: number,
+  success: boolean,
+): void {
   const duration = Date.now() - startTime;
 
-  logDebugInfo('Performance', { operation, duration: `${duration}ms`, success }, 'info');
+  logDebugInfo(
+    'Performance',
+    { operation, duration: `${duration}ms`, success },
+    'info',
+  );
 }
 
 /**
@@ -70,11 +85,16 @@ function logPerformanceMetrics(operation: string, startTime: number, success: bo
 async function executeDryRunCall(
   dryRunApi: any,
   origin: DryRunOrigin,
-  processedCall: IMethod | Uint8Array
-): Promise<Result<XcmRuntimeApisDryRunCallDryRunEffects, XcmRuntimeApisDryRunError>> {
+  processedCall: IMethod | Uint8Array,
+): Promise<
+  Result<XcmRuntimeApisDryRunCallDryRunEffects, XcmRuntimeApisDryRunError>
+> {
   const paramCount = dryRunApi.meta.params.length;
 
-  logDebugInfo('API Configuration', { paramCount, expectedParams: DRY_RUN_API_PARAM_COUNT });
+  logDebugInfo('API Configuration', {
+    paramCount,
+    expectedParams: DRY_RUN_API_PARAM_COUNT,
+  });
 
   try {
     if (paramCount === DRY_RUN_API_PARAM_COUNT) {
@@ -86,9 +106,9 @@ async function executeDryRunCall(
     logDebugInfo(
       'API Call Failed',
       {
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       },
-      'error'
+      'error',
     );
     throw error;
   }
@@ -105,11 +125,15 @@ async function executeDryRunCall(
 export async function dryRun(
   api: ApiPromise,
   call: IMethod | Uint8Array | HexString,
-  address: string
+  address: string,
 ): Promise<DryRunResult> {
   const startTime = Date.now();
 
-  logDebugInfo('Started', { chain: api.runtimeChain.toString(), address }, 'info');
+  logDebugInfo(
+    'Started',
+    { chain: api.runtimeChain.toString(), address },
+    'info',
+  );
 
   // Validate dry run API availability
   if (!api.call.dryRunApi?.dryRunCall) {
@@ -121,15 +145,15 @@ export async function dryRun(
 
   const origin: DryRunOrigin = {
     system: {
-      Signed: address
-    }
+      Signed: address,
+    },
   };
 
   try {
     const processedCall = await buildRemoteProxy(
       api,
       isU8a(call) || isHex(call) ? api.createType('Call', call) : call,
-      address
+      address,
     );
 
     // Handle the API call with proper typing
@@ -137,7 +161,11 @@ export async function dryRun(
 
     const result = await executeDryRunCall(dryRunApi, origin, processedCall);
 
-    logDebugInfo('Execution Completed', { success: result.isOk }, result.isOk ? 'info' : 'warn');
+    logDebugInfo(
+      'Execution Completed',
+      { success: result.isOk },
+      result.isOk ? 'info' : 'warn',
+    );
 
     const processedResult = processDryRunResult(api, result);
 
@@ -148,9 +176,9 @@ export async function dryRun(
     logDebugInfo(
       'Failed',
       {
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       },
-      'error'
+      'error',
     );
     logPerformanceMetrics('dryRun', startTime, false);
     throw error;
@@ -165,7 +193,10 @@ export async function dryRun(
  */
 function processDryRunResult(
   api: ApiPromise,
-  result: Result<XcmRuntimeApisDryRunCallDryRunEffects, XcmRuntimeApisDryRunError>
+  result: Result<
+    XcmRuntimeApisDryRunCallDryRunEffects,
+    XcmRuntimeApisDryRunError
+  >,
 ): DryRunResult {
   if (!result.isOk) {
     const err = result.asErr;
@@ -175,7 +206,7 @@ function processDryRunResult(
 
     return {
       success: false,
-      error: new Error(errorMsg)
+      error: new Error(errorMsg),
     };
   }
 
@@ -185,18 +216,28 @@ function processDryRunResult(
   const commonData = {
     rawEvents: ok.emittedEvents.toHuman(),
     localXcm: ok.localXcm,
-    forwardedXcms: ok.forwardedXcms
+    forwardedXcms: ok.forwardedXcms,
   };
 
   if (executionResult.isOk) {
-    const balancesChanges = parseBalancesChange(ok.emittedEvents, api.genesisHash.toHex());
+    const balancesChanges = parseBalancesChange(
+      ok.emittedEvents,
+      api.genesisHash.toHex(),
+    );
 
-    logDebugInfo('Success', { events: ok.emittedEvents.length, balanceChanges: balancesChanges.length }, 'info');
+    logDebugInfo(
+      'Success',
+      {
+        events: ok.emittedEvents.length,
+        balanceChanges: balancesChanges.length,
+      },
+      'info',
+    );
 
     return {
       success: true,
       ...commonData,
-      balancesChanges
+      balancesChanges,
     };
   }
 
@@ -208,6 +249,6 @@ function processDryRunResult(
   return {
     success: false,
     ...commonData,
-    error: dispatchError
+    error: dispatchError,
   };
 }

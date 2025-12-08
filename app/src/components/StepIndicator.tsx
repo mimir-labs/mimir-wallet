@@ -16,7 +16,13 @@ interface StepIndicatorProps {
   onStepClick?: (stepNumber: number) => void;
 }
 
-function StepIndicator({ currentStep, steps, className = '', variant = 'default', onStepClick }: StepIndicatorProps) {
+function StepIndicator({
+  currentStep,
+  steps,
+  className = '',
+  variant = 'default',
+  onStepClick,
+}: StepIndicatorProps) {
   const handleStepClick = (stepNumber: number) => {
     if (onStepClick) {
       onStepClick(stepNumber);
@@ -36,7 +42,7 @@ function StepIndicator({ currentStep, steps, className = '', variant = 'default'
             className={`bg-secondary flex h-10 flex-1 items-center rounded-full ${isClickable ? 'hover:bg-secondary/80 cursor-pointer transition-colors' : ''}`}
             onClick={() => handleStepClick(step.number)}
           >
-            <div className='flex h-10 items-center gap-2.5 pr-2.5'>
+            <div className="flex h-10 items-center gap-2.5 pr-2.5">
               <div
                 className={`flex h-10 w-10 flex-[0_0_auto] items-center justify-center rounded-full text-base font-bold ${
                   isActive || isCompleted
@@ -46,7 +52,9 @@ function StepIndicator({ currentStep, steps, className = '', variant = 'default'
               >
                 {isCompleted && variant === 'default' ? '✓' : step.number}
               </div>
-              <span className={`text-foreground text-sm font-bold`}>{step.label}</span>
+              <span className={`text-foreground text-sm font-bold`}>
+                {step.label}
+              </span>
             </div>
           </div>
         );

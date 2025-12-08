@@ -8,13 +8,19 @@ import { useAccount } from '@/accounts/useAccount';
 import IconClose from '@/assets/svg/icon-close.svg?react';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
 
-function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen: (state: boolean) => void }) {
+function ToggleAlert({
+  address,
+  setAlertOpen,
+}: {
+  address: string;
+  setAlertOpen: (state: boolean) => void;
+}) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [forceHide, setForceHide] = useState(false);
 
   const hasThisAccount = useMemo(
     () => isLocalAccount(address) || isLocalAddress(address, true),
-    [address, isLocalAccount, isLocalAddress]
+    [address, isLocalAccount, isLocalAddress],
   );
 
   const alertOpen = !forceHide && !hasThisAccount;
@@ -33,27 +39,29 @@ function ToggleAlert({ address, setAlertOpen }: { address: string; setAlertOpen:
                 addAddressBook(address, true);
               }
         }
-        className='text-primary-foreground bg-home-main flex h-[38px] w-full cursor-pointer items-center gap-1 rounded-[5px] py-1 pl-2.5 sm:gap-2.5 sm:pl-5'
+        className="text-primary-foreground bg-home-main flex h-[38px] w-full cursor-pointer items-center gap-1 rounded-[5px] py-1 pl-2.5 sm:gap-2.5 sm:pl-5"
       >
-        <IconInfo className='h-4 w-4' />
+        <IconInfo className="h-4 w-4" />
 
         {!hasThisAccount && (
-          <p className='flex-1'>
+          <p className="flex-1">
             You are not a member of this account, currently in Watch-only mode.
-            <span className='cursor-pointer hover:underline'>{'Add to watch list>>'}</span>
+            <span className="cursor-pointer hover:underline">
+              {'Add to watch list>>'}
+            </span>
           </p>
         )}
 
         <Button
           isIconOnly
-          className='text-inherit'
-          size='sm'
-          variant='light'
+          className="text-inherit"
+          size="sm"
+          variant="light"
           onClick={() => {
             setForceHide(true);
           }}
         >
-          <IconClose className='h-4 w-4' />
+          <IconClose className="h-4 w-4" />
         </Button>
       </div>
     </>

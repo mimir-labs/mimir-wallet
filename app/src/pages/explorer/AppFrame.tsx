@@ -10,7 +10,15 @@ import { useCommunicator } from './useCommunicator';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
 import { AppIframe } from '@/components';
 
-function AppFrame({ url, iconUrl, appName }: { url: string; iconUrl?: string; appName?: string }) {
+function AppFrame({
+  url,
+  iconUrl,
+  appName,
+}: {
+  url: string;
+  iconUrl?: string;
+  appName?: string;
+}) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [loading, setLoading] = useState(true);
   const selected = useSelectedAccount();
@@ -22,9 +30,22 @@ function AppFrame({ url, iconUrl, appName }: { url: string; iconUrl?: string; ap
   useCommunicator(iframeRef, appUrl, iconUrl, appName);
 
   return (
-    <div key={selected || 'none'} className='relative h-full'>
-      {loading && <Spinner size='lg' variant='wave' className='absolute top-0 right-0 bottom-0 left-0 m-auto' />}
-      {url && <AppIframe appUrl={appUrl} iframeRef={iframeRef} key={url} onLoad={() => setLoading(false)} />}
+    <div key={selected || 'none'} className="relative h-full">
+      {loading && (
+        <Spinner
+          size="lg"
+          variant="ellipsis"
+          className="absolute top-0 right-0 bottom-0 left-0 m-auto"
+        />
+      )}
+      {url && (
+        <AppIframe
+          appUrl={appUrl}
+          iframeRef={iframeRef}
+          key={url}
+          onLoad={() => setLoading(false)}
+        />
+      )}
       {url && selected && <PendingTx address={selected} url={url} />}
     </div>
   );

@@ -6,7 +6,11 @@ import type { IMethod, Registry } from '@polkadot/types/types';
 import { findAction } from '@mimir-wallet/polkadot-core';
 import { useMemo } from 'react';
 
-export function useParseTransfer(registry: Registry, fromAddress?: string, call?: IMethod | null) {
+export function useParseTransfer(
+  registry: Registry,
+  fromAddress?: string,
+  call?: IMethod | null,
+) {
   const results = useMemo(() => {
     if (!call) {
       return null;
@@ -26,7 +30,11 @@ export function useParseTransfer(registry: Registry, fromAddress?: string, call?
 
     const [section, method] = action;
 
-    if (section !== 'balances' && section !== 'assets' && section !== 'tokens') {
+    if (
+      section !== 'balances' &&
+      section !== 'assets' &&
+      section !== 'tokens'
+    ) {
       return null;
     }
 
@@ -39,7 +47,10 @@ export function useParseTransfer(registry: Registry, fromAddress?: string, call?
         to = call.args[0].toString();
         value = '0';
         isAll = true;
-      } else if (method === 'transferAllowDeath' || method === 'transferKeepAlive') {
+      } else if (
+        method === 'transferAllowDeath' ||
+        method === 'transferKeepAlive'
+      ) {
         to = call.args[0].toString();
         value = call.args[1].toString();
       } else {

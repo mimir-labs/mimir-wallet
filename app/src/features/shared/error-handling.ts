@@ -25,43 +25,72 @@ export function createFeatureError(
   message: string,
   originalError?: Error,
   details?: string,
-  code?: string
+  code?: string,
 ): FeatureError {
   return {
     type,
     message,
     code,
     details,
-    originalError
+    originalError,
   };
 }
 
 /**
  * Error handler for decode operations
  */
-export function handleDecodeError(error: unknown, context: string = 'decode'): FeatureError {
+export function handleDecodeError(
+  error: unknown,
+  context: string = 'decode',
+): FeatureError {
   if (error instanceof Error) {
-    return createFeatureError('decode', `Failed to ${context}: ${error.message}`, error, error.stack);
+    return createFeatureError(
+      'decode',
+      `Failed to ${context}: ${error.message}`,
+      error,
+      error.stack,
+    );
   }
 
-  return createFeatureError('decode', `Failed to ${context}: Unknown error`, undefined, String(error));
+  return createFeatureError(
+    'decode',
+    `Failed to ${context}: Unknown error`,
+    undefined,
+    String(error),
+  );
 }
 
 /**
  * Error handler for network operations
  */
-export function handleNetworkError(error: unknown, operation: string = 'network operation'): FeatureError {
+export function handleNetworkError(
+  error: unknown,
+  operation: string = 'network operation',
+): FeatureError {
   if (error instanceof Error) {
-    return createFeatureError('network', `${operation} failed: ${error.message}`, error, error.stack);
+    return createFeatureError(
+      'network',
+      `${operation} failed: ${error.message}`,
+      error,
+      error.stack,
+    );
   }
 
-  return createFeatureError('network', `${operation} failed: Network error`, undefined, String(error));
+  return createFeatureError(
+    'network',
+    `${operation} failed: Network error`,
+    undefined,
+    String(error),
+  );
 }
 
 /**
  * Error handler for validation operations
  */
-export function handleValidationError(message: string, details?: string): FeatureError {
+export function handleValidationError(
+  message: string,
+  details?: string,
+): FeatureError {
   return createFeatureError('validation', message, undefined, details);
 }
 
@@ -86,7 +115,10 @@ export function formatErrorMessage(error: FeatureError): string {
 /**
  * Safe execution wrapper that returns DecodeResult
  */
-export function safeExecute<T>(operation: () => T, context: string = 'operation'): DecodeResult<T> {
+export function safeExecute<T>(
+  operation: () => T,
+  context: string = 'operation',
+): DecodeResult<T> {
   try {
     const result = operation();
 
@@ -101,7 +133,7 @@ export function safeExecute<T>(operation: () => T, context: string = 'operation'
  */
 export async function safeExecuteAsync<T>(
   operation: () => Promise<T>,
-  context: string = 'async operation'
+  context: string = 'async operation',
 ): Promise<DecodeResult<T>> {
   try {
     const result = await operation();

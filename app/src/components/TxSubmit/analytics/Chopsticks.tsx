@@ -3,7 +3,8 @@
 
 import type { IMethod } from '@polkadot/types/types';
 
-import { ApiManager, simulate, useNetwork } from '@mimir-wallet/polkadot-core';
+import { ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
+import { simulate } from '@mimir-wallet/polkadot-core/simulate';
 import { Button, buttonSpinner } from '@mimir-wallet/ui';
 import React, { useState } from 'react';
 
@@ -16,7 +17,7 @@ const EMPTY_SIMULATION = {
   isDone: false,
   success: false,
   error: null,
-  isLoading: false
+  isLoading: false,
 };
 
 function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
@@ -40,7 +41,12 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
           throw new Error('API not ready');
         }
 
-        const { success, html, error } = await simulate(api, Object.values(chain.wsUrl), call, account);
+        const { success, html, error } = await simulate(
+          api,
+          Object.values(chain.wsUrl),
+          call,
+          account,
+        );
 
         setSimulation({ isDone: true, success, error, isLoading: false });
         setHtml(html);
@@ -49,7 +55,7 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
           isDone: true,
           success: false,
           error: error instanceof Error ? error.message : 'Unknown Error',
-          isLoading: false
+          isLoading: false,
         });
       }
     }
@@ -57,28 +63,39 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
 
   return (
     <div>
-      <div className='font-bold'>Transaction Simulation</div>
-      <Cell title='Simulation' img={<img src='/images/chopsticks.webp' alt='chopticks' className='h-[24px]' />}>
+      <div className="font-bold">Transaction Simulation</div>
+      <Cell
+        title="Simulation"
+        img={
+          <img
+            src="/images/chopsticks.webp"
+            alt="chopticks"
+            className="h-[24px]"
+          />
+        }
+      >
         {simulation.isDone ? (
-          <div className='flex items-center gap-1'>
+          <div className="flex items-center gap-1">
             {simulation.success ? (
-              <IconSuccess className='text-success h-4 w-4' />
+              <IconSuccess className="text-success h-4 w-4" />
             ) : (
-              <IconFailed className='text-danger h-4 w-4' />
+              <IconFailed className="text-danger h-4 w-4" />
             )}
 
-            <div className='relative'>
+            <div className="relative">
               <p
                 data-success={simulation.success}
                 data-error={simulation.error}
-                className='data-[success=true]:text-success data-[error]:text-danger font-bold'
+                className="data-[success=true]:text-success data-[error]:text-danger font-bold"
               >
-                {simulation.success ? 'Success' : simulation.error || 'Unknown Error'}
+                {simulation.success
+                  ? 'Success'
+                  : simulation.error || 'Unknown Error'}
               </p>
 
               <Button
-                className='absolute top-full right-0 min-w-0 p-0'
-                variant='light'
+                className="absolute top-full right-0 min-w-0 p-0"
+                variant="light"
                 onClick={() => {
                   const newWindow = window.open();
 
@@ -86,14 +103,18 @@ function SafetyCheck({ call, account }: { call: IMethod; account?: string }) {
                   newWindow?.document.write(html);
                   newWindow?.document.close();
                 }}
-                size='sm'
+                size="sm"
               >
                 Details
               </Button>
             </div>
           </div>
         ) : (
-          <Button variant='ghost' disabled={simulation.isLoading} onClick={handleSimulate}>
+          <Button
+            variant="ghost"
+            disabled={simulation.isLoading}
+            onClick={handleSimulate}
+          >
             {simulation.isLoading ? buttonSpinner : undefined}
             {simulation.isLoading ? '~30s' : 'Simulate'}
           </Button>

@@ -28,11 +28,14 @@ function Unknown({ name, value }: ParamProps) {
 
   return (
     <span onClick={(e) => e.stopPropagation()}>
-      <span className='text-primary cursor-pointer text-xs font-bold' onClick={toggleOpen}>
+      <span
+        className="text-primary cursor-pointer text-xs font-bold"
+        onClick={toggleOpen}
+      >
         View {name || 'Details'}
       </span>
 
-      <Modal size='xl' isOpen={open} onClose={toggleOpen}>
+      <Modal size="xl" isOpen={open} onClose={toggleOpen}>
         <ModalContent>
           <ModalBody>
             <JsonView data={human} />

@@ -13,11 +13,17 @@ export function isPositiveNumber(value: { toString: () => string }): boolean {
   return isValidNumber(value) && Number(value) >= 0;
 }
 
-export const isValidURL = (url: string, protocolsAllowed = ['https:']): boolean => {
+export const isValidURL = (
+  url: string,
+  protocolsAllowed = ['https:'],
+): boolean => {
   try {
     const urlInfo = new URL(url);
 
-    return protocolsAllowed.includes(urlInfo.protocol) || urlInfo.hostname.split('.').pop() === 'localhost';
+    return (
+      protocolsAllowed.includes(urlInfo.protocol) ||
+      urlInfo.hostname.split('.').pop() === 'localhost'
+    );
   } catch {
     return false;
   }

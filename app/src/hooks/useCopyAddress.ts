@@ -1,7 +1,13 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { encodeAddress, isPolkadotEvmAddress, sub2Eth, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  encodeAddress,
+  isPolkadotEvmAddress,
+  sub2Eth,
+  useChains,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { create } from 'zustand';
 
 import { useCopyClipboard } from './useCopyClipboard';
@@ -17,8 +23,9 @@ export const useCopyAddress = create<{
 }>()((set) => ({
   isOpen: false,
   address: '',
-  open: (address: { toString: () => string }) => set({ isOpen: true, address: address.toString() }),
-  close: () => set({ isOpen: false })
+  open: (address: { toString: () => string }) =>
+    set({ isOpen: true, address: address.toString() }),
+  close: () => set({ isOpen: false }),
 }));
 
 export function useCopyAddressToClipboard(address?: string) {
@@ -36,7 +43,9 @@ export function useCopyAddressToClipboard(address?: string) {
     let encodedAddress: string;
 
     if (meta.isPure) {
-      const network = chains.find((chain) => chain.genesisHash === meta.pureCreatedAt);
+      const network = chains.find(
+        (chain) => chain.genesisHash === meta.pureCreatedAt,
+      );
 
       if (!network) {
         return;

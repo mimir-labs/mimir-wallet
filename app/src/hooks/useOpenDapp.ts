@@ -57,7 +57,8 @@ export function useOpenDapp(dapp: DappOption) {
         setRightSidebarTab('decoder');
         openRightSidebar();
       } else {
-        const _url = dapp.urlSearch?.(network || defaultNetwork) || new URL(dapp.url);
+        const _url =
+          dapp.urlSearch?.(network || defaultNetwork) || new URL(dapp.url);
 
         if (path) {
           dapp.isSubPathHash ? (_url.hash = path) : (_url.pathname = path);
@@ -66,6 +67,6 @@ export function useOpenDapp(dapp: DappOption) {
         navigate({ to: '/explorer/$url', params: { url: _url.toString() } });
       }
     },
-    [dapp, navigate, defaultNetwork, openRightSidebar, setRightSidebarTab]
+    [dapp, navigate, defaultNetwork, openRightSidebar, setRightSidebarTab],
   );
 }

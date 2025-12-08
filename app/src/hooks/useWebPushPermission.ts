@@ -7,7 +7,7 @@ import {
   getNotificationPermission,
   isNotificationPermissionSupported,
   isWebPushSupported,
-  requestNotificationPermission
+  requestNotificationPermission,
 } from '@/utils/webPushUtils';
 
 export interface WebPushPermissionState {
@@ -36,7 +36,8 @@ export interface WebPushPermissionState {
  * Handles browser support detection, permission status, and permission requests
  */
 export function useWebPushPermission(): WebPushPermissionState {
-  const [permission, setPermission] = useState<NotificationPermission>('default');
+  const [permission, setPermission] =
+    useState<NotificationPermission>('default');
   const [isRequestingPermission, setIsRequestingPermission] = useState(false);
 
   // Check browser support
@@ -58,31 +59,37 @@ export function useWebPushPermission(): WebPushPermissionState {
   }, [isPermissionSupported]);
 
   // Request notification permission
-  const requestPermission = useCallback(async (): Promise<NotificationPermission> => {
-    if (!isSupported || !isPermissionSupported) {
-      return 'denied';
-    }
+  const requestPermission =
+    useCallback(async (): Promise<NotificationPermission> => {
+      if (!isSupported || !isPermissionSupported) {
+        return 'denied';
+      }
 
-    if (isRequestingPermission) {
-      return permission;
-    }
+      if (isRequestingPermission) {
+        return permission;
+      }
 
-    setIsRequestingPermission(true);
+      setIsRequestingPermission(true);
 
-    try {
-      const result = await requestNotificationPermission();
+      try {
+        const result = await requestNotificationPermission();
 
-      setPermission(result);
+        setPermission(result);
 
-      return result;
-    } catch (error) {
-      console.error('Failed to request notification permission:', error);
+        return result;
+      } catch (error) {
+        console.error('Failed to request notification permission:', error);
 
-      return 'denied';
-    } finally {
-      setIsRequestingPermission(false);
-    }
-  }, [isSupported, isPermissionSupported, isRequestingPermission, permission]);
+        return 'denied';
+      } finally {
+        setIsRequestingPermission(false);
+      }
+    }, [
+      isSupported,
+      isPermissionSupported,
+      isRequestingPermission,
+      permission,
+    ]);
 
   // Initialize permission status on mount
   useEffect(() => {
@@ -143,6 +150,6 @@ export function useWebPushPermission(): WebPushPermissionState {
     isDefault,
     requestPermission,
     refreshPermission,
-    isRequestingPermission
+    isRequestingPermission,
   };
 }

@@ -7,10 +7,18 @@ import {
   type FunctionCallHandler,
   toFunctionCallNumber,
   toFunctionCallString,
-  toFunctionCallStringArray
+  toFunctionCallStringArray,
 } from '@mimir-wallet/ai-assistant';
 import { NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Divider,
+} from '@mimir-wallet/ui';
 import { useCallback, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -39,7 +47,7 @@ interface MultisigData {
 const STEPS = [
   { number: 1, label: 'Name' },
   { number: 2, label: 'Signers and Threshold' },
-  { number: 3, label: 'Review' }
+  { number: 3, label: 'Review' },
 ];
 
 function DesktopCreateMultisig() {
@@ -55,10 +63,10 @@ function DesktopCreateMultisig() {
       name: '',
       isPureProxy: false,
       members: [],
-      threshold: 1
+      threshold: 1,
     },
     STEPS,
-    1
+    1,
   );
 
   const [network, setNetwork] = useInputNetwork();
@@ -111,12 +119,17 @@ function DesktopCreateMultisig() {
         updateData(newData);
       }, 0);
     },
-    [goToStep, setNetwork, updateData]
+    [goToStep, setNetwork, updateData],
   );
 
-  useRouteDependentHandler('createMultisig', '/create-multisig', handleCreateMultisig, {
-    displayName: 'Create Multisig'
-  });
+  useRouteDependentHandler(
+    'createMultisig',
+    '/create-multisig',
+    handleCreateMultisig,
+    {
+      displayName: 'Create Multisig',
+    },
+  );
 
   const handleConfirm = async () => {
     if (multisigData.isPureProxy) {
@@ -124,7 +137,7 @@ function DesktopCreateMultisig() {
         who: multisigData.members,
         threshold: multisigData.threshold,
         name: multisigData.name,
-        multisigName: multisigData.name
+        multisigName: multisigData.name,
       });
     } else {
       toggleStaticOpen(true);
@@ -134,22 +147,31 @@ function DesktopCreateMultisig() {
   return (
     <NetworkProvider network={network}>
       {prepare ? (
-        <CreateFlexible prepare={prepare} onCancel={() => setPrepare(undefined)} />
+        <CreateFlexible
+          prepare={prepare}
+          onCancel={() => setPrepare(undefined)}
+        />
       ) : (
-        <div className='mx-auto flex w-full max-w-[800px] flex-col gap-5'>
-          <div className='flex items-center justify-between'>
-            <Button onClick={() => window.history.back()} variant='ghost'>
+        <div className="mx-auto flex w-full max-w-[800px] flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <Button onClick={() => window.history.back()} variant="ghost">
               {'<'} Back
             </Button>
             <Prepare onSelect={setPrepare} />
           </div>
 
-          <Card className='shadow-small mx-auto w-full max-w-[800px]'>
-            <CardHeader className='gap-4'>
-              <CardTitle className='text-foreground text-center text-xl font-extrabold'>Create Multisig</CardTitle>
+          <Card className="mx-auto w-full max-w-[800px] shadow-md">
+            <CardHeader className="gap-4">
+              <CardTitle className="text-foreground text-center text-xl font-extrabold">
+                Create Multisig
+              </CardTitle>
               <Divider />
               <CardDescription>
-                <StepIndicator steps={STEPS} currentStep={currentStep} onStepClick={goToStep} />
+                <StepIndicator
+                  steps={STEPS}
+                  currentStep={currentStep}
+                  onStepClick={goToStep}
+                />
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -159,7 +181,9 @@ function DesktopCreateMultisig() {
                   name={multisigData.name}
                   onNameChange={(name) => updateData({ name })}
                   isPureProxy={multisigData.isPureProxy}
-                  onPureProxyChange={(isPureProxy) => updateData({ isPureProxy })}
+                  onPureProxyChange={(isPureProxy) =>
+                    updateData({ isPureProxy })
+                  }
                   onNext={goToNext}
                   setNetwork={setNetwork}
                 />
@@ -184,7 +208,9 @@ function DesktopCreateMultisig() {
                   network={network}
                   onNameChange={(name) => updateData({ name })}
                   setNetwork={setNetwork}
-                  onPureProxyChange={(isPureProxy) => updateData({ isPureProxy })}
+                  onPureProxyChange={(isPureProxy) =>
+                    updateData({ isPureProxy })
+                  }
                   onBack={goToPrevious}
                   onConfirm={handleConfirm}
                 />
@@ -209,7 +235,11 @@ function DesktopCreateMultisig() {
       />
 
       {completedAddress && (
-        <CreateSuccess isOpen={isSuccess} onClose={() => toggleSuccess(false)} address={completedAddress} />
+        <CreateSuccess
+          isOpen={isSuccess}
+          onClose={() => toggleSuccess(false)}
+          address={completedAddress}
+        />
       )}
     </NetworkProvider>
   );

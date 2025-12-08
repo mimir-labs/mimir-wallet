@@ -28,7 +28,13 @@ interface EmailUnbindData {
 /**
  * Create signature message for bind operation
  */
-function createBindMessage(address: string, signer: string, email: string, nonce: string, timestamp: number): string {
+function createBindMessage(
+  address: string,
+  signer: string,
+  email: string,
+  nonce: string,
+  timestamp: number,
+): string {
   return `action: bind
 address: ${address}
 signer: ${signer}
@@ -40,7 +46,12 @@ timestamp: ${timestamp}`;
 /**
  * Create signature message for unbind operation
  */
-function createUnbindMessage(address: string, signer: string, nonce: string, timestamp: number): string {
+function createUnbindMessage(
+  address: string,
+  signer: string,
+  nonce: string,
+  timestamp: number,
+): string {
   return `action: unbind
 address: ${address}
 signer: ${signer}
@@ -52,9 +63,15 @@ timestamp: ${timestamp}`;
 /**
  * Generate signature for email bind operation
  */
-export async function createEmailBindSignature(address: string, email: string, signer: string): Promise<EmailBindData> {
+export async function createEmailBindSignature(
+  address: string,
+  email: string,
+  signer: string,
+): Promise<EmailBindData> {
   try {
-    const source = useWallet.getState().walletAccounts.find((item) => addressEq(item.address, signer))?.source;
+    const source = useWallet
+      .getState()
+      .walletAccounts.find((item) => addressEq(item.address, signer))?.source;
 
     if (!source) {
       throw new Error('not signer');
@@ -68,7 +85,10 @@ export async function createEmailBindSignature(address: string, email: string, s
     const message = createBindMessage(address, signer, email, nonce, timestamp);
 
     // Get injector for signing
-    const injected = await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(CONNECT_ORIGIN);
+    const injected =
+      await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(
+        CONNECT_ORIGIN,
+      );
     const injectSigner = injected?.signer;
 
     // Sign the message
@@ -79,7 +99,7 @@ export async function createEmailBindSignature(address: string, email: string, s
     const signResult = await injectSigner.signRaw({
       address: signer,
       data: message,
-      type: 'bytes'
+      type: 'bytes',
     });
 
     return {
@@ -87,20 +107,29 @@ export async function createEmailBindSignature(address: string, email: string, s
       email,
       nonce,
       timestamp,
-      signature: signResult.signature
+      signature: signResult.signature,
     };
   } catch (error) {
     console.error('Failed to create email bind signature:', error);
-    throw new Error(error instanceof Error ? error.message : 'Failed to create signature for email binding');
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : 'Failed to create signature for email binding',
+    );
   }
 }
 
 /**
  * Generate signature for email unbind operation
  */
-export async function createEmailUnbindSignature(address: string, signer: string): Promise<EmailUnbindData> {
+export async function createEmailUnbindSignature(
+  address: string,
+  signer: string,
+): Promise<EmailUnbindData> {
   try {
-    const source = useWallet.getState().walletAccounts.find((item) => addressEq(item.address, signer))?.source;
+    const source = useWallet
+      .getState()
+      .walletAccounts.find((item) => addressEq(item.address, signer))?.source;
 
     if (!source) {
       throw new Error('not signer');
@@ -114,7 +143,10 @@ export async function createEmailUnbindSignature(address: string, signer: string
     const message = createUnbindMessage(address, signer, nonce, timestamp);
 
     // Get injector for signing
-    const injected = await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(CONNECT_ORIGIN);
+    const injected =
+      await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(
+        CONNECT_ORIGIN,
+      );
     const injectSigner = injected?.signer;
 
     // Sign the message
@@ -125,25 +157,32 @@ export async function createEmailUnbindSignature(address: string, signer: string
     const signResult = await injectSigner.signRaw({
       address: signer,
       data: message,
-      type: 'bytes'
+      type: 'bytes',
     });
 
     return {
       address,
       nonce,
       timestamp,
-      signature: signResult.signature as HexString
+      signature: signResult.signature as HexString,
     };
   } catch (error) {
     console.error('Failed to create email unbind signature:', error);
-    throw new Error(error instanceof Error ? error.message : 'Failed to create signature for email unbinding');
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : 'Failed to create signature for email unbinding',
+    );
   }
 }
 
 /**
  * Validate email format
  */
-export function validateEmail(email: string): { isValid: boolean; error?: string } {
+export function validateEmail(email: string): {
+  isValid: boolean;
+  error?: string;
+} {
   if (!email) {
     return { isValid: false, error: 'Email is required' };
   }
@@ -157,7 +196,10 @@ export function validateEmail(email: string): { isValid: boolean; error?: string
 
   // Length validation (RFC 5321)
   if (email.length > 320) {
-    return { isValid: false, error: 'Email address too long (maximum 320 characters)' };
+    return {
+      isValid: false,
+      error: 'Email address too long (maximum 320 characters)',
+    };
   }
 
   // Check for suspicious patterns

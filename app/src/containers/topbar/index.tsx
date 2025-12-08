@@ -21,29 +21,40 @@ function TopBar() {
   const { mode, setNetworkMode } = useChains();
 
   return (
-    <div className='bg-content1/70 border-secondary sticky top-0 z-50 flex h-[56px] w-full items-center justify-between gap-2 border-b px-4 backdrop-blur-lg backdrop-saturate-150 sm:gap-2.5 sm:px-6'>
-      <div className='flex items-center gap-2'>
-        <Link to='/'>
-          <img className='hidden sm:block' alt='Mimir' src={Logo} style={{ width: 87 }} />
-          <img className='block sm:hidden' alt='Mimir' src={LogoCircle} style={{ width: 32 }} />
+    <div className="bg-background/70 border-secondary sticky top-0 z-50 flex h-[56px] w-full items-center justify-between gap-2 border-b px-4 backdrop-blur-lg backdrop-saturate-150 sm:gap-2.5 sm:px-6">
+      <div className="flex items-center gap-2">
+        <Link to="/">
+          <img
+            className="hidden sm:block"
+            alt="Mimir"
+            src={Logo}
+            style={{ width: 87 }}
+          />
+          <img
+            className="block sm:hidden"
+            alt="Mimir"
+            src={LogoCircle}
+            style={{ width: 32 }}
+          />
         </Link>
         <Button
-          variant='solid'
-          color='primary'
-          size='sm'
-          className='h-[18px]'
+          variant="solid"
+          color="primary"
+          size="sm"
+          className="h-[18px]"
           onClick={() => {
-            setNetworkMode(mode === 'solo' ? 'omni' : 'solo', () => window.location.reload());
+            setNetworkMode(mode === 'solo' ? 'omni' : 'solo', () =>
+              window.location.reload(),
+            );
             analyticsActions.omniSolochain(mode === 'solo' ? 'omni' : 'solo');
           }}
         >
-          <b className='uppercase'>{mode}</b>
+          <b className="uppercase">{mode}</b>
           <IconArrowClockWise />
         </Button>
       </div>
 
-      <div className='flex items-center gap-2 sm:gap-5'>
-        {/* <Notification /> */}
+      <div className="flex items-center gap-2 sm:gap-5">
         <NotificationButton />
         <WalletConnect />
         <TemplateButton />

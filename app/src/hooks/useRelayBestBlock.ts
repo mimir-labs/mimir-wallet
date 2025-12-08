@@ -8,7 +8,11 @@ import { useQuery } from '@mimir-wallet/service';
 
 import { useBlockInterval } from './useBlockInterval';
 
-async function fetchRelayBestBlock({ queryKey }: { queryKey: readonly [string, string] }): Promise<Header> {
+async function fetchRelayBestBlock({
+  queryKey,
+}: {
+  queryKey: readonly [string, string];
+}): Promise<Header> {
   const [, relayChainKey] = queryKey;
 
   const api = await ApiManager.getInstance().getApi(relayChainKey);
@@ -41,14 +45,14 @@ export function useRelayBestBlock(network: string) {
   const {
     data: bestBlock,
     isFetched,
-    isFetching
+    isFetching,
   } = useQuery({
     queryKey: ['relayBestBlock', relayChainKey ?? ''] as const,
     // Only enable query when current chain has a relay chain (is a parachain)
     enabled: !!relayChainKey,
     refetchOnMount: false,
     refetchInterval: blockInterval.toNumber(),
-    queryFn: fetchRelayBestBlock
+    queryFn: fetchRelayBestBlock,
   });
 
   return [bestBlock, isFetched, isFetching] as const;

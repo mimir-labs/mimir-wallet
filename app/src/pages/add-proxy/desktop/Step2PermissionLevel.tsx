@@ -45,7 +45,7 @@ function Step2PermissionLevel({
   pureProxyName,
   onNext,
   onBack,
-  onDataChange
+  onDataChange,
 }: Step2PermissionLevelProps) {
   const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(network);
 
@@ -54,26 +54,33 @@ function Step2PermissionLevel({
   };
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className="flex flex-col gap-4">
       {/* Configure Proxy Access Summary */}
-      <div className='flex flex-col gap-1'>
-        <label className='text-foreground text-sm font-bold'>Configure Proxy Access</label>
-        <div className='relative flex flex-col items-center gap-[5px]'>
+      <div className="flex flex-col gap-1">
+        <label className="text-foreground text-sm font-bold">
+          Configure Proxy Access
+        </label>
+        <div className="relative flex flex-col items-center gap-[5px]">
           {/* Proxy Account (Upper) */}
-          <div className='bg-secondary w-full rounded-[10px] p-2.5'>
+          <div className="bg-secondary w-full rounded-[10px] p-2.5">
             <AddressCell shorten={false} value={proxy} />
           </div>
 
-          <ProxyControls proxyType={proxyType} className='!absolute inset-x-auto inset-y-0 z-10 m-auto' />
+          <ProxyControls
+            proxyType={proxyType}
+            className="!absolute inset-x-auto inset-y-0 z-10 m-auto"
+          />
 
           {/* Proxied Account (Lower) */}
           {isPureProxy ? (
-            <div className='bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5'>
+            <div className="bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5">
               <img src={PureIcon} style={{ width: 30 }} />
-              <span className='text-foreground font-bold'>{pureProxyName || DEFAULT_PURE_ACCOUNT_NAME}</span>
+              <span className="text-foreground font-bold">
+                {pureProxyName || DEFAULT_PURE_ACCOUNT_NAME}
+              </span>
             </div>
           ) : (
-            <div className='bg-secondary w-full rounded-[10px] p-2.5'>
+            <div className="bg-secondary w-full rounded-[10px] p-2.5">
               <AddressCell value={proxied} />
             </div>
           )}
@@ -85,51 +92,60 @@ function Step2PermissionLevel({
         network={network}
         value={proxyType}
         onChange={(value) => onDataChange({ proxyType: value })}
-        label='Permission Level'
-        description='What functions an account execute on behalf of another.'
+        label="Permission Level"
+        description="What functions an account execute on behalf of another."
       />
 
       {/* Time Delay */}
-      <div className='flex flex-col gap-1'>
-        <div className='flex items-center justify-between'>
-          <label className='text-foreground text-sm font-bold'>{hasDelay ? 'Delay' : 'Time Delay'}</label>
-          <Switch size='sm' isSelected={hasDelay} onValueChange={(checked) => onDataChange({ hasDelay: checked })} />
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center justify-between">
+          <label className="text-foreground text-sm font-bold">
+            {hasDelay ? 'Delay' : 'Time Delay'}
+          </label>
+          <Switch
+            checked={hasDelay}
+            onCheckedChange={(checked) => onDataChange({ hasDelay: checked })}
+          />
         </div>
-        <p className='text-foreground/50 text-xs'>
+        <p className="text-foreground/50 text-xs">
           {hasDelay
             ? 'The proxy will announce its intended action and will wait for the number of blocks defined in the delay time before executing it.'
             : 'Require waiting period before transactions execute for extra security.'}
         </p>
 
         {hasDelay && (
-          <div className='mt-3 flex flex-col gap-3'>
-            <label className='text-foreground text-sm font-bold'>Delay Time</label>
-            <div className='flex gap-2'>
+          <div className="mt-3 flex flex-col gap-3">
+            <label className="text-foreground text-sm font-bold">
+              Delay Time
+            </label>
+            <div className="flex gap-2">
               <DelayItem
                 network={network}
                 isSelected={delayType === 'hour'}
-                delayType='hour'
+                delayType="hour"
                 onSelect={handleDelayTypeChange}
               />
               <DelayItem
                 network={network}
                 isSelected={delayType === 'day'}
-                delayType='day'
+                delayType="day"
                 onSelect={handleDelayTypeChange}
               />
               <DelayItem
                 network={network}
                 isSelected={delayType === 'week'}
-                delayType='week'
+                delayType="week"
                 onSelect={handleDelayTypeChange}
               />
               <DelayItem
                 network={network}
                 isSelected={delayType === 'custom'}
-                delayType='custom'
+                delayType="custom"
                 onSelect={handleDelayTypeChange}
                 customBlocks={customBlocks}
-                onCustomBlockChange={(value) => onDataChange({ customBlocks: value })}
+                onCustomBlockChange={(value) =>
+                  onDataChange({ customBlocks: value })
+                }
               />
             </div>
           </div>
@@ -141,17 +157,33 @@ function Step2PermissionLevel({
 
       {/* Proxy Module Not Supported Alert */}
       {!isProxyModuleSupported && (
-        <Alert variant='destructive'>
-          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        <Alert variant="destructive">
+          <AlertTitle>
+            The current network does not support proxy module
+          </AlertTitle>
         </Alert>
       )}
 
       {/* Action Buttons */}
-      <div className='flex gap-2.5'>
-        <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
+      <div className="flex gap-2.5">
+        <Button
+          fullWidth
+          size="md"
+          variant="ghost"
+          color="primary"
+          radius="full"
+          onClick={onBack}
+        >
           Back
         </Button>
-        <Button fullWidth size='md' color='primary' radius='full' onClick={onNext} disabled={!isProxyModuleSupported}>
+        <Button
+          fullWidth
+          size="md"
+          color="primary"
+          radius="full"
+          onClick={onNext}
+          disabled={!isProxyModuleSupported}
+        >
           Next
         </Button>
       </div>

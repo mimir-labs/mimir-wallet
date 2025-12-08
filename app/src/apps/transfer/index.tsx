@@ -1,7 +1,10 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { type FunctionCallHandler, toFunctionCallString } from '@mimir-wallet/ai-assistant';
+import {
+  type FunctionCallHandler,
+  toFunctionCallString,
+} from '@mimir-wallet/ai-assistant';
 import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
 import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
@@ -33,7 +36,7 @@ function PageTransfer() {
     navigate({
       to: '.',
       search: { ...search, assetId: newAssetId },
-      replace: true
+      replace: true,
     });
   };
 
@@ -41,13 +44,15 @@ function PageTransfer() {
   const supportedNetworks = useAddressSupportedNetworks(current);
   const [network, setNetwork] = useInputNetwork(
     assetNetwork,
-    supportedNetworks?.map((item) => item.key)
+    supportedNetworks?.map((item) => item.key),
   );
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
   const [assets] = useChainXcmAsset(network);
   const token = useMemo(() => {
-    const foundAsset = assets?.find((item) => (assetId === 'native' ? item.isNative : item.key === assetId));
+    const foundAsset = assets?.find((item) =>
+      assetId === 'native' ? item.isNative : item.key === assetId,
+    );
 
     return foundAsset;
   }, [assetId, assets]);
@@ -67,7 +72,10 @@ function PageTransfer() {
       const amountValue = event.arguments.amount;
 
       if (amountValue !== undefined && amountValue !== null) {
-        const amountStr = typeof amountValue === 'number' ? amountValue.toString() : String(amountValue);
+        const amountStr =
+          typeof amountValue === 'number'
+            ? amountValue.toString()
+            : String(amountValue);
 
         setAmount(amountStr);
       }
@@ -79,29 +87,34 @@ function PageTransfer() {
         setNetwork(networkValue);
       }
     },
-    [setAmount, setNetwork]
+    [setAmount, setNetwork],
   );
 
-  useRouteDependentHandler('transferForm', '/explorer/mimir%3A%2F%2Fapp%2Ftransfer', handleTransferForm, {
-    displayName: 'Transfer'
-  });
+  useRouteDependentHandler(
+    'transferForm',
+    '/explorer/mimir%3A%2F%2Fapp%2Ftransfer',
+    handleTransferForm,
+    {
+      displayName: 'Transfer',
+    },
+  );
 
   return (
     <NetworkProvider network={network}>
-      <div className='mx-auto w-full max-w-[500px] p-4 sm:p-5'>
-        <Button onClick={() => window.history.back()} variant='ghost'>
+      <div className="mx-auto w-full max-w-[500px] p-4 sm:p-5">
+        <Button onClick={() => window.history.back()} variant="ghost">
           {'<'} Back
         </Button>
-        <div className='border-secondary bg-content1 shadow-medium mt-4 rounded-[20px] border-1 p-4 sm:p-6'>
-          <div className='flex flex-col gap-5'>
-            <div className='flex items-center justify-between'>
+        <div className="card-root mt-4 p-4 sm:p-6">
+          <div className="flex flex-col gap-5">
+            <div className="flex items-center justify-between">
               <h3>Transfer</h3>
 
-              <Button asChild color='primary' variant='light'>
+              <Button asChild color="primary" variant="light">
                 <Link
-                  to='/explorer/$url'
+                  to="/explorer/$url"
                   params={{
-                    url: 'mimir://app/multi-transfer'
+                    url: 'mimir://app/multi-transfer',
                   }}
                 >
                   <IconMultiTransfer />

@@ -3,7 +3,10 @@
 
 import type React from 'react';
 
-export interface InputProps extends Omit<React.ComponentProps<'input'>, 'onChange'> {
+export interface InputProps extends Omit<
+  React.ComponentProps<'input'>,
+  'onChange'
+> {
   className?: string;
   defaultValue?: string;
   value?: string;
@@ -11,7 +14,14 @@ export interface InputProps extends Omit<React.ComponentProps<'input'>, 'onChang
   label?: React.ReactNode;
   error?: Error | null;
   autoFocus?: boolean;
-  enterKeyHint?: 'enter' | 'done' | 'go' | 'next' | 'previous' | 'search' | 'send';
+  enterKeyHint?:
+    | 'enter'
+    | 'done'
+    | 'go'
+    | 'next'
+    | 'previous'
+    | 'search'
+    | 'send';
   placeholder?: string;
   type?: string;
   fullWidth?: boolean;
@@ -19,7 +29,14 @@ export interface InputProps extends Omit<React.ComponentProps<'input'>, 'onChang
   endAdornment?: React.ReactNode;
   startAdornment?: React.ReactNode;
   endButton?: React.ReactNode;
-  autoComplete?: 'on' | 'off' | 'name' | 'email' | 'username' | 'current-password' | 'new-password';
+  autoComplete?:
+    | 'on'
+    | 'off'
+    | 'name'
+    | 'email'
+    | 'username'
+    | 'current-password'
+    | 'new-password';
   tabIndex?: number;
   onChange?: (value: string) => void;
 }
@@ -46,7 +63,10 @@ export interface InputAddressProps {
   withZeroAddress?: boolean;
 }
 
-export interface InputNumberProps extends Omit<InputProps, 'defaultValue' | 'value' | 'onChange'> {
+export interface InputNumberProps extends Omit<
+  InputProps,
+  'defaultValue' | 'value' | 'onChange'
+> {
   format?: [decimals: number, unit: string];
   defaultValue?: string | { toString: () => string };
   value?: string;

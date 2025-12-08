@@ -9,9 +9,9 @@ import {
   ApiManager,
   fetchAccountBalances,
   fetchSingleAssetBalance,
-  useChains
+  useChains,
 } from '@mimir-wallet/polkadot-core';
-import { useQueries, useQuery } from '@mimir-wallet/service';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { isEqual } from 'lodash-es';
 import { useMemo } from 'react';
 
@@ -31,11 +31,14 @@ type ChainBalancesOptions = {
 export function useChainBalances(
   chain?: string,
   address?: string,
-  options?: ChainBalancesOptions
+  options?: ChainBalancesOptions,
 ): [AccountEnhancedAssetBalance[] | undefined, boolean, boolean] {
   const [allXcmAssets, isXcmAssetsFetched] = useAllXcmAsset();
 
-  const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address) : ''),
+    [address],
+  );
 
   // Filter XCM assets for the specific chain
   const chainAssets = useMemo(() => {
@@ -59,7 +62,9 @@ export function useChainBalances(
   const { data, isFetched, isFetching } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ['chain-balances', chain, addressHex, false] as const,
-    queryFn: async ({ queryKey: [, chain, addressHex] }): Promise<AccountEnhancedAssetBalance[]> => {
+    queryFn: async ({
+      queryKey: [, chain, addressHex],
+    }): Promise<AccountEnhancedAssetBalance[]> => {
       if (!chain || !addressHex || !chainAssets.length) {
         throw new Error('Chain, address, and chain assets are required');
       }
@@ -68,14 +73,15 @@ export function useChainBalances(
 
       return fetchAccountBalances(api, addressHex as HexString, chainAssets);
     },
-    enabled: !!address && !!chain && isXcmAssetsFetched && chainAssets.length > 0,
+    enabled:
+      !!address && !!chain && isXcmAssetsFetched && chainAssets.length > 0,
     staleTime: 12_000,
     refetchInterval: 12_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
-    }
+    },
   });
 
   return [data, isFetched, isFetching];
@@ -101,15 +107,24 @@ type AllChainBalancesOptions = {
  * @param options - Optional configuration { onlyWithPrice: boolean, alwaysIncludeNative: boolean }
  * @returns Array of chain balance results
  */
-export function useAllChainBalances(address?: string, options?: AllChainBalancesOptions): UseAllChainBalances[] {
+export function useAllChainBalances(
+  address?: string,
+  options?: AllChainBalancesOptions,
+): UseAllChainBalances[] {
   const apiManager = ApiManager.getInstance();
   const { chains } = useChains();
   const [allXcmAssets, isXcmAssetsFetched] = useAllXcmAsset();
 
   // Get user's enabled networks
-  const enabledChains = useMemo(() => chains.filter((c) => c.enabled), [chains]);
+  const enabledChains = useMemo(
+    () => chains.filter((c) => c.enabled),
+    [chains],
+  );
 
-  const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address) : ''),
+    [address],
+  );
 
   // Memoize queries configuration to prevent unnecessary re-creation
   const queriesConfig = useMemo(
@@ -124,7 +139,9 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
 
           // Filter assets with price if option is enabled
           if (options?.onlyWithPrice) {
-            chainAssets = chainAssets.filter((asset) => asset.price && asset.price > 0);
+            chainAssets = chainAssets.filter(
+              (asset) => asset.price && asset.price > 0,
+            );
           }
 
           // Always include native asset if option is enabled and it's not already included
@@ -135,7 +152,10 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
               chainAssets = [nativeAsset, ...chainAssets];
             } else {
               // Ensure native is at the beginning
-              chainAssets = [nativeAsset, ...chainAssets.filter((asset) => !asset.isNative)];
+              chainAssets = [
+                nativeAsset,
+                ...chainAssets.filter((asset) => !asset.isNative),
+              ];
             }
           }
         }
@@ -143,13 +163,22 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
         const finalChainAssets = chainAssets;
 
         return {
-          queryKey: ['chain-balances', chainName, addressHex, !!options?.onlyWithPrice] as const,
+          queryKey: [
+            'chain-balances',
+            chainName,
+            addressHex,
+            !!options?.onlyWithPrice,
+          ] as const,
           staleTime: 12_000,
           refetchInterval: 12_000,
           refetchOnMount: false,
           refetchOnWindowFocus: false,
           enabled:
-            !!address && !!isXcmAssetsFetched && !!allXcmAssets && !!finalChainAssets && finalChainAssets.length > 0,
+            !!address &&
+            !!isXcmAssetsFetched &&
+            !!allXcmAssets &&
+            !!finalChainAssets &&
+            finalChainAssets.length > 0,
           queryFn: async (): Promise<AccountEnhancedAssetBalance[]> => {
             if (!addressHex || !finalChainAssets?.length) {
               return [];
@@ -157,8 +186,12 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
 
             const api = await apiManager.getApi(chainName);
 
-            return fetchAccountBalances(api, addressHex as HexString, finalChainAssets);
-          }
+            return fetchAccountBalances(
+              api,
+              addressHex as HexString,
+              finalChainAssets,
+            );
+          },
         };
       }),
     [
@@ -169,8 +202,8 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
       address,
       options?.onlyWithPrice,
       options?.alwaysIncludeNative,
-      apiManager
-    ]
+      apiManager,
+    ],
   );
 
   return useQueries({
@@ -182,8 +215,8 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
         isFetching: results[index].isFetching,
         isError: results[index].isError,
         refetch: results[index].refetch,
-        data: results[index].data
-      }))
+        data: results[index].data,
+      })),
   });
 }
 
@@ -195,7 +228,9 @@ export function useAllChainBalances(address?: string, options?: AllChainBalances
  */
 export function useBalanceTotalUsd(address?: string): [number, number] {
   // Only fetch assets with price for performance optimization
-  const allChainBalances = useAllChainBalances(address, { onlyWithPrice: true });
+  const allChainBalances = useAllChainBalances(address, {
+    onlyWithPrice: true,
+  });
 
   return useMemo(() => {
     let total = 0;
@@ -207,16 +242,22 @@ export function useBalanceTotalUsd(address?: string): [number, number] {
           // Only process assets with price information
           if (asset.price && asset.price > 0 && asset.total > 0n) {
             // Convert balance to decimal and multiply by price
-            const assetValue = (Number(asset.total) / Math.pow(10, asset.decimals)) * asset.price;
+            const assetValue =
+              (Number(asset.total) / Math.pow(10, asset.decimals)) *
+              asset.price;
 
             total += assetValue;
 
             // Calculate previous value for 24h change
             // If priceChange exists, calculate what the value was 24h ago
             // priceChange is a percentage number (e.g., 5 means 5%), so divide by 100
-            const previousPrice = asset.priceChange ? asset.price / (1 + asset.priceChange / 100) : asset.price;
+            const previousPrice = asset.priceChange
+              ? asset.price / (1 + asset.priceChange / 100)
+              : asset.price;
 
-            lastTotal += (Number(asset.total) / Math.pow(10, asset.decimals)) * previousPrice;
+            lastTotal +=
+              (Number(asset.total) / Math.pow(10, asset.decimals)) *
+              previousPrice;
           }
         }
       }
@@ -239,17 +280,30 @@ export function useBalanceTotalUsd(address?: string): [number, number] {
 export function useBalanceByIdentifier(
   network?: string,
   address?: string,
-  identifier?: 'native' | HexString | string | null
+  identifier?: 'native' | HexString | string | null,
 ): [AccountEnhancedAssetBalance | undefined, boolean, boolean] {
-  const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address) : ''),
+    [address],
+  );
 
   // Get asset information first
-  const [assetInfo, isAssetFetched, isAssetFetching] = useXcmAsset(network, identifier);
+  const [assetInfo, isAssetFetched, isAssetFetching] = useXcmAsset(
+    network,
+    identifier,
+  );
 
   // Query single asset balance directly
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: ['single-asset-balance', network, addressHex, assetInfo ?? null] as const,
-    queryFn: async ({ queryKey: [, network, addressHex, assetInfo] }): Promise<AccountEnhancedAssetBalance | null> => {
+    queryKey: [
+      'single-asset-balance',
+      network,
+      addressHex,
+      assetInfo ?? null,
+    ] as const,
+    queryFn: async ({
+      queryKey: [, network, addressHex, assetInfo],
+    }): Promise<AccountEnhancedAssetBalance | null> => {
       if (!network || !addressHex || !assetInfo) {
         throw new Error('Network, address, and asset info are required');
       }
@@ -258,14 +312,15 @@ export function useBalanceByIdentifier(
 
       return fetchSingleAssetBalance(api, addressHex as HexString, assetInfo);
     },
-    enabled: !!address && !!network && !!identifier && !!assetInfo && isAssetFetched,
+    enabled:
+      !!address && !!network && !!identifier && !!assetInfo && isAssetFetched,
     staleTime: 12_000,
     refetchInterval: 12_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
-    }
+    },
   });
 
   // Combined fetching state - consider both asset info and balance fetching

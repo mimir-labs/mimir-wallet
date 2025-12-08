@@ -10,7 +10,9 @@ export class SessionStore extends BaseStore {
   constructor() {
     super();
     this.#session = new SessionStorage();
-    this.#session.on('store_changed', (...args) => this.emit('store_changed', ...args));
+    this.#session.on('store_changed', (...args) =>
+      this.emit('store_changed', ...args),
+    );
   }
 
   public all(): [string, unknown][] {

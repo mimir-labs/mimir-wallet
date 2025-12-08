@@ -2,7 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { addressToHex, useChains } from '@mimir-wallet/polkadot-core';
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import {
+  Button,
+  Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from '@mimir-wallet/ui';
 import { useMemo } from 'react';
 
 import IdentityIcon from '../../components/IdentityIcon';
@@ -30,19 +38,22 @@ function AccountItem({ account }: { account: MigratedAccount }) {
   const { open } = useCopyAddress();
 
   return (
-    <div className='border-divider-300 flex h-10 w-full items-center gap-[5px] rounded-[10px] border bg-white px-2.5'>
+    <div className="border-divider flex h-10 w-full items-center gap-[5px] rounded-[10px] border bg-white px-2.5">
       {/* Account Icon */}
-      <div className='h-5 w-5 flex-shrink-0'>
+      <div className="h-5 w-5 flex-shrink-0">
         <IdentityIcon value={account.address} size={20} />
       </div>
 
       {/* Account Name */}
-      <div className='w-[50%]'>
+      <div className="w-[50%]">
         <AddressName value={account.address} />
       </div>
 
       {/* Address */}
-      <div className='text-small min-w-0 flex-1 text-right' onClick={() => open(account.address)}>
+      <div
+        className="min-w-0 flex-1 text-right text-sm"
+        onClick={() => open(account.address)}
+      >
         <Address value={account.address} shorten />
       </div>
     </div>
@@ -53,7 +64,10 @@ function MigrationModal({ isOpen, onClose, destChain, accounts = [] }: Props) {
   const { chains: networks } = useChains();
   const { accounts: localAccounts, metas } = useAccount();
 
-  const destNetwork = useMemo(() => networks.find((network) => network.key === destChain), [networks, destChain]);
+  const destNetwork = useMemo(
+    () => networks.find((network) => network.key === destChain),
+    [networks, destChain],
+  );
 
   // Filter local accounts that are proxied and have delegatees on the destChain
   const filteredAccounts = useMemo(() => {
@@ -69,14 +83,14 @@ function MigrationModal({ isOpen, onClose, destChain, accounts = [] }: Props) {
       if (meta?.isProxied && account.delegatees?.length > 0) {
         // Check if any delegatee is on the destChain
         const hasDestChainDelegatee = account.delegatees.some(
-          (delegatee) => delegatee.proxyNetwork === destNetwork.genesisHash
+          (delegatee) => delegatee.proxyNetwork === destNetwork.genesisHash,
         );
 
         if (hasDestChainDelegatee) {
           proxiedAccounts.push({
             address: account.address,
             name: account.name || meta.name || 'Unnamed',
-            tokenIcon: destNetwork.tokenIcon
+            tokenIcon: destNetwork.tokenIcon,
           });
         }
       }
@@ -88,33 +102,43 @@ function MigrationModal({ isOpen, onClose, destChain, accounts = [] }: Props) {
   const displayAccounts = accounts.length > 0 ? accounts : filteredAccounts;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='lg'>
+    <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalContent>
         <ModalHeader>
-          <h2 className='text-[20px] font-extrabold'>Migrated Accounts</h2>
+          <h2 className="text-[20px] font-extrabold">Migrated Accounts</h2>
         </ModalHeader>
 
-        <ModalBody className='py-0'>
-          <div className='flex flex-col gap-4'>
-            <p className='text-small'>
+        <ModalBody className="py-0">
+          <div className="flex flex-col gap-4">
+            <p className="text-sm">
               {`Due to the Asset Hub Migration, the following accounts's asset migrated to Asset Hub. Please use them on`}{' '}
               {destNetwork?.name} instead.
             </p>
 
             <Divider />
 
-            <div className='flex flex-col gap-2.5'>
+            <div className="flex flex-col gap-2.5">
               {displayAccounts.length > 0 ? (
                 displayAccounts.map((account, index) => (
-                  <AccountItem key={`${account.address}-${index}`} account={account} />
+                  <AccountItem
+                    key={`${account.address}-${index}`}
+                    account={account}
+                  />
                 ))
               ) : (
-                <div className='py-8 text-center'>No migrated accounts found for {destNetwork?.name}</div>
+                <div className="py-8 text-center">
+                  No migrated accounts found for {destNetwork?.name}
+                </div>
               )}
             </div>
 
             <Divider />
-            <a className='text-inherit underline' target='_blank' href={MIGRATION_DOCS_URL} rel='noreferrer'>
+            <a
+              className="text-inherit underline"
+              target="_blank"
+              href={MIGRATION_DOCS_URL}
+              rel="noreferrer"
+            >
               {`What's Assethub Migration?`}
             </a>
           </div>

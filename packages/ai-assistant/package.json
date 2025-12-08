@@ -6,7 +6,6 @@
   },
   "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/ai-assistant#readme",
   "license": "Apache-2.0",
-  "packageManager": "yarn@4.5.3",
   "private": true,
   "repository": {
     "directory": "packages/ai-assistant",
@@ -29,18 +28,23 @@
         "default": "./build/index.js"
       }
     },
-    "./styles.css": "./dist/styles.css"
+    "./SimpleChat": {
+      "import": {
+        "@mimir-wallet/source": "./src/SimpleChat.ts",
+        "types": "./build/SimpleChat.d.ts",
+        "default": "./build/SimpleChat.js"
+      }
+    },
+    "./styles.css": "./styles.css"
   },
   "files": [
     "build",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc --build && tailwindcss -i ./src/styles.css -o ./dist/styles.css",
+    "build": "tsc --build",
     "check-types": "tsc --noEmit",
-    "dev": "run-p dev:tsc dev:tailwindcss",
-    "dev:tsc": "tsc --watch",
-    "dev:tailwindcss": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch"
+    "dev": "tsc --watch"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -54,17 +58,20 @@
     "@radix-ui/react-use-controllable-state": "^1.2.2",
     "eventemitter3": "^5.0.1",
     "lucide-react": "^0.552.0",
-    "react-syntax-highlighter": "^15.6.6",
+    "react-syntax-highlighter": "^16.1.0",
     "streamdown": "^1.1.6",
     "use-stick-to-bottom": "^1.1.1"
   },
   "devDependencies": {
     "@mimir-wallet/service": "workspace:^",
     "@tailwindcss/cli": "^4.1.16",
-    "@types/react-syntax-highlighter": "^15",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "npm-run-all2": "^7.0.2",
     "tailwind-variants": "^3.1.1",
     "tailwindcss": "^4.1.17",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^7.2.6"
   }
 }

@@ -74,20 +74,24 @@ export function pushSw() {
         // Check if any app window is focused
         const windowClients = await self.clients.matchAll({
           type: 'window',
-          includeUncontrolled: true
+          includeUncontrolled: true,
         });
 
-        const isAppFocused = windowClients.some((client) => client.visibilityState === 'visible' && client.focused);
+        const isAppFocused = windowClients.some(
+          (client) => client.visibilityState === 'visible' && client.focused,
+        );
 
         if (isAppFocused) {
           console.debug('[SW] App is focused, skipping notification display');
           // You could send a message to the client instead to update UI directly
-          const focusedClient = windowClients.find((client) => client.visibilityState === 'visible' && client.focused);
+          const focusedClient = windowClients.find(
+            (client) => client.visibilityState === 'visible' && client.focused,
+          );
 
           if (focusedClient) {
             focusedClient.postMessage({
               type: 'PUSH_NOTIFICATION',
-              data: data
+              data: data,
             });
           }
 
@@ -119,18 +123,20 @@ export function pushSw() {
           vibrate: [200, 100, 200],
           data: notificationData,
           requireInteraction: true, // Keep notification until user interacts
-          tag: data.tag || `mimir-tx-${notificationData?.transactionId || Date.now()}`,
+          tag:
+            data.tag ||
+            `mimir-tx-${notificationData?.transactionId || Date.now()}`,
           timestamp: data.timestamp || Date.now(),
           actions: [
             {
               action: 'view',
-              title: 'View Transaction'
+              title: 'View Transaction',
             },
             {
               action: 'dismiss',
-              title: 'Dismiss'
-            }
-          ]
+              title: 'Dismiss',
+            },
+          ],
         };
 
         return self.registration.showNotification(title, options);
@@ -146,12 +152,15 @@ export function pushSw() {
           actions: [
             {
               action: 'view',
-              title: 'Open App'
-            }
-          ]
+              title: 'Open App',
+            },
+          ],
         };
 
-        return self.registration.showNotification('Mimir Wallet', genericOptions);
+        return self.registration.showNotification(
+          'Mimir Wallet',
+          genericOptions,
+        );
       }
     })();
   });

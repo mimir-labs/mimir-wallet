@@ -37,7 +37,7 @@ export const router = createRouter({
   routeTree,
   context: {} as RouterContext,
   defaultPreload: 'intent',
-  defaultPreloadDelay: 100
+  defaultPreloadDelay: 100,
 });
 
 /**

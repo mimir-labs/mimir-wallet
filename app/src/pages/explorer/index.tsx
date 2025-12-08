@@ -22,7 +22,12 @@ function AppExplorer() {
   useEffect(() => {
     if (url) {
       const _url = decodeURIComponent(url);
-      const customApps = Object.values((store.get(CUSTOM_APP_KEY) || {}) as Record<string | number, CustomDappOption>);
+      const customApps = Object.values(
+        (store.get(CUSTOM_APP_KEY) || {}) as Record<
+          string | number,
+          CustomDappOption
+        >,
+      );
 
       if (_url.startsWith('mimir://app')) {
         const params = new URLSearchParams(new URL(_url).searchParams);
@@ -51,7 +56,9 @@ function AppExplorer() {
 
           const app = apps.find((item) => _url.startsWith(item.url));
 
-          setElement(<AppFrame url={url} iconUrl={app?.icon} appName={app?.name} />);
+          setElement(
+            <AppFrame url={url} iconUrl={app?.icon} appName={app?.name} />,
+          );
         });
       }
     }

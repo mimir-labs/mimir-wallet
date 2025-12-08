@@ -35,7 +35,9 @@ export function useAddressSupportedNetworks(address?: string | null) {
         meta.proxyNetworks.forEach((network) => genesisHashes.add(network));
       }
 
-      const supported = chains.filter((item) => genesisHashes.has(item.genesisHash));
+      const supported = chains.filter((item) =>
+        genesisHashes.has(item.genesisHash),
+      );
 
       return supported;
     }
@@ -43,5 +45,8 @@ export function useAddressSupportedNetworks(address?: string | null) {
     return undefined;
   }, [meta.isPure, meta.pureCreatedAt, meta.proxyNetworks, chains]);
 
-  return useMemo(() => (supportedNetwork ? supportedNetwork : undefined), [supportedNetwork]);
+  return useMemo(
+    () => (supportedNetwork ? supportedNetwork : undefined),
+    [supportedNetwork],
+  );
 }

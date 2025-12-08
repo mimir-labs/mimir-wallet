@@ -17,19 +17,20 @@ export const allEndpoints: Endpoint[] = import.meta.env.VITE_ENDPOINTS
       ...(kusamaChains as unknown as Endpoint[]),
       ...(paseoChains as unknown as Endpoint[]),
       ...(westendChains as unknown as Endpoint[]),
-      ...(solochainChains as unknown as Endpoint[])
+      ...(solochainChains as unknown as Endpoint[]),
     ];
 
-export const remoteProxyRelations: Record<HexString, HexString> = allEndpoints.reduce(
-  (acc, item) => {
-    if (item.remoteProxyTo) {
-      acc[item.genesisHash] = item.remoteProxyTo as HexString;
-    }
+export const remoteProxyRelations: Record<HexString, HexString> =
+  allEndpoints.reduce(
+    (acc, item) => {
+      if (item.remoteProxyTo) {
+        acc[item.genesisHash] = item.remoteProxyTo as HexString;
+      }
 
-    return acc;
-  },
-  {} as Record<HexString, HexString>
-);
+      return acc;
+    },
+    {} as Record<HexString, HexString>,
+  );
 
 const chainMap: Map<string, Endpoint | undefined> = new Map();
 
@@ -38,7 +39,9 @@ export function getChainIcon(key: string) {
     return chainMap.get(key);
   }
 
-  const endpoint = allEndpoints.find((item) => item.key === key || item.genesisHash === key);
+  const endpoint = allEndpoints.find(
+    (item) => item.key === key || item.genesisHash === key,
+  );
 
   chainMap.set(key, endpoint);
 

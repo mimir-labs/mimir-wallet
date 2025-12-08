@@ -20,7 +20,10 @@ export const isSameOrigin = (url1: string, url2: string): boolean => {
 // is same top domain
 export const isSameTopDomain = (url1: string, url2: string): boolean => {
   try {
-    return new URL(url1).host.split('.').slice(-2).join('.') === new URL(url2).host.split('.').slice(-2).join('.');
+    return (
+      new URL(url1).host.split('.').slice(-2).join('.') ===
+      new URL(url2).host.split('.').slice(-2).join('.')
+    );
   } catch {
     return false;
   }

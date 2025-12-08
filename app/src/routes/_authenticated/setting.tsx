@@ -6,8 +6,6 @@ import type { RouteMetadata } from '@/hooks/usePageTitle';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
-import PageSetting from '@/pages/setting';
-
 /**
  * Settings Route (/setting)
  *
@@ -18,13 +16,12 @@ import PageSetting from '@/pages/setting';
 
 const settingSearchSchema = z.object({
   type: z.enum(['account', 'general']).optional().default('general'),
-  tabs: z.enum(['network', 'account-display', 'notification']).optional()
+  tabs: z.enum(['network', 'account-display', 'notification']).optional(),
 });
 
 export const Route = createFileRoute('/_authenticated/setting')({
   validateSearch: settingSearchSchema,
   staticData: {
-    title: 'Setting'
+    title: 'Setting',
   } as RouteMetadata,
-  component: PageSetting
 });

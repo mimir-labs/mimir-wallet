@@ -32,7 +32,9 @@ function Import() {
         parse(csvData, {
           complete: (results) => {
             if (results.errors.length > 0) {
-              toastError(`Import failed: ${results.errors?.[0]?.message || 'Unknown error'}`);
+              toastError(
+                `Import failed: ${results.errors?.[0]?.message || 'Unknown error'}`,
+              );
 
               return;
             }
@@ -48,13 +50,19 @@ function Import() {
                   item[header] = row[index];
                 });
 
-                if (item.address && item.name && isPolkadotAddress(item.address)) {
+                if (
+                  item.address &&
+                  item.name &&
+                  isPolkadotAddress(item.address)
+                ) {
                   return [item.address, item.name];
                 }
 
                 return null;
               })
-              .filter((item): item is [string, string, string] => item !== null);
+              .filter(
+                (item): item is [string, string, string] => item !== null,
+              );
 
             for (const [address, name] of parsedData) {
               addAddress(address, name);
@@ -66,7 +74,7 @@ function Import() {
             toastError(`Import failed: ${error?.message || 'Unknown error'}`);
           },
           header: false,
-          skipEmptyLines: true
+          skipEmptyLines: true,
         });
       }
     };
@@ -75,10 +83,16 @@ function Import() {
   };
 
   return (
-    <Button color='primary' variant='ghost' onClick={handleButtonClick}>
+    <Button color="primary" variant="ghost" onClick={handleButtonClick}>
       <IconDownload />
       Import
-      <input type='file' accept='.csv' hidden onChange={handleImport} ref={fileInputRef} />
+      <input
+        type="file"
+        accept=".csv"
+        hidden
+        onChange={handleImport}
+        ref={fileInputRef}
+      />
     </Button>
   );
 }

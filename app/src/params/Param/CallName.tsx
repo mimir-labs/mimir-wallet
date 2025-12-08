@@ -3,18 +3,32 @@
 
 import type { IMethod } from '@polkadot/types/types';
 
-import { Divider, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
+import {
+  Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+} from '@mimir-wallet/ui';
 import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
 
 import Call from '../Call';
 
-function CallDialog({ action, value, onClose }: { action: string; value: IMethod; onClose: () => void }) {
+function CallDialog({
+  action,
+  value,
+  onClose,
+}: {
+  action: string;
+  value: IMethod;
+  onClose: () => void;
+}) {
   return (
-    <Modal size='lg' isOpen onClose={onClose}>
+    <Modal size="lg" isOpen onClose={onClose}>
       <ModalContent>
         <ModalHeader>{action}</ModalHeader>
-        <ModalBody className='@container gap-4'>
+        <ModalBody className="@container gap-4">
           <Divider />
           <Call call={value} registry={value.registry} showFallback />
         </ModalBody>
@@ -44,7 +58,13 @@ function CallName({ value }: { value: IMethod }) {
       <>
         <button onClick={toggleOpen}>{action}</button>
 
-        {isOpen && <CallDialog action={action} value={value} onClose={() => toggleOpen(false)} />}
+        {isOpen && (
+          <CallDialog
+            action={action}
+            value={value}
+            onClose={() => toggleOpen(false)}
+          />
+        )}
       </>
     );
   }

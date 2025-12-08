@@ -6,7 +6,13 @@ import type { ApiPromise } from '@polkadot/api';
 import type { EventRecord } from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 
-import { addressToHex, ApiManager, signAndSend, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  addressToHex,
+  ApiManager,
+  signAndSend,
+  useNetwork,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Button, buttonSpinner, Divider, Tooltip } from '@mimir-wallet/ui';
 import { u8aEq } from '@polkadot/util';
@@ -18,7 +24,13 @@ import AccountVisibility from '../components/AccountVisibility';
 import CreateSuccess from '../components/CreateSuccess';
 
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { Address, AddressRow, InputAddress, LockContainer, LockItem } from '@/components';
+import {
+  Address,
+  AddressRow,
+  InputAddress,
+  LockContainer,
+  LockItem,
+} from '@/components';
 import { utm } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
 import { useProxyDeposit } from '@/hooks/useProxyDeposit';
@@ -32,7 +44,10 @@ interface Props {
   onCancel: () => void;
 }
 
-function filterPureAccount(api: ApiPromise, events: EventRecord[]): string | undefined {
+function filterPureAccount(
+  api: ApiPromise,
+  events: EventRecord[],
+): string | undefined {
   for (const { event } of events) {
     if (api.events.proxy.PureCreated.is(event)) {
       return event.data.pure.toString();
@@ -45,17 +60,17 @@ function filterPureAccount(api: ApiPromise, events: EventRecord[]): string | und
 function ItemStep({
   children,
   step,
-  disabled = false
+  disabled = false,
 }: {
   disabled?: boolean;
   step: React.ReactNode;
   children?: React.ReactNode;
 }) {
   return (
-    <div className='bg-primary/5 flex w-full items-center gap-2.5 rounded-full'>
+    <div className="bg-primary/5 flex w-full items-center gap-2.5 rounded-full">
       <div
         data-disabled={disabled}
-        className='data-[disabled=true]:bg-primary/5 bg-primary flex h-10 w-10 items-center justify-center rounded-full text-sm font-extrabold text-white'
+        className="data-[disabled=true]:bg-primary/5 bg-primary flex h-10 w-10 items-center justify-center rounded-full text-sm font-extrabold text-white"
       >
         {step}
       </div>
@@ -74,21 +89,27 @@ function CreateFlexible({
     multisigName,
     pure: pureAccount,
     threshold,
-    who
-  }
+    who,
+  },
 }: Props) {
   const { network, chain } = useNetwork();
   const { ss58 } = useSs58Format();
   const { proxyDepositBase, proxyDepositFactor } = useProxyDeposit(network);
   const [signer, setSigner] = useState<string>(creator || '');
   const [pure, setPure] = useState<string | null | undefined>(pureAccount);
-  const [blockNumber, setBlockNumber] = useState<number | null | undefined>(_blockNumber);
-  const [extrinsicIndex, setExtrinsicIndex] = useState<number | null | undefined>(_extrinsicIndex);
+  const [blockNumber, setBlockNumber] = useState<number | null | undefined>(
+    _blockNumber,
+  );
+  const [extrinsicIndex, setExtrinsicIndex] = useState<
+    number | null | undefined
+  >(_extrinsicIndex);
   const [loadingFirst, setLoadingFirst] = useState(false);
   const [loadingSecond, setLoadingSecond] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
   const source = useAccountSource(signer);
-  const [enoughtState, setEnoughtState] = useState<Record<HexString, boolean | 'pending'>>({});
+  const [enoughtState, setEnoughtState] = useState<
+    Record<HexString, boolean | 'pending'>
+  >({});
   const isEnought = signer ? !!enoughtState[addressToHex(signer)] : false;
   const [isOpen, toggleOpen] = useToggle(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -96,43 +117,61 @@ function CreateFlexible({
   // Calculate reserved amount: 3 * proxyDepositFactor + 2 * proxyDepositBase
   const reservedAmount = useMemo(
     () => proxyDepositFactor.muln(3).add(proxyDepositBase.muln(2)),
-    [proxyDepositBase, proxyDepositFactor]
+    [proxyDepositBase, proxyDepositFactor],
   );
 
-  const createMembers = async (pure: string, who: string[], signer: string, source: string, threshold: number) => {
+  const createMembers = async (
+    pure: string,
+    who: string[],
+    signer: string,
+    source: string,
+    threshold: number,
+  ) => {
     const api = await ApiManager.getInstance().getApi(network);
-
-    if (!api) return;
 
     const extrinsic = api.tx.utility.batchAll([
       ...(api.consts.proxy
         ? [
             api.tx.balances.transferKeepAlive(
               pure,
-              api.consts.proxy.proxyDepositFactor.muln(2).add(api.consts.proxy.proxyDepositBase)
-            )
+              api.consts.proxy.proxyDepositFactor
+                .muln(2)
+                .add(api.consts.proxy.proxyDepositBase),
+            ),
           ]
         : []),
       api.tx.proxy.proxy(
         pure,
         'Any',
-        api.tx.proxy.addProxy(encodeMultiAddress(who, threshold, ss58), 'Any', 0).method.toU8a()
+        api.tx.proxy
+          .addProxy(encodeMultiAddress(who, threshold, ss58), 'Any', 0)
+          .method.toU8a(),
       ),
-      api.tx.proxy.proxy(pure, 'Any', api.tx.proxy.removeProxy(signer, 'Any', 0).method.toU8a())
+      api.tx.proxy.proxy(
+        pure,
+        'Any',
+        api.tx.proxy.removeProxy(signer, 'Any', 0).method.toU8a(),
+      ),
     ]);
 
     setLoadingSecond(true);
-    const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
-      checkProxy: true,
-      beforeSend: async (extrinsic) => {
-        service.transaction.uploadWebsite(
-          network,
-          extrinsic.hash.toHex(),
-          'mimir://internal/create-flexible',
-          'Create Flexible'
-        );
-      }
-    });
+    const events = signAndSend(
+      api,
+      extrinsic,
+      signer,
+      () => enableWallet(source, CONNECT_ORIGIN),
+      {
+        checkProxy: true,
+        beforeSend: async (extrinsic) => {
+          service.transaction.uploadWebsite(
+            network,
+            extrinsic.hash.toHex(),
+            'mimir://internal/create-flexible',
+            'Create Flexible',
+          );
+        },
+      },
+    );
 
     addTxToast({ events });
 
@@ -164,24 +203,28 @@ function CreateFlexible({
 
     const api = await ApiManager.getInstance().getApi(network);
 
-    if (!api) return;
-
     const extrinsic = api.tx.proxy.createPure('Any', 0, 0);
-    const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
-      beforeSend: async (extrinsic) => {
-        if (!name) throw new Error('Please provide account name');
+    const events = signAndSend(
+      api,
+      extrinsic,
+      signer,
+      () => enableWallet(source, CONNECT_ORIGIN),
+      {
+        beforeSend: async (extrinsic) => {
+          if (!name) throw new Error('Please provide account name');
 
-        await service.multisig.prepareMultisig(
-          network,
-          addressToHex(extrinsic.signer.toString()),
-          extrinsic.hash.toHex(),
-          name,
-          threshold,
-          who.map((address) => addressToHex(address)),
-          multisigName || undefined
-        );
-      }
-    });
+          await service.multisig.prepareMultisig(
+            network,
+            addressToHex(extrinsic.signer.toString()),
+            extrinsic.hash.toHex(),
+            name,
+            threshold,
+            who.map((address) => addressToHex(address)),
+            multisigName || undefined,
+          );
+        },
+      },
+    );
 
     addTxToast({ events });
 
@@ -195,7 +238,11 @@ function CreateFlexible({
 
       api.rpc.chain.getBlock(result.status.asInBlock).then((block) => {
         setBlockNumber(block.block.header.number.toNumber());
-        setExtrinsicIndex(block.block.extrinsics.findIndex((item) => u8aEq(item.hash, extrinsic.hash)));
+        setExtrinsicIndex(
+          block.block.extrinsics.findIndex((item) =>
+            u8aEq(item.hash, extrinsic.hash),
+          ),
+        );
       });
 
       if (_pure) {
@@ -209,22 +256,33 @@ function CreateFlexible({
     });
   };
 
-  const killPure = async (pure: string, signer: string, blockNumber: number, extrinsicIndex: number) => {
+  const killPure = async (
+    pure: string,
+    signer: string,
+    blockNumber: number,
+    extrinsicIndex: number,
+  ) => {
     if (!source) return;
 
     const api = await ApiManager.getInstance().getApi(network);
 
-    if (!api) return;
-
     const extrinsic = api.tx.proxy.proxy(
       pure,
       'Any',
-      api.tx.proxy.killPure(signer, 'Any', 0, blockNumber, extrinsicIndex).method.toU8a()
+      api.tx.proxy
+        .killPure(signer, 'Any', 0, blockNumber, extrinsicIndex)
+        .method.toU8a(),
     );
 
-    const events = signAndSend(api, extrinsic, signer, () => enableWallet(source, CONNECT_ORIGIN), {
-      checkProxy: true
-    });
+    const events = signAndSend(
+      api,
+      extrinsic,
+      signer,
+      () => enableWallet(source, CONNECT_ORIGIN),
+      {
+        checkProxy: true,
+      },
+    );
 
     addTxToast({ events });
 
@@ -238,22 +296,22 @@ function CreateFlexible({
 
   return (
     <>
-      <div className='mx-auto flex w-full max-w-[500px] flex-col gap-5'>
-        <Button className='self-start' onClick={onCancel} variant='ghost'>
+      <div className="mx-auto flex w-full max-w-[500px] flex-col gap-5">
+        <Button className="self-start" onClick={onCancel} variant="ghost">
           {'<'} Back
         </Button>
 
-        <div className='bg-content1 border-secondary shadow-medium rounded-[20px] border-1 p-4 sm:p-5'>
-          <div className='space-y-4'>
+        <div className="card-root p-4 sm:p-5">
+          <div className="space-y-4">
             <h2>Add Pure Proxy</h2>
             <p>Please complete both steps to avoid unnecessary asset loss.</p>
             <Divider />
-            <div className='bg-secondary shadow-small flex items-center gap-2 rounded-[20px] p-2.5'>
+            <div className="bg-secondary flex items-center gap-2 rounded-[20px] p-2.5 shadow-md">
               <ItemStep step={1}>
-                <div className='flex items-center justify-between gap-2'>
+                <div className="flex items-center justify-between gap-2">
                   {pure ? (
                     <b>
-                      <span className='text-primary'>
+                      <span className="text-primary">
                         <Address shorten value={pure} />
                       </span>
                       &nbsp; Created!
@@ -261,7 +319,7 @@ function CreateFlexible({
                   ) : (
                     <b>Add Pure Proxy</b>
                   )}
-                  <div className='flex items-center gap-1 text-sm'>
+                  <div className="flex items-center gap-1 text-sm">
                     <img src={chain.icon} style={{ width: 20, height: 20 }} />
                     {chain.name}
                   </div>
@@ -269,8 +327,8 @@ function CreateFlexible({
               </ItemStep>
             </div>
 
-            <div className='bg-secondary shadow-small space-y-2.5 rounded-[20px] p-2.5'>
-              <div className='flex items-center gap-2'>
+            <div className="bg-secondary space-y-2.5 rounded-[20px] p-2.5 shadow-md">
+              <div className="flex items-center gap-2">
                 <ItemStep disabled={!pure} step={2}>
                   <b>
                     Set Signers ({threshold}/{who.length})
@@ -279,33 +337,42 @@ function CreateFlexible({
                     classNames={{ content: 'max-w-[320px]' }}
                     content={
                       <span>
-                        Flexible Multisig is a Pure Proxy. In <b>‘set signers’</b> step, you add the multisig account as
-                        its proxy and remove the creator&apos;s proxy, making the multi-signature its only controller.
-                        Then transfer some funds to keep Flexible alive.
+                        Flexible Multisig is a Pure Proxy. In{' '}
+                        <b>‘set signers’</b> step, you add the multisig account
+                        as its proxy and remove the creator&apos;s proxy, making
+                        the multi-signature its only controller. Then transfer
+                        some funds to keep Flexible alive.
                       </span>
                     }
                   >
-                    <IconQuestion className='text-primary/50' />
+                    <IconQuestion className="text-primary/50" />
                   </Tooltip>
                 </ItemStep>
               </div>
 
               {who.map((address) => (
-                <div key={address} className='flex items-center justify-between'>
-                  <p className='text-xs font-bold'>
+                <div
+                  key={address}
+                  className="flex items-center justify-between"
+                >
+                  <p className="text-xs font-bold">
                     <AddressRow value={address} />
                   </p>
-                  <p className='text-foreground/50 text-xs'>
+                  <p className="text-foreground/50 text-xs">
                     <Address shorten value={address} />
                   </p>
                 </div>
               ))}
             </div>
-            <Divider className='mt-5' />
-            <p className='font-bold'>Transaction Initiator</p>
+            <Divider className="mt-5" />
+            <p className="font-bold">Transaction Initiator</p>
             <InputAddress
               disabled={!!pure}
-              filtered={creator ? [creator] : who.filter((address) => !!accountSource(address))}
+              filtered={
+                creator
+                  ? [creator]
+                  : who.filter((address) => !!accountSource(address))
+              }
               isSign
               onChange={setSigner}
               value={signer}
@@ -315,20 +382,23 @@ function CreateFlexible({
               <LockContainer>
                 <LockItem
                   address={signer}
-                  tip='Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation.'
+                  tip="Flexible Multisig is a pure proxy, so it requires executing some on-chain operations to complete its creation."
                   value={reservedAmount}
                   onEnoughtState={(address, isEnought) =>
-                    setEnoughtState((state) => ({ ...state, [addressToHex(address)]: isEnought }))
+                    setEnoughtState((state) => ({
+                      ...state,
+                      [addressToHex(address)]: isEnought,
+                    }))
                   }
                 />
               </LockContainer>
             )}
 
             <Divider />
-            <div className='flex gap-2.5'>
+            <div className="flex gap-2.5">
               {pure ? (
                 <Button
-                  color='danger'
+                  color="danger"
                   disabled={loadingFirst || loadingSecond}
                   fullWidth
                   onClick={() => {
@@ -336,20 +406,30 @@ function CreateFlexible({
                       killPure(pure, signer, blockNumber, extrinsicIndex);
                     }
                   }}
-                  variant='ghost'
+                  variant="ghost"
                 >
                   Delete Account
                 </Button>
               ) : (
-                <Button fullWidth onClick={onCancel} color='primary' variant='ghost'>
+                <Button
+                  fullWidth
+                  onClick={onCancel}
+                  color="primary"
+                  variant="ghost"
+                >
                   Cancel
                 </Button>
               )}
               {pure ? (
                 <Button
-                  disabled={loadingSecond || !(signer && pure) || loadingCancel || !source}
+                  disabled={
+                    loadingSecond ||
+                    !(signer && pure) ||
+                    loadingCancel ||
+                    !source
+                  }
                   fullWidth
-                  color='primary'
+                  color="primary"
                   onClick={() => {
                     if (pure && who && signer && source) {
                       createMembers(pure, who, signer, source, threshold);
@@ -363,7 +443,7 @@ function CreateFlexible({
                 <Button
                   disabled={loadingFirst || !(signer && isEnought)}
                   fullWidth
-                  color='primary'
+                  color="primary"
                   onClick={createPure}
                 >
                   {loadingFirst ? buttonSpinner : null}
@@ -386,7 +466,11 @@ function CreateFlexible({
             pureAddress={pure}
             multisigAddress={encodeMultiAddress(who, threshold, ss58)}
           />
-          <CreateSuccess isOpen={isSuccess} onClose={() => setIsSuccess(false)} address={pure} />
+          <CreateSuccess
+            isOpen={isSuccess}
+            onClose={() => setIsSuccess(false)}
+            address={pure}
+          />
         </>
       )}
     </>

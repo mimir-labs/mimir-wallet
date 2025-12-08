@@ -1,9 +1,6 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { default as posthogLib } from 'posthog-js';
-import ReactGA from 'react-ga4';
-
 // Environment configuration
 const isProduction = location.hostname === 'app.mimir.global';
 const isDevelopment = location.hostname === 'dev.mimir.global';
@@ -11,7 +8,7 @@ const isDevelopment = location.hostname === 'dev.mimir.global';
 // GA4 Configuration
 const GA4_CONFIG = {
   production: 'G-8GQYDFDBZ6',
-  development: 'G-4987GHNZMV'
+  development: 'G-4987GHNZMV',
 };
 
 // PostHog Configuration
@@ -20,14 +17,26 @@ const POSTHOG_CONFIG = {
     apiKey: 'phc_1ljcIswDSHXxwIWbYzcTqgay5nJgmHg7QzbjBzF5M70',
     options: {
       api_host: 'https://us.posthog.com',
-      defaults: '2025-05-24'
-    } as const
-  }
+      defaults: '2025-05-24',
+    } as const,
+  },
 };
 
-// State tracking
-let isGA4Initialized = false;
-let isPostHogInitialized = false;
+// Analytics state - encapsulates libraries and their ready state
+const analyticsState = {
+  // Libraries (lazy loaded)
+  posthog: null as typeof import('posthog-js').default | null,
+  ga4: null as typeof import('react-ga4').default | null,
+
+  // Ready flags - true when library is loaded AND initialized
+  isPostHogReady: false,
+  isGA4Ready: false,
+
+  // Overall initialization state
+  isInitialized: false,
+  initPromise: null as Promise<void> | null,
+  initResolve: null as (() => void) | null,
+};
 
 // Format string for consistent event naming
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -72,7 +81,7 @@ export enum AnalyticsEvent {
   TEMPLATE_STARTED = 'template_started',
 
   // Multisig
-  MULTISIG_LOGIN_CTA = 'multisig_login_cta'
+  MULTISIG_LOGIN_CTA = 'multisig_login_cta',
 }
 
 /**
@@ -90,71 +99,118 @@ export const dynamicEvents = {
    * @example dynamicEvents.connectWallet('talisman') => 'ConnectWallet_talisman'
    */
   connectWallet: (
-    wallet: 'talisman' | 'SubWallet' | 'Nova' | 'PolkaGate' | 'Fearless' | 'Polkadot.js' | 'Plutonication' | string
+    wallet:
+      | 'talisman'
+      | 'SubWallet'
+      | 'Nova'
+      | 'PolkaGate'
+      | 'Fearless'
+      | 'Polkadot.js'
+      | 'Plutonication'
+      | string,
   ) => `ConnectWallet_${wallet}`,
 
   /**
    * Generate connected mode event name
    * @example dynamicEvents.connectedMode('omni') => 'Connected_mode_omni'
    */
-  connectedMode: (mode: 'omni' | 'solo') => `Connected_mode_${mode}`
+  connectedMode: (mode: 'omni' | 'solo') => `Connected_mode_${mode}`,
 };
 
-// Initialize GA4
-function initGA4() {
-  if (isGA4Initialized) return;
+// Wait for analytics to be initialized
+async function waitForAnalytics(): Promise<typeof analyticsState> {
+  if (analyticsState.isInitialized) return analyticsState;
 
-  try {
-    const measurementId = isProduction ? GA4_CONFIG.production : isDevelopment ? GA4_CONFIG.development : null;
+  if (analyticsState.initPromise) {
+    await analyticsState.initPromise;
 
-    if (measurementId) {
-      ReactGA.initialize(measurementId);
-      isGA4Initialized = true;
-      console.log('GA4 initialized with ID:', measurementId);
-    }
-  } catch (error) {
-    console.error('Failed to initialize GA4:', error);
+    return analyticsState;
   }
+
+  // Create a promise that will be resolved when analytics is initialized
+  analyticsState.initPromise = new Promise((resolve) => {
+    analyticsState.initResolve = resolve;
+  });
+
+  await analyticsState.initPromise;
+
+  return analyticsState;
 }
 
-// Initialize PostHog
-function initPostHog() {
-  if (isPostHogInitialized) return;
-
-  try {
-    const config = isProduction ? POSTHOG_CONFIG.production : null;
-
-    if (config) {
-      posthogLib.init(config.apiKey, config.options);
-      isPostHogInitialized = true;
-      console.log('PostHog initialized with key:', config.apiKey);
-    }
-  } catch (error) {
-    console.error('Failed to initialize PostHog:', error);
-  }
-}
-
-// Initialize all analytics
+// Initialize all analytics (lazy loaded after page load)
 export function initAnalytics() {
-  initGA4();
-  initPostHog();
+  // Delay analytics initialization to not block initial page load
+  const doInit = async () => {
+    try {
+      // Load libraries
+      const [posthogModule, reactGaModule] = await Promise.all([
+        import('posthog-js'),
+        import('react-ga4'),
+      ]);
+
+      analyticsState.posthog = posthogModule.default;
+      analyticsState.ga4 = reactGaModule.default;
+
+      // Initialize GA4
+      const measurementId = isProduction
+        ? GA4_CONFIG.production
+        : isDevelopment
+          ? GA4_CONFIG.development
+          : null;
+
+      if (measurementId && analyticsState.ga4) {
+        analyticsState.ga4.initialize(measurementId);
+        analyticsState.isGA4Ready = true;
+        console.log('GA4 initialized with ID:', measurementId);
+      }
+
+      // Initialize PostHog
+      const config = isProduction ? POSTHOG_CONFIG.production : null;
+
+      if (config && analyticsState.posthog) {
+        analyticsState.posthog.init(config.apiKey, config.options);
+        analyticsState.isPostHogReady = true;
+        console.log('PostHog initialized with key:', config.apiKey);
+      }
+
+      // Mark as initialized and resolve pending promise
+      analyticsState.isInitialized = true;
+      analyticsState.initResolve?.();
+    } catch (error) {
+      console.error('Failed to initialize analytics:', error);
+      // Still resolve to prevent hanging promises
+      analyticsState.isInitialized = true;
+      analyticsState.initResolve?.();
+    }
+  };
+
+  if (typeof requestIdleCallback !== 'undefined') {
+    requestIdleCallback(() => doInit());
+  } else {
+    setTimeout(() => doInit(), 1000);
+  }
 }
 
-// Analytics action functions
-export function gaAction(action: string, parameters?: Record<string, any>) {
+// Analytics action functions - waits for initialization
+export async function gaAction(
+  action: string,
+  parameters?: Record<string, any>,
+) {
+  const state = await waitForAnalytics();
+
   // GA4 Event
-  if (isGA4Initialized) {
+  if (state.isGA4Ready && state.ga4) {
     try {
-      ReactGA.event(action, parameters);
+      state.ga4.event(action, parameters);
     } catch (error) {
       console.error('GA4 event failed:', error);
     }
   }
 
   // PostHog Event
-  if (isPostHogInitialized) {
+  if (state.isPostHogReady && state.posthog) {
     try {
-      posthogLib.capture(action, parameters);
+      state.posthog.capture(action, parameters);
     } catch (error) {
       console.error('PostHog event failed:', error);
     }
@@ -176,15 +232,17 @@ export const analyticsActions = {
    * Switch between omni and solo mode
    * @deprecated Use connectedMode instead
    */
-  omniSolochain(mode: string) {
+  async omniSolochain(mode: string) {
+    const state = await waitForAnalytics();
+
     // GA4 Event
-    if (isGA4Initialized) {
+    if (state.isGA4Ready && state.ga4) {
       try {
-        ReactGA.event({
+        state.ga4.event({
           category: 'TopBar',
           action: 'OmniSoloSwitch',
           label: `Switch to ${mode}`,
-          transport: 'beacon'
+          transport: 'beacon',
         });
       } catch (error) {
         console.error('GA4 event failed:', error);
@@ -192,12 +250,12 @@ export const analyticsActions = {
     }
 
     // PostHog Event
-    if (isPostHogInitialized) {
+    if (state.isPostHogReady && state.posthog) {
       try {
-        posthogLib.capture('OmniSoloSwitch', {
+        state.posthog.capture('OmniSoloSwitch', {
           mode,
           previous_mode: mode === 'omni' ? 'solo' : 'omni',
-          source: 'topbar'
+          source: 'topbar',
         });
       } catch (error) {
         console.error('PostHog event failed:', error);
@@ -209,12 +267,14 @@ export const analyticsActions = {
    * Track connected wallets
    * Use this for initial wallet connection
    */
-  connectedWallet(wallet: string) {
+  async connectedWallet(wallet: string) {
+    const state = await waitForAnalytics();
+
     // GA4 Event
-    if (isGA4Initialized) {
+    if (state.isGA4Ready && state.ga4) {
       try {
-        ReactGA.event('connect_wallet', {
-          connect_wallet: wallet
+        state.ga4.event('connect_wallet', {
+          connect_wallet: wallet,
         });
       } catch (error) {
         console.error('GA4 event failed:', error);
@@ -222,10 +282,10 @@ export const analyticsActions = {
     }
 
     // PostHog Event
-    if (isPostHogInitialized) {
+    if (state.isPostHogReady && state.posthog) {
       try {
-        posthogLib.capture('connect_wallet', {
-          wallet_type: wallet
+        state.posthog.capture('connect_wallet', {
+          wallet_type: wallet,
         });
       } catch (error) {
         console.error('PostHog event failed:', error);
@@ -233,8 +293,8 @@ export const analyticsActions = {
     }
 
     // Also track with dynamic event name for granular tracking
-    gaAction(dynamicEvents.connectWallet(wallet), {
-      wallet_type: wallet
+    await gaAction(dynamicEvents.connectWallet(wallet), {
+      wallet_type: wallet,
     });
   },
 
@@ -242,22 +302,19 @@ export const analyticsActions = {
 
   /**
    * Track transactions view (pending or history)
-   * @param viewType - Type of transaction view
    */
-  transactionsView(viewType: string) {
-    gaAction(AnalyticsEvent.TRANSACTIONS_VIEW, { view_type: viewType });
+  async transactionsView(viewType: string) {
+    await gaAction(AnalyticsEvent.TRANSACTIONS_VIEW, { view_type: viewType });
   },
 
   /**
    * Track transaction result (success or failure)
-   * @param success - Whether transaction was successful
-   * @param errorMessage - Error message if failed
    */
-  transactionResult(success: boolean, errorMessage?: string) {
-    gaAction(AnalyticsEvent.TRANSACTION_SUBMITTED, {
+  async transactionResult(success: boolean, errorMessage?: string) {
+    await gaAction(AnalyticsEvent.TRANSACTION_SUBMITTED, {
       transaction_success: success,
       transaction_failed: !success,
-      ...(errorMessage && { error_message: errorMessage })
+      ...(errorMessage && { error_message: errorMessage }),
     });
   },
 
@@ -265,35 +322,35 @@ export const analyticsActions = {
 
   /**
    * Track apps view
-   * @param viewType - Type of app being viewed
    */
-  appsView(viewType: string) {
-    gaAction(AnalyticsEvent.APPS_VIEW, { view_type: viewType });
+  async appsView(viewType: string) {
+    await gaAction(AnalyticsEvent.APPS_VIEW, { view_type: viewType });
   },
 
   // ========== Batch Operations ==========
 
   /**
    * Track batch operation started
-   * @param count - Number of transactions in batch
    */
-  batchStarted(count: number) {
-    gaAction(AnalyticsEvent.BATCH_STARTED, { batch_count: count });
+  async batchStarted(count: number) {
+    await gaAction(AnalyticsEvent.BATCH_STARTED, { batch_count: count });
   },
 
   /**
    * Track batch interaction
    */
-  batchInteracted() {
-    gaAction(AnalyticsEvent.BATCH_STARTED, { batch_interacted: true });
+  async batchInteracted() {
+    await gaAction(AnalyticsEvent.BATCH_STARTED, { batch_interacted: true });
   },
 
   /**
    * Track batch operation success
-   * @param count - Number of transactions successfully batched
    */
-  batchSuccess(count: number) {
-    gaAction(AnalyticsEvent.BATCH_STARTED, { batch_success: true, batch_count: count });
+  async batchSuccess(count: number) {
+    await gaAction(AnalyticsEvent.BATCH_STARTED, {
+      batch_success: true,
+      batch_count: count,
+    });
   },
 
   // ========== Template Operations ==========
@@ -301,22 +358,24 @@ export const analyticsActions = {
   /**
    * Track template operation started
    */
-  templateStarted() {
-    gaAction(AnalyticsEvent.TEMPLATE_STARTED, {});
+  async templateStarted() {
+    await gaAction(AnalyticsEvent.TEMPLATE_STARTED, {});
   },
 
   /**
    * Track template interaction
    */
-  templateInteracted() {
-    gaAction(AnalyticsEvent.TEMPLATE_STARTED, { template_interacted: true });
+  async templateInteracted() {
+    await gaAction(AnalyticsEvent.TEMPLATE_STARTED, {
+      template_interacted: true,
+    });
   },
 
   /**
    * Track template operation success
    */
-  templateSuccess() {
-    gaAction(AnalyticsEvent.TEMPLATE_STARTED, { template_success: true });
+  async templateSuccess() {
+    await gaAction(AnalyticsEvent.TEMPLATE_STARTED, { template_success: true });
   },
 
   // ========== WalletConnect ==========
@@ -324,32 +383,35 @@ export const analyticsActions = {
   /**
    * Track WalletConnect session start
    */
-  walletConnectStart() {
-    gaAction(AnalyticsEvent.WALLET_CONNECT_START, {});
+  async walletConnectStart() {
+    await gaAction(AnalyticsEvent.WALLET_CONNECT_START, {});
   },
 
   /**
    * Track WalletConnect pairing key entered
    */
-  walletConnectPairingKey() {
-    gaAction(AnalyticsEvent.WALLET_CONNECT_START, { pairing_key_entered: true });
+  async walletConnectPairingKey() {
+    await gaAction(AnalyticsEvent.WALLET_CONNECT_START, {
+      pairing_key_entered: true,
+    });
   },
 
   /**
    * Track WalletConnect connection success
    */
-  walletConnectSuccess() {
-    gaAction(AnalyticsEvent.WALLET_CONNECT_START, { wallet_connect_success: true });
+  async walletConnectSuccess() {
+    await gaAction(AnalyticsEvent.WALLET_CONNECT_START, {
+      wallet_connect_success: true,
+    });
   },
 
   // ========== Network & Mode ==========
 
   /**
    * Track connected mode (omni or solo)
-   * @param mode - Network mode
    */
-  connectedMode(mode: 'omni' | 'solo') {
-    gaAction(dynamicEvents.connectedMode(mode), { mode });
+  async connectedMode(mode: 'omni' | 'solo') {
+    await gaAction(dynamicEvents.connectedMode(mode), { mode });
   },
 
   // ========== Multisig ==========
@@ -357,44 +419,46 @@ export const analyticsActions = {
   /**
    * Track multisig login CTA
    */
-  multisigLoginCta() {
-    gaAction(AnalyticsEvent.MULTISIG_LOGIN_CTA, { connect_to_dapp: true });
+  async multisigLoginCta() {
+    await gaAction(AnalyticsEvent.MULTISIG_LOGIN_CTA, {
+      connect_to_dapp: true,
+    });
   },
 
   // ========== Onboarding Events ==========
+
   /**
    * Track onboarding features close
    */
-  onboardingFeaturesClose() {
-    gaAction(AnalyticsEvent.ONBOARDING_FEATURES_CLOSE, {});
+  async onboardingFeaturesClose() {
+    await gaAction(AnalyticsEvent.ONBOARDING_FEATURES_CLOSE, {});
   },
 
   /**
    * Track specific onboarding feature interaction
-   * @param feature - Feature identifier
    */
-  onboardingFeature(feature: string) {
-    gaAction(dynamicEvents.onboardingFeature(feature), { feature });
+  async onboardingFeature(feature: string) {
+    await gaAction(dynamicEvents.onboardingFeature(feature), { feature });
   },
 
   /**
    * Track onboarding connect wallet step
    */
-  onboardingConnectWallet() {
-    gaAction(AnalyticsEvent.ONBOARDING_CONNECT_WALLET, {});
+  async onboardingConnectWallet() {
+    await gaAction(AnalyticsEvent.ONBOARDING_CONNECT_WALLET, {});
   },
 
   /**
    * Track onboarding example account click
    */
-  onboardingClickExample() {
-    gaAction(AnalyticsEvent.ONBOARDING_CLICK_EXAMPLE, {});
+  async onboardingClickExample() {
+    await gaAction(AnalyticsEvent.ONBOARDING_CLICK_EXAMPLE, {});
   },
 
   /**
    * Track onboarding extension account connected
    */
-  onboardingConnectedExtension() {
-    gaAction(AnalyticsEvent.ONBOARDING_CONNECTED_EXTENSION, {});
-  }
+  async onboardingConnectedExtension() {
+    await gaAction(AnalyticsEvent.ONBOARDING_CONNECTED_EXTENSION, {});
+  },
 };

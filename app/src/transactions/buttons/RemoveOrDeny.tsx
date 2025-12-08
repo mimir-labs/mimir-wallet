@@ -12,11 +12,20 @@ import IconFailed from '@/assets/svg/icon-failed-outlined.svg?react';
 import { TxButton } from '@/components';
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 
-function RemoveOrDeny({ isIcon = false, transaction }: { isIcon?: boolean; transaction: Transaction }) {
+function RemoveOrDeny({
+  isIcon = false,
+  transaction,
+}: {
+  isIcon?: boolean;
+  transaction: Transaction;
+}) {
   const { network } = useNetwork();
   const { isLocalAccount } = useAccount();
 
-  if (transaction.type !== TransactionType.Announce || transaction.status !== TransactionStatus.Pending) {
+  if (
+    transaction.type !== TransactionType.Announce ||
+    transaction.status !== TransactionStatus.Pending
+  ) {
     return null;
   }
 
@@ -34,13 +43,16 @@ function RemoveOrDeny({ isIcon = false, transaction }: { isIcon?: boolean; trans
           fullWidth={!isIcon}
           variant={isIcon ? 'light' : 'ghost'}
           size={isIcon ? 'sm' : 'md'}
-          color='danger'
+          color="danger"
           accountId={delegate}
-          website='mimir://internal/remove-announcement'
+          website="mimir://internal/remove-announcement"
           getCall={async () => {
             const api = await ApiManager.getInstance().getApi(network);
 
-            return api.tx.proxy.removeAnnouncement(transaction.address, transaction.callHash);
+            return api.tx.proxy.removeAnnouncement(
+              transaction.address,
+              transaction.callHash,
+            );
           }}
         >
           {isIcon ? <IconFailed /> : 'Remove'}
@@ -59,11 +71,14 @@ function RemoveOrDeny({ isIcon = false, transaction }: { isIcon?: boolean; trans
           size={isIcon ? 'sm' : 'md'}
           color={isIcon ? 'danger' : 'primary'}
           accountId={transaction.address}
-          website='mimir://internal/deny-announcement'
+          website="mimir://internal/deny-announcement"
           getCall={async () => {
             const api = await ApiManager.getInstance().getApi(network);
 
-            return api.tx.proxy.rejectAnnouncement(delegate, transaction.callHash);
+            return api.tx.proxy.rejectAnnouncement(
+              delegate,
+              transaction.callHash,
+            );
           }}
         >
           {isIcon ? <IconFailed /> : 'Deny'}

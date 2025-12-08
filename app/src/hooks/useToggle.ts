@@ -9,7 +9,7 @@ import { useIsMountedRef } from './useIsMountedRef';
 // Simple wrapper for a true/false toggle
 function useToggleImpl(
   defaultValue = false,
-  onToggle?: (isActive: boolean) => void
+  onToggle?: (isActive: boolean) => void,
 ): [boolean, () => void, (value: boolean) => void] {
   const mountedRef = useIsMountedRef();
   const [isActive, setActive] = useState(defaultValue);
@@ -22,12 +22,15 @@ function useToggleImpl(
     (isActive: boolean): void => {
       mountedRef.current && setActive(isActive);
     },
-    [mountedRef]
+    [mountedRef],
   );
 
   useEffect(() => onToggle?.(isActive), [isActive, onToggle]);
 
-  return useMemo(() => [isActive, _toggleActive, _setActive], [isActive, _toggleActive, _setActive]);
+  return useMemo(
+    () => [isActive, _toggleActive, _setActive],
+    [isActive, _toggleActive, _setActive],
+  );
 }
 
 export const useToggle = createNamedHook('useToggle', useToggleImpl);

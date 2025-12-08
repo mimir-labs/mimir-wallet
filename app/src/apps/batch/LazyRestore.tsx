@@ -13,8 +13,8 @@ interface LazyRestoreProps {
 
 function LoadingFallback() {
   return (
-    <div className='flex h-64 items-center justify-center'>
-      <Spinner variant='wave' />
+    <div className="flex h-64 items-center justify-center">
+      <Spinner variant="ellipsis" />
     </div>
   );
 }

@@ -16,7 +16,9 @@ import TransferCall from './TransferCall';
 
 type MatchType = 'exact' | 'prefix';
 
-type CallComponent = React.ComponentType<CallProps & { ref?: React.Ref<HTMLDivElement | null> }>;
+type CallComponent = React.ComponentType<
+  CallProps & { ref?: React.Ref<HTMLDivElement | null> }
+>;
 
 interface ComponentConfig {
   component: CallComponent;
@@ -28,39 +30,47 @@ const componentDef: ComponentConfig[] = [
   {
     component: BatchCall,
     actions: ['utility.batchAll', 'utility.batch', 'utility.forceBatch'],
-    matchType: 'exact'
+    matchType: 'exact',
   },
   {
     component: CancelAsMulti,
     actions: ['multisig.cancelAsMulti'],
-    matchType: 'exact'
+    matchType: 'exact',
   },
   {
     component: ConvictionVotingCall,
     actions: ['convictionVoting.'],
-    matchType: 'prefix'
+    matchType: 'prefix',
   },
   {
     component: CrossChainTransferCall,
     actions: ['polkadotXcm.', 'xcmPallet.', 'xTokens.', 'ormlXTokens.'],
-    matchType: 'prefix'
+    matchType: 'prefix',
   },
   {
     component: TransferCall,
     actions: ['balances.', 'assets.', 'tokens.'],
-    matchType: 'prefix'
+    matchType: 'prefix',
   },
   {
     component: SetIdentity,
     actions: ['identity.setIdentity'],
-    matchType: 'exact'
-  }
+    matchType: 'exact',
+  },
 ];
 
 const Call = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
-  const { registry, call, showFallback = false, fallbackComponent: FallbackComponent = FunctionArgs } = props;
+  const {
+    registry,
+    call,
+    showFallback = false,
+    fallbackComponent: FallbackComponent = FunctionArgs,
+  } = props;
 
-  const action = useMemo(() => (call ? findAction(registry, call)?.join('.') : null), [call, registry]);
+  const action = useMemo(
+    () => (call ? findAction(registry, call)?.join('.') : null),
+    [call, registry],
+  );
   const domRef = useRef<HTMLDivElement>(null);
   const currentRef = ref || domRef;
 
@@ -72,7 +82,9 @@ const Call = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
       const isMatch =
         config.matchType === 'exact'
           ? config.actions.includes(action)
-          : config.actions.some((actionPattern) => action.startsWith(actionPattern));
+          : config.actions.some((actionPattern) =>
+              action.startsWith(actionPattern),
+            );
 
       if (isMatch) {
         return config.component;
@@ -83,7 +95,9 @@ const Call = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
   }, [action]);
 
   if (!action || !Component) {
-    return showFallback ? <FallbackComponent ref={currentRef} {...props} /> : null;
+    return showFallback ? (
+      <FallbackComponent ref={currentRef} {...props} />
+    ) : null;
   }
 
   // If we have a matched component, render it with render state detection

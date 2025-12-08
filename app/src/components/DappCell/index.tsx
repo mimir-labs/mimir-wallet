@@ -4,7 +4,13 @@
 import type { DappOption } from '@/config';
 
 import { Button, Tooltip } from '@mimir-wallet/ui';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import SupportedChains from './SupportedChains';
 
@@ -36,7 +42,10 @@ function DappCell({
   onDelete,
   ...dapp
 }: Props) {
-  const _isFavorite = useMemo(() => isFavorite?.(dapp.id), [dapp.id, isFavorite]);
+  const _isFavorite = useMemo(
+    () => isFavorite?.(dapp.id),
+    [dapp.id, isFavorite],
+  );
   const toggleFavorite = useCallback(() => {
     if (_isFavorite) {
       removeFavorite?.(dapp.id);
@@ -50,7 +59,7 @@ function DappCell({
       e.stopPropagation();
       onDelete?.(dapp.id);
     },
-    [dapp.id, onDelete]
+    [dapp.id, onDelete],
   );
 
   const [isFocus, setFocus] = useState(false);
@@ -80,88 +89,105 @@ function DappCell({
   const content =
     variant === 'mobile' ? (
       <div
-        className='relative flex w-full cursor-pointer items-start gap-5 rounded-[20px] border-1 border-solid border-[rgba(39,0,255,0.05)] bg-white p-5'
+        className="relative flex w-full cursor-pointer items-start gap-5 rounded-[20px] border-1 border-solid border-[rgba(39,0,255,0.05)] bg-white p-5"
         onClick={(e) => {
           e.stopPropagation();
           handleOpenDapp();
         }}
       >
-        <div className='relative h-[50px] w-[50px] shrink-0'>
-          <img src={dapp.icon} alt={dapp.name} className='h-full w-full' />
+        <div className="relative h-[50px] w-[50px] shrink-0">
+          <img src={dapp.icon} alt={dapp.name} className="h-full w-full" />
         </div>
 
-        <div className='flex min-w-0 flex-1 flex-col gap-2.5'>
-          <div className='flex items-center gap-2.5'>
-            <h6 className='min-w-0 flex-1 truncate text-base leading-normal font-bold'>{dapp.name}</h6>
+        <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+          <div className="flex items-center gap-2.5">
+            <h6 className="min-w-0 flex-1 truncate text-base leading-normal font-bold">
+              {dapp.name}
+            </h6>
             {onDelete ? (
-              <Tooltip content='Delete'>
-                <Button isIconOnly color='danger' onClick={handleDelete} className='bg-danger/10 shrink-0' size='sm'>
-                  <IconDelete className='text-danger h-4 w-4' />
+              <Tooltip content="Delete">
+                <Button
+                  isIconOnly
+                  color="danger"
+                  onClick={handleDelete}
+                  className="bg-danger/10 shrink-0"
+                  size="sm"
+                >
+                  <IconDelete className="text-danger h-4 w-4" />
                 </Button>
               </Tooltip>
             ) : (
               <Tooltip content={_isFavorite ? 'Unpin' : 'Pin'}>
                 <Button
                   isIconOnly
-                  color='primary'
+                  color="primary"
                   onClick={toggleFavorite}
-                  className='bg-primary/10 shrink-0'
-                  size='sm'
+                  className="bg-primary/10 shrink-0"
+                  size="sm"
                 >
-                  <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
+                  <IconStar
+                    className="text-primary"
+                    style={{ opacity: _isFavorite ? 1 : 0.2 }}
+                  />
                 </Button>
               </Tooltip>
             )}
           </div>
 
           {dapp.tags && dapp.tags.length > 0 && (
-            <div className='flex flex-wrap items-center gap-1.5'>
+            <div className="flex flex-wrap items-center gap-1.5">
               {dapp.tags.slice(0, 3).map((tag, index) => (
-                <div key={index} className='bg-primary/5 text-primary rounded-full px-2.5 py-1 text-xs font-normal'>
+                <div
+                  key={index}
+                  className="bg-primary/5 text-primary rounded-full px-2.5 py-1 text-xs font-normal"
+                >
                   {tag}
                 </div>
               ))}
             </div>
           )}
 
-          <div className='flex items-center gap-1.5 text-xs'>
-            <span className='text-foreground/50'>Supported on</span>
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-foreground/50">Supported on</span>
             <SupportedChains app={dapp} />
           </div>
         </div>
       </div>
     ) : size === 'sm' ? (
       <div
-        className='bg-content1 border-secondary hover:bg-secondary transition-background shadow-medium relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] rounded-[20px] border-1 p-5'
+        className="card-root hover:bg-secondary transition-background relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-[15px] p-5"
         onClick={(e) => {
           e.stopPropagation();
           handleOpenDapp();
         }}
       >
-        <img src={dapp.icon} alt={dapp.name} className='h-12 w-12' />
+        <img src={dapp.icon} alt={dapp.name} className="h-12 w-12" />
 
         <h6>{dapp.name}</h6>
 
         {onDelete ? (
-          <Tooltip content='Delete'>
+          <Tooltip content="Delete">
             <Button
               isIconOnly
-              color='danger'
+              color="danger"
               onClick={handleDelete}
-              className='bg-danger/10 absolute top-2.5 right-2.5 z-10'
+              className="bg-danger/10 absolute top-2.5 right-2.5 z-10"
             >
-              <IconDelete className='text-danger h-4 w-4' />
+              <IconDelete className="text-danger h-4 w-4" />
             </Button>
           </Tooltip>
         ) : (
           <Tooltip content={_isFavorite ? 'Unpin' : 'Pin'}>
             <Button
               isIconOnly
-              color='primary'
+              color="primary"
               onClick={toggleFavorite}
-              className='bg-primary/10 absolute top-2.5 right-2.5 z-10'
+              className="bg-primary/10 absolute top-2.5 right-2.5 z-10"
             >
-              <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
+              <IconStar
+                className="text-primary"
+                style={{ opacity: _isFavorite ? 1 : 0.2 }}
+              />
             </Button>
           </Tooltip>
         )}
@@ -169,7 +195,7 @@ function DappCell({
     ) : (
       <div
         data-focus={isFocus}
-        className='bg-content1 border-secondary shadow-medium relative aspect-square cursor-pointer rounded-[20px] border-1 p-5 transition-transform duration-300 data-[focus=true]:scale-x-[-1]'
+        className="card-root relative aspect-square cursor-pointer p-5 transition-transform duration-300 data-[focus=true]:scale-x-[-1]"
         onClick={(e) => {
           e.stopPropagation();
 
@@ -181,15 +207,15 @@ function DappCell({
         }}
       >
         {onDelete ? (
-          <Tooltip content='Delete'>
+          <Tooltip content="Delete">
             <Button
               data-focus={isFocus}
               isIconOnly
-              color='danger'
+              color="danger"
               onClick={handleDelete}
-              className='bg-danger/10 absolute top-2.5 right-2.5 z-10 data-[focus=true]:right-auto data-[focus=true]:left-2.5'
+              className="bg-danger/10 absolute top-2.5 right-2.5 z-10 data-[focus=true]:right-auto data-[focus=true]:left-2.5"
             >
-              <IconDelete className='text-danger h-4 w-4' />
+              <IconDelete className="text-danger h-4 w-4" />
             </Button>
           </Tooltip>
         ) : (
@@ -197,11 +223,14 @@ function DappCell({
             <Button
               data-focus={isFocus}
               isIconOnly
-              color='primary'
+              color="primary"
               onClick={toggleFavorite}
-              className='bg-primary/10 absolute top-2.5 right-2.5 z-10 data-[focus=true]:right-auto data-[focus=true]:left-2.5'
+              className="bg-primary/10 absolute top-2.5 right-2.5 z-10 data-[focus=true]:right-auto data-[focus=true]:left-2.5"
             >
-              <IconStar className='text-primary' style={{ opacity: _isFavorite ? 1 : 0.2 }} />
+              <IconStar
+                className="text-primary"
+                style={{ opacity: _isFavorite ? 1 : 0.2 }}
+              />
             </Button>
           </Tooltip>
         )}
@@ -209,69 +238,95 @@ function DappCell({
         {isFocus ? (
           <div
             data-focus={isFocus}
-            className='flex h-full flex-col items-center justify-center gap-5 data-[focus=true]:scale-x-[-1]'
+            className="flex h-full flex-col items-center justify-center gap-5 data-[focus=true]:scale-x-[-1]"
           >
-            <div className='flex items-center gap-2.5'>
+            <div className="flex items-center gap-2.5">
               {dapp.website && (
-                <Button isIconOnly color='secondary' asChild size='sm'>
-                  <a href={dapp.website} target='_blank' rel='noopener noreferrer'>
-                    <IconWebsite className='h-4 w-4' />
+                <Button isIconOnly color="secondary" asChild size="sm">
+                  <a
+                    href={dapp.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconWebsite className="h-4 w-4" />
                   </a>
                 </Button>
               )}
               {dapp.github && (
-                <Button isIconOnly color='secondary' asChild size='sm'>
-                  <a href={dapp.github} target='_blank' rel='noopener noreferrer'>
-                    <IconGithub className='h-4 w-4' />
+                <Button isIconOnly color="secondary" asChild size="sm">
+                  <a
+                    href={dapp.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconGithub className="h-4 w-4" />
                   </a>
                 </Button>
               )}
               {dapp.discord && (
-                <Button isIconOnly color='secondary' asChild size='sm'>
-                  <a href={dapp.discord} target='_blank' rel='noopener noreferrer'>
-                    <IconDiscord className='h-4 w-4' />
+                <Button isIconOnly color="secondary" asChild size="sm">
+                  <a
+                    href={dapp.discord}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconDiscord className="h-4 w-4" />
                   </a>
                 </Button>
               )}
               {dapp.twitter && (
-                <Button isIconOnly color='secondary' asChild size='sm'>
-                  <a href={dapp.twitter} target='_blank' rel='noopener noreferrer'>
-                    <IconX className='h-4 w-4' />
+                <Button isIconOnly color="secondary" asChild size="sm">
+                  <a
+                    href={dapp.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconX className="h-4 w-4" />
                   </a>
                 </Button>
               )}
               {dapp.matrix && (
-                <Button isIconOnly color='secondary' asChild size='sm'>
-                  <a href={dapp.matrix} target='_blank' rel='noopener noreferrer'>
-                    <IconMatrix className='h-4 w-4' />
+                <Button isIconOnly color="secondary" asChild size="sm">
+                  <a
+                    href={dapp.matrix}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconMatrix className="h-4 w-4" />
                   </a>
                 </Button>
               )}
             </div>
 
-            <p className='text-center'>{dapp.description}</p>
+            <p className="text-center">{dapp.description}</p>
 
-            <Button size='lg' fullWidth className='w-[90%]' onClick={() => handleOpenDapp()}>
+            <Button
+              size="lg"
+              fullWidth
+              className="w-[90%]"
+              onClick={() => handleOpenDapp()}
+            >
               Open Dapp
             </Button>
           </div>
         ) : (
-          <div className='flex h-full flex-col items-center justify-center gap-5'>
-            <img src={dapp.icon} className='h-16 w-16 bg-transparent' />
-            <h3 className='text-center text-2xl font-bold'>{dapp.name}</h3>
+          <div className="flex h-full flex-col items-center justify-center gap-5">
+            <img src={dapp.icon} className="h-16 w-16 bg-transparent" />
+            <h3 className="text-center text-2xl font-bold">{dapp.name}</h3>
 
             {dapp.tags && dapp.tags.length > 0 && (
-              <div className='flex items-center gap-2.5'>
+              <div className="flex items-center gap-2.5">
                 {dapp.tags.map((tag, index) => (
-                  <Button color='secondary' key={index} size='sm'>
+                  <Button color="secondary" key={index} size="sm">
                     {tag}
                   </Button>
                 ))}
               </div>
             )}
 
-            <div className='flex items-center justify-between gap-2 text-xs'>
-              <span className='text-foreground/50'>Supported on</span> <SupportedChains app={dapp} />
+            <div className="flex items-center justify-between gap-2 text-xs">
+              <span className="text-foreground/50">Supported on</span>{' '}
+              <SupportedChains app={dapp} />
             </div>
           </div>
         )}

@@ -8,6 +8,8 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -15,12 +17,10 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedTransferRouteImport } from './routes/_authenticated/transfer'
 import { Route as AuthenticatedSettingRouteImport } from './routes/_authenticated/setting'
 import { Route as AuthenticatedMultiTransferRouteImport } from './routes/_authenticated/multi-transfer'
-import { Route as AuthenticatedFundRouteImport } from './routes/_authenticated/fund'
 import { Route as AuthenticatedExtrinsicRouteImport } from './routes/_authenticated/extrinsic'
 import { Route as AuthenticatedDappRouteImport } from './routes/_authenticated/dapp'
 import { Route as AuthenticatedCreatePureRouteImport } from './routes/_authenticated/create-pure'
 import { Route as AuthenticatedCreateMultisigRouteImport } from './routes/_authenticated/create-multisig'
-import { Route as AuthenticatedAssetsRouteImport } from './routes/_authenticated/assets'
 import { Route as AuthenticatedAnalyticRouteImport } from './routes/_authenticated/analytic'
 import { Route as AuthenticatedAddressBookRouteImport } from './routes/_authenticated/address-book'
 import { Route as AuthenticatedAddProxyRouteImport } from './routes/_authenticated/add-proxy'
@@ -28,6 +28,13 @@ import { Route as AuthenticatedAccountSettingRouteImport } from './routes/_authe
 import { Route as AuthenticatedTransactionsIndexRouteImport } from './routes/_authenticated/transactions/index'
 import { Route as AuthenticatedTransactionsIdRouteImport } from './routes/_authenticated/transactions/$id'
 import { Route as AuthenticatedExplorerUrlRouteImport } from './routes/_authenticated/explorer.$url'
+
+const AuthenticatedFundLazyRouteImport = createFileRoute(
+  '/_authenticated/fund',
+)()
+const AuthenticatedAssetsLazyRouteImport = createFileRoute(
+  '/_authenticated/assets',
+)()
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -42,7 +49,23 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_authenticated/index.lazy').then((d) => d.Route),
+)
+const AuthenticatedFundLazyRoute = AuthenticatedFundLazyRouteImport.update({
+  id: '/fund',
+  path: '/fund',
+  getParentRoute: () => AuthenticatedRoute,
+} as any).lazy(() =>
+  import('./routes/_authenticated/fund.lazy').then((d) => d.Route),
+)
+const AuthenticatedAssetsLazyRoute = AuthenticatedAssetsLazyRouteImport.update({
+  id: '/assets',
+  path: '/assets',
+  getParentRoute: () => AuthenticatedRoute,
+} as any).lazy(() =>
+  import('./routes/_authenticated/assets.lazy').then((d) => d.Route),
+)
 const AuthenticatedTransferRoute = AuthenticatedTransferRouteImport.update({
   id: '/transfer',
   path: '/transfer',
@@ -52,18 +75,15 @@ const AuthenticatedSettingRoute = AuthenticatedSettingRouteImport.update({
   id: '/setting',
   path: '/setting',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_authenticated/setting.lazy').then((d) => d.Route),
+)
 const AuthenticatedMultiTransferRoute =
   AuthenticatedMultiTransferRouteImport.update({
     id: '/multi-transfer',
     path: '/multi-transfer',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedFundRoute = AuthenticatedFundRouteImport.update({
-  id: '/fund',
-  path: '/fund',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedExtrinsicRoute = AuthenticatedExtrinsicRouteImport.update({
   id: '/extrinsic',
   path: '/extrinsic',
@@ -73,39 +93,46 @@ const AuthenticatedDappRoute = AuthenticatedDappRouteImport.update({
   id: '/dapp',
   path: '/dapp',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_authenticated/dapp.lazy').then((d) => d.Route),
+)
 const AuthenticatedCreatePureRoute = AuthenticatedCreatePureRouteImport.update({
   id: '/create-pure',
   path: '/create-pure',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_authenticated/create-pure.lazy').then((d) => d.Route),
+)
 const AuthenticatedCreateMultisigRoute =
   AuthenticatedCreateMultisigRouteImport.update({
     id: '/create-multisig',
     path: '/create-multisig',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAssetsRoute = AuthenticatedAssetsRouteImport.update({
-  id: '/assets',
-  path: '/assets',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
+  } as any).lazy(() =>
+    import('./routes/_authenticated/create-multisig.lazy').then((d) => d.Route),
+  )
 const AuthenticatedAnalyticRoute = AuthenticatedAnalyticRouteImport.update({
   id: '/analytic',
   path: '/analytic',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_authenticated/analytic.lazy').then((d) => d.Route),
+)
 const AuthenticatedAddressBookRoute =
   AuthenticatedAddressBookRouteImport.update({
     id: '/address-book',
     path: '/address-book',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
+  } as any).lazy(() =>
+    import('./routes/_authenticated/address-book.lazy').then((d) => d.Route),
+  )
 const AuthenticatedAddProxyRoute = AuthenticatedAddProxyRouteImport.update({
   id: '/add-proxy',
   path: '/add-proxy',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_authenticated/add-proxy.lazy').then((d) => d.Route),
+)
 const AuthenticatedAccountSettingRoute =
   AuthenticatedAccountSettingRouteImport.update({
     id: '/account-setting',
@@ -117,19 +144,29 @@ const AuthenticatedTransactionsIndexRoute =
     id: '/transactions/',
     path: '/transactions/',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
+  } as any).lazy(() =>
+    import('./routes/_authenticated/transactions/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const AuthenticatedTransactionsIdRoute =
   AuthenticatedTransactionsIdRouteImport.update({
     id: '/transactions/$id',
     path: '/transactions/$id',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
+  } as any).lazy(() =>
+    import('./routes/_authenticated/transactions/$id.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const AuthenticatedExplorerUrlRoute =
   AuthenticatedExplorerUrlRouteImport.update({
     id: '/explorer/$url',
     path: '/explorer/$url',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
+  } as any).lazy(() =>
+    import('./routes/_authenticated/explorer.$url.lazy').then((d) => d.Route),
+  )
 
 export interface FileRoutesByFullPath {
   '/welcome': typeof WelcomeRoute
@@ -137,15 +174,15 @@ export interface FileRoutesByFullPath {
   '/add-proxy': typeof AuthenticatedAddProxyRoute
   '/address-book': typeof AuthenticatedAddressBookRoute
   '/analytic': typeof AuthenticatedAnalyticRoute
-  '/assets': typeof AuthenticatedAssetsRoute
   '/create-multisig': typeof AuthenticatedCreateMultisigRoute
   '/create-pure': typeof AuthenticatedCreatePureRoute
   '/dapp': typeof AuthenticatedDappRoute
   '/extrinsic': typeof AuthenticatedExtrinsicRoute
-  '/fund': typeof AuthenticatedFundRoute
   '/multi-transfer': typeof AuthenticatedMultiTransferRoute
   '/setting': typeof AuthenticatedSettingRoute
   '/transfer': typeof AuthenticatedTransferRoute
+  '/assets': typeof AuthenticatedAssetsLazyRoute
+  '/fund': typeof AuthenticatedFundLazyRoute
   '/': typeof AuthenticatedIndexRoute
   '/explorer/$url': typeof AuthenticatedExplorerUrlRoute
   '/transactions/$id': typeof AuthenticatedTransactionsIdRoute
@@ -157,15 +194,15 @@ export interface FileRoutesByTo {
   '/add-proxy': typeof AuthenticatedAddProxyRoute
   '/address-book': typeof AuthenticatedAddressBookRoute
   '/analytic': typeof AuthenticatedAnalyticRoute
-  '/assets': typeof AuthenticatedAssetsRoute
   '/create-multisig': typeof AuthenticatedCreateMultisigRoute
   '/create-pure': typeof AuthenticatedCreatePureRoute
   '/dapp': typeof AuthenticatedDappRoute
   '/extrinsic': typeof AuthenticatedExtrinsicRoute
-  '/fund': typeof AuthenticatedFundRoute
   '/multi-transfer': typeof AuthenticatedMultiTransferRoute
   '/setting': typeof AuthenticatedSettingRoute
   '/transfer': typeof AuthenticatedTransferRoute
+  '/assets': typeof AuthenticatedAssetsLazyRoute
+  '/fund': typeof AuthenticatedFundLazyRoute
   '/': typeof AuthenticatedIndexRoute
   '/explorer/$url': typeof AuthenticatedExplorerUrlRoute
   '/transactions/$id': typeof AuthenticatedTransactionsIdRoute
@@ -179,15 +216,15 @@ export interface FileRoutesById {
   '/_authenticated/add-proxy': typeof AuthenticatedAddProxyRoute
   '/_authenticated/address-book': typeof AuthenticatedAddressBookRoute
   '/_authenticated/analytic': typeof AuthenticatedAnalyticRoute
-  '/_authenticated/assets': typeof AuthenticatedAssetsRoute
   '/_authenticated/create-multisig': typeof AuthenticatedCreateMultisigRoute
   '/_authenticated/create-pure': typeof AuthenticatedCreatePureRoute
   '/_authenticated/dapp': typeof AuthenticatedDappRoute
   '/_authenticated/extrinsic': typeof AuthenticatedExtrinsicRoute
-  '/_authenticated/fund': typeof AuthenticatedFundRoute
   '/_authenticated/multi-transfer': typeof AuthenticatedMultiTransferRoute
   '/_authenticated/setting': typeof AuthenticatedSettingRoute
   '/_authenticated/transfer': typeof AuthenticatedTransferRoute
+  '/_authenticated/assets': typeof AuthenticatedAssetsLazyRoute
+  '/_authenticated/fund': typeof AuthenticatedFundLazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/explorer/$url': typeof AuthenticatedExplorerUrlRoute
   '/_authenticated/transactions/$id': typeof AuthenticatedTransactionsIdRoute
@@ -201,15 +238,15 @@ export interface FileRouteTypes {
     | '/add-proxy'
     | '/address-book'
     | '/analytic'
-    | '/assets'
     | '/create-multisig'
     | '/create-pure'
     | '/dapp'
     | '/extrinsic'
-    | '/fund'
     | '/multi-transfer'
     | '/setting'
     | '/transfer'
+    | '/assets'
+    | '/fund'
     | '/'
     | '/explorer/$url'
     | '/transactions/$id'
@@ -221,15 +258,15 @@ export interface FileRouteTypes {
     | '/add-proxy'
     | '/address-book'
     | '/analytic'
-    | '/assets'
     | '/create-multisig'
     | '/create-pure'
     | '/dapp'
     | '/extrinsic'
-    | '/fund'
     | '/multi-transfer'
     | '/setting'
     | '/transfer'
+    | '/assets'
+    | '/fund'
     | '/'
     | '/explorer/$url'
     | '/transactions/$id'
@@ -242,15 +279,15 @@ export interface FileRouteTypes {
     | '/_authenticated/add-proxy'
     | '/_authenticated/address-book'
     | '/_authenticated/analytic'
-    | '/_authenticated/assets'
     | '/_authenticated/create-multisig'
     | '/_authenticated/create-pure'
     | '/_authenticated/dapp'
     | '/_authenticated/extrinsic'
-    | '/_authenticated/fund'
     | '/_authenticated/multi-transfer'
     | '/_authenticated/setting'
     | '/_authenticated/transfer'
+    | '/_authenticated/assets'
+    | '/_authenticated/fund'
     | '/_authenticated/'
     | '/_authenticated/explorer/$url'
     | '/_authenticated/transactions/$id'
@@ -285,6 +322,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/fund': {
+      id: '/_authenticated/fund'
+      path: '/fund'
+      fullPath: '/fund'
+      preLoaderRoute: typeof AuthenticatedFundLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/assets': {
+      id: '/_authenticated/assets'
+      path: '/assets'
+      fullPath: '/assets'
+      preLoaderRoute: typeof AuthenticatedAssetsLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/transfer': {
       id: '/_authenticated/transfer'
       path: '/transfer'
@@ -304,13 +355,6 @@ declare module '@tanstack/react-router' {
       path: '/multi-transfer'
       fullPath: '/multi-transfer'
       preLoaderRoute: typeof AuthenticatedMultiTransferRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/fund': {
-      id: '/_authenticated/fund'
-      path: '/fund'
-      fullPath: '/fund'
-      preLoaderRoute: typeof AuthenticatedFundRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/extrinsic': {
@@ -339,13 +383,6 @@ declare module '@tanstack/react-router' {
       path: '/create-multisig'
       fullPath: '/create-multisig'
       preLoaderRoute: typeof AuthenticatedCreateMultisigRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/assets': {
-      id: '/_authenticated/assets'
-      path: '/assets'
-      fullPath: '/assets'
-      preLoaderRoute: typeof AuthenticatedAssetsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/analytic': {
@@ -405,15 +442,15 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAddProxyRoute: typeof AuthenticatedAddProxyRoute
   AuthenticatedAddressBookRoute: typeof AuthenticatedAddressBookRoute
   AuthenticatedAnalyticRoute: typeof AuthenticatedAnalyticRoute
-  AuthenticatedAssetsRoute: typeof AuthenticatedAssetsRoute
   AuthenticatedCreateMultisigRoute: typeof AuthenticatedCreateMultisigRoute
   AuthenticatedCreatePureRoute: typeof AuthenticatedCreatePureRoute
   AuthenticatedDappRoute: typeof AuthenticatedDappRoute
   AuthenticatedExtrinsicRoute: typeof AuthenticatedExtrinsicRoute
-  AuthenticatedFundRoute: typeof AuthenticatedFundRoute
   AuthenticatedMultiTransferRoute: typeof AuthenticatedMultiTransferRoute
   AuthenticatedSettingRoute: typeof AuthenticatedSettingRoute
   AuthenticatedTransferRoute: typeof AuthenticatedTransferRoute
+  AuthenticatedAssetsLazyRoute: typeof AuthenticatedAssetsLazyRoute
+  AuthenticatedFundLazyRoute: typeof AuthenticatedFundLazyRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedExplorerUrlRoute: typeof AuthenticatedExplorerUrlRoute
   AuthenticatedTransactionsIdRoute: typeof AuthenticatedTransactionsIdRoute
@@ -425,15 +462,15 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAddProxyRoute: AuthenticatedAddProxyRoute,
   AuthenticatedAddressBookRoute: AuthenticatedAddressBookRoute,
   AuthenticatedAnalyticRoute: AuthenticatedAnalyticRoute,
-  AuthenticatedAssetsRoute: AuthenticatedAssetsRoute,
   AuthenticatedCreateMultisigRoute: AuthenticatedCreateMultisigRoute,
   AuthenticatedCreatePureRoute: AuthenticatedCreatePureRoute,
   AuthenticatedDappRoute: AuthenticatedDappRoute,
   AuthenticatedExtrinsicRoute: AuthenticatedExtrinsicRoute,
-  AuthenticatedFundRoute: AuthenticatedFundRoute,
   AuthenticatedMultiTransferRoute: AuthenticatedMultiTransferRoute,
   AuthenticatedSettingRoute: AuthenticatedSettingRoute,
   AuthenticatedTransferRoute: AuthenticatedTransferRoute,
+  AuthenticatedAssetsLazyRoute: AuthenticatedAssetsLazyRoute,
+  AuthenticatedFundLazyRoute: AuthenticatedFundLazyRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedExplorerUrlRoute: AuthenticatedExplorerUrlRoute,
   AuthenticatedTransactionsIdRoute: AuthenticatedTransactionsIdRoute,

@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { CookieConsentConfig, CookieConsentState, CookiePreference } from './types';
+import type {
+  CookieConsentConfig,
+  CookieConsentState,
+  CookiePreference,
+} from './types';
 
 import { useLocalStore } from '@mimir-wallet/service';
 import { Button, cn } from '@mimir-wallet/ui';
@@ -24,7 +28,7 @@ interface CookieConsentProps extends CookieConsentConfig {
 const getDefaultConsentState = (): CookieConsentState => ({
   preference: null,
   isVisible: true,
-  lastUpdated: Date.now()
+  lastUpdated: Date.now(),
 });
 
 /**
@@ -36,18 +40,19 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({
   privacyText,
   onPreferenceChange,
   initialVisible,
-  className
+  className,
 }) => {
   // Use project's useLocalStore hook for persistent storage
   const [consentState, setConsentState] = useLocalStore<CookieConsentState>(
     COOKIE_CONSENT_STORAGE_KEY,
-    getDefaultConsentState()
+    getDefaultConsentState(),
   );
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   // Show banner based on visibility state, not just preference
-  const shouldShowBanner = initialVisible !== undefined ? initialVisible : consentState.isVisible;
+  const shouldShowBanner =
+    initialVisible !== undefined ? initialVisible : consentState.isVisible;
 
   // Handle preference change
   const handlePreferenceChange = useCallback(
@@ -56,34 +61,35 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({
         ...consentState,
         preference,
         isVisible: false, // Keep visible to show selection and allow changes
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
       };
 
       setConsentState(newState);
       onPreferenceChange?.(preference);
     },
-    [consentState, setConsentState, onPreferenceChange]
+    [consentState, setConsentState, onPreferenceChange],
   );
 
   // Default privacy text (matching Figma design)
   const defaultPrivacyText = (
     <>
-      This website utilizes technologies such as cookies to enable essential site functionality, as well as for
-      analytics, personalization, and targeted advertising. To learn more, view{' '}
+      This website utilizes technologies such as cookies to enable essential
+      site functionality, as well as for analytics, personalization, and
+      targeted advertising. To learn more, view{' '}
       <a
         href={termsUrl}
-        className='text-primary underline hover:no-underline'
-        target='_blank'
-        rel='noopener noreferrer'
+        className="text-primary underline hover:no-underline"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         terms
       </a>{' '}
       and{' '}
       <a
         href={privacyPolicyUrl}
-        className='text-primary underline hover:no-underline'
-        target='_blank'
-        rel='noopener noreferrer'
+        className="text-primary underline hover:no-underline"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         privacy
       </a>
@@ -97,29 +103,39 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({
 
   return (
     <div
-      className={cn('sticky bottom-4 z-50', 'mx-4 mt-auto', 'bg-secondary shadow-medium rounded-[20px] p-4', className)}
+      className={cn(
+        'sticky bottom-4 z-50',
+        'mx-4 mt-auto p-4',
+        'bg-secondary rounded-[20px] shadow-md',
+        className,
+      )}
     >
-      <div className='flex items-start gap-4'>
+      <div className="flex items-start gap-4">
         {/* Content */}
-        <div className='flex flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <div className='text-foreground flex-1 text-sm'>
+        <div className="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-foreground flex-1 text-sm">
             {privacyText || defaultPrivacyText}
             {consentState.preference && (
-              <div className='text-success mt-2 text-xs'>
-                Current preference: {consentState.preference === 'all' ? 'All cookies' : 'Only essential cookies'}
+              <div className="text-success mt-2 text-xs">
+                Current preference:{' '}
+                {consentState.preference === 'all'
+                  ? 'All cookies'
+                  : 'Only essential cookies'}
               </div>
             )}
           </div>
 
-          <div className='flex-shrink-0'>
+          <div className="flex-shrink-0">
             <PreferencePopover
               selectedPreference={consentState.preference}
               onPreferenceChange={handlePreferenceChange}
               open={isPopoverOpen}
               onOpenChange={setIsPopoverOpen}
             >
-              <Button variant='bordered' color='primary' radius='full'>
-                {consentState.preference ? 'Change Preference' : 'Manage Preference'}
+              <Button variant="bordered" color="primary" radius="full">
+                {consentState.preference
+                  ? 'Change Preference'
+                  : 'Manage Preference'}
               </Button>
             </PreferencePopover>
           </div>

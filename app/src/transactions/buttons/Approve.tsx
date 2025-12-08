@@ -12,10 +12,19 @@ import RecoverTx from './RecoverTx';
 
 import IconSuccess from '@/assets/svg/icon-success-outlined.svg?react';
 import { toastError } from '@/components/utils';
-import { type AccountData, type FilterPath, type Transaction, TransactionType } from '@/hooks/types';
+import {
+  type AccountData,
+  type FilterPath,
+  type Transaction,
+  TransactionType,
+} from '@/hooks/types';
 import { useTxQueue } from '@/hooks/useTxQueue';
 
-async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, string, string, string] }) {
+async function fetchMultisigInfo({
+  queryKey,
+}: {
+  queryKey: readonly [string, string, string, string];
+}) {
   const [, network, address, callHash] = queryKey;
 
   if (!address || !callHash) {
@@ -24,14 +33,16 @@ async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, str
 
   const api = await ApiManager.getInstance().getApi(network);
 
-  if (!api) {
-    throw new Error(`API not available for network: ${network}`);
-  }
-
   return api.query.multisig.multisigs(address, callHash);
 }
 
-function ExecuteMultisig({ transaction, account }: { account: AccountData; transaction: Transaction }) {
+function ExecuteMultisig({
+  transaction,
+  account,
+}: {
+  account: AccountData;
+  transaction: Transaction;
+}) {
   const { network } = useNetwork();
   const [isOpen, toggleOpen] = useToggle(false);
   const { addQueue } = useTxQueue();
@@ -41,7 +52,7 @@ function ExecuteMultisig({ transaction, account }: { account: AccountData; trans
       addQueue({
         accountId: account.address,
         call: transaction.call,
-        network
+        network,
       });
     } else {
       toggleOpen(true);
@@ -54,8 +65,9 @@ function ExecuteMultisig({ transaction, account }: { account: AccountData; trans
     const call = api.createType('Call', calldata);
 
     if (
-      (transaction.type === TransactionType.Multisig ? blake2AsHex(call.toU8a()) : call.hash.toHex()) !==
-      transaction.callHash
+      (transaction.type === TransactionType.Multisig
+        ? blake2AsHex(call.toU8a())
+        : call.hash.toHex()) !== transaction.callHash
     ) {
       toastError('Invalid call data');
 
@@ -65,7 +77,7 @@ function ExecuteMultisig({ transaction, account }: { account: AccountData; trans
     addQueue({
       accountId: account.address,
       call,
-      network
+      network,
     });
 
     toggleOpen(false);
@@ -73,11 +85,16 @@ function ExecuteMultisig({ transaction, account }: { account: AccountData; trans
 
   return (
     <>
-      <Button fullWidth variant='solid' color='primary' onClick={handleApprove}>
+      <Button fullWidth variant="solid" color="primary" onClick={handleApprove}>
         Execute
       </Button>
 
-      <RecoverTx transaction={transaction} isOpen={isOpen} onClose={toggleOpen} handleRecover={handleRecover} />
+      <RecoverTx
+        transaction={transaction}
+        isOpen={isOpen}
+        onClose={toggleOpen}
+        handleRecover={handleRecover}
+      />
     </>
   );
 }
@@ -86,7 +103,7 @@ function Approve({
   isIcon = false,
   account,
   transaction,
-  filterPaths
+  filterPaths,
 }: {
   isIcon?: boolean;
   account: AccountData;
@@ -103,7 +120,9 @@ function Approve({
     }
 
     if (transaction.type === TransactionType.Proxy) {
-      const subTransaction = transaction.children.find((item) => item.type === TransactionType.Multisig);
+      const subTransaction = transaction.children.find(
+        (item) => item.type === TransactionType.Multisig,
+      );
 
       return subTransaction || null;
     }
@@ -112,13 +131,22 @@ function Approve({
   }, [transaction]);
 
   const { data: multisigInfo } = useQuery({
-    queryKey: ['multisig-info', network, multisigTx?.address || '', multisigTx?.callHash || ''] as const,
+    queryKey: [
+      'multisig-info',
+      network,
+      multisigTx?.address || '',
+      multisigTx?.callHash || '',
+    ] as const,
     enabled: !!multisigTx?.callHash,
     refetchOnMount: false,
-    queryFn: fetchMultisigInfo
+    queryFn: fetchMultisigInfo,
   });
 
-  if (multisigTx && multisigInfo && multisigInfo.unwrapOrDefault().approvals.length >= multisigTx.threshold) {
+  if (
+    multisigTx &&
+    multisigInfo &&
+    multisigInfo.unwrapOrDefault().approvals.length >= multisigTx.threshold
+  ) {
     return <ExecuteMultisig transaction={transaction} account={account} />;
   }
 
@@ -137,7 +165,7 @@ function Approve({
         accountId: account.address,
         transaction,
         call: transaction.call,
-        network
+        network,
       });
     } else {
       toggleOpen(true);
@@ -150,8 +178,9 @@ function Approve({
     const call = api.createType('Call', calldata);
 
     if (
-      (transaction.type === TransactionType.Multisig ? blake2AsHex(call.toU8a()) : call.hash.toHex()) !==
-      transaction.callHash
+      (transaction.type === TransactionType.Multisig
+        ? blake2AsHex(call.toU8a())
+        : call.hash.toHex()) !== transaction.callHash
     ) {
       toastError('Invalid call data');
 
@@ -162,7 +191,7 @@ function Approve({
       accountId: account.address,
       transaction,
       call,
-      network
+      network,
     });
 
     toggleOpen(false);
@@ -171,18 +200,34 @@ function Approve({
   return (
     <>
       {isIcon ? (
-        <Tooltip content='Approve'>
-          <Button size='sm' isIconOnly variant='light' color='success' onClick={handleApprove}>
+        <Tooltip content="Approve">
+          <Button
+            size="sm"
+            isIconOnly
+            variant="light"
+            color="success"
+            onClick={handleApprove}
+          >
             <IconSuccess />
           </Button>
         </Tooltip>
       ) : (
-        <Button fullWidth variant='solid' color='primary' onClick={handleApprove}>
+        <Button
+          fullWidth
+          variant="solid"
+          color="primary"
+          onClick={handleApprove}
+        >
           Approve
         </Button>
       )}
 
-      <RecoverTx transaction={transaction} isOpen={isOpen} onClose={toggleOpen} handleRecover={handleRecover} />
+      <RecoverTx
+        transaction={transaction}
+        isOpen={isOpen}
+        onClose={toggleOpen}
+        handleRecover={handleRecover}
+      />
     </>
   );
 }

@@ -9,7 +9,7 @@
 [![React](https://img.shields.io/badge/React-19.2-blue)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.2-blue)](https://vitejs.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-20%2B-green)](https://nodejs.org/)
-[![Yarn](https://img.shields.io/badge/Yarn-4.7-blue)](https://yarnpkg.com/)
+[![pnpm](https://img.shields.io/badge/pnpm-10.24-blue)](https://pnpm.io/)
 [![GitHub Stars](https://img.shields.io/github/stars/mimir-labs/mimir-wallet.svg)](https://github.com/mimir-labs/mimir-wallet/stargazers)
 
 **The most comprehensive enterprise-level multi-signature wallet for Polkadot ecosystem**
@@ -62,7 +62,7 @@ Mimir Wallet is a state-of-the-art Progressive Web Application (PWA) designed fo
 - **Modern Development Stack**
   - TypeScript-first development with strict type safety
   - Comprehensive React hooks for blockchain interactions
-  - Modular component library with HeroUI v2
+  - Modular component library with ShadCN/UI + Radix UI
   - Extensive testing coverage with Vitest and Cypress
 
 ### 🎨 User Experience
@@ -81,7 +81,7 @@ Mimir Wallet is a state-of-the-art Progressive Web Application (PWA) designed fo
 Ensure you have the following installed:
 
 - **Node.js** >= 20.0.0 ([Download](https://nodejs.org/))
-- **Yarn** v4.7.0+ ([Install via Corepack](https://yarnpkg.com/getting-started/install))
+- **pnpm** v10.24+ ([Install](https://pnpm.io/installation))
 - **Git** ([Download](https://git-scm.com/))
 - **Modern Browser** (Chrome 61+, Firefox 60+, Safari 11+, Edge 18+)
 
@@ -93,15 +93,15 @@ Ensure you have the following installed:
    cd mimir-wallet
    ```
 
-2. **Enable Yarn and install dependencies**
+2. **Enable pnpm and install dependencies**
    ```bash
    corepack enable
-   yarn install
+   pnpm install
    ```
 
 3. **Start development server**
    ```bash
-   yarn dev
+   pnpm dev
    ```
 
 4. **Open your browser**
@@ -113,10 +113,10 @@ Ensure you have the following installed:
 
 ```bash
 # Build all packages for production
-yarn build
+pnpm build
 
 # Preview the production build locally
-cd app && yarn preview
+cd app && pnpm preview
 ```
 
 ---
@@ -148,7 +148,7 @@ mimir-wallet/
 
 #### [`@mimir-wallet/polkadot-core`](./packages/polkadot-core/)
 The foundational blockchain integration package
-- **Polkadot.js API** v16.5.2 integration
+- **Polkadot.js API** v16.x integration
 - **Multi-chain API management** for Polkadot ecosystem
 - **Transaction processing** with dry-run capabilities
 - **Chopsticks integration** for fork simulation and testing
@@ -163,9 +163,9 @@ Service layer and data management
 - **WebSocket support** for real-time blockchain updates
 
 #### [`@mimir-wallet/ui`](./packages/ui/)
-Hybrid React UI component library with modern architecture
-- **HeroUI v2 + ShadCN/UI** hybrid component system for gradual migration
-- **Radix UI primitives** for enhanced accessibility and customization
+Modern React UI component library built on ShadCN/UI architecture
+- **ShadCN/UI + Radix UI** unstyled, accessible components as foundation
+- **Radix UI primitives** for industry-leading accessibility
 - **Tailwind CSS v4.1** for utility-first styling with modern features
 - **Class Variance Authority (CVA)** for type-safe component variants
 - **TypeScript-first** design system with strict typing
@@ -188,7 +188,7 @@ Development tooling and shared configurations
 | **React** | 19.2 | UI framework with concurrent features |
 | **TypeScript** | 5.9 | Type-safe development |
 | **Vite** | 7.2 | Fast build tool and dev server |
-| **HeroUI + ShadCN/UI** | v2 + Latest | Hybrid accessible component library |
+| **ShadCN/UI + Radix UI** | Latest | Accessible component library |
 | **Tailwind CSS** | 4.1 | Utility-first styling |
 | **Framer Motion** | 12.12 | Smooth animations |
 
@@ -211,7 +211,7 @@ Development tooling and shared configurations
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | **Turbo** | 2.4.4 | Monorepo build system |
-| **Yarn** | 4.7.0 | Package management with PnP |
+| **pnpm** | 10.24 | Package management |
 | **ESLint** | 9.21 | Code linting and formatting |
 | **Vitest** | 4.0 | Unit & integration testing framework |
 | **Cypress** | 13.13 | End-to-end testing |
@@ -230,52 +230,52 @@ Development tooling and shared configurations
 ### 🔧 Monorepo Management
 ```bash
 # Development
-yarn dev              # Start all development servers
-yarn build            # Build all packages for production
-yarn check-types      # Run TypeScript checks across all packages
+pnpm dev              # Start all development servers
+pnpm build            # Build all packages for production
+pnpm check-types      # Run TypeScript checks across all packages
 
 # Code Quality
-yarn lint             # Run ESLint across all packages
-yarn commit           # Create conventional commit (uses Commitizen)
+pnpm lint             # Run ESLint across all packages
+pnpm commit           # Create conventional commit (uses Commitizen)
 
 # Package Management
-yarn workspace <package-name> <command>  # Run command in specific workspace
+pnpm --filter <package-name> <command>  # Run command in specific workspace
 ```
 
 ### 🎯 Application Commands
 ```bash
 # Navigate to app directory first: cd app/
 
-yarn dev              # Start app development server (Vite)
-yarn build            # Build app for production
-yarn preview          # Preview production build
-yarn check-types      # TypeScript type checking
+pnpm dev              # Start app development server (Vite)
+pnpm build            # Build app for production
+pnpm preview          # Preview production build
+pnpm check-types      # TypeScript type checking
 ```
 
 ### 📦 Package Development
 ```bash
 # Navigate to specific package: cd packages/<package-name>/
 
-yarn dev              # Start package in watch mode
-yarn build            # Build package
-yarn check-types      # Check TypeScript types
+pnpm dev              # Start package in watch mode
+pnpm build            # Build package
+pnpm check-types      # Check TypeScript types
 ```
 
 ### 🧪 Testing
 ```bash
 # Run all tests (from root)
-yarn test             # Run all tests across packages (via Turbo)
-yarn test:cov         # Run all tests with coverage report
+pnpm test             # Run all tests across packages (via Turbo)
+pnpm test:cov         # Run all tests with coverage report
 
 # Package-specific testing (from packages/polkadot-core/)
-yarn test             # Run unit tests
-yarn test:unit        # Run unit tests (explicit)
-yarn test:integration # Run integration tests (connects to Paseo testnet)
-yarn test:watch       # Run tests in watch mode
+pnpm test             # Run unit tests
+pnpm test:unit        # Run unit tests (explicit)
+pnpm test:integration # Run integration tests (connects to Paseo testnet)
+pnpm test:watch       # Run tests in watch mode
 
 # E2E Testing (from app/)
-yarn cypress:open     # Open Cypress test runner
-yarn cypress:run      # Run Cypress tests headlessly
+pnpm cypress:open     # Open Cypress test runner
+pnpm cypress:run      # Run Cypress tests headlessly
 ```
 
 ---
@@ -348,7 +348,7 @@ We welcome contributions from the community! Here's how you can help:
 
 4. **Commit using Conventional Commits**
    ```bash
-   yarn commit  # Uses Commitizen for proper formatting
+   pnpm commit  # Uses Commitizen for proper formatting
    ```
 
 5. **Push and create a Pull Request**

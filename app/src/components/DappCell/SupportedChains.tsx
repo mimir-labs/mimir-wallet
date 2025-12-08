@@ -18,20 +18,33 @@ function SupportedChains({ app }: { app: DappOption }) {
       return networks;
     }
 
-    return networks.filter((network: Endpoint) => supportedChains.includes(network.key));
+    return networks.filter((network: Endpoint) =>
+      supportedChains.includes(network.key),
+    );
   }, [app.supportedChains, networks]);
 
   return (
     <Tooltip
       classNames={{ content: 'max-w-[300px]' }}
-      color='foreground'
-      content={supportedNetworks.map((network: Endpoint) => network.name).join(', ')}
+      color="foreground"
+      content={supportedNetworks
+        .map((network: Endpoint) => network.name)
+        .join(', ')}
     >
-      <AvatarGroup max={3} renderCount={(count) => <p className='text-foreground/50 !ms-1 text-xs'>+{count}</p>}>
+      <AvatarGroup
+        max={3}
+        renderCount={(count) => (
+          <p className="text-foreground/50 !ms-1 text-xs">+{count}</p>
+        )}
+      >
         {supportedNetworks.map((network: Endpoint, index: number) => (
           <Avatar
-            classNames={{ base: 'data-[hover=true]:translate-none' }}
-            style={{ width: 20, height: 20, backgroundColor: 'transparent', marginInlineStart: index ? -4 : 0 }}
+            style={{
+              width: 20,
+              height: 20,
+              backgroundColor: 'transparent',
+              marginInlineStart: index ? -4 : 0,
+            }}
             key={network.key}
             src={network.icon}
           />

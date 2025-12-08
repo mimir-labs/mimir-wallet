@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Tab, Tabs, Tooltip } from '@mimir-wallet/ui';
+import { Tabs, Tooltip } from '@mimir-wallet/ui';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useTransition } from 'react';
 
@@ -17,7 +17,9 @@ import { Empty } from '@/components';
 function PageAddressBook() {
   const { addresses } = useAccount();
   const navigate = useNavigate();
-  const search = useSearch({ strict: false }) as { tab?: 'contacts' | 'watchlist' };
+  const search = useSearch({ strict: false }) as {
+    tab?: 'contacts' | 'watchlist';
+  };
   const selectedTab = search.tab || 'contacts';
 
   const [, startTransition] = useTransition();
@@ -25,55 +27,63 @@ function PageAddressBook() {
   const contactAddresses = addresses.filter((address) => !address.watchlist);
   const watchlistAddresses = addresses.filter((address) => address.watchlist);
 
-  const handleTabChange = (key: React.Key) => {
+  const handleTabChange = (key: string) => {
     // Wrap tab navigation in transition for smooth switching
     startTransition(() => {
       navigate({
-        search: ((prev: any) => ({ ...prev, tab: key.toString() })) as any,
-        replace: true
+        search: ((prev: any) => ({ ...prev, tab: key })) as any,
+        replace: true,
       });
     });
   };
 
   return (
     <>
-      <Tabs color='primary' aria-label='Address Book' selectedKey={selectedTab} onSelectionChange={handleTabChange}>
-        <Tab key='contacts' title='Contacts' />
-        <Tab
-          key='watchlist'
-          title={
-            <div className='flex items-center gap-1'>
-              <span>Watchlist</span>
-              <Tooltip content='You can view watchlist in account side bar'>
-                <IconQuestion className='h-4 w-4 opacity-70' />
-              </Tooltip>
-            </div>
-          }
-        />
-      </Tabs>
+      <Tabs
+        tabs={[
+          { key: 'contacts', label: 'Contacts' },
+          {
+            key: 'watchlist',
+            label: (
+              <div className="flex items-center gap-1">
+                <span>Watchlist</span>
+                <Tooltip content="You can view watchlist in account side bar">
+                  <IconQuestion className="h-4 w-4 opacity-70" />
+                </Tooltip>
+              </div>
+            ),
+          },
+        ]}
+        selectedKey={selectedTab}
+        onSelectionChange={handleTabChange}
+      />
 
-      <div className='mt-5 flex justify-between gap-2.5'>
+      <div className="mt-5 flex justify-between gap-2.5">
         <AddAddress isWatchlist={selectedTab === 'watchlist'} />
-        <div className='flex-1' />
+        <div className="flex-1" />
         <Import />
         <Export />
       </div>
 
-      <div className='mt-5 space-y-5'>
+      <div className="mt-5 space-y-5">
         {selectedTab === 'contacts' ? (
           contactAddresses.length > 0 ? (
             contactAddresses.map((address) => {
-              return <AddressItem address={address.address} key={address.address} />;
+              return (
+                <AddressItem address={address.address} key={address.address} />
+              );
             })
           ) : (
-            <Empty height='80dvh' label='no contacts' />
+            <Empty height="80dvh" label="no contacts" />
           )
         ) : watchlistAddresses.length > 0 ? (
           watchlistAddresses.map((address) => {
-            return <AddressItem address={address.address} key={address.address} />;
+            return (
+              <AddressItem address={address.address} key={address.address} />
+            );
           })
         ) : (
-          <Empty height='80dvh' label='no watchlist addresses' />
+          <Empty height="80dvh" label="no watchlist addresses" />
         )}
       </div>
     </>

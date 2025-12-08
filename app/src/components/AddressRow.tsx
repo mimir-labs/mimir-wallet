@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
+import type {
+  AccountId,
+  AccountIndex,
+  Address,
+} from '@polkadot/types/interfaces';
 
 import { encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
 import React, { forwardRef, useMemo } from 'react';
@@ -37,10 +41,13 @@ const AddressRow = forwardRef<HTMLDivElement, Props>(
       showMultisigBadge = true,
       ...props
     }: Props,
-    ref
+    ref,
   ) => {
     const { ss58: chainSS58 } = useSs58Format();
-    const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
+    const address = useMemo(
+      () => encodeAddress(value, chainSS58),
+      [value, chainSS58],
+    );
 
     return (
       <div
@@ -50,25 +57,30 @@ const AddressRow = forwardRef<HTMLDivElement, Props>(
         {...props}
       >
         <IdentityIcon
-          className='AddressRow-Icon'
+          className="AddressRow-Icon"
           size={iconSize}
           value={address}
           showMultisigBadge={showMultisigBadge}
         />
-        <div className='AddressRow-Content flex items-center gap-[5px]'>
+        <div className="AddressRow-Content flex items-center gap-[5px]">
           {withName && (
-            <span data-bold={withName && withAddress} className='AddressRow-Name data-[bold="true"]:font-bold'>
+            <span
+              data-bold={withName && withAddress}
+              className='AddressRow-Name data-[bold="true"]:font-bold'
+            >
               <AddressName defaultName={defaultName} value={address} />
             </span>
           )}
-          <span className='AddressRow-Address flex items-center gap-[5px] text-[0.875em]'>
+          <span className="AddressRow-Address flex items-center gap-[5px] text-[0.875em]">
             {withAddress && <AddressComp shorten={shorten} value={address} />}
-            {withCopy && <CopyAddress address={address} className='opacity-50' />}
+            {withCopy && (
+              <CopyAddress address={address} className="opacity-50" />
+            )}
           </span>
         </div>
       </div>
     );
-  }
+  },
 );
 
 AddressRow.displayName = 'AddressRow';

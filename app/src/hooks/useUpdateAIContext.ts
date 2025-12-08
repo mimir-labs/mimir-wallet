@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAIContext } from '@mimir-wallet/ai-assistant';
-import { addressToHex, encodeAddress, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  addressToHex,
+  encodeAddress,
+  useChains,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { useLocation } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
@@ -25,8 +30,8 @@ export function useUpdateAIContext() {
         ss58Format: item.ss58Format,
         paraId: item.paraId,
         isTestnet: !!item.isTestnet,
-        isEnabled: item.enabled
-      }))
+        isEnabled: item.enabled,
+      })),
     });
   }, [chains]);
 
@@ -45,10 +50,10 @@ export function useUpdateAIContext() {
             hasPermission: isLocalAccount(item.address),
             isMultisig: !!meta.isMultisig,
             isPure: !!meta.isPure,
-            network: meta.pureCreatedAt
+            network: meta.pureCreatedAt,
           };
         })
-        .filter((item) => !!item)
+        .filter((item) => !!item),
     });
   }, [accounts, addresses, chainSS58, isLocalAccount, metas]);
 
@@ -65,7 +70,7 @@ export function useUpdateAIContext() {
           isMultisig: !!meta.isMultisig,
           delegatees: meta.delegatees || [],
           members: meta.isMultisig ? meta.who || [] : [],
-          threshold: meta.isMultisig ? meta.threshold : undefined
+          threshold: meta.isMultisig ? meta.threshold : undefined,
         };
       }
 
@@ -76,8 +81,8 @@ export function useUpdateAIContext() {
       state: {
         currentAccount: currentAccount ? ({ ...currentAccount } as any) : {},
         currentPath: pathname,
-        chainSS58
-      }
+        chainSS58,
+      },
     });
   }, [chainSS58, current, metas, pathname]);
 
@@ -85,18 +90,20 @@ export function useUpdateAIContext() {
   useEffect(() => {
     const dappFeatures = dapps
       .filter((item) => {
-        return item.visible !== false && !item.url.startsWith('mimir://internal');
+        return (
+          item.visible !== false && !item.url.startsWith('mimir://internal')
+        );
       })
       .map((item) => ({
         id: item.id,
         subPaths: item.subPaths,
         description: item.description,
-        tags: item.tags
+        tags: item.tags,
       }));
 
     // Update routingContext in AIContext
     useAIContext.setState({
-      dappFeatures: dappFeatures
+      dappFeatures: dappFeatures,
     });
   }, []);
 }

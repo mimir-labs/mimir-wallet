@@ -6,8 +6,6 @@ import type { RouteMetadata } from '@/hooks/usePageTitle';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
-import PageAddressBook from '@/pages/address-book';
-
 /**
  * Address Book Route (/address-book)
  *
@@ -16,13 +14,12 @@ import PageAddressBook from '@/pages/address-book';
  */
 
 const addressBookSearchSchema = z.object({
-  tab: z.enum(['contacts', 'watchlist']).optional().default('contacts')
+  tab: z.enum(['contacts', 'watchlist']).optional().default('contacts'),
 });
 
 export const Route = createFileRoute('/_authenticated/address-book')({
   validateSearch: addressBookSearchSchema,
   staticData: {
-    title: 'Address Book'
+    title: 'Address Book',
   } as RouteMetadata,
-  component: PageAddressBook
 });

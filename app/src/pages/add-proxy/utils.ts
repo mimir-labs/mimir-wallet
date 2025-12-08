@@ -15,13 +15,16 @@ export const proxyTypeDescriptions: Record<string, string> = {
   Governance: 'Only voting and democracy actions',
   Staking: 'Only staking, nominating, and rewards',
   IdentityJudgement: 'Only certify identities (for registrars)',
-  CancelProxy: 'Only cancel delayed proxy announcements'
+  CancelProxy: 'Only cancel delayed proxy announcements',
 };
 
 /**
  * Estimate time from custom blocks
  */
-export function estimateTimeFromBlocks(customBlocks: string, blockInterval: number): string {
+export function estimateTimeFromBlocks(
+  customBlocks: string,
+  blockInterval: number,
+): string {
   const blocks = Number(customBlocks);
   const timeMs = blocks * blockInterval;
 
@@ -39,9 +42,14 @@ export function estimateTimeFromBlocks(customBlocks: string, blockInterval: numb
 /**
  * Filter accounts by network for proxy operations
  */
-export function filterAccountsByNetwork(accounts: AccountData[], genesisHash: HexString): string[] {
+export function filterAccountsByNetwork(
+  accounts: AccountData[],
+  genesisHash: HexString,
+): string[] {
   return accounts
-    .filter((account) => (account.type === 'pure' ? account.network === genesisHash : true))
+    .filter((account) =>
+      account.type === 'pure' ? account.network === genesisHash : true,
+    )
     .map((item) => item.address);
 }
 

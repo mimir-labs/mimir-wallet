@@ -6,9 +6,12 @@ import { service, useQuery } from '@mimir-wallet/service';
 import { useMemo } from 'react';
 
 export function useMultiChainStats(
-  address?: string | null
+  address?: string | null,
 ): [data: Record<string, boolean>, isFetched: boolean, isFetching: boolean] {
-  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address.toString()) : ''),
+    [address],
+  );
   const { chains } = useChains();
 
   // Get enabled network keys
@@ -18,36 +21,41 @@ export function useMultiChainStats(
     queryKey: ['multi-chain-stats', addressHex] as const,
     enabled: !!addressHex,
     queryFn: ({ queryKey: [, addressHex] }): Promise<Record<string, boolean>> =>
-      service.account.getMultiChainStats(addressHex)
+      service.account.getMultiChainStats(addressHex),
   });
 
   return [
     useMemo(
       () =>
         Object.fromEntries(
-          Object.entries(data || {}).filter(([network, enabled]) => chainsSet.has(network) && enabled)
+          Object.entries(data || {}).filter(
+            ([network, enabled]) => chainsSet.has(network) && enabled,
+          ),
         ),
-      [data, chainsSet]
+      [data, chainsSet],
     ),
     isFetched,
-    isFetching
+    isFetching,
   ];
 }
 
 export function useQueryStats(chain: string, address?: string | null) {
-  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address.toString()) : ''),
+    [address],
+  );
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['chain-stats', chain, addressHex] as const,
     enabled: !!addressHex,
     queryFn: ({
-      queryKey: [, chain, addressHex]
+      queryKey: [, chain, addressHex],
     }): Promise<{
       total: number;
       callOverview: { section: string; method: string; counts: number }[];
       transferBook: { to: string; amount: string }[];
       transactionCounts: { time: string; address: string; counts: number }[];
-    }> => service.account.getChainStats(chain, addressHex)
+    }> => service.account.getChainStats(chain, addressHex),
   });
 
   return [data, isFetched, isFetching] as const;

@@ -25,17 +25,33 @@ const SPECIAL_TYPES = [
   'Address',
   'Balance',
   'BalanceOf',
-  'Vec<KeyValue>'
+  'Vec<KeyValue>',
 ];
 
 const DISPATCH_ERROR = ['DispatchError', 'SpRuntimeDispatchError'];
 
 const componentDef: TypeToComponent[] = [
   { c: Account, t: ['AccountId', 'Address', 'LookupSource', 'MultiAddress'] },
-  { c: Amount, t: ['AccountIndex', 'i8', 'i16', 'i32', 'i64', 'i128', 'u8', 'u16', 'u32', 'u64', 'u128', 'u256'] },
+  {
+    c: Amount,
+    t: [
+      'AccountIndex',
+      'i8',
+      'i16',
+      'i32',
+      'i64',
+      'i128',
+      'u8',
+      'u16',
+      'u32',
+      'u64',
+      'u128',
+      'u256',
+    ],
+  },
   { c: Balance, t: ['Amount', 'Balance', 'BalanceOf'] },
   { c: CallName, t: ['Call'] },
-  { c: Unknown, t: ['Unknown'] }
+  { c: Unknown, t: ['Unknown'] },
 ];
 
 const components: ComponentMap = componentDef.reduce(
@@ -46,10 +62,16 @@ const components: ComponentMap = componentDef.reduce(
 
     return components;
   },
-  {} as unknown as ComponentMap
+  {} as unknown as ComponentMap,
 );
 
-function fromDef({ displayName, info, lookupName, sub, type }: TypeDef): string {
+function fromDef({
+  displayName,
+  info,
+  lookupName,
+  sub,
+  type,
+}: TypeDef): string {
   if (displayName && SPECIAL_TYPES.includes(displayName)) {
     return displayName;
   }
@@ -73,7 +95,9 @@ function fromDef({ displayName, info, lookupName, sub, type }: TypeDef): string 
     case TypeDefInfo.Result: {
       const [, errSub] = sub as TypeDef[];
 
-      return DISPATCH_ERROR.includes(errSub.lookupName || errSub.type) ? 'DispatchResult' : typeValue;
+      return DISPATCH_ERROR.includes(errSub.lookupName || errSub.type)
+        ? 'DispatchResult'
+        : typeValue;
     }
 
     case TypeDefInfo.Struct:
@@ -89,7 +113,11 @@ function fromDef({ displayName, info, lookupName, sub, type }: TypeDef): string 
       return components[type] === Account ? type : 'Tuple';
 
     case TypeDefInfo.Vec:
-      return type === 'Vec<u8>' ? 'Bytes' : ['Vec<KeyValue>'].includes(type) ? 'Vec<KeyValue>' : 'Vec';
+      return type === 'Vec<u8>'
+        ? 'Bytes'
+        : ['Vec<KeyValue>'].includes(type)
+          ? 'Vec<KeyValue>'
+          : 'Vec';
 
     case TypeDefInfo.VecFixed:
       return (sub as TypeDef).type === 'u8' ? type : 'VecFixed';
@@ -102,7 +130,7 @@ function fromDef({ displayName, info, lookupName, sub, type }: TypeDef): string 
 export default function findComponent(
   registry: Registry,
   def: TypeDef,
-  overrides: ComponentMap = {}
+  overrides: ComponentMap = {},
 ): React.ComponentType<ParamProps> {
   // Explicit/special handling for Account20/32 types where they don't match
   // the actual chain we are connected to
@@ -124,7 +152,8 @@ export default function findComponent(
     type ? overrides[type] || components[type] : null;
 
   const type = fromDef(def);
-  const Component = findOne(def.lookupName) || findOne(def.type) || findOne(type);
+  const Component =
+    findOne(def.lookupName) || findOne(def.type) || findOne(type);
 
   return Component || Unknown;
 }

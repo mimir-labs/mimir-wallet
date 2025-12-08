@@ -11,7 +11,7 @@ function openMetadataDB() {
       }
 
       deleteDB('chain_metadata');
-    }
+    },
   });
 }
 
@@ -25,17 +25,24 @@ export async function getMetadata(network: string) {
     return undefined;
   }
 
-  return { [`${metadata.genesisHash}-${metadata.specVersion}`]: metadata.metadata };
+  return {
+    [`${metadata.genesisHash}-${metadata.specVersion}`]: metadata.metadata,
+  };
 }
 
-export async function saveMetadata(network: string, genesisHash: string, specVersion: string, metadata: string) {
+export async function saveMetadata(
+  network: string,
+  genesisHash: string,
+  specVersion: string,
+  metadata: string,
+) {
   const db = await openMetadataDB();
 
   await db.put('metadata', {
     network,
     genesisHash,
     specVersion,
-    metadata
+    metadata,
   });
 
   db.close();

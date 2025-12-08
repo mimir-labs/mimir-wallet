@@ -22,7 +22,7 @@ import { Input, InputNetwork } from '@/components';
 function checkError(
   signatories: string[],
   isThresholdValid: boolean,
-  hasSoloAccount: boolean
+  hasSoloAccount: boolean,
 ): [Error | null, Error | null] {
   return [
     signatories.length < 2
@@ -32,11 +32,19 @@ function checkError(
         : new Error('You need add at least one local account'),
     isThresholdValid
       ? null
-      : new Error(`Threshold must great or equal than 1 and less or equal than ${signatories.length}`)
+      : new Error(
+          `Threshold must great or equal than 1 and less or equal than ${signatories.length}`,
+        ),
   ];
 }
 
-function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: (network: string) => void }) {
+function CreateMultisig({
+  network,
+  setNetwork,
+}: {
+  network: string;
+  setNetwork: (network: string) => void;
+}) {
   const [name, setName] = useState<string>('');
 
   const [flexible, setFlexible] = useState(false);
@@ -49,12 +57,17 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
     threshold,
     unselect,
     unselected,
-    unselectAll
+    unselectAll,
   } = useSelectMultisig();
-  const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
+  const [[memberError, thresholdError], setErrors] = useState<
+    [Error | null, Error | null]
+  >([null, null]);
   const multisigAddress = useMemo(
-    () => (signatories.length > 1 && threshold > 0 ? encodeMultiAddress(signatories, threshold) : undefined),
-    [signatories, threshold]
+    () =>
+      signatories.length > 1 && threshold > 0
+        ? encodeMultiAddress(signatories, threshold)
+        : undefined,
+    [signatories, threshold],
   );
   const { meta } = useAddressMeta(multisigAddress);
 
@@ -65,7 +78,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
     (value: string) => {
       setThreshold(Number(value));
     },
-    [setThreshold]
+    [setThreshold],
   );
 
   const _onFlexibleCancel = () => {
@@ -86,41 +99,57 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
 
   return (
     <>
-      <div className='mx-auto w-full max-w-[500px]'>
-        <div className='flex items-center justify-between'>
-          <Button onClick={prepare ? _onFlexibleCancel : () => window.history.back()} variant='ghost'>
+      <div className="mx-auto w-full max-w-[500px]">
+        <div className="flex items-center justify-between">
+          <Button
+            onClick={prepare ? _onFlexibleCancel : () => window.history.back()}
+            variant="ghost"
+          >
             {'<'} Back
           </Button>
           <Prepare onSelect={setPrepare} />
         </div>
-        <div className='bg-content1 border-secondary shadow-medium mt-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
-          <div className='space-y-4'>
-            <div className='flex justify-between'>
-              <h3 className='text-base'>Create Multisig</h3>
+        <div className="card-root mt-2.5 p-4 sm:p-5">
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <h3 className="text-base">Create Multisig</h3>
               {/* <Button variant='outlined'>Import</Button> */}
             </div>
             <Divider />
-            <Input label='Name' onChange={setName} placeholder='input multisig account name' value={name} />
+            <Input
+              label="Name"
+              onChange={setName}
+              placeholder="input multisig account name"
+              value={name}
+            />
 
-            <div className='bg-secondary space-y-2.5 rounded-[10px] p-2.5'>
+            <div className="bg-secondary space-y-2.5 rounded-[10px] p-2.5">
               <AccountSelect
                 withSearch
                 scroll
                 accounts={unselected}
                 ignoreAccounts={signatories}
                 onClick={select}
-                title='Addresss book'
-                type='add'
+                title="Addresss book"
+                type="add"
               />
 
-              {memberError && <div className='text-danger'>{memberError.message}</div>}
+              {memberError && (
+                <div className="text-danger">{memberError.message}</div>
+              )}
             </div>
 
-            <div className='bg-secondary space-y-2.5 rounded-[10px] p-2.5'>
-              <AccountSelect scroll={false} accounts={signatories} onClick={unselect} title='Members' type='delete' />
+            <div className="bg-secondary space-y-2.5 rounded-[10px] p-2.5">
+              <AccountSelect
+                scroll={false}
+                accounts={signatories}
+                onClick={unselect}
+                title="Members"
+                type="delete"
+              />
 
               {threshold === 1 ? (
-                <div className='text-foreground/50 flex h-3.5 max-h-3.5 items-center gap-1 text-xs leading-3.5 font-normal'>
+                <div className="text-foreground/50 flex h-3.5 max-h-3.5 items-center gap-1 text-xs leading-3.5 font-normal">
                   <IconInfo />
                   All members can initiate transactions.
                 </div>
@@ -130,25 +159,34 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
             <Input
               defaultValue={String(threshold)}
               error={thresholdError}
-              label='Threshold'
+              label="Threshold"
               onChange={_onChangeThreshold}
             />
 
             <div>
-              <div className='flex items-center justify-between'>
-                <div className='font-bold'>Add Pure Proxy</div>
-                <Switch isSelected={flexible} onValueChange={(checked) => setFlexible(checked)} />
+              <div className="flex items-center justify-between">
+                <div className="font-bold">Add Pure Proxy</div>
+                <Switch
+                  checked={flexible}
+                  onCheckedChange={(checked) => setFlexible(checked)}
+                />
               </div>
-              <p className='text-foreground/50 mt-1 text-xs font-normal'>
+              <p className="text-foreground/50 mt-1 text-xs font-normal">
                 Flexible Multisig allows you to change members and thresholds
               </p>
             </div>
 
-            {flexible && <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} />}
+            {flexible && (
+              <InputNetwork
+                label="Select Network"
+                network={network}
+                setNetwork={setNetwork}
+              />
+            )}
 
             <Tips flexible={flexible} />
 
-            <div className='flex items-center gap-2'>
+            <div className="flex items-center gap-2">
               <Button
                 fullWidth
                 onClick={() => {
@@ -156,7 +194,7 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                   setThreshold(2);
                   unselectAll();
                 }}
-                variant='ghost'
+                variant="ghost"
               >
                 Clear
               </Button>
@@ -174,15 +212,20 @@ function CreateMultisig({ network, setNetwork }: { network: string; setNetwork: 
                       who: signatories,
                       threshold,
                       name,
-                      multisigName: meta.name
+                      multisigName: meta.name,
                     });
                   }}
-                  variant='solid'
+                  variant="solid"
                 >
                   Create
                 </Button>
               ) : (
-                <CreateStatic checkField={checkField} name={name} signatories={signatories} threshold={threshold} />
+                <CreateStatic
+                  checkField={checkField}
+                  name={name}
+                  signatories={signatories}
+                  threshold={threshold}
+                />
               )}
             </div>
           </div>

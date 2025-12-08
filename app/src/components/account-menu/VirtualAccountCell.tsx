@@ -21,16 +21,16 @@ function VirtualAccountCell({
   onSelect,
   selected,
   watchlist = false,
-  withAdd = false
+  withAdd = false,
 }: VirtualAccountCellProps) {
   const { ref, inView } = useInView({
     threshold: 0,
     triggerOnce: false,
-    rootMargin: '50px 0px' // Pre-load items 50px before they enter viewport
+    rootMargin: '50px 0px', // Pre-load items 50px before they enter viewport
   });
 
   return (
-    <div ref={ref} className='w-full'>
+    <div ref={ref} className="w-full">
       {inView ? (
         <AccountCell
           value={value}
@@ -41,7 +41,7 @@ function VirtualAccountCell({
           withAdd={withAdd}
         />
       ) : (
-        <div className='bg-secondary h-[50px] w-full animate-pulse rounded-[10px]' />
+        <div className="bg-secondary h-[50px] w-full animate-pulse rounded-[10px]" />
       )}
     </div>
   );

@@ -3,22 +3,46 @@
 
 import type { AddressMeta } from '@/hooks/types';
 
-import { addressEq, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  addressToHex,
+  encodeAddress,
+  isPolkadotAddress,
+  useChains,
+  useNetwork,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { merge } from 'lodash-es';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
-import { addAddressBook, deleteAddress, hideAccount, resync, setAccountName, setName, showAccount } from './actions';
+import {
+  addAddressBook,
+  deleteAddress,
+  hideAccount,
+  resync,
+  setAccountName,
+  setName,
+  showAccount,
+} from './actions';
 import { AccountContext } from './context';
 
-import { SWITCH_ACCOUNT_REMIND_KEY } from '@/constants';
+import {
+  CURRENT_ADDRESS_HEX_KEY,
+  CURRENT_ADDRESS_PREFIX,
+  SWITCH_ACCOUNT_REMIND_KEY,
+} from '@/constants';
 import { useAddressStore } from '@/hooks/useAddressStore';
 
-export const AddressMetaContext = createContext<Record<`0x${string}`, AddressMeta>>({});
+export const AddressMetaContext = createContext<
+  Record<`0x${string}`, AddressMeta>
+>({});
 
 export function useAccount() {
   const { ss58: chainSS58 } = useSs58Format();
+  const { network } = useNetwork();
+  const { mode } = useChains();
   const { metas, updateMetas } = useContext(AccountContext);
   const overrideMetas = useContext(AddressMetaContext);
 
@@ -31,8 +55,18 @@ export function useAccount() {
     return merge({}, metas, overrideMetas);
   }, [metas, overrideMetas]);
 
-  const { accounts, current, addresses, hideAccountHex, isMultisigSyned, switchAddress } = useAddressStore();
+  const {
+    accounts,
+    addresses,
+    hideAccountHex,
+    isMultisigSyned,
+    switchAddress,
+  } = useAddressStore();
   const navigate = useNavigate();
+
+  // Get current address from URL search params
+  const { address: urlAddress } = useSearch({ strict: false });
+  const current = urlAddress as string | undefined;
 
   const setCurrent = (address: string, confirm?: boolean) => {
     if (address && isPolkadotAddress(address)) {
@@ -46,39 +80,38 @@ export function useAccount() {
 
       useAddressStore.setState({ switchAddress: undefined });
 
-      // update url
+      // Persist to localStorage
+      if (mode === 'omni') {
+        store.set(CURRENT_ADDRESS_HEX_KEY, addressToHex(value));
+      } else {
+        store.set(`${CURRENT_ADDRESS_PREFIX}${network}`, addressToHex(value));
+      }
+
+      // Update URL - this is now the single source of truth for current address
       navigate({
         to: '.',
-        search: (prev) => ({ ...prev, address: value })
+        search: (prev) => ({ ...prev, address: value }),
       });
-
-      useAddressStore.setState({ current: value });
     }
   };
 
   const isLocalAddress = useCallback(
     (address: string, watchlist?: boolean) => {
-      return addresses.some((item) => (watchlist ? !!item.watchlist : true) && addressEq(item.address, address));
+      return addresses.some(
+        (item) =>
+          (watchlist ? !!item.watchlist : true) &&
+          addressEq(item.address, address),
+      );
     },
-    [addresses]
+    [addresses],
   );
 
   const isLocalAccount = useCallback(
     (address: string) => {
       return accounts.some((item) => addressEq(item.address, address));
     },
-    [accounts]
+    [accounts],
   );
-
-  // let current: string | undefined;
-
-  // if (currentAddress) {
-  //   current = currentAddress;
-  // } else {
-  //   const stored = store.get(CURRENT_ADDRESS_HEX_KEY) as string | undefined;
-
-  //   current = stored ? encodeAddress(stored, chainSS58) : undefined;
-  // }
 
   return {
     accounts: accounts,
@@ -99,6 +132,6 @@ export function useAccount() {
     showAccount: showAccount,
     // context
     metas: finalMetas,
-    updateMetas: updateMetas
+    updateMetas: updateMetas,
   };
 }

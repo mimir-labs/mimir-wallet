@@ -14,14 +14,14 @@ function ToastRoot() {
       icons={{
         success: <SuccessAnimation size={30} />,
         error: <FailedAnimation size={30} />,
-        info: <NoticeAnimation size={30} />
+        info: <NoticeAnimation size={30} />,
       }}
-      position='top-right'
-      theme='light'
+      position="top-right"
+      theme="light"
       duration={3000}
       closeButton
     />,
-    document.body
+    document.body,
   );
 }
 

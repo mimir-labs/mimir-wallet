@@ -22,7 +22,16 @@ interface BatchItemBaseProps {
   onToggle: () => void;
 }
 
-function BatchItemBase({ children, actions, from, calldata, bgcolor, registry, isOpen, onToggle }: BatchItemBaseProps) {
+function BatchItemBase({
+  children,
+  actions,
+  from,
+  calldata,
+  bgcolor,
+  registry,
+  isOpen,
+  onToggle,
+}: BatchItemBaseProps) {
   const call = useMemo(() => {
     if (!registry) return null;
 
@@ -36,15 +45,15 @@ function BatchItemBase({ children, actions, from, calldata, bgcolor, registry, i
   return (
     <div
       data-open={isOpen}
-      className='bg-secondary overflow-hidden rounded-[10px]'
+      className="bg-secondary overflow-hidden rounded-[10px]"
       style={{ background: bgcolor }}
-      role='article'
+      role="article"
       aria-expanded={isOpen}
     >
       <div
-        className='grid h-[44px] cursor-pointer grid-cols-6 px-2 text-sm sm:px-3'
+        className="grid h-[44px] cursor-pointer grid-cols-6 px-2 text-sm sm:px-3"
         onClick={onToggle}
-        role='button'
+        role="button"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -54,21 +63,25 @@ function BatchItemBase({ children, actions, from, calldata, bgcolor, registry, i
         }}
       >
         {children}
-        <div className='col-span-2 flex items-center'>
-          <span className='overflow-hidden text-ellipsis'>
+        <div className="col-span-2 flex items-center">
+          <span className="overflow-hidden text-ellipsis">
             {/* registry is guaranteed non-null here since call is non-null (call requires registry) */}
-            <CallDisplayDetail fallbackWithName registry={registry!} call={call} />
+            <CallDisplayDetail
+              fallbackWithName
+              registry={registry!}
+              call={call}
+            />
           </span>
         </div>
-        <div className='col-span-1 flex items-center justify-between'>
+        <div className="col-span-1 flex items-center justify-between">
           {actions || <div />}
           <Button
             isIconOnly
-            size='sm'
-            variant='light'
-            color='primary'
+            size="sm"
+            variant="light"
+            color="primary"
             data-open={isOpen}
-            className='rotate-0 data-[open=true]:rotate-180'
+            className="rotate-0 data-[open=true]:rotate-180"
             onClick={onToggle}
             aria-label={isOpen ? 'Collapse details' : 'Expand details'}
           >
@@ -78,7 +91,7 @@ function BatchItemBase({ children, actions, from, calldata, bgcolor, registry, i
       </div>
 
       {isOpen && (
-        <div className='bg-content1 @container mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
+        <div className="bg-background @container mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3">
           {/* registry is guaranteed non-null here since call is non-null (call requires registry) */}
           <Call showFallback from={from} call={call} registry={registry!} />
         </div>

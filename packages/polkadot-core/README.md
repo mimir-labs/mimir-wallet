@@ -35,13 +35,13 @@ This package serves as the foundational layer for Polkadot ecosystem integration
 This package is part of the Mimir Wallet monorepo and is typically not installed separately. However, if you need to use it in your own project:
 
 ```bash
-yarn add @mimir-wallet/polkadot-core
+pnpm add @mimir-wallet/polkadot-core
 ```
 
 ### Peer Dependencies
 
 ```bash
-yarn add react react-dom zustand @polkadot/api @polkadot/types @polkadot/util
+pnpm add react react-dom zustand @polkadot/api @polkadot/types @polkadot/util
 ```
 
 ## Usage

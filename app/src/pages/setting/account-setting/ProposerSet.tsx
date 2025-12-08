@@ -19,7 +19,7 @@ import {
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow
+  TableRow,
 } from '@mimir-wallet/ui';
 import { memo, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
@@ -38,7 +38,7 @@ function AddModal({
   account,
   isOpen,
   onClose,
-  refetch
+  refetch,
 }: {
   type: 'add' | 'delete';
   deleteProposer?: string;
@@ -67,17 +67,24 @@ function AddModal({
       return;
     }
 
-    const injected = await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(CONNECT_ORIGIN);
+    const injected =
+      await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(
+        CONNECT_ORIGIN,
+      );
     const injectSigner = injected?.signer;
 
     if (!injectSigner) {
-      toastError(`Please connect to the wallet: ${walletConfig[source]?.name || source}`);
+      toastError(
+        `Please connect to the wallet: ${walletConfig[source]?.name || source}`,
+      );
 
       return;
     }
 
     if (!injectSigner.signRaw) {
-      toastError(`Wallet ${walletConfig[source]?.name || source} does not support signRaw`);
+      toastError(
+        `Wallet ${walletConfig[source]?.name || source} does not support signRaw`,
+      );
 
       return;
     }
@@ -93,7 +100,7 @@ Genesis Hash: ${genesisHash}`;
       const result = await injectSigner.signRaw({
         address: signer,
         data: message,
-        type: 'bytes'
+        type: 'bytes',
       });
 
       await service.account[type === 'add' ? 'addProposer' : 'removeProposer'](
@@ -102,7 +109,7 @@ Genesis Hash: ${genesisHash}`;
         proposer,
         result.signature,
         signer,
-        time
+        time,
       );
       refetch();
       onClose();
@@ -119,11 +126,11 @@ Genesis Hash: ${genesisHash}`;
       <ModalContent>
         <ModalHeader>Set New Proposer</ModalHeader>
         <Divider />
-        <ModalBody className='gap-y-5'>
+        <ModalBody className="gap-y-5">
           <InputAddress
             label={type === 'add' ? 'Proposer' : 'Proposer to delete'}
             disabled={type === 'delete'}
-            placeholder='Please input proposer address. e.g.5G789...'
+            placeholder="Please input proposer address. e.g.5G789..."
             value={type === 'add' ? proposer : deleteProposer}
             onChange={type === 'add' ? setProposer : undefined}
             helper={
@@ -133,8 +140,8 @@ Genesis Hash: ${genesisHash}`;
             }
           />
           <InputAddress
-            label='Select signer'
-            placeholder='Please select signer address. e.g.5G789...'
+            label="Select signer"
+            placeholder="Please select signer address. e.g.5G789..."
             isSign
             filtered={filtered}
             value={signer}
@@ -167,7 +174,13 @@ Genesis Hash: ${genesisHash}`;
   );
 }
 
-function ProposerSet({ account, refetch }: { account: AccountData; refetch: () => void }) {
+function ProposerSet({
+  account,
+  refetch,
+}: {
+  account: AccountData;
+  refetch: () => void;
+}) {
   const [isOpen, toggleOpen] = useToggle(false);
   const [type, setType] = useState<'add' | 'delete'>('add');
   const [deleteProposer, setDeleteProposer] = useState<string>();
@@ -176,48 +189,65 @@ function ProposerSet({ account, refetch }: { account: AccountData; refetch: () =
 
   return (
     <>
-      <div className='space-y-5'>
-        <Table
-          removeWrapper
-          classNames={{
-            th: 'bg-transparent text-sm font-bold',
-            td: 'text-sm'
-          }}
-        >
+      <div className="space-y-5">
+        <Table>
           <TableHeader>
-            <TableColumn>Proposer</TableColumn>
-            <TableColumn>Creator</TableColumn>
-            <TableColumn align='end'>Operation</TableColumn>
+            <TableRow>
+              <TableColumn className="text-sm font-bold">Proposer</TableColumn>
+              <TableColumn className="text-sm font-bold">Creator</TableColumn>
+              <TableColumn className="text-right text-sm font-bold">
+                Operation
+              </TableColumn>
+            </TableRow>
           </TableHeader>
 
-          <TableBody
-            items={proposers}
-            emptyContent={<Empty className='text-foreground' height='150px' label='No proposers' />}
-          >
-            {(item) => (
-              <TableRow key={item.proposer}>
-                <TableCell>
-                  <AddressRow shorten withCopy iconSize={20} value={item.proposer} />
-                </TableCell>
-                <TableCell>
-                  <AddressRow shorten withCopy iconSize={20} value={item.creator} />
-                </TableCell>
-                <TableCell align='right'>
-                  <Button
-                    isIconOnly
-                    size='sm'
-                    variant='light'
-                    color='danger'
-                    onClick={() => {
-                      toggleOpen(true);
-                      setDeleteProposer(item.proposer);
-                      setType('delete');
-                    }}
-                  >
-                    <IconDelete />
-                  </Button>
+          <TableBody>
+            {!proposers || proposers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3}>
+                  <Empty
+                    className="text-foreground"
+                    height="150px"
+                    label="No proposers"
+                  />
                 </TableCell>
               </TableRow>
+            ) : (
+              proposers.map((item) => (
+                <TableRow key={item.proposer}>
+                  <TableCell>
+                    <AddressRow
+                      shorten
+                      withCopy
+                      iconSize={20}
+                      value={item.proposer}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <AddressRow
+                      shorten
+                      withCopy
+                      iconSize={20}
+                      value={item.creator}
+                    />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      color="danger"
+                      onClick={() => {
+                        toggleOpen(true);
+                        setDeleteProposer(item.proposer);
+                        setType('delete');
+                      }}
+                    >
+                      <IconDelete />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>

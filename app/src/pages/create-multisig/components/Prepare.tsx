@@ -22,7 +22,7 @@ function Prepare({ onSelect }: { onSelect: (data: PrepareFlexible) => void }) {
   return (
     <>
       {prepares.length > 0 && (
-        <Button color='primary' onClick={toggleOpen} variant='light'>
+        <Button color="primary" onClick={toggleOpen} variant="light">
           <IconInfo />
           {prepares.length} unfinished creation
         </Button>
@@ -30,29 +30,38 @@ function Prepare({ onSelect }: { onSelect: (data: PrepareFlexible) => void }) {
 
       <Modal onClose={toggleOpen} hideCloseButton isOpen={open}>
         <ModalContent>
-          <ModalBody className='gap-4'>
+          <ModalBody className="gap-4">
             {prepares.map((item, index) => (
               <Button
-                color='secondary'
+                color="secondary"
                 key={index}
                 onClick={() => {
                   if (item.pure) {
                     onSelect({
                       creator: item.creator,
-                      who: item.who.map((address) => encodeAddress(address, chain.ss58Format)),
+                      who: item.who.map((address) =>
+                        encodeAddress(address, chain.ss58Format),
+                      ),
                       threshold: item.threshold,
                       name: item.name,
                       multisigName: item.multisigName,
-                      pure: item.pure ? encodeAddress(item.pure, chain.ss58Format) : null,
+                      pure: item.pure
+                        ? encodeAddress(item.pure, chain.ss58Format)
+                        : null,
                       blockNumber: item.blockNumber,
-                      extrinsicIndex: item.extrinsicIndex
+                      extrinsicIndex: item.extrinsicIndex,
                     });
                     toggleOpen();
                   }
                 }}
-                className='text-foreground flex items-center justify-between'
+                className="text-foreground flex items-center justify-between"
               >
-                <AddressRow defaultName={item.name} withAddress withName value={item.pure} />
+                <AddressRow
+                  defaultName={item.name}
+                  withAddress
+                  withName
+                  value={item.pure}
+                />
               </Button>
             ))}
           </ModalBody>

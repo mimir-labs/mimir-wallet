@@ -11,7 +11,5 @@ export type {
   ChainStatus,
   ApiConnection,
   Ss58FormatControl,
-  ApiManagerListener
+  ApiManagerListener,
 } from './types.js';
-
-export { typesBundle, typesChain } from './api-types/index.js';

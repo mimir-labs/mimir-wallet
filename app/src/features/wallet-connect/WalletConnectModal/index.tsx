@@ -1,7 +1,13 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Modal, ModalBody, ModalContent, ModalHeader, VisuallyHidden } from '@mimir-wallet/ui';
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  VisuallyHidden,
+} from '@mimir-wallet/ui';
 import React, { useContext } from 'react';
 
 import { WalletConnectContext } from '../context';
@@ -9,7 +15,13 @@ import { WalletConnectContext } from '../context';
 import Connect from './Connect';
 import Session from './Session';
 
-function WalletConnectModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function WalletConnectModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const { sessionProposal, sessions } = useContext(WalletConnectContext);
 
   return (
@@ -18,8 +30,12 @@ function WalletConnectModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         <VisuallyHidden asChild>
           <ModalHeader>Wallet Connect</ModalHeader>
         </VisuallyHidden>
-        <ModalBody className='py-5'>
-          {sessionProposal ? <Session proposal={sessionProposal} onClose={onClose} /> : <Connect sessions={sessions} />}
+        <ModalBody className="py-5">
+          {sessionProposal ? (
+            <Session proposal={sessionProposal} onClose={onClose} />
+          ) : (
+            <Connect sessions={sessions} />
+          )}
         </ModalBody>
       </ModalContent>
     </Modal>

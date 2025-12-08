@@ -7,7 +7,7 @@ import {
   parseAccountFromLocation,
   parseJunctions,
   parseLocationChain,
-  XcmNetworkNotSupportError
+  XcmNetworkNotSupportError,
 } from '../../../src/xcm/parseLocation.js';
 
 // Mock junction types
@@ -26,7 +26,7 @@ function createMockJunction(type: string, value: any) {
     isAccountId32: false,
     isPalletInstance: false,
     isGeneralIndex: false,
-    isGeneralKey: false
+    isGeneralKey: false,
   };
 
   if (type === 'Here') {
@@ -43,11 +43,15 @@ function createMockJunction(type: string, value: any) {
 }
 
 // Mock XCM versioned location
-function createMockVersionedLocation(version: 'V3' | 'V4' | 'V5', parents: number, interior: any) {
+function createMockVersionedLocation(
+  version: 'V3' | 'V4' | 'V5',
+  parents: number,
+  interior: any,
+) {
   const location: any = {
     isV3: false,
     isV4: false,
-    isV5: false
+    isV5: false,
   };
 
   const versionKey = `is${version}` as keyof typeof location;
@@ -56,7 +60,7 @@ function createMockVersionedLocation(version: 'V3' | 'V4' | 'V5', parents: numbe
   location[versionKey] = true;
   location[asVersionKey] = {
     parents: { toNumber: () => parents },
-    interior
+    interior,
   };
 
   return location;
@@ -69,7 +73,7 @@ function createMockInteriorJunction(type: string, value: any) {
     isAccountId32: false,
     isPalletInstance: false,
     isGeneralIndex: false,
-    isGeneralKey: false
+    isGeneralKey: false,
   };
 
   if (type === 'Parachain') {
@@ -88,7 +92,7 @@ function createMockInteriorJunction(type: string, value: any) {
     junction.isGeneralKey = true;
     junction.asGeneralKey = {
       data: { toHex: () => value },
-      toHuman: () => ({ data: value })
+      toHuman: () => ({ data: value }),
     };
   }
 
@@ -139,9 +143,12 @@ describe('parseLocation', () => {
       const parachainJunction = createMockInteriorJunction('Parachain', 1000);
       const accountJunction = createMockInteriorJunction(
         'AccountId32',
-        '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
+        '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
       );
-      const junction = createMockJunction('X2', [parachainJunction, accountJunction]);
+      const junction = createMockJunction('X2', [
+        parachainJunction,
+        accountJunction,
+      ]);
       const result = parseJunctions(junction);
 
       expect(result).toHaveLength(2);
@@ -157,10 +164,12 @@ describe('parseLocation', () => {
         isX5: false,
         isX6: false,
         isX7: false,
-        isX8: false
+        isX8: false,
       };
 
-      expect(() => parseJunctions(invalidJunction as any)).toThrow('Cannot parse junctions');
+      expect(() => parseJunctions(invalidJunction as any)).toThrow(
+        'Cannot parse junctions',
+      );
     });
   });
 
@@ -206,10 +215,12 @@ describe('parseLocation', () => {
         isV4: false,
         isV5: false,
         isV1: true,
-        asV1: {}
+        asV1: {},
       };
 
-      expect(() => parseLocationChain(location as any)).toThrow('Unknown version for XcmVersionedLocation');
+      expect(() => parseLocationChain(location as any)).toThrow(
+        'Unknown version for XcmVersionedLocation',
+      );
     });
   });
 
@@ -224,7 +235,10 @@ describe('parseLocation', () => {
 
     it('should extract AccountId32 from location', () => {
       const accountAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
-      const accountJunction = createMockInteriorJunction('AccountId32', accountAddress);
+      const accountJunction = createMockInteriorJunction(
+        'AccountId32',
+        accountAddress,
+      );
       const interior = createMockJunction('X1', [accountJunction]);
       const location = createMockVersionedLocation('V3', 0, interior);
       const result = parseAccountFromLocation(location);
@@ -244,8 +258,14 @@ describe('parseLocation', () => {
     it('should get AccountId32 from last position in X2', () => {
       const parachainJunction = createMockInteriorJunction('Parachain', 1000);
       const accountAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
-      const accountJunction = createMockInteriorJunction('AccountId32', accountAddress);
-      const interior = createMockJunction('X2', [parachainJunction, accountJunction]);
+      const accountJunction = createMockInteriorJunction(
+        'AccountId32',
+        accountAddress,
+      );
+      const interior = createMockJunction('X2', [
+        parachainJunction,
+        accountJunction,
+      ]);
       const location = createMockVersionedLocation('V3', 1, interior);
       const result = parseAccountFromLocation(location);
 

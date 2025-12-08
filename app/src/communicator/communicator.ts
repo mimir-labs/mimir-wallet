@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { State } from './types';
-import type { MessageTypes, ResponseTypes, TransportRequestMessage } from '@polkadot/extension-base/background/types';
+import type {
+  MessageTypes,
+  ResponseTypes,
+  TransportRequestMessage,
+} from '@polkadot/extension-base/background/types';
 import type { SignerPayloadJSON } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 import type { MutableRefObject } from 'react';
@@ -24,13 +28,19 @@ export abstract class Communicator {
     this.#state = state;
   }
 
-  public abstract sendMessage(id: string, response?: unknown, subscription?: unknown): void;
+  public abstract sendMessage(
+    id: string,
+    response?: unknown,
+    subscription?: unknown,
+  ): void;
 
   public async handle<TMessageType extends MessageTypes>({
     id,
     message: type,
-    request
-  }: TransportRequestMessage<TMessageType>): Promise<ResponseTypes[keyof ResponseTypes]> {
+    request,
+  }: TransportRequestMessage<TMessageType>): Promise<
+    ResponseTypes[keyof ResponseTypes]
+  > {
     // if (type === 'pub(phishing.redirectIfDenied)') {
     //   return this.redirectIfPhishing(url);
     // }
@@ -43,7 +53,9 @@ export abstract class Communicator {
       case 'pub(authorize.tab)':
         return {
           result: true,
-          authorizedAccounts: this.#state.current.getAccounts().map((item) => item.address)
+          authorizedAccounts: this.#state.current
+            .getAccounts()
+            .map((item) => item.address),
         };
 
       case 'pub(accounts.list)':
@@ -63,7 +75,10 @@ export abstract class Communicator {
         throw new Error('not support for sign');
 
       case 'pub(extrinsic.sign)':
-        return this.#state.current.extrinsicSign(request as SignerPayloadJSON, id);
+        return this.#state.current.extrinsicSign(
+          request as SignerPayloadJSON,
+          id,
+        );
 
       case 'pub(metadata.list)':
         throw new Error('not implements');
@@ -101,7 +116,9 @@ export abstract class Communicator {
   }
 
   private async getCall(hash: HexString): Promise<HexString> {
-    const endpoint = allEndpoints.find((item) => item.genesisHash === this.#state.current.genesisHash);
+    const endpoint = allEndpoints.find(
+      (item) => item.genesisHash === this.#state.current.genesisHash,
+    );
 
     assert(endpoint, 'not support get call for current chain');
 

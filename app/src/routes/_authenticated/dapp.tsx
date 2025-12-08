@@ -6,8 +6,6 @@ import type { RouteMetadata } from '@/hooks/usePageTitle';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
-import PageDapp from '@/pages/dapp';
-
 /**
  * DApp Hub Route (/dapp)
  *
@@ -16,13 +14,12 @@ import PageDapp from '@/pages/dapp';
  */
 
 const dappSearchSchema = z.object({
-  tab: z.enum(['apps', 'custom']).optional().default('apps')
+  tab: z.enum(['apps', 'custom']).optional().default('apps'),
 });
 
 export const Route = createFileRoute('/_authenticated/dapp')({
   validateSearch: dappSearchSchema,
   staticData: {
-    title: 'Dapp'
+    title: 'Dapp',
   } as RouteMetadata,
-  component: PageDapp
 });

@@ -13,7 +13,7 @@ export function parseCsv(
   file: File,
   onDataParsed: (data: MultiTransferData[], invalidAssets?: string[]) => void,
   availableAssets: CompleteEnhancedAssetInfo[],
-  onError?: (error: string) => void
+  onError?: (error: string) => void,
 ) {
   const reader = new FileReader();
 
@@ -49,12 +49,17 @@ export function parseCsv(
         return null;
       });
 
-      const validData = parsedData.filter<MultiTransferData>((item): item is MultiTransferData => item !== null);
+      const validData = parsedData.filter<MultiTransferData>(
+        (item): item is MultiTransferData => item !== null,
+      );
 
       // filter out invalid assets and report them
       const invalidAssets = validateAssetIds(validData, availableAssets);
       const filteredData = validData.filter(([, assetId]) => {
-        return assetId === 'native' || availableAssets.some((asset) => asset.assetId === assetId);
+        return (
+          assetId === 'native' ||
+          availableAssets.some((asset) => asset.assetId === assetId)
+        );
       });
 
       onDataParsed(filteredData, invalidAssets);
@@ -63,7 +68,7 @@ export function parseCsv(
       onError?.(error.message);
     },
     header: false,
-    skipEmptyLines: true
+    skipEmptyLines: true,
   });
 }
 
@@ -72,7 +77,7 @@ export function generateExampleCsv() {
     ['address', 'assetId', 'amount'],
     ['111111111111111111111111111111111HC1', 'native', '0.001'],
     ['111111111111111111111111111111111HC1', '1984', '0.001'],
-    ['111111111111111111111111111111111HC1', '1337', '0.001']
+    ['111111111111111111111111111111111HC1', '1337', '0.001'],
   ];
 
   // Convert array to CSV format
@@ -100,7 +105,10 @@ export function generateExampleCsv() {
  * @param availableAssets - Available assets on the current network
  * @returns Array of invalid asset IDs
  */
-export function validateAssetIds(data: MultiTransferData[], availableAssets: CompleteEnhancedAssetInfo[]): string[] {
+export function validateAssetIds(
+  data: MultiTransferData[],
+  availableAssets: CompleteEnhancedAssetInfo[],
+): string[] {
   const invalidAssetIds: string[] = [];
   const validAssetIds = new Set(['native']); // 'native' is always valid
 

@@ -19,11 +19,11 @@ const FAB_MARGIN = 8;
 export function useDraggableFAB({
   initialPosition,
   size = FAB_SIZE,
-  margin = FAB_MARGIN
+  margin = FAB_MARGIN,
 }: UseDraggableFABOptions = {}) {
   return useDraggableSquare<HTMLButtonElement>({
     initialPosition,
     size,
-    margin
+    margin,
   });
 }

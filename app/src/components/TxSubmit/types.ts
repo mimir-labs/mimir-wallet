@@ -3,7 +3,11 @@
 
 import type { FilterPath, Transaction } from '@/hooks/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
+import type {
+  ExtrinsicPayloadValue,
+  IMethod,
+  ISubmittableResult,
+} from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 export interface TxSubmitProps {
@@ -26,7 +30,7 @@ export interface TxSubmitProps {
     signer: string,
     signature: HexString,
     signedTransaction: HexString,
-    payload: ExtrinsicPayloadValue
+    payload: ExtrinsicPayloadValue,
   ) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }

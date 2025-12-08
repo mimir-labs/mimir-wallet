@@ -18,19 +18,22 @@ export function useFrontendAction() {
    * @param toolName - Name of the tool/action
    * @param toolInput - Tool input parameters
    */
-  const triggerFrontendAction = useCallback((toolName: string, toolInput: unknown) => {
-    // Create function call event for frontend listeners
-    const functionCallEvent: FunctionCallEvent = {
-      id: `${toolName}-${Date.now()}`,
-      name: toolName,
-      arguments: toFunctionCallArguments(toolInput),
-      timestamp: new Date()
-    };
+  const triggerFrontendAction = useCallback(
+    (toolName: string, toolInput: unknown) => {
+      // Create function call event for frontend listeners
+      const functionCallEvent: FunctionCallEvent = {
+        id: `${toolName}-${Date.now()}`,
+        name: toolName,
+        arguments: toFunctionCallArguments(toolInput),
+        timestamp: new Date(),
+      };
 
-    // Emit to frontend listeners (navigation, modals, etc.)
-    // This is fire-and-forget event emission
-    functionCallManager.emitFunctionCall(functionCallEvent);
-  }, []);
+      // Emit to frontend listeners (navigation, modals, etc.)
+      // This is fire-and-forget event emission
+      functionCallManager.emitFunctionCall(functionCallEvent);
+    },
+    [],
+  );
 
   return { triggerFrontendAction };
 }

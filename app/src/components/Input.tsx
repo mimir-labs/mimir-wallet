@@ -29,7 +29,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       value,
       ...props
     },
-    ref
+    ref,
   ) => {
     const startRef = useRef<HTMLDivElement>(null);
     const endRef = useRef<HTMLDivElement>(null);
@@ -40,7 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange?.(e.target.value);
       },
-      [onChange]
+      [onChange],
     );
 
     useEffect(() => {
@@ -68,14 +68,17 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn('flex flex-col', fullWidth && 'w-full', className)}>
         {label && (
-          <label className='mb-2 text-sm leading-none font-bold peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
+          <label className="mb-2 text-sm leading-none font-bold peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             {label}
           </label>
         )}
 
-        <div className='relative flex items-center'>
+        <div className="relative flex items-center">
           {startAdornment && (
-            <div ref={startRef} className='absolute left-3 z-10 flex items-center'>
+            <div
+              ref={startRef}
+              className="absolute left-3 z-10 flex items-center"
+            >
               {startAdornment}
             </div>
           )}
@@ -85,7 +88,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(errorClass)}
             style={{
               paddingLeft: startWidth > 0 ? `${startWidth}px` : undefined,
-              paddingRight: endWidth > 0 ? `${endWidth}px` : undefined
+              paddingRight: endWidth > 0 ? `${endWidth}px` : undefined,
             }}
             aria-invalid={!!error}
             value={value}
@@ -102,24 +105,29 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           />
 
           {endAdornment && (
-            <div ref={endRef} className='absolute right-3 z-10 flex items-center'>
+            <div
+              ref={endRef}
+              className="absolute right-3 z-10 flex items-center"
+            >
               {endAdornment}
             </div>
           )}
 
-          {endButton && <div className='ml-2'>{endButton}</div>}
+          {endButton && <div className="ml-2">{endButton}</div>}
         </div>
 
         {error && (
           <>
-            <p className='text-danger mt-[5px] text-xs'>{error.message}</p>
+            <p className="text-danger mt-[5px] text-xs">{error.message}</p>
           </>
         )}
 
-        {helper && <p className='text-foreground/50 mt-[5px] text-xs'>{helper}</p>}
+        {helper && (
+          <p className="text-foreground/50 mt-[5px] text-xs">{helper}</p>
+        )}
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = 'Input';

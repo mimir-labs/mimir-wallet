@@ -7,6 +7,6 @@ import { mergeConfig } from 'vitest/config';
 export default mergeConfig(vitestConfig, {
   test: {
     include: ['tests/unit/**/*.test.ts'],
-    exclude: ['node_modules', 'dist', 'tests/integration/**']
-  }
+    exclude: ['node_modules', 'dist', 'tests/integration/**'],
+  },
 });

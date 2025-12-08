@@ -23,26 +23,34 @@ interface FundContentProps {
   setNetwork: (network: string) => void;
 }
 
-function FundContent({ filterSending, receipt, network, supportedNetworks, setNetwork }: FundContentProps) {
+function FundContent({
+  filterSending,
+  receipt,
+  network,
+  supportedNetworks,
+  setNetwork,
+}: FundContentProps) {
   const [sending, setSending] = useState<string>(filterSending.at(0) || '');
   const [keepAlive, toggleKeepAlive] = useToggle(true);
   const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
   const [assetId, setAssetId] = useState('native');
   const [assets] = useChainXcmAsset(network);
   const token = useMemo(() => {
-    const foundAsset = assets?.find((item) => (assetId === 'native' ? item.isNative : item.key === assetId));
+    const foundAsset = assets?.find((item) =>
+      assetId === 'native' ? item.isNative : item.key === assetId,
+    );
 
     return foundAsset;
   }, [assetId, assets]);
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <div className='mx-auto w-full max-w-[500px] p-4 sm:p-5'>
-      <Button onClick={() => window.history.back()} variant='ghost'>
+    <div className="mx-auto w-full max-w-[500px] p-4 sm:p-5">
+      <Button onClick={() => window.history.back()} variant="ghost">
         {'<'} Back
       </Button>
-      <div className='border-secondary bg-content1 shadow-medium mt-4 rounded-[20px] border-1 p-4 sm:p-6'>
-        <div className='flex flex-col gap-5'>
+      <div className="card-root mt-4 p-4 sm:p-6">
+        <div className="flex flex-col gap-5">
           <h3>Fund</h3>
           <TransferContent
             disabledRecipient
@@ -64,7 +72,7 @@ function FundContent({ filterSending, receipt, network, supportedNetworks, setNe
           />
 
           {error && (
-            <Alert variant='destructive'>
+            <Alert variant="destructive">
               <AlertTitle>{error}</AlertTitle>
             </Alert>
           )}
@@ -79,7 +87,8 @@ function FundContent({ filterSending, receipt, network, supportedNetworks, setNe
             recipient={receipt}
             onDone={() => setError(null)}
             onError={(err: unknown) => {
-              const message = err instanceof Error ? err.message : 'Something went wrong';
+              const message =
+                err instanceof Error ? err.message : 'Something went wrong';
 
               setError(message);
             }}
@@ -100,7 +109,7 @@ function PageFund() {
   const supportedNetworks = useAddressSupportedNetworks(receipt);
   const [network, setNetwork] = useInputNetwork(
     undefined,
-    supportedNetworks?.map((item) => item.key)
+    supportedNetworks?.map((item) => item.key),
   );
 
   // Enable network when it changes

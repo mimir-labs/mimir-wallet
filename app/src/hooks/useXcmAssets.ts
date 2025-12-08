@@ -4,16 +4,27 @@
 import type { HexString } from '@polkadot/util/types';
 
 import { allEndpoints, getChainIcon } from '@mimir-wallet/polkadot-core';
-import { type CompleteEnhancedAssetInfo, service, useQuery } from '@mimir-wallet/service';
+import {
+  type CompleteEnhancedAssetInfo,
+  service,
+  useQuery,
+} from '@mimir-wallet/service';
 import { isEqual } from 'lodash-es';
 import { useMemo } from 'react';
 
 import { findAsset } from '@/config/tokens';
 
-export const queryXcmAssetKey = (chain: string, identifier: string) => ['query-xcm-asset', chain, identifier];
+export const queryXcmAssetKey = (chain: string, identifier: string) => [
+  'query-xcm-asset',
+  chain,
+  identifier,
+];
 
 // Helper function to enhance asset with local icon
-function enhanceAssetWithLocalIcon(asset: CompleteEnhancedAssetInfo, network: string): CompleteEnhancedAssetInfo {
+function enhanceAssetWithLocalIcon(
+  asset: CompleteEnhancedAssetInfo,
+  network: string,
+): CompleteEnhancedAssetInfo {
   let localIcon: string | undefined;
 
   if (asset.isNative) {
@@ -31,19 +42,27 @@ function enhanceAssetWithLocalIcon(asset: CompleteEnhancedAssetInfo, network: st
 
   return {
     ...asset,
-    logoUri: localIcon || asset.logoUri // Prioritize local icon
+    logoUri: localIcon || asset.logoUri, // Prioritize local icon
   };
 }
 
 export function useXcmAsset(
   chain?: string,
-  identifier?: 'native' | HexString | string | null
-): [data: CompleteEnhancedAssetInfo | undefined, isFetched: boolean, isFetching: boolean] {
-  const chainKey = allEndpoints.find((item) => item.genesisHash === chain || item.key === chain)?.key;
+  identifier?: 'native' | HexString | string | null,
+): [
+  data: CompleteEnhancedAssetInfo | undefined,
+  isFetched: boolean,
+  isFetching: boolean,
+] {
+  const chainKey = allEndpoints.find(
+    (item) => item.genesisHash === chain || item.key === chain,
+  )?.key;
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: queryXcmAssetKey(chainKey || '', identifier || ''),
-    queryFn: async ({ queryKey: [, chainKey, identifier] }): Promise<CompleteEnhancedAssetInfo> => {
+    queryFn: async ({
+      queryKey: [, chainKey, identifier],
+    }): Promise<CompleteEnhancedAssetInfo> => {
       if (!identifier || !chainKey) {
         throw new Error('identifier is required');
       }
@@ -56,7 +75,7 @@ export function useXcmAsset(
     enabled: !!chain && !!identifier,
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
-    }
+    },
   });
 
   // Enhance data with local icon
@@ -78,7 +97,7 @@ export function useAllXcmAsset() {
     refetchOnWindowFocus: false,
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
-    }
+    },
   });
 
   // Enhance all assets with local icons
@@ -88,7 +107,9 @@ export function useAllXcmAsset() {
     const enhancedAssets: Record<string, CompleteEnhancedAssetInfo[]> = {};
 
     for (const [network, assets] of Object.entries(data)) {
-      enhancedAssets[network] = assets.map((asset) => enhanceAssetWithLocalIcon(asset, network));
+      enhancedAssets[network] = assets.map((asset) =>
+        enhanceAssetWithLocalIcon(asset, network),
+      );
     }
 
     return enhancedAssets;
@@ -99,14 +120,16 @@ export function useAllXcmAsset() {
 
 export function useChainXcmAsset(network: string) {
   const [data, isFetched, isFetching, promise] = useAllXcmAsset();
-  const chainKey = allEndpoints.find((item) => item.genesisHash === network || item.key === network)?.key;
+  const chainKey = allEndpoints.find(
+    (item) => item.genesisHash === network || item.key === network,
+  )?.key;
 
   return useMemo(() => {
     return [
       chainKey ? (data?.[chainKey] ?? []) : [],
       isFetched,
       isFetching,
-      () => (chainKey ? promise.then((data) => data[chainKey] ?? []) : [])
+      () => (chainKey ? promise.then((data) => data[chainKey] ?? []) : []),
     ] as const;
   }, [data, isFetched, isFetching, chainKey, promise]);
 }

@@ -7,7 +7,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { dapps } from '@/config';
-import PageExplorer from '@/pages/explorer';
 import { isSameOrigin } from '@/utils';
 
 /**
@@ -22,7 +21,7 @@ const explorerSearchSchema = z.object({
   from: z.string().optional(),
   assetId: z.string().optional(),
   asset_network: z.string().optional(),
-  to: z.string().optional()
+  to: z.string().optional(),
 });
 
 export const Route = createFileRoute('/_authenticated/explorer/$url')({
@@ -31,8 +30,8 @@ export const Route = createFileRoute('/_authenticated/explorer/$url')({
     // Explorer needs full-screen layout without padding
     return {
       layoutOptions: {
-        withPadding: false
-      }
+        withPadding: false,
+      },
     };
   },
   staticData: {
@@ -41,10 +40,12 @@ export const Route = createFileRoute('/_authenticated/explorer/$url')({
 
       if (!appUrl) return 'Explorer';
 
-      const dapp = dapps.find((item) => item.url.startsWith('https://') && isSameOrigin(item.url, appUrl));
+      const dapp = dapps.find(
+        (item) =>
+          item.url.startsWith('https://') && isSameOrigin(item.url, appUrl),
+      );
 
       return dapp ? dapp.name : `Explorer(${appUrl})`;
-    }
+    },
   } as RouteMetadata,
-  component: PageExplorer
 });

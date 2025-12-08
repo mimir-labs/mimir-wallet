@@ -39,19 +39,31 @@ type OptionalKeys<T> = Exclude<AllKeys<T>, SharedKeys<T>>;
 /**
  * Get the type of a key from any member of the union
  */
-type UnionValue<T, K extends PropertyKey> = T extends unknown ? (K extends keyof T ? T[K] : never) : never;
+type UnionValue<T, K extends PropertyKey> = T extends unknown
+  ? K extends keyof T
+    ? T[K]
+    : never
+  : never;
 
 /**
  * Widen literal types to base types
  */
-type Widen<T> = T extends string ? string : T extends number ? number : T extends boolean ? boolean : T;
+type Widen<T> = T extends string
+  ? string
+  : T extends number
+    ? number
+    : T extends boolean
+      ? boolean
+      : T;
 
 /**
  * Required fields: exist in ALL chain configs, non-optional
  * Except genesisHash which is overridden to HexString, and wsUrl to Record<string, string>
  */
 type RequiredFieldsFromJSON = {
-  [K in Exclude<SharedKeys<AllChains>, 'genesisHash' | 'wsUrl'>]: Widen<AllChains[K]>;
+  [K in Exclude<SharedKeys<AllChains>, 'genesisHash' | 'wsUrl'>]: Widen<
+    AllChains[K]
+  >;
 };
 
 /**

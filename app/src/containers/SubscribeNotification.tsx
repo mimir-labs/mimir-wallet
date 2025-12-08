@@ -11,7 +11,10 @@ import { useEffect, useMemo } from 'react';
 import { useAccount } from '@/accounts/useAccount';
 import { Address } from '@/components';
 import { toastError, toastSuccess } from '@/components/utils';
-import { type NotificationMessage, notificationStore } from '@/hooks/useNotifications';
+import {
+  type NotificationMessage,
+  notificationStore,
+} from '@/hooks/useNotifications';
 import { formatTransactionId } from '@/transactions';
 
 const handler = (message: NotificationMessage) => {
@@ -19,39 +22,53 @@ const handler = (message: NotificationMessage) => {
 
   if (message.status === 'success' || message.status === 'failed') {
     (message.status === 'success' ? toastSuccess : toastError)(
-      <div className='flex flex-col gap-1'>
-        <div className='font-bold'>Transaction</div>
-        <p className='text-xs'>
-          Transaction {formatTransactionId(message.id)} Executed {message.status}
+      <div className="flex flex-col gap-1">
+        <div className="font-bold">Transaction</div>
+        <p className="text-xs">
+          Transaction {formatTransactionId(message.id)} Executed{' '}
+          {message.status}
         </p>
-        <Link className='text-primary text-xs active:underline' to='/transactions' search={{ status: 'history' }}>
+        <Link
+          className="text-primary text-xs active:underline"
+          to="/transactions"
+          search={{ status: 'history' }}
+        >
           View Transaction{'>'}
         </Link>
-      </div>
+      </div>,
     );
   } else if (message.notificationType === 'transaction_created') {
     toastSuccess(
-      <div className='flex flex-col gap-1'>
-        <div className='font-bold'>Transaction</div>
-        <p className='text-xs'>
+      <div className="flex flex-col gap-1">
+        <div className="font-bold">Transaction</div>
+        <p className="text-xs">
           New Transaction by <Address shorten value={message.signer} />
         </p>
-        <Link className='text-primary text-xs active:underline' to='/transactions' search={{ status: 'pending' }}>
+        <Link
+          className="text-primary text-xs active:underline"
+          to="/transactions"
+          search={{ status: 'pending' }}
+        >
           View Pending{'>'}
         </Link>
-      </div>
+      </div>,
     );
   } else {
     toastSuccess(
-      <div className='flex flex-col gap-1'>
-        <div className='font-bold'>Transaction</div>
-        <p className='text-xs'>
-          <Address shorten value={message.signer} /> approve Transaction {formatTransactionId(message.id)}
+      <div className="flex flex-col gap-1">
+        <div className="font-bold">Transaction</div>
+        <p className="text-xs">
+          <Address shorten value={message.signer} /> approve Transaction{' '}
+          {formatTransactionId(message.id)}
         </p>
-        <Link className='text-primary text-xs active:underline' to='/transactions' search={{ status: 'pending' }}>
+        <Link
+          className="text-primary text-xs active:underline"
+          to="/transactions"
+          search={{ status: 'pending' }}
+        >
           View Pending{'>'}
         </Link>
-      </div>
+      </div>,
     );
   }
 };
@@ -81,7 +98,10 @@ function SubscribeNotification() {
   const { isConnected, socket } = useSocket();
   const { accounts } = useAccount();
 
-  const addresses = useMemo(() => accounts.map((item) => addressToHex(item.address)), [accounts]);
+  const addresses = useMemo(
+    () => accounts.map((item) => addressToHex(item.address)),
+    [accounts],
+  );
 
   useEffect(() => {
     if (isConnected) {
@@ -95,7 +115,9 @@ function SubscribeNotification() {
     return () => {};
   }, [isConnected, socket]);
 
-  return addresses.map((address) => <SubscribeItem key={address} address={address} />);
+  return addresses.map((address) => (
+    <SubscribeItem key={address} address={address} />
+  ));
 }
 
 export default SubscribeNotification;

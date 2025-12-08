@@ -4,9 +4,15 @@
 import type { AddressMeta } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { addressEq, addressToHex, isPolkadotAddress, zeroAddress } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  addressToHex,
+  isPolkadotAddress,
+  zeroAddress,
+} from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
-import React, { useCallback, useMemo, useState } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
@@ -26,7 +32,13 @@ interface Props {
   onClick: (value: string) => void;
 }
 
-function filterAccounts(signatories: string[], metas: Record<HexString, AddressMeta>, input: string) {
+const ITEM_HEIGHT = 42; // Item height including gap
+
+function filterAccounts(
+  signatories: string[],
+  metas: Record<HexString, AddressMeta>,
+  input: string,
+) {
   if (!input) return signatories;
 
   if (isPolkadotAddress(input)) {
@@ -48,7 +60,9 @@ function filterAccounts(signatories: string[], metas: Record<HexString, AddressM
 
     return (
       address.toLowerCase().includes(input.toLowerCase()) ||
-      (meta?.name ? meta.name.toLowerCase().includes(input.toLowerCase()) : false) ||
+      (meta?.name
+        ? meta.name.toLowerCase().includes(input.toLowerCase())
+        : false) ||
       (identity ? identity.toLowerCase().includes(input.toLowerCase()) : false)
     );
   });
@@ -59,14 +73,16 @@ function filterIgnoreAccounts(accounts: string[], ignoreAccounts: string[]) {
     return accounts;
   }
 
-  return accounts.filter((account) => !ignoreAccounts.some((value) => addressEq(value, account)));
+  return accounts.filter(
+    (account) => !ignoreAccounts.some((value) => addressEq(value, account)),
+  );
 }
 
 function Item({
   account,
   disabled,
   type,
-  onClick
+  onClick,
 }: {
   account: string;
   disabled?: boolean;
@@ -83,7 +99,7 @@ function Item({
 
   return (
     <div
-      className='bg-secondary flex cursor-pointer snap-start items-center justify-between rounded-[5px] p-1'
+      className="bg-secondary flex cursor-pointer snap-start items-center justify-between rounded-[5px] p-1"
       onClick={(e) => {
         e.stopPropagation();
         onClick(account);
@@ -94,11 +110,11 @@ function Item({
           <AddressRow iconSize={24} value={account} />
         </Tooltip>
       </div>
-      <div className='flex-1' />
+      <div className="flex-1" />
       {addressEq(zeroAddress, account) && (
         <Tooltip
           classNames={{ content: 'max-w-[500px] break-all' }}
-          content='The SS58 address for 0x0000000000000000000000000000000000000000000000000000000000000000 which cannot be controlled.'
+          content="The SS58 address for 0x0000000000000000000000000000000000000000000000000000000000000000 which cannot be controlled."
         >
           <IconQuestion />
         </Tooltip>
@@ -106,64 +122,122 @@ function Item({
       <Button
         isIconOnly
         disabled={disabled}
-        variant='light'
+        variant="light"
         color={type === 'add' ? 'primary' : 'danger'}
         onClick={() => {
           _handleAdd();
           onClick(account);
         }}
-        size='sm'
-        className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
+        size="sm"
+        className="h-[26px] min-h-0 w-[26px] min-w-0"
       >
-        {type === 'add' ? <IconAdd className='h-4 w-4' /> : <IconDelete className='h-4 w-4' />}
+        {type === 'add' ? (
+          <IconAdd className="h-4 w-4" />
+        ) : (
+          <IconDelete className="h-4 w-4" />
+        )}
       </Button>
     </div>
   );
 }
 
-function AccountSelect({ withSearch, accounts, ignoreAccounts = [], onClick, title, type, scroll = true }: Props) {
+function AccountSelect({
+  withSearch,
+  accounts,
+  ignoreAccounts = [],
+  onClick,
+  title,
+  type,
+  scroll = true,
+}: Props) {
   const { metas } = useAccount();
   const [keywords, setKeywords] = useState('');
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(
-    () => filterIgnoreAccounts(filterAccounts(accounts, metas, keywords), ignoreAccounts),
-    [accounts, ignoreAccounts, keywords, metas]
+    () =>
+      filterIgnoreAccounts(
+        filterAccounts(accounts, metas, keywords),
+        ignoreAccounts,
+      ),
+    [accounts, ignoreAccounts, keywords, metas],
   );
+
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const virtualizer = useVirtualizer({
+    count: filtered.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ITEM_HEIGHT,
+    overscan: 5,
+  });
 
   const handleSelect = useCallback(
     (value: string) => {
       onClick(value);
       setKeywords('');
     },
-    [onClick]
+    [onClick],
   );
 
   return (
-    <div className='flex flex-1 flex-col gap-3'>
+    <div className="flex flex-1 flex-col gap-3">
       <b>{title}</b>
 
-      <div className='border-divider-300 bg-content1 relative mt-1 flex-1 space-y-2.5 overflow-y-auto rounded-[10px] border-1 p-2.5'>
+      <div className="border-divider bg-background relative mt-1 flex-1 space-y-2.5 overflow-y-auto rounded-[10px] border p-2.5">
         {withSearch && (
           <Input
-            className='bg-content1 sticky top-0 z-10'
+            className="bg-background sticky top-0 z-10"
             endAdornment={<IconSearch />}
             onChange={setKeywords}
-            placeholder='search or input address'
+            placeholder="search or input address"
             value={keywords}
           />
         )}
 
-        <div
-          style={{
-            maxHeight: scroll ? '200px' : 'none'
-          }}
-          className='-mx-1.5 snap-y scroll-pt-2 space-y-2.5 overflow-y-auto scroll-smooth px-1.5 focus:scroll-auto'
-        >
-          {filtered.map((account, index) => (
-            <Item key={index} account={account} type={type} onClick={handleSelect} />
-          ))}
-          {filtered.length === 0 && <Empty height={160} label='empty' />}
-        </div>
+        {filtered.length === 0 ? (
+          <Empty height={160} label="empty" />
+        ) : (
+          <div
+            ref={parentRef}
+            style={{
+              maxHeight: scroll ? '200px' : 'none',
+            }}
+            className="-mx-1.5 overflow-y-auto px-1.5"
+          >
+            <div
+              style={{
+                height: `${virtualizer.getTotalSize()}px`,
+                width: '100%',
+                position: 'relative',
+              }}
+            >
+              {virtualizer.getVirtualItems().map((virtualItem) => {
+                const account = filtered[virtualItem.index];
+
+                return (
+                  <div
+                    key={virtualItem.key}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: `${virtualItem.size}px`,
+                      transform: `translateY(${virtualItem.start}px)`,
+                      paddingBottom: '10px',
+                    }}
+                  >
+                    <Item
+                      account={account}
+                      type={type}
+                      onClick={handleSelect}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

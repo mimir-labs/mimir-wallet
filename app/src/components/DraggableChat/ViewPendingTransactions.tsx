@@ -4,14 +4,16 @@
 import { getChainIcon } from '@mimir-wallet/polkadot-core';
 import { Avatar, Button, Skeleton, Tooltip } from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
-import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { Empty } from '@/components';
 import { type Transaction, TransactionStatus } from '@/hooks/types';
-import { useMultichainPendingTransactions, useValidTransactionNetworks } from '@/hooks/useTransactions';
-import { formatAgo } from '@/utils';
+import {
+  useMultichainPendingTransactions,
+  useValidTransactionNetworks,
+} from '@/hooks/useTransactions';
+import { formatAgo, formatDate } from '@/utils';
 
 // Component props interface
 interface ViewPendingTransactionsProps {
@@ -31,20 +33,28 @@ function NetworkIcon({ network }: { network: string }) {
     <Avatar
       src={chainInfo.icon}
       style={{ width: 30, height: 30, backgroundColor: 'transparent' }}
-      className='flex-shrink-0'
+      className="flex-shrink-0"
     />
   );
 }
 
 // Transaction item component matching Figma design exactly
-function TransactionItem({ transaction, address }: { transaction: Transaction; address: string }) {
+function TransactionItem({
+  transaction,
+  address,
+}: {
+  transaction: Transaction;
+  address: string;
+}) {
   const navigate = useNavigate();
   // Use state to track current time for time-ago display
   const [now, setNow] = useState(() => Date.now());
   const time = transaction.createdAt;
   const { meta } = useAddressMeta(transaction.address);
   const approvals = useMemo(() => {
-    return transaction.children.filter((item) => item.status === TransactionStatus.Success).length;
+    return transaction.children.filter(
+      (item) => item.status === TransactionStatus.Success,
+    ).length;
   }, [transaction.children]);
 
   // Update 'now' every minute to keep time-ago display current
@@ -61,27 +71,31 @@ function TransactionItem({ transaction, address }: { transaction: Transaction; a
     navigate({
       to: '/transactions/$id',
       params: {
-        id: transaction.id.toString()
+        id: transaction.id.toString(),
       },
       search: {
         network: transaction.network,
-        address: address
-      }
+        address: address,
+      },
     });
   };
 
   return (
-    <div className='border-divider-300 flex items-center gap-2.5 rounded-[10px] border p-2.5'>
+    <div className="border-divider flex items-center gap-2.5 rounded-[10px] border p-2.5">
       <NetworkIcon network={transaction.network} />
 
-      <div className='min-w-0 flex-1 gap-[5px]'>
-        <div className='text-sm leading-tight font-bold'>
+      <div className="min-w-0 flex-1 gap-[5px]">
+        <div className="text-sm leading-tight font-bold">
           {transaction.section}.{transaction.method}
         </div>
 
-        <div className='text-foreground/50 flex items-center gap-1 text-xs leading-tight'>
-          <Tooltip content={moment(time).format()}>
-            <span>{now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`}</span>
+        <div className="text-foreground/50 flex items-center gap-1 text-xs leading-tight">
+          <Tooltip content={formatDate(time)}>
+            <span>
+              {now - Number(time) < 1000
+                ? 'Now'
+                : `${formatAgo(Number(time))} ago`}
+            </span>
           </Tooltip>
           <span>
             {approvals}/{meta.threshold} Approved
@@ -89,7 +103,7 @@ function TransactionItem({ transaction, address }: { transaction: Transaction; a
         </div>
       </div>
 
-      <Button size='sm' variant='ghost' radius='full' onClick={handleViewClick}>
+      <Button size="sm" variant="ghost" radius="full" onClick={handleViewClick}>
         View
       </Button>
     </div>
@@ -97,11 +111,15 @@ function TransactionItem({ transaction, address }: { transaction: Transaction; a
 }
 
 // Main component
-function ViewPendingTransactions({ address, className }: ViewPendingTransactionsProps) {
-  const [{ validPendingNetworks }, isFetched, isFetching] = useValidTransactionNetworks(address);
+function ViewPendingTransactions({
+  address,
+  className,
+}: ViewPendingTransactionsProps) {
+  const [{ validPendingNetworks }, isFetched, isFetching] =
+    useValidTransactionNetworks(address);
   const data = useMultichainPendingTransactions(
     validPendingNetworks.map((item) => item.network),
-    address
+    address,
   );
   const navigate = useNavigate();
 
@@ -114,7 +132,9 @@ function ViewPendingTransactions({ address, className }: ViewPendingTransactions
       .slice(0, 3); // Limit to 3 most recent transactions
   }, [data]);
 
-  const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching && !item.isFetched);
+  const showSkeleton =
+    (!isFetched && isFetching) ||
+    data.some((item) => item.isFetching && !item.isFetched);
 
   const handleViewAllClick = () => {
     navigate({ to: `/transactions?tab=pending&address=${address}` as any });
@@ -124,16 +144,16 @@ function ViewPendingTransactions({ address, className }: ViewPendingTransactions
   if (showSkeleton) {
     return (
       <div className={`rounded-[10px] bg-white p-4 ${className || ''}`}>
-        <div className='mb-4'>
-          <Skeleton className='h-5 w-64' />
+        <div className="mb-4">
+          <Skeleton className="h-5 w-64" />
         </div>
-        <div className='space-y-3'>
-          <Skeleton className='h-[50px] w-full rounded-[10px]' />
-          <Skeleton className='h-[50px] w-full rounded-[10px]' />
-          <Skeleton className='h-[50px] w-full rounded-[10px]' />
+        <div className="space-y-3">
+          <Skeleton className="h-[50px] w-full rounded-[10px]" />
+          <Skeleton className="h-[50px] w-full rounded-[10px]" />
+          <Skeleton className="h-[50px] w-full rounded-[10px]" />
         </div>
-        <div className='mt-4 flex justify-center'>
-          <Skeleton className='h-8 w-20' />
+        <div className="mt-4 flex justify-center">
+          <Skeleton className="h-8 w-20" />
         </div>
       </div>
     );
@@ -143,11 +163,13 @@ function ViewPendingTransactions({ address, className }: ViewPendingTransactions
   if (!recentTransactions.length) {
     return (
       <div className={`rounded-[10px] bg-white p-4 ${className || ''}`}>
-        <div className='mb-4'>
-          <h3 className='text-sm font-normal text-black'>Most Recent Pending Transactions</h3>
+        <div className="mb-4">
+          <h3 className="text-sm font-normal text-black">
+            Most Recent Pending Transactions
+          </h3>
         </div>
-        <div className='flex min-h-[200px] items-center justify-center'>
-          <Empty variant='pending-transaction' height='100px' />
+        <div className="flex min-h-[200px] items-center justify-center">
+          <Empty variant="pending-transaction" height="100px" />
         </div>
       </div>
     );
@@ -159,7 +181,7 @@ function ViewPendingTransactions({ address, className }: ViewPendingTransactions
       <p>Most Recent Pending Transactions</p>
 
       {/* Transaction List */}
-      <div className='space-y-3'>
+      <div className="space-y-3">
         {recentTransactions.map((transaction) => (
           <TransactionItem
             key={`${transaction.network}-${transaction.id}`}
@@ -171,7 +193,12 @@ function ViewPendingTransactions({ address, className }: ViewPendingTransactions
 
       {/* View All Button - same style as individual View buttons */}
       <div>
-        <Button size='sm' variant='ghost' radius='full' onClick={handleViewAllClick}>
+        <Button
+          size="sm"
+          variant="ghost"
+          radius="full"
+          onClick={handleViewAllClick}
+        >
           View All
         </Button>
       </div>

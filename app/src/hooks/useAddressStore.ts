@@ -11,7 +11,6 @@ import { HIDE_ACCOUNT_HEX_KEY } from '@/constants';
 
 export interface AddressState {
   accounts: AccountData[];
-  current?: string | undefined;
   hideAccountHex: HexString[];
   addresses: { address: string; name: string; watchlist?: boolean }[];
   isMultisigSyned: boolean;
@@ -31,5 +30,5 @@ export const useAddressStore = create<AddressState>()(() => ({
   addresses: [],
   isMultisigSyned: false,
   addAddressDialog: { open: false },
-  switchAddress: undefined
+  switchAddress: undefined,
 }));

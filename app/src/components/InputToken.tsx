@@ -11,7 +11,7 @@ import {
   Spinner,
   TooltipContent,
   TooltipTrigger,
-  TooltipWrapper
+  TooltipWrapper,
 } from '@mimir-wallet/ui';
 import { clsx } from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -54,15 +54,21 @@ function InputToken({
   address,
   identifier,
   defaultIdentifier,
-  onChange
+  onChange,
 }: Props) {
   const isControl = useRef(identifier !== undefined);
-  const [allBalances, isFetched, isFetching] = useChainBalances(network, address, { alwaysIncludeNative: true });
+  const [allBalances, isFetched, isFetching] = useChainBalances(
+    network,
+    address,
+    { alwaysIncludeNative: true },
+  );
   const [allAssets] = useChainXcmAsset(network);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const popoverWidth = useElementWidth(wrapperRef);
   const [isOpen, toggleOpen] = useToggle(false);
-  const [value, setValue] = useState<string>(identifier || defaultIdentifier || '');
+  const [value, setValue] = useState<string>(
+    identifier || defaultIdentifier || '',
+  );
   const onChangeRef = useRef(onChange);
 
   useEffect(() => {
@@ -82,7 +88,9 @@ function InputToken({
   };
 
   const token = useMemo(() => {
-    return allAssets?.find((item) => (value === 'native' ? item.isNative : item.key === value));
+    return allAssets?.find((item) =>
+      value === 'native' ? item.isNative : item.key === value,
+    );
   }, [allAssets, value]);
 
   useEffect(() => {
@@ -99,19 +107,23 @@ function InputToken({
 
   const element =
     !isFetched && isFetching ? (
-      <div data-disabled={disabled} className='data-[disabled=true]:text-foreground/50 flex items-center gap-2.5'>
-        <Spinner size='sm' />
-        {isIconOnly ? null : <p className='text-foreground/50'>Fetching Assets...</p>}
+      <div
+        data-disabled={disabled}
+        className="data-[disabled=true]:text-foreground/50 flex items-center gap-2.5"
+      >
+        <Spinner size="sm" />
+        {isIconOnly ? null : (
+          <p className="text-foreground/50">Fetching Assets...</p>
+        )}
       </div>
     ) : token ? (
-      <div data-disabled={disabled} className='data-[disabled=true]:text-foreground/50 flex items-center gap-2.5'>
+      <div
+        data-disabled={disabled}
+        className="data-[disabled=true]:text-foreground/50 flex items-center gap-2.5"
+      >
         <Avatar
           alt={token.name}
-          fallback={
-            <div className='bg-divider-300 text-content1 flex h-5 w-5 items-center justify-center rounded-full text-base font-bold'>
-              {token.symbol.slice(0, 1)}
-            </div>
-          }
+          fallback={token.symbol.slice(0, 1)}
           src={token.logoUri}
           style={{ width: 20, height: 20 }}
         >
@@ -119,29 +131,30 @@ function InputToken({
         </Avatar>
         {isIconOnly ? null : (
           <p>
-            {token.name}&nbsp;<span className='text-foreground/50'>({token.symbol})</span>
+            {token.name}&nbsp;
+            <span className="text-foreground/50">({token.symbol})</span>
           </p>
         )}
       </div>
     ) : (
-      <span className='text-foreground-500'>{placeholder}</span>
+      <span className="text-foreground/50">{placeholder}</span>
     );
 
   return (
     <div
       data-disabled={disabled}
       className={'input-token-wrapper w-full space-y-2 data-[disabled=true]:pointer-events-none'.concat(
-        ` ${className || ''}`
+        ` ${className || ''}`,
       )}
     >
-      {label && <div className='text-sm font-bold'>{label}</div>}
+      {label && <div className="text-sm font-bold">{label}</div>}
 
       <Popover open={isOpen} onOpenChange={toggleOpen}>
         <PopoverTrigger asChild>
           <div
             ref={wrapperRef}
             className={twMerge([
-              'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none',
+              'group tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none',
               radius === 'full'
                 ? 'rounded-full'
                 : radius === 'lg'
@@ -151,7 +164,7 @@ function InputToken({
                     : radius === 'sm'
                       ? 'rounded-[5px]'
                       : 'rounded-none',
-              wrapperClassName
+              wrapperClassName,
             ])}
             onClick={(e) => {
               e.stopPropagation();
@@ -162,7 +175,7 @@ function InputToken({
 
             <ArrowDown
               data-open={isOpen}
-              className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
+              className="absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180"
               style={{ color: 'inherit' }}
               onClick={(e) => {
                 e.stopPropagation();
@@ -171,12 +184,18 @@ function InputToken({
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent style={{ width: popoverWidth, minWidth: 200 }} className='border-divider-300 border-1 p-[5px]'>
+        <PopoverContent
+          style={{ width: popoverWidth, minWidth: 200 }}
+          className="border-divider border-1 p-[5px]"
+        >
           {options.length > 0 ? (
-            <div className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
+            <div
+              className={clsx('text-foreground max-h-[250px] overflow-y-auto')}
+            >
               <ul className={clsx('flex list-none flex-col')}>
                 {options.map((item) => {
-                  const { logoUri, name, symbol, transferrable, decimals } = item;
+                  const { logoUri, name, symbol, transferrable, decimals } =
+                    item;
                   const identifier = item.isNative ? 'native' : item.key;
 
                   return (
@@ -188,29 +207,31 @@ function InputToken({
                             setValue(identifier);
                           }}
                           className={clsx(
-                            'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5'
+                            'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5',
                           )}
                         >
                           <Avatar
                             alt={name}
-                            className='shrink-0'
-                            fallback={
-                              <div className='bg-divider-300 text-content1 flex h-5 w-5 items-center justify-center rounded-full text-base font-bold'>
-                                {symbol.slice(0, 1)}
-                              </div>
-                            }
+                            className="shrink-0"
+                            fallback={symbol.slice(0, 1)}
                             src={logoUri}
                             style={{ width: 20, height: 20 }}
                           >
                             {symbol}
                           </Avatar>
-                          <span className='flex-1'>{symbol}</span>
+                          <span className="flex-1">{symbol}</span>
                           <div>
-                            <FormatBalance value={transferrable} format={[decimals, symbol]} />
+                            <FormatBalance
+                              value={transferrable}
+                              format={[decimals, symbol]}
+                            />
                           </div>
                         </li>
                       </TooltipTrigger>
-                      <TooltipContent side='left' className='bg-background text-foreground'>
+                      <TooltipContent
+                        side="left"
+                        className="bg-background text-foreground"
+                      >
                         {name}
                       </TooltipContent>
                     </TooltipWrapper>
@@ -219,12 +240,12 @@ function InputToken({
               </ul>
             </div>
           ) : (
-            <div className='text-foreground/50 text-center'>no tokens</div>
+            <div className="text-foreground/50 text-center">no tokens</div>
           )}
         </PopoverContent>
       </Popover>
 
-      {helper && <div className='text-foreground/50 text-xs'>{helper}</div>}
+      {helper && <div className="text-foreground/50 text-xs">{helper}</div>}
     </div>
   );
 }

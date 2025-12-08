@@ -6,7 +6,6 @@
   },
   "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/dev#readme",
   "license": "Apache-2.0",
-  "packageManager": "yarn@4.5.3",
   "private": true,
   "repository": {
     "directory": "packages/dev",

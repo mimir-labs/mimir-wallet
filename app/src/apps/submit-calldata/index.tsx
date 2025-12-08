@@ -14,8 +14,14 @@ function SubmitCalldata() {
   const { current } = useAccount();
   const [sending, setSending] = useState<string>(current || '');
   const supportedNetworks = useAddressSupportedNetworks(sending);
-  const supportedNetworksKeys = useMemo(() => supportedNetworks?.map((item) => item.key), [supportedNetworks]);
-  const [network, setNetwork] = useInputNetwork(undefined, supportedNetworksKeys);
+  const supportedNetworksKeys = useMemo(
+    () => supportedNetworks?.map((item) => item.key),
+    [supportedNetworks],
+  );
+  const [network, setNetwork] = useInputNetwork(
+    undefined,
+    supportedNetworksKeys,
+  );
 
   return (
     <NetworkProvider network={network}>

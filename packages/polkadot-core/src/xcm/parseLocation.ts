@@ -1,12 +1,17 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Junctions, LocationInfo, SupportXcmChainConfig, XcmChainConfig } from './types.js';
+import type {
+  Junctions,
+  LocationInfo,
+  SupportXcmChainConfig,
+  XcmChainConfig,
+} from './types.js';
 import type {
   StagingXcmV4Junctions,
   StagingXcmV5Junctions,
   XcmV3Junctions,
-  XcmVersionedLocation
+  XcmVersionedLocation,
 } from '@polkadot/types/lookup';
 import type { HexString } from '@polkadot/util/types';
 
@@ -30,19 +35,34 @@ export class XcmNetworkNotSupportError extends Error {
  * @returns Array of parsed junctions
  * @throws Error if junctions cannot be parsed
  */
-export function parseJunctions(junctions: XcmV3Junctions | StagingXcmV4Junctions | StagingXcmV5Junctions): Junctions {
+export function parseJunctions(
+  junctions: XcmV3Junctions | StagingXcmV4Junctions | StagingXcmV5Junctions,
+): Junctions {
   if (junctions.isHere) {
     return [];
   }
 
   // Check for X1 through X8 junctions
-  const junctionTypes = ['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8'] as const;
+  const junctionTypes = [
+    'X1',
+    'X2',
+    'X3',
+    'X4',
+    'X5',
+    'X6',
+    'X7',
+    'X8',
+  ] as const;
 
   for (const type of junctionTypes) {
     const isMethodName = `is${type}` as keyof typeof junctions;
     const asMethodName = `as${type}` as keyof typeof junctions;
 
-    if (junctions[isMethodName] && typeof junctions[isMethodName] === 'boolean' && junctions[isMethodName]) {
+    if (
+      junctions[isMethodName] &&
+      typeof junctions[isMethodName] === 'boolean' &&
+      junctions[isMethodName]
+    ) {
       const value = junctions[asMethodName];
 
       if (Array.isArray(value)) {
@@ -54,7 +74,7 @@ export function parseJunctions(junctions: XcmV3Junctions | StagingXcmV4Junctions
   }
 
   throw new Error('Cannot parse junctions', {
-    cause: junctions
+    cause: junctions,
   });
 }
 
@@ -64,30 +84,36 @@ export function parseJunctions(junctions: XcmV3Junctions | StagingXcmV4Junctions
  * @returns Object containing parents count and interior junctions
  * @throws Error if location version is not supported
  */
-export function parseLocationChain(location: XcmVersionedLocation): LocationInfo {
+export function parseLocationChain(
+  location: XcmVersionedLocation,
+): LocationInfo {
   // Check supported versions
   for (const version of SUPPORTED_XCM_VERSIONS) {
     const isMethodName = `is${version}` as keyof typeof location;
     const asMethodName = `as${version}` as keyof typeof location;
 
-    if (location[isMethodName] && typeof location[isMethodName] === 'boolean' && location[isMethodName]) {
+    if (
+      location[isMethodName] &&
+      typeof location[isMethodName] === 'boolean' &&
+      location[isMethodName]
+    ) {
       const versionedLocation = location[asMethodName] as any;
 
       return {
         parents: versionedLocation.parents.toNumber(),
-        interiors: parseJunctions(versionedLocation.interior)
+        interiors: parseJunctions(versionedLocation.interior),
       };
     }
   }
 
   throw new Error('Unknown version for XcmVersionedLocation', {
-    cause: location
+    cause: location,
   });
 }
 
 export function loopLocation(
   location: LocationInfo,
-  initialChain: SupportXcmChainConfig
+  initialChain: SupportXcmChainConfig,
 ): {
   chain: XcmChainConfig;
   beneficiary: string | null;
@@ -121,7 +147,9 @@ export function loopLocation(
         return { isSupport: true, ...findedChain };
       }
 
-      throw new Error(`Relay Network not supported(ParachainID:${JSON.stringify(initialChain)})`);
+      throw new Error(
+        `Relay Network not supported(ParachainID:${JSON.stringify(initialChain)})`,
+      );
     } else {
       const errorMsg = `Cannot jump to parents(${parents}): exceeds maximum parent chain jump limit`;
 
@@ -139,7 +167,10 @@ export function loopLocation(
 
       const findedChain = allEndpoints.find(
         (item) =>
-          currentChain.isSupport && item.relayChain && item.relayChain === currentChain.key && item.paraId === paraId
+          currentChain.isSupport &&
+          item.relayChain &&
+          item.relayChain === currentChain.key &&
+          item.paraId === paraId,
       );
 
       if (!findedChain) {
@@ -171,16 +202,21 @@ export function loopLocation(
     generalKey,
     origin: {
       parents: originParents,
-      interior: originInterior
-    }
+      interior: originInterior,
+    },
   };
 }
 
-export function findDestChain(location: XcmVersionedLocation, initialChain: SupportXcmChainConfig) {
+export function findDestChain(
+  location: XcmVersionedLocation,
+  initialChain: SupportXcmChainConfig,
+) {
   return loopLocation(parseLocationChain(location), initialChain);
 }
 
-export function parseAccountFromLocation(location: XcmVersionedLocation): string | null {
+export function parseAccountFromLocation(
+  location: XcmVersionedLocation,
+): string | null {
   const { interiors } = parseLocationChain(location);
 
   if (interiors.length === 0) {

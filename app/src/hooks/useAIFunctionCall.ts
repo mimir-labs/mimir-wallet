@@ -38,10 +38,10 @@ function useRouteCheck() {
         isOnRequiredRoute,
         navigateToRoute: async () => {
           await navigate({ to: requiredRoute });
-        }
+        },
       };
     },
-    [location, navigate]
+    [location, navigate],
   );
 
   return checkAndNavigate;
@@ -84,10 +84,14 @@ function useNavigateCallHandler() {
         hash?: string;
       };
 
-      const navParams: { to: string; params?: Record<string, string>; search?: Record<string, string>; hash?: string } =
-        {
-          to: path
-        };
+      const navParams: {
+        to: string;
+        params?: Record<string, string>;
+        search?: Record<string, string>;
+        hash?: string;
+      } = {
+        to: path,
+      };
 
       if (params) navParams.params = params;
       if (query) navParams.search = query;
@@ -95,7 +99,7 @@ function useNavigateCallHandler() {
 
       navigate(navParams);
     },
-    [navigate]
+    [navigate],
   );
 
   useFunctionCallHandler('navigate', handler);
@@ -124,11 +128,11 @@ function useSwitchNetworksHandler() {
         }
       });
     },
-    [enableNetwork, disableNetwork]
+    [enableNetwork, disableNetwork],
   );
 
   useFunctionCallHandler('showComponent', handler, {
-    metadata: { componentType: 'switchNetworks' }
+    metadata: { componentType: 'switchNetworks' },
   });
 }
 
@@ -148,11 +152,11 @@ function useSetSs58ChainHandler() {
         setSs58Chain(networkKey);
       }
     },
-    [setSs58Chain]
+    [setSs58Chain],
   );
 
   useFunctionCallHandler('showComponent', handler, {
-    metadata: { componentType: 'setSs58Chain' }
+    metadata: { componentType: 'setSs58Chain' },
   });
 }
 

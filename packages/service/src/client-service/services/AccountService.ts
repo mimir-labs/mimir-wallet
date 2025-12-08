@@ -19,7 +19,9 @@ export class AccountService extends BaseService {
   }
 
   public ownedBy(chain: string, addresses: string[]) {
-    return this.get(`chains/${chain}/owned-by`, { addresses: addresses.join(',') });
+    return this.get(`chains/${chain}/owned-by`, {
+      addresses: addresses.join(','),
+    });
   }
 
   public omniChainOwnedBy(addresses: string[]) {
@@ -32,9 +34,14 @@ export class AccountService extends BaseService {
     proposer: string,
     signature: string,
     signer: string,
-    time: string
+    time: string,
   ) {
-    return this.post(`chains/${chain}/${address}/add-proposer`, { proposer, signature, signer, time });
+    return this.post(`chains/${chain}/${address}/add-proposer`, {
+      proposer,
+      signature,
+      signer,
+      time,
+    });
   }
 
   public removeProposer(
@@ -43,9 +50,14 @@ export class AccountService extends BaseService {
     proposer: string,
     signature: string,
     signer: string,
-    time: string
+    time: string,
   ) {
-    return this.put(`chains/${chain}/${address}/remove-proposer`, { proposer, signature, signer, time });
+    return this.put(`chains/${chain}/${address}/remove-proposer`, {
+      proposer,
+      signature,
+      signer,
+      time,
+    });
   }
 
   public utm(
@@ -55,7 +67,7 @@ export class AccountService extends BaseService {
       utm_source: string;
       utm_medium?: string | null;
       utm_campaign?: string | null;
-    }
+    },
   ) {
     return this.post(`chains/${chain}/${address}/utm`, utm);
   }

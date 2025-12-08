@@ -11,7 +11,7 @@ function transformAccount(chainSS58: number, data: AccountData) {
   data.proposers = data.proposers?.map((item) => ({
     ...item,
     proposer: encodeAddress(item.proposer, chainSS58),
-    creator: encodeAddress(item.creator, chainSS58)
+    creator: encodeAddress(item.creator, chainSS58),
   }));
 
   for (const delegatee of data.delegatees) {
@@ -30,14 +30,14 @@ export async function sync(
   isOmni: true,
   chainSS58: number,
   walletAccounts: string[],
-  cb: (values: AccountData[]) => void
+  cb: (values: AccountData[]) => void,
 ): Promise<void>;
 export async function sync(
   isOmni: false,
   network: string,
   chainSS58: number,
   walletAccounts: string[],
-  cb: (values: AccountData[]) => void
+  cb: (values: AccountData[]) => void,
 ): Promise<void>;
 
 // Implementation
@@ -46,7 +46,7 @@ export async function sync(
   networkOrChainSS58: string | number,
   chainSS58OrWalletAccounts: number | string[],
   walletAccountsOrCb: string[] | ((values: AccountData[]) => void),
-  cb?: (values: AccountData[]) => void
+  cb?: (values: AccountData[]) => void,
 ): Promise<void> {
   let network: string | undefined;
   let chainSS58: number;

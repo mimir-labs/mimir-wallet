@@ -3,7 +3,14 @@
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Alert, AlertTitle, Button, buttonSpinner, Checkbox, Spinner } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  buttonSpinner,
+  Checkbox,
+  Spinner,
+} from '@mimir-wallet/ui';
 import { useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -29,7 +36,8 @@ function Restore({ onClose }: { onClose: () => void }) {
   const [isOpen, toggleOpen] = useToggle(true);
   const [selected, setSelected] = useState<number[]>([]);
 
-  const [txs, restoreList, restore, isFetched, isFetching, refetch] = useBatchSync(network, current);
+  const [txs, restoreList, restore, isFetched, isFetching, refetch] =
+    useBatchSync(network, current);
   const isCheckAll = selected.length === txs.length;
   const isCheckSome = selected.length > 0 && selected.length < txs.length;
   const [account] = useQueryAccount(current);
@@ -51,11 +59,16 @@ function Restore({ onClose }: { onClose: () => void }) {
       return;
     }
 
-    const injected = await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(CONNECT_ORIGIN);
+    const injected =
+      await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(
+        CONNECT_ORIGIN,
+      );
     const injectSigner = injected?.signer;
 
     if (!injectSigner) {
-      toastError(`Please connect to the wallet: ${walletConfig[source]?.name || source}`);
+      toastError(
+        `Please connect to the wallet: ${walletConfig[source]?.name || source}`,
+      );
 
       return;
     }
@@ -79,48 +92,73 @@ Timestamp: ${time}`;
       const result = await injectSigner.signRaw({
         address: signer,
         data: message,
-        type: 'bytes'
+        type: 'bytes',
       });
 
-      await service.transaction.removeBatch(network, current, selected, result.signature, signer, time);
+      await service.transaction.removeBatch(
+        network,
+        current,
+        selected,
+        result.signature,
+        signer,
+        time,
+      );
       setSelected([]);
       refetch();
     } catch (error) {
       console.error('Failed to delete batch transactions:', error);
-      toastError(error instanceof Error ? error.message : 'Failed to delete selected transactions');
+      toastError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to delete selected transactions',
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className='flex h-full flex-1 flex-col gap-5 overflow-hidden'>
-      {isFetched && !txs?.length && <Empty label='No batch found' height='300px' />}
+    <div className="flex h-full flex-1 flex-col gap-5 overflow-hidden">
+      {isFetched && !txs?.length && (
+        <Empty label="No batch found" height="300px" />
+      )}
 
-      {!isFetched && isFetching && <Spinner variant='wave' />}
+      {!isFetched && isFetching && <Spinner variant="ellipsis" />}
 
-      <div className='scrollbar-hide flex-1 space-y-2.5 overflow-y-auto'>
+      <div className="scrollbar-hide flex-1 space-y-2.5 overflow-y-auto">
         {current && !!txs?.length && (
           <>
-            <Alert variant='success' className='flex-grow-0'>
+            <Alert variant="success" className="flex-grow-0">
               <AlertTitle>{txs.length} Transactions Found</AlertTitle>
             </Alert>
 
             {txs?.map((item) => (
-              <BatchItem key={item.id} from={current} calldata={item.call} registry={registry}>
-                <div className='col-span-1 flex items-center'>
-                  <Checkbox
-                    size='sm'
-                    isSelected={selected.includes(item.id)}
-                    onValueChange={(state) => {
-                      setSelected((values) => (state ? [...values, item.id] : values.filter((v) => item.id !== v)));
-                    }}
-                  >
-                    {item.id}
-                  </Checkbox>
+              <BatchItem
+                key={item.id}
+                from={current}
+                calldata={item.call}
+                registry={registry}
+              >
+                <div className="col-span-1 flex items-center">
+                  <label className="inline-flex cursor-pointer items-center gap-2">
+                    <Checkbox
+                      checked={selected.includes(item.id)}
+                      onCheckedChange={(state) => {
+                        setSelected((values) =>
+                          state
+                            ? [...values, item.id]
+                            : values.filter((v) => item.id !== v),
+                        );
+                      }}
+                    />
+                    <span>{item.id}</span>
+                  </label>
                 </div>
-                <div className='col-span-2 flex items-center'>
-                  <CallDisplaySection section={item.section} method={item.method} />
+                <div className="col-span-2 flex items-center">
+                  <CallDisplaySection
+                    section={item.section}
+                    method={item.method}
+                  />
                 </div>
               </BatchItem>
             ))}
@@ -129,9 +167,15 @@ Timestamp: ${time}`;
 
         {current && !!restoreList?.length && (
           <>
-            <div onClick={toggleOpen} className='flex cursor-pointer items-center justify-between'>
+            <div
+              onClick={toggleOpen}
+              className="flex cursor-pointer items-center justify-between"
+            >
               Restored
-              <ArrowDown data-open={isOpen} className='h-5 w-5 data-[open=true]:rotate-180' />
+              <ArrowDown
+                data-open={isOpen}
+                className="h-5 w-5 data-[open=true]:rotate-180"
+              />
             </div>
 
             {isOpen &&
@@ -140,12 +184,15 @@ Timestamp: ${time}`;
                   key={item.id}
                   from={current}
                   calldata={item.call}
-                  bgcolor='var(--color-main-bg)'
+                  bgcolor="var(--color-main-bg)"
                   registry={registry}
                 >
-                  <div className='col-span-1 flex items-center'>{item.id}</div>
-                  <div className='col-span-2 flex items-center'>
-                    <CallDisplaySection section={item.section} method={item.method} />
+                  <div className="col-span-1 flex items-center">{item.id}</div>
+                  <div className="col-span-2 flex items-center">
+                    <CallDisplaySection
+                      section={item.section}
+                      method={item.method}
+                    />
                   </div>
                 </BatchItem>
               ))}
@@ -153,28 +200,32 @@ Timestamp: ${time}`;
         )}
       </div>
 
-      <div className='flex gap-5'>
-        <div className='flex flex-1 items-center pl-2'>
-          <Checkbox
-            size='sm'
-            isSelected={isCheckAll || isCheckSome}
-            isIndeterminate={isCheckSome}
-            onValueChange={(checked) => {
-              if (checked) {
-                setSelected(txs.map((item) => item.id));
-              } else {
-                setSelected([]);
-              }
-            }}
-          >
-            All
-          </Checkbox>
+      <div className="flex gap-5">
+        <div className="flex flex-1 items-center pl-2">
+          <label className="inline-flex cursor-pointer items-center gap-2">
+            <Checkbox
+              checked={isCheckSome ? 'indeterminate' : isCheckAll}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  setSelected(txs.map((item) => item.id));
+                } else {
+                  setSelected([]);
+                }
+              }}
+            />
+            <span>All</span>
+          </label>
         </div>
 
         <Button
-          disabled={loading || selected.length === 0 || filtered.length === 0 || !current}
-          color='danger'
-          variant='ghost'
+          disabled={
+            loading ||
+            selected.length === 0 ||
+            filtered.length === 0 ||
+            !current
+          }
+          color="danger"
+          variant="ghost"
           onClick={handleDelete}
         >
           {loading ? buttonSpinner : null}

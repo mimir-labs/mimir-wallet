@@ -10,7 +10,9 @@ import type { FunctionCallArgumentValue } from './types.js';
 /**
  * Safely convert FunctionCallArgumentValue or unknown to string
  */
-export function toFunctionCallString(value: FunctionCallArgumentValue | unknown): string | undefined {
+export function toFunctionCallString(
+  value: FunctionCallArgumentValue | unknown,
+): string | undefined {
   if (value === undefined || value === null) {
     return undefined;
   }
@@ -25,7 +27,9 @@ export function toFunctionCallString(value: FunctionCallArgumentValue | unknown)
 /**
  * Safely convert FunctionCallArgumentValue or unknown to number
  */
-export function toFunctionCallNumber(value: FunctionCallArgumentValue | unknown): number | undefined {
+export function toFunctionCallNumber(
+  value: FunctionCallArgumentValue | unknown,
+): number | undefined {
   if (value === undefined || value === null) {
     return undefined;
   }
@@ -42,7 +46,9 @@ export function toFunctionCallNumber(value: FunctionCallArgumentValue | unknown)
 /**
  * Safely convert FunctionCallArgumentValue or unknown to boolean
  */
-export function toFunctionCallBoolean(value: FunctionCallArgumentValue | unknown): boolean | undefined {
+export function toFunctionCallBoolean(
+  value: FunctionCallArgumentValue | unknown,
+): boolean | undefined {
   if (value === undefined || value === null) {
     return undefined;
   }
@@ -61,13 +67,17 @@ export function toFunctionCallBoolean(value: FunctionCallArgumentValue | unknown
 /**
  * Safely convert FunctionCallArgumentValue or unknown to string array
  */
-export function toFunctionCallStringArray(value: FunctionCallArgumentValue | unknown): string[] | undefined {
+export function toFunctionCallStringArray(
+  value: FunctionCallArgumentValue | unknown,
+): string[] | undefined {
   if (value === undefined || value === null) {
     return undefined;
   }
 
   if (Array.isArray(value)) {
-    return value.map((item) => (typeof item === 'string' ? item : String(item)));
+    return value.map((item) =>
+      typeof item === 'string' ? item : String(item),
+    );
   }
 
   return undefined;
@@ -76,7 +86,9 @@ export function toFunctionCallStringArray(value: FunctionCallArgumentValue | unk
 /**
  * Type guard to check if FunctionCallArgumentValue is an array
  */
-export function isFunctionCallArray(value: FunctionCallArgumentValue): value is FunctionCallArgumentValue[] {
+export function isFunctionCallArray(
+  value: FunctionCallArgumentValue,
+): value is FunctionCallArgumentValue[] {
   return Array.isArray(value);
 }
 
@@ -84,7 +96,7 @@ export function isFunctionCallArray(value: FunctionCallArgumentValue): value is 
  * Type guard to check if FunctionCallArgumentValue is an object
  */
 export function isFunctionCallObject(
-  value: FunctionCallArgumentValue
+  value: FunctionCallArgumentValue,
 ): value is { [key: string]: FunctionCallArgumentValue } {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

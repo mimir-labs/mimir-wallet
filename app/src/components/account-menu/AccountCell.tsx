@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { Button, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@mimir-wallet/ui';
 import { Link } from '@tanstack/react-router';
 import React, { useCallback, useMemo } from 'react';
 
@@ -22,7 +27,7 @@ function AccountCell({
   watchlist,
   selected,
   withAdd = false,
-  value
+  value,
 }: {
   onClose?: () => void;
   selected?: boolean;
@@ -31,29 +36,34 @@ function AccountCell({
   watchlist?: boolean;
   onSelect?: (address: string) => void;
 }) {
-  const { isLocalAccount, deleteAddress, hideAccount, addAddressBook } = useAccount();
+  const { isLocalAccount, deleteAddress, hideAccount, addAddressBook } =
+    useAccount();
   const [totalUsd] = useBalanceTotalUsd(value);
   const source = useAccountSource(value);
 
   // Derive formatted USD display from totalUsd
   const formatUsd = useMemo(() => {
     if (!totalUsd) {
-      return <div className='text-xs font-bold whitespace-nowrap'>$ 0</div>;
+      return <div className="text-xs font-bold whitespace-nowrap">$ 0</div>;
     }
 
     const formattedParts = formatDisplay(totalUsd.toString());
 
     return (
-      <div className='text-xs font-bold whitespace-nowrap'>
+      <div className="text-xs font-bold whitespace-nowrap">
         $ {formattedParts[0]}
         {formattedParts[1] ? `.${formattedParts[1]}` : ''}
         {formattedParts[2] || ''}
       </div>
     );
   }, [totalUsd]);
-  const { pinnedAccounts, addPinnedAccount, removePinnedAccount } = usePinAccounts();
+  const { pinnedAccounts, addPinnedAccount, removePinnedAccount } =
+    usePinAccounts();
 
-  const isPinned = useMemo(() => pinnedAccounts.includes(addressToHex(value)), [pinnedAccounts, value]);
+  const isPinned = useMemo(
+    () => pinnedAccounts.includes(addressToHex(value)),
+    [pinnedAccounts, value],
+  );
 
   const handleClick = useCallback(() => {
     onSelect?.(value);
@@ -65,14 +75,14 @@ function AccountCell({
     <Button
       fullWidth
       onClick={handleClick}
-      variant='bordered'
-      color='secondary'
-      size='md'
+      variant="bordered"
+      color="secondary"
+      size="md"
       data-selected={selected}
-      className='text-foreground data-[selected=true]:bg-secondary h-[50px] justify-between rounded-[10px] px-1 py-1 sm:px-2.5'
+      className="text-foreground data-[selected=true]:bg-secondary h-[50px] justify-between rounded-[10px] px-1 py-1 sm:px-2.5"
     >
       <AddressCell
-        className='min-w-0 flex-1'
+        className="min-w-0 flex-1"
         withIconBorder
         shorten
         showType
@@ -88,9 +98,9 @@ function AccountCell({
       {withAdd && (
         <Button
           isIconOnly
-          className='text-inherit'
-          size='sm'
-          variant='light'
+          className="text-inherit"
+          size="sm"
+          variant="light"
           onClick={() => addAddressBook(value, true)}
         >
           <IconAdd />
@@ -100,20 +110,25 @@ function AccountCell({
       {value && (isLocal || watchlist) && (
         <Popover>
           <PopoverTrigger asChild>
-            <Button isIconOnly size='sm' variant='light' className='text-inherit'>
-              <IconMore className='h-4 w-4' />
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              className="text-inherit"
+            >
+              <IconMore className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className='flex flex-col items-stretch gap-y-2.5 p-2.5'>
+          <PopoverContent className="flex flex-col items-stretch gap-y-2.5 p-2.5">
             {value &&
               isLocal && [
                 source ? null : (
                   <Button
-                    key='hide-0'
-                    radius='sm'
-                    variant='light'
-                    color='primary'
-                    className='text-foreground justify-start'
+                    key="hide-0"
+                    radius="sm"
+                    variant="light"
+                    color="primary"
+                    className="text-foreground justify-start"
                     onClick={() => {
                       hideAccount(value);
                     }}
@@ -122,24 +137,27 @@ function AccountCell({
                   </Button>
                 ),
                 <Button
-                  key='setting-1'
+                  key="setting-1"
                   asChild
-                  radius='sm'
-                  variant='light'
-                  color='primary'
-                  className='text-foreground justify-start'
+                  radius="sm"
+                  variant="light"
+                  color="primary"
+                  className="text-foreground justify-start"
                   onClick={onClose}
                 >
-                  <Link to='/setting' search={{ type: 'account', address: value }}>
+                  <Link
+                    to="/setting"
+                    search={{ type: 'account', address: value }}
+                  >
                     Setting
                   </Link>
                 </Button>,
                 <Button
-                  key='pin-0'
-                  radius='sm'
-                  variant='light'
-                  color='primary'
-                  className='text-foreground justify-start'
+                  key="pin-0"
+                  radius="sm"
+                  variant="light"
+                  color="primary"
+                  className="text-foreground justify-start"
                   onClick={() => {
                     if (isPinned) {
                       removePinnedAccount(value);
@@ -149,16 +167,16 @@ function AccountCell({
                   }}
                 >
                   {isPinned ? 'Unpin' : 'Pin'}
-                </Button>
+                </Button>,
               ]}
 
             {value && watchlist && (
               <Button
-                key='delete-2'
-                radius='sm'
-                variant='light'
-                color='primary'
-                className='text-foreground justify-start'
+                key="delete-2"
+                radius="sm"
+                variant="light"
+                color="primary"
+                className="text-foreground justify-start"
                 onClick={() => deleteAddress(value)}
               >
                 Delete

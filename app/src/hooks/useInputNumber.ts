@@ -8,12 +8,15 @@ import { isPositiveNumber, isValidInteger, isValidNumber } from '@/utils';
 export function useInputNumber(
   defaultValue?: string,
   integer = false,
-  min?: number
+  min?: number,
 ): [
   [address: string, isValidAddress: boolean],
-  setAddress: (value: string | React.ChangeEvent<HTMLInputElement>) => void
+  setAddress: (value: string | React.ChangeEvent<HTMLInputElement>) => void,
 ] {
-  const [value, setValue] = useState<[string, boolean]>([defaultValue?.toString() || '', true]);
+  const [value, setValue] = useState<[string, boolean]>([
+    defaultValue?.toString() || '',
+    true,
+  ]);
 
   const onChange = useCallback(
     (_value: string | React.ChangeEvent<HTMLInputElement>) => {
@@ -39,9 +42,12 @@ export function useInputNumber(
         return;
       }
 
-      setValue([v, v ? (integer ? isValidInteger(v) : isValidNumber(v)) : true]);
+      setValue([
+        v,
+        v ? (integer ? isValidInteger(v) : isValidNumber(v)) : true,
+      ]);
     },
-    [integer, min]
+    [integer, min],
   );
 
   return [value, onChange];

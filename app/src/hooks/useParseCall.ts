@@ -11,7 +11,7 @@ import { useQuery } from '@mimir-wallet/service';
  * Parse call data (hex string) into an IMethod object
  */
 async function parseCallData({
-  queryKey
+  queryKey,
 }: {
   queryKey: readonly [string, string, HexString | string | undefined | null];
 }): Promise<IMethod | null> {
@@ -64,20 +64,20 @@ export function useParseCall(
   callData: HexString | string | undefined | null,
   options?: {
     enabled?: boolean;
-  }
+  },
 ): UseParseCallResult {
   const { data, isLoading, error } = useQuery({
     queryKey: ['parse-call', network, callData] as const,
     queryFn: parseCallData,
     enabled: (options?.enabled ?? true) && !!network && !!callData,
     staleTime: Infinity, // Call data parsing result doesn't change for same input
-    retry: false // Don't retry on parse errors
+    retry: false, // Don't retry on parse errors
   });
 
   return {
     call: data ?? null,
     isLoading,
-    error: error as Error | null
+    error: error as Error | null,
   };
 }
 
@@ -94,19 +94,19 @@ export function useParseCall(
 export function useParseCallWithFallback(
   network: string,
   callData: HexString | string | undefined | null,
-  existingCall: IMethod | null | undefined
+  existingCall: IMethod | null | undefined,
 ): UseParseCallResult {
   const shouldParse = !existingCall && !!callData;
 
   const result = useParseCall(network, callData, {
-    enabled: shouldParse
+    enabled: shouldParse,
   });
 
   if (existingCall) {
     return {
       call: existingCall,
       isLoading: false,
-      error: null
+      error: null,
     };
   }
 

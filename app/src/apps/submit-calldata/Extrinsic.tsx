@@ -6,17 +6,63 @@ import type { Registry } from '@polkadot/types/types';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Divider } from '@mimir-wallet/ui';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
-import { ErrorBoundary, Input, InputAddress, InputNetwork, TxButton } from '@/components';
+import {
+  ErrorBoundary,
+  Input,
+  InputAddress,
+  InputNetwork,
+  TxButton,
+} from '@/components';
 import JsonView from '@/components/JsonView';
+import { PolkadotJsApp, DotConsoleApp } from '@/config';
 import { events } from '@/events';
 import { useInput } from '@/hooks/useInput';
 import { useRegistry } from '@/hooks/useRegistry';
 import { Call as CallComp } from '@/params';
 
-function decodeCallData(registry: Registry, callData: string): [Call | null, Error | null] {
+function DotConsoleLink({ network }: { network: string }) {
+  const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
+
+  if (!isDotConsoleSupport) {
+    const url =
+      PolkadotJsApp.urlSearch?.(network) || new URL(PolkadotJsApp.url);
+
+    url.hash = '#/extrinsics';
+
+    return (
+      <Link
+        to="/explorer/$url"
+        params={{ url: url.toString() }}
+        className="hover:underline"
+      >
+        Polkadot.js
+      </Link>
+    );
+  }
+
+  const url = DotConsoleApp.urlSearch?.(network) || new URL(DotConsoleApp.url);
+
+  url.pathname = '/extrinsics';
+
+  return (
+    <a
+      href={url.toString()}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:underline"
+    >
+      DOT Console
+    </a>
+  );
+}
+
+function decodeCallData(
+  registry: Registry,
+  callData: string,
+): [Call | null, Error | null] {
   if (!callData) return [null, null];
 
   try {
@@ -33,7 +79,7 @@ function Extrinsic({
   setSending,
   network,
   supportedNetworks,
-  setNetwork
+  setNetwork,
 }: {
   sending: string;
   network: string;
@@ -50,48 +96,50 @@ function Extrinsic({
   // Derive parsed call data and error directly from callData
   const [parsedCallData, callDataError] = useMemo(
     () => (registry ? decodeCallData(registry, callData) : [null, null]),
-    [registry, callData]
+    [registry, callData],
   );
 
   return (
-    <div className='mx-auto mt-3 w-full max-w-[500px] p-4 sm:p-5'>
-      <Button onClick={() => router.history.back()} variant='ghost'>
+    <div className="mx-auto mt-3 w-full max-w-[500px] p-4 sm:p-5">
+      <Button onClick={() => router.history.back()} variant="ghost">
         {'<'} Back
       </Button>
-      <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-5'>
+      <div className="card-root mt-4 flex flex-col gap-5 border p-5">
         <h3>Submit Extrinsic</h3>
 
         <InputNetwork
-          label='Select Network'
+          label="Select Network"
           network={network}
           supportedNetworks={supportedNetworks}
           setNetwork={setNetwork}
         />
 
-        <InputAddress isSign label='Sending From' onChange={setSending} placeholder='Sender' value={sending} />
+        <InputAddress
+          isSign
+          label="Sending From"
+          onChange={setSending}
+          placeholder="Sender"
+          value={sending}
+        />
 
         <Input
           label={
-            <div className='flex items-center justify-between gap-1'>
+            <div className="flex items-center justify-between gap-1">
               Call Data
-              <button className='text-primary hover:underline' onClick={() => events.emit('template_open', network)}>
+              <button
+                className="text-primary hover:underline"
+                onClick={() => events.emit('template_open', network)}
+              >
                 View Template
               </button>
             </div>
           }
-          placeholder='0x...'
+          placeholder="0x..."
           error={callDataError}
           helper={
-            <div className='text-foreground mt-1'>
+            <div className="text-foreground mt-1">
               You can paste the Encoded Call Data in{' '}
-              <a className='hover:underline' target='_blank' rel='noopener noreferrer'>
-                DOT Console
-              </a>
-              /
-              <a className='hover:underline' target='_blank' rel='noopener noreferrer'>
-                Polkadot.JS
-              </a>
-              .
+              <DotConsoleLink network={network} />.
             </div>
           }
           value={callData}
@@ -99,32 +147,45 @@ function Extrinsic({
         />
 
         {callDataError && (
-          <div className='bg-secondary rounded-[10px] p-2.5 break-all'>
-            <p style={{ fontFamily: 'Geist Mono' }} className='text-danger text-xs'>
+          <div className="bg-secondary rounded-[10px] p-2.5 break-all">
+            <p
+              style={{ fontFamily: 'Geist Mono' }}
+              className="text-danger text-xs"
+            >
               {callDataError.message}
             </p>
           </div>
         )}
 
         {parsedCallData && (
-          <div className='space-y-[5px]'>
-            <div className='flex items-center justify-between'>
-              <p className='font-bold'>
+          <div className="space-y-[5px]">
+            <div className="flex items-center justify-between">
+              <p className="font-bold">
                 {parsedCallData.section}.{parsedCallData.method}
               </p>
-              <button className='text-primary hover:underline' onClick={() => setShowDetail(!showDetail)}>
+              <button
+                className="text-primary hover:underline"
+                onClick={() => setShowDetail(!showDetail)}
+              >
                 {showDetail ? 'Hide' : 'Details'}
               </button>
             </div>
 
-            <div className='border-divider-300 @container rounded-[10px] border-1 p-2.5'>
+            <div className="border-divider @container rounded-[10px] border p-2.5">
               <ErrorBoundary>
-                {registry && <CallComp showFallback registry={registry} from={sending} call={parsedCallData} />}
+                {registry && (
+                  <CallComp
+                    showFallback
+                    registry={registry}
+                    from={sending}
+                    call={parsedCallData}
+                  />
+                )}
               </ErrorBoundary>
             </div>
 
             {showDetail && (
-              <div className='bg-secondary rounded-[10px] p-2.5'>
+              <div className="bg-secondary rounded-[10px] p-2.5">
                 <JsonView data={parsedCallData.toHuman()} />
               </div>
             )}
@@ -135,11 +196,11 @@ function Extrinsic({
 
         <TxButton
           fullWidth
-          variant='solid'
-          color='primary'
+          variant="solid"
+          color="primary"
           disabled={!parsedCallData}
           accountId={sending}
-          website='mimir://app/submit-calldata'
+          website="mimir://app/submit-calldata"
           getCall={parsedCallData ? () => parsedCallData : undefined}
         >
           Submit

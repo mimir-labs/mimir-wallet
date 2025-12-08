@@ -3,17 +3,18 @@
 
 import React, { forwardRef } from 'react';
 
-const CallDisplaySection = forwardRef<HTMLSpanElement, { section?: string; method?: string }>(
-  ({ section, method }, ref) => {
-    return section && method ? (
-      <span ref={ref}>
-        {section}.{method}
-      </span>
-    ) : (
-      <span ref={ref}>Unknown</span>
-    );
-  }
-);
+const CallDisplaySection = forwardRef<
+  HTMLSpanElement,
+  { section?: string; method?: string }
+>(({ section, method }, ref) => {
+  return section && method ? (
+    <span ref={ref}>
+      {section}.{method}
+    </span>
+  ) : (
+    <span ref={ref}>Unknown</span>
+  );
+});
 
 CallDisplaySection.displayName = 'CallDisplaySection';
 

@@ -32,7 +32,7 @@ interface WizardActions<T> {
 export function useWizardState<T>(
   initialData: T,
   steps: WizardStep[],
-  initialStep: number = 1
+  initialStep: number = 1,
 ): [WizardState<T>, WizardActions<T>] {
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [data, setData] = useState<T>(initialData);
@@ -55,7 +55,7 @@ export function useWizardState<T>(
         setCurrentStep(step);
       }
     },
-    [steps.length]
+    [steps.length],
   );
 
   const updateData = useCallback((updates: Partial<T>) => {
@@ -73,7 +73,7 @@ export function useWizardState<T>(
   const state: WizardState<T> = {
     currentStep,
     data,
-    steps
+    steps,
   };
 
   const actions: WizardActions<T> = {
@@ -83,7 +83,7 @@ export function useWizardState<T>(
     updateData,
     resetWizard,
     canGoNext,
-    canGoPrevious
+    canGoPrevious,
   };
 
   return [state, actions];

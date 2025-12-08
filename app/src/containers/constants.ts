@@ -17,7 +17,7 @@ export const LAYOUT = {
     /** Right sidebar default width */
     RIGHT_DEFAULT_WIDTH: '360px',
     /** Right sidebar batch mode width */
-    RIGHT_BATCH_WIDTH: '440px'
+    RIGHT_BATCH_WIDTH: '440px',
   },
 
   /**
@@ -27,7 +27,7 @@ export const LAYOUT = {
     /** Standard button height for large buttons */
     BUTTON_HEIGHT_LG: 48,
     /** Standard modal padding */
-    MODAL_PADDING: 16
+    MODAL_PADDING: 16,
   },
 
   /**
@@ -38,7 +38,7 @@ export const LAYOUT = {
     MD: 768,
     LG: 1024,
     XL: 1280,
-    '2XL': 1536
+    '2XL': 1536,
   },
 
   /**
@@ -48,8 +48,8 @@ export const LAYOUT = {
     MODAL: 1000,
     DROPDOWN: 100,
     SIDEBAR: 50,
-    HEADER: 40
-  }
+    HEADER: 40,
+  },
 } as const;
 
 /**
@@ -57,7 +57,7 @@ export const LAYOUT = {
  */
 export const CSS_VARS = {
   HEADER_HEIGHT: '--header-height',
-  SIDEBAR_WIDTH: '--sidebar-width'
+  SIDEBAR_WIDTH: '--sidebar-width',
 } as const;
 
 /**
@@ -72,7 +72,9 @@ export const layoutHelpers = {
   /**
    * Get right sidebar width based on tab
    */
-  getRightSidebarWidth: (tab?: 'batch' | 'template' | 'decoder' | 'ai-assistant') => {
+  getRightSidebarWidth: (
+    tab?: 'batch' | 'template' | 'decoder' | 'ai-assistant',
+  ) => {
     switch (tab) {
       case 'batch':
         return LAYOUT.SIDEBAR.RIGHT_BATCH_WIDTH;
@@ -86,5 +88,6 @@ export const layoutHelpers = {
   /**
    * Calculate viewport height minus header
    */
-  getContentHeight: () => `calc(100dvh - ${layoutHelpers.getTotalHeaderHeight()}px)`
+  getContentHeight: () =>
+    `calc(100dvh - ${layoutHelpers.getTotalHeaderHeight()}px)`,
 } as const;

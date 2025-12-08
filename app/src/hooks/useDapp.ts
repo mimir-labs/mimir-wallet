@@ -31,7 +31,10 @@ export function useDapp(website?: string | null): DappOption | undefined {
       const app = dapps.find((item) => {
         const appURL = new URL(item.url);
 
-        return websiteURL.hostname === appURL.hostname || isSameTopDomain(website, item.url);
+        return (
+          websiteURL.hostname === appURL.hostname ||
+          isSameTopDomain(website, item.url)
+        );
       });
 
       return app;
@@ -42,8 +45,14 @@ export function useDapp(website?: string | null): DappOption | undefined {
 }
 
 export function useDapps(): UseDapps {
-  const [favoriteIds, setFavoriteIds] = useLocalStore<(number | string)[]>(FAVORITE_DAPP_KEY, []);
-  const [customApps, setCustomApps] = useLocalStore<CustomDappOption[]>(CUSTOM_APP_KEY, []);
+  const [favoriteIds, setFavoriteIds] = useLocalStore<(number | string)[]>(
+    FAVORITE_DAPP_KEY,
+    [],
+  );
+  const [customApps, setCustomApps] = useLocalStore<CustomDappOption[]>(
+    CUSTOM_APP_KEY,
+    [],
+  );
 
   const addCustom = useCallback(
     (app: CustomDappOption) => {
@@ -55,7 +64,7 @@ export function useDapps(): UseDapps {
         }
       });
     },
-    [setCustomApps]
+    [setCustomApps],
   );
 
   const removeCustom = useCallback(
@@ -64,7 +73,7 @@ export function useDapps(): UseDapps {
         return v.filter((item) => item.id !== id);
       });
     },
-    [setCustomApps]
+    [setCustomApps],
   );
 
   const validDapps = useMemo(
@@ -73,24 +82,27 @@ export function useDapps(): UseDapps {
         .filter((item) => !item.url.startsWith('mimir://internal'))
         .filter((item) => item.visible !== false)
         .sort((a, b) => favoriteIds.indexOf(b.id) - favoriteIds.indexOf(a.id)),
-    [favoriteIds]
+    [favoriteIds],
   );
 
   const addFavorite = useCallback(
     (id: number | string) => {
       setFavoriteIds((ids) => Array.from([...ids, id]));
     },
-    [setFavoriteIds]
+    [setFavoriteIds],
   );
 
   const removeFavorite = useCallback(
     (id: number | string) => {
       setFavoriteIds((ids) => ids.filter((_id) => _id !== id));
     },
-    [setFavoriteIds]
+    [setFavoriteIds],
   );
 
-  const isFavorite = useCallback((id: number | string) => favoriteIds.includes(id), [favoriteIds]);
+  const isFavorite = useCallback(
+    (id: number | string) => favoriteIds.includes(id),
+    [favoriteIds],
+  );
 
   return useMemo(
     () => ({
@@ -100,8 +112,16 @@ export function useDapps(): UseDapps {
       removeFavorite,
       isFavorite,
       addCustom,
-      removeCustom
+      removeCustom,
     }),
-    [addCustom, addFavorite, customApps, isFavorite, removeCustom, removeFavorite, validDapps]
+    [
+      addCustom,
+      addFavorite,
+      customApps,
+      isFavorite,
+      removeCustom,
+      removeFavorite,
+      validDapps,
+    ],
   );
 }

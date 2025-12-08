@@ -24,25 +24,30 @@ type SyncBatchItem = {
 
 export function useBatchSync(
   network: string,
-  address?: string
+  address?: string,
 ): [
   list: SyncBatchItem[],
   restoreList: SyncBatchItem[],
   restore: (ids: number[]) => void,
   isFetched: boolean,
   isFetching: boolean,
-  refetch: () => void
+  refetch: () => void,
 ] {
-  const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address) : ''),
+    [address],
+  );
   const { data, isFetched, isFetching, refetch } = useQuery({
     queryKey: ['batch-sync', network, addressHex] as const,
     queryFn: ({ queryKey: [, chain, addr] }): Promise<SyncBatchItem[]> =>
       service.transaction.getBatchTransactions(chain as string, addr as string),
-    enabled: !!addressHex
+    enabled: !!addressHex,
   });
   const [txs, addTx] = useBatchTxs(network, addressHex);
   const syncedIds = useMemo(() => {
-    return txs.map((item) => item.relatedBatch).filter((item) => typeof item === 'number');
+    return txs
+      .map((item) => item.relatedBatch)
+      .filter((item) => typeof item === 'number');
   }, [txs]);
 
   // Derive list and restoreList from data and syncedIds
@@ -59,11 +64,13 @@ export function useBatchSync(
       if (!list.length || !addressHex) return;
 
       addTx(
-        list.filter((item) => values.includes(item.id)).map((item) => ({ calldata: item.call, relatedBatch: item.id })),
-        false
+        list
+          .filter((item) => values.includes(item.id))
+          .map((item) => ({ calldata: item.call, relatedBatch: item.id })),
+        false,
       );
     },
-    [addTx, addressHex, list]
+    [addTx, addressHex, list],
   );
 
   return [list, restoreList, restore, isFetched, isFetching, refetch];

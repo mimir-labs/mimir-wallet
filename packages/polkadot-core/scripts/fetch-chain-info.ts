@@ -53,7 +53,10 @@ async function fetchChainInfo(config: ChainConfig): Promise<FetchedChainInfo> {
   const wsUrls = Object.values(config.wsUrl);
 
   try {
-    const api = await ApiPromise.create({ provider: new WsProvider(wsUrls), noInitWarn: true });
+    const api = await ApiPromise.create({
+      provider: new WsProvider(wsUrls),
+      noInitWarn: true,
+    });
 
     const info: FetchedChainInfo = {
       genesisHash: api.genesisHash.toHex(),
@@ -61,7 +64,7 @@ async function fetchChainInfo(config: ChainConfig): Promise<FetchedChainInfo> {
       nativeDecimals: api.registry.chainDecimals[0] ?? 12,
       nativeToken: api.registry.chainTokens[0] ?? 'UNIT',
       supportsDryRun: typeof api.call.dryRunApi?.dryRunCall === 'function',
-      supportsProxy: !!api.tx.proxy
+      supportsProxy: !!api.tx.proxy,
     };
 
     await api.disconnect();
@@ -69,7 +72,9 @@ async function fetchChainInfo(config: ChainConfig): Promise<FetchedChainInfo> {
 
     return info;
   } catch (error) {
-    console.warn(`  ✗ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.warn(
+      `  ✗ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 
   throw new Error(`All endpoints failed for ${config.name}`);
@@ -85,7 +90,7 @@ function showDiff(chain: ChainConfig, newInfo: FetchedChainInfo): boolean {
     'nativeDecimals',
     'nativeToken',
     'supportsDryRun',
-    'supportsProxy'
+    'supportsProxy',
   ];
 
   let hasChanges = false;
@@ -100,7 +105,9 @@ function showDiff(chain: ChainConfig, newInfo: FetchedChainInfo): boolean {
         hasChanges = true;
       }
 
-      console.log(`    ${field}: ${JSON.stringify(oldValue)} → ${JSON.stringify(newValue)}`);
+      console.log(
+        `    ${field}: ${JSON.stringify(oldValue)} → ${JSON.stringify(newValue)}`,
+      );
     }
   }
 
@@ -110,7 +117,10 @@ function showDiff(chain: ChainConfig, newInfo: FetchedChainInfo): boolean {
 /**
  * Process a single JSON config file
  */
-async function processFile(filePath: string, targetChain?: string): Promise<number> {
+async function processFile(
+  filePath: string,
+  targetChain?: string,
+): Promise<number> {
   console.log(`\nProcessing ${path.basename(filePath)}...`);
 
   const chains: ChainConfig[] = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -135,13 +145,17 @@ async function processFile(filePath: string, targetChain?: string): Promise<numb
         console.log(`  No changes`);
       }
     } catch (error) {
-      console.error(`  ✗ Error: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(
+        `  ✗ Error: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
   if (updatedCount > 0) {
     fs.writeFileSync(filePath, JSON.stringify(chains, null, 2) + '\n');
-    console.log(`\n✓ Updated ${updatedCount} chain(s) in ${path.basename(filePath)}`);
+    console.log(
+      `\n✓ Updated ${updatedCount} chain(s) in ${path.basename(filePath)}`,
+    );
   }
 
   return updatedCount;
@@ -168,7 +182,13 @@ async function main() {
   }
 
   const chainsDir = path.join(__dirname, '../src/chains');
-  const files = ['polkadot.json', 'kusama.json', 'paseo.json', 'westend.json', 'solochain.json'];
+  const files = [
+    'polkadot.json',
+    'kusama.json',
+    'paseo.json',
+    'westend.json',
+    'solochain.json',
+  ];
 
   let totalUpdated = 0;
 

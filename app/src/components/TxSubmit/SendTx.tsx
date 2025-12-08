@@ -3,10 +3,19 @@
 
 import type { BuildTx } from './hooks/useBuildTx';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { ExtrinsicPayloadValue, ISubmittableResult } from '@polkadot/types/types';
+import type {
+  ExtrinsicPayloadValue,
+  ISubmittableResult,
+} from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { ApiManager, sign, signAndSend, TxEvents, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  ApiManager,
+  sign,
+  signAndSend,
+  TxEvents,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Alert, AlertTitle, Button, buttonSpinner } from '@mimir-wallet/ui';
 import React, { useState } from 'react';
@@ -35,7 +44,7 @@ function SendTx({
   onFinalized,
   onResults,
   onSignature,
-  beforeSend
+  beforeSend,
 }: {
   disabled?: boolean;
   buildTx: BuildTx;
@@ -49,7 +58,12 @@ function SendTx({
   onResults?: (results: ISubmittableResult) => void;
   onFinalized?: (results: ISubmittableResult) => void;
   onError?: (error: unknown) => void;
-  onSignature?: (signer: string, signature: HexString, tx: HexString, payload: ExtrinsicPayloadValue) => void;
+  onSignature?: (
+    signer: string,
+    signature: HexString,
+    tx: HexString,
+    payload: ExtrinsicPayloadValue,
+  ) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }) {
   const { network } = useNetwork();
@@ -82,10 +96,6 @@ function SendTx({
     try {
       const api = await ApiManager.getInstance().getApi(network);
 
-      if (!api) {
-        throw new Error('API not ready');
-      }
-
       for await (const item of hashSet) {
         await service.chain.updateCalldata(network, item);
       }
@@ -93,15 +103,16 @@ function SendTx({
       if (onlySign) {
         addTxToast({ events });
 
-        const [signature, payload, extrinsicHash, signedTransaction] = await sign(
-          api,
-          tx,
-          signer,
-          () => enableWallet(source, CONNECT_ORIGIN),
-          {
-            assetId: assetId === 'native' ? undefined : assetId
-          }
-        );
+        const [signature, payload, extrinsicHash, signedTransaction] =
+          await sign(
+            api,
+            tx,
+            signer,
+            () => enableWallet(source, CONNECT_ORIGIN),
+            {
+              assetId: assetId === 'native' ? undefined : assetId,
+            },
+          );
 
         await service.transaction.uploadWebsite(
           network,
@@ -110,7 +121,7 @@ function SendTx({
           appName,
           iconUrl,
           note,
-          relatedBatches
+          relatedBatches,
         );
 
         onSignature?.(signer, signature, signedTransaction, payload);
@@ -121,10 +132,16 @@ function SendTx({
 
         setLoading(false);
       } else {
-        events = signAndSend(api, tx, signer, () => enableWallet(source, CONNECT_ORIGIN), {
-          beforeSend,
-          assetId: assetId === 'native' ? undefined : assetId
-        });
+        events = signAndSend(
+          api,
+          tx,
+          signer,
+          () => enableWallet(source, CONNECT_ORIGIN),
+          {
+            beforeSend,
+            assetId: assetId === 'native' ? undefined : assetId,
+          },
+        );
 
         addTxToast({ events });
 
@@ -136,7 +153,7 @@ function SendTx({
             appName,
             iconUrl,
             note,
-            relatedBatches
+            relatedBatches,
           );
         });
         events.once('inblock', (result) => {
@@ -165,7 +182,8 @@ function SendTx({
       events.emit('error', error);
 
       // Track transaction failure
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
 
       analyticsActions.transactionResult(false, errorMessage);
 
@@ -176,29 +194,31 @@ function SendTx({
   return (
     <>
       {error ? (
-        <Alert variant='destructive'>
+        <Alert variant="destructive">
           <AlertTitle>
-            <span className='break-all'>{error.message}</span>
+            <span className="break-all">{error.message}</span>
           </AlertTitle>
         </Alert>
       ) : null}
 
       {Object.keys(delay).length > 0 ? (
-        <Alert variant='warning'>
-          <AlertTitle>This transaction can be executed after review window</AlertTitle>
+        <Alert variant="warning">
+          <AlertTitle>
+            This transaction can be executed after review window
+          </AlertTitle>
         </Alert>
       ) : null}
 
       {dryRunResult && !dryRunResult.success ? (
-        <Alert variant='destructive'>
+        <Alert variant="destructive">
           <AlertTitle>{dryRunResult.error.message}</AlertTitle>
         </Alert>
       ) : null}
 
       <Button
         fullWidth
-        variant='solid'
-        color='primary'
+        variant="solid"
+        color="primary"
         onClick={error ? undefined : onConfirm}
         disabled={
           loading ||

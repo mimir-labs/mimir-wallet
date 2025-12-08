@@ -18,7 +18,9 @@ function hasRemoteProxy(api: ApiPromise, tx: IMethod) {
   let method = tx instanceof GenericExtrinsic ? tx.method : tx;
 
   while (true) {
-    if (api.tx.remoteProxyRelayChain?.remoteProxyWithRegisteredProof?.is(method)) {
+    if (
+      api.tx.remoteProxyRelayChain?.remoteProxyWithRegisteredProof?.is(method)
+    ) {
       method = api.createType('Call', method.args[2].toU8a());
 
       return true;
@@ -41,7 +43,11 @@ function hasRemoteProxy(api: ApiPromise, tx: IMethod) {
 }
 
 // return the u8a of the call, not the extrinsic
-export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: string): Promise<Uint8Array> {
+export async function buildRemoteProxy(
+  api: ApiPromise,
+  tx: IMethod,
+  address: string,
+): Promise<Uint8Array> {
   if (!hasRemoteProxy(api, tx)) {
     return tx instanceof GenericExtrinsic ? tx.method.toU8a() : tx.toU8a();
   }
@@ -51,7 +57,9 @@ export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: st
   let method = tx instanceof GenericExtrinsic ? tx.method : tx;
 
   while (true) {
-    if (api.tx.remoteProxyRelayChain?.remoteProxyWithRegisteredProof?.is(method)) {
+    if (
+      api.tx.remoteProxyRelayChain?.remoteProxyWithRegisteredProof?.is(method)
+    ) {
       proxyAddresses.push(method.args[0].toString());
       address = method.args[0].toString();
       method = api.createType('Call', method.args[2].toU8a());
@@ -59,10 +67,13 @@ export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: st
       const threshold = method.args[0].toNumber();
       const multisigAddress = encodeMultiAddress(
         method.args[1].map((item) => item.toString()).concat(address),
-        threshold
+        threshold,
       );
       const methodU8a = method.args[3].toU8a();
-      const info = await api.query.multisig.multisigs(multisigAddress, blake2AsU8a(methodU8a));
+      const info = await api.query.multisig.multisigs(
+        multisigAddress,
+        blake2AsU8a(methodU8a),
+      );
 
       if (!info.isSome || info.unwrap().approvals.length < threshold - 1) {
         break;
@@ -74,7 +85,7 @@ export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: st
       const threshold = 1;
       const multisigAddress = encodeMultiAddress(
         method.args[0].map((item) => item.toString()).concat(address),
-        threshold
+        threshold,
       );
       const methodU8a = method.args[1].toU8a();
 
@@ -93,7 +104,9 @@ export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: st
   }
 
   const genesisHash = api.genesisHash.toHex();
-  const remoteGenesisHash = Object.entries(remoteProxyRelations).find(([, value]) => value === genesisHash)?.[0];
+  const remoteGenesisHash = Object.entries(remoteProxyRelations).find(
+    ([, value]) => value === genesisHash,
+  )?.[0];
 
   if (!remoteGenesisHash) {
     throw new Error('Remote chain not support');
@@ -101,7 +114,9 @@ export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: st
 
   const remoteApi = await ApiManager.getInstance().getApi(remoteGenesisHash);
 
-  const blockToRoot = JSON.parse((await api.query.remoteProxyRelayChain.blockToRoot()) as any);
+  const blockToRoot = JSON.parse(
+    (await api.query.remoteProxyRelayChain.blockToRoot()) as any,
+  );
   // Get the latest block for which AH knows the storage root.
   const proofBlock = blockToRoot[blockToRoot.length - 1][0];
   const proofBlockHash = await remoteApi.rpc.chain.getBlockHash(proofBlock);
@@ -110,13 +125,19 @@ export async function buildRemoteProxy(api: ApiPromise, tx: IMethod, address: st
 
   for (const proxyAddress of proxyAddresses) {
     const proxyDefinitionKey = remoteApi.query.proxy.proxies.key(proxyAddress);
-    const proof = await remoteApi.rpc.state.getReadProof([proxyDefinitionKey], proofBlockHash);
+    const proof = await remoteApi.rpc.state.getReadProof(
+      [proxyDefinitionKey],
+      proofBlockHash,
+    );
 
     batchTxs.unshift(
-      api.tx.remoteProxyRelayChain.registerRemoteProxyProof({ RelayChain: { proof: proof.proof, block: proofBlock } })
-        .method
+      api.tx.remoteProxyRelayChain.registerRemoteProxyProof({
+        RelayChain: { proof: proof.proof, block: proofBlock },
+      }).method,
     );
   }
 
-  return api.tx.utility.batchAll(batchTxs.concat(tx instanceof GenericExtrinsic ? tx.method : tx)).method.toU8a();
+  return api.tx.utility
+    .batchAll(batchTxs.concat(tx instanceof GenericExtrinsic ? tx.method : tx))
+    .method.toU8a();
 }

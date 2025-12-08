@@ -3,11 +3,15 @@
 
 import type { FilterPath, Transaction } from '@/hooks/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
+import type {
+  ExtrinsicPayloadValue,
+  IMethod,
+  ISubmittableResult,
+} from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, type ButtonProps, Spinner } from '@mimir-wallet/ui';
+import { Button, type ButtonProps, buttonSpinner } from '@mimir-wallet/ui';
 import React, { forwardRef, useState } from 'react';
 
 import { toastError } from './utils';
@@ -15,7 +19,10 @@ import { toastError } from './utils';
 import { useTxQueue } from '@/hooks/useTxQueue';
 import { useWallet } from '@/wallet/useWallet';
 
-interface Props extends Omit<ButtonProps, 'onClick' | 'startContent' | 'endContent'> {
+interface Props extends Omit<
+  ButtonProps,
+  'onClick' | 'startContent' | 'endContent'
+> {
   startContent?: React.ReactNode;
   endContent?: React.ReactNode;
   accountId?: string;
@@ -35,7 +42,7 @@ interface Props extends Omit<ButtonProps, 'onClick' | 'startContent' | 'endConte
     signer: string,
     signature: HexString,
     signedTransaction: HexString,
-    payload: ExtrinsicPayloadValue
+    payload: ExtrinsicPayloadValue,
   ) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
   getCall?: () => IMethod | string | Promise<IMethod | string>;
@@ -65,13 +72,14 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
       endContent,
       ...props
     },
-    ref
+    ref,
   ) => {
     const { network } = useNetwork();
     const { addQueue } = useTxQueue();
     const { walletAccounts } = useWallet();
     const [isLoading, setIsLoading] = useState(false);
-    const address = accountId || transaction?.address || walletAccounts.at(0)?.address;
+    const address =
+      accountId || transaction?.address || walletAccounts.at(0)?.address;
 
     const handleClick = async () => {
       setIsLoading(true);
@@ -97,7 +105,7 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
               onResults: (result) => onResults?.(result),
               beforeSend: async (extrinsic) => beforeSend?.(extrinsic),
               network,
-              onError
+              onError,
             });
             onDone?.();
           }
@@ -110,14 +118,19 @@ const TxButton = forwardRef<HTMLButtonElement, Props>(
     };
 
     return (
-      <Button {...props} ref={ref} disabled={disabled || isLoading} onClick={handleClick}>
-        {isLoading && <Spinner size='sm' />}
+      <Button
+        {...props}
+        ref={ref}
+        disabled={disabled || isLoading}
+        onClick={handleClick}
+      >
+        {isLoading && buttonSpinner}
         {startContent}
         {children}
         {endContent}
       </Button>
     );
-  }
+  },
 );
 
 TxButton.displayName = 'TxButton';

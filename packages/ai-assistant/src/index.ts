@@ -13,8 +13,5 @@ export { handlerMetadataRegistry } from './store/handlerMetadataRegistry.js';
 // Middleware
 export { NavigationMiddleware } from './middleware/navigationMiddleware.js';
 
-// Components
-export * from './components/index.js';
-
 // Context
 export * from './store/aiContext.js';

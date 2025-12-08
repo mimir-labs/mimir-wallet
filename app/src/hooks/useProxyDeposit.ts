@@ -36,7 +36,7 @@ async function fetchProxyDeposit(network: string): Promise<ProxyDepositData> {
   return {
     base,
     factor,
-    total: base.add(factor)
+    total: base.add(factor),
   };
 }
 
@@ -66,7 +66,7 @@ export function useProxyDeposit(network: string): ProxyDepositResult {
     queryFn: ({ queryKey }) => fetchProxyDeposit(queryKey[1]),
     enabled: !!network,
     staleTime: Infinity,
-    retry: false
+    retry: false,
   });
 
   return useMemo(
@@ -75,8 +75,8 @@ export function useProxyDeposit(network: string): ProxyDepositResult {
       proxyDepositFactor: data?.factor ?? BN_ZERO,
       totalDeposit: data?.total ?? BN_ZERO,
       isLoading,
-      error: error as Error | null
+      error: error as Error | null,
     }),
-    [data, isLoading, error]
+    [data, isLoading, error],
   );
 }

@@ -3,7 +3,12 @@
 
 import type { TxBundle } from '../utils';
 
-import { ApiManager, dryRun, type DryRunResult, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  ApiManager,
+  dryRun,
+  type DryRunResult,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
 import { useSupportsDryRun } from '@/hooks/useChainCapabilities';
@@ -23,18 +28,14 @@ export function useDryRunResult(txBundle: TxBundle | null) {
 
       const api = await ApiManager.getInstance().getApi(network);
 
-      if (!api) {
-        return undefined;
-      }
-
       return dryRun(api, method, address);
     },
     enabled: !!network && !!method && !!address && supportsDryRun,
     staleTime: 0, // Always refetch for new transactions
-    retry: false
+    retry: false,
   });
 
   return {
-    dryRunResult: dryRunResult as DryRunResult | undefined
+    dryRunResult: dryRunResult as DryRunResult | undefined,
   };
 }

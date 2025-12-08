@@ -8,7 +8,14 @@ import * as React from 'react';
 
 import { cn } from '../lib/utils.js';
 
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command.js';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from './command.js';
 import { Popover, PopoverContent, PopoverTrigger } from './popover.js';
 
 export interface ComboboxOption {
@@ -50,21 +57,32 @@ export interface ComboboxProps<T extends ComboboxOption = ComboboxOption> {
 
 // Dropdown arrow icon (same as Autocomplete)
 const DropdownIcon = () => (
-  <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+  >
     <path
-      d='M10.7998 13.9344C10.3998 14.4674 9.60022 14.4674 9.20021 13.9344L5.57194 9.10028C5.07718 8.44109 5.54751 7.5 6.37172 7.5L13.6283 7.5C14.4525 7.5 14.9228 8.44109 14.4281 9.10028L10.7998 13.9344Z'
-      fill='currentColor'
+      d="M10.7998 13.9344C10.3998 14.4674 9.60022 14.4674 9.20021 13.9344L5.57194 9.10028C5.07718 8.44109 5.54751 7.5 6.37172 7.5L13.6283 7.5C14.4525 7.5 14.9228 8.44109 14.4281 9.10028L10.7998 13.9344Z"
+      fill="currentColor"
     />
   </svg>
 );
 
-const defaultFilterOptions = <T extends ComboboxOption>(options: T[], inputValue: string): T[] => {
+const defaultFilterOptions = <T extends ComboboxOption>(
+  options: T[],
+  inputValue: string,
+): T[] => {
   if (!inputValue) return options;
 
   const lowerInput = inputValue.toLowerCase();
 
   return options.filter(
-    (option) => option.label.toLowerCase().includes(lowerInput) || option.value.toLowerCase().includes(lowerInput)
+    (option) =>
+      option.label.toLowerCase().includes(lowerInput) ||
+      option.value.toLowerCase().includes(lowerInput),
   );
 };
 
@@ -82,7 +100,7 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
   renderValue,
   disabled = false,
   className,
-  contentClassName
+  contentClassName,
 }: ComboboxProps<T>) {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
@@ -103,7 +121,9 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
     const lowerInput = inputValue.toLowerCase();
 
     return options.some(
-      (option) => option.value.toLowerCase() === lowerInput || option.label.toLowerCase() === lowerInput
+      (option) =>
+        option.value.toLowerCase() === lowerInput ||
+        option.label.toLowerCase() === lowerInput,
     );
   }, [options, inputValue]);
 
@@ -114,7 +134,12 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
   // 4. no matching options found
   // 5. validation passes (if provided)
   const showCustomValueOption = React.useMemo(() => {
-    if (!allowCustomValue || !inputValue || hasExactMatch || filteredOptions.length > 0) {
+    if (
+      !allowCustomValue ||
+      !inputValue ||
+      hasExactMatch ||
+      filteredOptions.length > 0
+    ) {
       return false;
     }
 
@@ -123,7 +148,13 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
     }
 
     return true;
-  }, [allowCustomValue, inputValue, hasExactMatch, filteredOptions.length, validateCustomValue]);
+  }, [
+    allowCustomValue,
+    inputValue,
+    hasExactMatch,
+    filteredOptions.length,
+    validateCustomValue,
+  ]);
 
   const handleSelect = (selectedValue: string) => {
     onValueChange?.(selectedValue);
@@ -153,7 +184,9 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
 
   const defaultRenderOption = (option: T, isSelected: boolean) => (
     <>
-      <CheckIcon className={cn('mr-2 h-4 w-4', isSelected ? 'opacity-100' : 'opacity-0')} />
+      <CheckIcon
+        className={cn('mr-2 h-4 w-4', isSelected ? 'opacity-100' : 'opacity-0')}
+      />
       {option.label}
     </>
   );
@@ -161,10 +194,10 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <div className='relative'>
+        <div className="relative">
           <button
-            type='button'
-            role='combobox'
+            type="button"
+            role="combobox"
             aria-expanded={open}
             disabled={disabled}
             className={cn(
@@ -178,36 +211,45 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
               'items-center text-left',
               // Placeholder color when no value
               !value && 'text-foreground/50',
-              className
+              className,
             )}
           >
-            <span className='truncate'>{displayValue || placeholder}</span>
+            <span className="truncate">{displayValue || placeholder}</span>
           </button>
-          <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1'>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">
             <DropdownIcon />
           </div>
         </div>
       </PopoverTrigger>
       <PopoverContent
-        className={cn('border-divider-300 w-(--radix-popover-trigger-width) border-1 p-[5px]', contentClassName)}
-        align='start'
+        className={cn(
+          'border-divider w-(--radix-popover-trigger-width) border-1 p-[5px]',
+          contentClassName,
+        )}
+        align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command shouldFilter={false}>
-          <CommandInput placeholder={searchPlaceholder} value={inputValue} onValueChange={setInputValue} />
+          <CommandInput
+            placeholder={searchPlaceholder}
+            value={inputValue}
+            onValueChange={setInputValue}
+          />
           <CommandList>
             <CommandEmpty>{emptyMessage}</CommandEmpty>
-            <CommandGroup className='p-0'>
+            <CommandGroup className="p-0">
               {/* Custom value option */}
               {showCustomValueOption && (
                 <CommandItem
                   value={`__custom__${inputValue}`}
                   onSelect={handleCustomValueSelect}
-                  className='data-[selected=true]:bg-secondary hover:bg-secondary cursor-pointer rounded-[5px]'
+                  className="data-[selected=true]:bg-secondary hover:bg-secondary cursor-pointer rounded-[5px]"
                 >
-                  <CheckIcon className='mr-2 h-4 w-4 opacity-0' />
-                  <span className='text-muted-foreground'>Use:</span>
-                  <span className='ml-1 truncate font-medium'>{inputValue}</span>
+                  <CheckIcon className="mr-2 h-4 w-4 opacity-0" />
+                  <span className="text-muted-foreground">Use:</span>
+                  <span className="ml-1 truncate font-medium">
+                    {inputValue}
+                  </span>
                 </CommandItem>
               )}
               {/* Filtered options */}
@@ -221,10 +263,12 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
                     onSelect={() => handleSelect(option.value)}
                     className={cn(
                       'data-[selected=true]:bg-secondary hover:bg-secondary cursor-pointer rounded-[5px]',
-                      isSelected && 'bg-secondary'
+                      isSelected && 'bg-secondary',
                     )}
                   >
-                    {renderOption ? renderOption(option, isSelected) : defaultRenderOption(option, isSelected)}
+                    {renderOption
+                      ? renderOption(option, isSelected)
+                      : defaultRenderOption(option, isSelected)}
                   </CommandItem>
                 );
               })}

@@ -75,7 +75,9 @@ export class HandlerMetadataRegistry {
    * Get route requirement for a function name
    * Returns the first registered route requirement
    */
-  public getRouteRequirement(functionName: string): RouteRequirement | undefined {
+  public getRouteRequirement(
+    functionName: string,
+  ): RouteRequirement | undefined {
     const metadataList = this.getMetadataByFunction(functionName);
 
     return metadataList.find((m) => m.routeRequirement)?.routeRequirement;
@@ -103,12 +105,14 @@ export class HandlerMetadataRegistry {
     totalFunctions: number;
     routeDependentFunctions: number;
   } {
-    const routeDependentFunctions = this.getAllFunctionNames().filter((name) => this.requiresRoute(name)).length;
+    const routeDependentFunctions = this.getAllFunctionNames().filter((name) =>
+      this.requiresRoute(name),
+    ).length;
 
     return {
       totalHandlers: this.metadata.size,
       totalFunctions: this.functionNameIndex.size,
-      routeDependentFunctions
+      routeDependentFunctions,
     };
   }
 

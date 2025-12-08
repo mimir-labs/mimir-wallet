@@ -1,7 +1,16 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import {
+  Button,
+  Checkbox,
+  Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from '@mimir-wallet/ui';
 import { memo } from 'react';
 import { useToggle } from 'react-use';
 
@@ -31,7 +40,7 @@ function SafetyWarningModal({
   title = 'Safety Alert',
   description = 'We have detected that, because your proxy account also has its own proxy, the following accounts can indirectly control your account.',
   confirmText = 'I Understand',
-  severity = 'warning'
+  severity = 'warning',
 }: SafetyWarningModalProps) {
   const [acknowledged, toggleAcknowledged] = useToggle(false);
 
@@ -72,51 +81,61 @@ function SafetyWarningModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} size='2xl'>
+    <Modal isOpen={isOpen} onClose={handleClose} size="2xl">
       <ModalContent>
-        <ModalHeader className='flex-col gap-4'>
-          <div className='flex items-center gap-2'>
-            <span className='text-lg'>{getSeverityIcon()}</span>
-            <span className='text-foreground text-lg font-bold'>{title}</span>
+        <ModalHeader className="flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{getSeverityIcon()}</span>
+            <span className="text-foreground text-lg font-bold">{title}</span>
           </div>
-          {description && <p className='text-foreground/80 max-w-none text-sm'>{description}</p>}
+          {description && (
+            <p className="text-foreground/80 max-w-none text-sm">
+              {description}
+            </p>
+          )}
         </ModalHeader>
 
         <Divider />
 
-        <ModalBody className='gap-4'>
+        <ModalBody className="gap-4">
           {indirectControllers.length > 0 && (
             <>
-              <div className='flex flex-col gap-2'>
-                <h4 className='text-foreground text-base font-semibold'>
+              <div className="flex flex-col gap-2">
+                <h4 className="text-foreground text-base font-semibold">
                   Indirect Controllers ({indirectControllers.length})
                 </h4>
-                <p className='text-foreground/60 text-sm'>
-                  These accounts can control your proxy account and therefore indirectly control your funds:
+                <p className="text-foreground/60 text-sm">
+                  These accounts can control your proxy account and therefore
+                  indirectly control your funds:
                 </p>
               </div>
 
-              <div className='flex flex-col gap-2'>
+              <div className="flex flex-col gap-2">
                 {indirectControllers.map((address, index) => (
                   <div
                     key={address}
-                    className='border-divider bg-content2 flex items-center justify-between rounded-[10px] border-1 p-3'
+                    className="border-divider bg-content2 flex items-center justify-between rounded-[10px] border-1 p-3"
                   >
-                    <div className='flex items-center gap-3'>
-                      <div className='bg-warning text-warning-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold'>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-warning text-warning-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
                         {index + 1}
                       </div>
-                      <AddressRow value={address} withAddress={false} withName />
+                      <AddressRow
+                        value={address}
+                        withAddress={false}
+                        withName
+                      />
                     </div>
                     <Address shorten value={address} />
                   </div>
                 ))}
               </div>
 
-              <div className='bg-warning/10 border-warning/20 rounded-[10px] border-1 p-3'>
-                <p className='text-warning-600 text-sm'>
-                  <strong>Security Risk:</strong> These accounts can execute transactions on your behalf. Only proceed
-                  if you trust all listed controllers.
+              <div className="bg-warning/10 border-warning/20 rounded-[10px] border-1 p-3">
+                <p className="text-warning-600 text-sm">
+                  <strong>Security Risk:</strong> These accounts can execute
+                  transactions on your behalf. Only proceed if you trust all
+                  listed controllers.
                 </p>
               </div>
             </>
@@ -126,16 +145,30 @@ function SafetyWarningModal({
         <Divider />
 
         <ModalFooter>
-          <div className='flex w-full flex-col gap-4'>
-            <Checkbox size='sm' isSelected={acknowledged} onValueChange={toggleAcknowledged}>
-              <span className='text-sm'>{confirmText} and accept the security risks</span>
-            </Checkbox>
+          <div className="flex w-full flex-col gap-4">
+            <label className="inline-flex cursor-pointer items-center gap-2">
+              <Checkbox
+                checked={acknowledged}
+                onCheckedChange={(checked) => toggleAcknowledged(!!checked)}
+              />
+              <span>{confirmText} and accept the security risks</span>
+            </label>
 
-            <div className='flex gap-2'>
-              <Button fullWidth variant='ghost' color={getSeverityColor()} onClick={handleClose}>
+            <div className="flex gap-2">
+              <Button
+                fullWidth
+                variant="ghost"
+                color={getSeverityColor()}
+                onClick={handleClose}
+              >
                 Cancel
               </Button>
-              <Button fullWidth color={getSeverityColor()} disabled={!acknowledged} onClick={handleConfirm}>
+              <Button
+                fullWidth
+                color={getSeverityColor()}
+                disabled={!acknowledged}
+                onClick={handleConfirm}
+              >
                 Continue
               </Button>
             </div>

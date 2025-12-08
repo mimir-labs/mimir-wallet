@@ -41,7 +41,7 @@ class NotificationStorage {
             if (!db.objectStoreNames.contains(STORE_NAME)) {
               db.createObjectStore(STORE_NAME, { keyPath: 'notificationId' });
             }
-          }
+          },
         });
 
         // Perform cleanup on initialization
@@ -66,7 +66,7 @@ class NotificationStorage {
     try {
       await this.db.put(STORE_NAME, {
         notificationId,
-        readAt: new Date().toISOString()
+        readAt: new Date().toISOString(),
       });
 
       // Invalidate cache
@@ -92,7 +92,7 @@ class NotificationStorage {
       for (const notificationId of notificationIds) {
         store.put({
           notificationId,
-          readAt
+          readAt,
         });
       }
 
@@ -159,7 +159,9 @@ class NotificationStorage {
     try {
       const records = await this.db.getAll(STORE_NAME);
       const now = new Date();
-      const cutoffDate = new Date(now.getTime() - CLEANUP_DAYS * 24 * 60 * 60 * 1000);
+      const cutoffDate = new Date(
+        now.getTime() - CLEANUP_DAYS * 24 * 60 * 60 * 1000,
+      );
 
       // Remove old records
       const tx = this.db.transaction(STORE_NAME, 'readwrite');
@@ -179,7 +181,9 @@ class NotificationStorage {
 
       // If still too many records, keep only the most recent ones
       if (recordsToKeep.length > MAX_RECORDS) {
-        const sortedRecords = recordsToKeep.sort((a, b) => new Date(b.readAt).getTime() - new Date(a.readAt).getTime());
+        const sortedRecords = recordsToKeep.sort(
+          (a, b) => new Date(b.readAt).getTime() - new Date(a.readAt).getTime(),
+        );
         const recordsToDelete = sortedRecords.slice(MAX_RECORDS);
 
         for (const record of recordsToDelete) {

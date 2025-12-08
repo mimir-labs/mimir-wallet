@@ -23,7 +23,13 @@ interface ExplorerItem {
   tooltip: string;
 }
 
-function ExplorerLink({ address, showAll = false, className, chain, iconSize = 20 }: ExplorerLinkProps) {
+function ExplorerLink({
+  address,
+  showAll = false,
+  className,
+  chain,
+  iconSize = 20,
+}: ExplorerLinkProps) {
   const explorerItems = useMemo<ExplorerItem[]>(() => {
     if (!address) return [];
 
@@ -33,7 +39,7 @@ function ExplorerLink({ address, showAll = false, className, chain, iconSize = 2
     if (chain.explorerUrl) {
       const url = chainLinks.accountExplorerLink(
         { ss58Format: chain.ss58Format, explorerUrl: chain.explorerUrl },
-        address
+        address,
       );
 
       if (url) {
@@ -41,7 +47,7 @@ function ExplorerLink({ address, showAll = false, className, chain, iconSize = 2
           type: 'subscan',
           url,
           icon: SubscanImg,
-          tooltip: 'Subscan'
+          tooltip: 'Subscan',
         });
       }
     }
@@ -49,7 +55,7 @@ function ExplorerLink({ address, showAll = false, className, chain, iconSize = 2
     if (chain.statescanUrl) {
       const url = chainLinks.accountExplorerLink(
         { ss58Format: chain.ss58Format, statescanUrl: chain.statescanUrl },
-        address
+        address,
       );
 
       if (url) {
@@ -57,7 +63,7 @@ function ExplorerLink({ address, showAll = false, className, chain, iconSize = 2
           type: 'statescan',
           url,
           icon: StatescanImg,
-          tooltip: 'Statescan'
+          tooltip: 'Statescan',
         });
       }
     }
@@ -75,9 +81,13 @@ function ExplorerLink({ address, showAll = false, className, chain, iconSize = 2
     <div className={`flex items-center gap-1 sm:gap-2 ${className || ''}`}>
       {displayItems.map((item) => (
         <Tooltip key={item.type} content={item.tooltip}>
-          <a target='_blank' href={item.url} rel='noopener noreferrer'>
+          <a target="_blank" href={item.url} rel="noopener noreferrer">
             <Avatar
-              style={{ width: iconSize, height: iconSize, backgroundColor: 'transparent' }}
+              style={{
+                width: iconSize,
+                height: iconSize,
+                backgroundColor: 'transparent',
+              }}
               src={item.icon}
               alt={item.type}
             />

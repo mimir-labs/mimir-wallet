@@ -5,8 +5,6 @@ import { addressToHex } from '@mimir-wallet/polkadot-core';
 import { queryClient, service, STALE_TIMES } from '@mimir-wallet/service';
 import { createFileRoute } from '@tanstack/react-router';
 
-import PageAnalytic from '@/pages/analytic';
-
 /**
  * Analytics Dashboard Route (/analytic)
  *
@@ -27,8 +25,7 @@ export const Route = createFileRoute('/_authenticated/analytic')({
     await queryClient.ensureQueryData({
       queryKey: ['multi-chain-stats', addressHex],
       queryFn: () => service.account.getMultiChainStats(addressHex),
-      staleTime: STALE_TIMES.MODERATE
+      staleTime: STALE_TIMES.MODERATE,
     });
   },
-  component: PageAnalytic
 });

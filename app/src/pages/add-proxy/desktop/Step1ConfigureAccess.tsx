@@ -9,7 +9,13 @@ import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
 
 import { useAccount } from '@/accounts/useAccount';
 import PureIcon from '@/assets/images/pure-icon.svg';
-import { AddressName, EditableField, InputAddress, InputNetwork, ProxyControls } from '@/components';
+import {
+  AddressName,
+  EditableField,
+  InputAddress,
+  InputNetwork,
+  ProxyControls,
+} from '@/components';
 import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface Step1ConfigureAccessProps {
@@ -36,7 +42,7 @@ function Step1ConfigureAccess({
   isPureProxy,
   pureProxyName,
   onNext,
-  onDataChange
+  onDataChange,
 }: Step1ConfigureAccessProps) {
   const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(network);
   const { current } = useAccount();
@@ -49,43 +55,49 @@ function Step1ConfigureAccess({
     proxyType: 'Any', // Default value for validation
     hasDelay: false,
     delayType: 'hour',
-    customBlocks: '0'
+    customBlocks: '0',
   });
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className="flex flex-col gap-4">
       {/* Network Selection */}
-      <InputNetwork label='Select network' network={network} setNetwork={setNetwork} />
+      <InputNetwork
+        label="Select network"
+        network={network}
+        setNetwork={setNetwork}
+      />
 
       {/* Configure Proxy Access */}
-      <div className='flex flex-col gap-1'>
-        <label className='text-foreground text-sm font-bold'>Configure Proxy Access</label>
-        <div className='relative flex flex-col items-center gap-[5px]'>
+      <div className="flex flex-col gap-1">
+        <label className="text-foreground text-sm font-bold">
+          Configure Proxy Access
+        </label>
+        <div className="relative flex flex-col items-center gap-[5px]">
           {/* Proxy Account (Upper) */}
           <InputAddress
             shorten={false}
             value={proxy}
             onChange={(value) => onDataChange({ proxy: value })}
-            placeholder='Select proxy account'
+            placeholder="Select proxy account"
           />
 
           <ProxyControls
-            className='absolute! inset-x-auto inset-y-0 z-10 m-auto'
+            className="absolute! inset-x-auto inset-y-0 z-10 m-auto"
             onSwitch={() => {
               // Switch proxy and proxied accounts
               onDataChange({
                 proxy: proxied,
-                proxied: proxy
+                proxied: proxy,
               });
             }}
           />
 
           {/* Proxied Account (Lower) */}
           {isPureProxy ? (
-            <div className='bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5'>
+            <div className="bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5">
               <img src={PureIcon} style={{ width: 30 }} />
               <EditableField
-                className='font-bold'
+                className="font-bold"
                 placeholder={DEFAULT_PURE_ACCOUNT_NAME}
                 value={pureProxyName || ''}
                 onChange={(value) => onDataChange({ pureProxyName: value })}
@@ -97,57 +109,65 @@ function Step1ConfigureAccess({
               shorten={false}
               value={proxied}
               onChange={(value) => onDataChange({ proxied: value })}
-              placeholder='Select account to be proxied'
+              placeholder="Select account to be proxied"
             />
           )}
         </div>
       </div>
 
       {/* Create Pure Toggle */}
-      <div className='flex items-center justify-between'>
-        <div className='flex flex-col'>
-          <span className='text-foreground text-sm font-bold'>Create Pure</span>
-          <span className='text-foreground/50 text-xs'>
-            Pure proxies are new keyless accounts that are created and controlled by&nbsp;
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col">
+          <span className="text-foreground text-sm font-bold">Create Pure</span>
+          <span className="text-foreground/50 text-xs">
+            Pure proxies are new keyless accounts that are created and
+            controlled by&nbsp;
             {proxy ? <AddressName value={proxy} /> : 'your account'}.
           </span>
         </div>
         <Switch
-          isSelected={isPureProxy}
-          onValueChange={(checked) => {
+          checked={isPureProxy}
+          onCheckedChange={(checked) => {
             onDataChange({
               isPureProxy: checked,
-              proxied: checked ? current : proxied
+              proxied: checked ? current : proxied,
             });
           }}
         />
       </div>
 
       {/* Notice Alert */}
-      <Tips network={network} pure={isPureProxy} proxied={proxied} proxy={proxy} />
+      <Tips
+        network={network}
+        pure={isPureProxy}
+        proxied={proxied}
+        proxy={proxy}
+      />
 
       {/* Divider */}
       <Divider />
 
       {/* Proxy Module Not Supported Alert */}
       {!isProxyModuleSupported && (
-        <Alert variant='destructive'>
-          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        <Alert variant="destructive">
+          <AlertTitle>
+            The current network does not support proxy module
+          </AlertTitle>
         </Alert>
       )}
 
       {/* Action Button */}
-      <div className='flex flex-col gap-2.5'>
+      <div className="flex flex-col gap-2.5">
         {validationResult.visibleErrors.map((error, index) => (
-          <Alert key={index} variant='destructive'>
+          <Alert key={index} variant="destructive">
             <AlertTitle>{error}</AlertTitle>
           </Alert>
         ))}
         <Button
           fullWidth
-          size='md'
-          color='primary'
-          radius='full'
+          size="md"
+          color="primary"
+          radius="full"
           onClick={onNext}
           disabled={!validationResult.canProceed || !isProxyModuleSupported}
         >

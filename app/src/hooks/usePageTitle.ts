@@ -49,7 +49,9 @@ export function usePageTitle() {
   const { mode } = useChains();
 
   const PREFIX =
-    mode === 'omni' ? 'Mimir|Your Ultimate Omni Web3 Multisig Wallet' : 'Mimir|Your Ultimate Web3 Multisig Wallet';
+    mode === 'omni'
+      ? 'Mimir|Your Ultimate Omni Web3 Multisig Wallet'
+      : 'Mimir|Your Ultimate Web3 Multisig Wallet';
 
   useEffect(() => {
     // Find the deepest route match with metadata
@@ -69,7 +71,7 @@ export function usePageTitle() {
         const dynamicTitle = meta.getTitle({
           params: matchWithMetadata.params as Record<string, string>,
           search: matchWithMetadata.search as Record<string, any>,
-          mode
+          mode,
         });
 
         title += ` - ${dynamicTitle}`;

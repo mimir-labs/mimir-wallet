@@ -3,7 +3,15 @@
 
 import { addressToHex, useNetwork } from '@mimir-wallet/polkadot-core';
 import { service, useMutation } from '@mimir-wallet/service';
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import {
+  Button,
+  Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from '@mimir-wallet/ui';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -18,7 +26,7 @@ function RecoverTx({
   transaction,
   isOpen,
   onClose,
-  handleRecover
+  handleRecover,
 }: {
   transaction: Transaction;
   isOpen: boolean;
@@ -33,17 +41,25 @@ function RecoverTx({
   // Mutation for uploading calldata to server
   const { mutateAsync: uploadCalldata, isPending } = useMutation({
     mutationFn: async (calldata: string) => {
-      await service.transaction.supplementCall(network, transaction.id, calldata as `0x${string}`);
+      await service.transaction.supplementCall(
+        network,
+        transaction.id,
+        calldata as `0x${string}`,
+      );
 
       // Refetch both single-chain and multi-chain pending transactions
       queryClient.invalidateQueries({
-        queryKey: ['pending-transactions', transaction.network, addressToHex(transaction.address)]
+        queryKey: [
+          'pending-transactions',
+          transaction.network,
+          addressToHex(transaction.address),
+        ],
       });
     },
     onError: (error) => {
       console.error('Failed to upload call data:', error);
       toastError('Failed to upload call data to server');
-    }
+    },
   });
 
   const error = useMemo(() => {
@@ -55,8 +71,9 @@ function RecoverTx({
       const call = registry.createType('Call', calldata);
 
       if (
-        (transaction.type === TransactionType.Multisig ? blake2AsHex(call.toU8a()) : call.hash.toHex()) !==
-        transaction.callHash
+        (transaction.type === TransactionType.Multisig
+          ? blake2AsHex(call.toU8a())
+          : call.hash.toHex()) !== transaction.callHash
       ) {
         return new Error('Call hash mismatch');
       }
@@ -70,17 +87,17 @@ function RecoverTx({
   if (!registry) return null;
 
   return (
-    <Modal size='2xl' onClose={onClose} isOpen={isOpen}>
+    <Modal size="2xl" onClose={onClose} isOpen={isOpen}>
       <ModalContent>
         <ModalHeader>Call Data</ModalHeader>
         <ModalBody>
-          <p className='text-foreground/50 text-xs leading-4'>
-            <IconInfo className='mr-1 inline h-4 w-4 align-middle' />
-            This transaction wasn’t initiated from Mimir. But you can copy Call Data from explorer to recover this
-            transaction
+          <p className="text-foreground/50 text-xs leading-4">
+            <IconInfo className="mr-1 inline h-4 w-4 align-middle" />
+            This transaction wasn’t initiated from Mimir. But you can copy Call
+            Data from explorer to recover this transaction
           </p>
           <Divider />
-          <div className='grid grid-cols-[60px_1fr] items-center gap-x-1.5 gap-y-2.5'>
+          <div className="grid grid-cols-[60px_1fr] items-center gap-x-1.5 gap-y-2.5">
             <b>Call Data</b>
             <Input value={calldata} onChange={setCalldata} error={error} />
             <b>Call Hash</b>
@@ -92,8 +109,8 @@ function RecoverTx({
         <ModalFooter>
           <Button
             fullWidth
-            variant='ghost'
-            color='primary'
+            variant="ghost"
+            color="primary"
             disabled={!calldata || !!error || isPending}
             onClick={async () => {
               // Upload calldata to server and refetch queries

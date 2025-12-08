@@ -29,48 +29,48 @@ export const walletConfig: Record<string, WalletConfig> = {
     icon: Nova,
     disabledIcon: NovaDisabled,
     name: 'Nova',
-    downloadUrl: 'https://novawallet.io/'
+    downloadUrl: 'https://novawallet.io/',
   },
   'subwallet-js': {
     key: 'subwallet-js',
     icon: Subwallet,
     disabledIcon: SubwalletDisabled,
     name: 'SubWallet',
-    downloadUrl: 'https://www.subwallet.app/zh/'
+    downloadUrl: 'https://www.subwallet.app/zh/',
   },
   talisman: {
     key: 'talisman',
     icon: Talisman,
     disabledIcon: TalismanDisabled,
     name: 'Talisman',
-    downloadUrl: 'https://www.talisman.xyz/'
+    downloadUrl: 'https://www.talisman.xyz/',
   },
   'fearless-wallet': {
     key: 'fearless-wallet',
     icon: Fearless,
     disabledIcon: FearlessDisabled,
     name: 'Fearless',
-    downloadUrl: 'https://fearlesswallet.io/'
+    downloadUrl: 'https://fearlesswallet.io/',
   },
   polkagate: {
     key: 'polkagate',
     icon: Polkagate,
     disabledIcon: PolkagateDisabled,
     name: 'Polkagate',
-    downloadUrl: 'https://polkagate.xyz/'
+    downloadUrl: 'https://polkagate.xyz/',
   },
   'polkadot-js': {
     key: 'polkadot-js',
     icon: PolkadotJs,
     disabledIcon: PolkadotJsDisabled,
     name: 'Polkadot.js',
-    downloadUrl: 'https://polkadot.js.org/extension/'
+    downloadUrl: 'https://polkadot.js.org/extension/',
   },
   plutonication: {
     key: 'plutonication',
     icon: Plutonication,
     disabledIcon: Plutonication, // PlutoWallet is always enabled
     name: 'Plutonication',
-    downloadUrl: 'https://plutonication.com'
-  }
+    downloadUrl: 'https://plutonication.com',
+  },
 };

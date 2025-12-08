@@ -1,8 +1,19 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { type Endpoint, useChains, useChainStatus } from '@mimir-wallet/polkadot-core';
-import { Avatar, Chip, Popover, PopoverContent, PopoverTrigger, Spinner } from '@mimir-wallet/ui';
+import {
+  type Endpoint,
+  useChains,
+  useChainStatus,
+} from '@mimir-wallet/polkadot-core';
+import {
+  Avatar,
+  Badge,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Spinner,
+} from '@mimir-wallet/ui';
 import { clsx } from 'clsx';
 import React, { useRef } from 'react';
 import { useToggle } from 'react-use';
@@ -36,7 +47,7 @@ function NetworkItem({
   item,
   onSelect,
   isMigrationCompleted,
-  endContent
+  endContent,
 }: {
   item: Endpoint;
   onSelect: () => void;
@@ -50,19 +61,19 @@ function NetworkItem({
     <li
       onClick={onSelect}
       className={clsx(
-        'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5'
+        'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5',
       )}
     >
-      <Avatar alt={item.name} src={item.icon} style={{ width: 20, height: 20, background: 'transparent' }}></Avatar>
-      <div className='flex-1'>{item.name}</div>
-      <div className='flex items-center gap-2'>
+      <Avatar
+        alt={item.name}
+        src={item.icon}
+        style={{ width: 20, height: 20, background: 'transparent' }}
+      ></Avatar>
+      <div className="flex-1">{item.name}</div>
+      <div className="flex items-center gap-2">
         {endContent}
-        {isMigrationCompleted && (
-          <Chip color='secondary' size='sm'>
-            Migrated
-          </Chip>
-        )}
-        {isConnecting && <Spinner size='sm' />}
+        {isMigrationCompleted && <Badge variant="secondary">Migrated</Badge>}
+        {isConnecting && <Spinner size="sm" />}
       </div>
     </li>
   );
@@ -80,7 +91,7 @@ function OmniChainInputNetwork({
   helper,
   network,
   setNetwork,
-  endContent
+  endContent,
 }: Props) {
   const { chains: networks } = useChains();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -101,7 +112,7 @@ function OmniChainInputNetwork({
     })
     .map((item) => ({
       ...item,
-      endContent: endContent?.[item.key] || endContent?.[item.genesisHash]
+      endContent: endContent?.[item.key] || endContent?.[item.genesisHash],
     }));
 
   const { data: migrationNetworks } = useMigrationNetworks();
@@ -113,7 +124,7 @@ function OmniChainInputNetwork({
   const chain: Options | undefined = networks
     .map((item) => ({
       ...item,
-      endContent: endContent?.[item.key] || endContent?.[item.genesisHash]
+      endContent: endContent?.[item.key] || endContent?.[item.genesisHash],
     }))
     .find((item) => item.key === network);
 
@@ -126,8 +137,15 @@ function OmniChainInputNetwork({
   };
 
   const element = chain ? (
-    <div data-disabled={disabled} className='data-[disabled=true]:text-foreground/50 flex items-center gap-2.5'>
-      <Avatar alt={chain.name} src={chain.icon} style={{ width: 20, height: 20, background: 'transparent' }}></Avatar>
+    <div
+      data-disabled={disabled}
+      className="data-[disabled=true]:text-foreground/50 flex items-center gap-2.5"
+    >
+      <Avatar
+        alt={chain.name}
+        src={chain.icon}
+        style={{ width: 20, height: 20, background: 'transparent' }}
+      ></Avatar>
       {isIconOnly ? null : (
         <>
           <p>{chain.name}</p>
@@ -142,17 +160,17 @@ function OmniChainInputNetwork({
       data-disabled={disabled}
       className={twMerge([
         'input-network-wrapper w-full space-y-2 data-[disabled=true]:pointer-events-none',
-        className || ''
+        className || '',
       ])}
     >
-      {label && <div className='text-sm font-bold'>{label}</div>}
+      {label && <div className="text-sm font-bold">{label}</div>}
 
       <Popover open={isOpen} onOpenChange={toggleOpen}>
         <PopoverTrigger asChild>
           <div
             ref={wrapperRef}
             className={twMerge([
-              'group tap-highlight-transparent border-divider-300 hover:border-primary hover:bg-primary-50 relative inline-flex h-11 min-h-11 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
+              'group tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 relative inline-flex h-11 min-h-11 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
               radius === 'full'
                 ? 'rounded-full'
                 : radius === 'lg'
@@ -162,7 +180,7 @@ function OmniChainInputNetwork({
                     : radius === 'sm'
                       ? 'rounded-[5px]'
                       : 'rounded-none',
-              contentClassName || ''
+              contentClassName || '',
             ])}
             onClick={(e) => {
               e.stopPropagation();
@@ -173,7 +191,7 @@ function OmniChainInputNetwork({
 
             <ArrowDown
               data-open={isOpen}
-              className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
+              className="absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180"
               style={{ color: 'inherit' }}
               onClick={(e) => {
                 e.stopPropagation();
@@ -182,12 +200,19 @@ function OmniChainInputNetwork({
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent style={{ width: popoverWidth, minWidth: 200 }} className='border-divider-300 border-1 p-[5px]'>
+        <PopoverContent
+          style={{ width: popoverWidth, minWidth: 200 }}
+          className="border-divider border-1 p-[5px]"
+        >
           {options.length > 0 ? (
-            <div autoFocus className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
+            <div
+              autoFocus
+              className={clsx('text-foreground max-h-[250px] overflow-y-auto')}
+            >
               <ul className={clsx('flex list-none flex-col')}>
                 {options.map((item) => {
-                  const isMigrationCompleted = !!completedMigrationNetworks?.includes(item.key);
+                  const isMigrationCompleted =
+                    !!completedMigrationNetworks?.includes(item.key);
 
                   return (
                     <NetworkItem
@@ -205,12 +230,12 @@ function OmniChainInputNetwork({
               </ul>
             </div>
           ) : (
-            <div className='text-foreground/50 text-center'>no networks</div>
+            <div className="text-foreground/50 text-center">no networks</div>
           )}
         </PopoverContent>
       </Popover>
 
-      {helper && <div className='text-foreground/50 text-xs'>{helper}</div>}
+      {helper && <div className="text-foreground/50 text-xs">{helper}</div>}
     </div>
   );
 }

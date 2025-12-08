@@ -3,4 +3,6 @@
 
 export const jsonHeader = { 'Content-Type': 'application/json' };
 
-export const getAuthorizationHeader = (accessToken: string) => ({ Authorization: `Bearer ${accessToken}` });
+export const getAuthorizationHeader = (accessToken: string) => ({
+  Authorization: `Bearer ${accessToken}`,
+});

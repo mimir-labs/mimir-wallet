@@ -13,7 +13,10 @@ import { BN_ZERO } from '@polkadot/util';
  * @param address - Account address to query
  * @returns Promise<BalanceResult[]> - Array of balance results for non-zero balances
  */
-export async function fetchTokenBalances(api: ApiPromise, address: HexString): Promise<BalanceResult[]> {
+export async function fetchTokenBalances(
+  api: ApiPromise,
+  address: HexString,
+): Promise<BalanceResult[]> {
   if (!api?.isConnected) {
     throw new Error('API is not connected');
   }
@@ -35,7 +38,9 @@ export async function fetchTokenBalances(api: ApiPromise, address: HexString): P
       const frozen = balance.frozen;
 
       // Calculate transferrable balance (free - max(frozen - reserved, 0))
-      const transferrable = free.sub(frozen.gt(reserved) ? frozen.sub(reserved) : BN_ZERO);
+      const transferrable = free.sub(
+        frozen.gt(reserved) ? frozen.sub(reserved) : BN_ZERO,
+      );
 
       results.push({
         key: currencyIdHex,
@@ -43,12 +48,14 @@ export async function fetchTokenBalances(api: ApiPromise, address: HexString): P
         locked: BigInt(frozen.toString()),
         reserved: BigInt(reserved.toString()),
         free: BigInt(free.toString()),
-        transferrable: BigInt(transferrable.toString())
+        transferrable: BigInt(transferrable.toString()),
       });
     }
 
     return results;
   } catch (error) {
-    throw new Error(`Failed to fetch token balances: ${(error as Error).message}`);
+    throw new Error(
+      `Failed to fetch token balances: ${(error as Error).message}`,
+    );
   }
 }

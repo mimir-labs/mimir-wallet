@@ -7,22 +7,44 @@ import type { IMethod } from '@polkadot/types/types';
 import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
 
-import { BuildBlockMode, decodeBlockStorageDiff, setup } from '@acala-network/chopsticks-core';
-import DiffMatchPatch from 'diff-match-patch';
-import { create } from 'jsondiffpatch';
 import { cloneDeep, template } from 'lodash-es';
-
-import { typesBundle } from '../types/api-types/index.js';
 
 import { IdbDatabase } from './db.js';
 import { simulateTemplate } from './template.js';
 
-const diffPatcher = create({
-  arrays: { detectMove: false },
-  textDiff: { diffMatchPatch: DiffMatchPatch, minLength: Number.MAX_VALUE } // Skip text diff
-});
+// Lazy load jsondiffpatch (~50KB) and diff-match-patch
+let diffPatcherPromise: Promise<
+  ReturnType<typeof import('jsondiffpatch').create>
+> | null = null;
 
-export const decodeStorageDiff = async (block: Block, diff: [HexString, HexString | null][]) => {
+async function getDiffPatcher() {
+  if (!diffPatcherPromise) {
+    diffPatcherPromise = Promise.all([
+      import('jsondiffpatch'),
+      import('diff-match-patch'),
+    ]).then(([jsondiffpatch, DiffMatchPatchModule]) => {
+      return jsondiffpatch.create({
+        arrays: { detectMove: false },
+        textDiff: {
+          diffMatchPatch: DiffMatchPatchModule.default,
+          minLength: Number.MAX_VALUE,
+        },
+      });
+    });
+  }
+
+  return diffPatcherPromise;
+}
+
+export const decodeStorageDiff = async (
+  block: Block,
+  diff: [HexString, HexString | null][],
+) => {
+  const [{ decodeBlockStorageDiff }, diffPatcher] = await Promise.all([
+    import('@acala-network/chopsticks-core'),
+    getDiffPatcher(),
+  ]);
+
   const [oldState, newState] = await decodeBlockStorageDiff(block, diff);
   const oldStateWithoutEvents: any = cloneDeep(oldState);
 
@@ -30,27 +52,40 @@ export const decodeStorageDiff = async (block: Block, diff: [HexString, HexStrin
     oldStateWithoutEvents.system.events = [];
   }
 
-  return { oldState, newState, delta: diffPatcher.diff(oldStateWithoutEvents, newState) };
+  return {
+    oldState,
+    newState,
+    delta: diffPatcher.diff(oldStateWithoutEvents, newState),
+  };
 };
 
-export const generateHtmlDiff = async (block: Block, diff: [HexString, HexString | null][]) => {
+export const generateHtmlDiff = async (
+  block: Block,
+  diff: [HexString, HexString | null][],
+) => {
   const { oldState, delta } = await decodeStorageDiff(block, diff);
   const htmlTemplate = simulateTemplate;
 
-  return template(htmlTemplate)({ left: JSON.stringify(oldState), delta: JSON.stringify(delta) });
+  return template(htmlTemplate)({
+    left: JSON.stringify(oldState),
+    delta: JSON.stringify(delta),
+  });
 };
 
 export async function simulate(
   api: ApiPromise,
   rpc: string | string[],
   call: IMethod,
-  address: string
+  address: string,
 ): Promise<{
   success: boolean;
   error: string | null;
   html: string;
   balanceChanges: { value: BN; change: 'send' | 'receive' }[];
 }> {
+  const { BuildBlockMode, setup } =
+    await import('@acala-network/chopsticks-core');
+
   const storageKey = api.query.system.account.key(address);
   const db = new IdbDatabase(`chopsticks-cache:${api.genesisHash.toHex()}`);
   const blockHash = await api.rpc.chain.getBlockHash();
@@ -60,10 +95,7 @@ export async function simulate(
     block: blockHash.toHex(),
     buildBlockMode: BuildBlockMode.Batch,
     mockSignatureHost: true,
-    registeredTypes: {
-      typesBundle
-    },
-    db
+    db,
   });
 
   console.debug('simulate:', call.toHuman(), address);
@@ -71,9 +103,9 @@ export async function simulate(
   const { outcome, storageDiff } = await chain.dryRunExtrinsic(
     {
       call: call.toHex(),
-      address
+      address,
     },
-    blockHash.toHex()
+    blockHash.toHex(),
   );
 
   console.debug('simulate result:', outcome, outcome.toString());
@@ -88,13 +120,23 @@ export async function simulate(
         const accountInfo = api.createType('FrameSystemAccountInfo', diff[1]);
         const prevAccountInfo = await api.query.system.account(address);
 
-        const prevTotalBalance = prevAccountInfo.data.free.add(prevAccountInfo.data.reserved);
-        const totalBalance = accountInfo.data.free.add(accountInfo.data.reserved);
+        const prevTotalBalance = prevAccountInfo.data.free.add(
+          prevAccountInfo.data.reserved,
+        );
+        const totalBalance = accountInfo.data.free.add(
+          accountInfo.data.reserved,
+        );
 
         if (totalBalance.gt(prevTotalBalance)) {
-          balanceChanges.push({ change: 'receive', value: totalBalance.sub(prevTotalBalance) });
+          balanceChanges.push({
+            change: 'receive',
+            value: totalBalance.sub(prevTotalBalance),
+          });
         } else if (totalBalance.lt(prevTotalBalance)) {
-          balanceChanges.push({ change: 'send', value: prevTotalBalance.sub(totalBalance) });
+          balanceChanges.push({
+            change: 'send',
+            value: prevTotalBalance.sub(totalBalance),
+          });
         }
       }
     }
@@ -116,7 +158,9 @@ export async function simulate(
       const err = ok.asErr;
 
       if (err.isModule) {
-        const { docs, name, section } = api.registry.findMetaError(err.asModule);
+        const { docs, name, section } = api.registry.findMetaError(
+          err.asModule,
+        );
 
         error = `${section}.${name} Error:\n ${docs.join(', ')}`;
       } else if (err.isToken) {

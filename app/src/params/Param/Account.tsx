@@ -12,7 +12,16 @@ function Account({ value, displayType }: ParamProps) {
     return <AddressCell iconSize={40} value={value.toString()} withCopy />;
   }
 
-  return <AddressRow iconSize={20} shorten={false} value={value.toString()} withAddress={false} withCopy withName />;
+  return (
+    <AddressRow
+      iconSize={20}
+      shorten={false}
+      value={value.toString()}
+      withAddress={false}
+      withCopy
+      withName
+    />
+  );
 }
 
 export default React.memo(Account);

@@ -7,12 +7,21 @@ import { addressEq } from '@mimir-wallet/polkadot-core';
 
 import { TransactionStatus, TransactionType } from '@/hooks/types';
 
-export function approvalCounts(account: AccountData, transaction: Transaction): [counts: number, threshold: number] {
+export function approvalCounts(
+  account: AccountData,
+  transaction: Transaction,
+): [counts: number, threshold: number] {
   if (account.type !== 'multisig') {
-    if (account.type === 'pure' && account.delegatees.length === 1 && account.delegatees[0].type === 'multisig') {
+    if (
+      account.type === 'pure' &&
+      account.delegatees.length === 1 &&
+      account.delegatees[0].type === 'multisig'
+    ) {
       const multisigAccount = account.delegatees[0];
       const multisigTransaction = transaction.children.find(
-        (item) => item.type === TransactionType.Multisig && addressEq(item.address, multisigAccount.address)
+        (item) =>
+          item.type === TransactionType.Multisig &&
+          addressEq(item.address, multisigAccount.address),
       );
 
       if (multisigTransaction) {

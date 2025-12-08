@@ -3,7 +3,7 @@
 
 import type { SubscanExtrinsic, Transaction } from '@/hooks/types';
 
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 export interface GroupedTransactions {
   date: string;
@@ -16,21 +16,24 @@ export interface GroupedTransactions {
  * @param transactions - Array of transactions to group
  * @returns Array of grouped transactions
  */
-export function groupTransactionsByDate(transactions: Transaction[]): GroupedTransactions[] {
+export function groupTransactionsByDate(
+  transactions: Transaction[],
+): GroupedTransactions[] {
   if (!transactions || transactions.length === 0) {
     return [];
   }
 
-  const today = moment().startOf('day');
-  const yesterday = moment().subtract(1, 'day').startOf('day');
+  const today = dayjs().startOf('day');
+  const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
   // Group transactions by date
   const grouped = new Map<string, Transaction[]>();
 
   transactions.forEach((transaction) => {
     // Use createdAt for pending transactions, updatedAt for completed ones
-    const timestamp = transaction.status < 2 ? transaction.createdAt : transaction.updatedAt;
-    const date = moment(timestamp).startOf('day');
+    const timestamp =
+      transaction.status < 2 ? transaction.createdAt : transaction.updatedAt;
+    const date = dayjs(timestamp).startOf('day');
     const dateKey = date.format('YYYY-MM-DD');
 
     if (!grouped.has(dateKey)) {
@@ -46,7 +49,7 @@ export function groupTransactionsByDate(transactions: Transaction[]): GroupedTra
   Array.from(grouped.entries())
     .sort(([a], [b]) => b.localeCompare(a)) // Sort dates descending
     .forEach(([dateKey, txs]) => {
-      const date = moment(dateKey);
+      const date = dayjs(dateKey);
       let label: string;
 
       if (date.isSame(today, 'day')) {
@@ -61,7 +64,7 @@ export function groupTransactionsByDate(transactions: Transaction[]): GroupedTra
       result.push({
         date: dateKey,
         label,
-        transactions: txs
+        transactions: txs,
       });
     });
 
@@ -76,7 +79,7 @@ export function groupTransactionsByDate(transactions: Transaction[]): GroupedTra
  */
 export function mergeTransactionGroups(
   existingGroups: GroupedTransactions[],
-  newTransactions: Transaction[]
+  newTransactions: Transaction[],
 ): GroupedTransactions[] {
   if (!newTransactions || newTransactions.length === 0) {
     return existingGroups;
@@ -98,7 +101,10 @@ export function mergeTransactionGroups(
       // Merge transactions into existing group
       const existingGroup = groupMap.get(newGroup.date)!;
 
-      existingGroup.transactions = [...existingGroup.transactions, ...newGroup.transactions];
+      existingGroup.transactions = [
+        ...existingGroup.transactions,
+        ...newGroup.transactions,
+      ];
     } else {
       // Add new group
       groupMap.set(newGroup.date, newGroup);
@@ -106,7 +112,9 @@ export function mergeTransactionGroups(
   });
 
   // Convert back to array and sort
-  return Array.from(groupMap.values()).sort((a, b) => b.date.localeCompare(a.date));
+  return Array.from(groupMap.values()).sort((a, b) =>
+    b.date.localeCompare(a.date),
+  );
 }
 
 export interface GroupedSubscanExtrinsics {
@@ -120,20 +128,22 @@ export interface GroupedSubscanExtrinsics {
  * @param extrinsics - Array of Subscan extrinsics to group
  * @returns Array of grouped extrinsics
  */
-export function groupSubscanExtrinsicsByDate(extrinsics: SubscanExtrinsic[]): GroupedSubscanExtrinsics[] {
+export function groupSubscanExtrinsicsByDate(
+  extrinsics: SubscanExtrinsic[],
+): GroupedSubscanExtrinsics[] {
   if (!extrinsics || extrinsics.length === 0) {
     return [];
   }
 
-  const today = moment().startOf('day');
-  const yesterday = moment().subtract(1, 'day').startOf('day');
+  const today = dayjs().startOf('day');
+  const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
   // Group extrinsics by date
   const grouped = new Map<string, SubscanExtrinsic[]>();
 
   extrinsics.forEach((extrinsic) => {
     // Use block_timestamp (Unix timestamp in seconds)
-    const date = moment(extrinsic.block_timestamp * 1000).startOf('day');
+    const date = dayjs(extrinsic.block_timestamp * 1000).startOf('day');
     const dateKey = date.format('YYYY-MM-DD');
 
     if (!grouped.has(dateKey)) {
@@ -149,7 +159,7 @@ export function groupSubscanExtrinsicsByDate(extrinsics: SubscanExtrinsic[]): Gr
   Array.from(grouped.entries())
     .sort(([a], [b]) => b.localeCompare(a)) // Sort dates descending
     .forEach(([dateKey, txs]) => {
-      const date = moment(dateKey);
+      const date = dayjs(dateKey);
       let label: string;
 
       if (date.isSame(today, 'day')) {
@@ -164,7 +174,7 @@ export function groupSubscanExtrinsicsByDate(extrinsics: SubscanExtrinsic[]): Gr
       result.push({
         date: dateKey,
         label,
-        transactions: txs
+        transactions: txs,
       });
     });
 

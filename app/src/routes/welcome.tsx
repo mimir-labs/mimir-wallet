@@ -15,7 +15,7 @@ import PageWelcome from '@/pages/profile/Welcome';
  */
 export const Route = createFileRoute('/welcome')({
   staticData: {
-    title: 'Welcome'
+    title: 'Welcome',
   } as RouteMetadata,
-  component: PageWelcome
+  component: PageWelcome,
 });

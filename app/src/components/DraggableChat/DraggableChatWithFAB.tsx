@@ -7,7 +7,9 @@ import { AnimatePresence, motion, useDragControls } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import DraggableChatWindow, { type DraggableChatWindowRef } from './DraggableChatWindow';
+import DraggableChatWindow, {
+  type DraggableChatWindowRef,
+} from './DraggableChatWindow';
 import MimoLogo from './MimoLogo';
 
 import IconClose from '@/assets/svg/icon-close.svg?react';
@@ -38,17 +40,17 @@ function DraggableChatWithFAB({
   initialChatPosition,
   onOpen,
   onClose,
-  showFABOnMobile = true
+  showFABOnMobile = true,
 }: DraggableChatWithFABProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [chatStatus, setChatStatus] = useState<'ready' | 'streaming' | 'submitted' | 'error'>('ready');
+  const [chatStatus, setChatStatus] = useState<
+    'ready' | 'streaming' | 'submitted' | 'error'
+  >('ready');
   const [hasNewReply, setHasNewReply] = useState(false);
-  const [hasDismissedSuggestions, setHasDismissedSuggestions] = useLocalStore<boolean>(
-    SUGGESTIONS_DISMISSED_KEY,
-    false
-  );
+  const [hasDismissedSuggestions, setHasDismissedSuggestions] =
+    useLocalStore<boolean>(SUGGESTIONS_DISMISSED_KEY, false);
   const chatWindowRef = useRef<DraggableChatWindowRef>(null);
 
   // Define suggestions and randomly select 3: one from each group
@@ -63,7 +65,7 @@ function DraggableChatWithFAB({
       'Set Proposer': 'What is proposer?',
       'Stake DOT': 'i want to stake dot',
       'Participate OpenGov': 'i want to vote in OpenGov',
-      'Use Hydration Dapp': 'I want to use Hydration Dapp'
+      'Use Hydration Dapp': 'I want to use Hydration Dapp',
     };
 
     const suggestionEntries = Object.entries(allSuggestions);
@@ -72,9 +74,15 @@ function DraggableChatWithFAB({
     const group3 = suggestionEntries.slice(6, 9); // indices 6-8
 
     const pickRandom = <T,>(items: T[]) =>
-      items.length > 0 ? items[Math.floor(Math.random() * items.length)] : undefined;
+      items.length > 0
+        ? items[Math.floor(Math.random() * items.length)]
+        : undefined;
 
-    const selected = [pickRandom(group1), pickRandom(group2), pickRandom(group3)];
+    const selected = [
+      pickRandom(group1),
+      pickRandom(group2),
+      pickRandom(group3),
+    ];
 
     return selected.filter(Boolean) as Array<[string, string]>;
   });
@@ -85,20 +93,23 @@ function DraggableChatWithFAB({
   const calculateInitialPosition = useCallback(() => {
     if (typeof window === 'undefined') return { x: 24, y: 24 };
 
-    const bottom = typeof fabPosition.bottom === 'number' ? fabPosition.bottom : 24;
-    const right = typeof fabPosition.right === 'number' ? fabPosition.right : 24;
+    const bottom =
+      typeof fabPosition.bottom === 'number' ? fabPosition.bottom : 24;
+    const right =
+      typeof fabPosition.right === 'number' ? fabPosition.right : 24;
 
     return {
       x: window.innerWidth - right - 60, // 60 is FAB size
-      y: window.innerHeight - bottom - 60
+      y: window.innerHeight - bottom - 60,
     };
   }, [fabPosition.bottom, fabPosition.right]);
 
-  const { position, dragConstraints, containerRef, handleDragEnd } = useDraggable({
-    initialPosition: calculateInitialPosition(),
-    bounds: { width: 60, height: 60 }, // Use max size for bounds
-    margin: 8
-  });
+  const { position, dragConstraints, containerRef, handleDragEnd } =
+    useDraggable({
+      initialPosition: calculateInitialPosition(),
+      bounds: { width: 60, height: 60 }, // Use max size for bounds
+      margin: 8,
+    });
 
   // Calculate dynamic height: half of screen height, minimum 600px, but if screen height < 600, use screen height
   const calculateHeight = () => {
@@ -119,13 +130,15 @@ function DraggableChatWithFAB({
     if (initialChatPosition) return initialChatPosition;
 
     // Position chat window near the FAB
-    const bottomValue = typeof fabPosition.bottom === 'number' ? fabPosition.bottom : 24;
-    const rightValue = typeof fabPosition.right === 'number' ? fabPosition.right : 24;
+    const bottomValue =
+      typeof fabPosition.bottom === 'number' ? fabPosition.bottom : 24;
+    const rightValue =
+      typeof fabPosition.right === 'number' ? fabPosition.right : 24;
     const dynamicHeight = calculateHeight();
 
     return {
       x: Math.max(0, window.innerWidth - 395 - rightValue - 20), // 20px gap from FAB
-      y: Math.max(0, window.innerHeight - dynamicHeight - bottomValue - 20) // 20px gap from FAB
+      y: Math.max(0, window.innerHeight - dynamicHeight - bottomValue - 20), // 20px gap from FAB
     };
   };
 
@@ -145,13 +158,19 @@ function DraggableChatWithFAB({
     onClose?.();
   }, [onClose]);
 
-  const handleStatusChange = (status: 'ready' | 'streaming' | 'submitted' | 'error') => {
+  const handleStatusChange = (
+    status: 'ready' | 'streaming' | 'submitted' | 'error',
+  ) => {
     const prevStatus = chatStatus;
 
     setChatStatus(status);
 
     // If chat is closed and status changed from streaming/submitted to ready, mark as new reply
-    if (!isOpen && (prevStatus === 'streaming' || prevStatus === 'submitted') && status === 'ready') {
+    if (
+      !isOpen &&
+      (prevStatus === 'streaming' || prevStatus === 'submitted') &&
+      status === 'ready'
+    ) {
       setHasNewReply(true);
     }
   };
@@ -183,7 +202,7 @@ function DraggableChatWithFAB({
 
   // Setup keyboard shortcut: Cmd/Ctrl + K
   useKeyboardShortcut('k', toggleChat, {
-    enabled: showFABOnMobile // Only enable if FAB is visible
+    enabled: showFABOnMobile, // Only enable if FAB is visible
   });
 
   // Listen to sidebar:open event to minimize chat
@@ -217,7 +236,7 @@ function DraggableChatWithFAB({
               className={`fixed top-0 z-50 ${fabClassName}`}
               style={{
                 x: position.x,
-                y: position.y
+                y: position.y,
               }}
               drag
               dragControls={dragControls}
@@ -235,7 +254,7 @@ function DraggableChatWithFAB({
               }}
             >
               {/* Container for status and suggestions */}
-              <motion.div className='absolute right-0 bottom-full flex flex-col items-end gap-[5px] pb-[5px]'>
+              <motion.div className="absolute right-0 bottom-full flex flex-col items-end gap-[5px] pb-[5px]">
                 {/* Suggestion Buttons - show on hover or initially if not dismissed */}
                 <AnimatePresence>
                   {(isHovered || !hasDismissedSuggestions) && !isDragging && (
@@ -243,12 +262,12 @@ function DraggableChatWithFAB({
                       {/* Close button */}
                       {!hasDismissedSuggestions ? (
                         <motion.button
-                          key='close-suggestions'
+                          key="close-suggestions"
                           onClick={() => {
                             setHasDismissedSuggestions(true);
                             setIsHovered(false);
                           }}
-                          className='border-primary/20 bg-card text-primary hover:bg-secondary flex h-[24px] w-[24px] items-center justify-center rounded-full border shadow-[0px_0px_10px_0px_rgba(0,82,255,0.15)] transition-colors'
+                          className="border-primary/20 bg-card text-primary hover:bg-secondary flex h-[24px] w-[24px] items-center justify-center rounded-full border shadow-[0px_0px_10px_0px_rgba(0,82,255,0.15)] transition-colors"
                           initial={{ opacity: 0, x: 20, scale: 0.8 }}
                           animate={{ opacity: 1, x: 0, scale: 1 }}
                           exit={{ opacity: 0, x: 20, scale: 0.8 }}
@@ -257,13 +276,13 @@ function DraggableChatWithFAB({
                             duration: 0.2,
                             type: 'spring',
                             damping: 20,
-                            stiffness: 300
+                            stiffness: 300,
                           }}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          aria-label='Close suggestions'
+                          aria-label="Close suggestions"
                         >
-                          <IconClose className='h-4 w-4' />
+                          <IconClose className="h-4 w-4" />
                         </motion.button>
                       ) : null}
 
@@ -272,7 +291,7 @@ function DraggableChatWithFAB({
                         <motion.button
                           key={label}
                           onClick={() => handleSuggestionClick(value)}
-                          className='border-primary/20 bg-card text-primary hover:bg-secondary rounded-full border px-[15px] py-[5px] text-[12px] text-nowrap shadow-[0px_0px_10px_0px_rgba(0,82,255,0.15)] transition-colors'
+                          className="border-primary/20 bg-card text-primary hover:bg-secondary rounded-full border px-[15px] py-[5px] text-[12px] text-nowrap shadow-[0px_0px_10px_0px_rgba(0,82,255,0.15)] transition-colors"
                           initial={{ opacity: 0, x: 20, scale: 0.8 }}
                           animate={{ opacity: 1, x: 0, scale: 1 }}
                           exit={{ opacity: 0, x: 20, scale: 0.8 }}
@@ -281,7 +300,7 @@ function DraggableChatWithFAB({
                             duration: 0.2,
                             type: 'spring',
                             damping: 20,
-                            stiffness: 300
+                            stiffness: 300,
                           }}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -295,28 +314,31 @@ function DraggableChatWithFAB({
 
                 {/* Status Indicator - always visible when thinking or has new reply */}
                 <AnimatePresence>
-                  {(chatStatus === 'streaming' || chatStatus === 'submitted' || hasNewReply) && !isDragging && (
-                    <motion.div
-                      className='border-primary/20 bg-card text-primary hover:bg-secondary cursor-pointer rounded-full border px-[15px] py-[5px] text-[12px] text-nowrap shadow-[0px_0px_10px_0px_rgba(0,82,255,0.15)] transition-colors'
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.2 }}
-                      onClick={handleOpen}
-                    >
-                      {hasNewReply ? '✅ Reply ready!' : '💡 Thinking...'}
-                    </motion.div>
-                  )}
+                  {(chatStatus === 'streaming' ||
+                    chatStatus === 'submitted' ||
+                    hasNewReply) &&
+                    !isDragging && (
+                      <motion.div
+                        className="border-primary/20 bg-card text-primary hover:bg-secondary cursor-pointer rounded-full border px-[15px] py-[5px] text-[12px] text-nowrap shadow-[0px_0px_10px_0px_rgba(0,82,255,0.15)] transition-colors"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
+                        onClick={handleOpen}
+                      >
+                        {hasNewReply ? '✅ Reply ready!' : '💡 Thinking...'}
+                      </motion.div>
+                    )}
                 </AnimatePresence>
               </motion.div>
 
               {/* FAB Button */}
               <motion.button
                 onClick={handleOpen}
-                className='relative'
-                aria-label='Open AI Assistant'
+                className="relative"
+                aria-label="Open AI Assistant"
                 style={{
-                  filter: 'drop-shadow(0 0 30px rgba(0, 82, 255, 0.25))'
+                  filter: 'drop-shadow(0 0 30px rgba(0, 82, 255, 0.25))',
                 }}
               >
                 <motion.div
@@ -331,15 +353,19 @@ function DraggableChatWithFAB({
                   exit={{ scale: 0, opacity: 0 }}
                   transition={
                     isDragging || isHovered
-                      ? { duration: 0.2, opacity: { duration: 0.2 }, scale: { duration: 0.2 } }
+                      ? {
+                          duration: 0.2,
+                          opacity: { duration: 0.2 },
+                          scale: { duration: 0.2 },
+                        }
                       : {
                           opacity: { duration: 0.2 },
                           scale: { duration: 0.2 },
                           rotate: {
                             duration: 3,
                             repeat: Infinity,
-                            repeatDelay: 2
-                          }
+                            repeatDelay: 2,
+                          },
                         }
                   }
                 >
@@ -350,7 +376,7 @@ function DraggableChatWithFAB({
             </motion.div>
           )}
         </AnimatePresence>,
-        document.body
+        document.body,
       )}
 
       {/* Draggable Chat Window */}

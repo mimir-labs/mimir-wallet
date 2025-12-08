@@ -4,11 +4,13 @@
 import type { AccountData, Transaction } from '@/hooks/types';
 
 import { Button } from '@mimir-wallet/ui';
-import React, { useMemo, useState } from 'react';
+import React, { lazy, Suspense, useMemo, useState } from 'react';
 
-import TxOverviewDialog from '../TxOverview/TxOverviewDialog';
+import FlowSkeleton from '../FlowSkeleton';
 
 import { approvalCounts } from '@/transactions/utils';
+
+const TxOverviewDialog = lazy(() => import('../TxOverview/TxOverviewDialog'));
 
 interface Props {
   account: AccountData;
@@ -24,23 +26,32 @@ function Confirmations({ account, transaction }: Props) {
 
   return (
     <>
-      <div className='flex flex-row items-center justify-start gap-[5px]'>
-        <div className='text-foreground text-sm leading-none font-bold'>Confirmations</div>
-        <div className='text-foreground/50 flex-1 text-sm leading-none font-bold'>
+      <div className="flex flex-row items-center justify-start gap-[5px]">
+        <div className="text-foreground text-sm leading-none font-bold">
+          Confirmations
+        </div>
+        <div className="text-foreground/50 flex-1 text-sm leading-none font-bold">
           ({confirmations}/{totalConfirmations})
         </div>
-        <Button variant='ghost' color='primary' radius='full' onClick={() => setShowOverview(true)}>
+        <Button
+          variant="ghost"
+          color="primary"
+          radius="full"
+          onClick={() => setShowOverview(true)}
+        >
           Overview
         </Button>
       </div>
 
-      <TxOverviewDialog
-        account={account}
-        transaction={transaction}
-        open={showOverview}
-        showButton={false}
-        onClose={() => setShowOverview(false)}
-      />
+      <Suspense fallback={<FlowSkeleton className="h-[50dvh]" />}>
+        <TxOverviewDialog
+          account={account}
+          transaction={transaction}
+          open={showOverview}
+          showButton={false}
+          onClose={() => setShowOverview(false)}
+        />
+      </Suspense>
     </>
   );
 }

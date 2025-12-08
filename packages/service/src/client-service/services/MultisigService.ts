@@ -6,8 +6,17 @@ import type { HexString } from '../types.js';
 import { BaseService } from './BaseService.js';
 
 export class MultisigService extends BaseService {
-  public createMultisig(chain: string, who: HexString[], threshold: number, name?: string | null) {
-    return this.post(`chains/${chain}/create-multisig`, { who, threshold, name });
+  public createMultisig(
+    chain: string,
+    who: HexString[],
+    threshold: number,
+    name?: string | null,
+  ) {
+    return this.post(`chains/${chain}/create-multisig`, {
+      who,
+      threshold,
+      name,
+    });
   }
 
   public prepareMultisig(
@@ -17,12 +26,21 @@ export class MultisigService extends BaseService {
     name: string,
     threshold?: number | null,
     who?: HexString[] | null,
-    multisigName?: string
+    multisigName?: string,
   ) {
-    return this.post(`chains/${chain}/prepare-pure`, { creator, extrinsicHash, who, threshold, name, multisigName });
+    return this.post(`chains/${chain}/prepare-pure`, {
+      creator,
+      extrinsicHash,
+      who,
+      threshold,
+      name,
+      multisigName,
+    });
   }
 
   public pendingPrepareMultisig(chain: string, addresses: string[]) {
-    return this.get(`chains/${chain}/prepare-pure/pending`, { addresses: addresses.join(',') });
+    return this.get(`chains/${chain}/prepare-pure/pending`, {
+      addresses: addresses.join(','),
+    });
   }
 }

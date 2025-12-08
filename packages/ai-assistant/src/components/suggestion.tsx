@@ -10,7 +10,7 @@ import { Button } from '@mimir-wallet/ui';
 export type SuggestionsProps = ComponentProps<'div'>;
 
 export const Suggestions = ({ children, ...props }: SuggestionsProps) => (
-  <div className='flex w-full flex-wrap gap-2.5' {...props}>
+  <div className="flex w-full flex-wrap gap-2.5" {...props}>
     <p>{`Hey there! i'm Mimo, What do you want today?`}</p>
     {children}
   </div>
@@ -34,7 +34,14 @@ export const Suggestion = ({
   };
 
   return (
-    <Button onClick={handleClick} size={size} type='button' color='secondary' variant={variant} {...props}>
+    <Button
+      onClick={handleClick}
+      size={size}
+      type="button"
+      color="secondary"
+      variant={variant}
+      {...props}
+    >
       {children || suggestion}
     </Button>
   );

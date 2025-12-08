@@ -7,6 +7,9 @@ export function useSelectedAccount(): string | undefined {
   return useAccount().current;
 }
 
-export function useSelectedAccountCallback(): (address: string, confirm?: boolean) => void {
+export function useSelectedAccountCallback(): (
+  address: string,
+  confirm?: boolean,
+) => void {
   return useAccount().setCurrent;
 }

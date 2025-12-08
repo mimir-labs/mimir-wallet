@@ -5,8 +5,6 @@ import type { RouteMetadata } from '@/hooks/usePageTitle';
 
 import { createFileRoute } from '@tanstack/react-router';
 
-import PageAddProxy from '@/pages/add-proxy';
-
 /**
  * Create Pure Proxy Route (/create-pure)
  *
@@ -15,7 +13,6 @@ import PageAddProxy from '@/pages/add-proxy';
  */
 export const Route = createFileRoute('/_authenticated/create-pure')({
   staticData: {
-    title: 'Create Pure'
+    title: 'Create Pure',
   } as RouteMetadata,
-  component: () => <PageAddProxy pure={true} />
 });

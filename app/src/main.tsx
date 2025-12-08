@@ -1,62 +1,35 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import '@xyflow/react/dist/style.css';
 import './style.css';
 import '@mimir-wallet/polkadot-core/augment';
 
 import { getNetworkMode, NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { API_CLIENT_GATEWAY, initService, QueryProvider } from '@mimir-wallet/service';
-import { RouterProvider } from '@tanstack/react-router';
 import {
-  ArcElement,
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip
-} from 'chart.js';
-import moment from 'moment';
+  API_CLIENT_GATEWAY,
+  initService,
+  QueryProvider,
+} from '@mimir-wallet/service';
+import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 
-import { initializeAccount } from './accounts/initialize';
 import { initAnalytics } from './analytics';
 import { initFavoriteDapps, initMimir } from './initMimir';
 import { router } from './router';
 import { upgradeAddresBook } from './upgrade';
 import { initializeWallet } from './wallet/initialize';
 
-// Set default date-time format for the entire application
-moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
-
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  ArcElement
-);
 // Create React root container for application mounting
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
 const isOmni = getNetworkMode() === 'omni';
 
-// Initialize core Mimir wallet configuration and get initial chain and address settings
+// Initialize core Mimir wallet configuration and get initial chain settings
 // This sets up the basic configuration needed for the wallet to function
-const { chain, address } = initMimir(isOmni);
+// Address is now managed via URL search params (retainSearchParams in router)
+const { chain } = initMimir(isOmni);
 
 initFavoriteDapps();
 
@@ -69,10 +42,6 @@ upgradeAddresBook();
 // Set up wallet connection and state management
 // This initializes wallet providers (like Polkadot.js) and restores previous connections
 initializeWallet();
-
-// Initialize account management and synchronization
-// This sets up account tracking, multisig handling, and proxy relationships
-initializeAccount(chain, address);
 
 // Render the main App component with initial configuration
 // StrictMode is enabled in development to help identify potential problems

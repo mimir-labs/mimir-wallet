@@ -25,7 +25,11 @@ const Item = React.memo(({ icon, value }: { icon: string; value: string }) => {
 
   return (
     <Tooltip content={copied ? 'Copied' : value}>
-      <Avatar src={icon} style={{ cursor: 'copy', width: 32, height: 32 }} onClick={() => copy(value)} />
+      <Avatar
+        src={icon}
+        style={{ cursor: 'copy', width: 32, height: 32 }}
+        onClick={() => copy(value)}
+      />
     </Tooltip>
   );
 });
@@ -40,7 +44,7 @@ const IdentityDisplay = React.memo(
     email,
     github,
     matrix,
-    twitter
+    twitter,
   }: {
     address?: string;
     display: string | undefined;
@@ -55,17 +59,20 @@ const IdentityDisplay = React.memo(
   }) => {
     return (
       <>
-        <div className='flex items-center gap-2'>
+        <div className="flex items-center gap-2">
           {address && <IdentityIcon size={34} value={address} />}
           <b>{display}</b>
           {address && (
-            <span className='flex items-center' style={{ opacity: 0.5, fontSize: '0.75rem' }}>
+            <span
+              className="flex items-center"
+              style={{ opacity: 0.5, fontSize: '0.75rem' }}
+            >
               <Address value={address} shorten />
               <CopyAddress address={address} />
             </span>
           )}
         </div>
-        <div className='flex items-center gap-2.5 sm:gap-5'>
+        <div className="flex items-center gap-2.5 sm:gap-5">
           {twitter && <Item icon={IconTwitter} value={twitter} />}
           {discord && <Item icon={IconDiscord} value={discord} />}
           {matrix && <Item icon={IconMatrix} value={matrix} />}
@@ -74,70 +81,95 @@ const IdentityDisplay = React.memo(
         </div>
       </>
     );
-  }
+  },
 );
 
 IdentityDisplay.displayName = 'SetIdentity.IdentityDisplay';
 
-const SetIdentity = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
-  const { from, registry, call, className, showFallback, fallbackComponent: FallbackComponent = FunctionArgs } = props;
-  const action = useMemo(() => findAction(registry, call), [registry, call]);
+const SetIdentity = forwardRef<HTMLDivElement | null, CallProps>(
+  (props, ref) => {
+    const {
+      from,
+      registry,
+      call,
+      className,
+      showFallback,
+      fallbackComponent: FallbackComponent = FunctionArgs,
+    } = props;
+    const action = useMemo(() => findAction(registry, call), [registry, call]);
 
-  const results = useMemo(() => {
-    let display: string | undefined;
-    let discord: string | undefined;
-    let email: string | undefined;
-    let github: string | undefined;
-    let legal: string | undefined;
-    let matrix: string | undefined;
-    let riot: string | undefined;
-    let twitter: string | undefined;
-    let web: string | undefined;
+    const results = useMemo(() => {
+      let display: string | undefined;
+      let discord: string | undefined;
+      let email: string | undefined;
+      let github: string | undefined;
+      let legal: string | undefined;
+      let matrix: string | undefined;
+      let riot: string | undefined;
+      let twitter: string | undefined;
+      let web: string | undefined;
 
-    if (!action) {
-      return null;
-    }
-
-    const [section, method] = action;
-
-    if (section !== 'identity') {
-      return null;
-    }
-
-    if (method === 'setIdentity') {
-      const info = call.args.at(0) as PalletIdentityLegacyIdentityInfo | undefined;
-
-      if (!info) {
+      if (!action) {
         return null;
       }
 
-      display = dataToUtf8(info.display);
-      discord = dataToUtf8(info.getT('discord'));
-      email = dataToUtf8(info.email);
-      github = dataToUtf8(info.getT('github'));
-      legal = dataToUtf8(info.legal);
-      matrix = dataToUtf8(info.getT('matrix'));
-      riot = dataToUtf8(info.riot);
-      twitter = dataToUtf8(info.twitter);
-      web = dataToUtf8(info.web);
-    } else {
-      return null;
-    }
+      const [section, method] = action;
 
-    return { display, discord, email, github, legal, matrix, riot, twitter, web } as const;
-  }, [action, call]);
+      if (section !== 'identity') {
+        return null;
+      }
 
-  if (!results) return showFallback ? <FallbackComponent ref={ref} {...props} /> : null;
+      if (method === 'setIdentity') {
+        const info = call.args.at(0) as
+          | PalletIdentityLegacyIdentityInfo
+          | undefined;
 
-  return (
-    <div
-      ref={ref}
-      className={mergeClasses('flex w-full items-center justify-between gap-2.5 sm:gap-5 md:gap-7', className)}
-    >
-      <IdentityDisplay {...results} address={from} />
-    </div>
-  );
-});
+        if (!info) {
+          return null;
+        }
+
+        display = dataToUtf8(info.display);
+        discord = dataToUtf8(info.getT('discord'));
+        email = dataToUtf8(info.email);
+        github = dataToUtf8(info.getT('github'));
+        legal = dataToUtf8(info.legal);
+        matrix = dataToUtf8(info.getT('matrix'));
+        riot = dataToUtf8(info.riot);
+        twitter = dataToUtf8(info.twitter);
+        web = dataToUtf8(info.web);
+      } else {
+        return null;
+      }
+
+      return {
+        display,
+        discord,
+        email,
+        github,
+        legal,
+        matrix,
+        riot,
+        twitter,
+        web,
+      } as const;
+    }, [action, call]);
+
+    if (!results)
+      return showFallback ? <FallbackComponent ref={ref} {...props} /> : null;
+
+    return (
+      <div
+        ref={ref}
+        className={mergeClasses(
+          'flex w-full items-center justify-between gap-2.5 sm:gap-5 md:gap-7',
+          className,
+        )}
+      >
+        <IdentityDisplay {...results} address={from} />
+      </div>
+    );
+  },
+);
 
 SetIdentity.displayName = 'SetIdentity';
 

@@ -1,9 +1,19 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, DelegateeProp, MultisigAccountData } from '@/hooks/types';
+import type {
+  AccountData,
+  DelegateeProp,
+  MultisigAccountData,
+} from '@/hooks/types';
 
-import { addressEq, addressToHex, encodeAddress, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  addressToHex,
+  encodeAddress,
+  remoteProxyRelations,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
 import { isEqual } from 'lodash-es';
 import { useEffect, useMemo } from 'react';
@@ -15,13 +25,13 @@ import { useAccount } from './useAccount';
  */
 function transformProposer(
   proposer: NonNullable<AccountData['proposers']>[number],
-  chainSS58: number
+  chainSS58: number,
 ): NonNullable<AccountData['proposers']>[number] {
   return {
     proposer: encodeAddress(proposer.proposer, chainSS58),
     creator: encodeAddress(proposer.creator, chainSS58),
     createdAt: proposer.createdAt,
-    network: proposer.network
+    network: proposer.network,
   };
 }
 
@@ -40,7 +50,7 @@ function shouldIncludeDelegatee(
   delegatee: AccountData['delegatees'][number],
   allDelegatees: AccountData['delegatees'],
   filterByGenesisHash: boolean,
-  genesisHash?: string
+  genesisHash?: string,
 ): boolean {
   // Skip filtering if not enabled
   if (!filterByGenesisHash) {
@@ -55,7 +65,8 @@ function shouldIncludeDelegatee(
   // Check for remote proxy relationships
   // remoteProxyRelations maps proxy networks that have cross-chain relationships
   // e.g., { 'polkadot-genesis': 'assethub-genesis', 'assethub-genesis': 'polkadot-genesis' }
-  const isRemoteProxyRelation = remoteProxyRelations[delegatee.proxyNetwork] === genesisHash;
+  const isRemoteProxyRelation =
+    remoteProxyRelations[delegatee.proxyNetwork] === genesisHash;
 
   if (!isRemoteProxyRelation) {
     return false;
@@ -68,7 +79,7 @@ function shouldIncludeDelegatee(
       item.proxyNetwork === genesisHash &&
       addressEq(item.address, delegatee.address) &&
       item.proxyDelay === delegatee.proxyDelay &&
-      item.proxyType === delegatee.proxyType
+      item.proxyType === delegatee.proxyType,
   );
 
   return !hasLocalEquivalent;
@@ -82,14 +93,21 @@ function transformDelegatee(
   delegatee: AccountData['delegatees'][number],
   chainSS58: number,
   filterByGenesisHash: boolean,
-  genesisHash?: string
+  genesisHash?: string,
 ): AccountData & DelegateeProp {
-  const transformed = transformAccount(chainSS58, delegatee, filterByGenesisHash, genesisHash);
+  const transformed = transformAccount(
+    chainSS58,
+    delegatee,
+    filterByGenesisHash,
+    genesisHash,
+  );
 
   return {
     ...transformed,
     // Mark as remote proxy if filtering is enabled and the proxy network differs from current chain
-    isRemoteProxy: filterByGenesisHash ? delegatee.proxyNetwork !== genesisHash : false
+    isRemoteProxy: filterByGenesisHash
+      ? delegatee.proxyNetwork !== genesisHash
+      : false,
   } as AccountData & DelegateeProp;
 }
 
@@ -101,14 +119,16 @@ function transformMultisigMembers(
   account: AccountData,
   chainSS58: number,
   filterByGenesisHash: boolean,
-  genesisHash?: string
+  genesisHash?: string,
 ): Pick<MultisigAccountData, 'members'> | Record<string, never> {
   if (account.type !== 'multisig') {
     return {};
   }
 
   return {
-    members: account.members.map((member) => transformAccount(chainSS58, member, filterByGenesisHash, genesisHash))
+    members: account.members.map((member) =>
+      transformAccount(chainSS58, member, filterByGenesisHash, genesisHash),
+    ),
   };
 }
 
@@ -131,18 +151,34 @@ export function transformAccount(
   chainSS58: number,
   account: AccountData,
   filterByGenesisHash: boolean = false,
-  genesisHash?: string
+  genesisHash?: string,
 ): AccountData {
   // Transform proposer addresses if they exist
-  const proposers = account.proposers?.map((item) => transformProposer(item, chainSS58));
+  const proposers = account.proposers?.map((item) =>
+    transformProposer(item, chainSS58),
+  );
 
   // Filter and transform delegatees based on genesis hash and remote proxy relationships
   const delegatees = account.delegatees
-    .filter((delegatee, _, self) => shouldIncludeDelegatee(delegatee, self, filterByGenesisHash, genesisHash))
-    .map((delegatee) => transformDelegatee(delegatee, chainSS58, filterByGenesisHash, genesisHash));
+    .filter((delegatee, _, self) =>
+      shouldIncludeDelegatee(delegatee, self, filterByGenesisHash, genesisHash),
+    )
+    .map((delegatee) =>
+      transformDelegatee(
+        delegatee,
+        chainSS58,
+        filterByGenesisHash,
+        genesisHash,
+      ),
+    );
 
   // Transform multisig members if applicable
-  const multisigMembers = transformMultisigMembers(account, chainSS58, filterByGenesisHash, genesisHash);
+  const multisigMembers = transformMultisigMembers(
+    account,
+    chainSS58,
+    filterByGenesisHash,
+    genesisHash,
+  );
 
   return {
     ...account,
@@ -152,7 +188,7 @@ export function transformAccount(
     address: encodeAddress(account.address, chainSS58),
     delegatees,
     ...multisigMembers,
-    proposers
+    proposers,
   };
 }
 
@@ -183,9 +219,12 @@ function createQueryConfig(addressHex: string) {
     // Only enable query when address is provided
     enabled: !!addressHex,
     // Fetch account details from service
-    queryFn: ({ queryKey: [, address] }: { queryKey: readonly [string, string] }) =>
-      service.account.getOmniChainDetails(address),
-    structuralSharing: accountDataStructuralSharing
+    queryFn: ({
+      queryKey: [, address],
+    }: {
+      queryKey: readonly [string, string];
+    }) => service.account.getOmniChainDetails(address),
+    structuralSharing: accountDataStructuralSharing,
   };
 }
 
@@ -193,7 +232,9 @@ function createQueryConfig(addressHex: string) {
  * Custom hook to automatically update account metadata when account data changes
  * Syncs account information to the global account store
  */
-function useAccountMetaUpdater(accountData: AccountData | null | undefined): void {
+function useAccountMetaUpdater(
+  accountData: AccountData | null | undefined,
+): void {
   const { updateMetas } = useAccount();
 
   useEffect(() => {
@@ -222,19 +263,28 @@ function useAccountMetaUpdater(accountData: AccountData | null | undefined): voi
  * const [account, isFetched, isFetching, refetch] = useQueryAccount('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
  */
 export function useQueryAccount(
-  address?: string | null
-): [AccountData | null | undefined, isFetched: boolean, isFetching: boolean, refetch: () => void] {
+  address?: string | null,
+): [
+  AccountData | null | undefined,
+  isFetched: boolean,
+  isFetching: boolean,
+  refetch: () => void,
+] {
   const { chain } = useNetwork();
   const chainSS58 = chain.ss58Format;
   const genesisHash = chain.genesisHash;
 
   // Reuse omni-chain data to avoid duplicate requests
-  const [omniChainData, isFetched, isFetching, refetch] = useQueryAccountOmniChain(address);
+  const [omniChainData, isFetched, isFetching, refetch] =
+    useQueryAccountOmniChain(address);
 
   // Filter account data for current chain with genesis hash filtering
   const accountData = useMemo(
-    () => (omniChainData ? transformAccount(chainSS58, omniChainData, true, genesisHash) : null),
-    [omniChainData, chainSS58, genesisHash]
+    () =>
+      omniChainData
+        ? transformAccount(chainSS58, omniChainData, true, genesisHash)
+        : null,
+    [omniChainData, chainSS58, genesisHash],
   );
 
   return [accountData, isFetched, isFetching, refetch];
@@ -260,13 +310,13 @@ export function useQueryAccount(
  * const [account, isFetched, isFetching, refetch, promise] = useQueryAccountOmniChain('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
  */
 export function useQueryAccountOmniChain(
-  address?: string | null
+  address?: string | null,
 ): [
   AccountData | null | undefined,
   isFetched: boolean,
   isFetching: boolean,
   refetch: () => void,
-  promise: Promise<AccountData | null>
+  promise: Promise<AccountData | null>,
 ] {
   const { chain } = useNetwork();
   const chainSS58 = chain.ss58Format;
@@ -275,10 +325,15 @@ export function useQueryAccountOmniChain(
   const addressHex: string = address ? addressToHex(address) : '';
 
   // Fetch omni-chain account data
-  const { data, isFetched, isFetching, refetch, promise } = useQuery(createQueryConfig(addressHex));
+  const { data, isFetched, isFetching, refetch, promise } = useQuery(
+    createQueryConfig(addressHex),
+  );
 
   // Transform account data to current chain format WITHOUT genesis hash filtering
-  const accountData = useMemo(() => (data ? transformAccount(chainSS58, data) : null), [data, chainSS58]);
+  const accountData = useMemo(
+    () => (data ? transformAccount(chainSS58, data) : null),
+    [data, chainSS58],
+  );
 
   // Automatically sync account metadata to global store
   useAccountMetaUpdater(accountData);

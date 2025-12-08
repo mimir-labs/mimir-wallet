@@ -4,7 +4,11 @@
 import type { WalletAccount } from './types';
 import type { InjectedAccount } from '@polkadot/extension-inject/types';
 
-import { addressEq, encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  encodeAddress,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { useEffect } from 'react';
 
 import { useWallet } from './useWallet';
@@ -16,7 +20,7 @@ function combineWalletAccounts(
   walletAccounts: WalletAccount[],
   source: string,
   accounts: InjectedAccount[],
-  chainSS58: number
+  chainSS58: number,
 ): WalletAccount[] {
   return walletAccounts
     .filter((account) => account.source !== source)
@@ -25,8 +29,8 @@ function combineWalletAccounts(
         address: encodeAddress(account.address, chainSS58),
         name: account.name,
         type: account.type,
-        source
-      }))
+        source,
+      })),
     );
 }
 
@@ -46,13 +50,22 @@ function WalletConsumer() {
             return injected.accounts.subscribe((accounts) => {
               useWallet.setState(({ walletAccounts }) => ({
                 // Deduplicate wallet accounts by address
-                walletAccounts: combineWalletAccounts(walletAccounts, wallet, accounts, ss58).filter(
-                  (account, index, self) => !self.some((t, i) => i < index && addressEq(t.address, account.address))
+                walletAccounts: combineWalletAccounts(
+                  walletAccounts,
+                  wallet,
+                  accounts,
+                  ss58,
+                ).filter(
+                  (account, index, self) =>
+                    !self.some(
+                      (t, i) =>
+                        i < index && addressEq(t.address, account.address),
+                    ),
                 ),
-                wallets: window.injectedWeb3
+                wallets: window.injectedWeb3,
               }));
             });
-          })
+          }),
         );
       }
     }

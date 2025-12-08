@@ -4,11 +4,15 @@
 import { debounce } from 'lodash-es';
 import { useCallback } from 'react';
 
-export function useDebounceFn<T extends (...args: any[]) => any>(fn: T, deps: readonly any[], ms: number = 500) {
+export function useDebounceFn<T extends (...args: any[]) => any>(
+  fn: T,
+  deps: readonly any[],
+  ms: number = 500,
+) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(
     debounce(fn, ms),
 
-    [fn, ...deps]
+    [fn, ...deps],
   );
 }

@@ -11,11 +11,26 @@ export type LoaderProps = HTMLAttributes<HTMLDivElement> & {
   showText?: boolean;
 };
 
-export const Loader = ({ className, size = 10, text = 'Thinking', showText = true, ...props }: LoaderProps) => (
-  <div className={cn('flex items-center justify-start gap-[5px]', className)} {...props}>
-    <div className='bg-primary animate-pulse rounded-full' style={{ width: size, height: size }} />
+export const Loader = ({
+  className,
+  size = 10,
+  text = 'Thinking',
+  showText = true,
+  ...props
+}: LoaderProps) => (
+  <div
+    className={cn('flex items-center justify-start gap-[5px]', className)}
+    {...props}
+  >
+    <div
+      className="bg-primary animate-pulse rounded-full"
+      style={{ width: size, height: size }}
+    />
     {showText && (
-      <span className='text-foreground animate-dots font-normal whitespace-nowrap' style={{ lineHeight: 'normal' }}>
+      <span
+        className="text-foreground animate-dots font-normal whitespace-nowrap"
+        style={{ lineHeight: 'normal' }}
+      >
         {text}
       </span>
     )}

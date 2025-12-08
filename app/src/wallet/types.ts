@@ -8,7 +8,12 @@ export interface InjectedWindowProvider {
   version: string;
 }
 
-export type WalletAccount = { address: string; name?: string; type?: string; source: string };
+export type WalletAccount = {
+  address: string;
+  name?: string;
+  type?: string;
+  source: string;
+};
 export interface WalletState {
   initialized: boolean;
   isWalletReady: boolean;

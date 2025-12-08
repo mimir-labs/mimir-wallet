@@ -12,7 +12,7 @@ const DEFAULT_STATUS: ChainStatus = {
   isApiConnected: false,
   isApiReady: false,
   isApiInitialized: false,
-  apiError: null
+  apiError: null,
 };
 
 /**
@@ -34,5 +34,7 @@ const DEFAULT_STATUS: ChainStatus = {
  * ```
  */
 export function useChainStatus(chain: string): ChainStatus {
-  return useApiStore(useShallow((state) => state.chainStatuses[chain] ?? DEFAULT_STATUS));
+  return useApiStore(
+    useShallow((state) => state.chainStatuses[chain] ?? DEFAULT_STATUS),
+  );
 }

@@ -11,7 +11,7 @@ import { useMemo } from 'react';
  */
 export function useGasFeeEstimate(
   extrinsic: SubmittableExtrinsic<'promise'> | null,
-  signer?: string
+  signer?: string,
 ): bigint | undefined | null {
   const extrinsicHex = useMemo(() => extrinsic?.toHex(), [extrinsic]);
 
@@ -29,7 +29,7 @@ export function useGasFeeEstimate(
 
         return {
           partialFee: info.partialFee,
-          weight: info.weight.refTime || info.weight
+          weight: info.weight.refTime || info.weight,
         };
       } catch (error) {
         console.error('Failed to query gas fee:', error);
@@ -38,7 +38,7 @@ export function useGasFeeEstimate(
     },
     enabled: !!extrinsicHex && !!signer,
     staleTime: 30000, // Cache for 30 seconds
-    retry: 1
+    retry: 1,
   });
 
   return useMemo(() => {

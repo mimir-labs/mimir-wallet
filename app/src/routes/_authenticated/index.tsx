@@ -3,14 +3,10 @@
 
 import { createFileRoute } from '@tanstack/react-router';
 
-import PageProfile from '@/pages/profile';
-
 /**
  * Home Page Route (/)
  *
  * Multisig control center with account structure view, balance overview,
  * transaction analytics, and quick actions for Polkadot ecosystem
  */
-export const Route = createFileRoute('/_authenticated/')({
-  component: PageProfile
-});
+export const Route = createFileRoute('/_authenticated/')({});

@@ -23,6 +23,6 @@ export function usePendingTx(address: string, url: string) {
 
         return urlIn.origin === urlThis.origin;
       }),
-    [transactions, url]
+    [transactions, url],
   );
 }

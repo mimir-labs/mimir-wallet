@@ -3,26 +3,36 @@
 
 function Version() {
   return (
-    <div className='z-0 flex items-center gap-5'>
+    <div className="z-0 flex items-center gap-5">
       <span>Version: {import.meta.env.VERSION}</span>
       <a
-        className='text-primary'
-        href='https://github.com/mimir-labs/mimir-wallet'
-        target='_blank'
-        rel='noopener noreferrer'
+        className="text-primary"
+        href="https://github.com/mimir-labs/mimir-wallet"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         Github
       </a>
-      <a className='text-primary' href='https://t.me/+t7vZ1kXV5h1kNGQ9' target='_blank' rel='noopener noreferrer'>
+      <a
+        className="text-primary"
+        href="https://t.me/+t7vZ1kXV5h1kNGQ9"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         Report Bug
       </a>
-      <a className='text-primary' href='https://docs.mimir.global' target='_blank' rel='noopener noreferrer'>
+      <a
+        className="text-primary"
+        href="https://docs.mimir.global"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         Docs
       </a>
-      <a className='text-primary' href='/privacy.html' target='_blank'>
+      <a className="text-primary" href="/privacy.html" target="_blank">
         Privacy
       </a>
-      <a className='text-primary' href='/terms.html' target='_blank'>
+      <a className="text-primary" href="/terms.html" target="_blank">
         Terms
       </a>
     </div>

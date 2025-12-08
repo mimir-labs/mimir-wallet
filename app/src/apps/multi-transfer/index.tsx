@@ -3,7 +3,11 @@
 
 import type { MultiTransferData } from './types';
 
-import { type FunctionCallHandler, isFunctionCallArray, toFunctionCallString } from '@mimir-wallet/ai-assistant';
+import {
+  type FunctionCallHandler,
+  isFunctionCallArray,
+  toFunctionCallString,
+} from '@mimir-wallet/ai-assistant';
 import { isValidAddress, NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Button, Divider } from '@mimir-wallet/ui';
 import { Link } from '@tanstack/react-router';
@@ -32,7 +36,10 @@ function MultiTransfer() {
         const invalidAddress = addRecipient
           .filter((item) => {
             if (!item || typeof item !== 'object') return false;
-            const recipient = 'recipient' in item ? toFunctionCallString(item.recipient) : undefined;
+            const recipient =
+              'recipient' in item
+                ? toFunctionCallString(item.recipient)
+                : undefined;
 
             return recipient && !isValidAddress(recipient);
           })
@@ -45,7 +52,9 @@ function MultiTransfer() {
           });
 
         if (invalidAddress.length > 0) {
-          console.error(`Invalid recipients address format ${invalidAddress.join(',')}`);
+          console.error(
+            `Invalid recipients address format ${invalidAddress.join(',')}`,
+          );
 
           return;
         }
@@ -54,11 +63,23 @@ function MultiTransfer() {
       // Update recipients
       if (addRecipient && isFunctionCallArray(addRecipient)) {
         const recipients: MultiTransferData[] = addRecipient
-          .filter((item) => item && typeof item === 'object' && 'recipient' in item && 'amount' in item)
+          .filter(
+            (item) =>
+              item &&
+              typeof item === 'object' &&
+              'recipient' in item &&
+              'amount' in item,
+          )
           .map((item) => {
-            const recipient = toFunctionCallString((item as { recipient: unknown }).recipient) || '';
+            const recipient =
+              toFunctionCallString(
+                (item as { recipient: unknown }).recipient,
+              ) || '';
             const amount = (item as { amount: unknown }).amount;
-            const amountStr = typeof amount === 'number' ? amount.toString() : String(amount || '');
+            const amountStr =
+              typeof amount === 'number'
+                ? amount.toString()
+                : String(amount || '');
 
             return [recipient, 'native', amountStr] as MultiTransferData;
           });
@@ -67,7 +88,9 @@ function MultiTransfer() {
           const next = [...prev];
 
           recipients.forEach((recipient) => {
-            const emptyIndex = next.findIndex(([address, assetId, amount]) => !address && !assetId && !amount);
+            const emptyIndex = next.findIndex(
+              ([address, assetId, amount]) => !address && !assetId && !amount,
+            );
 
             if (emptyIndex !== -1) {
               next[emptyIndex] = recipient;
@@ -87,7 +110,7 @@ function MultiTransfer() {
         setNetwork(networkValue);
       }
     },
-    [setNetwork]
+    [setNetwork],
   );
 
   useRouteDependentHandler(
@@ -95,26 +118,26 @@ function MultiTransfer() {
     '/explorer/mimir%3A%2F%2Fapp%2Fmulti-transfer',
     handleBatchTransferForm,
     {
-      displayName: 'Multi Transfer'
-    }
+      displayName: 'Multi Transfer',
+    },
   );
 
   return (
     <NetworkProvider network={network}>
-      <div className='mx-auto w-full max-w-[900px] p-4 sm:p-5'>
-        <Button onClick={() => window.history.back()} variant='ghost'>
+      <div className="mx-auto w-full max-w-[900px] p-4 sm:p-5">
+        <Button onClick={() => window.history.back()} variant="ghost">
           {'<'} Back
         </Button>
-        <div className='border-secondary bg-content1 shadow-medium mt-4 flex flex-col gap-5 rounded-[20px] border-1 p-4 sm:p-5'>
-          <div className='flex flex-col gap-5'>
-            <div className='flex items-center justify-between'>
+        <div className="mt-4 flex flex-col gap-5 p-4 card-root sm:p-5">
+          <div className="flex flex-col gap-5">
+            <div className="flex items-center justify-between">
               <h3>Multi Transfer</h3>
 
-              <Button asChild color='primary' variant='light'>
+              <Button asChild color="primary" variant="light">
                 <Link
-                  to='/explorer/$url'
+                  to="/explorer/$url"
                   params={{
-                    url: 'mimir://app/transfer'
+                    url: 'mimir://app/transfer',
                   }}
                 >
                   <IconTransfer />

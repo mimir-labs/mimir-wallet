@@ -11,9 +11,14 @@ import { useQuery } from '@mimir-wallet/service';
  * Find target call from nested proxy/multisig calls
  */
 async function findTarget({
-  queryKey
+  queryKey,
 }: {
-  queryKey: readonly [string, string, string, HexString | string | undefined | null];
+  queryKey: readonly [
+    string,
+    string,
+    string,
+    HexString | string | undefined | null,
+  ];
 }): Promise<[string, IMethod | null | undefined]> {
   const [, network, address, callData] = queryKey;
 
@@ -22,10 +27,6 @@ async function findTarget({
   }
 
   const api = await ApiManager.getInstance().getApi(network);
-
-  if (!api) {
-    return [address, null];
-  }
 
   try {
     const call = api.registry.createTypeUnsafe<IMethod>('Call', [callData]);
@@ -67,21 +68,21 @@ export interface UseFindTargetCallResult {
 export function useFindTargetCall(
   network: string,
   address: string,
-  callData: HexString | string | undefined | null
+  callData: HexString | string | undefined | null,
 ): UseFindTargetCallResult {
   const { data, isLoading, error } = useQuery({
     queryKey: ['find-target-call', network, address, callData] as const,
     queryFn: findTarget,
     enabled: !!network && !!address && !!callData,
     staleTime: Infinity, // Result doesn't change for same input
-    retry: false
+    retry: false,
   });
 
   return {
     from: data?.[0] ?? address,
     targetCall: data?.[1] ?? null,
     isLoading,
-    error: error as Error | null
+    error: error as Error | null,
   };
 }
 
@@ -93,7 +94,7 @@ export function useFindTargetCall(
 export function useFindTargetCallFromMethod(
   network: string,
   address: string,
-  call: IMethod | null | undefined
+  call: IMethod | null | undefined,
 ): UseFindTargetCallResult {
   const callHex = call?.toHex();
 
@@ -107,19 +108,21 @@ export function useFindTargetCallFromMethod(
       const api = await ApiManager.getInstance().getApi(network);
 
       // Recreate call from hex since IMethod can't be used in queryKey
-      const parsedCall = api.registry.createTypeUnsafe<IMethod>('Call', [callHex]);
+      const parsedCall = api.registry.createTypeUnsafe<IMethod>('Call', [
+        callHex,
+      ]);
 
       return findTargetCall(api, address, parsedCall);
     },
     enabled: !!network && !!address && !!callHex,
     staleTime: Infinity,
-    retry: false
+    retry: false,
   });
 
   return {
     from: data?.[0] ?? address,
     targetCall: data?.[1] ?? null,
     isLoading,
-    error: error as Error | null
+    error: error as Error | null,
   };
 }

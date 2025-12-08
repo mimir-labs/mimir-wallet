@@ -13,14 +13,16 @@ export interface ExistentialDepositResult {
   error: Error | null;
 }
 
-async function fetchExistentialDeposit(network: string): Promise<{ bn: BN; bigint: bigint }> {
+async function fetchExistentialDeposit(
+  network: string,
+): Promise<{ bn: BN; bigint: bigint }> {
   const api = await ApiManager.getInstance().getApi(network);
 
   const ed = api.consts.balances.existentialDeposit;
 
   return {
     bn: ed,
-    bigint: ed.toBigInt()
+    bigint: ed.toBigInt(),
   };
 }
 
@@ -44,13 +46,15 @@ async function fetchExistentialDeposit(network: string): Promise<{ bn: BN; bigin
  * const isEnough = balance.gte(amount.add(existentialDeposit));
  * ```
  */
-export function useExistentialDeposit(network: string): ExistentialDepositResult {
+export function useExistentialDeposit(
+  network: string,
+): ExistentialDepositResult {
   const { data, isLoading, error } = useQuery({
     queryKey: ['existentialDeposit', network] as const,
     queryFn: ({ queryKey }) => fetchExistentialDeposit(queryKey[1]),
     enabled: !!network,
     staleTime: Infinity,
-    retry: false
+    retry: false,
   });
 
   return useMemo(
@@ -58,8 +62,8 @@ export function useExistentialDeposit(network: string): ExistentialDepositResult
       existentialDeposit: data?.bn ?? BN_ZERO,
       existentialDepositBigInt: data?.bigint ?? 0n,
       isLoading,
-      error: error as Error | null
+      error: error as Error | null,
     }),
-    [data, isLoading, error]
+    [data, isLoading, error],
   );
 }

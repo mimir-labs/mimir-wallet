@@ -7,19 +7,30 @@ import type { ComponentProps } from 'react';
 
 import { Button, cn } from '@mimir-wallet/ui';
 import { ArrowDownIcon } from 'lucide-react';
-import { createContext, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom';
 
 export interface ConversationRef {
   scrollToBottom: () => void;
 }
 
-export interface ConversationProps extends ComponentProps<typeof StickToBottom> {
+export interface ConversationProps extends ComponentProps<
+  typeof StickToBottom
+> {
   ref?: React.Ref<ConversationRef>;
 }
 
 // Context to share scrollToBottomRef between Conversation and ConversationContent
-const ScrollRefContext = createContext<React.MutableRefObject<(() => void) | null> | null>(null);
+const ScrollRefContext = createContext<React.MutableRefObject<
+  (() => void) | null
+> | null>(null);
 
 // Helper component to capture scrollToBottom from StickToBottom context
 const ScrollController = () => {
@@ -35,7 +46,12 @@ const ScrollController = () => {
   return null;
 };
 
-export function Conversation({ className, children, ref, ...props }: ConversationProps) {
+export function Conversation({
+  className,
+  children,
+  ref,
+  ...props
+}: ConversationProps) {
   const scrollToBottomRef = useRef<(() => void) | null>(null);
 
   // Expose scrollToBottom through ref
@@ -44,18 +60,18 @@ export function Conversation({ className, children, ref, ...props }: Conversatio
     () => ({
       scrollToBottom: () => {
         scrollToBottomRef.current?.();
-      }
+      },
     }),
-    []
+    [],
   );
 
   return (
     <ScrollRefContext.Provider value={scrollToBottomRef}>
       <StickToBottom
         className={cn('relative flex-1 overflow-y-auto', className)}
-        initial='smooth'
-        resize='smooth'
-        role='log'
+        initial="smooth"
+        resize="smooth"
+        role="log"
         {...props}
       >
         {children}
@@ -66,9 +82,14 @@ export function Conversation({ className, children, ref, ...props }: Conversatio
 
 Conversation.displayName = 'Conversation';
 
-export type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>;
+export type ConversationContentProps = ComponentProps<
+  typeof StickToBottom.Content
+>;
 
-export const ConversationContent = ({ className, ...props }: ConversationContentProps) => (
+export const ConversationContent = ({
+  className,
+  ...props
+}: ConversationContentProps) => (
   <StickToBottom.Content className={cn('', className)} {...props} />
 );
 
@@ -77,7 +98,10 @@ export { ScrollController };
 
 export type ConversationScrollButtonProps = ComponentProps<typeof Button>;
 
-export const ConversationScrollButton = ({ className, ...props }: ConversationScrollButtonProps) => {
+export const ConversationScrollButton = ({
+  className,
+  ...props
+}: ConversationScrollButtonProps) => {
   const { isAtBottom, scrollToBottom } = useStickToBottomContext();
 
   const handleScrollToBottom = useCallback(() => {
@@ -87,15 +111,18 @@ export const ConversationScrollButton = ({ className, ...props }: ConversationSc
   return (
     !isAtBottom && (
       <Button
-        className={cn('absolute bottom-4 left-[50%] translate-x-[-50%]', className)}
+        className={cn(
+          'absolute bottom-4 left-[50%] translate-x-[-50%]',
+          className,
+        )}
         onClick={handleScrollToBottom}
         isIconOnly
-        radius='full'
-        type='button'
-        variant='solid'
+        radius="full"
+        type="button"
+        variant="solid"
         {...props}
       >
-        <ArrowDownIcon className='size-4' />
+        <ArrowDownIcon className="size-4" />
       </Button>
     )
   );

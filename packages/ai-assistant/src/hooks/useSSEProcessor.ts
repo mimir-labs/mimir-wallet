@@ -13,36 +13,42 @@ export function useSSEProcessor() {
   /**
    * Parse SSE event line into ChatResponseEvent
    */
-  const parseSSEEvent = useCallback((line: string): ChatResponseEvent | null => {
-    if (!line.startsWith('data: ')) return null;
+  const parseSSEEvent = useCallback(
+    (line: string): ChatResponseEvent | null => {
+      if (!line.startsWith('data: ')) return null;
 
-    try {
-      return JSON.parse(line.slice(6)) as ChatResponseEvent;
-    } catch (err) {
-      console.error('[useSSEProcessor] Failed to parse SSE event:', err);
+      try {
+        return JSON.parse(line.slice(6)) as ChatResponseEvent;
+      } catch (err) {
+        console.error('[useSSEProcessor] Failed to parse SSE event:', err);
 
-      return null;
-    }
-  }, []);
+        return null;
+      }
+    },
+    [],
+  );
 
   /**
    * Process text event - append incremental text content
    */
-  const processTextEvent = useCallback((event: ChatResponseEvent, assistantParts: MessagePart[]): boolean => {
-    if (event.type !== 'text') return false;
+  const processTextEvent = useCallback(
+    (event: ChatResponseEvent, assistantParts: MessagePart[]): boolean => {
+      if (event.type !== 'text') return false;
 
-    const lastPart = assistantParts.find((item) => item.type === 'text');
+      const lastPart = assistantParts.find((item) => item.type === 'text');
 
-    if (lastPart && lastPart.type === 'text') {
-      // Append to existing text (incremental streaming)
-      lastPart.text += event.content;
-    } else {
-      // Create new text part with initial content
-      assistantParts.push({ type: 'text', text: event.content });
-    }
+      if (lastPart && lastPart.type === 'text') {
+        // Append to existing text (incremental streaming)
+        lastPart.text += event.content;
+      } else {
+        // Create new text part with initial content
+        assistantParts.push({ type: 'text', text: event.content });
+      }
 
-    return true;
-  }, []);
+      return true;
+    },
+    [],
+  );
 
   /**
    * Process tool_start event - create new tool part
@@ -51,16 +57,17 @@ export function useSSEProcessor() {
     (
       event: ChatResponseEvent,
       assistantParts: MessagePart[],
-      toolCallsMap: Map<string, number>
+      toolCallsMap: Map<string, number>,
     ): { processed: boolean; partIndex: number } => {
-      if (event.type !== 'tool_start') return { processed: false, partIndex: -1 };
+      if (event.type !== 'tool_start')
+        return { processed: false, partIndex: -1 };
 
       // Create new tool part
       const toolPart: MessagePart = {
         type: 'tool',
         toolName: event.name,
         input: event.input,
-        state: 'input-available'
+        state: 'input-available',
       };
 
       // Add to parts array and track its index
@@ -71,7 +78,7 @@ export function useSSEProcessor() {
 
       return { processed: true, partIndex };
     },
-    []
+    [],
   );
 
   /**
@@ -81,28 +88,38 @@ export function useSSEProcessor() {
     (
       event: ChatResponseEvent,
       assistantParts: MessagePart[],
-      toolCallsMap: Map<string, number>
+      toolCallsMap: Map<string, number>,
     ): { processed: boolean; updated: boolean } => {
-      if (event.type !== 'tool_end') return { processed: false, updated: false };
+      if (event.type !== 'tool_end')
+        return { processed: false, updated: false };
 
       // Find the corresponding tool part by ID
       const partIndex = toolCallsMap.get(event.id);
 
       // Validate tool state before updating
       if (partIndex === undefined) {
-        console.error('[useSSEProcessor] Tool state corruption: tool_end without tool_start:', event.id);
+        console.error(
+          '[useSSEProcessor] Tool state corruption: tool_end without tool_start:',
+          event.id,
+        );
 
         return { processed: true, updated: false };
       }
 
       if (partIndex >= assistantParts.length) {
-        console.error('[useSSEProcessor] Tool state corruption: invalid part index:', partIndex);
+        console.error(
+          '[useSSEProcessor] Tool state corruption: invalid part index:',
+          partIndex,
+        );
 
         return { processed: true, updated: false };
       }
 
       if (assistantParts[partIndex]?.type !== 'tool') {
-        console.error('[useSSEProcessor] Tool state corruption: type mismatch at index:', partIndex);
+        console.error(
+          '[useSSEProcessor] Tool state corruption: type mismatch at index:',
+          partIndex,
+        );
 
         return { processed: true, updated: false };
       }
@@ -113,7 +130,7 @@ export function useSSEProcessor() {
           return {
             ...part,
             output: event.output,
-            state: 'output-available' as const
+            state: 'output-available' as const,
           };
         }
 
@@ -126,42 +143,45 @@ export function useSSEProcessor() {
 
       return { processed: true, updated: true };
     },
-    []
+    [],
   );
 
   /**
    * Process error event - create error message part
    */
-  const processErrorEvent = useCallback((event: ChatResponseEvent, assistantParts: MessagePart[]): boolean => {
-    if (event.type !== 'error') return false;
+  const processErrorEvent = useCallback(
+    (event: ChatResponseEvent, assistantParts: MessagePart[]): boolean => {
+      if (event.type !== 'error') return false;
 
-    // Format error message with details
-    let errorText = event.message;
+      // Format error message with details
+      let errorText = event.message;
 
-    if (event.errorType) {
-      errorText = `[${event.errorType}] ${errorText}`;
-    }
+      if (event.errorType) {
+        errorText = `[${event.errorType}] ${errorText}`;
+      }
 
-    if (event.details) {
-      const detailsStr = JSON.stringify(event.details, null, 2);
+      if (event.details) {
+        const detailsStr = JSON.stringify(event.details, null, 2);
 
-      errorText += `\n\nDetails:\n${detailsStr}`;
-    }
+        errorText += `\n\nDetails:\n${detailsStr}`;
+      }
 
-    // Add error as text part
-    assistantParts.push({
-      type: 'text',
-      text: `❌ Error: ${errorText}`
-    });
+      // Add error as text part
+      assistantParts.push({
+        type: 'text',
+        text: `❌ Error: ${errorText}`,
+      });
 
-    return true;
-  }, []);
+      return true;
+    },
+    [],
+  );
 
   return {
     parseSSEEvent,
     processTextEvent,
     processToolStartEvent,
     processToolEndEvent,
-    processErrorEvent
+    processErrorEvent,
   };
 }

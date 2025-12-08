@@ -22,7 +22,12 @@ interface Props {
   transaction: Transaction;
 }
 
-function TxCell({ withDetails, defaultOpen, address, transaction: propsTransaction }: Props) {
+function TxCell({
+  withDetails,
+  defaultOpen,
+  address,
+  transaction: propsTransaction,
+}: Props) {
   const upSm = useMediaQuery('sm');
   const { network } = useNetwork();
 
@@ -34,7 +39,7 @@ function TxCell({ withDetails, defaultOpen, address, transaction: propsTransacti
   const [shouldLoadDetails, setShouldLoadDetails] = useState(false);
   const [fullTransaction] = useTransactionDetail(
     network,
-    shouldLoadDetails ? propsTransaction.id.toString() : undefined
+    shouldLoadDetails ? propsTransaction.id.toString() : undefined,
   );
 
   // Use full transaction if loaded, otherwise use original
@@ -45,8 +50,8 @@ function TxCell({ withDetails, defaultOpen, address, transaction: propsTransacti
 
   if (!account) {
     return (
-      <div ref={ref} className='flex h-[100px] items-center justify-center'>
-        <Spinner size='lg' variant='wave' />
+      <div ref={ref} className="flex h-[100px] items-center justify-center">
+        <Spinner size="lg" variant="ellipsis" />
       </div>
     );
   }

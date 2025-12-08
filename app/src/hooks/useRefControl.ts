@@ -61,7 +61,11 @@ export function useRefControl<T>() {
             action();
           } catch (actionError) {
             console.error('Error executing pending action:', actionError);
-            setError(actionError instanceof Error ? actionError : new Error('Unknown action error'));
+            setError(
+              actionError instanceof Error
+                ? actionError
+                : new Error('Unknown action error'),
+            );
           }
         });
         setPendingActions([]);
@@ -69,7 +73,11 @@ export function useRefControl<T>() {
         if (error) setError(null);
       } catch (batchError) {
         console.error('Error executing pending actions batch:', batchError);
-        setError(batchError instanceof Error ? batchError : new Error('Unknown batch error'));
+        setError(
+          batchError instanceof Error
+            ? batchError
+            : new Error('Unknown batch error'),
+        );
       }
     }
   }, [pendingActions, error]);
@@ -102,12 +110,16 @@ export function useRefControl<T>() {
             } else {
               throw new Error(`Method '${String(method)}' is not available`);
             }
-          }
+          },
         ]);
       }
     } catch (callError) {
       console.error(`Error calling method '${String(method)}':`, callError);
-      setError(callError instanceof Error ? callError : new Error(`Error calling ${String(method)}`));
+      setError(
+        callError instanceof Error
+          ? callError
+          : new Error(`Error calling ${String(method)}`),
+      );
     }
   };
 

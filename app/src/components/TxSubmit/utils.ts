@@ -8,7 +8,11 @@ import type { Timepoint } from '@polkadot/types/interfaces';
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { addressEq, callFilter, decodeAddress } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  callFilter,
+  decodeAddress,
+} from '@mimir-wallet/polkadot-core';
 import { isString, u8aSorted } from '@polkadot/util';
 import { blake2AsU8a } from '@polkadot/util-crypto';
 
@@ -19,14 +23,14 @@ async function asMulti(
   tx: SubmittableExtrinsic<'promise'>,
   multisig: string,
   threshold: number,
-  otherSignatories: string[]
+  otherSignatories: string[],
 ) {
   const u8a = api.tx(tx.toU8a()).toU8a();
 
   const [info, { weight }] = await Promise.all([
     // IMPORTANT: the hash is used to identify the multisig transaction
     api.query.multisig.multisigs(multisig, blake2AsU8a(tx.method.toU8a())),
-    api.call.transactionPaymentApi.queryInfo(u8a, u8a.length)
+    api.call.transactionPaymentApi.queryInfo(u8a, u8a.length),
   ]);
 
   let timepoint: Timepoint | null = null;
@@ -38,7 +42,7 @@ async function asMulti(
   if (threshold === 1 && api.tx.multisig.asMultiThreshold1) {
     return api.tx.multisig.asMultiThreshold1(
       u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
-      tx.method.toU8a()
+      tx.method.toU8a(),
     );
   }
 
@@ -49,14 +53,14 @@ async function asMulti(
         timepoint,
         tx.method.toU8a(),
         false,
-        weight
+        weight,
       )
     : api.tx.multisig.asMulti(
         threshold,
         u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
         timepoint,
         tx.method.toU8a(),
-        weight
+        weight,
       );
 }
 
@@ -65,10 +69,12 @@ async function announce(
   tx: SubmittableExtrinsic<'promise'>,
   proxy: string,
   delegate: string,
-  delay: number
+  delay: number,
 ) {
   const proxies = await api.query.proxy.proxies(proxy);
-  const exists = proxies[0].filter((item) => addressEq(item.delegate.toString(), delegate));
+  const exists = proxies[0].filter((item) =>
+    addressEq(item.delegate.toString(), delegate),
+  );
 
   if (!exists.length) {
     throw new Error('Proxy not found');
@@ -79,7 +85,9 @@ async function announce(
   }
 
   if (!api.tx.proxy?.announce) {
-    throw new Error(`${api.runtimeChain.toString()} does not support proxy announce`);
+    throw new Error(
+      `${api.runtimeChain.toString()} does not support proxy announce`,
+    );
   }
 
   return api.tx.proxy.announce(proxy, tx.method.hash);
@@ -91,18 +99,25 @@ async function proxy(
   proxy: string,
   delegate: string,
   proxyType: string,
-  call?: HexString | null
+  call?: HexString | null,
 ) {
   const proxies = await api.query.proxy.proxies(proxy);
 
-  const exists = proxies[0].find((item) => addressEq(item.delegate.toString(), delegate));
+  const exists = proxies[0].find((item) =>
+    addressEq(item.delegate.toString(), delegate),
+  );
 
   if (!exists) {
-    if (!api.tx.remoteProxyRelayChain) throw new Error(`Proxy not exists on account ${proxy}`);
+    if (!api.tx.remoteProxyRelayChain)
+      throw new Error(`Proxy not exists on account ${proxy}`);
 
     return call
       ? api.tx(api.registry.createType('Call', call))
-      : api.tx.remoteProxyRelayChain.remoteProxyWithRegisteredProof(proxy, proxyType, tx.method.toU8a());
+      : api.tx.remoteProxyRelayChain.remoteProxyWithRegisteredProof(
+          proxy,
+          proxyType,
+          tx.method.toU8a(),
+        );
   }
 
   if (call) {
@@ -117,14 +132,14 @@ export function buildTx(
   call: IMethod,
   path: [FilterPath, ...FilterPath[]],
   transaction?: Transaction | null,
-  calls?: Set<HexString>
+  calls?: Set<HexString>,
 ): Promise<TxBundle>;
 export function buildTx(
   api: ApiPromise,
   call: IMethod,
   account: string,
   transaction?: Transaction | null,
-  calls?: Set<HexString>
+  calls?: Set<HexString>,
 ): Promise<TxBundle>;
 
 export async function buildTx(
@@ -132,7 +147,7 @@ export async function buildTx(
   call: IMethod,
   pathOrAccount: [FilterPath, ...FilterPath[]] | string,
   transaction?: Transaction | null,
-  calls: Set<HexString> = new Set()
+  calls: Set<HexString> = new Set(),
 ): Promise<TxBundle> {
   const functionMeta = api.registry.findMetaCall(call.callIndex);
 
@@ -148,19 +163,31 @@ export async function buildTx(
 
   for (const item of path) {
     if (item.type === 'multisig') {
-      tx = await asMulti(api, tx, item.multisig, item.threshold, item.otherSignatures);
-      _transaction = _transaction?.children.find(({ address }) => addressEq(address, item.address));
+      tx = await asMulti(
+        api,
+        tx,
+        item.multisig,
+        item.threshold,
+        item.otherSignatures,
+      );
+      _transaction = _transaction?.children.find(({ address }) =>
+        addressEq(address, item.address),
+      );
     } else if (item.type === 'proxy') {
       callFilter(api, item.proxyType, item.address, tx.method);
 
       if (item.delay) {
         calls.add(tx.method.toHex());
-        _transaction = _transaction?.children.find(({ address }) => addressEq(address, item.address));
+        _transaction = _transaction?.children.find(({ address }) =>
+          addressEq(address, item.address),
+        );
 
         tx = await announce(api, tx, item.real, item.address, item.delay);
       } else {
         _transaction = _transaction?.children.find(
-          ({ address }) => addressEq(address, _transaction?.delegate) && addressEq(address, item.address)
+          ({ address }) =>
+            addressEq(address, _transaction?.delegate) &&
+            addressEq(address, item.address),
         );
 
         tx = await proxy(
@@ -169,7 +196,7 @@ export async function buildTx(
           item.real,
           _transaction ? _transaction.address : item.address,
           item.proxyType as any,
-          _transaction?.call
+          _transaction?.call,
         );
       }
     }

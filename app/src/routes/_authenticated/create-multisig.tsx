@@ -5,8 +5,6 @@ import type { RouteMetadata } from '@/hooks/usePageTitle';
 
 import { createFileRoute } from '@tanstack/react-router';
 
-import PageCreateMultisig from '@/pages/create-multisig';
-
 /**
  * Create Multisig Route (/create-multisig)
  *
@@ -15,7 +13,6 @@ import PageCreateMultisig from '@/pages/create-multisig';
  */
 export const Route = createFileRoute('/_authenticated/create-multisig')({
   staticData: {
-    title: 'Create Multisig'
+    title: 'Create Multisig',
   } as RouteMetadata,
-  component: PageCreateMultisig
 });

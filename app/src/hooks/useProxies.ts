@@ -4,7 +4,11 @@
 import { ApiManager, isPolkadotAddress } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
-async function fetchProxies({ queryKey }: { queryKey: readonly [string, string, string | null | undefined] }) {
+async function fetchProxies({
+  queryKey,
+}: {
+  queryKey: readonly [string, string, string | null | undefined];
+}) {
   const [, network, address] = queryKey;
 
   if (!address) {
@@ -25,7 +29,7 @@ export function useProxies(network: string, address?: string | null) {
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['proxies', network, address] as const,
     enabled: !!address && isPolkadotAddress(address) && !!network,
-    queryFn: fetchProxies
+    queryFn: fetchProxies,
   });
 
   return [data, isFetched, isFetching] as const;

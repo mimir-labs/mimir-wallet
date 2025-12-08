@@ -2,10 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Compact } from '@polkadot/types';
-import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
+import type {
+  AccountId,
+  AccountIndex,
+  Address,
+} from '@polkadot/types/interfaces';
 import type { BN } from '@polkadot/util';
 
-import { encodeAddress, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  encodeAddress,
+  useNetwork,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { Button, Spinner, Tooltip } from '@mimir-wallet/ui';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useToggle } from 'react-use';
@@ -34,7 +42,11 @@ interface Props {
 function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   const { ss58: chainSS58 } = useSs58Format();
   const { network, chain } = useNetwork();
-  const [allBalances] = useBalanceByIdentifier(network, address.toString(), 'native');
+  const [allBalances] = useBalanceByIdentifier(
+    network,
+    address.toString(),
+    'native',
+  );
   const [open, toggleOpen] = useToggle(false);
   const onEnoughtStateRef = useRef(onEnoughtState);
   const { existentialDepositBigInt } = useExistentialDeposit(network);
@@ -44,7 +56,8 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   const isEnought = useMemo(() => {
     if (allBalances && existentialDepositBigInt > 0n) {
       return (
-        allBalances.transferrable >= BigInt(value.toString()) + existentialDepositBigInt &&
+        allBalances.transferrable >=
+          BigInt(value.toString()) + existentialDepositBigInt &&
         allBalances.free >= allBalances.locked + BigInt(value.toString())
       );
     }
@@ -53,11 +66,20 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   }, [allBalances, existentialDepositBigInt, value]);
 
   useEffect(() => {
-    onEnoughtStateRef.current?.(encodeAddress(address.toString(), chainSS58), isEnought);
+    onEnoughtStateRef.current?.(
+      encodeAddress(address.toString(), chainSS58),
+      isEnought,
+    );
   }, [address, isEnought, chainSS58]);
 
   const icon = (
-    <div>{isUnLock ? <IconUnLock className='text-primary/50' /> : <IconLock className='text-primary/50' />}</div>
+    <div>
+      {isUnLock ? (
+        <IconUnLock className="text-primary/50" />
+      ) : (
+        <IconLock className="text-primary/50" />
+      )}
+    </div>
   );
 
   return (
@@ -71,17 +93,26 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
           receipt={address.toString()}
         />
       )}
-      <div className='flex items-center gap-[5px] sm:gap-2.5'>
+      <div className="flex items-center gap-[5px] sm:gap-2.5">
         {icon}
-        <div className='flex flex-1 items-center gap-[5px] sm:gap-2.5'>
+        <div className="flex flex-1 items-center gap-[5px] sm:gap-2.5">
           <AddressName value={address} /> {isUnLock ? 'unlock' : 'lock'}
-          <Tooltip classNames={{ content: 'max-w-[320px]' }} content={<span>{tip}</span>}>
-            <IconQuestion className='text-primary/40' />
+          <Tooltip
+            classNames={{ content: 'max-w-[320px]' }}
+            content={<span>{tip}</span>}
+          >
+            <IconQuestion className="text-primary/40" />
           </Tooltip>
         </div>
-        <div className='flex items-center gap-[5px] sm:gap-2.5'>
+        <div className="flex items-center gap-[5px] sm:gap-2.5">
           {!isUnLock && isEnought === false && (
-            <Button color='primary' variant='bordered' onClick={toggleOpen} size='sm' className='h-5'>
+            <Button
+              color="primary"
+              variant="bordered"
+              onClick={toggleOpen}
+              size="sm"
+              className="h-5"
+            >
               Fund
             </Button>
           )}
@@ -92,11 +123,11 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
 
           {!isUnLock &&
             (isEnought === 'pending' ? (
-              <Spinner size='sm' />
+              <Spinner size="sm" />
             ) : isEnought ? (
-              <IconSuccess className='text-success' />
+              <IconSuccess className="text-success" />
             ) : (
-              <IconFail className='text-danger' />
+              <IconFail className="text-danger" />
             ))}
         </div>
       </div>
@@ -104,9 +135,15 @@ function LockItem({ address, isUnLock, tip, value, onEnoughtState }: Props) {
   );
 }
 
-export const LockContainer = React.memo(({ children }: { children: React.ReactNode }) => {
-  return <div className='bg-secondary space-y-2.5 rounded-[10px] p-2.5'>{children}</div>;
-});
+export const LockContainer = React.memo(
+  ({ children }: { children: React.ReactNode }) => {
+    return (
+      <div className="bg-secondary space-y-2.5 rounded-[10px] p-2.5">
+        {children}
+      </div>
+    );
+  },
+);
 
 LockContainer.displayName = 'LockContainer';
 

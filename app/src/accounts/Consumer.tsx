@@ -4,7 +4,13 @@
 import type { AccountData, AddressMeta } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { addressEq, addressToHex, encodeAddress, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  addressToHex,
+  encodeAddress,
+  useChains,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 import { isEqual } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -13,8 +19,7 @@ import { AccountContext } from './context';
 import { sync } from './sync';
 import { deriveAccountMeta } from './utils';
 
-import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX } from '@/constants';
-import { type AddressState, useAddressStore } from '@/hooks/useAddressStore';
+import { useAddressStore } from '@/hooks/useAddressStore';
 import { useWallet } from '@/wallet/useWallet';
 
 /**
@@ -59,7 +64,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
             isInjected: true,
             source: account.source,
             cryptoType: account.type || 'ed25519',
-            name: account.name || metas[addressHex]?.name || ''
+            name: account.name || metas[addressHex]?.name || '',
           } as AddressMeta;
         }
 
@@ -76,12 +81,16 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
 
       newMetas[addressHex] = {
         ...newMetas[addressHex],
-        name
+        name,
       };
     }
 
     for (const meta of Object.values(metas)) {
-      if (meta.isPure && meta.delegatees?.length === 1 && metas[addressToHex(meta.delegatees[0])]?.isMultisig) {
+      if (
+        meta.isPure &&
+        meta.delegatees?.length === 1 &&
+        metas[addressToHex(meta.delegatees[0])]?.isMultisig
+      ) {
         const { threshold, who } = metas[addressToHex(meta.delegatees[0])];
 
         if (threshold) {
@@ -97,26 +106,13 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
     return newMetas;
   }, [addresses, metas]);
 
-  useEffect(() => {
-    const onChange = (state: AddressState, prevState: AddressState) => {
-      if (state.current && state.current !== prevState.current) {
-        mode === 'omni'
-          ? store.set(CURRENT_ADDRESS_HEX_KEY, addressToHex(state.current))
-          : store.set(`${CURRENT_ADDRESS_PREFIX}${network}`, state.current);
-      }
-    };
-
-    const unsubscribe = useAddressStore.subscribe(onChange);
-
-    return unsubscribe;
-  }, [mode, network]);
-
   // Initialize address book from local storage
   // This effect runs once when the network changes to load stored addresses
   useEffect(() => {
     // Helper function to get stored address values
     const getValues = () => {
-      const values: { address: string; name: string; watchlist?: boolean }[] = [];
+      const values: { address: string; name: string; watchlist?: boolean }[] =
+        [];
 
       store.each((key: string, value) => {
         if (key.startsWith('address:0x')) {
@@ -130,7 +126,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
               values.push({
                 address: encodeAddress(v.address, chainSS58),
                 name: v.meta.name,
-                watchlist: v.meta.watchlist
+                watchlist: v.meta.watchlist,
               });
             } catch {
               /* empty */
@@ -144,14 +140,14 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
 
     // Update address store with initial values
     useAddressStore.setState({
-      addresses: getValues()
+      addresses: getValues(),
     });
 
     // Listen for changes in stored addresses
     store.on('store_changed', (key: string) => {
       if (key.startsWith('address:0x')) {
         useAddressStore.setState({
-          addresses: getValues()
+          addresses: getValues(),
         });
       }
     });
@@ -163,7 +159,7 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
         .map((item) => addressToHex(item.address))
         .sort()
         .join(','),
-    [walletAccounts]
+    [walletAccounts],
   );
 
   const [syncData, setSyncData] = useState<AccountData[]>([]);
@@ -174,7 +170,9 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
     let interval: any;
 
     const update = (value: AccountData[]) =>
-      setSyncData((prevValue) => (isEqual(value, prevValue) ? prevValue : value));
+      setSyncData((prevValue) =>
+        isEqual(value, prevValue) ? prevValue : value,
+      );
 
     if (isWalletReady && sortedWalletAccounts) {
       // Initial sync when wallet is ready
@@ -184,7 +182,13 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
         if (isOmni) {
           sync(true, chainSS58, sortedWalletAccounts.split(','), update);
         } else {
-          sync(false, network, chainSS58, sortedWalletAccounts.split(','), update);
+          sync(
+            false,
+            network,
+            chainSS58,
+            sortedWalletAccounts.split(','),
+            update,
+          );
         }
       };
 
@@ -206,25 +210,34 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
     const updateAccounts = (values: AccountData[]) => {
       useAddressStore.setState((state) => {
         const newWalletAccounts = walletAccounts
-          .filter((account) => !values.some((a) => addressEq(a.address, account.address)))
+          .filter(
+            (account) =>
+              !values.some((a) => addressEq(a.address, account.address)),
+          )
           .map(
             (account): AccountData => ({
               createdAt: Date.now(),
               address: encodeAddress(account.address, chainSS58),
               name: account.name,
               delegatees: [],
-              type: 'account'
-            })
+              type: 'account',
+            }),
           );
         const newValues =
           mode === 'solo'
-            ? values.filter((account) => (account.type === 'pure' ? account.network === genesisHash : true))
+            ? values.filter((account) =>
+                account.type === 'pure'
+                  ? account.network === genesisHash
+                  : true,
+              )
             : values;
         const newAccounts = [...newValues, ...newWalletAccounts];
 
         return {
-          accounts: isEqual(newAccounts, state.accounts) ? state.accounts : newAccounts,
-          isMultisigSyned: true
+          accounts: isEqual(newAccounts, state.accounts)
+            ? state.accounts
+            : newAccounts,
+          isMultisigSyned: true,
         };
       });
     };
@@ -233,7 +246,11 @@ function AddressConsumer({ children }: { children: React.ReactNode }) {
   }, [chainSS58, genesisHash, mode, syncData, walletAccounts]);
 
   // Component doesn't render anything visible
-  return <AccountContext.Provider value={{ metas: finalMetas, updateMetas }}>{children}</AccountContext.Provider>;
+  return (
+    <AccountContext.Provider value={{ metas: finalMetas, updateMetas }}>
+      {children}
+    </AccountContext.Provider>
+  );
 }
 
 export default AddressConsumer;

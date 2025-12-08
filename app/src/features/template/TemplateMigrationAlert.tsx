@@ -13,7 +13,7 @@ import IconClose from '@/assets/svg/icon-close.svg?react';
 import { toastSuccess } from '@/components/utils';
 import {
   useNetworkMigrationCompleted,
-  useTemplateMigrationStatus
+  useTemplateMigrationStatus,
 } from '@/features/assethub-migration/useMigrationStatus';
 
 interface TemplateMigrationAlertProps {
@@ -22,17 +22,28 @@ interface TemplateMigrationAlertProps {
   onMigrationComplete?: () => void;
 }
 
-function TemplateMigrationAlert({ chain, templates, onMigrationComplete }: TemplateMigrationAlertProps) {
+function TemplateMigrationAlert({
+  chain,
+  templates,
+  onMigrationComplete,
+}: TemplateMigrationAlertProps) {
   const { isAlertVisible, dismissAlert } = useTemplateMigrationStatus(chain);
   const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false);
   const { chains: networks } = useChains();
   const migrationCompleted = useNetworkMigrationCompleted(chain);
 
-  if (!isAlertVisible || !migrationCompleted.completed || !migrationCompleted.block || !migrationCompleted.destChain) {
+  if (
+    !isAlertVisible ||
+    !migrationCompleted.completed ||
+    !migrationCompleted.block ||
+    !migrationCompleted.destChain
+  ) {
     return null;
   }
 
-  const destNetwork = networks.find((network) => network.key === migrationCompleted.destChain);
+  const destNetwork = networks.find(
+    (network) => network.key === migrationCompleted.destChain,
+  );
 
   const handleMigrationComplete = () => {
     dismissAlert();
@@ -42,23 +53,38 @@ function TemplateMigrationAlert({ chain, templates, onMigrationComplete }: Templ
 
   return (
     <>
-      <Alert className='grow-0' variant='warning'>
-        <AlertTitle className='relative flex items-center'>
-          <span className='font-normal'>
+      <Alert className="grow-0" variant="warning">
+        <AlertTitle className="relative flex items-center">
+          <span className="font-normal">
             Due to the Assethub Migration, you can copy Batch to{' '}
             <img
               draggable={false}
-              style={{ display: 'inline', width: '1em', height: '1em', verticalAlign: 'middle', userSelect: 'none' }}
+              style={{
+                display: 'inline',
+                width: '1em',
+                height: '1em',
+                verticalAlign: 'middle',
+                userSelect: 'none',
+              }}
               src={destNetwork?.icon}
             />{' '}
             {destNetwork?.name}.{' '}
-            <button className='text-primary cursor-pointer' onClick={() => setIsMigrationModalOpen(true)}>
+            <button
+              className="text-primary cursor-pointer"
+              onClick={() => setIsMigrationModalOpen(true)}
+            >
               View The List{'>>'}
             </button>
           </span>
 
-          <Button size='sm' className='absolute right-0 text-inherit' isIconOnly variant='light' onClick={dismissAlert}>
-            <IconClose className='h-5 w-5' />
+          <Button
+            size="sm"
+            className="absolute right-0 text-inherit"
+            isIconOnly
+            variant="light"
+            onClick={dismissAlert}
+          >
+            <IconClose className="h-5 w-5" />
           </Button>
         </AlertTitle>
       </Alert>

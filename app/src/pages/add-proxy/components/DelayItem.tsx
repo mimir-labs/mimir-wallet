@@ -41,7 +41,13 @@ function getLabel(delayType: DelayType) {
   return label;
 }
 
-function EstimateCustom({ network, customBlocks }: { network: string; customBlocks: string }) {
+function EstimateCustom({
+  network,
+  customBlocks,
+}: {
+  network: string;
+  customBlocks: string;
+}) {
   const blockInterval = useBlockInterval(network).toNumber();
 
   // Use utility function for time estimation
@@ -50,7 +56,14 @@ function EstimateCustom({ network, customBlocks }: { network: string; customBloc
   }, [customBlocks, blockInterval]);
 }
 
-function DelayItem({ network, isSelected, delayType, customBlocks = '', onCustomBlockChange, onSelect }: Props) {
+function DelayItem({
+  network,
+  isSelected,
+  delayType,
+  customBlocks = '',
+  onCustomBlockChange,
+  onSelect,
+}: Props) {
   const handleClick = () => {
     onSelect(delayType);
   };
@@ -61,21 +74,25 @@ function DelayItem({ network, isSelected, delayType, customBlocks = '', onCustom
     <div
       data-selected={isSelected}
       data-custom={isCustomSelected}
-      className='bg-secondary text-secondary-foreground data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground flex h-[43px] w-[25%] cursor-pointer items-center justify-center gap-[5px] rounded-full px-2.5 text-sm transition-all data-[custom=true]:w-[50%] data-[custom=true]:flex-[0_0_auto] data-[custom=true]:shrink-0 data-[custom=true]:grow-0'
+      className="bg-secondary text-secondary-foreground data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground flex h-[43px] w-[25%] cursor-pointer items-center justify-center gap-[5px] rounded-full px-2.5 text-sm transition-all data-[custom=true]:w-[50%] data-[custom=true]:flex-[0_0_auto] data-[custom=true]:shrink-0 data-[custom=true]:grow-0"
       onClick={handleClick}
     >
       {isCustomSelected ? (
         <>
           <input
             autoFocus
-            type='number'
+            type="number"
             min={0}
             value={customBlocks}
-            onChange={onCustomBlockChange && ((e) => onCustomBlockChange(e.target.value))}
-            className='text-foreground border-divider-300 bg-primary-foreground h-[27px] flex-shrink flex-grow rounded-full border-1 px-2.5 outline-none'
+            onChange={
+              onCustomBlockChange &&
+              ((e) => onCustomBlockChange(e.target.value))
+            }
+            className="text-foreground border-divider bg-primary-foreground h-[27px] flex-shrink flex-grow rounded-full border-1 px-2.5 outline-none"
           />
-          <span className='text-nowrap'>
-            Blocks ( <EstimateCustom network={network} customBlocks={customBlocks} /> )
+          <span className="text-nowrap">
+            Blocks ({' '}
+            <EstimateCustom network={network} customBlocks={customBlocks} /> )
           </span>
         </>
       ) : (

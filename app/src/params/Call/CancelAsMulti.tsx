@@ -21,33 +21,41 @@ const CancelAsMulti = forwardRef<HTMLDivElement | null, CallProps>(
       }
 
       const threshold = Number(call.args[0].toString());
-      const who = (call.args[1] as Vec<AccountId32>).map((account) => account.toString()).concat(from);
+      const who = (call.args[1] as Vec<AccountId32>)
+        .map((account) => account.toString())
+        .concat(from);
 
-      const multisig = registry.createType('AccountId', createKeyMulti(who, threshold));
+      const multisig = registry.createType(
+        'AccountId',
+        createKeyMulti(who, threshold),
+      );
 
       return [multisig, getTypeDef(multisig.toRawType())] as const;
     }, [call, from, registry]);
 
     return (
-      <div ref={ref} className={mergeClasses('flex flex-col gap-2.5', className)}>
+      <div
+        ref={ref}
+        className={mergeClasses('flex flex-col gap-2.5', className)}
+      >
         {multisig && (
           <Item
             type={displayType}
             content={
               <Param
                 displayType={displayType}
-                name='Multisig'
+                name="Multisig"
                 registry={registry}
                 type={multisig[1]}
                 value={multisig[0]}
               />
             }
-            name='Multisig'
+            name="Multisig"
           />
         )}
       </div>
     );
-  }
+  },
 );
 
 CancelAsMulti.displayName = 'CancelAsMulti';

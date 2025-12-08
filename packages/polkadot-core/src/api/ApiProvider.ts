@@ -8,14 +8,25 @@ import type {
   ProviderInterfaceCallback,
   ProviderInterfaceEmitCb,
   ProviderInterfaceEmitted,
-  ProviderStats
+  ProviderStats,
 } from '@polkadot/rpc-provider/types';
 
 import { RpcCoder } from '@polkadot/rpc-provider/coder';
 import defaults from '@polkadot/rpc-provider/defaults';
-import { DEFAULT_CAPACITY, DEFAULT_TTL, LRUCache } from '@polkadot/rpc-provider/lru';
+import {
+  DEFAULT_CAPACITY,
+  DEFAULT_TTL,
+  LRUCache,
+} from '@polkadot/rpc-provider/lru';
 import { getWSErrorString } from '@polkadot/rpc-provider/ws/errors';
-import { isNull, isUndefined, logger, noop, objectSpread, stringify } from '@polkadot/util';
+import {
+  isNull,
+  isUndefined,
+  logger,
+  noop,
+  objectSpread,
+  stringify,
+} from '@polkadot/util';
 import { WebSocket } from '@polkadot/x-ws';
 import { EventEmitter } from 'eventemitter3';
 
@@ -40,7 +51,7 @@ interface WsStateSubscription extends SubscriptionHandler {
 const ALIASES: Record<string, string> = {
   chain_finalisedHead: 'chain_finalizedHead',
   chain_subscribeFinalisedHeads: 'chain_subscribeFinalizedHeads',
-  chain_unsubscribeFinalisedHeads: 'chain_unsubscribeFinalizedHeads'
+  chain_unsubscribeFinalisedHeads: 'chain_unsubscribeFinalizedHeads',
 };
 
 const RETRY_DELAY = 2_500;
@@ -51,7 +62,10 @@ const TIMEOUT_INTERVAL = 5_000;
 const l = logger('api-ws');
 
 /** @internal Clears a Record<*> of all keys, optionally with all callback on clear */
-function eraseRecord<T>(record: Record<string, T>, cb?: (item: T) => void): void {
+function eraseRecord<T>(
+  record: Record<string, T>,
+  cb?: (item: T) => void,
+): void {
   Object.keys(record).forEach((key): void => {
     if (cb) {
       cb(record[key]);
@@ -63,7 +77,15 @@ function eraseRecord<T>(record: Record<string, T>, cb?: (item: T) => void): void
 
 /** @internal Creates a default/empty stats object */
 function defaultEndpointStats(): EndpointStats {
-  return { bytesRecv: 0, bytesSent: 0, cached: 0, errors: 0, requests: 0, subscriptions: 0, timeout: 0 };
+  return {
+    bytesRecv: 0,
+    bytesSent: 0,
+    cached: 0,
+    errors: 0,
+    requests: 0,
+    subscriptions: 0,
+    timeout: 0,
+  };
 }
 
 /**
@@ -129,7 +151,7 @@ export class ApiProvider implements ProviderInterface {
     timeout?: number,
     cacheCapacity?: number,
     cacheTtl?: number | null,
-    connectionTimeout: number = 10000
+    connectionTimeout: number = 10000,
   ) {
     const endpoints = Array.isArray(endpoint) ? endpoint : [endpoint];
 
@@ -139,12 +161,17 @@ export class ApiProvider implements ProviderInterface {
 
     endpoints.forEach((endpoint) => {
       if (!/^(wss|ws):\/\//.test(endpoint)) {
-        throw new Error(`Endpoint should start with 'ws://', received '${endpoint}'`);
+        throw new Error(
+          `Endpoint should start with 'ws://', received '${endpoint}'`,
+        );
       }
     });
     const ttl = cacheTtl === undefined ? DEFAULT_TTL : cacheTtl;
 
-    this.#callCache = new LRUCache(cacheCapacity === 0 ? 0 : cacheCapacity || DEFAULT_CAPACITY, ttl);
+    this.#callCache = new LRUCache(
+      cacheCapacity === 0 ? 0 : cacheCapacity || DEFAULT_CAPACITY,
+      ttl,
+    );
     this.#ttl = cacheTtl;
     this.#cacheCapacity = cacheCapacity || DEFAULT_CAPACITY;
     this.#eventemitter = new EventEmitter();
@@ -155,7 +182,7 @@ export class ApiProvider implements ProviderInterface {
     this.#websocket = null;
     this.#stats = {
       active: { requests: 0, subscriptions: 0 },
-      total: defaultEndpointStats()
+      total: defaultEndpointStats(),
     };
     this.#endpointStats = defaultEndpointStats();
     this.#timeout = timeout || DEFAULT_TIMEOUT_MS;
@@ -244,7 +271,10 @@ export class ApiProvider implements ProviderInterface {
       }
 
       // timeout any handlers that have not had a response
-      this.#timeoutId = setInterval(() => this.#timeoutHandlers(), TIMEOUT_INTERVAL);
+      this.#timeoutId = setInterval(
+        () => this.#timeoutHandlers(),
+        TIMEOUT_INTERVAL,
+      );
     } catch (error) {
       this.#clearConnectionTimer();
       l.error(error);
@@ -297,9 +327,9 @@ export class ApiProvider implements ProviderInterface {
     return {
       active: {
         requests: Object.keys(this.#handlers).length,
-        subscriptions: Object.keys(this.#subscriptions).length
+        subscriptions: Object.keys(this.#subscriptions).length,
       },
-      total: this.#stats.total
+      total: this.#stats.total,
     };
   }
 
@@ -320,7 +350,10 @@ export class ApiProvider implements ProviderInterface {
    * @param  {ProviderInterfaceEmitCb}  sub  Callback
    * @return unsubscribe function
    */
-  public on(type: ProviderInterfaceEmitted, sub: ProviderInterfaceEmitCb): () => void {
+  public on(
+    type: ProviderInterfaceEmitted,
+    sub: ProviderInterfaceEmitCb,
+  ): () => void {
     this.#eventemitter.on(type, sub);
 
     return (): void => {
@@ -338,7 +371,7 @@ export class ApiProvider implements ProviderInterface {
     method: string,
     params: unknown[],
     isCacheable?: boolean,
-    subscription?: SubscriptionHandler
+    subscription?: SubscriptionHandler,
   ): Promise<T> {
     this.#endpointStats.requests++;
     this.#stats.total.requests++;
@@ -350,7 +383,9 @@ export class ApiProvider implements ProviderInterface {
     }
 
     const cacheKey = isCacheable ? `${method}::${stringify(params)}` : '';
-    let resultPromise: Promise<T> | null = isCacheable ? this.#callCache.get(cacheKey) : null;
+    let resultPromise: Promise<T> | null = isCacheable
+      ? this.#callCache.get(cacheKey)
+      : null;
 
     if (!resultPromise) {
       resultPromise = this.#send(id, body, method, params, subscription);
@@ -371,7 +406,7 @@ export class ApiProvider implements ProviderInterface {
     body: string,
     method: string,
     params: unknown[],
-    subscription?: SubscriptionHandler
+    subscription?: SubscriptionHandler,
   ): Promise<T> {
     return new Promise<T>((resolve, reject): void => {
       try {
@@ -390,7 +425,7 @@ export class ApiProvider implements ProviderInterface {
           method,
           params,
           start: Date.now(),
-          subscription
+          subscription,
         };
 
         const bytesSent = body.length;
@@ -435,19 +470,26 @@ export class ApiProvider implements ProviderInterface {
     type: string,
     method: string,
     params: unknown[],
-    callback: ProviderInterfaceCallback
+    callback: ProviderInterfaceCallback,
   ): Promise<number | string> {
     this.#endpointStats.subscriptions++;
     this.#stats.total.subscriptions++;
 
     // subscriptions are not cached, LRU applies to .at(<blockHash>) only
-    return this.send<number | string>(method, params, false, { callback, type });
+    return this.send<number | string>(method, params, false, {
+      callback,
+      type,
+    });
   }
 
   /**
    * @summary Allows unsubscribing to subscriptions made with [[subscribe]].
    */
-  public async unsubscribe(type: string, method: string, id: number | string): Promise<boolean> {
+  public async unsubscribe(
+    type: string,
+    method: string,
+    id: number | string,
+  ): Promise<boolean> {
     const subscription = `${type}::${id}`;
 
     // FIXME This now could happen with re-subscriptions. The issue is that with a re-sub
@@ -463,7 +505,9 @@ export class ApiProvider implements ProviderInterface {
     delete this.#subscriptions[subscription];
 
     try {
-      return this.isConnected && !isNull(this.#websocket) ? this.send<boolean>(method, [id]) : true;
+      return this.isConnected && !isNull(this.#websocket)
+        ? this.send<boolean>(method, [id])
+        : true;
     } catch {
       return false;
     }
@@ -475,7 +519,7 @@ export class ApiProvider implements ProviderInterface {
 
   #onSocketClose = (event: CloseEvent): void => {
     const error = new Error(
-      `disconnected from ${this.endpoint}: ${event.code}:: ${event.reason || getWSErrorString(event.code)}`
+      `disconnected from ${this.endpoint}: ${event.code}:: ${event.reason || getWSErrorString(event.code)}`,
     );
 
     if (this.#autoConnectMs > 0) {
@@ -520,7 +564,9 @@ export class ApiProvider implements ProviderInterface {
     // Check if all endpoints have been tried
     if (this.#attemptedEndpoints.size >= this.#endpoints.length) {
       // All endpoints failed, emit a concise error
-      const finalError = new Error(`Failed to connect: all ${this.#endpoints.length} endpoints unavailable`);
+      const finalError = new Error(
+        `Failed to connect: all ${this.#endpoints.length} endpoints unavailable`,
+      );
 
       this.#emit('error', finalError);
 
@@ -546,7 +592,10 @@ export class ApiProvider implements ProviderInterface {
     let errorMessage = `WebSocket error on ${this.endpoint}`;
 
     // Check if it's an ErrorEvent (Node.js environment)
-    if ('message' in event && typeof (event as ErrorEvent).message === 'string') {
+    if (
+      'message' in event &&
+      typeof (event as ErrorEvent).message === 'string'
+    ) {
       const errorEvent = event as ErrorEvent;
 
       errorMessage = errorEvent.message || errorMessage;
@@ -557,7 +606,8 @@ export class ApiProvider implements ProviderInterface {
         const details: string[] = [];
 
         if (nestedError.code) details.push(`code: ${nestedError.code}`);
-        if (nestedError.syscall) details.push(`syscall: ${nestedError.syscall}`);
+        if (nestedError.syscall)
+          details.push(`syscall: ${nestedError.syscall}`);
 
         if (details.length > 0) {
           errorMessage = `${errorMessage} (${details.join(', ')})`;
@@ -610,7 +660,7 @@ export class ApiProvider implements ProviderInterface {
 
         this.#subscriptions[subId] = objectSpread({}, subscription, {
           method,
-          params
+          params,
         });
 
         // if we have a result waiting for this subscription already
@@ -705,7 +755,7 @@ export class ApiProvider implements ProviderInterface {
         } catch (error) {
           l.error(error);
         }
-      })
+      }),
     ).catch(l.error);
   };
 
@@ -718,7 +768,12 @@ export class ApiProvider implements ProviderInterface {
 
       if (now - handler.start > this.#timeout) {
         try {
-          handler.callback(new Error(`No response received from RPC endpoint in ${this.#timeout / 1000}s`), undefined);
+          handler.callback(
+            new Error(
+              `No response received from RPC endpoint in ${this.#timeout / 1000}s`,
+            ),
+            undefined,
+          );
         } catch {
           // ignore
         }
@@ -760,10 +815,14 @@ export class ApiProvider implements ProviderInterface {
   #handleConnectionTimeout = (): void => {
     const currentEndpoint = this.endpoint;
 
-    console.warn(`[ApiProvider] Connection timeout after ${this.#connectionTimeout}ms on endpoint: ${currentEndpoint}`);
+    console.warn(
+      `[ApiProvider] Connection timeout after ${this.#connectionTimeout}ms on endpoint: ${currentEndpoint}`,
+    );
 
     if (this.#websocket) {
-      console.log(`[ApiProvider] Closing connection to rotate to next endpoint from: ${currentEndpoint}`);
+      console.log(
+        `[ApiProvider] Closing connection to rotate to next endpoint from: ${currentEndpoint}`,
+      );
 
       // Close the WebSocket to trigger #onSocketClose
       // This will automatically retry with the next endpoint via connectWithRetry

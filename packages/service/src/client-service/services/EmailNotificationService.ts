@@ -81,29 +81,45 @@ export class EmailNotificationService extends BaseService {
   /**
    * Create or update an email subscription for an account
    */
-  async bindEmail(dto: BindEmailRequestDto): Promise<BindEmailSuccessResponseDto> {
+  async bindEmail(
+    dto: BindEmailRequestDto,
+  ): Promise<BindEmailSuccessResponseDto> {
     return this.post<BindEmailSuccessResponseDto>(`${this.baseUrl}/bind`, dto);
   }
 
   /**
    * Remove an email subscription from an account
    */
-  async unbindEmail(dto: UnbindEmailRequestDto): Promise<UnbindEmailSuccessResponseDto> {
-    return this.delete<UnbindEmailSuccessResponseDto>(`${this.baseUrl}/unbind`, dto);
+  async unbindEmail(
+    dto: UnbindEmailRequestDto,
+  ): Promise<UnbindEmailSuccessResponseDto> {
+    return this.delete<UnbindEmailSuccessResponseDto>(
+      `${this.baseUrl}/unbind`,
+      dto,
+    );
   }
 
   /**
    * Retrieve current email subscriptions for an account
    */
-  async getSubscriptions(address: string, signer: string): Promise<EmailSubscriptionListResponseDto> {
-    return this.get<EmailSubscriptionListResponseDto>(`${this.baseUrl}/subscriptions/${address}/${signer}`);
+  async getSubscriptions(
+    address: string,
+    signer: string,
+  ): Promise<EmailSubscriptionListResponseDto> {
+    return this.get<EmailSubscriptionListResponseDto>(
+      `${this.baseUrl}/subscriptions/${address}/${signer}`,
+    );
   }
 
   /**
    * Get the total number of active email subscriptions for an address
    */
-  async getSubscriptionCount(address: string): Promise<EmailSubscriptionCountResponseDto> {
-    return this.get<EmailSubscriptionCountResponseDto>(`${this.baseUrl}/count/${address}`);
+  async getSubscriptionCount(
+    address: string,
+  ): Promise<EmailSubscriptionCountResponseDto> {
+    return this.get<EmailSubscriptionCountResponseDto>(
+      `${this.baseUrl}/count/${address}`,
+    );
   }
 
   /**

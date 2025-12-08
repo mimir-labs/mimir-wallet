@@ -31,7 +31,7 @@ const exampleAccounts = [
   '146FpXUf1GZyVUX5G1pwz7SsbqR9zcc62QaSaruanCjt6ChD',
   '16maYYXg9chsfsBVoiSbSWzmFveamERwShPZv3SB5hVnYTmT',
   '13du3Rt2CAV9L1v1QXTeYosuKaiBSYiPWpa2B4nxzfSdEAF1',
-  '14ZaBmSkr6JWf4fUDHbApqHBvbeeAEBSAARxgzXHcSruLELJ'
+  '14ZaBmSkr6JWf4fUDHbApqHBvbeeAEBSAARxgzXHcSruLELJ',
 ];
 
 let index = 0;
@@ -49,7 +49,7 @@ function nextExampleAccount() {
 function AccountItem({
   isExample,
   isExtension,
-  address
+  address,
 }: {
   isExample?: boolean;
   isExtension?: boolean;
@@ -62,7 +62,7 @@ function AccountItem({
 
   return (
     <div
-      className='border-primary/5 bg-secondary flex cursor-pointer items-center justify-between rounded-[10px] border-1 px-2.5 py-[5px]'
+      className="border-primary/5 bg-secondary flex cursor-pointer items-center justify-between rounded-[10px] border-1 px-2.5 py-[5px]"
       key={`multisig-searched`}
       onClick={(e) => {
         e.stopPropagation();
@@ -76,14 +76,21 @@ function AccountItem({
         }
       }}
     >
-      <AddressCell shorten={false} showType value={address} withCopy withAddressBook addressCopyDisabled />
+      <AddressCell
+        shorten={false}
+        showType
+        value={address}
+        withCopy
+        withAddressBook
+        addressCopyDisabled
+      />
 
-      <div className='text-xs font-bold'>
+      <div className="text-xs font-bold">
         $ {formatUsd[0]}
         {formatUsd[1] ? `.${formatUsd[1]}` : ''}
         {formatUsd[2] || ''}
       </div>
-      <span className='ml-1'>{'>'}</span>
+      <span className="ml-1">{'>'}</span>
     </div>
   );
 }
@@ -92,7 +99,7 @@ function Accounts({
   keywords,
   searchAccount,
   setSearchAccount,
-  setIsSearching
+  setIsSearching,
 }: {
   keywords: string;
   searchAccount: AccountData | undefined;
@@ -113,7 +120,7 @@ function Accounts({
       return groupAccounts(
         accounts.filter((account) => addressEq(account.address, keywords)),
         [],
-        metas
+        metas,
       );
     }
 
@@ -144,23 +151,23 @@ function Accounts({
   }, [keywords, setIsSearching, setSearchAccount]);
 
   const description = (
-    <p className='text-xs'>
-      Mimir auto-syncs all multisig accounts across networks, including those created in other apps. (Multix, Signet,
-      PolkadotJS, Polkasafe, etc.)
+    <p className="text-xs">
+      Mimir auto-syncs all multisig accounts across networks, including those
+      created in other apps. (Multix, Signet, PolkadotJS, Polkasafe, etc.)
     </p>
   );
 
   if (!isConnected) {
     return (
-      <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
-        <h3 className='font-extrabold'>Your Account</h3>
+      <div className="card-root w-full space-y-4 p-5">
+        <h3 className="font-extrabold">Your Account</h3>
 
         {description}
         <Divider />
 
         <Button
           fullWidth
-          color='primary'
+          color="primary"
           onClick={() => {
             analyticsActions.onboardingConnectWallet();
             openWallet();
@@ -173,14 +180,14 @@ function Accounts({
   }
 
   return (
-    <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
-      <div className='flex items-center justify-between gap-2.5'>
-        <h3 className='flex-1 font-extrabold'>Your Account</h3>
-        <Button asChild size='sm' color='primary' variant='ghost'>
-          <Link to='/create-multisig'>Create Multisig</Link>
+    <div className="card-root w-full space-y-4 p-5">
+      <div className="flex items-center justify-between gap-2.5">
+        <h3 className="flex-1 font-extrabold">Your Account</h3>
+        <Button asChild size="sm" color="primary" variant="ghost">
+          <Link to="/create-multisig">Create Multisig</Link>
         </Button>
-        <Button asChild size='sm' color='primary' variant='ghost'>
-          <Link to='/create-pure'>Create Pure Account</Link>
+        <Button asChild size="sm" color="primary" variant="ghost">
+          <Link to="/create-pure">Create Pure Account</Link>
         </Button>
       </div>
 
@@ -208,7 +215,11 @@ function Accounts({
         <>
           <h6>Extension Account</h6>
           {grouped.injected.map((account) => (
-            <AccountItem key={`extension-${account}`} isExtension address={account} />
+            <AccountItem
+              key={`extension-${account}`}
+              isExtension
+              address={account}
+            />
           ))}
         </>
       )}
@@ -217,19 +228,20 @@ function Accounts({
 }
 
 function ExampleAccount() {
-  const [exampleAccounts, setExampleAccounts] = useState<string[]>(nextExampleAccount());
+  const [exampleAccounts, setExampleAccounts] =
+    useState<string[]>(nextExampleAccount());
 
   return (
-    <div className='bg-content1 shadow-medium w-full space-y-4 rounded-[20px] p-5'>
-      <div className='flex items-center'>
-        <h3 className='font-extrabold'>Example Account</h3>
+    <div className="card-root w-full space-y-4 p-5">
+      <div className="flex items-center">
+        <h3 className="font-extrabold">Example Account</h3>
         <Button
           isIconOnly
-          className='text-inherit'
-          variant='light'
+          className="text-inherit"
+          variant="light"
           onClick={() => setExampleAccounts(nextExampleAccount())}
         >
-          <IconArrowClockWise className='h-4 w-4' />
+          <IconArrowClockWise className="h-4 w-4" />
         </Button>
       </div>
 
@@ -249,36 +261,49 @@ function Welcome() {
 
   return (
     <div
-      className='relative h-[100dvh] overflow-y-auto'
+      className="relative h-[100dvh] overflow-y-auto"
       style={{
         backgroundImage: 'url(/images/welcome-bg.svg)',
         backgroundSize: '115% 115%',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundRepeat: 'no-repeat',
       }}
     >
       <div
-        className='sticky top-0 right-0 left-0 z-10'
+        className="sticky top-0 right-0 left-0 z-10"
         style={{
           height: 22,
-          background: 'linear-gradient(90deg, #2700FF 0%, #0094FF 100%)'
+          background: 'linear-gradient(90deg, #2700FF 0%, #0094FF 100%)',
         }}
       />
 
-      <div className='mx-auto my-10 flex w-full max-w-[520px] flex-col items-center justify-center gap-5'>
-        <img className='hidden sm:block' alt='Mimir' src={Logo} style={{ width: 137 }} />
+      <div className="mx-auto my-10 flex w-full max-w-[520px] flex-col items-center justify-center gap-5">
+        <img
+          className="hidden sm:block"
+          alt="Mimir"
+          src={Logo}
+          style={{ width: 137 }}
+        />
 
-        <div className='text-center'>
-          <h3 className='text-[26px]'>Start your ultimate </h3>
-          <h1 className='text-primary text-[40px] font-[900]'>OMNI multisig journey</h1>
+        <div className="text-center">
+          <h3 className="text-[26px]">Start your ultimate </h3>
+          <h1 className="text-primary text-[40px] font-[900]">
+            OMNI multisig journey
+          </h1>
         </div>
 
         <Input
           fullWidth
-          className='[&_input]:bg-background w-full [&_input]:rounded-full'
-          endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider-300 h-4 w-4' />}
+          className="[&_input]:bg-background w-full [&_input]:rounded-full"
+          endAdornment={
+            isSearching ? (
+              <Spinner size="sm" />
+            ) : (
+              <IconSearch className="text-divider h-4 w-4" />
+            )
+          }
           onChange={setKeywords}
-          placeholder='Please input address'
+          placeholder="Please input address"
           value={keywords}
         />
 

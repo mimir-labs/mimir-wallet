@@ -10,7 +10,7 @@ import type {
   WebPushSubscriptionsResponse,
   WebPushUnsubscribeRequest,
   WebPushUnsubscribeResponse,
-  WebPushVapidKeyResponse
+  WebPushVapidKeyResponse,
 } from '../types.js';
 import type { BaseServiceOptions } from './BaseService.js';
 
@@ -42,28 +42,44 @@ export class WebPushService extends BaseService {
   /**
    * Subscribe to web push notifications
    */
-  async subscribe(request: WebPushSubscribeRequest): Promise<WebPushSubscribeResponse> {
+  async subscribe(
+    request: WebPushSubscribeRequest,
+  ): Promise<WebPushSubscribeResponse> {
     return this.post<WebPushSubscribeResponse>('/web-push/subscribe', request);
   }
 
   /**
    * Unsubscribe from web push notifications
    */
-  async unsubscribe(request: WebPushUnsubscribeRequest): Promise<WebPushUnsubscribeResponse> {
-    return this.delete<WebPushUnsubscribeResponse>('/web-push/unsubscribe', request);
+  async unsubscribe(
+    request: WebPushUnsubscribeRequest,
+  ): Promise<WebPushUnsubscribeResponse> {
+    return this.delete<WebPushUnsubscribeResponse>(
+      '/web-push/unsubscribe',
+      request,
+    );
   }
 
   /**
    * Get user's web push subscriptions
    */
-  async getSubscriptions(address: string): Promise<WebPushSubscriptionsResponse> {
-    return this.get<WebPushSubscriptionsResponse>('/web-push/subscriptions', { address });
+  async getSubscriptions(
+    address: string,
+  ): Promise<WebPushSubscriptionsResponse> {
+    return this.get<WebPushSubscriptionsResponse>('/web-push/subscriptions', {
+      address,
+    });
   }
 
   /**
    * Check if current device is subscribed using device identifier
    */
-  async checkDeviceSubscription(request: WebPushCheckDeviceRequest): Promise<WebPushCheckDeviceResponse> {
-    return this.post<WebPushCheckDeviceResponse>('/web-push/check-device-subscription', request);
+  async checkDeviceSubscription(
+    request: WebPushCheckDeviceRequest,
+  ): Promise<WebPushCheckDeviceResponse> {
+    return this.post<WebPushCheckDeviceResponse>(
+      '/web-push/check-device-subscription',
+      request,
+    );
   }
 }

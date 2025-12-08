@@ -1,6 +1,8 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TabItem } from '@mimir-wallet/ui';
+
 import { useChains } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
@@ -12,13 +14,15 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  Spinner,
-  Tab,
   Tabs,
-  Tooltip
+  Tooltip,
 } from '@mimir-wallet/ui';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
-import { lazy, Suspense, useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
+
+import AllHistoryTransactions from './AllHistoryTransactions';
+import HistoryTransactions from './HistoryTransactions';
+import PendingTransactions from './PendingTransactions';
 
 import { useAccountMeta } from '@/accounts/useAccountMeta';
 import { useSelectedAccount } from '@/accounts/useSelectedAccount';
@@ -29,20 +33,6 @@ import { useValidTransactionNetworks } from '@/hooks/useTransactions';
 import { getChainsWithSubscanSupport } from '@/utils/networkGrouping';
 
 const routeApi = getRouteApi('/_authenticated/transactions/');
-
-// Lazy load transaction list components for better code splitting
-const HistoryTransactions = lazy(() => import('./HistoryTransactions'));
-const PendingTransactions = lazy(() => import('./PendingTransactions'));
-const AllHistoryTransactions = lazy(() => import('./AllHistoryTransactions'));
-
-// Loading fallback for transaction lists
-function TransactionListFallback() {
-  return (
-    <div className='flex h-64 items-center justify-center'>
-      <Spinner variant='wave' />
-    </div>
-  );
-}
 
 function Content({ address }: { address: string }) {
   const navigate = useNavigate();
@@ -58,19 +48,29 @@ function Content({ address }: { address: string }) {
 
         return acc;
       },
-      {} as Record<string, (typeof chains)[0]>
+      {} as Record<string, (typeof chains)[0]>,
     );
   }, [chains]);
   const meta = useAccountMeta(address);
-  const [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] = useValidTransactionNetworks(address);
+  const [
+    { validPendingNetworks, validHistoryNetworks },
+    isFetched,
+    isFetching,
+  ] = useValidTransactionNetworks(address);
 
   // Show All History tab only for non-multisig and non-pure accounts
   const showAllHistoryTab = useMemo(() => {
     return !meta?.isMultisig && !meta?.isPure;
   }, [meta]);
-  const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<string[]>([]);
-  const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<string[]>([]);
-  const [selectedAllHistoryNetwork, setSelectedAllHistoryNetwork] = useState<string | undefined>(undefined);
+  const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<
+    string[]
+  >([]);
+  const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<
+    string[]
+  >([]);
+  const [selectedAllHistoryNetwork, setSelectedAllHistoryNetwork] = useState<
+    string | undefined
+  >(undefined);
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
 
   // Get chains with Subscan support for All History tab
@@ -81,16 +81,20 @@ function Content({ address }: { address: string }) {
       .filter((chain) => allApis[chain.key]) // Only show enabled chains
       .map((chain) => ({
         network: chain.key,
-        chain
+        chain,
       }));
   }, [allApis]);
 
   const [, startTransition] = useTransition();
   const selectedPendingNetwork = useMemo(() => {
-    return validPendingNetworks.find(({ network }) => selectedPendingNetworks.includes(network));
+    return validPendingNetworks.find(({ network }) =>
+      selectedPendingNetworks.includes(network),
+    );
   }, [validPendingNetworks, selectedPendingNetworks]);
   const selectedHistoryNetwork = useMemo(() => {
-    return validHistoryNetworks.find(({ network }) => selectedHistoryNetworks.includes(network));
+    return validHistoryNetworks.find(({ network }) =>
+      selectedHistoryNetworks.includes(network),
+    );
   }, [validHistoryNetworks, selectedHistoryNetworks]);
 
   const [discardedCounts, setDiscardedCounts] = useState(0);
@@ -108,7 +112,7 @@ function Content({ address }: { address: string }) {
     startTransition(() => {
       navigate({
         to: '.',
-        search: { ...search, status: newStatus }
+        search: { ...search, status: newStatus },
       });
     });
   };
@@ -116,15 +120,20 @@ function Content({ address }: { address: string }) {
   useEffect(() => {
     queueMicrotask(() => {
       setSelectedPendingNetworks((selectedPendingNetworks) => {
-        if (selectedPendingNetworks.length === 0 && validPendingNetworks.length > 0) {
+        if (
+          selectedPendingNetworks.length === 0 &&
+          validPendingNetworks.length > 0
+        ) {
           return validPendingNetworks.map(({ network }) => network);
         } else if (validPendingNetworks.length > 0) {
           return Array.from(
             new Set(
               selectedPendingNetworks
-                .filter((network) => validPendingNetworks.some(({ network: n }) => n === network))
-                .concat(validPendingNetworks.map(({ network }) => network))
-            )
+                .filter((network) =>
+                  validPendingNetworks.some(({ network: n }) => n === network),
+                )
+                .concat(validPendingNetworks.map(({ network }) => network)),
+            ),
           );
         } else {
           return selectedPendingNetworks;
@@ -132,15 +141,20 @@ function Content({ address }: { address: string }) {
       });
 
       setSelectedHistoryNetworks((selectedHistoryNetworks) => {
-        if (selectedHistoryNetworks.length === 0 && validHistoryNetworks.length > 0) {
+        if (
+          selectedHistoryNetworks.length === 0 &&
+          validHistoryNetworks.length > 0
+        ) {
           return validHistoryNetworks.map(({ network }) => network).slice(0, 1);
         } else if (validHistoryNetworks.length > 0) {
           return Array.from(
             new Set(
               selectedHistoryNetworks
-                .filter((network) => validHistoryNetworks.some(({ network: n }) => n === network))
-                .concat(validHistoryNetworks.map(({ network }) => network))
-            )
+                .filter((network) =>
+                  validHistoryNetworks.some(({ network: n }) => n === network),
+                )
+                .concat(validHistoryNetworks.map(({ network }) => network)),
+            ),
           ).slice(0, 1);
         } else {
           return selectedHistoryNetworks;
@@ -159,45 +173,59 @@ function Content({ address }: { address: string }) {
   }, [selectedAllHistoryNetwork, subscanChains]);
 
   return (
-    <div className='space-y-5'>
-      <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-        <div className='w-full sm:flex-1'>
+    <div className="space-y-5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-full sm:flex-1">
           <Tabs
-            color='primary'
-            aria-label='Transaction'
+            tabs={
+              [
+                { key: 'pending', label: 'Pending' },
+                { key: 'history', label: 'History' },
+                showAllHistoryTab
+                  ? { key: 'all-history', label: 'All History' }
+                  : null,
+              ].filter(Boolean) as TabItem[]
+            }
             selectedKey={status}
             onSelectionChange={(key) => {
               const viewType = key.toString();
 
               handleStatusChange(viewType);
               // Track transactions view
-              analyticsActions.transactionsView(viewType as 'pending' | 'history');
+              analyticsActions.transactionsView(
+                viewType as 'pending' | 'history',
+              );
             }}
-          >
-            <Tab key='pending' title='Pending' />
-            <Tab key='history' title='History' />
-            {showAllHistoryTab && <Tab key='all-history' title='All History' />}
-          </Tabs>
+          />
         </div>
 
-        <div className='flex items-center justify-between gap-2'>
+        <div className="flex items-center justify-between gap-2">
           {status === 'pending' && (
-            <span className='inline-flex items-center gap-2'>
-              <Checkbox size='sm' isSelected={showDiscarded} onValueChange={setShowDiscarded}>
-                <span className='flex items-center gap-1'>Discarded Transactions({discardedCounts})</span>
-              </Checkbox>
+            <span className="inline-flex items-center gap-2">
+              <label className="inline-flex cursor-pointer items-center gap-2">
+                <Checkbox
+                  checked={showDiscarded}
+                  onCheckedChange={(checked) => setShowDiscarded(!!checked)}
+                />
+                <span className="flex items-center gap-1">
+                  Discarded Transactions({discardedCounts})
+                </span>
+              </label>
               <Tooltip
                 content={
                   <div>
-                    These transactions have now been discarded due to Assethub Migration.
+                    These transactions have now been discarded due to Assethub
+                    Migration.
                     <br />
                     You can re-initiate them on Assethub.
                     <br />
-                    <b>Deposit has been refunded to your account on Assethub.</b>
+                    <b>
+                      Deposit has been refunded to your account on Assethub.
+                    </b>
                   </div>
                 }
               >
-                <IconQuestion className='text-primary' />
+                <IconQuestion className="text-primary" />
               </Tooltip>
             </span>
           )}
@@ -205,25 +233,36 @@ function Content({ address }: { address: string }) {
           {status === 'pending' &&
             validPendingNetworks.length > 0 &&
             (validPendingNetworks.length > 1 ? (
-              <DropdownMenu open={pendingDropdownOpen} onOpenChange={setPendingDropdownOpen}>
+              <DropdownMenu
+                open={pendingDropdownOpen}
+                onOpenChange={setPendingDropdownOpen}
+              >
                 <DropdownMenuTrigger asChild>
                   <Button
-                    radius='md'
-                    variant='bordered'
-                    className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                    radius="md"
+                    variant="bordered"
+                    className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
                   >
-                    <Avatar src={selectedPendingNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
+                    <Avatar
+                      src={selectedPendingNetwork?.chain.icon}
+                      className="h-4 w-4 bg-transparent"
+                    />
                     {selectedPendingNetworks.length > 1 ? (
                       <>
-                        {selectedPendingNetwork?.chain.name} and other {selectedPendingNetworks.length - 1}
+                        {selectedPendingNetwork?.chain.name} and other{' '}
+                        {selectedPendingNetworks.length - 1}
                       </>
                     ) : (
                       selectedPendingNetwork?.chain.name
                     )}
-                    <ArrowDown className='h-4 w-4' />
+                    <ArrowDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
+                <DropdownMenuContent
+                  side="bottom"
+                  align="end"
+                  className="w-[200px]"
+                >
                   {validPendingNetworks.map(({ network, chain, counts }) => (
                     <DropdownMenuCheckboxItem
                       key={network}
@@ -233,9 +272,14 @@ function Content({ address }: { address: string }) {
                         // Wrap network selection in transition for non-blocking updates
                         startTransition(() => {
                           if (checked) {
-                            setSelectedPendingNetworks([...selectedPendingNetworks, network]);
+                            setSelectedPendingNetworks([
+                              ...selectedPendingNetworks,
+                              network,
+                            ]);
                           } else {
-                            const remaining = selectedPendingNetworks.filter((n) => n !== network);
+                            const remaining = selectedPendingNetworks.filter(
+                              (n) => n !== network,
+                            );
 
                             if (remaining.length > 0) {
                               setSelectedPendingNetworks(remaining);
@@ -243,9 +287,12 @@ function Content({ address }: { address: string }) {
                           }
                         });
                       }}
-                      className='h-8'
+                      className="h-8"
                     >
-                      <Avatar src={chain.icon} className='mr-2 h-4 w-4 bg-transparent' />
+                      <Avatar
+                        src={chain.icon}
+                        className="mr-2 h-4 w-4 bg-transparent"
+                      />
                       {chain.name}({counts})
                     </DropdownMenuCheckboxItem>
                   ))}
@@ -253,12 +300,16 @@ function Content({ address }: { address: string }) {
               </DropdownMenu>
             ) : (
               <Button
-                radius='md'
-                variant='bordered'
-                className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                radius="md"
+                variant="bordered"
+                className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
               >
-                <Avatar src={validPendingNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
-                {validPendingNetworks[0].chain.name}({validPendingNetworks[0].counts})
+                <Avatar
+                  src={validPendingNetworks[0].chain.icon}
+                  className="h-4 w-4 bg-transparent"
+                />
+                {validPendingNetworks[0].chain.name}(
+                {validPendingNetworks[0].counts})
               </Button>
             ))}
           {status === 'history' &&
@@ -267,16 +318,24 @@ function Content({ address }: { address: string }) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    radius='md'
-                    variant='bordered'
-                    className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                    radius="md"
+                    variant="bordered"
+                    className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
                   >
-                    <Avatar src={selectedHistoryNetwork?.chain.icon} className='h-4 w-4 bg-transparent' />
-                    {selectedHistoryNetwork?.chain.name}({selectedHistoryNetwork?.counts})
-                    <ArrowDown className='h-4 w-4' />
+                    <Avatar
+                      src={selectedHistoryNetwork?.chain.icon}
+                      className="h-4 w-4 bg-transparent"
+                    />
+                    {selectedHistoryNetwork?.chain.name}(
+                    {selectedHistoryNetwork?.counts})
+                    <ArrowDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
+                <DropdownMenuContent
+                  side="bottom"
+                  align="end"
+                  className="w-[200px]"
+                >
                   <DropdownMenuRadioGroup
                     value={selectedHistoryNetworks[0]}
                     onValueChange={(value) => {
@@ -287,8 +346,15 @@ function Content({ address }: { address: string }) {
                     }}
                   >
                     {validHistoryNetworks.map(({ network, chain, counts }) => (
-                      <DropdownMenuRadioItem key={network} value={network} className='h-8'>
-                        <Avatar src={chain.icon} className='mr-2 h-4 w-4 bg-transparent' />
+                      <DropdownMenuRadioItem
+                        key={network}
+                        value={network}
+                        className="h-8"
+                      >
+                        <Avatar
+                          src={chain.icon}
+                          className="mr-2 h-4 w-4 bg-transparent"
+                        />
                         {chain.name}({counts})
                       </DropdownMenuRadioItem>
                     ))}
@@ -297,12 +363,16 @@ function Content({ address }: { address: string }) {
               </DropdownMenu>
             ) : (
               <Button
-                radius='md'
-                variant='bordered'
-                className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                radius="md"
+                variant="bordered"
+                className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
               >
-                <Avatar src={validHistoryNetworks[0].chain.icon} className='h-4 w-4 bg-transparent' />
-                {validHistoryNetworks[0].chain.name}({validHistoryNetworks[0].counts})
+                <Avatar
+                  src={validHistoryNetworks[0].chain.icon}
+                  className="h-4 w-4 bg-transparent"
+                />
+                {validHistoryNetworks[0].chain.name}(
+                {validHistoryNetworks[0].counts})
               </Button>
             ))}
           {showAllHistoryTab &&
@@ -312,19 +382,31 @@ function Content({ address }: { address: string }) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    radius='md'
-                    variant='bordered'
-                    className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                    radius="md"
+                    variant="bordered"
+                    className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
                   >
                     <Avatar
-                      src={subscanChains.find((c) => c.network === selectedAllHistoryNetwork)?.chain.icon}
-                      className='h-4 w-4 bg-transparent'
+                      src={
+                        subscanChains.find(
+                          (c) => c.network === selectedAllHistoryNetwork,
+                        )?.chain.icon
+                      }
+                      className="h-4 w-4 bg-transparent"
                     />
-                    {subscanChains.find((c) => c.network === selectedAllHistoryNetwork)?.chain.name}
-                    <ArrowDown className='h-4 w-4' />
+                    {
+                      subscanChains.find(
+                        (c) => c.network === selectedAllHistoryNetwork,
+                      )?.chain.name
+                    }
+                    <ArrowDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side='bottom' align='end' className='w-[200px]'>
+                <DropdownMenuContent
+                  side="bottom"
+                  align="end"
+                  className="w-[200px]"
+                >
                   <DropdownMenuRadioGroup
                     value={selectedAllHistoryNetwork}
                     onValueChange={(value) => {
@@ -335,8 +417,15 @@ function Content({ address }: { address: string }) {
                     }}
                   >
                     {subscanChains.map(({ network, chain }) => (
-                      <DropdownMenuRadioItem key={network} value={network} className='h-8'>
-                        <Avatar src={chain.icon} className='mr-2 h-4 w-4 bg-transparent' />
+                      <DropdownMenuRadioItem
+                        key={network}
+                        value={network}
+                        className="h-8"
+                      >
+                        <Avatar
+                          src={chain.icon}
+                          className="mr-2 h-4 w-4 bg-transparent"
+                        />
                         {chain.name}
                       </DropdownMenuRadioItem>
                     ))}
@@ -345,11 +434,14 @@ function Content({ address }: { address: string }) {
               </DropdownMenu>
             ) : (
               <Button
-                radius='md'
-                variant='bordered'
-                className='border-divider-300 max-sm:border-secondary h-8 text-inherit max-sm:bg-white'
+                radius="md"
+                variant="bordered"
+                className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
               >
-                <Avatar src={subscanChains[0].chain.icon} className='h-4 w-4 bg-transparent' />
+                <Avatar
+                  src={subscanChains[0].chain.icon}
+                  className="h-4 w-4 bg-transparent"
+                />
                 {subscanChains[0].chain.name}
               </Button>
             ))}
@@ -357,38 +449,32 @@ function Content({ address }: { address: string }) {
       </div>
 
       {status === 'pending' && (
-        <Suspense fallback={<TransactionListFallback />}>
-          <PendingTransactions
-            showDiscarded={showDiscarded}
-            isFetched={isFetched}
-            isFetching={isFetching}
-            networks={selectedPendingNetworks}
-            address={address}
-            txId={txId}
-            onDiscardedCountsChange={setDiscardedCounts}
-          />
-        </Suspense>
+        <PendingTransactions
+          showDiscarded={showDiscarded}
+          isFetched={isFetched}
+          isFetching={isFetching}
+          networks={selectedPendingNetworks}
+          address={address}
+          txId={txId}
+          onDiscardedCountsChange={setDiscardedCounts}
+        />
       )}
       {status === 'history' && (
-        <Suspense fallback={<TransactionListFallback />}>
-          <HistoryTransactions
-            isFetched={isFetched}
-            isFetching={isFetching}
-            network={selectedHistoryNetworks.at(0)}
-            address={address}
-            txId={txId}
-          />
-        </Suspense>
+        <HistoryTransactions
+          isFetched={isFetched}
+          isFetching={isFetching}
+          network={selectedHistoryNetworks.at(0)}
+          address={address}
+          txId={txId}
+        />
       )}
       {showAllHistoryTab && status === 'all-history' && (
-        <Suspense fallback={<TransactionListFallback />}>
-          <AllHistoryTransactions
-            isFetched={isFetched}
-            isFetching={isFetching}
-            network={selectedAllHistoryNetwork}
-            address={address}
-          />
-        </Suspense>
+        <AllHistoryTransactions
+          isFetched={isFetched}
+          isFetching={isFetching}
+          network={selectedAllHistoryNetwork}
+          address={address}
+        />
       )}
     </div>
   );

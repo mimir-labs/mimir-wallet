@@ -25,7 +25,9 @@ interface ValidationResult {
  * Hook for validating proxy configuration and filtering available addresses
  * Handles validation logic for proxy setup wizard
  */
-export function useProxyValidation(config: ProxyConfiguration): ValidationResult {
+export function useProxyValidation(
+  config: ProxyConfiguration,
+): ValidationResult {
   const validationResult = useMemo(() => {
     const errors: string[] = [];
     const visibleErrors: string[] = [];
@@ -40,9 +42,16 @@ export function useProxyValidation(config: ProxyConfiguration): ValidationResult
     }
 
     // Prevent self-proxy for regular proxy
-    if (!config.isPureProxy && config.proxied && config.proxy && addressEq(config.proxied, config.proxy)) {
+    if (
+      !config.isPureProxy &&
+      config.proxied &&
+      config.proxy &&
+      addressEq(config.proxied, config.proxy)
+    ) {
       errors.push('Unable to create proxy management for the same account.');
-      visibleErrors.push('Unable to create proxy management for the same account.');
+      visibleErrors.push(
+        'Unable to create proxy management for the same account.',
+      );
     }
 
     // Validate custom delay blocks
@@ -55,15 +64,24 @@ export function useProxyValidation(config: ProxyConfiguration): ValidationResult
     }
 
     // Check if configuration is complete for proceeding
-    const canProceed = config.isPureProxy ? !!config.proxy : !!(config.proxied && config.proxy);
+    const canProceed = config.isPureProxy
+      ? !!config.proxy
+      : !!(config.proxied && config.proxy);
 
     return {
       isValid: errors.length === 0,
       canProceed: canProceed && errors.length === 0,
       errors,
-      visibleErrors
+      visibleErrors,
     };
-  }, [config.isPureProxy, config.proxied, config.proxy, config.hasDelay, config.delayType, config.customBlocks]);
+  }, [
+    config.isPureProxy,
+    config.proxied,
+    config.proxy,
+    config.hasDelay,
+    config.delayType,
+    config.customBlocks,
+  ]);
 
   return validationResult;
 }

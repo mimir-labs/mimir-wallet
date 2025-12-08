@@ -26,5 +26,5 @@ find . -name "tsconfig.tsbuildinfo" -type f -delete
 echo "✅ Clean complete!"
 echo ""
 echo "Next steps:"
-echo "  yarn install"
-echo "  yarn build"
+echo "  pnpm install"
+echo "  pnpm build"

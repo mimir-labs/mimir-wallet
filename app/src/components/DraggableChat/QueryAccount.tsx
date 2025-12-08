@@ -4,7 +4,7 @@
 import type { AccountData, DelegateeProp } from '@/hooks/types';
 
 import { allEndpoints } from '@mimir-wallet/polkadot-core';
-import { Chip, Tooltip } from '@mimir-wallet/ui';
+import { Badge, Tooltip } from '@mimir-wallet/ui';
 import { useMemo } from 'react';
 
 import AddressCell from '../AddressCell';
@@ -17,7 +17,13 @@ interface QueryAccountProps {
 }
 
 // Component for proxy type tags with network info tooltip
-function ProxyTypeTag({ proxyType, network }: { proxyType: string; network?: string }) {
+function ProxyTypeTag({
+  proxyType,
+  network,
+}: {
+  proxyType: string;
+  network?: string;
+}) {
   const networkName = useMemo(() => {
     if (!network) return null;
     const endpoint = allEndpoints.find((e) => e.genesisHash === network);
@@ -25,17 +31,13 @@ function ProxyTypeTag({ proxyType, network }: { proxyType: string; network?: str
     return endpoint?.name || 'Unknown Network';
   }, [network]);
 
-  const chip = (
-    <Chip size='sm' color='secondary'>
-      {proxyType}
-    </Chip>
-  );
+  const badge = <Badge variant="secondary">{proxyType}</Badge>;
 
   if (networkName) {
-    return <Tooltip content={`Network: ${networkName}`}>{chip}</Tooltip>;
+    return <Tooltip content={`Network: ${networkName}`}>{badge}</Tooltip>;
   }
 
-  return chip;
+  return badge;
 }
 
 // Reusable AccountCard component for individual address display
@@ -43,7 +45,7 @@ function AccountCard({
   address,
   proxyType,
   delay,
-  network
+  network,
 }: {
   address: string;
   proxyType?: string;
@@ -51,13 +53,13 @@ function AccountCard({
   network?: string;
 }) {
   return (
-    <div className='border-divider-300 flex w-full items-center gap-2.5 rounded-[10px] border p-[10px]'>
-      <div className='flex-1'>
+    <div className="border-divider flex w-full items-center gap-2.5 rounded-[10px] border p-[10px]">
+      <div className="flex-1">
         <AddressCell value={address} />
       </div>
       {delay && delay > 0 ? (
         <Tooltip content={`Delay Blocks: ${delay}`}>
-          <IconClock className='h-4 w-4 opacity-70' />
+          <IconClock className="h-4 w-4 opacity-70" />
         </Tooltip>
       ) : null}
       {proxyType && <ProxyTypeTag proxyType={proxyType} network={network} />}
@@ -69,7 +71,7 @@ function AccountCard({
 function AddressSection({
   title,
   addresses,
-  proxyData
+  proxyData,
 }: {
   title: string;
   addresses: AccountData[] | (AccountData & DelegateeProp)[];
@@ -78,15 +80,25 @@ function AddressSection({
   if (!addresses || addresses.length === 0) return null;
 
   return (
-    <div className='flex w-full flex-col gap-[5px]'>
-      <div className='text-foreground text-[14px] font-normal'>{title}</div>
+    <div className="flex w-full flex-col gap-[5px]">
+      <div className="text-foreground text-[14px] font-normal">{title}</div>
       {addresses.map((account, index) => (
         <AccountCard
           key={`${account.address}-${index}`}
           address={account.address}
-          proxyType={proxyData && 'proxyType' in account ? account.proxyType : undefined}
-          delay={proxyData && 'proxyDelay' in account ? account.proxyDelay : undefined}
-          network={proxyData && 'proxyNetwork' in account ? account.proxyNetwork : undefined}
+          proxyType={
+            proxyData && 'proxyType' in account ? account.proxyType : undefined
+          }
+          delay={
+            proxyData && 'proxyDelay' in account
+              ? account.proxyDelay
+              : undefined
+          }
+          network={
+            proxyData && 'proxyNetwork' in account
+              ? account.proxyNetwork
+              : undefined
+          }
         />
       ))}
     </div>
@@ -111,33 +123,48 @@ function QueryAccount({ account }: QueryAccountProps) {
       type: 'account' as const,
       createdAt: 0, // Use stable default value instead of Date.now()
       delegatees: [],
-      isMimir: false
+      isMimir: false,
     })) || [];
 
   // Calculate section titles with counts
   const multisigTitle =
-    accountData.type === 'multisig' ? `Multisig Members (${accountData.threshold}/${members.length})` : null;
-  const proxyTitle = proxies.length > 0 ? `Proxy Accounts (${proxies.length})` : null;
-  const proposerTitle = proposers.length > 0 ? `Proposers (${proposers.length})` : null;
+    accountData.type === 'multisig'
+      ? `Multisig Members (${accountData.threshold}/${members.length})`
+      : null;
+  const proxyTitle =
+    proxies.length > 0 ? `Proxy Accounts (${proxies.length})` : null;
+  const proposerTitle =
+    proposers.length > 0 ? `Proposers (${proposers.length})` : null;
 
-  const hasAnyData = members.length > 0 || proxies.length > 0 || proposers.length > 0;
+  const hasAnyData =
+    members.length > 0 || proxies.length > 0 || proposers.length > 0;
 
   return (
-    <div className='flex w-full flex-col items-start gap-[10px]'>
-      <div className='text-foreground text-[14px] font-normal'>Account Information</div>
+    <div className="flex w-full flex-col items-start gap-[10px]">
+      <div className="text-foreground text-[14px] font-normal">
+        Account Information
+      </div>
 
       {hasAnyData ? (
-        <div className='flex w-full flex-col gap-[10px]'>
-          {multisigTitle && <AddressSection title={multisigTitle} addresses={members} />}
+        <div className="flex w-full flex-col gap-[10px]">
+          {multisigTitle && (
+            <AddressSection title={multisigTitle} addresses={members} />
+          )}
 
-          {proxyTitle && <AddressSection title={proxyTitle} addresses={proxies} proxyData />}
+          {proxyTitle && (
+            <AddressSection title={proxyTitle} addresses={proxies} proxyData />
+          )}
 
-          {proposerTitle && <AddressSection title={proposerTitle} addresses={proposers} />}
+          {proposerTitle && (
+            <AddressSection title={proposerTitle} addresses={proposers} />
+          )}
         </div>
       ) : (
         // Show the queried address itself when no other data is available
-        <div className='flex w-full flex-col gap-[5px]'>
-          <div className='text-foreground text-[14px] font-normal'>Queried Address</div>
+        <div className="flex w-full flex-col gap-[5px]">
+          <div className="text-foreground text-[14px] font-normal">
+            Queried Address
+          </div>
           <AccountCard address={accountData.address} />
         </div>
       )}

@@ -18,7 +18,7 @@ export interface CustomDappOption {
 
 export interface DappOption<
   SupportedChains extends true | string[] = true | string[],
-  urlSearch extends (network: string) => URL = (network: string) => URL
+  urlSearch extends (network: string) => URL = (network: string) => URL,
 > {
   // (1 - 500) is internal app
   // (500 - 999) is internal feature
@@ -46,7 +46,8 @@ export const PolkadotJsApp: DappOption<true, (network: string) => URL> = {
   id: 1000,
   icon: '/dapp-icons/apps.svg',
   name: 'Apps',
-  description: 'The native application for accessing all features available on Substrate chains',
+  description:
+    'The native application for accessing all features available on Substrate chains',
   url: 'https://apps.mimir.global/',
   supportedChains: true as const,
   tags: ['Wallet', 'Tool'],
@@ -59,21 +60,26 @@ export const PolkadotJsApp: DappOption<true, (network: string) => URL> = {
       return new URL(this.url);
     }
 
-    return new URL(`${this.url}?rpc=${encodeURIComponent(Object.values(wsUrl)[0])}`);
+    return new URL(
+      `${this.url}?rpc=${encodeURIComponent(Object.values(wsUrl)[0])}`,
+    );
   },
   isSubPathHash: true,
   subPaths: {
-    '/extrinsics': 'Submit and manage on-chain calls (extrinsics) across modules',
-    '/signing': 'Sign and verify arbitrary messages for identity proof or message validation.',
-    '/files': 'Manage/import chain specification and metadata files'
-  }
+    '/extrinsics':
+      'Submit and manage on-chain calls (extrinsics) across modules',
+    '/signing':
+      'Sign and verify arbitrary messages for identity proof or message validation.',
+    '/files': 'Manage/import chain specification and metadata files',
+  },
 };
 
 export const DotConsoleApp: DappOption<string[], (network: string) => URL> = {
   id: 1010,
   icon: '/dapp-icons/dot-console.svg',
   name: 'ĐÓTConsole',
-  description: 'Provide a Polkadot/Substrate development console for real-time interaction and debugging.',
+  description:
+    'Provide a Polkadot/Substrate development console for real-time interaction and debugging.',
   url: 'https://dotconsole.app',
   supportedChains: [
     'polkadot',
@@ -87,7 +93,7 @@ export const DotConsoleApp: DappOption<string[], (network: string) => URL> = {
     'people-kusama',
     'paseo',
     'assethub-paseo',
-    'assethub-westend'
+    'assethub-westend',
   ],
   tags: ['Utility', 'Tool'],
   website: 'https://dotconsole.app/',
@@ -105,7 +111,7 @@ export const DotConsoleApp: DappOption<string[], (network: string) => URL> = {
       'people-kusama': 'kusama-people',
       paseo: 'paseo',
       'assethub-paseo': 'paseo-asset-hub',
-      'assethub-westend': 'westend-asset-hub'
+      'assethub-westend': 'westend-asset-hub',
     }[network];
 
     if (!chain) {
@@ -115,15 +121,17 @@ export const DotConsoleApp: DappOption<string[], (network: string) => URL> = {
     return new URL(`${this.url}?chain=${chain}`);
   },
   subPaths: {
-    '/extrinsics': 'Submit and manage on-chain calls (extrinsics) across modules'
-  }
+    '/extrinsics':
+      'Submit and manage on-chain calls (extrinsics) across modules',
+  },
 };
 
 export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
   id: 1002,
   icon: '/dapp-icons/subsquare.svg',
   name: 'Subsquare',
-  description: 'SubSquare enables community members to propose, discuss and vote on governance proposals.',
+  description:
+    'SubSquare enables community members to propose, discuss and vote on governance proposals.',
   url: 'https://polkadot.subsquare.io/',
   supportedChains: [
     'polkadot',
@@ -142,7 +150,7 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
     'assethub-paseo',
     'crust',
     'vara',
-    'zkverify-testnet'
+    'zkverify-testnet',
   ],
   tags: ['Governance'],
   website: 'https://www.subsquare.io/',
@@ -166,7 +174,7 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
       'assethub-paseo': 'https://paseo.subsquare.io',
       crust: 'https://crust.subsquare.io/',
       vara: 'https://vara.subsquare.io/',
-      'zkverify-testnet': 'https://zkverify-testnet.subsquare.io/'
+      'zkverify-testnet': 'https://zkverify-testnet.subsquare.io/',
     }[network];
 
     if (!url) {
@@ -177,16 +185,18 @@ export const SubsquareApp: DappOption<string[], (network: string) => URL> = {
   },
   subPaths: {
     '/referenda/:referendaId': 'Polkadot on-chain governance referenda',
-    '/posts/:postId': 'publishing or viewing community discussion posts or governance-related messages',
-    '/delegation': 'delegate their voting power to an expert'
-  }
+    '/posts/:postId':
+      'publishing or viewing community discussion posts or governance-related messages',
+    '/delegation': 'delegate their voting power to an expert',
+  },
 };
 
 export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
   id: 1012,
   icon: '/dapp-icons/polkassembly.png',
   name: 'Polkassembly',
-  description: 'The premier platform for governance and collaboration in the Polkadot ecosystem.',
+  description:
+    'The premier platform for governance and collaboration in the Polkadot ecosystem.',
   url: 'https://polkadot.polkassembly.io/',
   supportedChains: [
     'polkadot',
@@ -202,7 +212,7 @@ export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
     'crust',
     'vara',
     'polimec',
-    'pendulum'
+    'pendulum',
   ],
   tags: ['Governance'],
   website: 'https://polkassembly.io/',
@@ -223,7 +233,7 @@ export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
       crust: 'https://crust.polkassembly.io/',
       vara: 'https://vara.polkassembly.io/',
       polimec: 'https://polimec.polkassembly.io/',
-      pendulum: 'https://pendulum.polkassembly.io/'
+      pendulum: 'https://pendulum.polkassembly.io/',
     }[network];
 
     if (!url) {
@@ -234,32 +244,35 @@ export const PolkassemblyApp: DappOption<string[], (network: string) => URL> = {
   },
   subPaths: {
     '/referenda/:referendaId': 'Polkadot on-chain governance referenda',
-    '/posts/:postId': 'publishing or viewing community discussion posts or governance-related messages',
-    '/delegation': 'delegate their voting power to an expert'
-  }
+    '/posts/:postId':
+      'publishing or viewing community discussion posts or governance-related messages',
+    '/delegation': 'delegate their voting power to an expert',
+  },
 };
 
-export const StakingApp: DappOption<true | string[], (network: string) => URL> = {
-  id: 1004,
-  icon: '/dapp-icons/staking.png',
-  name: 'Polkadot Cloud Staking',
-  description:
-    'Polkadot Cloud Staking is the easiest way to stake DOT, check validator stats, manage your nominations and join nomination pools.',
-  url: 'https://staking.polkadot.cloud/',
-  supportedChains: ['polkadot', 'kusama', 'westend'],
-  tags: ['Staking'],
-  website: 'https://polkadot.cloud',
-  github: 'https://github.com/polkadot-cloud/polkadot-staking-dashboard',
-  isSubPathHash: true,
-  subPaths: {
-    '/pools': 'Bond DOT and join nominating pool(>1 DOT)',
-    '/nominate':
-      'Section for direct nominations where users can select and delegate DOT to individual validators(>250 DOT)',
-    '/rewards': 'Displays staking reward history and current earnings.',
-    '/validators': 'Shows a comprehensive list of active validators.',
-    '/operators': 'Section dedicated to nomination pool or validator operators.'
-  }
-};
+export const StakingApp: DappOption<true | string[], (network: string) => URL> =
+  {
+    id: 1004,
+    icon: '/dapp-icons/staking.png',
+    name: 'Polkadot Cloud Staking',
+    description:
+      'Polkadot Cloud Staking is the easiest way to stake DOT, check validator stats, manage your nominations and join nomination pools.',
+    url: 'https://staking.polkadot.cloud/',
+    supportedChains: ['polkadot', 'kusama', 'westend'],
+    tags: ['Staking'],
+    website: 'https://polkadot.cloud',
+    github: 'https://github.com/polkadot-cloud/polkadot-staking-dashboard',
+    isSubPathHash: true,
+    subPaths: {
+      '/pools': 'Bond DOT and join nominating pool(>1 DOT)',
+      '/nominate':
+        'Section for direct nominations where users can select and delegate DOT to individual validators(>250 DOT)',
+      '/rewards': 'Displays staking reward history and current earnings.',
+      '/validators': 'Shows a comprehensive list of active validators.',
+      '/operators':
+        'Section dedicated to nomination pool or validator operators.',
+    },
+  };
 
 export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
   {
@@ -272,43 +285,46 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     tags: ['Assets'],
     website: 'https://mimir.global',
     twitter: 'https://twitter.com/Mimir_global',
-    github: 'https://github.com/mimir-labs'
+    github: 'https://github.com/mimir-labs',
   },
   {
     id: 2,
     name: 'Batch',
-    description: 'Combine multiple extrinsics into a single transaction to save fees and simplify approvals',
+    description:
+      'Combine multiple extrinsics into a single transaction to save fees and simplify approvals',
     url: 'mimir://app/batch',
     icon: '/dapp-icons/batch.webp',
     supportedChains: true,
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Batch', 'utility']
+    tags: ['Batch', 'utility'],
   },
   {
     id: 3,
     name: 'Multi Transfer',
-    description: 'Distribute serval tokens to many recipients in a single action',
+    description:
+      'Distribute serval tokens to many recipients in a single action',
     url: 'mimir://app/multi-transfer',
     icon: '/dapp-icons/multi-transfer.webp',
     supportedChains: true,
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Assets', 'Transfer', 'MultiTransfer']
+    tags: ['Assets', 'Transfer', 'MultiTransfer'],
   },
   {
     id: 4,
     icon: '/dapp-icons/template.svg',
     name: 'Template',
-    description: 'Store reusable transaction drafts (extrinsics with parameters) for quick execution',
+    description:
+      'Store reusable transaction drafts (extrinsics with parameters) for quick execution',
     url: 'mimir://app/template',
     supportedChains: true,
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Tool']
+    tags: ['Tool'],
   },
   {
     id: 5,
@@ -320,7 +336,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Tool']
+    tags: ['Tool'],
   },
   {
     id: 6,
@@ -332,7 +348,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     website: 'https://mimir.global/',
     github: 'https://github.com/mimir-labs/',
     twitter: 'https://x.com/Mimir_global/',
-    tags: ['Tool']
+    tags: ['Tool'],
   },
   {
     id: 500,
@@ -340,7 +356,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Setup',
     description: 'setup member of proxy',
     url: 'mimir://internal/setup',
-    supportedChains: true
+    supportedChains: true,
   },
   {
     id: 501,
@@ -348,7 +364,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Fund',
     description: 'Fund',
     url: 'mimir://internal/fund',
-    supportedChains: true
+    supportedChains: true,
   },
   {
     id: 502,
@@ -356,7 +372,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Cancel',
     description: 'Cancel Tx',
     url: 'mimir://internal/cancel',
-    supportedChains: true
+    supportedChains: true,
   },
   {
     id: 503,
@@ -364,7 +380,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Deny Announcement',
     description: 'Deny announcement',
     url: 'mimir://internal/deny-announcement',
-    supportedChains: true
+    supportedChains: true,
   },
   {
     id: 505,
@@ -372,7 +388,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Create Pure',
     description: 'Create Pure',
     url: 'mimir://internal/create-pure',
-    supportedChains: true
+    supportedChains: true,
   },
   {
     id: 506,
@@ -380,7 +396,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Execute Announcement',
     description: 'Execute Announcement',
     url: 'mimir://internal/execute-announcement',
-    supportedChains: true
+    supportedChains: true,
   },
   {
     id: 507,
@@ -388,7 +404,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Remove All Proxies',
     description: 'Remove All Proxies',
     url: 'mimir://internal/remove-proxies',
-    supportedChains: true
+    supportedChains: true,
   },
   {
     id: 507,
@@ -396,7 +412,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Remove Account',
     description: 'Remove Account',
     url: 'mimir://internal/remove-account',
-    supportedChains: true
+    supportedChains: true,
   },
   {
     id: 508,
@@ -404,7 +420,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Template',
     description: 'Template',
     url: 'mimir://internal/template',
-    supportedChains: true
+    supportedChains: true,
   },
   {
     id: 509,
@@ -412,7 +428,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     name: 'Create Flexible',
     description: 'Create Flexible',
     url: 'mimir://internal/create-flexible',
-    supportedChains: true
+    supportedChains: true,
   },
   PolkadotJsApp,
   SubsquareApp,
@@ -424,7 +440,13 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     description:
       'The Bifrost App integrates operations such as cross-chain transfers, swaps, and Yield Farming, providing vital liquidity and asset management services for the Polkadot ecosystem. This makes Bifrost an indispensable part of the Polkadot ecosystem.',
     url: 'https://app.bifrost.io/',
-    supportedChains: ['polkadot', 'bifrost-polkadot', 'kusama', 'bifrost-kusama', 'assethub-polkadot'],
+    supportedChains: [
+      'polkadot',
+      'bifrost-polkadot',
+      'kusama',
+      'bifrost-kusama',
+      'assethub-polkadot',
+    ],
     tags: ['Defi'],
     website: 'https://bifrost.finance/',
     github: 'https://github.com/bifrost-finance',
@@ -432,34 +454,36 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
       '/vstaking': 'Mint and staking vDOT',
       '/swap': 'Swap on Bifrost network',
       '/crosschain': 'Transfer assets across Bifrost and other networks',
-      '/farming': 'Supply LP tokens to farming pools to earn extra yields'
-    }
+      '/farming': 'Supply LP tokens to farming pools to earn extra yields',
+    },
   },
   {
     id: 1006,
     icon: '/dapp-icons/crust.webp',
     name: 'Crust Files',
-    description: 'Store files using decentralized IPFS-based storage with optional encryption and premium features.',
+    description:
+      'Store files using decentralized IPFS-based storage with optional encryption and premium features.',
     url: 'https://crustfiles.io/',
     supportedChains: ['crust'],
     tags: ['Defi'],
     website: 'https://crust.network/',
     twitter: 'https://x.com/CrustNetwork',
     discord: 'https://discord.gg/prkGRTeMGN',
-    github: 'https://github.com/crustio'
+    github: 'https://github.com/crustio',
   },
   {
     id: 1007,
     icon: '/dapp-icons/avail.png',
     name: 'Avail Staking',
-    description: 'Stake AVAIL tokens via direct nomination or pools on the Avail.',
+    description:
+      'Stake AVAIL tokens via direct nomination or pools on the Avail.',
     url: 'https://staking.avail.tools/#/overview',
     supportedChains: ['avail', 'avail-turing'],
     tags: ['Staking'],
     website: 'https://www.availproject.org/',
     twitter: 'https://x.com/AvailProject',
     discord: 'https://discord.com/invite/y6fHnxZQX8',
-    github: 'https://github.com/availproject'
+    github: 'https://github.com/availproject',
   },
   {
     id: 1008,
@@ -479,21 +503,22 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
       'kusama',
       'assethub-kusama',
       'coretime-kusama',
-      'people-kusama'
+      'people-kusama',
     ],
     tags: ['Identity'],
-    matrix: 'https://matrix.to/#/#polkaidentity:matrix.org'
+    matrix: 'https://matrix.to/#/#polkaidentity:matrix.org',
   },
   {
     id: 1009,
     icon: '/dapp-icons/bounty.jpeg',
     name: 'Bounty Manager',
-    description: 'The go-to tool for curators to execute their bounty duties and users to explore bounties.',
+    description:
+      'The go-to tool for curators to execute their bounty duties and users to explore bounties.',
     url: 'https://bountymanager.io/',
     supportedChains: ['polkadot', 'paseo'],
     tags: ['Bounty', 'Tool'],
     website: 'https://bountymanager.io/',
-    github: 'https://github.com/galaniprojects/Polkadot-Bounty-Manager'
+    github: 'https://github.com/galaniprojects/Polkadot-Bounty-Manager',
   },
   DotConsoleApp,
   {
@@ -508,17 +533,25 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     github: 'https://github.com/polkadot-api/bounties',
     subPaths: {
       '/bounty/:id':
-        'View bounty details, manage curator actions, approve child bounties, and track bounty progress for a specific bounty ID'
-    }
+        'View bounty details, manage curator actions, approve child bounties, and track bounty progress for a specific bounty ID',
+    },
   },
   PolkassemblyApp,
   {
     id: 1013,
     icon: '/dapp-icons/regionx.svg',
     name: 'RegionX',
-    description: 'The primary interface for interacting with Polkadot’s Agile Coretime model.',
+    description:
+      'The primary interface for interacting with Polkadot’s Agile Coretime model.',
     url: 'https://hub.regionx.tech/',
-    supportedChains: ['polkadot', 'kusama', 'coretime-polkadot', 'coretime-kusama', 'paseo', 'westend'],
+    supportedChains: [
+      'polkadot',
+      'kusama',
+      'coretime-polkadot',
+      'coretime-kusama',
+      'paseo',
+      'westend',
+    ],
     tags: ['Coretime Tool'],
     website: 'https://hub.regionx.tech/',
     twitter: 'https://x.com/RegionXLabs',
@@ -529,7 +562,7 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
         paseo: 'https://hub.regionx.tech/?network=paseo',
         westend: 'https://hub.regionx.tech/?network=westend',
         'coretime-polkadot': 'https://hub.regionx.tech/?network=polkadot',
-        'coretime-kusama': 'https://hub.regionx.tech/?network=kusama'
+        'coretime-kusama': 'https://hub.regionx.tech/?network=kusama',
       }[network];
 
       if (!url) {
@@ -537,12 +570,12 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
       }
 
       return new URL(url);
-    }
+    },
   },
   {
     ...StakingApp,
     id: 1014,
     url: 'https://staking.mimir.global/',
-    visible: false
-  }
+    visible: false,
+  },
 ];

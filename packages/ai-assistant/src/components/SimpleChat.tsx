@@ -3,20 +3,49 @@
 
 import type { ToolState } from '../hooks/chat.types.js';
 
-import { Alert, AlertTitle, Button } from '@mimir-wallet/ui';
-import { useCallback, useImperativeHandle, useRef, useState } from 'react';
+import { Alert, AlertTitle, Button, Skeleton } from '@mimir-wallet/ui';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 
 import { useChat } from '../hooks/useChat.js';
 import { useFrontendAction } from '../hooks/useFrontendAction.js';
 
-import { Conversation, ConversationContent, ScrollController } from './conversation.js';
+import {
+  Conversation,
+  ConversationContent,
+  ScrollController,
+} from './conversation.js';
 import { Loader } from './Loader.js';
 import { Message, MessageContent } from './message.js';
-import { PromptInput, PromptInputSubmit, PromptInputTextarea } from './prompt-input.js';
+import {
+  PromptInput,
+  PromptInputSubmit,
+  PromptInputTextarea,
+} from './prompt-input.js';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './reasoning.js';
 import { Response } from './response.js';
 import { Suggestion, Suggestions } from './suggestion.js';
-import { ToolHeader } from './tool.js';
+
+// Lazy load ToolHeader to avoid loading react-syntax-highlighter (~640KB) on initial page load
+const LazyToolHeader = lazy(() =>
+  import('./tool.js').then((mod) => ({ default: mod.ToolHeader })),
+);
+
+function ToolHeaderSkeleton() {
+  return (
+    <div className="border-divider flex items-center gap-3 rounded-[10px] border p-2">
+      <Skeleton className="size-4" />
+      <Skeleton className="h-4 w-24" />
+      <Skeleton className="h-4 w-16" />
+    </div>
+  );
+}
 
 /**
  * Tool data structure for custom rendering
@@ -33,7 +62,9 @@ export interface ToolData {
 interface Props {
   renderTool?: (params: { tool: ToolData }) => React.ReactNode;
   suggestions: Array<[string, string]>; // Array of [label, value] pairs - required
-  onStatusChange?: (status: 'submitted' | 'streaming' | 'ready' | 'error') => void;
+  onStatusChange?: (
+    status: 'submitted' | 'streaming' | 'ready' | 'error',
+  ) => void;
   ref?: React.Ref<SimpleChatRef>;
 }
 
@@ -58,9 +89,9 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
     sendMessage: chatSendMessage,
     retry,
     stop,
-    clearChat
+    clearChat,
   } = useChat({
-    onStatusChange
+    onStatusChange,
   });
 
   // Use frontend action hook for retrying tool calls
@@ -75,7 +106,7 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
         conversationRef.current?.scrollToBottom();
       }, 100);
     },
-    [chatSendMessage]
+    [chatSendMessage],
   );
 
   // Expose sendMessage and clearChat through ref
@@ -86,9 +117,9 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
       clearChat: () => {
         clearChat();
         setInput('');
-      }
+      },
     }),
-    [sendMessage, clearChat]
+    [sendMessage, clearChat],
   );
 
   // Handle submit
@@ -116,18 +147,22 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
     (toolName: string, toolInput: unknown) => {
       triggerFrontendAction(toolName, toolInput);
     },
-    [triggerFrontendAction]
+    [triggerFrontendAction],
   );
 
   return (
-    <div className='flex h-full flex-col'>
-      <Conversation className='h-full' ref={conversationRef}>
+    <div className="flex h-full flex-col">
+      <Conversation className="h-full" ref={conversationRef}>
         <ConversationContent>
           <ScrollController />
           {messages.length === 0 ? (
             <Suggestions>
               {suggestions.map(([label, value]) => (
-                <Suggestion key={label} onClick={handleSuggestionClick} suggestion={value}>
+                <Suggestion
+                  key={label}
+                  onClick={handleSuggestionClick}
+                  suggestion={value}
+                >
                   {label}
                 </Suggestion>
               ))}
@@ -140,28 +175,42 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
                   {message.parts.map((part, i) => {
                     switch (part.type) {
                       case 'text':
-                        return <Response key={`${message.id}-${i}`}>{part.text}</Response>;
+                        return (
+                          <Response key={`${message.id}-${i}`}>
+                            {part.text}
+                          </Response>
+                        );
                       case 'reasoning':
                         return (
-                          <Reasoning key={`${message.id}-${i}`} className='w-full' isStreaming={status === 'streaming'}>
+                          <Reasoning
+                            key={`${message.id}-${i}`}
+                            className="w-full"
+                            isStreaming={status === 'streaming'}
+                          >
                             <ReasoningTrigger />
                             <ReasoningContent>{part.text}</ReasoningContent>
                           </Reasoning>
                         );
                       case 'tool':
                         return (
-                          <div key={`${message.id}-${i}`} className='space-y-2'>
+                          <div key={`${message.id}-${i}`} className="space-y-2">
                             {/* Tool status component - always displayed */}
-                            <ToolHeader
-                              type={`tool-call`}
-                              state={part.state}
-                              title={part.toolName}
-                              onRetry={
-                                part.toolName === 'navigate'
-                                  ? () => handleRetryTool(part.toolName, part.input)
-                                  : undefined
-                              }
-                            />
+                            <Suspense fallback={<ToolHeaderSkeleton />}>
+                              <LazyToolHeader
+                                type={`tool-call`}
+                                state={part.state}
+                                title={part.toolName}
+                                onRetry={
+                                  part.toolName === 'navigate'
+                                    ? () =>
+                                        handleRetryTool(
+                                          part.toolName,
+                                          part.input,
+                                        )
+                                    : undefined
+                                }
+                              />
+                            </Suspense>
 
                             {/* Custom renderTool content - if provided */}
                             {renderTool &&
@@ -172,8 +221,8 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
                                   toolName: part.toolName,
                                   input: part.input,
                                   output: part.output,
-                                  state: part.state
-                                }
+                                  state: part.state,
+                                },
                               })}
                           </div>
                         );
@@ -189,13 +238,13 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
 
           {/* Error retry prompt */}
           {status === 'error' && lastFailedMessage && (
-            <Alert variant='destructive'>
+            <Alert variant="destructive">
               <AlertTitle>Meet some problems, please retry</AlertTitle>
               <Button
-                size='sm'
-                variant='ghost'
+                size="sm"
+                variant="ghost"
                 onClick={retry}
-                className='absolute top-0 right-2 bottom-0 m-auto mt-2 h-[20px]'
+                className="absolute top-0 right-2 bottom-0 m-auto mt-2 h-[20px]"
               >
                 Retry
               </Button>
@@ -204,10 +253,13 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
         </ConversationContent>
       </Conversation>
 
-      <PromptInput onSubmit={handleSubmit} className='relative mt-4'>
-        <PromptInputTextarea onChange={(e) => setInput(e.target.value)} value={input} />
+      <PromptInput onSubmit={handleSubmit} className="relative mt-4">
+        <PromptInputTextarea
+          onChange={(e) => setInput(e.target.value)}
+          value={input}
+        />
         <PromptInputSubmit
-          className='absolute right-1 bottom-1'
+          className="absolute right-1 bottom-1"
           disabled={status === 'ready' && !input.trim()}
           status={status}
         />

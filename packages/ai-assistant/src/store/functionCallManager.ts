@@ -5,7 +5,7 @@ import type {
   FunctionCallEvent,
   FunctionCallHandler,
   HandlerRegistration,
-  HandlerRegistrationOptions
+  HandlerRegistrationOptions,
 } from '../types.js';
 
 import { EventEmitter } from 'eventemitter3';
@@ -50,7 +50,10 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
   private readonly channelQueues = new Map<ChannelName, PendingEventEntry[]>();
 
   // Track registered handlers per channel
-  private readonly channelHandlers = new Map<ChannelName, Set<HandlerRegistration>>();
+  private readonly channelHandlers = new Map<
+    ChannelName,
+    Set<HandlerRegistration>
+  >();
 
   private readonly EVENT_EXPIRATION_MS = 5000; // 5 seconds
   private readonly MAX_PENDING_EVENTS_PER_CHANNEL = 10;
@@ -92,7 +95,7 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
   public registerHandler(
     channelName: ChannelName,
     handler: FunctionCallHandler,
-    options?: HandlerRegistrationOptions
+    options?: HandlerRegistrationOptions,
   ): () => void {
     // Generate unique handler ID
     const handlerId = `${channelName}_${Date.now()}_${Math.random()}`;
@@ -101,7 +104,7 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
     const registration: HandlerRegistration = {
       handlerId,
       handler,
-      channelName
+      channelName,
     };
 
     // Register in channel handlers
@@ -116,14 +119,16 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
 
     // Register metadata if provided
     if (options) {
-      const routeRequirement = this.normalizeRouteRequirement(options.requiresRoute);
+      const routeRequirement = this.normalizeRouteRequirement(
+        options.requiresRoute,
+      );
 
       handlerMetadataRegistry.register({
         handlerId,
         functionName: channelName,
         routeRequirement,
         priority: options.priority,
-        customData: options.metadata
+        customData: options.metadata,
       });
     }
 
@@ -202,7 +207,10 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
   /**
    * Determine if an event should be routed to a specific channel
    */
-  private shouldRouteToChannel(event: FunctionCallEvent, channelName: ChannelName): boolean {
+  private shouldRouteToChannel(
+    event: FunctionCallEvent,
+    channelName: ChannelName,
+  ): boolean {
     // Wildcard channel receives all events
     if (channelName === '*') {
       return true;
@@ -215,7 +223,10 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
   /**
    * Queue event for a specific channel
    */
-  private queueEventForChannel(channelName: ChannelName, event: FunctionCallEvent): void {
+  private queueEventForChannel(
+    channelName: ChannelName,
+    event: FunctionCallEvent,
+  ): void {
     let queue = this.channelQueues.get(channelName);
 
     if (!queue) {
@@ -225,7 +236,7 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
 
     queue.push({
       event,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     // Enforce max limit to prevent memory leaks
@@ -233,27 +244,37 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
       queue.shift();
     }
 
-    console.log(`[FunctionCallManager] Queued event for channel '${channelName}': ${event.name} (id: ${event.id})`);
+    console.log(
+      `[FunctionCallManager] Queued event for channel '${channelName}': ${event.name} (id: ${event.id})`,
+    );
   }
 
   /**
    * Replay all pending events for a specific channel to a handler
    */
-  private replayChannelEvents(channelName: ChannelName, handler: FunctionCallHandler): void {
+  private replayChannelEvents(
+    channelName: ChannelName,
+    handler: FunctionCallHandler,
+  ): void {
     const queue = this.channelQueues.get(channelName);
 
     if (!queue || queue.length === 0) {
       return;
     }
 
-    console.log(`[FunctionCallManager] Replaying ${queue.length} events for channel '${channelName}'`);
+    console.log(
+      `[FunctionCallManager] Replaying ${queue.length} events for channel '${channelName}'`,
+    );
 
     // Replay events
     for (const entry of queue) {
       try {
         handler(entry.event);
       } catch (error) {
-        console.error(`[FunctionCallManager] Error replaying event for channel '${channelName}':`, error);
+        console.error(
+          `[FunctionCallManager] Error replaying event for channel '${channelName}':`,
+          error,
+        );
       }
     }
 
@@ -298,13 +319,13 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
     if (typeof input === 'string') {
       return {
         path: input,
-        autoNavigate: true
+        autoNavigate: true,
       };
     }
 
     return {
       ...input,
-      autoNavigate: input.autoNavigate ?? true
+      autoNavigate: input.autoNavigate ?? true,
     };
   }
 
@@ -320,7 +341,9 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
       const now = Date.now();
 
       for (const [channelName, queue] of this.channelQueues.entries()) {
-        const validEntries = queue.filter((entry) => now - entry.timestamp < this.EVENT_EXPIRATION_MS);
+        const validEntries = queue.filter(
+          (entry) => now - entry.timestamp < this.EVENT_EXPIRATION_MS,
+        );
 
         if (validEntries.length === 0) {
           this.channelQueues.delete(channelName);
@@ -343,7 +366,10 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
     const stats: ChannelStats[] = [];
 
     // Get all unique channels
-    const allChannels = new Set([...this.channelQueues.keys(), ...this.channelHandlers.keys()]);
+    const allChannels = new Set([
+      ...this.channelQueues.keys(),
+      ...this.channelHandlers.keys(),
+    ]);
 
     for (const channelName of allChannels) {
       const handlers = this.channelHandlers.get(channelName);
@@ -355,7 +381,7 @@ class FunctionCallManager extends EventEmitter<FunctionCallManagerEvents> {
         channelName,
         handlerCount: handlers?.size || 0,
         pendingEventCount: queue?.length || 0,
-        oldestEventAge: oldestEvent ? now - oldestEvent.timestamp : 0
+        oldestEventAge: oldestEvent ? now - oldestEvent.timestamp : 0,
       });
     }
 

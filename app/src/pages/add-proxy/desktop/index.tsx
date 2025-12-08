@@ -7,10 +7,18 @@ import {
   type FunctionCallHandler,
   isFunctionCallObject,
   toFunctionCallBoolean,
-  toFunctionCallString
+  toFunctionCallString,
 } from '@mimir-wallet/ai-assistant';
 import { NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Divider } from '@mimir-wallet/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Divider,
+} from '@mimir-wallet/ui';
 import { useCallback, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -42,7 +50,7 @@ interface ProxyWizardData {
 const STEPS = [
   { number: 1, label: 'Configure Access' },
   { number: 2, label: 'Permission Level' },
-  { number: 3, label: 'Review' }
+  { number: 3, label: 'Review' },
 ];
 
 function PageAddProxy({ pure }: { pure?: boolean }) {
@@ -60,7 +68,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
     proxyType: 'Any',
     hasDelay: false,
     delayType: 'hour',
-    customBlocks: ''
+    customBlocks: '',
   };
 
   const [wizardState, wizardActions] = useWizardState(initialData, STEPS);
@@ -68,7 +76,8 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
 
   // Success modal state
   const [isSuccess, toggleSuccess] = useToggle(false);
-  const [transactionData, setTransactionData] = useState<TransactionResult | null>(null);
+  const [transactionData, setTransactionData] =
+    useState<TransactionResult | null>(null);
 
   const handleConfirm = async (result: TransactionResult) => {
     // Store transaction result for success modal
@@ -156,7 +165,12 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
           if (isFunctionCallObject(periodValue)) {
             const periodType = toFunctionCallString(periodValue.type);
 
-            if (periodType === 'hour' || periodType === 'day' || periodType === 'week' || periodType === 'custom') {
+            if (
+              periodType === 'hour' ||
+              periodType === 'day' ||
+              periodType === 'week' ||
+              periodType === 'custom'
+            ) {
               newData.delayType = periodType;
 
               // If custom type, extract blocks
@@ -184,11 +198,11 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
         setNetwork(networkValue);
       }
     },
-    [goToStep, setNetwork, updateData]
+    [goToStep, setNetwork, updateData],
   );
 
   useRouteDependentHandler('createProxy', '/add-proxy', handleCreateProxy, {
-    displayName: 'Add Proxy'
+    displayName: 'Add Proxy',
   });
 
   return (
@@ -226,27 +240,31 @@ function AddProxyContent({
   handleConfirm,
   isSuccess,
   toggleSuccess,
-  transactionData
+  transactionData,
 }: AddProxyContentProps) {
   const { goToStep } = wizardActions;
 
   return (
     <>
-      <div className='mx-auto flex w-full max-w-[800px] flex-col gap-5'>
-        <div className='flex items-center justify-between'>
-          <Button onClick={() => window.history.back()} variant='ghost'>
+      <div className="mx-auto flex w-full max-w-[800px] flex-col gap-5">
+        <div className="flex items-center justify-between">
+          <Button onClick={() => window.history.back()} variant="ghost">
             {'<'} Back
           </Button>
         </div>
 
-        <Card className='shadow-small mx-auto w-full max-w-[800px]'>
-          <CardHeader className='gap-4'>
-            <CardTitle className='text-foreground text-center text-xl font-extrabold'>
+        <Card className="mx-auto w-full max-w-[800px] shadow-md">
+          <CardHeader className="gap-4">
+            <CardTitle className="text-foreground text-center text-xl font-extrabold">
               Proxy Authorization Setup
             </CardTitle>
             <Divider />
             <CardDescription>
-              <StepIndicator steps={STEPS} currentStep={wizardState.currentStep} onStepClick={goToStep} />
+              <StepIndicator
+                steps={STEPS}
+                currentStep={wizardState.currentStep}
+                onStepClick={goToStep}
+              />
             </CardDescription>
           </CardHeader>
           <CardContent>

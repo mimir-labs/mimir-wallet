@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
-  Tooltip
+  Tooltip,
 } from '@mimir-wallet/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
@@ -39,7 +39,11 @@ import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useInput } from '@/hooks/useInput';
 import { useProxyTypes } from '@/hooks/useProxyTypes';
 
-async function fetchProxiesForAddress({ queryKey }: { queryKey: readonly [string, string, string] }) {
+async function fetchProxiesForAddress({
+  queryKey,
+}: {
+  queryKey: readonly [string, string, string];
+}) {
   const [, network, address] = queryKey;
 
   if (!address) {
@@ -47,10 +51,6 @@ async function fetchProxiesForAddress({ queryKey }: { queryKey: readonly [string
   }
 
   const api = await ApiManager.getInstance().getApi(network);
-
-  if (!api) {
-    throw new Error(`API not available for network: ${network}`);
-  }
 
   return api.query.proxy.proxies(address);
 }
@@ -61,7 +61,7 @@ function AddProxy({
   supportedNetworks,
   proxied,
   setNetwork,
-  setProxied
+  setProxied,
 }: {
   pure?: boolean;
   network: string;
@@ -77,12 +77,16 @@ function AddProxy({
   // filter accounts by network
   const [, filteredProxy] = useMemo(() => {
     const filteredProxied = filterAccountsByNetwork(accounts, genesisHash);
-    const filteredProxy = filteredProxied.concat(addresses.map((item) => item.address));
+    const filteredProxy = filteredProxied.concat(
+      addresses.map((item) => item.address),
+    );
 
     return [filteredProxied, filteredProxy];
   }, [accounts, addresses, genesisHash]);
   const proxyTypes = useProxyTypes(network);
-  const [proxyType, setProxyType] = useState<string>(proxyTypes?.[0]?.text || 'Any');
+  const [proxyType, setProxyType] = useState<string>(
+    proxyTypes?.[0]?.text || 'Any',
+  );
   const [name, setName] = useInput('');
   const [advanced, toggleAdvanced] = useToggle(false);
   const [custom, setCustom] = useState<string>('');
@@ -90,16 +94,18 @@ function AddProxy({
   const reviewWindows = {
     [(ONE_DAY * 1000) / blockInterval]: '1 Day',
     [(ONE_DAY * 7 * 1000) / blockInterval]: '1 Week',
-    [-1]: 'Custom'
+    [-1]: 'Custom',
   };
   const [reviewWindow, setReviewWindow] = useState<number>(0);
   const [proxyArgs, setProxyArgs] = useState<ProxyArgs[]>([]);
-  const [proxy, setProxy] = useState<string | undefined>(pure ? current : filteredProxy[0]);
+  const [proxy, setProxy] = useState<string | undefined>(
+    pure ? current : filteredProxy[0],
+  );
 
   const { data: proxies } = useQuery({
     queryKey: ['proxies', network, proxied || ''] as const,
     enabled: !pure && !!proxied,
-    queryFn: fetchProxiesForAddress
+    queryFn: fetchProxiesForAddress,
   });
 
   const swap = useCallback(() => {
@@ -113,9 +119,9 @@ function AddProxy({
         proxied,
         delegate: proxy.delegate.toString(),
         delay: proxy.delay.toNumber(),
-        proxyType: proxy.proxyType.toString()
+        proxyType: proxy.proxyType.toString(),
       })) || [],
-    [proxied, proxies]
+    [proxied, proxies],
   );
 
   useEffect(() => {
@@ -133,20 +139,20 @@ function AddProxy({
 
   return (
     <>
-      <div className='mx-auto my-0 w-[500px] max-w-full'>
-        <div className='flex items-center justify-between'>
-          <Button onClick={() => window.history.back()} variant='ghost'>
+      <div className="mx-auto my-0 w-[500px] max-w-full">
+        <div className="flex items-center justify-between">
+          <Button onClick={() => window.history.back()} variant="ghost">
             {'<'} Back
           </Button>
         </div>
-        <div className='bg-content1 border-secondary shadow-medium mt-2.5 rounded-[20px] border-1 p-4 sm:p-5'>
-          <div className='space-y-5'>
-            <div className='flex justify-between'>
+        <div className="card-root mt-2.5 p-4 sm:p-5">
+          <div className="space-y-5">
+            <div className="flex justify-between">
               <h3>{pure ? 'Create New Pure Proxy' : 'Add Proxy'}</h3>
             </div>
             <Divider />
 
-            <div className='flex flex-col items-center gap-2.5'>
+            <div className="flex flex-col items-center gap-2.5">
               {pure ? (
                 <PureCell />
               ) : (
@@ -156,16 +162,21 @@ function AddProxy({
                   value={proxied}
                   onChange={setProxied}
                   label={
-                    <Label tooltip='Account authorizes one or more proxy accounts to act on its behalf.'>
+                    <Label tooltip="Account authorizes one or more proxy accounts to act on its behalf.">
                       Proxied Account
                     </Label>
                   }
                   isSign={!!pure}
                 />
               )}
-              <Tooltip content='Switch'>
-                <Button isIconOnly variant='light' onClick={swap} disabled={pure || proxyArgs.length > 0}>
-                  <IconTransfer className='h-4 w-4 rotate-90' />
+              <Tooltip content="Switch">
+                <Button
+                  isIconOnly
+                  variant="light"
+                  onClick={swap}
+                  disabled={pure || proxyArgs.length > 0}
+                >
+                  <IconTransfer className="h-4 w-4 rotate-90" />
                 </Button>
               </Tooltip>
               <InputAddress
@@ -174,34 +185,36 @@ function AddProxy({
                 value={proxy}
                 onChange={setProxy}
                 label={
-                  <Label tooltip='Can perform specific actions on behalf of proxied account.'>Proxy Account</Label>
+                  <Label tooltip="Can perform specific actions on behalf of proxied account.">
+                    Proxy Account
+                  </Label>
                 }
                 filtered={filteredProxy}
               />
             </div>
 
             <InputNetwork
-              label='Select Network'
+              label="Select Network"
               network={network}
               supportedNetworks={supportedNetworks}
               setNetwork={setNetwork}
             />
 
-            {pure && <Input label='Name' value={name} onChange={setName} />}
+            {pure && <Input label="Name" value={name} onChange={setName} />}
 
             <ProxyPermissionSelector
               network={network}
               value={proxyType}
               onChange={setProxyType}
-              label='Authorize'
-              description='Determines what actions the proxy can perform.'
+              label="Authorize"
+              description="Determines what actions the proxy can perform."
             />
 
-            <div className='flex items-center justify-between'>
-              <div className='font-bold'>Advanced Setting</div>
+            <div className="flex items-center justify-between">
+              <div className="font-bold">Advanced Setting</div>
               <Switch
-                isSelected={advanced}
-                onValueChange={(checked) => {
+                checked={advanced}
+                onCheckedChange={(checked) => {
                   toggleAdvanced(checked);
                 }}
               />
@@ -209,9 +222,9 @@ function AddProxy({
 
             {advanced && (
               <>
-                <div className='flex'>
-                  <div className='flex flex-col gap-2'>
-                    <Label tooltip='Wait for a specified number of blocks (the delay period) before executing it.'>
+                <div className="flex">
+                  <div className="flex flex-col gap-2">
+                    <Label tooltip="Wait for a specified number of blocks (the delay period) before executing it.">
                       Review Window
                     </Label>
                     <Select
@@ -221,7 +234,7 @@ function AddProxy({
                       }}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder='Review Window' />
+                        <SelectValue placeholder="Review Window" />
                       </SelectTrigger>
                       <SelectContent>
                         {Object.entries(reviewWindows).map(([key, text]) => (
@@ -236,21 +249,26 @@ function AddProxy({
 
                 {reviewWindow === -1 && (
                   <Input
-                    label='Custom'
+                    label="Custom"
                     value={custom}
                     onChange={setCustom}
-                    endAdornment={<p className='text-foreground text-nowrap'>Blocks (≈ {estimateCustom})</p>}
+                    endAdornment={
+                      <p className="text-foreground text-nowrap">
+                        Blocks (≈ {estimateCustom})
+                      </p>
+                    }
                   />
                 )}
               </>
             )}
 
             {pure && proxyType !== 'Any' && (
-              <Alert variant='warning'>
+              <Alert variant="warning">
                 <AlertTitle>
-                  You have selected a Pure Proxy with non-ANY permissions, which means that the assets in this account
-                  cannot be moved, and you will not be able to add or remove new proxies. Please ensure the security of
-                  your assets.
+                  You have selected a Pure Proxy with non-ANY permissions, which
+                  means that the assets in this account cannot be moved, and you
+                  will not be able to add or remove new proxies. Please ensure
+                  the security of your assets.
                 </AlertTitle>
               </Alert>
             )}
@@ -284,24 +302,38 @@ function AddProxy({
 
             {!!(proxyArgs.length + (existsProxies.length || 0)) && <Divider />}
 
-            <Alert variant='warning'>
+            <Alert variant="warning">
               <AlertDescription>
                 <ul>
                   <li>A deposit is required for proxy creation.</li>
-                  <li>Only accounts with full authority (ANY) can delete a proxy.</li>
+                  <li>
+                    Only accounts with full authority (ANY) can delete a proxy.
+                  </li>
                 </ul>
               </AlertDescription>
             </Alert>
 
             {pure ? (
-              <SubmitPure proxy={proxy} name={name} reviewWindow={reviewWindow} custom={custom} proxyType={proxyType} />
+              <SubmitPure
+                proxy={proxy}
+                name={name}
+                reviewWindow={reviewWindow}
+                custom={custom}
+                proxyType={proxyType}
+              />
             ) : (
-              <SubmitProxy proxied={proxied} proxyArgs={proxyArgs} setProxyArgs={setProxyArgs} />
+              <SubmitProxy
+                proxied={proxied}
+                proxyArgs={proxyArgs}
+                setProxyArgs={setProxyArgs}
+              />
             )}
 
             {!pure && existsProxies.length > 0 && (
               <div style={{ filter: 'grayscale(30%)' }}>
-                <p className='text-foreground/65 mb-2.5 font-bold'>Existing Proxy</p>
+                <p className="text-foreground/65 mb-2.5 font-bold">
+                  Existing Proxy
+                </p>
 
                 {existsProxies.map((proxy, index) => (
                   <ProxyInfo

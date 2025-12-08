@@ -3,7 +3,14 @@
 
 import type { Web3WalletTypes } from '@walletconnect/web3wallet';
 
-import { Alert, AlertTitle, Avatar, Button, buttonSpinner, Divider } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertTitle,
+  Avatar,
+  Button,
+  buttonSpinner,
+  Divider,
+} from '@mimir-wallet/ui';
 import { useContext, useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
@@ -16,7 +23,13 @@ import { analyticsActions } from '@/analytics';
 import { AddressCell } from '@/components';
 import { toastError } from '@/components/utils';
 
-function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionProposal; onClose: () => void }) {
+function Session({
+  proposal,
+  onClose,
+}: {
+  proposal: Web3WalletTypes.SessionProposal;
+  onClose: () => void;
+}) {
   const { current } = useAccount();
   const { deleteProposal } = useContext(WalletConnectContext);
   const [account] = useQueryAccountOmniChain(current);
@@ -43,10 +56,16 @@ function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionPropo
   }, [account, onClose, proposal]);
 
   return (
-    <div className='flex flex-col items-center gap-5'>
+    <div className="flex flex-col items-center gap-5">
       <Avatar
         showFallback={showFallback}
-        fallback={<Avatar src='/images/wallet-connect.webp' alt='wallet connect' style={{ width: 80, height: 80 }} />}
+        fallback={
+          <Avatar
+            src="/images/wallet-connect.webp"
+            alt="wallet connect"
+            style={{ width: 80, height: 80 }}
+          />
+        }
         onError={() => {
           setShowFallback(true);
         }}
@@ -58,42 +77,55 @@ function Session({ proposal, onClose }: { proposal: Web3WalletTypes.SessionPropo
         style={{ width: 80, height: 80 }}
       />
       <div>
-        <h4 className='text-center text-xl font-bold'>{proposal.params.proposer.metadata.name}</h4>
-        <p className='text-center text-sm'>
-          <a href={proposal.params.proposer.metadata.url} target='_blank' rel='noopener noreferrer'>
+        <h4 className="text-center text-xl font-bold">
+          {proposal.params.proposer.metadata.name}
+        </h4>
+        <p className="text-center text-sm">
+          <a
+            href={proposal.params.proposer.metadata.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {proposal.params.proposer.metadata.url}
           </a>
         </p>
       </div>
-      <p className='text-sm'>
-        You authorize access to {proposal.params.proposer.metadata.name} with the following identity.
+      <p className="text-sm">
+        You authorize access to {proposal.params.proposer.metadata.name} with
+        the following identity.
       </p>
 
       {current ? (
-        <div className='bg-secondary w-full rounded-[10px] p-2.5'>
+        <div className="bg-secondary w-full rounded-[10px] p-2.5">
           <AddressCell shorten={false} value={current} iconSize={30} />
         </div>
       ) : (
-        <Alert variant='destructive'>
+        <Alert variant="destructive">
           <AlertTitle>Please create or select multisig account</AlertTitle>
         </Alert>
       )}
 
       <Divider />
       {/* <Alert color='warning' title={`Make sure the Dapp is connecting to ${chain.name}`} className='w-full' /> */}
-      <div className='flex w-full gap-2.5'>
+      <div className="flex w-full gap-2.5">
         <Button
           fullWidth
-          radius='full'
-          color='primary'
-          variant='bordered'
+          radius="full"
+          color="primary"
+          variant="bordered"
           disabled={rejectState.loading}
           onClick={handleReject}
         >
           {rejectState.loading ? buttonSpinner : null}
           Reject
         </Button>
-        <Button fullWidth radius='full' color='primary' disabled={approveState.loading} onClick={handleApprove}>
+        <Button
+          fullWidth
+          radius="full"
+          color="primary"
+          disabled={approveState.loading}
+          onClick={handleApprove}
+        >
           {approveState.loading ? buttonSpinner : null}
           Approve
         </Button>

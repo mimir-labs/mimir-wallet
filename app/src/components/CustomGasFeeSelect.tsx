@@ -3,7 +3,15 @@
 
 import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
-import { Avatar, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton } from '@mimir-wallet/ui';
+import {
+  Avatar,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Skeleton,
+} from '@mimir-wallet/ui';
 import React, { useEffect, useMemo } from 'react';
 
 import { FormatBalance } from '@/components';
@@ -37,7 +45,7 @@ export interface GasFeeInfo {
 function AssetBalance({
   asset,
   address,
-  network
+  network,
 }: {
   asset: CompleteEnhancedAssetInfo;
   address: string | undefined;
@@ -46,18 +54,22 @@ function AssetBalance({
   const [balanceData, isFetched, isFetching] = useBalanceByIdentifier(
     network,
     address,
-    asset.isNative ? 'native' : asset.assetId || ''
+    asset.isNative ? 'native' : asset.assetId || '',
   );
 
   const balance = balanceData?.transferrable;
 
   if (isFetching && !isFetched) {
-    return <Skeleton className='h-[16px] w-16' />;
+    return <Skeleton className="h-[16px] w-16" />;
   }
 
   return (
     <span>
-      <FormatBalance value={balance} withCurrency format={[asset.decimals, asset.symbol]} />
+      <FormatBalance
+        value={balance}
+        withCurrency
+        format={[asset.decimals, asset.symbol]}
+      />
     </span>
   );
 }
@@ -70,15 +82,24 @@ function CustomGasFeeSelect({
   onChange,
   isDisabled,
   className = '',
-  gasFeeInfo
+  gasFeeInfo,
 }: CustomGasFeeSelectProps) {
-  const { isSupported, feeEligibleAssets, selectedAssetId, setSelectedAssetId, isFetched, isFetching } =
-    useCustomGasFee(network);
+  const {
+    isSupported,
+    feeEligibleAssets,
+    selectedAssetId,
+    setSelectedAssetId,
+    isFetched,
+    isFetching,
+  } = useCustomGasFee(network);
 
   const asset = useMemo(() => {
     return (
-      feeEligibleAssets.find((item) => (item.isNative ? 'native' === selectedAssetId : item.key === selectedAssetId)) ||
-      null
+      feeEligibleAssets.find((item) =>
+        item.isNative
+          ? 'native' === selectedAssetId
+          : item.key === selectedAssetId,
+      ) || null
     );
   }, [feeEligibleAssets, selectedAssetId]);
 
@@ -94,9 +115,9 @@ function CustomGasFeeSelect({
   if (isFetching && !isFetched) {
     return (
       <div className={className}>
-        <div className='flex flex-col gap-2'>
-          <label className='text-sm font-medium'>{label}</label>
-          <Skeleton className='h-14 w-full rounded-[10px]' />
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">{label}</label>
+          <Skeleton className="h-14 w-full rounded-[10px]" />
         </div>
       </div>
     );
@@ -104,8 +125,8 @@ function CustomGasFeeSelect({
 
   return (
     <div className={`${className}`}>
-      <div className='flex flex-col gap-2'>
-        <label className='text-sm font-medium'>{label}</label>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">{label}</label>
         <Select
           value={selectedAssetId || ''}
           onValueChange={(value) => {
@@ -121,20 +142,26 @@ function CustomGasFeeSelect({
               <SelectItem
                 key={asset.isNative ? 'native' : asset.key}
                 value={asset.isNative ? 'native' : asset.key}
-                className='w-full pr-2.5 *:[span]:first:hidden'
+                className="w-full pr-2.5 *:[span]:first:hidden"
               >
-                <div className='flex w-full items-center justify-between'>
-                  <div className='flex items-center gap-3'>
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex items-center gap-3">
                     <Avatar
                       alt={asset.symbol}
                       fallback={asset.symbol.slice(0, 1)}
                       src={asset.logoUri}
                       style={{ width: 22, height: 22 }}
                     />
-                    <span className='text-sm font-medium'>{asset.symbol}</span>
-                    <span className='text-foreground/50 text-xs'>{asset.assetId}</span>
+                    <span className="text-sm font-medium">{asset.symbol}</span>
+                    <span className="text-foreground/50 text-xs">
+                      {asset.assetId}
+                    </span>
                   </div>
-                  <AssetBalance asset={asset} address={address} network={network} />
+                  <AssetBalance
+                    asset={asset}
+                    address={address}
+                    network={network}
+                  />
                 </div>
               </SelectItem>
             ))}
@@ -143,14 +170,18 @@ function CustomGasFeeSelect({
       </div>
 
       {gasFeeInfo ? (
-        <div className='text-foreground mt-[5px] text-right text-sm leading-[20px]'>
+        <div className="text-foreground mt-[5px] text-right text-sm leading-[20px]">
           <b>Required: </b>
           <span>
-            <FormatBalance value={gasFeeInfo.amount} withCurrency format={[gasFeeInfo.decimals, gasFeeInfo.symbol]} />
+            <FormatBalance
+              value={gasFeeInfo.amount}
+              withCurrency
+              format={[gasFeeInfo.decimals, gasFeeInfo.symbol]}
+            />
           </span>
         </div>
       ) : (
-        <Skeleton className='mt-[5px] ml-auto h-[20px] w-32' />
+        <Skeleton className="mt-[5px] ml-auto h-[20px] w-32" />
       )}
     </div>
   );

@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ApiManager, decodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  ApiManager,
+  decodeAddress,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { u8aToHex } from '@polkadot/util';
 import React from 'react';
@@ -13,7 +17,7 @@ function SubmitPure({
   name,
   reviewWindow,
   custom,
-  proxyType
+  proxyType,
 }: {
   proxy?: string;
   name: string;
@@ -26,16 +30,12 @@ function SubmitPure({
   return (
     <TxButton
       fullWidth
-      color='primary'
+      color="primary"
       disabled={!(proxy && name)}
       accountId={proxy}
-      website='mimir://internal/create-pure'
+      website="mimir://internal/create-pure"
       getCall={async () => {
         const api = await ApiManager.getInstance().getApi(network);
-
-        if (!api) {
-          throw new Error('API not ready');
-        }
 
         const delay = reviewWindow === -1 ? Number(custom) : reviewWindow;
 
@@ -48,7 +48,7 @@ function SubmitPure({
                 network,
                 u8aToHex(decodeAddress(proxy)),
                 extrinsic.hash.toHex(),
-                name
+                name,
               );
             }
           : undefined

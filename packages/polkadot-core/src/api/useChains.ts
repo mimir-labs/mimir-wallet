@@ -45,14 +45,20 @@ export interface ChainsControl {
  * ```
  */
 export function useChains(): ChainsControl {
-  const { networks, networkMode, enableNetwork, disableNetwork, setNetworkMode } = useApiStore(
+  const {
+    networks,
+    networkMode,
+    enableNetwork,
+    disableNetwork,
+    setNetworkMode,
+  } = useApiStore(
     useShallow((state) => ({
       networks: state.networks,
       networkMode: state.networkMode,
       enableNetwork: state.enableNetwork,
       disableNetwork: state.disableNetwork,
-      setNetworkMode: state.setNetworkMode
-    }))
+      setNetworkMode: state.setNetworkMode,
+    })),
   );
 
   const { network } = useNetwork();
@@ -62,10 +68,10 @@ export function useChains(): ChainsControl {
       networks.map(
         (item): Network => ({
           ...item,
-          enabled: networkMode === 'omni' ? item.enabled : item.key === network
-        })
+          enabled: networkMode === 'omni' ? item.enabled : item.key === network,
+        }),
       ),
-    [networks, networkMode, network]
+    [networks, networkMode, network],
   );
 
   return {
@@ -73,7 +79,7 @@ export function useChains(): ChainsControl {
     mode: networkMode,
     enableNetwork,
     disableNetwork,
-    setNetworkMode
+    setNetworkMode,
   };
 }
 

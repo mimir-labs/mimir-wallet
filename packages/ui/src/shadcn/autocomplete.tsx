@@ -21,7 +21,10 @@ export interface AutocompleteProps {
   options: AutocompleteOption[];
   getOptionLabel?: (option: AutocompleteOption) => string;
   getOptionValue?: (option: AutocompleteOption) => string;
-  filterOptions?: (options: AutocompleteOption[], inputValue: string) => AutocompleteOption[];
+  filterOptions?: (
+    options: AutocompleteOption[],
+    inputValue: string,
+  ) => AutocompleteOption[];
 
   // Value control
   value?: string;
@@ -39,17 +42,25 @@ export interface AutocompleteProps {
   disabled?: boolean;
 
   // Custom rendering
-  renderOption?: (option: AutocompleteOption, isSelected: boolean) => React.ReactNode;
+  renderOption?: (
+    option: AutocompleteOption,
+    isSelected: boolean,
+  ) => React.ReactNode;
   emptyMessage?: string | React.ReactNode;
 }
 
-const defaultFilterOptions = (options: AutocompleteOption[], inputValue: string): AutocompleteOption[] => {
+const defaultFilterOptions = (
+  options: AutocompleteOption[],
+  inputValue: string,
+): AutocompleteOption[] => {
   if (!inputValue) return options;
 
   const lowerInput = inputValue.toLowerCase();
 
   return options.filter(
-    (option) => option.label.toLowerCase().includes(lowerInput) || option.value.toLowerCase().includes(lowerInput)
+    (option) =>
+      option.label.toLowerCase().includes(lowerInput) ||
+      option.value.toLowerCase().includes(lowerInput),
   );
 };
 
@@ -68,7 +79,7 @@ export function Autocomplete({
   className,
   disabled,
   renderOption,
-  emptyMessage = 'No results found'
+  emptyMessage = 'No results found',
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
   const [internalInputValue, setInternalInputValue] = React.useState('');
@@ -82,7 +93,9 @@ export function Autocomplete({
   // Update input value when value changes
   React.useEffect(() => {
     if (value) {
-      const selectedOption = options.find((opt) => getOptionValue(opt) === value);
+      const selectedOption = options.find(
+        (opt) => getOptionValue(opt) === value,
+      );
 
       if (selectedOption) {
         const displayValue = getOptionValue(selectedOption); // Use value instead of label for display
@@ -94,7 +107,14 @@ export function Autocomplete({
         }
       }
     }
-  }, [value, options, getOptionLabel, getOptionValue, isControlled, onInputChange]);
+  }, [
+    value,
+    options,
+    getOptionLabel,
+    getOptionValue,
+    isControlled,
+    onInputChange,
+  ]);
 
   const filteredOptions = React.useMemo(() => {
     return filterOptions(options, inputValue);
@@ -131,7 +151,9 @@ export function Autocomplete({
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setOpen(true);
-      setHighlightedIndex((prev) => (prev < filteredOptions.length - 1 ? prev + 1 : prev));
+      setHighlightedIndex((prev) =>
+        prev < filteredOptions.length - 1 ? prev + 1 : prev,
+      );
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
 
@@ -161,7 +183,9 @@ export function Autocomplete({
     // Allow custom value on blur if enabled
     if (allowCustomValue && inputValue) {
       const matchingOption = options.find(
-        (opt) => getOptionLabel(opt) === inputValue || getOptionValue(opt) === inputValue
+        (opt) =>
+          getOptionLabel(opt) === inputValue ||
+          getOptionValue(opt) === inputValue,
       );
 
       if (!matchingOption) {
@@ -171,13 +195,16 @@ export function Autocomplete({
     }
   };
 
-  const defaultRenderOption = (option: AutocompleteOption, isSelected: boolean) => (
+  const defaultRenderOption = (
+    option: AutocompleteOption,
+    isSelected: boolean,
+  ) => (
     <div
       className={cn(
         'relative flex cursor-pointer items-center rounded-[5px] px-2 py-1.5 text-sm outline-none select-none',
         'hover:bg-secondary focus:bg-secondary',
         isSelected && 'bg-secondary',
-        highlightedIndex === filteredOptions.indexOf(option) && 'bg-secondary'
+        highlightedIndex === filteredOptions.indexOf(option) && 'bg-secondary',
       )}
       onMouseEnter={() => setHighlightedIndex(filteredOptions.indexOf(option))}
     >
@@ -188,10 +215,10 @@ export function Autocomplete({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <div className='relative'>
+        <div className="relative">
           <Input
             ref={inputRef}
-            type='text'
+            type="text"
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
@@ -201,37 +228,48 @@ export function Autocomplete({
             disabled={disabled}
             className={cn('pr-5', className)}
           />
-          <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1'>
-            <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+            >
               <path
-                d='M10.7998 13.9344C10.3998 14.4674 9.60022 14.4674 9.20021 13.9344L5.57194 9.10028C5.07718 8.44109 5.54751 7.5 6.37172 7.5L13.6283 7.5C14.4525 7.5 14.9228 8.44109 14.4281 9.10028L10.7998 13.9344Z'
-                fill='currentColor'
+                d="M10.7998 13.9344C10.3998 14.4674 9.60022 14.4674 9.20021 13.9344L5.57194 9.10028C5.07718 8.44109 5.54751 7.5 6.37172 7.5L13.6283 7.5C14.4525 7.5 14.9228 8.44109 14.4281 9.10028L10.7998 13.9344Z"
+                fill="currentColor"
               />
             </svg>
           </div>
         </div>
       </PopoverTrigger>
       <PopoverContent
-        className='border-divider-300 w-[var(--radix-popover-trigger-width)] border-1 p-[5px]'
-        align='start'
+        className="border-divider w-[var(--radix-popover-trigger-width)] border-1 p-[5px]"
+        align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div className='max-h-[300px] overflow-auto'>
+        <div className="max-h-[300px] overflow-auto">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option) => (
               <div
                 key={getOptionValue(option)}
                 onClick={() => handleOptionSelect(option)}
                 onMouseDown={(e) => e.preventDefault()}
-                className='hover:bg-secondary cursor-pointer rounded-[5px] px-2 py-1.5'
+                className="hover:bg-secondary cursor-pointer rounded-[5px] px-2 py-1.5"
               >
                 {renderOption
                   ? renderOption(option, value === getOptionValue(option))
-                  : defaultRenderOption(option, value === getOptionValue(option))}
+                  : defaultRenderOption(
+                      option,
+                      value === getOptionValue(option),
+                    )}
               </div>
             ))
           ) : (
-            <div className='text-muted-foreground px-2 py-6 text-center text-sm'>{emptyMessage}</div>
+            <div className="text-muted-foreground px-2 py-6 text-center text-sm">
+              {emptyMessage}
+            </div>
           )}
         </div>
       </PopoverContent>

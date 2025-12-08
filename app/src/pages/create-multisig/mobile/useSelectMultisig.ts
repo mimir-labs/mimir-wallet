@@ -28,27 +28,40 @@ export function useSelectMultisig(): UseSelectMultisig {
   const all = useMemo(
     () =>
       [encodeAddress(hexToU8a('0x0', 256), chain.ss58Format)].concat(
-        accounts.map((item) => item.address).concat(addresses.map((item) => item.address))
+        accounts
+          .map((item) => item.address)
+          .concat(addresses.map((item) => item.address)),
       ),
-    [accounts, addresses, chain.ss58Format]
+    [accounts, addresses, chain.ss58Format],
   );
   const [signatories, setSignatories] = useState<string[]>([]);
   const [threshold, setThreshold] = useState<number>(2);
 
   const unselected = useMemo(
-    () => Array.from(new Set(all.filter((account) => !signatories.includes(account)))),
-    [all, signatories]
+    () =>
+      Array.from(
+        new Set(all.filter((account) => !signatories.includes(account))),
+      ),
+    [all, signatories],
   );
 
-  const hasSoloAccount = useMemo(() => !!signatories.find((address) => !!accountSource(address)), [signatories]);
-  const isThresholdValid = Number(threshold) >= 1 && Number(threshold) <= signatories.length;
+  const hasSoloAccount = useMemo(
+    () => !!signatories.find((address) => !!accountSource(address)),
+    [signatories],
+  );
+  const isThresholdValid =
+    Number(threshold) >= 1 && Number(threshold) <= signatories.length;
 
   const select = useCallback((value: string) => {
-    setSignatories((accounts) => (accounts.includes(value) ? accounts : accounts.concat(value)));
+    setSignatories((accounts) =>
+      accounts.includes(value) ? accounts : accounts.concat(value),
+    );
   }, []);
 
   const unselect = useCallback((value: string) => {
-    setSignatories((accounts) => accounts.filter((account) => account !== value));
+    setSignatories((accounts) =>
+      accounts.filter((account) => account !== value),
+    );
   }, []);
 
   return {
@@ -60,6 +73,6 @@ export function useSelectMultisig(): UseSelectMultisig {
     hasSoloAccount,
     select,
     unselect,
-    unselectAll: () => setSignatories([])
+    unselectAll: () => setSignatories([]),
   };
 }

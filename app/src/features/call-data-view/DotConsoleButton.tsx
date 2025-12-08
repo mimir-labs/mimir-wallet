@@ -6,17 +6,22 @@ import { Link } from '@tanstack/react-router';
 
 import { DotConsoleApp, PolkadotJsApp } from '@/config';
 
-function DotConsoleButton({ call, network, ...props }: { call: string; network: string } & ButtonProps) {
+function DotConsoleButton({
+  call,
+  network,
+  ...props
+}: { call: string; network: string } & ButtonProps) {
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
 
   if (!isDotConsoleSupport) {
-    const url = PolkadotJsApp.urlSearch?.(network) || new URL(PolkadotJsApp.url);
+    const url =
+      PolkadotJsApp.urlSearch?.(network) || new URL(PolkadotJsApp.url);
 
     url.hash = `#/extrinsics/decode/${call}`;
 
     return (
       <Button fullWidth asChild>
-        <Link to='/explorer/$url' params={{ url: url.toString() }}>
+        <Link to="/explorer/$url" params={{ url: url.toString() }}>
           View In Polkadot.js
         </Link>
       </Button>
@@ -30,7 +35,7 @@ function DotConsoleButton({ call, network, ...props }: { call: string; network: 
 
   return (
     <Button fullWidth asChild {...props}>
-      <Link to='/explorer/$url' params={{ url: url.toString() }}>
+      <Link to="/explorer/$url" params={{ url: url.toString() }}>
         View In DOTConsole
       </Link>
     </Button>

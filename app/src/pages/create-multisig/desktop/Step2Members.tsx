@@ -12,7 +12,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@mimir-wallet/ui';
 import { useState } from 'react';
 
@@ -39,7 +39,7 @@ function Step2Members({
   onMembersChange,
   onNext,
   onThresholdChange,
-  threshold
+  threshold,
 }: Step2MembersProps) {
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [selectedAccount, setSelectedAccount] = useState<string>('');
@@ -51,7 +51,10 @@ function Step2Members({
       onMembersChange([...members, selectedAccount]);
       setSelectedAccount('');
 
-      if (!isLocalAccount(selectedAccount) && !isLocalAddress(selectedAccount)) {
+      if (
+        !isLocalAccount(selectedAccount) &&
+        !isLocalAddress(selectedAccount)
+      ) {
         addAddressBook(selectedAccount, false);
       }
     }
@@ -79,25 +82,25 @@ function Step2Members({
   };
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className="flex flex-col gap-4">
       {/* Add New Signers Section */}
       <InputAddress
         withAddButton
-        label='Add New Signers'
-        wrapperClassName='!h-10'
-        addressType='row'
+        label="Add New Signers"
+        wrapperClassName="!h-10"
+        addressType="row"
         iconSize={20}
         value={selectedAccount}
         onChange={setSelectedAccount}
         onSelect={handleSelect}
         excluded={members}
-        placeholder='Select account'
+        placeholder="Select account"
         withZeroAddress
         endContent={
           <Button
-            className='h-10 min-w-[53px]'
-            size='md'
-            color='primary'
+            className="h-10 min-w-[53px]"
+            size="md"
+            color="primary"
             onClick={handleAddMember}
             disabled={!selectedAccount}
           >
@@ -107,69 +110,85 @@ function Step2Members({
       />
 
       {/* Multisig Signers List */}
-      <div className='flex flex-col gap-1'>
-        <label className='text-foreground text-sm font-bold'>Multisig Signers</label>
-        <div className='border-divider-300 flex flex-col gap-2.5 rounded-[10px] border p-2.5'>
+      <div className="flex flex-col gap-1">
+        <label className="text-foreground text-sm font-bold">
+          Multisig Signers
+        </label>
+        <div className="border-divider flex flex-col gap-2.5 rounded-[10px] border p-2.5">
           {members.length > 0 ? (
             members.map((member) => (
-              <div key={member} className='bg-secondary flex items-center gap-1 rounded-[5px] px-1 py-1'>
+              <div
+                key={member}
+                className="bg-secondary flex items-center gap-1 rounded-[5px] px-1 py-1"
+              >
                 <AddressRow
-                  className='[&_.AddressRow-Address]:text-[#949494]'
+                  className="[&_.AddressRow-Address]:text-[#949494]"
                   value={member}
                   withAddress
                   withName
                   iconSize={20}
                 />
-                <div className='flex-1' />
+                <div className="flex-1" />
                 <button
                   onClick={() => handleRemoveMember(member)}
-                  className='text-danger p-1 transition-opacity hover:opacity-80'
+                  className="text-danger p-1 transition-opacity hover:opacity-80"
                 >
                   <DeleteIcon />
                 </button>
               </div>
             ))
           ) : (
-            <Empty height={100} variant='select-account' />
+            <Empty height={100} variant="select-account" />
           )}
         </div>
       </div>
 
       {/* Set Approval Threshold */}
-      <div className='flex flex-col gap-1'>
-        <label className='text-foreground text-sm font-bold'>Set Approval Threshold</label>
-        <p className='text-foreground/50 text-xs'>Any transaction requires the confirmation of:</p>
-        <div className='flex items-center gap-2.5'>
+      <div className="flex flex-col gap-1">
+        <label className="text-foreground text-sm font-bold">
+          Set Approval Threshold
+        </label>
+        <p className="text-foreground/50 text-xs">
+          Any transaction requires the confirmation of:
+        </p>
+        <div className="flex items-center gap-2.5">
           <Select
             value={threshold.toString()}
             onValueChange={(value) => {
               onThresholdChange(parseInt(value));
             }}
           >
-            <SelectTrigger className='w-20'>
+            <SelectTrigger className="w-20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Array.from({ length: Math.max(1, members.length) }, (_, i) => i + 1).map((num) => (
+              {Array.from(
+                { length: Math.max(1, members.length) },
+                (_, i) => i + 1,
+              ).map((num) => (
                 <SelectItem key={num.toString()} value={num.toString()}>
                   {num}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <span className='text-foreground text-sm'>out of {members.length || 1} Signers</span>
+          <span className="text-foreground text-sm">
+            out of {members.length || 1} Signers
+          </span>
         </div>
       </div>
 
       {/* Tips Alert */}
       {threshold === 1 && members.length > 0 && (
         <Alert variant={'warning'}>
-          <AlertTitle className='text-foreground text-base/4 font-bold'>Tips</AlertTitle>
-          <AlertDescription className='text-foreground/50 text-xs'>
+          <AlertTitle className="text-foreground text-base/4 font-bold">
+            Tips
+          </AlertTitle>
+          <AlertDescription className="text-foreground/50 text-xs">
             <ul style={{ listStyle: 'outside', lineHeight: '14px' }}>
               <li>
-                Mimir support 1/N multisig which bring more flexibility and also more risks. Each member can transfer
-                funds out.
+                Mimir support 1/N multisig which bring more flexibility and also
+                more risks. Each member can transfer funds out.
               </li>
             </ul>
           </AlertDescription>
@@ -177,27 +196,38 @@ function Step2Members({
       )}
 
       {/* Divider */}
-      <Divider className='bg-secondary' />
+      <Divider className="bg-secondary" />
 
       {/* Proxy Module Not Supported Alert */}
       {isPureProxy && !isProxyModuleSupported && (
-        <Alert variant='destructive'>
-          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        <Alert variant="destructive">
+          <AlertTitle>
+            The current network does not support proxy module
+          </AlertTitle>
         </Alert>
       )}
 
       {/* Action Buttons */}
-      <div className='flex gap-2.5'>
-        <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
+      <div className="flex gap-2.5">
+        <Button
+          fullWidth
+          size="md"
+          variant="ghost"
+          color="primary"
+          radius="full"
+          onClick={onBack}
+        >
           Back
         </Button>
         <Button
           fullWidth
-          size='md'
-          color='primary'
-          radius='full'
+          size="md"
+          color="primary"
+          radius="full"
           onClick={onNext}
-          disabled={members.length === 0 || (isPureProxy && !isProxyModuleSupported)}
+          disabled={
+            members.length === 0 || (isPureProxy && !isProxyModuleSupported)
+          }
         >
           Next
         </Button>

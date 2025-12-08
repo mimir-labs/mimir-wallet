@@ -28,7 +28,7 @@ export function useDelayCalculation({
   network,
   delayType,
   customBlocks = '0',
-  hasDelay = true
+  hasDelay = true,
 }: DelayCalculationOptions): DelayCalculationResult {
   const blockInterval = useBlockInterval(network).toNumber();
 
@@ -42,7 +42,7 @@ export function useDelayCalculation({
     const delays = {
       hour: Math.floor((ONE_HOUR * 1000) / blockInterval),
       day: Math.floor((ONE_DAY * 1000) / blockInterval),
-      week: Math.floor((ONE_DAY * 7 * 1000) / blockInterval)
+      week: Math.floor((ONE_DAY * 7 * 1000) / blockInterval),
     };
 
     return delays[delayType];
@@ -71,6 +71,6 @@ export function useDelayCalculation({
 
   return {
     delayInBlocks,
-    delayDisplay
+    delayDisplay,
   };
 }

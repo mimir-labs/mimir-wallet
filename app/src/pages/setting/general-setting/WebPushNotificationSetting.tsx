@@ -3,7 +3,14 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { Alert, AlertDescription, Button, Card, Spinner, Switch } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  Card,
+  Spinner,
+  Switch,
+} from '@mimir-wallet/ui';
 import { useCallback } from 'react';
 
 import { useWebPush } from '@/hooks/useWebPush';
@@ -12,7 +19,9 @@ interface WebPushNotificationSettingProps {
   address: HexString;
 }
 
-function WebPushNotificationSetting({ address }: WebPushNotificationSettingProps) {
+function WebPushNotificationSetting({
+  address,
+}: WebPushNotificationSettingProps) {
   const webPush = useWebPush(address);
 
   // Handle enabling/disabling notifications
@@ -23,14 +32,17 @@ function WebPushNotificationSetting({ address }: WebPushNotificationSettingProps
           await webPush.permission.requestPermission();
         }
 
-        if (webPush.permission.isGranted && !webPush.subscription.isSubscribed) {
+        if (
+          webPush.permission.isGranted &&
+          !webPush.subscription.isSubscribed
+        ) {
           await webPush.subscription.subscribe();
         }
       } else {
         await webPush.subscription.unsubscribe();
       }
     },
-    [webPush]
+    [webPush],
   );
 
   const isNotificationEnabled = webPush.subscription.isSubscribed;
@@ -38,12 +50,14 @@ function WebPushNotificationSetting({ address }: WebPushNotificationSettingProps
   if (!webPush.permission.isSupported) {
     return (
       <div>
-        <h6 className='text-foreground/50 mb-2.5 text-sm'>Push Notifications</h6>
-        <Card className='gap-2.5 p-4 sm:p-5'>
+        <h6 className="text-foreground/50 mb-2.5 text-sm">
+          Push Notifications
+        </h6>
+        <Card className="gap-2.5 p-4 sm:p-5">
           <Alert>
             <AlertDescription>
-              Web Push notifications are not supported in your browser. Please use a modern browser like Chrome,
-              Firefox, Safari, or Edge.
+              Web Push notifications are not supported in your browser. Please
+              use a modern browser like Chrome, Firefox, Safari, or Edge.
             </AlertDescription>
           </Alert>
         </Card>
@@ -53,49 +67,59 @@ function WebPushNotificationSetting({ address }: WebPushNotificationSettingProps
 
   return (
     <div>
-      <h6 className='text-foreground/50 mb-2.5 text-sm'>Push Notifications</h6>
-      <Card className='gap-2.5 p-4 sm:p-5'>
-        <div className='flex items-center justify-between'>
+      <h6 className="text-foreground/50 mb-2.5 text-sm">Push Notifications</h6>
+      <Card className="gap-2.5 p-4 sm:p-5">
+        <div className="flex items-center justify-between">
           <b>Push Notification</b>
           <Switch
-            size='sm'
-            isSelected={isNotificationEnabled}
-            onValueChange={handleToggleNotifications}
-            isDisabled={webPush.subscription.isSubscribing || webPush.subscription.isUnsubscribing}
+            checked={isNotificationEnabled}
+            onCheckedChange={handleToggleNotifications}
+            disabled={
+              webPush.subscription.isSubscribing ||
+              webPush.subscription.isUnsubscribing
+            }
           />
         </div>
 
-        <p className='text-foreground/50 text-xs'>
-          Enable push notifications for this Account in your browser. You will receive all transaction notifications
-          across all supported chains.
+        <p className="text-foreground/50 text-xs">
+          Enable push notifications for this Account in your browser. You will
+          receive all transaction notifications across all supported chains.
         </p>
 
         {/* Permission Status */}
         {webPush.permission.isDenied && (
-          <Alert variant='destructive' className='mt-2'>
-            <AlertDescription className='text-xs'>
-              Notifications are blocked. Please enable them in your browser settings.
+          <Alert variant="destructive" className="mt-2">
+            <AlertDescription className="text-xs">
+              Notifications are blocked. Please enable them in your browser
+              settings.
             </AlertDescription>
           </Alert>
         )}
 
         {webPush.permission.isDefault && (
           <Button
-            size='sm'
-            variant='ghost'
+            size="sm"
+            variant="ghost"
             onClick={webPush.permission.requestPermission}
             disabled={webPush.permission.isRequestingPermission}
-            className='mt-2'
+            className="mt-2"
           >
-            {webPush.permission.isRequestingPermission ? <Spinner size='sm' /> : 'Grant Permission'}
+            {webPush.permission.isRequestingPermission ? (
+              <Spinner size="sm" />
+            ) : (
+              'Grant Permission'
+            )}
           </Button>
         )}
       </Card>
 
       {/* Error Display */}
       {webPush.error && (
-        <Alert variant='destructive' className='mt-2.5'>
-          <AlertDescription>{webPush.error.message || 'An error occurred with push notifications'}</AlertDescription>
+        <Alert variant="destructive" className="mt-2.5">
+          <AlertDescription>
+            {webPush.error.message ||
+              'An error occurred with push notifications'}
+          </AlertDescription>
         </Alert>
       )}
     </div>

@@ -19,11 +19,15 @@ interface EmailNotificationSettingProps {
   address: HexString;
 }
 
-function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSettingProps) {
+function EmailNotificationSetting({
+  address: propsAddress,
+}: EmailNotificationSettingProps) {
   const { ss58 } = useSs58Format();
   const [email, setEmail] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<'bind' | 'unbind' | null>(null);
+  const [pendingAction, setPendingAction] = useState<'bind' | 'unbind' | null>(
+    null,
+  );
   const [address, setAddress] = useState<string>(propsAddress);
   const [filteredSigner, setFilteredSigner] = useState<string>();
 
@@ -46,13 +50,18 @@ function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSe
         if (pendingAction === 'bind' && email) {
           await emailNotification.bindEmail({ email, signer });
           setEmail(''); // Clear input after successful bind
-          toast.success('Email notification subscription created successfully!');
+          toast.success(
+            'Email notification subscription created successfully!',
+          );
         } else if (pendingAction === 'unbind') {
           await emailNotification.unbindEmail({ signer });
-          toast.success('Email notification subscription removed successfully!');
+          toast.success(
+            'Email notification subscription removed successfully!',
+          );
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Operation failed';
+        const message =
+          error instanceof Error ? error.message : 'Operation failed';
 
         toast.error(message);
       } finally {
@@ -60,7 +69,7 @@ function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSe
         setPendingAction(null);
       }
     },
-    [pendingAction, email, emailNotification]
+    [pendingAction, email, emailNotification],
   );
 
   // Handle modal close
@@ -83,62 +92,79 @@ function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSe
     setIsModalOpen(true);
   }, []);
 
-  const isLoading = emailNotification.isLoading || emailNotification.isBinding || emailNotification.isUnbinding;
+  const isLoading =
+    emailNotification.isLoading ||
+    emailNotification.isBinding ||
+    emailNotification.isUnbinding;
 
   return (
     <>
       <div>
-        <h6 className='text-foreground/50 mb-2.5 text-sm'>Email</h6>
-        <Card className='gap-5 p-4 sm:p-5'>
+        <h6 className="text-foreground/50 mb-2.5 text-sm">Email</h6>
+        <Card className="gap-5 p-4 sm:p-5">
           {/* Email Toggle */}
-          <div className='flex w-full max-w-md flex-col gap-2.5'>
-            <div className='flex items-center justify-between'>
-              <b className='text-sm'>Email Notification</b>
+          <div className="flex w-full max-w-md flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <b className="text-sm">Email Notification</b>
             </div>
 
             {/* Email Input - only show when no subscription exists */}
-            <div className='flex w-full flex-row gap-2.5'>
-              <Input placeholder='Email...' value={email} onChange={handleEmailChange} disabled={isLoading} />
+            <div className="flex w-full flex-row gap-2.5">
+              <Input
+                placeholder="Email..."
+                value={email}
+                onChange={handleEmailChange}
+                disabled={isLoading}
+              />
             </div>
 
             {/* Account Display using InputAddress in readonly mode */}
             <InputAddress
               iconSize={20}
-              addressType='row'
+              addressType="row"
               shorten
-              label={<span className='font-normal'>Subscribe this account</span>}
-              wrapperClassName='h-[36px]'
+              label={
+                <span className="font-normal">Subscribe this account</span>
+              }
+              wrapperClassName="h-[36px]"
               value={address}
               onChange={(value) => setAddress(encodeAddress(value, ss58))}
-              placeholder='Please select account'
-              helper='You will receive email notification once your account got new transaction information.'
+              placeholder="Please select account"
+              helper="You will receive email notification once your account got new transaction information."
             />
           </div>
 
           {/* General Error Display */}
           {emailNotification.error && (
-            <Alert variant='destructive'>
+            <Alert variant="destructive">
               <AlertTitle>{emailNotification.error}</AlertTitle>
             </Alert>
           )}
 
           {/* My Subscription */}
           {emailNotification.subscriptions.length > 0 && (
-            <div className='flex flex-col gap-[5px]'>
-              <b className='text-sm'>My Subscription</b>
-              <div className='border-divider-300 flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5'>
+            <div className="flex flex-col gap-[5px]">
+              <b className="text-sm">My Subscription</b>
+              <div className="border-divider flex flex-col gap-2.5 rounded-[10px] border-1 p-2.5">
                 {emailNotification.subscriptions.map((subscription) => (
-                  <div key={subscription.id} className='bg-secondary flex items-center gap-[5px] rounded-[5px] p-[5px]'>
+                  <div
+                    key={subscription.id}
+                    className="bg-secondary flex items-center gap-[5px] rounded-[5px] p-[5px]"
+                  >
                     <AddressRow iconSize={20} value={subscription.signer} />
-                    <span className='text-foreground/50 flex-1'>{subscription.email}</span>
+                    <span className="text-foreground/50 flex-1">
+                      {subscription.email}
+                    </span>
 
                     <Button
-                      onClick={() => handleRemoveSubscription(subscription.signer)}
+                      onClick={() =>
+                        handleRemoveSubscription(subscription.signer)
+                      }
                       disabled={isLoading}
                       isIconOnly
-                      variant='light'
-                      size='sm'
-                      color='danger'
+                      variant="light"
+                      size="sm"
+                      color="danger"
                     >
                       <IconDelete style={{ width: 16, height: 16 }} />
                     </Button>
@@ -149,7 +175,11 @@ function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSe
           )}
 
           {/* Save Button */}
-          <Button color='primary' disabled={!email} onClick={handleAddSubscription}>
+          <Button
+            color="primary"
+            disabled={!email}
+            onClick={handleAddSubscription}
+          >
             Save
           </Button>
         </Card>
@@ -161,14 +191,20 @@ function EmailNotificationSetting({ address: propsAddress }: EmailNotificationSe
           isOpen={isModalOpen}
           onClose={handleModalClose}
           onConfirm={handleModalConfirm}
-          title={pendingAction === 'bind' ? 'Choose an Extension account' : 'Confirm Unsubscribe'}
+          title={
+            pendingAction === 'bind'
+              ? 'Choose an Extension account'
+              : 'Confirm Unsubscribe'
+          }
           description={
             pendingAction === 'bind'
               ? 'Select an account to finish the subscription.'
               : 'Are you sure you want to remove email notifications for this account?'
           }
           confirmText={pendingAction === 'bind' ? 'Confirm' : 'Unsubscribe'}
-          isLoading={emailNotification.isBinding || emailNotification.isUnbinding}
+          isLoading={
+            emailNotification.isBinding || emailNotification.isUnbinding
+          }
           filteredAddress={filteredSigner}
         />
       )}

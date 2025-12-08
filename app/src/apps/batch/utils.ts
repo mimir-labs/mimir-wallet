@@ -9,7 +9,10 @@ import { findAction, parseCall } from '@mimir-wallet/polkadot-core';
 /**
  * Check if a transaction is a utility.batchAll transaction
  */
-export function isBatchAllTransaction(item: BatchTxItem, registry: Registry): boolean {
+export function isBatchAllTransaction(
+  item: BatchTxItem,
+  registry: Registry,
+): boolean {
   try {
     const call = parseCall(registry, item.calldata);
 
@@ -26,21 +29,30 @@ export function isBatchAllTransaction(item: BatchTxItem, registry: Registry): bo
 /**
  * Filter out utility.batchAll transactions from a list
  */
-export function filterOutBatchAllTransactions(items: BatchTxItem[], registry: Registry): BatchTxItem[] {
+export function filterOutBatchAllTransactions(
+  items: BatchTxItem[],
+  registry: Registry,
+): BatchTxItem[] {
   return items.filter((item) => !isBatchAllTransaction(item, registry));
 }
 
 /**
  * Check if any of the items is a utility.batchAll transaction
  */
-export function hasBatchAllTransaction(items: BatchTxItem[], registry: Registry): boolean {
+export function hasBatchAllTransaction(
+  items: BatchTxItem[],
+  registry: Registry,
+): boolean {
   return items.some((item) => isBatchAllTransaction(item, registry));
 }
 
 /**
  * Check if any of the items is NOT a utility.batchAll transaction
  */
-export function hasNormalTransaction(items: BatchTxItem[], registry: Registry): boolean {
+export function hasNormalTransaction(
+  items: BatchTxItem[],
+  registry: Registry,
+): boolean {
   return items.some((item) => !isBatchAllTransaction(item, registry));
 }
 
@@ -51,11 +63,15 @@ export function calculateSelectionConstraints(
   item: BatchTxItem,
   selectedItems: BatchTxItem[],
   registry: Registry,
-  isSelected: boolean
+  isSelected: boolean,
 ) {
   const isBatchAll = isBatchAllTransaction(item, registry);
-  const hasBatchAllSelected = selectedItems.some((tx) => isBatchAllTransaction(tx, registry));
-  const hasNormalSelected = selectedItems.some((tx) => !isBatchAllTransaction(tx, registry));
+  const hasBatchAllSelected = selectedItems.some((tx) =>
+    isBatchAllTransaction(tx, registry),
+  );
+  const hasNormalSelected = selectedItems.some(
+    (tx) => !isBatchAllTransaction(tx, registry),
+  );
 
   // Disable selection if:
   // 1. This is a batchAll and normal transactions are selected

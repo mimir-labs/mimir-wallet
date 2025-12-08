@@ -3,7 +3,7 @@
 
 import type { NodeData } from './context';
 
-import { Avatar, Button, Chip } from '@mimir-wallet/ui';
+import { Avatar, Badge, Button } from '@mimir-wallet/ui';
 import { Handle, type Node, type NodeProps, Position } from '@xyflow/react';
 import React, { useContext } from 'react';
 
@@ -21,178 +21,193 @@ import PureIcon from '@/assets/images/pure-icon.svg';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
 import IconView from '@/assets/svg/icon-view.svg?react';
 
-const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
-  const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const { showAddressNodeOperations = true } = useContext(context);
-  const isPure = data.account.type === 'pure';
-  const isProxied = data.account.delegatees.length > 0;
-  const isMultisig = data.account.type === 'multisig';
+const AddressNode = React.memo(
+  ({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
+    const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
+    const { showAddressNodeOperations = true } = useContext(context);
+    const isPure = data.account.type === 'pure';
+    const isProxied = data.account.delegatees.length > 0;
+    const isMultisig = data.account.type === 'multisig';
 
-  let cell: React.ReactElement;
+    let cell: React.ReactElement;
 
-  if (data.account.type === 'pure' && data.account.isUnknownPure) {
-    cell = data.isTop ? (
-      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
-        <div className='bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full' />
-        <div className='z-10 flex h-full w-full flex-col items-center gap-[5px]'>
-          <Avatar src={PureIcon} style={{ width: 40 }} />
+    if (data.account.type === 'pure' && data.account.isUnknownPure) {
+      cell = data.isTop ? (
+        <div className="bg-background border-primary/5 relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5 shadow-md">
+          <div className="bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full" />
+          <div className="z-10 flex h-full w-full flex-col items-center gap-[5px]">
+            <Avatar src={PureIcon} style={{ width: 40 }} />
 
-          <h6>{data.account.name || 'Pending'}</h6>
-        </div>
-      </div>
-    ) : (
-      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
-        <div className={`flex min-w-0 flex-1 items-center gap-2.5`}>
-          <Avatar src={PureIcon} style={{ width: 30 }} />
-          <div className='flex min-w-0 flex-1 flex-col gap-y-[2px]'>
-            <div className='flex min-w-0 items-center gap-1'>
-              <span className='min-w-0 overflow-hidden text-left font-bold'>{data.account.name || 'Pending'}</span>
-            </div>
-
-            <div className='text-foreground/50 flex h-[16px] min-w-0 items-center text-xs'>...</div>
+            <h6>{data.account.name || 'Pending'}</h6>
           </div>
         </div>
-      </div>
-    );
-  } else {
-    cell = data.isTop ? (
-      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
-        <div className='bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full' />
-        <div className='z-10 flex h-full w-full flex-col items-center gap-[5px]'>
-          <IdentityIcon value={data.account.address} size={40} />
+      ) : (
+        <div className="bg-background border-primary/5 relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5 shadow-md">
+          <div className={`flex min-w-0 flex-1 items-center gap-2.5`}>
+            <Avatar src={PureIcon} style={{ width: 30 }} />
+            <div className="flex min-w-0 flex-1 flex-col gap-y-[2px]">
+              <div className="flex min-w-0 items-center gap-1">
+                <span className="min-w-0 overflow-hidden text-left font-bold">
+                  {data.account.name || 'Pending'}
+                </span>
+              </div>
 
-          <h6>
-            <AddressName value={data.account.address} />
-          </h6>
-
-          <div className='text-foreground/50 flex h-[16px] items-center text-xs whitespace-nowrap'>
-            <div className='mr-1 flex items-center gap-1'>
-              <AddressNetworks address={data.account.address} avatarSize={12} />
+              <div className="text-foreground/50 flex h-[16px] min-w-0 items-center text-xs">
+                ...
+              </div>
             </div>
-            <span>
-              <Address shorten value={data.account.address} />
-            </span>
-            {showAddressNodeOperations ? (
-              <>
-                <CopyAddress size='sm' address={data.account.address} className='opacity-50' />
+          </div>
+        </div>
+      );
+    } else {
+      cell = data.isTop ? (
+        <div className="bg-background border-primary/5 relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5 shadow-md">
+          <div className="bg-secondary absolute top-0 left-0 z-0 h-[30px] w-full" />
+          <div className="z-10 flex h-full w-full flex-col items-center gap-[5px]">
+            <IdentityIcon value={data.account.address} size={40} />
 
-                {!isLocalAccount(data.account.address) && !isLocalAddress(data.account.address) && (
+            <h6>
+              <AddressName value={data.account.address} />
+            </h6>
+
+            <div className="text-foreground/50 flex h-[16px] items-center text-xs whitespace-nowrap">
+              <div className="mr-1 flex items-center gap-1">
+                <AddressNetworks
+                  address={data.account.address}
+                  avatarSize={12}
+                />
+              </div>
+              <span>
+                <Address shorten value={data.account.address} />
+              </span>
+              {showAddressNodeOperations ? (
+                <>
+                  <CopyAddress
+                    size="sm"
+                    address={data.account.address}
+                    className="opacity-50"
+                  />
+
+                  {!isLocalAccount(data.account.address) &&
+                    !isLocalAddress(data.account.address) && (
+                      <Button
+                        isIconOnly
+                        onClick={() => {
+                          addAddressBook(data.account.address);
+                        }}
+                        variant="light"
+                        size="sm"
+                        className="text-foreground/50 h-[18px] w-[18px] opacity-50"
+                      >
+                        <IconAddressBook className="h-3 w-3" />
+                      </Button>
+                    )}
+
                   <Button
                     isIconOnly
+                    variant="light"
+                    size="sm"
+                    className="text-foreground/50 h-[18px] w-[18px] opacity-50"
                     onClick={() => {
-                      addAddressBook(data.account.address);
+                      window.open(
+                        `${window.location.origin}?address=${data.account.address}&tab=structure`,
+                        '_blank',
+                      );
                     }}
-                    variant='light'
-                    size='sm'
-                    className='text-foreground/50 h-[18px] w-[18px] opacity-50'
                   >
-                    <IconAddressBook className='h-3 w-3' />
+                    <IconView />
                   </Button>
-                )}
+                </>
+              ) : null}
+            </div>
 
+            <div className="flex items-center">
+              {isMultisig && <Badge variant="secondary">Multisig</Badge>}
+              {(isPure || isProxied) && (
+                <Badge variant="purple">{isPure ? 'Pure' : 'Proxied'}</Badge>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-background border-primary/5 relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5 shadow-md">
+          <AddressCell
+            value={data.account.address}
+            withAddressBook={showAddressNodeOperations}
+            withCopy={showAddressNodeOperations}
+            icons={
+              showAddressNodeOperations ? (
                 <Button
                   isIconOnly
-                  variant='light'
-                  size='sm'
-                  className='text-foreground/50 h-[18px] w-[18px] opacity-50'
+                  variant="light"
+                  size="sm"
+                  className="text-foreground/50 h-[18px] w-[18px] opacity-50"
                   onClick={() => {
-                    window.open(`${window.location.origin}?address=${data.account.address}&tab=structure`, '_blank');
+                    window.open(
+                      `${window.location.origin}?address=${data.account.address}&tab=structure`,
+                      '_blank',
+                    );
                   }}
                 >
                   <IconView />
                 </Button>
-              </>
-            ) : null}
-          </div>
-
-          <div className='flex items-center'>
-            {isMultisig && (
-              <Chip color='secondary' size='sm'>
-                Multisig
-              </Chip>
-            )}
-            {(isPure || isProxied) && (
-              <Chip color='default' className='bg-[#B700FF]/5 text-[#B700FF]' size='sm'>
-                {isPure ? 'Pure' : 'Proxied'}
-              </Chip>
-            )}
-          </div>
+              ) : undefined
+            }
+          />
         </div>
-      </div>
-    ) : (
-      <div className='bg-content1 border-primary/5 shadow-small relative w-[240px] overflow-hidden rounded-[10px] border-1 p-2.5'>
-        <AddressCell
-          value={data.account.address}
-          withAddressBook={showAddressNodeOperations}
-          withCopy={showAddressNodeOperations}
-          icons={
-            showAddressNodeOperations ? (
-              <Button
-                isIconOnly
-                variant='light'
-                size='sm'
-                className='text-foreground/50 h-[18px] w-[18px] opacity-50'
-                onClick={() => {
-                  window.open(`${window.location.origin}?address=${data.account.address}&tab=structure`, '_blank');
-                }}
-              >
-                <IconView />
-              </Button>
-            ) : undefined
-          }
-        />
-      </div>
-    );
-  }
+      );
+    }
 
-  return (
-    <>
-      {(data.account.type === 'multisig' || !!data.account.delegatees.length) && (
-        <Handle
-          isConnectable={isConnectable}
-          position={Position.Left}
-          style={{
-            zIndex: 1,
-            top: 29,
-            width: 5,
-            height: 18,
-            left: 2.5,
-            borderRadius: '10px',
-            background:
-              isPure || isProxied
-                ? '#B700FF'
-                : isMultisig
-                  ? 'hsl(var(--heroui-primary))'
-                  : 'hsl(var(--heroui-divider-300))'
-          }}
-          type='source'
-        />
-      )}
-      {cell}
-      {!data.isTop && (
-        <Handle
-          isConnectable={isConnectable}
-          position={Position.Right}
-          style={{
-            zIndex: 1,
-            top: 29,
-            width: 5,
-            height: 18,
-            right: 2.5,
-            borderRadius: '10px',
-            background:
-              data.type === 'proxy'
-                ? '#B700FF'
-                : data.type === 'multisig'
-                  ? 'hsl(var(--heroui-primary))'
-                  : 'hsl(var(--heroui-divider-300))'
-          }}
-          type='target'
-        />
-      )}
-    </>
-  );
-});
+    return (
+      <>
+        {(data.account.type === 'multisig' ||
+          !!data.account.delegatees.length) && (
+          <Handle
+            isConnectable={isConnectable}
+            position={Position.Left}
+            style={{
+              zIndex: 1,
+              top: 29,
+              width: 5,
+              height: 18,
+              left: 2.5,
+              borderRadius: '10px',
+              background:
+                isPure || isProxied
+                  ? '#B700FF'
+                  : isMultisig
+                    ? 'var(--primary)'
+                    : 'var(--border)',
+            }}
+            type="source"
+          />
+        )}
+        {cell}
+        {!data.isTop && (
+          <Handle
+            isConnectable={isConnectable}
+            position={Position.Right}
+            style={{
+              zIndex: 1,
+              top: 29,
+              width: 5,
+              height: 18,
+              right: 2.5,
+              borderRadius: '10px',
+              background:
+                data.type === 'proxy'
+                  ? '#B700FF'
+                  : data.type === 'multisig'
+                    ? 'var(--primary)'
+                    : 'var(--border)',
+            }}
+            type="target"
+          />
+        )}
+      </>
+    );
+  },
+);
 
 AddressNode.displayName = 'AddressNode';
 

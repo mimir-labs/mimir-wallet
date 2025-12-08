@@ -15,7 +15,7 @@ export const Route = createFileRoute('/_authenticated/extrinsic')({
     throw redirect({
       to: '/explorer/$url',
       params: { url: 'mimir://app/submit-calldata' },
-      replace: true
+      replace: true,
     });
-  }
+  },
 });

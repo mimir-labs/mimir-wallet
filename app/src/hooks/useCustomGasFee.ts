@@ -9,13 +9,19 @@ import { useMemo, useState } from 'react';
 
 import { useChainXcmAsset } from './useXcmAssets';
 
-async function fetchCustomGasFeeSupport({ queryKey }: { queryKey: readonly [string, string] }): Promise<boolean> {
+async function fetchCustomGasFeeSupport({
+  queryKey,
+}: {
+  queryKey: readonly [string, string];
+}): Promise<boolean> {
   const [, network] = queryKey;
 
   const api = await ApiManager.getInstance().getApi(network);
 
   // Check if the chain has ChargeAssetTxPayment signed extension
-  return api.registry.signedExtensions.some((ext) => ext === 'ChargeAssetTxPayment');
+  return api.registry.signedExtensions.some(
+    (ext) => ext === 'ChargeAssetTxPayment',
+  );
 }
 
 /**
@@ -28,7 +34,7 @@ export function useCustomGasFeeSupport(network: string): boolean {
     queryKey: ['custom-gas-fee-support', network] as const,
     queryFn: fetchCustomGasFeeSupport,
     enabled: !!network,
-    staleTime: Infinity // Support status doesn't change
+    staleTime: Infinity, // Support status doesn't change
   });
 
   return data ?? false;
@@ -47,7 +53,9 @@ export function useCustomGasFee(network: string) {
   // Include native token and local assets (exclude foreignAssets)
   const feeEligibleAssets = useMemo(() => {
     return assets.filter((asset) => {
-      return isSupported ? asset.isNative || asset.isSufficient : !!asset.isNative;
+      return isSupported
+        ? asset.isNative || asset.isSufficient
+        : !!asset.isNative;
     });
   }, [assets, isSupported]);
 
@@ -70,14 +78,16 @@ export function useCustomGasFee(network: string) {
     selectedAssetId,
     setSelectedAssetId,
     isFetched,
-    isFetching
+    isFetching,
   };
 }
 
 /**
  * Get the asset ID in the format expected by the transaction
  */
-export function getTransactionAssetId(asset: CompleteEnhancedAssetInfo | null): string | null {
+export function getTransactionAssetId(
+  asset: CompleteEnhancedAssetInfo | null,
+): string | null {
   if (!asset) {
     return null;
   }

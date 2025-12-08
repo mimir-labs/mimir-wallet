@@ -14,7 +14,12 @@ interface Props {
   label?: string;
   height: number | string;
   className?: string;
-  variant?: 'account' | 'select-account' | 'default' | 'favorite-dapps' | 'pending-transaction';
+  variant?:
+    | 'account'
+    | 'select-account'
+    | 'default'
+    | 'favorite-dapps'
+    | 'pending-transaction';
 }
 
 function Empty({ height, label, variant = 'default', className = '' }: Props) {
@@ -26,12 +31,20 @@ function Empty({ height, label, variant = 'default', className = '' }: Props) {
         return (
           <>
             <img src={EmptyFavoriteDapp} />
-            <div className='text-center'>
+            <div className="text-center">
               <h6>{`You haven't favorited any apps yet.`}</h6>
-              <p className='text-foreground/50 text-sm'>You can go to the App page to add them to your favorites.</p>
+              <p className="text-foreground/50 text-sm">
+                You can go to the App page to add them to your favorites.
+              </p>
             </div>
-            <Button asChild size='sm' color='primary' variant='ghost' radius='full'>
-              <Link to='/dapp'>Go To Apps</Link>
+            <Button
+              asChild
+              size="sm"
+              color="primary"
+              variant="ghost"
+              radius="full"
+            >
+              <Link to="/dapp">Go To Apps</Link>
             </Button>
           </>
         );
@@ -39,16 +52,28 @@ function Empty({ height, label, variant = 'default', className = '' }: Props) {
         return (
           <>
             <img src={EmptyPendingTransactions} />
-            <p className='text-base'>No Pending Transaction</p>
+            <p className="text-base">No Pending Transaction</p>
           </>
         );
       default:
         return (
           <>
             <img
-              alt='null'
-              src={variant === 'account' ? EmptyAccount : variant === 'select-account' ? EmptySelectAccount : NullImg}
-              width={variant === 'account' ? 52 : variant === 'select-account' ? 55 : 100}
+              alt="null"
+              src={
+                variant === 'account'
+                  ? EmptyAccount
+                  : variant === 'select-account'
+                    ? EmptySelectAccount
+                    : NullImg
+              }
+              width={
+                variant === 'account'
+                  ? 52
+                  : variant === 'select-account'
+                    ? 55
+                    : 100
+              }
             />
             <span>
               {label ||

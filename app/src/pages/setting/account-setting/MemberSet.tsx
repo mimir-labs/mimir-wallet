@@ -3,7 +3,13 @@
 
 import type { MultisigAccountData, PureAccountData } from '@/hooks/types';
 
-import { allEndpoints, ApiManager, remoteProxyRelations, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  allEndpoints,
+  ApiManager,
+  remoteProxyRelations,
+  useNetwork,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
 import { Alert, AlertDescription, AlertTitle, Avatar } from '@mimir-wallet/ui';
 import { u8aToHex } from '@polkadot/util';
@@ -19,7 +25,7 @@ import { Input, TxButton } from '@/components';
 function checkError(
   signatories: string[],
   isThresholdValid: boolean,
-  hasSoloAccount: boolean
+  hasSoloAccount: boolean,
 ): [Error | null, Error | null] {
   return [
     signatories.length < 2
@@ -27,14 +33,18 @@ function checkError(
       : hasSoloAccount
         ? null
         : new Error('You need add at least one local account'),
-    isThresholdValid ? null : new Error(`Threshold must great than 1 and less equal than ${signatories.length}`)
+    isThresholdValid
+      ? null
+      : new Error(
+          `Threshold must great than 1 and less equal than ${signatories.length}`,
+        ),
   ];
 }
 
 function MemberSet({
   account,
   pureAccount,
-  disabled
+  disabled,
 }: {
   account: MultisigAccountData;
   pureAccount?: PureAccountData;
@@ -44,12 +54,22 @@ function MemberSet({
   const genesisHash = chain.genesisHash;
   const { ss58: chainSS58 } = useSs58Format();
 
-  const { hasSoloAccount, isThresholdValid, select, setThreshold, signatories, threshold, unselect, unselected } =
-    useSetMembers(
-      account.members.map((item) => item.address),
-      account.threshold
-    );
-  const [[memberError, thresholdError], setErrors] = useState<[Error | null, Error | null]>([null, null]);
+  const {
+    hasSoloAccount,
+    isThresholdValid,
+    select,
+    setThreshold,
+    signatories,
+    threshold,
+    unselect,
+    unselected,
+  } = useSetMembers(
+    account.members.map((item) => item.address),
+    account.threshold,
+  );
+  const [[memberError, thresholdError], setErrors] = useState<
+    [Error | null, Error | null]
+  >([null, null]);
 
   const checkField = useCallback((): boolean => {
     const errors = checkError(signatories, isThresholdValid, hasSoloAccount);
@@ -63,66 +83,70 @@ function MemberSet({
     (value: string) => {
       setThreshold(Number(value));
     },
-    [setThreshold]
+    [setThreshold],
   );
   const remoteProxyChain = useMemo(
     () =>
       remoteProxyRelations[genesisHash]
-        ? allEndpoints.find((item) => item.genesisHash === remoteProxyRelations[genesisHash])
+        ? allEndpoints.find(
+            (item) => item.genesisHash === remoteProxyRelations[genesisHash],
+          )
         : null,
-    [genesisHash]
+    [genesisHash],
   );
 
   return (
-    <div className='space-y-5'>
+    <div className="space-y-5">
       {!pureAccount && (
-        <div className='text-warning font-bold'>{`Multisig account can's change threshold and members`}</div>
+        <div className="text-warning font-bold">{`Multisig account can's change threshold and members`}</div>
       )}
       <div
-        className='space-y-5'
+        className="space-y-5"
         style={{
           opacity: !pureAccount || disabled ? 0.5 : undefined,
-          pointerEvents: !pureAccount || disabled ? 'none' : undefined
+          pointerEvents: !pureAccount || disabled ? 'none' : undefined,
         }}
       >
-        <div className='bg-secondary rounded-[10px] p-2.5'>
+        <div className="bg-secondary rounded-[10px] p-2.5">
           <AccountSelect
             withSearch
             scroll
             accounts={unselected}
             ignoreAccounts={signatories}
             onClick={select}
-            title='Addresss book'
-            type='add'
+            title="Addresss book"
+            type="add"
           />
         </div>
 
-        <div className='bg-secondary rounded-[10px] p-2.5'>
+        <div className="bg-secondary rounded-[10px] p-2.5">
           <AccountSelect
             scroll={false}
             accounts={signatories}
             onClick={unselect}
             title={`Multisig Members(${signatories.length})`}
-            type='delete'
+            type="delete"
           />
 
-          {memberError && <div className='text-danger'>{memberError.message}</div>}
+          {memberError && (
+            <div className="text-danger">{memberError.message}</div>
+          )}
         </div>
         <Input
           defaultValue={String(threshold)}
           error={thresholdError}
-          label='Threshold'
+          label="Threshold"
           onChange={_onChangeThreshold}
         />
 
-        <Alert variant='warning'>
-          <AlertTitle className='font-bold'>Notice</AlertTitle>
-          <AlertDescription className='text-foreground/50 text-xs'>
-            <ul className='list-outside list-disc'>
+        <Alert variant="warning">
+          <AlertTitle className="font-bold">Notice</AlertTitle>
+          <AlertDescription className="text-foreground/50 text-xs">
+            <ul className="list-outside list-disc">
               <li>
-                <span className='inline-flex items-center'>
+                <span className="inline-flex items-center">
                   You are trying to modify memebers on&nbsp;
-                  <Avatar src={chain.icon} className='h-4 w-4 bg-transparent' />
+                  <Avatar src={chain.icon} className="h-4 w-4 bg-transparent" />
                   &nbsp;
                   {chain.name}.
                 </span>
@@ -138,10 +162,10 @@ function MemberSet({
                   />{' '}
                   {remoteProxyChain.name} due to{' '}
                   <a
-                    className='underline'
-                    target='_blank'
-                    href='https://blog.kchr.de/ecosystem-proxy/'
-                    rel='noreferrer'
+                    className="underline"
+                    target="_blank"
+                    href="https://blog.kchr.de/ecosystem-proxy/"
+                    rel="noreferrer"
                   >
                     Remote Proxy
                   </a>
@@ -153,7 +177,7 @@ function MemberSet({
 
         <TxButton
           fullWidth
-          color='primary'
+          color="primary"
           accountId={pureAccount?.address}
           getCall={async () => {
             if (!checkField()) {
@@ -165,22 +189,26 @@ function MemberSet({
             }
 
             const oldMultiAddress = account.address;
-            const newMultiAddress = encodeMultiAddress(signatories, threshold, chainSS58);
+            const newMultiAddress = encodeMultiAddress(
+              signatories,
+              threshold,
+              chainSS58,
+            );
 
             const api = await ApiManager.getInstance().getApi(network);
 
             return api.tx.utility.batchAll([
               api.tx.proxy.addProxy(newMultiAddress, 0, 0).method.toU8a(),
-              api.tx.proxy.removeProxy(oldMultiAddress, 0, 0).method.toU8a()
+              api.tx.proxy.removeProxy(oldMultiAddress, 0, 0).method.toU8a(),
             ]);
           }}
-          website='mimir://internal/setup'
+          website="mimir://internal/setup"
           beforeSend={() =>
             service.multisig.createMultisig(
               network,
               signatories.map((address) => u8aToHex(decodeAddress(address))),
               threshold,
-              account.name
+              account.name,
             )
           }
         >

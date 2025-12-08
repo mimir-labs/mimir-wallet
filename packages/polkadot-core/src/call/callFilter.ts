@@ -4,22 +4,47 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { CallFunction, IMethod } from '@polkadot/types/types';
 
-export function matchProxyType(proxyType: string, callFunction: CallFunction): boolean {
+export function matchProxyType(
+  proxyType: string,
+  callFunction: CallFunction,
+): boolean {
   const match = {
     Any: () => true,
     NonTransfer: () =>
-      !['balances', 'assets', 'nftFractionalization', 'nfts', 'uniques'].includes(callFunction.section),
+      ![
+        'balances',
+        'assets',
+        'nftFractionalization',
+        'nfts',
+        'uniques',
+      ].includes(callFunction.section),
     Staking: () =>
-      ['staking', 'utility', 'session', 'fastUnstake', 'voterList', 'nominationPools'].includes(callFunction.section),
-    NominationPools: () => ['nominationPools', 'utility'].includes(callFunction.section),
+      [
+        'staking',
+        'utility',
+        'session',
+        'fastUnstake',
+        'voterList',
+        'nominationPools',
+      ].includes(callFunction.section),
+    NominationPools: () =>
+      ['nominationPools', 'utility'].includes(callFunction.section),
     SudoBalances: () => ['sudo', 'utility'].includes(callFunction.section),
-    Governance: () => ['convictionVoting', 'referenda', 'whitelist'].includes(callFunction.section),
-    Auction: () => ['auctions', 'crowdloan', 'registrar', 'slots'].includes(callFunction.section),
+    Governance: () =>
+      ['convictionVoting', 'referenda', 'whitelist'].includes(
+        callFunction.section,
+      ),
+    Auction: () =>
+      ['auctions', 'crowdloan', 'registrar', 'slots'].includes(
+        callFunction.section,
+      ),
     IdentityJudgement: () =>
-      (callFunction.section === 'identity' && callFunction.method === 'provideJudgement') ||
+      (callFunction.section === 'identity' &&
+        callFunction.method === 'provideJudgement') ||
       ['utility'].includes(callFunction.section),
     CancelProxy: () =>
-      (callFunction.section === 'proxy' && callFunction.method === 'rejectAnnouncement') ||
+      (callFunction.section === 'proxy' &&
+        callFunction.method === 'rejectAnnouncement') ||
       callFunction.section === 'utility' ||
       callFunction.section === 'multisig',
     Assets: () =>
@@ -41,7 +66,7 @@ export function matchProxyType(proxyType: string, callFunction: CallFunction): b
           'setTeam',
           'setMetadata',
           'clearMetadata',
-          'setMinBalance'
+          'setMinBalance',
         ].includes(callFunction.method)) ||
       (callFunction.section === 'nfts' &&
         [
@@ -51,7 +76,7 @@ export function matchProxyType(proxyType: string, callFunction: CallFunction): b
           'transferOwnership',
           'setTeam',
           'setCollectionMaxSupply',
-          'lockCollection'
+          'lockCollection',
         ].includes(callFunction.method)) ||
       (callFunction.section === 'uniques' &&
         [
@@ -65,15 +90,23 @@ export function matchProxyType(proxyType: string, callFunction: CallFunction): b
           'clearMetadata',
           'clearAttribute',
           'clearCollection_metadata',
-          'setCollectionMaxSupply'
+          'setCollectionMaxSupply',
         ].includes(callFunction.method)) ||
       callFunction.section === 'utility' ||
       callFunction.section === 'multisig',
     AssetManager: () =>
       (callFunction.section === 'assets' &&
-        ['mint', 'burn', 'freeze', 'block', 'thaw', 'freezeAsset', 'thawAsset', 'touchOther', 'refundOther'].includes(
-          callFunction.method
-        )) ||
+        [
+          'mint',
+          'burn',
+          'freeze',
+          'block',
+          'thaw',
+          'freezeAsset',
+          'thawAsset',
+          'touchOther',
+          'refundOther',
+        ].includes(callFunction.method)) ||
       (callFunction.section === 'nfts' &&
         [
           'forceMint',
@@ -86,14 +119,27 @@ export function matchProxyType(proxyType: string, callFunction: CallFunction): b
           'setMetadata',
           'clearMetadata',
           'setCollectionMetadata',
-          'clearCollectionMetadata'
+          'clearCollectionMetadata',
         ].includes(callFunction.method)) ||
       (callFunction.section === 'uniques' &&
-        ['mint', 'burn', 'freeze', 'thaw', 'freezeCollection', 'thawCollection'].includes(callFunction.method)) ||
+        [
+          'mint',
+          'burn',
+          'freeze',
+          'thaw',
+          'freezeCollection',
+          'thawCollection',
+        ].includes(callFunction.method)) ||
       callFunction.section === 'utility' ||
       callFunction.section === 'multisig',
-    Collator: () => ['collatorSelection', 'utility', 'multisig'].includes(callFunction.section),
-    Alliance: () => ['allianceMotion', 'alliance', 'utility', 'multisig'].includes(callFunction.section),
+    Collator: () =>
+      ['collatorSelection', 'utility', 'multisig'].includes(
+        callFunction.section,
+      ),
+    Alliance: () =>
+      ['allianceMotion', 'alliance', 'utility', 'multisig'].includes(
+        callFunction.section,
+      ),
     Fellowship: () =>
       [
         'fellowshipCollective',
@@ -102,7 +148,7 @@ export function matchProxyType(proxyType: string, callFunction: CallFunction): b
         'fellowshipSalary',
         'fellowshipTreasury',
         'utility',
-        'multisig'
+        'multisig',
       ].includes(callFunction.section),
     Ambassador: () =>
       [
@@ -112,8 +158,8 @@ export function matchProxyType(proxyType: string, callFunction: CallFunction): b
         'ambassadorCore',
         'ambassadorSalary',
         'utility',
-        'multisig'
-      ].includes(callFunction.section)
+        'multisig',
+      ].includes(callFunction.section),
   }[proxyType];
 
   if (match) {
@@ -151,29 +197,51 @@ export function isSuperset(x: string, y: string) {
   return false;
 }
 
-export function callFilter(api: ApiPromise, proxyType: string, address: string, method: IMethod) {
+export function callFilter(
+  api: ApiPromise,
+  proxyType: string,
+  address: string,
+  method: IMethod,
+) {
   const callFunction = api.registry.findMetaCall(method.callIndex);
 
   if (!matchProxyType(proxyType, callFunction)) {
-    throw new Error(`Insufficient permissions to initiate ${callFunction.section}.${callFunction.method}`);
+    throw new Error(
+      `Insufficient permissions to initiate ${callFunction.section}.${callFunction.method}`,
+    );
   }
 
-  if (api.tx.proxy?.addProxy.is(method) || api.tx.proxy?.removeProxy.is(method)) {
+  if (
+    api.tx.proxy?.addProxy.is(method) ||
+    api.tx.proxy?.removeProxy.is(method)
+  ) {
     const subType: string = method.args[1].type;
 
     if (!isSuperset(proxyType, subType)) {
-      throw new Error('Proxy call cannot add or remove a proxy with more permissions than it already has.');
+      throw new Error(
+        'Proxy call cannot add or remove a proxy with more permissions than it already has.',
+      );
     }
   }
 
-  if (api.tx.proxy?.killPure.is(method) || api.tx.proxy?.removeProxies.is(method)) {
+  if (
+    api.tx.proxy?.killPure.is(method) ||
+    api.tx.proxy?.removeProxies.is(method)
+  ) {
     if (proxyType !== 'Any') {
-      throw new Error('Proxy call cannot remove all proxies or kill pure proxies unless it has full permissions.');
+      throw new Error(
+        'Proxy call cannot remove all proxies or kill pure proxies unless it has full permissions.',
+      );
     }
   }
 
   if (api.tx.proxy?.proxy.is(method)) {
-    callFilter(api, method.args[1].unwrapOrDefault().type, method.args[0].toString(), method.args[2]);
+    callFilter(
+      api,
+      method.args[1].unwrapOrDefault().type,
+      method.args[0].toString(),
+      method.args[2],
+    );
   } else if (
     api.tx.utility?.batch.is(method) ||
     api.tx.utility?.batchAll.is(method) ||

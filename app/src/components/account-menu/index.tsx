@@ -3,9 +3,22 @@
 
 import type { AccountData, AddressMeta } from '@/hooks/types';
 
-import { addressEq, addressToHex, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  addressToHex,
+  encodeAddress,
+  isPolkadotAddress,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button, Divider, Drawer, DrawerContent, DrawerFooter, DrawerHeader } from '@mimir-wallet/ui';
+import {
+  Button,
+  Divider,
+  Drawer,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+} from '@mimir-wallet/ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AccountCell from './AccountCell';
@@ -33,7 +46,11 @@ interface Props {
   onClose?: () => void;
 }
 
-function filterKeywords(address: string, keywords: string, metas: Record<string, AddressMeta>) {
+function filterKeywords(
+  address: string,
+  keywords: string,
+  metas: Record<string, AddressMeta>,
+) {
   const addressHex = addressToHex(address);
 
   const meta = metas[addressHex];
@@ -41,7 +58,9 @@ function filterKeywords(address: string, keywords: string, metas: Record<string,
 
   return (
     address.toLowerCase().includes(keywords.toLowerCase()) ||
-    (meta?.name ? meta?.name.toLowerCase().includes(keywords.toLowerCase()) : false) ||
+    (meta?.name
+      ? meta?.name.toLowerCase().includes(keywords.toLowerCase())
+      : false) ||
     (identity ? identity.toLowerCase().includes(keywords.toLowerCase()) : false)
   );
 }
@@ -49,7 +68,15 @@ function filterKeywords(address: string, keywords: string, metas: Record<string,
 function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   const [keywords, setKeywords] = useState<string>('');
   const { ss58: chainSS58 } = useSs58Format();
-  const { current, setCurrent, addresses, addAddressBook, accounts, hideAccountHex, metas } = useAccount();
+  const {
+    current,
+    setCurrent,
+    addresses,
+    addAddressBook,
+    accounts,
+    hideAccountHex,
+    metas,
+  } = useAccount();
   const [isSearching, setIsSearching] = useState(false);
   const [searchAccount, setSearchAccount] = useState<AccountData>();
   const [isMimirExpanded, setIsMimirExpanded] = useState(true);
@@ -76,18 +103,27 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
   // Derive grouped accounts from keywords filter
   const grouped = useMemo(() => {
     if (!keywords) {
-      return groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas);
+      return groupAccounts(
+        accounts,
+        hideAccountHex.concat(pinnedAccounts),
+        metas,
+      );
     }
 
     if (isPolkadotAddress(keywords)) {
       return groupAccounts(
         accounts.filter((account) => addressEq(account.address, keywords)),
         hideAccountHex.concat(pinnedAccounts),
-        metas
+        metas,
       );
     }
 
-    return groupAccounts(accounts, hideAccountHex.concat(pinnedAccounts), metas, keywords);
+    return groupAccounts(
+      accounts,
+      hideAccountHex.concat(pinnedAccounts),
+      metas,
+      keywords,
+    );
   }, [accounts, hideAccountHex, keywords, metas, pinnedAccounts]);
 
   // Async search effect for polkadot addresses
@@ -127,7 +163,7 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
       onClose?.();
     },
-    [onClose, current, setCurrent]
+    [onClose, current, setCurrent],
   );
 
   const watchlist = useMemo(
@@ -145,26 +181,32 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
         return filterKeywords(address, keywords, metas);
       }),
-    [addresses, keywords, metas, pinnedAccounts]
+    [addresses, keywords, metas, pinnedAccounts],
   );
 
   return (
     <Drawer onClose={onClose} open={open} direction={anchor}>
       <DrawerContent
         data-mobile={!upSm}
-        className='w-full max-w-[320px] data-[mobile=true]:rounded-l-[20px] sm:max-w-[400px]'
+        className="w-full max-w-[320px] data-[mobile=true]:rounded-l-[20px] sm:max-w-[400px]"
       >
-        <DrawerHeader className='flex-col'>
-          <h3 className='sm:none mb-2.5 flex items-center justify-between'>Menu</h3>
+        <DrawerHeader className="flex-col">
+          <h3 className="sm:none mb-2.5 flex items-center justify-between">
+            Menu
+          </h3>
 
-          <Search onChange={setKeywords} isSearching={isSearching} value={keywords} />
+          <Search
+            onChange={setKeywords}
+            isSearching={isSearching}
+            value={keywords}
+          />
         </DrawerHeader>
 
-        <div className='scrollbar-hide w-full space-y-2.5 overflow-y-auto px-4 text-xs sm:text-sm'>
+        <div className="scrollbar-hide w-full space-y-2.5 overflow-y-auto px-4 text-xs sm:text-sm">
           {searchAccount && (
             <>
-              <div className='flex flex-1 items-center gap-1'>
-                <IconGlobal className='opacity-60' />
+              <div className="flex flex-1 items-center gap-1">
+                <IconGlobal className="opacity-60" />
                 Searched Account
               </div>
 
@@ -182,12 +224,17 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
           {current && !keywordsIsPolkadotAddress && (
             <>
-              <div className='flex items-center gap-1'>
-                <IconUser className='opacity-60' />
+              <div className="flex items-center gap-1">
+                <IconUser className="opacity-60" />
                 Current Wallet
               </div>
 
-              <AccountCell key={`current-${current}`} onClose={onClose} value={current} selected />
+              <AccountCell
+                key={`current-${current}`}
+                onClose={onClose}
+                value={current}
+                selected
+              />
 
               <Divider />
             </>
@@ -195,8 +242,8 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
           {visiblePinnedAccounts.length > 0 && (
             <>
-              <div className='flex items-center gap-1'>
-                <IconPin className='h-4 w-4 opacity-60' />
+              <div className="flex items-center gap-1">
+                <IconPin className="h-4 w-4 opacity-60" />
                 Pinned Wallet
               </div>
 
@@ -215,21 +262,21 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
           {grouped.mimir.length > 0 && (
             <>
               <div
-                className='flex cursor-pointer items-center gap-1'
+                className="flex cursor-pointer items-center gap-1"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsMimirExpanded(!isMimirExpanded);
                 }}
               >
-                <IconUnion className='opacity-60' />
-                <span className='flex-1'>Mimir Wallet</span>
+                <IconUnion className="opacity-60" />
+                <span className="flex-1">Mimir Wallet</span>
                 <Button
                   continuePropagation
                   isIconOnly
-                  size='sm'
-                  variant='light'
+                  size="sm"
+                  variant="light"
                   data-expanded={isMimirExpanded}
-                  className='text-inherit data-[expanded=true]:rotate-180'
+                  className="text-inherit data-[expanded=true]:rotate-180"
                   onClick={() => setIsMimirExpanded(!isMimirExpanded)}
                 >
                   <ArrowDownIcon />
@@ -253,8 +300,8 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
           {grouped.injected.length > 0 && (
             <>
-              <div className='flex items-center gap-1'>
-                <IconExtension className='opacity-60' />
+              <div className="flex items-center gap-1">
+                <IconExtension className="opacity-60" />
                 Extension Wallet
               </div>
               {grouped.injected.map((account) => (
@@ -271,16 +318,16 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
           )}
 
           {!keywordsIsPolkadotAddress && (
-            <div className='flex items-center gap-1'>
-              <span className='flex flex-1 items-center gap-1'>
-                <IconWatch className='opacity-60' />
+            <div className="flex items-center gap-1">
+              <span className="flex flex-1 items-center gap-1">
+                <IconWatch className="opacity-60" />
                 Watchlist
               </span>
               <Button
                 isIconOnly
-                className='text-inherit'
-                size='sm'
-                variant='light'
+                className="text-inherit"
+                size="sm"
+                variant="light"
                 onClick={() => addAddressBook(undefined, true)}
               >
                 <IconAdd />

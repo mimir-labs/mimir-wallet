@@ -5,20 +5,34 @@
 
 import type { ComponentProps, HTMLAttributes, ReactNode } from 'react';
 
-import { Button, cn } from '@mimir-wallet/ui';
+import { Button, cn, Skeleton } from '@mimir-wallet/ui';
 import { CheckIcon, CopyIcon } from 'lucide-react';
-import { createContext, useContext, useState } from 'react';
-import { Prism as SyntaxHighlighterComponent } from 'react-syntax-highlighter';
-import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { createContext, lazy, Suspense, useContext, useState } from 'react';
 
-const SyntaxHighlighter = SyntaxHighlighterComponent as any;
+// Lazy load the syntax highlighter component (~640KB)
+const SyntaxHighlighterWrapper = lazy(() =>
+  import('./syntax-highlighter.js').then((mod) => ({
+    default: mod.SyntaxHighlighterWrapper,
+  })),
+);
+
+function CodeBlockSkeleton() {
+  return (
+    <div className="space-y-2 p-4">
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-4 w-1/3" />
+    </div>
+  );
+}
 
 type CodeBlockContextType = {
   code: string;
 };
 
 const CodeBlockContext = createContext<CodeBlockContextType>({
-  code: ''
+  code: '',
 });
 
 export type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
@@ -39,54 +53,24 @@ export const CodeBlock = ({
   <CodeBlockContext.Provider value={{ code }}>
     <div
       className={cn(
-        'bg-background text-foreground border-divider-300 relative w-full overflow-hidden rounded-[10px] border',
-        className
+        'bg-background text-foreground border-divider relative w-full overflow-hidden rounded-[10px] border',
+        className,
       )}
       {...props}
     >
-      <div className='relative'>
-        <SyntaxHighlighter
-          className='overflow-hidden dark:hidden'
-          codeTagProps={{
-            className: 'font-mono text-sm'
-          }}
-          customStyle={{
-            margin: 0,
-            padding: '1rem',
-            fontSize: '0.875rem'
-          }}
-          language={language}
-          lineNumberStyle={{
-            paddingRight: '1rem',
-            minWidth: '2.5rem'
-          }}
-          showLineNumbers={showLineNumbers}
-          style={oneLight}
-        >
-          {code}
-        </SyntaxHighlighter>
-        <SyntaxHighlighter
-          className='hidden overflow-hidden dark:block'
-          codeTagProps={{
-            className: 'font-mono text-sm'
-          }}
-          customStyle={{
-            margin: 0,
-            padding: '1rem',
-            fontSize: '0.875rem',
-            color: 'hsl(var(--foreground))'
-          }}
-          language={language}
-          lineNumberStyle={{
-            paddingRight: '1rem',
-            minWidth: '2.5rem'
-          }}
-          showLineNumbers={showLineNumbers}
-          style={oneDark}
-        >
-          {code}
-        </SyntaxHighlighter>
-        {children && <div className='absolute top-2 right-2 flex items-center gap-2'>{children}</div>}
+      <div className="relative">
+        <Suspense fallback={<CodeBlockSkeleton />}>
+          <SyntaxHighlighterWrapper
+            code={code}
+            language={language}
+            showLineNumbers={showLineNumbers}
+          />
+        </Suspense>
+        {children && (
+          <div className="absolute top-2 right-2 flex items-center gap-2">
+            {children}
+          </div>
+        )}
       </div>
     </div>
   </CodeBlockContext.Provider>
@@ -133,8 +117,8 @@ export const CodeBlockCopyButton = ({
       className={cn('shrink-0', className)}
       onClick={copyToClipboard}
       isIconOnly
-      size='sm'
-      variant='ghost'
+      size="sm"
+      variant="ghost"
       {...props}
     >
       {children ?? <Icon size={14} />}

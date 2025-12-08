@@ -4,18 +4,31 @@
 import type { AccountData, AddressMeta } from '@/hooks/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { useNetwork, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
+import {
+  useNetwork,
+  useSs58Format,
+  zeroAddress,
+} from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalHeader } from '@mimir-wallet/ui';
-import React, { useEffect, useState } from 'react';
+import {
+  Button,
+  buttonSpinner,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+} from '@mimir-wallet/ui';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
 
 import { AddressMetaContext } from '@/accounts/useAccount';
 import { transformAccount } from '@/accounts/useQueryAccount';
-import { AddressOverview } from '@/components';
+import { FlowSkeleton } from '@/components';
 import { toastError } from '@/components/utils';
+
+const AddressOverview = lazy(() => import('@/components/AddressOverview'));
 
 interface ProxyAccountStructureProps {
   proxy: string;
@@ -32,7 +45,7 @@ function ProxyAccountStructure({
   pureName,
   isPureProxy,
   proxyType,
-  hasDelay
+  hasDelay,
 }: ProxyAccountStructureProps) {
   const { chain } = useNetwork();
   const genesisHash = chain.genesisHash;
@@ -51,7 +64,7 @@ function ProxyAccountStructure({
         name: '',
         address: proxy,
         createdAt: 0,
-        delegatees: []
+        delegatees: [],
       };
 
       if (isPureProxy) {
@@ -66,8 +79,8 @@ function ProxyAccountStructure({
               ...delegatee,
               proxyDelay: hasDelay ? 1 : 0, //mock,
               proxyNetwork: genesisHash,
-              proxyType
-            }
+              proxyType,
+            },
           ],
           createdBlock: '0',
           createdBlockHash: '0x',
@@ -75,7 +88,7 @@ function ProxyAccountStructure({
           createdExtrinsicIndex: 1,
           creator: '0x',
           disambiguationIndex: 0,
-          network: genesisHash
+          network: genesisHash,
         });
       } else if (proxied) {
         setProxyAccount({
@@ -87,10 +100,10 @@ function ProxyAccountStructure({
               ...delegatee,
               proxyDelay: hasDelay ? 1 : 0, //mock,
               proxyNetwork: genesisHash,
-              proxyType
-            }
+              proxyType,
+            },
           ],
-          createdAt: 0
+          createdAt: 0,
         });
       }
     });
@@ -102,7 +115,9 @@ function ProxyAccountStructure({
     try {
       const proxyAccount = await service.account
         .getOmniChainDetails(proxy)
-        .then((account) => transformAccount(chainSS58, account, true, genesisHash));
+        .then((account) =>
+          transformAccount(chainSS58, account, true, genesisHash),
+        );
 
       if (isPureProxy) {
         setFullAccount({
@@ -116,8 +131,8 @@ function ProxyAccountStructure({
               ...proxyAccount,
               proxyDelay: hasDelay ? 1 : 0, //mock,
               proxyNetwork: genesisHash,
-              proxyType
-            }
+              proxyType,
+            },
           ],
           createdBlock: '0',
           createdBlockHash: '0x',
@@ -125,7 +140,7 @@ function ProxyAccountStructure({
           createdExtrinsicIndex: 1,
           creator: '0x',
           disambiguationIndex: 0,
-          network: genesisHash
+          network: genesisHash,
         });
       } else if (proxied) {
         setFullAccount({
@@ -137,10 +152,10 @@ function ProxyAccountStructure({
               ...proxyAccount,
               proxyDelay: hasDelay ? 1 : 0, //mock,
               proxyNetwork: genesisHash,
-              proxyType
-            }
+              proxyType,
+            },
           ],
-          createdAt: 0
+          createdAt: 0,
         });
       }
 
@@ -154,15 +169,15 @@ function ProxyAccountStructure({
 
   return (
     <>
-      <div className='bg-secondary relative h-[250px] rounded-[10px] pt-10'>
+      <div className="bg-secondary relative h-[250px] rounded-[10px] pt-10">
         {/* View Full Structure Button */}
         <Button
           disabled={isFetching}
-          size='sm'
-          variant='ghost'
-          color='primary'
-          radius='full'
-          className='bg-content1 absolute top-2.5 left-2.5 z-10'
+          size="sm"
+          variant="ghost"
+          color="primary"
+          radius="full"
+          className="bg-background absolute top-2.5 left-2.5 z-10"
           onClick={fetchFullStructure}
         >
           {isFetching ? buttonSpinner : null}
@@ -171,19 +186,33 @@ function ProxyAccountStructure({
 
         {/* Simple visualization - can be enhanced with actual diagram */}
         <AddressMetaContext.Provider value={overrideMetas}>
-          <div className='flex h-full items-center justify-center'>
-            {proxyAccount ? <AddressOverview showAddressNodeOperations={false} account={proxyAccount} /> : null}
+          <div className="flex h-full items-center justify-center">
+            {proxyAccount ? (
+              <Suspense fallback={<FlowSkeleton />}>
+                <AddressOverview
+                  showAddressNodeOperations={false}
+                  account={proxyAccount}
+                />
+              </Suspense>
+            ) : null}
           </div>
         </AddressMetaContext.Provider>
       </div>
 
       {fullAccount && (
-        <Modal size='5xl' isOpen={isOpen} onClose={() => toggleOpen(false)}>
+        <Modal size="5xl" isOpen={isOpen} onClose={() => toggleOpen(false)}>
           <ModalContent>
             <ModalHeader>Full Structure</ModalHeader>
-            <ModalBody className='pb-5'>
-              <div className='bg-secondary h-[50dvh] rounded-[10px]'>
-                {isOpen ? <AddressOverview showAddressNodeOperations={false} account={fullAccount} /> : null}
+            <ModalBody className="pb-5">
+              <div className="bg-secondary h-[50dvh] rounded-[10px]">
+                {isOpen ? (
+                  <Suspense fallback={<FlowSkeleton />}>
+                    <AddressOverview
+                      showAddressNodeOperations={false}
+                      account={fullAccount}
+                    />
+                  </Suspense>
+                ) : null}
               </div>
             </ModalBody>
           </ModalContent>

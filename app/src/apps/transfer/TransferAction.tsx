@@ -24,7 +24,7 @@ function TransferAction({
   recipient,
   children,
   onDone,
-  onError
+  onError,
 }: {
   network: string;
   token?: TransferToken;
@@ -38,10 +38,14 @@ function TransferAction({
   children?: React.ReactNode;
 }) {
   const { network: currentNetwork } = useNetwork();
-  const { existentialDeposit: nativeED } = useExistentialDeposit(currentNetwork);
+  const { existentialDeposit: nativeED } =
+    useExistentialDeposit(currentNetwork);
 
   const [format, sendingBalances] = useTransferBalance(token, sending);
-  const [assetInfo] = useXcmAsset(network, token?.isNative ? null : token?.assetId);
+  const [assetInfo] = useXcmAsset(
+    network,
+    token?.isNative ? null : token?.assetId,
+  );
 
   // Determine existential deposit based on token type
   const existentialDeposit = useMemo(() => {
@@ -55,15 +59,13 @@ function TransferAction({
   }, [token?.isNative, nativeED, assetInfo?.existentialDeposit]);
 
   const isInsufficientBalance = keepAlive
-    ? sendingBalances.sub(existentialDeposit).lt(new BN(parseUnits(amount, format[0]).toString()))
+    ? sendingBalances
+        .sub(existentialDeposit)
+        .lt(new BN(parseUnits(amount, format[0]).toString()))
     : sendingBalances.lt(new BN(parseUnits(amount, format[0]).toString()));
 
   const getCall = useCallback(async () => {
     const api = await ApiManager.getInstance().getApi(currentNetwork);
-
-    if (!api) {
-      throw new Error('API not ready');
-    }
 
     if (recipient && sending && amount && token) {
       if (!isAmountValid) {
@@ -72,8 +74,14 @@ function TransferAction({
 
       if (token.isNative) {
         return keepAlive
-          ? api.tx.balances.transferKeepAlive(recipient, parseUnits(amount, format[0])).method
-          : api.tx.balances.transferAllowDeath(recipient, parseUnits(amount, format[0])).method;
+          ? api.tx.balances.transferKeepAlive(
+              recipient,
+              parseUnits(amount, format[0]),
+            ).method
+          : api.tx.balances.transferAllowDeath(
+              recipient,
+              parseUnits(amount, format[0]),
+            ).method;
       }
 
       if (api.tx.assets && token.assetId) {
@@ -82,27 +90,46 @@ function TransferAction({
         }
 
         return keepAlive
-          ? api.tx[isHex(token.assetId) ? 'foreignAssets' : 'assets'].transferKeepAlive(
+          ? api.tx[
+              isHex(token.assetId) ? 'foreignAssets' : 'assets'
+            ].transferKeepAlive(
               token.assetId,
               recipient,
-              parseUnits(amount, format[0])
+              parseUnits(amount, format[0]),
             ).method
           : api.tx[isHex(token.assetId) ? 'foreignAssets' : 'assets'].transfer(
               token.assetId,
               recipient,
-              parseUnits(amount, format[0])
+              parseUnits(amount, format[0]),
             ).method;
       }
 
       if (api.tx.tokens && token.assetId) {
         return keepAlive
-          ? api.tx.tokens.transferKeepAlive(recipient, token.key, parseUnits(amount, format[0])).method
-          : api.tx.tokens.transfer(recipient, token.key, parseUnits(amount, format[0])).method;
+          ? api.tx.tokens.transferKeepAlive(
+              recipient,
+              token.key,
+              parseUnits(amount, format[0]),
+            ).method
+          : api.tx.tokens.transfer(
+              recipient,
+              token.key,
+              parseUnits(amount, format[0]),
+            ).method;
       }
     }
 
     throw new Error('Invalid arguments');
-  }, [amount, currentNetwork, format, isAmountValid, keepAlive, recipient, sending, token]);
+  }, [
+    amount,
+    currentNetwork,
+    format,
+    isAmountValid,
+    keepAlive,
+    recipient,
+    sending,
+    token,
+  ]);
 
   return (
     <TxButton
@@ -110,12 +137,14 @@ function TransferAction({
       color={isInsufficientBalance ? 'danger' : 'primary'}
       disabled={!(amount && recipient && token)}
       accountId={sending}
-      website='mimir://app/transfer'
+      website="mimir://app/transfer"
       getCall={getCall}
       onDone={onDone}
       onError={onError}
     >
-      {isInsufficientBalance ? `Insufficient ${format[1] || ''} balance` : children}
+      {isInsufficientBalance
+        ? `Insufficient ${format[1] || ''} balance`
+        : children}
     </TxButton>
   );
 }

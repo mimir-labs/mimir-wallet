@@ -13,19 +13,29 @@ export const vitestConfig = defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'dist/', '**/*.test.ts', '**/*.spec.ts', '**/test/**', '**/__tests__/**'],
+      exclude: [
+        'node_modules/',
+        'dist/',
+        '**/*.test.ts',
+        '**/*.spec.ts',
+        '**/test/**',
+        '**/__tests__/**',
+      ],
       thresholds: {
         global: {
           branches: 70,
           functions: 70,
           lines: 70,
-          statements: 70
-        }
-      }
+          statements: 70,
+        },
+      },
     },
-    include: ['src/**/*.{test,spec}.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}'],
-    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache']
-  }
+    include: [
+      'src/**/*.{test,spec}.{ts,tsx}',
+      'src/**/__tests__/**/*.{ts,tsx}',
+    ],
+    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
+  },
 });
 
 export default vitestConfig;

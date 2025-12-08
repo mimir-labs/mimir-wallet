@@ -19,13 +19,13 @@ export function useInfiniteScroll({
   loading = false,
   threshold = 0.1,
   rootMargin = '100px',
-  root = null
+  root = null,
 }: UseInfiniteScrollOptions) {
   const { ref, inView } = useInView({
     threshold,
     rootMargin,
     root,
-    triggerOnce: false
+    triggerOnce: false,
   });
 
   useEffect(() => {

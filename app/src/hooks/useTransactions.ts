@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { HistoryTransaction, SubscanExtrinsic, Transaction } from './types';
+import type {
+  HistoryTransaction,
+  SubscanExtrinsic,
+  Transaction,
+} from './types';
 
 import {
   addressToHex,
@@ -10,15 +14,25 @@ import {
   type Endpoint,
   useChain,
   useChains,
-  useSs58Format
+  useSs58Format,
 } from '@mimir-wallet/polkadot-core';
-import { API_CLIENT_GATEWAY, fetcher, service, useInfiniteQuery, useQueries, useQuery } from '@mimir-wallet/service';
+import {
+  API_CLIENT_GATEWAY,
+  fetcher,
+  service,
+  useInfiniteQuery,
+  useQueries,
+  useQuery,
+} from '@mimir-wallet/service';
 import { isEqual } from 'lodash-es';
 import { useEffect, useMemo } from 'react';
 
 import { events } from '@/events';
 
-function transformTransaction(chainSS58: number, transaction: Transaction): Transaction {
+function transformTransaction(
+  chainSS58: number,
+  transaction: Transaction,
+): Transaction {
   const tx = { ...transaction };
 
   tx.address = encodeAddress(tx.address, chainSS58);
@@ -39,30 +53,38 @@ function transformTransaction(chainSS58: number, transaction: Transaction): Tran
     ...tx,
     children: tx.children
       .filter(
-        (item, index, self) => self.findIndex((t) => t.createdExtrinsicHash === item.createdExtrinsicHash) === index
+        (item, index, self) =>
+          self.findIndex(
+            (t) => t.createdExtrinsicHash === item.createdExtrinsicHash,
+          ) === index,
       )
-      .map((item) => transformTransaction(chainSS58, item))
+      .map((item) => transformTransaction(chainSS58, item)),
   };
 }
 
 export function usePendingTransactions(
   network: string,
   address?: string | null,
-  txId?: string
+  txId?: string,
 ): [transactions: Transaction[], isFetched: boolean, isFetching: boolean] {
   const chain = useChain(network);
   const chainSS58 = chain.ss58Format;
-  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address.toString()) : ''),
+    [address],
+  );
 
   const { data, isFetched, isFetching, refetch } = useQuery({
     queryKey: ['pending-transactions', network, addressHex, txId] as const,
     enabled: !!addressHex,
     staleTime: 0,
-    queryFn: ({ queryKey: [, network, addressHex, txId] }): Promise<Transaction[]> =>
+    queryFn: ({
+      queryKey: [, network, addressHex, txId],
+    }): Promise<Transaction[]> =>
       service.transaction.getPendingTransactions(network, addressHex, txId),
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
-    }
+    },
   });
 
   useEffect(() => {
@@ -74,30 +96,52 @@ export function usePendingTransactions(
   }, [refetch]);
 
   return [
-    useMemo(() => data?.map((item) => transformTransaction(chainSS58, item)) || [], [chainSS58, data]),
+    useMemo(
+      () => data?.map((item) => transformTransaction(chainSS58, item)) || [],
+      [chainSS58, data],
+    ),
     isFetched,
-    isFetching
+    isFetching,
   ];
 }
 
-export function useMultichainPendingTransactions(networks: string[], address?: string | null, txId?: string) {
+export function useMultichainPendingTransactions(
+  networks: string[],
+  address?: string | null,
+  txId?: string,
+) {
   const { ss58: chainSS58 } = useSs58Format();
-  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address.toString()) : ''),
+    [address],
+  );
 
   return useQueries({
     queries: networks.map((network) => ({
       queryKey: ['pending-transactions', network, addressHex, txId] as const,
       // Only enable query when address is provided
       enabled: !!addressHex,
-      structuralSharing: (prev: unknown | undefined, next: unknown): Transaction[] => {
-        const nextTransactions = (next as Transaction[]).map((item) => transformTransaction(chainSS58, item));
+      structuralSharing: (
+        prev: unknown | undefined,
+        next: unknown,
+      ): Transaction[] => {
+        const nextTransactions = (next as Transaction[]).map((item) =>
+          transformTransaction(chainSS58, item),
+        );
 
-        return isEqual(prev, nextTransactions) ? (prev as Transaction[]) : nextTransactions;
+        return isEqual(prev, nextTransactions)
+          ? (prev as Transaction[])
+          : nextTransactions;
       },
       queryFn: async ({
-        queryKey: [, network, addressHex, txId]
+        queryKey: [, network, addressHex, txId],
       }: {
-        queryKey: readonly [string, string, string | null | undefined, string | undefined];
+        queryKey: readonly [
+          string,
+          string,
+          string | null | undefined,
+          string | undefined,
+        ];
       }): Promise<Transaction[]> => {
         // Validate address before making request
         if (!addressHex) {
@@ -107,13 +151,14 @@ export function useMultichainPendingTransactions(networks: string[], address?: s
         const data = await fetcher(
           txId
             ? `${API_CLIENT_GATEWAY}/chains/${network}/${addressHex}/transactions/pending?tx_id=${txId}`
-            : `${API_CLIENT_GATEWAY}/chains/${network}/${addressHex}/transactions/pending`
+            : `${API_CLIENT_GATEWAY}/chains/${network}/${addressHex}/transactions/pending`,
         );
 
         return data.map((item: any) => ({ ...item, network }));
-      }
+      },
     })),
-    combine: (results) => results.map((item) => ({ ...item, data: item.data || [] }))
+    combine: (results) =>
+      results.map((item) => ({ ...item, data: item.data || [] })),
   });
 }
 
@@ -121,19 +166,26 @@ export function useHistoryTransactions(
   network?: string,
   address?: string | null,
   limit = 20,
-  txId?: string
+  txId?: string,
 ): [
   transactions: HistoryTransaction[],
   isFetched: boolean,
   isFetching: boolean,
   hasNextPage: boolean,
   isFetchingNextPage: boolean,
-  fetchNextPage: () => void
+  fetchNextPage: () => void,
 ] {
   const chain = useChain(network ?? '');
   const chainSS58 = chain.ss58Format;
 
-  const { data, fetchNextPage, hasNextPage, isFetched, isFetching, isFetchingNextPage } = useInfiniteQuery<any[]>({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetched,
+    isFetching,
+    isFetchingNextPage,
+  } = useInfiniteQuery<any[]>({
     initialPageParam: null,
     queryKey: ['history-transactions', network, address, txId, limit] as const,
     enabled: !!network && !!address,
@@ -143,7 +195,7 @@ export function useHistoryTransactions(
         string | undefined,
         address?: string | null,
         txId?: string,
-        limit?: number
+        limit?: number,
       ];
 
       if (!network) {
@@ -159,7 +211,7 @@ export function useHistoryTransactions(
         address,
         txId,
         pageParam ? String(pageParam) : undefined,
-        limit
+        limit,
       );
 
       return data.map((item: any) => ({ ...item, network }));
@@ -179,26 +231,36 @@ export function useHistoryTransactions(
       return isEqual(prev, next) ? prev : next;
     },
     maxPages: 100,
-    refetchInterval: 0
+    refetchInterval: 0,
   });
 
   return [
     useMemo(
-      () => data?.pages.flat().map((item) => transformTransaction(chainSS58, item) as HistoryTransaction) || [],
-      [chainSS58, data?.pages]
+      () =>
+        data?.pages
+          .flat()
+          .map(
+            (item) =>
+              transformTransaction(chainSS58, item) as HistoryTransaction,
+          ) || [],
+      [chainSS58, data?.pages],
     ),
     isFetched,
     isFetching,
     hasNextPage,
     isFetchingNextPage,
-    fetchNextPage
+    fetchNextPage,
   ];
 }
 
 export function useTransactionDetail(
   network: string,
-  id?: string
-): [transactions: Transaction | undefined, isFetched: boolean, isFetching: boolean] {
+  id?: string,
+): [
+  transactions: Transaction | undefined,
+  isFetched: boolean,
+  isFetching: boolean,
+] {
   const chain = useChain(network);
   const chainSS58 = chain.ss58Format;
 
@@ -207,77 +269,121 @@ export function useTransactionDetail(
     enabled: !!id,
     queryFn: ({ queryKey: [, network, id] }): Promise<Transaction> =>
       service.transaction.getTransactionDetail(network, id!),
-    structuralSharing: (prev: unknown | undefined, next: unknown): Transaction | null => {
-      const nextData = next ? transformTransaction(chainSS58, next as Transaction) : null;
+    structuralSharing: (
+      prev: unknown | undefined,
+      next: unknown,
+    ): Transaction | null => {
+      const nextData = next
+        ? transformTransaction(chainSS58, next as Transaction)
+        : null;
 
       return isEqual(prev, nextData) ? (prev as Transaction) || null : nextData;
-    }
+    },
   });
 
   return [data, isFetched, isFetching];
 }
 
 export function useMultiChainTransactionCounts(
-  address?: string | null
-): [data: Record<string, { pending: number; history: number }>, isFetched: boolean, isFetching: boolean] {
-  const addressHex = useMemo(() => (address ? addressToHex(address.toString()) : ''), [address]);
+  address?: string | null,
+): [
+  data: Record<string, { pending: number; history: number }>,
+  isFetched: boolean,
+  isFetching: boolean,
+] {
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address.toString()) : ''),
+    [address],
+  );
   const { chains, mode } = useChains();
 
   // Get enabled network keys
   const enabledNetworks = useMemo(
-    () => new Map(chains.filter((item) => (mode === 'omni' ? true : item.enabled)).map((c) => [c.key, c])),
-    [chains, mode]
+    () =>
+      new Map(
+        chains
+          .filter((item) => (mode === 'omni' ? true : item.enabled))
+          .map((c) => [c.key, c]),
+      ),
+    [chains, mode],
   );
 
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['transaction-counts', addressHex] as const,
     refetchOnMount: false,
     enabled: !!addressHex,
-    queryFn: ({ queryKey: [, addressHex] }): Promise<Record<string, { pending: number; history: number }>> =>
+    queryFn: ({
+      queryKey: [, addressHex],
+    }): Promise<Record<string, { pending: number; history: number }>> =>
       service.transaction.getTransactionCounts(addressHex),
     structuralSharing: (
       prev: unknown | undefined,
-      next: unknown
+      next: unknown,
     ): Record<string, { pending: number; history: number }> | undefined => {
-      const nextData = Object.entries(next as Record<string, { pending: number; history: number }>).reduce(
+      const nextData = Object.entries(
+        next as Record<string, { pending: number; history: number }>,
+      ).reduce(
         (acc, [network, { pending, history }]) => {
           acc[network] = { pending, history };
 
           return acc;
         },
-        {} as Record<string, { pending: number; history: number }>
+        {} as Record<string, { pending: number; history: number }>,
       );
 
-      return isEqual(prev, nextData) ? (prev as Record<string, { pending: number; history: number }>) : nextData;
-    }
+      return isEqual(prev, nextData)
+        ? (prev as Record<string, { pending: number; history: number }>)
+        : nextData;
+    },
   });
 
   return [
     useMemo(
-      () => Object.fromEntries(Object.entries(data || {}).filter(([network]) => enabledNetworks.has(network))),
-      [data, enabledNetworks]
+      () =>
+        Object.fromEntries(
+          Object.entries(data || {}).filter(([network]) =>
+            enabledNetworks.has(network),
+          ),
+        ),
+      [data, enabledNetworks],
     ),
     isFetched,
-    isFetching
+    isFetching,
   ];
 }
 
 export function useValidTransactionNetworks(address?: string | null) {
   const { chains, mode } = useChains();
-  const [transactionCounts, isFetched, isFetching] = useMultiChainTransactionCounts(address);
+  const [transactionCounts, isFetched, isFetching] =
+    useMultiChainTransactionCounts(address);
 
   // Create a map from network key to chain info for enabled networks
   const chainsMap = useMemo(
-    () => new Map(chains.filter((item) => (mode === 'omni' ? true : item.enabled)).map((c) => [c.key, c])),
-    [chains, mode]
+    () =>
+      new Map(
+        chains
+          .filter((item) => (mode === 'omni' ? true : item.enabled))
+          .map((c) => [c.key, c]),
+      ),
+    [chains, mode],
   );
 
   const [validPendingNetworks, validHistoryNetworks] = useMemo(() => {
-    const validPendingNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
-    const validHistoryNetworks: { network: string; counts: number; chain: Endpoint }[] = [];
+    const validPendingNetworks: {
+      network: string;
+      counts: number;
+      chain: Endpoint;
+    }[] = [];
+    const validHistoryNetworks: {
+      network: string;
+      counts: number;
+      chain: Endpoint;
+    }[] = [];
 
     // Create network order mapping based on config.ts
-    const networkOrderMap = new Map(allEndpoints.map((endpoint, index) => [endpoint.key, index]));
+    const networkOrderMap = new Map(
+      allEndpoints.map((endpoint, index) => [endpoint.key, index]),
+    );
 
     Object.entries(transactionCounts || {}).forEach(([network, counts]) => {
       const chain = chainsMap.get(network);
@@ -286,7 +392,7 @@ export function useValidTransactionNetworks(address?: string | null) {
         validPendingNetworks.push({
           network,
           counts: counts.pending,
-          chain
+          chain,
         });
       }
 
@@ -294,13 +400,16 @@ export function useValidTransactionNetworks(address?: string | null) {
         validHistoryNetworks.push({
           network,
           counts: counts.history,
-          chain
+          chain,
         });
       }
     });
 
     // Sort by config.ts order
-    const sortByConfigOrder = (a: { network: string }, b: { network: string }) => {
+    const sortByConfigOrder = (
+      a: { network: string },
+      b: { network: string },
+    ) => {
       const orderA = networkOrderMap.get(a.network) ?? Infinity;
       const orderB = networkOrderMap.get(b.network) ?? Infinity;
 
@@ -308,12 +417,20 @@ export function useValidTransactionNetworks(address?: string | null) {
     };
 
     return [
-      validPendingNetworks.filter((item) => networkOrderMap.has(item.network)).sort(sortByConfigOrder),
-      validHistoryNetworks.filter((item) => networkOrderMap.has(item.network)).sort(sortByConfigOrder)
+      validPendingNetworks
+        .filter((item) => networkOrderMap.has(item.network))
+        .sort(sortByConfigOrder),
+      validHistoryNetworks
+        .filter((item) => networkOrderMap.has(item.network))
+        .sort(sortByConfigOrder),
     ];
   }, [chainsMap, transactionCounts]);
 
-  return [{ validPendingNetworks, validHistoryNetworks }, isFetched, isFetching] as const;
+  return [
+    { validPendingNetworks, validHistoryNetworks },
+    isFetched,
+    isFetching,
+  ] as const;
 }
 
 /**
@@ -327,13 +444,18 @@ export function useValidTransactionNetworks(address?: string | null) {
 export function useSimpleHistory(
   network?: string,
   address?: string | null,
-  row = 100
+  row = 100,
 ): [data: SubscanExtrinsic[], isFetched: boolean, isFetching: boolean] {
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['simple-history', network, address, row] as const,
     enabled: !!network && !!address,
     queryFn: async ({ queryKey }) => {
-      const [, network, address, row] = queryKey as readonly [string, string | undefined, string | null, number];
+      const [, network, address, row] = queryKey as readonly [
+        string,
+        string | undefined,
+        string | null,
+        number,
+      ];
 
       if (!network) {
         throw new Error('Network is required');
@@ -343,13 +465,17 @@ export function useSimpleHistory(
         throw new Error('Address is required');
       }
 
-      const result = await service.transaction.getSimpleHistory(network, address, row);
+      const result = await service.transaction.getSimpleHistory(
+        network,
+        address,
+        row,
+      );
 
       return result as SubscanExtrinsic[];
     },
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
-    }
+    },
   });
 
   return [data || [], isFetched, isFetching];

@@ -25,8 +25,16 @@ export interface KeyboardShortcutOptions {
  * });
  * ```
  */
-export function useKeyboardShortcut(key: string, callback: () => void, options: KeyboardShortcutOptions = {}) {
-  const { enabled = true, preventDefault = true, stopPropagation = false } = options;
+export function useKeyboardShortcut(
+  key: string,
+  callback: () => void,
+  options: KeyboardShortcutOptions = {},
+) {
+  const {
+    enabled = true,
+    preventDefault = true,
+    stopPropagation = false,
+  } = options;
 
   useEffect(() => {
     if (!enabled) return;
@@ -35,7 +43,8 @@ export function useKeyboardShortcut(key: string, callback: () => void, options: 
       // Check if the correct modifier key is pressed based on OS
       // macOS uses metaKey (Cmd), Windows/Linux use ctrlKey
       const isMac = navigator.userAgent.toLowerCase().includes('mac');
-      const isModifierPressed = (isMac && event.metaKey) || (!isMac && event.ctrlKey);
+      const isModifierPressed =
+        (isMac && event.metaKey) || (!isMac && event.ctrlKey);
 
       // Check if the target key matches (case insensitive)
       const isKeyPressed = event.key.toLowerCase() === key.toLowerCase();

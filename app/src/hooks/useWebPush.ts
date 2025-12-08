@@ -15,7 +15,7 @@ import {
   getCurrentPushSubscription,
   subscribeToPush,
   subscriptionToJson,
-  unsubscribeFromPush
+  unsubscribeFromPush,
 } from '@/utils/webPushUtils';
 
 export interface WebPushState {
@@ -51,7 +51,10 @@ export interface WebPushState {
 /**
  * Query key factory for web push subscriptions
  */
-const createSubscriptionsQueryKey = (address: string) => ['webPushSubscriptions', address];
+const createSubscriptionsQueryKey = (address: string) => [
+  'webPushSubscriptions',
+  address,
+];
 
 /**
  * Main hook for managing Web Push notifications
@@ -98,7 +101,7 @@ export function useWebPush(address: string): WebPushState {
   const {
     data: subscriptionsData = [],
     isLoading: isLoadingSubscriptions,
-    refetch: refetchSubscriptions
+    refetch: refetchSubscriptions,
   } = useQuery({
     queryKey: createSubscriptionsQueryKey(address),
     queryFn: async () => {
@@ -108,12 +111,14 @@ export function useWebPush(address: string): WebPushState {
     },
     enabled: !!address && permissionState.isGranted,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    retry: 2
+    retry: 2,
   });
 
   // Check if currently subscribed using device identifier
   const [isClientSubscribed, setIsClientSubscribed] = useState(false);
-  const [currentDeviceIdentifier, setCurrentDeviceIdentifier] = useState<string | null>(null);
+  const [currentDeviceIdentifier, setCurrentDeviceIdentifier] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -124,7 +129,11 @@ export function useWebPush(address: string): WebPushState {
 
         if (isMounted) {
           setIsClientSubscribed(subscription !== null);
-          setCurrentDeviceIdentifier(subscription ? generateDeviceIdentifier(subscription.endpoint) : null);
+          setCurrentDeviceIdentifier(
+            subscription
+              ? generateDeviceIdentifier(subscription.endpoint)
+              : null,
+          );
         }
       } catch (error) {
         console.error('Error checking subscription status:', error);
@@ -141,22 +150,24 @@ export function useWebPush(address: string): WebPushState {
   }, [permissionState.isGranted]);
 
   // Query for checking device subscription status using device identifier
-  const { data: deviceSubscriptionData, isLoading: isLoadingDeviceCheck } = useQuery({
-    queryKey: ['webPushDeviceCheck', address, currentDeviceIdentifier],
-    queryFn: async () => {
-      if (!currentDeviceIdentifier) {
-        return { isSubscribed: false };
-      }
+  const { data: deviceSubscriptionData, isLoading: isLoadingDeviceCheck } =
+    useQuery({
+      queryKey: ['webPushDeviceCheck', address, currentDeviceIdentifier],
+      queryFn: async () => {
+        if (!currentDeviceIdentifier) {
+          return { isSubscribed: false };
+        }
 
-      return await service.webPush.checkDeviceSubscription({
-        address,
-        deviceIdentifier: currentDeviceIdentifier
-      });
-    },
-    enabled: !!address && !!currentDeviceIdentifier && permissionState.isGranted,
-    staleTime: 1 * 60 * 1000, // 1 minute
-    retry: 2
-  });
+        return await service.webPush.checkDeviceSubscription({
+          address,
+          deviceIdentifier: currentDeviceIdentifier,
+        });
+      },
+      enabled:
+        !!address && !!currentDeviceIdentifier && permissionState.isGranted,
+      staleTime: 1 * 60 * 1000, // 1 minute
+      retry: 2,
+    });
 
   // Subscribe mutation
   const subscribeMutation = useMutation({
@@ -178,7 +189,7 @@ export function useWebPush(address: string): WebPushState {
       await service.webPush.subscribe({
         address,
         subscription: subscriptionToJson(subscription),
-        userAgent: browserInfo.userAgent
+        userAgent: browserInfo.userAgent,
       });
 
       return subscription;
@@ -186,16 +197,22 @@ export function useWebPush(address: string): WebPushState {
     onSuccess: (subscription) => {
       // Update local subscription state
       setIsClientSubscribed(true);
-      setCurrentDeviceIdentifier(generateDeviceIdentifier(subscription.endpoint));
+      setCurrentDeviceIdentifier(
+        generateDeviceIdentifier(subscription.endpoint),
+      );
       // Invalidate queries to get updated server data
-      queryClient.invalidateQueries({ queryKey: createSubscriptionsQueryKey(address) });
-      queryClient.invalidateQueries({ queryKey: ['webPushDeviceCheck', address] });
+      queryClient.invalidateQueries({
+        queryKey: createSubscriptionsQueryKey(address),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['webPushDeviceCheck', address],
+      });
       setError(null);
     },
     onError: (error) => {
       console.error('Failed to subscribe to push notifications:', error);
       setError(error as Error);
-    }
+    },
   });
 
   // Unsubscribe mutation
@@ -211,7 +228,7 @@ export function useWebPush(address: string): WebPushState {
       if (subscription) {
         await service.webPush.unsubscribe({
           address,
-          endpoint: subscription.endpoint
+          endpoint: subscription.endpoint,
         });
       }
     },
@@ -220,14 +237,18 @@ export function useWebPush(address: string): WebPushState {
       setIsClientSubscribed(false);
       setCurrentDeviceIdentifier(null);
       // Invalidate queries to get updated server data
-      queryClient.invalidateQueries({ queryKey: createSubscriptionsQueryKey(address) });
-      queryClient.invalidateQueries({ queryKey: ['webPushDeviceCheck', address] });
+      queryClient.invalidateQueries({
+        queryKey: createSubscriptionsQueryKey(address),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['webPushDeviceCheck', address],
+      });
       setError(null);
     },
     onError: (error) => {
       console.error('Failed to unsubscribe from push notifications:', error);
       setError(error as Error);
-    }
+    },
   });
 
   // Destructure mutateAsync for stable references
@@ -284,7 +305,11 @@ export function useWebPush(address: string): WebPushState {
     deviceSubscriptionData?.subscription?.isActive === true;
 
   const isEnabled = permissionState.isGranted && isSubscribed;
-  const isReady = permissionState.isSupported && !!vapidPublicKey && !isLoadingSubscriptions && !isLoadingDeviceCheck;
+  const isReady =
+    permissionState.isSupported &&
+    !!vapidPublicKey &&
+    !isLoadingSubscriptions &&
+    !isLoadingDeviceCheck;
 
   return {
     permission: {
@@ -294,7 +319,7 @@ export function useWebPush(address: string): WebPushState {
       isDenied: permissionState.isDenied,
       isDefault: permissionState.isDefault,
       requestPermission: permissionState.requestPermission,
-      isRequestingPermission: permissionState.isRequestingPermission
+      isRequestingPermission: permissionState.isRequestingPermission,
     },
     subscription: {
       isSubscribed,
@@ -304,10 +329,10 @@ export function useWebPush(address: string): WebPushState {
       isUnsubscribing: unsubscribeMutation.isPending,
       subscribe,
       unsubscribe,
-      refetchSubscriptions
+      refetchSubscriptions,
     },
     isEnabled,
     isReady,
-    error
+    error,
   };
 }

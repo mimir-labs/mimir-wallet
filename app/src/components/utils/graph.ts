@@ -9,7 +9,7 @@ export function getLayoutedElements(
   edges: Edge<any>[],
   nodeWidth = 330,
   nodeHeight = 70,
-  direction = 'RL'
+  direction = 'RL',
 ): { nodes: Node<any>[]; edges: Edge<any>[] } {
   const dagreGraph = new dagre.graphlib.Graph();
 
@@ -39,8 +39,8 @@ export function getLayoutedElements(
       // so it matches the React Flow node anchor point (top left).
       position: {
         x: nodeWithPosition.x - nodeWidth / 2,
-        y: nodeWithPosition.y - nodeHeight / 2
-      }
+        y: nodeWithPosition.y - nodeHeight / 2,
+      },
     };
 
     return newNode;

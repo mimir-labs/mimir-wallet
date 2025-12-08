@@ -16,7 +16,7 @@ function PageAddProxy({ pure }: { pure?: boolean }) {
   const supportedNetworks = useAddressSupportedNetworks(proxied);
   const [network, setNetwork] = useInputNetwork(
     undefined,
-    supportedNetworks?.map((item) => item.key)
+    supportedNetworks?.map((item) => item.key),
   );
 
   return (
