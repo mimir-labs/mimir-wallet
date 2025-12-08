@@ -4,12 +4,31 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { SignerOptions, SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Injected } from '@polkadot/extension-inject/types';
-import type { Extrinsic, ExtrinsicEra, Hash, Header, Index, SignerPayload } from '@polkadot/types/interfaces';
-import type { ISubmittableResult, SignatureOptions, SignerPayloadJSON } from '@polkadot/types/types';
+import type {
+  Extrinsic,
+  ExtrinsicEra,
+  Hash,
+  Header,
+  Index,
+  SignerPayload,
+} from '@polkadot/types/interfaces';
+import type {
+  ISubmittableResult,
+  SignatureOptions,
+  SignerPayloadJSON,
+} from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { getSpecTypes } from '@polkadot/types-known';
-import { assert, formatBalance, isFunction, isHex, isNumber, objectSpread, u8aToHex } from '@polkadot/util';
+import {
+  assert,
+  formatBalance,
+  isFunction,
+  isHex,
+  isNumber,
+  objectSpread,
+  u8aToHex,
+} from '@polkadot/util';
 import { base64Encode } from '@polkadot/util-crypto';
 
 import { getFeeAssetLocation } from '../xcm/fee-location.js';
@@ -27,7 +46,7 @@ type Options = {
 async function extractParams(
   api: ApiPromise,
   address: string,
-  _injected: Injected | (() => Promise<Injected>)
+  _injected: Injected | (() => Promise<Injected>),
 ): Promise<Partial<SignerOptions>> {
   const injected = isFunction(_injected) ? await _injected() : _injected;
 
@@ -40,7 +59,8 @@ async function extractParams(
     if (
       !knowns.find(
         (item) =>
-          item.genesisHash === api.genesisHash.toHex() && item.specVersion === api.runtimeVersion.specVersion.toNumber()
+          item.genesisHash === api.genesisHash.toHex() &&
+          item.specVersion === api.runtimeVersion.specVersion.toNumber(),
       )
     ) {
       const [systemChain] = await Promise.all([api.rpc.system.chain()]);
@@ -53,13 +73,14 @@ async function extractParams(
         specVersion: api.runtimeVersion.specVersion.toNumber(),
         ss58Format: api.registry.chainSS58!,
         tokenDecimals: api.registry.chainDecimals[0],
-        tokenSymbol: (api.registry.chainTokens || formatBalance.getDefaults().unit)[0],
+        tokenSymbol: (api.registry.chainTokens ||
+          formatBalance.getDefaults().unit)[0],
         types: getSpecTypes(
           api.registry,
           systemChain,
           api.runtimeVersion.specName,
-          api.runtimeVersion.specVersion
-        ) as unknown as Record<string, string>
+          api.runtimeVersion.specVersion,
+        ) as unknown as Record<string, string>,
       };
 
       await metadata.provide(chainInfo);
@@ -75,7 +96,11 @@ async function extractParams(
   return { signer };
 }
 
-export function checkSubmittableResult(api: ApiPromise, result: ISubmittableResult, checkProxy = false) {
+export function checkSubmittableResult(
+  api: ApiPromise,
+  result: ISubmittableResult,
+  checkProxy = false,
+) {
   if (result.dispatchError) {
     throw assetDispatchError(api, result.dispatchError);
   }
@@ -100,22 +125,33 @@ export function checkSubmittableResult(api: ApiPromise, result: ISubmittableResu
 function makeSignOptions(
   api: ApiPromise,
   partialOptions: Partial<SignerOptions>,
-  extras: { blockHash?: HexString; era?: ExtrinsicEra; nonce?: Index }
+  extras: { blockHash?: HexString; era?: ExtrinsicEra; nonce?: Index },
 ): SignatureOptions {
-  return objectSpread({ blockHash: api.genesisHash, genesisHash: api.genesisHash }, partialOptions, extras, {
-    runtimeVersion: api.runtimeVersion,
-    signedExtensions: api.registry.signedExtensions
-  });
+  return objectSpread(
+    { blockHash: api.genesisHash, genesisHash: api.genesisHash },
+    partialOptions,
+    extras,
+    {
+      runtimeVersion: api.runtimeVersion,
+      signedExtensions: api.registry.signedExtensions,
+    },
+  );
 }
 
 function makeEraOptions(
   api: ApiPromise,
   partialOptions: Partial<SignerOptions>,
-  { header, mortalLength, nonce }: { header: Header | null; mortalLength: number; nonce: Index }
+  {
+    header,
+    mortalLength,
+    nonce,
+  }: { header: Header | null; mortalLength: number; nonce: Index },
 ): SignatureOptions {
   if (!header) {
     if (partialOptions.era && !partialOptions.blockHash) {
-      throw new Error('Expected blockHash to be passed alongside non-immortal era options');
+      throw new Error(
+        'Expected blockHash to be passed alongside non-immortal era options',
+      );
     }
 
     if (isNumber(partialOptions.era)) {
@@ -133,10 +169,10 @@ function makeEraOptions(
     era: api.registry.createTypeUnsafe<ExtrinsicEra>('ExtrinsicEra', [
       {
         current: header.number,
-        period: partialOptions.era || mortalLength
-      }
+        period: partialOptions.era || mortalLength,
+      },
     ]),
-    nonce
+    nonce,
   });
 }
 
@@ -145,8 +181,15 @@ export async function sign(
   extrinsic: SubmittableExtrinsic<'promise'>,
   signer: string,
   injected: Injected | (() => Promise<Injected>),
-  { assetId }: { assetId?: string } = {}
-): Promise<[signature: HexString, payload: SignerPayloadJSON, txHash: Hash, signedTransaction: HexString]> {
+  { assetId }: { assetId?: string } = {},
+): Promise<
+  [
+    signature: HexString,
+    payload: SignerPayloadJSON,
+    txHash: Hash,
+    signedTransaction: HexString,
+  ]
+> {
   const signingInfo = await api.derive.tx.signingInfo(signer);
   const eraOptions = makeEraOptions(api, {}, signingInfo);
 
@@ -156,75 +199,101 @@ export async function sign(
 
   const finalExtrinsic = api.tx[call.section][call.method](...call.args);
 
-  const { signer: accountSigner, withSignedTransaction } = await extractParams(api, signer, injected);
+  const { signer: accountSigner, withSignedTransaction } = await extractParams(
+    api,
+    signer,
+    injected,
+  );
 
-  const payload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
-    objectSpread({}, eraOptions, {
-      address: signer,
-      blockNumber: signingInfo.header ? signingInfo.header.number : 0,
-      method: finalExtrinsic.method,
-      version: finalExtrinsic.version,
-      withSignedTransaction,
-      assetId: getFeeAssetLocation(api, assetId)
-    })
-  ]);
+  const payload = api.registry.createTypeUnsafe<SignerPayload>(
+    'SignerPayload',
+    [
+      objectSpread({}, eraOptions, {
+        address: signer,
+        blockNumber: signingInfo.header ? signingInfo.header.number : 0,
+        method: finalExtrinsic.method,
+        version: finalExtrinsic.version,
+        withSignedTransaction,
+        assetId: getFeeAssetLocation(api, assetId),
+      }),
+    ],
+  );
 
   if (!accountSigner?.signPayload) {
     throw new Error('No signer');
   }
 
-  const { signature, signedTransaction } = await accountSigner.signPayload(payload.toPayload());
+  const { signature, signedTransaction } = await accountSigner.signPayload(
+    payload.toPayload(),
+  );
 
   if (signedTransaction) {
-    const ext = api.registry.createTypeUnsafe<Extrinsic>('Extrinsic', [signedTransaction]);
-
-    const newSignerPayload = api.registry.createTypeUnsafe<SignerPayload>('SignerPayload', [
-      objectSpread(
-        {},
-        {
-          address: signer,
-          assetId: ext.assetId?.isSome ? ext.assetId.toHex() : null,
-          blockHash: payload.blockHash,
-          blockNumber: signingInfo.header ? signingInfo.header.number : 0,
-          era: ext.era.toHex(),
-          genesisHash: payload.genesisHash,
-          metadataHash: ext.metadataHash ? ext.metadataHash.toHex() : null,
-          method: ext.method.toHex(),
-          mode: ext.mode ? ext.mode.toHex() : null,
-          nonce: ext.nonce.toHex(),
-          runtimeVersion: payload.runtimeVersion,
-          signedExtensions: payload.signedExtensions,
-          tip: ext.tip ? ext.tip.toHex() : null,
-          version: payload.version
-        }
-      )
+    const ext = api.registry.createTypeUnsafe<Extrinsic>('Extrinsic', [
+      signedTransaction,
     ]);
+
+    const newSignerPayload = api.registry.createTypeUnsafe<SignerPayload>(
+      'SignerPayload',
+      [
+        objectSpread(
+          {},
+          {
+            address: signer,
+            assetId: ext.assetId?.isSome ? ext.assetId.toHex() : null,
+            blockHash: payload.blockHash,
+            blockNumber: signingInfo.header ? signingInfo.header.number : 0,
+            era: ext.era.toHex(),
+            genesisHash: payload.genesisHash,
+            metadataHash: ext.metadataHash ? ext.metadataHash.toHex() : null,
+            method: ext.method.toHex(),
+            mode: ext.mode ? ext.mode.toHex() : null,
+            nonce: ext.nonce.toHex(),
+            runtimeVersion: payload.runtimeVersion,
+            signedExtensions: payload.signedExtensions,
+            tip: ext.tip ? ext.tip.toHex() : null,
+            version: payload.version,
+          },
+        ),
+      ],
+    );
 
     if (!ext.isSigned) {
       throw new Error(
-        `When using the signedTransaction field, the transaction must be signed. Recieved isSigned: ${ext.isSigned}`
+        `When using the signedTransaction field, the transaction must be signed. Recieved isSigned: ${ext.isSigned}`,
       );
     }
 
-    const errMsg = (field: string) => `signAndSend: ${field} does not match the original payload`;
+    const errMsg = (field: string) =>
+      `signAndSend: ${field} does not match the original payload`;
 
     if (payload.method.toHex() !== ext.method.toHex()) {
       throw new Error(errMsg('call data'));
     }
 
-    finalExtrinsic.addSignature(signer, signature, newSignerPayload.toPayload());
+    finalExtrinsic.addSignature(
+      signer,
+      signature,
+      newSignerPayload.toPayload(),
+    );
 
     return [
       signature,
       newSignerPayload.toPayload(),
       finalExtrinsic.hash,
-      isHex(signedTransaction) ? signedTransaction : u8aToHex(signedTransaction)
+      isHex(signedTransaction)
+        ? signedTransaction
+        : u8aToHex(signedTransaction),
     ];
   }
 
   finalExtrinsic.addSignature(signer, signature, payload.toPayload());
 
-  return [signature, payload.toPayload(), finalExtrinsic.hash, finalExtrinsic.toHex()];
+  return [
+    signature,
+    payload.toPayload(),
+    finalExtrinsic.hash,
+    finalExtrinsic.toHex(),
+  ];
 }
 
 export function signAndSend(
@@ -232,7 +301,7 @@ export function signAndSend(
   extrinsic: SubmittableExtrinsic<'promise'>,
   signer: string,
   injected: Injected | (() => Promise<Injected>),
-  { beforeSend, checkProxy, assetId }: Options = {}
+  { beforeSend, checkProxy, assetId }: Options = {},
 ): TxEvents {
   const events = new TxEvents();
 
@@ -242,7 +311,10 @@ export function signAndSend(
       const finalExtrinsic = api.tx[call.section][call.method](...call.args);
 
       return extractParams(api, signer, injected).then((params) =>
-        finalExtrinsic.signAsync(signer, { ...params, assetId: getFeeAssetLocation(api, assetId) })
+        finalExtrinsic.signAsync(signer, {
+          ...params,
+          assetId: getFeeAssetLocation(api, assetId),
+        }),
       );
     })
     .then(async (extrinsic) => {

@@ -75,8 +75,8 @@ export const useMimirLayout = create<MimirLayoutState>()((set) => {
     closeRightSidebar: () => set({ rightSidebarOpen: false }),
     setRightSidebarTab: (tab: RightSidebarTab) => {
       set((state) => ({
-        rightSidebarState: { ...state.rightSidebarState, tab }
+        rightSidebarState: { ...state.rightSidebarState, tab },
       }));
-    }
+    },
   };
 });

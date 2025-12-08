@@ -18,14 +18,14 @@ function SetSs58Chain({ networkKey }: SetSs58ChainProps) {
   if (!chain) return null;
 
   return (
-    <div className='border-divider flex items-center justify-between rounded-[10px] border p-2.5'>
-      <div className='flex items-center gap-2.5'>
-        <Avatar src={chain.icon} className='h-[30px] w-[30px] bg-transparent' />
-        <div className='text-foreground leading-normal font-bold'>
-          Switched to <span className='text-primary'>{chain.name} Format</span>
+    <div className="border-divider flex items-center justify-between rounded-[10px] border p-2.5">
+      <div className="flex items-center gap-2.5">
+        <Avatar src={chain.icon} className="h-[30px] w-[30px] bg-transparent" />
+        <div className="text-foreground leading-normal font-bold">
+          Switched to <span className="text-primary">{chain.name} Format</span>
         </div>
       </div>
-      <IconSuccess className='text-success h-4 w-4' />
+      <IconSuccess className="text-success h-4 w-4" />
     </div>
   );
 }

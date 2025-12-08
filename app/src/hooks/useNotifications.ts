@@ -14,7 +14,10 @@ export type NotificationMessage = {
   genesisHash: HexString;
   id: number;
   method: string;
-  notificationType: 'transaction_created' | 'transaction_approved' | 'transaction_executed';
+  notificationType:
+    | 'transaction_created'
+    | 'transaction_approved'
+    | 'transaction_executed';
   section: string;
   signer: HexString;
   status: 'pending' | 'success' | 'failed';
@@ -80,7 +83,9 @@ const useNotificationStore = create<NotificationStore>()((set, get) => ({
       }
 
       // Convert to array and sort by id (descending)
-      const sortedNotifications = Array.from(notificationMap.values()).sort((a, b) => b.id - a.id);
+      const sortedNotifications = Array.from(notificationMap.values()).sort(
+        (a, b) => b.id - a.id,
+      );
 
       const newState = { notifications: sortedNotifications };
 
@@ -93,7 +98,10 @@ const useNotificationStore = create<NotificationStore>()((set, get) => ({
   markAsRead: async (notificationId: number) => {
     // Update local state immediately for instant feedback
     set((state) => ({
-      readNotificationIds: new Set([...state.readNotificationIds, notificationId])
+      readNotificationIds: new Set([
+        ...state.readNotificationIds,
+        notificationId,
+      ]),
     }));
 
     // Trigger cache recomputation
@@ -106,7 +114,10 @@ const useNotificationStore = create<NotificationStore>()((set, get) => ({
   markMultipleAsRead: async (notificationIds: number[]) => {
     // Update local state immediately
     set((state) => ({
-      readNotificationIds: new Set([...state.readNotificationIds, ...notificationIds])
+      readNotificationIds: new Set([
+        ...state.readNotificationIds,
+        ...notificationIds,
+      ]),
     }));
 
     // Trigger cache recomputation
@@ -122,7 +133,7 @@ const useNotificationStore = create<NotificationStore>()((set, get) => ({
 
     // Update local state
     set({
-      readNotificationIds: new Set(allIds)
+      readNotificationIds: new Set(allIds),
     });
 
     // Trigger cache recomputation
@@ -139,26 +150,15 @@ const useNotificationStore = create<NotificationStore>()((set, get) => ({
   },
 
   getUnreadCount: () => {
-    const state = get();
-    const currentHash = `${state.notifications.length}-${state.readNotificationIds.size}`;
-
-    // Return cached value if no changes detected
-    if (state._lastComputedHash === currentHash) {
-      return state._unreadCount;
-    }
-
-    // Recompute and cache
-    const unreadCount = state.notifications.filter((n) => !state.readNotificationIds.has(n.id)).length;
-
-    // Update cache - use set to update state
-    set({ _unreadCount: unreadCount, _lastComputedHash: currentHash });
-
-    return unreadCount;
+    // Return cached value only - cache is updated by _recomputeCache after state changes
+    return get()._unreadCount;
   },
 
   _recomputeCache: () => {
     const state = get();
-    const unreadCount = state.notifications.filter((n) => !state.readNotificationIds.has(n.id)).length;
+    const unreadCount = state.notifications.filter(
+      (n) => !state.readNotificationIds.has(n.id),
+    ).length;
     const currentHash = `${state.notifications.length}-${state.readNotificationIds.size}`;
 
     set({ _unreadCount: unreadCount, _lastComputedHash: currentHash });
@@ -168,7 +168,10 @@ const useNotificationStore = create<NotificationStore>()((set, get) => ({
     const readIds = await notificationStorage.getReadNotificationIds();
 
     set({ readNotificationIds: readIds });
-  }
+
+    // Trigger cache recomputation
+    setTimeout(() => get()._recomputeCache(), 0);
+  },
 }));
 
 // Export the store for non-React usage (like in event handlers)

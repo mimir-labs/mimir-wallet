@@ -34,28 +34,35 @@ interface NavLinkProps {
  * Button styling is applied through Link's activeProps/inactiveProps
  * Supports aria-current for accessibility
  */
-function NavLink({ Icon, label, onClick, to, endContent, exact = false }: NavLinkProps) {
+function NavLink({
+  Icon,
+  label,
+  onClick,
+  to,
+  endContent,
+  exact = false,
+}: NavLinkProps) {
   return (
     <Button
       asChild
       fullWidth
-      size='lg'
-      radius='md'
-      variant='light'
-      className='text-foreground/50 aria-[current=page]:bg-secondary aria-[current=page]:text-primary hover:bg-secondary hover:text-primary h-[50px] items-center justify-start gap-x-2.5 px-[15px] py-[20px] text-base font-semibold'
+      size="lg"
+      radius="md"
+      variant="light"
+      className="text-foreground/50 aria-[current=page]:bg-secondary aria-[current=page]:text-primary hover:bg-secondary hover:text-primary h-[50px] items-center justify-start gap-x-2.5 px-[15px] py-[20px] text-base font-semibold"
     >
       <Link
         to={to}
         onClick={onClick}
         activeOptions={{
           exact,
-          includeSearch: false
+          includeSearch: false,
         }}
         activeProps={{
-          'aria-current': 'page' as const
+          'aria-current': 'page' as const,
         }}
       >
-        <Icon className='h-5 w-5' />
+        <Icon className="h-5 w-5" />
         {label}
         {endContent}
       </Link>
@@ -75,29 +82,29 @@ function NavigationMenuComponent({ address }: { address?: string }) {
       Object.values(transactionCounts || {}).reduce((acc, item) => {
         return acc + item.pending;
       }, 0),
-    [transactionCounts]
+    [transactionCounts],
   );
 
   return (
     <>
-      <NavLink Icon={IconHome} label='Home' to='/' exact />
-      <NavLink Icon={IconDapp} label='Apps' to='/dapp' />
-      <NavLink Icon={IconAssets} label='Assets' to='/assets' />
+      <NavLink Icon={IconHome} label="Home" to="/" exact />
+      <NavLink Icon={IconDapp} label="Apps" to="/dapp" />
+      <NavLink Icon={IconAssets} label="Assets" to="/assets" />
       <NavLink
         Icon={IconTransaction}
-        label='Transactions'
+        label="Transactions"
         endContent={
           totalCounts ? (
-            <div className='text-danger-foreground bg-danger flex aspect-1/1 w-5 items-center justify-center rounded-full text-sm leading-[1] font-semibold'>
+            <div className="text-danger-foreground bg-danger flex aspect-1/1 w-5 items-center justify-center rounded-full text-sm leading-[1] font-semibold">
               {totalCounts}
             </div>
           ) : null
         }
-        to='/transactions'
+        to="/transactions"
       />
-      <NavLink Icon={IconAddressBook} label='Address Book' to='/address-book' />
-      <NavLink Icon={IconAnalytic} label='Analytic' to='/analytic' />
-      <NavLink Icon={IconSetting} label='Setting' to='/setting' />
+      <NavLink Icon={IconAddressBook} label="Address Book" to="/address-book" />
+      <NavLink Icon={IconAnalytic} label="Analytic" to="/analytic" />
+      <NavLink Icon={IconSetting} label="Setting" to="/setting" />
     </>
   );
 }

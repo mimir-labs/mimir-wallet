@@ -16,11 +16,17 @@ import IconSuccess from '@/assets/svg/icon-success-fill.svg?react';
 import IconWaiting from '@/assets/svg/icon-waiting-fill.svg?react';
 import { TransactionStatus } from '@/hooks/types';
 
-export function AnnouncementStatus({ account, transaction }: { account: AccountData; transaction: ProxyTransaction }) {
+export function AnnouncementStatus({
+  account,
+  transaction,
+}: {
+  account: AccountData;
+  transaction: ProxyTransaction;
+}) {
   const [status, isFetching] = useAnnouncementStatus(transaction, account);
 
   if (isFetching) {
-    return <Spinner size='sm' />;
+    return <Spinner size="sm" />;
   }
 
   const SvgIcon =
@@ -34,10 +40,12 @@ export function AnnouncementStatus({ account, transaction }: { account: AccountD
     <div
       data-pending={status === 'indexing' || status === 'reviewing'}
       data-success={status === 'executable' || status === 'success'}
-      data-failed={!['indexing', 'reviewing', 'executable', 'success'].includes(status)}
-      className='data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger flex items-center gap-[5px] break-words whitespace-nowrap'
+      data-failed={
+        !['indexing', 'reviewing', 'executable', 'success'].includes(status)
+      }
+      className="data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger flex items-center gap-[5px] break-words whitespace-nowrap"
     >
-      <SvgIcon color='inherit' />
+      <SvgIcon color="inherit" />
       {status === 'indexing'
         ? 'Indexing'
         : status === 'reviewing'
@@ -57,15 +65,23 @@ export function AnnouncementStatus({ account, transaction }: { account: AccountD
   );
 }
 
-export function MultisigStatus({ transaction, onClick }: { transaction: Transaction; onClick: () => void }) {
+export function MultisigStatus({
+  transaction,
+  onClick,
+}: {
+  transaction: Transaction;
+  onClick: () => void;
+}) {
   const { meta } = useAddressMeta(transaction.address);
   const approvals = useMemo(() => {
-    return transaction.children.filter((item) => item.status === TransactionStatus.Success).length;
+    return transaction.children.filter(
+      (item) => item.status === TransactionStatus.Success,
+    ).length;
   }, [transaction.children]);
 
   return (
-    <div className='flex-1'>
-      <Button onClick={onClick} size='sm' variant='ghost'>
+    <div className="flex-1">
+      <Button onClick={onClick} size="sm" variant="ghost">
         <IconMember />
         {approvals}/{meta.threshold}
       </Button>
@@ -92,9 +108,9 @@ export function Status({ transaction }: { transaction: Transaction }) {
       data-pending={status < TransactionStatus.Success}
       data-success={status === TransactionStatus.Success}
       data-failed={status > TransactionStatus.Success}
-      className='data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger flex items-center gap-[5px] break-words whitespace-nowrap'
+      className="data-[pending=true]:text-warning data-[success=true]:text-success data-[failed=true]:text-danger flex items-center gap-[5px] break-words whitespace-nowrap"
     >
-      <SvgIcon color='inherit' />
+      <SvgIcon color="inherit" />
       {status < TransactionStatus.Success
         ? 'Pending'
         : status === TransactionStatus.Success

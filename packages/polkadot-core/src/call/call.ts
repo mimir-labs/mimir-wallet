@@ -51,7 +51,9 @@ class CallCache {
 const callCache = new CallCache(200); // Cache up to 200 parsed calls
 
 export function parseCall(registry: Registry, calldata: string): Call | null {
-  const chainSS58 = String(((registry as any).chainSS58 as string) || 'unknown');
+  const chainSS58 = String(
+    ((registry as any).chainSS58 as string) || 'unknown',
+  );
   const cacheKey = `${chainSS58}-${calldata}`;
 
   const cachedCall = callCache.get(cacheKey);
@@ -77,18 +79,26 @@ export function parseCall(registry: Registry, calldata: string): Call | null {
 export function findTargetCall(
   api: ApiPromise,
   address: string,
-  call?: IMethod | null
+  call?: IMethod | null,
 ): [string, IMethod | null | undefined] {
   if (!call) {
     return [address, call];
   }
 
   if (api.tx.proxy?.proxy.is(call)) {
-    return findTargetCall(api, call.args[0].toString(), api.registry.createType('Call', call.args[2].toU8a()));
+    return findTargetCall(
+      api,
+      call.args[0].toString(),
+      api.registry.createType('Call', call.args[2].toU8a()),
+    );
   }
 
   if (api.tx.proxy?.proxyAnnounced.is(call)) {
-    return findTargetCall(api, call.args[1].toString(), api.registry.createType('Call', call.args[3].toU8a()));
+    return findTargetCall(
+      api,
+      call.args[1].toString(),
+      api.registry.createType('Call', call.args[3].toU8a()),
+    );
   }
 
   // if (api.tx.proxy?.announce.is(call)) {
@@ -99,10 +109,13 @@ export function findTargetCall(
     return findTargetCall(
       api,
       encodeAddress(
-        createKeyMulti(call.args[1].map((item) => item.toString()).concat(address), call.args[0]),
-        api.registry.chainSS58!
+        createKeyMulti(
+          call.args[1].map((item) => item.toString()).concat(address),
+          call.args[0],
+        ),
+        api.registry.chainSS58!,
       ),
-      api.registry.createType('Call', call.args[3].toU8a())
+      api.registry.createType('Call', call.args[3].toU8a()),
     );
   }
 
@@ -110,10 +123,13 @@ export function findTargetCall(
     return findTargetCall(
       api,
       encodeAddress(
-        createKeyMulti(call.args[0].map((item) => item.toString()).concat(address), 1),
-        api.registry.chainSS58!
+        createKeyMulti(
+          call.args[0].map((item) => item.toString()).concat(address),
+          1,
+        ),
+        api.registry.chainSS58!,
       ),
-      api.registry.createType('Call', call.args[1].toU8a())
+      api.registry.createType('Call', call.args[1].toU8a()),
     );
   }
 

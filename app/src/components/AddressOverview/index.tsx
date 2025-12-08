@@ -2,35 +2,51 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { EdgeData, NodeData, Props } from './context';
-import type { AccountData, DelegateeProp, MultisigAccountData } from '@/hooks/types';
+import type {
+  AccountData,
+  DelegateeProp,
+  MultisigAccountData,
+} from '@/hooks/types';
 
 import { addressToHex } from '@mimir-wallet/polkadot-core';
-import { Controls, type Edge, MiniMap, type Node, ReactFlow, useEdgesState, useNodesState } from '@xyflow/react';
+import {
+  Controls,
+  type Edge,
+  MiniMap,
+  type Node,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
+} from '@xyflow/react';
 import React, { useEffect, useMemo } from 'react';
 
 import AddressEdge from '../AddressEdge';
-import { getLayoutedElements } from '../utils';
+import { getLayoutedElements } from '../utils/graph';
 
 import AddressNode from './AddressNode';
 import { context } from './context';
 
 // Define node and edge types outside component to prevent recreation
 const NODE_TYPES = {
-  AddressNode: AddressNode
+  AddressNode: AddressNode,
 } as const;
 
 const EDGE_TYPES = {
-  AddressEdge
+  AddressEdge,
 } as const;
 
-function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges: Edge<EdgeData>[] = []) {
+function makeNodes(
+  topAccount: AccountData,
+  nodes: Node<NodeData>[] = [],
+  edges: Edge<EdgeData>[] = [],
+) {
   function createNode(
     id: string,
     account: AccountData,
     isTop: boolean,
     type: 'multisig' | 'proxy' | 'unknown',
     proxyType?: string,
-    delay?: number
+    delay?: number,
   ): Node<NodeData> {
     return {
       id,
@@ -42,19 +58,31 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
         isLeaf: true, // Will be updated after traversal based on actual edges
         type,
         proxyType,
-        delay
+        delay,
       },
       position: { x: 0, y: 0 },
-      connectable: false
+      connectable: false,
     };
   }
 
-  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9', isDash = false) {
+  function makeEdge(
+    parentId: string,
+    nodeId: string,
+    label = '',
+    delay?: number,
+    color = '#d9d9d9',
+    isDash = false,
+  ) {
     const id = `${parentId}->${nodeId}`;
     const exists = edges.find((edge) => edge.id === id);
 
     if (exists) {
-      if (label && !exists.data?.tips.some((tip) => tip.label === label && tip.delay === delay)) {
+      if (
+        label &&
+        !exists.data?.tips.some(
+          (tip) => tip.label === label && tip.delay === delay,
+        )
+      ) {
         exists.data?.tips.push({ label, delay });
       }
     } else {
@@ -63,7 +91,7 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
         source: parentId,
         target: nodeId,
         type: 'AddressEdge',
-        data: { color, tips: label ? [{ label, delay }] : [], isDash }
+        data: { color, tips: label ? [{ label, delay }] : [], isDash },
       });
     }
   }
@@ -100,10 +128,14 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
           nodeId,
           node.value,
           true,
-          node.from === 'delegate' ? 'proxy' : node.from === 'member' ? 'multisig' : 'unknown',
+          node.from === 'delegate'
+            ? 'proxy'
+            : node.from === 'member'
+              ? 'multisig'
+              : 'unknown',
           node.from === 'delegate' ? node.value.proxyType : undefined,
-          node.from === 'delegate' ? node.value.proxyDelay : undefined
-        )
+          node.from === 'delegate' ? node.value.proxyDelay : undefined,
+        ),
       );
     } else {
       nodes.push(
@@ -111,18 +143,30 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
           nodeId,
           node.value,
           false,
-          node.from === 'delegate' ? 'proxy' : node.from === 'member' ? 'multisig' : 'unknown',
+          node.from === 'delegate'
+            ? 'proxy'
+            : node.from === 'member'
+              ? 'multisig'
+              : 'unknown',
           node.from === 'delegate' ? node.value.proxyType : undefined,
-          node.from === 'delegate' ? node.value.proxyDelay : undefined
-        )
+          node.from === 'delegate' ? node.value.proxyDelay : undefined,
+        ),
       );
       makeEdge(
         node.parentId,
         nodeId,
-        node.from === 'delegate' ? node.value.proxyType : node.from === 'member' ? 'multisig' : '',
+        node.from === 'delegate'
+          ? node.value.proxyType
+          : node.from === 'member'
+            ? 'multisig'
+            : '',
         node.from === 'delegate' ? node.value.proxyDelay : undefined,
-        node.from === 'delegate' ? '#B700FF' : node.from === 'member' ? 'var(--primary)' : 'var(--border)',
-        node.from === 'delegate' && !!node.value.isRemoteProxy
+        node.from === 'delegate'
+          ? '#B700FF'
+          : node.from === 'member'
+            ? 'var(--primary)'
+            : 'var(--border)',
+        node.from === 'delegate' && !!node.value.isRemoteProxy,
       );
     }
 
@@ -133,9 +177,9 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
           from: 'delegate',
           parent: node.value,
           value: child,
-          parentId: nodeId
+          parentId: nodeId,
         },
-        deep + 1
+        deep + 1,
       );
     }
 
@@ -147,9 +191,9 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
             from: 'member',
             parent: node.value,
             value: child,
-            parentId: nodeId
+            parentId: nodeId,
           },
-          deep + 1
+          deep + 1,
         );
       }
     }
@@ -159,7 +203,7 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
     from: 'origin',
     parent: null,
     value: topAccount,
-    parentId: null
+    parentId: null,
   });
 
   // Update isLeaf based on actual edges
@@ -174,36 +218,47 @@ function makeNodes(topAccount: AccountData, nodes: Node<NodeData>[] = [], edges:
   });
 }
 
-function AddressOverview({ account, showControls, showMiniMap, showAddressNodeOperations = true }: Props) {
+function AddressOverview({
+  account,
+  showControls,
+  showMiniMap,
+  showAddressNodeOperations = true,
+}: Props) {
   // Memoize fitView options
   const fitViewOptions = useMemo(
     () => ({
       maxZoom: 1.5,
-      minZoom: 0.1
+      minZoom: 0.1,
     }),
-    []
+    [],
   );
 
   // Memoize the graph computation
   const { layoutedNodes, layoutedEdges } = useMemo(() => {
-    if (!account) return { layoutedNodes: [], layoutedEdges: [] };
-
     const initialNodes: Node<NodeData>[] = [];
     const initialEdges: Edge<EdgeData>[] = [];
 
     makeNodes(account, initialNodes, initialEdges);
-    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 400);
+    const { nodes, edges } = getLayoutedElements(
+      initialNodes,
+      initialEdges,
+      400,
+    );
 
     return { layoutedNodes: nodes, layoutedEdges: edges };
   }, [account]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>(layoutedNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>(layoutedEdges);
+  const [nodes, setNodes, onNodesChange] =
+    useNodesState<Node<NodeData>>(layoutedNodes);
+  const [edges, setEdges, onEdgesChange] =
+    useEdgesState<Edge<EdgeData>>(layoutedEdges);
 
   // Update nodes and edges when layout changes
   useEffect(() => {
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges);
+    queueMicrotask(() => {
+      setNodes(layoutedNodes);
+      setEdges(layoutedEdges);
+    });
   }, [layoutedNodes, layoutedEdges, setNodes, setEdges]);
 
   return (

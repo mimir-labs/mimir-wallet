@@ -14,7 +14,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Spinner
+  Spinner,
 } from '@mimir-wallet/ui';
 import React, { useCallback, useRef, useState } from 'react';
 
@@ -24,7 +24,13 @@ import { useDapps } from '@/hooks/useDapp';
 import { useDebounceFn } from '@/hooks/useDebounceFn';
 import { fetchAppMetadata, isValidURL } from '@/utils';
 
-function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function AddCustomApp({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState(false);
   const editRef = useRef<HTMLInputElement>(null);
@@ -67,17 +73,22 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           url: val,
           name: name || 'Unknown App',
           description: description || '',
-          icon
+          icon,
         });
 
         setEdit(name || 'Unknown App');
         setError(undefined);
       } else {
-        setError(new Error(response.error || 'Unable to fetch app information'));
+        setError(
+          new Error(response.error || 'Unable to fetch app information'),
+        );
         setFindApp(undefined);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch app information';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to fetch app information';
 
       setError(new Error(errorMessage));
       setFindApp(undefined);
@@ -93,37 +104,46 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
         <Divider />
         <ModalBody>
           <Input
-            label='Url'
-            placeholder='eg. https://app.uniswap.org'
+            label="Url"
+            placeholder="eg. https://app.uniswap.org"
             onChange={onInput}
-            endAdornment={isLoading ? <Spinner size='sm' /> : null}
+            endAdornment={isLoading ? <Spinner size="sm" /> : null}
           />
 
           {error && (
-            <Alert variant='destructive'>
+            <Alert variant="destructive">
               <AlertTitle>{error?.message}</AlertTitle>
             </Alert>
           )}
 
           {findApp && (
-            <div className='border-secondary flex items-center gap-5 rounded-[10px] border-1 p-5 shadow-md'>
-              <Avatar src={findApp.icon} className='h-[50px] w-[50px] flex-shrink-0 bg-transparent' radius='none' />
+            <div className="card-root flex items-center gap-5 rounded-[10px] p-5">
+              <Avatar
+                src={findApp.icon}
+                className="h-[50px] w-[50px] flex-shrink-0 bg-transparent"
+                radius="none"
+              />
               <div>
-                <div className='flex items-center gap-2'>
+                <div className="flex items-center gap-2">
                   <div
                     ref={editRef}
                     suppressContentEditableWarning
                     contentEditable
-                    className='text-base font-bold outline-none'
-                    onInput={(e) => setFindApp({ ...findApp, name: e.currentTarget.textContent || '' })}
+                    className="text-base font-bold outline-none"
+                    onInput={(e) =>
+                      setFindApp({
+                        ...findApp,
+                        name: e.currentTarget.textContent || '',
+                      })
+                    }
                   >
                     {edit}
                   </div>
                   <Button
-                    size='sm'
+                    size="sm"
                     isIconOnly
-                    variant='light'
-                    className='text-foreground/50'
+                    variant="light"
+                    className="text-foreground/50"
                     onClick={() => {
                       editRef.current?.focus();
                     }}
@@ -131,7 +151,9 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                     <IconEdit />
                   </Button>
                 </div>
-                <p className='text-foreground/50 mt-[5px] text-xs'>{findApp.description}</p>
+                <p className="text-foreground/50 mt-[5px] text-xs">
+                  {findApp.description}
+                </p>
               </div>
             </div>
           )}
@@ -141,8 +163,8 @@ function AddCustomApp({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           <Button
             disabled={!findApp}
             fullWidth
-            color='primary'
-            radius='full'
+            color="primary"
+            radius="full"
             onClick={
               findApp
                 ? () => {

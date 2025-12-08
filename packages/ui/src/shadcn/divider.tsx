@@ -9,7 +9,13 @@ type DividerProps = React.ButtonHTMLAttributes<HTMLHRElement>;
 
 function Divider({ className = '', ...props }: DividerProps) {
   return (
-    <hr className={cn('h-divider bg-secondary w-full shrink-0 border-none [&+hr]:hidden', className)} {...props} />
+    <hr
+      className={cn(
+        'h-px bg-secondary w-full shrink-0 border-none [&+hr]:hidden',
+        className,
+      )}
+      {...props}
+    />
   );
 }
 

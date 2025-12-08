@@ -1,8 +1,24 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { chainLinks, type Network, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
-import { Avatar, Divider, Drawer, DrawerContent, Modal, ModalBody, ModalContent } from '@mimir-wallet/ui';
+import {
+  chainLinks,
+  type Network,
+  useChains,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
+import {
+  Avatar,
+  Divider,
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  VisuallyHidden,
+} from '@mimir-wallet/ui';
 import { useMemo, useRef } from 'react';
 import { useEffectOnce } from 'react-use';
 
@@ -19,7 +35,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       // scroll to the top of the page
       ref.current?.scrollIntoView?.({
         behavior: 'smooth',
-        block: 'center'
+        block: 'center',
       });
     }
   });
@@ -29,38 +45,44 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       data-selected={ss58Chain === endpoint.key}
       ref={ref}
       style={{
-        background: 'var(--color-main-bg)'
+        background: 'var(--color-main-bg)',
       }}
-      className='data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 rounded-[10px] p-2 sm:gap-2 sm:p-2.5'
+      className="data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 rounded-[10px] p-2 sm:gap-2 sm:p-2.5"
       onClick={(e) => {
         e.stopPropagation();
 
         if (endpoint.explorerUrl) {
           window.open(
             chainLinks.accountExplorerLink(
-              { ss58Format: endpoint.ss58Format, explorerUrl: endpoint.explorerUrl },
-              address
+              {
+                ss58Format: endpoint.ss58Format,
+                explorerUrl: endpoint.explorerUrl,
+              },
+              address,
             ),
-            '_blank'
+            '_blank',
           );
         } else if (endpoint.statescanUrl) {
           window.open(
             chainLinks.accountExplorerLink(
-              { ss58Format: endpoint.ss58Format, statescanUrl: endpoint.statescanUrl },
-              address
+              {
+                ss58Format: endpoint.ss58Format,
+                statescanUrl: endpoint.statescanUrl,
+              },
+              address,
             ),
-            '_blank'
+            '_blank',
           );
         }
       }}
     >
       <Avatar
         src={endpoint.icon}
-        className='h-[20px] w-[20px] sm:h-[30px] sm:w-[30px]'
+        className="h-[20px] w-[20px] sm:h-[30px] sm:w-[30px]"
         style={{ backgroundColor: 'transparent' }}
       />
-      <b className='text-sm sm:text-base'>{endpoint.name}</b>
-      <div className='text-foreground/50 flex-1 text-xs'>
+      <b className="text-sm sm:text-base">{endpoint.name}</b>
+      <div className="text-foreground/50 flex-1 text-xs">
         <Address value={address} shorten ss58Format={endpoint.ss58Format} />
       </div>
       <ExplorerLink showAll chain={endpoint} address={address} />
@@ -68,11 +90,21 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
   );
 }
 
-function GroupedNetwork({ address, group, endpoints }: { address: string; group: string; endpoints: Network[] }) {
+function GroupedNetwork({
+  address,
+  group,
+  endpoints,
+}: {
+  address: string;
+  group: string;
+  endpoints: Network[];
+}) {
   return (
     <div>
-      <div className='text-primary mb-2.5 text-base font-bold capitalize'>{group}</div>
-      <div className='grid grid-cols-1 gap-2.5 md:grid-cols-2'>
+      <div className="text-primary mb-2.5 text-base font-bold capitalize">
+        {group}
+      </div>
+      <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
         {endpoints.map((endpoint) => (
           <Item key={endpoint.key} endpoint={endpoint} address={address} />
         ))}
@@ -92,14 +124,17 @@ function ExplorerAddressModal() {
         if (network.isRelayChain) {
           acc[network.key] = [network, ...(acc[network.key] || [])];
         } else if (network.relayChain) {
-          acc[network.relayChain] = [...(acc[network.relayChain] || []), network];
+          acc[network.relayChain] = [
+            ...(acc[network.relayChain] || []),
+            network,
+          ];
         } else {
           acc['solochain'] = [...(acc['solochain'] || []), network];
         }
 
         return acc;
       },
-      {} as Record<string, Network[]>
+      {} as Record<string, Network[]>,
     );
 
     return groupedEndpoints;
@@ -111,7 +146,12 @@ function ExplorerAddressModal() {
 
   const content = Object.keys(groupedEndpoints).map((group, index) => (
     <>
-      <GroupedNetwork key={`group-${group}`} address={address} group={group} endpoints={groupedEndpoints[group]} />
+      <GroupedNetwork
+        key={`group-${group}`}
+        address={address}
+        group={group}
+        endpoints={groupedEndpoints[group]}
+      />
 
       {index > 0 && <Divider />}
     </>
@@ -119,9 +159,14 @@ function ExplorerAddressModal() {
 
   if (upMd) {
     return (
-      <Drawer open={isOpen} onClose={close} direction='right'>
+      <Drawer open={isOpen} onClose={close} direction="right">
         <DrawerContent>
-          <div className='flex flex-col gap-2.5 overflow-y-auto p-4'>{content}</div>
+          <VisuallyHidden>
+            <DrawerTitle>Open Explorer</DrawerTitle>
+          </VisuallyHidden>
+          <div className="flex flex-col gap-2.5 overflow-y-auto p-4">
+            {content}
+          </div>
         </DrawerContent>
       </Drawer>
     );
@@ -130,6 +175,10 @@ function ExplorerAddressModal() {
   return (
     <Modal onClose={close} isOpen={isOpen}>
       <ModalContent>
+        <VisuallyHidden>
+          <ModalHeader>Open Explorer</ModalHeader>
+        </VisuallyHidden>
+
         <ModalBody>{content}</ModalBody>
       </ModalContent>
     </Modal>

@@ -5,7 +5,13 @@ import React, { createContext, forwardRef, useContext } from 'react';
 
 import { cn } from '../lib/utils.js';
 
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './dialog.js';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './dialog.js';
 
 const sizeClassNames = {
   xs: 'max-w-xs',
@@ -16,7 +22,7 @@ const sizeClassNames = {
   '2xl': 'max-w-2xl',
   '3xl': 'max-w-3xl',
   '4xl': 'max-w-4xl',
-  '5xl': 'max-w-5xl'
+  '5xl': 'max-w-5xl',
 } as const;
 
 interface CompatProps {
@@ -33,7 +39,14 @@ export interface ModalProps extends CompatProps {
   className?: string;
 }
 
-function Modal({ children, isOpen = false, size, hideCloseButton, onClose, ...props }: ModalProps) {
+function Modal({
+  children,
+  isOpen = false,
+  size,
+  hideCloseButton,
+  onClose,
+  ...props
+}: ModalProps) {
   const handleOpenChange = (open: boolean) => {
     if (!open && onClose) {
       onClose();
@@ -51,22 +64,23 @@ function Modal({ children, isOpen = false, size, hideCloseButton, onClose, ...pr
 
 Modal.displayName = 'Modal';
 
-const ModalContent = forwardRef<HTMLDivElement, React.ComponentProps<typeof DialogContent>>(
-  ({ children, className, ...props }, ref) => {
-    const { size = 'lg', hideCloseButton = false } = useContext(context);
+const ModalContent = forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<typeof DialogContent>
+>(({ children, className, ...props }, ref) => {
+  const { size = 'lg', hideCloseButton = false } = useContext(context);
 
-    return (
-      <DialogContent
-        ref={ref}
-        className={cn(sizeClassNames[size], 'gap-5', className)}
-        showCloseButton={props.showCloseButton ?? !hideCloseButton}
-        {...props}
-      >
-        {children}
-      </DialogContent>
-    );
-  }
-);
+  return (
+    <DialogContent
+      ref={ref}
+      className={cn(sizeClassNames[size], 'gap-5', className)}
+      showCloseButton={props.showCloseButton ?? !hideCloseButton}
+      {...props}
+    >
+      {children}
+    </DialogContent>
+  );
+});
 
 ModalContent.displayName = 'ModalContent';
 
@@ -75,15 +89,21 @@ export interface ModalHeaderProps {
   className?: string;
 }
 
-const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(({ children, className, ...props }, ref) => {
-  const isTextContent = typeof children === 'string';
+const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(
+  ({ children, className, ...props }, ref) => {
+    const isTextContent = typeof children === 'string';
 
-  return (
-    <DialogHeader ref={ref} className={className} {...props}>
-      {isTextContent ? <DialogTitle className='text-2xl font-bold'>{children}</DialogTitle> : children}
-    </DialogHeader>
-  );
-});
+    return (
+      <DialogHeader ref={ref} className={className} {...props}>
+        {isTextContent ? (
+          <DialogTitle className="text-2xl font-bold">{children}</DialogTitle>
+        ) : (
+          children
+        )}
+      </DialogHeader>
+    );
+  },
+);
 
 ModalHeader.displayName = 'ModalHeader';
 
@@ -92,13 +112,19 @@ export interface ModalBodyProps {
   className?: string;
 }
 
-const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(({ children, className, ...props }, ref) => {
-  return (
-    <div ref={ref} className={cn('flex flex-col gap-2.5 p-0', className)} {...props}>
-      {children}
-    </div>
-  );
-});
+const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn('flex flex-col gap-2.5 p-0', className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  },
+);
 
 ModalBody.displayName = 'ModalBody';
 
@@ -107,13 +133,15 @@ export interface ModalFooterProps {
   className?: string;
 }
 
-const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(({ children, className, ...props }, ref) => {
-  return (
-    <DialogFooter ref={ref} className={cn('gap-2', className)} {...props}>
-      {children}
-    </DialogFooter>
-  );
-});
+const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <DialogFooter ref={ref} className={cn('gap-2', className)} {...props}>
+        {children}
+      </DialogFooter>
+    );
+  },
+);
 
 ModalFooter.displayName = 'ModalFooter';
 

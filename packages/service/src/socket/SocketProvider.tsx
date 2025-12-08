@@ -28,13 +28,13 @@ const SocketProvider = ({
   url = API_CLIENT_WS_GATEWAY,
   path = '/',
   autoConnect = true,
-  children
+  children,
 }: SocketProviderProps) => {
   const [socketState, setSocketState] = useState<SocketState>({
     isConnected: false,
     isReconnecting: false,
     error: null,
-    socket: null
+    socket: null,
   });
 
   const socketRef = useRef<Socket | null>(null);
@@ -90,7 +90,7 @@ const SocketProvider = ({
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      timeout: 20000
+      timeout: 20000,
     });
 
     socketRef.current = socket;
@@ -102,7 +102,7 @@ const SocketProvider = ({
         isConnected: true,
         isReconnecting: false,
         error: null,
-        socket
+        socket,
       });
     });
 
@@ -117,12 +117,14 @@ const SocketProvider = ({
     });
 
     socket.on('reconnect', (attemptNumber: number) => {
-      console.log(`WebSocket reconnected successfully (after ${attemptNumber} attempts)`);
+      console.log(
+        `WebSocket reconnected successfully (after ${attemptNumber} attempts)`,
+      );
       updateSocketState({
         isConnected: true,
         isReconnecting: false,
         error: null,
-        socket
+        socket,
       });
     });
 
@@ -131,7 +133,7 @@ const SocketProvider = ({
       isConnectingRef.current = false;
       updateSocketState({
         isReconnecting: false,
-        error: new Error('Failed to reconnect after multiple attempts')
+        error: new Error('Failed to reconnect after multiple attempts'),
       });
     });
 
@@ -159,7 +161,7 @@ const SocketProvider = ({
           isConnected: false,
           isReconnecting: false,
           error: null,
-          socket: null
+          socket: null,
         });
       }
     };
@@ -172,10 +174,14 @@ const SocketProvider = ({
     isConnected: socketState.isConnected,
     isReconnecting: socketState.isReconnecting,
     error: socketState.error,
-    socket: socketState.socket
+    socket: socketState.socket,
   };
 
-  return <SocketContext.Provider value={contextValue}>{children}</SocketContext.Provider>;
+  return (
+    <SocketContext.Provider value={contextValue}>
+      {children}
+    </SocketContext.Provider>
+  );
 };
 
 export default SocketProvider;

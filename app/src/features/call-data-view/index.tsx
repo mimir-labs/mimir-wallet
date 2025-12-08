@@ -26,7 +26,7 @@ function CallDataViewerContent({
   network,
   calldata,
   setNetwork,
-  setCallData
+  setCallData,
 }: {
   network: string;
   calldata: string;
@@ -37,23 +37,37 @@ function CallDataViewerContent({
   const { call: parsedCallData, error } = useParseCall(network, calldata);
 
   // Convert standard Error to FeatureError for ErrorDisplay
-  const callDataError = useMemo(() => (error ? handleDecodeError(error, 'call data decoding') : null), [error]);
+  const callDataError = useMemo(
+    () => (error ? handleDecodeError(error, 'call data decoding') : null),
+    [error],
+  );
 
   return (
-    <div className='h-full space-y-5'>
-      <div className='flex items-center justify-between'>
+    <div className="h-full space-y-5">
+      <div className="flex items-center justify-between">
         <h4>Call Data Details</h4>
       </div>
 
       <InputNetwork network={network} setNetwork={setNetwork} />
 
-      <Input label='Call Data' placeholder='0x...' onChange={setCallData} value={calldata} />
+      <Input
+        label="Call Data"
+        placeholder="0x..."
+        onChange={setCallData}
+        value={calldata}
+      />
 
-      <ErrorDisplay error={callDataError} showDetails={process.env.NODE_ENV === 'development'} />
+      <ErrorDisplay
+        error={callDataError}
+        showDetails={process.env.NODE_ENV === 'development'}
+      />
 
       {parsedCallData && (
-        <div className='bg-secondary rounded-[10px] p-2.5'>
-          <JsonView data={parsedCallData.toHuman()} collapseStringsAfterLength={20} />
+        <div className="bg-secondary rounded-[10px] p-2.5">
+          <JsonView
+            data={parsedCallData.toHuman()}
+            collapseStringsAfterLength={20}
+          />
         </div>
       )}
 
@@ -64,12 +78,16 @@ function CallDataViewerContent({
             onClick={() => {
               events.emit('template_add', network, parsedCallData.toHex());
             }}
-            color='primary'
-            variant='ghost'
+            color="primary"
+            variant="ghost"
           >
             Add To Template
           </Button>
-          <DotConsoleButton variant='ghost' network={network} call={parsedCallData.toHex()} />
+          <DotConsoleButton
+            variant="ghost"
+            network={network}
+            call={parsedCallData.toHex()}
+          />
         </>
       )}
     </div>
@@ -81,7 +99,10 @@ interface CallDataViewerProps {
   ref?: React.Ref<CallDataViewRef>;
 }
 
-function CallDataViewer({ calldata: initialCallData, ref }: CallDataViewerProps) {
+function CallDataViewer({
+  calldata: initialCallData,
+  ref,
+}: CallDataViewerProps) {
   const [network, setNetwork] = useInputNetwork();
   const [calldata, setCallData] = useState(initialCallData || '');
 
@@ -90,14 +111,19 @@ function CallDataViewer({ calldata: initialCallData, ref }: CallDataViewerProps)
     ref,
     () => ({
       setNetwork: setNetwork,
-      setCallData: setCallData
+      setCallData: setCallData,
     }),
-    [setNetwork]
+    [setNetwork],
   );
 
   return (
     <NetworkProvider network={network}>
-      <CallDataViewerContent network={network} calldata={calldata} setNetwork={setNetwork} setCallData={setCallData} />
+      <CallDataViewerContent
+        network={network}
+        calldata={calldata}
+        setNetwork={setNetwork}
+        setCallData={setCallData}
+      />
     </NetworkProvider>
   );
 }

@@ -34,17 +34,20 @@ export function useSs58Format(): Ss58FormatControl {
   const { ss58Chain, setSs58Chain } = useApiStore(
     useShallow((state) => ({
       ss58Chain: state.ss58Chain,
-      setSs58Chain: state.setSs58Chain
-    }))
+      setSs58Chain: state.setSs58Chain,
+    })),
   );
 
-  const chainInfo = useMemo(() => ApiManager.resolveChain(ss58Chain) ?? allEndpoints[0], [ss58Chain]);
+  const chainInfo = useMemo(
+    () => ApiManager.resolveChain(ss58Chain) ?? allEndpoints[0],
+    [ss58Chain],
+  );
 
   return {
     ss58: chainInfo.ss58Format,
     ss58Chain,
     chainInfo,
-    setSs58Chain
+    setSs58Chain,
   };
 }
 

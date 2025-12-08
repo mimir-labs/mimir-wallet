@@ -7,7 +7,7 @@ import type {
   FilterPath,
   FilterPathWithoutId,
   MultisigAccountData,
-  Transaction
+  Transaction,
 } from '@/hooks/types';
 
 import { addressEq, addressToHex } from '@mimir-wallet/polkadot-core';
@@ -35,7 +35,7 @@ export function filterPathId(_deep: number, filterPath: FilterPathWithoutId) {
 function findFilterPaths(
   topAccount: AccountData,
   accountSource: (address: string) => string | undefined,
-  topTransaction?: Transaction | null
+  topTransaction?: Transaction | null,
 ): FilterPath[][] {
   const paths: FilterPath[][] = [];
 
@@ -59,7 +59,12 @@ function findFilterPaths(
         approvalForThisPath: boolean;
       };
 
-  function dfs(deep: number, node: NodeInfo, path: FilterPath[], transaction?: Transaction | null) {
+  function dfs(
+    deep: number,
+    node: NodeInfo,
+    path: FilterPath[],
+    transaction?: Transaction | null,
+  ) {
     if (node.from === 'delegate') {
       const p: FilterPathWithoutId = {
         type: 'proxy',
@@ -67,12 +72,12 @@ function findFilterPaths(
         proxyType: node.value.proxyType,
         delay: node.value.proxyDelay,
         address: node.value.address,
-        genesisHash: node.value.proxyNetwork
+        genesisHash: node.value.proxyNetwork,
       } as FilterPath;
 
       path.push({
         id: filterPathId(deep, p),
-        ...p
+        ...p,
       });
     } else if (node.from === 'member') {
       const p: FilterPathWithoutId = {
@@ -82,17 +87,17 @@ function findFilterPaths(
         otherSignatures: node.parent.members
           .filter((item) => !addressEq(item.address, node.value.address))
           .map((item) => item.address),
-        address: node.value.address
+        address: node.value.address,
       };
 
       path.push({
         id: filterPathId(deep, p),
-        ...p
+        ...p,
       });
     } else {
       const p: FilterPathWithoutId = {
         type: 'origin',
-        address: node.value.address
+        address: node.value.address,
       };
 
       path.push({ id: filterPathId(deep, p), ...p });
@@ -126,14 +131,20 @@ function findFilterPaths(
           if (addressEq(transaction.delegate, child.address)) {
             dfs(
               deep + 1,
-              { from: 'delegate', parent: node.value, value: child, approvalForThisPath },
+              {
+                from: 'delegate',
+                parent: node.value,
+                value: child,
+                approvalForThisPath,
+              },
               path,
               transaction.children.find(
                 (item) =>
                   item.section === 'proxy' &&
-                  (item.method === 'proxyAnnounced' || item.method === 'announce') &&
-                  addressEq(item.address, child.address)
-              )
+                  (item.method === 'proxyAnnounced' ||
+                    item.method === 'announce') &&
+                  addressEq(item.address, child.address),
+              ),
             );
           }
         }
@@ -142,23 +153,42 @@ function findFilterPaths(
           if (addressEq(transaction.delegate, child.address)) {
             dfs(
               deep + 1,
-              { from: 'delegate', parent: node.value, value: child, approvalForThisPath },
+              {
+                from: 'delegate',
+                parent: node.value,
+                value: child,
+                approvalForThisPath,
+              },
               path,
               transaction.children.find(
                 (item) =>
                   ((item.section === 'proxy' && item.method === 'proxy') ||
-                    (item.section === 'remoteProxyRelayChain' && item.method === 'remoteProxyWithRegisteredProof')) &&
-                  addressEq(item.address, child.address)
-              )
+                    (item.section === 'remoteProxyRelayChain' &&
+                      item.method === 'remoteProxyWithRegisteredProof')) &&
+                  addressEq(item.address, child.address),
+              ),
             );
           }
         }
       } else {
-        dfs(deep + 1, { from: 'delegate', parent: node.value, value: child, approvalForThisPath }, path, null);
+        dfs(
+          deep + 1,
+          {
+            from: 'delegate',
+            parent: node.value,
+            value: child,
+            approvalForThisPath,
+          },
+          path,
+          null,
+        );
       }
     }
 
-    if (node.value.type === 'multisig' && (!transaction || transaction.type === TransactionType.Multisig)) {
+    if (
+      node.value.type === 'multisig' &&
+      (!transaction || transaction.type === TransactionType.Multisig)
+    ) {
       // traverse the member or members of the current account
       for (const child of node.value.members) {
         dfs(
@@ -167,15 +197,17 @@ function findFilterPaths(
             from: 'member',
             parent: node.value,
             value: child,
-            approvalForThisPath
+            approvalForThisPath,
           },
           path,
           transaction?.children.find(
             (item) =>
               item.section === 'multisig' &&
-              (item.method === 'asMulti' || item.method === 'approveAsMulti' || item.method === 'asMultiThreshold1') &&
-              addressEq(item.address, child.address)
-          )
+              (item.method === 'asMulti' ||
+                item.method === 'approveAsMulti' ||
+                item.method === 'asMultiThreshold1') &&
+              addressEq(item.address, child.address),
+          ),
         );
       }
     }
@@ -193,16 +225,20 @@ function findFilterPaths(
         !topTransaction ||
         (topTransaction.type === TransactionType.Proxy
           ? topTransaction.status !== TransactionStatus.Success
-          : topTransaction.status === TransactionStatus.Pending)
+          : topTransaction.status === TransactionStatus.Pending),
     },
     [],
-    topTransaction
+    topTransaction,
   );
 
   return paths;
 }
 
-function appendProposers(paths: FilterPath[][], account: AccountData, proposers?: AccountData['proposers'] | null) {
+function appendProposers(
+  paths: FilterPath[][],
+  account: AccountData,
+  proposers?: AccountData['proposers'] | null,
+) {
   if (!proposers || proposers.length === 0) return;
 
   let first = paths.at(0)?.at(0);
@@ -211,10 +247,10 @@ function appendProposers(paths: FilterPath[][], account: AccountData, proposers?
     first = {
       id: filterPathId(0, {
         type: 'origin',
-        address: account.address
+        address: account.address,
       }),
       type: 'origin',
-      address: account.address
+      address: account.address,
     };
   }
 
@@ -226,13 +262,16 @@ function appendProposers(paths: FilterPath[][], account: AccountData, proposers?
       {
         id: filterPathId(0, { type: 'proposer', address: proposer.proposer }),
         type: 'proposer',
-        address: proposer.proposer
-      }
+        address: proposer.proposer,
+      },
     ]);
   }
 }
 
-export function useFilterPaths(account?: AccountData | null, transaction?: Transaction | null) {
+export function useFilterPaths(
+  account?: AccountData | null,
+  transaction?: Transaction | null,
+) {
   return useMemo(() => {
     if (!account) return [];
 

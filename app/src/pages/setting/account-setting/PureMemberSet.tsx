@@ -21,7 +21,7 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
   // Memoize filtered delegatees to avoid recalculation on every render
   const multisigDelegatees = useMemo(
     () => account.delegatees.filter((item) => item.type === 'multisig'),
-    [account.delegatees]
+    [account.delegatees],
   );
 
   // Call hooks unconditionally before any early returns
@@ -38,22 +38,26 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
   }
 
   const activeIndex = parseInt(activeTab, 10);
-  const activeAccount = multisigDelegatees[activeIndex] || multisigDelegatees[0];
+  const activeAccount =
+    multisigDelegatees[activeIndex] || multisigDelegatees[0];
 
   return (
     <div>
-      <h6 className='text-foreground/50 mb-2.5 inline-flex items-center gap-1 text-sm'>
+      <h6 className="text-foreground/50 mb-2.5 inline-flex items-center gap-1 text-sm">
         Multisig Information
         <Tooltip
           classNames={{ content: 'max-w-[300px]' }}
-          content='For Pure Proxy, each controllable multisig account is listed as a member set.'
+          content="For Pure Proxy, each controllable multisig account is listed as a member set."
         >
-          <IconQuestion className='text-primary' />
+          <IconQuestion className="text-primary" />
         </Tooltip>
       </h6>
-      <div className='border-secondary bg-background rounded-[20px] border-1 p-4 shadow-md sm:p-5'>
+      <div className="card-root p-4 sm:p-5">
         {txs.length > 0 && (
-          <div className='text-primary mb-5 cursor-pointer font-bold' onClick={handleNavigateToTransactions}>
+          <div
+            className="text-primary mb-5 cursor-pointer font-bold"
+            onClick={handleNavigateToTransactions}
+          >
             Please process {txs.length} Pending Transaction first
           </div>
         )}
@@ -61,19 +65,27 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
         {multisigDelegatees.length > 1 ? (
           <>
             <Tabs
-              className='mb-2.5'
-              variant='underlined'
+              className="mb-2.5"
+              variant="underlined"
               tabs={multisigDelegatees.map((_, index) => ({
                 key: String(index),
-                label: `Members Set${index + 1}`
+                label: `Members Set${index + 1}`,
               }))}
               selectedKey={activeTab}
               onSelectionChange={setActiveTab}
             />
-            <MemberSet account={activeAccount} pureAccount={account} disabled={!!txs.length} />
+            <MemberSet
+              account={activeAccount}
+              pureAccount={account}
+              disabled={!!txs.length}
+            />
           </>
         ) : (
-          <MemberSet account={multisigDelegatees[0]} pureAccount={account} disabled={!!txs.length} />
+          <MemberSet
+            account={multisigDelegatees[0]}
+            pureAccount={account}
+            disabled={!!txs.length}
+          />
         )}
       </div>
     </div>

@@ -14,12 +14,12 @@ function createMockRegistry(chainSS58?: number) {
         return {
           callIndex: new Uint8Array([0, 1]),
           args: [],
-          toU8a: () => data
+          toU8a: () => data,
         };
       }
 
       return data;
-    })
+    }),
   } as any;
 }
 
@@ -38,21 +38,23 @@ function createMockApi(options?: {
     tx: {
       proxy: {
         proxy: {
-          is: vi.fn().mockReturnValue(options?.proxyProxy || false)
+          is: vi.fn().mockReturnValue(options?.proxyProxy || false),
         },
         proxyAnnounced: {
-          is: vi.fn().mockReturnValue(options?.proxyProxyAnnounced || false)
-        }
+          is: vi.fn().mockReturnValue(options?.proxyProxyAnnounced || false),
+        },
       },
       multisig: {
         asMulti: {
-          is: vi.fn().mockReturnValue(options?.multisigAsMulti || false)
+          is: vi.fn().mockReturnValue(options?.multisigAsMulti || false),
         },
         asMultiThreshold1: {
-          is: vi.fn().mockReturnValue(options?.multisigAsMultiThreshold1 || false)
-        }
-      }
-    }
+          is: vi
+            .fn()
+            .mockReturnValue(options?.multisigAsMultiThreshold1 || false),
+        },
+      },
+    },
   } as any;
 }
 
@@ -84,7 +86,7 @@ describe('call', () => {
         chainSS58: 42,
         createType: vi.fn(() => {
           throw new Error('Invalid call data');
-        })
+        }),
       } as any;
 
       // Suppress console.warn during test
@@ -102,7 +104,7 @@ describe('call', () => {
         chainSS58: 42,
         createType: vi.fn(() => {
           throw new Error('Invalid call data');
-        })
+        }),
       } as any;
 
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -133,7 +135,10 @@ describe('call', () => {
 
     it('should handle unknown chainSS58', () => {
       const registry = {
-        createType: vi.fn(() => ({ callIndex: new Uint8Array([0, 1]), args: [] }))
+        createType: vi.fn(() => ({
+          callIndex: new Uint8Array([0, 1]),
+          args: [],
+        })),
       } as any;
       const calldata = '0x0004';
 
@@ -158,7 +163,11 @@ describe('call', () => {
       const api = createMockApi();
       const address = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 
-      const [resultAddress, resultCall] = findTargetCall(api, address, undefined);
+      const [resultAddress, resultCall] = findTargetCall(
+        api,
+        address,
+        undefined,
+      );
 
       expect(resultAddress).toBe(address);
       expect(resultCall).toBeUndefined();
@@ -169,10 +178,14 @@ describe('call', () => {
       const address = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
       const mockCall = {
         callIndex: new Uint8Array([0, 1]),
-        args: []
+        args: [],
       } as any;
 
-      const [resultAddress, resultCall] = findTargetCall(api, address, mockCall);
+      const [resultAddress, resultCall] = findTargetCall(
+        api,
+        address,
+        mockCall,
+      );
 
       expect(resultAddress).toBe(address);
       expect(resultCall).toBe(mockCall);
@@ -186,12 +199,12 @@ describe('call', () => {
       const mockInnerCall = {
         callIndex: new Uint8Array([0, 2]),
         args: [],
-        toU8a: () => new Uint8Array([0, 2])
+        toU8a: () => new Uint8Array([0, 2]),
       };
 
       const mockCall = {
         callIndex: new Uint8Array([0, 1]),
-        args: [{ toString: () => targetAddress }, {}, mockInnerCall]
+        args: [{ toString: () => targetAddress }, {}, mockInnerCall],
       } as any;
 
       // After first call, make proxy.proxy.is return false to stop recursion
@@ -216,12 +229,12 @@ describe('call', () => {
       const mockInnerCall = {
         callIndex: new Uint8Array([0, 2]),
         args: [],
-        toU8a: () => new Uint8Array([0, 2])
+        toU8a: () => new Uint8Array([0, 2]),
       };
 
       const mockCall = {
         callIndex: new Uint8Array([0, 1]),
-        args: [{}, { toString: () => targetAddress }, {}, mockInnerCall]
+        args: [{}, { toString: () => targetAddress }, {}, mockInnerCall],
       } as any;
 
       let callCount = 0;

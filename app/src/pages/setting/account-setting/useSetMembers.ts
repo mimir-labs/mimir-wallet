@@ -19,29 +19,46 @@ interface UseSetMembers {
   unselect: (value: string) => void;
 }
 
-export function useSetMembers(defaultSignatories: string[], defaultThreshold: number): UseSetMembers {
+export function useSetMembers(
+  defaultSignatories: string[],
+  defaultThreshold: number,
+): UseSetMembers {
   const { accounts, addresses } = useAccount();
   const all = useMemo(
-    () => accounts.map((item) => item.address).concat(addresses.map((item) => item.address)),
-    [accounts, addresses]
+    () =>
+      accounts
+        .map((item) => item.address)
+        .concat(addresses.map((item) => item.address)),
+    [accounts, addresses],
   );
   const [signatories, setSignatories] = useState<string[]>(defaultSignatories);
   const [threshold, setThreshold] = useState<number>(defaultThreshold);
 
   const unselected = useMemo(
-    () => Array.from(new Set(all.filter((account) => !signatories.includes(account)))),
-    [all, signatories]
+    () =>
+      Array.from(
+        new Set(all.filter((account) => !signatories.includes(account))),
+      ),
+    [all, signatories],
   );
 
-  const hasSoloAccount = useMemo(() => !!signatories.find((address) => !!accountSource(address)), [signatories]);
-  const isThresholdValid = Number(threshold) >= 1 && Number(threshold) <= signatories.length;
+  const hasSoloAccount = useMemo(
+    () => !!signatories.find((address) => !!accountSource(address)),
+    [signatories],
+  );
+  const isThresholdValid =
+    Number(threshold) >= 1 && Number(threshold) <= signatories.length;
 
   const select = useCallback((value: string) => {
-    setSignatories((accounts) => (accounts.includes(value) ? accounts : accounts.concat(value)));
+    setSignatories((accounts) =>
+      accounts.includes(value) ? accounts : accounts.concat(value),
+    );
   }, []);
 
   const unselect = useCallback((value: string) => {
-    setSignatories((accounts) => accounts.filter((account) => account !== value));
+    setSignatories((accounts) =>
+      accounts.filter((account) => account !== value),
+    );
   }, []);
 
   return {
@@ -52,6 +69,6 @@ export function useSetMembers(defaultSignatories: string[], defaultThreshold: nu
     setThreshold,
     hasSoloAccount,
     select,
-    unselect
+    unselect,
   };
 }

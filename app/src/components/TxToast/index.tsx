@@ -8,7 +8,9 @@ import { useTxQueue } from '@/hooks/useTxQueue';
 function TxToast() {
   const { toasts } = useTxQueue();
 
-  return toasts.map(({ events, id, onRemove }) => <ToastNotification events={events} key={id} onRemove={onRemove} />);
+  return toasts.map(({ events, id, onRemove }) => (
+    <ToastNotification events={events} key={id} onRemove={onRemove} />
+  ));
 }
 
 export default TxToast;

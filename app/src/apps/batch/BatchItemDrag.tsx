@@ -44,7 +44,7 @@ function BatchItemDrag({
   disabledReason,
   onSelected,
   onDelete,
-  onCopy
+  onCopy,
 }: Props) {
   const [isOpen, toggleOpen] = useToggle(false);
 
@@ -52,7 +52,14 @@ function BatchItemDrag({
     return registry ? parseCall(registry, calldata) : null;
   }, [registry, calldata]);
 
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
 
   const isSelected = useMemo(() => selected.includes(id), [selected, id]);
 
@@ -60,7 +67,7 @@ function BatchItemDrag({
     (checked: boolean) => {
       onSelected(checked);
     },
-    [onSelected]
+    [onSelected],
   );
 
   const handleCopy = useCallback(() => {
@@ -84,8 +91,10 @@ function BatchItemDrag({
   }
 
   const style = {
-    transform: CSS.Transform.toString(transform ? { ...transform, scaleY: transform.scaleX } : null),
-    transition
+    transform: CSS.Transform.toString(
+      transform ? { ...transform, scaleY: transform.scaleX } : null,
+    ),
+    transition,
   };
 
   return (
@@ -97,16 +106,31 @@ function BatchItemDrag({
       data-open={isOpen}
       data-dragging={isDragging}
       data-disabled={isSelectionDisabled}
-      className='bg-secondary data-[dragging=true]:bg-primary-50 overflow-hidden rounded-[10px] data-[disabled=true]:opacity-50'
+      className="bg-secondary data-[dragging=true]:bg-primary-50 overflow-hidden rounded-[10px] data-[disabled=true]:opacity-50"
     >
-      <div className='grid h-11 cursor-pointer grid-cols-12 px-2 text-sm sm:px-3' onClick={handleToggle}>
-        <div className='col-span-2 flex items-center' onClick={handleStopPropagation}>
-          <img {...listeners} src={Drag} style={{ cursor: 'grab', padding: 10, marginLeft: -10, userSelect: 'none' }} />
+      <div
+        className="grid h-11 cursor-pointer grid-cols-12 px-2 text-sm sm:px-3"
+        onClick={handleToggle}
+      >
+        <div
+          className="col-span-2 flex items-center"
+          onClick={handleStopPropagation}
+        >
+          <img
+            {...listeners}
+            src={Drag}
+            style={{
+              cursor: 'grab',
+              padding: 10,
+              marginLeft: -10,
+              userSelect: 'none',
+            }}
+          />
           {disabledReason ? (
             <Tooltip content={disabledReason}>
               <div>
                 <label
-                  className='inline-flex cursor-pointer items-center gap-2 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50'
+                  className="inline-flex cursor-pointer items-center gap-2 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
                   data-disabled={isSelectionDisabled || undefined}
                 >
                   <Checkbox
@@ -120,7 +144,7 @@ function BatchItemDrag({
             </Tooltip>
           ) : (
             <label
-              className='inline-flex cursor-pointer items-center gap-2 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50'
+              className="inline-flex cursor-pointer items-center gap-2 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
               data-disabled={isSelectionDisabled || undefined}
             >
               <Checkbox
@@ -133,36 +157,54 @@ function BatchItemDrag({
           )}
         </div>
 
-        <div className='col-span-3 flex items-center'>
+        <div className="col-span-3 flex items-center">
           <AppName website={website} iconUrl={iconUrl} appName={appName} />
         </div>
 
-        <div className='col-span-5 flex items-center'>
-          <span className='overflow-hidden text-ellipsis'>
-            {registry ? <CallDisplayDetail fallbackWithName registry={registry} call={call} /> : null}
+        <div className="col-span-5 flex items-center">
+          <span className="overflow-hidden text-ellipsis">
+            {registry ? (
+              <CallDisplayDetail
+                fallbackWithName
+                registry={registry}
+                call={call}
+              />
+            ) : null}
           </span>
         </div>
 
-        <div className='col-span-2 flex items-center justify-between'>
-          <div className='flex items-center gap-1'>
-            <Tooltip content='Copy'>
-              <Button isIconOnly variant='light' onClick={handleCopy} size='sm' color='primary'>
+        <div className="col-span-2 flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <Tooltip content="Copy">
+              <Button
+                isIconOnly
+                variant="light"
+                onClick={handleCopy}
+                size="sm"
+                color="primary"
+              >
                 <IconCopy style={{ width: '1em', height: '1em' }} />
               </Button>
             </Tooltip>
-            <Tooltip content='Delete'>
-              <Button isIconOnly variant='light' onClick={handleDelete} size='sm' color='danger'>
+            <Tooltip content="Delete">
+              <Button
+                isIconOnly
+                variant="light"
+                onClick={handleDelete}
+                size="sm"
+                color="danger"
+              >
                 <IconDelete style={{ width: 16, height: 16 }} />
               </Button>
             </Tooltip>
           </div>
           <Button
             isIconOnly
-            size='sm'
-            variant='light'
-            color='primary'
+            size="sm"
+            variant="light"
+            color="primary"
             data-open={isOpen}
-            className='rotate-0 data-[open=true]:rotate-180'
+            className="rotate-0 data-[open=true]:rotate-180"
             onClick={handleToggle}
           >
             <ArrowDown style={{ width: 16, height: 16 }} />
@@ -171,8 +213,10 @@ function BatchItemDrag({
       </div>
 
       {isOpen ? (
-        <div className='bg-background @container mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3'>
-          {registry ? <Call showFallback from={from} call={call} registry={registry} /> : null}
+        <div className="bg-background @container mr-2 mb-2 ml-2 flex flex-col justify-between gap-2 overflow-hidden rounded-[10px] p-2 sm:mr-3 sm:mb-3 sm:ml-3 sm:gap-3 sm:p-3">
+          {registry ? (
+            <Call showFallback from={from} call={call} registry={registry} />
+          ) : null}
         </div>
       ) : null}
     </div>

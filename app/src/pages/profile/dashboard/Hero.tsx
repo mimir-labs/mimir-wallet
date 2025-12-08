@@ -21,7 +21,13 @@ import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
 import { formatDisplay } from '@/utils';
 
-function SubsquareLink({ network, address }: { network: string; address: string }) {
+function SubsquareLink({
+  network,
+  address,
+}: {
+  network: string;
+  address: string;
+}) {
   const isSupported = SubsquareApp.supportedChains.includes(network);
 
   if (!isSupported) {
@@ -33,15 +39,27 @@ function SubsquareLink({ network, address }: { network: string; address: string 
   url.pathname = `/user/${address}`;
 
   return (
-    <Tooltip content='Subsquare'>
-      <Link to='/explorer/$url' params={{ url: url.toString() }}>
-        <img style={{ width: 16, height: 16 }} src='/dapp-icons/subsquare.svg' alt='subsquare' />
+    <Tooltip content="Subsquare">
+      <Link to="/explorer/$url" params={{ url: url.toString() }}>
+        <img
+          style={{ width: 16, height: 16 }}
+          src="/dapp-icons/subsquare.svg"
+          alt="subsquare"
+        />
       </Link>
     </Tooltip>
   );
 }
 
-function Hero({ address, totalUsd, changes }: { address: string; totalUsd: string | number; changes: number }) {
+function Hero({
+  address,
+  totalUsd,
+  changes,
+}: {
+  address: string;
+  totalUsd: string | number;
+  changes: number;
+}) {
   const { network } = useNetwork();
   const [open, toggleOpen] = useToggle(false);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
@@ -63,38 +81,67 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
   const showAddWatchlistButton = useMemo(
     () => !isLocalAccount(address) && !isLocalAddress(address, true),
-    [address, isLocalAccount, isLocalAddress]
+    [address, isLocalAccount, isLocalAddress],
   );
   const buttons = (
-    <div className='item-center grid w-full grid-cols-2 gap-2 pt-2.5 sm:w-auto md:flex'>
-      <Button asChild variant='solid' color='primary' size='md' className='h-[26px]'>
-        <Link to='/explorer/$url' params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}>
+    <div className="item-center grid w-full grid-cols-2 gap-2 pt-2.5 sm:w-auto md:flex">
+      <Button
+        asChild
+        variant="solid"
+        color="primary"
+        size="md"
+        className="h-[26px]"
+      >
+        <Link
+          to="/explorer/$url"
+          params={{
+            url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`,
+          }}
+        >
           Transfer
           <IconSend />
         </Link>
       </Button>
-      <Button onClick={toggleOpen} variant='ghost' color='primary' size='md' className='h-[26px]'>
+      <Button
+        onClick={toggleOpen}
+        variant="ghost"
+        color="primary"
+        size="md"
+        className="h-[26px]"
+      >
         Fund
         <IconCancel />
       </Button>
-      <Button asChild variant='ghost' color='primary' size='md' className='h-[26px]'>
-        <Link to='/add-proxy'>
+      <Button
+        asChild
+        variant="ghost"
+        color="primary"
+        size="md"
+        className="h-[26px]"
+      >
+        <Link to="/add-proxy">
           Proxy
           <IconProxy />
         </Link>
       </Button>
-      <Button asChild variant='ghost' color='primary' size='md' className='h-[26px]'>
-        <Link to='/extrinsic'>
+      <Button
+        asChild
+        variant="ghost"
+        color="primary"
+        size="md"
+        className="h-[26px]"
+      >
+        <Link to="/extrinsic">
           Extrinsic
           <IconExtrinsic />
         </Link>
       </Button>
       {showAddWatchlistButton ? (
         <Button
-          variant='ghost'
-          color='primary'
-          size='md'
-          className='h-[26px]'
+          variant="ghost"
+          color="primary"
+          size="md"
+          className="h-[26px]"
           onClick={() => {
             addAddressBook(address, true);
           }}
@@ -108,31 +155,31 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
 
   return (
     <>
-      <div className='border-secondary bg-background relative flex h-auto w-full flex-col items-start justify-between gap-[5px] rounded-[20px] border-1 p-4 shadow-md sm:p-5 md:h-[210px]'>
+      <div className="card-root relative flex h-auto w-full flex-col items-start justify-between gap-[5px] p-4 sm:p-5 md:h-[210px]">
         <Button
-          className='absolute top-4 right-4 flex rotate-0 transition-transform! duration-300! hover:rotate-180'
+          className="absolute top-4 right-4 flex rotate-0 transition-transform! duration-300! hover:rotate-180"
           asChild
           isIconOnly
-          variant='solid'
-          color='secondary'
-          size='lg'
+          variant="solid"
+          color="secondary"
+          size="lg"
         >
-          <Link to='/setting' search={{ type: 'account' }}>
+          <Link to="/setting" search={{ type: 'account' }}>
             <IconSet />
           </Link>
         </Button>
 
-        <h1 className='text-[50px] leading-[1.2]'>
+        <h1 className="text-[50px] leading-[1.2]">
           $ {formatUsd[0]}
           {formatUsd[1] ? `.${formatUsd[1]}` : ''}
           {formatUsd[2] || ''}
         </h1>
 
-        <p className='text-base font-bold'>
+        <p className="text-base font-bold">
           <span
             data-up={changes > 0}
             data-down={changes < 0}
-            className='data-up:text-success data-down:text-danger text-secondary mr-[5px]'
+            className="data-up:text-success data-down:text-danger text-secondary mr-[5px]"
           >
             {changes > 0 ? '+' : ''}
             {(changes * 100).toFixed(2)}%
@@ -140,13 +187,17 @@ function Hero({ address, totalUsd, changes }: { address: string; totalUsd: strin
           <span style={{ fontWeight: 400 }}>Last 24 Hours</span>
         </p>
 
-        <span className='text-foreground/50'>Mimir Secured {days} Days</span>
+        <span className="text-foreground/50">Mimir Secured {days} Days</span>
 
-        <div className='flex items-center gap-[5px]'>
+        <div className="flex items-center gap-[5px]">
           <SubsquareLink network={network} address={address} />
-          <Tooltip content='Sub ID'>
-            <a href={`https://sub.id/${address}`} target='_blank' rel='noopener noreferrer'>
-              <img src={SubId} className='h-4 w-4' />
+          <Tooltip content="Sub ID">
+            <a
+              href={`https://sub.id/${address}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={SubId} className="h-4 w-4" />
             </a>
           </Tooltip>
         </div>

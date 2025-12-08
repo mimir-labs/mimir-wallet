@@ -18,13 +18,17 @@ import { GroupedTransactions, TxProgress } from '@/transactions';
 import { groupTransactionsByDate } from '@/transactions/transactionDateGrouping';
 import Extrinsic from '@/transactions/TxCell/Extrinsic';
 
-function SmPage({ transaction: propsTransaction }: { transaction: Transaction }) {
+function SmPage({
+  transaction: propsTransaction,
+}: {
+  transaction: Transaction;
+}) {
   const { network } = useNetwork();
   const [account] = useQueryAccount(propsTransaction?.address);
   const [shouldLoadDetails, setShouldLoadDetails] = useState(false);
   const [fullTransaction] = useTransactionDetail(
     network,
-    shouldLoadDetails ? propsTransaction.id.toString() : undefined
+    shouldLoadDetails ? propsTransaction.id.toString() : undefined,
   );
   // Use full transaction if loaded, otherwise use original
   const transaction = fullTransaction || propsTransaction;
@@ -37,7 +41,7 @@ function SmPage({ transaction: propsTransaction }: { transaction: Transaction })
   }
 
   return (
-    <div className='space-y-4'>
+    <div className="space-y-4">
       <Summary transaction={transaction} />
 
       <Extrinsic
@@ -52,7 +56,7 @@ function SmPage({ transaction: propsTransaction }: { transaction: Transaction })
       <TxProgress
         account={account}
         transaction={transaction}
-        className='bg-background rounded-[20px] p-[15px] shadow-md'
+        className="card-root! p-[15px]"
       />
     </div>
   );
@@ -60,7 +64,10 @@ function SmPage({ transaction: propsTransaction }: { transaction: Transaction })
 
 function PageTransactionDetails() {
   const { id } = useParams({ from: '/_authenticated/transactions/$id' });
-  const [transaction, isFetched, isFetching] = useTransactionDetail('polkadot', id);
+  const [transaction, isFetched, isFetching] = useTransactionDetail(
+    'polkadot',
+    id,
+  );
   const upSm = useMediaQuery('sm');
 
   const groupedTransactions = useMemo(() => {
@@ -68,7 +75,7 @@ function PageTransactionDetails() {
   }, [transaction]);
 
   if (isFetching && !isFetched) {
-    return <Spinner size='lg' variant='ellipsis' />;
+    return <Spinner size="lg" variant="ellipsis" />;
   }
 
   if (!transaction) {

@@ -3,11 +3,20 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { Bytes, Data, Option, Vec } from '@polkadot/types';
-import type { PalletIdentityJudgement, PalletIdentityRegistration } from '@polkadot/types/lookup';
+import type {
+  PalletIdentityJudgement,
+  PalletIdentityRegistration,
+} from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { addressToHex, ApiManager, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  addressToHex,
+  ApiManager,
+  useChains,
+  useNetwork,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 import { useEffect, useMemo } from 'react';
 import { create } from 'zustand';
@@ -45,7 +54,9 @@ function extractOther(additional: Vec<ITuple<[Data, Data]>>) {
 }
 
 function identityCompat(
-  identityOfOpt: Option<ITuple<[PalletIdentityRegistration, Option<Bytes>]>> | Option<PalletIdentityRegistration>
+  identityOfOpt:
+    | Option<ITuple<[PalletIdentityRegistration, Option<Bytes>]>>
+    | Option<PalletIdentityRegistration>,
 ): PalletIdentityRegistration {
   const identity = identityOfOpt.unwrap();
 
@@ -53,7 +64,7 @@ function identityCompat(
 }
 
 async function getIdentityInfo({
-  queryKey: [api, value]
+  queryKey: [api, value],
 }: {
   queryKey: [api?: ApiPromise | null, value?: string | null];
 }) {
@@ -89,7 +100,9 @@ async function getIdentityInfo({
 
     if (superOf.isSome) {
       display = dataToUtf8(superOf.unwrap()[1]);
-      const superIdentity = await api.query.identity.identityOf(superOf.unwrap()[0]);
+      const superIdentity = await api.query.identity.identityOf(
+        superOf.unwrap()[0],
+      );
 
       final = identityCompat(superIdentity);
 
@@ -129,11 +142,15 @@ async function getIdentityInfo({
     other,
     riot,
     twitter,
-    web
+    web,
   };
 }
 
-async function fetchIdentityInfo({ queryKey }: { queryKey: readonly [string, string, string] }) {
+async function fetchIdentityInfo({
+  queryKey,
+}: {
+  queryKey: readonly [string, string, string];
+}) {
   const [, network, addressHex] = queryKey;
 
   // getIdentityApi resolves the identity network internally
@@ -145,29 +162,38 @@ async function fetchIdentityInfo({ queryKey }: { queryKey: readonly [string, str
 export const useIdentityStore = create<Record<HexString, string>>()(() => ({}));
 
 export function useDeriveAccountInfo(
-  value?: string | null
+  value?: string | null,
 ): [data: AccountInfo | undefined, isFetched: boolean, isFetching: boolean] {
   const { network } = useNetwork();
   const { mode } = useChains();
   const { chainInfo } = useSs58Format();
 
   const address = value ? value.toString() : '';
-  const addressHex = useMemo(() => (address ? addressToHex(address) : '0x'), [address]);
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address) : '0x'),
+    [address],
+  );
 
   const { data, isFetched, isFetching } = useQuery({
-    queryKey: ['identity-info', mode === 'omni' ? chainInfo.key : network, addressHex] as const,
+    queryKey: [
+      'identity-info',
+      mode === 'omni' ? chainInfo.key : network,
+      addressHex,
+    ] as const,
     refetchInterval: 12000,
     refetchOnMount: false,
     queryFn: fetchIdentityInfo,
-    enabled: !!address
+    enabled: !!address,
   });
 
   useEffect(() => {
     if (data && data.display && value) {
-      const display = data.displayParent ? `${data.displayParent}/${data.display}` : data.display;
+      const display = data.displayParent
+        ? `${data.displayParent}/${data.display}`
+        : data.display;
 
       useIdentityStore.setState({
-        [addressHex]: display
+        [addressHex]: display,
       });
     }
   }, [data, value, addressHex]);

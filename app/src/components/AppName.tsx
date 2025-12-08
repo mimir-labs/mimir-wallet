@@ -13,7 +13,7 @@ function AppName({
   iconSize = 20,
   iconUrl,
   appName,
-  hiddenName
+  hiddenName,
 }: {
   website?: string | null;
   iconSize?: number;
@@ -27,8 +27,24 @@ function AppName({
     if (website) {
       if (website.startsWith('mimir://')) {
         return app
-          ? [app.name, <img alt='mimir' src={app.icon} key={website} style={{ width: iconSize, height: iconSize }} />]
-          : ['Mimir', <img alt='mimir' src={LogoCircle} style={{ width: iconSize, height: iconSize }} key={website} />];
+          ? [
+              app.name,
+              <img
+                alt="mimir"
+                src={app.icon}
+                key={website}
+                style={{ width: iconSize, height: iconSize }}
+              />,
+            ]
+          : [
+              'Mimir',
+              <img
+                alt="mimir"
+                src={LogoCircle}
+                style={{ width: iconSize, height: iconSize }}
+                key={website}
+              />,
+            ];
       }
 
       const websiteURL = new URL(website);
@@ -37,7 +53,15 @@ function AppName({
       const initials = displayName?.charAt(0).toUpperCase();
 
       return app
-        ? [app.name, <img alt='mimir' src={app.icon} key={website} style={{ width: iconSize, height: iconSize }} />]
+        ? [
+            app.name,
+            <img
+              alt="mimir"
+              src={app.icon}
+              key={website}
+              style={{ width: iconSize, height: iconSize }}
+            />,
+          ]
         : [
             displayName,
             iconUrl ? (
@@ -46,24 +70,36 @@ function AppName({
                 src={iconUrl}
                 fallback={initials}
                 style={{ width: iconSize, height: iconSize }}
-                className='bg-primary/10'
+                className="bg-primary/10"
               />
             ) : (
-              <IconExternal style={{ width: iconSize, height: iconSize }} className='text-primary/50' key={website} />
-            )
+              <IconExternal
+                style={{ width: iconSize, height: iconSize }}
+                className="text-primary/50"
+                key={website}
+              />
+            ),
           ];
     }
 
     return [
       'External',
-      <IconExternal style={{ width: iconSize, height: iconSize }} className='text-primary/50' key='external' />
+      <IconExternal
+        style={{ width: iconSize, height: iconSize }}
+        className="text-primary/50"
+        key="external"
+      />,
     ];
   }, [app, appName, iconSize, iconUrl, website]);
 
   return (
-    <span className='flex max-w-full items-center gap-[5px]'>
-      <div className='flex shrink-0'>{icon}</div>
-      {!hiddenName && <span className='grow overflow-hidden text-ellipsis whitespace-nowrap'>{name}</span>}
+    <span className="flex max-w-full items-center gap-[5px]">
+      <div className="flex shrink-0">{icon}</div>
+      {!hiddenName && (
+        <span className="grow overflow-hidden text-ellipsis whitespace-nowrap">
+          {name}
+        </span>
+      )}
     </span>
   );
 }

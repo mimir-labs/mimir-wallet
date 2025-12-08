@@ -3,7 +3,13 @@
 
 import type { CookiePreference } from './types';
 
-import { Button, cn, Popover, PopoverContent, PopoverTrigger } from '@mimir-wallet/ui';
+import {
+  Button,
+  cn,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@mimir-wallet/ui';
 import React from 'react';
 
 import IconCheck from '@/assets/svg/icon-success-fill.svg?react';
@@ -43,23 +49,28 @@ const PreferenceOption: React.FC<{
 }> = ({ label, selected, disabled, onClick }) => {
   return (
     <button
-      type='button'
+      type="button"
       disabled={disabled}
       onClick={onClick}
       className={cn(
         'border-divider flex w-full items-center justify-between gap-3 rounded-[10px] border px-[15px] py-[5px] text-left transition-colors',
-        'hover:bg-secondary focus:bg-secondary focus:outline-none'
+        'hover:bg-secondary focus:bg-secondary focus:outline-none',
       )}
     >
-      <span className={cn('text-[14px] text-nowrap', !disabled ? 'text-foreground' : 'text-foreground/50')}>
+      <span
+        className={cn(
+          'text-[14px] text-nowrap',
+          !disabled ? 'text-foreground' : 'text-foreground/50',
+        )}
+      >
         {label}
       </span>
 
-      <div className='flex-shrink-0'>
+      <div className="flex-shrink-0">
         {selected ? (
-          <IconCheck className='text-success h-[20px] w-[20px]' />
+          <IconCheck className="text-success h-[20px] w-[20px]" />
         ) : (
-          <div className='border-divider mr-[2px] h-4 w-4 rounded-full border' />
+          <div className="border-divider mr-[2px] h-4 w-4 rounded-full border" />
         )}
       </div>
     </button>
@@ -71,10 +82,11 @@ export const PreferencePopover: React.FC<PreferencePopoverProps> = ({
   onPreferenceChange,
   children,
   open,
-  onOpenChange
+  onOpenChange,
 }) => {
   const effectivePreference: CookiePreference = selectedPreference ?? 'all';
-  const [pendingPreference, setPendingPreference] = React.useState<CookiePreference>(effectivePreference);
+  const [pendingPreference, setPendingPreference] =
+    React.useState<CookiePreference>(effectivePreference);
 
   React.useEffect(() => {
     if (!open) {
@@ -101,23 +113,29 @@ export const PreferencePopover: React.FC<PreferencePopoverProps> = ({
       <PopoverTrigger asChild>{children}</PopoverTrigger>
 
       <PopoverContent
-        className={cn('border-secondary rounded-[20px] border p-[10px]', 'w-[171px] shadow-md')}
-        align='end'
+        className={cn('card-root', 'p-[10px] w-[171px]')}
+        align="end"
         sideOffset={8}
       >
-        <div className='flex flex-col gap-[5px]'>
+        <div className="flex flex-col gap-[5px]">
           <PreferenceOption
-            label='All'
+            label="All"
             selected={pendingPreference === 'all'}
             onClick={() => handlePreferenceSelect('all')}
           />
 
           <PreferenceOption
-            label='Only Essentials'
+            label="Only Essentials"
             selected={pendingPreference === 'essentials'}
             onClick={() => handlePreferenceSelect('essentials')}
           />
-          <Button color='primary' onClick={handleApply} variant='ghost' size='sm' fullWidth>
+          <Button
+            color="primary"
+            onClick={handleApply}
+            variant="ghost"
+            size="sm"
+            fullWidth
+          >
             Apply
           </Button>
         </div>

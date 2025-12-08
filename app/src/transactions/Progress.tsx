@@ -1,7 +1,12 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, ProposeTransaction, ProxyTransaction, Transaction } from '@/hooks/types';
+import type {
+  AccountData,
+  ProposeTransaction,
+  ProxyTransaction,
+  Transaction,
+} from '@/hooks/types';
 
 import { addressEq, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, cn, Divider } from '@mimir-wallet/ui';
@@ -32,31 +37,34 @@ interface Props {
 function ProgressItem({
   account,
   transaction,
-  address
+  address,
 }: {
   account?: AccountData;
   transaction?: Transaction;
   address: string;
 }) {
   const [counts, threshold] = useMemo(
-    () => (account && transaction ? approvalCounts(account, transaction) : [0, 1]),
-    [account, transaction]
+    () =>
+      account && transaction ? approvalCounts(account, transaction) : [0, 1],
+    [account, transaction],
   );
 
   return (
-    <div className='bg-primary/5 flex w-full flex-col gap-[5px] rounded-md p-[5px]'>
+    <div className="bg-primary/5 flex w-full flex-col gap-[5px] rounded-md p-[5px]">
       <AddressCell showType withCopy withAddressBook shorten value={address} />
       <div
         data-visible={
           account?.type == 'multisig' ||
-          (account?.type === 'pure' && account.delegatees.length === 1 && account.delegatees[0].type === 'multisig')
+          (account?.type === 'pure' &&
+            account.delegatees.length === 1 &&
+            account.delegatees[0].type === 'multisig')
         }
-        className='bg-primary/10 relative mx-9 h-[2px] overflow-hidden rounded-[1px] data-[visible=false]:hidden'
+        className="bg-primary/10 relative mx-9 h-[2px] overflow-hidden rounded-[1px] data-[visible=false]:hidden"
       >
         <div
-          className='bg-primary absolute top-0 bottom-0 left-0 rounded-[1px]'
+          className="bg-primary absolute top-0 bottom-0 left-0 rounded-[1px]"
           style={{
-            width: `${(counts / threshold) * 100}%`
+            width: `${(counts / threshold) * 100}%`,
           }}
         />
       </div>
@@ -65,13 +73,13 @@ function ProgressItem({
 }
 
 function Content({ children }: { children: React.ReactNode }) {
-  return <div className='space-y-2.5'>{children}</div>;
+  return <div className="space-y-2.5">{children}</div>;
 }
 
 function MultisigContent({
   account,
   transaction,
-  button
+  button,
 }: {
   account: AccountData;
   transaction: Transaction;
@@ -79,8 +87,8 @@ function MultisigContent({
 }) {
   return (
     <>
-      <div className='flex items-center justify-between'>
-        <p className='flex-1 font-bold'>Confirmations</p>
+      <div className="flex items-center justify-between">
+        <p className="flex-1 font-bold">Confirmations</p>
         {button}
       </div>
 
@@ -91,7 +99,9 @@ function MultisigContent({
               key={index}
               account={
                 account.type === 'multisig'
-                  ? account.members.find((item) => addressEq(item.address, tx.address))
+                  ? account.members.find((item) =>
+                      addressEq(item.address, tx.address),
+                    )
                   : undefined
               }
               transaction={tx}
@@ -99,7 +109,7 @@ function MultisigContent({
             />
           ))
         ) : (
-          <Empty height={150} label='no approvals' />
+          <Empty height={150} label="no approvals" />
         )}
       </Content>
     </>
@@ -109,27 +119,39 @@ function MultisigContent({
 function ProxyContent({
   account,
   transaction,
-  button
+  button,
 }: {
   account: AccountData;
   transaction: Transaction;
   button?: React.ReactNode;
 }) {
-  if (account.type === 'pure' && account.delegatees.length === 1 && account.delegatees[0].type === 'multisig') {
+  if (
+    account.type === 'pure' &&
+    account.delegatees.length === 1 &&
+    account.delegatees[0].type === 'multisig'
+  ) {
     const multisigAccount = account.delegatees[0];
     const multisigTransaction = transaction.children.find(
-      (item) => item.type === TransactionType.Multisig && addressEq(item.address, multisigAccount.address)
+      (item) =>
+        item.type === TransactionType.Multisig &&
+        addressEq(item.address, multisigAccount.address),
     );
 
     if (multisigTransaction) {
-      return <MultisigContent account={multisigAccount} transaction={multisigTransaction} button={button} />;
+      return (
+        <MultisigContent
+          account={multisigAccount}
+          transaction={multisigTransaction}
+          button={button}
+        />
+      );
     }
   }
 
   return (
     <>
-      <div className='flex items-center justify-between'>
-        <p className='flex-1 font-bold'>Proxy</p>
+      <div className="flex items-center justify-between">
+        <p className="flex-1 font-bold">Proxy</p>
         {button}
       </div>
 
@@ -138,7 +160,9 @@ function ProxyContent({
           transaction.children.map((tx, index) => (
             <ProgressItem
               key={index}
-              account={account.delegatees.find((item) => addressEq(item.address, tx.address))}
+              account={account.delegatees.find((item) =>
+                addressEq(item.address, tx.address),
+              )}
               transaction={tx}
               address={tx.address}
             />
@@ -146,7 +170,7 @@ function ProxyContent({
         ) : transaction.delegate ? (
           <ProgressItem address={transaction.delegate} />
         ) : (
-          <Empty height={150} label='no delegatees' />
+          <Empty height={150} label="no delegatees" />
         )}
       </Content>
     </>
@@ -156,11 +180,19 @@ function ProxyContent({
 function ProposeContent({ transaction }: { transaction: ProposeTransaction }) {
   return (
     <>
-      <div className='flex items-center justify-between font-bold'>Proposer</div>
+      <div className="flex items-center justify-between font-bold">
+        Proposer
+      </div>
 
       <Content>
-        <div className='bg-primary/5 flex w-full flex-col gap-[5px] rounded-md p-[5px]'>
-          <AddressCell showType withCopy withAddressBook shorten value={transaction.proposer} />
+        <div className="bg-primary/5 flex w-full flex-col gap-[5px] rounded-md p-[5px]">
+          <AddressCell
+            showType
+            withCopy
+            withAddressBook
+            shorten
+            value={transaction.proposer}
+          />
         </div>
       </Content>
     </>
@@ -170,49 +202,60 @@ function ProposeContent({ transaction }: { transaction: ProposeTransaction }) {
 function AnnounceContent({
   account,
   transaction,
-  button
+  button,
 }: {
   account: AccountData;
   transaction: ProxyTransaction;
   button?: React.ReactNode;
 }) {
   const { network } = useNetwork();
-  const [startBlock, currentBlock, endBlock] = useAnnouncementProgress(transaction, account);
+  const [startBlock, currentBlock, endBlock] = useAnnouncementProgress(
+    transaction,
+    account,
+  );
   const blockInterval = useBlockInterval(network).toNumber();
 
-  const leftTime = currentBlock >= endBlock ? 0 : ((endBlock - currentBlock) * blockInterval) / 1000;
+  const leftTime =
+    currentBlock >= endBlock
+      ? 0
+      : ((endBlock - currentBlock) * blockInterval) / 1000;
 
-  const leftTimeFormat = useMemo(() => autoFormatTimeStr(leftTime * 1000), [leftTime]);
+  const leftTimeFormat = useMemo(
+    () => autoFormatTimeStr(leftTime * 1000),
+    [leftTime],
+  );
 
   const element =
     transaction.status === TransactionStatus.Pending ? (
-      <div className='space-y-2.5'>
-        <div className='flex items-center justify-between'>
-          <p className='flex-1 font-bold'>Review Time</p>
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between">
+          <p className="flex-1 font-bold">Review Time</p>
         </div>
-        <div className='bg-primary/10 relative h-[4px] overflow-hidden rounded-[2px]'>
+        <div className="bg-primary/10 relative h-[4px] overflow-hidden rounded-[2px]">
           <div
             data-left={!!leftTime}
-            className='data-[left=true]:bg-primary data-[left=false]:bg-success absolute top-0 bottom-0 left-0 rounded-[2px]'
+            className="data-[left=true]:bg-primary data-[left=false]:bg-success absolute top-0 bottom-0 left-0 rounded-[2px]"
             style={{
-              width: `${(currentBlock > endBlock ? 1 : (currentBlock - startBlock) / (endBlock - startBlock)) * 100}%`
+              width: `${(currentBlock > endBlock ? 1 : (currentBlock - startBlock) / (endBlock - startBlock)) * 100}%`,
             }}
           />
         </div>
 
-        <div className='flex items-center justify-between'>
-          <p className='flex-1'>{currentBlock >= endBlock ? 'Finished' : 'Reviewing'}</p>
+        <div className="flex items-center justify-between">
+          <p className="flex-1">
+            {currentBlock >= endBlock ? 'Finished' : 'Reviewing'}
+          </p>
           {leftTime ? (leftTimeFormat ? `${leftTimeFormat} left` : '') : ''}
         </div>
 
-        <div className='flex items-center justify-between'>
-          <p className='flex-1 font-bold'>Proxy</p>
+        <div className="flex items-center justify-between">
+          <p className="flex-1 font-bold">Proxy</p>
           {button}
         </div>
       </div>
     ) : (
-      <div className='flex items-center justify-between'>
-        <p className='flex-1 font-bold'>Proxy</p>
+      <div className="flex items-center justify-between">
+        <p className="flex-1 font-bold">Proxy</p>
         {button}
       </div>
     );
@@ -226,7 +269,9 @@ function AnnounceContent({
           transaction.children.map((tx, index) => (
             <ProgressItem
               key={index}
-              account={account.delegatees.find((item) => addressEq(item.address, tx.address))}
+              account={account.delegatees.find((item) =>
+                addressEq(item.address, tx.address),
+              )}
               transaction={tx}
               address={tx.address}
             />
@@ -234,7 +279,7 @@ function AnnounceContent({
         ) : transaction.delegate ? (
           <ProgressItem address={transaction.delegate} />
         ) : (
-          <Empty height={150} label='no delegatees' />
+          <Empty height={150} label="no delegatees" />
         )}
       </Content>
     </>
@@ -245,9 +290,14 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
   const filterPaths = useFilterPaths(account, transaction);
 
   return (
-    <div className={cn('bg-primary/5 min-w-[280px] space-y-2.5 rounded-[10px] p-5', props.className)}>
-      <p className='text-primary font-bold'>Progress</p>
-      <Divider className='bg-primary/5' />
+    <div
+      className={cn(
+        'bg-primary/5 min-w-[280px] space-y-2.5 rounded-[10px] p-5',
+        props.className,
+      )}
+    >
+      <p className="text-primary font-bold">Progress</p>
+      <Divider className="bg-primary/5" />
 
       {transaction.type === TransactionType.Multisig ? (
         <MultisigContent
@@ -255,7 +305,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           transaction={transaction}
           button={
             openOverview ? (
-              <Button onClick={openOverview} size='sm' variant='light'>
+              <Button onClick={openOverview} size="sm" variant="light">
                 Overview
               </Button>
             ) : null
@@ -267,7 +317,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           transaction={transaction}
           button={
             openOverview ? (
-              <Button onClick={openOverview} size='sm' variant='light'>
+              <Button onClick={openOverview} size="sm" variant="light">
                 Overview
               </Button>
             ) : null
@@ -279,7 +329,7 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
           transaction={transaction}
           button={
             openOverview ? (
-              <Button onClick={openOverview} size='sm' variant='light'>
+              <Button onClick={openOverview} size="sm" variant="light">
                 Overview
               </Button>
             ) : null
@@ -291,13 +341,19 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
 
       {transaction.exector ? (
         <>
-          <Divider className='bg-primary/5' />
+          <Divider className="bg-primary/5" />
 
-          <div className='font-bold'>Executor</div>
+          <div className="font-bold">Executor</div>
 
           <Content>
-            <div className='bg-primary/5 flex w-full flex-col gap-[5px] rounded-md p-[5px]'>
-              <AddressCell showType withCopy withAddressBook shorten value={transaction.exector} />
+            <div className="bg-primary/5 flex w-full flex-col gap-[5px] rounded-md p-[5px]">
+              <AddressCell
+                showType
+                withCopy
+                withAddressBook
+                shorten
+                value={transaction.exector}
+              />
             </div>
           </Content>
         </>
@@ -305,10 +361,14 @@ function Progress({ account, transaction, openOverview, ...props }: Props) {
 
       {transaction.status < TransactionStatus.Success && (
         <>
-          <Divider className='bg-primary/5' />
+          <Divider className="bg-primary/5" />
 
-          <div className='space-y-2.5'>
-            <Approve account={account} transaction={transaction} filterPaths={filterPaths} />
+          <div className="space-y-2.5">
+            <Approve
+              account={account}
+              transaction={transaction}
+              filterPaths={filterPaths}
+            />
             <ExecuteAnnounce account={account} transaction={transaction} />
             <ViewPending transaction={transaction} filterPaths={filterPaths} />
             <Cancel transaction={transaction} />

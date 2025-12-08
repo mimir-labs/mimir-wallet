@@ -31,7 +31,9 @@ export class ProxySafetyService {
    * Check for indirect controllers
    * Detects if proxy account has its own proxies that could indirectly control the target
    */
-  async checkIndirectControllers(proxyAddress: string): Promise<SafetyCheckResult> {
+  async checkIndirectControllers(
+    proxyAddress: string,
+  ): Promise<SafetyCheckResult> {
     try {
       const detected: Set<string> = new Set();
       const warnings: string[] = [];
@@ -49,7 +51,7 @@ export class ProxySafetyService {
 
       if (detected.size > 0) {
         warnings.push(
-          `The proxy account has ${detected.size} controller(s) that could indirectly control your account`
+          `The proxy account has ${detected.size} controller(s) that could indirectly control your account`,
         );
       }
 
@@ -57,14 +59,14 @@ export class ProxySafetyService {
         hasWarnings: detected.size > 0,
         indirectControllers: Array.from(detected),
         warnings,
-        severity: detected.size > 0 ? 'warning' : 'info'
+        severity: detected.size > 0 ? 'warning' : 'info',
       };
     } catch (error: any) {
       return {
         hasWarnings: true,
         indirectControllers: [],
         warnings: [error?.message || 'Failed to check proxy safety'],
-        severity: 'error'
+        severity: 'error',
       };
     }
   }

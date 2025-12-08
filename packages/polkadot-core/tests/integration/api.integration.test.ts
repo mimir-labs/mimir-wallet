@@ -5,7 +5,12 @@ import { describe, expect, it } from 'vitest';
 
 import { ApiManager } from '../../src/api/ApiManager.js';
 
-import { apiManager, assetHubApi, paseoApi, skipIfNotConnected } from './setup.js';
+import {
+  apiManager,
+  assetHubApi,
+  paseoApi,
+  skipIfNotConnected,
+} from './setup.js';
 import { TEST_ADDRESSES, TEST_CONFIG, TIMEOUTS } from './test-config.js';
 
 describe('ApiManager Integration Tests', () => {
@@ -21,7 +26,9 @@ describe('ApiManager Integration Tests', () => {
       skipIfNotConnected(assetHubApi, 'connect to Asset Hub');
 
       expect(assetHubApi.isConnected).toBe(true);
-      expect(assetHubApi.genesisHash.toHex()).toBe(TEST_CONFIG.assetHubPaseo.genesisHash);
+      expect(assetHubApi.genesisHash.toHex()).toBe(
+        TEST_CONFIG.assetHubPaseo.genesisHash,
+      );
     });
 
     it('should report correct chain status for Paseo', () => {
@@ -72,7 +79,7 @@ describe('ApiManager Integration Tests', () => {
 
         expect(tokenSymbol).toBe(TEST_CONFIG.paseo.nativeToken);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -84,7 +91,7 @@ describe('ApiManager Integration Tests', () => {
 
         expect(tokenDecimals).toBe(TEST_CONFIG.paseo.nativeDecimals);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -94,7 +101,7 @@ describe('ApiManager Integration Tests', () => {
 
         expect(paseoApi.registry.chainSS58).toBe(TEST_CONFIG.paseo.ss58Format);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -107,7 +114,7 @@ describe('ApiManager Integration Tests', () => {
         expect(specName).toBeTruthy();
         expect(typeof specName).toBe('string');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -121,7 +128,7 @@ describe('ApiManager Integration Tests', () => {
 
         expect(systemName.toString()).toBeTruthy();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -133,7 +140,7 @@ describe('ApiManager Integration Tests', () => {
 
         expect(version.toString()).toBeTruthy();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -145,7 +152,7 @@ describe('ApiManager Integration Tests', () => {
 
         expect(blockHash.toHex()).toMatch(/^0x[a-f0-9]{64}$/);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -158,7 +165,7 @@ describe('ApiManager Integration Tests', () => {
 
         expect(blockNumber).toBeGreaterThan(0);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -170,7 +177,7 @@ describe('ApiManager Integration Tests', () => {
 
         expect(finalizedHead.toHex()).toMatch(/^0x[a-f0-9]{64}$/);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -180,13 +187,15 @@ describe('ApiManager Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'account info query');
 
-        const accountInfo = await paseoApi.query.system.account(TEST_ADDRESSES.alice);
+        const accountInfo = await paseoApi.query.system.account(
+          TEST_ADDRESSES.alice,
+        );
 
         expect(accountInfo).toBeDefined();
         expect(accountInfo.nonce).toBeDefined();
         expect(accountInfo.data).toBeDefined();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -194,8 +203,13 @@ describe('ApiManager Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'batch account query');
 
-        const addresses = [TEST_ADDRESSES.alice, TEST_ADDRESSES.bob, TEST_ADDRESSES.charlie];
-        const accountInfos = await paseoApi.query.system.account.multi(addresses);
+        const addresses = [
+          TEST_ADDRESSES.alice,
+          TEST_ADDRESSES.bob,
+          TEST_ADDRESSES.charlie,
+        ];
+        const accountInfos =
+          await paseoApi.query.system.account.multi(addresses);
 
         expect(accountInfos).toHaveLength(3);
         accountInfos.forEach((info) => {
@@ -203,7 +217,7 @@ describe('ApiManager Integration Tests', () => {
           expect(info.nonce).toBeDefined();
         });
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -216,7 +230,7 @@ describe('ApiManager Integration Tests', () => {
         expect(metadata).toBeDefined();
         expect(metadata.version).toBeGreaterThan(0);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 

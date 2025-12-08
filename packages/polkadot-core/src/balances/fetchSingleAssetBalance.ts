@@ -21,7 +21,7 @@ import { BN_ZERO } from '@polkadot/util';
 export async function fetchSingleAssetBalance(
   api: ApiPromise,
   address: HexString,
-  asset: CompleteEnhancedAssetInfo
+  asset: CompleteEnhancedAssetInfo,
 ): Promise<AccountEnhancedAssetBalance | null> {
   if (!api?.isConnected) {
     throw new Error('API is not connected');
@@ -37,7 +37,9 @@ export async function fetchSingleAssetBalance(
       const locked = account.data.frozen;
 
       // Calculate transferrable balance (free - max(frozen - reserved, 0))
-      const transferrable = free.sub(locked.gt(reserved) ? locked.sub(reserved) : BN_ZERO);
+      const transferrable = free.sub(
+        locked.gt(reserved) ? locked.sub(reserved) : BN_ZERO,
+      );
 
       return {
         ...asset,
@@ -46,7 +48,7 @@ export async function fetchSingleAssetBalance(
         locked: BigInt(locked.toString()),
         reserved: BigInt(reserved.toString()),
         free: BigInt(free.toString()),
-        transferrable: BigInt(transferrable.toString())
+        transferrable: BigInt(transferrable.toString()),
       };
     }
 
@@ -54,9 +56,10 @@ export async function fetchSingleAssetBalance(
     if (api.query.assets) {
       const accountData =
         asset.isForeignAsset && api.query.foreignAssets
-          ? await (api.query.foreignAssets.account?.(asset.key, address.toString()) as Promise<
-              Option<PalletAssetsAssetAccount> | null | undefined
-            >)
+          ? await (api.query.foreignAssets.account?.(
+              asset.key,
+              address.toString(),
+            ) as Promise<Option<PalletAssetsAssetAccount> | null | undefined>)
           : await api.query.assets.account(asset.key, address.toString());
 
       if (accountData && accountData.isSome) {
@@ -70,7 +73,7 @@ export async function fetchSingleAssetBalance(
           locked: 0n,
           reserved: 0n,
           free: BigInt(balance.toString()),
-          transferrable: BigInt(balance.toString())
+          transferrable: BigInt(balance.toString()),
         };
       }
 
@@ -79,7 +82,10 @@ export async function fetchSingleAssetBalance(
 
     // Handle tokens using orml-tokens pallet
     if (api.query.tokens?.accounts) {
-      const tokenAccount = await api.query.tokens.accounts(address.toString(), asset.key);
+      const tokenAccount = await api.query.tokens.accounts(
+        address.toString(),
+        asset.key,
+      );
       const balance = tokenAccount as any;
       const totalBalance = balance.free.add(balance.reserved);
       const free = balance.free;
@@ -87,7 +93,9 @@ export async function fetchSingleAssetBalance(
       const frozen = balance.frozen;
 
       // Calculate transferrable balance (free - max(frozen - reserved, 0))
-      const transferrable = free.sub(frozen.gt(reserved) ? frozen.sub(reserved) : BN_ZERO);
+      const transferrable = free.sub(
+        frozen.gt(reserved) ? frozen.sub(reserved) : BN_ZERO,
+      );
 
       return {
         ...asset,
@@ -96,12 +104,16 @@ export async function fetchSingleAssetBalance(
         locked: BigInt(frozen.toString()),
         reserved: BigInt(reserved.toString()),
         free: BigInt(free.toString()),
-        transferrable: BigInt(transferrable.toString())
+        transferrable: BigInt(transferrable.toString()),
       };
     }
 
-    throw new Error('No suitable balance query method available for this asset type');
+    throw new Error(
+      'No suitable balance query method available for this asset type',
+    );
   } catch (error) {
-    throw new Error(`Failed to fetch single asset balance for ${asset.symbol}: ${(error as Error).message}`);
+    throw new Error(
+      `Failed to fetch single asset balance for ${asset.symbol}: ${(error as Error).message}`,
+    );
   }
 }

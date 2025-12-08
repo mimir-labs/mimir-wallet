@@ -10,24 +10,26 @@ import { session, store } from '../store/index.js';
 
 export function useStore<T>(
   isSession: boolean,
-  key: string
+  key: string,
 ): [T | undefined, (value: T | ((value: T | undefined) => T)) => void];
 export function useStore<T>(
   isSession: boolean,
   key: string,
-  defaultValue: T
+  defaultValue: T,
 ): [T, (value: T | ((value: T) => T)) => void];
 
 export function useStore<T>(
   isSession: boolean,
   key: string,
-  defaultValue?: T
+  defaultValue?: T,
 ): [T | undefined, (value: T | ((value: T) => T)) => void] {
   const defaultValueRef = useRef(defaultValue);
   const ref = useRef<BaseStore>(isSession ? session : store);
   // Use lazy initializer to avoid accessing ref during render
   const [value, setValue] = useState<T | undefined>(() =>
-    key ? ((isSession ? session : store).get(key) as T) || defaultValue : defaultValue
+    key
+      ? ((isSession ? session : store).get(key) as T) || defaultValue
+      : defaultValue,
   );
   const latestValue = useRef<T | undefined>(value);
 
@@ -67,34 +69,46 @@ export function useStore<T>(
         if (!key) return;
 
         if (typeof _value === 'function') {
-          const newValue = (_value as (v: T | undefined) => T)(latestValue.current);
+          const newValue = (_value as (v: T | undefined) => T)(
+            latestValue.current,
+          );
 
           ref.current.set(key, newValue);
         } else {
           ref.current.set(key, _value);
         }
       },
-      [key]
-    )
+      [key],
+    ),
   ];
 }
 
-export function useLocalStore<T>(key: string): [T | undefined, (value: T | ((value: T | undefined) => T)) => void];
-export function useLocalStore<T>(key: string, defaultValue: T): [T, (value: T | ((value: T) => T)) => void];
+export function useLocalStore<T>(
+  key: string,
+): [T | undefined, (value: T | ((value: T | undefined) => T)) => void];
+export function useLocalStore<T>(
+  key: string,
+  defaultValue: T,
+): [T, (value: T | ((value: T) => T)) => void];
 
 export function useLocalStore<T>(
   key: string,
-  defaultValue?: T
+  defaultValue?: T,
 ): [T | undefined, (value: T | ((value: T) => T)) => void] {
   return useStore<T>(false, key, defaultValue as T);
 }
 
-export function useSessionStore<T>(key: string): [T | undefined, (value: T | ((value: T | undefined) => T)) => void];
-export function useSessionStore<T>(key: string, defaultValue: T): [T, (value: T | ((value: T) => T)) => void];
+export function useSessionStore<T>(
+  key: string,
+): [T | undefined, (value: T | ((value: T | undefined) => T)) => void];
+export function useSessionStore<T>(
+  key: string,
+  defaultValue: T,
+): [T, (value: T | ((value: T) => T)) => void];
 
 export function useSessionStore<T>(
   key: string,
-  defaultValue?: T
+  defaultValue?: T,
 ): [T | undefined, (value: T | ((value: T) => T)) => void] {
   return useStore<T>(true, key, defaultValue as T);
 }

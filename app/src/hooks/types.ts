@@ -44,7 +44,12 @@ export type AccountDataType = {
   name?: string | null;
   isMimir?: boolean;
   delegatees: (AccountData & DelegateeProp)[];
-  proposers?: { proposer: string; creator: string; createdAt: string; network: HexString }[];
+  proposers?: {
+    proposer: string;
+    creator: string;
+    createdAt: string;
+    network: HexString;
+  }[];
 };
 
 export type MultisigAccountData = AccountDataType & {
@@ -70,7 +75,10 @@ type BaseAccountData = AccountDataType & {
   type: 'account';
 };
 
-export type AccountData = MultisigAccountData | PureAccountData | BaseAccountData;
+export type AccountData =
+  | MultisigAccountData
+  | PureAccountData
+  | BaseAccountData;
 
 export enum TransactionStatus {
   Initialized = 0,
@@ -80,7 +88,7 @@ export enum TransactionStatus {
   MemberChanged = 4,
   Cancelled = 5,
   AnnounceRemoved = 6,
-  AnnounceReject = 7
+  AnnounceReject = 7,
 }
 
 export enum TransactionType {
@@ -88,7 +96,7 @@ export enum TransactionType {
   Multisig = 1,
   Proxy = 2,
   Announce = 3,
-  Propose = 4
+  Propose = 4,
 }
 
 type BaseTransaction = {
@@ -167,7 +175,11 @@ export type ProposeTransaction = BaseTransaction & {
   proposer: string;
 };
 
-export type Transaction = UnknownTransaction | MultisigTransaction | ProxyTransaction | ProposeTransaction;
+export type Transaction =
+  | UnknownTransaction
+  | MultisigTransaction
+  | ProxyTransaction
+  | ProposeTransaction;
 
 export type HistoryTransaction = Transaction & { uuid: string };
 
@@ -282,7 +294,11 @@ type ProposerFilterPath = {
   address: string;
 };
 
-export type FilterPath = MultisigFilterPath | ProxyFilterPath | OriginFilterPath | ProposerFilterPath;
+export type FilterPath =
+  | MultisigFilterPath
+  | ProxyFilterPath
+  | OriginFilterPath
+  | ProposerFilterPath;
 
 export type FilterPathWithoutId =
   | Omit<MultisigFilterPath, 'id'>

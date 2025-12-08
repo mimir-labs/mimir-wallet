@@ -40,7 +40,7 @@ export interface UseDraggableReturn<T extends HTMLElement = HTMLElement> {
 export function useDraggable<T extends HTMLElement = HTMLElement>({
   initialPosition = { x: 24, y: 24 },
   bounds,
-  margin = 0
+  margin = 0,
 }: UseDraggableOptions): UseDraggableReturn<T> {
   const clamp = useCallback((value: number, min: number, max: number) => {
     if (Number.isNaN(value)) return min;
@@ -62,7 +62,7 @@ export function useDraggable<T extends HTMLElement = HTMLElement>({
     left: 0,
     right: 0,
     top: 0,
-    bottom: 0
+    bottom: 0,
   });
 
   const containerRef = useRef<T>(null);
@@ -83,16 +83,19 @@ export function useDraggable<T extends HTMLElement = HTMLElement>({
           left: margin,
           right: maxX,
           top: margin,
-          bottom: maxY
+          bottom: maxY,
         });
 
         // Validate current position and fix if needed
         const validatedPosition = {
           x: clamp(position.x, margin, maxX),
-          y: clamp(position.y, margin, maxY)
+          y: clamp(position.y, margin, maxY),
         };
 
-        if (validatedPosition.x !== position.x || validatedPosition.y !== position.y) {
+        if (
+          validatedPosition.x !== position.x ||
+          validatedPosition.y !== position.y
+        ) {
           setPosition(validatedPosition);
         }
       }
@@ -109,13 +112,19 @@ export function useDraggable<T extends HTMLElement = HTMLElement>({
     (_event: any, info: any) => {
       const newPosition = {
         x: position.x + info.offset.x,
-        y: position.y + info.offset.y
+        y: position.y + info.offset.y,
       };
 
       // Ensure position is within bounds
       if (typeof window !== 'undefined') {
-        const maxX = Math.max(margin, window.innerWidth - bounds.width - margin);
-        const maxY = Math.max(margin, window.innerHeight - bounds.height - margin);
+        const maxX = Math.max(
+          margin,
+          window.innerWidth - bounds.width - margin,
+        );
+        const maxY = Math.max(
+          margin,
+          window.innerHeight - bounds.height - margin,
+        );
 
         newPosition.x = clamp(newPosition.x, margin, maxX);
         newPosition.y = clamp(newPosition.y, margin, maxY);
@@ -123,14 +132,14 @@ export function useDraggable<T extends HTMLElement = HTMLElement>({
 
       setPosition(newPosition);
     },
-    [position.x, position.y, bounds.width, bounds.height, margin, clamp]
+    [position.x, position.y, bounds.width, bounds.height, margin, clamp],
   );
 
   return {
     position,
     dragConstraints,
     containerRef,
-    handleDragEnd
+    handleDragEnd,
   };
 }
 
@@ -142,7 +151,7 @@ export function useDraggable<T extends HTMLElement = HTMLElement>({
 export function useDraggableSquare<T extends HTMLElement = HTMLElement>({
   initialPosition,
   size = 60,
-  margin = 8
+  margin = 8,
 }: {
   initialPosition?: Position;
   size?: number;
@@ -151,7 +160,7 @@ export function useDraggableSquare<T extends HTMLElement = HTMLElement>({
   return useDraggable<T>({
     initialPosition,
     bounds: { width: size, height: size },
-    margin
+    margin,
   });
 }
 
@@ -162,7 +171,7 @@ export function useDraggableRectangle<T extends HTMLElement = HTMLElement>({
   initialPosition,
   width = 395,
   height = 600,
-  margin = 0
+  margin = 0,
 }: {
   initialPosition?: Position;
   width?: number;
@@ -172,6 +181,6 @@ export function useDraggableRectangle<T extends HTMLElement = HTMLElement>({
   return useDraggable<T>({
     initialPosition,
     bounds: { width, height },
-    margin
+    margin,
   });
 }

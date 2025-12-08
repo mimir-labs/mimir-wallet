@@ -4,7 +4,7 @@
 import { store } from '@mimir-wallet/service';
 import { Button } from '@mimir-wallet/ui';
 import { encodeAddress } from '@polkadot/util-crypto';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { unparse } from 'papaparse';
 
 import IconDownload from '@/assets/svg/icon-download.svg?react';
@@ -22,19 +22,22 @@ function Export() {
 
         values.push({
           address: encodeAddress(v.address),
-          name: v.meta.name
+          name: v.meta.name,
         });
       }
     });
 
-    const data: string[][] = [['address', 'name'], ...values.map((address) => [address.address, address.name || ''])];
+    const data: string[][] = [
+      ['address', 'name'],
+      ...values.map((address) => [address.address, address.name || '']),
+    ];
     const csv = unparse(data);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
     const link = document.createElement('a');
 
     link.href = URL.createObjectURL(blob);
-    link.download = `mimir-address-book-${moment().format('YYYY-MM-DD')}.csv`;
+    link.download = `mimir-address-book-${dayjs().format('YYYY-MM-DD')}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -42,8 +45,8 @@ function Export() {
   };
 
   return (
-    <Button color='primary' variant='ghost' onClick={handleExport}>
-      <IconDownload className='rotate-180' />
+    <Button color="primary" variant="ghost" onClick={handleExport}>
+      <IconDownload className="rotate-180" />
       Export
     </Button>
   );

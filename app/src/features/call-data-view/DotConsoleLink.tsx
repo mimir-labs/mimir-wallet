@@ -9,12 +9,17 @@ function DotConsoleLink({ network }: { network: string }) {
   const isDotConsoleSupport = DotConsoleApp.supportedChains.includes(network);
 
   if (!isDotConsoleSupport) {
-    const url = PolkadotJsApp.urlSearch?.(network) || new URL(PolkadotJsApp.url);
+    const url =
+      PolkadotJsApp.urlSearch?.(network) || new URL(PolkadotJsApp.url);
 
     url.hash = '#/extrinsics';
 
     return (
-      <Link to='/explorer/$url' params={{ url: url.toString() }} className='hover:underline'>
+      <Link
+        to="/explorer/$url"
+        params={{ url: url.toString() }}
+        className="hover:underline"
+      >
         Polkadot.js
       </Link>
     );
@@ -25,7 +30,11 @@ function DotConsoleLink({ network }: { network: string }) {
   url.pathname = '/extrinsics';
 
   return (
-    <Link to='/explorer/$url' params={{ url: url.toString() }} className='hover:underline'>
+    <Link
+      to="/explorer/$url"
+      params={{ url: url.toString() }}
+      className="hover:underline"
+    >
       DOT Console
     </Link>
   );

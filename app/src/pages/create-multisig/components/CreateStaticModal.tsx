@@ -1,9 +1,23 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { addressToHex, encodeAddress, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  addressToHex,
+  encodeAddress,
+  useChains,
+  useNetwork,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
-import { Button, buttonSpinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import {
+  Button,
+  buttonSpinner,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from '@mimir-wallet/ui';
 import { u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 import React, { useState } from 'react';
@@ -25,7 +39,7 @@ async function createMultisig(
   network: string,
   signatories: string[],
   threshold: number,
-  name: string
+  name: string,
 ): Promise<Uint8Array> {
   const address = createKeyMulti(signatories, threshold);
 
@@ -33,13 +47,20 @@ async function createMultisig(
     network,
     signatories.map((value) => addressToHex(value)),
     threshold,
-    name
+    name,
   );
 
   return address;
 }
 
-function CreateStaticModal({ name, signatories, threshold, isOpen, onClose, onSuccess }: Props) {
+function CreateStaticModal({
+  name,
+  signatories,
+  threshold,
+  isOpen,
+  onClose,
+  onSuccess,
+}: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const { resync } = useAccount();
   const { network } = useNetwork();
@@ -52,7 +73,12 @@ function CreateStaticModal({ name, signatories, threshold, isOpen, onClose, onSu
     try {
       setIsLoading(true);
 
-      const address = await createMultisig(network, signatories, threshold, name);
+      const address = await createMultisig(
+        network,
+        signatories,
+        threshold,
+        name,
+      );
 
       utm && (await service.account.utm(network, u8aToHex(address), utm));
 
@@ -73,8 +99,8 @@ function CreateStaticModal({ name, signatories, threshold, isOpen, onClose, onSu
   };
 
   return (
-    <Modal onClose={onClose} isOpen={isOpen} size='xl'>
-      <ModalContent className='w-auto'>
+    <Modal onClose={onClose} isOpen={isOpen} size="xl">
+      <ModalContent className="w-auto">
         <ModalHeader>Create Static Multisig</ModalHeader>
         <ModalBody>
           <ul>
@@ -83,7 +109,7 @@ function CreateStaticModal({ name, signatories, threshold, isOpen, onClose, onSu
           </ul>
         </ModalBody>
         <ModalFooter>
-          <Button fullWidth onClick={onClose} variant='ghost'>
+          <Button fullWidth onClick={onClose} variant="ghost">
             Cancel
           </Button>
           <Button fullWidth onClick={handleCreate}>

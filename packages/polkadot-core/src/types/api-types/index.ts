@@ -1,24 +1,19 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { OverrideBundleType, RegistryTypes } from '@polkadot/types/types';
-
-import { typesBundleForPolkadot } from '@acala-network/type-definitions';
-import { typesBundle as typesBundleJs } from '@polkadot/apps-config/api';
+import type { OverrideBundleType } from '@polkadot/types/types';
 
 import avail from './avail.json' with { type: 'json' };
 
-export const typesBundle: OverrideBundleType = {
-  ...typesBundleJs,
-  spec: {
-    ...typesBundleJs.spec,
-    avail,
-    ...typesBundleForPolkadot.spec
-  }
-};
+export async function getTypesBundle(): Promise<OverrideBundleType> {
+  const { typesBundle: typesBundleJs } =
+    await import('@polkadot/apps-config/api');
 
-export const typesChain: Record<string, RegistryTypes> = {
-  Crust: {
-    DispatchErrorModule: 'DispatchErrorModuleU8'
-  }
-};
+  return {
+    ...typesBundleJs,
+    spec: {
+      ...typesBundleJs.spec,
+      avail,
+    },
+  };
+}

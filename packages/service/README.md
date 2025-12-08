@@ -36,13 +36,13 @@ This package implements the service layer architecture for Mimir Wallet, offerin
 This package is part of the Mimir Wallet monorepo and is typically not installed separately. However, if you need to use it in your own project:
 
 ```bash
-yarn add @mimir-wallet/service
+pnpm add @mimir-wallet/service
 ```
 
 ### Peer Dependencies
 
 ```bash
-yarn add react react-dom
+pnpm add react react-dom
 ```
 
 ## Usage

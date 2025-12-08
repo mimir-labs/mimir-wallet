@@ -7,15 +7,25 @@ import type { Registry } from '@polkadot/types/types';
 import { ApiManager } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
 
-export function getProxyTypeInstance(registry: Registry, index = 0): KitchensinkRuntimeProxyType {
+export function getProxyTypeInstance(
+  registry: Registry,
+  index = 0,
+): KitchensinkRuntimeProxyType {
   // This is not perfect, but should work for `{Kusama, Node, Polkadot}RuntimeProxyType`
-  const proxyNames = registry.lookup.names.filter((name) => name.endsWith('RuntimeProxyType'));
+  const proxyNames = registry.lookup.names.filter((name) =>
+    name.endsWith('RuntimeProxyType'),
+  );
 
   // fallback to previous version (may be Substrate default), when not found
-  return registry.createType<KitchensinkRuntimeProxyType>(proxyNames.length ? proxyNames[0] : 'ProxyType', index);
+  return registry.createType<KitchensinkRuntimeProxyType>(
+    proxyNames.length ? proxyNames[0] : 'ProxyType',
+    index,
+  );
 }
 
-export function getProxyOptions(registry: Registry): { text: string; value: number }[] {
+export function getProxyOptions(
+  registry: Registry,
+): { text: string; value: number }[] {
   return (
     getProxyTypeInstance(registry)
       .defKeys.map((text, value) => ({ text, value }))
@@ -25,7 +35,7 @@ export function getProxyOptions(registry: Registry): { text: string; value: numb
 }
 
 async function fetchProxyTypes({
-  queryKey
+  queryKey,
 }: {
   queryKey: readonly [string, string];
 }): Promise<{ text: string; value: number }[]> {
@@ -41,12 +51,14 @@ async function fetchProxyTypes({
  * @param network - The network key to query
  * @returns Array of proxy type options
  */
-export function useProxyTypes(network: string): { text: string; value: number }[] {
+export function useProxyTypes(
+  network: string,
+): { text: string; value: number }[] {
   const { data } = useQuery({
     queryKey: ['proxy-types', network] as const,
     queryFn: fetchProxyTypes,
     enabled: !!network,
-    staleTime: Infinity // Proxy types don't change
+    staleTime: Infinity, // Proxy types don't change
   });
 
   return data ?? [];

@@ -3,7 +3,13 @@
 
 import type { HexString } from '@polkadot/util/types';
 
-import { Sidebar, SidebarContent, SidebarHeader, Tabs, Tooltip } from '@mimir-wallet/ui';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  Tabs,
+  Tooltip,
+} from '@mimir-wallet/ui';
 import { useCallback, useEffect } from 'react';
 
 import { layoutHelpers } from '../constants';
@@ -17,13 +23,22 @@ import { useMimirLayout } from '@/hooks/useMimirLayout';
 import { useRefControl } from '@/hooks/useRefControl';
 
 function RightSideBar() {
-  const { rightSidebarOpen, openRightSidebar, closeRightSidebar, rightSidebarState, setRightSidebarTab } =
-    useMimirLayout();
+  const {
+    rightSidebarOpen,
+    openRightSidebar,
+    closeRightSidebar,
+    rightSidebarState,
+    setRightSidebarTab,
+  } = useMimirLayout();
 
-  const { ref: templateRef, callMethod: callTemplate } = useRefControl<TemplateRef>();
-  const { ref: callDataViewRef, callMethod: callDataView } = useRefControl<CallDataViewRef>();
+  const { ref: templateRef, callMethod: callTemplate } =
+    useRefControl<TemplateRef>();
+  const { ref: callDataViewRef, callMethod: callDataView } =
+    useRefControl<CallDataViewRef>();
 
-  const sidebarWidth = layoutHelpers.getRightSidebarWidth(rightSidebarState.tab);
+  const sidebarWidth = layoutHelpers.getRightSidebarWidth(
+    rightSidebarState.tab,
+  );
 
   // Stable event handlers using useCallback
   const handleTemplateOpen = useCallback(
@@ -35,7 +50,7 @@ function RightSideBar() {
       callTemplate('setNetwork', eventNetwork);
       callTemplate('showList');
     },
-    [openRightSidebar, setRightSidebarTab, callTemplate]
+    [openRightSidebar, setRightSidebarTab, callTemplate],
   );
 
   const handleTemplateAdd = useCallback(
@@ -47,7 +62,7 @@ function RightSideBar() {
       callTemplate('setNetwork', eventNetwork);
       callTemplate('showAdd', callData);
     },
-    [openRightSidebar, setRightSidebarTab, callTemplate]
+    [openRightSidebar, setRightSidebarTab, callTemplate],
   );
 
   const handleCallDataView = useCallback(
@@ -59,7 +74,7 @@ function RightSideBar() {
       callDataView('setNetwork', eventNetwork);
       callDataView('setCallData', callData);
     },
-    [openRightSidebar, setRightSidebarTab, callDataView]
+    [openRightSidebar, setRightSidebarTab, callDataView],
   );
 
   // Register event listeners with stable handlers
@@ -77,68 +92,78 @@ function RightSideBar() {
 
   return (
     <Sidebar
-      side='right'
+      side="right"
       open={rightSidebarOpen}
-      onOpenChange={(state) => (state ? openRightSidebar() : closeRightSidebar())}
-      className='top-(--header-height) h-[calc(100svh-var(--header-height))]!'
+      onOpenChange={(state) =>
+        state ? openRightSidebar() : closeRightSidebar()
+      }
+      className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
       sideBarWidth={sidebarWidth}
     >
-      <SidebarHeader className='border-b-divider mb-3 border-b px-4 pb-[5px]'>
+      <SidebarHeader className="border-b-divider mb-3 border-b px-4 pb-[5px]">
         <Tabs
-          variant='underlined'
+          variant="underlined"
           tabs={[
             {
               key: 'batch',
               label: (
-                <span className='flex items-center gap-1'>
+                <span className="flex items-center gap-1">
                   Batch
                   <Tooltip
                     classNames={{ content: 'max-w-[300px]' }}
-                    content={'Send multiple actions within a single transaction.'}
+                    content={
+                      'Send multiple actions within a single transaction.'
+                    }
                   >
-                    <IconQuestion className='text-foreground/50' />
+                    <IconQuestion className="text-foreground/50" />
                   </Tooltip>
                 </span>
-              )
+              ),
             },
             {
               key: 'template',
               label: (
-                <span className='flex items-center gap-1'>
+                <span className="flex items-center gap-1">
                   Template
                   <Tooltip
                     classNames={{ content: 'max-w-[300px]' }}
-                    content={'Save frequent transactions as templates for future use.'}
+                    content={
+                      'Save frequent transactions as templates for future use.'
+                    }
                   >
-                    <IconQuestion className='text-foreground/50' />
+                    <IconQuestion className="text-foreground/50" />
                   </Tooltip>
                 </span>
-              )
+              ),
             },
             {
               key: 'decoder',
               label: (
-                <span className='flex items-center gap-1'>
+                <span className="flex items-center gap-1">
                   Decoder
                   <Tooltip
                     classNames={{ content: 'max-w-[300px]' }}
                     content={'Decode call data to show raw information.'}
                   >
-                    <IconQuestion className='text-foreground/50' />
+                    <IconQuestion className="text-foreground/50" />
                   </Tooltip>
                 </span>
-              )
-            }
+              ),
+            },
           ]}
           selectedKey={rightSidebarState.tab}
           onSelectionChange={(key) => setRightSidebarTab(key as any)}
         />
       </SidebarHeader>
 
-      <SidebarContent className='px-4 pb-4'>
+      <SidebarContent className="px-4 pb-4">
         {rightSidebarState.tab === 'batch' ? <Batch /> : null}
-        {rightSidebarState.tab === 'template' ? <Template ref={templateRef} /> : null}
-        {rightSidebarState.tab === 'decoder' ? <CallDataView ref={callDataViewRef} /> : null}
+        {rightSidebarState.tab === 'template' ? (
+          <Template ref={templateRef} />
+        ) : null}
+        {rightSidebarState.tab === 'decoder' ? (
+          <CallDataView ref={callDataViewRef} />
+        ) : null}
       </SidebarContent>
     </Sidebar>
   );

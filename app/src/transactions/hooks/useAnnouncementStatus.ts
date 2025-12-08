@@ -6,7 +6,12 @@ import { useQuery } from '@mimir-wallet/service';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
-import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@/hooks/types';
+import {
+  type AccountData,
+  type Transaction,
+  TransactionStatus,
+  TransactionType,
+} from '@/hooks/types';
 import { useProxyBestBlock } from '@/hooks/useProxyBestBlock';
 
 type AnnouncementStatus =
@@ -19,7 +24,11 @@ type AnnouncementStatus =
   | 'removed'
   | 'proxy_removed';
 
-async function fetchAnnouncementsForStatus({ queryKey }: { queryKey: readonly [string, string, string] }) {
+async function fetchAnnouncementsForStatus({
+  queryKey,
+}: {
+  queryKey: readonly [string, string, string];
+}) {
   const [, network, delegate] = queryKey;
 
   if (!delegate) {
@@ -28,36 +37,43 @@ async function fetchAnnouncementsForStatus({ queryKey }: { queryKey: readonly [s
 
   const api = await ApiManager.getInstance().getApi(network);
 
-  if (!api) {
-    throw new Error(`API not available for network: ${network}`);
-  }
-
   return api.query.proxy.announcements(delegate);
 }
 
 export function useAnnouncementStatus(
   transaction: Transaction,
-  account: AccountData
+  account: AccountData,
 ): [status: AnnouncementStatus, isFetching: boolean] {
   const { network } = useNetwork();
 
   const status = transaction.status;
   const type = transaction.type;
   const delegate = useMemo(
-    () => account.delegatees.find((item) => addressEq(item.address, transaction.delegate) && item.proxyDelay > 0),
-    [account.delegatees, transaction.delegate]
+    () =>
+      account.delegatees.find(
+        (item) =>
+          addressEq(item.address, transaction.delegate) && item.proxyDelay > 0,
+      ),
+    [account.delegatees, transaction.delegate],
   );
 
   const [bestBlock, isFetched, isFetching] = useProxyBestBlock(network);
   const {
     data: result,
     isFetched: isFetchedResult,
-    isFetching: isFetchingResult
+    isFetching: isFetchingResult,
   } = useQuery({
-    queryKey: ['announcement-status', network, transaction.delegate || ''] as const,
-    enabled: !!transaction.delegate && status === TransactionStatus.Pending && type === TransactionType.Announce,
+    queryKey: [
+      'announcement-status',
+      network,
+      transaction.delegate || '',
+    ] as const,
+    enabled:
+      !!transaction.delegate &&
+      status === TransactionStatus.Pending &&
+      type === TransactionType.Announce,
     refetchOnMount: false,
-    queryFn: fetchAnnouncementsForStatus
+    queryFn: fetchAnnouncementsForStatus,
   });
 
   const announcements = result?.[0];
@@ -66,9 +82,10 @@ export function useAnnouncementStatus(
     () =>
       announcements?.findLast(
         (item) =>
-          addressEq(item.real.toString(), transaction.address) && u8aEq(item.callHash.toHex(), transaction.callHash)
+          addressEq(item.real.toString(), transaction.address) &&
+          u8aEq(item.callHash.toHex(), transaction.callHash),
       ),
-    [announcements, transaction.address, transaction.callHash]
+    [announcements, transaction.address, transaction.callHash],
   );
 
   if (status < TransactionStatus.Success) {
@@ -77,14 +94,16 @@ export function useAnnouncementStatus(
         ? 'proxy_removed'
         : announcements
           ? announcement
-            ? announcement.height.add(new BN(delegate?.proxyDelay || 0)).lte(bestBlock?.number.toBn() || new BN(0))
+            ? announcement.height
+                .add(new BN(delegate?.proxyDelay || 0))
+                .lte(bestBlock?.number.toBn() || new BN(0))
               ? 'executable'
               : 'reviewing'
             : 'indexing'
           : 'reviewing',
       status === TransactionStatus.Pending
         ? (!isFetched && isFetching) || (!isFetchedResult && isFetchingResult)
-        : !isFetched && isFetching
+        : !isFetched && isFetching,
     ];
   }
 
@@ -96,6 +115,6 @@ export function useAnnouncementStatus(
         : status === TransactionStatus.AnnounceReject
           ? 'rejected'
           : 'removed',
-    (!isFetched && isFetching) || (!isFetchedResult && isFetchingResult)
+    (!isFetched && isFetching) || (!isFetchedResult && isFetchingResult),
   ];
 }

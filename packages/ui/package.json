@@ -6,7 +6,6 @@
   },
   "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/ui#readme",
   "license": "Apache-2.0",
-  "packageManager": "yarn@4.5.3",
   "private": true,
   "repository": {
     "directory": "packages/ui",
@@ -29,7 +28,7 @@
         "default": "./build/index.js"
       }
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./styles.css"
   },
   "files": [
     "dist",
@@ -37,11 +36,13 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc --build && tailwindcss -i ./src/styles.css -o ./dist/styles.css",
+    "build": "tsc --build",
     "check-types": "tsc --noEmit",
-    "dev": "run-p dev:tsc dev:tailwindcss",
-    "dev:tsc": "tsc --watch",
-    "dev:tailwindcss": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch"
+    "dev": "tsc --watch"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "dependencies": {
     "@mimir-wallet/dev": "workspace:^",
@@ -69,6 +70,8 @@
   "devDependencies": {
     "@mimir-wallet/dev": "workspace:^",
     "@tailwindcss/cli": "^4.1.16",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "npm-run-all2": "^7.0.2",
     "tailwind-variants": "^3.1.1",
     "tailwindcss": "^4.1.17",

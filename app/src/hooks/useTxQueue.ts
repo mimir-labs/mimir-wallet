@@ -4,7 +4,11 @@
 import type { FilterPath, Transaction } from '../hooks/types';
 import type { TxEvents } from '@mimir-wallet/polkadot-core';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { ExtrinsicPayloadValue, IMethod, ISubmittableResult } from '@polkadot/types/types';
+import type {
+  ExtrinsicPayloadValue,
+  IMethod,
+  ISubmittableResult,
+} from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
 import { GenericExtrinsic } from '@polkadot/types';
@@ -32,7 +36,7 @@ export interface TxQueue {
     signer: string,
     signature: HexString,
     signedTransaction: HexString,
-    payload: ExtrinsicPayloadValue
+    payload: ExtrinsicPayloadValue,
   ) => void;
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }
@@ -49,7 +53,9 @@ export interface TxToast {
   events: TxEvents;
 }
 
-export type TxToastState = Omit<Required<TxToast>, 'onChange'> & { onChange?: () => void };
+export type TxToastState = Omit<Required<TxToast>, 'onChange'> & {
+  onChange?: () => void;
+};
 
 let queueId = 1;
 let toastId = 1;
@@ -62,35 +68,44 @@ export const useTxQueue = create<TxState>()((set) => ({
     const newValue: TxQueue = {
       ...value,
       id,
-      call: value.call instanceof GenericExtrinsic ? value.call.method : value.call,
+      call:
+        value.call instanceof GenericExtrinsic ? value.call.method : value.call,
       onResults: (result) => {
         value.onResults?.(result);
-        set((state) => ({ queue: state.queue.filter((item) => item.id !== id) }));
+        set((state) => ({
+          queue: state.queue.filter((item) => item.id !== id),
+        }));
       },
       onSignature: (...args) => {
         value.onSignature?.(...args);
-        set((state) => ({ queue: state.queue.filter((item) => item.id !== id) }));
+        set((state) => ({
+          queue: state.queue.filter((item) => item.id !== id),
+        }));
       },
       onClose: () => {
         value.onClose?.();
-        set((state) => ({ queue: state.queue.filter((item) => item.id !== id) }));
-      }
+        set((state) => ({
+          queue: state.queue.filter((item) => item.id !== id),
+        }));
+      },
     };
 
     set((state) => {
       return { queue: [...state.queue, newValue] };
     });
-  }
+  },
 }));
 
 export function addTxToast(toast: TxToast) {
   const _id = ++toastId;
 
   const onRemove = () => {
-    useTxQueue.setState((state) => ({ toasts: state.toasts.filter((item) => item.id !== _id) }));
+    useTxQueue.setState((state) => ({
+      toasts: state.toasts.filter((item) => item.id !== _id),
+    }));
   };
 
   useTxQueue.setState((state) => ({
-    toasts: [...state.toasts, { id: _id, events: toast.events, onRemove }]
+    toasts: [...state.toasts, { id: _id, events: toast.events, onRemove }],
   }));
 }

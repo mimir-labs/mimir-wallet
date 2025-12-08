@@ -1,10 +1,19 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
+import type {
+  AccountId,
+  AccountIndex,
+  Address,
+} from '@polkadot/types/interfaces';
 import type { Circle } from '@polkadot/ui-shared/icons/types';
 
-import { addressEq, encodeAddress, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  encodeAddress,
+  useSs58Format,
+  zeroAddress,
+} from '@mimir-wallet/polkadot-core';
 import { Avatar } from '@mimir-wallet/ui';
 import { polkadotIcon } from '@polkadot/ui-shared';
 import React, { useCallback, useMemo } from 'react';
@@ -26,19 +35,42 @@ function renderCircle({ cx, cy, fill, r }: Circle, index: number) {
   return <circle key={index} cx={cx} cy={cy} fill={fill} r={r} />;
 }
 
-function IdentityIcon({ className, prefix, size = 30, value, withBorder = false, showMultisigBadge = true }: Props) {
+function IdentityIcon({
+  className,
+  prefix,
+  size = 30,
+  value,
+  withBorder = false,
+  showMultisigBadge = true,
+}: Props) {
   const { ss58: chainSS58 } = useSs58Format();
   const address = encodeAddress(value, prefix ?? chainSS58);
   const { meta } = useAddressMeta(value?.toString());
   const copyAddress = useCopyAddressToClipboard(address);
 
-  const { isInjected, isMultisig, isProxied, source, threshold, who, multipleMultisig } = meta || {};
+  const {
+    isInjected,
+    isMultisig,
+    isProxied,
+    source,
+    threshold,
+    who,
+    multipleMultisig,
+  } = meta || {};
 
-  const extensionIcon = isInjected ? walletConfig[source || '']?.icon : undefined;
+  const extensionIcon = isInjected
+    ? walletConfig[source || '']?.icon
+    : undefined;
 
-  const isZeroAddress = useMemo(() => addressEq(zeroAddress, address), [address]);
+  const isZeroAddress = useMemo(
+    () => addressEq(zeroAddress, address),
+    [address],
+  );
 
-  const circles = useMemo(() => polkadotIcon(address, { isAlternative: false }), [address]);
+  const circles = useMemo(
+    () => polkadotIcon(address, { isAlternative: false }),
+    [address],
+  );
 
   let element: React.ReactNode;
 
@@ -48,7 +80,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false,
       e.stopPropagation();
       copyAddress();
     },
-    [copyAddress]
+    [copyAddress],
   );
 
   if (!value) {
@@ -70,7 +102,7 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false,
           borderRadius: '50%',
           fontWeight: 800,
           fontSize: Math.min(16, size / 2),
-          lineHeight: 1
+          lineHeight: 1,
         }}
       >
         0
@@ -89,16 +121,16 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false,
           position: 'relative',
           width: size,
           height: size + (shouldShowBadge ? 6 + size / 16 : 0),
-          borderRadius: '50%'
+          borderRadius: '50%',
         }}
       >
-        <svg viewBox='0 0 64 64' width={size} height={size}>
+        <svg viewBox="0 0 64 64" width={size} height={size}>
           {circles.map(renderCircle)}
         </svg>
 
         {shouldShowBadge ? (
           <span
-            className='text-white'
+            className="text-white"
             style={{
               zIndex: 2,
               position: 'absolute',
@@ -113,7 +145,11 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false,
               borderRadius: `${Math.max(12, size / 2.5) / 2}px`,
               fontWeight: 700,
               fontSize: size / 3,
-              background: withBorder ? (isProxied ? '#B700FF' : 'var(--primary)') : 'var(--primary)'
+              background: withBorder
+                ? isProxied
+                  ? '#B700FF'
+                  : 'var(--primary)'
+                : 'var(--primary)',
             }}
           >
             {who && who.length > 0 ? `${threshold}/${who.length}` : 'Multi'}
@@ -126,11 +162,13 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false,
               right: -2,
               bottom: -2,
               width: size / 2.2,
-              height: size / 2.2
+              height: size / 2.2,
             }}
           />
         ) : null}
-        {withBorder && !isInjected && (isProxied || isMultisig || multipleMultisig) ? (
+        {withBorder &&
+        !isInjected &&
+        (isProxied || isMultisig || multipleMultisig) ? (
           <div
             style={{
               zIndex: 1,
@@ -139,9 +177,9 @@ function IdentityIcon({ className, prefix, size = 30, value, withBorder = false,
               top: -3,
               right: -3,
               width: size + 6,
-              height: size + 6
+              height: size + 6,
             }}
-            className='pointer-events-none rounded-full border-1'
+            className="pointer-events-none rounded-full border-1"
           />
         ) : null}
       </span>

@@ -10,7 +10,9 @@ export class LocalStore extends BaseStore {
   constructor() {
     super();
     this.#store = new LocalStorage();
-    this.#store.on('store_changed', (...args) => this.emit('store_changed', ...args));
+    this.#store.on('store_changed', (...args) =>
+      this.emit('store_changed', ...args),
+    );
   }
 
   public all(): [string, unknown][] {

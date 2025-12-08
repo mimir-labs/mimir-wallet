@@ -3,7 +3,10 @@
 
 import type { TxDispatchError, TxModuleError } from '../tx/dispatch-error.js';
 import type { Option, Vec } from '@polkadot/types';
-import type { XcmVersionedLocation, XcmVersionedXcm } from '@polkadot/types/lookup';
+import type {
+  XcmVersionedLocation,
+  XcmVersionedXcm,
+} from '@polkadot/types/lookup';
 import type { ITuple } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 

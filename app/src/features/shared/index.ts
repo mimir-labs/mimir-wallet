@@ -10,7 +10,7 @@ export {
   handleValidationError,
   formatErrorMessage,
   safeExecute,
-  safeExecuteAsync
+  safeExecuteAsync,
 } from './error-handling';
 
 // Error display components
@@ -18,4 +18,10 @@ export { ErrorDisplay, LegacyErrorDisplay } from './ErrorDisplay';
 
 // Call data utilities
 export type { CallSummary } from './calldata-utils';
-export { decodeCallData, isValidCallData, formatCallData, getCallSummary, compareCallData } from './calldata-utils';
+export {
+  decodeCallData,
+  isValidCallData,
+  formatCallData,
+  getCallSummary,
+  compareCallData,
+} from './calldata-utils';

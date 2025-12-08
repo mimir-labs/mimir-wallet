@@ -17,17 +17,34 @@ function CustomApps() {
 
   return (
     <>
-      <div className={isMobile ? 'flex flex-col gap-4' : 'grid grid-cols-[repeat(auto-fill,minmax(258px,1fr))] gap-6'}>
+      <div
+        className={
+          isMobile
+            ? 'flex flex-col gap-4'
+            : 'grid grid-cols-[repeat(auto-fill,minmax(258px,1fr))] gap-6'
+        }
+      >
         <div
-          key='add-custom-app'
-          className='bg-background border-secondary relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-5 rounded-[20px] border-1 p-5 shadow-md'
+          key="add-custom-app"
+          className="card-root relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-5 p-5"
           onClick={toggleOpen}
         >
-          <Button className='h-16 w-16' variant='light' isIconOnly size='lg' radius='full' onClick={toggleOpen}>
-            <IconAdd className='text-primary h-16 w-16' />
+          <Button
+            className="h-16 w-16"
+            variant="light"
+            isIconOnly
+            size="lg"
+            radius="full"
+            onClick={toggleOpen}
+          >
+            <IconAdd className="text-primary h-16 w-16" />
           </Button>
-          <h3 className='text-center text-2xl font-bold'>Add New Customized App</h3>
-          <p className='text-foreground/50 text-center text-xs'>You can add apps not listed but support Mimir SDK.</p>
+          <h3 className="text-center text-2xl font-bold">
+            Add New Customized App
+          </h3>
+          <p className="text-foreground/50 text-center text-xs">
+            You can add apps not listed but support Mimir SDK.
+          </p>
         </div>
 
         {customApps.map((app) => (

@@ -13,7 +13,11 @@ import IconFailed from '@/assets/svg/icon-failed-outlined.svg?react';
 import { TxButton } from '@/components';
 import { TransactionType } from '@/hooks/types';
 
-async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, string, string, string] }) {
+async function fetchMultisigInfo({
+  queryKey,
+}: {
+  queryKey: readonly [string, string, string, string];
+}) {
   const [, network, address, callHash] = queryKey;
 
   if (!address || !callHash) {
@@ -22,14 +26,16 @@ async function fetchMultisigInfo({ queryKey }: { queryKey: readonly [string, str
 
   const api = await ApiManager.getInstance().getApi(network);
 
-  if (!api) {
-    throw new Error(`API not available for network: ${network}`);
-  }
-
   return api.query.multisig.multisigs(address, callHash);
 }
 
-function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction: Transaction }) {
+function Cancel({
+  isIcon = false,
+  transaction,
+}: {
+  isIcon?: boolean;
+  transaction: Transaction;
+}) {
   const { network } = useNetwork();
   const { isLocalAccount } = useAccount();
 
@@ -39,7 +45,9 @@ function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction
     }
 
     if (transaction.type === TransactionType.Proxy) {
-      const subTransaction = transaction.children.find((item) => item.type === TransactionType.Multisig);
+      const subTransaction = transaction.children.find(
+        (item) => item.type === TransactionType.Multisig,
+      );
 
       return subTransaction || null;
     }
@@ -48,15 +56,21 @@ function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction
   }, [transaction]);
 
   const { data: multisigInfo } = useQuery({
-    queryKey: ['multisig-info', network, multisigTx?.address || '', multisigTx?.callHash || ''] as const,
+    queryKey: [
+      'multisig-info',
+      network,
+      multisigTx?.address || '',
+      multisigTx?.callHash || '',
+    ] as const,
     enabled: !!multisigTx,
     refetchOnMount: false,
-    queryFn: fetchMultisigInfo
+    queryFn: fetchMultisigInfo,
   });
 
   const depositor = useMemo(
-    () => (multisigInfo?.isSome ? multisigInfo.unwrap().depositor.toString() : null),
-    [multisigInfo]
+    () =>
+      multisigInfo?.isSome ? multisigInfo.unwrap().depositor.toString() : null,
+    [multisigInfo],
   );
 
   if (!(multisigTx && multisigInfo && depositor && isLocalAccount(depositor))) {
@@ -70,9 +84,9 @@ function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction
         fullWidth={!isIcon}
         variant={isIcon ? 'light' : 'ghost'}
         size={isIcon ? 'sm' : 'md'}
-        color='danger'
+        color="danger"
         accountId={depositor}
-        website='mimir://internal/cancel'
+        website="mimir://internal/cancel"
         getCall={async () => {
           const api = await ApiManager.getInstance().getApi(network);
 
@@ -80,7 +94,7 @@ function Cancel({ isIcon = false, transaction }: { isIcon?: boolean; transaction
             multisigTx.threshold,
             multisigTx.members.filter((item) => !addressEq(item, depositor)),
             multisigInfo?.unwrap().when,
-            multisigTx.callHash
+            multisigTx.callHash,
           );
         }}
       >

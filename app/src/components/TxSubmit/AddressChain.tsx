@@ -16,13 +16,21 @@ interface Props {
   setAddressChain: React.Dispatch<React.SetStateAction<FilterPath[]>>;
 }
 
-function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Props) {
+function AddressChain({
+  filterPaths,
+  deep,
+  addressChain,
+  setAddressChain,
+}: Props) {
   const selected = addressChain.at(deep) || '';
   const source = useAccountSource((selected as FilterPath)?.address);
 
   const addresses = useMemo(
-    () => Array.from(new Set(filterPaths.map((item) => item[0]).filter((item) => !!item))),
-    [filterPaths]
+    () =>
+      Array.from(
+        new Set(filterPaths.map((item) => item[0]).filter((item) => !!item)),
+      ),
+    [filterPaths],
   );
 
   useLayoutEffect(() => {
@@ -43,7 +51,9 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
 
   return (
     <div>
-      {deep === 0 && <div className='mb-2 text-sm font-bold'>Select Signer</div>}
+      {deep === 0 && (
+        <div className="mb-2 text-sm font-bold">Select Signer</div>
+      )}
       {deep === 0 && !source ? null : (
         <SelectFilterPath
           filterPaths={addresses}
@@ -67,11 +77,18 @@ function AddressChain({ filterPaths, deep, addressChain, setAddressChain }: Prop
       )}
 
       {!source && (
-        <div style={{ paddingTop: deep === 0 ? 0 : 10, paddingLeft: deep === 0 ? 0 : 10 }}>
+        <div
+          style={{
+            paddingTop: deep === 0 ? 0 : 10,
+            paddingLeft: deep === 0 ? 0 : 10,
+          }}
+        >
           <AddressChain
             addressChain={addressChain}
             deep={deep + 1}
-            filterPaths={filterPaths.filter((item) => item[0]?.id === selected.id).map((item) => item.slice(1))}
+            filterPaths={filterPaths
+              .filter((item) => item[0]?.id === selected.id)
+              .map((item) => item.slice(1))}
             setAddressChain={setAddressChain}
           />
         </div>

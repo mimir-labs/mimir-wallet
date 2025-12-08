@@ -23,7 +23,10 @@ interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
 }
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
-  ({ className, stickyHeader, containerClassName, scrollClassName, ...props }, ref) => {
+  (
+    { className, stickyHeader, containerClassName, scrollClassName, ...props },
+    ref,
+  ) => {
     const table = (
       <table
         ref={ref}
@@ -31,58 +34,82 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
           'w-full caption-bottom text-sm',
           stickyHeader &&
             '[&_thead_th]:bg-background/70 [&_thead]:sticky [&_thead]:top-0 [&_thead]:z-10 [&_thead_th]:backdrop-blur-sm [&_thead_th]:backdrop-saturate-150',
-          className
+          className,
         )}
         {...props}
       />
     );
 
     return (
-      <div className={cn('group bg-background overflow-hidden shadow-md', containerClassName)}>
-        <div className={cn('scroll-hover-show overflow-auto', scrollClassName)}>{table}</div>
+      <div
+        className={cn(
+          'group bg-background overflow-hidden shadow-md',
+          containerClassName,
+        )}
+      >
+        <div className={cn('scroll-hover-show overflow-auto', scrollClassName)}>
+          {table}
+        </div>
       </div>
     );
-  }
+  },
 );
 
 Table.displayName = 'Table';
 
-const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => <thead ref={ref} className={className} {...props} />
-);
+const TableHeader = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <thead ref={ref} className={className} {...props} />
+));
 
 TableHeader.displayName = 'TableHeader';
 
-const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => <tbody ref={ref} className={className} {...props} />
-);
+const TableBody = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tbody ref={ref} className={className} {...props} />
+));
 
 TableBody.displayName = 'TableBody';
 
-const TableFooter = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => <tfoot ref={ref} className={cn('bg-muted/50 font-medium', className)} {...props} />
-);
+const TableFooter = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tfoot
+    ref={ref}
+    className={cn('bg-muted/50 font-medium', className)}
+    {...props}
+  />
+));
 
 TableFooter.displayName = 'TableFooter';
 
-const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
-  ({ className, ...props }, ref) => <tr ref={ref} className={cn('transition-colors', className)} {...props} />
-);
+const TableRow = React.forwardRef<
+  HTMLTableRowElement,
+  React.HTMLAttributes<HTMLTableRowElement>
+>(({ className, ...props }, ref) => (
+  <tr ref={ref} className={cn('transition-colors', className)} {...props} />
+));
 
 TableRow.displayName = 'TableRow';
 
-const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => (
-    <th
-      ref={ref}
-      className={cn(
-        'text-foreground/50 h-auto bg-transparent px-2 text-left align-middle text-xs font-medium',
-        className
-      )}
-      {...props}
-    />
-  )
-);
+const TableHead = React.forwardRef<
+  HTMLTableCellElement,
+  React.ThHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <th
+    ref={ref}
+    className={cn(
+      'text-foreground/50 h-auto bg-transparent px-2 text-left align-middle text-xs font-medium',
+      className,
+    )}
+    {...props}
+  />
+));
 
 TableHead.displayName = 'TableHead';
 
@@ -90,19 +117,29 @@ const TableColumn = TableHead;
 
 TableColumn.displayName = 'TableColumn';
 
-const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => (
-    <td ref={ref} className={cn('px-2 py-1.5 align-middle text-sm', className)} {...props} />
-  )
-);
+const TableCell = React.forwardRef<
+  HTMLTableCellElement,
+  React.TdHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <td
+    ref={ref}
+    className={cn('px-2 py-1.5 align-middle text-sm', className)}
+    {...props}
+  />
+));
 
 TableCell.displayName = 'TableCell';
 
-const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttributes<HTMLTableCaptionElement>>(
-  ({ className, ...props }, ref) => (
-    <caption ref={ref} className={cn('text-muted-foreground mt-4 text-sm', className)} {...props} />
-  )
-);
+const TableCaption = React.forwardRef<
+  HTMLTableCaptionElement,
+  React.HTMLAttributes<HTMLTableCaptionElement>
+>(({ className, ...props }, ref) => (
+  <caption
+    ref={ref}
+    className={cn('text-muted-foreground mt-4 text-sm', className)}
+    {...props}
+  />
+));
 
 TableCaption.displayName = 'TableCaption';
 
@@ -123,25 +160,40 @@ interface SortableTableColumnProps extends React.ThHTMLAttributes<HTMLTableCellE
 
 const SortIcon = ({ direction }: { direction?: SortDirection }) => {
   if (direction === 'ascending') {
-    return <ArrowUpIcon className='h-3 w-3' />;
+    return <ArrowUpIcon className="h-3 w-3" />;
   }
 
   if (direction === 'descending') {
-    return <ArrowDownIcon className='h-3 w-3' />;
+    return <ArrowDownIcon className="h-3 w-3" />;
   }
 
-  return <ChevronsUpDownIcon className='h-3 w-3 opacity-50' />;
+  return <ChevronsUpDownIcon className="h-3 w-3 opacity-50" />;
 };
 
-const SortableTableColumn = React.forwardRef<HTMLTableCellElement, SortableTableColumnProps>(
-  ({ className, columnKey, sortDescriptor, onSortChange, allowsSorting = true, children, ...props }, ref) => {
+const SortableTableColumn = React.forwardRef<
+  HTMLTableCellElement,
+  SortableTableColumnProps
+>(
+  (
+    {
+      className,
+      columnKey,
+      sortDescriptor,
+      onSortChange,
+      allowsSorting = true,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
     const isSorted = sortDescriptor?.column === columnKey;
     const direction = isSorted ? sortDescriptor.direction : undefined;
 
     const handleClick = () => {
       if (!allowsSorting || !onSortChange) return;
 
-      const newDirection: SortDirection = isSorted && direction === 'ascending' ? 'descending' : 'ascending';
+      const newDirection: SortDirection =
+        isSorted && direction === 'ascending' ? 'descending' : 'ascending';
 
       onSortChange({ column: columnKey, direction: newDirection });
     };
@@ -152,18 +204,18 @@ const SortableTableColumn = React.forwardRef<HTMLTableCellElement, SortableTable
         className={cn(
           'text-foreground/50 h-auto bg-transparent px-2 text-left align-middle text-xs font-medium',
           allowsSorting && 'hover:text-foreground cursor-pointer select-none',
-          className
+          className,
         )}
         onClick={handleClick}
         {...props}
       >
-        <span className='inline-flex items-center gap-1'>
+        <span className="inline-flex items-center gap-1">
           {children}
           {allowsSorting && <SortIcon direction={direction} />}
         </span>
       </th>
     );
-  }
+  },
 );
 
 SortableTableColumn.displayName = 'SortableTableColumn';
@@ -178,5 +230,5 @@ export {
   TableHead,
   TableHeader,
   TableRow,
-  SortableTableColumn
+  SortableTableColumn,
 };

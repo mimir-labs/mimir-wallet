@@ -13,10 +13,14 @@ import { useWallet } from '@/wallet/useWallet';
  * Hook to get cached multisig data for a specific network
  * @param network - The network key to query
  */
-export function useCacheMultisig(network: string): [data: CacheMultisig[], isLoading: boolean] {
+export function useCacheMultisig(
+  network: string,
+): [data: CacheMultisig[], isLoading: boolean] {
   const { walletAccounts } = useWallet();
 
-  const addresses: string[] = walletAccounts.map(({ address }) => addressToHex(address)).sort();
+  const addresses: string[] = walletAccounts
+    .map(({ address }) => addressToHex(address))
+    .sort();
   const { data, isLoading } = useQuery({
     queryKey: ['cache-multisig', network, addresses] as const,
     staleTime: 6_000,
@@ -28,7 +32,7 @@ export function useCacheMultisig(network: string): [data: CacheMultisig[], isLoa
       service.multisig.pendingPrepareMultisig(chain, address),
     structuralSharing: (prev, next) => {
       return isEqual(prev, next) ? prev : next;
-    }
+    },
   });
 
   return [data?.filter((item) => item.who && item.threshold) || [], isLoading];

@@ -17,7 +17,7 @@ function AddProxyButton({
   reviewWindow,
   custom,
   proxyType,
-  setProxyArgs
+  setProxyArgs,
 }: {
   proxied?: string;
   proxy?: string;
@@ -36,10 +36,6 @@ function AddProxyButton({
 
     const api = await ApiManager.getInstance().getApi(network);
 
-    if (!api) {
-      return;
-    }
-
     const delay = reviewWindow === -1 ? Number(custom) : reviewWindow;
 
     if (addressEq(proxied, proxy)) {
@@ -48,7 +44,9 @@ function AddProxyButton({
       return;
     }
 
-    const exists = proxyArgs.find((item) => item.delegate === proxy && item.proxyType === proxyType);
+    const exists = proxyArgs.find(
+      (item) => item.delegate === proxy && item.proxyType === proxyType,
+    );
 
     if (exists) {
       toastWarn('Already added');
@@ -59,7 +57,8 @@ function AddProxyButton({
     const result = await api.query.proxy.proxies(proxied);
 
     const onChainExists = result[0].find(
-      (item) => item.delegate.toString() === proxy && item.proxyType.type === proxyType
+      (item) =>
+        item.delegate.toString() === proxy && item.proxyType.type === proxyType,
     );
 
     if (onChainExists) {
@@ -69,10 +68,24 @@ function AddProxyButton({
     }
 
     setProxyArgs([...proxyArgs, { delegate: proxy, proxyType, delay }]);
-  }, [custom, network, proxied, proxy, proxyArgs, proxyType, reviewWindow, setProxyArgs]);
+  }, [
+    custom,
+    network,
+    proxied,
+    proxy,
+    proxyArgs,
+    proxyType,
+    reviewWindow,
+    setProxyArgs,
+  ]);
 
   return (
-    <Button disabled={state.loading || !(proxied && proxy)} fullWidth variant='ghost' onClick={onAdd}>
+    <Button
+      disabled={state.loading || !(proxied && proxy)}
+      fullWidth
+      variant="ghost"
+      onClick={onAdd}
+    >
       {state.loading ? buttonSpinner : null}
       Add
     </Button>

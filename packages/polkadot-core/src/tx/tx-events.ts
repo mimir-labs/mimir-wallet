@@ -8,7 +8,10 @@ import type { U8aLike } from '@polkadot/util/types';
 import { EventEmitter } from 'eventemitter3';
 
 type EventTypes = {
-  signed: (signature: U8aLike, extrinsic: SubmittableExtrinsic<'promise'>) => void;
+  signed: (
+    signature: U8aLike,
+    extrinsic: SubmittableExtrinsic<'promise'>,
+  ) => void;
   inblock: (result: ISubmittableResult) => void;
   completed: (result: ISubmittableResult) => void;
   finalized: (result: ISubmittableResult) => void;
@@ -32,11 +35,14 @@ export class TxEvents extends EventEmitter<EventTypes> {
   constructor() {
     super();
 
-    this.once('signed', (signature: U8aLike, extrinsic: SubmittableExtrinsic<'promise'>) => {
-      this.status = 'signed';
-      this.signature = signature;
-      this.extrinsic = extrinsic;
-    });
+    this.once(
+      'signed',
+      (signature: U8aLike, extrinsic: SubmittableExtrinsic<'promise'>) => {
+        this.status = 'signed';
+        this.signature = signature;
+        this.extrinsic = extrinsic;
+      },
+    );
     this.once('inblock', (result: ISubmittableResult) => {
       this.status = 'inblock';
       this.result = result;

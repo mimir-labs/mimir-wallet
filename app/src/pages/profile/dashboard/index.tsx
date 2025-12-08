@@ -19,10 +19,16 @@ import { useAddressStructureNetworks } from '@/hooks/useAddressStructureNetworks
 import { useBalanceTotalUsd } from '@/hooks/useChainBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 
-function Title({ endContent, children }: { endContent?: React.ReactNode; children?: React.ReactNode }) {
+function Title({
+  endContent,
+  children,
+}: {
+  endContent?: React.ReactNode;
+  children?: React.ReactNode;
+}) {
   return (
-    <div className='mb-[5px] flex items-center justify-between'>
-      <h6 className='leading-6'>{children}</h6>
+    <div className="mb-[5px] flex items-center justify-between">
+      <h6 className="leading-6">{children}</h6>
       {endContent}
     </div>
   );
@@ -37,7 +43,7 @@ function DashboardV2({ address }: { address: string }) {
   const supportedNetworks = useAddressStructureNetworks(address);
   const [network, setNetwork] = useInputNetwork(
     undefined,
-    supportedNetworks?.map((n) => n.key)
+    supportedNetworks?.map((n) => n.key),
   );
 
   const refreshAssets = useCallback(async () => {
@@ -48,7 +54,7 @@ function DashboardV2({ address }: { address: string }) {
     try {
       // Invalidate all balance-related queries for this address
       await queryClient.invalidateQueries({
-        queryKey: ['chain-balances']
+        queryKey: ['chain-balances'],
       });
 
       toastSuccess('Assets refreshed successfully');
@@ -61,22 +67,27 @@ function DashboardV2({ address }: { address: string }) {
   }, [address, isRefreshing, queryClient]);
 
   return (
-    <div className='w-full'>
+    <div className="w-full">
       {/* Main Content Grid */}
-      <div className='grid grid-cols-8 gap-5'>
+      <div className="grid grid-cols-8 gap-5">
         {/* Hero Section */}
-        <div className='col-span-8 lg:col-span-5'>
+        <div className="col-span-8 lg:col-span-5">
           <Title>Overview</Title>
 
           <Hero address={address} totalUsd={totalUsd} changes={changes} />
         </div>
 
         {/* Favorite Dapps */}
-        <div className='col-span-8 lg:col-span-3'>
+        <div className="col-span-8 lg:col-span-3">
           <Title
             endContent={
-              <Button asChild variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                <Link to='/dapp'>View All</Link>
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="h-[23px] px-[15px]"
+              >
+                <Link to="/dapp">View All</Link>
               </Button>
             }
           >
@@ -86,25 +97,32 @@ function DashboardV2({ address }: { address: string }) {
         </div>
 
         {/* Assets */}
-        <div className='col-span-8 lg:col-span-4'>
+        <div className="col-span-8 lg:col-span-4">
           <Title
             endContent={
-              <Button asChild variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                <Link to='/assets'>View All</Link>
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="h-[23px] px-[15px]"
+              >
+                <Link to="/assets">View All</Link>
               </Button>
             }
           >
-            <div className='flex items-center gap-2.5'>
+            <div className="flex items-center gap-2.5">
               Assets
-              <Tooltip content='Refresh Asset List'>
+              <Tooltip content="Refresh Asset List">
                 <Button
                   isIconOnly
-                  variant='light'
-                  size='sm'
+                  variant="light"
+                  size="sm"
                   onClick={refreshAssets}
                   disabled={isRefreshing || !address}
                 >
-                  <IconArrowClockWise className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  <IconArrowClockWise
+                    className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`}
+                  />
                 </Button>
               </Tooltip>
             </div>
@@ -113,11 +131,16 @@ function DashboardV2({ address }: { address: string }) {
         </div>
 
         {/* Pending Transactions */}
-        <div className='col-span-8 lg:col-span-4'>
+        <div className="col-span-8 lg:col-span-4">
           <Title
             endContent={
-              <Button asChild variant='ghost' size='sm' className='h-[23px] px-[15px]'>
-                <Link to='/transactions'>View All</Link>
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="h-[23px] px-[15px]"
+              >
+                <Link to="/transactions">View All</Link>
               </Button>
             }
           >
@@ -127,7 +150,7 @@ function DashboardV2({ address }: { address: string }) {
         </div>
 
         {/* Account Structure */}
-        <div className='col-span-8'>
+        <div className="col-span-8">
           <Title>Account Strucuture</Title>
           <NetworkProvider network={network}>
             <AccountStructure

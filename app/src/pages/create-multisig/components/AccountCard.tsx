@@ -13,7 +13,12 @@ interface AccountCardProps {
   placeholder?: string;
 }
 
-function AccountCard({ label, address, onNameChange, placeholder }: AccountCardProps) {
+function AccountCard({
+  label,
+  address,
+  onNameChange,
+  placeholder,
+}: AccountCardProps) {
   const { name, setName } = useAddressMeta(address);
 
   useEffect(() => {
@@ -21,22 +26,22 @@ function AccountCard({ label, address, onNameChange, placeholder }: AccountCardP
   }, [name, onNameChange]);
 
   return (
-    <div className='flex flex-col gap-[5px]'>
-      <label className='text-foreground text-sm font-bold'>{label}</label>
-      <div className='bg-primary/5 rounded-[10px] p-2.5'>
-        <div className='flex items-center gap-[10px]'>
+    <div className="flex flex-col gap-[5px]">
+      <label className="text-foreground text-sm font-bold">{label}</label>
+      <div className="bg-primary/5 rounded-[10px] p-2.5">
+        <div className="flex items-center gap-[10px]">
           <IdentityIcon size={40} value={address} />
-          <div className='flex flex-1 flex-col gap-[5px]'>
+          <div className="flex flex-1 flex-col gap-[5px]">
             <EditableField
               value={name}
               onChange={setName}
               placeholder={placeholder}
-              className='text-foreground text-sm font-bold'
+              className="text-foreground text-sm font-bold"
             />
             {address && (
-              <div className='flex items-center gap-[5px]'>
-                <span className='text-foreground/50 text-xs'>{address}</span>
-                <CopyAddress address={address} className='opacity-30' />
+              <div className="flex items-center gap-[5px]">
+                <span className="text-foreground/50 text-xs">{address}</span>
+                <CopyAddress address={address} className="opacity-30" />
               </div>
             )}
           </div>

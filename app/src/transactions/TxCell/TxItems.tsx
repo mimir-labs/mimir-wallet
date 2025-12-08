@@ -4,10 +4,15 @@
 import type { IMethod } from '@polkadot/types/types';
 
 import { encodeAddress, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Button, Tooltip, TooltipContent, TooltipTrigger, TooltipWrapper } from '@mimir-wallet/ui';
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipWrapper,
+} from '@mimir-wallet/ui';
 import { Link } from '@tanstack/react-router';
-import moment from 'moment';
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 
 import Progress from '../Progress';
 import { AnnouncementStatus, MultisigStatus, Status } from '../Status';
@@ -16,19 +21,40 @@ import Extrinsic from './Extrinsic';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconShare from '@/assets/svg/icon-share.svg?react';
-import { AppName, TxOverviewDialog } from '@/components';
-import { type AccountData, type Transaction, TransactionStatus, TransactionType } from '@/hooks/types';
+import { AppName } from '@/components';
+import {
+  type AccountData,
+  type Transaction,
+  TransactionStatus,
+  TransactionType,
+} from '@/hooks/types';
 import { useCopyClipboard } from '@/hooks/useCopyClipboard';
 import { useParseCall } from '@/hooks/useParseCall';
 import { useToggle } from '@/hooks/useToggle';
 import { CallDisplayDetail, CallDisplaySection } from '@/params';
-import { formatAgo } from '@/utils';
+import { formatAgo, formatDate } from '@/utils';
+
+const TxOverviewDialog = lazy(
+  () => import('@/components/TxOverview/TxOverviewDialog'),
+);
 
 function AppCell({ transaction }: { transaction: Transaction }) {
-  return <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />;
+  return (
+    <AppName
+      website={transaction.website}
+      appName={transaction.appName}
+      iconUrl={transaction.iconUrl}
+    />
+  );
 }
 
-function ActionTextCell({ section, method }: { section?: string; method?: string }) {
+function ActionTextCell({
+  section,
+  method,
+}: {
+  section?: string;
+  method?: string;
+}) {
   return <CallDisplaySection section={section} method={method} />;
 }
 
@@ -44,8 +70,10 @@ function TimeCell({ time }: { time?: number }) {
   time ||= now;
 
   return (
-    <Tooltip content={moment(time).format()}>
-      <span>{now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`}</span>
+    <Tooltip content={formatDate(time)}>
+      <span>
+        {now - Number(time) < 1000 ? 'Now' : `${formatAgo(Number(time))} ago`}
+      </span>
     </Tooltip>
   );
 }
@@ -53,7 +81,7 @@ function TimeCell({ time }: { time?: number }) {
 function ActionsCell({
   withDetails,
   transaction,
-  detailOpen
+  detailOpen,
 }: {
   withDetails?: boolean;
   transaction: Transaction;
@@ -71,29 +99,43 @@ function ActionsCell({
   };
 
   return (
-    <div className='flex w-full flex-row-reverse items-center gap-1'>
+    <div className="flex w-full flex-row-reverse items-center gap-1">
       {withDetails ? (
-        <Button size='sm' continuePropagation isIconOnly color='primary' variant='light'>
+        <Button
+          size="sm"
+          continuePropagation
+          isIconOnly
+          color="primary"
+          variant="light"
+        >
           <ArrowDown
             className={`text-primary transform-origin-center transition-transform duration-200 ${
               detailOpen ? 'rotate-180' : 'rotate-0'
             }`}
-            fontSize='0.6rem'
+            fontSize="0.6rem"
           />
         </Button>
       ) : (
-        <Button size='sm' asChild variant='light'>
-          <Link to='/transactions'>View More</Link>
+        <Button size="sm" asChild variant="light">
+          <Link to="/transactions">View More</Link>
         </Button>
       )}
 
       <TooltipWrapper open={tooltipOpen} onOpenChange={setTooltipOpen}>
         <TooltipTrigger asChild>
-          <Button isIconOnly color='primary' size='sm' variant='light' onClick={handleCopyUrl}>
-            <IconShare className='h-4 w-4' />
+          <Button
+            isIconOnly
+            color="primary"
+            size="sm"
+            variant="light"
+            onClick={handleCopyUrl}
+          >
+            <IconShare className="h-4 w-4" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>{isCopied ? 'Copied!' : 'Copy the transaction URL'}</TooltipContent>
+        <TooltipContent>
+          {isCopied ? 'Copied!' : 'Copy the transaction URL'}
+        </TooltipContent>
       </TooltipWrapper>
     </div>
   );
@@ -106,7 +148,7 @@ function TxItems({
   transaction,
   hasLargeCalls = false,
   shouldLoadDetails = false,
-  onLoadDetails
+  onLoadDetails,
 }: {
   withDetails?: boolean;
   defaultOpen?: boolean;
@@ -125,31 +167,44 @@ function TxItems({
 
   return (
     <>
-      <div className='overflow-hidden transition-all duration-200'>
+      <div className="overflow-hidden transition-all duration-200">
         <div
-          className='bg-secondary grid cursor-pointer grid-cols-10 gap-2.5 rounded-[10px] px-2.5 font-semibold sm:px-4 md:grid-cols-12 md:px-5 lg:grid-cols-15 [&>div]:flex [&>div]:h-10 [&>div]:items-center'
+          className="bg-secondary grid cursor-pointer grid-cols-10 gap-2.5 rounded-[10px] px-2.5 font-semibold sm:px-4 md:grid-cols-12 md:px-5 lg:grid-cols-15 [&>div]:flex [&>div]:h-10 [&>div]:items-center"
           onClick={toggleDetailOpen}
         >
-          <div className='col-span-2'>
+          <div className="col-span-2">
             <AppCell transaction={transaction} />
           </div>
-          <div className='col-span-5'>
-            <ActionTextCell section={transaction.section} method={transaction.method} />
-          </div>
-          <div className='col-span-3 hidden lg:flex'>
-            <ActionDisplayCell call={call} />
-          </div>
-          <div className='col-span-2 hidden md:flex'>
-            <TimeCell
-              time={transaction.status < TransactionStatus.Success ? transaction.createdAt : transaction.updatedAt}
+          <div className="col-span-5">
+            <ActionTextCell
+              section={transaction.section}
+              method={transaction.method}
             />
           </div>
-          <div className='col-span-2'>
+          <div className="col-span-3 hidden lg:flex">
+            <ActionDisplayCell call={call} />
+          </div>
+          <div className="col-span-2 hidden md:flex">
+            <TimeCell
+              time={
+                transaction.status < TransactionStatus.Success
+                  ? transaction.createdAt
+                  : transaction.updatedAt
+              }
+            />
+          </div>
+          <div className="col-span-2">
             {transaction.status < TransactionStatus.Success ? (
               transaction.type === TransactionType.Announce ? (
-                <AnnouncementStatus transaction={transaction} account={account} />
+                <AnnouncementStatus
+                  transaction={transaction}
+                  account={account}
+                />
               ) : transaction.type === TransactionType.Multisig ? (
-                <MultisigStatus transaction={transaction} onClick={toggleOverviewOpen} />
+                <MultisigStatus
+                  transaction={transaction}
+                  onClick={toggleOverviewOpen}
+                />
               ) : (
                 <Status transaction={transaction} />
               )
@@ -157,13 +212,17 @@ function TxItems({
               <Status transaction={transaction} />
             )}
           </div>
-          <div className='col-span-1'>
-            <ActionsCell withDetails={withDetails} transaction={transaction} detailOpen={detailOpen} />
+          <div className="col-span-1">
+            <ActionsCell
+              withDetails={withDetails}
+              transaction={transaction}
+              detailOpen={detailOpen}
+            />
           </div>
         </div>
 
         {withDetails && detailOpen && (
-          <div className='bg-background mt-3 flex flex-row gap-3 md:gap-4'>
+          <div className="bg-background mt-3 flex flex-row gap-3 md:gap-4">
             <Extrinsic
               transaction={transaction}
               call={call}
@@ -171,11 +230,22 @@ function TxItems({
               shouldLoadDetails={shouldLoadDetails}
               onLoadDetails={onLoadDetails}
             />
-            <Progress openOverview={toggleOverviewOpen} account={account} transaction={transaction} />
+            <Progress
+              openOverview={toggleOverviewOpen}
+              account={account}
+              transaction={transaction}
+            />
           </div>
         )}
       </div>
-      <TxOverviewDialog account={account} transaction={transaction} onClose={toggleOverviewOpen} open={overviewOpen} />
+      <Suspense fallback={null}>
+        <TxOverviewDialog
+          account={account}
+          transaction={transaction}
+          onClose={toggleOverviewOpen}
+          open={overviewOpen}
+        />
+      </Suspense>
     </>
   );
 }

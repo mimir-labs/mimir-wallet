@@ -19,7 +19,7 @@ describe('Dry Run Integration Tests', () => {
 
         expect(hasDryRunApi).toBe(true);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -31,7 +31,7 @@ describe('Dry Run Integration Tests', () => {
 
         expect(hasDryRunApi).toBe(true);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -42,14 +42,18 @@ describe('Dry Run Integration Tests', () => {
         skipIfNotConnected(paseoApi, 'system.remark dry run');
 
         const remarkCall = paseoApi.tx.system.remark('test remark');
-        const result = await dryRun(paseoApi, remarkCall.method, TEST_ADDRESSES.alice);
+        const result = await dryRun(
+          paseoApi,
+          remarkCall.method,
+          TEST_ADDRESSES.alice,
+        );
 
         expect(result).toBeDefined();
         expect(result.success).toBe(true);
         expect(result.rawEvents).toBeDefined();
         expect(Array.isArray(result.rawEvents)).toBe(true);
       },
-      TIMEOUTS.dryRun
+      TIMEOUTS.dryRun,
     );
 
     it(
@@ -57,14 +61,20 @@ describe('Dry Run Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'system.remarkWithEvent dry run');
 
-        const remarkCall = paseoApi.tx.system.remarkWithEvent('test remark with event');
-        const result = await dryRun(paseoApi, remarkCall.method, TEST_ADDRESSES.alice);
+        const remarkCall = paseoApi.tx.system.remarkWithEvent(
+          'test remark with event',
+        );
+        const result = await dryRun(
+          paseoApi,
+          remarkCall.method,
+          TEST_ADDRESSES.alice,
+        );
 
         expect(result).toBeDefined();
         expect(result.success).toBe(true);
         expect(result.rawEvents).toBeDefined();
       },
-      TIMEOUTS.dryRun
+      TIMEOUTS.dryRun,
     );
   });
 
@@ -76,9 +86,16 @@ describe('Dry Run Integration Tests', () => {
 
         // Create a transfer call for 1 PAS (10 decimals)
         const transferAmount = BigInt(1_000_000_0000); // 1 PAS
-        const transferCall = paseoApi.tx.balances.transferKeepAlive(TEST_ADDRESSES.bob, transferAmount);
+        const transferCall = paseoApi.tx.balances.transferKeepAlive(
+          TEST_ADDRESSES.bob,
+          transferAmount,
+        );
 
-        const result = await dryRun(paseoApi, transferCall.method, TEST_ADDRESSES.alice);
+        const result = await dryRun(
+          paseoApi,
+          transferCall.method,
+          TEST_ADDRESSES.alice,
+        );
 
         expect(result).toBeDefined();
         expect(result.rawEvents).toBeDefined();
@@ -89,7 +106,7 @@ describe('Dry Run Integration Tests', () => {
           expect(result.balancesChanges).toBeDefined();
         }
       },
-      TIMEOUTS.dryRun
+      TIMEOUTS.dryRun,
     );
 
     it(
@@ -99,9 +116,16 @@ describe('Dry Run Integration Tests', () => {
 
         // Create a transfer call for an extremely large amount
         const largeAmount = BigInt('999999999999999999999999999');
-        const transferCall = paseoApi.tx.balances.transferKeepAlive(TEST_ADDRESSES.bob, largeAmount);
+        const transferCall = paseoApi.tx.balances.transferKeepAlive(
+          TEST_ADDRESSES.bob,
+          largeAmount,
+        );
 
-        const result = await dryRun(paseoApi, transferCall.method, TEST_ADDRESSES.alice);
+        const result = await dryRun(
+          paseoApi,
+          transferCall.method,
+          TEST_ADDRESSES.alice,
+        );
 
         expect(result).toBeDefined();
         // This should fail due to insufficient balance
@@ -111,7 +135,7 @@ describe('Dry Run Integration Tests', () => {
           expect(result.error).toBeDefined();
         }
       },
-      TIMEOUTS.dryRun
+      TIMEOUTS.dryRun,
     );
   });
 
@@ -129,7 +153,7 @@ describe('Dry Run Integration Tests', () => {
         expect(result).toBeDefined();
         expect(result.success).toBe(true);
       },
-      TIMEOUTS.dryRun
+      TIMEOUTS.dryRun,
     );
   });
 
@@ -139,8 +163,13 @@ describe('Dry Run Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'events parsing');
 
-        const remarkCall = paseoApi.tx.system.remarkWithEvent('event parsing test');
-        const result = await dryRun(paseoApi, remarkCall.method, TEST_ADDRESSES.alice);
+        const remarkCall =
+          paseoApi.tx.system.remarkWithEvent('event parsing test');
+        const result = await dryRun(
+          paseoApi,
+          remarkCall.method,
+          TEST_ADDRESSES.alice,
+        );
 
         expect(result).toBeDefined();
         expect(result.success).toBe(true);
@@ -149,13 +178,14 @@ describe('Dry Run Integration Tests', () => {
         // Check that we have at least some events
         if (Array.isArray(result.rawEvents) && result.rawEvents.length > 0) {
           const hasSystemEvent = result.rawEvents.some(
-            (event: any) => event?.section === 'System' || event?.section === 'system'
+            (event: any) =>
+              event?.section === 'System' || event?.section === 'system',
           );
 
           expect(hasSystemEvent).toBe(true);
         }
       },
-      TIMEOUTS.dryRun
+      TIMEOUTS.dryRun,
     );
   });
 
@@ -166,12 +196,16 @@ describe('Dry Run Integration Tests', () => {
         skipIfNotConnected(assetHubApi, 'Asset Hub dry run');
 
         const remarkCall = assetHubApi.tx.system.remark('asset hub test');
-        const result = await dryRun(assetHubApi, remarkCall.method, TEST_ADDRESSES.alice);
+        const result = await dryRun(
+          assetHubApi,
+          remarkCall.method,
+          TEST_ADDRESSES.alice,
+        );
 
         expect(result).toBeDefined();
         expect(result.success).toBe(true);
       },
-      TIMEOUTS.dryRun
+      TIMEOUTS.dryRun,
     );
   });
 
@@ -182,7 +216,11 @@ describe('Dry Run Integration Tests', () => {
         skipIfNotConnected(paseoApi, 'XCM fields');
 
         const remarkCall = paseoApi.tx.system.remark('xcm test');
-        const result = await dryRun(paseoApi, remarkCall.method, TEST_ADDRESSES.alice);
+        const result = await dryRun(
+          paseoApi,
+          remarkCall.method,
+          TEST_ADDRESSES.alice,
+        );
 
         expect(result).toBeDefined();
 
@@ -192,7 +230,7 @@ describe('Dry Run Integration Tests', () => {
           expect('forwardedXcms' in result).toBe(true);
         }
       },
-      TIMEOUTS.dryRun
+      TIMEOUTS.dryRun,
     );
   });
 });

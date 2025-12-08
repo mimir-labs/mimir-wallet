@@ -8,7 +8,7 @@ export function useClientQuery(path?: string | null) {
     queryKey: [
       path !== null && path !== undefined
         ? `${API_CLIENT_GATEWAY}/${path.startsWith('/') ? path.slice(1) : path}`
-        : null
-    ]
+        : null,
+    ],
   } as const;
 }

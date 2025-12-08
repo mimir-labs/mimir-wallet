@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ChatRequest, FrontendState } from '../chat-types.js';
-import type { ChatStatus, DisplayMessage, MessagePart, UseChatOptions, UseChatReturn } from './chat.types.js';
+import type {
+  ChatStatus,
+  DisplayMessage,
+  MessagePart,
+  UseChatOptions,
+  UseChatReturn,
+} from './chat.types.js';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -33,23 +39,31 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [status, setStatus] = useState<ChatStatus>('ready');
-  const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(null);
+  const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
+    null,
+  );
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // ===== API Client Setup =====
   const chatAPI = useMemo(() => {
-    const primaryEndpoint = import.meta.env.VITE_AI_ENDPOINT || 'https://ai-assistant.mimir.global/';
+    const primaryEndpoint =
+      import.meta.env.VITE_AI_ENDPOINT || 'https://ai-assistant.mimir.global/';
 
     return new ChatAPIClient({
       endpoints: [primaryEndpoint].filter(Boolean),
       timeout: 30000, // 30 seconds
-      maxRetries: 2 // 2 retries per endpoint
+      maxRetries: 2, // 2 retries per endpoint
     });
   }, []);
 
   // ===== Extracted Hooks =====
-  const { parseSSEEvent, processTextEvent, processToolStartEvent, processToolEndEvent, processErrorEvent } =
-    useSSEProcessor();
+  const {
+    parseSSEEvent,
+    processTextEvent,
+    processToolStartEvent,
+    processToolEndEvent,
+    processErrorEvent,
+  } = useSSEProcessor();
   const { triggerFrontendAction } = useFrontendAction();
 
   // ===== Helper Functions =====
@@ -62,7 +76,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       setStatus(newStatus);
       onStatusChange?.(newStatus);
     },
-    [onStatusChange]
+    [onStatusChange],
   );
 
   /**
@@ -76,45 +90,54 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       currentAccount: aiContext.state?.currentAccount?.address,
       ss58Format: aiContext.state?.chainSS58,
       networks: aiContext.supportedNetworks || [],
-      addressBook: aiContext.addresses || []
+      addressBook: aiContext.addresses || [],
     };
   }, []);
 
   /**
    * Update message display with current assistant parts
    */
-  const updateMessageDisplay = useCallback((assistantMessageId: string, assistantParts: MessagePart[]) => {
-    setMessages((prev) => {
-      const existingIndex = prev.findIndex((m) => m.id === assistantMessageId);
+  const updateMessageDisplay = useCallback(
+    (assistantMessageId: string, assistantParts: MessagePart[]) => {
+      setMessages((prev) => {
+        const existingIndex = prev.findIndex(
+          (m) => m.id === assistantMessageId,
+        );
 
-      if (existingIndex >= 0) {
-        const updated = [...prev];
+        if (existingIndex >= 0) {
+          const updated = [...prev];
 
-        updated[existingIndex] = {
-          id: assistantMessageId,
-          role: 'assistant',
-          parts: [...assistantParts]
-        };
+          updated[existingIndex] = {
+            id: assistantMessageId,
+            role: 'assistant',
+            parts: [...assistantParts],
+          };
 
-        return updated;
-      }
-
-      return [
-        ...prev,
-        {
-          id: assistantMessageId,
-          role: 'assistant',
-          parts: [...assistantParts]
+          return updated;
         }
-      ];
-    });
-  }, []);
+
+        return [
+          ...prev,
+          {
+            id: assistantMessageId,
+            role: 'assistant',
+            parts: [...assistantParts],
+          },
+        ];
+      });
+    },
+    [],
+  );
 
   /**
    * Process SSE stream and update UI
    */
   const processSSEStream = useCallback(
-    async (reader: ReadableStreamDefaultReader<Uint8Array>, assistantMessageId: string, userMessage: string) => {
+    async (
+      reader: ReadableStreamDefaultReader<Uint8Array>,
+      assistantMessageId: string,
+      userMessage: string,
+    ) => {
       const decoder = new TextDecoder();
       let buffer = '';
       const assistantParts: MessagePart[] = [];
@@ -151,7 +174,11 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
                 }
 
                 case 'tool_start': {
-                  const { processed } = processToolStartEvent(event, assistantParts, toolCallsMap);
+                  const { processed } = processToolStartEvent(
+                    event,
+                    assistantParts,
+                    toolCallsMap,
+                  );
 
                   if (processed) {
                     updateMessageDisplay(assistantMessageId, assistantParts);
@@ -162,7 +189,11 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
                 }
 
                 case 'tool_end': {
-                  const { updated } = processToolEndEvent(event, assistantParts, toolCallsMap);
+                  const { updated } = processToolEndEvent(
+                    event,
+                    assistantParts,
+                    toolCallsMap,
+                  );
 
                   if (updated) {
                     updateMessageDisplay(assistantMessageId, assistantParts);
@@ -219,8 +250,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       processErrorEvent,
       triggerFrontendAction,
       updateMessageDisplay,
-      updateStatus
-    ]
+      updateStatus,
+    ],
   );
 
   // ===== Public API Functions =====
@@ -250,8 +281,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           {
             id: userMessageId,
             role: 'user',
-            parts: [{ type: 'text', text }]
-          }
+            parts: [{ type: 'text', text }],
+          },
         ]);
       }
 
@@ -264,10 +295,13 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           message: text,
           state,
           conversationId,
-          userAddress: useAIContext.getState().getUserAddress()
+          userAddress: useAIContext.getState().getUserAddress(),
         };
 
-        const response = await chatAPI.post(requestBody, abortControllerRef.current.signal);
+        const response = await chatAPI.post(
+          requestBody,
+          abortControllerRef.current.signal,
+        );
 
         // Update conversation ID
         const newConversationId = response.headers.get(CONVERSATION_ID_HEADER);
@@ -309,14 +343,26 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           {
             id: `error-${Date.now()}`,
             role: 'assistant',
-            parts: [{ type: 'text', text: `Sorry, an error occurred: ${err.message}` }]
-          }
+            parts: [
+              {
+                type: 'text',
+                text: `Sorry, an error occurred: ${err.message}`,
+              },
+            ],
+          },
         ]);
       } finally {
         abortControllerRef.current = null;
       }
     },
-    [chatAPI, status, conversationId, updateStatus, getFrontendState, processSSEStream]
+    [
+      chatAPI,
+      status,
+      conversationId,
+      updateStatus,
+      getFrontendState,
+      processSSEStream,
+    ],
   );
 
   /**
@@ -338,7 +384,11 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       for (let i = prev.length - 1; i >= 0; i--) {
         const firstPart = prev[i].parts[0];
 
-        if (prev[i].role === 'user' && firstPart?.type === 'text' && firstPart.text === lastFailedMessage) {
+        if (
+          prev[i].role === 'user' &&
+          firstPart?.type === 'text' &&
+          firstPart.text === lastFailedMessage
+        ) {
           lastUserMessageIndex = i;
           break;
         }
@@ -351,7 +401,11 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       // Fallback: remove error message
       const lastMessage = prev[prev.length - 1];
 
-      if (lastMessage && lastMessage.role === 'assistant' && lastMessage.id.startsWith('error-')) {
+      if (
+        lastMessage &&
+        lastMessage.role === 'assistant' &&
+        lastMessage.id.startsWith('error-')
+      ) {
         return prev.slice(0, -1);
       }
 
@@ -376,7 +430,9 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const clearChat = useCallback(() => {
     // Prevent clearing during active chat session
     if (status === 'submitted' || status === 'streaming') {
-      console.warn('[useChat] Cannot clear chat while message is being processed');
+      console.warn(
+        '[useChat] Cannot clear chat while message is being processed',
+      );
 
       return;
     }
@@ -413,6 +469,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     sendMessage,
     retry,
     stop,
-    clearChat
+    clearChat,
   };
 }

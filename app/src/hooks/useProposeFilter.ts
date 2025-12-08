@@ -10,7 +10,10 @@ import { reduceAccount } from '@/accounts/utils';
 import { TransactionType } from '@/hooks/types';
 import { useWallet } from '@/wallet/useWallet';
 
-export function useProposeFilterForRemove(account: AccountData, transaction: Transaction) {
+export function useProposeFilterForRemove(
+  account: AccountData,
+  transaction: Transaction,
+) {
   const { walletAccounts } = useWallet();
 
   const filtered = useMemo(() => {
@@ -18,7 +21,11 @@ export function useProposeFilterForRemove(account: AccountData, transaction: Tra
 
     reduceAccount(account, (account, proxyType, delay) => {
       if (!proxyType || delay === 0) {
-        if (walletAccounts.some((item) => addressEq(item.address, account.address))) {
+        if (
+          walletAccounts.some((item) =>
+            addressEq(item.address, account.address),
+          )
+        ) {
           addresses.push(account.address);
         }
       }
@@ -26,7 +33,9 @@ export function useProposeFilterForRemove(account: AccountData, transaction: Tra
 
     if (
       transaction.type === TransactionType.Propose &&
-      walletAccounts.some((item) => addressEq(item.address, transaction.proposer))
+      walletAccounts.some((item) =>
+        addressEq(item.address, transaction.proposer),
+      )
     ) {
       return Array.from(new Set(addresses.concat(transaction.proposer)));
     } else {
@@ -45,7 +54,11 @@ export function useManageProposerFilter(account: AccountData) {
 
     reduceAccount(account, (account, proxyType, delay) => {
       if (!proxyType || delay === 0) {
-        if (walletAccounts.some((item) => addressEq(item.address, account.address))) {
+        if (
+          walletAccounts.some((item) =>
+            addressEq(item.address, account.address),
+          )
+        ) {
           addresses.push(account.address);
         }
       }
@@ -69,14 +82,22 @@ export function useProposersAndMembersFilter(account?: AccountData | null) {
 
     reduceAccount(account, (account, proxyType, delay) => {
       if (!proxyType || delay === 0) {
-        if (walletAccounts.some((item) => addressEq(item.address, account.address))) {
+        if (
+          walletAccounts.some((item) =>
+            addressEq(item.address, account.address),
+          )
+        ) {
           addresses.add(account.address);
         }
       }
     });
 
     account.proposers?.forEach((proposer) => {
-      if (walletAccounts.some((item) => addressEq(item.address, proposer.proposer))) {
+      if (
+        walletAccounts.some((item) =>
+          addressEq(item.address, proposer.proposer),
+        )
+      ) {
         addresses.add(proposer.proposer);
       }
     });

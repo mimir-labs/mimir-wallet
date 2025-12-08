@@ -11,7 +11,14 @@ import Input from './Input';
 
 import { useInputNumber } from '@/hooks/useInputNumber';
 
-function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...props }: InputNumberProps) {
+function InputNumber({
+  defaultValue,
+  format,
+  maxValue,
+  onChange,
+  withMax,
+  ...props
+}: InputNumberProps) {
   const _defaultValue = useMemo(() => defaultValue?.toString(), [defaultValue]);
   const [[value], setValue] = useInputNumber(_defaultValue);
 
@@ -20,7 +27,7 @@ function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...pro
       setValue(value);
       onChange?.(value);
     },
-    [onChange, setValue]
+    [onChange, setValue],
   );
 
   return (
@@ -33,9 +40,9 @@ function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...pro
           {withMax && maxValue && (
             <Button
               onClick={() => setValue(maxValue.toString())}
-              size='sm'
-              variant='ghost'
-              className='rounded-[5px] py-[2px]'
+              size="sm"
+              variant="ghost"
+              className="rounded-[5px] py-[2px]"
             >
               Max
             </Button>
@@ -43,9 +50,9 @@ function InputNumber({ defaultValue, format, maxValue, onChange, withMax, ...pro
         </>
       }
       label={
-        <div className='flex justify-between'>
+        <div className="flex justify-between">
           {props.label}
-          <div className='font-normal'>
+          <div className="font-normal">
             Balance:
             <FormatBalance format={format} value={maxValue?.toString()} />
           </div>

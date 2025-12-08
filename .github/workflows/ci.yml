@@ -16,16 +16,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          cache: 'yarn'
+          cache: 'pnpm'
           node-version: 20
 
       - name: Install dependencies
-        run: |
-          yarn install --immutable
+        run: pnpm install --frozen-lockfile
 
-
-      - run: yarn lint
-      - run: yarn check-types
+      - run: pnpm lint
+      - run: pnpm check-types

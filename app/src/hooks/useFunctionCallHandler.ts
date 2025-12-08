@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { FunctionCallHandler, HandlerRegistrationOptions, RouteRequirement } from '@mimir-wallet/ai-assistant';
+import type {
+  FunctionCallHandler,
+  HandlerRegistrationOptions,
+  RouteRequirement,
+} from '@mimir-wallet/ai-assistant';
 
 import { functionCallManager } from '@mimir-wallet/ai-assistant';
 import { useCallback, useEffect } from 'react';
@@ -24,7 +28,7 @@ export function useFunctionCallHandler(
   options?: {
     priority?: number;
     metadata?: Record<string, unknown>;
-  }
+  },
 ): void {
   // Memoize options to avoid unnecessary re-registrations
   const optionsStr = JSON.stringify(options);
@@ -32,7 +36,11 @@ export function useFunctionCallHandler(
   useEffect(() => {
     const parsedOptions = optionsStr ? JSON.parse(optionsStr) : undefined;
 
-    return functionCallManager.registerHandler(functionName, handler, parsedOptions);
+    return functionCallManager.registerHandler(
+      functionName,
+      handler,
+      parsedOptions,
+    );
   }, [functionName, handler, optionsStr]);
 }
 
@@ -64,7 +72,7 @@ export function useRouteDependentHandler(
     autoNavigate?: boolean;
     priority?: number;
     navigationOptions?: RouteRequirement['navigationOptions'];
-  }
+  },
 ): void {
   // Memoize route requirement
   const routeRequirement = useCallback<() => RouteRequirement>(
@@ -72,17 +80,26 @@ export function useRouteDependentHandler(
       path: routePath,
       displayName: options?.displayName,
       autoNavigate: options?.autoNavigate ?? true,
-      navigationOptions: options?.navigationOptions
+      navigationOptions: options?.navigationOptions,
     }),
-    [routePath, options?.displayName, options?.autoNavigate, options?.navigationOptions]
+    [
+      routePath,
+      options?.displayName,
+      options?.autoNavigate,
+      options?.navigationOptions,
+    ],
   );
 
   useEffect(() => {
     const registrationOptions: HandlerRegistrationOptions = {
       requiresRoute: routeRequirement(),
-      priority: options?.priority
+      priority: options?.priority,
     };
 
-    return functionCallManager.registerHandler(functionName, handler, registrationOptions);
+    return functionCallManager.registerHandler(
+      functionName,
+      handler,
+      registrationOptions,
+    );
   }, [functionName, handler, routeRequirement, options?.priority]);
 }

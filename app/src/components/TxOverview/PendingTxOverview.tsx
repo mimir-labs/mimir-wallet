@@ -7,12 +7,16 @@ import type {
   FilterPath,
   FilterPathWithoutId,
   MultisigAccountData,
-  Transaction
+  Transaction,
 } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { addressEq, addressToHex, ApiManager } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  addressToHex,
+  ApiManager,
+} from '@mimir-wallet/polkadot-core';
 import {
   Controls,
   type Edge,
@@ -22,14 +26,14 @@ import {
   Position,
   ReactFlow,
   useEdgesState,
-  useNodesState
+  useNodesState,
 } from '@xyflow/react';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
 import TxButton from '../TxButton';
-import { getLayoutedElements } from '../utils';
+import { getLayoutedElements } from '../utils/graph';
 
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
 import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
@@ -71,117 +75,134 @@ type EdgeData = {
 
 const context = createContext<State>({} as State);
 
-const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
-  const { network, transaction: topTransaction, onApprove, showButton } = useContext(context);
-  const source = useAccountSource(data.account.address);
+const AddressNode = React.memo(
+  ({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
+    const {
+      network,
+      transaction: topTransaction,
+      onApprove,
+      showButton,
+    } = useContext(context);
+    const source = useAccountSource(data.account.address);
 
-  const { call, transaction } = data;
+    const { call, transaction } = data;
 
-  const Icon = transaction
-    ? transaction.status < TransactionStatus.Success
-      ? IconWaiting
-      : transaction.status === TransactionStatus.Success
-        ? IconSuccess
-        : transaction.status === TransactionStatus.Cancelled
-          ? IconCancel
-          : IconFail
-    : null;
-  const icon = Icon ? (
-    <Icon
-      data-success={transaction && transaction.status === TransactionStatus.Success}
-      data-failed={
-        transaction &&
-        transaction.status > TransactionStatus.Success &&
-        transaction.status !== TransactionStatus.Cancelled
-      }
-      data-cancelled={transaction && transaction.status === TransactionStatus.Cancelled}
-      data-pending={transaction && transaction.status < TransactionStatus.Success}
-      className='data-[success=true]:text-success data-[failed=true]:text-danger data-[cancelled=true]:text-danger data-[pending=true]:text-warning h-4 w-4'
-    />
-  ) : null;
-  const borderColor = transaction
-    ? transaction.status < TransactionStatus.Success
-      ? source
+    const Icon = transaction
+      ? transaction.status < TransactionStatus.Success
+        ? IconWaiting
+        : transaction.status === TransactionStatus.Success
+          ? IconSuccess
+          : transaction.status === TransactionStatus.Cancelled
+            ? IconCancel
+            : IconFail
+      : null;
+    const icon = Icon ? (
+      <Icon
+        data-success={
+          transaction && transaction.status === TransactionStatus.Success
+        }
+        data-failed={
+          transaction &&
+          transaction.status > TransactionStatus.Success &&
+          transaction.status !== TransactionStatus.Cancelled
+        }
+        data-cancelled={
+          transaction && transaction.status === TransactionStatus.Cancelled
+        }
+        data-pending={
+          transaction && transaction.status < TransactionStatus.Success
+        }
+        className="data-[success=true]:text-success data-[failed=true]:text-danger data-[cancelled=true]:text-danger data-[pending=true]:text-warning h-4 w-4"
+      />
+    ) : null;
+    const borderColor = transaction
+      ? transaction.status < TransactionStatus.Success
+        ? source
+          ? 'var(--color-primary-100)'
+          : 'var(--border)'
+        : transaction.status === TransactionStatus.Success
+          ? 'var(--success)'
+          : transaction.status === TransactionStatus.Cancelled
+            ? 'var(--danger)'
+            : 'var(--danger)'
+      : source
         ? 'var(--color-primary-100)'
-        : 'var(--border)'
-      : transaction.status === TransactionStatus.Success
-        ? 'var(--success)'
-        : transaction.status === TransactionStatus.Cancelled
-          ? 'var(--danger)'
-          : 'var(--danger)'
-    : source
-      ? 'var(--color-primary-100)'
-      : 'var(--border)';
+        : 'var(--border)';
 
-  return (
-    <>
-      {!data.isLeaf && (
-        <Handle
-          isConnectable={isConnectable}
-          position={Position.Left}
-          style={{ zIndex: 1, top: 22, left: 0, width: 0, height: 0 }}
-          className='bg-divider'
-          type='source'
-        />
-      )}
-      <div
-        className='bg-background rounded-[10px]'
-        style={{
-          border: '1px solid var(--border)',
-          borderColor,
-          backgroundColor: source ? 'var(--secondary)' : undefined,
-          boxShadow: source ? 'var(--shadow-md)' : undefined
-        }}
-      >
-        <div className='flex w-[220px] items-center justify-between p-2.5 px-2.5 py-[3px]'>
-          <AddressCell value={data.account.address} withCopy />
-          {icon}
-        </div>
-        {topTransaction && data.approvalForThisPath && call && source && showButton && (
-          <div className='flex'>
-            <TxButton
-              color='primary'
-              fullWidth
-              variant='solid'
-              radius='md'
-              startContent={<IconSuccessOutlined />}
-              accountId={topTransaction.address}
-              filterPaths={data.path}
-              transaction={topTransaction}
-              getCall={async () => {
-                const api = await ApiManager.getInstance().getApi(network);
-
-                return api!.createType('Call', topTransaction.call);
-              }}
-              onDone={onApprove}
-            >
-              Approve
-            </TxButton>
-          </div>
+    return (
+      <>
+        {!data.isLeaf && (
+          <Handle
+            isConnectable={isConnectable}
+            position={Position.Left}
+            style={{ zIndex: 1, top: 22, left: 0, width: 0, height: 0 }}
+            className="bg-divider"
+            type="source"
+          />
         )}
-      </div>
-      {!data.isTop && (
-        <Handle
-          isConnectable={isConnectable}
-          position={Position.Right}
-          style={{ zIndex: 1, top: 22, right: 0, width: 0, height: 0 }}
-          className='bg-divider'
-          type='target'
-        />
-      )}
-    </>
-  );
-});
+        <div
+          className="bg-background rounded-[10px]"
+          style={{
+            border: '1px solid var(--border)',
+            borderColor,
+            backgroundColor: source ? 'var(--secondary)' : undefined,
+            boxShadow: source ? 'var(--shadow-md)' : undefined,
+          }}
+        >
+          <div className="flex w-[220px] items-center justify-between p-2.5 px-2.5 py-[3px]">
+            <AddressCell value={data.account.address} withCopy />
+            {icon}
+          </div>
+          {topTransaction &&
+            data.approvalForThisPath &&
+            call &&
+            source &&
+            showButton && (
+              <div className="flex">
+                <TxButton
+                  color="primary"
+                  fullWidth
+                  variant="solid"
+                  radius="md"
+                  startContent={<IconSuccessOutlined />}
+                  accountId={topTransaction.address}
+                  filterPaths={data.path}
+                  transaction={topTransaction}
+                  getCall={async () => {
+                    const api = await ApiManager.getInstance().getApi(network);
+
+                    return api!.createType('Call', topTransaction.call);
+                  }}
+                  onDone={onApprove}
+                >
+                  Approve
+                </TxButton>
+              </div>
+            )}
+        </div>
+        {!data.isTop && (
+          <Handle
+            isConnectable={isConnectable}
+            position={Position.Right}
+            style={{ zIndex: 1, top: 22, right: 0, width: 0, height: 0 }}
+            className="bg-divider"
+            type="target"
+          />
+        )}
+      </>
+    );
+  },
+);
 
 AddressNode.displayName = 'AddressNode';
 
 // Define node and edge types outside component to prevent recreation
 const NODE_TYPES = {
-  AddressNode
+  AddressNode,
 } as const;
 
 const EDGE_TYPES = {
-  AddressEdge
+  AddressEdge,
 } as const;
 
 function makeNodes(
@@ -189,7 +210,7 @@ function makeNodes(
   topTransaction: Transaction,
   call?: IMethod | HexString | null,
   nodes: Node<NodeData>[] = [],
-  edges: Edge<EdgeData>[] = []
+  edges: Edge<EdgeData>[] = [],
 ) {
   function createNode(
     id: string,
@@ -197,7 +218,7 @@ function makeNodes(
     isTop: boolean,
     path: FilterPath[],
     approvalForThisPath: boolean,
-    transaction?: Transaction | null
+    transaction?: Transaction | null,
   ): Node<NodeData> {
     return {
       id,
@@ -211,19 +232,31 @@ function makeNodes(
         call,
         path,
         approvalForThisPath,
-        transaction
+        transaction,
       },
       position: { x: 0, y: 0 },
-      connectable: false
+      connectable: false,
     };
   }
 
-  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9', isDash = false) {
+  function makeEdge(
+    parentId: string,
+    nodeId: string,
+    label = '',
+    delay?: number,
+    color = '#d9d9d9',
+    isDash = false,
+  ) {
     const id = `${parentId}->${nodeId}`;
     const exists = edges.find((edge) => edge.id === id);
 
     if (exists) {
-      if (label && !exists.data?.tips.some((tip) => tip.label === label && tip.delay === delay)) {
+      if (
+        label &&
+        !exists.data?.tips.some(
+          (tip) => tip.label === label && tip.delay === delay,
+        )
+      ) {
         exists.data?.tips.push({ label, delay });
       }
     } else {
@@ -232,7 +265,7 @@ function makeNodes(
         source: parentId,
         target: nodeId,
         type: 'AddressEdge',
-        data: { color, tips: label ? [{ label, delay }] : [], isDash }
+        data: { color, tips: label ? [{ label, delay }] : [], isDash },
       });
     }
   }
@@ -260,7 +293,12 @@ function makeNodes(
         approvalForThisPath: boolean;
       };
 
-  function dfs(deep: number, node: NodeInfo, path: FilterPath[], transaction?: Transaction | null) {
+  function dfs(
+    deep: number,
+    node: NodeInfo,
+    path: FilterPath[],
+    transaction?: Transaction | null,
+  ) {
     if (node.from === 'delegate') {
       const p: FilterPathWithoutId = {
         type: 'proxy',
@@ -268,12 +306,12 @@ function makeNodes(
         proxyType: node.value.proxyType,
         delay: node.value.proxyDelay,
         address: node.value.address,
-        genesisHash: node.value.proxyNetwork
+        genesisHash: node.value.proxyNetwork,
       } as FilterPath;
 
       path.push({
         id: filterPathId(deep, p),
-        ...p
+        ...p,
       });
     } else if (node.from === 'member') {
       const p: FilterPathWithoutId = {
@@ -283,15 +321,18 @@ function makeNodes(
         otherSignatures: node.parent.members
           .filter((item) => !addressEq(item.address, node.value.address))
           .map((item) => item.address),
-        address: node.value.address
+        address: node.value.address,
       };
 
       path.push({
         id: filterPathId(deep, p),
-        ...p
+        ...p,
       });
     } else {
-      const p: FilterPathWithoutId = { type: 'origin', address: node.value.address };
+      const p: FilterPathWithoutId = {
+        type: 'origin',
+        address: node.value.address,
+      };
 
       path.push({ id: filterPathId(deep, p), ...p });
     }
@@ -309,16 +350,34 @@ function makeNodes(
       : addressToHex(node.value.address);
 
     if (!node.parent) {
-      nodes.push(createNode(nodeId, node.value, true, path.slice(), approvalForThisPath, transaction));
+      nodes.push(
+        createNode(
+          nodeId,
+          node.value,
+          true,
+          path.slice(),
+          approvalForThisPath,
+          transaction,
+        ),
+      );
     } else {
-      nodes.push(createNode(nodeId, node.value, false, path.slice(), approvalForThisPath, transaction));
+      nodes.push(
+        createNode(
+          nodeId,
+          node.value,
+          false,
+          path.slice(),
+          approvalForThisPath,
+          transaction,
+        ),
+      );
       makeEdge(
         node.parentId,
         nodeId,
         node.from === 'delegate' ? node.value.proxyType : '',
         node.from === 'delegate' ? node.value.proxyDelay : undefined,
         node.from === 'delegate' ? '#B700FF' : '#AEAEAE',
-        node.from === 'delegate' && node.value.isRemoteProxy ? true : false
+        node.from === 'delegate' && node.value.isRemoteProxy ? true : false,
       );
     }
 
@@ -334,15 +393,16 @@ function makeNodes(
                 parent: node.value,
                 value: child,
                 parentId: nodeId,
-                approvalForThisPath
+                approvalForThisPath,
               },
               path,
               transaction.children.find(
                 (item) =>
                   item.section === 'proxy' &&
-                  (item.method === 'proxyAnnounced' || item.method === 'announce') &&
-                  addressEq(item.address, child.address)
-              )
+                  (item.method === 'proxyAnnounced' ||
+                    item.method === 'announce') &&
+                  addressEq(item.address, child.address),
+              ),
             );
           }
         }
@@ -356,15 +416,16 @@ function makeNodes(
                 parent: node.value,
                 value: child,
                 parentId: nodeId,
-                approvalForThisPath
+                approvalForThisPath,
               },
               path,
               transaction.children.find(
                 (item) =>
                   ((item.section === 'proxy' && item.method === 'proxy') ||
-                    (item.section === 'remoteProxyRelayChain' && item.method === 'remoteProxyWithRegisteredProof')) &&
-                  addressEq(item.address, child.address)
-              )
+                    (item.section === 'remoteProxyRelayChain' &&
+                      item.method === 'remoteProxyWithRegisteredProof')) &&
+                  addressEq(item.address, child.address),
+              ),
             );
           }
         }
@@ -376,15 +437,18 @@ function makeNodes(
             parent: node.value,
             value: child,
             parentId: nodeId,
-            approvalForThisPath
+            approvalForThisPath,
           },
           path,
-          null
+          null,
         );
       }
     }
 
-    if (node.value.type === 'multisig' && (!transaction || transaction.type === TransactionType.Multisig)) {
+    if (
+      node.value.type === 'multisig' &&
+      (!transaction || transaction.type === TransactionType.Multisig)
+    ) {
       // traverse the member or members of the current account
       for (const child of node.value.members) {
         dfs(
@@ -394,15 +458,17 @@ function makeNodes(
             parent: node.value,
             value: child,
             parentId: nodeId,
-            approvalForThisPath
+            approvalForThisPath,
           },
           path,
           transaction?.children.find(
             (item) =>
               item.section === 'multisig' &&
-              (item.method === 'asMulti' || item.method === 'approveAsMulti' || item.method === 'asMultiThreshold1') &&
-              addressEq(item.address, child.address)
-          )
+              (item.method === 'asMulti' ||
+                item.method === 'approveAsMulti' ||
+                item.method === 'asMultiThreshold1') &&
+              addressEq(item.address, child.address),
+          ),
         );
       }
     }
@@ -421,10 +487,10 @@ function makeNodes(
         !topTransaction ||
         (topTransaction.type === TransactionType.Proxy
           ? topTransaction.status !== TransactionStatus.Success
-          : topTransaction.status === TransactionStatus.Pending)
+          : topTransaction.status === TransactionStatus.Pending),
     },
     [],
-    topTransaction
+    topTransaction,
   );
 
   // Update isLeaf based on actual edges
@@ -439,20 +505,27 @@ function makeNodes(
   });
 }
 
-function TxOverview({ account, call, transaction, network, onApprove, showButton = true }: Props) {
+function TxOverview({
+  account,
+  call,
+  transaction,
+  network,
+  onApprove,
+  showButton = true,
+}: Props) {
   // Memoize the context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({ network, transaction, onApprove, showButton }),
-    [network, transaction, onApprove, showButton]
+    [network, transaction, onApprove, showButton],
   );
 
   // Memoize fitView options
   const fitViewOptions = useMemo(
     () => ({
       maxZoom: 1.5,
-      minZoom: 0.1
+      minZoom: 0.1,
     }),
-    []
+    [],
   );
 
   // Memoize the graph computation
@@ -461,18 +534,27 @@ function TxOverview({ account, call, transaction, network, onApprove, showButton
     const initialEdges: Edge<EdgeData>[] = [];
 
     makeNodes(account, transaction, call, initialNodes, initialEdges);
-    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 330, 70);
+    const { nodes, edges } = getLayoutedElements(
+      initialNodes,
+      initialEdges,
+      330,
+      70,
+    );
 
     return { layoutedNodes: nodes, layoutedEdges: edges };
   }, [account, call, transaction]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>(layoutedNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>(layoutedEdges);
+  const [nodes, setNodes, onNodesChange] =
+    useNodesState<Node<NodeData>>(layoutedNodes);
+  const [edges, setEdges, onEdgesChange] =
+    useEdgesState<Edge<EdgeData>>(layoutedEdges);
 
   // Update nodes and edges when layout changes
   useEffect(() => {
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges);
+    queueMicrotask(() => {
+      setNodes(layoutedNodes);
+      setEdges(layoutedEdges);
+    });
   }, [layoutedNodes, layoutedEdges, setNodes, setEdges]);
 
   return (

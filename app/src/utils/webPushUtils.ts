@@ -115,7 +115,9 @@ export async function getCurrentPushSubscription(): Promise<PushSubscription | n
 /**
  * Subscribe to push notifications
  */
-export async function subscribeToPush(vapidPublicKey: string): Promise<PushSubscription | null> {
+export async function subscribeToPush(
+  vapidPublicKey: string,
+): Promise<PushSubscription | null> {
   try {
     const registration = await getServiceWorkerRegistration();
 
@@ -124,7 +126,8 @@ export async function subscribeToPush(vapidPublicKey: string): Promise<PushSubsc
     }
 
     // Check if already subscribed
-    const existingSubscription = await registration.pushManager.getSubscription();
+    const existingSubscription =
+      await registration.pushManager.getSubscription();
 
     if (existingSubscription) {
       return existingSubscription;
@@ -134,7 +137,7 @@ export async function subscribeToPush(vapidPublicKey: string): Promise<PushSubsc
     const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey
+      applicationServerKey,
     });
 
     return subscription;
@@ -195,8 +198,8 @@ export function subscriptionToJson(subscription: PushSubscription): {
     endpoint: subscription.endpoint,
     keys: {
       p256dh: arrayBufferToBase64(subscription.getKey('p256dh')!),
-      auth: arrayBufferToBase64(subscription.getKey('auth')!)
-    }
+      auth: arrayBufferToBase64(subscription.getKey('auth')!),
+    },
   };
 }
 
@@ -218,7 +221,10 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 /**
  * Generate a unique notification tag based on transaction data
  */
-export function generateNotificationTag(transactionId?: number, type?: string): string {
+export function generateNotificationTag(
+  transactionId?: number,
+  type?: string,
+): string {
   const timestamp = Date.now();
 
   if (transactionId) {
@@ -269,7 +275,7 @@ export function getBrowserInfo(): {
   return {
     name,
     version,
-    userAgent
+    userAgent,
   };
 }
 

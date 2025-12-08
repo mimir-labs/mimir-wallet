@@ -1,9 +1,18 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
+import type {
+  AccountId,
+  AccountIndex,
+  Address,
+} from '@polkadot/types/interfaces';
 
-import { addressEq, encodeAddress, useSs58Format, zeroAddress } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  encodeAddress,
+  useSs58Format,
+  zeroAddress,
+} from '@mimir-wallet/polkadot-core';
 import { Badge, Button } from '@mimir-wallet/ui';
 import React, { useMemo } from 'react';
 
@@ -50,10 +59,13 @@ function AddressCell({
   withCopy = false,
   withAddressBook = false,
   withIconBorder = false,
-  showNetworkProxied = false
+  showNetworkProxied = false,
 }: Props) {
   const { ss58: chainSS58 } = useSs58Format();
-  const address = useMemo(() => encodeAddress(value, chainSS58), [value, chainSS58]);
+  const address = useMemo(
+    () => encodeAddress(value, chainSS58),
+    [value, chainSS58],
+  );
   // Fetch meta once and pass to child components to avoid redundant calls
   const { meta } = useAddressMeta(address);
   const { isMultisig, isProxied, isPure } = meta || {};
@@ -61,12 +73,17 @@ function AddressCell({
   const copyAddress = useCopyAddressToClipboard(address);
 
   // Only fetch transaction counts when needed to avoid unnecessary API calls
-  const [transactionCounts] = useMultiChainTransactionCounts(withPendingTxCounts ? address : undefined);
+  const [transactionCounts] = useMultiChainTransactionCounts(
+    withPendingTxCounts ? address : undefined,
+  );
   const totalCounts = useMemo(() => {
     // Skip calculation if counts are not needed
     if (!withPendingTxCounts || !transactionCounts) return 0;
 
-    return Object.values(transactionCounts).reduce((acc, curr) => acc + curr.pending, 0);
+    return Object.values(transactionCounts).reduce(
+      (acc, curr) => acc + curr.pending,
+      0,
+    );
   }, [withPendingTxCounts, transactionCounts]);
 
   const showTypeWidth = useMemo(() => {
@@ -78,43 +95,74 @@ function AddressCell({
     if (withPendingTxCounts && totalCounts) width += 20; // Pending transaction count badge width
 
     return width;
-  }, [showType, withPendingTxCounts, isMultisig, isPure, isProxied, totalCounts]);
+  }, [
+    showType,
+    withPendingTxCounts,
+    isMultisig,
+    isPure,
+    isProxied,
+    totalCounts,
+  ]);
 
   return (
-    <div className={`AddressCell flex min-w-0 flex-1 items-center gap-2.5 ${className}`} style={style}>
-      <IdentityIcon className='AddressCell-Icon' size={iconSize} value={address} withBorder={withIconBorder} />
-      <div className='AddressCell-Content flex min-w-0 flex-1 flex-col gap-y-0.5'>
-        <div className='flex min-w-0 items-center gap-1 overflow-hidden'>
+    <div
+      className={`AddressCell flex min-w-0 flex-1 items-center gap-2.5 ${className}`}
+      style={style}
+    >
+      <IdentityIcon
+        className="AddressCell-Icon"
+        size={iconSize}
+        value={address}
+        withBorder={withIconBorder}
+      />
+      <div className="AddressCell-Content flex min-w-0 flex-1 flex-col gap-y-0.5">
+        <div className="flex min-w-0 items-center gap-1 overflow-hidden">
           <span
-            className='AddressCell-Name min-w-0 overflow-hidden text-left font-bold text-ellipsis whitespace-nowrap'
+            className="AddressCell-Name min-w-0 overflow-hidden text-left font-bold text-ellipsis whitespace-nowrap"
             style={{
-              maxWidth: showType && (isMultisig || isPure || isProxied) ? `calc(100% - ${showTypeWidth}px)` : '100%'
+              maxWidth:
+                showType && (isMultisig || isPure || isProxied)
+                  ? `calc(100% - ${showTypeWidth}px)`
+                  : '100%',
             }}
           >
             <AddressName defaultName={defaultName} value={value} meta={meta} />
           </span>
 
-          {showType && isMultisig && <Badge variant='secondary'>Multisig</Badge>}
+          {showType && isMultisig && (
+            <Badge variant="secondary">Multisig</Badge>
+          )}
 
-          {showType && (isPure || isProxied) && <Badge variant='purple'>{isPure ? 'Pure' : 'Proxied'}</Badge>}
+          {showType && (isPure || isProxied) && (
+            <Badge variant="purple">{isPure ? 'Pure' : 'Proxied'}</Badge>
+          )}
 
           {withPendingTxCounts && !!totalCounts && (
-            <div className='flex h-4 w-4 items-center justify-center rounded-full bg-[#FF8C00] text-[10px] text-white'>
+            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#FF8C00] text-[10px] text-white">
               {totalCounts}
             </div>
           )}
         </div>
 
-        <div className='AddressCell-Address text-foreground/50 flex h-4 min-w-0 items-center text-xs'>
+        <div className="AddressCell-Address text-foreground/50 flex h-4 min-w-0 items-center text-xs">
           {showNetworkProxied && (
-            <div className='mr-1 flex items-center gap-1'>
+            <div className="mr-1 flex items-center gap-1">
               <AddressNetworks address={address} avatarSize={12} meta={meta} />
             </div>
           )}
-          <span onClick={addressCopyDisabled ? undefined : () => copyAddress} className='min-w-0 truncate'>
+          <span
+            onClick={addressCopyDisabled ? undefined : () => copyAddress}
+            className="min-w-0 truncate"
+          >
             <AddressComp shorten={shorten} value={address} />
           </span>
-          {withCopy && <CopyAddress size='sm' address={address} className='shrink-0 opacity-50' />}
+          {withCopy && (
+            <CopyAddress
+              size="sm"
+              address={address}
+              className="shrink-0 opacity-50"
+            />
+          )}
           {withAddressBook &&
             address &&
             !isLocalAccount(address) &&
@@ -125,14 +173,14 @@ function AddressCell({
                 onClick={() => {
                   addAddressBook(address);
                 }}
-                variant='light'
-                size='sm'
-                className='text-foreground/50 h-[18px] w-[18px] shrink-0 opacity-50'
+                variant="light"
+                size="sm"
+                className="text-foreground/50 h-[18px] w-[18px] shrink-0 opacity-50"
               >
-                <IconAddressBook className='h-3 w-3' />
+                <IconAddressBook className="h-3 w-3" />
               </Button>
             )}
-          {icons && <div className='shrink-0'>{icons}</div>}
+          {icons && <div className="shrink-0">{icons}</div>}
         </div>
       </div>
     </div>

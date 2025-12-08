@@ -8,7 +8,7 @@ import {
   MIGRATION_ALERT_DISMISSED_PREFIX,
   MIGRATION_ASSETS_ALERT_DISMISSED_PREFIX,
   MIGRATION_BATCH_ALERT_DISMISSED_PREFIX,
-  MIGRATION_TEMPLATE_ALERT_DISMISSED_PREFIX
+  MIGRATION_TEMPLATE_ALERT_DISMISSED_PREFIX,
 } from '@/constants';
 
 interface MigrationStatus {
@@ -25,10 +25,13 @@ interface MigrationNetwork {
   updatedAt: string;
 }
 
-export function useMigrationStatus(chain: string, isComplete: boolean): MigrationStatus {
+export function useMigrationStatus(
+  chain: string,
+  isComplete: boolean,
+): MigrationStatus {
   const [isDismissed, setIsDismissed] = useLocalStore(
     `${MIGRATION_ALERT_DISMISSED_PREFIX}${chain}:${isComplete}`,
-    false
+    false,
   );
 
   const dismissAlert = () => {
@@ -42,7 +45,7 @@ export function useMigrationStatus(chain: string, isComplete: boolean): Migratio
   return {
     isAlertVisible: !isDismissed,
     dismissAlert,
-    resetAlert
+    resetAlert,
   };
 }
 
@@ -57,9 +60,12 @@ export function useMigrationNetworks() {
       return service.chain
         .getMigrationStatus()
         .then((list: MigrationNetwork[]) =>
-          list.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+          list.sort(
+            (a, b) =>
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+          ),
         );
-    }
+    },
   });
 }
 
@@ -68,39 +74,21 @@ export function useNetworkMigrationCompleted(chain: string) {
 
   const migrationNetwork = useMemo(
     () => migrationNetworks?.find((network) => network.chain === chain),
-    [migrationNetworks, chain]
+    [migrationNetworks, chain],
   );
 
   return {
     completed: migrationNetwork?.status === 'completed',
     chain: chain,
     destChain: migrationNetwork?.destChain,
-    block: migrationNetwork?.block
+    block: migrationNetwork?.block,
   };
 }
 
 export function useAssetsMigrationStatus(chain: string): MigrationStatus {
-  const [isDismissed, setIsDismissed] = useLocalStore(`${MIGRATION_ASSETS_ALERT_DISMISSED_PREFIX}${chain}`, false);
-
-  const dismissAlert = () => {
-    setIsDismissed(true);
-  };
-
-  const resetAlert = () => {
-    setIsDismissed(false);
-  };
-
-  return {
-    isAlertVisible: !isDismissed,
-    dismissAlert,
-    resetAlert
-  };
-}
-
-export function useBatchMigrationStatus(chain: string, address: string): MigrationStatus {
   const [isDismissed, setIsDismissed] = useLocalStore(
-    `${MIGRATION_BATCH_ALERT_DISMISSED_PREFIX}${chain}:${address}`,
-    false
+    `${MIGRATION_ASSETS_ALERT_DISMISSED_PREFIX}${chain}`,
+    false,
   );
 
   const dismissAlert = () => {
@@ -114,12 +102,18 @@ export function useBatchMigrationStatus(chain: string, address: string): Migrati
   return {
     isAlertVisible: !isDismissed,
     dismissAlert,
-    resetAlert
+    resetAlert,
   };
 }
 
-export function useTemplateMigrationStatus(chain: string): MigrationStatus {
-  const [isDismissed, setIsDismissed] = useLocalStore(`${MIGRATION_TEMPLATE_ALERT_DISMISSED_PREFIX}${chain}`, false);
+export function useBatchMigrationStatus(
+  chain: string,
+  address: string,
+): MigrationStatus {
+  const [isDismissed, setIsDismissed] = useLocalStore(
+    `${MIGRATION_BATCH_ALERT_DISMISSED_PREFIX}${chain}:${address}`,
+    false,
+  );
 
   const dismissAlert = () => {
     setIsDismissed(true);
@@ -132,6 +126,27 @@ export function useTemplateMigrationStatus(chain: string): MigrationStatus {
   return {
     isAlertVisible: !isDismissed,
     dismissAlert,
-    resetAlert
+    resetAlert,
+  };
+}
+
+export function useTemplateMigrationStatus(chain: string): MigrationStatus {
+  const [isDismissed, setIsDismissed] = useLocalStore(
+    `${MIGRATION_TEMPLATE_ALERT_DISMISSED_PREFIX}${chain}`,
+    false,
+  );
+
+  const dismissAlert = () => {
+    setIsDismissed(true);
+  };
+
+  const resetAlert = () => {
+    setIsDismissed(false);
+  };
+
+  return {
+    isAlertVisible: !isDismissed,
+    dismissAlert,
+    resetAlert,
   };
 }

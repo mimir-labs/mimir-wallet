@@ -9,12 +9,13 @@ import {
   DEFAULT_AUX,
   DEFAULE_SS58_CHAIN_KEY,
   encodeAddress,
-  NETWORK_RPC_PREFIX
+  NETWORK_RPC_PREFIX,
 } from '../../../src/utils/defaults.js';
 
 // Test addresses
 const ALICE_SS58_FORMAT_42 = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
-const ALICE_HEX = '0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d';
+const ALICE_HEX =
+  '0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d';
 
 describe('defaults', () => {
   describe('constants', () => {
@@ -32,7 +33,17 @@ describe('defaults', () => {
 
     it('should export DEFAULT_AUX array with 9 items', () => {
       expect(DEFAULT_AUX).toHaveLength(9);
-      expect(DEFAULT_AUX).toEqual(['Aux1', 'Aux2', 'Aux3', 'Aux4', 'Aux5', 'Aux6', 'Aux7', 'Aux8', 'Aux9']);
+      expect(DEFAULT_AUX).toEqual([
+        'Aux1',
+        'Aux2',
+        'Aux3',
+        'Aux4',
+        'Aux5',
+        'Aux6',
+        'Aux7',
+        'Aux8',
+        'Aux9',
+      ]);
     });
   });
 

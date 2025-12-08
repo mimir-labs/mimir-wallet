@@ -49,7 +49,7 @@ This package provides a comprehensive set of React components using **ShadCN/UI 
 This package is part of the Mimir Wallet monorepo:
 
 ```bash
-yarn add @mimir-wallet/ui
+pnpm add @mimir-wallet/ui
 ```
 
 ### Dependencies

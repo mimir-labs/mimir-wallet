@@ -9,7 +9,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { parseBalancesChange } from '../../../src/dry-run/parse-balances-change.js';
 
 // Mock genesis hash for testing
-const MOCK_GENESIS_HASH: HexString = '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3';
+const MOCK_GENESIS_HASH: HexString =
+  '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3';
 
 // Helper to create mock events
 function createMockEvent(section: string, method: string, data: any[]): Event {
@@ -18,8 +19,11 @@ function createMockEvent(section: string, method: string, data: any[]): Event {
     method,
     data: data.map((item) => ({
       toString: () => item.toString(),
-      toHex: () => (typeof item === 'string' && item.startsWith('0x') ? item : `0x${item.toString(16)}`)
-    }))
+      toHex: () =>
+        typeof item === 'string' && item.startsWith('0x')
+          ? item
+          : `0x${item.toString(16)}`,
+    })),
   } as unknown as Event;
 }
 
@@ -30,7 +34,9 @@ const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 describe('parseBalancesChange', () => {
   describe('balances events', () => {
     it('should parse balances.Transfer event', () => {
-      const events = [createMockEvent('balances', 'Transfer', [ALICE, BOB, '1000000000000'])];
+      const events = [
+        createMockEvent('balances', 'Transfer', [ALICE, BOB, '1000000000000']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -40,12 +46,14 @@ describe('parseBalancesChange', () => {
         from: ALICE,
         to: BOB,
         amount: BigInt('1000000000000'),
-        genesisHash: MOCK_GENESIS_HASH
+        genesisHash: MOCK_GENESIS_HASH,
       });
     });
 
     it('should parse balances.Burned event', () => {
-      const events = [createMockEvent('balances', 'Burned', [ALICE, '500000000000'])];
+      const events = [
+        createMockEvent('balances', 'Burned', [ALICE, '500000000000']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -56,7 +64,9 @@ describe('parseBalancesChange', () => {
     });
 
     it('should parse balances.Minted event', () => {
-      const events = [createMockEvent('balances', 'Minted', [BOB, '2000000000000'])];
+      const events = [
+        createMockEvent('balances', 'Minted', [BOB, '2000000000000']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -67,7 +77,9 @@ describe('parseBalancesChange', () => {
     });
 
     it('should parse balances.Deposit event', () => {
-      const events = [createMockEvent('balances', 'Deposit', [ALICE, '100000000000'])];
+      const events = [
+        createMockEvent('balances', 'Deposit', [ALICE, '100000000000']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -77,7 +89,9 @@ describe('parseBalancesChange', () => {
     });
 
     it('should parse balances.Withdraw event', () => {
-      const events = [createMockEvent('balances', 'Withdraw', [BOB, '300000000000'])];
+      const events = [
+        createMockEvent('balances', 'Withdraw', [BOB, '300000000000']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -90,7 +104,14 @@ describe('parseBalancesChange', () => {
   describe('assets events', () => {
     it('should parse assets.Transferred event with assetId', () => {
       const assetId = '1984';
-      const events = [createMockEvent('assets', 'Transferred', [assetId, ALICE, BOB, '5000000'])];
+      const events = [
+        createMockEvent('assets', 'Transferred', [
+          assetId,
+          ALICE,
+          BOB,
+          '5000000',
+        ]),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -102,7 +123,9 @@ describe('parseBalancesChange', () => {
 
     it('should parse assets.Burned event', () => {
       const assetId = '1984';
-      const events = [createMockEvent('assets', 'Burned', [assetId, ALICE, '1000000'])];
+      const events = [
+        createMockEvent('assets', 'Burned', [assetId, ALICE, '1000000']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -113,7 +136,9 @@ describe('parseBalancesChange', () => {
 
     it('should parse assets.Issued event', () => {
       const assetId = '1984';
-      const events = [createMockEvent('assets', 'Issued', [assetId, BOB, '2000000'])];
+      const events = [
+        createMockEvent('assets', 'Issued', [assetId, BOB, '2000000']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -126,7 +151,14 @@ describe('parseBalancesChange', () => {
   describe('foreignAssets events', () => {
     it('should parse foreignAssets.Transferred event with hex assetId', () => {
       const hexAssetId = '0x0102030405060708090a0b0c0d0e0f10';
-      const events = [createMockEvent('foreignAssets', 'Transferred', [hexAssetId, ALICE, BOB, '1000'])];
+      const events = [
+        createMockEvent('foreignAssets', 'Transferred', [
+          hexAssetId,
+          ALICE,
+          BOB,
+          '1000',
+        ]),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -136,7 +168,9 @@ describe('parseBalancesChange', () => {
 
     it('should parse foreignAssets.Burned event', () => {
       const hexAssetId = '0xabcdef';
-      const events = [createMockEvent('foreignAssets', 'Burned', [hexAssetId, ALICE, '500'])];
+      const events = [
+        createMockEvent('foreignAssets', 'Burned', [hexAssetId, ALICE, '500']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -148,7 +182,14 @@ describe('parseBalancesChange', () => {
   describe('tokens events', () => {
     it('should parse tokens.Transfer event', () => {
       const hexAssetId = '0x1234';
-      const events = [createMockEvent('tokens', 'Transfer', [hexAssetId, ALICE, BOB, '10000'])];
+      const events = [
+        createMockEvent('tokens', 'Transfer', [
+          hexAssetId,
+          ALICE,
+          BOB,
+          '10000',
+        ]),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -160,7 +201,9 @@ describe('parseBalancesChange', () => {
 
     it('should parse tokens.Deposited event', () => {
       const hexAssetId = '0x5678';
-      const events = [createMockEvent('tokens', 'Deposited', [hexAssetId, BOB, '20000'])];
+      const events = [
+        createMockEvent('tokens', 'Deposited', [hexAssetId, BOB, '20000']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -171,7 +214,9 @@ describe('parseBalancesChange', () => {
 
     it('should parse tokens.Withdrawn event', () => {
       const hexAssetId = '0x9abc';
-      const events = [createMockEvent('tokens', 'Withdrawn', [hexAssetId, ALICE, '15000'])];
+      const events = [
+        createMockEvent('tokens', 'Withdrawn', [hexAssetId, ALICE, '15000']),
+      ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
 
@@ -186,7 +231,7 @@ describe('parseBalancesChange', () => {
       const events = [
         createMockEvent('balances', 'Transfer', [ALICE, BOB, '1000']),
         createMockEvent('balances', 'Deposit', [BOB, '500']),
-        createMockEvent('assets', 'Transferred', ['1984', ALICE, BOB, '100'])
+        createMockEvent('assets', 'Transferred', ['1984', ALICE, BOB, '100']),
       ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
@@ -198,7 +243,7 @@ describe('parseBalancesChange', () => {
       const events = [
         createMockEvent('balances', 'Transfer', [ALICE, BOB, '1000']),
         createMockEvent('system', 'ExtrinsicSuccess', [{}]),
-        createMockEvent('balances', 'Deposit', [BOB, '500'])
+        createMockEvent('balances', 'Deposit', [BOB, '500']),
       ];
 
       const changes = parseBalancesChange(events, MOCK_GENESIS_HASH);
@@ -222,7 +267,7 @@ describe('parseBalancesChange', () => {
       const badEvent = {
         section: 'balances',
         method: 'Transfer',
-        data: [] // Missing required data
+        data: [], // Missing required data
       } as unknown as Event;
 
       const goodEvent = createMockEvent('balances', 'Deposit', [ALICE, '1000']);
@@ -239,10 +284,11 @@ describe('parseBalancesChange', () => {
 
   describe('genesis hash', () => {
     it('should include genesis hash in all changes', () => {
-      const customGenesisHash: HexString = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+      const customGenesisHash: HexString =
+        '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
       const events = [
         createMockEvent('balances', 'Transfer', [ALICE, BOB, '1000']),
-        createMockEvent('balances', 'Deposit', [BOB, '500'])
+        createMockEvent('balances', 'Deposit', [BOB, '500']),
       ];
 
       const changes = parseBalancesChange(events, customGenesisHash);

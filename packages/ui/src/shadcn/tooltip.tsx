@@ -9,20 +9,33 @@ import * as React from 'react';
 
 import { cn } from '../lib/utils.js';
 
-function TooltipProvider({ delayDuration = 0, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return <TooltipPrimitive.Provider data-slot='tooltip-provider' delayDuration={delayDuration} {...props} />;
+function TooltipProvider({
+  delayDuration = 0,
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
+  return (
+    <TooltipPrimitive.Provider
+      data-slot="tooltip-provider"
+      delayDuration={delayDuration}
+      {...props}
+    />
+  );
 }
 
-function TooltipWrapper({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+function TooltipWrapper({
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
   return (
     <TooltipProvider>
-      <TooltipPrimitive.Root data-slot='tooltip' {...props} />
+      <TooltipPrimitive.Root data-slot="tooltip" {...props} />
     </TooltipProvider>
   );
 }
 
-function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot='tooltip-trigger' {...props} />;
+function TooltipTrigger({
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
+  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
 }
 
 function TooltipContent({
@@ -34,11 +47,11 @@ function TooltipContent({
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
-        data-slot='tooltip-content'
+        data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
-          'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-[10px] px-3 py-1 shadow-md',
-          className
+          'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-[10px] px-3 py-1 shadow-md bg-background text-foreground',
+          className,
         )}
         {...props}
       >
@@ -49,17 +62,20 @@ function TooltipContent({
 }
 
 // Simplified Tooltip component
-const tooltipVariants = cva('z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-[10px] px-3 py-1.5', {
-  variants: {
-    color: {
-      default: 'bg-background text-foreground',
-      foreground: 'bg-foreground text-white'
-    }
+const tooltipVariants = cva(
+  'z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-[10px] px-3 py-1.5',
+  {
+    variants: {
+      color: {
+        default: 'bg-background text-foreground',
+        foreground: 'bg-foreground text-white',
+      },
+    },
+    defaultVariants: {
+      color: 'default',
+    },
   },
-  defaultVariants: {
-    color: 'default'
-  }
-});
+);
 
 interface TooltipProps extends VariantProps<typeof tooltipVariants> {
   content?: React.ReactNode;
@@ -70,7 +86,14 @@ interface TooltipProps extends VariantProps<typeof tooltipVariants> {
   ref?: React.Ref<React.ComponentRef<typeof TooltipContent>>;
 }
 
-function Tooltip({ content, color, classNames, ref, children, ...props }: TooltipProps) {
+function Tooltip({
+  content,
+  color,
+  classNames,
+  ref,
+  children,
+  ...props
+}: TooltipProps) {
   if (!content) {
     return children;
   }
@@ -78,7 +101,11 @@ function Tooltip({ content, color, classNames, ref, children, ...props }: Toolti
   return (
     <TooltipWrapper>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent ref={ref} className={cn(tooltipVariants({ color }), classNames?.content)} {...props}>
+      <TooltipContent
+        ref={ref}
+        className={cn(tooltipVariants({ color }), classNames?.content)}
+        {...props}
+      >
         {content}
       </TooltipContent>
     </TooltipWrapper>
@@ -87,4 +114,10 @@ function Tooltip({ content, color, classNames, ref, children, ...props }: Toolti
 
 Tooltip.displayName = 'Tooltip';
 
-export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, TooltipWrapper };
+export {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipWrapper,
+};

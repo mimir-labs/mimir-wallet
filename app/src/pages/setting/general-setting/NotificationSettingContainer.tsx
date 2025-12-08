@@ -10,9 +10,11 @@ interface NotificationSettingContainerProps {
   address: HexString;
 }
 
-function NotificationSettingContainer({ address }: NotificationSettingContainerProps) {
+function NotificationSettingContainer({
+  address,
+}: NotificationSettingContainerProps) {
   return (
-    <div className='flex flex-col gap-5'>
+    <div className="flex flex-col gap-5">
       {/* Web Push Notifications */}
       <WebPushNotificationSetting address={address} />
 

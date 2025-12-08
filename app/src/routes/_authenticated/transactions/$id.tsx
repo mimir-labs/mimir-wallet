@@ -6,8 +6,6 @@ import type { RouteMetadata } from '@/hooks/usePageTitle';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
-import PageTransactionDetails from '@/pages/transaction-details';
-
 /**
  * Transaction Details Route (/transactions/:id)
  *
@@ -16,13 +14,12 @@ import PageTransactionDetails from '@/pages/transaction-details';
  */
 
 const transactionDetailsSearchSchema = z.object({
-  network: z.string().optional()
+  network: z.string().optional(),
 });
 
 export const Route = createFileRoute('/_authenticated/transactions/$id')({
   validateSearch: transactionDetailsSearchSchema,
   staticData: {
-    getTitle: ({ params }) => `Transaction ${params?.id || ''}`
+    getTitle: ({ params }) => `Transaction ${params?.id || ''}`,
   } as RouteMetadata,
-  component: PageTransactionDetails
 });

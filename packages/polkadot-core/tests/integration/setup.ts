@@ -19,7 +19,9 @@ export let apiManager: ApiManager;
 /**
  * Helper to create Endpoint config for tests
  */
-function createTestEndpoint(config: typeof TEST_CONFIG.paseo | typeof TEST_CONFIG.assetHubPaseo) {
+function createTestEndpoint(
+  config: typeof TEST_CONFIG.paseo | typeof TEST_CONFIG.assetHubPaseo,
+) {
   return {
     key: config.key,
     name: config.name,
@@ -33,7 +35,9 @@ function createTestEndpoint(config: typeof TEST_CONFIG.paseo | typeof TEST_CONFI
     supportsDryRun: config.supportsDryRun,
     supportsProxy: config.supportsProxy,
     isTestnet: true,
-    ...('paraId' in config ? { paraId: config.paraId, relayChain: config.relayChain } : { isRelayChain: true })
+    ...('paraId' in config
+      ? { paraId: config.paraId, relayChain: config.relayChain }
+      : { isRelayChain: true }),
   };
 }
 
@@ -52,10 +56,17 @@ beforeAll(
     try {
       await Promise.race([
         apiManager.initialize(paseoEndpoint as any),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Paseo connection timeout')), TIMEOUTS.connection))
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error('Paseo connection timeout')),
+            TIMEOUTS.connection,
+          ),
+        ),
       ]);
       paseoApi = await apiManager.getApi(TEST_CONFIG.paseo.key);
-      console.log(`[Setup] Connected to Paseo relay chain: ${paseoApi.runtimeVersion.specName.toString()}`);
+      console.log(
+        `[Setup] Connected to Paseo relay chain: ${paseoApi.runtimeVersion.specName.toString()}`,
+      );
     } catch (error) {
       console.error('[Setup] Failed to connect to Paseo:', error);
       throw error;
@@ -68,11 +79,16 @@ beforeAll(
       await Promise.race([
         apiManager.initialize(assetHubEndpoint as any),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Asset Hub connection timeout')), TIMEOUTS.connection)
-        )
+          setTimeout(
+            () => reject(new Error('Asset Hub connection timeout')),
+            TIMEOUTS.connection,
+          ),
+        ),
       ]);
       assetHubApi = await apiManager.getApi(TEST_CONFIG.assetHubPaseo.key);
-      console.log(`[Setup] Connected to Asset Hub Paseo: ${assetHubApi.runtimeVersion.specName.toString()}`);
+      console.log(
+        `[Setup] Connected to Asset Hub Paseo: ${assetHubApi.runtimeVersion.specName.toString()}`,
+      );
     } catch (error) {
       console.error('[Setup] Failed to connect to Asset Hub:', error);
       throw error;
@@ -80,7 +96,7 @@ beforeAll(
 
     console.log('[Setup] All connections established');
   },
-  TIMEOUTS.connection * 2 + 10000
+  TIMEOUTS.connection * 2 + 10000,
 );
 
 /**
@@ -100,7 +116,10 @@ afterAll(async () => {
 /**
  * Helper to wait for API to be ready
  */
-export async function waitForApiReady(api: ApiPromise, timeout = TIMEOUTS.connection): Promise<void> {
+export async function waitForApiReady(
+  api: ApiPromise,
+  timeout = TIMEOUTS.connection,
+): Promise<void> {
   const startTime = Date.now();
 
   while (!api.isConnected) {
@@ -115,7 +134,10 @@ export async function waitForApiReady(api: ApiPromise, timeout = TIMEOUTS.connec
 /**
  * Helper to skip test if API is not connected
  */
-export function skipIfNotConnected(api: ApiPromise | undefined, testName: string): void {
+export function skipIfNotConnected(
+  api: ApiPromise | undefined,
+  testName: string,
+): void {
   if (!api || !api.isConnected) {
     console.warn(`[Skip] ${testName}: API not connected`);
     throw new Error('API not connected - skipping test');

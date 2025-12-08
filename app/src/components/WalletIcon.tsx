@@ -5,7 +5,10 @@ import React from 'react';
 
 import { walletConfig } from '@/config';
 
-interface Props extends React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement> {
+interface Props extends React.DetailedHTMLProps<
+  React.ImgHTMLAttributes<HTMLImageElement>,
+  HTMLImageElement
+> {
   disabled: boolean;
   id: string;
 }

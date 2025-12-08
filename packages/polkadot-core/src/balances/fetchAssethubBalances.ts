@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BalanceResult } from './types.js';
-import type { AssetInfo, EnhancedAssetInfo, ForeignAssetInfo } from '@mimir-wallet/service';
+import type {
+  AssetInfo,
+  EnhancedAssetInfo,
+  ForeignAssetInfo,
+} from '@mimir-wallet/service';
 import type { ApiPromise } from '@polkadot/api';
 import type { Option } from '@polkadot/types';
 import type { PalletAssetsAssetAccount } from '@polkadot/types/lookup';
@@ -18,7 +22,10 @@ import type { HexString } from '@polkadot/util/types';
 export async function fetchAssethubBalances(
   api: ApiPromise,
   address: HexString,
-  assets: ((AssetInfo & EnhancedAssetInfo) | (ForeignAssetInfo & EnhancedAssetInfo))[]
+  assets: (
+    | (AssetInfo & EnhancedAssetInfo)
+    | (ForeignAssetInfo & EnhancedAssetInfo)
+  )[],
 ): Promise<BalanceResult[]> {
   if (!api?.isConnected) {
     throw new Error('API is not connected');
@@ -41,9 +48,10 @@ export async function fetchAssethubBalances(
       const queryId = asset.key;
 
       const accountData = asset.isForeignAsset
-        ? await (api.query.foreignAssets?.account?.(queryId, address.toString()) as Promise<
-            Option<PalletAssetsAssetAccount> | null | undefined
-          >)
+        ? await (api.query.foreignAssets?.account?.(
+            queryId,
+            address.toString(),
+          ) as Promise<Option<PalletAssetsAssetAccount> | null | undefined>)
         : await api.query.assets?.account(queryId, address.toString());
 
       if (accountData && accountData.isSome) {
@@ -58,7 +66,7 @@ export async function fetchAssethubBalances(
           locked: 0n,
           reserved: 0n,
           free: BigInt(balance.toString()),
-          transferrable: BigInt(balance.toString())
+          transferrable: BigInt(balance.toString()),
         };
       }
 

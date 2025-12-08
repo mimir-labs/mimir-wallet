@@ -19,62 +19,68 @@ function toastCustom(events: TxEvents, id?: number | string) {
     events.status === 'success'
   ) {
     return toast.success(
-      <div className='flex flex-col gap-1'>
-        <p className='font-bold'>Waiting</p>
-        <p className='text-xs'>Transaction is inblock</p>
+      <div className="flex flex-col gap-1">
+        <p className="font-bold">Waiting</p>
+        <p className="text-xs">Transaction is inblock</p>
       </div>,
       {
         id,
         icon: <SuccessAnimation />,
-        duration: 3000
-      }
+        duration: 3000,
+      },
     );
   }
 
   if (events.status === 'signed') {
     return toast.warning(
-      <div className='flex flex-col gap-1'>
-        <p className='font-bold'>Waiting</p>
-        <p className='text-xs'>Transaction is inblock</p>
+      <div className="flex flex-col gap-1">
+        <p className="font-bold">Waiting</p>
+        <p className="text-xs">Transaction is inblock</p>
       </div>,
       {
         id,
         icon: <WaitingAnimation />,
-        duration: 9999999
-      }
+        duration: 9999999,
+      },
     );
   }
 
   if (events.status === 'error') {
     return toast.error(
-      <div className='flex flex-col gap-1'>
-        <p className='font-bold'>Failed</p>
-        <p className='text-xs'>
+      <div className="flex flex-col gap-1">
+        <p className="font-bold">Failed</p>
+        <p className="text-xs">
           <TxError error={events.error} />
         </p>
       </div>,
       {
         id,
         icon: <FailedAnimation />,
-        duration: 3000
-      }
+        duration: 3000,
+      },
     );
   }
 
   return toast.warning(
-    <div className='flex flex-col gap-1'>
-      <p className='font-bold'>Waiting</p>
-      <p className='text-xs'>Waiting for sign</p>
+    <div className="flex flex-col gap-1">
+      <p className="font-bold">Waiting</p>
+      <p className="text-xs">Waiting for sign</p>
     </div>,
     {
       id,
       icon: <WaitingAnimation />,
-      duration: 9999999
-    }
+      duration: 9999999,
+    },
   );
 }
 
-function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: () => void }) {
+function ToastNotification({
+  events,
+  onRemove,
+}: {
+  events: TxEvents;
+  onRemove: () => void;
+}) {
   const idRef = useRef<number | string | undefined>(undefined);
 
   useEffect(() => {
@@ -103,7 +109,11 @@ function ToastNotification({ events, onRemove }: { events: TxEvents; onRemove: (
       idRef.current = toastCustom(events, id);
     };
 
-    events.on('signed', onSign).on('inblock', onInblock).on('success', onSuccess).on('error', onError);
+    events
+      .on('signed', onSign)
+      .on('inblock', onInblock)
+      .on('success', onSuccess)
+      .on('error', onError);
 
     return () => {
       events.off('signed', onSign);

@@ -1,7 +1,12 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ProxyAddedEvent, ProxyArgs, PureCreatedEvent, TransactionResult } from '../types';
+import type {
+  ProxyAddedEvent,
+  ProxyArgs,
+  PureCreatedEvent,
+  TransactionResult,
+} from '../types';
 import type { ApiPromise } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { ISubmittableResult } from '@polkadot/types/types';
@@ -18,8 +23,13 @@ import { useTxQueue } from '@/hooks/useTxQueue';
 /**
  * Parse PureCreated events from transaction result
  */
-function parsePureCreatedEvents(result: ISubmittableResult, api: ApiPromise): PureCreatedEvent | null {
-  const events = result.events.filter((item) => api.events.proxy.PureCreated.is(item.event));
+function parsePureCreatedEvents(
+  result: ISubmittableResult,
+  api: ApiPromise,
+): PureCreatedEvent | null {
+  const events = result.events.filter((item) =>
+    api.events.proxy.PureCreated.is(item.event),
+  );
 
   if (events.length === 0) return null;
 
@@ -29,21 +39,26 @@ function parsePureCreatedEvents(result: ISubmittableResult, api: ApiPromise): Pu
     pureAccount: event.data[0].toString(),
     whoCreated: event.data[1].toString(),
     proxyType: event.data[2].toString(),
-    disambiguationIndex: Number(event.data[3].toString())
+    disambiguationIndex: Number(event.data[3].toString()),
   };
 }
 
 /**
  * Parse ProxyAdded events from transaction result
  */
-function parseProxyAddedEvents(result: ISubmittableResult, api: ApiPromise): ProxyAddedEvent[] {
-  const events = result.events.filter((item) => api.events.proxy.ProxyAdded.is(item.event));
+function parseProxyAddedEvents(
+  result: ISubmittableResult,
+  api: ApiPromise,
+): ProxyAddedEvent[] {
+  const events = result.events.filter((item) =>
+    api.events.proxy.ProxyAdded.is(item.event),
+  );
 
   return events.map((item) => ({
     delegator: item.event.data[0].toString(),
     delegate: item.event.data[1].toString(),
     proxyType: item.event.data[2].toString(),
-    delay: Number(item.event.data[3].toString())
+    delay: Number(item.event.data[3].toString()),
   }));
 }
 
@@ -80,7 +95,7 @@ export function useProxyTransaction(network: string) {
 
   const [state, setState] = useState<TransactionState>({
     isLoading: false,
-    error: null
+    error: null,
   });
 
   /**
@@ -89,7 +104,9 @@ export function useProxyTransaction(network: string) {
   const submitPureProxy = useCallback(
     async (config: ProxyTransactionConfig) => {
       if (!config.proxyType || config.delay === undefined) {
-        throw new Error('ProxyType and delay are required for pure proxy creation');
+        throw new Error(
+          'ProxyType and delay are required for pure proxy creation',
+        );
       }
 
       setState({ isLoading: true, error: null });
@@ -97,15 +114,11 @@ export function useProxyTransaction(network: string) {
       try {
         const api = await ApiManager.getInstance().getApi(network);
 
-        if (!api) {
-          throw new Error('API is not ready');
-        }
-
         const transactionService = createProxyTransactionService(api);
 
         const transaction = transactionService.buildCreatePureProxyTransaction({
           proxyType: config.proxyType,
-          delay: config.delay
+          delay: config.delay,
         });
 
         const call = transactionService.getTransactionMethod(transaction);
@@ -117,7 +130,7 @@ export function useProxyTransaction(network: string) {
                 config.network,
                 u8aToHex(decodeAddress(config.accountId)),
                 extrinsic.hash.toHex(),
-                config.pureName || 'Pure Proxy'
+                config.pureName || 'Pure Proxy',
               );
             }
           : undefined;
@@ -144,8 +157,8 @@ export function useProxyTransaction(network: string) {
                 proxyType: config.proxyType!,
                 proxy: config.accountId,
                 delay: config.delay,
-                pureProxyName: config.pureName
-              }
+                pureProxyName: config.pureName,
+              },
             };
 
             config.onSuccess?.(transactionResult);
@@ -158,7 +171,7 @@ export function useProxyTransaction(network: string) {
 
             setState({ isLoading: false, error: err });
             config.onError?.(err);
-          }
+          },
         });
       } catch (error) {
         const err = error as Error;
@@ -167,7 +180,7 @@ export function useProxyTransaction(network: string) {
         config.onError?.(err);
       }
     },
-    [network, addQueue]
+    [network, addQueue],
   );
 
   /**
@@ -186,20 +199,20 @@ export function useProxyTransaction(network: string) {
       try {
         const api = await ApiManager.getInstance().getApi(network);
 
-        if (!api) {
-          throw new Error('API is not ready');
-        }
-
         const transactionService = createProxyTransactionService(api);
 
         // Validate all proxy arguments
-        const validation = transactionService.validateBatchProxyArgs([proxyArgs]);
+        const validation = transactionService.validateBatchProxyArgs([
+          proxyArgs,
+        ]);
 
         if (!validation.isValid) {
           throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
         }
 
-        const transaction = transactionService.buildBatchProxyTransaction([proxyArgs]);
+        const transaction = transactionService.buildBatchProxyTransaction([
+          proxyArgs,
+        ]);
         const call = transactionService.getTransactionMethod(transaction);
 
         addQueue({
@@ -223,8 +236,8 @@ export function useProxyTransaction(network: string) {
                 proxyType: proxyArgs.proxyType,
                 proxied: config.accountId,
                 proxy: proxyArgs.delegate,
-                delay: proxyArgs.delay
-              }
+                delay: proxyArgs.delay,
+              },
             };
 
             config.onSuccess?.(transactionResult);
@@ -237,7 +250,7 @@ export function useProxyTransaction(network: string) {
 
             setState({ isLoading: false, error: err });
             config.onError?.(err);
-          }
+          },
         });
       } catch (error) {
         const err = error as Error;
@@ -246,7 +259,7 @@ export function useProxyTransaction(network: string) {
         config.onError?.(err);
       }
     },
-    [network, addQueue]
+    [network, addQueue],
   );
 
   return {
@@ -254,6 +267,6 @@ export function useProxyTransaction(network: string) {
     submitPureProxy,
     submitProxyAddition,
     isLoading: state.isLoading,
-    error: state.error
+    error: state.error,
   };
 }

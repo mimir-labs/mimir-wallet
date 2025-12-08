@@ -20,16 +20,10 @@ cypress/videos
 .env.production.local
 
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.yarn/*
-!.yarn/releases
-!.yarn/plugins
-!.yarn/sdks
+pnpm-debug.log*
 
 # turbo
 .turbo
-packages/**/.turbo
 
 # typescript
 *.tsbuildinfo

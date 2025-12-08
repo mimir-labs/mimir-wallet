@@ -9,6 +9,6 @@ export default defineConfig({
   projectId: '4xjmem',
   e2e: {
     baseUrl: 'http://localhost:4173/',
-    specPattern: 'cypress/e2e/**/*.ts'
-  }
+    specPattern: 'cypress/e2e/**/*.ts',
+  },
 });

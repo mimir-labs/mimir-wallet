@@ -1,8 +1,21 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { addressEq, decodeAddress, encodeAddress, isPolkadotAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import {
+  addressEq,
+  decodeAddress,
+  encodeAddress,
+  isPolkadotAddress,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from '@mimir-wallet/ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Input from './Input';
@@ -14,7 +27,7 @@ function Content({
   defaultAddress,
   watchlist,
   onAdded,
-  onClose
+  onClose,
 }: {
   defaultAddress?: string;
   watchlist?: boolean;
@@ -24,14 +37,20 @@ function Content({
   const { addAddress, addresses } = useAccount();
   const { ss58 } = useSs58Format();
   const [name, setName] = useState<string>('');
-  const [address, setAddress] = useState<string | undefined>(defaultAddress || '');
-  const [info] = useDeriveAccountInfo(isPolkadotAddress(address) ? address : undefined);
+  const [address, setAddress] = useState<string | undefined>(
+    defaultAddress || '',
+  );
+  const [info] = useDeriveAccountInfo(
+    isPolkadotAddress(address) ? address : undefined,
+  );
   const { display, displayParent } = info || {};
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (display) {
-      setName(`${displayParent || display}${displayParent ? `/${display}` : ''}`);
+      setName(
+        `${displayParent || display}${displayParent ? `/${display}` : ''}`,
+      );
     }
   }, [display, displayParent]);
 
@@ -50,15 +69,18 @@ function Content({
         setAddress(addressInput);
       }
     },
-    [ss58]
+    [ss58],
   );
 
   const exists = useMemo(
     () =>
       address &&
       isPolkadotAddress(address) &&
-      addresses.findIndex((item) => item.watchlist === watchlist && addressEq(item.address, address)) > -1,
-    [address, addresses, watchlist]
+      addresses.findIndex(
+        (item) =>
+          item.watchlist === watchlist && addressEq(item.address, address),
+      ) > -1,
+    [address, addresses, watchlist],
   );
 
   const _onCommit = useCallback((): void => {
@@ -71,33 +93,62 @@ function Content({
 
       addAddress(
         address,
-        display ? `${displayParent || display}${displayParent ? `/${display}` : ''}` : name.trim(),
-        watchlist
+        display
+          ? `${displayParent || display}${displayParent ? `/${display}` : ''}`
+          : name.trim(),
+        watchlist,
       );
       onAdded?.(address);
       onClose?.();
     } catch (error: any) {
       setError(error.message || 'Failed to add address');
     }
-  }, [address, addAddress, display, displayParent, name, watchlist, onAdded, onClose]);
+  }, [
+    address,
+    addAddress,
+    display,
+    displayParent,
+    name,
+    watchlist,
+    onAdded,
+    onClose,
+  ]);
 
   return (
     <>
-      <ModalBody className='gap-y-5'>
-        <Input label='Name' disabled={!!display} onChange={setName} placeholder='input name for contact' value={name} />
+      <ModalBody className="gap-y-5">
         <Input
-          error={exists ? new Error('Already in related account') : error ? new Error(error) : null}
-          label='Address'
+          label="Name"
+          disabled={!!display}
+          onChange={setName}
+          placeholder="input name for contact"
+          value={name}
+        />
+        <Input
+          error={
+            exists
+              ? new Error('Already in related account')
+              : error
+                ? new Error(error)
+                : null
+          }
+          label="Address"
           onChange={_onChangeAddress}
-          placeholder='input address'
+          placeholder="input address"
           value={address}
         />
       </ModalBody>
       <ModalFooter>
-        <Button color='primary' fullWidth onClick={onClose} variant='ghost'>
+        <Button color="primary" fullWidth onClick={onClose} variant="ghost">
           Cancel
         </Button>
-        <Button color='primary' disabled={!(name || display) || !address} fullWidth onClick={_onCommit} variant='solid'>
+        <Button
+          color="primary"
+          disabled={!(name || display) || !address}
+          fullWidth
+          onClick={_onCommit}
+          variant="solid"
+        >
           Save
         </Button>
       </ModalFooter>
@@ -110,7 +161,7 @@ function AddAddressDialog({
   watchlist,
   onAdded,
   onClose,
-  open
+  open,
 }: {
   defaultAddress?: string;
   watchlist?: boolean;
@@ -119,10 +170,17 @@ function AddAddressDialog({
   onClose?: () => void;
 }) {
   return (
-    <Modal size='lg' onClose={onClose} isOpen={open}>
+    <Modal size="lg" onClose={onClose} isOpen={open}>
       <ModalContent>
-        <ModalHeader className='justify-center'>{watchlist ? 'Add Watchlist' : 'Add New Contact'}</ModalHeader>
-        <Content defaultAddress={defaultAddress} watchlist={watchlist} onAdded={onAdded} onClose={onClose} />
+        <ModalHeader className="justify-center">
+          {watchlist ? 'Add Watchlist' : 'Add New Contact'}
+        </ModalHeader>
+        <Content
+          defaultAddress={defaultAddress}
+          watchlist={watchlist}
+          onAdded={onAdded}
+          onClose={onClose}
+        />
       </ModalContent>
     </Modal>
   );

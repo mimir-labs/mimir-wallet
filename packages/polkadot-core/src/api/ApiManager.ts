@@ -1,7 +1,12 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ApiConnection, ApiManagerListener, ChainStatus, Endpoint } from '../types/types.js';
+import type {
+  ApiConnection,
+  ApiManagerListener,
+  ChainStatus,
+  Endpoint,
+} from '../types/types.js';
 import type { HexString } from '@polkadot/util/types';
 
 import { ApiPromise } from '@polkadot/api';
@@ -27,7 +32,8 @@ export class ApiManager {
   // Map<network, Set<source>> - Track which sources reference each network
   private references: Map<string, Set<string>> = new Map();
   // Map<network, Set<listener>> - Chain-specific listeners for efficient single-chain subscriptions
-  private chainListeners: Map<string, Set<(status: ChainStatus) => void>> = new Map();
+  private chainListeners: Map<string, Set<(status: ChainStatus) => void>> =
+    new Map();
 
   private constructor() {}
 
@@ -54,7 +60,10 @@ export class ApiManager {
     }
 
     // Skip if already initialized and ready
-    if (this.apis.has(chain.key) && this.apis.get(chain.key)?.status.isApiReady) {
+    if (
+      this.apis.has(chain.key) &&
+      this.apis.get(chain.key)?.status.isApiReady
+    ) {
       return;
     }
 
@@ -79,8 +88,8 @@ export class ApiManager {
           isApiConnected: false,
           isApiReady: false,
           isApiInitialized: false,
-          apiError: null
-        }
+          apiError: null,
+        },
       });
 
       createApi(chain)
@@ -93,12 +102,14 @@ export class ApiManager {
               isApiConnected: false,
               isApiReady: false,
               isApiInitialized: true,
-              apiError: null
-            }
+              apiError: null,
+            },
           });
 
           // Setup event handlers for state management
-          api.on('error', (error: Error) => this._handleError(chain.key, error));
+          api.on('error', (error: Error) =>
+            this._handleError(chain.key, error),
+          );
           api.on('disconnected', () => this._handleDisconnected(chain.key));
           api.on('connected', () => this._handleConnected(chain.key));
           api.on('ready', () => {
@@ -120,25 +131,27 @@ export class ApiManager {
     const properties = api.registry.createType('ChainProperties', {
       ss58Format: api.registry.chainSS58,
       tokenDecimals: api.registry.chainDecimals,
-      tokenSymbol: api.registry.chainTokens
+      tokenSymbol: api.registry.chainTokens,
     });
 
     const tokenSymbol = properties.tokenSymbol.unwrapOr([...DEFAULT_AUX]);
-    const tokenDecimals = properties.tokenDecimals.unwrapOr([api.registry.createType('u32', 12)]);
+    const tokenDecimals = properties.tokenDecimals.unwrapOr([
+      api.registry.createType('u32', 12),
+    ]);
 
     api.registry.setChainProperties(
       api.registry.createType('ChainProperties', {
         ss58Format: chain.ss58Format,
         tokenDecimals,
-        tokenSymbol
-      })
+        tokenSymbol,
+      }),
     );
 
     setDeriveCache(api.genesisHash.toHex(), deriveMapCache);
 
     return {
       tokenSymbol: tokenSymbol[0].toString(),
-      genesisHash: api.genesisHash.toHex() as HexString
+      genesisHash: api.genesisHash.toHex() as HexString,
     };
   }
 
@@ -160,21 +173,22 @@ export class ApiManager {
         isApiConnected: true,
         isApiReady: true,
         isApiInitialized: true,
-        apiError: null
-      }
+        apiError: null,
+      },
     });
 
     // Subscribe to runtime updates for metadata caching
     connection.api.rpc.state.subscribeRuntimeVersion(async () => {
-      const { metadata, runtimeVersion } = await connection.api!.getBlockRegistry(
-        await connection.api!.rpc.chain.getBlockHash()
-      );
+      const { metadata, runtimeVersion } =
+        await connection.api!.getBlockRegistry(
+          await connection.api!.rpc.chain.getBlockHash(),
+        );
 
       saveMetadata(
         network,
         connection.api!.genesisHash.toHex(),
         runtimeVersion.specVersion.toString(),
-        metadata.toHex()
+        metadata.toHex(),
       );
     });
   }
@@ -186,7 +200,7 @@ export class ApiManager {
     if (connection) {
       this._updateConnection(network, {
         ...connection,
-        status: { ...connection.status, apiError: error.message }
+        status: { ...connection.status, apiError: error.message },
       });
     }
   }
@@ -197,7 +211,7 @@ export class ApiManager {
     if (connection) {
       this._updateConnection(network, {
         ...connection,
-        status: { ...connection.status, isApiConnected: false }
+        status: { ...connection.status, isApiConnected: false },
       });
     }
   }
@@ -212,8 +226,8 @@ export class ApiManager {
       status: {
         ...connection.status,
         isApiConnected: true,
-        apiError: null
-      }
+        apiError: null,
+      },
     });
   }
 
@@ -349,10 +363,17 @@ export class ApiManager {
    * @param networkOrGenesisHash - Network key or genesis hash
    * @param timeout - Timeout in milliseconds (default: 15000)
    */
-  async getApi(networkOrGenesisHash: string, timeout = 15000): Promise<ApiPromise> {
+  async getApi(
+    networkOrGenesisHash: string,
+    timeout = 15000,
+  ): Promise<ApiPromise> {
     // Wait for ready with timeout
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error(`Connection timeout for: ${networkOrGenesisHash}`)), timeout);
+      setTimeout(
+        () =>
+          reject(new Error(`Connection timeout for: ${networkOrGenesisHash}`)),
+        timeout,
+      );
     });
 
     return Promise.race([
@@ -381,7 +402,7 @@ export class ApiManager {
 
         return newConnection.api.isReady;
       })(),
-      timeoutPromise
+      timeoutPromise,
     ]);
   }
 
@@ -396,7 +417,7 @@ export class ApiManager {
         isApiConnected: false,
         isApiReady: false,
         isApiInitialized: false,
-        apiError: null
+        apiError: null,
       }
     );
   }
@@ -426,7 +447,10 @@ export class ApiManager {
    * @param listener - Callback function that receives the chain status
    * @returns Unsubscribe function
    */
-  subscribeToChain(network: string, listener: (status: ChainStatus) => void): () => void {
+  subscribeToChain(
+    network: string,
+    listener: (status: ChainStatus) => void,
+  ): () => void {
     if (!this.chainListeners.has(network)) {
       this.chainListeners.set(network, new Set());
     }
@@ -441,8 +465,8 @@ export class ApiManager {
         isApiConnected: false,
         isApiReady: false,
         isApiInitialized: false,
-        apiError: null
-      }
+        apiError: null,
+      },
     );
 
     return () => {
@@ -461,7 +485,9 @@ export class ApiManager {
   /**
    * Resolve chain identifier to connection
    */
-  private _resolveConnection(networkOrGenesisHash: string): ApiConnection | undefined {
+  private _resolveConnection(
+    networkOrGenesisHash: string,
+  ): ApiConnection | undefined {
     // Try direct lookup by network key
     if (this.apis.has(networkOrGenesisHash)) {
       return this.apis.get(networkOrGenesisHash);

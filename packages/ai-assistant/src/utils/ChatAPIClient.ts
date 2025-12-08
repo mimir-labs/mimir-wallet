@@ -62,16 +62,22 @@ export class ChatAPIClient {
         try {
           // Create timeout controller
           const timeoutController = new AbortController();
-          const timeoutId = setTimeout(() => timeoutController.abort(), this.timeout);
+          const timeoutId = setTimeout(
+            () => timeoutController.abort(),
+            this.timeout,
+          );
 
           // Combine timeout signal with user abort signal
-          const combinedSignal = this.combineSignals([signal, timeoutController.signal]);
+          const combinedSignal = this.combineSignals([
+            signal,
+            timeoutController.signal,
+          ]);
 
           const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
-            signal: combinedSignal
+            signal: combinedSignal,
           });
 
           clearTimeout(timeoutId);
@@ -81,11 +87,16 @@ export class ChatAPIClient {
           }
 
           // Log non-2xx responses
-          console.warn(`[ChatAPIClient] Endpoint returned ${response.status}:`, endpoint);
+          console.warn(
+            `[ChatAPIClient] Endpoint returned ${response.status}:`,
+            endpoint,
+          );
 
           // Don't retry on 4xx errors (client errors)
           if (response.status >= 400 && response.status < 500) {
-            throw new Error(`Client error: ${response.status} ${response.statusText}`);
+            throw new Error(
+              `Client error: ${response.status} ${response.statusText}`,
+            );
           }
         } catch (error) {
           lastError = error as Error;
@@ -96,8 +107,14 @@ export class ChatAPIClient {
           }
 
           // Don't retry on timeout for last attempt
-          if ((error as Error).name === 'AbortError' && attempt === this.maxRetries) {
-            console.error(`[ChatAPIClient] Request timeout after ${this.timeout}ms:`, endpoint);
+          if (
+            (error as Error).name === 'AbortError' &&
+            attempt === this.maxRetries
+          ) {
+            console.error(
+              `[ChatAPIClient] Request timeout after ${this.timeout}ms:`,
+              endpoint,
+            );
             continue; // Try next endpoint
           }
 
@@ -114,7 +131,7 @@ export class ChatAPIClient {
     }
 
     throw new Error(
-      `All chat endpoints failed after ${this.maxRetries + 1} attempts each. Last error: ${lastError?.message || 'Unknown error'}`
+      `All chat endpoints failed after ${this.maxRetries + 1} attempts each. Last error: ${lastError?.message || 'Unknown error'}`,
     );
   }
 
@@ -129,7 +146,9 @@ export class ChatAPIClient {
       if (signal.aborted) {
         controller.abort();
       } else {
-        signal.addEventListener('abort', () => controller.abort(), { once: true });
+        signal.addEventListener('abort', () => controller.abort(), {
+          once: true,
+        });
       }
     });
 
@@ -150,7 +169,7 @@ export class ChatAPIClient {
     return {
       endpoints: this.endpoints,
       timeout: this.timeout,
-      maxRetries: this.maxRetries
+      maxRetries: this.maxRetries,
     };
   }
 }

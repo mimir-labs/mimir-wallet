@@ -2,7 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
-import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@mimir-wallet/ui';
+import {
+  cn,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 
@@ -14,18 +23,21 @@ import {
   type ProxyTransaction,
   type Transaction,
   TransactionStatus,
-  TransactionType
+  TransactionType,
 } from '@/hooks/types';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useParseCall } from '@/hooks/useParseCall';
-import { useMultichainPendingTransactions, useValidTransactionNetworks } from '@/hooks/useTransactions';
+import {
+  useMultichainPendingTransactions,
+  useValidTransactionNetworks,
+} from '@/hooks/useTransactions';
 import { CallDisplayDetail } from '@/params';
 import {
   ApproveButton,
   CancelButton,
   ExecuteAnnounceButton,
   formatTransactionId,
-  RemoveOrDenyButton
+  RemoveOrDenyButton,
 } from '@/transactions';
 import { useAnnouncementStatus } from '@/transactions/hooks/useAnnouncementStatus';
 
@@ -36,14 +48,22 @@ function CallDetail({ value }: { value?: string | null }) {
 
   if (isLoading || !call) return null;
 
-  return <CallDisplayDetail fallbackWithName registry={call.registry} call={call} />;
+  return (
+    <CallDisplayDetail fallbackWithName registry={call.registry} call={call} />
+  );
 }
 
-function AnnouncementStatus({ account, transaction }: { account: AccountData; transaction: ProxyTransaction }) {
+function AnnouncementStatus({
+  account,
+  transaction,
+}: {
+  account: AccountData;
+  transaction: ProxyTransaction;
+}) {
   const [status, isFetching] = useAnnouncementStatus(transaction, account);
 
   if (isFetching) {
-    return <Skeleton className='ml-auto h-[20px] w-[60px]' />;
+    return <Skeleton className="ml-auto h-[20px] w-[60px]" />;
   }
 
   if (status === 'indexing') return 'Indexing';
@@ -56,17 +76,25 @@ function AnnouncementStatus({ account, transaction }: { account: AccountData; tr
 function MultisigStatus({ transaction }: { transaction: Transaction }) {
   const { meta } = useAddressMeta(transaction.address);
   const approvals = useMemo(() => {
-    return transaction.children.filter((item) => item.status === TransactionStatus.Success).length;
+    return transaction.children.filter(
+      (item) => item.status === TransactionStatus.Success,
+    ).length;
   }, [transaction.children]);
 
   return `${approvals}/${meta.threshold}`;
 }
 
-function Status({ transaction, address }: { transaction: Transaction; address: string }) {
+function Status({
+  transaction,
+  address,
+}: {
+  transaction: Transaction;
+  address: string;
+}) {
   const [account] = useQueryAccount(address);
 
   if (!account) {
-    return <Skeleton className='ml-auto h-[20px] w-[60px]' />;
+    return <Skeleton className="ml-auto h-[20px] w-[60px]" />;
   }
 
   if (transaction.type === TransactionType.Announce) {
@@ -80,29 +108,55 @@ function Status({ transaction, address }: { transaction: Transaction; address: s
   return 'Pending';
 }
 
-function Operation({ transaction, address }: { transaction: Transaction; address: string }) {
+function Operation({
+  transaction,
+  address,
+}: {
+  transaction: Transaction;
+  address: string;
+}) {
   const [account] = useQueryAccount(address);
   const filterPaths = useFilterPaths(account, transaction);
 
   return (
     <>
-      {account ? <ApproveButton isIcon filterPaths={filterPaths} account={account} transaction={transaction} /> : null}
-      {account ? <ExecuteAnnounceButton isIcon account={account} transaction={transaction} /> : null}
+      {account ? (
+        <ApproveButton
+          isIcon
+          filterPaths={filterPaths}
+          account={account}
+          transaction={transaction}
+        />
+      ) : null}
+      {account ? (
+        <ExecuteAnnounceButton
+          isIcon
+          account={account}
+          transaction={transaction}
+        />
+      ) : null}
       <CancelButton isIcon transaction={transaction} />
       <RemoveOrDenyButton isIcon transaction={transaction} />
     </>
   );
 }
 
-function NetworkWrapper({ network, children }: { network: string; children: React.ReactNode }) {
+function NetworkWrapper({
+  network,
+  children,
+}: {
+  network: string;
+  children: React.ReactNode;
+}) {
   return <NetworkProvider network={network}>{children}</NetworkProvider>;
 }
 
 function PendingTransactions({ address }: { address: string }) {
-  const [{ validPendingNetworks }, isFetched, isFetching] = useValidTransactionNetworks(address);
+  const [{ validPendingNetworks }, isFetched, isFetching] =
+    useValidTransactionNetworks(address);
   const data = useMultichainPendingTransactions(
     validPendingNetworks.map((item) => item.network),
-    address
+    address,
   );
 
   const navigate = useNavigate();
@@ -114,23 +168,25 @@ function PendingTransactions({ address }: { address: string }) {
       .sort((a, b) => b.createdAt - a.createdAt);
   }, [data]);
 
-  const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching && !item.isFetched);
+  const showSkeleton =
+    (!isFetched && isFetching) ||
+    data.some((item) => item.isFetching && !item.isFetched);
 
   if (showSkeleton) {
     return (
-      <div className='bg-background flex h-[260px] flex-col gap-5 rounded-[20px] p-5 shadow-md'>
-        <Skeleton className='h-[45px] w-full rounded-lg' />
-        <Skeleton className='h-[45px] w-full rounded-lg' />
-        <Skeleton className='h-[45px] w-full rounded-lg' />
-        <Skeleton className='h-[45px] w-full rounded-lg' />
+      <div className="card-root flex h-[260px] flex-col gap-5 p-5">
+        <Skeleton className="h-[45px] w-full rounded-lg" />
+        <Skeleton className="h-[45px] w-full rounded-lg" />
+        <Skeleton className="h-[45px] w-full rounded-lg" />
+        <Skeleton className="h-[45px] w-full rounded-lg" />
       </div>
     );
   }
 
   if (!transactions.length) {
     return (
-      <div className='bg-background flex h-[260px] flex-col items-center justify-center gap-5 rounded-[20px] p-5 shadow-md'>
-        <Empty variant='pending-transaction' height='200px' />
+      <div className="card-root flex h-[260px] flex-col items-center justify-center gap-5 p-5">
+        <Empty variant="pending-transaction" height="200px" />
       </div>
     );
   }
@@ -138,18 +194,18 @@ function PendingTransactions({ address }: { address: string }) {
   return (
     <Table
       stickyHeader
-      containerClassName='border-secondary bg-background shadow-md rounded-[20px] border'
-      scrollClassName='h-auto sm:h-[260px] px-2 sm:px-3'
+      containerClassName="card-root"
+      scrollClassName="h-auto sm:h-[260px] px-2 sm:px-3"
     >
       <TableHeader>
-        <TableRow className='border-0'>
-          <TableColumn className='w-[140px] pt-5 pb-2' key='id'>
+        <TableRow className="border-0">
+          <TableColumn className="w-[140px] pt-5 pb-2" key="id">
             Transaction ID
           </TableColumn>
-          <TableColumn className='w-[240px] pt-5 pb-2' key='call'>
+          <TableColumn className="w-[240px] pt-5 pb-2" key="call">
             Call
           </TableColumn>
-          <TableColumn className='w-[180px] pt-5 pb-2 text-right' key='status'>
+          <TableColumn className="w-[180px] pt-5 pb-2 text-right" key="status">
             Status
           </TableColumn>
         </TableRow>
@@ -158,22 +214,24 @@ function PendingTransactions({ address }: { address: string }) {
         {transactions.map((item) => (
           <TableRow
             key={item.id}
-            className='[&:hover>td]:bg-secondary cursor-pointer [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]'
+            className={cn(
+              'border-secondary border-b last:border-0 [&:hover>td]:bg-secondary cursor-pointer [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]',
+            )}
             onClick={() => {
               navigate({
                 to: `/transactions/$id`,
                 params: {
-                  id: item.id.toString()
+                  id: item.id.toString(),
                 },
                 search: {
                   network: item.network,
-                  address: address
-                }
+                  address: address,
+                },
               });
             }}
           >
             <TableCell>
-              <div className='flex min-w-max items-center gap-[5px] text-nowrap'>
+              <div className="flex min-w-max items-center gap-[5px] text-nowrap">
                 <AppName
                   website={item.website}
                   iconSize={16}
@@ -193,12 +251,12 @@ function PendingTransactions({ address }: { address: string }) {
                 <CallDetail value={item.call} />
               </NetworkWrapper>
             </TableCell>
-            <TableCell className='text-right'>
+            <TableCell className="text-right">
               <NetworkWrapper network={item.network}>
-                <span className='status'>
+                <span className="status">
                   <Status address={address} transaction={item} />
                 </span>
-                <div className='operation hidden flex-row-reverse items-center gap-[5px]'>
+                <div className="operation hidden flex-row-reverse items-center gap-[5px]">
                   <Operation address={address} transaction={item} />
                 </div>
               </NetworkWrapper>

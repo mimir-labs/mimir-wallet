@@ -25,7 +25,7 @@ export interface TemplateRef {
 function TemplateContent({
   network,
   setNetwork,
-  templateState
+  templateState,
 }: {
   network: string;
   setNetwork: (network: string) => void;
@@ -73,7 +73,7 @@ function Template({ ref }: TemplateProps) {
 
   // Internal state management
   const templateState = useTemplateState({
-    network
+    network,
   });
 
   // Expose methods to parent via ref
@@ -84,14 +84,18 @@ function Template({ ref }: TemplateProps) {
       showAdd: templateState.actions.showAdd,
       showView: templateState.actions.showView,
       reset: templateState.actions.reset,
-      setNetwork: setNetwork
+      setNetwork: setNetwork,
     }),
-    [templateState.actions, setNetwork]
+    [templateState.actions, setNetwork],
   );
 
   return (
     <NetworkProvider network={network}>
-      <TemplateContent network={network} setNetwork={setNetwork} templateState={templateState} />
+      <TemplateContent
+        network={network}
+        setNetwork={setNetwork}
+        templateState={templateState}
+      />
     </NetworkProvider>
   );
 }

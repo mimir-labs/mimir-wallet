@@ -7,7 +7,12 @@ import type { HexString } from '@polkadot/util/types';
 import { addressToHex, allEndpoints } from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 
-import { BATCH_TX_PREFIX, BATCH_TX_V2_PREFIX, HIDE_ACCOUNT_HEX_KEY, HIDE_ACCOUNT_PREFIX } from './constants';
+import {
+  BATCH_TX_PREFIX,
+  BATCH_TX_V2_PREFIX,
+  HIDE_ACCOUNT_HEX_KEY,
+  HIDE_ACCOUNT_PREFIX,
+} from './constants';
 
 const ADDRESS_BOOK_UPGRADE_VERSION_KEY = 'address_book_upgrade_version';
 const BATCH_TX_UPGRADE_VERSION_KEY = 'batch_tx_upgrade_version';
@@ -22,11 +27,18 @@ function upgradeAddressBookV1() {
 
   store.each((key: string, value) => {
     if (key.startsWith('address:0x')) {
-      const v = value as { address: string; meta: { name: string; watchlist?: boolean; genesisHash?: HexString } };
+      const v = value as {
+        address: string;
+        meta: { name: string; watchlist?: boolean; genesisHash?: HexString };
+      };
 
       store.set(key, {
         address: v.address,
-        meta: { name: v.meta.name, watchlist: !!v.meta.watchlist, networks: ['polkadot', 'paseo'] }
+        meta: {
+          name: v.meta.name,
+          watchlist: !!v.meta.watchlist,
+          networks: ['polkadot', 'paseo'],
+        },
       });
     }
   });
@@ -49,13 +61,17 @@ function upgradeBatchTxV1() {
 
       const genesisHash = key.replace(BATCH_TX_PREFIX, '');
 
-      const network = allEndpoints.find((item) => item.genesisHash === genesisHash)?.key;
+      const network = allEndpoints.find(
+        (item) => item.genesisHash === genesisHash,
+      )?.key;
 
       if (!network) {
         return;
       }
 
-      nextValue[network] = Object.entries(v).reduce<Record<HexString, BatchTxItem[]>>((acc, [address, txs]) => {
+      nextValue[network] = Object.entries(v).reduce<
+        Record<HexString, BatchTxItem[]>
+      >((acc, [address, txs]) => {
         acc[addressToHex(address)] = txs.map((tx) => ({ ...tx }));
 
         return acc;

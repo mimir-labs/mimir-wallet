@@ -3,13 +3,15 @@
 
 export function createNamedHook<F extends (...args: any[]) => any>(
   name: string,
-  fn: F
+  fn: F,
 ): (...args: Parameters<F>) => ReturnType<F> {
   return (...args: Parameters<F>): ReturnType<F> => {
     try {
       return fn(...args);
     } catch (error) {
-      throw new Error(`${name}:: ${(error as Error).message}:: ${(error as Error).stack || '<unknown>'}`);
+      throw new Error(
+        `${name}:: ${(error as Error).message}:: ${(error as Error).stack || '<unknown>'}`,
+      );
     }
   };
 }

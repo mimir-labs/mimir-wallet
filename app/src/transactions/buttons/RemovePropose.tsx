@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, ProposeTransaction, Transaction } from '@/hooks/types';
+import type {
+  AccountData,
+  ProposeTransaction,
+  Transaction,
+} from '@/hooks/types';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { service } from '@mimir-wallet/service';
@@ -15,7 +19,7 @@ import {
   ModalBody,
   ModalContent,
   ModalFooter,
-  ModalHeader
+  ModalHeader,
 } from '@mimir-wallet/ui';
 import React, { useState } from 'react';
 import { useToggle } from 'react-use';
@@ -32,7 +36,7 @@ import { accountSource } from '@/wallet/useWallet';
 function Content({
   filtered,
   transaction,
-  onRemove
+  onRemove,
 }: {
   filtered: string[];
   transaction: ProposeTransaction;
@@ -59,17 +63,24 @@ function Content({
       return;
     }
 
-    const injected = await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(CONNECT_ORIGIN);
+    const injected =
+      await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(
+        CONNECT_ORIGIN,
+      );
     const injectSigner = injected?.signer;
 
     if (!injectSigner) {
-      toastError(`Please connect to the wallet: ${walletConfig[source]?.name || source}`);
+      toastError(
+        `Please connect to the wallet: ${walletConfig[source]?.name || source}`,
+      );
 
       return;
     }
 
     if (!injectSigner.signRaw) {
-      toastError(`Wallet ${walletConfig[source]?.name || source} does not support signRaw`);
+      toastError(
+        `Wallet ${walletConfig[source]?.name || source} does not support signRaw`,
+      );
 
       return;
     }
@@ -86,10 +97,16 @@ Genesis Hash: ${genesisHash}`;
       const result = await injectSigner.signRaw({
         address: signer,
         data: message,
-        type: 'bytes'
+        type: 'bytes',
       });
 
-      await service.transaction.removePropose(network, transaction.id, signer, result.signature, time);
+      await service.transaction.removePropose(
+        network,
+        transaction.id,
+        signer,
+        result.signature,
+        time,
+      );
       onRemove();
       events.emit('refetch_pending_tx');
     } catch (error) {
@@ -101,13 +118,13 @@ Genesis Hash: ${genesisHash}`;
 
   return (
     <>
-      <ModalBody className='gap-y-5'>
+      <ModalBody className="gap-y-5">
         <Alert>
           <AlertTitle>{`Please select the signer address to remove the propose with id ${transaction.id}.`}</AlertTitle>
         </Alert>
         <InputAddress
-          label='Select signer'
-          placeholder='Please select signer address. e.g.5G789...'
+          label="Select signer"
+          placeholder="Please select signer address. e.g.5G789..."
           isSign
           filtered={filtered}
           value={signer}
@@ -116,7 +133,12 @@ Genesis Hash: ${genesisHash}`;
       </ModalBody>
       <Divider />
       <ModalFooter>
-        <Button fullWidth color='danger' onClick={handleConfirm} disabled={!signer || loading}>
+        <Button
+          fullWidth
+          color="danger"
+          onClick={handleConfirm}
+          disabled={!signer || loading}
+        >
           {loading ? buttonSpinner : null}
           Confirm
         </Button>
@@ -125,7 +147,13 @@ Genesis Hash: ${genesisHash}`;
   );
 }
 
-function RemovePropose({ account, transaction }: { account: AccountData; transaction: Transaction }) {
+function RemovePropose({
+  account,
+  transaction,
+}: {
+  account: AccountData;
+  transaction: Transaction;
+}) {
   const [isOpen, toggleOpen] = useToggle(false);
   const filtered = useProposeFilterForRemove(account, transaction);
 
@@ -135,7 +163,7 @@ function RemovePropose({ account, transaction }: { account: AccountData; transac
 
   return (
     <>
-      <Button fullWidth variant='ghost' color='danger' onClick={toggleOpen}>
+      <Button fullWidth variant="ghost" color="danger" onClick={toggleOpen}>
         Remove Propose
       </Button>
 
@@ -143,7 +171,11 @@ function RemovePropose({ account, transaction }: { account: AccountData; transac
         <ModalContent>
           <ModalHeader>Remove Propose {transaction.id}</ModalHeader>
           <Divider />
-          <Content filtered={filtered} transaction={transaction} onRemove={toggleOpen} />
+          <Content
+            filtered={filtered}
+            transaction={transaction}
+            onRemove={toggleOpen}
+          />
         </ModalContent>
       </Modal>
     </>

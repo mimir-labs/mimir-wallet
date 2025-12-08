@@ -8,7 +8,8 @@ import type { HexString } from '@polkadot/util/types';
 import { encodeAddress } from '../utils/defaults.js';
 
 // Constants
-const ZERO_ADDRESS_HEX = '0x0000000000000000000000000000000000000000000000000000000000000000';
+const ZERO_ADDRESS_HEX =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 const DEFAULT_SS58_FORMAT = 42;
 const zeroAddress = encodeAddress(ZERO_ADDRESS_HEX, DEFAULT_SS58_FORMAT);
 
@@ -33,9 +34,11 @@ const extractAssetId = (event: Event, index: number, isHex = false): string => {
   return isHex ? event.data[index].toHex() : event.data[index].toString();
 };
 
-const extractAddress = (event: Event, index: number): string => event.data[index].toString();
+const extractAddress = (event: Event, index: number): string =>
+  event.data[index].toString();
 
-const extractAmount = (event: Event, index: number): bigint => BigInt(event.data[index].toString());
+const extractAmount = (event: Event, index: number): bigint =>
+  BigInt(event.data[index].toString());
 
 // Factory function to create standard event handlers
 function createTransferHandler(
@@ -43,13 +46,13 @@ function createTransferHandler(
   fromIndex: number,
   toIndex: number,
   amountIndex: number,
-  isHexAsset = false
+  isHexAsset = false,
 ): EventHandler {
   return {
     getAssetId: (event) => extractAssetId(event, assetIdIndex, isHexAsset),
     getFrom: (event) => extractAddress(event, fromIndex),
     getTo: (event) => extractAddress(event, toIndex),
-    getAmount: (event) => extractAmount(event, amountIndex)
+    getAmount: (event) => extractAmount(event, amountIndex),
   };
 }
 
@@ -57,13 +60,13 @@ function createBurnHandler(
   assetIdIndex: number,
   fromIndex: number,
   amountIndex: number,
-  isHexAsset = false
+  isHexAsset = false,
 ): EventHandler {
   return {
     getAssetId: (event) => extractAssetId(event, assetIdIndex, isHexAsset),
     getFrom: (event) => extractAddress(event, fromIndex),
     getTo: () => zeroAddress,
-    getAmount: (event) => extractAmount(event, amountIndex)
+    getAmount: (event) => extractAmount(event, amountIndex),
   };
 }
 
@@ -71,43 +74,107 @@ function createMintHandler(
   assetIdIndex: number,
   toIndex: number,
   amountIndex: number,
-  isHexAsset = false
+  isHexAsset = false,
 ): EventHandler {
   return {
     getAssetId: (event) => extractAssetId(event, assetIdIndex, isHexAsset),
     getFrom: () => zeroAddress,
     getTo: (event) => extractAddress(event, toIndex),
-    getAmount: (event) => extractAmount(event, amountIndex)
+    getAmount: (event) => extractAmount(event, amountIndex),
   };
 }
 
 // Configuration mapping for all supported events
 const EVENT_CONFIGS: EventConfig[] = [
   // Native balance events
-  { section: 'balances', method: 'Transfer', handler: createTransferHandler(-1, 0, 1, 2) },
-  { section: 'balances', method: 'Burned', handler: createBurnHandler(-1, 0, 1) },
-  { section: 'balances', method: 'Minted', handler: createMintHandler(-1, 0, 1) },
-  { section: 'balances', method: 'Deposit', handler: createMintHandler(-1, 0, 1) },
-  { section: 'balances', method: 'Withdraw', handler: createBurnHandler(-1, 0, 1) },
+  {
+    section: 'balances',
+    method: 'Transfer',
+    handler: createTransferHandler(-1, 0, 1, 2),
+  },
+  {
+    section: 'balances',
+    method: 'Burned',
+    handler: createBurnHandler(-1, 0, 1),
+  },
+  {
+    section: 'balances',
+    method: 'Minted',
+    handler: createMintHandler(-1, 0, 1),
+  },
+  {
+    section: 'balances',
+    method: 'Deposit',
+    handler: createMintHandler(-1, 0, 1),
+  },
+  {
+    section: 'balances',
+    method: 'Withdraw',
+    handler: createBurnHandler(-1, 0, 1),
+  },
 
   // Asset events
-  { section: 'assets', method: 'Transferred', handler: createTransferHandler(0, 1, 2, 3) },
+  {
+    section: 'assets',
+    method: 'Transferred',
+    handler: createTransferHandler(0, 1, 2, 3),
+  },
   { section: 'assets', method: 'Burned', handler: createBurnHandler(0, 1, 2) },
   { section: 'assets', method: 'Issued', handler: createMintHandler(0, 1, 2) },
-  { section: 'assets', method: 'Deposited', handler: createMintHandler(0, 1, 2) },
-  { section: 'assets', method: 'Withdrawn', handler: createBurnHandler(0, 1, 2) },
+  {
+    section: 'assets',
+    method: 'Deposited',
+    handler: createMintHandler(0, 1, 2),
+  },
+  {
+    section: 'assets',
+    method: 'Withdrawn',
+    handler: createBurnHandler(0, 1, 2),
+  },
 
   // Foreign asset events (using hex asset IDs)
-  { section: 'foreignAssets', method: 'Transferred', handler: createTransferHandler(0, 1, 2, 3, true) },
-  { section: 'foreignAssets', method: 'Burned', handler: createBurnHandler(0, 1, 2, true) },
-  { section: 'foreignAssets', method: 'Issued', handler: createMintHandler(0, 1, 2, true) },
-  { section: 'foreignAssets', method: 'Deposited', handler: createMintHandler(0, 1, 2, true) },
-  { section: 'foreignAssets', method: 'Withdrawn', handler: createBurnHandler(0, 1, 2, true) },
+  {
+    section: 'foreignAssets',
+    method: 'Transferred',
+    handler: createTransferHandler(0, 1, 2, 3, true),
+  },
+  {
+    section: 'foreignAssets',
+    method: 'Burned',
+    handler: createBurnHandler(0, 1, 2, true),
+  },
+  {
+    section: 'foreignAssets',
+    method: 'Issued',
+    handler: createMintHandler(0, 1, 2, true),
+  },
+  {
+    section: 'foreignAssets',
+    method: 'Deposited',
+    handler: createMintHandler(0, 1, 2, true),
+  },
+  {
+    section: 'foreignAssets',
+    method: 'Withdrawn',
+    handler: createBurnHandler(0, 1, 2, true),
+  },
 
   // Token events (using hex asset IDs)
-  { section: 'tokens', method: 'Transfer', handler: createTransferHandler(0, 1, 2, 3, true) },
-  { section: 'tokens', method: 'Deposited', handler: createMintHandler(0, 1, 2, true) },
-  { section: 'tokens', method: 'Withdrawn', handler: createBurnHandler(0, 1, 2, true) }
+  {
+    section: 'tokens',
+    method: 'Transfer',
+    handler: createTransferHandler(0, 1, 2, 3, true),
+  },
+  {
+    section: 'tokens',
+    method: 'Deposited',
+    handler: createMintHandler(0, 1, 2, true),
+  },
+  {
+    section: 'tokens',
+    method: 'Withdrawn',
+    handler: createBurnHandler(0, 1, 2, true),
+  },
 ];
 
 // Create a lookup map for faster event processing
@@ -123,7 +190,10 @@ for (const config of EVENT_CONFIGS) {
  * @param genesisHash - The genesis hash of the chain
  * @returns Array of parsed balance changes
  */
-export function parseBalancesChange(events: Event[], genesisHash: HexString): BalanceChange[] {
+export function parseBalancesChange(
+  events: Event[],
+  genesisHash: HexString,
+): BalanceChange[] {
   const changes: BalanceChange[] = [];
 
   for (const event of events) {
@@ -137,7 +207,7 @@ export function parseBalancesChange(events: Event[], genesisHash: HexString): Ba
           from: handler.getFrom(event),
           to: handler.getTo(event),
           amount: handler.getAmount(event),
-          genesisHash
+          genesisHash,
         });
       } catch (error) {
         // Log error but continue processing other events

@@ -14,7 +14,7 @@ export type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root>;
 function Checkbox({ className, checked, ...props }: CheckboxProps) {
   return (
     <CheckboxPrimitive.Root
-      data-slot='checkbox'
+      data-slot="checkbox"
       className={cn(
         'peer border-divider size-4 shrink-0 rounded-[5px] border shadow-xs transition-shadow outline-none',
         'data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:border-primary',
@@ -22,16 +22,20 @@ function Checkbox({ className, checked, ...props }: CheckboxProps) {
         'focus-visible:border-primary focus-visible:ring-primary/50 focus-visible:ring-[3px]',
         'aria-invalid:ring-danger/20 dark:aria-invalid:ring-danger/40 aria-invalid:border-danger',
         'disabled:cursor-not-allowed disabled:opacity-50',
-        className
+        className,
       )}
       checked={checked}
       {...props}
     >
       <CheckboxPrimitive.Indicator
-        data-slot='checkbox-indicator'
-        className='text-red grid place-content-center transition-none'
+        data-slot="checkbox-indicator"
+        className="text-red grid place-content-center transition-none"
       >
-        {checked === 'indeterminate' ? <MinusIcon className='size-3.5' /> : <CheckIcon className='size-3.5' />}
+        {checked === 'indeterminate' ? (
+          <MinusIcon className="size-3.5" />
+        ) : (
+          <CheckIcon className="size-3.5" />
+        )}
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

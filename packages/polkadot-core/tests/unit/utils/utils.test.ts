@@ -12,18 +12,21 @@ import {
   isPolkadotEvmAddress,
   isValidAddress,
   sub2Eth,
-  zeroAddress
+  zeroAddress,
 } from '../../../src/utils/utils.js';
 
 // Test addresses
 const ALICE_SS58 = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 const BOB_SS58 = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
-const ALICE_HEX = '0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d';
-const BOB_HEX = '0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48';
+const ALICE_HEX =
+  '0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d';
+const BOB_HEX =
+  '0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48';
 
 // EVM addresses
 const VALID_ETH_ADDRESS = '0x1234567890123456789012345678901234567890';
-const VALID_ETH_ADDRESS_CHECKSUMMED = '0x1234567890123456789012345678901234567890';
+const VALID_ETH_ADDRESS_CHECKSUMMED =
+  '0x1234567890123456789012345678901234567890';
 
 describe('utils', () => {
   describe('zeroAddress', () => {
@@ -223,7 +226,9 @@ describe('utils', () => {
 
       expect(ethAddress).toMatch(/^0x[a-fA-F0-9]{40}$/);
       // Regular address uses keccak256 hash, so it won't match the original
-      expect(ethAddress.toLowerCase()).not.toBe(VALID_ETH_ADDRESS.toLowerCase());
+      expect(ethAddress.toLowerCase()).not.toBe(
+        VALID_ETH_ADDRESS.toLowerCase(),
+      );
     });
 
     it('should produce consistent results for same input', () => {

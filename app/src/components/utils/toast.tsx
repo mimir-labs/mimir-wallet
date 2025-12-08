@@ -16,20 +16,24 @@ function getMessage(value: unknown): React.ReactNode {
 export function toastSuccess(message: any, description?: React.ReactNode) {
   return toast.success(
     description ? (
-      <div className='flex flex-col gap-1'>
+      <div className="flex flex-col gap-1">
         <b>{message}</b>
-        <span className='text-xs'>{description}</span>
+        <span className="text-xs">{description}</span>
       </div>
     ) : (
-      <div className='flex min-h-[30px] items-center'>{message}</div>
-    )
+      <div className="flex min-h-[30px] items-center">{message}</div>
+    ),
   );
 }
 
 export function toastError(error: any) {
-  return toast.error(<div className='flex min-h-[30px] items-center'>{getMessage(error)}</div>);
+  return toast.error(
+    <div className="flex min-h-[30px] items-center">{getMessage(error)}</div>,
+  );
 }
 
 export function toastWarn(error: any) {
-  return toast.warning(<div className='flex min-h-[30px] items-center'>{getMessage(error)}</div>);
+  return toast.warning(
+    <div className="flex min-h-[30px] items-center">{getMessage(error)}</div>,
+  );
 }

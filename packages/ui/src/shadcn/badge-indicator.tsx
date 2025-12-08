@@ -14,23 +14,25 @@ const badgeIndicatorVariants = cva(
         primary: 'bg-primary text-primary-foreground',
         danger: 'bg-danger text-white',
         success: 'bg-success text-white',
-        warning: 'bg-warning text-warning-foreground'
+        warning: 'bg-warning text-warning-foreground',
       },
       placement: {
         'top-right': 'top-0 right-0 translate-x-1/2 -translate-y-1/2',
         'bottom-right': 'bottom-0 right-0 translate-x-1/2 translate-y-1/2',
         'top-left': 'top-0 left-0 -translate-x-1/2 -translate-y-1/2',
-        'bottom-left': 'bottom-0 left-0 -translate-x-1/2 translate-y-1/2'
-      }
+        'bottom-left': 'bottom-0 left-0 -translate-x-1/2 translate-y-1/2',
+      },
     },
     defaultVariants: {
       color: 'primary',
-      placement: 'top-right'
-    }
-  }
+      placement: 'top-right',
+    },
+  },
 );
 
-export interface BadgeIndicatorProps extends VariantProps<typeof badgeIndicatorVariants> {
+export interface BadgeIndicatorProps extends VariantProps<
+  typeof badgeIndicatorVariants
+> {
   children: React.ReactNode;
   content?: React.ReactNode;
   isInvisible?: boolean;
@@ -47,20 +49,23 @@ function BadgeIndicator({
   isInvisible = false,
   isDot = false,
   className,
-  badgeClassName
+  badgeClassName,
 }: BadgeIndicatorProps) {
   const showBadge = !isInvisible;
 
   return (
-    <div data-slot='badge-indicator' className={cn('relative inline-flex', className)}>
+    <div
+      data-slot="badge-indicator"
+      className={cn('relative inline-flex', className)}
+    >
       {children}
       {showBadge && (
         <span
-          data-slot='badge-indicator-badge'
+          data-slot="badge-indicator-badge"
           className={cn(
             badgeIndicatorVariants({ color, placement }),
             isDot ? 'size-2 min-h-2 min-w-2' : 'min-h-4 min-w-4 px-1',
-            badgeClassName
+            badgeClassName,
           )}
         >
           {!isDot && content}

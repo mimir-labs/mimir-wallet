@@ -1,7 +1,8 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import lottie, { type AnimationItem } from 'lottie-web';
+import type { AnimationItem } from 'lottie-web';
+
 import { useEffect, useRef } from 'react';
 
 import DataJson from './lottie-success.json';
@@ -12,15 +13,18 @@ function Success({ size = 28 }: { size?: number }) {
   useEffect(() => {
     let animation: AnimationItem | null = null;
 
-    if (container.current) {
-      animation = lottie.loadAnimation({
-        container: container.current,
-        renderer: 'svg',
-        loop: false,
-        autoplay: true,
-        animationData: DataJson
-      });
-    }
+    // Dynamic import lottie-web to avoid loading on page init (~307KB)
+    import('lottie-web').then((lottie) => {
+      if (container.current) {
+        animation = lottie.default.loadAnimation({
+          container: container.current,
+          renderer: 'svg',
+          loop: false,
+          autoplay: true,
+          animationData: DataJson,
+        });
+      }
+    });
 
     return () => {
       animation?.destroy();

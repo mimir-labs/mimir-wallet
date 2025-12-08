@@ -7,32 +7,39 @@ import {
   assetDispatchError,
   assetXcmV5TraitsError,
   TxDispatchError,
-  TxModuleError
+  TxModuleError,
 } from '../../../src/tx/dispatch-error.js';
 
 // Helper to create mock API
-function createMockApi(metaError?: { section: string; method: string; docs: string[] }) {
+function createMockApi(metaError?: {
+  section: string;
+  method: string;
+  docs: string[];
+}) {
   return {
     registry: {
       findMetaError: vi.fn().mockReturnValue(
         metaError || {
           section: 'balances',
           method: 'InsufficientBalance',
-          docs: ['Balance too low to send value.']
-        }
-      )
-    }
+          docs: ['Balance too low to send value.'],
+        },
+      ),
+    },
   } as any;
 }
 
 // Helper to create mock dispatch error
-function createMockDispatchError(type: 'Module' | 'Token' | 'Arithmetic' | 'Transactional' | 'Other', value?: any) {
+function createMockDispatchError(
+  type: 'Module' | 'Token' | 'Arithmetic' | 'Transactional' | 'Other',
+  value?: any,
+) {
   const error: any = {
     type,
     isModule: type === 'Module',
     isToken: type === 'Token',
     isArithmetic: type === 'Arithmetic',
-    isTransactional: type === 'Transactional'
+    isTransactional: type === 'Transactional',
   };
 
   if (type === 'Module') {
@@ -66,7 +73,12 @@ describe('dispatch-error', () => {
 
   describe('TxModuleError', () => {
     it('should be instance of TxDispatchError', () => {
-      const error = new TxModuleError('Test', 'balances', 'InsufficientBalance', ['Not enough funds']);
+      const error = new TxModuleError(
+        'Test',
+        'balances',
+        'InsufficientBalance',
+        ['Not enough funds'],
+      );
 
       expect(error).toBeInstanceOf(Error);
       expect(error).toBeInstanceOf(TxDispatchError);
@@ -74,7 +86,9 @@ describe('dispatch-error', () => {
     });
 
     it('should store section, method, and docs', () => {
-      const error = new TxModuleError('Test', 'staking', 'NotController', ['Account is not controller']);
+      const error = new TxModuleError('Test', 'staking', 'NotController', [
+        'Account is not controller',
+      ]);
 
       expect(error.section).toBe('staking');
       expect(error.method).toBe('NotController');
@@ -82,12 +96,16 @@ describe('dispatch-error', () => {
     });
 
     it('should generate correct shortMessage', () => {
-      const error = new TxModuleError('Test', 'balances', 'InsufficientBalance', [
-        'Balance too low.',
-        'Second line of docs.'
-      ]);
+      const error = new TxModuleError(
+        'Test',
+        'balances',
+        'InsufficientBalance',
+        ['Balance too low.', 'Second line of docs.'],
+      );
 
-      expect(error.shortMessage).toBe('balances.InsufficientBalance: Balance too low.\nSecond line of docs.');
+      expect(error.shortMessage).toBe(
+        'balances.InsufficientBalance: Balance too low.\nSecond line of docs.',
+      );
     });
 
     it('should handle empty docs array', () => {
@@ -102,7 +120,7 @@ describe('dispatch-error', () => {
       const api = createMockApi({
         section: 'balances',
         method: 'InsufficientBalance',
-        docs: ['Balance too low to send value.']
+        docs: ['Balance too low to send value.'],
       });
       const dispatchError = createMockDispatchError('Module');
 
@@ -116,7 +134,10 @@ describe('dispatch-error', () => {
 
     it('should parse Token error', () => {
       const api = createMockApi();
-      const dispatchError = createMockDispatchError('Token', 'FundsUnavailable');
+      const dispatchError = createMockDispatchError(
+        'Token',
+        'FundsUnavailable',
+      );
 
       const error = assetDispatchError(api, dispatchError);
 
@@ -136,7 +157,10 @@ describe('dispatch-error', () => {
 
     it('should parse Transactional error', () => {
       const api = createMockApi();
-      const dispatchError = createMockDispatchError('Transactional', 'LimitReached');
+      const dispatchError = createMockDispatchError(
+        'Transactional',
+        'LimitReached',
+      );
 
       const error = assetDispatchError(api, dispatchError);
 
@@ -157,7 +181,14 @@ describe('dispatch-error', () => {
     it('should handle different Token error types', () => {
       const api = createMockApi();
 
-      const errors = ['FundsUnavailable', 'OnlyProvider', 'BelowMinimum', 'CannotCreate', 'UnknownAsset', 'Frozen'];
+      const errors = [
+        'FundsUnavailable',
+        'OnlyProvider',
+        'BelowMinimum',
+        'CannotCreate',
+        'UnknownAsset',
+        'Frozen',
+      ];
 
       for (const tokenType of errors) {
         const dispatchError = createMockDispatchError('Token', tokenType);
@@ -173,7 +204,10 @@ describe('dispatch-error', () => {
       const errors = ['Overflow', 'Underflow', 'DivisionByZero'];
 
       for (const arithmeticType of errors) {
-        const dispatchError = createMockDispatchError('Arithmetic', arithmeticType);
+        const dispatchError = createMockDispatchError(
+          'Arithmetic',
+          arithmeticType,
+        );
         const error = assetDispatchError(api, dispatchError);
 
         expect(error.message).toBe(`Arithmetic Error: ${arithmeticType}`);
@@ -232,7 +266,7 @@ describe('dispatch-error', () => {
         'WeightLimitReached',
         'Barrier',
         'WeightNotComputable',
-        'ExceedsStackLimit'
+        'ExceedsStackLimit',
       ];
 
       for (const errorType of errorTypes) {

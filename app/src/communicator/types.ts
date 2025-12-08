@@ -9,7 +9,11 @@ export interface State {
   genesisHash: HexString;
   extrinsicSign(
     payload: SignerPayloadJSON,
-    id: string
-  ): Promise<{ id: string; signature: HexString; signedTransaction?: HexString }>;
+    id: string,
+  ): Promise<{
+    id: string;
+    signature: HexString;
+    signedTransaction?: HexString;
+  }>;
   getAccounts(): ResponseTypes['pub(accounts.list)'];
 }

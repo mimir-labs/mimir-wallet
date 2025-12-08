@@ -12,7 +12,7 @@ import {
   ethereumEncode,
   isEthereumAddress,
   keccak256AsU8a,
-  validateAddress
+  validateAddress,
 } from '@polkadot/util-crypto';
 
 // Cache for address to hex performance
@@ -32,7 +32,10 @@ export function addressToHex(address: string | HexString): HexString {
   return hex;
 }
 
-export function addressEq(a?: string | HexString | null, b?: string | HexString | null): boolean {
+export function addressEq(
+  a?: string | HexString | null,
+  b?: string | HexString | null,
+): boolean {
   if (!(a && b)) return false;
 
   if (a === b) {
@@ -49,7 +52,10 @@ export function addressEq(a?: string | HexString | null, b?: string | HexString 
   }
 }
 
-export function findAction(registry: Registry, call: IMethod | ICall): [string, string] | null {
+export function findAction(
+  registry: Registry,
+  call: IMethod | ICall,
+): [string, string] | null {
   try {
     const callFunc = registry.findMetaCall(call.callIndex);
 
@@ -77,7 +83,10 @@ export function isPolkadotEvmAddress(address?: string | null): boolean {
   }
 
   try {
-    return u8aToHex(decodeAddress(address).slice(20)) === '0xeeeeeeeeeeeeeeeeeeeeeeee';
+    return (
+      u8aToHex(decodeAddress(address).slice(20)) ===
+      '0xeeeeeeeeeeeeeeeeeeeeeeee'
+    );
   } catch {
     return false;
   }
@@ -87,7 +96,10 @@ export function isEthAddress(address?: string | undefined | null): boolean {
   return address ? isEthereumAddress(address) : false;
 }
 
-export function evm2Ss58(address: string | undefined | null, ss58Format: number): string {
+export function evm2Ss58(
+  address: string | undefined | null,
+  ss58Format: number,
+): string {
   if (!address) {
     return '';
   }
@@ -129,5 +141,7 @@ export function sub2Eth(address: string | undefined | null) {
 // check the address is valid
 // if polkavm is true, check the address is valid for ethereum address
 export function isValidAddress(address?: string, polkavm: boolean = false) {
-  return isPolkadotAddress(address) || (polkavm ? isEthAddress(address) : false);
+  return (
+    isPolkadotAddress(address) || (polkavm ? isEthAddress(address) : false)
+  );
 }

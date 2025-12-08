@@ -9,13 +9,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={'light'}
-      className='toaster group'
+      className="toaster group"
       style={
         {
           '--normal-bg': 'var(--color-popover)',
           '--normal-text': 'var(--color-popover-foreground)',
           '--normal-border': 'transparent',
-          '--border-radius': '20px'
+          '--border-radius': '20px',
         } as React.CSSProperties
       }
       {...props}

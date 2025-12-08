@@ -46,7 +46,9 @@ export function useAddressStructureNetworks(address?: string | null) {
       });
 
       // Filter and return networks
-      const supported = chains.filter((item) => genesisHashes.has(item.genesisHash));
+      const supported = chains.filter((item) =>
+        genesisHashes.has(item.genesisHash),
+      );
 
       return supported.length > 0 ? supported : undefined;
     }

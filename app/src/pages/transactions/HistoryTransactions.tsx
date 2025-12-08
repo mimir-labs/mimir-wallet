@@ -15,7 +15,7 @@ function HistoryTransactions({
   isFetching: propsIsFetching,
   network,
   address,
-  txId
+  txId,
 }: {
   isFetched: boolean;
   isFetching: boolean;
@@ -23,12 +23,8 @@ function HistoryTransactions({
   address: string;
   txId?: string;
 }) {
-  const [data, isFetched, isFetching, hasNexPage, , fetchNextPage] = useHistoryTransactions(
-    network,
-    address,
-    limit,
-    txId
-  );
+  const [data, isFetched, isFetching, hasNexPage, , fetchNextPage] =
+    useHistoryTransactions(network, address, limit, txId);
 
   const groupedTransactions = useMemo(() => {
     return groupTransactionsByDate(data);
@@ -37,23 +33,31 @@ function HistoryTransactions({
   const sentinelRef = useInfiniteScroll({
     onLoadMore: fetchNextPage,
     hasMore: hasNexPage,
-    loading: isFetching
+    loading: isFetching,
   });
 
   return (
-    <div className='flex flex-col gap-5'>
+    <div className="flex flex-col gap-5">
       <GroupedTransactions
-        showSkeleton={(!isFetched && isFetching) || (!propsIsFetched && propsIsFetching) || (isFetching && hasNexPage)}
+        showSkeleton={
+          (!isFetched && isFetching) ||
+          (!propsIsFetched && propsIsFetching) ||
+          (isFetching && hasNexPage)
+        }
         groupedTransactions={groupedTransactions}
         defaultOpenFirst={false}
-        spacing='md'
+        spacing="md"
       />
 
       {/* End message */}
-      {!hasNexPage && data.length > 0 && <h6 className='text-foreground/50 text-center text-sm'>No more data.</h6>}
+      {!hasNexPage && data.length > 0 && (
+        <h6 className="text-foreground/50 text-center text-sm">
+          No more data.
+        </h6>
+      )}
 
       {/* Intersection Observer sentinel */}
-      {isFetching ? null : <div ref={sentinelRef} className='h-1' />}
+      {isFetching ? null : <div ref={sentinelRef} className="h-1" />}
     </div>
   );
 }

@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { BlockEntry, Database, KeyValueEntry } from '@acala-network/chopsticks-core';
+import type {
+  BlockEntry,
+  Database,
+  KeyValueEntry,
+} from '@acala-network/chopsticks-core';
 
 import { type DBSchema, type IDBPDatabase, openDB } from 'idb';
 
@@ -26,7 +30,7 @@ export class IdbDatabase implements Database {
         const blockStore = db.createObjectStore('block', { keyPath: 'hash' });
 
         blockStore.createIndex('byNumber', 'number');
-      }
+      },
     });
   }
 
@@ -80,13 +84,20 @@ export class IdbDatabase implements Database {
     return db.count('block');
   }
 
-  async saveStorage(blockHash: `0x${string}`, key: `0x${string}`, value: `0x${string}` | null): Promise<void> {
+  async saveStorage(
+    blockHash: `0x${string}`,
+    key: `0x${string}`,
+    value: `0x${string}` | null,
+  ): Promise<void> {
     const db = await this.datasource;
 
     await db.put('keyValue', value, `${blockHash}-${key}`);
   }
 
-  async queryStorage(blockHash: `0x${string}`, key: `0x${string}`): Promise<KeyValueEntry | null> {
+  async queryStorage(
+    blockHash: `0x${string}`,
+    key: `0x${string}`,
+  ): Promise<KeyValueEntry | null> {
     const db = await this.datasource;
     const value = await db.get('keyValue', `${blockHash}-${key}`);
 

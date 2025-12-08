@@ -47,68 +47,81 @@ function AccountInfoComponent({ address, onAccountOpen }: AccountInfoProps) {
   const formatUsd = formatDisplay(totalUsd.toString());
 
   return (
-    <div className='border-secondary rounded-[10px] border-1'>
+    <div className="border-secondary rounded-[10px] border-1">
       {/* Account header with address */}
       <div
-        className='hover:bg-secondary transition-background flex w-full cursor-pointer items-center gap-2.5 rounded-t-[10px] bg-transparent p-2.5'
+        className="hover:bg-secondary transition-background flex w-full cursor-pointer items-center gap-2.5 rounded-t-[10px] bg-transparent p-2.5"
         onClick={handleAccountOpen}
       >
-        <AddressCell value={address} withIconBorder shorten withAddressBook showNetworkProxied />
-        <ArrowRight className='text-primary' />
+        <AddressCell
+          value={address}
+          withIconBorder
+          shorten
+          withAddressBook
+          showNetworkProxied
+        />
+        <ArrowRight className="text-primary" />
       </div>
 
-      <Divider className='mx-2.5 w-auto' />
-      <Divider className='mx-2.5 w-auto' />
+      <Divider className="mx-2.5 w-auto" />
+      <Divider className="mx-2.5 w-auto" />
 
       {/* Balance display */}
-      <p className='text-foreground/65 p-2.5 text-xs'>
+      <p className="text-foreground/65 p-2.5 text-xs">
         $ {formatUsd[0]}
         {formatUsd[1] ? `.${formatUsd[1]}` : ''}
         {formatUsd[2] || ''}
       </p>
 
-      <Divider className='mx-2.5 w-auto' />
+      <Divider className="mx-2.5 w-auto" />
 
       {/* Action buttons */}
-      <div className='flex items-center p-2.5'>
-        <Tooltip content='QR Code'>
+      <div className="flex items-center p-2.5">
+        <Tooltip content="QR Code">
           <Button
             isIconOnly
-            className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
-            color='primary'
-            variant='light'
+            className="h-[26px] min-h-[0px] w-[26px] min-w-[0px]"
+            color="primary"
+            variant="light"
             onClick={handleQrOpen}
-            size='sm'
+            size="sm"
           >
-            <IconQr className='h-4 w-4' />
+            <IconQr className="h-4 w-4" />
           </Button>
         </Tooltip>
-        <Tooltip content='Copy'>
-          <CopyAddress address={address} color='primary' className='text-primary opacity-100' />
+        <Tooltip content="Copy">
+          <CopyAddress
+            address={address}
+            color="primary"
+            className="text-primary opacity-100"
+          />
         </Tooltip>
-        <Tooltip content='Explorer'>
+        <Tooltip content="Explorer">
           <Button
             isIconOnly
-            className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
-            color='primary'
-            variant='light'
-            size='sm'
+            className="h-[26px] min-h-[0px] w-[26px] min-w-[0px]"
+            color="primary"
+            variant="light"
+            size="sm"
             onClick={handleExplorerOpen}
           >
-            <IconLink className='h-4 w-4' />
+            <IconLink className="h-4 w-4" />
           </Button>
         </Tooltip>
-        <Tooltip content='Transfer'>
+        <Tooltip content="Transfer">
           <Button
             asChild
             isIconOnly
-            className='h-[26px] min-h-[0px] w-[26px] min-w-[0px]'
-            color='primary'
-            variant='light'
-            size='sm'
+            className="h-[26px] min-h-[0px] w-[26px] min-w-[0px]"
+            color="primary"
+            variant="light"
+            size="sm"
           >
-            <Link to='/explorer/$url' params={{ url: encodeURI('mimir://app/transfer') }}>
-              <IconTransfer className='h-4 w-4' />
+            <Link
+              to="/explorer/$url"
+              params={{ url: encodeURI('mimir://app/transfer') }}
+            >
+              <IconTransfer className="h-4 w-4" />
             </Link>
           </Button>
         </Tooltip>

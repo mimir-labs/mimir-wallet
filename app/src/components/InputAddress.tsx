@@ -13,12 +13,25 @@ import {
   isValidAddress as isValidAddressUtil,
   useNetwork,
   useSs58Format,
-  zeroAddress
+  zeroAddress,
 } from '@mimir-wallet/polkadot-core';
-import { Divider, Popover, PopoverContent, PopoverTrigger, Tooltip } from '@mimir-wallet/ui';
+import {
+  Divider,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+} from '@mimir-wallet/ui';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { clsx } from 'clsx';
-import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useToggle } from 'react-use';
 
 import AddressCell from './AddressCell';
@@ -40,14 +53,18 @@ function createOptions(
   metas: Record<string, AddressMeta>,
   input?: string,
   filtered?: string[],
-  excluded?: string[]
+  excluded?: string[],
 ): string[] {
   const list: Set<string> = new Set();
   const identity = useIdentityStore.getState();
 
   // Pre-compute hex addresses for excluded/filtered for O(1) lookup
-  const excludedSet = excluded?.length ? new Set(excluded.map((addr) => addressToHex(addr))) : null;
-  const filteredSet = filtered?.length ? new Set(filtered.map((addr) => addressToHex(addr))) : null;
+  const excludedSet = excluded?.length
+    ? new Set(excluded.map((addr) => addressToHex(addr)))
+    : null;
+  const filteredSet = filtered?.length
+    ? new Set(filtered.map((addr) => addressToHex(addr)))
+    : null;
 
   // Pre-compute lowercase input once
   const inputLower = input?.toLowerCase();
@@ -55,7 +72,11 @@ function createOptions(
   const inputHex = isAddressInput ? addressToHex(input!) : null;
 
   // Helper function to check if address matches search criteria
-  const matchesSearch = (address: string, addressHex: string, name?: string): boolean => {
+  const matchesSearch = (
+    address: string,
+    addressHex: string,
+    name?: string,
+  ): boolean => {
     if (!input) return true;
 
     if (isAddressInput && inputHex) {
@@ -64,7 +85,9 @@ function createOptions(
 
     const addressLower = address.toLowerCase();
     const nameLower = name?.toLowerCase();
-    const identityValue = (identity as Record<string, string>)[addressHex]?.toLowerCase();
+    const identityValue = (identity as Record<string, string>)[
+      addressHex
+    ]?.toLowerCase();
 
     return (
       addressLower.includes(inputLower!) ||
@@ -131,18 +154,30 @@ function InputAddress({
   addressType = 'cell',
   endContent,
   withAddButton,
-  withZeroAddress = false
+  withZeroAddress = false,
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
   const { ss58: chainSS58 } = useSs58Format();
   const { chain } = useNetwork();
   const polkavm = chain.polkavm;
-  const { accounts, addresses, isLocalAccount, isLocalAddress, addAddressBook, metas } = useAccount();
+  const {
+    accounts,
+    addresses,
+    isLocalAccount,
+    isLocalAddress,
+    addAddressBook,
+    metas,
+  } = useAccount();
   const [value, setValue] = useState<string>(
-    isValidAddressUtil(propsValue || defaultValue, polkavm) ? propsValue || defaultValue || '' : ''
+    isValidAddressUtil(propsValue || defaultValue, polkavm)
+      ? propsValue || defaultValue || ''
+      : '',
   );
   // const [inputValue, setInputValue] = useState<string>('');
-  const [[inputValue, isValidAddress], setInputValue] = useInputAddress(undefined, polkavm);
+  const [[inputValue, isValidAddress], setInputValue] = useInputAddress(
+    undefined,
+    polkavm,
+  );
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -152,15 +187,28 @@ function InputAddress({
   const onChangeRef = useRef(onChange);
   const stateRef = useRef({
     polkavm,
-    chainSS58
+    chainSS58,
   });
 
   // Memoize options computation to avoid unnecessary recalculations
   const options = useMemo(() => {
-    const list = sortAccounts(createOptions(accounts, addresses, isSign, metas, inputValue, filtered, excluded), metas);
+    const list = sortAccounts(
+      createOptions(
+        accounts,
+        addresses,
+        isSign,
+        metas,
+        inputValue,
+        filtered,
+        excluded,
+      ),
+      metas,
+    );
 
     if (list.length === 0 && isValidAddressUtil(inputValue, polkavm)) {
-      list.push(isEthAddress(inputValue) ? evm2Ss58(inputValue, chainSS58) : inputValue);
+      list.push(
+        isEthAddress(inputValue) ? evm2Ss58(inputValue, chainSS58) : inputValue,
+      );
     }
 
     if (withZeroAddress && !inputValue) {
@@ -168,7 +216,18 @@ function InputAddress({
     }
 
     return list;
-  }, [accounts, addresses, chainSS58, excluded, filtered, inputValue, isSign, metas, polkavm, withZeroAddress]);
+  }, [
+    accounts,
+    addresses,
+    chainSS58,
+    excluded,
+    filtered,
+    inputValue,
+    isSign,
+    metas,
+    polkavm,
+    withZeroAddress,
+  ]);
 
   // Set up virtualizer for efficient list rendering
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -178,7 +237,7 @@ function InputAddress({
     estimateSize: () => (addressType === 'cell' ? 50 : 40), // estimated row height
     overscan: 10, // render 10 extra items above/below viewport
     // Provide initial measurement to prevent empty state on first open
-    initialRect: { width: 0, height: 250 }
+    initialRect: { width: 0, height: 250 },
   });
 
   // Remeasure when dropdown opens to ensure virtualizer has correct dimensions
@@ -203,7 +262,9 @@ function InputAddress({
     const key = value || '';
 
     if (isValidAddressUtil(key, stateRef.current.polkavm)) {
-      onChangeRef.current?.(isEthAddress(key) ? evm2Ss58(key, stateRef.current.chainSS58) : key);
+      onChangeRef.current?.(
+        isEthAddress(key) ? evm2Ss58(key, stateRef.current.chainSS58) : key,
+      );
     } else if (key === '') {
       onChangeRef.current?.('');
     }
@@ -220,7 +281,7 @@ function InputAddress({
       setInputValue('');
       toggleOpen(false);
     },
-    [chainSS58, polkavm, setInputValue, toggleOpen]
+    [chainSS58, polkavm, setInputValue, toggleOpen],
   );
 
   const handleOpen = useCallback(() => {
@@ -241,18 +302,30 @@ function InputAddress({
         setValue('');
       }
     }
-  }, [chainSS58, handleSelect, inputValue, isSign, isValidAddress, toggleOpen, value]);
+  }, [
+    chainSS58,
+    handleSelect,
+    inputValue,
+    isSign,
+    isValidAddress,
+    toggleOpen,
+    value,
+  ]);
 
   const element = (
     <div
       data-hide={isOpen && isFocused}
-      className='inline-flex w-[calc(100%-20px)] grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden [&[data-hide=true]_.AddressRow-Content]:hidden'
+      className="inline-flex w-[calc(100%-20px)] grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden [&[data-hide=true]_.AddressRow-Content]:hidden"
     >
       {addressType === 'cell' ? (
-        <AddressCell iconSize={iconSize} value={value} shorten={upSm ? shorten : true} />
+        <AddressCell
+          iconSize={iconSize}
+          value={value}
+          shorten={upSm ? shorten : true}
+        />
       ) : (
         <AddressRow
-          className='[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal'
+          className="[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal"
           iconSize={iconSize}
           value={value}
           shorten={upSm ? shorten : true}
@@ -262,7 +335,10 @@ function InputAddress({
     </div>
   );
 
-  const valueIsPolkadotEvmAddress = useMemo(() => isPolkadotEvmAddress(value), [value]);
+  const valueIsPolkadotEvmAddress = useMemo(
+    () => isPolkadotEvmAddress(value),
+    [value],
+  );
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLOrSVGElement, MouseEvent>) => {
@@ -271,7 +347,7 @@ function InputAddress({
       if (isOpen) handleClose();
       else handleOpen();
     },
-    [handleClose, handleOpen, isOpen]
+    [handleClose, handleOpen, isOpen],
   );
 
   return (
@@ -279,10 +355,13 @@ function InputAddress({
       data-disabled={disabled}
       className={`input-address-wrapper w-full space-y-2 data-[disabled=true]:pointer-events-none ${className || ''}`}
     >
-      {label && <div className='text-sm font-bold'>{label}</div>}
+      {label && <div className="text-sm font-bold">{label}</div>}
 
-      <div className='input-address-base flex gap-2.5'>
-        <Popover open={isOpen} onOpenChange={(state) => (state ? handleOpen() : handleClose())}>
+      <div className="input-address-base flex gap-2.5">
+        <Popover
+          open={isOpen}
+          onOpenChange={(state) => (state ? handleOpen() : handleClose())}
+        >
           <PopoverTrigger asChild>
             <div
               ref={wrapperRef}
@@ -292,10 +371,10 @@ function InputAddress({
               {element}
               <input
                 ref={inputRef}
-                className='absolute top-0 right-0 bottom-0 left-0 rounded-[10px] border-none bg-transparent outline-none'
+                className="absolute top-0 right-0 bottom-0 left-0 rounded-[10px] border-none bg-transparent outline-none"
                 style={{
                   opacity: (isFocused && isOpen) || !value ? 1 : 0,
-                  paddingLeft: iconSize + 8 + (addressType === 'cell' ? 10 : 5)
+                  paddingLeft: iconSize + 8 + (addressType === 'cell' ? 10 : 5),
                 }}
                 value={inputValue}
                 placeholder={placeholder}
@@ -306,9 +385,9 @@ function InputAddress({
               />
 
               {value && !isLocalAccount(value) && !isLocalAddress(value) ? (
-                <Tooltip color='foreground' content='Add to address book'>
+                <Tooltip color="foreground" content="Add to address book">
                   <IconAddressBook
-                    className='text-divider hover:text-primary absolute top-1/2 right-8 -translate-y-1/2 cursor-pointer transition-colors'
+                    className="text-divider hover:text-primary absolute top-1/2 right-8 -translate-y-1/2 cursor-pointer transition-colors"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -320,7 +399,7 @@ function InputAddress({
 
               <ArrowDown
                 data-open={isOpen}
-                className='absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180'
+                className="absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180"
                 style={{ color: 'inherit' }}
                 onClick={handleClick}
               />
@@ -328,12 +407,20 @@ function InputAddress({
           </PopoverTrigger>
           <PopoverContent
             style={{ width: wrapperRef.current?.clientWidth }}
-            className='border-divider border-1 p-[5px]'
+            className="border-divider border-1 p-[5px]"
           >
             {options.length > 0 ? (
-              <div ref={scrollContainerRef} className={clsx('text-foreground max-h-[250px] overflow-y-auto')}>
+              <div
+                ref={scrollContainerRef}
+                className={clsx(
+                  'text-foreground max-h-[250px] overflow-y-auto',
+                )}
+              >
                 <ul
-                  className={clsx('relative flex list-none flex-col', addressType === 'cell' ? '' : 'gap-2.5')}
+                  className={clsx(
+                    'relative flex list-none flex-col',
+                    addressType === 'cell' ? '' : 'gap-2.5',
+                  )}
                   style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
                 >
                   {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -347,7 +434,7 @@ function InputAddress({
                             top: 0,
                             left: 0,
                             width: '100%',
-                            transform: `translateY(${virtualRow.start}px)`
+                            transform: `translateY(${virtualRow.start}px)`,
                           }}
                           onClick={() => {
                             const shouldContinue = onSelect?.(item);
@@ -361,14 +448,21 @@ function InputAddress({
                           }}
                           className={clsx(
                             'text-foreground transition-background hover:bg-secondary flex cursor-pointer items-center justify-between rounded-[10px] px-2 py-1.5',
-                            addressType === 'cell' ? '' : 'bg-secondary p-[5px]'
+                            addressType === 'cell'
+                              ? ''
+                              : 'bg-secondary p-[5px]',
                           )}
                         >
                           {addressType === 'cell' ? (
-                            <AddressCell addressCopyDisabled withCopy value={item} shorten={upSm ? shorten : true} />
+                            <AddressCell
+                              addressCopyDisabled
+                              withCopy
+                              value={item}
+                              shorten={upSm ? shorten : true}
+                            />
                           ) : (
                             <AddressRow
-                              className='[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal'
+                              className="[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal"
                               iconSize={iconSize}
                               value={item}
                               shorten={upSm ? shorten : true}
@@ -376,16 +470,20 @@ function InputAddress({
                               withAddress
                             />
                           )}
-                          {withAddButton ? <IconAdd className='text-primary' /> : undefined}
+                          {withAddButton ? (
+                            <IconAdd className="text-primary" />
+                          ) : undefined}
                         </li>
-                        {item === zeroAddress ? <Divider className='my-2.5' /> : null}
+                        {item === zeroAddress ? (
+                          <Divider className="my-2.5" />
+                        ) : null}
                       </React.Fragment>
                     );
                   })}
                 </ul>
               </div>
             ) : (
-              <div className='text-foreground/50 text-center'>no addresses</div>
+              <div className="text-foreground/50 text-center">no addresses</div>
             )}
           </PopoverContent>
         </Popover>
@@ -393,13 +491,17 @@ function InputAddress({
         {endContent ? <div>{endContent}</div> : null}
       </div>
 
-      {!isValidAddress && !!inputValue && <div className='text-danger mt-1 text-sm'>Invalid address</div>}
+      {!isValidAddress && !!inputValue && (
+        <div className="text-danger mt-1 text-sm">Invalid address</div>
+      )}
 
       {valueIsPolkadotEvmAddress ? (
-        <div className='mt-1 text-sm'>🥚✨ Yep, ETH address transfers work — magic, right? 😎</div>
+        <div className="mt-1 text-sm">
+          🥚✨ Yep, ETH address transfers work — magic, right? 😎
+        </div>
       ) : null}
 
-      {helper && <div className='text-foreground/50 text-xs'>{helper}</div>}
+      {helper && <div className="text-foreground/50 text-xs">{helper}</div>}
     </div>
   );
 }

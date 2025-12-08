@@ -5,13 +5,24 @@ import type { SignerPayloadJSON } from '@polkadot/types/types';
 import type { SessionTypes } from '@walletconnect/types';
 import type { Web3WalletTypes } from '@walletconnect/web3wallet';
 
-import { encodeAddress, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  encodeAddress,
+  useChains,
+  useNetwork,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { getSdkError } from '@walletconnect/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SESSION_ADD_EVENT } from './constants';
 import { WalletConnectContext } from './context';
-import { getActiveSessions, init, sendSessionError, sendSessionResponse, web3Wallet } from './wallet-connect';
+import {
+  getActiveSessions,
+  init,
+  sendSessionError,
+  sendSessionResponse,
+  web3Wallet,
+} from './wallet-connect';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
@@ -21,10 +32,13 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setReady] = useState(false);
   const [isError, setError] = useState(false);
   const [sessions, setSessions] = useState<SessionTypes.Struct[]>([]);
-  const [sessionProposal, setSessionProposal] = useState<Web3WalletTypes.SessionProposal>();
+  const [sessionProposal, setSessionProposal] =
+    useState<Web3WalletTypes.SessionProposal>();
   const { current } = useAccount();
   const [, , , , promise] = useQueryAccountOmniChain(current);
-  const handlerRef = useRef<((event: Web3WalletTypes.SessionRequest) => void) | undefined>(undefined);
+  const handlerRef = useRef<
+    ((event: Web3WalletTypes.SessionRequest) => void) | undefined
+  >(undefined);
   const { chains: networks, mode } = useChains();
   const { chain, network: currentNetwork } = useNetwork();
   const { ss58: chainSS58 } = useSs58Format();
@@ -37,7 +51,8 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
 
     switch (params.request.method) {
       case 'polkadot_signTransaction': {
-        const payload: SignerPayloadJSON = params.request.params.transactionPayload;
+        const payload: SignerPayloadJSON =
+          params.request.params.transactionPayload;
 
         console.log('transactionPayload', payload);
 
@@ -46,14 +61,18 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
 
           if (data && data.type === 'pure') {
             if (payload.genesisHash !== data.network) {
-              throw new Error(`Network not supported for this account, only ${data.network} is supported`);
+              throw new Error(
+                `Network not supported for this account, only ${data.network} is supported`,
+              );
             }
           }
 
           let network: string | undefined;
 
           if (mode === 'omni') {
-            network = networks.find((item) => item.genesisHash === payload.genesisHash)?.key;
+            network = networks.find(
+              (item) => item.genesisHash === payload.genesisHash,
+            )?.key;
 
             if (!network) {
               throw new Error(`Network not supported`);
@@ -75,9 +94,10 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
             iconUrl: session?.peer.metadata.icons?.[0],
             appName: session?.peer.metadata.name,
             alert: (
-              <span className='font-normal'>
-                When using WalletConnect, the app may show a failed message, but the transaction might still succeed.
-                Please check the result in Mimir’s <b>Pending page</b> for accuracy.
+              <span className="font-normal">
+                When using WalletConnect, the app may show a failed message, but
+                the transaction might still succeed. Please check the result in
+                Mimir’s <b>Pending page</b> for accuracy.
               </span>
             ),
             onSignature: (signer, signature, signedTransaction, payload) => {
@@ -89,8 +109,8 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
                   signature,
                   signer,
                   payload,
-                  ...(signedTransaction ? { signedTransaction } : {})
-                }
+                  ...(signedTransaction ? { signedTransaction } : {}),
+                },
               });
             },
             onResults: (data) => {
@@ -99,23 +119,24 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
                 id,
                 error: {
                   code: 9999,
-                  message: 'Transaction sent in mimir, please check the transaction in the mimir wallet',
-                  data: data.txHash.toHex()
-                }
+                  message:
+                    'Transaction sent in mimir, please check the transaction in the mimir wallet',
+                  data: data.txHash.toHex(),
+                },
               });
             },
             onReject: () =>
               sendSessionError(topic, {
                 jsonrpc: '2.0',
                 id,
-                error: getSdkError('USER_REJECTED_METHODS')
-              })
+                error: getSdkError('USER_REJECTED_METHODS'),
+              }),
           });
         } catch {
           return sendSessionError(topic, {
             jsonrpc: '2.0',
             id,
-            error: getSdkError('UNAUTHORIZED_METHOD')
+            error: getSdkError('UNAUTHORIZED_METHOD'),
           });
         }
 
@@ -126,7 +147,7 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
         return sendSessionError(topic, {
           jsonrpc: '2.0',
           id,
-          error: getSdkError('UNAUTHORIZED_METHOD')
+          error: getSdkError('UNAUTHORIZED_METHOD'),
         });
     }
   };
@@ -164,17 +185,20 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
 
   const state = useMemo(
     () => ({
-      web3Wallet,
       isReady,
       isError,
       sessions,
       sessionProposal,
-      deleteProposal
+      deleteProposal,
     }),
-    [deleteProposal, isError, isReady, sessionProposal, sessions]
+    [deleteProposal, isError, isReady, sessionProposal, sessions],
   );
 
-  return <WalletConnectContext.Provider value={state}>{children}</WalletConnectContext.Provider>;
+  return (
+    <WalletConnectContext.Provider value={state}>
+      {children}
+    </WalletConnectContext.Provider>
+  );
 }
 
 export default WalletConnectProvider;

@@ -8,7 +8,11 @@ import React from 'react';
 import HistoryTxOverview from './HistoryTxOverview';
 import PendingTxOverview from './PendingTxOverview';
 
-import { type AccountData, type Transaction, TransactionStatus } from '@/hooks/types';
+import {
+  type AccountData,
+  type Transaction,
+  TransactionStatus,
+} from '@/hooks/types';
 
 interface Props {
   account: AccountData;
@@ -18,15 +22,21 @@ interface Props {
   onClose: () => void;
 }
 
-function TxOverviewDialog({ account, showButton, transaction, onClose, open }: Props) {
+function TxOverviewDialog({
+  account,
+  showButton,
+  transaction,
+  onClose,
+  open,
+}: Props) {
   const { network } = useNetwork();
 
   return (
-    <Modal size='5xl' onClose={onClose} isOpen={open}>
+    <Modal size="5xl" onClose={onClose} isOpen={open}>
       <ModalContent>
         <ModalHeader>Progress Overview</ModalHeader>
-        <ModalBody className='pb-5'>
-          <div className='border-divider h-[50dvh] flex-auto rounded-[10px] border-1'>
+        <ModalBody className="pb-5">
+          <div className="border-divider h-[50dvh] flex-auto rounded-[10px] border-1">
             {open && transaction.status < TransactionStatus.Success ? (
               <PendingTxOverview
                 network={network}

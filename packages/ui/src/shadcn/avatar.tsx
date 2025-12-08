@@ -11,7 +11,10 @@ import { cn } from '../lib/utils.js';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
 
-export interface AvatarProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'onError'> {
+export interface AvatarProps extends Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  'onError'
+> {
   src?: string;
   alt?: string;
   fallback?: React.ReactNode;
@@ -25,11 +28,13 @@ const radiusMap: Record<NonNullable<AvatarProps['radius']>, string> = {
   sm: 'rounded-sm',
   md: 'rounded-md',
   lg: 'rounded-lg',
-  full: 'rounded-full'
+  full: 'rounded-full',
 };
 
 function useImageLoadingStatus(src?: string) {
-  const [status, setStatus] = useState<ImageLoadingStatus>(src ? 'loading' : 'error');
+  const [status, setStatus] = useState<ImageLoadingStatus>(
+    src ? 'loading' : 'error',
+  );
   const isMountedRef = useRef(true);
 
   useEffect(() => {
@@ -78,7 +83,21 @@ function useImageLoadingStatus(src?: string) {
 }
 
 const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
-  ({ src, alt = '', fallback, showFallback, onError, radius = 'full', className, style, children, ...props }, ref) => {
+  (
+    {
+      src,
+      alt = '',
+      fallback,
+      showFallback,
+      onError,
+      radius = 'full',
+      className,
+      style,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
     const imageStatus = useImageLoadingStatus(src);
 
     const handleImageError = useCallback(() => {
@@ -92,7 +111,9 @@ const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
     }, [imageStatus, handleImageError]);
 
     // Determine if fallback should be shown
-    const shouldShowFallback = showFallback === true || (showFallback !== false && imageStatus !== 'loaded');
+    const shouldShowFallback =
+      showFallback === true ||
+      (showFallback !== false && imageStatus !== 'loaded');
 
     return (
       <span
@@ -100,21 +121,29 @@ const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
         className={cn(
           'relative inline-flex shrink-0 items-center justify-center overflow-hidden bg-transparent',
           radiusMap[radius],
-          className
+          className,
         )}
         style={style}
         {...props}
       >
         {shouldShowFallback ? (
-          <span className={cn('bg-muted text-muted-foreground flex h-full w-full items-center justify-center')}>
-            {fallback || children || <User className='h-[60%] w-[60%]' />}
+          <span
+            className={cn(
+              'bg-muted text-muted-foreground flex h-full w-full items-center justify-center',
+            )}
+          >
+            {fallback || children || <User className="h-[60%] w-[60%]" />}
           </span>
         ) : (
-          <img src={src} alt={alt} className={cn('h-full w-full object-cover', radiusMap[radius])} />
+          <img
+            src={src}
+            alt={alt}
+            className={cn('h-full w-full object-cover', radiusMap[radius])}
+          />
         )}
       </span>
     );
-  }
+  },
 );
 
 Avatar.displayName = 'Avatar';
@@ -139,7 +168,7 @@ const AvatarGroup = React.forwardRef<HTMLDivElement, AvatarGroupProps>(
         {remainingCount > 0 && renderCount && renderCount(remainingCount)}
       </div>
     );
-  }
+  },
 );
 
 AvatarGroup.displayName = 'AvatarGroup';

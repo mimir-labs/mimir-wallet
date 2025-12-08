@@ -1,7 +1,13 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@mimir-wallet/ui';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@mimir-wallet/ui';
 import { memo } from 'react';
 
 import { proxyTypeDescriptions } from '../utils';
@@ -32,18 +38,25 @@ function ProxyPermissionSelector({
   isDisabled = false,
   className = '',
   label,
-  description
+  description,
 }: ProxyPermissionSelectorProps) {
   const proxyTypes = useProxyTypes(network);
 
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
-      {label && <label className='text-foreground text-sm font-bold'>{label}</label>}
+      {label && (
+        <label className="text-foreground text-sm font-bold">{label}</label>
+      )}
 
       {description && (
-        <p className='text-foreground/50 mb-2 text-xs'>
+        <p className="text-foreground/50 mb-2 text-xs">
           {description}{' '}
-          <a className='hover:underline' href={POLKADOT_PROXY_TYPES_WIKI_URL} target='_blank' rel='noopener noreferrer'>
+          <a
+            className="hover:underline"
+            href={POLKADOT_PROXY_TYPES_WIKI_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Permission level details
           </a>
         </p>
@@ -59,9 +72,14 @@ function ProxyPermissionSelector({
 
             return (
               <SelectItem key={text} value={text}>
-                <div className='flex items-center gap-[5px]'>
-                  <span className='text-foreground font-medium'>{text}</span>
-                  {description && <span className='text-foreground/50 text-xs'> - {description}</span>}
+                <div className="flex items-center gap-[5px]">
+                  <span className="text-foreground font-medium">{text}</span>
+                  {description && (
+                    <span className="text-foreground/50 text-xs">
+                      {' '}
+                      - {description}
+                    </span>
+                  )}
                 </div>
               </SelectItem>
             );

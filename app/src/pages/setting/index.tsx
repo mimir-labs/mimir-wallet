@@ -1,22 +1,12 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Spinner, Tabs } from '@mimir-wallet/ui';
+import { Tabs } from '@mimir-wallet/ui';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
-import { lazy, Suspense, useTransition } from 'react';
+import { useTransition } from 'react';
 
-// Lazy load setting components for better code splitting
-const AccountSetting = lazy(() => import('./account-setting'));
-const GeneralSetting = lazy(() => import('./general-setting'));
-
-// Loading fallback for settings
-function SettingFallback() {
-  return (
-    <div className='flex h-64 items-center justify-center'>
-      <Spinner variant='ellipsis' />
-    </div>
-  );
-}
+import AccountSetting from './account-setting';
+import GeneralSetting from './general-setting';
 
 const routeApi = getRouteApi('/_authenticated/setting');
 
@@ -35,34 +25,26 @@ function Setting() {
     startTransition(() => {
       navigate({
         to: '.',
-        search: { ...search, type: newType }
+        search: { ...search, type: newType },
       });
     });
   };
 
   return (
-    <div className='mx-auto flex w-[500px] max-w-full flex-col items-stretch gap-5'>
+    <div className="mx-auto flex w-[500px] max-w-full flex-col items-stretch gap-5">
       <Tabs
         tabs={[
           { key: 'account', label: 'Wallet Setting' },
-          { key: 'general', label: 'General Setting' }
+          { key: 'general', label: 'General Setting' },
         ]}
         selectedKey={type as string}
         onSelectionChange={handleTypeChange}
       />
 
-      {type === 'account' && (
-        <Suspense fallback={<SettingFallback />}>
-          <AccountSetting />
-        </Suspense>
-      )}
-      {type === 'general' && (
-        <Suspense fallback={<SettingFallback />}>
-          <GeneralSetting />
-        </Suspense>
-      )}
+      {type === 'account' && <AccountSetting />}
+      {type === 'general' && <GeneralSetting />}
 
-      <div className='h-5' />
+      <div className="h-5" />
     </div>
   );
 }

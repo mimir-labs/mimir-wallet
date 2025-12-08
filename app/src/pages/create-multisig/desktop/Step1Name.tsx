@@ -28,33 +28,43 @@ function Step1Name({
   setNetwork,
   onNameChange,
   onNext,
-  onPureProxyChange
+  onPureProxyChange,
 }: Step1NameProps) {
   const currentNetwork = useNetwork();
   const targetNetwork = isPureProxy ? network : currentNetwork.network;
-  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(targetNetwork);
+  const { supportsProxy: isProxyModuleSupported } =
+    useSupportsProxy(targetNetwork);
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className="flex flex-col gap-4">
       {/* Name Input Section */}
       <Input
-        label='Name'
-        placeholder='Enter multisig name'
+        label="Name"
+        placeholder="Enter multisig name"
         value={name}
         onChange={onNameChange}
         helper={
-          <p className='text-foreground/50 text-xs'>
+          <p className="text-foreground/50 text-xs">
             This name will be visible to all Signers and can be changed anytime.
           </p>
         }
       />
 
       {/* Pure Proxy Toggle */}
-      <AddPureProxy isPureProxy={isPureProxy} onPureProxyChange={onPureProxyChange} />
+      <AddPureProxy
+        isPureProxy={isPureProxy}
+        onPureProxyChange={onPureProxyChange}
+      />
 
-      {isPureProxy ? <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} /> : null}
+      {isPureProxy ? (
+        <InputNetwork
+          label="Select Network"
+          network={network}
+          setNetwork={setNetwork}
+        />
+      ) : null}
 
-      {isPureProxy && <MigrationTip type='create-multisig' chain={network} />}
+      {isPureProxy && <MigrationTip type="create-multisig" chain={network} />}
       {/* Notice Alert */}
       <Tips flexible={isPureProxy} />
 
@@ -63,18 +73,20 @@ function Step1Name({
 
       {/* Proxy Module Not Supported Alert */}
       {isPureProxy && !isProxyModuleSupported && (
-        <Alert variant='destructive'>
-          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        <Alert variant="destructive">
+          <AlertTitle>
+            The current network does not support proxy module
+          </AlertTitle>
         </Alert>
       )}
 
       {/* Action Buttons */}
-      <div className='flex gap-2.5'>
+      <div className="flex gap-2.5">
         <Button
           fullWidth
-          size='md'
-          color='primary'
-          radius='full'
+          size="md"
+          color="primary"
+          radius="full"
           onClick={onNext}
           disabled={!name.trim() || (isPureProxy && !isProxyModuleSupported)}
         >

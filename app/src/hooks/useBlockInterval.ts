@@ -31,11 +31,15 @@ function calcInterval(api: ApiPromise): BN {
           ? // default guess for a parachain
             DEFAULT_TIME.mul(BN_TWO)
           : // default guess for others
-            DEFAULT_TIME)
+            DEFAULT_TIME),
   );
 }
 
-async function fetchBlockInterval({ queryKey }: { queryKey: readonly [string, string] }): Promise<BN> {
+async function fetchBlockInterval({
+  queryKey,
+}: {
+  queryKey: readonly [string, string];
+}): Promise<BN> {
   const [, network] = queryKey;
 
   const api = await ApiManager.getInstance().getApi(network);
@@ -53,7 +57,7 @@ export function useBlockInterval(network: string): BN {
     queryKey: ['block-interval', network] as const,
     queryFn: fetchBlockInterval,
     enabled: !!network,
-    staleTime: Infinity // Block interval doesn't change
+    staleTime: Infinity, // Block interval doesn't change
   });
 
   return data ?? DEFAULT_TIME;

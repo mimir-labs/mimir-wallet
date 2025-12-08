@@ -13,7 +13,10 @@ export interface TabItem {
   label: React.ReactNode;
 }
 
-export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+export interface TabsProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  'onChange'
+> {
   tabs: TabItem[];
   selectedKey?: string;
   defaultSelectedKey?: string;
@@ -22,8 +25,17 @@ export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
 }
 
 // Pill variant - clip-path sliding highlight effect
-function PillTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChange, className, ...props }: TabsProps) {
-  const [activeKey, setActiveKey] = useState(selectedKey ?? defaultSelectedKey ?? tabs[0]?.key);
+function PillTabs({
+  tabs,
+  selectedKey,
+  defaultSelectedKey,
+  onSelectionChange,
+  className,
+  ...props
+}: TabsProps) {
+  const [activeKey, setActiveKey] = useState(
+    selectedKey ?? defaultSelectedKey ?? tabs[0]?.key,
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
 
@@ -50,7 +62,7 @@ function PillTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChange, cl
         const clipRight = offsetLeft + offsetWidth + 10;
 
         container.style.clipPath = `inset(0 ${Number(
-          100 - (clipRight / container.offsetWidth) * 100
+          100 - (clipRight / container.offsetWidth) * 100,
         ).toFixed()}% 0 ${Number((clipLeft / container.offsetWidth) * 100).toFixed()}% round 10px)`;
       }
     });
@@ -68,20 +80,20 @@ function PillTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChange, cl
     <div
       className={cn(
         'bg-background relative flex w-fit flex-col items-center rounded-[20px] p-2.5 shadow-md',
-        className
+        className,
       )}
       {...props}
     >
       <div
         ref={containerRef}
-        className='absolute z-10 w-full overflow-hidden [clip-path:inset(0px_75%_0px_0%_round_10px)] [transition:clip-path_0.25s_ease]'
+        className="absolute z-10 w-full overflow-hidden [clip-path:inset(0px_75%_0px_0%_round_10px)] [transition:clip-path_0.25s_ease]"
       >
-        <div className='bg-primary relative flex w-full justify-center'>
+        <div className="bg-primary relative flex w-full justify-center">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabClick(tab.key)}
-              className='text-primary-foreground flex h-8 items-center rounded-[10px] px-3 text-sm font-bold'
+              className="text-primary-foreground flex h-8 items-center rounded-[10px] px-3 text-sm font-bold"
               tabIndex={-1}
             >
               {tab.label}
@@ -90,7 +102,7 @@ function PillTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChange, cl
         </div>
       </div>
 
-      <div className='relative flex w-full justify-center'>
+      <div className="relative flex w-full justify-center">
         {tabs.map((tab) => {
           const isActive = activeKey === tab.key;
 
@@ -99,7 +111,7 @@ function PillTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChange, cl
               key={tab.key}
               ref={isActive ? activeTabRef : null}
               onClick={() => handleTabClick(tab.key)}
-              className='text-primary/50 flex h-8 cursor-pointer items-center rounded-[10px] px-3 text-sm font-bold'
+              className="text-primary/50 flex h-8 cursor-pointer items-center rounded-[10px] px-3 text-sm font-bold"
             >
               {tab.label}
             </button>
@@ -111,8 +123,17 @@ function PillTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChange, cl
 }
 
 // Underlined variant - hover highlight + bottom indicator
-function UnderlinedTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChange, className, ...props }: TabsProps) {
-  const [activeKey, setActiveKey] = useState(selectedKey ?? defaultSelectedKey ?? tabs[0]?.key);
+function UnderlinedTabs({
+  tabs,
+  selectedKey,
+  defaultSelectedKey,
+  onSelectionChange,
+  className,
+  ...props
+}: TabsProps) {
+  const [activeKey, setActiveKey] = useState(
+    selectedKey ?? defaultSelectedKey ?? tabs[0]?.key,
+  );
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [hoverStyle, setHoverStyle] = useState({});
   const [activeStyle, setActiveStyle] = useState({ left: '0px', width: '0px' });
@@ -137,7 +158,7 @@ function UnderlinedTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChan
 
         setHoverStyle({
           left: `${offsetLeft}px`,
-          width: `${offsetWidth}px`
+          width: `${offsetWidth}px`,
         });
       }
     }
@@ -154,7 +175,7 @@ function UnderlinedTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChan
 
         setActiveStyle({
           left: `${offsetLeft}px`,
-          width: `${offsetWidth}px`
+          width: `${offsetWidth}px`,
         });
       }
     });
@@ -170,24 +191,24 @@ function UnderlinedTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChan
 
   return (
     <div className={cn('relative', className)} {...props}>
-      <div className='relative'>
+      <div className="relative">
         {/* Hover Highlight */}
         <div
-          className='bg-primary/10 absolute top-0 h-[30px] rounded-md transition-all duration-300 ease-out'
+          className="bg-primary/10 absolute top-0 h-[30px] rounded-md transition-all duration-300 ease-out"
           style={{
             ...hoverStyle,
-            opacity: hoveredIndex !== null ? 1 : 0
+            opacity: hoveredIndex !== null ? 1 : 0,
           }}
         />
 
         {/* Active Indicator - underline */}
         <div
-          className='bg-primary absolute -bottom-1.5 h-0.5 transition-all duration-300 ease-out'
+          className="bg-primary absolute -bottom-1.5 h-0.5 transition-all duration-300 ease-out"
           style={activeStyle}
         />
 
         {/* Tabs */}
-        <div className='relative flex items-center space-x-1.5'>
+        <div className="relative flex items-center space-x-1.5">
           {tabs.map((tab, index) => {
             const isActive = activeKey === tab.key;
 
@@ -199,7 +220,7 @@ function UnderlinedTabs({ tabs, selectedKey, defaultSelectedKey, onSelectionChan
                 }}
                 className={cn(
                   'h-[30px] cursor-pointer px-3 text-sm font-bold transition-colors duration-300',
-                  isActive ? 'text-primary' : 'text-foreground/30'
+                  isActive ? 'text-primary' : 'text-foreground/30',
                 )}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}

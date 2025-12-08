@@ -18,9 +18,21 @@ import {
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow
+  TableRow,
 } from '@mimir-wallet/ui';
 import { Link } from '@tanstack/react-router';
+import {
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+} from 'chart.js';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
@@ -32,56 +44,69 @@ import { AddressRow, Empty, FormatBalance } from '@/components';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMultiChainStats, useQueryStats } from '@/hooks/useQueryStats';
 
+// Register Chart.js components (only loaded when this page is accessed)
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  PointElement,
+  LineElement,
+  ArcElement,
+);
+
 const options = {
   maintainAspectRatio: false,
   responsive: true,
   plugins: {
     legend: {
       display: false,
-      position: 'top' as const
+      position: 'top' as const,
     },
     title: {
       display: false,
-      text: 'Transactions'
+      text: 'Transactions',
     },
     tooltip: {
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
       padding: 12,
-      cornerRadius: 8
-    }
+      cornerRadius: 8,
+    },
   },
   scales: {
     x: {
       grid: {
-        display: false
+        display: false,
       },
       ticks: {
         color: '#666',
         font: {
-          size: 12
-        }
-      }
+          size: 12,
+        },
+      },
     },
     y: {
       grid: {
         color: 'rgba(0, 0, 0, 0.06)',
-        drawBorder: false
+        drawBorder: false,
       },
       border: {
-        display: false
+        display: false,
       },
       ticks: {
         stepSize: 1,
         precision: 0,
         color: '#666',
         font: {
-          size: 12
+          size: 12,
         },
-        padding: 10
+        padding: 10,
       },
-      beginAtZero: true
-    }
-  }
+      beginAtZero: true,
+    },
+  },
 };
 
 const doughnutOptions = {
@@ -89,13 +114,13 @@ const doughnutOptions = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'top' as const
+      position: 'top' as const,
     },
     title: {
       display: false,
-      text: 'Transactions'
-    }
-  }
+      text: 'Transactions',
+    },
+  },
 };
 
 const colors = [
@@ -108,12 +133,12 @@ const colors = [
   '#A0522D',
   '#34495E',
   '#BDC3C7',
-  '#D35400'
+  '#D35400',
 ];
 
 function Chart({
   txDaily,
-  callOverview
+  callOverview,
 }: {
   txDaily?: Array<{ time: string; address: string; counts: number }>;
   callOverview?: {
@@ -125,7 +150,9 @@ function Chart({
   const upSm = useMediaQuery('sm');
   const chartData: ChartData<'bar', number[], string> = useMemo(
     () => ({
-      labels: txDaily?.map((item) => dayjs(Number(item.time)).format('YYYY-MM-DD')) || [],
+      labels:
+        txDaily?.map((item) => dayjs(Number(item.time)).format('YYYY-MM-DD')) ||
+        [],
       datasets: [
         {
           label: 'Transactions',
@@ -135,55 +162,81 @@ function Chart({
           borderRadius: 8,
           borderSkipped: false,
           barThickness: 'flex',
-          maxBarThickness: 60
-        }
-      ]
+          maxBarThickness: 60,
+        },
+      ],
     }),
-    [txDaily]
+    [txDaily],
   );
   const categoryChartData: ChartData<'doughnut', number[], string> = useMemo(
     () => ({
-      labels: callOverview?.map((item) => `${item.section}.${item.method}`) || [],
-      datasets: [{ data: callOverview?.map((item) => item.counts) || [], backgroundColor: colors }],
-      hoverOffset: 4
+      labels:
+        callOverview?.map((item) => `${item.section}.${item.method}`) || [],
+      datasets: [
+        {
+          data: callOverview?.map((item) => item.counts) || [],
+          backgroundColor: colors,
+        },
+      ],
+      hoverOffset: 4,
     }),
-    [callOverview]
+    [callOverview],
   );
 
   const timeChart =
     txDaily && txDaily.length > 0 ? (
-      <div className='mx-auto h-[40dvh] max-h-full w-full max-w-full sm:h-[600px]'>
+      <div className="mx-auto h-[40dvh] max-h-full w-full max-w-full sm:h-[600px]">
         <Bar data={chartData} options={options} />
       </div>
     ) : (
-      <Empty label='no transactions' height={200} />
+      <Empty label="no transactions" height={200} />
     );
 
   const categoryChart =
     callOverview && callOverview.length > 0 ? (
-      <div className='mx-auto aspect-square h-[600px] max-h-full w-full max-w-full'>
+      <div className="mx-auto aspect-square h-[600px] max-h-full w-full max-w-full">
         <Doughnut data={categoryChartData} options={doughnutOptions} />
       </div>
     ) : (
-      <Empty label='no transactions' height={200} />
+      <Empty label="no transactions" height={200} />
     );
 
   return (
-    <div className='bg-background col-span-2 flex flex-col gap-5 rounded-[20px] p-3 shadow-md sm:p-5'>
-      <p className='text-foreground text-base font-bold'>Transaction Statistic</p>
-      <div className='grid grid-cols-1 gap-2.5 lg:grid-cols-2'>
-        <div className='col-span-1'>
-          {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{categoryChart}</div> : categoryChart}
+    <div className="card-root col-span-2 flex flex-col gap-5 p-3 sm:p-5">
+      <p className="text-foreground text-base font-bold">
+        Transaction Statistic
+      </p>
+      <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2">
+        <div className="col-span-1">
+          {upSm ? (
+            <div className="bg-secondary rounded-[20px] p-3 sm:p-5">
+              {categoryChart}
+            </div>
+          ) : (
+            categoryChart
+          )}
         </div>
-        <div className='col-span-1'>
-          {upSm ? <div className='bg-secondary rounded-[20px] p-3 sm:p-5'>{timeChart}</div> : timeChart}
+        <div className="col-span-1">
+          {upSm ? (
+            <div className="bg-secondary rounded-[20px] p-3 sm:p-5">
+              {timeChart}
+            </div>
+          ) : (
+            timeChart
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function Transaction({ chains, address }: { chains: string[]; address: string }) {
+function Transaction({
+  chains,
+  address,
+}: {
+  chains: string[];
+  address: string;
+}) {
   const [selectedChain, setSelectedChain] = useState<string>(chains[0]);
   const [data] = useQueryStats(selectedChain, address);
   const { chains: networks } = useChains();
@@ -193,14 +246,18 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
       data?.callOverview?.map(({ section, method, counts }, index) => ({
         order: index + 1,
         action: `${section}.${method}`,
-        count: counts
+        count: counts,
       })) || [],
-    [data]
+    [data],
   );
 
   const transferBook = useMemo(
-    () => data?.transferBook.map((item, index) => ({ order: index + 1, ...item })) || [],
-    [data]
+    () =>
+      data?.transferBook.map((item, index) => ({
+        order: index + 1,
+        ...item,
+      })) || [],
+    [data],
   );
 
   const selectedHistoryNetwork = useMemo(() => {
@@ -209,15 +266,15 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
 
   return (
     <NetworkProvider network={selectedChain}>
-      <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
-        <div className='col-span-2 flex gap-5'>
-          <div className='bg-background col-span-2 flex w-full flex-col items-stretch justify-between gap-3 rounded-[20px] p-3 px-4 py-3 shadow-md sm:flex-row sm:items-center sm:gap-10 sm:p-5 sm:px-12 sm:py-5'>
-            <div className='flex flex-grow items-center justify-between'>
-              <div className='text-foreground flex items-center gap-2.5 text-sm sm:text-base'>
-                <IconSafe className='text-primary' />
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-5">
+        <div className="col-span-2 flex gap-5">
+          <div className="card-root col-span-2 flex w-full flex-col items-stretch justify-between gap-3 p-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:p-5 sm:px-12 sm:py-5">
+            <div className="flex flex-grow items-center justify-between">
+              <div className="text-foreground flex items-center gap-2.5 text-sm sm:text-base">
+                <IconSafe className="text-primary" />
                 Multisig Transaction Executed
               </div>
-              <b className='text-[24px] leading-[30px] font-extrabold sm:text-[36px] sm:leading-[43px]'>
+              <b className="text-[24px] leading-[30px] font-extrabold sm:text-[36px] sm:leading-[43px]">
                 {data?.total}
               </b>
             </div>
@@ -225,23 +282,40 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                radius='md'
-                variant='bordered'
-                className='bg-background h-full w-auto min-w-[160px] rounded-[20px] border-transparent text-inherit shadow-md'
+                radius="md"
+                variant="bordered"
+                className="bg-card h-full w-auto min-w-[160px] text-inherit"
               >
-                <Avatar src={selectedHistoryNetwork?.icon} className='h-4 w-4 bg-transparent' />
+                <Avatar
+                  src={selectedHistoryNetwork?.icon}
+                  className="h-4 w-4 bg-transparent"
+                />
                 {selectedHistoryNetwork?.name}
-                <ArrowDown className='h-4 w-4' />
+                <ArrowDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side='bottom' align='end' className='w-[200px] border-none p-2'>
-              <DropdownMenuRadioGroup value={selectedChain} onValueChange={(value) => setSelectedChain(value)}>
+            <DropdownMenuContent
+              side="bottom"
+              align="end"
+              className="w-[200px] border-none p-2"
+            >
+              <DropdownMenuRadioGroup
+                value={selectedChain}
+                onValueChange={(value) => setSelectedChain(value)}
+              >
                 {chains.map((chain) => {
                   const network = networks.find(({ key }) => key === chain);
 
                   return (
-                    <DropdownMenuRadioItem key={chain} value={chain} className='h-8'>
-                      <Avatar src={network?.icon} className='h-4 w-4 bg-transparent' />
+                    <DropdownMenuRadioItem
+                      key={chain}
+                      value={chain}
+                      className="h-8"
+                    >
+                      <Avatar
+                        src={network?.icon}
+                        className="h-4 w-4 bg-transparent"
+                      />
                       {network?.name}
                     </DropdownMenuRadioItem>
                   );
@@ -251,9 +325,11 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
           </DropdownMenu>
         </div>
 
-        <div className='bg-background col-span-2 flex flex-col gap-5 rounded-[20px] p-3 shadow-md sm:col-span-1 sm:p-5'>
-          <p className='text-foreground text-base font-bold'>Transaction Category</p>
-          <Table containerClassName='shadow-none bg-transparent'>
+        <div className="card-root col-span-2 flex flex-col gap-5 p-3 sm:col-span-1 sm:p-5">
+          <p className="text-foreground text-base font-bold">
+            Transaction Category
+          </p>
+          <Table containerClassName="shadow-none bg-transparent">
             <TableHeader>
               <TableRow>
                 <TableColumn>Order</TableColumn>
@@ -265,7 +341,7 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
               {callOverview.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={3}>
-                    <Empty label='No items' height={150} />
+                    <Empty label="No items" height={150} />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -281,39 +357,46 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
           </Table>
         </div>
 
-        <div className='bg-background col-span-2 flex flex-col gap-5 rounded-[20px] p-3 shadow-md sm:col-span-1 sm:p-5'>
-          <p className='text-foreground text-base font-bold'>Recipients</p>
-          <Table containerClassName='shadow-none bg-transparent'>
+        <div className="card-root col-span-2 flex flex-col gap-5 p-3 sm:col-span-1 sm:p-5">
+          <p className="text-foreground text-base font-bold">Recipients</p>
+          <Table containerClassName="shadow-none bg-transparent">
             <TableHeader>
               <TableRow>
                 <TableColumn>Order</TableColumn>
                 <TableColumn>Address</TableColumn>
                 <TableColumn>Amount</TableColumn>
-                <TableColumn className='text-right'>Operation</TableColumn>
+                <TableColumn className="text-right">Operation</TableColumn>
               </TableRow>
             </TableHeader>
             <TableBody>
               {transferBook.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4}>
-                    <Empty label='No items' height={150} />
+                    <Empty label="No items" height={150} />
                   </TableCell>
                 </TableRow>
               ) : (
                 transferBook.map((item) => (
                   <TableRow key={item.to}>
                     <TableCell>{item.order}</TableCell>
-                    <TableCell className='whitespace-nowrap'>
+                    <TableCell className="whitespace-nowrap">
                       <AddressRow value={item.to} />
                     </TableCell>
                     <TableCell>
                       <FormatBalance value={item.amount} withCurrency />
                     </TableCell>
-                    <TableCell className='text-right'>
-                      <Button asChild variant='bordered' color='primary' size='sm'>
+                    <TableCell className="text-right">
+                      <Button
+                        asChild
+                        variant="bordered"
+                        color="primary"
+                        size="sm"
+                      >
                         <Link
-                          to='/explorer/$url'
-                          params={{ url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}` }}
+                          to="/explorer/$url"
+                          params={{
+                            url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`,
+                          }}
                           search={{ asset_network: selectedChain, to: item.to }}
                         >
                           Transfer
@@ -327,7 +410,10 @@ function Transaction({ chains, address }: { chains: string[]; address: string })
           </Table>
         </div>
 
-        <Chart txDaily={data?.transactionCounts} callOverview={data?.callOverview} />
+        <Chart
+          txDaily={data?.transactionCounts}
+          callOverview={data?.callOverview}
+        />
       </div>
     </NetworkProvider>
   );
@@ -340,16 +426,16 @@ function Analytic() {
 
   if (!isFetched && isFetching)
     return (
-      <div className='grid grid-cols-2 gap-2.5 sm:gap-5'>
-        <Skeleton className='bg-background col-span-2 h-[80px] rounded-[20px] shadow-md' />
-        <Skeleton className='bg-background col-span-1 h-[300px] rounded-[20px] shadow-md' />
-        <Skeleton className='bg-background col-span-1 h-[300px] rounded-[20px] shadow-md' />
-        <Skeleton className='bg-background col-span-2 h-[500px] rounded-[20px] shadow-md' />
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-5">
+        <Skeleton className="card-root col-span-2 h-[80px]" />
+        <Skeleton className="card-root col-span-1 h-[300px]" />
+        <Skeleton className="card-root col-span-1 h-[300px]" />
+        <Skeleton className="card-root col-span-2 h-[500px]" />
       </div>
     );
 
   if (chains.length === 0 || !address) {
-    return <Empty height={200} label='no data here.' />;
+    return <Empty height={200} label="no data here." />;
   }
 
   return <Transaction chains={chains} address={address} />;

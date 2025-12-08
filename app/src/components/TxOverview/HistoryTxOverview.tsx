@@ -12,13 +12,13 @@ import {
   Position,
   ReactFlow,
   useEdgesState,
-  useNodesState
+  useNodesState,
 } from '@xyflow/react';
 import React, { createContext, useEffect, useMemo } from 'react';
 
 import AddressCell from '../AddressCell';
 import AddressEdge from '../AddressEdge';
-import { getLayoutedElements } from '../utils';
+import { getLayoutedElements } from '../utils/graph';
 
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
 import IconFail from '@/assets/svg/icon-failed-fill.svg?react';
@@ -44,61 +44,75 @@ type EdgeData = {
 
 const context = createContext({});
 
-const AddressNode = React.memo(({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
-  const { transaction } = data;
+const AddressNode = React.memo(
+  ({ data, isConnectable }: NodeProps<Node<NodeData>>) => {
+    const { transaction } = data;
 
-  const icon =
-    transaction.status < TransactionStatus.Success ? (
-      <IconWaiting className='text-warning h-4 w-4' />
-    ) : transaction.status === TransactionStatus.Success ? (
-      <IconSuccess className='text-success h-4 w-4' />
-    ) : transaction.status === TransactionStatus.Cancelled ? (
-      <IconCancel className='text-danger h-4 w-4' />
-    ) : (
-      <IconFail className='text-danger h-4 w-4' />
-    );
+    const icon =
+      transaction.status < TransactionStatus.Success ? (
+        <IconWaiting className="text-warning h-4 w-4" />
+      ) : transaction.status === TransactionStatus.Success ? (
+        <IconSuccess className="text-success h-4 w-4" />
+      ) : transaction.status === TransactionStatus.Cancelled ? (
+        <IconCancel className="text-danger h-4 w-4" />
+      ) : (
+        <IconFail className="text-danger h-4 w-4" />
+      );
 
-  return (
-    <>
-      {!data.isLeaf && (
-        <Handle
-          isConnectable={isConnectable}
-          position={Position.Left}
-          style={{ zIndex: 1, top: 22, left: 0, width: 0, height: 0 }}
-          className='bg-divider'
-          type='source'
-        />
-      )}
-      <div>
-        <div className='bg-background border-divider flex w-[220px] items-center justify-between rounded-[10px] border-1 px-2.5 py-[3px]'>
-          <AddressCell value={data.transaction.address} withCopy withAddressBook />
-          {icon}
+    return (
+      <>
+        {!data.isLeaf && (
+          <Handle
+            isConnectable={isConnectable}
+            position={Position.Left}
+            style={{ zIndex: 1, top: 22, left: 0, width: 0, height: 0 }}
+            className="bg-divider"
+            type="source"
+          />
+        )}
+        <div>
+          <div className="bg-background border-divider flex w-[220px] items-center justify-between rounded-[10px] border-1 px-2.5 py-[3px]">
+            <AddressCell
+              value={data.transaction.address}
+              withCopy
+              withAddressBook
+            />
+            {icon}
+          </div>
         </div>
-      </div>
-      {!data.isTop && (
-        <Handle
-          isConnectable={isConnectable}
-          position={Position.Right}
-          style={{ zIndex: 1, top: 22, right: 0, width: 0, height: 0 }}
-          className='bg-divider'
-          type='target'
-        />
-      )}
-    </>
-  );
-});
+        {!data.isTop && (
+          <Handle
+            isConnectable={isConnectable}
+            position={Position.Right}
+            style={{ zIndex: 1, top: 22, right: 0, width: 0, height: 0 }}
+            className="bg-divider"
+            type="target"
+          />
+        )}
+      </>
+    );
+  },
+);
 
 // Define node and edge types outside component to prevent recreation
 const NODE_TYPES = {
-  AddressNode
+  AddressNode,
 } as const;
 
 const EDGE_TYPES = {
-  AddressEdge
+  AddressEdge,
 } as const;
 
-function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], edges: Edge<EdgeData>[] = []) {
-  function createNode(id: string, transaction: Transaction, isTop: boolean): Node<NodeData> {
+function makeNodes(
+  topTransaction: Transaction,
+  nodes: Node<NodeData>[] = [],
+  edges: Edge<EdgeData>[] = [],
+) {
+  function createNode(
+    id: string,
+    transaction: Transaction,
+    isTop: boolean,
+  ): Node<NodeData> {
     return {
       id,
       resizing: true,
@@ -106,19 +120,31 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
       data: {
         isTop,
         isLeaf: true, // Will be updated after traversal based on actual edges
-        transaction
+        transaction,
       },
       position: { x: 0, y: 0 },
-      connectable: false
+      connectable: false,
     };
   }
 
-  function makeEdge(parentId: string, nodeId: string, label = '', delay?: number, color = '#d9d9d9', isDash = false) {
+  function makeEdge(
+    parentId: string,
+    nodeId: string,
+    label = '',
+    delay?: number,
+    color = '#d9d9d9',
+    isDash = false,
+  ) {
     const id = `${parentId}->${nodeId}`;
     const exists = edges.find((edge) => edge.id === id);
 
     if (exists) {
-      if (label && !exists.data?.tips.some((tip) => tip.label === label && tip.delay === delay)) {
+      if (
+        label &&
+        !exists.data?.tips.some(
+          (tip) => tip.label === label && tip.delay === delay,
+        )
+      ) {
         exists.data?.tips.push({ label, delay });
       }
     } else {
@@ -127,7 +153,7 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
         source: parentId,
         target: nodeId,
         type: 'AddressEdge',
-        data: { color, tips: label ? [{ label, delay }] : [], isDash }
+        data: { color, tips: label ? [{ label, delay }] : [], isDash },
       });
     }
   }
@@ -158,7 +184,9 @@ function makeNodes(topTransaction: Transaction, nodes: Node<NodeData>[] = [], ed
           : node.parent.type === TransactionType.Announce
             ? '#B700FF'
             : '',
-        node.parent.type === TransactionType.Proxy && node.parent.isRemoteProxy ? true : false
+        node.parent.type === TransactionType.Proxy && node.parent.isRemoteProxy
+          ? true
+          : false,
       );
     }
 
@@ -191,9 +219,9 @@ function HistoryTxOverview({ transaction, ...props }: Props) {
   const fitViewOptions = useMemo(
     () => ({
       maxZoom: 1.5,
-      minZoom: 0.1
+      minZoom: 0.1,
     }),
-    []
+    [],
   );
 
   // Memoize the graph computation
@@ -202,18 +230,27 @@ function HistoryTxOverview({ transaction, ...props }: Props) {
     const initialEdges: Edge<EdgeData>[] = [];
 
     makeNodes(transaction, initialNodes, initialEdges);
-    const { nodes, edges } = getLayoutedElements(initialNodes, initialEdges, 330, 70);
+    const { nodes, edges } = getLayoutedElements(
+      initialNodes,
+      initialEdges,
+      330,
+      70,
+    );
 
     return { layoutedNodes: nodes, layoutedEdges: edges };
   }, [transaction]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<NodeData>>(layoutedNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<EdgeData>>(layoutedEdges);
+  const [nodes, setNodes, onNodesChange] =
+    useNodesState<Node<NodeData>>(layoutedNodes);
+  const [edges, setEdges, onEdgesChange] =
+    useEdgesState<Edge<EdgeData>>(layoutedEdges);
 
   // Update nodes and edges when layout changes
   useEffect(() => {
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges);
+    queueMicrotask(() => {
+      setNodes(layoutedNodes);
+      setEdges(layoutedEdges);
+    });
   }, [layoutedNodes, layoutedEdges, setNodes, setEdges]);
 
   return (

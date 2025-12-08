@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_authenticated/multi-transfer')({
     throw redirect({
       to: '/explorer/$url',
       params: { url: 'mimir%3A%2F%2Fapp%2Fmulti-transfer' },
-      replace: true
+      replace: true,
     });
-  }
+  },
 });

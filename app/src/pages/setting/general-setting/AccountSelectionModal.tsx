@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { addressEq, encodeAddress, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  encodeAddress,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import {
   Button,
   buttonSpinner,
@@ -16,7 +20,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@mimir-wallet/ui';
 import { useMemo, useState } from 'react';
 
@@ -42,7 +46,7 @@ function AccountSelectionModal({
   description = 'Select an account to finish the subscription.',
   confirmText = 'Confirm',
   isLoading = false,
-  filteredAddress
+  filteredAddress,
 }: AccountSelectionModalProps) {
   const { ss58 } = useSs58Format();
   const { walletAccounts } = useWallet();
@@ -52,15 +56,19 @@ function AccountSelectionModal({
     const list = walletAccounts.map((account) => ({
       address: encodeAddress(account.address, ss58),
       name: account.name || 'Unknown Account',
-      source: account.source
+      source: account.source,
     }));
 
-    return filteredAddress ? list.filter((item) => addressEq(item.address, filteredAddress)) : list;
+    return filteredAddress
+      ? list.filter((item) => addressEq(item.address, filteredAddress))
+      : list;
   }, [walletAccounts, filteredAddress, ss58]);
 
-  const [selectedAddress, setSelectedAddress] = useState<string | undefined>(() => {
-    return accountOptions.at(0)?.address;
-  });
+  const [selectedAddress, setSelectedAddress] = useState<string | undefined>(
+    () => {
+      return accountOptions.at(0)?.address;
+    },
+  );
 
   const handleConfirm = () => {
     if (selectedAddress) {
@@ -69,22 +77,22 @@ function AccountSelectionModal({
   };
 
   return (
-    <Modal size='md' isOpen={isOpen} onClose={onClose}>
+    <Modal size="md" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         <ModalHeader>{title}</ModalHeader>
         <DialogDescription>{description}</DialogDescription>
 
-        <ModalBody className='gap-y-5'>
+        <ModalBody className="gap-y-5">
           {/* Account Selection using Select */}
           <Select value={selectedAddress} onValueChange={setSelectedAddress}>
-            <SelectTrigger className='[&>span[data-slot=select-value]]:overflow-visible'>
-              <SelectValue placeholder='Select an account' />
+            <SelectTrigger className="[&>span[data-slot=select-value]]:overflow-visible">
+              <SelectValue placeholder="Select an account" />
             </SelectTrigger>
             <SelectContent>
               {accountOptions.map((account) => (
                 <SelectItem key={account.address} value={account.address}>
                   <AddressRow
-                    className='[&_.AddressRow-Address]:text-foreground/50 [&_.AddressRow-Name]:font-normal'
+                    className="[&_.AddressRow-Address]:text-foreground/50 [&_.AddressRow-Name]:font-normal"
                     iconSize={20}
                     withAddress
                     withName
@@ -100,7 +108,12 @@ function AccountSelectionModal({
         <Divider />
         <ModalFooter>
           {/* Confirm Button */}
-          <Button fullWidth color='primary' onClick={handleConfirm} disabled={isLoading || !selectedAddress}>
+          <Button
+            fullWidth
+            color="primary"
+            onClick={handleConfirm}
+            disabled={isLoading || !selectedAddress}
+          >
             {isLoading ? buttonSpinner : null}
             {confirmText}
           </Button>

@@ -14,7 +14,15 @@ import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useFindTargetCallFromMethod } from '@/hooks/useFindTargetCall';
 import { Call as CallComp, FunctionArgs } from '@/params';
 
-function CallInfo({ isMobile = false, address, call }: { isMobile?: boolean; address: string; call: IMethod }) {
+function CallInfo({
+  isMobile = false,
+  address,
+  call,
+}: {
+  isMobile?: boolean;
+  address: string;
+  call: IMethod;
+}) {
   const { network } = useNetwork();
   const [, addTx] = useBatchTxs(network, address);
 
@@ -37,26 +45,33 @@ function CallInfo({ isMobile = false, address, call }: { isMobile?: boolean; add
       data-mobile={isMobile}
       className={cn(
         'flex w-full flex-col items-start justify-start gap-[5px]',
-        'data-[mobile=true]:bg-background data-[mobile=true]:rounded-[20px] data-[mobile=true]:p-[15px] data-[mobile=true]:shadow-md'
+        'data-[mobile=true]:card-root data-[mobile=true]:p-[15px]',
       )}
     >
-      <div className='flex w-full shrink-0 flex-row items-center justify-start gap-2.5'>
-        <b className='flex-1'>{action}</b>
-        <Tooltip content='For better repeatly submit this transaction you can add to Template' color='foreground'>
-          <Button variant='ghost' size='sm' onClick={() => events.emit('template_add', network, call.toHex())}>
+      <div className="flex w-full shrink-0 flex-row items-center justify-start gap-2.5">
+        <b className="flex-1">{action}</b>
+        <Tooltip
+          content="For better repeatly submit this transaction you can add to Template"
+          color="foreground"
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => events.emit('template_add', network, call.toHex())}
+          >
             + Template
-            <IconTemplate className='h-3.5 w-3.5' />
+            <IconTemplate className="h-3.5 w-3.5" />
           </Button>
         </Tooltip>
-        <Tooltip content='Submit exact same transactions' color='foreground'>
+        <Tooltip content="Submit exact same transactions" color="foreground">
           <Button
-            variant='ghost'
-            size='sm'
+            variant="ghost"
+            size="sm"
             onClick={() => {
               addTx([
                 {
-                  calldata: call.toHex()
-                }
+                  calldata: call.toHex(),
+                },
               ]);
             }}
           >
@@ -66,7 +81,7 @@ function CallInfo({ isMobile = false, address, call }: { isMobile?: boolean; add
         </Tooltip>
       </div>
       <FunctionArgs
-        className='bg-secondary flex w-full shrink-0 flex-col gap-2.5 rounded-[10px] p-2.5'
+        className="bg-secondary flex w-full shrink-0 flex-col gap-2.5 rounded-[10px] p-2.5"
         registry={call.registry}
         call={call}
       />
@@ -74,12 +89,24 @@ function CallInfo({ isMobile = false, address, call }: { isMobile?: boolean; add
   );
 }
 
-function Target({ isMobile = false, call, address }: { isMobile?: boolean; address: string; call?: IMethod | null }) {
+function Target({
+  isMobile = false,
+  call,
+  address,
+}: {
+  isMobile?: boolean;
+  address: string;
+  call?: IMethod | null;
+}) {
   const { network } = useNetwork();
   const ref = useRef<any>(null);
 
   // Find target call using async hook
-  const { from, targetCall, isLoading } = useFindTargetCallFromMethod(network, address, call);
+  const { from, targetCall, isLoading } = useFindTargetCallFromMethod(
+    network,
+    address,
+    call,
+  );
 
   if (isLoading || !targetCall) {
     return null;
@@ -88,15 +115,20 @@ function Target({ isMobile = false, call, address }: { isMobile?: boolean; addre
   const Wrapper = isMobile ? 'div' : React.Fragment;
 
   const callElement = targetCall ? (
-    <Wrapper className='bg-background rounded-[20px] p-[15px] shadow-md'>
-      <CallComp ref={ref} from={from} registry={targetCall.registry} call={targetCall} />
+    <Wrapper className="card-root p-[15px]">
+      <CallComp
+        ref={ref}
+        from={from}
+        registry={targetCall.registry}
+        call={targetCall}
+      />
     </Wrapper>
   ) : null;
 
   return (
     <>
       {callElement}
-      {isMobile ? null : <Divider className='first:hidden' />}
+      {isMobile ? null : <Divider className="first:hidden" />}
       <CallInfo isMobile={isMobile} call={targetCall} address={address} />
     </>
   );

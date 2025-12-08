@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ApiManager, NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  ApiManager,
+  NetworkProvider,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import {
   Alert,
   AlertDescription,
@@ -16,7 +20,7 @@ import {
   ModalFooter,
   ModalHeader,
   Spinner,
-  Tooltip
+  Tooltip,
 } from '@mimir-wallet/ui';
 import { BN_ZERO } from '@polkadot/util';
 import { Link as RouterLink } from '@tanstack/react-router';
@@ -27,7 +31,14 @@ import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import IconClock from '@/assets/svg/icon-clock.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
-import { Address, AddressCell, Empty, FormatBalance, InputNetwork, TxButton } from '@/components';
+import {
+  Address,
+  AddressCell,
+  Empty,
+  FormatBalance,
+  InputNetwork,
+  TxButton,
+} from '@/components';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
@@ -39,7 +50,7 @@ function Content({
   address,
   network,
   supportedNetworks,
-  setNetwork
+  setNetwork,
 }: {
   address: string;
   network: string;
@@ -56,67 +67,83 @@ function Content({
   const [proxies, isFetched, isFetching] = useProxies(address);
   const [account] = useQueryAccount(address);
 
-  const isReadOnly = useMemo(() => !isLocalAccount(address), [address, isLocalAccount]);
+  const isReadOnly = useMemo(
+    () => !isLocalAccount(address),
+    [address, isLocalAccount],
+  );
 
   return (
     <>
-      <div className='space-y-5'>
-        <InputNetwork network={network} supportedNetworks={supportedNetworks} setNetwork={setNetwork} />
+      <div className="space-y-5">
+        <InputNetwork
+          network={network}
+          supportedNetworks={supportedNetworks}
+          setNetwork={setNetwork}
+        />
 
-        <div className='bg-secondary rounded-[10px] p-2.5'>
-          <div className='font-bold'>Proxy Account</div>
+        <div className="bg-secondary rounded-[10px] p-2.5">
+          <div className="font-bold">Proxy Account</div>
 
-          <div className='mt-2.5 space-y-2.5'>
+          <div className="mt-2.5 space-y-2.5">
             {isFetched &&
               proxies &&
               proxies[0].map((proxy, index) => (
                 <div
                   key={index}
-                  className='bg-background flex items-center justify-between gap-[5px] rounded-[10px] p-[5px]'
+                  className="bg-background flex items-center justify-between gap-[5px] rounded-[10px] p-[5px]"
                 >
-                  <div className='flex-1'>
+                  <div className="flex-1">
                     <AddressCell shorten value={proxy.delegate.toString()} />
                   </div>
                   {proxy.delay.gt(BN_ZERO) ? (
                     <Tooltip content={`Delay Blocks: ${[proxy.delay]}`}>
-                      <IconClock className='h-4 w-4 opacity-70' />
+                      <IconClock className="h-4 w-4 opacity-70" />
                     </Tooltip>
                   ) : null}
-                  <Badge variant='secondary'>{proxy.proxyType.toString()}</Badge>
+                  <Badge variant="secondary">
+                    {proxy.proxyType.toString()}
+                  </Badge>
                   {!isReadOnly && (
                     <TxButton
                       isIconOnly
-                      color='danger'
-                      size='sm'
-                      variant='light'
-                      className='h-[26px] min-h-0 w-[26px] min-w-0'
+                      color="danger"
+                      size="sm"
+                      variant="light"
+                      className="h-[26px] min-h-0 w-[26px] min-w-0"
                       accountId={address}
-                      website='mimir://internal/setup'
+                      website="mimir://internal/setup"
                       overrideAction={
                         proxies[0].length === 1 && account?.type === 'pure'
                           ? toggleAlertOpen
                           : async () => {
-                              const api = await ApiManager.getInstance().getApi(network);
+                              const api =
+                                await ApiManager.getInstance().getApi(network);
 
                               addQueue({
                                 accountId: address,
                                 call:
                                   proxies[0].length === 1
                                     ? api.tx.proxy.removeProxies()
-                                    : api.tx.proxy.removeProxy(proxy.delegate, proxy.proxyType.toU8a(), proxy.delay),
+                                    : api.tx.proxy.removeProxy(
+                                        proxy.delegate,
+                                        proxy.proxyType.toU8a(),
+                                        proxy.delay,
+                                      ),
                                 website: 'mimir://internal/setup',
-                                network
+                                network,
                               });
                             }
                       }
                     >
-                      <IconDelete className='h-4 w-4' />
+                      <IconDelete className="h-4 w-4" />
                     </TxButton>
                   )}
                 </div>
               ))}
 
-            {isFetched && proxies?.[0]?.length === 0 && <Empty height={200} label='No proxies' />}
+            {isFetched && proxies?.[0]?.length === 0 && (
+              <Empty height={200} label="No proxies" />
+            )}
 
             {!isFetched && isFetching && <Spinner />}
           </div>
@@ -125,29 +152,32 @@ function Content({
         <Divider />
 
         <Alert variant={'warning'}>
-          <AlertTitle className='font-bold'>Notice</AlertTitle>
+          <AlertTitle className="font-bold">Notice</AlertTitle>
           <AlertDescription>
             <ul style={{ listStyle: 'outside' }}>
               <li>Only All authority can delete proxy.</li>
-              <li>Deleting a Proxy will refund the fees, while adding a Proxy requires an additional deposit fee.</li>
+              <li>
+                Deleting a Proxy will refund the fees, while adding a Proxy
+                requires an additional deposit fee.
+              </li>
             </ul>
           </AlertDescription>
         </Alert>
 
-        <Button asChild color='primary' fullWidth>
-          <RouterLink to='/add-proxy'>Add New Proxy</RouterLink>
+        <Button asChild color="primary" fullWidth>
+          <RouterLink to="/add-proxy">Add New Proxy</RouterLink>
         </Button>
 
         {account?.type === 'pure' ? (
-          <Button fullWidth color='danger' onClick={toggleOpen}>
+          <Button fullWidth color="danger" onClick={toggleOpen}>
             Delete Account
           </Button>
         ) : (
           <TxButton
             fullWidth
-            color='danger'
+            color="danger"
             accountId={address}
-            website='mimir://internal/remove-proxies'
+            website="mimir://internal/remove-proxies"
             getCall={async () => {
               const api = await ApiManager.getInstance().getApi(network);
 
@@ -160,14 +190,16 @@ function Content({
       </div>
 
       {account && account.type === 'pure' && (
-        <Modal size='xl' isOpen={isOpen} onClose={toggleOpen}>
+        <Modal size="xl" isOpen={isOpen} onClose={toggleOpen}>
           <ModalContent>
             <ModalHeader>Attention</ModalHeader>
 
             <ModalBody>
               <p>
-                If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control
-                in this account. Make sure all of your assets in the <Address shorten value={address} /> account:
+                If you delete the proxy relationship,{' '}
+                <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to
+                control in this account. Make sure all of your assets in the{' '}
+                <Address shorten value={address} /> account:
               </p>
 
               <br />
@@ -180,7 +212,7 @@ function Content({
 
               <br />
 
-              <div className='flex flex-row items-center gap-[5px]'>
+              <div className="flex flex-row items-center gap-[5px]">
                 <span>Balance:</span>
                 {token && (
                   <Avatar
@@ -192,11 +224,11 @@ function Content({
                       height: '1em',
                       verticalAlign: 'middle',
                       backgroundColor: 'transparent',
-                      userSelect: 'none'
+                      userSelect: 'none',
                     }}
                   />
                 )}
-                <span className='text-foreground/50'>
+                <span className="text-foreground/50">
                   <FormatBalance withCurrency value={allBalances?.total} />
                 </span>
               </div>
@@ -205,9 +237,9 @@ function Content({
             <ModalFooter>
               <TxButton
                 fullWidth
-                color='danger'
+                color="danger"
                 accountId={account.address}
-                website='mimir://internal/remove-account'
+                website="mimir://internal/remove-account"
                 getCall={async () => {
                   const api = await ApiManager.getInstance().getApi(network);
 
@@ -216,7 +248,7 @@ function Content({
                     'Any',
                     account.disambiguationIndex,
                     account.createdBlock,
-                    account.createdExtrinsicIndex
+                    account.createdExtrinsicIndex,
                   );
                 }}
                 onDone={() => toggleOpen(false)}
@@ -229,14 +261,16 @@ function Content({
       )}
 
       {account && account.type === 'pure' && (
-        <Modal size='xl' isOpen={isAlertOpen} onClose={toggleAlertOpen}>
+        <Modal size="xl" isOpen={isAlertOpen} onClose={toggleAlertOpen}>
           <ModalContent>
             <ModalHeader>Attention</ModalHeader>
 
             <ModalBody>
               <p>
-                If you delete the proxy relationship, <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to control
-                in this account and the initial deposit will not be withdrawn.
+                If you delete the proxy relationship,{' '}
+                <b style={{ fontWeight: 800 }}>NO ONE</b> will be able to
+                control in this account and the initial deposit will not be
+                withdrawn.
               </p>
 
               <br />
@@ -254,7 +288,7 @@ function ProxySet({ address }: { address: string }) {
   const supportedNetworks = useAddressSupportedNetworks(address);
   const [network, setNetwork] = useInputNetwork(
     undefined,
-    supportedNetworks?.map((item) => item.key)
+    supportedNetworks?.map((item) => item.key),
   );
 
   const handleSetNetwork = (newNetwork: string) => {

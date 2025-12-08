@@ -11,6 +11,7 @@ export const useAddressExplorer = create<{
 }>()((set) => ({
   isOpen: false,
   address: '',
-  open: (address: { toString: () => string }) => set({ isOpen: true, address: address.toString() }),
-  close: () => set({ isOpen: false })
+  open: (address: { toString: () => string }) =>
+    set({ isOpen: true, address: address.toString() }),
+  close: () => set({ isOpen: false }),
 }));

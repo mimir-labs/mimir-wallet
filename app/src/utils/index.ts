@@ -10,3 +10,4 @@ export * from './units';
 export * from './url';
 export * from './document';
 export * from './proxy-network';
+export * from './dayjs';

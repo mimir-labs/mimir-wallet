@@ -14,7 +14,10 @@ function AddAddress({ isWatchlist = false }: AddAddressProps) {
   const { addAddressBook } = useAccount();
 
   return (
-    <Button onClick={() => addAddressBook(undefined, isWatchlist)} variant='ghost'>
+    <Button
+      onClick={() => addAddressBook(undefined, isWatchlist)}
+      variant="ghost"
+    >
       {isWatchlist ? 'Add Watchlist Address' : 'Add New Contact'}
     </Button>
   );

@@ -15,7 +15,7 @@ import { dataToUtf8 } from '@/utils';
 function TransferDetail({
   from: propsFrom,
   registry,
-  call
+  call,
 }: {
   from?: string;
   registry: Registry;
@@ -35,8 +35,12 @@ function TransferDetail({
     return isAll ? (
       'All'
     ) : (
-      <div className='flex items-center gap-1'>
-        <Avatar alt='Token' src={chain.tokenIcon} style={{ width: 20, height: 20 }} />
+      <div className="flex items-center gap-1">
+        <Avatar
+          alt="Token"
+          src={chain.tokenIcon}
+          style={{ width: 20, height: 20 }}
+        />
         <p>
           -<FormatBalance value={value} withCurrency />
         </p>
@@ -48,22 +52,27 @@ function TransferDetail({
     isAll ? (
       `All ${assetInfo.symbol}`
     ) : (
-      <div className='flex items-center gap-1'>
+      <div className="flex items-center gap-1">
         <Avatar
-          alt='Token'
+          alt="Token"
           fallback={assetInfo.symbol.slice(0, 1)}
           src={assetInfo.logoUri}
           style={{ width: 20, height: 20 }}
         />
         <p>
-          -<FormatBalance value={value} withCurrency format={[assetInfo.decimals, assetInfo.symbol]} />
+          -
+          <FormatBalance
+            value={value}
+            withCurrency
+            format={[assetInfo.decimals, assetInfo.symbol]}
+          />
         </p>
       </div>
     )
   ) : (
-    <div className='flex items-center gap-1'>
-      <Skeleton className='h-5 w-5 rounded-full' />
-      <Skeleton className='h-4 w-16' />
+    <div className="flex items-center gap-1">
+      <Skeleton className="h-5 w-5 rounded-full" />
+      <Skeleton className="h-4 w-16" />
     </div>
   );
 }
@@ -71,7 +80,7 @@ function TransferDetail({
 function CallDisplayDetail({
   registry,
   fallbackWithName,
-  call
+  call,
 }: {
   registry: Registry;
   fallbackWithName?: boolean;
@@ -79,36 +88,59 @@ function CallDisplayDetail({
 }) {
   let comp: React.ReactNode;
 
-  const calllFunction = useMemo(() => (call ? registry.findMetaCall(call?.callIndex) : null), [call, registry]);
+  const calllFunction = useMemo(
+    () => (call ? registry.findMetaCall(call?.callIndex) : null),
+    [call, registry],
+  );
 
   if (!(call && calllFunction)) {
     return null;
   }
 
   if (
-    ['balances.transfer', 'balances.transferKeepAlive', 'balances.transferAllowDeath'].includes(
-      `${calllFunction.section}.${calllFunction.method}`
+    [
+      'balances.transfer',
+      'balances.transferKeepAlive',
+      'balances.transferAllowDeath',
+    ].includes(`${calllFunction.section}.${calllFunction.method}`)
+  ) {
+    comp = <TransferDetail registry={registry} call={call} />;
+  } else if (
+    ['assets.transfer', 'assets.transferKeepAlive'].includes(
+      `${calllFunction.section}.${calllFunction.method}`,
     )
   ) {
     comp = <TransferDetail registry={registry} call={call} />;
   } else if (
-    ['assets.transfer', 'assets.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
-  ) {
-    comp = <TransferDetail registry={registry} call={call} />;
-  } else if (
-    ['tokens.transfer', 'tokens.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
+    ['tokens.transfer', 'tokens.transferKeepAlive'].includes(
+      `${calllFunction.section}.${calllFunction.method}`,
+    )
   ) {
     comp = <TransferDetail registry={registry} call={call} />;
   } else if (
     ['utility.batch', 'utility.forceBatch', 'utility.batchAll'].includes(
-      `${calllFunction.section}.${calllFunction.method}`
+      `${calllFunction.section}.${calllFunction.method}`,
     )
   ) {
-    comp = <div className='flex items-center gap-1'>{(call.args?.[0] as any)?.length} calls</div>;
-  } else if (['identity.setIdentity'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
-    comp = <div className='flex items-center gap-1 font-bold'>{dataToUtf8((call.args?.[0] as any)?.display)}</div>;
+    comp = (
+      <div className="flex items-center gap-1">
+        {(call.args?.[0] as any)?.length} calls
+      </div>
+    );
+  } else if (
+    ['identity.setIdentity'].includes(
+      `${calllFunction.section}.${calllFunction.method}`,
+    )
+  ) {
+    comp = (
+      <div className="flex items-center gap-1 font-bold">
+        {dataToUtf8((call.args?.[0] as any)?.display)}
+      </div>
+    );
   } else {
-    return fallbackWithName ? `${calllFunction.section}.${calllFunction.method}` : null;
+    return fallbackWithName
+      ? `${calllFunction.section}.${calllFunction.method}`
+      : null;
   }
 
   return comp;

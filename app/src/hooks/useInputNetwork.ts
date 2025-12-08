@@ -4,15 +4,24 @@
 import { useChains, useNetwork } from '@mimir-wallet/polkadot-core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: string[]) {
+export function useInputNetwork(
+  defaultNetwork?: string,
+  supportedNetworks?: string[],
+) {
   const { chains, mode } = useChains();
   const { network: initialNetwork } = useNetwork();
 
   // Get enabled network keys as a Set for fast lookup
-  const enabledNetworks = useMemo(() => new Set(chains.filter((c) => c.enabled).map((c) => c.key)), [chains]);
+  const enabledNetworks = useMemo(
+    () => new Set(chains.filter((c) => c.enabled).map((c) => c.key)),
+    [chains],
+  );
 
   const [network, setNetwork] = useState(
-    supportedNetworks?.at(0) || defaultNetwork || enabledNetworks.values().next().value || initialNetwork
+    supportedNetworks?.at(0) ||
+      defaultNetwork ||
+      enabledNetworks.values().next().value ||
+      initialNetwork,
   );
 
   const enabledNetworksRef = useRef(enabledNetworks);
@@ -42,9 +51,12 @@ export function useInputNetwork(defaultNetwork?: string, supportedNetworks?: str
   return [
     network,
     (newNetwork: string) => {
-      if (mode === 'omni' && (!supportedNetworks || supportedNetworks.includes(newNetwork))) {
+      if (
+        mode === 'omni' &&
+        (!supportedNetworks || supportedNetworks.includes(newNetwork))
+      ) {
         setNetwork(newNetwork);
       }
-    }
+    },
   ] as const;
 }

@@ -9,55 +9,113 @@ import React, { useMemo } from 'react';
 
 import { AddressRow } from '@/components';
 
-function CallDisplayDetailMinor({ registry, call }: { registry: Registry; call?: IMethod | null }) {
+function CallDisplayDetailMinor({
+  registry,
+  call,
+}: {
+  registry: Registry;
+  call?: IMethod | null;
+}) {
   let comp: React.ReactNode;
 
-  const calllFunction = useMemo(() => (call ? registry.findMetaCall(call?.callIndex) : null), [call, registry]);
+  const calllFunction = useMemo(
+    () => (call ? registry.findMetaCall(call?.callIndex) : null),
+    [call, registry],
+  );
 
   if (!(call && calllFunction)) {
     return null;
   }
 
   if (
-    ['balances.transfer', 'balances.transferKeepAlive', 'balances.transferAllowDeath'].includes(
-      `${calllFunction.section}.${calllFunction.method}`
+    [
+      'balances.transfer',
+      'balances.transferKeepAlive',
+      'balances.transferAllowDeath',
+    ].includes(`${calllFunction.section}.${calllFunction.method}`)
+  ) {
+    comp = (
+      <div className="flex items-center gap-1">
+        <AddressRow
+          shorten
+          withName
+          withAddress={false}
+          withCopy
+          iconSize={20}
+          value={call.args[0].toString()}
+        />
+      </div>
+    );
+  } else if (
+    ['assets.transfer', 'assets.transferKeepAlive'].includes(
+      `${calllFunction.section}.${calllFunction.method}`,
     )
   ) {
     comp = (
-      <div className='flex items-center gap-1'>
-        <AddressRow shorten withName withAddress={false} withCopy iconSize={20} value={call.args[0].toString()} />
+      <div className="flex items-center gap-1">
+        <AddressRow
+          shorten
+          withName
+          withAddress={false}
+          withCopy
+          iconSize={20}
+          value={call.args[1].toString()}
+        />
       </div>
     );
   } else if (
-    ['assets.transfer', 'assets.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
+    ['tokens.transfer', 'tokens.transferKeepAlive'].includes(
+      `${calllFunction.section}.${calllFunction.method}`,
+    )
   ) {
     comp = (
-      <div className='flex items-center gap-1'>
-        <AddressRow shorten withName withAddress={false} withCopy iconSize={20} value={call.args[1].toString()} />
+      <div className="flex items-center gap-1">
+        <AddressRow
+          shorten
+          withName
+          withAddress={false}
+          withCopy
+          iconSize={20}
+          value={call.args[0].toString()}
+        />
       </div>
     );
   } else if (
-    ['tokens.transfer', 'tokens.transferKeepAlive'].includes(`${calllFunction.section}.${calllFunction.method}`)
+    ['proxy.proxy'].includes(`${calllFunction.section}.${calllFunction.method}`)
   ) {
     comp = (
-      <div className='flex items-center gap-1'>
-        <AddressRow shorten withName withAddress={false} withCopy iconSize={20} value={call.args[0].toString()} />
+      <div className="flex items-center gap-1">
+        {
+          (
+            call.args[1] as Option<KitchensinkRuntimeProxyType>
+          )?.unwrapOrDefault?.()?.type
+        }
       </div>
     );
-  } else if (['proxy.proxy'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
+  } else if (
+    ['proxy.proxyAnnounced'].includes(
+      `${calllFunction.section}.${calllFunction.method}`,
+    )
+  ) {
     comp = (
-      <div className='flex items-center gap-1'>
-        {(call.args[1] as Option<KitchensinkRuntimeProxyType>)?.unwrapOrDefault?.()?.type}
+      <div className="flex items-center gap-1">
+        {
+          (
+            call.args[2] as Option<KitchensinkRuntimeProxyType>
+          )?.unwrapOrDefault?.()?.type
+        }
       </div>
     );
-  } else if (['proxy.proxyAnnounced'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
+  } else if (
+    ['proxy.addProxy', 'proxy.removeProxy'].includes(
+      `${calllFunction.section}.${calllFunction.method}`,
+    )
+  ) {
     comp = (
-      <div className='flex items-center gap-1'>
-        {(call.args[2] as Option<KitchensinkRuntimeProxyType>)?.unwrapOrDefault?.()?.type}
+      <div className="flex items-center gap-1">
+        {(call.args[1] as KitchensinkRuntimeProxyType)?.type}
       </div>
     );
-  } else if (['proxy.addProxy', 'proxy.removeProxy'].includes(`${calllFunction.section}.${calllFunction.method}`)) {
-    comp = <div className='flex items-center gap-1'>{(call.args[1] as KitchensinkRuntimeProxyType)?.type}</div>;
   } else {
     return null;
   }
@@ -65,4 +123,6 @@ function CallDisplayDetailMinor({ registry, call }: { registry: Registry; call?:
   return comp;
 }
 
-export default React.memo<typeof CallDisplayDetailMinor>(CallDisplayDetailMinor);
+export default React.memo<typeof CallDisplayDetailMinor>(
+  CallDisplayDetailMinor,
+);

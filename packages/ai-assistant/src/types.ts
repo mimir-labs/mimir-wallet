@@ -31,8 +31,15 @@ export type FunctionCallArgumentValue =
 /**
  * Type guard to check if a value is a valid FunctionCallArgumentValue
  */
-export function isFunctionCallArgumentValue(value: unknown): value is FunctionCallArgumentValue {
-  if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+export function isFunctionCallArgumentValue(
+  value: unknown,
+): value is FunctionCallArgumentValue {
+  if (
+    value === null ||
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
     return true;
   }
 
@@ -41,7 +48,9 @@ export function isFunctionCallArgumentValue(value: unknown): value is FunctionCa
   }
 
   if (typeof value === 'object' && value !== null) {
-    return Object.values(value).every((val) => isFunctionCallArgumentValue(val));
+    return Object.values(value).every((val) =>
+      isFunctionCallArgumentValue(val),
+    );
   }
 
   return false;
@@ -51,7 +60,9 @@ export function isFunctionCallArgumentValue(value: unknown): value is FunctionCa
  * Safely convert unknown value to FunctionCallArgumentValue
  * Returns empty object if conversion fails
  */
-export function toFunctionCallArguments(value: unknown): Record<string, FunctionCallArgumentValue> {
+export function toFunctionCallArguments(
+  value: unknown,
+): Record<string, FunctionCallArgumentValue> {
   if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
     const result: Record<string, FunctionCallArgumentValue> = {};
 
@@ -91,7 +102,7 @@ export type {
   RouteRequirement,
   HandlerMetadata,
   HandlerRegistrationOptions,
-  HandlerRegistration
+  HandlerRegistration,
 } from './types/metadata.js';
 
 // Default configurations
@@ -104,5 +115,5 @@ export const DEFAULT_AI_CONFIG: AiConfig = {
   topP: 1,
   topK: 40,
   baseURL: '',
-  systemPrompt: ``
+  systemPrompt: ``,
 };

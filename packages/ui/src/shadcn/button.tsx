@@ -29,7 +29,7 @@ const buttonVariants = cva(
     'touch-manipulation',
     'transform-gpu active:scale-[0.97]',
     'transition-transform-colors-opacity motion-reduce:transition-none',
-    'disabled:pointer-events-none disabled:not-has-[.button-spinner]:bg-divider disabled:not-has-[.button-spinner]:border-divider disabled:not-has-[.button-spinner]:text-white'
+    'disabled:pointer-events-none disabled:not-has-[.button-spinner]:bg-divider disabled:not-has-[.button-spinner]:border-divider disabled:not-has-[.button-spinner]:text-white',
   ],
   {
     variants: {
@@ -40,251 +40,267 @@ const buttonVariants = cva(
         flat: '',
         faded: 'border-1',
         shadow: '',
-        ghost: 'border-1 bg-transparent'
+        ghost: 'border-1 bg-transparent',
       },
       size: {
         sm: 'px-2 min-w-6 h-6 text-xs gap-2',
         md: 'px-3 min-w-8 h-8 text-sm gap-2',
-        lg: 'px-4 min-w-10 h-10 text-base gap-3'
+        lg: 'px-4 min-w-10 h-10 text-base gap-3',
       },
       color: {
         primary: '',
         secondary: '',
         success: '',
         warning: '',
-        danger: ''
+        danger: '',
       },
       radius: {
         none: 'rounded-none',
         sm: 'rounded-[5px]',
         md: 'rounded-[10px]',
         lg: 'rounded-[20px]',
-        full: 'rounded-full'
+        full: 'rounded-full',
       },
       fullWidth: {
-        true: 'w-full'
+        true: 'w-full',
       },
       isIconOnly: {
         true: 'min-w-0 px-0 px-0 !gap-0',
-        false: '[&>svg]:max-w-[theme(spacing.8)]'
-      }
+        false: '[&>svg]:max-w-[theme(spacing.8)]',
+      },
     },
     compoundVariants: [
       // solid / color
       {
         variant: 'solid',
         color: 'primary',
-        class: colorVariants.solid.primary
+        class: colorVariants.solid.primary,
       },
       {
         variant: 'solid',
         color: 'secondary',
-        class: colorVariants.solid.secondary
+        class: colorVariants.solid.secondary,
       },
       {
         variant: 'solid',
         color: 'success',
-        class: colorVariants.solid.success
+        class: colorVariants.solid.success,
       },
       {
         variant: 'solid',
         color: 'warning',
-        class: colorVariants.solid.warning
+        class: colorVariants.solid.warning,
       },
       {
         variant: 'solid',
         color: 'danger',
-        class: colorVariants.solid.danger
+        class: colorVariants.solid.danger,
       },
       // shadow / color
       {
         variant: 'shadow',
         color: 'primary',
-        class: colorVariants.shadow.primary
+        class: colorVariants.shadow.primary,
       },
       {
         variant: 'shadow',
         color: 'secondary',
-        class: colorVariants.shadow.secondary
+        class: colorVariants.shadow.secondary,
       },
       {
         variant: 'shadow',
         color: 'success',
-        class: colorVariants.shadow.success
+        class: colorVariants.shadow.success,
       },
       {
         variant: 'shadow',
         color: 'warning',
-        class: colorVariants.shadow.warning
+        class: colorVariants.shadow.warning,
       },
       {
         variant: 'shadow',
         color: 'danger',
-        class: colorVariants.shadow.danger
+        class: colorVariants.shadow.danger,
       },
       // bordered / color
       {
         variant: 'bordered',
         color: 'primary',
-        class: colorVariants.bordered.primary
+        class: colorVariants.bordered.primary,
       },
       {
         variant: 'bordered',
         color: 'secondary',
-        class: colorVariants.bordered.secondary
+        class: colorVariants.bordered.secondary,
       },
       {
         variant: 'bordered',
         color: 'success',
-        class: colorVariants.bordered.success
+        class: colorVariants.bordered.success,
       },
       {
         variant: 'bordered',
         color: 'warning',
-        class: colorVariants.bordered.warning
+        class: colorVariants.bordered.warning,
       },
       {
         variant: 'bordered',
         color: 'danger',
-        class: colorVariants.bordered.danger
+        class: colorVariants.bordered.danger,
       },
       // flat / color
       {
         variant: 'flat',
         color: 'primary',
-        class: colorVariants.flat.primary
+        class: colorVariants.flat.primary,
       },
       {
         variant: 'flat',
         color: 'secondary',
-        class: colorVariants.flat.secondary
+        class: colorVariants.flat.secondary,
       },
       {
         variant: 'flat',
         color: 'success',
-        class: colorVariants.flat.success
+        class: colorVariants.flat.success,
       },
       {
         variant: 'flat',
         color: 'warning',
-        class: colorVariants.flat.warning
+        class: colorVariants.flat.warning,
       },
       {
         variant: 'flat',
         color: 'danger',
-        class: colorVariants.flat.danger
+        class: colorVariants.flat.danger,
       },
       // faded / color
       {
         variant: 'faded',
         color: 'primary',
-        class: colorVariants.faded.primary
+        class: colorVariants.faded.primary,
       },
       {
         variant: 'faded',
         color: 'secondary',
-        class: colorVariants.faded.secondary
+        class: colorVariants.faded.secondary,
       },
       {
         variant: 'faded',
         color: 'success',
-        class: colorVariants.faded.success
+        class: colorVariants.faded.success,
       },
       {
         variant: 'faded',
         color: 'warning',
-        class: colorVariants.faded.warning
+        class: colorVariants.faded.warning,
       },
       {
         variant: 'faded',
         color: 'danger',
-        class: colorVariants.faded.danger
+        class: colorVariants.faded.danger,
       },
       // light / color
       {
         variant: 'light',
         color: 'primary',
-        class: [colorVariants.light.primary, 'hover:bg-primary/20']
+        class: [colorVariants.light.primary, 'hover:bg-primary/20'],
       },
       {
         variant: 'light',
         color: 'secondary',
-        class: [colorVariants.light.secondary, 'hover:bg-secondary/20']
+        class: [colorVariants.light.secondary, 'hover:bg-secondary/20'],
       },
       {
         variant: 'light',
         color: 'success',
-        class: [colorVariants.light.success, 'hover:bg-success/20']
+        class: [colorVariants.light.success, 'hover:bg-success/20'],
       },
       {
         variant: 'light',
         color: 'warning',
-        class: [colorVariants.light.warning, 'hover:bg-warning/20']
+        class: [colorVariants.light.warning, 'hover:bg-warning/20'],
       },
       {
         variant: 'light',
         color: 'danger',
-        class: [colorVariants.light.danger, 'hover:bg-danger/20']
+        class: [colorVariants.light.danger, 'hover:bg-danger/20'],
       },
       // ghost / color
       {
         variant: 'ghost',
         color: 'primary',
-        class: [colorVariants.ghost.primary, 'hover:!bg-primary hover:!text-primary-foreground']
+        class: [
+          colorVariants.ghost.primary,
+          'hover:!bg-primary hover:!text-primary-foreground',
+        ],
       },
       {
         variant: 'ghost',
         color: 'secondary',
-        class: [colorVariants.ghost.secondary, 'hover:!bg-secondary hover:!text-secondary-foreground']
+        class: [
+          colorVariants.ghost.secondary,
+          'hover:!bg-secondary hover:!text-secondary-foreground',
+        ],
       },
       {
         variant: 'ghost',
         color: 'success',
-        class: [colorVariants.ghost.success, 'hover:!bg-success hover:!text-success-foreground']
+        class: [
+          colorVariants.ghost.success,
+          'hover:!bg-success hover:!text-success-foreground',
+        ],
       },
       {
         variant: 'ghost',
         color: 'warning',
-        class: [colorVariants.ghost.warning, 'hover:!bg-warning hover:!text-warning-foreground']
+        class: [
+          colorVariants.ghost.warning,
+          'hover:!bg-warning hover:!text-warning-foreground',
+        ],
       },
       {
         variant: 'ghost',
         color: 'danger',
-        class: [colorVariants.ghost.danger, 'hover:!bg-danger hover:!text-danger-foreground']
+        class: [
+          colorVariants.ghost.danger,
+          'hover:!bg-danger hover:!text-danger-foreground',
+        ],
       },
       {
         isIconOnly: true,
         size: 'sm',
-        class: 'w-6 h-6'
+        class: 'w-6 h-6',
       },
       {
         isIconOnly: true,
         size: 'md',
-        class: 'w-8 h-8'
+        class: 'w-8 h-8',
       },
       {
         isIconOnly: true,
         size: 'lg',
-        class: 'w-10 h-10'
+        class: 'w-10 h-10',
       },
       // variant / hover
       {
         variant: ['solid', 'faded', 'flat', 'bordered', 'shadow'],
-        class: 'hover:opacity-hover'
-      }
+        class: 'hover:opacity-hover',
+      },
     ],
     defaultVariants: {
       variant: 'solid',
       isIconOnly: false,
       size: 'md',
       radius: 'full',
-      color: 'primary'
-    }
-  }
+      color: 'primary',
+    },
+  },
 );
 
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>,
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>,
     VariantProps<typeof buttonVariants> {
   continuePropagation?: boolean;
   asChild?: boolean;
@@ -310,7 +326,10 @@ function Button({
 
   return (
     <Comp
-      className={cn(buttonVariants({ variant, color, size, radius, isIconOnly, fullWidth }), className)}
+      className={cn(
+        buttonVariants({ variant, color, size, radius, isIconOnly, fullWidth }),
+        className,
+      )}
       ref={ref}
       onClick={
         !continuePropagation

@@ -21,7 +21,9 @@ function Hash({ value, withCopy, withExplorer }: Props) {
   const { chain } = useNetwork();
   const stringValue = value?.toString();
 
-  const explorerLink = withExplorer ? chainLinks.extrinsicExplorerLink(chain, stringValue) : undefined;
+  const explorerLink = withExplorer
+    ? chainLinks.extrinsicExplorerLink(chain, stringValue)
+    : undefined;
 
   const C = explorerLink ? 'a' : 'span';
 
@@ -35,15 +37,15 @@ function Hash({ value, withCopy, withExplorer }: Props) {
     >
       <>
         {`${stringValue?.slice(0, 8)}…${stringValue?.slice(-8)}`}
-        {withCopy && <CopyButton size='sm' value={stringValue} />}
+        {withCopy && <CopyButton size="sm" value={stringValue} />}
         {explorerLink && (
           <Button
             isIconOnly
-            size='sm'
-            variant='light'
-            className='h-5 min-h-[0px] w-5 min-w-[0px] text-inherit opacity-50'
+            size="sm"
+            variant="light"
+            className="h-5 min-h-[0px] w-5 min-w-[0px] text-inherit opacity-50"
           >
-            <IconLink className='h-4 w-4' />
+            <IconLink className="h-4 w-4" />
           </Button>
         )}
       </>

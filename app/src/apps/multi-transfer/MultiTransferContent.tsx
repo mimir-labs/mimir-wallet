@@ -3,7 +3,11 @@
 
 import type { MultiTransferData } from './types';
 
-import { ApiManager, remoteProxyRelations, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  ApiManager,
+  remoteProxyRelations,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Badge, Button, Divider } from '@mimir-wallet/ui';
 import { isHex } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -14,7 +18,14 @@ import Upload from './Upload';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconDelete from '@/assets/svg/icon-delete.svg?react';
-import { AddressCell, Input, InputAddress, InputNetwork, InputToken, TxButton } from '@/components';
+import {
+  AddressCell,
+  Input,
+  InputAddress,
+  InputNetwork,
+  InputToken,
+  TxButton,
+} from '@/components';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 import { isValidNumber, parseUnits } from '@/utils';
@@ -27,7 +38,13 @@ interface Props {
   setData: React.Dispatch<React.SetStateAction<MultiTransferData[]>>;
 }
 
-function MultiTransferContent({ data, sending, network, setNetwork, setData }: Props) {
+function MultiTransferContent({
+  data,
+  sending,
+  network,
+  setNetwork,
+  setData,
+}: Props) {
   const { network: currentNetwork, chain } = useNetwork();
   const genesisHash = chain.genesisHash;
   const upSm = useMediaQuery('sm');
@@ -43,13 +60,13 @@ function MultiTransferContent({ data, sending, network, setNetwork, setData }: P
       setData([['', '', '']]);
       setInvalidAssetIds([]);
     },
-    [setNetwork, setData]
+    [setNetwork, setData],
   );
 
   // Derive invalid asset IDs: empty when data is empty, otherwise use state
   const effectiveInvalidAssetIds = useMemo(
     () => (data.length === 0 ? [] : invalidAssetIds),
-    [data.length, invalidAssetIds]
+    [data.length, invalidAssetIds],
   );
 
   // Check if all data is valid for batch transfer
@@ -69,18 +86,19 @@ function MultiTransferContent({ data, sending, network, setNetwork, setData }: P
 
     const api = await ApiManager.getInstance().getApi(currentNetwork);
 
-    if (!api) {
-      throw new Error('API not ready');
-    }
-
     const calls = data.map(([address, assetId, amount]) => {
       // Find asset details
       const asset = assets.find((a) => a.assetId === assetId);
       const isNative = assetId === 'native';
-      const decimals = isNative ? api.registry.chainDecimals[0] : asset?.decimals || 0;
+      const decimals = isNative
+        ? api.registry.chainDecimals[0]
+        : asset?.decimals || 0;
 
       if (isNative) {
-        return api.tx.balances.transferKeepAlive(address, parseUnits(amount, decimals));
+        return api.tx.balances.transferKeepAlive(
+          address,
+          parseUnits(amount, decimals),
+        );
       }
 
       if (api.tx.assets) {
@@ -88,15 +106,17 @@ function MultiTransferContent({ data, sending, network, setNetwork, setData }: P
           throw new Error(`Invalid asset id: ${assetId}`);
         }
 
-        return api.tx[isHex(assetId) ? 'foreignAssets' : 'assets'].transferKeepAlive(
-          assetId,
-          address,
-          parseUnits(amount, decimals)
-        );
+        return api.tx[
+          isHex(assetId) ? 'foreignAssets' : 'assets'
+        ].transferKeepAlive(assetId, address, parseUnits(amount, decimals));
       }
 
       if (api.tx.tokens) {
-        return api.tx.tokens.transferKeepAlive(address, assetId, parseUnits(amount, decimals));
+        return api.tx.tokens.transferKeepAlive(
+          address,
+          assetId,
+          parseUnits(amount, decimals),
+        );
       }
 
       throw new Error(`Unsupported asset: ${assetId}`);
@@ -108,36 +128,49 @@ function MultiTransferContent({ data, sending, network, setNetwork, setData }: P
   return (
     <>
       <InputNetwork
-        label='Select Network'
+        label="Select Network"
         network={network}
         setNetwork={handleNetworkChange}
         endContent={
-          sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt]
+          sendingMeta &&
+          sendingMeta.isPure &&
+          remoteProxyRelations[sendingMeta.pureCreatedAt]
             ? {
-                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: <Badge variant='purple'>Remote Proxy</Badge>
+                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: (
+                  <Badge variant="purple">Remote Proxy</Badge>
+                ),
               }
             : undefined
         }
         helper={
-          sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt] === genesisHash ? (
-            <div className='text-foreground'>
-              🥷✨Yep, remote proxy lets you borrow a ninja from another chain — smooth and stealthy! 🕶️
+          sendingMeta &&
+          sendingMeta.isPure &&
+          remoteProxyRelations[sendingMeta.pureCreatedAt] === genesisHash ? (
+            <div className="text-foreground">
+              🥷✨Yep, remote proxy lets you borrow a ninja from another chain —
+              smooth and stealthy! 🕶️
             </div>
           ) : null
         }
       />
 
       {/* sending */}
-      <div className='flex flex-col gap-2'>
-        <p className='text-sm font-bold'>Sending From</p>
-        <div className='bg-secondary rounded-[10px] p-2'>
-          <AddressCell shorten={!upSm} showType value={sending} withCopy withAddressBook />
+      <div className="flex flex-col gap-2">
+        <p className="text-sm font-bold">Sending From</p>
+        <div className="bg-secondary rounded-[10px] p-2">
+          <AddressCell
+            shorten={!upSm}
+            showType
+            value={sending}
+            withCopy
+            withAddressBook
+          />
         </div>
       </div>
 
       {/* upload file */}
       <Upload
-        accept='.csv'
+        accept=".csv"
         onUpload={async (file) => {
           try {
             const assetsToValidate = assets ? assets : await assetsPromise();
@@ -150,7 +183,7 @@ function MultiTransferContent({ data, sending, network, setNetwork, setData }: P
                 setInvalidAssetIds(invalidAssets || []);
               },
               assetsToValidate,
-              console.error
+              console.error,
             );
           } catch (error) {
             console.error('Error processing file:', error);
@@ -160,65 +193,79 @@ function MultiTransferContent({ data, sending, network, setNetwork, setData }: P
 
       <Divider />
 
-      <div className='grid grid-cols-12 gap-2.5'>
-        <div className='col-span-8 flex items-center gap-1 font-bold'>
+      <div className="grid grid-cols-12 gap-2.5">
+        <div className="col-span-8 flex items-center gap-1 font-bold">
           Address
           <Button
-            size='sm'
+            size="sm"
             isIconOnly
-            color='primary'
-            radius='full'
-            variant='light'
+            color="primary"
+            radius="full"
+            variant="light"
             onClick={() => setData((data) => [...data, ['', '', '']])}
           >
-            <IconAdd className='h-4 w-4' />
+            <IconAdd className="h-4 w-4" />
           </Button>
         </div>
-        <div className='col-span-2 font-bold'>Token</div>
-        <div className='col-span-2 font-bold'>Amount</div>
+        <div className="col-span-2 font-bold">Token</div>
+        <div className="col-span-2 font-bold">Amount</div>
         {data.map(([address, assetId, amount], index) => (
           <React.Fragment key={index}>
-            <div className='col-span-8'>
+            <div className="col-span-8">
               <InputAddress
-                placeholder='input address'
-                wrapperClassName='h-[40px]'
+                placeholder="input address"
+                wrapperClassName="h-[40px]"
                 iconSize={20}
-                addressType='row'
+                addressType="row"
                 value={address}
                 onChange={(value) =>
-                  setData((data) => data.map((item, i) => (i === index ? [value, item[1], item[2]] : item)))
+                  setData((data) =>
+                    data.map((item, i) =>
+                      i === index ? [value, item[1], item[2]] : item,
+                    ),
+                  )
                 }
               />
             </div>
-            <div className='col-span-2'>
+            <div className="col-span-2">
               <InputToken
                 address={sending}
-                placeholder='select token'
+                placeholder="select token"
                 identifier={assetId}
-                wrapperClassName='h-[40px]'
+                wrapperClassName="h-[40px]"
                 network={network}
                 onChange={async (value) => {
-                  setData((data) => data.map((item, i) => (i === index ? [item[0], value, item[2]] : item)));
+                  setData((data) =>
+                    data.map((item, i) =>
+                      i === index ? [item[0], value, item[2]] : item,
+                    ),
+                  );
                 }}
               />
             </div>
-            <div className='col-span-2 flex items-center gap-1.5'>
+            <div className="col-span-2 flex items-center gap-1.5">
               <Input
-                className='h-[40px] flex-1'
-                placeholder='Amount'
+                className="h-[40px] flex-1"
+                placeholder="Amount"
                 value={amount}
                 onChange={(value) =>
-                  setData((data) => data.map((item, i) => (i === index ? [item[0], item[1], value] : item)))
+                  setData((data) =>
+                    data.map((item, i) =>
+                      i === index ? [item[0], item[1], value] : item,
+                    ),
+                  )
                 }
               />
               <Button
-                size='sm'
+                size="sm"
                 isIconOnly
-                color='danger'
-                variant='light'
-                onClick={() => setData((data) => data.filter((_, i) => i !== index))}
+                color="danger"
+                variant="light"
+                onClick={() =>
+                  setData((data) => data.filter((_, i) => i !== index))
+                }
               >
-                <IconDelete className='h-4 w-4' />
+                <IconDelete className="h-4 w-4" />
               </Button>
             </div>
           </React.Fragment>
@@ -227,8 +274,10 @@ function MultiTransferContent({ data, sending, network, setNetwork, setData }: P
 
       {/* Asset validation alert */}
       {effectiveInvalidAssetIds.length > 0 && (
-        <Alert variant='destructive'>
-          <AlertTitle>Token not found. (ID= {effectiveInvalidAssetIds.join(', ')})</AlertTitle>
+        <Alert variant="destructive">
+          <AlertTitle>
+            Token not found. (ID= {effectiveInvalidAssetIds.join(', ')})
+          </AlertTitle>
         </Alert>
       )}
 
@@ -240,7 +289,7 @@ function MultiTransferContent({ data, sending, network, setNetwork, setData }: P
         color={isDataValid ? 'primary' : 'danger'}
         disabled={!isDataValid}
         accountId={sending}
-        website='mimir://app/multi-transfer'
+        website="mimir://app/multi-transfer"
         getCall={getBatchCalls}
       >
         {data.length

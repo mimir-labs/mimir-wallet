@@ -15,7 +15,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Tooltip
+  Tooltip,
 } from '@mimir-wallet/ui';
 import { Link, useNavigate } from '@tanstack/react-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -24,7 +24,10 @@ import { useToggle } from 'react-use';
 
 import IconNotification from '@/assets/svg/icon-notification.svg?react';
 import { AddressRow } from '@/components';
-import { type NotificationMessage, useNotifications } from '@/hooks/useNotifications';
+import {
+  type NotificationMessage,
+  useNotifications,
+} from '@/hooks/useNotifications';
 import { formatAgo } from '@/utils';
 
 // Function to get notification status color classes
@@ -38,7 +41,9 @@ function getNotificationStatusColor(status: NotificationMessage['status']) {
 }
 
 // Function to get notification message based on notification type and status
-function getNotificationMessage(notification: NotificationMessage): React.ReactNode {
+function getNotificationMessage(
+  notification: NotificationMessage,
+): React.ReactNode {
   const txRef = `${notification.section}.${notification.method} #${notification.transactionId}`;
 
   const notificationType =
@@ -67,7 +72,7 @@ function getNotificationMessage(notification: NotificationMessage): React.ReactN
         <>
           {txRef} has been approved by{' '}
           <AddressRow
-            className='inline-flex align-middle'
+            className="inline-flex align-middle"
             value={notification.signer}
             withName
             withAddress={false}
@@ -94,7 +99,7 @@ const NotificationItem: React.FC<NotificationItemProps> = React.memo(
   ({ notification, isRead, handleSelect, onMarkAsViewed }) => {
     const { ref, inView } = useInView({
       threshold: 0.5, // Trigger when 50% of the item is visible
-      triggerOnce: true // Only trigger once when first viewed
+      triggerOnce: true, // Only trigger once when first viewed
     });
 
     // Track when the item has been viewed
@@ -110,7 +115,7 @@ const NotificationItem: React.FC<NotificationItemProps> = React.memo(
         className={cn(
           'flex cursor-pointer gap-2.5 rounded-[10px] p-[10px] transition-all duration-200',
           'bg-primary/5 hover:bg-primary/15',
-          isRead ? 'opacity-50' : ''
+          isRead ? 'opacity-50' : '',
         )}
         onClick={() => handleSelect(notification)}
       >
@@ -118,23 +123,32 @@ const NotificationItem: React.FC<NotificationItemProps> = React.memo(
         <div
           className={cn(
             'w-[5px] shrink-0 self-stretch rounded-[20px] transition-colors',
-            getNotificationStatusColor(notification.status)
+            getNotificationStatusColor(notification.status),
           )}
         />
 
         {/* Content */}
-        <div className='flex flex-1 flex-col gap-2.5'>
+        <div className="flex flex-1 flex-col gap-2.5">
           {/* Header */}
-          <div className='flex items-center gap-[5px]'>
-            <AddressRow className='flex-1' value={notification.address} withName withAddress={false} iconSize={20} />
+          <div className="flex items-center gap-[5px]">
+            <AddressRow
+              className="flex-1"
+              value={notification.address}
+              withName
+              withAddress={false}
+              iconSize={20}
+            />
 
             {/* Timestamp */}
-            <span className='text-foreground/60 text-xs font-normal whitespace-nowrap'>
+            <span className="text-foreground/60 text-xs font-normal whitespace-nowrap">
               {formatAgo(notification.updatedAt)} ago
             </span>
 
             {/* Status Icon */}
-            <Avatar src={getChainIcon(notification.genesisHash)?.icon} style={{ width: 14, height: 14 }} />
+            <Avatar
+              src={getChainIcon(notification.genesisHash)?.icon}
+              style={{ width: 14, height: 14 }}
+            />
           </div>
 
           {/* Message */}
@@ -144,7 +158,7 @@ const NotificationItem: React.FC<NotificationItemProps> = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 NotificationItem.displayName = 'NotificationItem';
@@ -153,9 +167,12 @@ function NotificationButton() {
   const [isOpen, toggleOpen] = useToggle(false);
   const anchorEl = useRef<HTMLButtonElement>(null);
 
-  const { notifications, isNotificationRead, markAsRead, getUnreadCount } = useNotifications();
+  const { notifications, isNotificationRead, markAsRead, getUnreadCount } =
+    useNotifications();
   const [filter, setFilter] = useState<string>('all');
-  const [viewedNotifications, setViewedNotifications] = useState<Set<number>>(new Set());
+  const [viewedNotifications, setViewedNotifications] = useState<Set<number>>(
+    new Set(),
+  );
   const [shouldShake, setShouldShake] = useState(false);
   const prevUnreadCountRef = useRef<number>(0);
   const navigate = useNavigate();
@@ -192,10 +209,13 @@ function NotificationButton() {
 
   const handleSelect = useCallback(
     (notification: NotificationMessage) => {
-      navigate({ to: '/transactions/$id', params: { id: notification.transactionId.toString() } });
+      navigate({
+        to: '/transactions/$id',
+        params: { id: notification.transactionId.toString() },
+      });
       toggleOpen(false);
     },
-    [navigate, toggleOpen]
+    [navigate, toggleOpen],
   );
 
   // Mark viewed notifications as read when popover closes
@@ -228,26 +248,32 @@ function NotificationButton() {
       <Popover open={isOpen} onOpenChange={toggleOpen}>
         <PopoverTrigger asChild>
           <div>
-            <Tooltip content='Notification'>
+            <Tooltip content="Notification">
               <Button
                 isIconOnly
                 ref={anchorEl}
                 className={cn(
-                  'border-secondary bg-secondary relative h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent'
+                  'border-secondary bg-secondary relative h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent',
                 )}
-                color='primary'
-                variant='ghost'
-                radius='md'
+                color="primary"
+                variant="ghost"
+                radius="md"
                 onClick={toggleOpen}
               >
                 <BadgeIndicator
                   isInvisible={!unreadCount}
-                  color='danger'
+                  color="danger"
                   isDot
-                  placement='top-right'
-                  badgeClassName='size-1.5 min-w-1.5 min-h-1.5'
+                  placement="top-right"
+                  badgeClassName="size-1.5 min-w-1.5 min-h-1.5"
                 >
-                  <IconNotification className={shouldShake ? 'origin-top animate-[swing_1s_ease-in-out]' : ''} />
+                  <IconNotification
+                    className={
+                      shouldShake
+                        ? 'origin-top animate-[swing_1s_ease-in-out]'
+                        : ''
+                    }
+                  />
                 </BadgeIndicator>
               </Button>
             </Tooltip>
@@ -256,27 +282,29 @@ function NotificationButton() {
         <PopoverContent
           className={cn(
             'w-[360px] max-w-full rounded-[20px] p-4 px-2 shadow-md sm:p-5 sm:px-3',
-            'border-primary/5 border border-solid'
+            'border-primary/5 border border-solid',
           )}
           sideOffset={8}
         >
-          <div className='flex flex-col gap-2.5'>
+          <div className="flex flex-col gap-2.5">
             {/* Header Section */}
             <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className='w-full'>
-                <SelectValue placeholder='All Transaction' />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="All Transaction" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>All Transaction</SelectItem>
-                <SelectItem value='transaction_created'>Pending</SelectItem>
-                <SelectItem value='transaction_executed'>History</SelectItem>
+                <SelectItem value="all">All Transaction</SelectItem>
+                <SelectItem value="transaction_created">Pending</SelectItem>
+                <SelectItem value="transaction_executed">History</SelectItem>
               </SelectContent>
             </Select>
 
             {/* Notifications List */}
-            <div className='flex max-h-[400px] flex-col gap-2.5 overflow-y-auto px-2'>
+            <div className="flex max-h-[400px] flex-col gap-2.5 overflow-y-auto px-2">
               {filteredNotifications.length === 0 ? (
-                <div className='text-foreground/60 py-8 text-center text-sm'>No notifications</div>
+                <div className="text-foreground/60 py-8 text-center text-sm">
+                  No notifications
+                </div>
               ) : (
                 filteredNotifications.map((notification) => (
                   <NotificationItem
@@ -291,10 +319,10 @@ function NotificationButton() {
             </div>
 
             {/* Footer Link */}
-            <div className='px-2 text-center'>
+            <div className="px-2 text-center">
               <Link
-                className='text-primary hover:underline'
-                to='/setting'
+                className="text-primary hover:underline"
+                to="/setting"
                 search={{ tabs: 'notification' }}
                 onClick={toggleOpen}
               >

@@ -18,7 +18,14 @@ interface Props {
   bgcolor?: string;
 }
 
-function BatchItem({ children, actions, from, calldata, bgcolor, registry }: Props) {
+function BatchItem({
+  children,
+  actions,
+  from,
+  calldata,
+  bgcolor,
+  registry,
+}: Props) {
   const [isOpen, toggleOpen] = useToggle(false);
 
   return (

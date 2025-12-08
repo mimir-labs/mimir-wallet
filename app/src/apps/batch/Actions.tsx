@@ -23,7 +23,7 @@ function Actions({
   deleteTx,
   setSelected,
   setRelatedBatches,
-  onClose
+  onClose,
 }: {
   address: string;
   txs: BatchTxItem[];
@@ -39,15 +39,20 @@ function Actions({
   const { network } = useNetwork();
 
   // Filter out batchAll transactions for select all
-  const selectableTxs = useMemo(() => (registry ? filterOutBatchAllTransactions(txs, registry) : []), [txs, registry]);
+  const selectableTxs = useMemo(
+    () => (registry ? filterOutBatchAllTransactions(txs, registry) : []),
+    [txs, registry],
+  );
 
-  const isCheckAll = selectableTxs.length > 0 && selected.length === selectableTxs.length;
-  const isCheckSome = selected.length > 0 && selected.length < selectableTxs.length;
+  const isCheckAll =
+    selectableTxs.length > 0 && selected.length === selectableTxs.length;
+  const isCheckSome =
+    selected.length > 0 && selected.length < selectableTxs.length;
 
   return (
-    <div className='flex gap-5'>
-      <div className='flex flex-1 items-center pl-2'>
-        <label className='inline-flex cursor-pointer items-center gap-2'>
+    <div className="flex gap-5">
+      <div className="flex flex-1 items-center pl-2">
+        <label className="inline-flex cursor-pointer items-center gap-2">
           <Checkbox
             checked={isCheckSome ? 'indeterminate' : isCheckAll}
             onCheckedChange={(checked) => {
@@ -56,7 +61,11 @@ function Actions({
                 analyticsActions.batchInteracted();
                 // Only select non-batchAll transactions
                 setSelected(selectableTxs.map((item) => item.id));
-                setRelatedBatches(selectableTxs.map((item) => item.relatedBatch).filter((item) => item !== undefined));
+                setRelatedBatches(
+                  selectableTxs
+                    .map((item) => item.relatedBatch)
+                    .filter((item) => item !== undefined),
+                );
               } else {
                 setSelected([]);
                 setRelatedBatches([]);
@@ -68,8 +77,8 @@ function Actions({
       </div>
       <Button
         disabled={selected.length === 0}
-        color='danger'
-        variant='ghost'
+        color="danger"
+        variant="ghost"
         onClick={() => {
           setSelected((values) => values.filter((v) => !selected.includes(v)));
           deleteTx(selected);
@@ -78,11 +87,11 @@ function Actions({
         Delete
       </Button>
       <TxButton
-        color='primary'
+        color="primary"
         disabled={selected.length === 0}
         relatedBatches={relatedBatches}
         accountId={address}
-        website='mimir://app/batch'
+        website="mimir://app/batch"
         beforeSend={async () => {
           try {
             setTxs(txs.filter((tx) => !selected.includes(tx.id)));
@@ -97,11 +106,9 @@ function Actions({
           try {
             const api = await ApiManager.getInstance().getApi(network);
 
-            if (!api) {
-              throw new Error('API not ready');
-            }
-
-            const selectedTxs = txs.filter((item) => selected.includes(item.id));
+            const selectedTxs = txs.filter((item) =>
+              selected.includes(item.id),
+            );
 
             if (selectedTxs.length === 0) {
               throw new Error('No transactions selected');

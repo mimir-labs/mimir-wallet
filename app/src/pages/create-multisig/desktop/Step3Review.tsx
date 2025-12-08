@@ -35,48 +35,69 @@ function Step3Review({
   onBack,
   onConfirm,
   onPureProxyChange,
-  threshold
+  threshold,
 }: Step3ReviewProps) {
   const currentNetwork = useNetwork();
   const targetNetwork = isPureProxy ? network : currentNetwork.network;
-  const { supportsProxy: isProxyModuleSupported } = useSupportsProxy(targetNetwork);
+  const { supportsProxy: isProxyModuleSupported } =
+    useSupportsProxy(targetNetwork);
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className="flex flex-col gap-4">
       {/* Account Structure Visualization */}
-      <div className='flex flex-col gap-1'>
-        <label className='text-foreground text-sm font-bold'>Account</label>
-        <AccountStructure isPureProxy={isPureProxy} name={name} members={members} threshold={threshold} />
+      <div className="flex flex-col gap-1">
+        <label className="text-foreground text-sm font-bold">Account</label>
+        <AccountStructure
+          isPureProxy={isPureProxy}
+          name={name}
+          members={members}
+          threshold={threshold}
+        />
       </div>
 
       {/* Name Review */}
       <Input
-        label='Name'
-        placeholder='Enter multisig name'
+        label="Name"
+        placeholder="Enter multisig name"
         value={name}
         onChange={onNameChange}
         helper={
-          <p className='text-foreground/50 text-xs'>
+          <p className="text-foreground/50 text-xs">
             This name will be visible to all Signers and can be changed anytime.
           </p>
         }
       />
 
       {/* Add Pure Proxy */}
-      <AddPureProxy isDisabled isPureProxy={isPureProxy} onPureProxyChange={onPureProxyChange} />
+      <AddPureProxy
+        isDisabled
+        isPureProxy={isPureProxy}
+        onPureProxyChange={onPureProxyChange}
+      />
 
       {/* Network */}
-      {isPureProxy ? <InputNetwork label='Select Network' network={network} setNetwork={setNetwork} /> : null}
+      {isPureProxy ? (
+        <InputNetwork
+          label="Select Network"
+          network={network}
+          setNetwork={setNetwork}
+        />
+      ) : null}
 
       {/* Multisig Signers Review */}
-      <div className='flex flex-col gap-1'>
-        <label className='text-foreground text-sm font-bold'>Multisig Signers</label>
-        <div className='border-divider rounded-[10px] border p-2.5'>
-          <div className='flex flex-col gap-2.5'>
+      <div className="flex flex-col gap-1">
+        <label className="text-foreground text-sm font-bold">
+          Multisig Signers
+        </label>
+        <div className="border-divider rounded-[10px] border p-2.5">
+          <div className="flex flex-col gap-2.5">
             {members.map((member) => (
-              <div key={member} className='bg-secondary flex items-center gap-1 rounded-[5px] px-1 py-1'>
+              <div
+                key={member}
+                className="bg-secondary flex items-center gap-1 rounded-[5px] px-1 py-1"
+              >
                 <AddressRow
-                  className='[&_.AddressRow-Address]:text-[#949494]'
+                  className="[&_.AddressRow-Address]:text-[#949494]"
                   value={member}
                   withAddress
                   withName
@@ -89,35 +110,44 @@ function Step3Review({
       </div>
 
       {/* Threshold Review */}
-      <div className='flex flex-col gap-1'>
-        <label className='text-foreground text-sm font-bold'>Threshold</label>
-        <div className='bg-secondary rounded-[10px] px-2.5 py-2'>
-          <span className='text-foreground text-sm'>
+      <div className="flex flex-col gap-1">
+        <label className="text-foreground text-sm font-bold">Threshold</label>
+        <div className="bg-secondary rounded-[10px] px-2.5 py-2">
+          <span className="text-foreground text-sm">
             {threshold} out of {members.length}
           </span>
         </div>
       </div>
 
       {/* Divider */}
-      <Divider className='bg-secondary' />
+      <Divider className="bg-secondary" />
 
       {/* Proxy Module Not Supported Alert */}
       {isPureProxy && !isProxyModuleSupported && (
-        <Alert variant='destructive'>
-          <AlertTitle>The current network does not support proxy module</AlertTitle>
+        <Alert variant="destructive">
+          <AlertTitle>
+            The current network does not support proxy module
+          </AlertTitle>
         </Alert>
       )}
 
       {/* Action Buttons */}
-      <div className='flex gap-2.5'>
-        <Button fullWidth size='md' variant='ghost' color='primary' radius='full' onClick={onBack}>
+      <div className="flex gap-2.5">
+        <Button
+          fullWidth
+          size="md"
+          variant="ghost"
+          color="primary"
+          radius="full"
+          onClick={onBack}
+        >
           Back
         </Button>
         <Button
           fullWidth
-          size='md'
-          color='primary'
-          radius='full'
+          size="md"
+          color="primary"
+          radius="full"
           onClick={onConfirm}
           disabled={isPureProxy && !isProxyModuleSupported}
         >

@@ -9,14 +9,21 @@ import { u8aToHex } from '@polkadot/util';
 
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 
-export function deriveAccountMeta(account: AccountData, metas: Record<string, AddressMeta>) {
+export function deriveAccountMeta(
+  account: AccountData,
+  metas: Record<string, AddressMeta>,
+) {
   const addressHex = addressToHex(account.address);
 
-  if (account.type === 'multisig' && (!metas[addressHex]?.isMultisig || (metas[addressHex]?.who || []).length === 0)) {
+  if (
+    account.type === 'multisig' &&
+    (!metas[addressHex]?.isMultisig ||
+      (metas[addressHex]?.who || []).length === 0)
+  ) {
     const existingMeta = metas[addressHex] || {};
     const baseMeta = {
       name: account.name || existingMeta.name || '',
-      isMimir: !!account.isMimir
+      isMimir: !!account.isMimir,
     };
 
     metas[addressHex] = {
@@ -25,8 +32,8 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
       ...{
         isMultisig: true,
         threshold: account.threshold,
-        who: account.members.map(({ address }) => address)
-      }
+        who: account.members.map(({ address }) => address),
+      },
     } as AddressMeta;
 
     for (const member of account.members) {
@@ -38,7 +45,7 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
     const existingMeta: AddressMeta = metas[addressHex] || {};
     const baseMeta = {
       name: account.name || existingMeta.name || '',
-      isMimir: !!account.isMimir
+      isMimir: !!account.isMimir,
     };
 
     metas[addressHex] = {
@@ -52,7 +59,7 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
       creator: account.creator,
       disambiguationIndex: account.disambiguationIndex,
       pureCreatedAt: account.network,
-      migrationNetwork: account.migrationNetwork
+      migrationNetwork: account.migrationNetwork,
     } as AddressMeta;
   }
 
@@ -60,7 +67,7 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
     const existingMeta = metas[addressHex] || {};
     const baseMeta = {
       name: account.name || existingMeta.name || '',
-      isMimir: !!account.isMimir
+      isMimir: !!account.isMimir,
     };
 
     metas[addressHex] = {
@@ -69,9 +76,13 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
       ...{
         isProxied: true,
         delegatees: account.delegatees.map(({ address }) => address),
-        multipleMultisig: account.delegatees.filter((item) => item.type === 'multisig').length > 1,
-        proxyNetworks: Array.from(new Set(account.delegatees.map((item) => item.proxyNetwork)))
-      }
+        multipleMultisig:
+          account.delegatees.filter((item) => item.type === 'multisig').length >
+          1,
+        proxyNetworks: Array.from(
+          new Set(account.delegatees.map((item) => item.proxyNetwork)),
+        ),
+      },
     } as AddressMeta;
 
     for (const delegatee of account.delegatees) {
@@ -80,7 +91,7 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
 
       const baseMeta = {
         name: delegatee.name || existingMeta.name || '',
-        isMimir: !!delegatee.isMimir
+        isMimir: !!delegatee.isMimir,
       };
 
       metas[delegateeHex] = {
@@ -90,8 +101,8 @@ export function deriveAccountMeta(account: AccountData, metas: Record<string, Ad
           isProxy: true,
           proxyType: delegatee.proxyType,
           network: delegatee.proxyNetwork,
-          delay: delegatee.proxyDelay
-        }
+          delay: delegatee.proxyDelay,
+        },
       } as AddressMeta;
 
       deriveAccountMeta(delegatee, metas);
@@ -105,11 +116,11 @@ export function groupAccounts(
   accounts: AccountData[],
   hideAccountHex: HexString[],
   metas: Record<string, AddressMeta>,
-  filter?: string
+  filter?: string,
 ): Record<GroupName, string[]> {
   const ret: Record<GroupName, string[]> = {
     mimir: [],
-    injected: []
+    injected: [],
   };
 
   for (let i = 0; i < accounts.length; i++) {
@@ -125,7 +136,9 @@ export function groupAccounts(
       if (
         !account.address.toLowerCase().includes(filter.toLowerCase()) &&
         !meta.name?.toLowerCase().includes(filter.toLowerCase()) &&
-        (identity ? !identity.toLowerCase().includes(filter.toLowerCase()) : true)
+        (identity
+          ? !identity.toLowerCase().includes(filter.toLowerCase())
+          : true)
       ) {
         continue;
       }
@@ -133,7 +146,9 @@ export function groupAccounts(
 
     if (meta?.isInjected) {
       ret.injected.push(account.address);
-    } else if (!hideAccountHex.includes(u8aToHex(decodeAddress(account.address)))) {
+    } else if (
+      !hideAccountHex.includes(u8aToHex(decodeAddress(account.address)))
+    ) {
       ret.mimir.push(account.address);
     }
   }
@@ -148,7 +163,7 @@ export function reduceAccount(
   account: AccountData,
   cb: (account: AccountData, proxyType?: string, delay?: number) => void,
   proxyType?: string,
-  delay?: number
+  delay?: number,
 ) {
   if (account.type === 'multisig') {
     for (const member of account.members) {
@@ -163,7 +178,10 @@ export function reduceAccount(
   cb(account, proxyType, delay);
 }
 
-export function sortAccounts(addresses: string[], metas: Record<HexString, AddressMeta>) {
+export function sortAccounts(
+  addresses: string[],
+  metas: Record<HexString, AddressMeta>,
+) {
   // sort addresses by the order of the metas
   // injected accounts first
   // pure accounts next
@@ -178,12 +196,14 @@ export function sortAccounts(addresses: string[], metas: Record<HexString, Addre
     if (metaA?.isInjected && !metaB?.isInjected) return -1;
     if (!metaA?.isInjected && metaB?.isInjected) return 1;
     // If both are injected accounts, sort by name
-    if (metaA?.isInjected && metaB?.isInjected) return addressNameA.localeCompare(addressNameB);
+    if (metaA?.isInjected && metaB?.isInjected)
+      return addressNameA.localeCompare(addressNameB);
 
     if (metaA?.isPure && !metaB?.isPure) return -1;
     if (!metaA?.isPure && metaB?.isPure) return 1;
     // If both are pure accounts, sort by name
-    if (metaA?.isPure && metaB?.isPure) return addressNameA.localeCompare(addressNameB);
+    if (metaA?.isPure && metaB?.isPure)
+      return addressNameA.localeCompare(addressNameB);
 
     // otherwise, sort by address name
     return addressNameA.localeCompare(addressNameB);

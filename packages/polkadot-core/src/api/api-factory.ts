@@ -6,7 +6,7 @@ import type { Endpoint } from '../types/types.js';
 import { store } from '@mimir-wallet/service';
 import { ApiPromise } from '@polkadot/api';
 
-import { typesBundle } from '../types/api-types/index.js';
+import { getTypesBundle } from '../types/api-types/index.js';
 import { NETWORK_RPC_PREFIX } from '../utils/defaults.js';
 import { getMetadata } from '../utils/metadata.js';
 import { StoredRegistry } from '../utils/registry.js';
@@ -21,8 +21,13 @@ import { ApiProvider } from './ApiProvider.js';
  * @param network - Network key for looking up custom RPC
  * @returns Array of WebSocket endpoints
  */
-export function getEndpoints(apiUrl: string | string[], network: string): string[] {
-  let wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as string | undefined;
+export function getEndpoints(
+  apiUrl: string | string[],
+  network: string,
+): string[] {
+  let wsUrl = store.get(`${NETWORK_RPC_PREFIX}${network}`) as
+    | string
+    | undefined;
 
   if (!wsUrl || (!wsUrl.startsWith('ws://') && !wsUrl.startsWith('wss://'))) {
     wsUrl = undefined;
@@ -43,17 +48,20 @@ export async function createApi(chain: Endpoint): Promise<ApiPromise> {
   const endpoints = getEndpoints(Object.values(chain.wsUrl), chain.key);
   const provider = new ApiProvider(endpoints);
   const registry = new StoredRegistry();
-  const metadata = await getMetadata(chain.key);
+  const [metadata, typesBundle] = await Promise.all([
+    getMetadata(chain.key),
+    getTypesBundle(),
+  ]);
 
   return new ApiPromise({
     provider,
     registry: registry as any,
     typesBundle,
     typesChain: {
-      Crust: { DispatchErrorModule: 'DispatchErrorModuleU8' }
+      Crust: { DispatchErrorModule: 'DispatchErrorModuleU8' },
     },
     metadata,
     rpcCacheCapacity: 1,
-    noInitWarn: true
+    noInitWarn: true,
   });
 }

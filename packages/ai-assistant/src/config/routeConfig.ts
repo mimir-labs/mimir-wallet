@@ -11,29 +11,31 @@ export const FUNCTION_ROUTE_CONFIG: Record<string, RouteRequirement> = {
   createMultisig: {
     path: '/create-multisig',
     displayName: 'Create Multisig',
-    autoNavigate: true
+    autoNavigate: true,
   },
   createProxy: {
     path: '/add-proxy',
     displayName: 'Add Proxy',
-    autoNavigate: true
+    autoNavigate: true,
   },
   transferForm: {
     path: '/explorer/mimir%3A%2F%2Fapp%2Ftransfer',
     displayName: 'Transfer',
-    autoNavigate: true
+    autoNavigate: true,
   },
   batchTransferForm: {
     path: '/explorer/mimir%3A%2F%2Fapp%2Fmulti-transfer',
     displayName: 'Multi Transfer',
-    autoNavigate: true
-  }
+    autoNavigate: true,
+  },
 };
 
 /**
  * Get static route requirement for a function
  */
-export function getStaticRouteRequirement(functionName: string): RouteRequirement | undefined {
+export function getStaticRouteRequirement(
+  functionName: string,
+): RouteRequirement | undefined {
   return FUNCTION_ROUTE_CONFIG[functionName];
 }
 

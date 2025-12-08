@@ -36,7 +36,7 @@ function EditableField({
   multiline = false,
   maxLength,
   pattern,
-  validator
+  validator,
 }: EditableFieldProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [localValue, setLocalValue] = useState(value);
@@ -92,7 +92,9 @@ function EditableField({
     onEditEnd?.();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     if (e.key === 'Enter' && !multiline) {
       e.preventDefault();
       handleSave();
@@ -101,7 +103,9 @@ function EditableField({
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const newValue = e.target.value;
 
     if (!maxLength || newValue.length <= maxLength) {
@@ -125,7 +129,7 @@ function EditableField({
     return (
       <InputComponent
         ref={inputRef as any}
-        type='text'
+        type="text"
         value={localValue}
         onChange={handleChange}
         onBlur={handleSave}
@@ -141,8 +145,13 @@ function EditableField({
 
   return (
     <div className={`flex items-center gap-[5px] leading-[20px] ${className}`}>
-      <span className={`${disabled ? 'opacity-50' : ''} ${error ? 'text-danger' : ''}`}>{value || placeholder}</span>
-      {!disabled && (icon ? <span onClick={handleStartEdit}>{icon}</span> : defaultIcon)}
+      <span
+        className={`${disabled ? 'opacity-50' : ''} ${error ? 'text-danger' : ''}`}
+      >
+        {value || placeholder}
+      </span>
+      {!disabled &&
+        (icon ? <span onClick={handleStartEdit}>{icon}</span> : defaultIcon)}
     </div>
   );
 }

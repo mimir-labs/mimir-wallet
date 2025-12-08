@@ -18,7 +18,7 @@ import { useTxQueue } from '@/hooks/useTxQueue';
 function SubmitProxy({
   proxied,
   proxyArgs,
-  setProxyArgs
+  setProxyArgs,
 }: {
   proxied?: string;
   proxyArgs: ProxyArgs[];
@@ -39,18 +39,24 @@ function SubmitProxy({
 
     const api = await ApiManager.getInstance().getApi(network);
 
-    if (!api) {
-      return;
-    }
-
     toggleAlertOpen(false);
 
     const call =
       proxyArgs.length > 1
         ? api.tx.utility.batchAll(
-            proxyArgs.map((item) => api.tx.proxy.addProxy(item.delegate, item.proxyType as any, item.delay))
+            proxyArgs.map((item) =>
+              api.tx.proxy.addProxy(
+                item.delegate,
+                item.proxyType as any,
+                item.delay,
+              ),
+            ),
           ).method
-        : api.tx.proxy.addProxy(proxyArgs[0].delegate, proxyArgs[0].proxyType as any, proxyArgs[0].delay).method;
+        : api.tx.proxy.addProxy(
+            proxyArgs[0].delegate,
+            proxyArgs[0].proxyType as any,
+            proxyArgs[0].delay,
+          ).method;
 
     addQueue({
       call,
@@ -59,28 +65,31 @@ function SubmitProxy({
       network,
       onResults: (result) => {
         setProxyArgs([]);
-        const events = result.events.filter((item) => api.events.proxy.ProxyAdded.is(item.event));
+        const events = result.events.filter((item) =>
+          api.events.proxy.ProxyAdded.is(item.event),
+        );
 
         if (events.length > 0) {
           toastSuccess(
-            <div className='ml-4 flex flex-col gap-1'>
+            <div className="ml-4 flex flex-col gap-1">
               <p>
                 <b>Proxy Added</b>
               </p>
-              <p className='text-xs'>
-                <Address value={proxied} shorten /> added {proxyArgs.length} new proxy
+              <p className="text-xs">
+                <Address value={proxied} shorten /> added {proxyArgs.length} new
+                proxy
               </p>
               <Link
-                className='text-primary text-xs no-underline'
-                to='/'
+                className="text-primary text-xs no-underline"
+                to="/"
                 search={{ address: proxied.toString(), tab: 'structure' }}
               >
                 Account Structure{'>'}
               </Link>
-            </div>
+            </div>,
           );
         }
-      }
+      },
     });
   }, [addQueue, network, proxied, proxyArgs, setProxyArgs, toggleAlertOpen]);
 
@@ -92,7 +101,9 @@ function SubmitProxy({
       const safetyResult = await checkSafety(delegate);
 
       if (safetyResult.hasWarnings) {
-        safetyResult.indirectControllers.forEach((controller) => allControllers.add(controller));
+        safetyResult.indirectControllers.forEach((controller) =>
+          allControllers.add(controller),
+        );
       }
     }
 
@@ -108,7 +119,7 @@ function SubmitProxy({
     <>
       <TxButton
         fullWidth
-        color='primary'
+        color="primary"
         disabled={!(proxyArgs.length && proxied)}
         accountId={proxied}
         overrideAction={handleClickAction[1]}

@@ -15,14 +15,14 @@ export interface UseRegistryResult {
 /**
  * Fetch registry from API
  */
-async function fetchRegistry({ queryKey }: { queryKey: readonly [string, string] }): Promise<Registry | null> {
+async function fetchRegistry({
+  queryKey,
+}: {
+  queryKey: readonly [string, string];
+}): Promise<Registry | null> {
   const [, network] = queryKey;
 
   const api = await ApiManager.getInstance().getApi(network);
-
-  if (!api) {
-    return null;
-  }
 
   return api.registry;
 }
@@ -48,12 +48,12 @@ export function useRegistry(network: string): UseRegistryResult {
     queryFn: fetchRegistry,
     enabled: !!network,
     staleTime: Infinity, // Registry doesn't change
-    retry: false
+    retry: false,
   });
 
   return {
     registry: data ?? null,
     isLoading,
-    error: error as Error | null
+    error: error as Error | null,
   };
 }

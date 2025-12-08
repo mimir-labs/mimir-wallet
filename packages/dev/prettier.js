@@ -2,20 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export default {
-  arrowParens: 'always',
-  bracketSpacing: true,
-  embeddedLanguageFormatting: 'off',
-  endOfLine: 'lf',
-  htmlWhitespaceSensitivity: 'ignore',
-  jsxBracketSameLine: false,
-  jsxSingleQuote: true,
-  printWidth: 120,
-  proseWrap: 'preserve',
-  quoteProps: 'as-needed',
   semi: true,
   singleQuote: true,
   tabWidth: 2,
-  trailingComma: 'none',
   useTabs: false,
-  plugins: ['prettier-plugin-tailwindcss']
+  trailingComma: 'all',
+  printWidth: 80,
+  bracketSpacing: true,
+  arrowParens: 'always',
+  endOfLine: 'lf',
 };

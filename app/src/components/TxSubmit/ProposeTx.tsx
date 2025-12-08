@@ -22,7 +22,7 @@ function ProposeTx({
   iconUrl,
   appName,
   note,
-  onProposed
+  onProposed,
 }: {
   call: IMethod | null;
   account?: string;
@@ -50,17 +50,24 @@ function ProposeTx({
       return;
     }
 
-    const injected = await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(CONNECT_ORIGIN);
+    const injected =
+      await window.injectedWeb3?.[walletConfig[source]?.key || ''].enable(
+        CONNECT_ORIGIN,
+      );
     const injectSigner = injected?.signer;
 
     if (!injectSigner) {
-      toastError(`Please connect to the wallet: ${walletConfig[source]?.name || source}`);
+      toastError(
+        `Please connect to the wallet: ${walletConfig[source]?.name || source}`,
+      );
 
       return;
     }
 
     if (!injectSigner.signRaw) {
-      toastError(`Wallet ${walletConfig[source]?.name || source} does not support signRaw`);
+      toastError(
+        `Wallet ${walletConfig[source]?.name || source} does not support signRaw`,
+      );
 
       return;
     }
@@ -78,7 +85,7 @@ Call Data: ${call.toHex()}`;
       const result = await injectSigner.signRaw({
         address: proposer,
         data: message,
-        type: 'bytes'
+        type: 'bytes',
       });
 
       await service.transaction.submitPropose(
@@ -91,7 +98,7 @@ Call Data: ${call.toHex()}`;
         appName,
         iconUrl,
         note,
-        website
+        website,
       );
       onProposed?.();
     } catch (error) {
@@ -105,8 +112,8 @@ Call Data: ${call.toHex()}`;
     <>
       <Button
         fullWidth
-        variant='solid'
-        color='primary'
+        variant="solid"
+        color="primary"
         onClick={handleClick}
         disabled={loading || !account || !proposer || !call}
       >

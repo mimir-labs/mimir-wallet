@@ -13,9 +13,9 @@ function Bytes({ value }: { value?: string | HexString }) {
   const size = useMemo(() => hexToU8a(value || '0x').length, [value]);
 
   return (
-    <span className='inline-flex items-center gap-x-1'>
+    <span className="inline-flex items-center gap-x-1">
       {size} Bytes
-      <CopyButton value={value} size='sm' className='opacity-50' />
+      <CopyButton value={value} size="sm" className="opacity-50" />
     </span>
   );
 }

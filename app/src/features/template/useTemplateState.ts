@@ -27,12 +27,20 @@ export function useTemplateState(config: TemplateStateConfig) {
   const { callData: propCallData, templateName } = config;
 
   // View state management
-  const [currentView, setCurrentView] = useState<TemplateViewState>(propCallData ? 'add' : 'list');
+  const [currentView, setCurrentView] = useState<TemplateViewState>(
+    propCallData ? 'add' : 'list',
+  );
 
   // Form data management
-  const [defaultCallData, setDefaultCallData] = useState<HexString | undefined>(propCallData);
-  const [viewTemplate, setViewTemplate] = useState<HexString | undefined>(undefined);
-  const [viewTemplateName, setViewTemplateName] = useState<string | undefined>(templateName);
+  const [defaultCallData, setDefaultCallData] = useState<HexString | undefined>(
+    propCallData,
+  );
+  const [viewTemplate, setViewTemplate] = useState<HexString | undefined>(
+    undefined,
+  );
+  const [viewTemplateName, setViewTemplateName] = useState<string | undefined>(
+    templateName,
+  );
 
   // State transition actions
   const actions = {
@@ -75,7 +83,7 @@ export function useTemplateState(config: TemplateStateConfig) {
       setDefaultCallData(propCallData);
       setViewTemplate(undefined);
       setViewTemplateName(templateName);
-    }
+    },
   };
 
   return {
@@ -91,6 +99,6 @@ export function useTemplateState(config: TemplateStateConfig) {
     // Computed properties
     isAddView: currentView === 'add',
     isViewTemplate: currentView === 'view',
-    isListView: currentView === 'list'
+    isListView: currentView === 'list',
   };
 }

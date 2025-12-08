@@ -23,7 +23,13 @@ function findSubPendingTx(transaction: Transaction): Transaction | null {
   return null;
 }
 
-function ViewPending({ transaction, filterPaths }: { transaction: Transaction; filterPaths: FilterPath[][] }) {
+function ViewPending({
+  transaction,
+  filterPaths,
+}: {
+  transaction: Transaction;
+  filterPaths: FilterPath[][];
+}) {
   const { setCurrent } = useAccount();
 
   if (transaction.status !== TransactionStatus.Initialized) {
@@ -43,8 +49,8 @@ function ViewPending({ transaction, filterPaths }: { transaction: Transaction; f
   return (
     <Button
       fullWidth
-      color='primary'
-      variant='ghost'
+      color="primary"
+      variant="ghost"
       onClick={() => {
         setCurrent(subPendingTx.address);
       }}

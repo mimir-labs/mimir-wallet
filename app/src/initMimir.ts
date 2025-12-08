@@ -1,12 +1,24 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { addressToHex, allEndpoints, CURRENT_NETWORK_KEY, isPolkadotAddress } from '@mimir-wallet/polkadot-core';
+import {
+  addressToHex,
+  allEndpoints,
+  CURRENT_NETWORK_KEY,
+  isPolkadotAddress,
+} from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
 import { encodeAddress } from '@polkadot/util-crypto';
 
-import { CURRENT_ADDRESS_HEX_KEY, CURRENT_ADDRESS_PREFIX, FAVORITE_DAPP_KEY } from '@/constants';
-import { internalToUrlNetwork, urlToInternalNetwork } from '@/utils/networkMapping';
+import {
+  CURRENT_ADDRESS_HEX_KEY,
+  CURRENT_ADDRESS_PREFIX,
+  FAVORITE_DAPP_KEY,
+} from '@/constants';
+import {
+  internalToUrlNetwork,
+  urlToInternalNetwork,
+} from '@/utils/networkMapping';
 
 export function initMimir(omni: boolean) {
   const search = new URLSearchParams(window.location.search);
@@ -50,7 +62,9 @@ export function initMimir(omni: boolean) {
       ? store.set(CURRENT_ADDRESS_HEX_KEY, addressToHex(address))
       : store.set(`${CURRENT_ADDRESS_PREFIX}${network}`, addressToHex(address));
   } else {
-    omni ? store.remove(CURRENT_ADDRESS_HEX_KEY) : store.remove(`${CURRENT_ADDRESS_PREFIX}${network}`);
+    omni
+      ? store.remove(CURRENT_ADDRESS_HEX_KEY)
+      : store.remove(`${CURRENT_ADDRESS_PREFIX}${network}`);
   }
 
   // Sync URL with final values if they're not present
@@ -82,7 +96,7 @@ export function initMimir(omni: boolean) {
 
   return {
     address,
-    chain
+    chain,
   };
 }
 

@@ -1,7 +1,10 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-interface BorderSpinWrapperProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+interface BorderSpinWrapperProps extends React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+> {
   children: React.ReactNode;
   loading?: boolean;
   className?: string;
@@ -14,7 +17,12 @@ interface BorderSpinWrapperProps extends React.DetailedHTMLProps<React.HTMLAttri
  * Note: Requires @property --border-angle and @keyframes border-spin
  * to be defined in global CSS (style.css)
  */
-export function BorderSpinWrapper({ children, loading = true, className = '', ...props }: BorderSpinWrapperProps) {
+export function BorderSpinWrapper({
+  children,
+  loading = true,
+  className = '',
+  ...props
+}: BorderSpinWrapperProps) {
   return (
     <div
       {...props}
@@ -30,10 +38,10 @@ export function BorderSpinWrapper({ children, loading = true, className = '', ..
               var(--primary) 100%
             )`
           : 'transparent',
-        animation: loading ? 'border-spin 1.5s linear infinite' : 'none'
+        animation: loading ? 'border-spin 1.5s linear infinite' : 'none',
       }}
     >
-      <div className='bg-background rounded-lg'>{children}</div>
+      <div className="bg-background rounded-lg">{children}</div>
     </div>
   );
 }

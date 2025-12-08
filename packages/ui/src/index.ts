@@ -4,7 +4,13 @@
 export { default as TextEllipsis } from './text-ellipsis/index.js';
 
 // Shadcn components
-export { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from './shadcn/modal-compat.js';
+export {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from './shadcn/modal-compat.js';
 export * from './shadcn/index.js';
 export type { ButtonProps } from './shadcn/index.js';
 

@@ -3,7 +3,13 @@
 
 import type { TransactionResult } from '../types';
 
-import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@mimir-wallet/ui';
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+} from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
 import { memo } from 'react';
 
@@ -21,7 +27,12 @@ interface SuccessModalProps {
   network: string;
 }
 
-function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessModalProps) {
+function SuccessModal({
+  isOpen,
+  onClose,
+  transactionResult,
+  network,
+}: SuccessModalProps) {
   const navigate = useNavigate();
   const [isCopied, copy] = useCopyClipboard(2000);
   const { setCurrent } = useAccount();
@@ -64,8 +75,8 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
         to: `/transactions`,
         search: {
           address: accountAddress,
-          network: network
-        }
+          network: network,
+        },
       });
     } else {
       navigate({ to: `/transactions`, search: { network: network } });
@@ -103,74 +114,96 @@ function SuccessModal({ isOpen, onClose, transactionResult, network }: SuccessMo
     if (type === 'pure') {
       return (
         <>
-          Your <span className='text-primary'>Pure Account</span>{' '}
-          {isPending ? 'was successfully initiated!' : 'was successfully created!'}
+          Your <span className="text-primary">Pure Account</span>{' '}
+          {isPending
+            ? 'was successfully initiated!'
+            : 'was successfully created!'}
         </>
       );
     }
 
     return (
       <>
-        Your <span className='text-primary'>proxy Relationship</span>{' '}
+        Your <span className="text-primary">proxy Relationship</span>{' '}
         {isPending ? 'was successfully initiated!' : 'is now active!'}
       </>
     );
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='md' hideCloseButton>
+    <Modal isOpen={isOpen} onClose={onClose} size="md" hideCloseButton>
       <ModalContent>
-        <ModalBody className='flex flex-col items-center gap-5 py-5 pt-10'>
-          <div className='bg-primary flex h-[120px] w-[120px] items-center justify-center rounded-[30px]'>
-            <img src='/images/congrats.png' className='w-20' />
+        <ModalBody className="flex flex-col items-center gap-5 py-5 pt-10">
+          <div className="bg-primary flex h-[120px] w-[120px] items-center justify-center rounded-[30px]">
+            <img src="/images/congrats.png" className="w-20" />
           </div>
 
-          <div className='text-center'>
-            <h2 className='text-foreground text-xl font-bold'>{getTitle()}</h2>
+          <div className="text-center">
+            <h2 className="text-foreground text-xl font-bold">{getTitle()}</h2>
           </div>
 
           {/* Account Relationship Display */}
-          <div className='relative flex w-full flex-col items-center gap-[5px]'>
+          <div className="relative flex w-full flex-col items-center gap-[5px]">
             {/* Proxy Account (Upper) */}
-            <div className='bg-secondary w-full rounded-[10px] p-2.5'>
-              <AddressCell shorten={false} value={transactionResult?.context?.proxy} />
+            <div className="bg-secondary w-full rounded-[10px] p-2.5">
+              <AddressCell
+                shorten={false}
+                value={transactionResult?.context?.proxy}
+              />
             </div>
 
             <ProxyControls
               tiny
               proxyType={transactionResult?.context?.proxyType || 'Any'}
-              className='!absolute inset-x-auto inset-y-0 z-10 m-auto'
+              className="!absolute inset-x-auto inset-y-0 z-10 m-auto"
             />
 
             {/* Proxied Account (Lower) */}
             {transactionResult?.context?.type === 'pure' ? (
-              <div className='bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5'>
+              <div className="bg-secondary flex h-14 w-full items-center gap-2.5 rounded-[10px] px-2.5">
                 <img src={PureIcon} style={{ width: 30 }} />
-                <span className='text-foreground font-bold'>
-                  {transactionResult.context.pureProxyName || DEFAULT_PURE_ACCOUNT_NAME}
+                <span className="text-foreground font-bold">
+                  {transactionResult.context.pureProxyName ||
+                    DEFAULT_PURE_ACCOUNT_NAME}
                 </span>
               </div>
             ) : (
-              <div className='bg-secondary w-full rounded-[10px] p-2.5'>
+              <div className="bg-secondary w-full rounded-[10px] p-2.5">
                 <AddressCell value={transactionResult?.context?.proxied} />
               </div>
             )}
           </div>
         </ModalBody>
 
-        <ModalFooter className='flex-col'>
+        <ModalFooter className="flex-col">
           {/* Action Buttons */}
           {transactionResult?.isPending ? (
             <>
-              <Button fullWidth color='primary' radius='full' onClick={handleGoToPending}>
+              <Button
+                fullWidth
+                color="primary"
+                radius="full"
+                onClick={handleGoToPending}
+              >
                 Go to Pending
               </Button>
-              <Button fullWidth variant='bordered' color='primary' radius='full' onClick={handleShareToSigners}>
+              <Button
+                fullWidth
+                variant="bordered"
+                color="primary"
+                radius="full"
+                onClick={handleShareToSigners}
+              >
                 {isCopied ? '✅ Copied' : 'Share to other Signers'}
               </Button>
             </>
           ) : (
-            <Button fullWidth color='primary' radius='full' onClick={handleStartUsing}>
+            <Button
+              fullWidth
+              color="primary"
+              radius="full"
+              onClick={handleStartUsing}
+            >
               Start using
             </Button>
           )}

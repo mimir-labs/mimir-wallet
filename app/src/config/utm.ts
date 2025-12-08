@@ -20,7 +20,10 @@ function initializeUTM(): UTM {
     const utm_medium = url.searchParams.get('utm_medium');
     const utm_campaign = url.searchParams.get('utm_campaign');
 
-    sessionStorage.setItem(UTM_KEY, JSON.stringify({ utm_source, utm_medium, utm_campaign }));
+    sessionStorage.setItem(
+      UTM_KEY,
+      JSON.stringify({ utm_source, utm_medium, utm_campaign }),
+    );
   }
 
   const utmStr = sessionStorage.getItem(UTM_KEY);

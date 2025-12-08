@@ -1,9 +1,22 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { type Endpoint, NETWORK_RPC_PREFIX, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  type Endpoint,
+  NETWORK_RPC_PREFIX,
+  useChains,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import { store } from '@mimir-wallet/service';
-import { Alert, AlertTitle, Button, buttonSpinner, Combobox, type ComboboxOption, Divider } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  buttonSpinner,
+  Combobox,
+  type ComboboxOption,
+  Divider,
+} from '@mimir-wallet/ui';
 import { WsProvider } from '@polkadot/api';
 import { useState } from 'react';
 import { useAsyncFn } from 'react-use';
@@ -13,7 +26,9 @@ import { isValidWsUrl } from '@/utils';
 
 function Content({ chain }: { chain: Endpoint }) {
   const [url, setUrl] = useState(
-    (store.get(`${NETWORK_RPC_PREFIX}${chain.key}`) as string) || Object.values(chain.wsUrl)[0] || ''
+    (store.get(`${NETWORK_RPC_PREFIX}${chain.key}`) as string) ||
+      Object.values(chain.wsUrl)[0] ||
+      '',
   );
 
   const [error, setError] = useState<Error | undefined>(undefined);
@@ -40,7 +55,7 @@ function Content({ chain }: { chain: Endpoint }) {
         provider.isReady.then(() => {
           return provider.send('chain_getBlockHash', [0]);
         }),
-        timeoutPromise
+        timeoutPromise,
       ]);
 
       if (rpcGenesisHash !== chain.genesisHash) {
@@ -61,10 +76,12 @@ function Content({ chain }: { chain: Endpoint }) {
   }, [url, chain.genesisHash, chain.key]);
 
   // Convert wsUrl entries to combobox options
-  const rpcOptions: ComboboxOption[] = Object.entries(chain.wsUrl).map(([name, wsUrl]) => ({
-    value: wsUrl,
-    label: name
-  }));
+  const rpcOptions: ComboboxOption[] = Object.entries(chain.wsUrl).map(
+    ([name, wsUrl]) => ({
+      value: wsUrl,
+      label: name,
+    }),
+  );
 
   const handleValueChange = (value: string) => {
     setUrl(value);
@@ -76,23 +93,27 @@ function Content({ chain }: { chain: Endpoint }) {
 
   return (
     <>
-      <div className='flex flex-col gap-2'>
-        <label className='text-sm font-medium'>Network RPC</label>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Network RPC</label>
         <Combobox
           options={rpcOptions}
           value={url}
           onValueChange={handleValueChange}
-          placeholder='Please select or input rpc url ws:// or wss://'
-          searchPlaceholder='Search or enter custom RPC URL...'
-          emptyMessage='No matching RPC endpoints'
+          placeholder="Please select or input rpc url ws:// or wss://"
+          searchPlaceholder="Search or enter custom RPC URL..."
+          emptyMessage="No matching RPC endpoints"
           allowCustomValue
           validateCustomValue={validateRpcUrl}
           renderOption={(option, isSelected) => (
             <>
-              <span className={isSelected ? 'opacity-100' : 'opacity-0'}>✓</span>
-              <div className='ml-2 flex flex-1 items-center justify-between'>
-                <span className='text-sm'>{option.value}</span>
-                <span className='text-muted-foreground text-right text-xs'>{option.label}</span>
+              <span className={isSelected ? 'opacity-100' : 'opacity-0'}>
+                ✓
+              </span>
+              <div className="ml-2 flex flex-1 items-center justify-between">
+                <span className="text-sm">{option.value}</span>
+                <span className="text-muted-foreground text-right text-xs">
+                  {option.label}
+                </span>
               </div>
             </>
           )}
@@ -100,7 +121,7 @@ function Content({ chain }: { chain: Endpoint }) {
         />
       </div>
       {error && (
-        <Alert variant='destructive'>
+        <Alert variant="destructive">
           <AlertTitle>{error.message}</AlertTitle>
         </Alert>
       )}
@@ -123,8 +144,13 @@ function NetworkSetting() {
   const chain = networks.find((item) => item.key === network);
 
   return (
-    <div className='bg-background flex flex-col gap-5 rounded-[20px] p-5 shadow-md'>
-      <InputNetwork showAllNetworks label='Select Network' network={network} setNetwork={setNetwork} />
+    <div className="card-root flex flex-col gap-5 p-5">
+      <InputNetwork
+        showAllNetworks
+        label="Select Network"
+        network={network}
+        setNetwork={setNetwork}
+      />
 
       {chain && <Content key={chain.key} chain={chain} />}
     </div>

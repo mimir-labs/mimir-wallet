@@ -62,13 +62,13 @@ export function useSafetyCheck(call: IMethod) {
           'assetRate',
           'beefy',
           'paraSudoWrapper',
-          'sudo'
+          'sudo',
         ].includes(section)
       ) {
         return Promise.resolve({
           severity: 'none',
           title: 'Success',
-          message: 'This transaction is safe to execute.'
+          message: 'This transaction is safe to execute.',
         } as SafetyLevel);
       } else {
         return service.chain.safetyCheck(network, call.toHex());

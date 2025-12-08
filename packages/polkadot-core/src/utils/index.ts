@@ -8,7 +8,7 @@ export {
   DEFAULE_SS58_CHAIN_KEY,
   DEFAULT_AUX,
   encodeAddress,
-  decodeAddress
+  decodeAddress,
 } from './defaults.js';
 export * from './metadata.js';
 export { StoredRegistry, createBlockRegistry } from './registry.js';

@@ -36,7 +36,7 @@ export function useChainCapabilities(network: string): ChainCapabilities {
   return useMemo(() => {
     return {
       supportsDryRun: chain?.supportsDryRun ?? false,
-      supportsProxy: chain?.supportsProxy ?? true
+      supportsProxy: chain?.supportsProxy ?? true,
     };
   }, [chain]);
 }
@@ -46,7 +46,9 @@ export function useChainCapabilities(network: string): ChainCapabilities {
  *
  * @param network - The network key to check
  */
-export function useSupportsDryRun(network: string): { supportsDryRun: boolean } {
+export function useSupportsDryRun(network: string): {
+  supportsDryRun: boolean;
+} {
   const { supportsDryRun } = useChainCapabilities(network);
 
   return { supportsDryRun };

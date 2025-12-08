@@ -14,16 +14,21 @@ const mockInitialChain: SupportXcmChainConfig = {
   name: 'Polkadot',
   icon: 'polkadot.svg',
   tokenIcon: 'dot.svg',
-  genesisHash: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
-  wsUrl: { Parity: 'wss://rpc.polkadot.io' }
+  genesisHash:
+    '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+  wsUrl: { Parity: 'wss://rpc.polkadot.io' },
 };
 
 // Helper to create mock location
-function createMockLocation(parents: number, interiorType: string, interiorValue?: any) {
+function createMockLocation(
+  parents: number,
+  interiorType: string,
+  interiorValue?: any,
+) {
   const interior: any = {
     isHere: interiorType === 'Here',
     isX1: interiorType === 'X1',
-    isX2: interiorType === 'X2'
+    isX2: interiorType === 'X2',
   };
 
   if (interiorType === 'Here') {
@@ -36,37 +41,49 @@ function createMockLocation(parents: number, interiorType: string, interiorValue
 
   return {
     parents: { toNumber: () => parents },
-    interior
+    interior,
   };
 }
 
 // Helper to create mock V3 asset
-function createMockV3Asset(isConcrete: boolean, isFungible: boolean, amount: string, location: any) {
+function createMockV3Asset(
+  isConcrete: boolean,
+  isFungible: boolean,
+  amount: string,
+  location: any,
+) {
   return {
     id: {
       isConcrete,
-      asConcrete: location
+      asConcrete: location,
     },
     fun: {
       isFungible,
-      asFungible: { toString: () => amount }
-    }
+      asFungible: { toString: () => amount },
+    },
   };
 }
 
 // Helper to create mock V4/V5 asset
-function createMockV4V5Asset(isFungible: boolean, amount: string, location: any) {
+function createMockV4V5Asset(
+  isFungible: boolean,
+  amount: string,
+  location: any,
+) {
   return {
     id: location,
     fun: {
       isFungible,
-      asFungible: { toString: () => amount }
-    }
+      asFungible: { toString: () => amount },
+    },
   };
 }
 
 // Helper to create mock versioned assets
-function createMockVersionedAssets(version: 'V3' | 'V4' | 'V5', assets: any[] | any) {
+function createMockVersionedAssets(
+  version: 'V3' | 'V4' | 'V5',
+  assets: any[] | any,
+) {
   return {
     isV3: version === 'V3',
     isV4: version === 'V4',
@@ -74,7 +91,7 @@ function createMockVersionedAssets(version: 'V3' | 'V4' | 'V5', assets: any[] | 
     asV3: version === 'V3' ? assets : undefined,
     asV4: version === 'V4' ? assets : undefined,
     asV5: version === 'V5' ? assets : undefined,
-    toHuman: () => ({ type: version, value: assets })
+    toHuman: () => ({ type: version, value: assets }),
   };
 }
 
@@ -107,7 +124,10 @@ describe('parseAssets', () => {
       const location = createMockLocation(0, 'Here');
       const concreteAsset = createMockV3Asset(true, true, '1000', location);
       const nonConcreteAsset = createMockV3Asset(false, true, '2000', location);
-      const versionedAssets = createMockVersionedAssets('V3', [concreteAsset, nonConcreteAsset]);
+      const versionedAssets = createMockVersionedAssets('V3', [
+        concreteAsset,
+        nonConcreteAsset,
+      ]);
 
       const results = parseAssets(versionedAssets as any, mockInitialChain);
 
@@ -218,12 +238,12 @@ describe('parseAssets', () => {
         isV5: false,
         isV2: true,
         asV2: [],
-        toHuman: () => ({ type: 'V2' })
+        toHuman: () => ({ type: 'V2' }),
       };
 
-      expect(() => parseAssets(unsupportedAssets as any, mockInitialChain)).toThrow(
-        /Unsupport XcmVersionedAssets version/
-      );
+      expect(() =>
+        parseAssets(unsupportedAssets as any, mockInitialChain),
+      ).toThrow(/Unsupport XcmVersionedAssets version/);
     });
 
     it('should silently skip assets that fail to parse location', () => {

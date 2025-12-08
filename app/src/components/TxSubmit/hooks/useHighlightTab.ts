@@ -6,13 +6,15 @@ import { useEffect } from 'react';
 const TITLE_PREFIX = '‼️ New Pending Transaction';
 
 const setDocumentTitle = (isPrefixed: boolean) => {
-  document.title = isPrefixed ? TITLE_PREFIX + document.title : document.title.replace(TITLE_PREFIX, '');
+  document.title = isPrefixed
+    ? TITLE_PREFIX + document.title
+    : document.title.replace(TITLE_PREFIX, '');
 };
 
 const blinkFavicon = (
   _favicon: HTMLLinkElement | null,
   _originalHref: string,
-  isBlinking = false
+  isBlinking = false,
 ): ReturnType<typeof setInterval> => {
   let _isBlinking = isBlinking;
 
@@ -31,7 +33,8 @@ const blinkFavicon = (
  */
 export function useHighlightTab() {
   useEffect(() => {
-    const favicon = document.querySelector<HTMLLinkElement>('link[rel*="icon"]');
+    const favicon =
+      document.querySelector<HTMLLinkElement>('link[rel*="icon"]');
     const originalHref = favicon?.href || '';
     let interval: ReturnType<typeof setInterval>;
 

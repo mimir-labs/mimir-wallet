@@ -26,7 +26,7 @@ function AddTemplate({
   onBack,
   defaultCallData,
   defaultName,
-  setNetwork
+  setNetwork,
 }: {
   isView?: boolean;
   defaultCallData?: HexString;
@@ -52,7 +52,9 @@ function AddTemplate({
   useEffect(() => {
     if (isView || hasTrackedInteraction.current) return;
 
-    const hasUserInput = (name && name !== defaultName) || (callData && callData !== defaultCallData);
+    const hasUserInput =
+      (name && name !== defaultName) ||
+      (callData && callData !== defaultCallData);
 
     if (hasUserInput) {
       analyticsActions.templateInteracted();
@@ -73,9 +75,9 @@ function AddTemplate({
   };
 
   return (
-    <div className='scrollbar-hide h-full space-y-5 overflow-y-auto'>
-      <div className='flex items-center gap-1'>
-        <Button isIconOnly color='primary' variant='light' onClick={onBack}>
+    <div className="scrollbar-hide h-full space-y-5 overflow-y-auto">
+      <div className="flex items-center gap-1">
+        <Button isIconOnly color="primary" variant="light" onClick={onBack}>
           <IconArrowLeft />
         </Button>
         <h4>{isView ? 'View Template' : 'Add New Template'}</h4>
@@ -85,16 +87,16 @@ function AddTemplate({
 
       <Divider />
 
-      <Input disabled={isView} label='Name' value={name} onChange={setName} />
+      <Input disabled={isView} label="Name" value={name} onChange={setName} />
 
       <Input
-        label='Call Data'
-        placeholder='0x...'
+        label="Call Data"
+        placeholder="0x..."
         helper={
           isView ? null : (
-            <div className='text-foreground/50'>
-              You can edit it in the <DotConsoleLink network={network} /> and then click Import or directly paste the
-              Encoded Call Data.
+            <div className="text-foreground/50">
+              You can edit it in the <DotConsoleLink network={network} /> and
+              then click Import or directly paste the Encoded Call Data.
             </div>
           )
         }
@@ -102,11 +104,17 @@ function AddTemplate({
         onChange={setCallData}
       />
 
-      <ErrorDisplay error={callDataError} showDetails={process.env.NODE_ENV === 'development'} />
+      <ErrorDisplay
+        error={callDataError}
+        showDetails={process.env.NODE_ENV === 'development'}
+      />
 
       {parsedCallData && (
-        <div className='bg-secondary rounded-[10px] p-2.5'>
-          <JsonView data={parsedCallData.toHuman()} collapseStringsAfterLength={20} />
+        <div className="bg-secondary rounded-[10px] p-2.5">
+          <JsonView
+            data={parsedCallData.toHuman()}
+            collapseStringsAfterLength={20}
+          />
         </div>
       )}
 
@@ -115,8 +123,8 @@ function AddTemplate({
       ) : (
         <Button
           fullWidth
-          variant='solid'
-          color='primary'
+          variant="solid"
+          color="primary"
           disabled={!(name && callData) || !!callDataError}
           onClick={onAdd}
         >

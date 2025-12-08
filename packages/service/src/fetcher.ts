@@ -16,7 +16,10 @@ export class NetworkError extends Error {
   }
 }
 
-export async function fetcher(resource: URL | string | Promise<URL | string>, init?: RequestInit): Promise<any> {
+export async function fetcher(
+  resource: URL | string | Promise<URL | string>,
+  init?: RequestInit,
+): Promise<any> {
   let url: string | URL;
 
   if (resource instanceof Promise) {
@@ -38,12 +41,18 @@ export async function fetcher(resource: URL | string | Promise<URL | string>, in
         if (res.ok) {
           return null;
         } else {
-          throw new FetchError('An error occurred while parsing the data.', res.status);
+          throw new FetchError(
+            'An error occurred while parsing the data.',
+            res.status,
+          );
         }
       }
 
       if (!res.ok) {
-        throw new FetchError(json?.message || 'An error occurred while fetching the data.', json?.statusCode || 500);
+        throw new FetchError(
+          json?.message || 'An error occurred while fetching the data.',
+          json?.statusCode || 500,
+        );
       }
 
       return json;

@@ -4,8 +4,20 @@
 import type { State } from '@/communicator/types';
 import type { SignerPayloadJSON } from '@polkadot/types/types';
 
-import { encodeAddress, remoteProxyRelations, useChains, useNetwork, useSs58Format } from '@mimir-wallet/polkadot-core';
-import { type MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  encodeAddress,
+  remoteProxyRelations,
+  useChains,
+  useNetwork,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
+import {
+  type MutableRefObject,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useAddressMeta } from '@/accounts/useAddressMeta';
@@ -17,9 +29,11 @@ export function useCommunicator(
   iframeRef: MutableRefObject<HTMLIFrameElement | null>,
   url: string,
   iconUrl?: string,
-  appName?: string
+  appName?: string,
 ): IframeCommunicator | null {
-  const [communicator, setCommunicator] = useState<IframeCommunicator | null>(null);
+  const [communicator, setCommunicator] = useState<IframeCommunicator | null>(
+    null,
+  );
   const { chain, network: currentNetwork } = useNetwork();
   const genesisHash = chain.genesisHash;
   const { ss58: chainSS58 } = useSs58Format();
@@ -41,14 +55,18 @@ export function useCommunicator(
             payload.genesisHash !== data.network &&
             !Object.values(remoteProxyRelations).includes(payload.genesisHash)
           ) {
-            throw new Error(`Network not supported for this account, only ${data.network} is supported`);
+            throw new Error(
+              `Network not supported for this account, only ${data.network} is supported`,
+            );
           }
         }
 
         let network: string | undefined;
 
         if (mode === 'omni') {
-          network = networks.find((item) => item.genesisHash === payload.genesisHash)?.key;
+          network = networks.find(
+            (item) => item.genesisHash === payload.genesisHash,
+          )?.key;
 
           if (!network) {
             throw new Error(`Network not supported`);
@@ -79,10 +97,10 @@ export function useCommunicator(
                 signature,
                 signer,
                 payload,
-                ...(withSignedTransaction ? { signedTransaction } : {})
+                ...(withSignedTransaction ? { signedTransaction } : {}),
               } as any);
             },
-            onReject: () => reject(new Error('User reject'))
+            onReject: () => reject(new Error('User reject')),
           });
         });
       },
@@ -93,12 +111,25 @@ export function useCommunicator(
           {
             address: current,
             name: meta?.name,
-            type: (meta?.cryptoType || 'ed25519') as 'ed25519' // for polkadot-api
-          }
+            type: (meta?.cryptoType || 'ed25519') as 'ed25519', // for polkadot-api
+          },
         ];
-      }
+      },
     }),
-    [genesisHash, promise, mode, networks, currentNetwork, url, chainSS58, addQueue, iconUrl, appName, current, meta]
+    [
+      genesisHash,
+      promise,
+      mode,
+      networks,
+      currentNetwork,
+      url,
+      chainSS58,
+      addQueue,
+      iconUrl,
+      appName,
+      current,
+      meta,
+    ],
   );
   const stateRef = useRef<State>(state);
 
@@ -107,7 +138,10 @@ export function useCommunicator(
   }, [state]);
 
   useEffect(() => {
-    const communicator: IframeCommunicator | undefined = new IframeCommunicator(iframeRef, stateRef);
+    const communicator: IframeCommunicator | undefined = new IframeCommunicator(
+      iframeRef,
+      stateRef,
+    );
 
     setCommunicator(communicator);
   }, [iframeRef]);

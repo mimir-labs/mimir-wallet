@@ -6,8 +6,6 @@ import type { RouteMetadata } from '@/hooks/usePageTitle';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
-import PageTransactions from '@/pages/transactions';
-
 /**
  * Transactions List Route
  *
@@ -16,14 +14,16 @@ import PageTransactions from '@/pages/transactions';
  */
 
 const transactionsSearchSchema = z.object({
-  status: z.enum(['pending', 'history', 'all-history']).optional().default('pending'),
-  tx_id: z.string().optional()
+  status: z
+    .enum(['pending', 'history', 'all-history'])
+    .optional()
+    .default('pending'),
+  tx_id: z.string().optional(),
 });
 
 export const Route = createFileRoute('/_authenticated/transactions/')({
   validateSearch: transactionsSearchSchema,
   staticData: {
-    title: 'Transactions'
+    title: 'Transactions',
   } as RouteMetadata,
-  component: PageTransactions
 });

@@ -4,7 +4,15 @@
 import type { AccountData, Transaction } from '@/hooks/types';
 
 import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
-import { buttonSpinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@mimir-wallet/ui';
+import {
+  buttonSpinner,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Tooltip,
+} from '@mimir-wallet/ui';
 import React, { useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -20,7 +28,7 @@ import { useWallet } from '@/wallet/useWallet';
 function ExecuteAnnounce({
   isIcon = false,
   account,
-  transaction
+  transaction,
 }: {
   isIcon?: boolean;
   account: AccountData;
@@ -62,7 +70,9 @@ function ExecuteAnnounce({
       if (transaction.call) {
         call = transaction.call;
       } else {
-        if (api.createType('Call', calldata).hash.toHex() !== transaction.callHash) {
+        if (
+          api.createType('Call', calldata).hash.toHex() !== transaction.callHash
+        ) {
           throw new Error('Invalid calldata');
         }
 
@@ -71,16 +81,23 @@ function ExecuteAnnounce({
 
       const proxies = await api.query.proxy.proxies(transaction.address);
 
-      const proxyDefine = proxies[0].find((item) => addressEq(item.delegate.toString(), delegate));
+      const proxyDefine = proxies[0].find((item) =>
+        addressEq(item.delegate.toString(), delegate),
+      );
 
       if (!proxyDefine) {
         toastError(`can not find delegate(${delegate})`);
       } else {
         addQueue({
           accountId: walletAccounts[0].address,
-          call: api.tx.proxy.proxyAnnounced(delegate, transaction.address, proxyDefine.proxyType.toU8a(), call),
+          call: api.tx.proxy.proxyAnnounced(
+            delegate,
+            transaction.address,
+            proxyDefine.proxyType.toU8a(),
+            call,
+          ),
           website: 'mimir://internal/execute-announcement',
-          network
+          network,
         });
       }
     } catch (error) {
@@ -108,17 +125,22 @@ function ExecuteAnnounce({
         </TxButton>
       </Tooltip>
 
-      <Modal size='2xl' onClose={toggleOpen} isOpen={isOpen}>
+      <Modal size="2xl" onClose={toggleOpen} isOpen={isOpen}>
         <ModalContent>
           <ModalHeader>Call Data</ModalHeader>
           <ModalBody>
-            <div className='space-y-4'>
+            <div className="space-y-4">
               <p>Fill Call Data to execute this transaction.</p>
               <Input value={calldata} onChange={setCalldata} />
             </div>
           </ModalBody>
           <ModalFooter>
-            <TxButton fullWidth variant='solid' color='primary' overrideAction={handleExecute}>
+            <TxButton
+              fullWidth
+              variant="solid"
+              color="primary"
+              overrideAction={handleExecute}
+            >
               Execute
             </TxButton>
           </ModalFooter>

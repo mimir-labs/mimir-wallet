@@ -16,36 +16,46 @@ function BatchButton() {
   const { current } = useAccount();
 
   const [txs] = useBatchTxs(network, current);
-  const { openRightSidebar, closeRightSidebar, rightSidebarOpen, setRightSidebarTab } = useMimirLayout();
+  const {
+    openRightSidebar,
+    closeRightSidebar,
+    rightSidebarOpen,
+    rightSidebarState,
+    setRightSidebarTab,
+  } = useMimirLayout();
   const anchorEl = useRef<HTMLButtonElement>(null);
+  const isOpen = rightSidebarOpen && rightSidebarState.tab === 'batch';
 
   return (
     <BadgeIndicator
       isInvisible={!txs.length}
       content={txs.length}
-      color='primary'
-      placement='bottom-right'
-      className='shrink-0'
-      badgeClassName='bottom-0.5 right-1 translate-x-0 -translate-y-0'
+      color="primary"
+      placement="bottom-right"
+      className="shrink-0"
+      badgeClassName="bottom-0.5 right-1 translate-x-0 -translate-y-0"
     >
-      <Tooltip content='Batch Transactions'>
+      <Tooltip content="Batch Transactions">
         <Button
           isIconOnly
           ref={anchorEl}
-          className='border-secondary bg-secondary h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent'
-          color='primary'
-          variant='ghost'
-          radius='md'
+          className="border-secondary bg-secondary h-[32px] w-[32px] sm:h-[42px] sm:w-[42px] sm:bg-transparent"
+          color="primary"
+          variant="ghost"
+          radius="md"
           onClick={() => {
-            setRightSidebarTab('batch');
-
             // Track batch started when opening
             analyticsActions.batchStarted(txs.length);
 
-            rightSidebarOpen ? closeRightSidebar() : openRightSidebar();
+            if (isOpen) {
+              closeRightSidebar();
+            } else {
+              setRightSidebarTab('batch');
+              openRightSidebar();
+            }
           }}
         >
-          <IconBatch className='h-[16px] w-[16px] sm:h-[22px] sm:w-[22px]' />
+          <IconBatch className="h-[16px] w-[16px] sm:h-[22px] sm:w-[22px]" />
         </Button>
       </Tooltip>
     </BadgeIndicator>

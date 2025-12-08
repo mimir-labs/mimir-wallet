@@ -14,7 +14,7 @@ function PendingTransactions({
   networks,
   address,
   txId,
-  onDiscardedCountsChange
+  onDiscardedCountsChange,
 }: {
   showDiscarded?: boolean;
   isFetched: boolean;
@@ -48,11 +48,16 @@ function PendingTransactions({
     onDiscardedCountsChange?.(discardedCounts);
   }, [discardedCounts, onDiscardedCountsChange]);
 
-  const showSkeleton = (!isFetched && isFetching) || data.some((item) => item.isFetching && !item.isFetched);
+  const showSkeleton =
+    (!isFetched && isFetching) ||
+    data.some((item) => item.isFetching && !item.isFetched);
 
   return (
-    <div className='space-y-5'>
-      <GroupedTransactions showSkeleton={showSkeleton} groupedTransactions={groupedTransactions} />
+    <div className="space-y-5">
+      <GroupedTransactions
+        showSkeleton={showSkeleton}
+        groupedTransactions={groupedTransactions}
+      />
     </div>
   );
 }

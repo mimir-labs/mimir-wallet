@@ -116,7 +116,12 @@ export interface Contact {
 /**
  * Server-Sent Event (SSE) response types
  */
-export type ChatResponseEvent = TextResponseEvent | ToolStartEvent | ToolEndEvent | ChatErrorEvent | DoneEvent;
+export type ChatResponseEvent =
+  | TextResponseEvent
+  | ToolStartEvent
+  | ToolEndEvent
+  | ChatErrorEvent
+  | DoneEvent;
 
 /**
  * Text response from AI

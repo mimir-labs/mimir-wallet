@@ -41,14 +41,22 @@ export function NetworkProvider({ network, children }: NetworkProviderProps) {
 
   const value = {
     network,
-    chain: chain
+    chain: chain,
   };
 
   if (mode === 'solo') {
-    return context ? children : <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>;
+    return context ? (
+      children
+    ) : (
+      <NetworkContext.Provider value={value}>
+        {children}
+      </NetworkContext.Provider>
+    );
   }
 
-  return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>;
+  return (
+    <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
+  );
 }
 
 /**
@@ -74,7 +82,7 @@ export function useNetwork(): NetworkContextValue {
   // Otherwise, use fallback from localStorage or default
   return {
     network: fallbackNetwork,
-    chain: fallbackChain as Endpoint
+    chain: fallbackChain as Endpoint,
   };
 }
 

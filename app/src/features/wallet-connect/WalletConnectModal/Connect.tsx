@@ -3,7 +3,15 @@
 
 import type { SessionTypes } from '@walletconnect/types';
 
-import { Alert, AlertTitle, Avatar, Button, buttonSpinner, Divider, Spinner } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertTitle,
+  Avatar,
+  Button,
+  buttonSpinner,
+  Divider,
+  Spinner,
+} from '@mimir-wallet/ui';
 import { useCallback, useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
@@ -22,18 +30,34 @@ function ConnectSession({ session }: { session: SessionTypes.Struct }) {
   const [showFallback, setShowFallback] = useState(false);
 
   return (
-    <div className='flex w-full items-center gap-2.5 rounded-[10px] border-1 border-[#d9d9d9]/50 p-2.5'>
+    <div className="flex w-full items-center gap-2.5 rounded-[10px] border-1 border-[#d9d9d9]/50 p-2.5">
       <Avatar
         showFallback={showFallback}
-        fallback={<Avatar src='/images/wallet-connect.webp' alt='wallet connect' style={{ width: 30, height: 30 }} />}
+        fallback={
+          <Avatar
+            src="/images/wallet-connect.webp"
+            alt="wallet connect"
+            style={{ width: 30, height: 30 }}
+          />
+        }
         style={{ width: 30, height: 30 }}
-        src={session.peer.metadata.icons[0]?.startsWith('https://') ? session.peer.metadata.icons[0] : undefined}
+        src={
+          session.peer.metadata.icons[0]?.startsWith('https://')
+            ? session.peer.metadata.icons[0]
+            : undefined
+        }
         onError={() => {
           setShowFallback(true);
         }}
       />
-      <p className='flex-1 text-sm'>{session.peer.metadata.name}</p>
-      <Button size='sm' color='danger' variant='light' disabled={state.loading} onClick={() => disconnect(session)}>
+      <p className="flex-1 text-sm">{session.peer.metadata.name}</p>
+      <Button
+        size="sm"
+        color="danger"
+        variant="light"
+        disabled={state.loading}
+        onClick={() => disconnect(session)}
+      >
         {state.loading ? buttonSpinner : null}
         Disconnect
       </Button>
@@ -71,24 +95,28 @@ function Connect({ sessions }: { sessions: SessionTypes.Struct[] }) {
         setError(asError(e));
       }
     },
-    [setUri]
+    [setUri],
   );
 
   return (
-    <div className='flex flex-col items-center gap-5'>
-      <Avatar src='/images/wallet-connect.webp' alt='wallet connect' style={{ width: 150, height: 150 }} />
-      <h4 className='text-xl font-bold'>Wallet Connect</h4>
+    <div className="flex flex-col items-center gap-5">
+      <Avatar
+        src="/images/wallet-connect.webp"
+        alt="wallet connect"
+        style={{ width: 150, height: 150 }}
+      />
+      <h4 className="text-xl font-bold">Wallet Connect</h4>
       <Input
         value={uri}
         onChange={onInput}
-        label='Pairing Key'
-        placeholder='wc:'
-        helper='In the application you wish to connect to, select the option to log in using WalletConnect and copy the Pairing Key.'
+        label="Pairing Key"
+        placeholder="wc:"
+        helper="In the application you wish to connect to, select the option to log in using WalletConnect and copy the Pairing Key."
         error={error}
-        endAdornment={isLoading ? <Spinner size='sm' /> : null}
+        endAdornment={isLoading ? <Spinner size="sm" /> : null}
       />
       {error && (
-        <Alert variant='destructive'>
+        <Alert variant="destructive">
           <AlertTitle>{error?.message}</AlertTitle>
         </Alert>
       )}

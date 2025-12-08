@@ -25,7 +25,7 @@ export interface UseChainInfoResult {
  * Async fetch chain info from API
  */
 async function fetchChainInfo({
-  queryKey
+  queryKey,
 }: {
   queryKey: readonly [string, string, Endpoint | undefined];
 }): Promise<ChainInfo | undefined> {
@@ -38,7 +38,7 @@ async function fetchChainInfo({
       chainInfo: chain,
       runtimeChainName: api.runtimeChain?.toString(),
       specName: api.runtimeVersion?.specName?.toString(),
-      specVersion: api.runtimeVersion?.specVersion?.toNumber()
+      specVersion: api.runtimeVersion?.specVersion?.toNumber(),
     };
 
     // Get metadata hash if available
@@ -84,12 +84,12 @@ export function useChainInfo(): UseChainInfoResult {
     queryFn: fetchChainInfo,
     enabled: !!network && !!chain,
     staleTime: Infinity, // Chain info doesn't change frequently
-    retry: false
+    retry: false,
   });
 
   return {
     chainInfo: data,
     isLoading,
-    error: error as Error | null
+    error: error as Error | null,
   };
 }

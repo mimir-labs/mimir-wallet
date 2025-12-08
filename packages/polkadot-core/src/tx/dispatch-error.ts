@@ -3,7 +3,10 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { DispatchError } from '@polkadot/types/interfaces';
-import type { SpRuntimeDispatchError, XcmV5TraitsError } from '@polkadot/types/lookup';
+import type {
+  SpRuntimeDispatchError,
+  XcmV5TraitsError,
+} from '@polkadot/types/lookup';
 
 export class TxDispatchError extends Error {}
 export class TxModuleError extends TxDispatchError {
@@ -13,7 +16,12 @@ export class TxModuleError extends TxDispatchError {
 
   public docs: string[];
 
-  constructor(message: string, section: string, method: string, docs: string[]) {
+  constructor(
+    message: string,
+    section: string,
+    method: string,
+    docs: string[],
+  ) {
     super(message);
     this.section = section;
     this.method = method;
@@ -27,7 +35,10 @@ export class TxModuleError extends TxDispatchError {
 
 // @internal assetDispatchError
 // @description Parse dispatch error
-export function assetDispatchError(api: ApiPromise, dispatch: DispatchError | SpRuntimeDispatchError): Error {
+export function assetDispatchError(
+  api: ApiPromise,
+  dispatch: DispatchError | SpRuntimeDispatchError,
+): Error {
   if (dispatch.isModule) {
     const error = api.registry.findMetaError(dispatch.asModule);
 
@@ -35,7 +46,7 @@ export function assetDispatchError(api: ApiPromise, dispatch: DispatchError | Sp
       `Cause by ${error.section}.${error.method}: ${error.docs.join('\n')}`,
       error.section,
       error.method,
-      error.docs
+      error.docs,
     );
   }
 
@@ -44,11 +55,15 @@ export function assetDispatchError(api: ApiPromise, dispatch: DispatchError | Sp
   }
 
   if (dispatch.isArithmetic) {
-    return new TxDispatchError(`Arithmetic Error: ${dispatch.asArithmetic.type}`);
+    return new TxDispatchError(
+      `Arithmetic Error: ${dispatch.asArithmetic.type}`,
+    );
   }
 
   if (dispatch.isTransactional) {
-    return new TxDispatchError(`Transactional Error: ${dispatch.asTransactional.type}`);
+    return new TxDispatchError(
+      `Transactional Error: ${dispatch.asTransactional.type}`,
+    );
   }
 
   return new TxDispatchError(`Dispatch Error: ${dispatch.type}`);

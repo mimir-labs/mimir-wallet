@@ -9,33 +9,38 @@ import { useCallback } from 'react';
 import { TEMPLATE_PREFIX } from '@/constants';
 
 export function useSavedTemplate(key: string) {
-  const [template, setTemplate] = useLocalStore<TemplateInfo[]>(`${TEMPLATE_PREFIX}:${key}`, []);
+  const [template, setTemplate] = useLocalStore<TemplateInfo[]>(
+    `${TEMPLATE_PREFIX}:${key}`,
+    [],
+  );
 
   const addTemplate = useCallback(
     (template: TemplateInfo) => {
       setTemplate((templates) => [...templates, template]);
     },
-    [setTemplate]
+    [setTemplate],
   );
 
   const removeTemplate = useCallback(
     (index: number) => {
       setTemplate((templates) => templates.filter((_t, i) => i !== index));
     },
-    [setTemplate]
+    [setTemplate],
   );
 
   const editTemplateName = useCallback(
     (index: number, name: string) => {
-      setTemplate((templates) => templates.map((t, i) => (i === index ? { ...t, name } : t)));
+      setTemplate((templates) =>
+        templates.map((t, i) => (i === index ? { ...t, name } : t)),
+      );
     },
-    [setTemplate]
+    [setTemplate],
   );
 
   return {
     template,
     addTemplate,
     removeTemplate,
-    editTemplateName
+    editTemplateName,
   };
 }

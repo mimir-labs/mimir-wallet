@@ -4,7 +4,10 @@
 import { ApiManager } from '@mimir-wallet/polkadot-core';
 import { useCallback, useState } from 'react';
 
-import { createProxySafetyService, type SafetyCheckResult } from '../services/proxySafetyService';
+import {
+  createProxySafetyService,
+  type SafetyCheckResult,
+} from '../services/proxySafetyService';
 
 interface ExtendedSafetyCheckResult extends SafetyCheckResult {
   isLoading: boolean;
@@ -22,7 +25,7 @@ export function useProxySafetyCheck(network: string) {
     warnings: [],
     severity: 'info',
     isLoading: false,
-    error: null
+    error: null,
   });
 
   // Legacy method for backward compatibility
@@ -35,7 +38,7 @@ export function useProxySafetyCheck(network: string) {
           warnings: [],
           severity: 'info',
           isLoading: false,
-          error: null
+          error: null,
         };
 
         setResult(emptyResult);
@@ -48,17 +51,14 @@ export function useProxySafetyCheck(network: string) {
       try {
         const api = await ApiManager.getInstance().getApi(network);
 
-        if (!api) {
-          throw new Error('API is not ready');
-        }
-
         const safetyService = createProxySafetyService(api);
-        const safetyResult = await safetyService.checkIndirectControllers(proxyAddress);
+        const safetyResult =
+          await safetyService.checkIndirectControllers(proxyAddress);
 
         const finalResult: ExtendedSafetyCheckResult = {
           ...safetyResult,
           isLoading: false,
-          error: null
+          error: null,
         };
 
         setResult(finalResult);
@@ -71,7 +71,7 @@ export function useProxySafetyCheck(network: string) {
           warnings: ['Failed to check proxy safety'],
           severity: 'error',
           isLoading: false,
-          error: error as Error
+          error: error as Error,
         };
 
         setResult(errorResult);
@@ -79,12 +79,12 @@ export function useProxySafetyCheck(network: string) {
         return errorResult;
       }
     },
-    [network]
+    [network],
   );
 
   return {
     // Legacy API for backward compatibility
     checkSafety,
-    result
+    result,
   };
 }

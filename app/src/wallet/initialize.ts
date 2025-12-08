@@ -24,12 +24,18 @@ async function _initialize(wallet: string) {
 }
 
 export async function initializeWallet() {
-  let connectWallets: string[] = (store.get(CONNECTED_WALLETS_KEY) as string[]) || [];
+  let connectWallets: string[] =
+    (store.get(CONNECTED_WALLETS_KEY) as string[]) || [];
 
   const promises: Promise<WalletAccount[]>[] = [];
 
-  if (connectWallets.includes('nova') && connectWallets.includes('polkadot-js')) {
-    connectWallets = connectWallets.filter((wallet) => wallet !== 'polkadot-js');
+  if (
+    connectWallets.includes('nova') &&
+    connectWallets.includes('polkadot-js')
+  ) {
+    connectWallets = connectWallets.filter(
+      (wallet) => wallet !== 'polkadot-js',
+    );
   }
 
   // Ensure document is ready before proceeding
@@ -46,8 +52,11 @@ export async function initializeWallet() {
   useWallet.setState({
     isWalletReady: true,
     walletAccounts: data.filter(
-      (account, index, self) => !self.some((t, i) => i < index && addressEq(t.address, account.address))
+      (account, index, self) =>
+        !self.some(
+          (t, i) => i < index && addressEq(t.address, account.address),
+        ),
     ),
-    wallets: window.injectedWeb3 || {}
+    wallets: window.injectedWeb3 || {},
   });
 }

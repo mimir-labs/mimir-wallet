@@ -18,7 +18,10 @@ describe('Balances Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'Paseo native balance');
 
-        const balance = await fetchNativeBalances(paseoApi, TEST_ADDRESSES.aliceHex);
+        const balance = await fetchNativeBalances(
+          paseoApi,
+          TEST_ADDRESSES.aliceHex,
+        );
 
         expect(balance).toBeDefined();
         expect(balance?.key).toBe('native');
@@ -28,7 +31,7 @@ describe('Balances Integration Tests', () => {
         expect(typeof balance?.locked).toBe('bigint');
         expect(typeof balance?.transferrable).toBe('bigint');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -36,13 +39,16 @@ describe('Balances Integration Tests', () => {
       async () => {
         skipIfNotConnected(assetHubApi, 'Asset Hub native balance');
 
-        const balance = await fetchNativeBalances(assetHubApi, TEST_ADDRESSES.aliceHex);
+        const balance = await fetchNativeBalances(
+          assetHubApi,
+          TEST_ADDRESSES.aliceHex,
+        );
 
         expect(balance).toBeDefined();
         expect(balance?.key).toBe('native');
         expect(typeof balance?.total).toBe('bigint');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -50,7 +56,10 @@ describe('Balances Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'balance consistency');
 
-        const balance = await fetchNativeBalances(paseoApi, TEST_ADDRESSES.aliceHex);
+        const balance = await fetchNativeBalances(
+          paseoApi,
+          TEST_ADDRESSES.aliceHex,
+        );
 
         if (balance) {
           // Total should equal free + reserved
@@ -60,7 +69,7 @@ describe('Balances Integration Tests', () => {
           expect(balance.transferrable).toBeLessThanOrEqual(balance.free);
         }
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -69,14 +78,15 @@ describe('Balances Integration Tests', () => {
         skipIfNotConnected(paseoApi, 'non-existent account');
 
         // Generate a random hex address that doesn't exist
-        const randomHex = '0x0000000000000000000000000000000000000000000000000000000000000001' as HexString;
+        const randomHex =
+          '0x0000000000000000000000000000000000000000000000000000000000000001' as HexString;
         const balance = await fetchNativeBalances(paseoApi, randomHex);
 
         // Should return a balance (possibly zero) without throwing
         expect(balance).toBeDefined();
         expect(balance?.key).toBe('native');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -86,7 +96,9 @@ describe('Balances Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'system.account query');
 
-        const accountInfo = await paseoApi.query.system.account(TEST_ADDRESSES.alice);
+        const accountInfo = await paseoApi.query.system.account(
+          TEST_ADDRESSES.alice,
+        );
 
         expect(accountInfo).toBeDefined();
         expect(accountInfo.nonce).toBeDefined();
@@ -95,7 +107,7 @@ describe('Balances Integration Tests', () => {
         expect(accountInfo.data.reserved).toBeDefined();
         expect(accountInfo.data.frozen).toBeDefined();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -111,7 +123,7 @@ describe('Balances Integration Tests', () => {
           expect(accountInfo.data).toBeDefined();
         });
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -119,13 +131,15 @@ describe('Balances Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'balance format');
 
-        const accountInfo = await paseoApi.query.system.account(TEST_ADDRESSES.alice);
+        const accountInfo = await paseoApi.query.system.account(
+          TEST_ADDRESSES.alice,
+        );
         const free = accountInfo.data.free.toString();
 
         // Balance should be a valid number string
         expect(() => BigInt(free)).not.toThrow();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -136,11 +150,13 @@ describe('Balances Integration Tests', () => {
         skipIfNotConnected(paseoApi, 'SS58 address');
 
         // Query with SS58 address directly
-        const accountInfo = await paseoApi.query.system.account(TEST_ADDRESSES.alice);
+        const accountInfo = await paseoApi.query.system.account(
+          TEST_ADDRESSES.alice,
+        );
 
         expect(accountInfo.data).toBeDefined();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -149,11 +165,13 @@ describe('Balances Integration Tests', () => {
         skipIfNotConnected(paseoApi, 'hex address');
 
         // Query with hex address
-        const accountInfo = await paseoApi.query.system.account(TEST_ADDRESSES.aliceHex);
+        const accountInfo = await paseoApi.query.system.account(
+          TEST_ADDRESSES.aliceHex,
+        );
 
         expect(accountInfo.data).toBeDefined();
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
@@ -161,26 +179,37 @@ describe('Balances Integration Tests', () => {
       async () => {
         skipIfNotConnected(paseoApi, 'address consistency');
 
-        const ss58Result = await paseoApi.query.system.account(TEST_ADDRESSES.alice);
-        const hexResult = await paseoApi.query.system.account(TEST_ADDRESSES.aliceHex);
+        const ss58Result = await paseoApi.query.system.account(
+          TEST_ADDRESSES.alice,
+        );
+        const hexResult = await paseoApi.query.system.account(
+          TEST_ADDRESSES.aliceHex,
+        );
 
         // Both should return the same balance
-        expect(ss58Result.data.free.toString()).toBe(hexResult.data.free.toString());
-        expect(ss58Result.data.reserved.toString()).toBe(hexResult.data.reserved.toString());
+        expect(ss58Result.data.free.toString()).toBe(
+          hexResult.data.free.toString(),
+        );
+        expect(ss58Result.data.reserved.toString()).toBe(
+          hexResult.data.reserved.toString(),
+        );
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
 
     it(
       'should convert hex to SS58 correctly',
       () => {
-        const converted = encodeAddress(TEST_ADDRESSES.aliceHex, TEST_CONFIG.paseo.ss58Format);
+        const converted = encodeAddress(
+          TEST_ADDRESSES.aliceHex,
+          TEST_CONFIG.paseo.ss58Format,
+        );
 
         // With ss58Format 0, Alice should be in the generic format
         expect(converted).toBeTruthy();
         expect(typeof converted).toBe('string');
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -198,7 +227,7 @@ describe('Balances Integration Tests', () => {
           expect(ed).toBeGreaterThan(0n);
         }
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 
@@ -213,7 +242,7 @@ describe('Balances Integration Tests', () => {
 
         expect(issuance).toBeGreaterThan(0n);
       },
-      TIMEOUTS.query
+      TIMEOUTS.query,
     );
   });
 });

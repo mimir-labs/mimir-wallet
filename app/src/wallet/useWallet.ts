@@ -20,18 +20,24 @@ export const useWallet = create<WalletState>()((set) => ({
   connectedWallets: (store.get(CONNECTED_WALLETS_KEY) as string[]) || [], // Names of currently connected wallets
   // UI control methods
   openWallet: () => set({ walletOpen: true }),
-  closeWallet: () => set({ walletOpen: false })
+  closeWallet: () => set({ walletOpen: false }),
 }));
 
 export function useAccountSource(address?: string | null) {
   const { walletAccounts } = useWallet();
 
   return useMemo(
-    () => (address ? walletAccounts.find((account) => addressEq(account.address, address))?.source : undefined),
-    [walletAccounts, address]
+    () =>
+      address
+        ? walletAccounts.find((account) => addressEq(account.address, address))
+            ?.source
+        : undefined,
+    [walletAccounts, address],
   );
 }
 
 export function accountSource(address: string) {
-  return useWallet.getState().walletAccounts.find((item) => addressEq(item.address, address))?.source;
+  return useWallet
+    .getState()
+    .walletAccounts.find((item) => addressEq(item.address, address))?.source;
 }

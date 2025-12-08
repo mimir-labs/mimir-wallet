@@ -17,14 +17,15 @@ import { Empty, InputNetwork } from '@/components';
 function TemplateList({
   onAdd,
   onView,
-  setNetwork
+  setNetwork,
 }: {
   onAdd: () => void;
   onView: (name: string, call: HexString) => void;
   setNetwork: (network: string) => void;
 }) {
   const { network } = useNetwork();
-  const { template, removeTemplate, editTemplateName } = useSavedTemplate(network);
+  const { template, removeTemplate, editTemplateName } =
+    useSavedTemplate(network);
 
   const handleMigrationComplete = () => {
     // Refresh templates after migration is complete
@@ -32,28 +33,32 @@ function TemplateList({
   };
 
   return (
-    <div className='scrollbar-hide flex h-full flex-col gap-5 overflow-y-auto'>
-      <div className='flex items-center gap-1'>
+    <div className="scrollbar-hide flex h-full flex-col gap-5 overflow-y-auto">
+      <div className="flex items-center gap-1">
         <h4>Call Template</h4>
-        <Tooltip content='Save frequently used on-chain operation templates for repeated use in the future.'>
+        <Tooltip content="Save frequently used on-chain operation templates for repeated use in the future.">
           <IconQuestion />
         </Tooltip>
 
-        <div className='flex-1' />
+        <div className="flex-1" />
 
-        <Button variant='ghost' color='primary' onClick={onAdd}>
+        <Button variant="ghost" color="primary" onClick={onAdd}>
           Add
-          <IconAdd className='h-4 w-4' />
+          <IconAdd className="h-4 w-4" />
         </Button>
       </div>
 
       <InputNetwork network={network} setNetwork={setNetwork} />
 
-      <TemplateMigrationAlert chain={network} templates={template} onMigrationComplete={handleMigrationComplete} />
+      <TemplateMigrationAlert
+        chain={network}
+        templates={template}
+        onMigrationComplete={handleMigrationComplete}
+      />
 
       <Divider />
 
-      <div className='scrollbar-hide flex-1 space-y-2.5 overflow-auto'>
+      <div className="scrollbar-hide flex-1 space-y-2.5 overflow-auto">
         {template.length > 0 && <p>Saved</p>}
         {template.length > 0 ? (
           template.map(({ name, call }, index) => (
@@ -67,7 +72,7 @@ function TemplateList({
             />
           ))
         ) : (
-          <Empty height={300} label='No saved template' />
+          <Empty height={300} label="No saved template" />
         )}
       </div>
     </div>

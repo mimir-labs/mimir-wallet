@@ -13,7 +13,11 @@ interface UseDraggableChatOptions {
  * @deprecated Use useDraggableRectangle from @mimir-wallet/ui instead
  * This hook is kept for backward compatibility and will be removed in a future version
  */
-export function useDraggableChat({ initialPosition, width = 395, height = 600 }: UseDraggableChatOptions = {}) {
+export function useDraggableChat({
+  initialPosition,
+  width = 395,
+  height = 600,
+}: UseDraggableChatOptions = {}) {
   // Provide default initial position if not specified
   const defaultPosition = initialPosition || { x: 100, y: 100 };
 
@@ -21,6 +25,6 @@ export function useDraggableChat({ initialPosition, width = 395, height = 600 }:
     initialPosition: defaultPosition,
     width,
     height,
-    margin: 0 // Chat windows use 0 margin
+    margin: 0, // Chat windows use 0 margin
   });
 }

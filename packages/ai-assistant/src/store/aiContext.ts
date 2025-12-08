@@ -62,8 +62,20 @@ export const useAIContext = create<AIContext>()((_, get) => {
       let currentAccountInfo = '';
 
       if (state?.currentAccount) {
-        const { address, isPure, isMultisig, network, members, delegatees, threshold } = state.currentAccount;
-        const accountType = isPure ? 'pure proxy account' : isMultisig ? 'multisig account' : 'eoa account';
+        const {
+          address,
+          isPure,
+          isMultisig,
+          network,
+          members,
+          delegatees,
+          threshold,
+        } = state.currentAccount;
+        const accountType = isPure
+          ? 'pure proxy account'
+          : isMultisig
+            ? 'multisig account'
+            : 'eoa account';
         const networkLabel = network ? ` (network: ${network || 'all'})` : '';
 
         let accountDetails = `My Current address: ${address}, ${accountType}${networkLabel}`;
@@ -109,7 +121,7 @@ ${supportedNetworks
     <genesisHash>${network.genesisHash}</genesisHash>
     <isEnabled>${network.isEnabled}</isEnabled>
     <ss58Format>${network.ss58Format}</ss58Format>
-  </network>`
+  </network>`,
   )
   .join('\n')}
 </network-list>`
@@ -126,6 +138,6 @@ ${networkSummary}
       const { state } = get();
 
       return state?.currentAccount?.address;
-    }
+    },
   };
 });

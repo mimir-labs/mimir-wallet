@@ -4,16 +4,36 @@
 'use client';
 
 import { cn } from '@mimir-wallet/ui';
-import { type ComponentProps, memo } from 'react';
-import { Streamdown } from 'streamdown';
+import { lazy, memo, Suspense } from 'react';
 
-type ResponseProps = ComponentProps<typeof Streamdown>;
+// Lazy load Streamdown to avoid loading shiki (~9MB) on initial page load
+const LazyStreamdown = lazy(() =>
+  import('streamdown').then((mod) => ({ default: mod.Streamdown })),
+);
+
+interface ResponseProps {
+  children?: string;
+  className?: string;
+}
 
 export const Response = memo(
-  ({ className, ...props }: ResponseProps) => (
-    <Streamdown className={cn('size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)} {...props} />
+  ({ className, children }: ResponseProps) => (
+    <Suspense
+      fallback={
+        <div className="animate-pulse whitespace-pre-wrap">{children}</div>
+      }
+    >
+      <LazyStreamdown
+        className={cn(
+          'size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0',
+          className,
+        )}
+      >
+        {children}
+      </LazyStreamdown>
+    </Suspense>
   ),
-  (prevProps, nextProps) => prevProps.children === nextProps.children
+  (prevProps, nextProps) => prevProps.children === nextProps.children,
 );
 
 Response.displayName = 'Response';

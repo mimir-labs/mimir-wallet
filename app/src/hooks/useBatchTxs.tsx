@@ -19,18 +19,27 @@ type BatchTxs = Record<HexString, BatchTxItem[]>; // addressHex => BatchTxItem[]
 
 export function useBatchTxs(
   network?: string | null,
-  address?: string | null
+  address?: string | null,
 ): [
   txs: BatchTxItem[],
   addTx: (value: Omit<BatchTxItem, 'id'>[], alert?: boolean) => void,
   deleteTx: (ids: (number | string)[]) => void,
-  setTx: (txs: BatchTxItem[]) => void
+  setTx: (txs: BatchTxItem[]) => void,
 ] {
-  const addressHex = useMemo(() => (address ? addressToHex(address) : ''), [address]);
-  const [values, setValues] = useLocalStore<BatchTxs>(network ? `${BATCH_TX_V2_PREFIX}${network}` : '', {});
+  const addressHex = useMemo(
+    () => (address ? addressToHex(address) : ''),
+    [address],
+  );
+  const [values, setValues] = useLocalStore<BatchTxs>(
+    network ? `${BATCH_TX_V2_PREFIX}${network}` : '',
+    {},
+  );
   const { openRightSidebar, setRightSidebarTab } = useMimirLayout();
 
-  const txs = useMemo(() => (addressHex ? values[addressHex] || [] : []), [addressHex, values]);
+  const txs = useMemo(
+    () => (addressHex ? values[addressHex] || [] : []),
+    [addressHex, values],
+  );
   const addTx = useCallback(
     (value: Omit<BatchTxItem, 'id'>[], alert = true) => {
       if (!addressHex) return;
@@ -43,17 +52,17 @@ export function useBatchTxs(
 
       setValues((_values) => ({
         ...(_values || {}),
-        [addressHex]: [...(_values?.[addressHex] || []), ...added]
+        [addressHex]: [...(_values?.[addressHex] || []), ...added],
       }));
 
       if (alert)
         toast.success(<b>New Batch</b>, {
-          icon: <IconBatch className='text-primary h-7 w-7' />,
+          icon: <IconBatch className="text-primary h-7 w-7" />,
           description: (
-            <div className='flex flex-col items-start gap-[5px]'>
+            <div className="flex flex-col items-start gap-[5px]">
               <p>New Transaction has been added</p>
               <button
-                className='text-primary underline'
+                className="text-primary underline"
                 onClick={() => {
                   setRightSidebarTab('batch');
                   openRightSidebar();
@@ -62,10 +71,10 @@ export function useBatchTxs(
                 View Batch {'>>'}
               </button>
             </div>
-          )
+          ),
         });
     },
-    [addressHex, openRightSidebar, setRightSidebarTab, setValues]
+    [addressHex, openRightSidebar, setRightSidebarTab, setValues],
   );
   const deleteTx = useCallback(
     (ids: (number | string)[]) => {
@@ -73,10 +82,12 @@ export function useBatchTxs(
 
       setValues((_values) => ({
         ...(_values || {}),
-        [addressHex]: (_values?.[addressHex] || []).filter((item) => !ids.includes(item.id))
+        [addressHex]: (_values?.[addressHex] || []).filter(
+          (item) => !ids.includes(item.id),
+        ),
       }));
     },
-    [addressHex, setValues]
+    [addressHex, setValues],
   );
   const setTx = useCallback(
     (txs: BatchTxItem[]) => {
@@ -84,10 +95,10 @@ export function useBatchTxs(
 
       setValues((_values) => ({
         ...(_values || {}),
-        [addressHex]: txs
+        [addressHex]: txs,
       }));
     },
-    [addressHex, setValues]
+    [addressHex, setValues],
   );
 
   return [txs, addTx, deleteTx, setTx];

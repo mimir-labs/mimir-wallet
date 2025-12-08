@@ -19,7 +19,7 @@ interface AppMetadata {
 const CORS_PROXIES = [
   'https://api.allorigins.win/get?url=',
   'https://corsproxy.io/?',
-  'https://cors-anywhere.herokuapp.com/'
+  'https://cors-anywhere.herokuapp.com/',
 ] as const;
 
 /**
@@ -76,7 +76,11 @@ function parseManifest(manifestData: any, baseUrl: string): AppMetadata {
 
   if (manifestData.iconPath) {
     icon = new URL(manifestData.iconPath, baseUrl).toString();
-  } else if (manifestData.icons && Array.isArray(manifestData.icons) && manifestData.icons.length > 0) {
+  } else if (
+    manifestData.icons &&
+    Array.isArray(manifestData.icons) &&
+    manifestData.icons.length > 0
+  ) {
     icon = new URL(manifestData.icons[0].src, baseUrl).toString();
   }
 
@@ -91,7 +95,11 @@ function parseHtml(htmlContent: string, baseUrl: string): AppMetadata {
   const doc = parser.parseFromString(htmlContent, 'text/html');
 
   const title = doc.querySelector('title')?.textContent?.trim() || '';
-  const description = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '';
+  const description =
+    doc
+      .querySelector('meta[name="description"]')
+      ?.getAttribute('content')
+      ?.trim() || '';
 
   let icon: string | undefined;
   const iconElement =
@@ -117,7 +125,9 @@ function parseHtml(htmlContent: string, baseUrl: string): AppMetadata {
 /**
  * Fetch app metadata with fallback strategies
  */
-export async function fetchAppMetadata(url: string): Promise<ProxyResponse<AppMetadata>> {
+export async function fetchAppMetadata(
+  url: string,
+): Promise<ProxyResponse<AppMetadata>> {
   try {
     // Validate URL
     const parsedUrl = new URL(url);
@@ -152,7 +162,8 @@ export async function fetchAppMetadata(url: string): Promise<ProxyResponse<AppMe
 
     return { success: false, error: 'Unable to fetch app metadata' };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
 
     return { success: false, error: errorMessage };
   }

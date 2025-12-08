@@ -1,7 +1,11 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
+import type {
+  AccountId,
+  AccountIndex,
+  Address,
+} from '@polkadot/types/interfaces';
 import type { HexString } from '@polkadot/util/types';
 
 import { encodeAddress } from '../utils/defaults.js';
@@ -9,7 +13,14 @@ import { isPolkadotAddress } from '../utils/utils.js';
 
 function accountExplorerLink(
   chain: { explorerUrl?: string; statescanUrl?: string; ss58Format: number },
-  value?: AccountId | AccountIndex | Address | HexString | Uint8Array | string | null
+  value?:
+    | AccountId
+    | AccountIndex
+    | Address
+    | HexString
+    | Uint8Array
+    | string
+    | null,
 ): string | undefined {
   const _value = encodeAddress(value, chain.ss58Format);
 
@@ -40,7 +51,7 @@ function accountExplorerLink(
 
 function extrinsicExplorerLink(
   chain: { explorerUrl?: string; statescanUrl?: string },
-  value?: string | { toString: () => string }
+  value?: string | { toString: () => string },
 ): string | undefined {
   const _value = value?.toString();
 
@@ -69,5 +80,5 @@ function extrinsicExplorerLink(
 
 export const chainLinks = {
   accountExplorerLink,
-  extrinsicExplorerLink
+  extrinsicExplorerLink,
 };

@@ -34,12 +34,16 @@ interface GroupedTransactionsProps {
   renderGroup?: (
     group: GroupedTransactionsType,
     groupIndex: number,
-    transactions: React.ReactNode[]
+    transactions: React.ReactNode[],
   ) => React.ReactNode;
   /**
    * Custom render function for individual transactions
    */
-  renderTransaction?: (transaction: Transaction, index: number, groupIndex: number) => React.ReactNode;
+  renderTransaction?: (
+    transaction: Transaction,
+    index: number,
+    groupIndex: number,
+  ) => React.ReactNode;
   /**
    * Additional className for the container
    */
@@ -58,12 +62,12 @@ interface GroupedTransactionsProps {
 const spacingClasses = {
   sm: 'space-y-3',
   md: 'space-y-5',
-  lg: 'space-y-8'
+  lg: 'space-y-8',
 };
 
 const variantClasses = {
   default: 'p-5',
-  compact: 'p-4'
+  compact: 'p-4',
 };
 
 function GroupedTransactions({
@@ -76,7 +80,7 @@ function GroupedTransactions({
   className = '',
   spacing = 'md',
   variant = 'default',
-  showSkeleton
+  showSkeleton,
 }: GroupedTransactionsProps) {
   // Show empty state if no transactions and showEmpty is enabled
   if (!showSkeleton && groupedTransactions.length === 0) {
@@ -84,7 +88,11 @@ function GroupedTransactions({
   }
 
   // Default transaction renderer
-  const defaultRenderTransaction = (transaction: Transaction, index: number, groupIndex: number) => (
+  const defaultRenderTransaction = (
+    transaction: Transaction,
+    index: number,
+    groupIndex: number,
+  ) => (
     <TxCell
       key={`${groupedTransactions[groupIndex].label}-${transaction.id}`}
       address={transaction.address}
@@ -94,13 +102,17 @@ function GroupedTransactions({
   );
 
   // Default group renderer
-  const defaultRenderGroup = (group: GroupedTransactionsType, _groupIndex: number, transactions: React.ReactNode[]) => (
+  const defaultRenderGroup = (
+    group: GroupedTransactionsType,
+    _groupIndex: number,
+    transactions: React.ReactNode[],
+  ) => (
     <div
       key={group.date}
-      className={`bg-background border-secondary flex flex-col gap-3 rounded-[20px] border-1 shadow-md ${variantClasses[variant]}`}
+      className={`card-root flex flex-col gap-3 ${variantClasses[variant]}`}
     >
-      <h6 className='text-primary'>{group.label}</h6>
-      <div className='space-y-3'>{transactions}</div>
+      <h6 className="text-primary">{group.label}</h6>
+      <div className="space-y-3">{transactions}</div>
     </div>
   );
 
@@ -111,7 +123,7 @@ function GroupedTransactions({
     <div className={`${spacingClasses[spacing]} ${className}`}>
       {groupedTransactions.map((group, groupIndex) => {
         const transactions = group.transactions.map((transaction, index) =>
-          transactionRenderer(transaction, index, groupIndex)
+          transactionRenderer(transaction, index, groupIndex),
         );
 
         return groupRenderer(group, groupIndex, transactions);

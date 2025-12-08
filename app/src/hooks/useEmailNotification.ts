@@ -7,7 +7,11 @@ import { service } from '@mimir-wallet/service';
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
-import { createEmailBindSignature, createEmailUnbindSignature, validateEmail } from '@/utils/emailSignatureUtils';
+import {
+  createEmailBindSignature,
+  createEmailUnbindSignature,
+  validateEmail,
+} from '@/utils/emailSignatureUtils';
 import { useWallet } from '@/wallet/useWallet';
 
 export interface UseEmailNotificationResult {
@@ -23,7 +27,10 @@ export interface UseEmailNotificationResult {
   error: string | null;
 
   // Actions
-  bindEmail: (value: { email: string; signer: string }, ...args: any[]) => Promise<void>;
+  bindEmail: (
+    value: { email: string; signer: string },
+    ...args: any[]
+  ) => Promise<void>;
   unbindEmail: (value: { signer: string }) => Promise<void>;
   clearError: () => void;
 }
@@ -31,7 +38,9 @@ export interface UseEmailNotificationResult {
 /**
  * Hook for managing email notification subscriptions
  */
-export function useEmailNotification(address: string | null): UseEmailNotificationResult {
+export function useEmailNotification(
+  address: string | null,
+): UseEmailNotificationResult {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const { walletAccounts } = useWallet();
@@ -48,7 +57,10 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
         ? walletAccounts.map((account) => ({
             queryKey: ['emailSubscription', address, account.address],
             queryFn: async () => {
-              const response = await service.emailNotification.getSubscriptions(address, account.address);
+              const response = await service.emailNotification.getSubscriptions(
+                address,
+                account.address,
+              );
 
               return response.subscriptions;
             },
@@ -60,13 +72,15 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
               }
 
               return failureCount < 2;
-            }
+            },
           }))
-        : []
+        : [],
   });
 
   // Combine results from all queries
-  const subscriptionsData = subscriptionQueries.reduce<EmailSubscriptionResponseDto[]>((acc, query) => {
+  const subscriptionsData = subscriptionQueries.reduce<
+    EmailSubscriptionResponseDto[]
+  >((acc, query) => {
     if (query.data) {
       acc.push(...query.data);
     }
@@ -78,7 +92,13 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
 
   // Bind email mutation
   const bindMutation = useMutation({
-    mutationFn: async ({ email, signer }: { email: string; signer: string }) => {
+    mutationFn: async ({
+      email,
+      signer,
+    }: {
+      email: string;
+      signer: string;
+    }) => {
       if (!address) {
         throw new Error('Address is required');
       }
@@ -91,7 +111,11 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
       }
 
       // Create signature data
-      const signatureData = await createEmailBindSignature(address, email, signer);
+      const signatureData = await createEmailBindSignature(
+        address,
+        email,
+        signer,
+      );
 
       // Bind email via API
       const response = await service.emailNotification.bindEmail({
@@ -100,7 +124,7 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
         email,
         nonce: signatureData.nonce,
         timestamp: signatureData.timestamp,
-        signature: signatureData.signature
+        signature: signatureData.signature,
       });
 
       return response;
@@ -109,14 +133,14 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
       // Invalidate all email subscription queries for this address
       queryClient.invalidateQueries({
         queryKey: ['emailSubscription', address],
-        exact: false // Match all queries starting with this pattern
+        exact: false, // Match all queries starting with this pattern
       });
       setError(null);
     },
     onError: (error) => {
       console.error('Failed to bind email:', error);
       setError(error instanceof Error ? error.message : 'Failed to bind email');
-    }
+    },
   });
 
   // Unbind email mutation
@@ -135,7 +159,7 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
         signer: signer,
         nonce: signatureData.nonce,
         timestamp: signatureData.timestamp,
-        signature: signatureData.signature
+        signature: signatureData.signature,
       });
 
       return response;
@@ -144,14 +168,16 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
       // Invalidate all email subscription queries for this address
       queryClient.invalidateQueries({
         queryKey: ['emailSubscription', address],
-        exact: false // Match all queries starting with this pattern
+        exact: false, // Match all queries starting with this pattern
       });
       setError(null);
     },
     onError: (error) => {
       console.error('Failed to unbind email:', error);
-      setError(error instanceof Error ? error.message : 'Failed to unbind email');
-    }
+      setError(
+        error instanceof Error ? error.message : 'Failed to unbind email',
+      );
+    },
   });
 
   // Destructure mutateAsync for stable references
@@ -164,7 +190,7 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
       clearError();
       await bindMutateAsync(value);
     },
-    [bindMutateAsync, clearError]
+    [bindMutateAsync, clearError],
   );
 
   const unbindEmail = useCallback(
@@ -172,7 +198,7 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
       clearError();
       await unbindMutateAsync(value);
     },
-    [unbindMutateAsync, clearError]
+    [unbindMutateAsync, clearError],
   );
 
   return {
@@ -190,6 +216,6 @@ export function useEmailNotification(address: string | null): UseEmailNotificati
     // Actions
     bindEmail,
     unbindEmail,
-    clearError
+    clearError,
   };
 }

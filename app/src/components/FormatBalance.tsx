@@ -9,7 +9,10 @@ import React, { useMemo } from 'react';
 
 import { formatDisplay, formatUnits } from '@/utils';
 
-interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
+interface Props extends React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLSpanElement>,
+  HTMLSpanElement
+> {
   format?: [decimals: number, symbol: string];
   label?: React.ReactNode;
   value?: Compact<any> | BN | bigint | string | number | null;
@@ -33,7 +36,8 @@ function FormatBalance({
 
   const [major, rest, unit] = useMemo(() => {
     // Ensure valid decimals, default to 10 for DOT if not available
-    const finalDecimals = typeof decimals === 'number' && decimals > 0 ? decimals : 10;
+    const finalDecimals =
+      typeof decimals === 'number' && decimals > 0 ? decimals : 10;
     const _value = formatUnits(BigInt(value?.toString() || 0), finalDecimals);
 
     return formatDisplay(_value);

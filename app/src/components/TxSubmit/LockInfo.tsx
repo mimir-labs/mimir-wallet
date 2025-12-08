@@ -17,29 +17,36 @@ import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 
 function LockInfo({ buildTx }: { buildTx: BuildTx }) {
   const { reserve, unreserve, delay } = buildTx;
-  const [enoughtState, setEnoughtState] = useState<Record<HexString, boolean | 'pending'>>({});
+  const [enoughtState, setEnoughtState] = useState<
+    Record<HexString, boolean | 'pending'>
+  >({});
 
   const isEnought = Object.keys(reserve).reduce<boolean>(
     (result, item) => result && !!enoughtState[addressToHex(item)],
-    true
+    true,
   );
   const isEnoughtPending = Object.keys(reserve).reduce<boolean>(
     (result, item) => result || enoughtState[addressToHex(item)] === 'pending',
-    false
+    false,
   );
 
   return (
     <>
       <Divider />
-      {(Object.keys(reserve).length > 0 || Object.keys(unreserve).length > 0 || Object.keys(delay).length > 0) && (
+      {(Object.keys(reserve).length > 0 ||
+        Object.keys(unreserve).length > 0 ||
+        Object.keys(delay).length > 0) && (
         <LockContainer>
           {Object.entries(delay).map(([address, delay], index) => (
-            <div key={`delay-${address}-${index}`} className='flex items-center justify-between gap-[5px] sm:gap-2.5'>
-              <div className='flex items-center gap-[5px] sm:gap-2.5'>
-                <IconClock className='text-primary h-4 w-4 opacity-50' />
+            <div
+              key={`delay-${address}-${index}`}
+              className="flex items-center justify-between gap-[5px] sm:gap-2.5"
+            >
+              <div className="flex items-center gap-[5px] sm:gap-2.5">
+                <IconClock className="text-primary h-4 w-4 opacity-50" />
                 <p>Review window</p>
-                <Tooltip content='This transaction needs to be executed manually after review window ends.'>
-                  <IconQuestion className='text-primary/40' />
+                <Tooltip content="This transaction needs to be executed manually after review window ends.">
+                  <IconQuestion className="text-primary/40" />
                 </Tooltip>
               </div>
 
@@ -47,7 +54,9 @@ function LockInfo({ buildTx }: { buildTx: BuildTx }) {
             </div>
           ))}
 
-          {Object.keys(delay).length > 0 && <Divider className='bg-primary/5' />}
+          {Object.keys(delay).length > 0 && (
+            <Divider className="bg-primary/5" />
+          )}
 
           {Object.entries(reserve).map(([address, { value }], index) => (
             <LockItem
@@ -65,7 +74,10 @@ function LockInfo({ buildTx }: { buildTx: BuildTx }) {
                 </>
               }
               onEnoughtState={(address, isEnought) =>
-                setEnoughtState((state) => ({ ...state, [addressToHex(address)]: isEnought }))
+                setEnoughtState((state) => ({
+                  ...state,
+                  [addressToHex(address)]: isEnought,
+                }))
               }
             />
           ))}
@@ -90,7 +102,7 @@ function LockInfo({ buildTx }: { buildTx: BuildTx }) {
       )}
 
       {!isEnought && !isEnoughtPending ? (
-        <Alert variant='destructive'>
+        <Alert variant="destructive">
           <AlertTitle>Insufficient funds</AlertTitle>
         </Alert>
       ) : null}

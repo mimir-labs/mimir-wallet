@@ -32,7 +32,9 @@ export class ProxyTransactionService {
   /**
    * Build transaction for adding a single proxy
    */
-  buildAddProxyTransaction(proxyArgs: ProxyArgs): SubmittableExtrinsic<'promise'> {
+  buildAddProxyTransaction(
+    proxyArgs: ProxyArgs,
+  ): SubmittableExtrinsic<'promise'> {
     const { delegate, proxyType, delay } = proxyArgs;
 
     return this.api.tx.proxy.addProxy(delegate, proxyType as any, delay);
@@ -41,7 +43,9 @@ export class ProxyTransactionService {
   /**
    * Build batch transaction for adding multiple proxies
    */
-  buildBatchProxyTransaction(proxyArgsList: ProxyArgs[]): SubmittableExtrinsic<'promise'> {
+  buildBatchProxyTransaction(
+    proxyArgsList: ProxyArgs[],
+  ): SubmittableExtrinsic<'promise'> {
     if (proxyArgsList.length === 0) {
       throw new Error('Proxy arguments list cannot be empty');
     }
@@ -51,7 +55,11 @@ export class ProxyTransactionService {
     }
 
     const transactions = proxyArgsList.map((args) =>
-      this.api.tx.proxy.addProxy(args.delegate, args.proxyType as any, args.delay)
+      this.api.tx.proxy.addProxy(
+        args.delegate,
+        args.proxyType as any,
+        args.delay,
+      ),
     );
 
     return this.api.tx.utility.batchAll(transactions);
@@ -60,7 +68,9 @@ export class ProxyTransactionService {
   /**
    * Build transaction for removing a proxy
    */
-  buildRemoveProxyTransaction(proxyArgs: ProxyArgs): SubmittableExtrinsic<'promise'> {
+  buildRemoveProxyTransaction(
+    proxyArgs: ProxyArgs,
+  ): SubmittableExtrinsic<'promise'> {
     const { delegate, proxyType, delay } = proxyArgs;
 
     return this.api.tx.proxy.removeProxy(delegate, proxyType as any, delay);
@@ -76,7 +86,10 @@ export class ProxyTransactionService {
   /**
    * Validate proxy arguments before transaction creation
    */
-  validateProxyArgs(proxyArgs: ProxyArgs): { isValid: boolean; error?: string } {
+  validateProxyArgs(proxyArgs: ProxyArgs): {
+    isValid: boolean;
+    error?: string;
+  } {
     const { delegate, proxyType, delay } = proxyArgs;
 
     if (!delegate) {
@@ -97,7 +110,10 @@ export class ProxyTransactionService {
   /**
    * Validate multiple proxy arguments
    */
-  validateBatchProxyArgs(proxyArgsList: ProxyArgs[]): { isValid: boolean; errors: string[] } {
+  validateBatchProxyArgs(proxyArgsList: ProxyArgs[]): {
+    isValid: boolean;
+    errors: string[];
+  } {
     const errors: string[] = [];
 
     if (proxyArgsList.length === 0) {
@@ -114,7 +130,7 @@ export class ProxyTransactionService {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 }
@@ -122,7 +138,9 @@ export class ProxyTransactionService {
 /**
  * Factory function to create ProxyTransactionService instance
  */
-export function createProxyTransactionService(api: ApiPromise): ProxyTransactionService {
+export function createProxyTransactionService(
+  api: ApiPromise,
+): ProxyTransactionService {
   return new ProxyTransactionService(api);
 }
 
@@ -137,14 +155,17 @@ export const proxyTransactionUtils = {
     return {
       method: transaction.method,
       hash: transaction.hash.toHex(),
-      length: transaction.encodedLength
+      length: transaction.encodedLength,
     };
   },
 
   /**
    * Calculate estimated transaction fee
    */
-  async calculateTransactionFee(transaction: SubmittableExtrinsic<'promise'>, senderAddress: string): Promise<string> {
+  async calculateTransactionFee(
+    transaction: SubmittableExtrinsic<'promise'>,
+    senderAddress: string,
+  ): Promise<string> {
     try {
       const info = await transaction.paymentInfo(senderAddress);
 
@@ -154,5 +175,5 @@ export const proxyTransactionUtils = {
 
       return '0';
     }
-  }
+  },
 };

@@ -18,7 +18,10 @@ export async function connectWallet(name: string) {
   const provider = window.injectedWeb3?.[walletConfig[name]?.key];
 
   if (provider) {
-    const walletAccounts = await loadWallet(await provider.enable(CONNECT_ORIGIN), name);
+    const walletAccounts = await loadWallet(
+      await provider.enable(CONNECT_ORIGIN),
+      name,
+    );
 
     useWallet.setState((state) => {
       const newValue = [...state.connectedWallets, name];
@@ -27,14 +30,20 @@ export async function connectWallet(name: string) {
       store.set(CONNECTED_WALLETS_KEY, newValue);
 
       // Deduplicate wallet accounts by address
-      const uniqueWalletAccounts = [...state.walletAccounts, ...walletAccounts].filter(
-        (account, index, self) => !self.some((t, i) => i < index && addressEq(t.address, account.address))
+      const uniqueWalletAccounts = [
+        ...state.walletAccounts,
+        ...walletAccounts,
+      ].filter(
+        (account, index, self) =>
+          !self.some(
+            (t, i) => i < index && addressEq(t.address, account.address),
+          ),
       );
 
       return {
         ...state,
         connectedWallets: newValue,
-        walletAccounts: uniqueWalletAccounts
+        walletAccounts: uniqueWalletAccounts,
       };
     });
   }
@@ -54,7 +63,9 @@ export function disconnectWallet(name: string) {
     return {
       ...state,
       connectedWallets: newValue,
-      walletAccounts: state.walletAccounts.filter((item) => item.source !== name)
+      walletAccounts: state.walletAccounts.filter(
+        (item) => item.source !== name,
+      ),
     };
   });
 }

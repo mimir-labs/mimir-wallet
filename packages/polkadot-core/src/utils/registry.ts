@@ -14,7 +14,7 @@ export class StoredRegistry extends TypeRegistry {
     metadata: Metadata,
     signedExtensions?: string[],
     userExtensions?: ExtDef,
-    noInitWarn?: boolean
+    noInitWarn?: boolean,
   ): void {
     this.latestMetadata = metadata;
     super.setMetadata(metadata, signedExtensions, userExtensions, noInitWarn);
@@ -26,7 +26,10 @@ export class StoredRegistry extends TypeRegistry {
  * This function attempts to create a block-specific registry that can properly
  * decode calls that were valid at that historical block height
  */
-export async function createBlockRegistry(api: ApiPromise, blockNumber: string | number): Promise<Registry> {
+export async function createBlockRegistry(
+  api: ApiPromise,
+  blockNumber: string | number,
+): Promise<Registry> {
   try {
     // Get the block registry for the specific block
     // This will include the metadata that was active at that block
@@ -35,7 +38,10 @@ export async function createBlockRegistry(api: ApiPromise, blockNumber: string |
 
     return blockRegistry.registry;
   } catch (error) {
-    console.warn('Failed to create block registry, falling back to current registry:', error);
+    console.warn(
+      'Failed to create block registry, falling back to current registry:',
+      error,
+    );
 
     // Fallback to current registry if block-specific registry creation fails
     return api.registry;

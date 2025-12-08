@@ -6,7 +6,13 @@ export { createApi, getEndpoints } from './api-factory.js';
 export { getIdentityNetwork, resolveChain } from './chain-resolver.js';
 export { useAllChainStatuses } from './useAllChainStatuses.js';
 export { useAllChainsConnected } from './useAllChainsConnected.js';
-export { useApiStore, getNetworkMode, getSs58Chain, getSs58ChainInfo, setSs58ChainExternal } from './useApiStore.js';
+export {
+  useApiStore,
+  getNetworkMode,
+  getSs58Chain,
+  getSs58ChainInfo,
+  setSs58ChainExternal,
+} from './useApiStore.js';
 export type { ApiState } from './useApiStore.js';
 export { useChain } from './useChain.js';
 export { useChains } from './useChains.js';

@@ -21,7 +21,7 @@ import { fetchTokenBalances } from './fetchTokenBalances.js';
 export async function fetchAccountBalances(
   api: ApiPromise,
   address: HexString,
-  assets: CompleteEnhancedAssetInfo[]
+  assets: CompleteEnhancedAssetInfo[],
 ): Promise<AccountEnhancedAssetBalance[]> {
   if (!api?.isConnected) {
     throw new Error('API is not connected');
@@ -58,7 +58,7 @@ export async function fetchAccountBalances(
           locked: nativeBalance.locked,
           reserved: nativeBalance.reserved,
           free: nativeBalance.free,
-          transferrable: nativeBalance.transferrable
+          transferrable: nativeBalance.transferrable,
         });
       }
     }
@@ -70,7 +70,11 @@ export async function fetchAccountBalances(
       // AssethubPolkadot and similar chains
       const nonNativeAssets = assets.filter((asset) => !asset.isNative);
 
-      balanceResults = await fetchAssethubBalances(api, address, nonNativeAssets);
+      balanceResults = await fetchAssethubBalances(
+        api,
+        address,
+        nonNativeAssets,
+      );
     } else if (api.query.tokens) {
       // Chains with orml-tokens
       balanceResults = await fetchTokenBalances(api, address);
@@ -88,13 +92,15 @@ export async function fetchAccountBalances(
           locked: balanceResult.locked,
           reserved: balanceResult.reserved,
           free: balanceResult.free,
-          transferrable: balanceResult.transferrable
+          transferrable: balanceResult.transferrable,
         });
       }
     }
 
     return results;
   } catch (error) {
-    throw new Error(`Failed to fetch account balances: ${(error as Error).message}`);
+    throw new Error(
+      `Failed to fetch account balances: ${(error as Error).message}`,
+    );
   }
 }

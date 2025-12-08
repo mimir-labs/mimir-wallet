@@ -13,7 +13,10 @@ import { handleValidationError, safeExecute } from './error-handling';
  * @param callData - Hex string call data
  * @returns Decoded call data or error
  */
-export function decodeCallData(registry: Registry, callData: string): DecodeResult<Call> {
+export function decodeCallData(
+  registry: Registry,
+  callData: string,
+): DecodeResult<Call> {
   if (!callData?.trim()) {
     return [null, null];
   }
@@ -76,7 +79,7 @@ export function getCallSummary(call: Call): CallSummary {
     section: call.section,
     method: call.method,
     args: (call.args as any).toHuman() as Record<string, any>,
-    hash: call.hash.toHex()
+    hash: call.hash.toHex(),
   };
 }
 

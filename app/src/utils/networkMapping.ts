@@ -21,7 +21,7 @@ const INTERNAL_TO_URL: Record<string, string> = {
   'assethub-paseo': 'paseo',
   paseo: 'paseo-relay',
   'assethub-westend': 'westend',
-  westend: 'westend-relay'
+  westend: 'westend-relay',
 };
 
 // URL parameter value → Internal chain key (reverse mapping)
@@ -33,7 +33,7 @@ const URL_TO_INTERNAL: Record<string, string> = {
   paseo: 'assethub-paseo',
   'paseo-relay': 'paseo',
   westend: 'assethub-westend',
-  'westend-relay': 'westend'
+  'westend-relay': 'westend',
 };
 
 /**

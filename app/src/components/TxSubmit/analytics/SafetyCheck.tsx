@@ -20,21 +20,30 @@ function SafetyCheck({ safetyCheck }: { safetyCheck?: SafetyLevel }) {
 
   return (
     <div>
-      <div className='font-bold'>Safety Check</div>
+      <div className="font-bold">Safety Check</div>
 
-      <Cell title='Cross-chain Check' img={<img src={Logo} alt='mimir' className='h-[14px]' />}>
-        {!safetyCheck && <Spinner size='sm' />}
+      <Cell
+        title="Cross-chain Check"
+        img={<img src={Logo} alt="mimir" className="h-[14px]" />}
+      >
+        {!safetyCheck && <Spinner size="sm" />}
         {safetyCheck && (
           <>
-            {safetyCheck.severity === 'none' && <IconSuccess className='text-success h-4 w-4' />}
-            {safetyCheck.severity === 'error' && <IconFailed className='text-danger h-4 w-4' />}
-            {safetyCheck.severity === 'warning' && <IconInfo className='text-warning h-4 w-4' />}
+            {safetyCheck.severity === 'none' && (
+              <IconSuccess className="text-success h-4 w-4" />
+            )}
+            {safetyCheck.severity === 'error' && (
+              <IconFailed className="text-danger h-4 w-4" />
+            )}
+            {safetyCheck.severity === 'warning' && (
+              <IconInfo className="text-warning h-4 w-4" />
+            )}
 
             <p
               data-success={safetyCheck.severity === 'none'}
               data-error={safetyCheck.severity === 'error'}
               data-warning={safetyCheck.severity === 'warning'}
-              className='data-[success=true]:text-success data-[error]:text-danger data-[warning]:text-warning font-bold'
+              className="data-[success=true]:text-success data-[error]:text-danger data-[warning]:text-warning font-bold"
             >
               {safetyCheck?.message}
             </p>

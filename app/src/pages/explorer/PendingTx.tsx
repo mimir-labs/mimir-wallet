@@ -29,39 +29,45 @@ function PendingTx({ address, url }: Props) {
     <>
       <div
         data-expanded={expanded}
-        className='pointer-events-none fixed top-0 right-0 bottom-0 left-0 h-full w-full bg-black/15 opacity-0 transition-opacity data-[expanded=true]:opacity-100'
+        className="pointer-events-none fixed top-0 right-0 bottom-0 left-0 h-full w-full bg-black/15 opacity-0 transition-opacity data-[expanded=true]:opacity-100"
         onClick={toggleExpand}
         style={{ pointerEvents: expanded ? 'auto' : 'none' }}
       />
 
       <div
         data-expanded={expanded}
-        className='bg-secondary fixed right-0 bottom-0 left-0 h-[calc(50vh+60px)] w-full translate-y-[50vh] transition-all data-[expanded=true]:translate-y-0'
+        className="bg-secondary fixed right-0 bottom-0 left-0 h-[calc(50vh+60px)] w-full translate-y-[50vh] transition-all data-[expanded=true]:translate-y-0"
       >
-        <div className='flex h-[60px] cursor-pointer items-center justify-between px-6' onClick={toggleExpand}>
-          <h6 data-expanded={expanded} className='text-secondary-foreground text-base font-bold'>
+        <div
+          className="flex h-[60px] cursor-pointer items-center justify-between px-6"
+          onClick={toggleExpand}
+        >
+          <h6
+            data-expanded={expanded}
+            className="text-secondary-foreground text-base font-bold"
+          >
             {counts} Pending Transactions
           </h6>
           <Button
             data-expanded={expanded}
             isIconOnly
-            size='sm'
-            color='secondary'
-            radius='full'
-            className='bg-primary/5 data-[expanded=true]:rotate-180'
+            size="sm"
+            color="secondary"
+            radius="full"
+            className="bg-primary/5 data-[expanded=true]:rotate-180"
             onClick={toggleExpand}
           >
             <ExpandArrow />
           </Button>
         </div>
 
-        <div className='h-[50vh] space-y-5 overflow-y-auto p-5'>
+        <div className="h-[50vh] space-y-5 overflow-y-auto p-5">
           <GroupedTransactions
             groupedTransactions={groupedTransactions}
             emptyHeight={280}
-            emptyLabel='No Pending Transactions'
-            variant='compact'
-            spacing='md'
+            emptyLabel="No Pending Transactions"
+            variant="compact"
+            spacing="md"
           />
         </div>
       </div>

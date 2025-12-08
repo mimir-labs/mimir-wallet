@@ -1,7 +1,12 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { encodeAddress, type Network, useChains, useSs58Format } from '@mimir-wallet/polkadot-core';
+import {
+  encodeAddress,
+  type Network,
+  useChains,
+  useSs58Format,
+} from '@mimir-wallet/polkadot-core';
 import { useLocalStore } from '@mimir-wallet/service';
 import {
   Avatar,
@@ -10,11 +15,14 @@ import {
   Drawer,
   DrawerContent,
   DrawerFooter,
+  DrawerTitle,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
-  Switch
+  ModalHeader,
+  Switch,
+  VisuallyHidden,
 } from '@mimir-wallet/ui';
 import { type ReactNode, useMemo, useRef } from 'react';
 import { useEffectOnce } from 'react-use';
@@ -44,7 +52,7 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       // scroll to the top of the page
       ref.current?.scrollIntoView?.({
         behavior: 'smooth',
-        block: 'center'
+        block: 'center',
       });
     }
   });
@@ -54,57 +62,86 @@ function Item({ endpoint, address }: { endpoint: Network; address: string }) {
       data-selected={ss58Chain === endpoint.key}
       ref={ref}
       style={{
-        background: 'var(--color-main-bg)'
+        background: 'var(--color-main-bg)',
       }}
-      className='data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 rounded-[10px] p-2 sm:gap-2 sm:p-2.5'
+      className="data-[selected=true]:animate-blink-bg flex cursor-pointer items-center gap-1 rounded-[10px] p-2 sm:gap-2 sm:p-2.5"
       onClick={(e) => {
         e.stopPropagation();
         copy(encodeAddress(address, endpoint.ss58Format));
-        toastSuccess('Address copied', encodeAddress(address, endpoint.ss58Format));
+        toastSuccess(
+          'Address copied',
+          encodeAddress(address, endpoint.ss58Format),
+        );
       }}
     >
       <Avatar
         src={endpoint.icon}
-        className='h-[20px] w-[20px] sm:h-[30px] sm:w-[30px]'
+        className="h-[20px] w-[20px] sm:h-[30px] sm:w-[30px]"
         style={{ backgroundColor: 'transparent' }}
       />
-      <b className='text-sm sm:text-base'>{endpoint.name}</b>
-      <div className='text-foreground/50 flex-1 text-xs'>
-        <Address value={address} shorten={!upSm} ss58Format={endpoint.ss58Format} />
+      <b className="text-sm sm:text-base">{endpoint.name}</b>
+      <div className="text-foreground/50 flex-1 text-xs">
+        <Address
+          value={address}
+          shorten={!upSm}
+          ss58Format={endpoint.ss58Format}
+        />
       </div>
       <ExplorerLink chain={endpoint} address={address} showAll={false} />
-      <CopyButton size='sm' className='h-6 w-6 opacity-30' value={encodeAddress(address, endpoint.ss58Format)} />
-      <Button isIconOnly size='sm' className='text-inherit' variant='light' onClick={() => openQr(address)}>
-        <IconQrcode className='h-[16px] w-[16px] opacity-30' />
+      <CopyButton
+        size="sm"
+        className="h-6 w-6 opacity-30"
+        value={encodeAddress(address, endpoint.ss58Format)}
+      />
+      <Button
+        isIconOnly
+        size="sm"
+        className="text-inherit"
+        variant="light"
+        onClick={() => openQr(address)}
+      >
+        <IconQrcode className="h-[16px] w-[16px] opacity-30" />
       </Button>
       <Button
         isIconOnly
-        size='sm'
-        className='text-inherit'
-        variant='light'
+        size="sm"
+        className="text-inherit"
+        variant="light"
         onClick={() => {
           setSs58Chain(endpoint.key);
 
           toast.success(<b>Address Formate Changed</b>, {
-            icon: <Avatar style={{ width: 30, height: 30 }} src={endpoint.icon} />,
-            description: `Switch to ${endpoint.name}`
+            icon: (
+              <Avatar style={{ width: 30, height: 30 }} src={endpoint.icon} />
+            ),
+            description: `Switch to ${endpoint.name}`,
           });
         }}
       >
         <IconStar
           data-selected={ss58Chain === endpoint.key}
-          className='data-[selected=true]:text-primary opacity-30 data-[selected=true]:opacity-100'
+          className="data-[selected=true]:text-primary opacity-30 data-[selected=true]:opacity-100"
         />
       </Button>
     </div>
   );
 }
 
-function GroupedNetwork({ address, group, endpoints }: { address: string; group: string; endpoints: Network[] }) {
+function GroupedNetwork({
+  address,
+  group,
+  endpoints,
+}: {
+  address: string;
+  group: string;
+  endpoints: Network[];
+}) {
   return (
     <div>
-      <div className='text-primary mb-2.5 text-base font-bold capitalize'>{group}</div>
-      <div className='space-y-2.5'>
+      <div className="text-primary mb-2.5 text-base font-bold capitalize">
+        {group}
+      </div>
+      <div className="space-y-2.5">
         {endpoints.map((endpoint) => (
           <Item key={endpoint.key} endpoint={endpoint} address={address} />
         ))}
@@ -119,7 +156,10 @@ function CopyAddressModal() {
   const { ss58Chain } = useSs58Format();
   const upMd = useMediaQuery('md');
   const { meta } = useAddressMeta(address);
-  const [showAll, setShowAll] = useLocalStore(SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY, false);
+  const [showAll, setShowAll] = useLocalStore(
+    SHOW_ALL_NETWORKS_IN_COPY_MODAL_KEY,
+    false,
+  );
 
   // Derive grouped endpoints from networks, showAll, and ss58Chain
   const groupedEndpoints = useMemo(() => {
@@ -137,7 +177,9 @@ function CopyAddressModal() {
   let content: ReactNode;
 
   if (meta.isPure) {
-    const network = chains.find((chain) => chain.genesisHash === meta.pureCreatedAt);
+    const network = chains.find(
+      (chain) => chain.genesisHash === meta.pureCreatedAt,
+    );
 
     if (!network) {
       return null;
@@ -145,8 +187,10 @@ function CopyAddressModal() {
 
     content = (
       <div>
-        <div className='text-primary mb-2.5 text-base font-bold capitalize'>{network?.name}</div>
-        <div className='space-y-2.5'>
+        <div className="text-primary mb-2.5 text-base font-bold capitalize">
+          {network?.name}
+        </div>
+        <div className="space-y-2.5">
           <Item endpoint={network} address={address} />
         </div>
       </div>
@@ -156,19 +200,29 @@ function CopyAddressModal() {
       <>
         {index > 0 && <Divider />}
 
-        <GroupedNetwork key={`group-${group}`} address={address} group={group} endpoints={groupedEndpoints[group]} />
+        <GroupedNetwork
+          key={`group-${group}`}
+          address={address}
+          group={group}
+          endpoints={groupedEndpoints[group]}
+        />
       </>
     ));
   }
 
   if (upMd) {
     return (
-      <Drawer open={isOpen} onClose={close} direction='right'>
+      <Drawer open={isOpen} onClose={close} direction="right">
         <DrawerContent>
-          <div className='flex flex-col gap-2.5 overflow-y-auto p-4'>{content}</div>
+          <VisuallyHidden>
+            <DrawerTitle>Copy Address</DrawerTitle>
+          </VisuallyHidden>
+          <div className="flex flex-col gap-2.5 overflow-y-auto p-4">
+            {content}
+          </div>
           <DrawerFooter>
-            <label className='flex w-full items-center justify-between'>
-              <span className='text-sm'>Show All Networks</span>
+            <label className="flex w-full items-center justify-between">
+              <span className="text-sm">Show All Networks</span>
               <Switch checked={showAll} onCheckedChange={setShowAll} />
             </label>
           </DrawerFooter>
@@ -180,10 +234,13 @@ function CopyAddressModal() {
   return (
     <Modal onClose={close} isOpen={isOpen}>
       <ModalContent>
+        <VisuallyHidden>
+          <ModalHeader>Copy Address</ModalHeader>
+        </VisuallyHidden>
         <ModalBody>{content}</ModalBody>
         <ModalFooter>
-          <label className='flex w-full items-center justify-between'>
-            <span className='text-sm'>Show All Networks</span>
+          <label className="flex w-full items-center justify-between">
+            <span className="text-sm">Show All Networks</span>
             <Switch checked={showAll} onCheckedChange={setShowAll} />
           </label>
         </ModalFooter>

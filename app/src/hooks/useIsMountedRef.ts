@@ -21,4 +21,7 @@ function useIsMountedRefImpl(): MountedRef {
   return isMounted;
 }
 
-export const useIsMountedRef = createNamedHook('useIsMountedRef', useIsMountedRefImpl);
+export const useIsMountedRef = createNamedHook(
+  'useIsMountedRef',
+  useIsMountedRefImpl,
+);

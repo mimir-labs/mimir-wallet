@@ -15,14 +15,21 @@ import { useQuery } from '@mimir-wallet/service';
 export function useAssetConversion(
   network: string,
   nativeGasFee: bigint | undefined | null,
-  targetAsset: CompleteEnhancedAssetInfo | undefined | null
+  targetAsset: CompleteEnhancedAssetInfo | undefined | null,
 ): bigint | undefined | null {
   // Store nativeGasFee string representation for queryKey
   const nativeGasFeeStr = nativeGasFee?.toString() ?? null;
 
   const { data: gasFeeData } = useQuery({
-    queryKey: ['asset-conversion', network, nativeGasFeeStr, targetAsset] as const,
-    queryFn: async ({ queryKey: [, network, nativeGasFeeStr] }): Promise<bigint> => {
+    queryKey: [
+      'asset-conversion',
+      network,
+      nativeGasFeeStr,
+      targetAsset,
+    ] as const,
+    queryFn: async ({
+      queryKey: [, network, nativeGasFeeStr],
+    }): Promise<bigint> => {
       if (!nativeGasFeeStr || !targetAsset) {
         throw new Error('nativeGasFee and targetAsset are required');
       }
@@ -44,15 +51,18 @@ export function useAssetConversion(
         const convertedFee = BigInt(
           (
             await api.call.assetConversionApi.quotePriceTokensForExactTokens(
-              getFeeAssetLocation(api, targetAsset.assetId) as unknown as string,
+              getFeeAssetLocation(
+                api,
+                targetAsset.assetId,
+              ) as unknown as string,
               {
                 interior: 'Here',
-                parents: 1
+                parents: 1,
               } as unknown as string,
               nativeGasFee,
-              true
+              true,
             )
-          ).toString()
+          ).toString(),
         );
 
         return convertedFee;
@@ -63,7 +73,7 @@ export function useAssetConversion(
     },
     enabled: !!nativeGasFeeStr && !!targetAsset && !!network,
     staleTime: 30000, // Cache for 30 seconds
-    retry: 1
+    retry: 1,
   });
 
   return gasFeeData;

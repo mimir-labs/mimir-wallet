@@ -15,13 +15,19 @@ interface UseAddressMeta {
   meta: AddressMeta;
   name: string;
   setName: React.Dispatch<string>;
-  saveName: (isAddressBook: boolean, cb?: (name: string) => void) => Promise<void>;
+  saveName: (
+    isAddressBook: boolean,
+    cb?: (name: string) => void,
+  ) => Promise<void>;
 }
 
 export function useAddressMeta(value?: string | null): UseAddressMeta {
   const { network } = useNetwork();
   const { metas, addAddress, setAccountName } = useAccount();
-  const addressHex = useMemo(() => (value ? addressToHex(value) : '0x'), [value]);
+  const addressHex = useMemo(
+    () => (value ? addressToHex(value) : '0x'),
+    [value],
+  );
   const _meta = metas[addressHex];
 
   // Derive meta directly from _meta - no need for state
@@ -48,7 +54,11 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
 
       try {
         if (!isAddressBook) {
-          await service.account.updateAccountName(network, addressToHex(value), name);
+          await service.account.updateAccountName(
+            network,
+            addressToHex(value),
+            name,
+          );
           setAccountName(value, name);
           cb?.(name);
         } else {
@@ -59,13 +69,13 @@ export function useAddressMeta(value?: string | null): UseAddressMeta {
         toastError(error);
       }
     },
-    [addAddress, meta.name, name, network, setAccountName, value]
+    [addAddress, meta.name, name, network, setAccountName, value],
   );
 
   return {
     meta: meta,
     name: name,
     setName: setName,
-    saveName: saveName
+    saveName: saveName,
   };
 }

@@ -10,5 +10,9 @@ export function dataToUtf8(data: Data) {
     return data;
   }
 
-  return data?.isRaw ? u8aToString(data.asRaw.toU8a(true)) : data?.isNone ? undefined : data?.toHex?.();
+  return data?.isRaw
+    ? u8aToString(data.asRaw.toU8a(true))
+    : data?.isNone
+      ? undefined
+      : data?.toHex?.();
 }

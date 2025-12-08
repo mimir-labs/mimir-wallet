@@ -22,7 +22,7 @@ const DEFAULT_NETWORKS = [
   'assethub-polkadot',
   'people-polkadot',
   'assethub-kusama',
-  'people-kusama'
+  'people-kusama',
 ];
 const ENABLED_NETWORKS_KEY = 'enabled_networks';
 const NETWORK_MODE_KEY = 'network_mode';
@@ -34,7 +34,11 @@ const NETWORK_MODE_KEY = 'network_mode';
 function initNetworks(): Network[] {
   let enabledNetworks = store.get(ENABLED_NETWORKS_KEY) as string[] | undefined;
 
-  if (!enabledNetworks || !Array.isArray(enabledNetworks) || enabledNetworks.length === 0) {
+  if (
+    !enabledNetworks ||
+    !Array.isArray(enabledNetworks) ||
+    enabledNetworks.length === 0
+  ) {
     enabledNetworks = DEFAULT_NETWORKS;
   }
 
@@ -47,7 +51,10 @@ function initNetworks(): Network[] {
     apiManager.addReference(key, 'user');
   });
 
-  return allEndpoints.map((item) => ({ ...item, enabled: enabledNetworks!.includes(item.key) }));
+  return allEndpoints.map((item) => ({
+    ...item,
+    enabled: enabledNetworks!.includes(item.key),
+  }));
 }
 
 function initNetworkMode(): 'omni' | 'solo' {
@@ -106,7 +113,9 @@ export const useApiStore = create<ApiState>()(
     ss58Chain: initSs58Chain(),
 
     // Sync chain statuses from ApiManager
-    _syncChainStatuses: (statuses) => set({ chainStatuses: statuses }),
+    _syncChainStatuses: (statuses) => {
+      set({ chainStatuses: statuses });
+    },
 
     // Network management actions
     enableNetwork: (key: string) => {
@@ -114,13 +123,15 @@ export const useApiStore = create<ApiState>()(
 
       if (networkMode !== 'omni') return;
 
-      const target = networks.find((n) => n.key === key || n.genesisHash === key);
+      const target = networks.find(
+        (n) => n.key === key || n.genesisHash === key,
+      );
 
       if (!target || target.enabled) return;
 
       const newNetworks = networks.map((n) => ({
         ...n,
-        enabled: n.key === key || n.genesisHash === key ? true : n.enabled
+        enabled: n.key === key || n.genesisHash === key ? true : n.enabled,
       }));
 
       // Add user reference when enabling network
@@ -130,7 +141,7 @@ export const useApiStore = create<ApiState>()(
       // Persist and update state
       store.set(
         ENABLED_NETWORKS_KEY,
-        newNetworks.filter((n) => n.enabled).map((n) => n.key)
+        newNetworks.filter((n) => n.enabled).map((n) => n.key),
       );
       set({ networks: newNetworks });
     },
@@ -151,11 +162,14 @@ export const useApiStore = create<ApiState>()(
 
       const newNetworks = networks.map((n) => ({
         ...n,
-        enabled: n.key === key ? false : n.enabled
+        enabled: n.key === key ? false : n.enabled,
       }));
 
       // Remove user reference and destroy connection if no references remain
-      const shouldDestroy = ApiManager.getInstance().removeReference(key, 'user');
+      const shouldDestroy = ApiManager.getInstance().removeReference(
+        key,
+        'user',
+      );
 
       if (shouldDestroy) {
         ApiManager.getInstance().destroy(key);
@@ -164,7 +178,7 @@ export const useApiStore = create<ApiState>()(
       // Persist and update state
       store.set(
         ENABLED_NETWORKS_KEY,
-        newNetworks.filter((n) => n.enabled).map((n) => n.key)
+        newNetworks.filter((n) => n.enabled).map((n) => n.key),
       );
       set({ networks: newNetworks });
     },
@@ -178,29 +192,50 @@ export const useApiStore = create<ApiState>()(
     // SS58 format actions
     setSs58Chain: (chain: string) => {
       // Validate chain exists
-      const target = allEndpoints.find((e) => e.key === chain || e.genesisHash === chain);
+      const target = allEndpoints.find(
+        (e) => e.key === chain || e.genesisHash === chain,
+      );
 
       if (!target) return;
 
       store.set(DEFAULE_SS58_CHAIN_KEY, target.key);
       set({ ss58Chain: target.key });
-    }
-  }))
+    },
+  })),
 );
 
 // ============================================================================
 // ApiManager Subscription
 // ============================================================================
 
+// Pending statuses for batched update
+let pendingStatuses: Record<string, ChainStatus> | null = null;
+
 // Subscribe to ApiManager and sync statuses to Zustand store
+// Uses queueMicrotask to batch multiple rapid calls and avoid updating during React render
 ApiManager.getInstance().subscribe((apis) => {
+  // Collect statuses
   const statuses: Record<string, ChainStatus> = {};
 
   for (const [key, connection] of Object.entries(apis)) {
     statuses[key] = connection.status;
   }
 
-  useApiStore.getState()._syncChainStatuses(statuses);
+  // If already pending, just update the pending statuses (will be processed in the queued microtask)
+  if (pendingStatuses) {
+    pendingStatuses = statuses;
+
+    return;
+  }
+
+  // Queue the update
+  pendingStatuses = statuses;
+  queueMicrotask(() => {
+    if (pendingStatuses) {
+      useApiStore.getState()._syncChainStatuses(pendingStatuses);
+      pendingStatuses = null;
+    }
+  });
 });
 
 // ============================================================================

@@ -10,8 +10,8 @@ export function extractParams(value: IMethod) {
   const params = value.meta.args.map(
     ({ name, type }): ParamDef => ({
       name: name.toString(),
-      type: getTypeDef(type.toString())
-    })
+      type: getTypeDef(type.toString()),
+    }),
   );
   const values: Codec[] = value.args;
 

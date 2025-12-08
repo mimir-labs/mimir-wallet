@@ -7,7 +7,7 @@ import { createContext } from 'react';
 
 export interface State {
   showAddressNodeOperations?: boolean;
-  account?: AccountData | null;
+  account: AccountData;
 }
 
 export interface Props extends State {

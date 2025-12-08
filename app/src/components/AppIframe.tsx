@@ -17,7 +17,13 @@ type AppIframeProps = {
 const IFRAME_SANDBOX_ALLOWED_FEATURES =
   'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-downloads allow-orientation-lock allow-storage-access-by-user-activation';
 
-function AppIframe({ allowedFeaturesList = 'camera', appUrl, iframeRef, onLoad, title }: AppIframeProps) {
+function AppIframe({
+  allowedFeaturesList = 'camera',
+  appUrl,
+  iframeRef,
+  onLoad,
+  title,
+}: AppIframeProps) {
   return (
     <iframe
       allow={allowedFeaturesList}
@@ -31,7 +37,7 @@ function AppIframe({ allowedFeaturesList = 'camera', appUrl, iframeRef, onLoad, 
         width: '100%',
         overflow: 'auto',
         boxSizing: 'border-box',
-        border: 'none'
+        border: 'none',
       }}
       title={title}
     />

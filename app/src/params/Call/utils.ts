@@ -7,6 +7,11 @@
  * @param additionalClassName - Additional className to append
  * @returns Merged class names
  */
-export function mergeClasses(baseClasses: string, additionalClassName?: string): string {
-  return additionalClassName ? `${baseClasses} ${additionalClassName}` : baseClasses;
+export function mergeClasses(
+  baseClasses: string,
+  additionalClassName?: string,
+): string {
+  return additionalClassName
+    ? `${baseClasses} ${additionalClassName}`
+    : baseClasses;
 }

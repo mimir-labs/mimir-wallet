@@ -32,13 +32,20 @@ function ViewOnExplorer({ eventId: _eventId, address }: ViewOnExplorerProps) {
       }`}
     >
       {/* Left side: Icon and title */}
-      <div className='flex items-center gap-2.5'>
-        <IconGlobal className='h-[30px] w-[30px]' />
-        <div className='text-foreground text-[14px] font-bold'>Blockchain Explorer</div>
+      <div className="flex items-center gap-2.5">
+        <IconGlobal className="h-[30px] w-[30px]" />
+        <div className="text-foreground text-[14px] font-bold">
+          Blockchain Explorer
+        </div>
       </div>
 
       {/* Right side: View button */}
-      <Button size='sm' color='secondary' disabled={!isValidAddress} continuePropagation>
+      <Button
+        size="sm"
+        color="secondary"
+        disabled={!isValidAddress}
+        continuePropagation
+      >
         View
       </Button>
     </div>

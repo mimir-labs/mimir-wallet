@@ -36,11 +36,20 @@ export type BuildTx = {
  * Create queryFn for building transaction
  * Complex objects (filterPath, transaction) are passed via closure
  */
-function createBuildTxQueryFn(filterPath: FilterPath[], transaction?: Transaction | null) {
+function createBuildTxQueryFn(
+  filterPath: FilterPath[],
+  transaction?: Transaction | null,
+) {
   return async ({
-    queryKey
+    queryKey,
   }: {
-    queryKey: readonly [string, string, HexString | undefined, string, number | undefined];
+    queryKey: readonly [
+      string,
+      string,
+      HexString | undefined,
+      string,
+      number | undefined,
+    ];
   }): Promise<BuildTxResult> => {
     const [, network, methodHex] = queryKey;
 
@@ -50,21 +59,27 @@ function createBuildTxQueryFn(filterPath: FilterPath[], transaction?: Transactio
 
     const api = await ApiManager.getInstance().getApi(network);
 
-    if (!api) {
-      throw new Error('Failed to load API');
-    }
-
     const hashSet = new Set<HexString>();
     const call = api.createType('Call', methodHex);
-    const bundle = await buildTx(api, call, filterPath as [FilterPath, ...FilterPath[]], transaction, hashSet);
-    const { reserve, unreserve, delay } = await extrinsicReserve(api, bundle.signer, bundle.tx);
+    const bundle = await buildTx(
+      api,
+      call,
+      filterPath as [FilterPath, ...FilterPath[]],
+      transaction,
+      hashSet,
+    );
+    const { reserve, unreserve, delay } = await extrinsicReserve(
+      api,
+      bundle.signer,
+      bundle.tx,
+    );
 
     return {
       txBundle: bundle,
       hashSet,
       reserve,
       unreserve,
-      delay
+      delay,
     };
   };
 }
@@ -73,16 +88,24 @@ export function useBuildTx(
   network: string,
   method: IMethod | HexString | undefined,
   filterPath: FilterPath[],
-  transaction?: Transaction | null | undefined
+  transaction?: Transaction | null | undefined,
 ): BuildTx {
   // Generate stable key for filterPath
   const filterPathKey = useMemo(
-    () => (filterPath.length > 0 ? filterPath.reduce<string>((result, item) => `${result}-${item.id}`, '') : 'none'),
-    [filterPath]
+    () =>
+      filterPath.length > 0
+        ? filterPath.reduce<string>(
+            (result, item) => `${result}-${item.id}`,
+            '',
+          )
+        : 'none',
+    [filterPath],
   );
 
   // Check if this is a proposer-type path (no build needed)
-  const isProposerPath = filterPath.length > 0 && filterPath.some((item) => item.type === 'proposer');
+  const isProposerPath =
+    filterPath.length > 0 &&
+    filterPath.some((item) => item.type === 'proposer');
 
   // Convert method to hex string for stable query key
   const methodHex = useMemo(() => {
@@ -92,10 +115,17 @@ export function useBuildTx(
   }, [method]);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['build-tx', network, methodHex, filterPathKey, transaction?.id] as const,
+    queryKey: [
+      'build-tx',
+      network,
+      methodHex,
+      filterPathKey,
+      transaction?.id,
+    ] as const,
     queryFn: createBuildTxQueryFn(filterPath, transaction),
-    enabled: !!network && !!methodHex && filterPath.length > 0 && !isProposerPath,
-    retry: false
+    enabled:
+      !!network && !!methodHex && filterPath.length > 0 && !isProposerPath,
+    retry: false,
   });
 
   // Return empty state for proposer paths
@@ -107,7 +137,7 @@ export function useBuildTx(
       hashSet: new Set<HexString>(),
       reserve: {},
       unreserve: {},
-      delay: {}
+      delay: {},
     };
   }
 
@@ -118,6 +148,6 @@ export function useBuildTx(
     hashSet: data?.hashSet ?? new Set<HexString>(),
     reserve: data?.reserve ?? {},
     unreserve: data?.unreserve ?? {},
-    delay: data?.delay ?? {}
+    delay: data?.delay ?? {},
   };
 }

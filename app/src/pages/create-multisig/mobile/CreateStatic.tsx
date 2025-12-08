@@ -26,7 +26,13 @@ function CreateStatic({ checkField, name, signatories, threshold }: Props) {
 
   return (
     <>
-      {address && <CreateSuccess isOpen={isSuccess} onClose={() => setIsSuccess(false)} address={address} />}
+      {address && (
+        <CreateSuccess
+          isOpen={isSuccess}
+          onClose={() => setIsSuccess(false)}
+          address={address}
+        />
+      )}
       <Button
         disabled={!name}
         fullWidth

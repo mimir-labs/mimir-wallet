@@ -4,7 +4,13 @@
 import type { LayoutOptions } from '@/router';
 
 import { SidebarProvider } from '@mimir-wallet/ui';
-import { createFileRoute, Navigate, Outlet, useLocation, useMatches } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Navigate,
+  Outlet,
+  useLocation,
+  useMatches,
+} from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 
 import { useAccount } from '../accounts/useAccount';
@@ -34,7 +40,7 @@ import { useUpdateAIContext } from '@/hooks/useUpdateAIContext';
  * because we need access to useAccount hook. We'll redirect if not authenticated.
  */
 export const Route = createFileRoute('/_authenticated')({
-  component: AuthenticatedLayout
+  component: AuthenticatedLayout,
 });
 
 // Top section component (TopBar + Alert)
@@ -48,15 +54,17 @@ const TopSection = ({ current, setAlertOpen }: TopSectionProps) => {
     (open: boolean) => {
       setAlertOpen(open);
     },
-    [setAlertOpen]
+    [setAlertOpen],
   );
   const [, setAlertCounts] = useState<number>(0);
 
   return (
     <>
       <TopBar />
-      <div className='fixed top-14 right-0 left-0 z-50 flex w-full flex-col gap-2.5 p-2.5'>
-        {current && <ToggleAlert address={current} setAlertOpen={handleSetAlertOpen} />}
+      <div className="fixed top-14 right-0 left-0 z-50 flex w-full flex-col gap-2.5 p-2.5">
+        {current && (
+          <ToggleAlert address={current} setAlertOpen={handleSetAlertOpen} />
+        )}
         <MigrationAlert onMigrationCounts={setAlertCounts} />
       </div>
     </>
@@ -72,7 +80,7 @@ const TransactionOverlay = ({ queue }: TransactionOverlayProps) => {
   if (queue.length === 0) return null;
 
   return (
-    <div className='absolute inset-0 z-50 flex-auto'>
+    <div className="absolute inset-0 z-50 flex-auto">
       <TxSubmit key={queue[0].id} {...queue[0]} />
     </div>
   );
@@ -84,19 +92,22 @@ interface ContentAreaProps {
   isTransactionActive: boolean;
 }
 
-const ContentArea = ({ withPadding, isTransactionActive }: ContentAreaProps) => {
+const ContentArea = ({
+  withPadding,
+  isTransactionActive,
+}: ContentAreaProps) => {
   const contentStyle: React.CSSProperties = {
     display: isTransactionActive ? 'none' : 'flex',
-    padding: withPadding ? undefined : 0
+    padding: withPadding ? undefined : 0,
   };
 
   const versionStyle: React.CSSProperties = {
-    padding: withPadding ? 0 : '0 0 16px 16px'
+    padding: withPadding ? 0 : '0 0 16px 16px',
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 sm:p-5' style={contentStyle}>
-      <div className='z-10 h-full flex-1'>
+    <div className="flex flex-1 flex-col gap-6 p-4 sm:p-5" style={contentStyle}>
+      <div className="z-10 h-full flex-1">
         <Outlet />
       </div>
 
@@ -118,16 +129,22 @@ const MainContent = ({ withPadding, queue }: MainContentProps) => {
   const isTransactionActive = queue.length > 0;
 
   return (
-    <div className='z-0 flex w-full flex-1' style={{ minHeight: contentHeight }}>
+    <div
+      className="z-0 flex w-full flex-1"
+      style={{ minHeight: contentHeight }}
+    >
       <AppSidebar />
 
       <main
-        className='relative flex w-full flex-1 flex-col'
+        className="relative flex w-full flex-1 flex-col"
         style={{
-          background: 'var(--color-main-bg)'
+          background: 'var(--color-main-bg)',
         }}
       >
-        <ContentArea withPadding={withPadding} isTransactionActive={isTransactionActive} />
+        <ContentArea
+          withPadding={withPadding}
+          isTransactionActive={isTransactionActive}
+        />
 
         <TransactionOverlay queue={queue} />
 
@@ -145,7 +162,9 @@ function AuthenticatedLayout() {
   const matches = useMatches();
 
   // Find the deepest route that has layoutOptions in its context
-  const matchWithOptions = [...matches].reverse().find((match) => (match.context as any)?.layoutOptions !== undefined);
+  const matchWithOptions = [...matches]
+    .reverse()
+    .find((match) => (match.context as any)?.layoutOptions !== undefined);
 
   const layoutOptions = matchWithOptions
     ? ((matchWithOptions.context as any)?.layoutOptions as LayoutOptions)
@@ -168,7 +187,7 @@ function AuthenticatedLayout() {
   if (!current) {
     // Use window.location for redirect since we're not in beforeLoad
     if (pathname !== '/welcome') {
-      return <Navigate to='/welcome' replace />;
+      return <Navigate to="/welcome" replace />;
     }
 
     return null;
@@ -176,7 +195,7 @@ function AuthenticatedLayout() {
 
   // Sidebar provider styles
   const sidebarProviderStyle = {
-    [CSS_VARS.HEADER_HEIGHT]: `${layoutHelpers.getTotalHeaderHeight()}px`
+    [CSS_VARS.HEADER_HEIGHT]: `${layoutHelpers.getTotalHeaderHeight()}px`,
   } as React.CSSProperties;
 
   return (
@@ -185,7 +204,7 @@ function AuthenticatedLayout() {
       <AddressModalsProvider />
 
       <SidebarProvider
-        className='relative flex flex-col [--header-height:calc(--spacing(14))]'
+        className="relative flex flex-col [--header-height:calc(--spacing(14))]"
         style={sidebarProviderStyle}
       >
         {/* Top Section: TopBar + Alert */}

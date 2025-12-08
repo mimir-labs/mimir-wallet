@@ -15,7 +15,7 @@ export const Route = createFileRoute('/_authenticated/account-setting')({
       to: '/setting',
       search: { type: 'account' },
       hash: location.hash,
-      replace: true
+      replace: true,
     });
-  }
+  },
 });

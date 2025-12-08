@@ -8,7 +8,11 @@ import { useQuery } from '@mimir-wallet/service';
 
 import { useBlockInterval } from './useBlockInterval';
 
-async function fetchBestBlock({ queryKey }: { queryKey: readonly [string, string] }): Promise<Header> {
+async function fetchBestBlock({
+  queryKey,
+}: {
+  queryKey: readonly [string, string];
+}): Promise<Header> {
   const [, network] = queryKey;
 
   const api = await ApiManager.getInstance().getApi(network);
@@ -27,13 +31,13 @@ export function useBestBlock(network: string) {
   const {
     data: bestBlock,
     isFetched,
-    isFetching
+    isFetching,
   } = useQuery({
     queryKey: ['bestBlock', network] as const,
     enabled: !!network,
     refetchOnMount: false,
     refetchInterval: blockInterval.toNumber(),
-    queryFn: fetchBestBlock
+    queryFn: fetchBestBlock,
   });
 
   return [bestBlock, isFetched, isFetching] as const;

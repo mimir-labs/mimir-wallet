@@ -11,7 +11,7 @@ import IconSearch from '@/assets/svg/icon-search.svg?react';
 function Search({
   onChange,
   isSearching = true,
-  value
+  value,
 }: {
   value: string;
   isSearching: boolean;
@@ -20,9 +20,15 @@ function Search({
   return (
     <Input
       fullWidth
-      endAdornment={isSearching ? <Spinner size='sm' /> : <IconSearch className='text-divider' />}
+      endAdornment={
+        isSearching ? (
+          <Spinner size="sm" />
+        ) : (
+          <IconSearch className="text-divider" />
+        )
+      }
       onChange={onChange}
-      placeholder='Please input address'
+      placeholder="Please input address"
       value={value}
     />
   );

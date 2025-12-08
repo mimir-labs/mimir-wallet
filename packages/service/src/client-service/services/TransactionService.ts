@@ -16,7 +16,7 @@ export class TransactionService extends BaseService {
     appName?: string,
     iconUrl?: string,
     note?: string,
-    website?: string
+    website?: string,
   ) {
     return this.post(`chains/${network}/${address}/transactions/propose`, {
       call,
@@ -26,12 +26,21 @@ export class TransactionService extends BaseService {
       appName,
       iconUrl,
       note,
-      website
+      website,
     });
   }
 
-  public removePropose(network: string, proposeId: number, signer: string, signature: string, time: string) {
-    return this.put(`chains/${network}/transactions/propose/${proposeId}/remove`, { signer, signature, time });
+  public removePropose(
+    network: string,
+    proposeId: number,
+    signer: string,
+    signature: string,
+    time: string,
+  ) {
+    return this.put(
+      `chains/${network}/transactions/propose/${proposeId}/remove`,
+      { signer, signature, time },
+    );
   }
 
   public getPendingTransactions(chain: string, address: string, txId?: string) {
@@ -58,9 +67,14 @@ export class TransactionService extends BaseService {
     ids: number[],
     signature: string,
     signer: string,
-    timestamp: string | number
+    timestamp: string | number,
   ) {
-    return this.post(`chains/${chain}/${address}/transactions/batch/remove`, { ids, signature, signer, timestamp });
+    return this.post(`chains/${chain}/${address}/transactions/batch/remove`, {
+      ids,
+      signature,
+      signer,
+      timestamp,
+    });
   }
 
   public uploadWebsite(
@@ -70,7 +84,7 @@ export class TransactionService extends BaseService {
     appName?: string | null,
     iconUrl?: string | null,
     note?: string | null,
-    relatedBatches?: number[]
+    relatedBatches?: number[],
   ): Promise<boolean> {
     return this.post(`chains/${network}/website`, {
       extrinsicHash,
@@ -78,11 +92,17 @@ export class TransactionService extends BaseService {
       appName,
       iconUrl,
       note,
-      relatedBatches
+      relatedBatches,
     });
   }
 
-  public getHistoryTransactions(chain: string, address: string, txId?: string, nextCursor?: string, limit?: number) {
+  public getHistoryTransactions(
+    chain: string,
+    address: string,
+    txId?: string,
+    nextCursor?: string,
+    limit?: number,
+  ) {
     const path = `chains/${chain}/${address}/transactions/history`;
     const params: Record<string, string> = {};
 
@@ -93,7 +113,13 @@ export class TransactionService extends BaseService {
     return this.get(path, Object.keys(params).length > 0 ? params : undefined);
   }
 
-  public getHistoryTransactionsV2(chain: string, address: string, txId?: string, nextCursor?: string, limit?: number) {
+  public getHistoryTransactionsV2(
+    chain: string,
+    address: string,
+    txId?: string,
+    nextCursor?: string,
+    limit?: number,
+  ) {
     const path = `chains/${chain}/${address}/transactions/history`;
     const params: Record<string, string> = {};
 
@@ -101,7 +127,11 @@ export class TransactionService extends BaseService {
     if (limit) params.limit = limit.toString();
     if (nextCursor) params.next_cursor = nextCursor;
 
-    return this.get(path, Object.keys(params).length > 0 ? params : undefined, 'v2');
+    return this.get(
+      path,
+      Object.keys(params).length > 0 ? params : undefined,
+      'v2',
+    );
   }
 
   /**
@@ -111,8 +141,14 @@ export class TransactionService extends BaseService {
    * @param call - Encoded call data in hexadecimal format
    * @returns Promise resolving to success status
    */
-  public supplementCall(chain: string, id: number, call: HexString): Promise<{ success: boolean }> {
-    return this.post(`chains/${chain}/transactions/supplement-call/${id}`, { call });
+  public supplementCall(
+    chain: string,
+    id: number,
+    call: HexString,
+  ): Promise<{ success: boolean }> {
+    return this.post(`chains/${chain}/transactions/supplement-call/${id}`, {
+      call,
+    });
   }
 
   /**

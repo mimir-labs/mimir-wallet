@@ -1,10 +1,19 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { LocationInfo, SupportXcmChainConfig, XcmChainConfig } from './types.js';
+import type {
+  LocationInfo,
+  SupportXcmChainConfig,
+  XcmChainConfig,
+} from './types.js';
 import type { HexString } from '@mimir-wallet/service';
 import type { Enum } from '@polkadot/types';
-import type { StagingXcmV4Asset, StagingXcmV5Asset, XcmV3MultiAsset, XcmVersionedAssets } from '@polkadot/types/lookup';
+import type {
+  StagingXcmV4Asset,
+  StagingXcmV5Asset,
+  XcmV3MultiAsset,
+  XcmVersionedAssets,
+} from '@polkadot/types/lookup';
 
 import { loopLocation, parseJunctions } from './parseLocation.js';
 
@@ -24,7 +33,10 @@ interface XcmVersionedAsset extends Enum {
  * @param assets - XCM versioned assets or asset
  * @returns Array of asset IDs as strings
  */
-export function parseAssets(assets: XcmVersionedAssets | XcmVersionedAsset, initialChain: SupportXcmChainConfig) {
+export function parseAssets(
+  assets: XcmVersionedAssets | XcmVersionedAsset,
+  initialChain: SupportXcmChainConfig,
+) {
   const list = (() => {
     if (assets.isV3) {
       const list = assets.asV3;
@@ -34,11 +46,18 @@ export function parseAssets(assets: XcmVersionedAssets | XcmVersionedAsset, init
           .filter((item) => item.id.isConcrete)
           .map((item) => ({
             amount: item.fun.isFungible ? item.fun.asFungible.toString() : '0',
-            location: item.id.asConcrete
+            location: item.id.asConcrete,
           }));
       } else {
         return list.id.isConcrete
-          ? [{ amount: list.fun.isFungible ? list.fun.asFungible.toString() : '0', location: list.id.asConcrete }]
+          ? [
+              {
+                amount: list.fun.isFungible
+                  ? list.fun.asFungible.toString()
+                  : '0',
+                location: list.id.asConcrete,
+              },
+            ]
           : [];
       }
     } else if (assets.isV4) {
@@ -47,14 +66,14 @@ export function parseAssets(assets: XcmVersionedAssets | XcmVersionedAsset, init
       if (Array.isArray(list)) {
         return list.map((item) => ({
           amount: item.fun.isFungible ? item.fun.asFungible.toString() : '0',
-          location: item.id
+          location: item.id,
         }));
       } else {
         return [
           {
             amount: list.fun.isFungible ? list.fun.asFungible.toString() : '0',
-            location: list.id
-          }
+            location: list.id,
+          },
         ];
       }
     } else if (assets.isV5) {
@@ -63,18 +82,20 @@ export function parseAssets(assets: XcmVersionedAssets | XcmVersionedAsset, init
       if (Array.isArray(list)) {
         return list.map((item) => ({
           amount: item.fun.isFungible ? item.fun.asFungible.toString() : '0',
-          location: item.id
+          location: item.id,
         }));
       } else {
         return [
           {
             amount: list.fun.isFungible ? list.fun.asFungible.toString() : '0',
-            location: list.id
-          }
+            location: list.id,
+          },
         ];
       }
     } else {
-      throw new Error(`Unsupport XcmVersionedAssets version ${assets.toHuman()}`);
+      throw new Error(
+        `Unsupport XcmVersionedAssets version ${assets.toHuman()}`,
+      );
     }
   })();
 
@@ -89,18 +110,21 @@ export function parseAssets(assets: XcmVersionedAssets | XcmVersionedAsset, init
   for (const item of list) {
     const locationInfo: LocationInfo = {
       parents: item.location.parents.toNumber(),
-      interiors: parseJunctions(item.location.interior)
+      interiors: parseJunctions(item.location.interior),
     };
 
     try {
-      const { chain, generalIndex, generalKey } = loopLocation(locationInfo, initialChain);
+      const { chain, generalIndex, generalKey } = loopLocation(
+        locationInfo,
+        initialChain,
+      );
 
       results.push({
         chain,
         assetKey: generalKey ? generalKey : null,
         assetId: generalIndex ? generalIndex : null,
         isNative: !generalIndex && !generalKey,
-        amount: item.amount
+        amount: item.amount,
       });
     } catch {
       /* empty */

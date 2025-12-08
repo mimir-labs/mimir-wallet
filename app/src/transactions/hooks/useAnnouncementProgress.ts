@@ -6,10 +6,19 @@ import { useQuery } from '@mimir-wallet/service';
 import { BN, u8aEq } from '@polkadot/util';
 import { useMemo } from 'react';
 
-import { type AccountData, type ProxyTransaction, TransactionStatus, TransactionType } from '@/hooks/types';
+import {
+  type AccountData,
+  type ProxyTransaction,
+  TransactionStatus,
+  TransactionType,
+} from '@/hooks/types';
 import { useProxyBestBlock } from '@/hooks/useProxyBestBlock';
 
-async function fetchAnnouncements({ queryKey }: { queryKey: readonly [string, string, string] }) {
+async function fetchAnnouncements({
+  queryKey,
+}: {
+  queryKey: readonly [string, string, string];
+}) {
   const [, network, delegate] = queryKey;
 
   if (!delegate) {
@@ -18,33 +27,40 @@ async function fetchAnnouncements({ queryKey }: { queryKey: readonly [string, st
 
   const api = await ApiManager.getInstance().getApi(network);
 
-  if (!api) {
-    throw new Error(`API not available for network: ${network}`);
-  }
-
   return api.query.proxy.announcements(delegate);
 }
 
 export function useAnnouncementProgress(
   transaction: ProxyTransaction,
-  account: AccountData
+  account: AccountData,
 ): [startBlock: number, currentBlock: number, endBlock: number] {
   const { network } = useNetwork();
 
   const status = transaction.status;
   const type = transaction.type;
   const delegate = useMemo(
-    () => account.delegatees.find((item) => addressEq(item.address, transaction.delegate) && item.proxyDelay > 0),
-    [account.delegatees, transaction.delegate]
+    () =>
+      account.delegatees.find(
+        (item) =>
+          addressEq(item.address, transaction.delegate) && item.proxyDelay > 0,
+      ),
+    [account.delegatees, transaction.delegate],
   );
 
   const [bestBlock] = useProxyBestBlock(network);
 
   const { data: result } = useQuery({
-    queryKey: ['announcement-progress', network, transaction.delegate || ''] as const,
-    enabled: !!transaction.delegate && status === TransactionStatus.Pending && type === TransactionType.Announce,
+    queryKey: [
+      'announcement-progress',
+      network,
+      transaction.delegate || '',
+    ] as const,
+    enabled:
+      !!transaction.delegate &&
+      status === TransactionStatus.Pending &&
+      type === TransactionType.Announce,
     refetchOnMount: false,
-    queryFn: fetchAnnouncements
+    queryFn: fetchAnnouncements,
   });
   const announcements = result?.[0];
 
@@ -52,14 +68,15 @@ export function useAnnouncementProgress(
     () =>
       announcements?.findLast(
         (item) =>
-          addressEq(item.real.toString(), transaction.address) && u8aEq(item.callHash.toHex(), transaction.callHash)
+          addressEq(item.real.toString(), transaction.address) &&
+          u8aEq(item.callHash.toHex(), transaction.callHash),
       ),
-    [announcements, transaction.address, transaction.callHash]
+    [announcements, transaction.address, transaction.callHash],
   );
 
   return [
     announcement?.height.toNumber() || 0,
     bestBlock?.number?.toNumber() || 0,
-    announcement?.height.add(new BN(delegate?.proxyDelay || 0)).toNumber() || 1
+    announcement?.height.add(new BN(delegate?.proxyDelay || 0)).toNumber() || 1,
   ];
 }

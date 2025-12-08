@@ -3,8 +3,20 @@
 
 import type { TransferToken } from './types';
 
-import { remoteProxyRelations, useChain, useChains } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Avatar, Badge, Button, Skeleton, Switch } from '@mimir-wallet/ui';
+import {
+  remoteProxyRelations,
+  useChain,
+  useChains,
+} from '@mimir-wallet/polkadot-core';
+import {
+  Alert,
+  AlertTitle,
+  Avatar,
+  Badge,
+  Button,
+  Skeleton,
+  Switch,
+} from '@mimir-wallet/ui';
 import { BN } from '@polkadot/util';
 import React, { useEffect, useMemo } from 'react';
 
@@ -12,7 +24,14 @@ import { useTransferBalance } from './useTransferBalances';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
-import { AddressCell, FormatBalance, Input, InputAddress, InputNetwork, InputToken } from '@/components';
+import {
+  AddressCell,
+  FormatBalance,
+  Input,
+  InputAddress,
+  InputNetwork,
+  InputToken,
+} from '@/components';
 import { MigrationTip } from '@/features/assethub-migration';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useXcmAsset } from '@/hooks/useXcmAssets';
@@ -36,7 +55,7 @@ function TransferContent({
   setRecipient,
   setAmount,
   toggleKeepAlive,
-  setToken
+  setToken,
 }: {
   amount: string;
   token?: TransferToken;
@@ -62,8 +81,14 @@ function TransferContent({
   const { chains } = useChains();
 
   const upSm = useMediaQuery('sm');
-  const [format, sendingBalances, isSendingFetched] = useTransferBalance(token, sending);
-  const [assetInfo] = useXcmAsset(network, token?.isNative ? 'native' : token?.key);
+  const [format, sendingBalances, isSendingFetched] = useTransferBalance(
+    token,
+    sending,
+  );
+  const [assetInfo] = useXcmAsset(
+    network,
+    token?.isNative ? 'native' : token?.key,
+  );
   const { meta: sendingMeta } = useAddressMeta(sending);
   const { meta: recipientMeta } = useAddressMeta(recipient);
   const [recipientAccount] = useQueryAccountOmniChain(recipient);
@@ -99,43 +124,64 @@ function TransferContent({
   return (
     <>
       {disabledSending ? (
-        <div className='flex flex-col gap-2'>
-          <p className='text-sm font-bold'>Sending From</p>
-          <div className='bg-secondary rounded-[10px] p-2'>
-            <AddressCell shorten={!upSm} showType value={sending} withCopy withAddressBook />
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-bold">Sending From</p>
+          <div className="bg-secondary rounded-[10px] p-2">
+            <AddressCell
+              shorten={!upSm}
+              showType
+              value={sending}
+              withCopy
+              withAddressBook
+            />
           </div>
         </div>
       ) : (
         <InputAddress
           isSign
           filtered={filterSending}
-          label='Sending From'
+          label="Sending From"
           onChange={setSending}
-          placeholder='Sender'
+          placeholder="Sender"
           value={sending}
         />
       )}
 
       {disabledRecipient ? (
-        <div className='flex flex-col gap-2'>
-          <p className='font-bold'>To</p>
-          <div className='bg-secondary rounded-[10px] p-2'>
-            <AddressCell shorten={!upSm} showType value={recipient} withCopy withAddressBook />
+        <div className="flex flex-col gap-2">
+          <p className="font-bold">To</p>
+          <div className="bg-secondary rounded-[10px] p-2">
+            <AddressCell
+              shorten={!upSm}
+              showType
+              value={recipient}
+              withCopy
+              withAddressBook
+            />
           </div>
         </div>
       ) : (
-        <InputAddress label='Recipient' onChange={setRecipient} placeholder='Recipient' value={recipient} />
+        <InputAddress
+          label="Recipient"
+          onChange={setRecipient}
+          placeholder="Recipient"
+          value={recipient}
+        />
       )}
 
       <InputNetwork
-        label='Select Network'
+        label="Select Network"
         network={network}
         supportedNetworks={supportedNetworks}
         setNetwork={setNetwork}
         endContent={
-          sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt]
+          sendingMeta &&
+          sendingMeta.isPure &&
+          remoteProxyRelations[sendingMeta.pureCreatedAt]
             ? {
-                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: <Badge variant='purple'>Remote Proxy</Badge>
+                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: (
+                  <Badge variant="purple">Remote Proxy</Badge>
+                ),
               }
             : undefined
         }
@@ -145,9 +191,14 @@ function TransferContent({
             recipientMeta.isPure &&
             remoteProxyRelations[recipientMeta.pureCreatedAt] === genesisHash
           ) ||
-          !!(sendingMeta && sendingMeta.isPure && remoteProxyRelations[sendingMeta.pureCreatedAt] === genesisHash) ? (
-            <div className='text-foreground'>
-              🥷✨Yep, remote proxy lets you borrow a ninja from another chain — smooth and stealthy! 🕶️
+          !!(
+            sendingMeta &&
+            sendingMeta.isPure &&
+            remoteProxyRelations[sendingMeta.pureCreatedAt] === genesisHash
+          ) ? (
+            <div className="text-foreground">
+              🥷✨Yep, remote proxy lets you borrow a ninja from another chain —
+              smooth and stealthy! 🕶️
             </div>
           ) : null
         }
@@ -155,7 +206,7 @@ function TransferContent({
 
       <InputToken
         network={network}
-        label='Select an asset'
+        label="Select an asset"
         address={sending}
         onChange={setToken}
         identifier={identifier}
@@ -165,30 +216,34 @@ function TransferContent({
         error={isAmountValid ? null : new Error('Invalid number')}
         key={token?.isNative ? 'native' : token?.key}
         label={
-          <div className='flex items-center justify-between'>
+          <div className="flex items-center justify-between">
             Amount
             {!isSendingFetched ? (
-              <Skeleton className='h-3.5 w-24 rounded-[5px]' />
+              <Skeleton className="h-3.5 w-24 rounded-[5px]" />
             ) : (
-              <span className='opacity-50'>
-                Balance: <FormatBalance format={format} value={sendingBalances} />
+              <span className="opacity-50">
+                Balance:{' '}
+                <FormatBalance format={format} value={sendingBalances} />
               </span>
             )}
           </div>
         }
         value={amount}
         onChange={setAmount}
-        placeholder='Input amount'
+        placeholder="Input amount"
         endAdornment={
           <Button
-            size='sm'
-            variant='ghost'
-            className='min-w-0 rounded-[5px] p-1.5 py-[1px]'
+            size="sm"
+            variant="ghost"
+            className="min-w-0 rounded-[5px] p-1.5 py-[1px]"
             onClick={() => {
               setAmount(
                 keepAlive
-                  ? formatUnits(sendingBalances.sub(existentialDeposit), format[0])
-                  : formatUnits(sendingBalances, format[0])
+                  ? formatUnits(
+                      sendingBalances.sub(existentialDeposit),
+                      format[0],
+                    )
+                  : formatUnits(sendingBalances, format[0]),
               );
             }}
           >
@@ -197,18 +252,26 @@ function TransferContent({
         }
       />
 
-      <label className='flex items-center justify-end gap-2'>
-        <Switch checked={keepAlive} onCheckedChange={(value) => toggleKeepAlive(value)} />
-        <span className='text-sm'>Keep Sender Alive</span>
+      <label className="flex items-center justify-end gap-2">
+        <Switch
+          checked={keepAlive}
+          onCheckedChange={(value) => toggleKeepAlive(value)}
+        />
+        <span className="text-sm">Keep Sender Alive</span>
       </label>
 
       {!isRecipientSupported && (
-        <Alert variant='destructive'>
+        <Alert variant="destructive">
           <AlertTitle>
             You are about to transfer to a pure account only exist on{' '}
             <Avatar
               src={recipientNetwork?.icon}
-              style={{ display: 'inline-block', width: 16, height: 16, backgroundColor: 'transparent' }}
+              style={{
+                display: 'inline-block',
+                width: 16,
+                height: 16,
+                backgroundColor: 'transparent',
+              }}
             />
             &nbsp;
             {recipientNetwork?.name}, please change to correct network.
@@ -216,7 +279,7 @@ function TransferContent({
         </Alert>
       )}
 
-      <MigrationTip type='transfer' chain={network} />
+      <MigrationTip type="transfer" chain={network} />
     </>
   );
 }

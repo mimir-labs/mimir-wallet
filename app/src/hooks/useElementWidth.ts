@@ -9,7 +9,10 @@ import { type RefObject, useEffect, useState } from 'react';
  * @param defaultWidth - Default width to use before measurement (default: 200)
  * @returns Current width of the element in pixels
  */
-export function useElementWidth(elementRef: RefObject<HTMLElement | null>, defaultWidth = 200): number {
+export function useElementWidth(
+  elementRef: RefObject<HTMLElement | null>,
+  defaultWidth = 200,
+): number {
   const [width, setWidth] = useState<number>(defaultWidth);
 
   useEffect(() => {
@@ -21,7 +24,8 @@ export function useElementWidth(elementRef: RefObject<HTMLElement | null>, defau
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         // Use borderBoxSize to include padding, fallback to contentRect for older browsers
-        const newWidth = entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width;
+        const newWidth =
+          entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width;
 
         if (newWidth > 0) {
           setWidth(newWidth);

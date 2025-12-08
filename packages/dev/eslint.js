@@ -14,7 +14,16 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-  { ignores: ['dist/*', 'build/*', '**/dist/*', '**/build/*', '.turbo/*', '**/.turbo', '.yarn/*'] },
+  {
+    ignores: [
+      'dist/*',
+      'build/*',
+      '**/dist/*',
+      '**/build/*',
+      '.turbo/*',
+      '**/.turbo',
+    ],
+  },
 
   // Base JS config
   js.configs.recommended,
@@ -31,20 +40,20 @@ export default defineConfig(
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.es2024
+        ...globals.es2024,
       },
       parserOptions: {
-        ecmaFeatures: { jsx: true }
-      }
+        ecmaFeatures: { jsx: true },
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
       react: react,
       'import-x': importX,
-      headers
+      headers,
     },
     settings: {
-      react: { version: 'detect' }
+      react: { version: 'detect' },
     },
     rules: {
       // React
@@ -74,13 +83,17 @@ export default defineConfig(
       'react-hooks/exhaustive-deps': [
         'error',
         {
-          additionalHooks: '(useAsyncFn|useDebounceFn)'
-        }
+          additionalHooks: '(useAsyncFn|useDebounceFn)',
+        },
       ],
       'padding-line-between-statements': [
         'error',
         { blankLine: 'always', prev: ['const', 'let', 'var'], next: '*' },
-        { blankLine: 'any', prev: ['const', 'let', 'var'], next: ['const', 'let', 'var'] },
+        {
+          blankLine: 'any',
+          prev: ['const', 'let', 'var'],
+          next: ['const', 'let', 'var'],
+        },
         { blankLine: 'always', prev: '*', next: 'block-like' },
         { blankLine: 'always', prev: 'block-like', next: '*' },
         { blankLine: 'always', prev: '*', next: 'function' },
@@ -90,22 +103,34 @@ export default defineConfig(
         { blankLine: 'always', prev: '*', next: 'return' },
         { blankLine: 'always', prev: '*', next: 'import' },
         { blankLine: 'always', prev: 'import', next: '*' },
-        { blankLine: 'any', prev: 'import', next: 'import' }
+        { blankLine: 'any', prev: 'import', next: 'import' },
       ],
       // Import sorting and organization
       'import-x/no-deprecated': 'error',
       'import-x/no-unresolved': 'off',
       'import-x/no-cycle': [
         'error',
-        { maxDepth: Infinity, ignoreExternal: true, allowUnsafeDynamicCyclicDependency: false }
+        {
+          maxDepth: Infinity,
+          ignoreExternal: true,
+          allowUnsafeDynamicCyclicDependency: false,
+        },
       ],
       'import-x/order': [
         'error',
         {
-          groups: ['type', 'builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          groups: [
+            'type',
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
           'newlines-between': 'always',
-          alphabetize: { order: 'asc', caseInsensitive: true }
-        }
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
       ],
       'import-x/no-duplicates': 'error',
       'headers/header-format': [
@@ -118,11 +143,11 @@ export default defineConfig(
           trailingNewlines: 2,
           variables: {
             startYear: '2023',
-            endYear: '2025'
-          }
-        }
-      ]
-    }
+            endYear: '2025',
+          },
+        },
+      ],
+    },
   },
-  prettier
+  prettier,
 );

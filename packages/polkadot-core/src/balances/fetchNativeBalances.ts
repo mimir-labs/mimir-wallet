@@ -13,7 +13,10 @@ import { BN_ZERO } from '@polkadot/util';
  * @param address - Account address to query
  * @returns Promise<BalanceResult | null> - Balance result or null if zero balance
  */
-export async function fetchNativeBalances(api: ApiPromise, address: HexString): Promise<BalanceResult | null> {
+export async function fetchNativeBalances(
+  api: ApiPromise,
+  address: HexString,
+): Promise<BalanceResult | null> {
   if (!api?.isConnected) {
     throw new Error('API is not connected');
   }
@@ -26,7 +29,9 @@ export async function fetchNativeBalances(api: ApiPromise, address: HexString): 
     const locked = account.data.frozen;
 
     // Calculate transferrable balance (free - max(frozen - reserved, 0))
-    const transferrable = free.sub(locked.gt(reserved) ? locked.sub(reserved) : BN_ZERO);
+    const transferrable = free.sub(
+      locked.gt(reserved) ? locked.sub(reserved) : BN_ZERO,
+    );
 
     return {
       key: 'native',
@@ -34,9 +39,11 @@ export async function fetchNativeBalances(api: ApiPromise, address: HexString): 
       locked: BigInt(locked.toString()),
       reserved: BigInt(reserved.toString()),
       free: BigInt(free.toString()),
-      transferrable: BigInt(transferrable.toString())
+      transferrable: BigInt(transferrable.toString()),
     };
   } catch (error) {
-    throw new Error(`Failed to fetch native balance: ${(error as Error).message}`);
+    throw new Error(
+      `Failed to fetch native balance: ${(error as Error).message}`,
+    );
   }
 }

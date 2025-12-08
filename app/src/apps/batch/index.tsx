@@ -3,9 +3,24 @@
 
 import type { BatchTxItem } from '@/hooks/types';
 
-import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { NetworkProvider, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  NetworkProvider,
+  useChains,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import { Avatar, Button } from '@mimir-wallet/ui';
 import { Link } from '@tanstack/react-router';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -33,7 +48,7 @@ function Content({
   addTx,
   deleteTx,
   setTxs,
-  onClose
+  onClose,
 }: {
   address: string;
   txs: BatchTxItem[];
@@ -57,22 +72,27 @@ function Content({
   const sortableItems = useMemo(() => txs.map((item) => item.id), [txs]);
 
   // Memoize handlers to prevent unnecessary re-renders
-  const handleItemSelection = useCallback((itemId: number | string, relatedBatch?: number) => {
-    return (state: boolean) => {
-      // Track batch interacted when selecting/deselecting individual items
-      analyticsActions.batchInteracted();
-      setSelected((values) => (state ? [...values, itemId] : values.filter((v) => itemId !== v)));
-      setRelatedBatches((values) =>
-        state
-          ? relatedBatch
-            ? [...values, relatedBatch]
-            : values
-          : relatedBatch
-            ? values.filter((v) => relatedBatch !== v)
-            : values
-      );
-    };
-  }, []);
+  const handleItemSelection = useCallback(
+    (itemId: number | string, relatedBatch?: number) => {
+      return (state: boolean) => {
+        // Track batch interacted when selecting/deselecting individual items
+        analyticsActions.batchInteracted();
+        setSelected((values) =>
+          state ? [...values, itemId] : values.filter((v) => itemId !== v),
+        );
+        setRelatedBatches((values) =>
+          state
+            ? relatedBatch
+              ? [...values, relatedBatch]
+              : values
+            : relatedBatch
+              ? values.filter((v) => relatedBatch !== v)
+              : values,
+        );
+      };
+    },
+    [],
+  );
 
   const handleItemDelete = useCallback(
     (itemId: number | string) => {
@@ -83,7 +103,7 @@ function Content({
         deleteTx([itemId]);
       };
     },
-    [deleteTx]
+    [deleteTx],
   );
 
   const handleItemCopy = useCallback(
@@ -94,15 +114,15 @@ function Content({
         addTx([item], false);
       };
     },
-    [addTx]
+    [addTx],
   );
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5
-      }
-    })
+        distance: 5,
+      },
+    }),
   );
 
   const handleDragEnd = useCallback(
@@ -122,7 +142,7 @@ function Content({
         }
       }
     },
-    [txs, setTxs]
+    [txs, setTxs],
   );
 
   const handleMigrationComplete = () => {
@@ -132,7 +152,7 @@ function Content({
 
   return (
     <>
-      <div className='scrollbar-hide flex flex-1 flex-col gap-2.5 overflow-y-auto'>
+      <div className="scrollbar-hide flex flex-1 flex-col gap-2.5 overflow-y-auto">
         <BatchMigrationAlert
           chain={network}
           txs={txs}
@@ -141,17 +161,25 @@ function Content({
         />
 
         <div ref={containerRef} style={{ touchAction: 'pan-y' }}>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={sortableItems} strategy={verticalListSortingStrategy}>
-              <div className='space-y-2.5'>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={sortableItems}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-2.5">
                 {registry &&
                   txs.map((item, index) => {
-                    const { isDisabled, disabledReason } = calculateSelectionConstraints(
-                      item,
-                      selectedTxs,
-                      registry,
-                      selected.includes(item.id)
-                    );
+                    const { isDisabled, disabledReason } =
+                      calculateSelectionConstraints(
+                        item,
+                        selectedTxs,
+                        registry,
+                        selected.includes(item.id),
+                      );
 
                     return (
                       <BatchItemDrag
@@ -163,7 +191,11 @@ function Content({
                         registry={registry}
                         isSelectionDisabled={isDisabled}
                         disabledReason={disabledReason}
-                        onSelected={isDisabled ? () => {} : handleItemSelection(item.id, item.relatedBatch)}
+                        onSelected={
+                          isDisabled
+                            ? () => {}
+                            : handleItemSelection(item.id, item.relatedBatch)
+                        }
                         onDelete={handleItemDelete(item.id)}
                         onCopy={handleItemCopy(item)}
                       />
@@ -173,15 +205,21 @@ function Content({
             </SortableContext>
           </DndContext>
         </div>
-        <Button asChild color='secondary' fullWidth radius='md' className='text-foreground flex-shrink-0'>
+        <Button
+          asChild
+          color="secondary"
+          fullWidth
+          radius="md"
+          className="text-foreground flex-shrink-0"
+        >
           <Link
-            to='/explorer/$url'
+            to="/explorer/$url"
             params={{
-              url: 'mimir://app/transfer'
+              url: 'mimir://app/transfer',
             }}
             onClick={onClose}
           >
-            <IconAdd className='h-4 w-4' />
+            <IconAdd className="h-4 w-4" />
             Add New Transfer
           </Link>
         </Button>
@@ -207,7 +245,7 @@ function Batch({
   address,
   network,
   setNetwork,
-  onClose
+  onClose,
 }: {
   address: string;
   network: string;
@@ -220,32 +258,44 @@ function Batch({
 
   const [txs, addTx, deleteTx, setTxs] = useBatchTxs(network, address);
 
-  const networkChain = useMemo(() => chains.find((n) => n.key === network), [chains, network]);
+  const networkChain = useMemo(
+    () => chains.find((n) => n.key === network),
+    [chains, network],
+  );
 
   return (
-    <div className='flex h-full w-full flex-col gap-5'>
-      <div className='flex gap-4'>
+    <div className="flex h-full w-full flex-col gap-5">
+      <div className="flex gap-4">
         <InputNetwork
-          contentClassName='min-h-[32px] h-[32px]'
-          radius='full'
+          contentClassName="min-h-[32px] h-[32px]"
+          radius="full"
           network={network}
           setNetwork={setNetwork}
         />
         {isRestore ? null : (
-          <Button variant='ghost' onClick={toggleRestore}>
+          <Button variant="ghost" onClick={toggleRestore}>
             Restore
           </Button>
         )}
       </div>
       {isRestore ? (
-        <div className='flex items-center justify-between gap-2 text-xl font-bold'>
-          <span className='inline-flex flex-1 items-center gap-2'>
-            <Avatar style={{ width: 20, height: 20, background: 'transparent' }} src={networkChain?.icon} />
+        <div className="flex items-center justify-between gap-2 text-xl font-bold">
+          <span className="inline-flex flex-1 items-center gap-2">
+            <Avatar
+              style={{ width: 20, height: 20, background: 'transparent' }}
+              src={networkChain?.icon}
+            />
             Restore Cache Transactions
           </span>
 
-          <Button key='close-restore' isIconOnly className='text-inherit' variant='light' onClick={toggleRestore}>
-            <IconClose className='h-5 w-5' />
+          <Button
+            key="close-restore"
+            isIconOnly
+            className="text-inherit"
+            variant="light"
+            onClick={toggleRestore}
+          >
+            <IconClose className="h-5 w-5" />
           </Button>
         </div>
       ) : null}
@@ -254,9 +304,20 @@ function Batch({
         {isRestore ? (
           <LazyRestore onClose={toggleRestore} />
         ) : txs.length === 0 ? (
-          <EmptyBatch onAdd={toggleOpen} onClose={onClose} onHandleRestore={toggleRestore} />
+          <EmptyBatch
+            onAdd={toggleOpen}
+            onClose={onClose}
+            onHandleRestore={toggleRestore}
+          />
         ) : (
-          <Content address={address} txs={txs} addTx={addTx} deleteTx={deleteTx} setTxs={setTxs} onClose={onClose} />
+          <Content
+            address={address}
+            txs={txs}
+            addTx={addTx}
+            deleteTx={deleteTx}
+            setTxs={setTxs}
+            onClose={onClose}
+          />
         )}
       </NetworkProvider>
     </div>

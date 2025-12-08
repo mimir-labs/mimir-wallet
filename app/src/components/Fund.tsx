@@ -2,7 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@mimir-wallet/ui';
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from '@mimir-wallet/ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
@@ -31,7 +40,7 @@ function FundContent({
   filterSending,
   network,
   supportedNetworks,
-  setNetwork
+  setNetwork,
 }: {
   defaultValue?: string | { toString: () => string };
   onClose: () => void;
@@ -44,11 +53,17 @@ function FundContent({
 }) {
   const [sending, setSending] = useState<string>(filterSending.at(0) || '');
   const [keepAlive, toggleKeepAlive] = useToggle(true);
-  const [[amount, isAmountValid], setAmount] = useInputNumber(defaultValue?.toString() || '', false, 0);
+  const [[amount, isAmountValid], setAmount] = useInputNumber(
+    defaultValue?.toString() || '',
+    false,
+    0,
+  );
   const [assetId, setAssetId] = useState('native');
   const [assets] = useChainXcmAsset(network);
   const token = useMemo(() => {
-    const foundAsset = assets?.find((item) => (assetId === 'native' ? item.isNative : item.key === assetId));
+    const foundAsset = assets?.find((item) =>
+      assetId === 'native' ? item.isNative : item.key === assetId,
+    );
 
     return foundAsset;
   }, [assetId, assets]);
@@ -70,11 +85,11 @@ function FundContent({
   }, [open, setAmount, toggleKeepAlive]);
 
   return (
-    <Modal size='lg' onClose={onClose} isOpen={open}>
+    <Modal size="lg" onClose={onClose} isOpen={open}>
       <ModalContent>
         <ModalHeader>Fund</ModalHeader>
 
-        <ModalBody className='flex flex-col gap-5'>
+        <ModalBody className="flex flex-col gap-5">
           {receipt && (
             <TransferContent
               disabledRecipient
@@ -97,14 +112,14 @@ function FundContent({
           )}
 
           {error && (
-            <Alert variant='destructive'>
+            <Alert variant="destructive">
               <AlertTitle>{error}</AlertTitle>
             </Alert>
           )}
         </ModalBody>
 
         <ModalFooter>
-          <Button fullWidth onClick={onClose} variant='ghost'>
+          <Button fullWidth onClick={onClose} variant="ghost">
             Cancel
           </Button>
 
@@ -140,7 +155,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const supportedNetworks = useAddressSupportedNetworks(receipt);
   const [network, setNetwork] = useInputNetwork(
     defaultNetwork,
-    supportedNetworks?.map((item) => item.key)
+    supportedNetworks?.map((item) => item.key),
   );
 
   return (

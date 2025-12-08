@@ -29,7 +29,7 @@ export class NavigationMiddleware {
     checkAndNavigate: (path: string) => {
       isOnRequiredRoute: boolean;
       navigateToRoute: () => Promise<void>;
-    }
+    },
   ) {
     this.checkAndNavigate = checkAndNavigate;
   }
@@ -41,7 +41,9 @@ export class NavigationMiddleware {
     const handler: FunctionCallHandler = async (event: FunctionCallEvent) => {
       // Query route requirement: prioritize static config, fallback to metadata registry
       const staticRoute = getStaticRouteRequirement(event.name);
-      const metadataRoute = handlerMetadataRegistry.getRouteRequirement(event.name);
+      const metadataRoute = handlerMetadataRegistry.getRouteRequirement(
+        event.name,
+      );
       const routeRequirement = staticRoute || metadataRoute;
 
       if (!routeRequirement) {
@@ -51,7 +53,9 @@ export class NavigationMiddleware {
         return;
       }
 
-      const { isOnRequiredRoute, navigateToRoute } = this.checkAndNavigate(routeRequirement.path);
+      const { isOnRequiredRoute, navigateToRoute } = this.checkAndNavigate(
+        routeRequirement.path,
+      );
 
       if (!isOnRequiredRoute && routeRequirement.autoNavigate) {
         await navigateToRoute();

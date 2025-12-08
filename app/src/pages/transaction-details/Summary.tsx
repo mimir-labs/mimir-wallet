@@ -4,33 +4,40 @@
 import type { Transaction } from '@/hooks/types';
 
 import { Divider } from '@mimir-wallet/ui';
-import moment from 'moment';
 import React from 'react';
 
 import { AppName } from '@/components';
 import { TransactionStatus } from '@/hooks/types';
 import { CallDisplaySection } from '@/params';
 import { formatTransactionId, Status } from '@/transactions';
+import { formatDate } from '@/utils';
 
 function Summary({ transaction }: { transaction: Transaction }) {
   return (
-    <div className='bg-background border-secondary space-y-2.5 rounded-[20px] border-1 p-4 shadow-md'>
+    <div className="card-root space-y-2.5 p-4">
       <p>
         {transaction.status < TransactionStatus.Success
-          ? moment(transaction.createdAt).format()
-          : moment(transaction.updatedAt).format()}
+          ? formatDate(transaction.createdAt)
+          : formatDate(transaction.updatedAt)}
       </p>
 
       <Divider />
 
-      <h4 className='text-primary'>{formatTransactionId(transaction.id)}</h4>
+      <h4 className="text-primary">{formatTransactionId(transaction.id)}</h4>
 
       <Divider />
 
-      <div className='flex items-center justify-between gap-7'>
-        <AppName website={transaction.website} appName={transaction.appName} iconUrl={transaction.iconUrl} />
+      <div className="flex items-center justify-between gap-7">
+        <AppName
+          website={transaction.website}
+          appName={transaction.appName}
+          iconUrl={transaction.iconUrl}
+        />
         <Status transaction={transaction} />
-        <CallDisplaySection section={transaction.section} method={transaction.method} />
+        <CallDisplaySection
+          section={transaction.section}
+          method={transaction.method}
+        />
       </div>
     </div>
   );

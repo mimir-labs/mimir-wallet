@@ -3,7 +3,9 @@
 
 import { useMedia } from 'react-use';
 
-export function useMediaQuery(size: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'): boolean {
+export function useMediaQuery(
+  size: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl',
+): boolean {
   const query =
     size === 'sm'
       ? '(min-width: 640px)'
