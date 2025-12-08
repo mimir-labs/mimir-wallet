@@ -2,7 +2,7 @@
   "author": "dev.mimir",
   "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/dev#readme",
   "license": "Apache-2.0",
@@ -23,10 +23,7 @@
     "./tsconfig.base.json": "./tsconfig.base.json",
     "./eslint.js": "./eslint.js",
     "./prettier.js": "./prettier.js",
-    "./vitest.config.base.js": "./vitest.config.base.ts"
-  },
-  "scripts": {
-    "check-types": "tsc -b --noEmit"
+    "./vitest.config.base.js": "./vitest.config.base.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

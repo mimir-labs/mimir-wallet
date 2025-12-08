@@ -1,6 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// @ts-check
 import { defineConfig } from 'vitest/config';
 
 /**
@@ -35,7 +36,7 @@ export const vitestConfig = defineConfig({
       'src/**/__tests__/**/*.{ts,tsx}',
     ],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
-  }
+  },
 });
 
 export default vitestConfig;

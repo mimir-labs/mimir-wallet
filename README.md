@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.2-blue)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.2-blue)](https://vitejs.dev/)
-[![Node.js](https://img.shields.io/badge/Node.js-20%2B-green)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-22%2B-green)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-10.24-blue)](https://pnpm.io/)
 [![GitHub Stars](https://img.shields.io/github/stars/mimir-labs/mimir-wallet.svg)](https://github.com/mimir-labs/mimir-wallet/stargazers)
 
@@ -80,7 +80,7 @@ Mimir Wallet is a state-of-the-art Progressive Web Application (PWA) designed fo
 
 Ensure you have the following installed:
 
-- **Node.js** >= 20.0.0 ([Download](https://nodejs.org/))
+- **Node.js** >= 22.0.0 ([Download](https://nodejs.org/))
 - **pnpm** v10.24+ ([Install](https://pnpm.io/installation))
 - **Git** ([Download](https://git-scm.com/))
 - **Modern Browser** (Chrome 61+, Firefox 60+, Safari 11+, Edge 18+)

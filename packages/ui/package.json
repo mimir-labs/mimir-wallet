@@ -2,7 +2,7 @@
   "author": "dev.mimir",
   "bugs": "https://github.com/mimir-labs/mimir-wallet/issues",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "homepage": "https://github.com/mimir-labs/mimir-wallet/tree/master/packages/ui#readme",
   "license": "Apache-2.0",
