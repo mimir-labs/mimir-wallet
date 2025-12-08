@@ -112,7 +112,7 @@ export function useProxyTransaction(network: string) {
       setState({ isLoading: true, error: null });
 
       try {
-        const api = await ApiManager.getInstance().getApi(network);
+        const api = await ApiManager.getInstance().getApi(network, true);
 
         const transactionService = createProxyTransactionService(api);
 
@@ -197,7 +197,7 @@ export function useProxyTransaction(network: string) {
       setState({ isLoading: true, error: null });
 
       try {
-        const api = await ApiManager.getInstance().getApi(network);
+        const api = await ApiManager.getInstance().getApi(network, true);
 
         const transactionService = createProxyTransactionService(api);
 

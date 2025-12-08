@@ -14,7 +14,6 @@ import {
 } from 'react';
 
 import { useChat } from '../hooks/useChat.js';
-import { useFrontendAction } from '../hooks/useFrontendAction.js';
 
 import {
   Conversation,
@@ -94,9 +93,6 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
     onStatusChange,
   });
 
-  // Use frontend action hook for retrying tool calls
-  const { triggerFrontendAction } = useFrontendAction();
-
   // Wrapper for sendMessage that scrolls to bottom
   const sendMessage = useCallback(
     (message: string) => {
@@ -141,14 +137,6 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
   const handleSuggestionClick = (suggestion: string) => {
     sendMessage(suggestion);
   };
-
-  // Handle tool retry
-  const handleRetryTool = useCallback(
-    (toolName: string, toolInput: unknown) => {
-      triggerFrontendAction(toolName, toolInput);
-    },
-    [triggerFrontendAction],
-  );
 
   return (
     <div className="flex h-full flex-col">
@@ -200,15 +188,6 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
                                 type={`tool-call`}
                                 state={part.state}
                                 title={part.toolName}
-                                onRetry={
-                                  part.toolName === 'navigate'
-                                    ? () =>
-                                        handleRetryTool(
-                                          part.toolName,
-                                          part.input,
-                                        )
-                                    : undefined
-                                }
                               />
                             </Suspense>
 
@@ -244,7 +223,7 @@ function SimpleChat({ renderTool, suggestions, onStatusChange, ref }: Props) {
                 size="sm"
                 variant="ghost"
                 onClick={retry}
-                className="absolute top-0 right-2 bottom-0 m-auto mt-2 h-[20px]"
+                className="absolute top-0 right-2 bottom-0 m-auto mt-2 h-5"
               >
                 Retry
               </Button>

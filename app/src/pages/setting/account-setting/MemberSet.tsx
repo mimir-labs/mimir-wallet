@@ -195,7 +195,7 @@ function MemberSet({
               chainSS58,
             );
 
-            const api = await ApiManager.getInstance().getApi(network);
+            const api = await ApiManager.getInstance().getApi(network, true);
 
             return api.tx.utility.batchAll([
               api.tx.proxy.addProxy(newMultiAddress, 0, 0).method.toU8a(),

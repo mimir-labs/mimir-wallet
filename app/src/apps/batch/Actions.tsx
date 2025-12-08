@@ -104,7 +104,7 @@ function Actions({
         }}
         getCall={async () => {
           try {
-            const api = await ApiManager.getInstance().getApi(network);
+            const api = await ApiManager.getInstance().getApi(network, true);
 
             const selectedTxs = txs.filter((item) =>
               selected.includes(item.id),

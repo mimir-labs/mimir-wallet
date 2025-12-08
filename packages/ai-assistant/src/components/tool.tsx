@@ -42,7 +42,6 @@ export type ToolHeaderProps = ComponentProps<'div'> & {
   title?: string;
   type: string;
   state: ToolState;
-  onRetry?: () => void;
 };
 
 const getStatusIndicator = (status: ToolState) => {
@@ -64,19 +63,19 @@ const getStatusIndicator = (status: ToolState) => {
 
   const icons: Record<ToolState, React.ReactElement> = {
     'input-streaming': (
-      <CircleIcon className={cn('size-[10px]', iconColors[status])} />
+      <CircleIcon className={cn('size-2.5', iconColors[status])} />
     ),
     'input-available': (
-      <CircleIcon className={cn('size-[10px]', iconColors[status])} />
+      <CircleIcon className={cn('size-2.5', iconColors[status])} />
     ),
     'output-streaming': (
-      <CircleIcon className={cn('size-[10px]', iconColors[status])} />
+      <CircleIcon className={cn('size-2.5', iconColors[status])} />
     ),
     'output-available': (
-      <CheckCircleIcon className={cn('size-[10px]', iconColors[status])} />
+      <CheckCircleIcon className={cn('size-2.5', iconColors[status])} />
     ),
     'output-error': (
-      <XCircleIcon className={cn('size-[10px]', iconColors[status])} />
+      <XCircleIcon className={cn('size-2.5', iconColors[status])} />
     ),
   };
 
@@ -93,25 +92,19 @@ export const ToolHeader = ({
   title,
   type,
   state,
-  onRetry,
   ...divProps
 }: ToolHeaderProps) => {
   return (
     <div
-      data-retry={!!onRetry}
       className={cn(
-        'data-[retry=true]:hover:border-primary not-prose border-divider mb-4 flex w-full items-center justify-between gap-4 rounded-[10px] border p-2 data-[retry=true]:cursor-pointer',
+        'not-prose border-divider mb-4 flex w-full items-center justify-between gap-4 rounded-[10px] border p-2',
         className,
       )}
-      onClick={onRetry}
       {...divProps}
     >
       <div className="flex items-center gap-3">
         <WrenchIcon className="text-foreground/50 size-4" />
-        <span
-          data-retry={!!onRetry}
-          className="text-sm font-medium data-[retry=true]:font-bold data-[retry=true]:underline"
-        >
+        <span className="text-sm font-medium">
           {title ?? type.split('-').slice(1).join('-')}
         </span>
         {getStatusIndicator(state)}

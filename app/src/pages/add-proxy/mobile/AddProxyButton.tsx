@@ -34,7 +34,7 @@ function AddProxyButton({
       return;
     }
 
-    const api = await ApiManager.getInstance().getApi(network);
+    const api = await ApiManager.getInstance().getApi(network, true);
 
     const delay = reviewWindow === -1 ? Number(custom) : reviewWindow;
 

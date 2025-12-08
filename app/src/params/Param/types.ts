@@ -9,5 +9,6 @@ export interface ParamProps {
   displayType?: 'horizontal' | 'vertical';
   type: TypeDef;
   value: Codec;
+  overrides?: ComponentMap;
 }
 export type ComponentMap = Record<string, React.ComponentType<ParamProps>>;

@@ -35,7 +35,7 @@ function SubmitPure({
       accountId={proxy}
       website="mimir://internal/create-pure"
       getCall={async () => {
-        const api = await ApiManager.getInstance().getApi(network);
+        const api = await ApiManager.getInstance().getApi(network, true);
 
         const delay = reviewWindow === -1 ? Number(custom) : reviewWindow;
 

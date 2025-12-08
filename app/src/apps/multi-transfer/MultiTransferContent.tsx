@@ -84,7 +84,7 @@ function MultiTransferContent({
       throw new Error('Invalid transfer data');
     }
 
-    const api = await ApiManager.getInstance().getApi(currentNetwork);
+    const api = await ApiManager.getInstance().getApi(currentNetwork, true);
 
     const calls = data.map(([address, assetId, amount]) => {
       // Find asset details

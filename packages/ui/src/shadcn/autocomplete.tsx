@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './popover.js';
 export interface AutocompleteOption {
   value: string;
   label: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface AutocompleteProps {

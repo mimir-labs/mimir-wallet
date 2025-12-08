@@ -64,7 +64,7 @@ function ExecuteAnnounce({
     setLoading(true);
 
     try {
-      const api = await ApiManager.getInstance().getApi(network);
+      const api = await ApiManager.getInstance().getApi(network, true);
       let call: string;
 
       if (transaction.call) {

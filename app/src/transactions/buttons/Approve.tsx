@@ -60,7 +60,7 @@ function ExecuteMultisig({
   };
 
   const handleRecover = async (calldata: string) => {
-    const api = await ApiManager.getInstance().getApi(network);
+    const api = await ApiManager.getInstance().getApi(network, true);
 
     const call = api.createType('Call', calldata);
 
@@ -173,7 +173,7 @@ function Approve({
   };
 
   const handleRecover = async (calldata: string) => {
-    const api = await ApiManager.getInstance().getApi(network);
+    const api = await ApiManager.getInstance().getApi(network, true);
 
     const call = api.createType('Call', calldata);
 

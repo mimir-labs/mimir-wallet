@@ -116,8 +116,10 @@ function Content({
                         proxies[0].length === 1 && account?.type === 'pure'
                           ? toggleAlertOpen
                           : async () => {
-                              const api =
-                                await ApiManager.getInstance().getApi(network);
+                              const api = await ApiManager.getInstance().getApi(
+                                network,
+                                true,
+                              );
 
                               addQueue({
                                 accountId: address,
@@ -179,7 +181,7 @@ function Content({
             accountId={address}
             website="mimir://internal/remove-proxies"
             getCall={async () => {
-              const api = await ApiManager.getInstance().getApi(network);
+              const api = await ApiManager.getInstance().getApi(network, true);
 
               return api.tx.proxy.removeProxies();
             }}
@@ -241,7 +243,10 @@ function Content({
                 accountId={account.address}
                 website="mimir://internal/remove-account"
                 getCall={async () => {
-                  const api = await ApiManager.getInstance().getApi(network);
+                  const api = await ApiManager.getInstance().getApi(
+                    network,
+                    true,
+                  );
 
                   return api.tx.proxy.killPure(
                     account.creator,

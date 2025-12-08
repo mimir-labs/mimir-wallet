@@ -28,7 +28,7 @@ const buttonVariants = cva(
     'tap-highlight-transparent',
     'touch-manipulation',
     'transform-gpu active:scale-[0.97]',
-    'transition-transform-colors-opacity motion-reduce:transition-none',
+    'transition-all motion-reduce:transition-none',
     'disabled:pointer-events-none disabled:not-has-[.button-spinner]:bg-divider disabled:not-has-[.button-spinner]:border-divider disabled:not-has-[.button-spinner]:text-white',
   ],
   {
@@ -285,7 +285,7 @@ const buttonVariants = cva(
       // variant / hover
       {
         variant: ['solid', 'faded', 'flat', 'bordered', 'shadow'],
-        class: 'hover:opacity-hover',
+        class: 'hover:opacity-85',
       },
     ],
     defaultVariants: {

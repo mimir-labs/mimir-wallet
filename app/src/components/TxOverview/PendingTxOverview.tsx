@@ -169,7 +169,10 @@ const AddressNode = React.memo(
                   filterPaths={data.path}
                   transaction={topTransaction}
                   getCall={async () => {
-                    const api = await ApiManager.getInstance().getApi(network);
+                    const api = await ApiManager.getInstance().getApi(
+                      network,
+                      true,
+                    );
 
                     return api!.createType('Call', topTransaction.call);
                   }}

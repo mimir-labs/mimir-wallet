@@ -361,49 +361,56 @@ export class ApiManager {
    * Returns a Promise that resolves when the API is ready
    * Will auto-initialize if chain is found in endpoints but not yet initialized
    * @param networkOrGenesisHash - Network key or genesis hash
-   * @param timeout - Timeout in milliseconds (default: 15000)
+   * @param timeout - Timeout: false for no timeout (default), true for 15s timeout, or number for custom timeout in ms
    */
   async getApi(
     networkOrGenesisHash: string,
-    timeout = 15000,
+    timeout: number | boolean = false,
   ): Promise<ApiPromise> {
+    const apiPromise = (async () => {
+      // Check if already connected and ready
+      const connection = this._resolveConnection(networkOrGenesisHash);
+
+      if (connection?.api && connection.status.isApiReady) {
+        return connection.api;
+      }
+
+      // Try to auto-initialize if chain exists in endpoints
+      const chain = ApiManager.resolveChain(networkOrGenesisHash);
+
+      if (!chain) {
+        throw new Error(`Chain not found: ${networkOrGenesisHash}`);
+      }
+
+      await this.initialize(chain);
+
+      const newConnection = this._resolveConnection(networkOrGenesisHash);
+
+      if (!newConnection?.api) {
+        throw new Error(`API not available for: ${networkOrGenesisHash}`);
+      }
+
+      return newConnection.api.isReady;
+    })();
+
+    // If timeout is false, no timeout limit
+    if (timeout === false) {
+      return apiPromise;
+    }
+
+    // timeout: true means 15s, otherwise use the provided number
+    const timeoutMs = timeout === true ? 15000 : timeout;
+
     // Wait for ready with timeout
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(
         () =>
           reject(new Error(`Connection timeout for: ${networkOrGenesisHash}`)),
-        timeout,
+        timeoutMs,
       );
     });
 
-    return Promise.race([
-      (async () => {
-        // Check if already connected and ready
-        const connection = this._resolveConnection(networkOrGenesisHash);
-
-        if (connection?.api && connection.status.isApiReady) {
-          return connection.api;
-        }
-
-        // Try to auto-initialize if chain exists in endpoints
-        const chain = ApiManager.resolveChain(networkOrGenesisHash);
-
-        if (!chain) {
-          throw new Error(`Chain not found: ${networkOrGenesisHash}`);
-        }
-
-        await this.initialize(chain);
-
-        const newConnection = this._resolveConnection(networkOrGenesisHash);
-
-        if (!newConnection?.api) {
-          throw new Error(`API not available for: ${networkOrGenesisHash}`);
-        }
-
-        return newConnection.api.isReady;
-      })(),
-      timeoutPromise,
-    ]);
+    return Promise.race([apiPromise, timeoutPromise]);
   }
 
   /**

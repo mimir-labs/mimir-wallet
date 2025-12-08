@@ -94,7 +94,7 @@ function SendTx({
     setLoading(true);
 
     try {
-      const api = await ApiManager.getInstance().getApi(network);
+      const api = await ApiManager.getInstance().getApi(network, true);
 
       for await (const item of hashSet) {
         await service.chain.updateCalldata(network, item);

@@ -37,7 +37,7 @@ function SubmitProxy({
       return;
     }
 
-    const api = await ApiManager.getInstance().getApi(network);
+    const api = await ApiManager.getInstance().getApi(network, true);
 
     toggleAlertOpen(false);
 

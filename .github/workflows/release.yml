@@ -1,3 +1,5 @@
+name: Release
+
 on:
   push:
     branches:
@@ -7,12 +9,11 @@ permissions:
   contents: write
   pull-requests: write
 
-name: release-please
-
 jobs:
   release-please:
     runs-on: ubuntu-latest
-    environment: production
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
 
     steps:
       - uses: googleapis/release-please-action@v4
@@ -22,37 +23,33 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+  deploy-production:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.releases_created == 'true' }}
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
+      - uses: pnpm/action-setup@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           cache: 'pnpm'
           node-version: 20
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
+      - run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
+      - run: pnpm build
 
       - name: Deploy to production
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr
+          switches: -avzr --delete
           remote_host: ${{ secrets.HOST }}
           remote_user: ${{ secrets.USERNAME }}
           remote_port: ${{ secrets.PORT }}
           remote_key: ${{ secrets.KEY }}
           remote_path: ${{ secrets.TARGET }}
           path: app/dist/
-        if: ${{ steps.release.outputs.releases_created == 'true' }}

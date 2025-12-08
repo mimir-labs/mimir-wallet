@@ -64,7 +64,6 @@ function AddTemplate({
 
   const onAdd = () => {
     if (!(name && callData) || !!callDataError || !parsedCallData) return;
-    parsedCallData.data;
 
     addTemplate({ name, call: parsedCallData.toHex() });
 

@@ -127,7 +127,7 @@ function CreateFlexible({
     source: string,
     threshold: number,
   ) => {
-    const api = await ApiManager.getInstance().getApi(network);
+    const api = await ApiManager.getInstance().getApi(network, true);
 
     const extrinsic = api.tx.utility.batchAll([
       ...(api.consts.proxy
@@ -201,7 +201,7 @@ function CreateFlexible({
     if (!signer) return;
     if (!source) return;
 
-    const api = await ApiManager.getInstance().getApi(network);
+    const api = await ApiManager.getInstance().getApi(network, true);
 
     const extrinsic = api.tx.proxy.createPure('Any', 0, 0);
     const events = signAndSend(
@@ -264,7 +264,7 @@ function CreateFlexible({
   ) => {
     if (!source) return;
 
-    const api = await ApiManager.getInstance().getApi(network);
+    const api = await ApiManager.getInstance().getApi(network, true);
 
     const extrinsic = api.tx.proxy.proxy(
       pure,
