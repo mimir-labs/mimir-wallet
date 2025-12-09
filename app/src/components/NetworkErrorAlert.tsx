@@ -3,6 +3,7 @@
 
 import { useChain, useChainStatus } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
 
 interface NetworkErrorAlertProps {
   network: string;
@@ -26,7 +27,10 @@ function NetworkErrorAlert({ network, className }: NetworkErrorAlertProps) {
   return (
     <Alert variant="destructive" className={className}>
       <AlertTitle>
-        Fail to connect {chain?.name || network}. View in Network Status
+        Fail to connect {chain?.name || network}.{' '}
+        <Link to="/setting" search={{ tabs: 'network', type: 'general' }}>
+          View in Network Status
+        </Link>
       </AlertTitle>
     </Alert>
   );

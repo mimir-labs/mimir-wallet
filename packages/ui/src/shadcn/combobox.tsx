@@ -31,6 +31,8 @@ export interface ComboboxProps<T extends ComboboxOption = ComboboxOption> {
   value?: string;
   /** Callback when value changes */
   onValueChange?: (value: string) => void;
+  /** Callback when popover open state changes */
+  onOpenChange?: (open: boolean) => void;
   /** Placeholder text when no value is selected */
   placeholder?: string;
   /** Placeholder text for the search input */
@@ -90,6 +92,7 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
   options,
   value,
   onValueChange,
+  onOpenChange,
   placeholder = 'Select an option...',
   searchPlaceholder = 'Search...',
   emptyMessage = 'No results found.',
@@ -103,6 +106,14 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
   contentClassName,
 }: ComboboxProps<T>) {
   const [open, setOpen] = React.useState(false);
+
+  const handleOpenChange = React.useCallback(
+    (newOpen: boolean) => {
+      setOpen(newOpen);
+      onOpenChange?.(newOpen);
+    },
+    [onOpenChange],
+  );
   const [inputValue, setInputValue] = React.useState('');
 
   // Find the selected option
@@ -192,7 +203,7 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
   );
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <div className="relative">
           <button
@@ -208,13 +219,13 @@ export function Combobox<T extends ComboboxOption = ComboboxOption>({
               // Disabled state
               'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
               // Layout for combobox trigger
-              'items-center text-left',
+              'items-center text-left truncate',
               // Placeholder color when no value
               !value && 'text-foreground/50',
               className,
             )}
           >
-            <span className="truncate">{displayValue || placeholder}</span>
+            {displayValue || placeholder}
           </button>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">
             <DropdownIcon />

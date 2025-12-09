@@ -12,7 +12,7 @@ import TxSubmitErrorBoundary from './TxSubmitErrorBoundary';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 
-function TxSubmitRoot({
+function Content({
   network,
   accountId,
   transaction: initialTransaction,
@@ -51,12 +51,22 @@ function TxSubmitRoot({
   }
 
   return (
+    <TxSubmit {...props} accountData={accountData} transaction={transaction} />
+  );
+}
+
+function TxSubmitRoot({
+  network,
+  transaction: initialTransaction,
+  ...props
+}: TxSubmitProps & { network: string }) {
+  return (
     <TxSubmitErrorBoundary>
       <NetworkProvider network={network}>
-        <TxSubmit
+        <Content
           {...props}
-          accountData={accountData}
-          transaction={transaction}
+          network={network}
+          transaction={initialTransaction}
         />
       </NetworkProvider>
     </TxSubmitErrorBoundary>
