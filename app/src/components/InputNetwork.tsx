@@ -1,18 +1,13 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  type Endpoint,
-  useChains,
-  useChainStatus,
-} from '@mimir-wallet/polkadot-core';
+import { type Endpoint, useChains } from '@mimir-wallet/polkadot-core';
 import {
   Avatar,
   Badge,
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Spinner,
 } from '@mimir-wallet/ui';
 import { clsx } from 'clsx';
 import React, { useRef } from 'react';
@@ -54,9 +49,6 @@ function NetworkItem({
   isMigrationCompleted: boolean;
   endContent?: React.ReactNode;
 }) {
-  const { isApiReady, isApiConnected, apiError } = useChainStatus(item.key);
-  const isConnecting = (!isApiReady && !apiError) || !isApiConnected;
-
   return (
     <li
       onClick={onSelect}
@@ -73,7 +65,6 @@ function NetworkItem({
       <div className="flex items-center gap-2">
         {endContent}
         {isMigrationCompleted && <Badge variant="secondary">Migrated</Badge>}
-        {isConnecting && <Spinner size="sm" />}
       </div>
     </li>
   );

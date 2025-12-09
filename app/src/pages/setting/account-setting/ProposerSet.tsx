@@ -190,7 +190,7 @@ function ProposerSet({
   return (
     <>
       <div className="space-y-5">
-        <Table>
+        <Table containerClassName="bg-transparent shadow-none">
           <TableHeader>
             <TableRow>
               <TableColumn className="text-sm font-bold">Proposer</TableColumn>

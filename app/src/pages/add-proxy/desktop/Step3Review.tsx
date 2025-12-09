@@ -27,7 +27,7 @@ import { DEFAULT_PURE_ACCOUNT_NAME, proxyTypeDescriptions } from '../utils';
 import ProxyAccountStructure from './ProxyAccountStructure';
 
 import PureIcon from '@/assets/images/pure-icon.svg';
-import { AddressCell, ProxyControls } from '@/components';
+import { AddressCell, NetworkErrorAlert, ProxyControls } from '@/components';
 import { toastError } from '@/components/utils';
 import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
@@ -279,6 +279,8 @@ function Step3Review({
           </AlertTitle>
         </Alert>
       )}
+
+      <NetworkErrorAlert network={network} />
 
       {/* Action Buttons */}
       <div className="flex gap-2.5">

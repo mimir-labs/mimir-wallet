@@ -18,7 +18,7 @@ import { useState } from 'react';
 
 import { useAccount } from '@/accounts/useAccount';
 import DeleteIcon from '@/assets/svg/icon-delete.svg?react';
-import { Empty, InputAddress } from '@/components';
+import { Empty, InputAddress, NetworkErrorAlert } from '@/components';
 import AddressRow from '@/components/AddressRow';
 import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
@@ -206,6 +206,8 @@ function Step2Members({
           </AlertTitle>
         </Alert>
       )}
+
+      {isPureProxy && <NetworkErrorAlert network={network} />}
 
       {/* Action Buttons */}
       <div className="flex gap-2.5">

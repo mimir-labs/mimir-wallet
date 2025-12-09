@@ -14,6 +14,7 @@ import {
   EditableField,
   InputAddress,
   InputNetwork,
+  NetworkErrorAlert,
   ProxyControls,
 } from '@/components';
 import { useSupportsProxy } from '@/hooks/useChainCapabilities';
@@ -155,6 +156,8 @@ function Step1ConfigureAccess({
           </AlertTitle>
         </Alert>
       )}
+
+      <NetworkErrorAlert network={network} />
 
       {/* Action Button */}
       <div className="flex flex-col gap-2.5">

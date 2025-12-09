@@ -25,7 +25,8 @@ import { BorderSpinWrapper } from '@/components/BorderSpinWrapper';
 import { useAllChainsConnected } from '@/hooks/useAllChainsConnected';
 
 const Status = React.memo(function Status({ network }: { network: Network }) {
-  const { isApiReady, isApiConnected, apiError } = useChainStatus(network.key);
+  const { isApiReady, isApiInitialized, isApiConnected, apiError } =
+    useChainStatus(network.key);
 
   return (
     <Tooltip
@@ -38,7 +39,7 @@ const Status = React.memo(function Status({ network }: { network: Network }) {
       }
     >
       <BadgeIndicator
-        isInvisible={!isApiReady}
+        isInvisible={!isApiInitialized}
         color={
           isApiReady && isApiConnected
             ? 'success'

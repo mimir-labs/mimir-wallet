@@ -5,6 +5,10 @@
     "build": {
       "outputs": ["dist/**", "build/**"]
     },
+    "mimir-wallet-app#build": {
+      "inputs": ["$TURBO_DEFAULT$", "../packages/*/src/**"],
+      "outputs": ["dist/**"]
+    },
     "check-types": {},
     "lint": {},
     "dev": {

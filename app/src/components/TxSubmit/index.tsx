@@ -3,7 +3,7 @@
 
 import type { TxSubmitProps } from './types';
 
-import { NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
 
 import TxSubmit from './TxSubmit';
@@ -12,12 +12,12 @@ import TxSubmitErrorBoundary from './TxSubmitErrorBoundary';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 
-function Content({
+function TxSubmitRoot({
+  network,
   accountId,
   transaction: initialTransaction,
   ...props
-}: TxSubmitProps) {
-  const { network } = useNetwork();
+}: TxSubmitProps & { network: string }) {
   const [accountData] = useQueryAccount(accountId);
 
   // Refresh transaction state to prevent race conditions
@@ -52,23 +52,14 @@ function Content({
 
   return (
     <TxSubmitErrorBoundary>
-      <TxSubmit
-        {...props}
-        accountData={accountData}
-        transaction={transaction}
-      />
+      <NetworkProvider network={network}>
+        <TxSubmit
+          {...props}
+          accountData={accountData}
+          transaction={transaction}
+        />
+      </NetworkProvider>
     </TxSubmitErrorBoundary>
-  );
-}
-
-function TxSubmitRoot({
-  network,
-  ...props
-}: TxSubmitProps & { network: string }) {
-  return (
-    <NetworkProvider network={network}>
-      <Content {...props} />
-    </NetworkProvider>
   );
 }
 

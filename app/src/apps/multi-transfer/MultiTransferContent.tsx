@@ -24,6 +24,7 @@ import {
   InputAddress,
   InputNetwork,
   InputToken,
+  NetworkErrorAlert,
   TxButton,
 } from '@/components';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -245,7 +246,7 @@ function MultiTransferContent({
             </div>
             <div className="col-span-2 flex items-center gap-1.5">
               <Input
-                className="h-[40px] flex-1"
+                className="h-10 flex-1"
                 placeholder="Amount"
                 value={amount}
                 onChange={(value) =>
@@ -283,6 +284,8 @@ function MultiTransferContent({
 
       <Divider />
 
+      <NetworkErrorAlert network={network} />
+
       {/* Batch Transfer Button */}
       <TxButton
         fullWidth
@@ -298,8 +301,6 @@ function MultiTransferContent({
             : 'Invalid Transfer Data'
           : 'Confirm'}
       </TxButton>
-
-      <Divider />
     </>
   );
 }

@@ -10,7 +10,7 @@ import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
 import { DEFAULT_PURE_ACCOUNT_NAME } from '../utils';
 
 import PureIcon from '@/assets/images/pure-icon.svg';
-import { AddressCell, ProxyControls } from '@/components';
+import { AddressCell, NetworkErrorAlert, ProxyControls } from '@/components';
 import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
 interface Step2PermissionLevelProps {
@@ -68,7 +68,7 @@ function Step2PermissionLevel({
 
           <ProxyControls
             proxyType={proxyType}
-            className="!absolute inset-x-auto inset-y-0 z-10 m-auto"
+            className="absolute! inset-x-auto inset-y-0 z-10 m-auto"
           />
 
           {/* Proxied Account (Lower) */}
@@ -163,6 +163,8 @@ function Step2PermissionLevel({
           </AlertTitle>
         </Alert>
       )}
+
+      <NetworkErrorAlert network={network} />
 
       {/* Action Buttons */}
       <div className="flex gap-2.5">

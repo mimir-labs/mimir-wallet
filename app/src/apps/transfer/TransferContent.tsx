@@ -235,7 +235,7 @@ function TransferContent({
           <Button
             size="sm"
             variant="ghost"
-            className="min-w-0 rounded-[5px] p-1.5 py-[1px]"
+            className="min-w-0 rounded-[5px] p-1.5 py-px"
             onClick={() => {
               setAmount(
                 keepAlive

@@ -9,7 +9,7 @@ import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
 import AddPureProxy from '../components/AddPureProxy';
 import Tips from '../components/Tips';
 
-import { Input, InputNetwork } from '@/components';
+import { Input, InputNetwork, NetworkErrorAlert } from '@/components';
 import { MigrationTip } from '@/features/assethub-migration';
 import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
@@ -79,6 +79,8 @@ function Step1Name({
           </AlertTitle>
         </Alert>
       )}
+
+      {isPureProxy && <NetworkErrorAlert network={network} />}
 
       {/* Action Buttons */}
       <div className="flex gap-2.5">

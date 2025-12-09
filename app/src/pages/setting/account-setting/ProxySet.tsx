@@ -37,6 +37,7 @@ import {
   Empty,
   FormatBalance,
   InputNetwork,
+  NetworkErrorAlert,
   TxButton,
 } from '@/components';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
@@ -165,6 +166,8 @@ function Content({
             </ul>
           </AlertDescription>
         </Alert>
+
+        <NetworkErrorAlert network={network} />
 
         <Button asChild color="primary" fullWidth>
           <RouterLink to="/add-proxy">Add New Proxy</RouterLink>
