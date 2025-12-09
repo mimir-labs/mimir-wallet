@@ -5,7 +5,11 @@ import type { TxSubmitProps } from './types';
 import type { AccountData, FilterPath } from '@/hooks/types';
 import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
-import { addressEq, useNetwork } from '@mimir-wallet/polkadot-core';
+import {
+  addressEq,
+  remoteProxyRelations,
+  useNetwork,
+} from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider, Skeleton } from '@mimir-wallet/ui';
 import { useNavigate } from '@tanstack/react-router';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
@@ -94,7 +98,7 @@ function TxSubmit({
     network,
     call ?? undefined,
     addressChain,
-    transaction,
+    transaction?.id,
   );
 
   // Gas fee calculation state
@@ -285,15 +289,15 @@ function TxSubmit({
                 {`You are currently not a member of this Account and won't be able to submit this transaction.`}
               </AlertTitle>
             </Alert>
-          ) : filterPaths.length === 0 ? (
+          ) : accountData.type === 'pure' &&
+            accountData.network !== chain.genesisHash &&
+            remoteProxyRelations[accountData.network] !== chain.genesisHash ? (
             <Alert variant="destructive">
               <AlertTitle>
                 {`This account doesn't exist on`} {chain.name}
               </AlertTitle>
             </Alert>
-          ) : null}
-
-          {hasPermission && filterPaths.length > 0 && (
+          ) : (
             <>
               {transaction && (
                 <Confirmations
@@ -351,6 +355,9 @@ function TxSubmit({
                   }
                   assetId={selectedFeeAsset?.assetId}
                   buildTx={buildTx}
+                  methodHex={call?.toHex()}
+                  filterPath={addressChain}
+                  transactionId={transaction?.id}
                   note={note}
                   onlySign={onlySign}
                   website={transaction?.website || website}

@@ -138,7 +138,7 @@ function Approve({
       multisigTx?.callHash || '',
     ] as const,
     enabled: !!multisigTx?.callHash,
-    refetchOnMount: false,
+    staleTime: 0,
     queryFn: fetchMultisigInfo,
   });
 

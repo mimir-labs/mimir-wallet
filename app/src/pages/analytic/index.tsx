@@ -269,7 +269,7 @@ function Transaction({
       <div className="grid grid-cols-2 gap-2.5 sm:gap-5">
         <div className="col-span-2 flex gap-5">
           <div className="card-root col-span-2 flex w-full flex-col items-stretch justify-between gap-3 p-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-10 sm:p-5 sm:px-12 sm:py-5">
-            <div className="flex flex-grow items-center justify-between">
+            <div className="flex grow items-center justify-between">
               <div className="text-foreground flex items-center gap-2.5 text-sm sm:text-base">
                 <IconSafe className="text-primary" />
                 Multisig Transaction Executed
@@ -284,7 +284,7 @@ function Transaction({
               <Button
                 radius="md"
                 variant="bordered"
-                className="bg-card h-full w-auto min-w-[160px] text-inherit"
+                className="bg-card border-secondary rounded-[20px] shadow-md h-full w-auto min-w-[160px] text-inherit"
               >
                 <Avatar
                   src={selectedHistoryNetwork?.icon}

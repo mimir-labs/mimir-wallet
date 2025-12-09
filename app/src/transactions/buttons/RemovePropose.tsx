@@ -8,7 +8,7 @@ import type {
 } from '@/hooks/types';
 
 import { useNetwork } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
+import { service, useQueryClient } from '@mimir-wallet/service';
 import {
   Alert,
   AlertTitle,
@@ -28,7 +28,6 @@ import { InputAddress } from '@/components';
 import { toastError } from '@/components/utils';
 import { walletConfig } from '@/config';
 import { CONNECT_ORIGIN } from '@/constants';
-import { events } from '@/events';
 import { TransactionType } from '@/hooks/types';
 import { useProposeFilterForRemove } from '@/hooks/useProposeFilter';
 import { accountSource } from '@/wallet/useWallet';
@@ -43,6 +42,7 @@ function Content({
   onRemove: () => void;
 }) {
   const { network, chain } = useNetwork();
+  const queryClient = useQueryClient();
   const [signer, setSigner] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
@@ -108,7 +108,7 @@ Genesis Hash: ${genesisHash}`;
         time,
       );
       onRemove();
-      events.emit('refetch_pending_tx');
+      queryClient.invalidateQueries({ queryKey: ['pending-transactions'] });
     } catch (error) {
       toastError(error);
     }

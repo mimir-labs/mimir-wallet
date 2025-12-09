@@ -15,7 +15,6 @@ type EventTypes = {
   template_open: (network: string) => void;
   template_add: (network: string, callData: HexString) => void;
   call_data_view: (network: string, callData: HexString) => void;
-  refetch_pending_tx: () => void;
   walletconnect: () => void;
   'sidebar:open': () => void;
 };

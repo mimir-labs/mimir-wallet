@@ -3,24 +3,48 @@
 
 import type { TxSubmitProps } from './types';
 
-import { NetworkProvider } from '@mimir-wallet/polkadot-core';
+import { NetworkProvider, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Spinner } from '@mimir-wallet/ui';
 
 import TxSubmit from './TxSubmit';
 import TxSubmitErrorBoundary from './TxSubmitErrorBoundary';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
+import { useTransactionDetail } from '@/hooks/useTransactions';
 
-function Content({ accountId, ...props }: TxSubmitProps) {
+function Content({
+  accountId,
+  transaction: initialTransaction,
+  ...props
+}: TxSubmitProps) {
+  const { network } = useNetwork();
   const [accountData] = useQueryAccount(accountId);
 
-  if (!accountData) {
+  // Refresh transaction state to prevent race conditions
+  // Use transaction id to fetch latest state from server
+  const txId = initialTransaction?.id?.toString();
+  const [refreshedTransaction, , isTransactionFetching] = useTransactionDetail(
+    network,
+    txId,
+  );
+
+  // Use refreshed transaction if available, otherwise fall back to initial
+  const transaction = txId
+    ? (refreshedTransaction ?? null)
+    : initialTransaction;
+
+  if (
+    !accountData ||
+    (txId && isTransactionFetching && !refreshedTransaction)
+  ) {
     return (
       <div className="flex h-auto w-full flex-col items-center justify-center gap-5 p-4 sm:p-5 md:h-[calc(100dvh-160px)]">
         <Spinner
           size="lg"
           variant="ellipsis"
-          label={'Fetching account data...'}
+          label={
+            !accountData ? 'Fetching account data...' : 'Loading transaction...'
+          }
         />
       </div>
     );
@@ -28,7 +52,11 @@ function Content({ accountId, ...props }: TxSubmitProps) {
 
   return (
     <TxSubmitErrorBoundary>
-      <TxSubmit {...props} accountData={accountData} />
+      <TxSubmit
+        {...props}
+        accountData={accountData}
+        transaction={transaction}
+      />
     </TxSubmitErrorBoundary>
   );
 }

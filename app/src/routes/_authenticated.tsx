@@ -23,6 +23,7 @@ import TopBar from '../containers/topbar';
 import Version from '../containers/Version';
 
 import { TxSubmit } from '@/components';
+import DraggableChatWithFAB from '@/components/DraggableChat/DraggableChatWithFAB';
 import { MigrationAlert } from '@/features/assethub-migration';
 import { useAIFunctionCall } from '@/hooks/useAIFunctionCall';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -150,6 +151,7 @@ const MainContent = ({ withPadding, queue }: MainContentProps) => {
 
         {/* Cookie Consent Banner - Absolute positioned */}
         <CookieConsent />
+        <DraggableChatWithFAB />
       </main>
 
       <RightSideBar />
