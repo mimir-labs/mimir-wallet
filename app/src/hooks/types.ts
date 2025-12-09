@@ -158,6 +158,8 @@ export type MultisigTransaction = BaseTransaction & {
   createdExtrinsicHash: HexString;
   threshold: number;
   members: HexString[];
+  height?: string;
+  index?: number;
 };
 
 export type ProxyTransaction = BaseTransaction & {

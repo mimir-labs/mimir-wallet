@@ -25,9 +25,7 @@ import {
   useQuery,
 } from '@mimir-wallet/service';
 import { isEqual } from 'lodash-es';
-import { useEffect, useMemo } from 'react';
-
-import { events } from '@/events';
+import { useMemo } from 'react';
 
 function transformTransaction(
   chainSS58: number,
@@ -74,7 +72,7 @@ export function usePendingTransactions(
     [address],
   );
 
-  const { data, isFetched, isFetching, refetch } = useQuery({
+  const { data, isFetched, isFetching } = useQuery({
     queryKey: ['pending-transactions', network, addressHex, txId] as const,
     enabled: !!addressHex,
     staleTime: 0,
@@ -86,14 +84,6 @@ export function usePendingTransactions(
       return isEqual(prev, next) ? prev : next;
     },
   });
-
-  useEffect(() => {
-    events.on('refetch_pending_tx', refetch);
-
-    return () => {
-      events.off('refetch_pending_tx', refetch);
-    };
-  }, [refetch]);
 
   return [
     useMemo(
@@ -267,6 +257,7 @@ export function useTransactionDetail(
   const { data, isFetched, isFetching } = useQuery({
     queryKey: ['transaction-detail', network, id] as const,
     enabled: !!id,
+    refetchOnMount: true,
     queryFn: ({ queryKey: [, network, id] }): Promise<Transaction> =>
       service.transaction.getTransactionDetail(network, id!),
     structuralSharing: (

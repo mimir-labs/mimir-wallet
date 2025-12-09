@@ -1,7 +1,6 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { FilterPath, Transaction } from '@/hooks/types';
 import type { ApiPromise } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api-base/types';
 import type { Timepoint } from '@polkadot/types/interfaces';
@@ -14,9 +13,46 @@ import {
   decodeAddress,
 } from '@mimir-wallet/polkadot-core';
 import { isString, u8aSorted } from '@polkadot/util';
-import { blake2AsU8a } from '@polkadot/util-crypto';
+import { blake2AsHex, blake2AsU8a } from '@polkadot/util-crypto';
+
+import {
+  type FilterPath,
+  type Transaction,
+  TransactionType,
+} from '@/hooks/types';
 
 export type TxBundle = { tx: SubmittableExtrinsic<'promise'>; signer: string };
+
+/**
+ * Error thrown when attempting to approve a multisig transaction that has already been executed.
+ * This typically happens due to a race condition where the UI hasn't refreshed after the final approval.
+ */
+export class MultisigAlreadyExecutedError extends Error {
+  public readonly multisigAddress: string;
+  public readonly callHash: string;
+
+  constructor(multisigAddress: string, callHash: string) {
+    super(
+      `Multisig transaction has already been executed or cancelled. ` +
+        `Multisig: ${multisigAddress}, CallHash: ${callHash}`,
+    );
+    this.name = 'MultisigAlreadyExecutedError';
+    this.multisigAddress = multisigAddress;
+    this.callHash = callHash;
+  }
+}
+
+/**
+ * Warning info when the on-chain timepoint doesn't match the expected timepoint from the transaction.
+ * This indicates the multisig transaction state has changed (e.g., someone else approved).
+ */
+export interface TimepointMismatchInfo {
+  multisigAddress: string;
+  expectedHeight: string;
+  expectedIndex: number;
+  actualHeight: string;
+  actualIndex: number;
+}
 
 async function asMulti(
   api: ApiPromise,
@@ -24,7 +60,11 @@ async function asMulti(
   multisig: string,
   threshold: number,
   otherSignatories: string[],
-) {
+  expectedTimepoint?: { height: string; index: number },
+): Promise<{
+  tx: SubmittableExtrinsic<'promise'>;
+  timepointMismatch?: TimepointMismatchInfo;
+}> {
   const u8a = api.tx(tx.toU8a()).toU8a();
 
   const [info, { weight }] = await Promise.all([
@@ -34,34 +74,66 @@ async function asMulti(
   ]);
 
   let timepoint: Timepoint | null = null;
+  let timepointMismatch: TimepointMismatchInfo | undefined;
 
   if (info.isSome) {
     timepoint = info.unwrap().when;
-  }
 
-  if (threshold === 1 && api.tx.multisig.asMultiThreshold1) {
-    return api.tx.multisig.asMultiThreshold1(
-      u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
-      tx.method.toU8a(),
+    // Check if timepoint matches expected
+    if (expectedTimepoint) {
+      const actualHeight = timepoint.height.toString();
+      const actualIndex = timepoint.index.toNumber();
+
+      if (
+        actualHeight !== expectedTimepoint.height ||
+        actualIndex !== expectedTimepoint.index
+      ) {
+        timepointMismatch = {
+          multisigAddress: multisig,
+          expectedHeight: expectedTimepoint.height,
+          expectedIndex: expectedTimepoint.index,
+          actualHeight,
+          actualIndex,
+        };
+      }
+    }
+  } else if (expectedTimepoint) {
+    // Race condition detected: user expects to approve but multisig already executed
+    throw new MultisigAlreadyExecutedError(
+      multisig,
+      blake2AsHex(tx.method.toU8a()),
     );
   }
 
-  return api.tx.multisig.asMulti.meta.args.length === 6
-    ? (api.tx.multisig.asMulti as any)(
-        threshold,
+  if (threshold === 1 && api.tx.multisig.asMultiThreshold1) {
+    return {
+      tx: api.tx.multisig.asMultiThreshold1(
         u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
-        timepoint,
         tx.method.toU8a(),
-        false,
-        weight,
-      )
-    : api.tx.multisig.asMulti(
-        threshold,
-        u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
-        timepoint,
-        tx.method.toU8a(),
-        weight,
-      );
+      ),
+      timepointMismatch,
+    };
+  }
+
+  const resultTx =
+    api.tx.multisig.asMulti.meta.args.length === 6
+      ? (api.tx.multisig.asMulti as any)(
+          threshold,
+          u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
+          timepoint,
+          tx.method.toU8a(),
+          false,
+          weight,
+        )
+      : api.tx.multisig.asMulti(
+          threshold,
+          u8aSorted(otherSignatories.map((address) => decodeAddress(address))),
+          timepoint,
+          tx.method.toU8a(),
+          weight,
+        );
+
+  return { tx: resultTx, timepointMismatch };
 }
 
 async function announce(
@@ -127,20 +199,24 @@ async function proxy(
   }
 }
 
+export type TxBundleWithWarning = TxBundle & {
+  timepointMismatch?: TimepointMismatchInfo;
+};
+
 export function buildTx(
   api: ApiPromise,
   call: IMethod,
   path: [FilterPath, ...FilterPath[]],
   transaction?: Transaction | null,
   calls?: Set<HexString>,
-): Promise<TxBundle>;
+): Promise<TxBundleWithWarning>;
 export function buildTx(
   api: ApiPromise,
   call: IMethod,
   account: string,
   transaction?: Transaction | null,
   calls?: Set<HexString>,
-): Promise<TxBundle>;
+): Promise<TxBundleWithWarning>;
 
 export async function buildTx(
   api: ApiPromise,
@@ -148,7 +224,7 @@ export async function buildTx(
   pathOrAccount: [FilterPath, ...FilterPath[]] | string,
   transaction?: Transaction | null,
   calls: Set<HexString> = new Set(),
-): Promise<TxBundle> {
+): Promise<TxBundleWithWarning> {
   const functionMeta = api.registry.findMetaCall(call.callIndex);
 
   let tx = api.tx[functionMeta.section][functionMeta.method](...call.args);
@@ -160,16 +236,40 @@ export async function buildTx(
   const path = pathOrAccount;
 
   let _transaction = transaction;
+  let timepointMismatch: TimepointMismatchInfo | undefined;
 
   for (const item of path) {
     if (item.type === 'multisig') {
-      tx = await asMulti(
+      // Extract expected timepoint from transaction for validation
+      let expectedTimepoint: { height: string; index: number } | undefined;
+
+      if (
+        _transaction &&
+        _transaction.type === TransactionType.Multisig &&
+        _transaction.height !== undefined &&
+        _transaction.index !== undefined
+      ) {
+        expectedTimepoint = {
+          height: _transaction.height,
+          index: _transaction.index,
+        };
+      }
+
+      const result = await asMulti(
         api,
         tx,
         item.multisig,
         item.threshold,
         item.otherSignatures,
+        expectedTimepoint,
       );
+
+      tx = result.tx;
+
+      if (result.timepointMismatch) {
+        timepointMismatch = result.timepointMismatch;
+      }
+
       _transaction = _transaction?.children.find(({ address }) =>
         addressEq(address, item.address),
       );
@@ -204,5 +304,5 @@ export async function buildTx(
 
   const signer = path[path.length - 1].address;
 
-  return { tx, signer };
+  return { tx, signer, timepointMismatch };
 }

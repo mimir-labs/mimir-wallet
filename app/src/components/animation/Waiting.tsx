@@ -17,11 +17,11 @@ function Waiting({
   const container = useRef(null);
 
   useEffect(() => {
-    let animation: AnimationItem | null = null;
+    let animation: Promise<AnimationItem | null> | null = null;
 
-    import('lottie-web').then((lottie) => {
+    animation = import('lottie-web').then((lottie) => {
       if (container.current) {
-        animation = lottie.default.loadAnimation({
+        return lottie.default.loadAnimation({
           container: container.current,
           renderer: 'svg',
           loop,
@@ -29,10 +29,12 @@ function Waiting({
           animationData: DataJson,
         });
       }
+
+      return null;
     });
 
     return () => {
-      animation?.destroy();
+      animation.then((anim) => anim?.destroy());
     };
   }, [loop]);
 

@@ -18,7 +18,6 @@ import OmniChainUpgradeTip from '../containers/OmniChainUpgradeTip';
 import SubscribeNotification from '../containers/SubscribeNotification';
 
 import { ConnectWalletModal, ToastRoot, TxToast } from '@/components';
-import DraggableChatWithFAB from '@/components/DraggableChat/DraggableChatWithFAB';
 import { WalletConnectProvider } from '@/features/wallet-connect';
 import WalletConsumer from '@/wallet/Consumer';
 import { useWallet } from '@/wallet/useWallet';
@@ -40,7 +39,6 @@ const GlobalModalsAndComponents = () => {
       <AddAddressBook />
       <OmniChainUpgradeTip />
       <SubscribeNotification />
-      <DraggableChatWithFAB />
       <ConnectWalletModal onClose={closeWallet} open={walletOpen} />
     </>
   );

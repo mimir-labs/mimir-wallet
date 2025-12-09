@@ -1,21 +1,31 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TxBundle } from '../utils';
+import type { TimepointMismatchInfo, TxBundleWithWarning } from '../utils';
 import type { FilterPath, Transaction } from '@/hooks/types';
 import type { IMethod } from '@polkadot/types/types';
 import type { BN } from '@polkadot/util';
 import type { HexString } from '@polkadot/util/types';
 
 import { ApiManager, extrinsicReserve } from '@mimir-wallet/polkadot-core';
-import { useQuery } from '@mimir-wallet/service';
+import { service, useQuery } from '@mimir-wallet/service';
 import { isHex } from '@polkadot/util';
+import { isEqual } from 'lodash-es';
 import { useMemo } from 'react';
 
-import { buildTx } from '../utils';
+import { buildTx, MultisigAlreadyExecutedError } from '../utils';
 
-interface BuildTxResult {
-  txBundle: TxBundle;
+/**
+ * Check if an error is a MultisigAlreadyExecutedError
+ */
+export function isMultisigAlreadyExecutedError(
+  error: unknown,
+): error is MultisigAlreadyExecutedError {
+  return error instanceof MultisigAlreadyExecutedError;
+}
+
+export interface BuildTxResult {
+  txBundle: TxBundleWithWarning;
   hashSet: Set<HexString>;
   reserve: Record<string, { value: BN }>;
   unreserve: Record<string, { value: BN }>;
@@ -24,63 +34,58 @@ interface BuildTxResult {
 
 export type BuildTx = {
   isLoading: boolean;
-  txBundle: TxBundle | null;
+  txBundle: TxBundleWithWarning | null;
   error: Error | null;
   hashSet: Set<HexString>;
   reserve: Record<string, { value: BN }>;
   unreserve: Record<string, { value: BN }>;
   delay: Record<string, BN>;
+  timepointMismatch?: TimepointMismatchInfo;
 };
 
 /**
- * Create queryFn for building transaction
- * Complex objects (filterPath, transaction) are passed via closure
+ * Build transaction with latest on-chain state
+ * This is the imperative version that can be used in mutations
  */
-function createBuildTxQueryFn(
+export async function buildTxAsync(
+  network: string,
+  methodHex: HexString,
   filterPath: FilterPath[],
-  transaction?: Transaction | null,
-) {
-  return async ({
-    queryKey,
-  }: {
-    queryKey: readonly [
-      string,
-      string,
-      HexString | undefined,
-      string,
-      number | undefined,
-    ];
-  }): Promise<BuildTxResult> => {
-    const [, network, methodHex] = queryKey;
+  transactionId?: number,
+): Promise<BuildTxResult> {
+  const api = await ApiManager.getInstance().getApi(network);
 
-    if (!methodHex) {
-      throw new Error('Method is required');
-    }
+  // Fetch latest transaction state if transactionId is provided
+  let transaction: Transaction | null = null;
 
-    const api = await ApiManager.getInstance().getApi(network);
-
-    const hashSet = new Set<HexString>();
-    const call = api.createType('Call', methodHex);
-    const bundle = await buildTx(
-      api,
-      call,
-      filterPath as [FilterPath, ...FilterPath[]],
-      transaction,
-      hashSet,
+  if (transactionId) {
+    transaction = await service.transaction.getTransactionDetail(
+      network,
+      transactionId.toString(),
     );
-    const { reserve, unreserve, delay } = await extrinsicReserve(
-      api,
-      bundle.signer,
-      bundle.tx,
-    );
+  }
 
-    return {
-      txBundle: bundle,
-      hashSet,
-      reserve,
-      unreserve,
-      delay,
-    };
+  const hashSet = new Set<HexString>();
+  const call = api.createType('Call', methodHex);
+  const bundle = await buildTx(
+    api,
+    call,
+    filterPath as [FilterPath, ...FilterPath[]],
+    transaction,
+    hashSet,
+  );
+  const { reserve, unreserve, delay } = await extrinsicReserve(
+    api,
+    bundle.signer,
+    bundle.tx,
+  );
+
+  return {
+    txBundle: bundle,
+    hashSet,
+    reserve,
+    unreserve,
+    delay,
   };
 }
 
@@ -88,20 +93,8 @@ export function useBuildTx(
   network: string,
   method: IMethod | HexString | undefined,
   filterPath: FilterPath[],
-  transaction?: Transaction | null | undefined,
+  transactionId?: number,
 ): BuildTx {
-  // Generate stable key for filterPath
-  const filterPathKey = useMemo(
-    () =>
-      filterPath.length > 0
-        ? filterPath.reduce<string>(
-            (result, item) => `${result}-${item.id}`,
-            '',
-          )
-        : 'none',
-    [filterPath],
-  );
-
   // Check if this is a proposer-type path (no build needed)
   const isProposerPath =
     filterPath.length > 0 &&
@@ -119,13 +112,21 @@ export function useBuildTx(
       'build-tx',
       network,
       methodHex,
-      filterPathKey,
-      transaction?.id,
+      filterPath,
+      transactionId,
     ] as const,
-    queryFn: createBuildTxQueryFn(filterPath, transaction),
+    queryFn: ({
+      queryKey: [, network, methodHex, filterPath, transactionId],
+    }) => buildTxAsync(network, methodHex!, filterPath, transactionId),
     enabled:
       !!network && !!methodHex && filterPath.length > 0 && !isProposerPath,
-    retry: false,
+    staleTime: 0,
+    refetchInterval: 6000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    structuralSharing: (prev: unknown | undefined, next: unknown) => {
+      return isEqual(prev, next) ? prev : next;
+    },
   });
 
   // Return empty state for proposer paths
@@ -138,6 +139,7 @@ export function useBuildTx(
       reserve: {},
       unreserve: {},
       delay: {},
+      timepointMismatch: undefined,
     };
   }
 
@@ -149,5 +151,6 @@ export function useBuildTx(
     reserve: data?.reserve ?? {},
     unreserve: data?.unreserve ?? {},
     delay: data?.delay ?? {},
+    timepointMismatch: data?.txBundle?.timepointMismatch,
   };
 }

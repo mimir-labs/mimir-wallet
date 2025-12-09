@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BuildTx } from './hooks/useBuildTx';
+import type { FilterPath } from '@/hooks/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type {
   ExtrinsicPayloadValue,
@@ -16,12 +17,13 @@ import {
   TxEvents,
   useNetwork,
 } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
+import { service, useMutation } from '@mimir-wallet/service';
 import { Alert, AlertTitle, Button, buttonSpinner } from '@mimir-wallet/ui';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { toastError } from '../utils';
 
+import { buildTxAsync } from './hooks/useBuildTx';
 import { useDryRunResult } from './hooks/useDryRunResult';
 
 import { analyticsActions } from '@/analytics';
@@ -33,6 +35,9 @@ import { enableWallet } from '@/wallet/utils';
 function SendTx({
   disabled,
   buildTx,
+  methodHex,
+  filterPath,
+  transactionId,
   note,
   onlySign,
   assetId,
@@ -48,6 +53,9 @@ function SendTx({
 }: {
   disabled?: boolean;
   buildTx: BuildTx;
+  methodHex: HexString | undefined;
+  filterPath: FilterPath[];
+  transactionId?: number;
   assetId?: string;
   website?: string | null;
   iconUrl?: string | null;
@@ -67,38 +75,44 @@ function SendTx({
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }) {
   const { network } = useNetwork();
-  const [loading, setLoading] = useState(false);
-  const { txBundle, isLoading, error, hashSet, delay } = buildTx;
+  const { txBundle, isLoading, error, delay, timepointMismatch } = buildTx;
   const source = useAccountSource(txBundle?.signer);
   const { dryRunResult } = useDryRunResult(txBundle);
 
-  const onConfirm = async () => {
-    let events: TxEvents = new TxEvents();
+  // Use mutation for submit with latest chain state
+  const submitMutation = useMutation({
+    mutationFn: async () => {
+      if (!methodHex || filterPath.length === 0) {
+        throw new Error('Method and filter path are required');
+      }
 
-    if (!txBundle) {
-      return;
-    }
+      // Rebuild transaction with latest chain state
+      const result = await buildTxAsync(
+        network,
+        methodHex,
+        filterPath,
+        transactionId,
+      );
 
-    const { tx, signer } = txBundle;
+      const { txBundle: latestTxBundle, hashSet } = result;
+      const { tx, signer } = latestTxBundle;
 
-    if (!signer) {
-      return;
-    }
+      if (!signer) {
+        throw new Error('No signer available');
+      }
 
-    if (!source) {
-      toastError('No available signing address.');
+      if (!source) {
+        throw new Error('No available signing address.');
+      }
 
-      return;
-    }
-
-    setLoading(true);
-
-    try {
       const api = await ApiManager.getInstance().getApi(network, true);
 
+      // Update calldata for all hashes
       for await (const item of hashSet) {
         await service.chain.updateCalldata(network, item);
       }
+
+      let events: TxEvents = new TxEvents();
 
       if (onlySign) {
         addTxToast({ events });
@@ -129,8 +143,6 @@ function SendTx({
 
         // Track transaction success
         analyticsActions.transactionResult(true);
-
-        setLoading(false);
       } else {
         events = signAndSend(
           api,
@@ -160,12 +172,10 @@ function SendTx({
           onResults?.(result);
         });
         events.once('error', (error) => {
-          setLoading(false);
           onError?.(error);
         });
 
         events.once('finalized', (result) => {
-          setLoading(false);
           onFinalized?.(result);
 
           // Track transaction finalized successfully
@@ -177,18 +187,21 @@ function SendTx({
           }, 3000);
         });
       }
-    } catch (error) {
+    },
+    onError: (error) => {
+      toastError(error);
       onError?.(error);
-      events.emit('error', error);
 
       // Track transaction failure
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
 
       analyticsActions.transactionResult(false, errorMessage);
+    },
+  });
 
-      setLoading(false);
-    }
+  const onConfirm = () => {
+    submitMutation.mutate();
   };
 
   return (
@@ -199,7 +212,20 @@ function SendTx({
             <span className="break-all">{error.message}</span>
           </AlertTitle>
         </Alert>
+      ) : dryRunResult && !dryRunResult.success ? (
+        <Alert variant="destructive">
+          <AlertTitle>{dryRunResult.error.message}</AlertTitle>
+        </Alert>
       ) : null}
+
+      {timepointMismatch && (
+        <Alert variant="warning">
+          <AlertTitle>
+            Transaction data is syncing with the chain. Please wait a moment or
+            refresh the page before submitting.
+          </AlertTitle>
+        </Alert>
+      )}
 
       {Object.keys(delay).length > 0 ? (
         <Alert variant="warning">
@@ -209,19 +235,13 @@ function SendTx({
         </Alert>
       ) : null}
 
-      {dryRunResult && !dryRunResult.success ? (
-        <Alert variant="destructive">
-          <AlertTitle>{dryRunResult.error.message}</AlertTitle>
-        </Alert>
-      ) : null}
-
       <Button
         fullWidth
         variant="solid"
         color="primary"
         onClick={error ? undefined : onConfirm}
         disabled={
-          loading ||
+          submitMutation.isPending ||
           isLoading ||
           !txBundle?.signer ||
           !!error ||
@@ -229,7 +249,7 @@ function SendTx({
           (dryRunResult ? !dryRunResult.success : false)
         }
       >
-        {loading || isLoading ? buttonSpinner : null}
+        {submitMutation.isPending || isLoading ? buttonSpinner : null}
         Submit
       </Button>
     </>

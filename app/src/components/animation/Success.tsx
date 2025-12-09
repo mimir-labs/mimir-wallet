@@ -11,12 +11,12 @@ function Success({ size = 28 }: { size?: number }) {
   const container = useRef(null);
 
   useEffect(() => {
-    let animation: AnimationItem | null = null;
+    let animation: Promise<AnimationItem | null> | null = null;
 
     // Dynamic import lottie-web to avoid loading on page init (~307KB)
-    import('lottie-web').then((lottie) => {
+    animation = import('lottie-web').then((lottie) => {
       if (container.current) {
-        animation = lottie.default.loadAnimation({
+        return lottie.default.loadAnimation({
           container: container.current,
           renderer: 'svg',
           loop: false,
@@ -24,10 +24,12 @@ function Success({ size = 28 }: { size?: number }) {
           animationData: DataJson,
         });
       }
+
+      return null;
     });
 
     return () => {
-      animation?.destroy();
+      animation.then((anim) => anim?.destroy());
     };
   }, []);
 

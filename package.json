@@ -22,6 +22,7 @@
   ],
   "scripts": {
     "lint": "turbo run lint --concurrency=100",
+    "lint:fix": "turbo run lint --concurrency=100 -- --fix",
     "build": "turbo run build --concurrency=100",
     "check-types": "turbo run check-types --concurrency=100",
     "dev": "turbo run dev --concurrency=100",
