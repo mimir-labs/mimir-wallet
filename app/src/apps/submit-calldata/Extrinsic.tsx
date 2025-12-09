@@ -14,6 +14,7 @@ import {
   Input,
   InputAddress,
   InputNetwork,
+  NetworkErrorAlert,
   TxButton,
 } from '@/components';
 import JsonView from '@/components/JsonView';
@@ -193,6 +194,8 @@ function Extrinsic({
         )}
 
         <Divider />
+
+        <NetworkErrorAlert network={network} />
 
         <TxButton
           fullWidth

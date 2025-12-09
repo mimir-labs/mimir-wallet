@@ -17,7 +17,7 @@ import { useSelectMultisig } from './useSelectMultisig';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import IconInfo from '@/assets/svg/icon-info-fill.svg?react';
-import { Input, InputNetwork } from '@/components';
+import { Input, InputNetwork, NetworkErrorAlert } from '@/components';
 
 function checkError(
   signatories: string[],
@@ -185,6 +185,8 @@ function CreateMultisig({
             )}
 
             <Tips flexible={flexible} />
+
+            {flexible && <NetworkErrorAlert network={network} />}
 
             <div className="flex items-center gap-2">
               <Button

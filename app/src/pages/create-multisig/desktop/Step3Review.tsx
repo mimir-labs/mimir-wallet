@@ -8,7 +8,7 @@ import AddPureProxy from '../components/AddPureProxy';
 
 import AccountStructure from './AccountStructure';
 
-import { Input, InputNetwork } from '@/components';
+import { Input, InputNetwork, NetworkErrorAlert } from '@/components';
 import AddressRow from '@/components/AddressRow';
 import { useSupportsProxy } from '@/hooks/useChainCapabilities';
 
@@ -130,6 +130,8 @@ function Step3Review({
           </AlertTitle>
         </Alert>
       )}
+
+      {isPureProxy && <NetworkErrorAlert network={network} />}
 
       {/* Action Buttons */}
       <div className="flex gap-2.5">

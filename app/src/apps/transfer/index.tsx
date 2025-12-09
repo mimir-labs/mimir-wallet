@@ -16,6 +16,7 @@ import TransferContent from './TransferContent';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
+import { NetworkErrorAlert } from '@/components';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
@@ -139,6 +140,9 @@ function PageTransfer() {
               toggleKeepAlive={toggleKeepAlive}
               setToken={setAssetId}
             />
+
+            <NetworkErrorAlert network={network} />
+
             <TransferAction
               network={network}
               token={token}

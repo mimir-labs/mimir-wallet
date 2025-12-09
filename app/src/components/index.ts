@@ -39,6 +39,7 @@ export { default as InputNumber } from './InputNumber';
 export { default as InputToken } from './InputToken';
 export { default as Label } from './Label';
 export { default as LockItem, LockContainer } from './LockItem';
+export { default as NetworkErrorAlert } from './NetworkErrorAlert';
 export { default as ProxyControls } from './ProxyControls';
 export { default as SelectFilterPath } from './SelectFilterPath';
 export { default as StepIndicator } from './StepIndicator';

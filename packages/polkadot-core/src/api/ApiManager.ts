@@ -322,6 +322,7 @@ export class ApiManager {
 
     this.apis.delete(network);
     this._notifyListeners();
+    this.initPromises.delete(network);
   }
 
   /**
@@ -340,6 +341,7 @@ export class ApiManager {
 
     this.apis.delete(network);
     this._notifyListeners();
+    this.initPromises.delete(network);
   }
 
   /**

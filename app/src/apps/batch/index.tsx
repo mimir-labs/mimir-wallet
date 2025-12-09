@@ -37,7 +37,7 @@ import { useAccount } from '@/accounts/useAccount';
 import { analyticsActions } from '@/analytics';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconClose from '@/assets/svg/icon-close.svg?react';
-import { InputNetwork } from '@/components';
+import { InputNetwork, NetworkErrorAlert } from '@/components';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useRegistry } from '@/hooks/useRegistry';
@@ -159,6 +159,8 @@ function Content({
           address={address}
           onMigrationComplete={handleMigrationComplete}
         />
+
+        <NetworkErrorAlert network={network} />
 
         <div ref={containerRef} style={{ touchAction: 'pan-y' }}>
           <DndContext

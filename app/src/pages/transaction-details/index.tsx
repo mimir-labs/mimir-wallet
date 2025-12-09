@@ -11,6 +11,7 @@ import { useMemo, useState } from 'react';
 import Summary from './Summary';
 
 import { useQueryAccount } from '@/accounts/useQueryAccount';
+import { NetworkErrorAlert } from '@/components';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useParseCall } from '@/hooks/useParseCall';
 import { useTransactionDetail } from '@/hooks/useTransactions';
@@ -42,6 +43,7 @@ function SmPage({
 
   return (
     <div className="space-y-4">
+      <NetworkErrorAlert network={network} />
       <Summary transaction={transaction} />
 
       <Extrinsic

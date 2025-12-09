@@ -16,7 +16,7 @@ import { useSavedTemplate } from './useSavedTemplate';
 
 import { analyticsActions } from '@/analytics';
 import IconArrowLeft from '@/assets/svg/icon-arrow-left.svg?react';
-import { Input, InputNetwork } from '@/components';
+import { Input, InputNetwork, NetworkErrorAlert } from '@/components';
 import JsonView from '@/components/JsonView';
 import { useInput } from '@/hooks/useInput';
 import { useRegistry } from '@/hooks/useRegistry';
@@ -83,6 +83,7 @@ function AddTemplate({
       </div>
 
       {setNetwork && <InputNetwork network={network} setNetwork={setNetwork} />}
+      <NetworkErrorAlert network={network} />
 
       <Divider />
 

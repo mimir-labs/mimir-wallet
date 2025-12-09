@@ -12,7 +12,7 @@ import { useSavedTemplate } from './useSavedTemplate';
 
 import IconAdd from '@/assets/svg/icon-add-fill.svg?react';
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
-import { Empty, InputNetwork } from '@/components';
+import { Empty, InputNetwork, NetworkErrorAlert } from '@/components';
 
 function TemplateList({
   onAdd,
@@ -49,6 +49,7 @@ function TemplateList({
       </div>
 
       <InputNetwork network={network} setNetwork={setNetwork} />
+      <NetworkErrorAlert network={network} />
 
       <TemplateMigrationAlert
         chain={network}

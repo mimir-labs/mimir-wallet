@@ -10,7 +10,7 @@ import { ErrorDisplay } from '../shared/ErrorDisplay';
 
 import DotConsoleButton from './DotConsoleButton';
 
-import { Input, InputNetwork } from '@/components';
+import { Input, InputNetwork, NetworkErrorAlert } from '@/components';
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
@@ -61,6 +61,8 @@ function CallDataViewerContent({
         error={callDataError}
         showDetails={process.env.NODE_ENV === 'development'}
       />
+
+      <NetworkErrorAlert network={network} />
 
       {parsedCallData && (
         <div className="bg-secondary rounded-[10px] p-2.5">

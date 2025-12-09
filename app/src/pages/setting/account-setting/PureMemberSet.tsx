@@ -11,6 +11,7 @@ import { memo, useCallback, useMemo, useState } from 'react';
 import MemberSet from './MemberSet';
 
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
+import { NetworkErrorAlert } from '@/components';
 import { usePendingTransactions } from '@/hooks/useTransactions';
 
 function PureMemberSet({ account }: { account: PureAccountData }) {
@@ -42,8 +43,8 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
     multisigDelegatees[activeIndex] || multisigDelegatees[0];
 
   return (
-    <div>
-      <h6 className="text-foreground/50 mb-2.5 inline-flex items-center gap-1 text-sm">
+    <div className="space-y-2.5">
+      <h6 className="text-foreground/50 inline-flex items-center gap-1 text-sm">
         Multisig Information
         <Tooltip
           classNames={{ content: 'max-w-[300px]' }}
@@ -52,6 +53,9 @@ function PureMemberSet({ account }: { account: PureAccountData }) {
           <IconQuestion className="text-primary" />
         </Tooltip>
       </h6>
+
+      <NetworkErrorAlert network={network} />
+
       <div className="card-root p-4 sm:p-5">
         {txs.length > 0 && (
           <div

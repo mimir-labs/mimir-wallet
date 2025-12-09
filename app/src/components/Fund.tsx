@@ -15,6 +15,8 @@ import {
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useToggle } from 'react-use';
 
+import NetworkErrorAlert from './NetworkErrorAlert';
+
 import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
@@ -118,31 +120,35 @@ function FundContent({
           )}
         </ModalBody>
 
-        <ModalFooter>
-          <Button fullWidth onClick={onClose} variant="ghost">
-            Cancel
-          </Button>
+        <ModalFooter className="flex-col sm:flex-col">
+          <NetworkErrorAlert network={network} />
 
-          {receipt && (
-            <TransferAction
-              network={network}
-              token={token}
-              amount={amount}
-              isAmountValid={isAmountValid}
-              keepAlive={keepAlive}
-              sending={sending}
-              recipient={receipt}
-              onDone={() => {
-                setError(null);
-                onClose();
-              }}
-              onError={(error: any) => {
-                setError(error.message || 'Something went wrong');
-              }}
-            >
-              Submit
-            </TransferAction>
-          )}
+          <div className="flex items-center gap-2.5">
+            <Button fullWidth onClick={onClose} variant="ghost">
+              Cancel
+            </Button>
+
+            {receipt && (
+              <TransferAction
+                network={network}
+                token={token}
+                amount={amount}
+                isAmountValid={isAmountValid}
+                keepAlive={keepAlive}
+                sending={sending}
+                recipient={receipt}
+                onDone={() => {
+                  setError(null);
+                  onClose();
+                }}
+                onError={(error: any) => {
+                  setError(error.message || 'Something went wrong');
+                }}
+              >
+                Submit
+              </TransferAction>
+            )}
+          </div>
         </ModalFooter>
       </ModalContent>
     </Modal>

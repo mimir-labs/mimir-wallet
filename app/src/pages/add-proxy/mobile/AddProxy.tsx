@@ -33,7 +33,13 @@ import SubmitPure from './SubmitPure';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
-import { Input, InputAddress, InputNetwork, Label } from '@/components';
+import {
+  Input,
+  InputAddress,
+  InputNetwork,
+  Label,
+  NetworkErrorAlert,
+} from '@/components';
 import { ONE_DAY, ONE_HOUR } from '@/constants';
 import { useBlockInterval } from '@/hooks/useBlockInterval';
 import { useInput } from '@/hooks/useInput';
@@ -312,6 +318,8 @@ function AddProxy({
                 </ul>
               </AlertDescription>
             </Alert>
+
+            <NetworkErrorAlert network={network} />
 
             {pure ? (
               <SubmitPure

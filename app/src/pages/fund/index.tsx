@@ -9,6 +9,7 @@ import { useToggle } from 'react-use';
 import { useAccount } from '@/accounts/useAccount';
 import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
+import { NetworkErrorAlert } from '@/components';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useInputNumber } from '@/hooks/useInputNumber';
@@ -76,6 +77,8 @@ function FundContent({
               <AlertTitle>{error}</AlertTitle>
             </Alert>
           )}
+
+          <NetworkErrorAlert network={network} />
 
           <TransferAction
             network={network}
