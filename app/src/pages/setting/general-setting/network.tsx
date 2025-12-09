@@ -16,13 +16,93 @@ import {
   Combobox,
   type ComboboxOption,
   Divider,
+  Spinner,
 } from '@mimir-wallet/ui';
 import { WsProvider } from '@polkadot/api';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
 import { InputNetwork } from '@/components';
 import { isValidWsUrl } from '@/utils';
+
+// Latency thresholds for color coding
+const LATENCY_THRESHOLDS = {
+  LOW: 200,
+  MEDIUM: 500,
+} as const;
+
+/**
+ * Test WebSocket endpoint latency by measuring connection time
+ */
+async function testWsLatency(
+  wsUrl: string,
+  timeout = 10000,
+): Promise<number | null> {
+  const startTime = performance.now();
+
+  return new Promise((resolve) => {
+    const ws = new WebSocket(wsUrl);
+    const timer = setTimeout(() => {
+      ws.close();
+      resolve(null);
+    }, timeout);
+
+    ws.onopen = () => {
+      clearTimeout(timer);
+      const latency = Math.round(performance.now() - startTime);
+
+      ws.close();
+      resolve(latency);
+    };
+
+    ws.onerror = () => {
+      clearTimeout(timer);
+      ws.close();
+      resolve(null);
+    };
+  });
+}
+
+/**
+ * Latency indicator component with color coding
+ * Each instance tests its own endpoint
+ */
+function LatencyIndicator({ wsUrl }: { wsUrl: string }) {
+  const {
+    data: latency,
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ['ws-latency', wsUrl],
+    queryFn: ({ queryKey: [, wsUrl] }) => testWsLatency(wsUrl),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  if (isPending) {
+    return (
+      <Spinner size={14} color="current" className="text-muted-foreground" />
+    );
+  }
+
+  if (isError || latency === null) {
+    return <span className="text-muted-foreground text-xs">--</span>;
+  }
+
+  const colorClass =
+    latency < LATENCY_THRESHOLDS.LOW
+      ? 'text-success'
+      : latency < LATENCY_THRESHOLDS.MEDIUM
+        ? 'text-warning'
+        : 'text-danger';
+
+  return (
+    <span className={`text-xs font-medium ${colorClass}`}>{latency}ms</span>
+  );
+}
 
 function Content({ chain }: { chain: Endpoint }) {
   const [url, setUrl] = useState(
@@ -109,15 +189,23 @@ function Content({ chain }: { chain: Endpoint }) {
               <span className={isSelected ? 'opacity-100' : 'opacity-0'}>
                 ✓
               </span>
-              <div className="ml-2 flex flex-1 items-center justify-between">
-                <span className="text-sm">{option.value}</span>
-                <span className="text-muted-foreground text-right text-xs">
-                  {option.label}
-                </span>
+              <div className="ml-2 flex flex-1 items-center justify-between gap-2">
+                <span className="flex-1 truncate text-sm">{option.value}</span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <LatencyIndicator wsUrl={option.value} />
+                  <span className="text-muted-foreground text-right text-xs">
+                    {option.label}
+                  </span>
+                </div>
               </div>
             </>
           )}
-          renderValue={(value) => value}
+          renderValue={(value) => (
+            <div className="flex flex-1 items-center justify-between gap-2">
+              <span className="flex-1 truncate">{value}</span>
+              <LatencyIndicator wsUrl={value} />
+            </div>
+          )}
         />
       </div>
       {error && (

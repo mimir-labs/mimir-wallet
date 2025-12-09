@@ -16,6 +16,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 
 import CustomGasFeeSelect from '../CustomGasFeeSelect';
 import Input from '../Input';
+import NetworkErrorAlert from '../NetworkErrorAlert';
 
 import AddressChain from './AddressChain';
 import Chopsticks from './analytics/Chopsticks';
@@ -344,6 +345,8 @@ function TxSubmit({
                   </AlertTitle>
                 </Alert>
               )}
+
+              <NetworkErrorAlert network={network} />
 
               {!isPropose && (
                 <SendTx
