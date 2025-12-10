@@ -5,6 +5,10 @@
 export {
   NETWORK_RPC_PREFIX,
   CURRENT_NETWORK_KEY,
+  DEFAULE_SS58_CHAIN_KEY,
+  ENABLED_NETWORKS_KEY,
+  NETWORK_MODE_KEY,
+  DEFAULT_NETWORKS,
   decodeAddress,
   encodeAddress,
 } from './utils/index.js';
@@ -45,10 +49,7 @@ export {
   useChains,
   useChainStatus,
   useSs58Format,
-  getNetworkMode,
-  getSs58Chain,
-  getSs58ChainInfo,
-  setSs58ChainExternal,
+  initializeApiStore,
 } from './api/index.js';
 export type { ApiState, ChainsControl } from './api/index.js';
 

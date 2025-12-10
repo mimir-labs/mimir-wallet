@@ -1,15 +1,13 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  type FunctionCallHandler,
-  toFunctionCallString,
-} from '@mimir-wallet/ai-assistant';
+import type { FunctionCallHandler } from '@mimir-wallet/ai-assistant';
+
+import { toFunctionCallString } from '@mimir-wallet/ai-assistant';
 import { NetworkProvider } from '@mimir-wallet/polkadot-core';
 import { Button } from '@mimir-wallet/ui';
-import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
-import { useCallback, useMemo, useState } from 'react';
-import { useToggle } from 'react-use';
+import { getRouteApi, Link } from '@tanstack/react-router';
+import { useCallback, useState } from 'react';
 
 import TransferAction from './TransferAction';
 import TransferContent from './TransferContent';
@@ -17,59 +15,36 @@ import TransferContent from './TransferContent';
 import { useAccount } from '@/accounts/useAccount';
 import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
 import { NetworkErrorAlert } from '@/components';
-import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
+import {
+  InputTokenAmountProvider,
+  useInputTokenAmountContext,
+} from '@/components/InputTokenAmount';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
-import { useInputNetwork } from '@/hooks/useInputNetwork';
-import { useInputNumber } from '@/hooks/useInputNumber';
-import { useChainXcmAsset } from '@/hooks/useXcmAssets';
 
 const routeApi = getRouteApi('/_authenticated/explorer/$url');
 
-function PageTransfer() {
+function TransferUI({ initialRecipient }: { initialRecipient?: string }) {
   const { current } = useAccount();
-  const navigate = useNavigate();
-  const search = routeApi.useSearch();
-  const assetId = search.assetId || 'native';
-  const assetNetwork = search.asset_network;
-  const toParam = search.to;
+  const [recipient, setRecipient] = useState<string>(initialRecipient || '');
 
-  const setAssetId = (newAssetId: string) => {
-    navigate({
-      to: '.',
-      search: { ...search, assetId: newAssetId },
-      replace: true,
-    });
-  };
-
-  const [recipient, setRecipient] = useState<string>(toParam || '');
-  const supportedNetworks = useAddressSupportedNetworks(current);
-  const [network, setNetwork] = useInputNetwork(
-    assetNetwork,
-    supportedNetworks?.map((item) => item.key),
-  );
-  const [keepAlive, toggleKeepAlive] = useToggle(true);
-  const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
-  const [assets] = useChainXcmAsset(network);
-  const token = useMemo(() => {
-    const foundAsset = assets?.find((item) =>
-      assetId === 'native' ? item.isNative : item.key === assetId,
-    );
-
-    return foundAsset;
-  }, [assetId, assets]);
+  const {
+    network,
+    token,
+    amount,
+    isAmountValid,
+    keepAlive,
+    setAmount,
+    setNetwork,
+  } = useInputTokenAmountContext();
 
   const handleTransferForm = useCallback<FunctionCallHandler>(
     (event) => {
-      // No need to check event.name - only 'transferForm' events arrive here
-
-      // Safe type conversion for recipient
       const recipientValue = toFunctionCallString(event.arguments.recipient);
 
       if (recipientValue) {
         setRecipient(recipientValue);
       }
 
-      // Safe type conversion for amount
       const amountValue = event.arguments.amount;
 
       if (amountValue !== undefined && amountValue !== null) {
@@ -81,7 +56,6 @@ function PageTransfer() {
         setAmount(amountStr);
       }
 
-      // Safe type conversion for network
       const networkValue = toFunctionCallString(event.arguments.network);
 
       if (networkValue) {
@@ -125,27 +99,16 @@ function PageTransfer() {
             </div>
             <TransferContent
               disabledSending
-              amount={amount}
-              isAmountValid={isAmountValid}
-              keepAlive={keepAlive}
-              token={token}
               sending={current || ''}
               recipient={recipient}
-              identifier={assetId}
-              network={network}
-              supportedNetworks={supportedNetworks?.map((item) => item.key)}
-              setNetwork={setNetwork}
               setRecipient={setRecipient}
-              setAmount={setAmount}
-              toggleKeepAlive={toggleKeepAlive}
-              setToken={setAssetId}
             />
 
             <NetworkErrorAlert network={network} />
 
             <TransferAction
               network={network}
-              token={token}
+              token={token?.token}
               amount={amount}
               isAmountValid={isAmountValid}
               keepAlive={keepAlive}
@@ -158,6 +121,24 @@ function PageTransfer() {
         </div>
       </div>
     </NetworkProvider>
+  );
+}
+
+function PageTransfer() {
+  const { current } = useAccount();
+  const search = routeApi.useSearch();
+  const assetId = search.assetId || 'native';
+  const assetNetwork = search.asset_network;
+  const toParam = search.to;
+
+  return (
+    <InputTokenAmountProvider
+      address={current}
+      defaultNetwork={assetNetwork}
+      defaultIdentifier={assetId}
+    >
+      <TransferUI initialRecipient={toParam} />
+    </InputTokenAmountProvider>
   );
 }
 

@@ -40,7 +40,7 @@ function Restore({ onClose }: { onClose: () => void }) {
     useBatchSync(network, current);
   const isCheckAll = selected.length === txs.length;
   const isCheckSome = selected.length > 0 && selected.length < txs.length;
-  const [account] = useQueryAccount(current);
+  const [account] = useQueryAccount(network, current);
   const filtered = useProposersAndMembersFilter(account);
   const [loading, setLoading] = useState(false);
 

@@ -12,13 +12,13 @@ import TxSubmitErrorBoundary from './TxSubmitErrorBoundary';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
 import { useTransactionDetail } from '@/hooks/useTransactions';
 
-function Content({
+function TxSubmitRoot({
   network,
   accountId,
   transaction: initialTransaction,
   ...props
 }: TxSubmitProps & { network: string }) {
-  const [accountData] = useQueryAccount(accountId);
+  const [accountData] = useQueryAccount(network, accountId);
 
   // Refresh transaction state to prevent race conditions
   // Use transaction id to fetch latest state from server
@@ -51,22 +51,12 @@ function Content({
   }
 
   return (
-    <TxSubmit {...props} accountData={accountData} transaction={transaction} />
-  );
-}
-
-function TxSubmitRoot({
-  network,
-  transaction: initialTransaction,
-  ...props
-}: TxSubmitProps & { network: string }) {
-  return (
     <TxSubmitErrorBoundary>
       <NetworkProvider network={network}>
-        <Content
+        <TxSubmit
           {...props}
-          network={network}
-          transaction={initialTransaction}
+          accountData={accountData}
+          transaction={transaction}
         />
       </NetworkProvider>
     </TxSubmitErrorBoundary>

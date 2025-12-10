@@ -91,7 +91,8 @@ function Status({
   transaction: Transaction;
   address: string;
 }) {
-  const [account] = useQueryAccount(address);
+  const { network } = useNetwork();
+  const [account] = useQueryAccount(network, address);
 
   if (!account) {
     return <Skeleton className="ml-auto h-[20px] w-[60px]" />;
@@ -115,7 +116,8 @@ function Operation({
   transaction: Transaction;
   address: string;
 }) {
-  const [account] = useQueryAccount(address);
+  const { network } = useNetwork();
+  const [account] = useQueryAccount(network, address);
   const filterPaths = useFilterPaths(account, transaction);
 
   return (

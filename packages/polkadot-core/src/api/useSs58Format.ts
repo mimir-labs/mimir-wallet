@@ -50,6 +50,3 @@ export function useSs58Format(): Ss58FormatControl {
     setSs58Chain,
   };
 }
-
-// Re-export external access functions from useApiStore for backward compatibility
-export { getSs58Chain, setSs58ChainExternal } from './useApiStore.js';

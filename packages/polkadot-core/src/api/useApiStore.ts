@@ -1,81 +1,20 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ChainStatus, Endpoint, Network } from '../types/types.js';
+import type { ChainStatus, Network } from '../types/types.js';
 
 import { store } from '@mimir-wallet/service';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
 import { allEndpoints } from '../chains/config.js';
-import { DEFAULE_SS58_CHAIN_KEY } from '../utils/defaults.js';
+import {
+  DEFAULE_SS58_CHAIN_KEY,
+  ENABLED_NETWORKS_KEY,
+  NETWORK_MODE_KEY,
+} from '../utils/defaults.js';
 
 import { ApiManager } from './ApiManager.js';
-
-// ============================================================================
-// Constants
-// ============================================================================
-
-const DEFAULT_NETWORKS = [
-  'polkadot',
-  'kusama',
-  'assethub-polkadot',
-  'people-polkadot',
-  'assethub-kusama',
-  'people-kusama',
-];
-const ENABLED_NETWORKS_KEY = 'enabled_networks';
-const NETWORK_MODE_KEY = 'network_mode';
-
-// ============================================================================
-// Initialization Functions
-// ============================================================================
-
-function initNetworks(): Network[] {
-  let enabledNetworks = store.get(ENABLED_NETWORKS_KEY) as string[] | undefined;
-
-  if (
-    !enabledNetworks ||
-    !Array.isArray(enabledNetworks) ||
-    enabledNetworks.length === 0
-  ) {
-    enabledNetworks = DEFAULT_NETWORKS;
-  }
-
-  store.set(ENABLED_NETWORKS_KEY, enabledNetworks);
-
-  // Add user references for initially enabled networks
-  const apiManager = ApiManager.getInstance();
-
-  enabledNetworks.forEach((key) => {
-    apiManager.addReference(key, 'user');
-  });
-
-  return allEndpoints.map((item) => ({
-    ...item,
-    enabled: enabledNetworks!.includes(item.key),
-  }));
-}
-
-function initNetworkMode(): 'omni' | 'solo' {
-  return (store.get(NETWORK_MODE_KEY) as 'omni' | 'solo') || 'omni';
-}
-
-function initSs58Chain(): string {
-  const stored = store.get(DEFAULE_SS58_CHAIN_KEY) as string | undefined;
-
-  // Validate stored value against available endpoints
-  if (stored && allEndpoints.some((e) => e.key === stored)) {
-    return stored;
-  }
-
-  // Default to first endpoint
-  const defaultChain = allEndpoints[0]?.key ?? 'polkadot';
-
-  store.set(DEFAULE_SS58_CHAIN_KEY, defaultChain);
-
-  return defaultChain;
-}
 
 // ============================================================================
 // Store Definition
@@ -106,11 +45,11 @@ export interface ApiState {
 
 export const useApiStore = create<ApiState>()(
   subscribeWithSelector((set, get) => ({
-    // Initial state
+    // Initial state (will be set by initializeApiStore in initMimir)
     chainStatuses: {},
-    networks: initNetworks(),
-    networkMode: initNetworkMode(),
-    ss58Chain: initSs58Chain(),
+    networks: [],
+    networkMode: 'omni',
+    ss58Chain: allEndpoints[0]?.key ?? 'polkadot',
 
     // Sync chain statuses from ApiManager
     _syncChainStatuses: (statuses) => {
@@ -243,31 +182,33 @@ ApiManager.getInstance().subscribe((apis) => {
 // ============================================================================
 
 /**
- * Get network mode (for use outside of React components)
+ * Initialize ApiStore with values from initMimir
+ * Sets networks, networkMode, ss58Chain and ApiManager references
  */
-export function getNetworkMode(): 'omni' | 'solo' {
-  return useApiStore.getState().networkMode;
-}
+export function initializeApiStore(params: {
+  enabledNetworks: string[];
+  networkMode: 'omni' | 'solo';
+  ss58Chain: string;
+}): void {
+  const { enabledNetworks, networkMode, ss58Chain } = params;
 
-/**
- * Get current SS58 chain (for use outside of React components)
- */
-export function getSs58Chain(): string {
-  return useApiStore.getState().ss58Chain;
-}
+  // Build networks array with enabled status
+  const networks: Network[] = allEndpoints.map((item) => ({
+    ...item,
+    enabled: enabledNetworks.includes(item.key),
+  }));
 
-/**
- * Get SS58 chain info (for use outside of React components)
- */
-export function getSs58ChainInfo(): Endpoint {
-  const ss58Chain = useApiStore.getState().ss58Chain;
+  // Set store state
+  useApiStore.setState({
+    networks,
+    networkMode,
+    ss58Chain,
+  });
 
-  return ApiManager.resolveChain(ss58Chain) ?? allEndpoints[0];
-}
+  // Add ApiManager references for enabled networks
+  const apiManager = ApiManager.getInstance();
 
-/**
- * Set SS58 chain (for use outside of React components)
- */
-export function setSs58ChainExternal(chain: string): void {
-  useApiStore.getState().setSs58Chain(chain);
+  enabledNetworks.forEach((key) => {
+    apiManager.addReference(key, 'user');
+  });
 }

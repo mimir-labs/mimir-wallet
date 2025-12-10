@@ -27,7 +27,7 @@ function SoloChainSelect() {
 
   const { chains } = useChains();
   const { isApiReady } = useChainStatus(network);
-  const [account] = useQueryAccount(current);
+  const [account] = useQueryAccount(network, current);
 
   const endpoint = useMemo(
     () => allEndpoints.find((item) => item.key === network),

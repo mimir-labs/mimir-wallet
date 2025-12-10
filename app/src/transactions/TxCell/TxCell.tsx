@@ -33,7 +33,7 @@ function TxCell({
 
   // Only fetch account data when component is visible
   const { ref, inView } = useInView({ triggerOnce: true });
-  const [account] = useQueryAccount(inView ? address : undefined);
+  const [account] = useQueryAccount(network, inView ? address : undefined);
 
   // State for loading full transaction details
   const [shouldLoadDetails, setShouldLoadDetails] = useState(false);

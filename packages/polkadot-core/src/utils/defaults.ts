@@ -16,6 +16,16 @@ import {
 export const NETWORK_RPC_PREFIX = 'network_rpc:';
 export const CURRENT_NETWORK_KEY = 'current_network';
 export const DEFAULE_SS58_CHAIN_KEY = 'default_ss58_chain';
+export const ENABLED_NETWORKS_KEY = 'enabled_networks';
+export const NETWORK_MODE_KEY = 'network_mode';
+export const DEFAULT_NETWORKS = [
+  'assethub-polkadot',
+  'people-polkadot',
+  'assethub-kusama',
+  'people-kusama',
+  'polkadot',
+  'kusama',
+];
 
 export const DEFAULT_AUX = [
   'Aux1',

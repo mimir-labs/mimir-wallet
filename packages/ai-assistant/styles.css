@@ -1,1 +1,2 @@
 @import '@mimir-wallet/ui/styles.css';
+@source './src/**/*.{js,ts,jsx,tsx}';

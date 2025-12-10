@@ -16,11 +16,10 @@ interface NetworkErrorAlertProps {
  */
 function NetworkErrorAlert({ network, className }: NetworkErrorAlertProps) {
   const chain = useChain(network);
-  const { isApiConnected, isApiReady, isApiInitialized, apiError } =
-    useChainStatus(network);
+  const { apiError } = useChainStatus(network);
 
   // Only show error when initialized but failed/disconnected
-  if (!isApiInitialized || (isApiConnected && isApiReady && !apiError)) {
+  if (!apiError) {
     return null;
   }
 

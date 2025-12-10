@@ -3,7 +3,7 @@
 
 import type { AccountData, DelegateeProp } from '@/hooks/types';
 
-import { allEndpoints } from '@mimir-wallet/polkadot-core';
+import { allEndpoints, useNetwork } from '@mimir-wallet/polkadot-core';
 import { Badge, Tooltip } from '@mimir-wallet/ui';
 import { useMemo } from 'react';
 
@@ -107,7 +107,8 @@ function AddressSection({
 
 // Main QueryAccount component
 function QueryAccount({ account }: QueryAccountProps) {
-  const [accountData] = useQueryAccount(account);
+  const { network } = useNetwork();
+  const [accountData] = useQueryAccount(network, account);
 
   if (!accountData) {
     return null;

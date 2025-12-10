@@ -2,12 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Injected } from '@polkadot/extension-inject/types';
+import type { KeypairType } from '@polkadot/util-crypto/types';
 
 import { walletConfig } from '@/config';
 import { sleep } from '@/utils';
 import { documentReadyPromise } from '@/utils/document';
 
-export async function loadWallet(injected: Injected, source: string) {
+export async function loadWallet(
+  injected: Injected,
+  source: string,
+): Promise<
+  {
+    address: string;
+    name: string | undefined;
+    type: KeypairType | undefined;
+    source: string;
+  }[]
+> {
   try {
     const accounts = await injected.accounts.get(true);
 
