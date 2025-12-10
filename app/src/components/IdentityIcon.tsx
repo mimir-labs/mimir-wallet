@@ -179,7 +179,7 @@ function IdentityIcon({
               width: size + 6,
               height: size + 6,
             }}
-            className="pointer-events-none rounded-full border-1"
+            className="pointer-events-none rounded-full border"
           />
         ) : null}
       </span>

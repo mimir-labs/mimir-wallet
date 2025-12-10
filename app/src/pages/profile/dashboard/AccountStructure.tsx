@@ -26,7 +26,7 @@ interface RelationProps {
 
 function Relation({ address, supportedNetworks, setNetwork }: RelationProps) {
   const { network } = useNetwork();
-  const [account] = useQueryAccount(address);
+  const [account] = useQueryAccount(network, address);
   const ref = useRef<HTMLDivElement>(null);
   const upSm = useMediaQuery('sm');
   const [isOpen, toggleOpen] = useToggle(false);

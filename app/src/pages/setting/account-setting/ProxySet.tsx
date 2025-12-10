@@ -66,7 +66,7 @@ function Content({
   const [token] = useXcmAsset(network, 'native');
   const [allBalances] = useBalanceByIdentifier(network, address, 'native');
   const [proxies, isFetched, isFetching] = useProxies(address);
-  const [account] = useQueryAccount(address);
+  const [account] = useQueryAccount(network, address);
 
   const isReadOnly = useMemo(
     () => !isLocalAccount(address),

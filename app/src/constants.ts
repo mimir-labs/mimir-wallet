@@ -13,6 +13,8 @@ export const FAVORITE_DAPP_KEY = 'favorite_dapp';
 
 export const LAST_READ_MESSAGE_KEY = 'last_read_message';
 
+export const RECENT_NETWORKS_KEY = `${LS_NAMESPACE}recent_networks`;
+
 export const ONE_DAY = 86400;
 export const ONE_HOUR = 3600;
 export const ONE_MINUTE = 60;

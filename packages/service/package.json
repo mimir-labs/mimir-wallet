@@ -38,7 +38,7 @@
     "vite": "^7.2.6"
   },
   "dependencies": {
-    "@polkadot/util": "^13.5.9",
+    "@polkadot/util": "catalog:",
     "@tanstack/react-query": "^5.90.12",
     "eventemitter3": "^5.0.1",
     "lodash-es": "^4.17.21",

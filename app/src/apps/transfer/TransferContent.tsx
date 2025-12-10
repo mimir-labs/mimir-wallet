@@ -1,95 +1,55 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TransferToken } from './types';
-
 import {
   remoteProxyRelations,
   useChain,
   useChains,
 } from '@mimir-wallet/polkadot-core';
-import {
-  Alert,
-  AlertTitle,
-  Avatar,
-  Badge,
-  Button,
-  Skeleton,
-  Switch,
-} from '@mimir-wallet/ui';
-import { BN } from '@polkadot/util';
-import React, { useEffect, useMemo } from 'react';
-
-import { useTransferBalance } from './useTransferBalances';
+import { Alert, AlertTitle, Avatar, Switch } from '@mimir-wallet/ui';
+import React, { useMemo } from 'react';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
+import { AddressCell, InputAddress } from '@/components';
 import {
-  AddressCell,
-  FormatBalance,
-  Input,
-  InputAddress,
-  InputNetwork,
-  InputToken,
-} from '@/components';
+  InputTokenAmount,
+  useInputTokenAmountContext,
+} from '@/components/InputTokenAmount';
 import { MigrationTip } from '@/features/assethub-migration';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useXcmAsset } from '@/hooks/useXcmAssets';
-import { formatUnits } from '@/utils';
+
+interface TransferContentProps {
+  sending: string;
+  recipient: string;
+  disabledSending?: boolean;
+  disabledRecipient?: boolean;
+  filterSending?: string[];
+  setSending?: (sending: string) => void;
+  setRecipient?: (recipient: string) => void;
+}
 
 function TransferContent({
-  token,
-  amount,
-  isAmountValid,
   sending,
   recipient,
-  identifier,
-  network,
-  supportedNetworks,
-  keepAlive,
   disabledSending,
   disabledRecipient,
   filterSending,
-  setNetwork,
   setSending,
   setRecipient,
-  setAmount,
-  toggleKeepAlive,
-  setToken,
-}: {
-  amount: string;
-  token?: TransferToken;
-  isAmountValid: boolean;
-  sending: string;
-  recipient: string;
-  network: string;
-  supportedNetworks?: string[];
-  keepAlive: boolean;
-  disabledSending?: boolean;
-  disabledRecipient?: boolean;
-  identifier?: string;
-  filterSending?: string[];
-  setSending?: (sending: string) => void;
-  setNetwork: (network: string) => void;
-  setAmount: (amount: string) => void;
-  toggleKeepAlive: (keepAlive: boolean) => void;
-  setToken: (token: string) => void;
-  setRecipient?: (recipient: string) => void;
-}) {
-  const chain = useChain(network);
-  const genesisHash = chain.genesisHash;
+}: TransferContentProps) {
+  // Get data from context
+  const {
+    value: tokenValue,
+    isAmountValid,
+    keepAlive,
+    setKeepAlive,
+  } = useInputTokenAmountContext();
+
+  const chain = useChain(tokenValue?.network ?? '');
   const { chains } = useChains();
 
   const upSm = useMediaQuery('sm');
-  const [format, sendingBalances, isSendingFetched] = useTransferBalance(
-    token,
-    sending,
-  );
-  const [assetInfo] = useXcmAsset(
-    network,
-    token?.isNative ? 'native' : token?.key,
-  );
-  const { meta: sendingMeta } = useAddressMeta(sending);
   const { meta: recipientMeta } = useAddressMeta(recipient);
   const [recipientAccount] = useQueryAccountOmniChain(recipient);
   const recipientNetwork =
@@ -97,8 +57,7 @@ function TransferContent({
       ? chains.find((item) => item.genesisHash === recipientAccount.network)
       : undefined;
 
-  // for migration tip
-
+  // Check if recipient is supported on current network
   const isRecipientSupported = useMemo(() => {
     return recipientAccount?.type === 'pure'
       ? recipientAccount.network === chain.genesisHash ||
@@ -106,20 +65,26 @@ function TransferContent({
       : true;
   }, [recipientAccount, chain]);
 
-  // Determine existential deposit based on token type
-  const existentialDeposit = useMemo(() => {
-    if (token?.isNative) {
-      return new BN(token.existentialDeposit);
-    } else if (assetInfo?.existentialDeposit) {
-      return new BN(assetInfo.existentialDeposit.toString());
+  // Helper text for remote proxy
+  const remoteProxyHelper = useMemo(() => {
+    const genesisHash = chain.genesisHash;
+
+    const isRecipientRemoteProxy =
+      recipientMeta &&
+      recipientMeta.isPure &&
+      remoteProxyRelations[recipientMeta.pureCreatedAt] === genesisHash;
+
+    if (isRecipientRemoteProxy) {
+      return (
+        <div className="text-foreground">
+          🥷✨Yep, remote proxy lets you borrow a ninja from another chain —
+          smooth and stealthy! 🕶️
+        </div>
+      );
     }
 
-    return new BN(0);
-  }, [token, assetInfo]);
-
-  useEffect(() => {
-    setAmount('');
-  }, [setAmount]);
+    return null;
+  }, [chain.genesisHash, recipientMeta]);
 
   return (
     <>
@@ -169,93 +134,17 @@ function TransferContent({
         />
       )}
 
-      <InputNetwork
-        label="Select Network"
-        network={network}
-        supportedNetworks={supportedNetworks}
-        setNetwork={setNetwork}
-        endContent={
-          sendingMeta &&
-          sendingMeta.isPure &&
-          remoteProxyRelations[sendingMeta.pureCreatedAt]
-            ? {
-                [remoteProxyRelations[sendingMeta.pureCreatedAt]]: (
-                  <Badge variant="purple">Remote Proxy</Badge>
-                ),
-              }
-            : undefined
-        }
-        helper={
-          !!(
-            recipientMeta &&
-            recipientMeta.isPure &&
-            remoteProxyRelations[recipientMeta.pureCreatedAt] === genesisHash
-          ) ||
-          !!(
-            sendingMeta &&
-            sendingMeta.isPure &&
-            remoteProxyRelations[sendingMeta.pureCreatedAt] === genesisHash
-          ) ? (
-            <div className="text-foreground">
-              🥷✨Yep, remote proxy lets you borrow a ninja from another chain —
-              smooth and stealthy! 🕶️
-            </div>
-          ) : null
-        }
-      />
-
-      <InputToken
-        network={network}
-        label="Select an asset"
-        address={sending}
-        onChange={setToken}
-        identifier={identifier}
-      />
-
-      <Input
+      {/* Combined Token + Network + Amount input (from context) */}
+      <InputTokenAmount
+        label="Transfer"
         error={isAmountValid ? null : new Error('Invalid number')}
-        key={token?.isNative ? 'native' : token?.key}
-        label={
-          <div className="flex items-center justify-between">
-            Amount
-            {!isSendingFetched ? (
-              <Skeleton className="h-3.5 w-24 rounded-[5px]" />
-            ) : (
-              <span className="opacity-50">
-                Balance:{' '}
-                <FormatBalance format={format} value={sendingBalances} />
-              </span>
-            )}
-          </div>
-        }
-        value={amount}
-        onChange={setAmount}
-        placeholder="Input amount"
-        endAdornment={
-          <Button
-            size="sm"
-            variant="ghost"
-            className="min-w-0 rounded-[5px] p-1.5 py-px"
-            onClick={() => {
-              setAmount(
-                keepAlive
-                  ? formatUnits(
-                      sendingBalances.sub(existentialDeposit),
-                      format[0],
-                    )
-                  : formatUnits(sendingBalances, format[0]),
-              );
-            }}
-          >
-            Max
-          </Button>
-        }
+        helper={remoteProxyHelper}
       />
 
       <label className="flex items-center justify-end gap-2">
         <Switch
           checked={keepAlive}
-          onCheckedChange={(value) => toggleKeepAlive(value)}
+          onCheckedChange={(value) => setKeepAlive(value)}
         />
         <span className="text-sm">Keep Sender Alive</span>
       </label>
@@ -279,7 +168,7 @@ function TransferContent({
         </Alert>
       )}
 
-      <MigrationTip type="transfer" chain={network} />
+      <MigrationTip type="transfer" chain={tokenValue?.network ?? ''} />
     </>
   );
 }

@@ -10,13 +10,14 @@ import {
   PopoverTrigger,
 } from '@mimir-wallet/ui';
 import { clsx } from 'clsx';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useToggle } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import { useMigrationNetworks } from '@/features/assethub-migration/useMigrationStatus';
 import { useElementWidth } from '@/hooks/useElementWidth';
+import { useRecentNetworks } from '@/hooks/useRecentNetworks';
 
 interface Props {
   showAllNetworks?: boolean;
@@ -87,24 +88,47 @@ function OmniChainInputNetwork({
   const { chains: networks } = useChains();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const popoverWidth = useElementWidth(wrapperRef, 200);
+  const { recentNetworks, addRecent } = useRecentNetworks();
 
   const [isOpen, toggleOpen] = useToggle(false);
 
-  // Filter networks based on supportedNetworks or showAllNetworks/enabled
-  const options = networks
-    .filter((item) => {
-      // If supportedNetworks is specified, only show networks in the list
-      if (supportedNetworks && supportedNetworks.length > 0) {
-        return supportedNetworks.includes(item.key);
-      }
+  // Filter and sort networks based on supportedNetworks or showAllNetworks/enabled
+  const options = useMemo(() => {
+    const filtered = networks
+      .filter((item) => {
+        // If supportedNetworks is specified, only show networks in the list
+        if (supportedNetworks && supportedNetworks.length > 0) {
+          return supportedNetworks.includes(item.key);
+        }
 
-      // Otherwise use original logic
-      return showAllNetworks || item.enabled;
-    })
-    .map((item) => ({
-      ...item,
-      endContent: endContent?.[item.key] || endContent?.[item.genesisHash],
-    }));
+        // Otherwise use original logic
+        return showAllNetworks || item.enabled;
+      })
+      .map((item) => ({
+        ...item,
+        endContent: endContent?.[item.key] || endContent?.[item.genesisHash],
+      }));
+
+    // Sort by recent networks
+    const priorityMap = new Map<string, number>();
+
+    recentNetworks.forEach((key, index) => {
+      priorityMap.set(key, index);
+    });
+
+    return [...filtered].sort((a, b) => {
+      const aPriority = priorityMap.get(a.key) ?? Infinity;
+      const bPriority = priorityMap.get(b.key) ?? Infinity;
+
+      return aPriority - bPriority;
+    });
+  }, [
+    networks,
+    supportedNetworks,
+    showAllNetworks,
+    endContent,
+    recentNetworks,
+  ]);
 
   const { data: migrationNetworks } = useMigrationNetworks();
   const completedMigrationNetworks = migrationNetworks
@@ -161,7 +185,7 @@ function OmniChainInputNetwork({
           <div
             ref={wrapperRef}
             className={twMerge([
-              'group tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 relative inline-flex h-11 min-h-11 w-full cursor-pointer flex-col items-start justify-center gap-0 border-1 px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
+              'group tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 relative inline-flex h-11 min-h-11 w-full cursor-pointer flex-col items-start justify-center gap-0 border px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
               radius === 'full'
                 ? 'rounded-full'
                 : radius === 'lg'
@@ -193,7 +217,7 @@ function OmniChainInputNetwork({
         </PopoverTrigger>
         <PopoverContent
           style={{ width: popoverWidth, minWidth: 200 }}
-          className="border-divider border-1 p-[5px]"
+          className="border-divider border p-[5px]"
         >
           {options.length > 0 ? (
             <div
@@ -211,6 +235,7 @@ function OmniChainInputNetwork({
                       item={item}
                       onSelect={() => {
                         setNetwork(item.key);
+                        addRecent(item.key);
                         handleClose();
                       }}
                       isMigrationCompleted={isMigrationCompleted}

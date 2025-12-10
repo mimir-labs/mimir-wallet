@@ -25,7 +25,7 @@ function SmPage({
   transaction: Transaction;
 }) {
   const { network } = useNetwork();
-  const [account] = useQueryAccount(propsTransaction?.address);
+  const [account] = useQueryAccount(network, propsTransaction?.address);
   const [shouldLoadDetails, setShouldLoadDetails] = useState(false);
   const [fullTransaction] = useTransactionDetail(
     network,

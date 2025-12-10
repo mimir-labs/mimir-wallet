@@ -12,6 +12,7 @@ import {
   addressToHex,
   encodeAddress,
   remoteProxyRelations,
+  useChain,
   useNetwork,
 } from '@mimir-wallet/polkadot-core';
 import { service, useQuery } from '@mimir-wallet/service';
@@ -260,9 +261,10 @@ function useAccountMetaUpdater(
  * @returns Tuple of [accountData, isFetched, isFetching, refetch]
  *
  * @example
- * const [account, isFetched, isFetching, refetch] = useQueryAccount('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
+ * const [account, isFetched, isFetching, refetch] = useQueryAccount('polkadot', '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
  */
 export function useQueryAccount(
+  network: string,
   address?: string | null,
 ): [
   AccountData | null | undefined,
@@ -270,7 +272,7 @@ export function useQueryAccount(
   isFetching: boolean,
   refetch: () => void,
 ] {
-  const { chain } = useNetwork();
+  const chain = useChain(network);
   const chainSS58 = chain.ss58Format;
   const genesisHash = chain.genesisHash;
 

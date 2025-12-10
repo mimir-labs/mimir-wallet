@@ -63,7 +63,7 @@ function Hero({
   const { network } = useNetwork();
   const [open, toggleOpen] = useToggle(false);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
-  const [account] = useQueryAccount(address);
+  const [account] = useQueryAccount(network, address);
   const [days, setDays] = useState<string | number>('--');
 
   // Calculate days in useEffect to avoid calling Date.now() during render

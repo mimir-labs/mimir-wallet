@@ -4,7 +4,10 @@
 import './style.css';
 import '@mimir-wallet/polkadot-core/augment';
 
-import { getNetworkMode, NetworkProvider } from '@mimir-wallet/polkadot-core';
+import {
+  initializeApiStore,
+  NetworkProvider,
+} from '@mimir-wallet/polkadot-core';
 import {
   API_CLIENT_GATEWAY,
   initService,
@@ -16,7 +19,14 @@ import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 
 import { initAnalytics } from './analytics';
-import { initFavoriteDapps, initMimir } from './initMimir';
+import {
+  initEnabledNetworks,
+  initFavoriteDapps,
+  initMimir,
+  initNetworkMode,
+  initRecentNetworks,
+  initSs58Chain,
+} from './initMimir';
 import { router } from './router';
 import { upgradeAddresBook } from './upgrade';
 import { initializeWallet } from './wallet/initialize';
@@ -24,7 +34,21 @@ import { initializeWallet } from './wallet/initialize';
 // Create React root container for application mounting
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
-const isOmni = getNetworkMode() === 'omni';
+// Initialize network mode from localStorage (must be before initMimir)
+const networkMode = initNetworkMode();
+const isOmni = networkMode === 'omni';
+// Initialize and get values for ApiStore
+const enabledNetworks = initEnabledNetworks();
+const ss58Chain = initSs58Chain();
+
+initRecentNetworks();
+
+// Initialize ApiStore with values
+initializeApiStore({
+  enabledNetworks,
+  networkMode,
+  ss58Chain,
+});
 
 // Initialize core Mimir wallet configuration and get initial chain settings
 // This sets up the basic configuration needed for the wallet to function

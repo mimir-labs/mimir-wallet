@@ -4,7 +4,10 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
     "composite": true,
     "outDir": "./build",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": [
+      "vite/client"
+    ]
   },
   "include": ["src"],
   "exclude": ["build/**/*", "**/*.spec.ts", "**/test/**/*"],

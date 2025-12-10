@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { SubmittableExtrinsic } from '@polkadot/api/types';
+import type { SubmittableExtrinsic } from '@polkadot/api-base/types';
 import type { Option } from '@polkadot/types';
 import type { Call, Multisig } from '@polkadot/types/interfaces';
 

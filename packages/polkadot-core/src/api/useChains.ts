@@ -82,6 +82,3 @@ export function useChains(): ChainsControl {
     setNetworkMode,
   };
 }
-
-// Re-export getNetworkMode from useApiStore for backward compatibility
-export { getNetworkMode } from './useApiStore.js';
