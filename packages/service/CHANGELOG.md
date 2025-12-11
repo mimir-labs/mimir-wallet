@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v3.0.0...service-v3.1.0) (2025-12-11)
+
+
+### Features
+
+* **input-token-amount:** add new token selector component with context-based data fetching ([#364](https://github.com/mimir-labs/mimir-wallet/issues/364)) ([180ee9c](https://github.com/mimir-labs/mimir-wallet/commit/180ee9c4ea0da216f7902053188df6322c6b13e8))
+* migrate all ui component from heroui and optimize build output ([#357](https://github.com/mimir-labs/mimir-wallet/issues/357)) ([1f13ad0](https://github.com/mimir-labs/mimir-wallet/commit/1f13ad0ad698dccfaae57f0d097e42c501a6d480))
+
 ## [3.0.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v2.39.0...service-v3.0.0) (2025-12-03)
 
 
