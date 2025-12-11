@@ -18,10 +18,16 @@ import { useWallet } from '@/wallet/useWallet';
 interface FundUIProps {
   filterSending: string[];
   receipt: string;
+  sending: string;
+  setSending: (value: string) => void;
 }
 
-function FundUI({ filterSending, receipt }: FundUIProps) {
-  const [sending, setSending] = useState<string>(filterSending.at(0) || '');
+function FundUI({
+  filterSending,
+  receipt,
+  sending,
+  setSending,
+}: FundUIProps & { sending: string; setSending: (value: string) => void }) {
   const [error, setError] = useState<string | null>(null);
 
   const { network, token, amount, isAmountValid, keepAlive } =
@@ -82,17 +88,20 @@ function PageFund() {
   const { current: receipt } = useAccount();
 
   const filterSending = walletAccounts.map((item) => item.address);
+  const [sending, setSending] = useState<string>(filterSending.at(0) || '');
 
   if (!receipt) {
     return null;
   }
 
   return (
-    <InputTokenAmountProvider
-      address={filterSending.at(0)}
-      defaultIdentifier="native"
-    >
-      <FundUI filterSending={filterSending} receipt={receipt} />
+    <InputTokenAmountProvider address={sending} defaultIdentifier="native">
+      <FundUI
+        filterSending={filterSending}
+        sending={sending}
+        setSending={setSending}
+        receipt={receipt}
+      />
     </InputTokenAmountProvider>
   );
 }

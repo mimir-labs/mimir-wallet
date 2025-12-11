@@ -77,7 +77,15 @@ export async function fetchSingleAssetBalance(
         };
       }
 
-      return null;
+      return {
+        ...asset,
+        address,
+        total: 0n,
+        locked: 0n,
+        reserved: 0n,
+        free: 0n,
+        transferrable: 0n,
+      };
     }
 
     // Handle tokens using orml-tokens pallet

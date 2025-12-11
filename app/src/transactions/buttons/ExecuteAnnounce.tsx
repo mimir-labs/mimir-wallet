@@ -5,7 +5,6 @@ import type { AccountData, Transaction } from '@/hooks/types';
 
 import { addressEq, ApiManager, useNetwork } from '@mimir-wallet/polkadot-core';
 import {
-  buttonSpinner,
   Modal,
   ModalBody,
   ModalContent,
@@ -38,7 +37,6 @@ function ExecuteAnnounce({
   const { addQueue } = useTxQueue();
   const { walletAccounts } = useWallet();
   const [status] = useAnnouncementStatus(transaction, account);
-  const [loading, setLoading] = useState(false);
   const [isOpen, toggleOpen] = useToggle(false);
   const [calldata, setCalldata] = useState('');
 
@@ -61,8 +59,6 @@ function ExecuteAnnounce({
   }
 
   const handleExecute = async () => {
-    setLoading(true);
-
     try {
       const api = await ApiManager.getInstance().getApi(network, true);
       let call: string;
@@ -105,7 +101,6 @@ function ExecuteAnnounce({
     }
 
     toggleOpen(false);
-    setLoading(false);
   };
 
   return (
@@ -118,9 +113,7 @@ function ExecuteAnnounce({
           color={isIcon ? 'success' : 'primary'}
           size={isIcon ? 'sm' : 'md'}
           overrideAction={transaction.call ? handleExecute : toggleOpen}
-          disabled={loading}
         >
-          {loading ? buttonSpinner : null}
           {isIcon ? <IconSuccess /> : 'Execute announcement'}
         </TxButton>
       </Tooltip>

@@ -4,7 +4,7 @@
 import type { InputTokenAmountContextValue } from './useInputTokenAmountContext';
 
 import { useChain, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { InputTokenAmountContext } from './useInputTokenAmountContext';
 import { useTokenNetworkData } from './useTokenNetworkData';
@@ -35,6 +35,9 @@ export interface InputTokenAmountProviderProps {
   includeZeroBalance?: boolean;
   /** Default keep alive setting */
   defaultKeepAlive?: boolean;
+
+  /** Supported networks filter - if provided, only show these networks */
+  supportedNetworks?: string[];
 }
 
 /**
@@ -62,6 +65,7 @@ export function InputTokenAmountProvider({
   minAmount = 0,
   includeZeroBalance = false,
   defaultKeepAlive = true,
+  supportedNetworks,
 }: InputTokenAmountProviderProps) {
   // Get initial network from context
   const { network: initialNetwork } = useNetwork();
@@ -91,11 +95,25 @@ export function InputTokenAmountProvider({
     string | null
   >(null);
 
-  // Data fetching (no supportedNetworks filter, all networks supported)
+  // Data fetching with optional network filter
   const { items, networks, isLoading, isFetched } = useTokenNetworkData(
     address,
-    { includeZeroBalance, activeNetworkFilter },
+    { includeZeroBalance, activeNetworkFilter, supportedNetworks },
   );
+
+  // Auto-switch to supported network when current network is not supported
+  useEffect(() => {
+    if (
+      supportedNetworks &&
+      supportedNetworks.length > 0 &&
+      !supportedNetworks.includes(network)
+    ) {
+      // Switch to first supported network with native token
+      setNetworkInternal(supportedNetworks[0]);
+      setIdentifierInternal('native');
+      setAmountInternal('');
+    }
+  }, [supportedNetworks, network, setAmountInternal]);
 
   // Recent networks for priority sorting
   const { addRecent } = useRecentNetworks();

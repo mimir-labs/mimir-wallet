@@ -228,15 +228,15 @@ function OmniChainSelect() {
           {enabledNetworks.length > 3 ? (
             <div className="flex items-center">
               <img
-                className="h-5 w-5 bg-transparent select-none"
+                className="h-5 w-5 bg-transparent select-none rounded-full"
                 src={enabledNetworks[0].icon}
               />
               <img
-                className="-ml-2.5 h-5 w-5 bg-transparent select-none"
+                className="-ml-2.5 h-5 w-5 bg-transparent select-none rounded-full"
                 src={enabledNetworks[1].icon}
               />
               <img
-                className="-ml-2.5 h-5 w-5 bg-transparent select-none"
+                className="-ml-2.5 h-5 w-5 bg-transparent select-none rounded-full"
                 src={enabledNetworks[2].icon}
               />
               <div className="bg-primary border-divider -ml-2.5 flex h-5 w-5 items-center justify-center rounded-full border select-none">

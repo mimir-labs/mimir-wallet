@@ -63,7 +63,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       }
     }, [endAdornment]);
 
-    const errorClass = error ? 'border-danger focus-visible:border-danger' : '';
+    const errorClass = error
+      ? 'border-danger focus-visible:border-danger'
+      : 'border-red';
 
     return (
       <div className={cn('flex flex-col', fullWidth && 'w-full', className)}>

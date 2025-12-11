@@ -17,12 +17,17 @@ import MultiTransferContent from './MultiTransferContent';
 
 import { useAccount } from '@/accounts/useAccount';
 import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
+import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 
 function MultiTransfer() {
   const { current } = useAccount();
-  const [network, setNetwork] = useInputNetwork();
+  const supportedNetworks = useAddressSupportedNetworks(current);
+  const [network, setNetwork] = useInputNetwork(
+    undefined,
+    supportedNetworks?.map((n) => n.key),
+  );
   const [data, setData] = useState<MultiTransferData[]>([['', '', '']]);
 
   const handleBatchTransferForm = useCallback<FunctionCallHandler>(
@@ -124,27 +129,25 @@ function MultiTransfer() {
 
   return (
     <NetworkProvider network={network}>
-      <div className="mx-auto w-full max-w-[900px] p-4 sm:p-5">
+      <div className="mx-auto w-full max-w-[500px] p-3 sm:p-5">
         <Button onClick={() => window.history.back()} variant="ghost">
           {'<'} Back
         </Button>
-        <div className="mt-4 flex flex-col gap-5 p-4 card-root sm:p-5">
-          <div className="flex flex-col gap-5">
-            <div className="flex items-center justify-between">
-              <h3>Multi Transfer</h3>
+        <div className="card-root mt-4 p-3 sm:p-6 flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <h3>Multi Transfer</h3>
 
-              <Button asChild color="primary" variant="light">
-                <Link
-                  to="/explorer/$url"
-                  params={{
-                    url: 'mimir://app/transfer',
-                  }}
-                >
-                  <IconTransfer />
-                  Solo-Transfer
-                </Link>
-              </Button>
-            </div>
+            <Button asChild color="primary" variant="light">
+              <Link
+                to="/explorer/$url"
+                params={{
+                  url: 'mimir://app/transfer',
+                }}
+              >
+                <IconTransfer />
+                Solo-Transfer
+              </Link>
+            </Button>
           </div>
           <Divider />
 
@@ -152,6 +155,7 @@ function MultiTransfer() {
             data={data}
             sending={current || ''}
             network={network}
+            supportedNetworks={supportedNetworks?.map((n) => n.key)}
             setNetwork={setNetwork}
             setData={setData}
           />

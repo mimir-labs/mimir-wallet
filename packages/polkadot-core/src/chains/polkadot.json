@@ -172,7 +172,7 @@
   },
   {
     "key": "pendulum",
-    "icon": "/chain-icons/pendulum.svg",
+    "icon": "/chain-icons/pendulum.png",
     "tokenIcon": "/token-icons/pen.png",
     "name": "Pendulum",
     "relayChain": "polkadot",

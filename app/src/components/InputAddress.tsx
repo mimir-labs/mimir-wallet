@@ -16,14 +16,13 @@ import {
   zeroAddress,
 } from '@mimir-wallet/polkadot-core';
 import {
-  Divider,
+  cn,
   Popover,
   PopoverContent,
   PopoverTrigger,
   Tooltip,
 } from '@mimir-wallet/ui';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { clsx } from 'clsx';
 import React, {
   startTransition,
   useCallback,
@@ -42,6 +41,7 @@ import { sortAccounts } from '@/accounts/utils';
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
 import IconAddressBook from '@/assets/svg/icon-address-book.svg?react';
+import IconSearch from '@/assets/svg/icon-search.svg?react';
 import { useIdentityStore } from '@/hooks/useDeriveAccountInfo';
 import { useInputAddress } from '@/hooks/useInputAddress';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -147,11 +147,13 @@ function InputAddress({
   label,
   onChange,
   onSelect,
-  placeholder = 'Address e.g. 5G789...',
+  placeholder = 'Select address...',
+  searchPlaceholder = 'Search address...',
   shorten = false,
   value: propsValue,
   helper,
   addressType = 'cell',
+  rowType = 'both',
   endContent,
   withAddButton,
   withZeroAddress = false,
@@ -173,16 +175,11 @@ function InputAddress({
       ? propsValue || defaultValue || ''
       : '',
   );
-  // const [inputValue, setInputValue] = useState<string>('');
-  const [[inputValue, isValidAddress], setInputValue] = useInputAddress(
-    undefined,
-    polkavm,
-  );
+  const [[inputValue], setInputValue] = useInputAddress(undefined, polkavm);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isOpen, toggleOpen] = useToggle(false);
-  const [isFocused, setIsFocused] = useState(false);
   const upSm = useMediaQuery('sm');
   const onChangeRef = useRef(onChange);
   const stateRef = useRef({
@@ -284,70 +281,37 @@ function InputAddress({
     [chainSS58, polkavm, setInputValue, toggleOpen],
   );
 
-  const handleOpen = useCallback(() => {
-    toggleOpen(true);
-  }, [toggleOpen]);
-
-  const handleClose = useCallback(() => {
-    toggleOpen(false);
-
-    if (!value) {
-      if (!isSign && isValidAddress) {
-        if (isEthAddress(inputValue)) {
-          handleSelect(evm2Ss58(inputValue, chainSS58));
-        } else {
-          handleSelect(inputValue);
-        }
-      } else if (!isSign) {
-        setValue('');
-      }
+  // Render selected address or placeholder in trigger
+  const renderSelectedValue = () => {
+    if (value) {
+      return (
+        <div className="inline-flex w-[calc(100%-20px)] grow-0 items-center gap-x-2.5">
+          {addressType === 'cell' ? (
+            <AddressCell
+              iconSize={iconSize}
+              value={value}
+              shorten={upSm ? shorten : true}
+            />
+          ) : (
+            <AddressRow
+              className="[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal"
+              iconSize={iconSize}
+              value={value}
+              shorten={upSm ? shorten : true}
+              withName={rowType === 'name' || rowType === 'both'}
+              withAddress={rowType === 'address' || rowType === 'both'}
+            />
+          )}
+        </div>
+      );
     }
-  }, [
-    chainSS58,
-    handleSelect,
-    inputValue,
-    isSign,
-    isValidAddress,
-    toggleOpen,
-    value,
-  ]);
 
-  const element = (
-    <div
-      data-hide={isOpen && isFocused}
-      className="inline-flex w-[calc(100%-20px)] grow-0 items-center gap-x-2.5 [&[data-hide=true]_.AddressCell-Content]:hidden [&[data-hide=true]_.AddressRow-Content]:hidden"
-    >
-      {addressType === 'cell' ? (
-        <AddressCell
-          iconSize={iconSize}
-          value={value}
-          shorten={upSm ? shorten : true}
-        />
-      ) : (
-        <AddressRow
-          className="[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal"
-          iconSize={iconSize}
-          value={value}
-          shorten={upSm ? shorten : true}
-          withAddress
-        />
-      )}
-    </div>
-  );
+    return <span className="text-foreground/50 truncate">{placeholder}</span>;
+  };
 
   const valueIsPolkadotEvmAddress = useMemo(
     () => isPolkadotEvmAddress(value),
     [value],
-  );
-
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLOrSVGElement, MouseEvent>) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (isOpen) handleClose();
-      else handleOpen();
-    },
-    [handleClose, handleOpen, isOpen],
   );
 
   return (
@@ -358,31 +322,16 @@ function InputAddress({
       {label && <div className="text-sm font-bold">{label}</div>}
 
       <div className="input-address-base flex gap-2.5">
-        <Popover
-          open={isOpen}
-          onOpenChange={(state) => (state ? handleOpen() : handleClose())}
-        >
+        <Popover open={isOpen} onOpenChange={toggleOpen}>
           <PopoverTrigger asChild>
             <div
               ref={wrapperRef}
-              data-error={!isValidAddress && !!inputValue}
-              className={`input-address-content tap-highlight-transparent border-divider data-[error=true]:border-danger hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full flex-col items-start justify-center gap-0 overflow-hidden rounded-[10px] border-1 px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none ${wrapperClassName || ''}`}
+              className={cn(
+                'input-address-content tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 relative inline-flex h-14 min-h-10 w-full cursor-pointer items-center overflow-hidden rounded-[10px] border px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
+                wrapperClassName,
+              )}
             >
-              {element}
-              <input
-                ref={inputRef}
-                className="absolute top-0 right-0 bottom-0 left-0 rounded-[10px] border-none bg-transparent outline-none"
-                style={{
-                  opacity: (isFocused && isOpen) || !value ? 1 : 0,
-                  paddingLeft: iconSize + 8 + (addressType === 'cell' ? 10 : 5),
-                }}
-                value={inputValue}
-                placeholder={placeholder}
-                onChange={setInputValue}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                onClick={handleClick}
-              />
+              {renderSelectedValue()}
 
               {value && !isLocalAccount(value) && !isLocalAddress(value) ? (
                 <Tooltip color="foreground" content="Add to address book">
@@ -401,23 +350,38 @@ function InputAddress({
                 data-open={isOpen}
                 className="absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer transition-transform duration-150 data-[open=true]:rotate-180"
                 style={{ color: 'inherit' }}
-                onClick={handleClick}
               />
             </div>
           </PopoverTrigger>
           <PopoverContent
-            style={{ width: wrapperRef.current?.clientWidth }}
-            className="border-divider border-1 p-[5px]"
+            align="start"
+            className="border-divider group w-(--radix-popover-trigger-width) min-w-[300px] border p-0"
+            onOpenAutoFocus={(e) => {
+              e.preventDefault();
+              inputRef.current?.focus();
+            }}
           >
+            {/* Search input - matching CommandInput style */}
+            <div className="flex h-9 items-center gap-2 border-b px-3">
+              <IconSearch className="size-4 shrink-0 opacity-50" />
+              <input
+                ref={inputRef}
+                autoFocus
+                className="placeholder:text-foreground/50 flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder={searchPlaceholder}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+              />
+            </div>
+
+            {/* Address list */}
             {options.length > 0 ? (
               <div
                 ref={scrollContainerRef}
-                className={clsx(
-                  'text-foreground max-h-[250px] overflow-y-auto',
-                )}
+                className="text-foreground group max-h-[300px] overflow-y-auto p-[5px] pr-0 scroll-hover-show"
               >
                 <ul
-                  className={clsx(
+                  className={cn(
                     'relative flex list-none flex-col',
                     addressType === 'cell' ? '' : 'gap-2.5',
                   )}
@@ -427,73 +391,66 @@ function InputAddress({
                     const item = options[virtualRow.index];
 
                     return (
-                      <React.Fragment key={virtualRow.key}>
-                        <li
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            transform: `translateY(${virtualRow.start}px)`,
-                          }}
-                          onClick={() => {
-                            const shouldContinue = onSelect?.(item);
+                      <li
+                        key={virtualRow.key}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          transform: `translateY(${virtualRow.start}px)`,
+                        }}
+                        onClick={() => {
+                          const shouldContinue = onSelect?.(item);
 
-                            if (shouldContinue !== false) {
-                              handleSelect(item);
-                            } else {
-                              setInputValue('');
-                              toggleOpen(false);
-                            }
-                          }}
-                          className={clsx(
-                            'text-foreground transition-background hover:bg-secondary flex cursor-pointer items-center justify-between rounded-[10px] px-2 py-1.5',
-                            addressType === 'cell'
-                              ? ''
-                              : 'bg-secondary p-[5px]',
-                          )}
-                        >
-                          {addressType === 'cell' ? (
-                            <AddressCell
-                              addressCopyDisabled
-                              withCopy
-                              value={item}
-                              shorten={upSm ? shorten : true}
-                            />
-                          ) : (
-                            <AddressRow
-                              className="[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal"
-                              iconSize={iconSize}
-                              value={item}
-                              shorten={upSm ? shorten : true}
-                              withCopy
-                              withAddress
-                            />
-                          )}
-                          {withAddButton ? (
-                            <IconAdd className="text-primary" />
-                          ) : undefined}
-                        </li>
-                        {item === zeroAddress ? (
-                          <Divider className="my-2.5" />
-                        ) : null}
-                      </React.Fragment>
+                          if (shouldContinue !== false) {
+                            handleSelect(item);
+                          } else {
+                            setInputValue('');
+                            toggleOpen(false);
+                          }
+                        }}
+                        className={cn(
+                          'text-foreground transition-background hover:bg-secondary flex cursor-pointer items-center justify-between rounded-[10px] px-2 py-1.5',
+                          addressType === 'cell' ? '' : 'bg-secondary p-[5px]',
+                        )}
+                      >
+                        {addressType === 'cell' ? (
+                          <AddressCell
+                            addressCopyDisabled
+                            withCopy
+                            value={item}
+                            shorten={upSm ? shorten : true}
+                          />
+                        ) : (
+                          <AddressRow
+                            className="[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal"
+                            iconSize={iconSize}
+                            value={item}
+                            shorten={upSm ? shorten : true}
+                            withCopy
+                            withName
+                            withAddress
+                          />
+                        )}
+                        {withAddButton ? (
+                          <IconAdd className="text-primary" />
+                        ) : undefined}
+                      </li>
                     );
                   })}
                 </ul>
               </div>
             ) : (
-              <div className="text-foreground/50 text-center">no addresses</div>
+              <div className="text-foreground/50 py-6 text-center text-sm">
+                No addresses found
+              </div>
             )}
           </PopoverContent>
         </Popover>
 
         {endContent ? <div>{endContent}</div> : null}
       </div>
-
-      {!isValidAddress && !!inputValue && (
-        <div className="text-danger mt-1 text-sm">Invalid address</div>
-      )}
 
       {valueIsPolkadotEvmAddress ? (
         <div className="mt-1 text-sm">

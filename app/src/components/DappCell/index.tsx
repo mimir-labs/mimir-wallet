@@ -3,7 +3,7 @@
 
 import type { DappOption } from '@/config';
 
-import { Button, Tooltip } from '@mimir-wallet/ui';
+import { Badge, Button, Tooltip } from '@mimir-wallet/ui';
 import React, {
   useCallback,
   useEffect,
@@ -89,7 +89,7 @@ function DappCell({
   const content =
     variant === 'mobile' ? (
       <div
-        className="relative flex w-full cursor-pointer items-start gap-5 rounded-[20px] border-1 border-solid border-[rgba(39,0,255,0.05)] bg-white p-5"
+        className="card-root relative flex w-full cursor-pointer items-start gap-5 p-5"
         onClick={(e) => {
           e.stopPropagation();
           handleOpenDapp();
@@ -317,9 +317,9 @@ function DappCell({
             {dapp.tags && dapp.tags.length > 0 && (
               <div className="flex items-center gap-2.5">
                 {dapp.tags.map((tag, index) => (
-                  <Button color="secondary" key={index} size="sm">
+                  <Badge variant="secondary" key={index}>
                     {tag}
-                  </Button>
+                  </Badge>
                 ))}
               </div>
             )}

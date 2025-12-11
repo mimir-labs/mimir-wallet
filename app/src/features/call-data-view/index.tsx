@@ -1,8 +1,8 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
+import { NetworkProvider, useChains } from '@mimir-wallet/polkadot-core';
+import { Button, Skeleton } from '@mimir-wallet/ui';
 import React, { useImperativeHandle, useMemo, useState } from 'react';
 
 import { handleDecodeError } from '../shared/error-handling';
@@ -13,7 +13,6 @@ import DotConsoleButton from './DotConsoleButton';
 import { Input, InputNetwork, NetworkErrorAlert } from '@/components';
 import JsonView from '@/components/JsonView';
 import { events } from '@/events';
-import { useInputNetwork } from '@/hooks/useInputNetwork';
 import { useParseCall } from '@/hooks/useParseCall';
 
 // CallDataView ref interface for external control
@@ -34,7 +33,11 @@ function CallDataViewerContent({
   setCallData: (value: string) => void;
 }) {
   // Parse call data using async hook
-  const { call: parsedCallData, error } = useParseCall(network, calldata);
+  const {
+    call: parsedCallData,
+    isLoading,
+    error,
+  } = useParseCall(network, calldata);
 
   // Convert standard Error to FeatureError for ErrorDisplay
   const callDataError = useMemo(
@@ -48,7 +51,7 @@ function CallDataViewerContent({
         <h4>Call Data Details</h4>
       </div>
 
-      <InputNetwork network={network} setNetwork={setNetwork} />
+      <InputNetwork showAllNetworks network={network} setNetwork={setNetwork} />
 
       <Input
         label="Call Data"
@@ -63,6 +66,8 @@ function CallDataViewerContent({
       />
 
       <NetworkErrorAlert network={network} />
+
+      {!parsedCallData && isLoading && <Skeleton className="h-[200px]" />}
 
       {parsedCallData && (
         <div className="bg-secondary rounded-[10px] p-2.5">
@@ -105,7 +110,8 @@ function CallDataViewer({
   calldata: initialCallData,
   ref,
 }: CallDataViewerProps) {
-  const [network, setNetwork] = useInputNetwork();
+  const { chains } = useChains();
+  const [network, setNetwork] = useState(chains[0].key);
   const [calldata, setCallData] = useState(initialCallData || '');
 
   // Expose methods to parent via ref

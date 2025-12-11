@@ -160,6 +160,7 @@ function TransferContent({
                 width: 16,
                 height: 16,
                 backgroundColor: 'transparent',
+                verticalAlign: 'middle',
               }}
             />
             &nbsp;

@@ -18,13 +18,12 @@ import {
   useNetwork,
 } from '@mimir-wallet/polkadot-core';
 import { service, useMutation } from '@mimir-wallet/service';
-import { Alert, AlertTitle, Button, buttonSpinner } from '@mimir-wallet/ui';
+import { Button, buttonSpinner } from '@mimir-wallet/ui';
 import React from 'react';
 
 import { toastError } from '../utils';
 
 import { buildTxAsync } from './hooks/useBuildTx';
-import { useDryRunResult } from './hooks/useDryRunResult';
 
 import { analyticsActions } from '@/analytics';
 import { CONNECT_ORIGIN } from '@/constants';
@@ -34,6 +33,7 @@ import { enableWallet } from '@/wallet/utils';
 
 function SendTx({
   disabled,
+  dryRunDisabled,
   buildTx,
   methodHex,
   filterPath,
@@ -52,6 +52,7 @@ function SendTx({
   beforeSend,
 }: {
   disabled?: boolean;
+  dryRunDisabled?: boolean;
   buildTx: BuildTx;
   methodHex: HexString | undefined;
   filterPath: FilterPath[];
@@ -75,9 +76,8 @@ function SendTx({
   beforeSend?: (extrinsic: SubmittableExtrinsic<'promise'>) => Promise<void>;
 }) {
   const { network } = useNetwork();
-  const { txBundle, isLoading, error, delay, timepointMismatch } = buildTx;
+  const { txBundle, isLoading, error } = buildTx;
   const source = useAccountSource(txBundle?.signer);
-  const { dryRunResult } = useDryRunResult(txBundle);
 
   // Use mutation for submit with latest chain state
   const submitMutation = useMutation({
@@ -144,48 +144,53 @@ function SendTx({
         // Track transaction success
         analyticsActions.transactionResult(true);
       } else {
-        events = signAndSend(
-          api,
-          tx,
-          signer,
-          () => enableWallet(source, CONNECT_ORIGIN),
-          {
-            beforeSend,
-            assetId: assetId === 'native' ? undefined : assetId,
-          },
-        );
+        await (async () =>
+          new Promise((resolve, reject) => {
+            events = signAndSend(
+              api,
+              tx,
+              signer,
+              () => enableWallet(source, CONNECT_ORIGIN),
+              {
+                beforeSend,
+                assetId: assetId === 'native' ? undefined : assetId,
+              },
+            );
 
-        addTxToast({ events });
+            addTxToast({ events });
 
-        events.once('signed', (_, extrinsic) => {
-          service.transaction.uploadWebsite(
-            network,
-            extrinsic.hash.toHex(),
-            website,
-            appName,
-            iconUrl,
-            note,
-            relatedBatches,
-          );
-        });
-        events.once('inblock', (result) => {
-          onResults?.(result);
-        });
-        events.once('error', (error) => {
-          onError?.(error);
-        });
+            events.once('signed', (_, extrinsic) => {
+              service.transaction.uploadWebsite(
+                network,
+                extrinsic.hash.toHex(),
+                website,
+                appName,
+                iconUrl,
+                note,
+                relatedBatches,
+              );
+            });
+            events.once('inblock', (result) => {
+              resolve(result);
+              onResults?.(result);
+            });
+            events.once('error', (error) => {
+              reject(error);
+              onError?.(error);
+            });
 
-        events.once('finalized', (result) => {
-          onFinalized?.(result);
+            events.once('finalized', (result) => {
+              onFinalized?.(result);
 
-          // Track transaction finalized successfully
-          analyticsActions.transactionResult(true);
+              // Track transaction finalized successfully
+              analyticsActions.transactionResult(true);
 
-          setTimeout(() => {
-            // clear all listener after 3s
-            events.removeAllListeners();
-          }, 3000);
-        });
+              setTimeout(() => {
+                // clear all listener after 3s
+                events.removeAllListeners();
+              }, 3000);
+            });
+          }))();
       }
     },
     onError: (error) => {
@@ -205,54 +210,23 @@ function SendTx({
   };
 
   return (
-    <>
-      {error ? (
-        <Alert variant="destructive">
-          <AlertTitle>
-            <span className="break-all">{error.message}</span>
-          </AlertTitle>
-        </Alert>
-      ) : dryRunResult && !dryRunResult.success ? (
-        <Alert variant="destructive">
-          <AlertTitle>{dryRunResult.error.message}</AlertTitle>
-        </Alert>
-      ) : null}
-
-      {timepointMismatch && (
-        <Alert variant="warning">
-          <AlertTitle>
-            Transaction data is syncing with the chain. Please wait a moment or
-            refresh the page before submitting.
-          </AlertTitle>
-        </Alert>
-      )}
-
-      {Object.keys(delay).length > 0 ? (
-        <Alert variant="warning">
-          <AlertTitle>
-            This transaction can be executed after review window
-          </AlertTitle>
-        </Alert>
-      ) : null}
-
-      <Button
-        fullWidth
-        variant="solid"
-        color="primary"
-        onClick={error ? undefined : onConfirm}
-        disabled={
-          submitMutation.isPending ||
-          isLoading ||
-          !txBundle?.signer ||
-          !!error ||
-          disabled ||
-          (dryRunResult ? !dryRunResult.success : false)
-        }
-      >
-        {submitMutation.isPending || isLoading ? buttonSpinner : null}
-        Submit
-      </Button>
-    </>
+    <Button
+      fullWidth
+      variant="solid"
+      color="primary"
+      onClick={error ? undefined : onConfirm}
+      disabled={
+        submitMutation.isPending ||
+        isLoading ||
+        !txBundle?.signer ||
+        !!error ||
+        disabled ||
+        dryRunDisabled
+      }
+    >
+      {submitMutation.isPending || isLoading ? buttonSpinner : null}
+      Submit
+    </Button>
   );
 }
 

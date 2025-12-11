@@ -35,6 +35,7 @@ interface Props {
   data: MultiTransferData[];
   sending: string;
   network: string;
+  supportedNetworks?: string[];
   setNetwork: (value: string) => void;
   setData: React.Dispatch<React.SetStateAction<MultiTransferData[]>>;
 }
@@ -43,6 +44,7 @@ function MultiTransferContent({
   data,
   sending,
   network,
+  supportedNetworks,
   setNetwork,
   setData,
 }: Props) {
@@ -131,6 +133,7 @@ function MultiTransferContent({
       <InputNetwork
         label="Select Network"
         network={network}
+        supportedNetworks={supportedNetworks}
         setNetwork={handleNetworkChange}
         endContent={
           sendingMeta &&
@@ -194,8 +197,8 @@ function MultiTransferContent({
 
       <Divider />
 
-      <div className="grid grid-cols-12 gap-2.5">
-        <div className="col-span-8 flex items-center gap-1 font-bold">
+      <div className="grid grid-cols-19 gap-2.5">
+        <div className="col-span-7 flex items-center gap-1 font-bold">
           Address
           <Button
             size="sm"
@@ -208,16 +211,18 @@ function MultiTransferContent({
             <IconAdd className="h-4 w-4" />
           </Button>
         </div>
-        <div className="col-span-2 font-bold">Token</div>
-        <div className="col-span-2 font-bold">Amount</div>
+        <div className="col-span-6 font-bold">Token</div>
+        <div className="col-span-6 font-bold">Amount</div>
         {data.map(([address, assetId, amount], index) => (
           <React.Fragment key={index}>
-            <div className="col-span-8">
+            <div className="col-span-7">
               <InputAddress
                 placeholder="input address"
                 wrapperClassName="h-[40px]"
+                shorten
                 iconSize={20}
                 addressType="row"
+                rowType="address"
                 value={address}
                 onChange={(value) =>
                   setData((data) =>
@@ -228,7 +233,7 @@ function MultiTransferContent({
                 }
               />
             </div>
-            <div className="col-span-2">
+            <div className="col-span-6">
               <InputToken
                 address={sending}
                 placeholder="select token"
@@ -244,7 +249,7 @@ function MultiTransferContent({
                 }}
               />
             </div>
-            <div className="col-span-2 flex items-center gap-1.5">
+            <div className="col-span-6 flex items-center gap-1.5">
               <Input
                 className="h-10 flex-1"
                 placeholder="Amount"
@@ -262,11 +267,12 @@ function MultiTransferContent({
                 isIconOnly
                 color="danger"
                 variant="light"
+                className="p-0 w-3.5 h-3.5 hover:bg-transparent hover:text-danger-300"
                 onClick={() =>
                   setData((data) => data.filter((_, i) => i !== index))
                 }
               >
-                <IconDelete className="h-4 w-4" />
+                <IconDelete className="h-3.5 w-3.5" />
               </Button>
             </div>
           </React.Fragment>
