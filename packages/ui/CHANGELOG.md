@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.1.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v3.0.0...ui-v3.1.0) (2025-12-11)
+
+
+### Features
+
+* **input-token-amount:** add new token selector component with context-based data fetching ([#364](https://github.com/mimir-labs/mimir-wallet/issues/364)) ([180ee9c](https://github.com/mimir-labs/mimir-wallet/commit/180ee9c4ea0da216f7902053188df6322c6b13e8))
+* migrate all ui component from heroui and optimize build output ([#357](https://github.com/mimir-labs/mimir-wallet/issues/357)) ([1f13ad0](https://github.com/mimir-labs/mimir-wallet/commit/1f13ad0ad698dccfaae57f0d097e42c501a6d480))
+* **network:** add WebSocket latency indicator for RPC endpoints ([#363](https://github.com/mimir-labs/mimir-wallet/issues/363)) ([2486da8](https://github.com/mimir-labs/mimir-wallet/commit/2486da84f3201e1ba77fdc366a423e4a0aca3de8))
+* **params:** add call-based component overrides for balance display ([#359](https://github.com/mimir-labs/mimir-wallet/issues/359)) ([6a7a511](https://github.com/mimir-labs/mimir-wallet/commit/6a7a5116988179fba475e7e9586c96721c06a9a3))
+
 ## [3.0.0](https://github.com/mimir-labs/mimir-wallet/compare/ui-v2.39.0...ui-v3.0.0) (2025-12-03)
 
 
