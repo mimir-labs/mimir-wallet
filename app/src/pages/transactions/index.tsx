@@ -182,7 +182,20 @@ function Content({ address }: { address: string }) {
                 { key: 'pending', label: 'Pending' },
                 { key: 'history', label: 'History' },
                 showAllHistoryTab
-                  ? { key: 'all-history', label: 'All History' }
+                  ? {
+                      key: 'all-history',
+                      label: (
+                        <span className="inline-flex items-center gap-1">
+                          All History
+                          <Tooltip
+                            content="Single-Signature accounts' all transactions sync
+                            from Subscan"
+                          >
+                            <IconQuestion className="text-primary" />
+                          </Tooltip>
+                        </span>
+                      ),
+                    }
                   : null,
               ].filter(Boolean) as TabItem[]
             }
@@ -241,7 +254,7 @@ function Content({ address }: { address: string }) {
                   <Button
                     radius="md"
                     variant="bordered"
-                    className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
+                    className="border-border h-8 text-inherit bg-background"
                   >
                     <Avatar
                       src={selectedPendingNetwork?.chain.icon}
@@ -258,11 +271,7 @@ function Content({ address }: { address: string }) {
                     <ArrowDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  side="bottom"
-                  align="end"
-                  className="w-[200px]"
-                >
+                <DropdownMenuContent side="bottom" align="end" className="w-60">
                   {validPendingNetworks.map(({ network, chain, counts }) => (
                     <DropdownMenuCheckboxItem
                       key={network}
@@ -302,7 +311,7 @@ function Content({ address }: { address: string }) {
               <Button
                 radius="md"
                 variant="bordered"
-                className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
+                className="border-border h-8 text-inherit bg-background"
               >
                 <Avatar
                   src={validPendingNetworks[0].chain.icon}
@@ -320,7 +329,7 @@ function Content({ address }: { address: string }) {
                   <Button
                     radius="md"
                     variant="bordered"
-                    className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
+                    className="border-border h-8 text-inherit bg-background"
                   >
                     <Avatar
                       src={selectedHistoryNetwork?.chain.icon}
@@ -331,11 +340,7 @@ function Content({ address }: { address: string }) {
                     <ArrowDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  side="bottom"
-                  align="end"
-                  className="w-[200px]"
-                >
+                <DropdownMenuContent side="bottom" align="end" className="w-60">
                   <DropdownMenuRadioGroup
                     value={selectedHistoryNetworks[0]}
                     onValueChange={(value) => {
@@ -365,7 +370,7 @@ function Content({ address }: { address: string }) {
               <Button
                 radius="md"
                 variant="bordered"
-                className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
+                className="border-border h-8 text-inherit bg-background"
               >
                 <Avatar
                   src={validHistoryNetworks[0].chain.icon}
@@ -384,7 +389,7 @@ function Content({ address }: { address: string }) {
                   <Button
                     radius="md"
                     variant="bordered"
-                    className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
+                    className="border-border h-8 text-inherit bg-background"
                   >
                     <Avatar
                       src={
@@ -402,11 +407,7 @@ function Content({ address }: { address: string }) {
                     <ArrowDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  side="bottom"
-                  align="end"
-                  className="w-[200px]"
-                >
+                <DropdownMenuContent side="bottom" align="end" className="w-60">
                   <DropdownMenuRadioGroup
                     value={selectedAllHistoryNetwork}
                     onValueChange={(value) => {
@@ -436,7 +437,7 @@ function Content({ address }: { address: string }) {
               <Button
                 radius="md"
                 variant="bordered"
-                className="border-divider max-sm:border-secondary h-8 text-inherit max-sm:bg-white"
+                className="border-border h-8 text-inherit bg-background"
               >
                 <Avatar
                   src={subscanChains[0].chain.icon}

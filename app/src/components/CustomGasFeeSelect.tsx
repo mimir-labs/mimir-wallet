@@ -60,7 +60,7 @@ function AssetBalance({
   const balance = balanceData?.transferrable;
 
   if (isFetching && !isFetched) {
-    return <Skeleton className="h-[16px] w-16" />;
+    return <Skeleton className="h-4 w-16" />;
   }
 
   return (
@@ -85,7 +85,6 @@ function CustomGasFeeSelect({
   gasFeeInfo,
 }: CustomGasFeeSelectProps) {
   const {
-    isSupported,
     feeEligibleAssets,
     selectedAssetId,
     setSelectedAssetId,
@@ -106,11 +105,6 @@ function CustomGasFeeSelect({
   useEffect(() => {
     onChange?.(asset);
   }, [asset, onChange]);
-
-  // Don't render if chain doesn't support custom fees
-  if (!isSupported) {
-    return null;
-  }
 
   if (isFetching && !isFetched) {
     return (
@@ -170,7 +164,7 @@ function CustomGasFeeSelect({
       </div>
 
       {gasFeeInfo ? (
-        <div className="text-foreground mt-[5px] text-right text-sm leading-[20px]">
+        <div className="text-foreground mt-[5px] text-right text-sm leading-5">
           <b>Required: </b>
           <span>
             <FormatBalance
@@ -181,7 +175,7 @@ function CustomGasFeeSelect({
           </span>
         </div>
       ) : (
-        <Skeleton className="mt-[5px] ml-auto h-[20px] w-32" />
+        <Skeleton className="mt-[5px] ml-auto h-5 w-32" />
       )}
     </div>
   );

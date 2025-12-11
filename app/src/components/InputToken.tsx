@@ -129,12 +129,7 @@ function InputToken({
         >
           {token.symbol}
         </Avatar>
-        {isIconOnly ? null : (
-          <p>
-            {token.name}&nbsp;
-            <span className="text-foreground/50">({token.symbol})</span>
-          </p>
-        )}
+        {isIconOnly ? null : <span>{token.symbol}</span>}
       </div>
     ) : (
       <span className="text-foreground/50">{placeholder}</span>
@@ -185,6 +180,7 @@ function InputToken({
           </div>
         </PopoverTrigger>
         <PopoverContent
+          align="start"
           style={{ width: popoverWidth, minWidth: 200 }}
           className="border-divider border p-[5px]"
         >

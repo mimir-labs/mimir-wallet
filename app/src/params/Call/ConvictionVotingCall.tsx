@@ -171,7 +171,7 @@ const ConvictionVotingCall = forwardRef<HTMLDivElement | null, CallProps>(
           </svg>
           {/* Conviction multiplier badge */}
           {voteInfo.voteType === 'Standard' && (
-            <div className="border-primary absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 bg-white">
+            <div className="border-primary absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 bg-background">
               <span className="text-primary text-[10px] leading-none font-black">
                 {getConvictionMultiplier(voteInfo.conviction)}
               </span>

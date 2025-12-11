@@ -51,7 +51,7 @@ const AddressRow = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div
-        className={`AddressRow flex items-center gap-[5px] ${className || ''}`}
+        className={`AddressRow flex flex-1 min-w-0 items-center gap-[5px] ${className || ''}`}
         ref={ref}
         style={{ maxHeight: iconSize }}
         {...props}
@@ -62,16 +62,16 @@ const AddressRow = forwardRef<HTMLDivElement, Props>(
           value={address}
           showMultisigBadge={showMultisigBadge}
         />
-        <div className="AddressRow-Content flex items-center gap-[5px]">
+        <div className="AddressRow-Content flex flex-1 min-w-0 items-center gap-1 overflow-hidden">
           {withName && (
             <span
               data-bold={withName && withAddress}
-              className='AddressRow-Name data-[bold="true"]:font-bold'
+              className='AddressRow-Name min-w-0 overflow-hidden text-left font-bold text-ellipsis whitespace-nowrap data-[bold="true"]:font-bold'
             >
               <AddressName defaultName={defaultName} value={address} />
             </span>
           )}
-          <span className="AddressRow-Address flex items-center gap-[5px] text-[0.875em]">
+          <span className="AddressRow-Address flex-1 flex whitespace-nowrap items-center gap-[5px] text-[0.875em]">
             {withAddress && <AddressComp shorten={shorten} value={address} />}
             {withCopy && (
               <CopyAddress address={address} className="opacity-50" />

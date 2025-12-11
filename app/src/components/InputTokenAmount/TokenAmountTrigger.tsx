@@ -150,7 +150,7 @@ function TokenAmountTrigger({
       <div
         data-disabled={disabled}
         data-error={!!error || !isAmountValid}
-        className="border-divider hover:border-primary data-[error=true]:border-danger flex h-[54px] items-center gap-2.5 rounded-[10px] border p-2.5 transition-all hover:bg-secondary data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
+        className="border-divider hover:border-primary data-[error=true]:border-danger flex h-[54px] items-center gap-2.5 rounded-[10px] border p-2 transition-all hover:bg-secondary data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
       >
         {/* Token selector trigger */}
         <button

@@ -100,6 +100,18 @@ const BatchCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
     ? (call.args[0] as Call[])
     : null;
 
+  const allExpanded = useMemo(() => {
+    if (!calls) return false;
+
+    return calls.every((_, index) => isOpen[index]);
+  }, [calls, isOpen]);
+
+  const allCollapsed = useMemo(() => {
+    if (!calls) return true;
+
+    return calls.every((_, index) => !isOpen[index]);
+  }, [calls, isOpen]);
+
   if (!calls) {
     return showFallback ? <FallbackComponent ref={ref} {...props} /> : null;
   }
@@ -113,6 +125,7 @@ const BatchCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
             color="primary"
             size="sm"
             variant="light"
+            disabled={allExpanded}
             onClick={() =>
               setOpen(
                 Array.from({ length: calls.length }).reduce<
@@ -131,6 +144,7 @@ const BatchCall = forwardRef<HTMLDivElement | null, CallProps>((props, ref) => {
             color="primary"
             size="sm"
             variant="light"
+            disabled={allCollapsed}
             onClick={() =>
               setOpen(
                 Array.from({ length: calls.length }).reduce<

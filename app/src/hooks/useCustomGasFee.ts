@@ -29,7 +29,7 @@ async function fetchCustomGasFeeSupport({
  * This is determined by checking for ChargeAssetTxPayment in signed extensions
  * @param network - The network key to query
  */
-export function useCustomGasFeeSupport(network: string): boolean {
+export function useCustomGasFeeSupport(network: string): boolean | undefined {
   const { data } = useQuery({
     queryKey: ['custom-gas-fee-support', network] as const,
     queryFn: fetchCustomGasFeeSupport,
@@ -37,7 +37,7 @@ export function useCustomGasFeeSupport(network: string): boolean {
     staleTime: Infinity, // Support status doesn't change
   });
 
-  return data ?? false;
+  return data;
 }
 
 /**
@@ -54,7 +54,7 @@ export function useCustomGasFee(network: string) {
   const feeEligibleAssets = useMemo(() => {
     return assets.filter((asset) => {
       return isSupported
-        ? asset.isNative || asset.isSufficient
+        ? asset.isNative || (!asset.isForeignAsset && asset.isSufficient)
         : !!asset.isNative;
     });
   }, [assets, isSupported]);

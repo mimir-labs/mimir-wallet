@@ -39,14 +39,17 @@ function FundModalContent({
   open,
   receipt,
   filterSending,
+  sending,
+  setSending,
 }: {
   defaultValue?: string | { toString: () => string };
+  sending: string;
+  setSending: (value: string) => void;
   onClose: () => void;
   open: boolean;
   receipt?: string;
   filterSending: string[];
 }) {
-  const [sending, setSending] = useState<string>(filterSending.at(0) || '');
   const [error, setError] = useState<string | null>(null);
   const prevOpenRef = useRef(open);
 
@@ -140,16 +143,19 @@ function FundModalContent({
 function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const { walletAccounts } = useWallet();
   const filterSending = walletAccounts.map((item) => item.address);
+  const [sending, setSending] = useState<string>(filterSending.at(0) || '');
 
   return (
     <InputTokenAmountProvider
-      address={filterSending.at(0)}
+      address={sending}
       defaultNetwork={defaultNetwork}
       defaultIdentifier="native"
     >
       <FundModalContent
         defaultValue={defaultValue}
         onClose={onClose}
+        sending={sending}
+        setSending={setSending}
         open={open}
         receipt={receipt}
         filterSending={filterSending}

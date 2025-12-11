@@ -43,8 +43,7 @@ function TokenNetworkItemDisplay({
             alt={network.name}
             fallback={network.name?.slice(0, 1) || '?'}
             src={network.icon}
-            style={{ width: 16, height: 16 }}
-            className="border-background border-2"
+            style={{ width: 14, height: 14 }}
           />
         </div>
       </div>

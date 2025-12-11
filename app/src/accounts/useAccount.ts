@@ -12,10 +12,16 @@ import {
   useNetwork,
   useSs58Format,
 } from '@mimir-wallet/polkadot-core';
-import { store } from '@mimir-wallet/service';
+import { service, store, useQueryClient } from '@mimir-wallet/service';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { merge } from 'lodash-es';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react';
 
 import {
   addAddressBook,
@@ -42,7 +48,7 @@ export const AddressMetaContext = createContext<
 export function useAccount() {
   const { ss58: chainSS58 } = useSs58Format();
   const { network } = useNetwork();
-  const { mode } = useChains();
+  const { mode, enableNetwork } = useChains();
   const { metas, updateMetas } = useContext(AccountContext);
   const overrideMetas = useContext(AddressMetaContext);
 
@@ -67,6 +73,8 @@ export function useAccount() {
   // Get current address from URL search params
   const { address: urlAddress } = useSearch({ strict: false });
   const current = urlAddress as string | undefined;
+
+  const queryClient = useQueryClient();
 
   const setCurrent = (address: string, confirm?: boolean) => {
     if (address && isPolkadotAddress(address)) {
@@ -94,6 +102,23 @@ export function useAccount() {
       });
     }
   };
+
+  useEffect(() => {
+    if (current) {
+      const addressHex = addressToHex(current);
+
+      queryClient
+        .ensureQueryData({
+          queryKey: ['omni-chain-account', addressHex] as const,
+          queryFn: () => service.account.getOmniChainDetails(addressHex),
+        })
+        .then((data) => {
+          if (data.type === 'pure') {
+            enableNetwork(data.network);
+          }
+        });
+    }
+  }, [current, enableNetwork, queryClient]);
 
   const isLocalAddress = useCallback(
     (address: string, watchlist?: boolean) => {

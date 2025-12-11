@@ -49,7 +49,10 @@ export interface InputAddressProps {
   value?: string;
   disabled?: boolean;
   label?: React.ReactNode;
+  /** Placeholder text when no value is selected */
   placeholder?: string;
+  /** Placeholder text for the search input in dropdown */
+  searchPlaceholder?: string;
   onChange?: (value: string) => void;
   onSelect?: (value: string) => void | boolean; // return false to prevent onChange
   isSign?: boolean;
@@ -57,6 +60,8 @@ export interface InputAddressProps {
   excluded?: string[];
   shorten?: boolean;
   addressType?: 'row' | 'cell';
+  /** Display mode when addressType is 'row': 'address' (default), 'name', or 'both' */
+  rowType?: 'address' | 'name' | 'both';
   helper?: React.ReactNode;
   endContent?: React.ReactNode;
   withAddButton?: boolean;

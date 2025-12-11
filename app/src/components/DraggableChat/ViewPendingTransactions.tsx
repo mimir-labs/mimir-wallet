@@ -143,7 +143,7 @@ function ViewPendingTransactions({
   // Loading state
   if (showSkeleton) {
     return (
-      <div className={`rounded-[10px] bg-white p-4 ${className || ''}`}>
+      <div className={`rounded-[10px] bg-card p-4 ${className || ''}`}>
         <div className="mb-4">
           <Skeleton className="h-5 w-64" />
         </div>
@@ -162,7 +162,7 @@ function ViewPendingTransactions({
   // Empty state
   if (!recentTransactions.length) {
     return (
-      <div className={`rounded-[10px] bg-white p-4 ${className || ''}`}>
+      <div className={`rounded-[10px] bg-card p-4 ${className || ''}`}>
         <div className="mb-4">
           <h3 className="text-sm font-normal text-black">
             Most Recent Pending Transactions

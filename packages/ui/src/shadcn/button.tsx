@@ -204,27 +204,42 @@ const buttonVariants = cva(
       {
         variant: 'light',
         color: 'primary',
-        class: [colorVariants.light.primary, 'hover:bg-primary/20'],
+        class: [
+          colorVariants.light.primary,
+          'hover:bg-primary/20 disabled:bg-transparent! disabled:text-muted-foreground!',
+        ],
       },
       {
         variant: 'light',
         color: 'secondary',
-        class: [colorVariants.light.secondary, 'hover:bg-secondary/20'],
+        class: [
+          colorVariants.light.secondary,
+          'hover:bg-secondary/20 disabled:bg-transparent! disabled:text-muted-foreground!',
+        ],
       },
       {
         variant: 'light',
         color: 'success',
-        class: [colorVariants.light.success, 'hover:bg-success/20'],
+        class: [
+          colorVariants.light.success,
+          'hover:bg-success/20 disabled:bg-transparent! disabled:text-muted-foreground!',
+        ],
       },
       {
         variant: 'light',
         color: 'warning',
-        class: [colorVariants.light.warning, 'hover:bg-warning/20'],
+        class: [
+          colorVariants.light.warning,
+          'hover:bg-warning/20 disabled:bg-transparent! disabled:text-muted-foreground!',
+        ],
       },
       {
         variant: 'light',
         color: 'danger',
-        class: [colorVariants.light.danger, 'hover:bg-danger/20'],
+        class: [
+          colorVariants.light.danger,
+          'hover:bg-danger/20 disabled:bg-transparent! disabled:text-muted-foreground!',
+        ],
       },
       // ghost / color
       {

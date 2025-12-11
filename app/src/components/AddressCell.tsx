@@ -13,7 +13,7 @@ import {
   useSs58Format,
   zeroAddress,
 } from '@mimir-wallet/polkadot-core';
-import { Badge, Button } from '@mimir-wallet/ui';
+import { Badge, Button, cn } from '@mimir-wallet/ui';
 import React, { useMemo } from 'react';
 
 import AddressComp from './Address';
@@ -86,24 +86,6 @@ function AddressCell({
     );
   }, [withPendingTxCounts, transactionCounts]);
 
-  const showTypeWidth = useMemo(() => {
-    if (!showType && !withPendingTxCounts) return 0;
-    let width = 0;
-
-    if (isMultisig) width += 60; // Multisig chip width
-    if (isPure || isProxied) width += isPure ? 44 : 46; // Pure/Proxied chip width
-    if (withPendingTxCounts && totalCounts) width += 20; // Pending transaction count badge width
-
-    return width;
-  }, [
-    showType,
-    withPendingTxCounts,
-    isMultisig,
-    isPure,
-    isProxied,
-    totalCounts,
-  ]);
-
   return (
     <div
       className={`AddressCell flex min-w-0 flex-1 items-center gap-2.5 ${className}`}
@@ -117,28 +99,29 @@ function AddressCell({
       />
       <div className="AddressCell-Content flex min-w-0 flex-1 flex-col gap-y-0.5">
         <div className="flex min-w-0 items-center gap-1 overflow-hidden">
-          <span
-            className="AddressCell-Name min-w-0 overflow-hidden text-left font-bold text-ellipsis whitespace-nowrap"
-            style={{
-              maxWidth:
-                showType && (isMultisig || isPure || isProxied)
-                  ? `calc(100% - ${showTypeWidth}px)`
-                  : '100%',
-            }}
-          >
+          <span className="AddressCell-Name min-w-0 overflow-hidden text-left font-bold text-ellipsis whitespace-nowrap">
             <AddressName defaultName={defaultName} value={value} meta={meta} />
           </span>
 
           {showType && isMultisig && (
-            <Badge variant="secondary">Multisig</Badge>
+            <Badge className="px-1.5" variant="secondary">
+              Multisig
+            </Badge>
           )}
 
           {showType && (isPure || isProxied) && (
-            <Badge variant="purple">{isPure ? 'Pure' : 'Proxied'}</Badge>
+            <Badge className="px-1.5" variant="purple">
+              {isPure ? 'Pure' : 'Proxied'}
+            </Badge>
           )}
 
           {withPendingTxCounts && !!totalCounts && (
-            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#FF8C00] text-[10px] text-white">
+            <div
+              className={cn(
+                'flex flex-1 min-w-3.5 max-w-4 aspect-square items-center justify-center',
+                'rounded-full bg-[#FF8C00] text-[10px] leading-0 text-white',
+              )}
+            >
               {totalCounts}
             </div>
           )}

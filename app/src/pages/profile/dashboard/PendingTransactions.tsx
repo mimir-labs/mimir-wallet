@@ -63,7 +63,7 @@ function AnnouncementStatus({
   const [status, isFetching] = useAnnouncementStatus(transaction, account);
 
   if (isFetching) {
-    return <Skeleton className="ml-auto h-[20px] w-[60px]" />;
+    return <Skeleton className="ml-auto h-5 w-[60px]" />;
   }
 
   if (status === 'indexing') return 'Indexing';
@@ -95,7 +95,7 @@ function Status({
   const [account] = useQueryAccount(network, address);
 
   if (!account) {
-    return <Skeleton className="ml-auto h-[20px] w-[60px]" />;
+    return <Skeleton className="ml-auto h-5 w-[60px]" />;
   }
 
   if (transaction.type === TransactionType.Announce) {
@@ -200,7 +200,7 @@ function PendingTransactions({ address }: { address: string }) {
       scrollClassName="h-auto sm:h-[260px] px-2 sm:px-3"
     >
       <TableHeader>
-        <TableRow className="border-0">
+        <TableRow>
           <TableColumn className="w-[140px] pt-5 pb-2" key="id">
             Transaction ID
           </TableColumn>
@@ -217,7 +217,7 @@ function PendingTransactions({ address }: { address: string }) {
           <TableRow
             key={item.id}
             className={cn(
-              'border-secondary border-b last:border-0 [&:hover>td]:bg-secondary cursor-pointer [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]',
+              '[&:hover>td]:bg-secondary cursor-pointer [&:hover_.operation]:flex [&:hover_.status]:hidden [&>td]:h-[45px] [&>td]:first:rounded-l-[10px] [&>td]:last:rounded-r-[10px]',
             )}
             onClick={() => {
               navigate({

@@ -134,8 +134,6 @@ function UnderlinedTabs({
   const [activeKey, setActiveKey] = useState(
     selectedKey ?? defaultSelectedKey ?? tabs[0]?.key,
   );
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [hoverStyle, setHoverStyle] = useState({});
   const [activeStyle, setActiveStyle] = useState({ left: '0px', width: '0px' });
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -147,22 +145,6 @@ function UnderlinedTabs({
       });
     }
   }, [selectedKey]);
-
-  // Update hover style
-  useEffect(() => {
-    if (hoveredIndex !== null) {
-      const hoveredElement = tabRefs.current[hoveredIndex];
-
-      if (hoveredElement) {
-        const { offsetLeft, offsetWidth } = hoveredElement;
-
-        setHoverStyle({
-          left: `${offsetLeft}px`,
-          width: `${offsetWidth}px`,
-        });
-      }
-    }
-  }, [hoveredIndex]);
 
   // Update active indicator style
   useEffect(() => {
@@ -190,47 +172,34 @@ function UnderlinedTabs({
   };
 
   return (
-    <div className={cn('relative', className)} {...props}>
-      <div className="relative">
-        {/* Hover Highlight */}
-        <div
-          className="bg-primary/10 absolute top-0 h-[30px] rounded-md transition-all duration-300 ease-out"
-          style={{
-            ...hoverStyle,
-            opacity: hoveredIndex !== null ? 1 : 0,
-          }}
-        />
+    <div className={cn('relative h-[30px]', className)} {...props}>
+      {/* Active Indicator - underline */}
+      <div
+        className="bg-primary absolute bottom-0 h-0.5 transition-all duration-300 ease-out"
+        style={activeStyle}
+      />
 
-        {/* Active Indicator - underline */}
-        <div
-          className="bg-primary absolute -bottom-1.5 h-0.5 transition-all duration-300 ease-out"
-          style={activeStyle}
-        />
+      {/* Tabs */}
+      <div className="relative h-full flex items-center space-x-1.5">
+        {tabs.map((tab, index) => {
+          const isActive = activeKey === tab.key;
 
-        {/* Tabs */}
-        <div className="relative flex items-center space-x-1.5">
-          {tabs.map((tab, index) => {
-            const isActive = activeKey === tab.key;
-
-            return (
-              <button
-                key={tab.key}
-                ref={(el) => {
-                  tabRefs.current[index] = el;
-                }}
-                className={cn(
-                  'h-[30px] cursor-pointer px-3 text-sm font-bold transition-colors duration-300',
-                  isActive ? 'text-primary' : 'text-foreground/30',
-                )}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                onClick={() => handleTabClick(tab.key)}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+          return (
+            <button
+              key={tab.key}
+              ref={(el) => {
+                tabRefs.current[index] = el;
+              }}
+              className={cn(
+                'h-full cursor-pointer px-3 text-sm font-bold transition-colors duration-300 hover:text-foreground/50',
+                isActive ? 'text-primary' : 'text-foreground/30',
+              )}
+              onClick={() => handleTabClick(tab.key)}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

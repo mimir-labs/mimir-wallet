@@ -16,7 +16,6 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 
 import CustomGasFeeSelect from '../CustomGasFeeSelect';
 import Input from '../Input';
-import NetworkErrorAlert from '../NetworkErrorAlert';
 
 import AddressChain from './AddressChain';
 import Chopsticks from './analytics/Chopsticks';
@@ -25,10 +24,12 @@ import Call from './Call';
 import Confirmations from './Confirmations';
 import { useBuildTx } from './hooks/useBuildTx';
 import { useCloseWhenPathChange } from './hooks/useCloseWhenPathChange';
+import { useDryRunResult } from './hooks/useDryRunResult';
 import { useHighlightTab } from './hooks/useHighlightTab';
 import LockInfo from './LockInfo';
 import ProposeTx from './ProposeTx';
 import SendTx from './SendTx';
+import TxAlerts from './TxAlerts';
 import TxInfo from './TxInfo';
 
 import { useAccount } from '@/accounts/useAccount';
@@ -40,6 +41,7 @@ import { useAssetConversion } from '@/hooks/useAssetConversion';
 import { useBatchTxs } from '@/hooks/useBatchTxs';
 import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
 import { useSupportsDryRun } from '@/hooks/useChainCapabilities';
+import { useCustomGasFeeSupport } from '@/hooks/useCustomGasFee';
 import { useFilterPaths } from '@/hooks/useFilterPaths';
 import { useGasFeeEstimate } from '@/hooks/useGasFeeEstimate';
 import { useRegistry } from '@/hooks/useRegistry';
@@ -81,7 +83,6 @@ function TxSubmit({
 
     return propsCall;
   }, [registry, propsCall]);
-  // const [safetyCheck, isConfirm, setConfirm] = useSafetyCheck(call);
   const [note, setNote] = useState<string>(transaction?.note || '');
   const filterPaths = useFilterPaths(accountData, transaction);
   const [addressChain, setAddressChain] = useState<FilterPath[]>(
@@ -103,6 +104,7 @@ function TxSubmit({
   );
 
   // Gas fee calculation state
+  const isSupported = useCustomGasFeeSupport(network);
   const nativeGasFee = useGasFeeEstimate(
     buildTx.txBundle?.tx || null,
     buildTx.txBundle?.signer,
@@ -134,8 +136,9 @@ function TxSubmit({
   const [assetBalance] = useBalanceByIdentifier(
     network,
     buildTx.txBundle?.signer,
-    selectedFeeAsset?.isNative ? 'native' : selectedFeeAsset?.assetId,
+    selectedFeeAsset?.isNative ? 'native' : selectedFeeAsset?.key,
   );
+
   const [nativeBalance] = useBalanceByIdentifier(
     network,
     buildTx.txBundle?.signer,
@@ -169,6 +172,8 @@ function TxSubmit({
     nativeGasFee,
     selectedFeeAsset,
   ]);
+
+  const { dryRunResult } = useDryRunResult(buildTx.txBundle);
 
   const { isLocalAccount } = useAccount();
 
@@ -321,13 +326,7 @@ function TxSubmit({
                 placeholder="Please note"
               />
 
-              {/* {safetyCheck && safetyCheck.severity === 'warning' && (
-                <Checkbox size='sm' isSelected={isConfirm} onValueChange={(state) => setConfirm(state)}>
-                  I confirm recipient address exsits on the destination chain.
-                </Checkbox>
-              )} */}
-
-              {buildTx.txBundle?.signer ? (
+              {isSupported && buildTx.txBundle?.signer ? (
                 <CustomGasFeeSelect
                   network={network}
                   gasFeeInfo={gasFeeInfo}
@@ -338,24 +337,17 @@ function TxSubmit({
                 />
               ) : null}
 
-              {gasFeeWarning && (
-                <Alert variant="warning">
-                  <AlertTitle>
-                    The selected asset is not enough to pay the gas fee.
-                  </AlertTitle>
-                </Alert>
-              )}
-
-              <NetworkErrorAlert network={network} />
+              <TxAlerts
+                network={network}
+                gasFeeWarning={gasFeeWarning}
+                buildTx={buildTx}
+                dryRunResult={dryRunResult}
+              />
 
               {!isPropose && (
                 <SendTx
-                  disabled={
-                    // !safetyCheck ||
-                    // safetyCheck.severity === 'error' ||
-                    // (safetyCheck.severity === 'warning' && !isConfirm) ||
-                    !!buildTx.error
-                  }
+                  disabled={!!buildTx.error}
+                  dryRunDisabled={dryRunResult ? !dryRunResult.success : false}
                   assetId={selectedFeeAsset?.assetId}
                   buildTx={buildTx}
                   methodHex={call?.toHex()}

@@ -100,8 +100,9 @@ function RightSideBar() {
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
       sideBarWidth={sidebarWidth}
     >
-      <SidebarHeader className="border-b-divider mb-3 border-b px-4 pb-[5px]">
+      <SidebarHeader className="mb-3 mx-4 p-0">
         <Tabs
+          className="h-10 border-b-divider border-b"
           variant="underlined"
           tabs={[
             {

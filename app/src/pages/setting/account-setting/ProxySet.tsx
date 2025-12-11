@@ -65,7 +65,7 @@ function Content({
   const [isAlertOpen, toggleAlertOpen] = useToggle(false);
   const [token] = useXcmAsset(network, 'native');
   const [allBalances] = useBalanceByIdentifier(network, address, 'native');
-  const [proxies, isFetched, isFetching] = useProxies(address);
+  const [proxies, isFetched, isFetching] = useProxies(network, address);
   const [account] = useQueryAccount(network, address);
 
   const isReadOnly = useMemo(
