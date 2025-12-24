@@ -31,41 +31,33 @@ export interface TokenNetworkItem {
 }
 
 /**
- * TokenAmountTrigger component props
+ * NetworkTokenTrigger component props
  */
-export interface TokenAmountTriggerProps {
+export interface NetworkTokenTriggerProps {
   /** Selected token data from context */
   selectedItem?: TokenNetworkItem;
   /** Whether token data is loading (from context) */
   isTokenLoading?: boolean;
-  /** Current amount value */
-  amount: string;
-  /** Whether amount is valid */
-  isAmountValid: boolean;
-  /** Amount change handler */
-  onAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** Click handler to open selector */
   onOpen: () => void;
   /** Whether popover is open */
   isOpen: boolean;
   /** Disabled state */
   disabled?: boolean;
-  /** Amount placeholder */
-  amountPlaceholder?: string;
-  /** Show Max button */
-  showMaxButton?: boolean;
-  /** Max button click handler */
-  onMaxClick?: () => void;
-  /** Error state */
-  error?: Error | null;
   /** Label */
   label?: React.ReactNode;
+  /** Variant style - default shows label outside, inline-label shows label inside border */
+  variant?: 'default' | 'inline-label';
+  /** Content alignment for inline-label variant */
+  align?: 'start' | 'end';
+  /** Children slot - rendered inside border container (for amount input in default variant) */
+  children?: React.ReactNode;
 }
 
 /**
- * TokenAmountSelector component props
+ * NetworkTokenSelector component props
  */
-export interface TokenAmountSelectorProps {
+export interface NetworkTokenSelectorProps {
   /** All available token+network items */
   items: TokenNetworkItem[];
   /** Currently selected value */

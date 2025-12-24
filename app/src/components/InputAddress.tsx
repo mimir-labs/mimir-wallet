@@ -294,7 +294,7 @@ function InputAddress({
             />
           ) : (
             <AddressRow
-              className="[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal"
+              className="[&_.AddressRow-Address]:text-muted-foreground [&_.AddressRow-Name]:font-normal"
               iconSize={iconSize}
               value={value}
               shorten={upSm ? shorten : true}
@@ -327,7 +327,7 @@ function InputAddress({
             <div
               ref={wrapperRef}
               className={cn(
-                'input-address-content tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 relative inline-flex h-14 min-h-10 w-full cursor-pointer items-center overflow-hidden rounded-[10px] border px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
+                'input-address-content border-divider hover:border-primary hover:bg-primary-50 relative inline-flex h-14 min-h-10 w-full cursor-pointer items-center overflow-hidden rounded-[10px] border px-2 py-2 shadow-none transition-all duration-150! motion-reduce:transition-none',
                 wrapperClassName,
               )}
             >
@@ -424,7 +424,7 @@ function InputAddress({
                           />
                         ) : (
                           <AddressRow
-                            className="[&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal"
+                            className="[&_.AddressRow-Address]:text-muted-foreground [&_.AddressRow-Name]:font-normal"
                             iconSize={iconSize}
                             value={item}
                             shorten={upSm ? shorten : true}

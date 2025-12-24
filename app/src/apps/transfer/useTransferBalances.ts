@@ -23,7 +23,7 @@ export function useTransferBalance(
   const identifier = token
     ? token.isNative
       ? 'native'
-      : token.assetId
+      : token.key
     : undefined;
 
   // Use modern balance hook

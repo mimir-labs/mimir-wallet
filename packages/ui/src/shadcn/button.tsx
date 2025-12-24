@@ -25,7 +25,6 @@ const buttonVariants = cva(
     'font-normal',
     'subpixel-antialiased',
     'overflow-hidden',
-    'tap-highlight-transparent',
     'touch-manipulation',
     'transform-gpu active:scale-[0.97]',
     'transition-all motion-reduce:transition-none',

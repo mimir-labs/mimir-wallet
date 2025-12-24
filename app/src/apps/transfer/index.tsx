@@ -5,22 +5,22 @@ import type { FunctionCallHandler } from '@mimir-wallet/ai-assistant';
 
 import { toFunctionCallString } from '@mimir-wallet/ai-assistant';
 import { NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { Button } from '@mimir-wallet/ui';
-import { getRouteApi, Link } from '@tanstack/react-router';
+import { Divider } from '@mimir-wallet/ui';
+import { getRouteApi } from '@tanstack/react-router';
 import { useCallback, useMemo, useState } from 'react';
 
 import TransferAction from './TransferAction';
 import TransferContent from './TransferContent';
 
 import { useAccount } from '@/accounts/useAccount';
-import IconMultiTransfer from '@/assets/svg/icon-multi-transfer.svg?react';
 import { NetworkErrorAlert } from '@/components';
 import {
-  InputTokenAmountProvider,
-  useInputTokenAmountContext,
-} from '@/components/InputTokenAmount';
+  InputNetworkTokenProvider,
+  useInputNetworkTokenContext,
+} from '@/components/InputNetworkToken';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
+import { useInputNumber } from '@/hooks/useInputNumber';
 
 const routeApi = getRouteApi('/_authenticated/explorer/$url');
 
@@ -28,15 +28,11 @@ function TransferUI({ initialRecipient }: { initialRecipient?: string }) {
   const { current } = useAccount();
   const [recipient, setRecipient] = useState<string>(initialRecipient || '');
 
-  const {
-    network,
-    token,
-    amount,
-    isAmountValid,
-    keepAlive,
-    setAmount,
-    setNetwork,
-  } = useInputTokenAmountContext();
+  // Amount state managed locally
+  const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
+
+  const { network, token, keepAlive, setNetwork } =
+    useInputNetworkTokenContext();
 
   const handleTransferForm = useCallback<FunctionCallHandler>(
     (event) => {
@@ -77,47 +73,34 @@ function TransferUI({ initialRecipient }: { initialRecipient?: string }) {
 
   return (
     <NetworkProvider network={network}>
-      <div className="mx-auto w-full max-w-[500px] p-3 sm:p-5">
-        <Button onClick={() => window.history.back()} variant="ghost">
-          {'<'} Back
-        </Button>
-        <div className="card-root mt-4 p-3 sm:p-6 flex flex-col gap-5">
-          <div className="flex items-center justify-between">
-            <h3>Transfer</h3>
+      <div className="card-root p-3 sm:p-6 flex flex-col gap-5">
+        <h4 className="font-extrabold">Transfer</h4>
 
-            <Button asChild color="primary" variant="light">
-              <Link
-                to="/explorer/$url"
-                params={{
-                  url: 'mimir://app/multi-transfer',
-                }}
-              >
-                <IconMultiTransfer />
-                Multi-Transfer
-              </Link>
-            </Button>
-          </div>
-          <TransferContent
-            disabledSending
-            sending={current || ''}
-            recipient={recipient}
-            setRecipient={setRecipient}
-          />
+        <Divider />
 
-          <NetworkErrorAlert network={network} />
+        <TransferContent
+          disabledSending
+          sending={current || ''}
+          recipient={recipient}
+          setRecipient={setRecipient}
+          amount={amount}
+          isAmountValid={isAmountValid}
+          setAmount={setAmount}
+        />
 
-          <TransferAction
-            network={network}
-            token={token?.token}
-            amount={amount}
-            isAmountValid={isAmountValid}
-            keepAlive={keepAlive}
-            sending={current || ''}
-            recipient={recipient}
-          >
-            Review
-          </TransferAction>
-        </div>
+        <NetworkErrorAlert network={network} />
+
+        <TransferAction
+          network={network}
+          token={token?.token}
+          amount={amount}
+          isAmountValid={isAmountValid}
+          keepAlive={keepAlive}
+          sending={current || ''}
+          recipient={recipient}
+        >
+          Review
+        </TransferAction>
       </div>
     </NetworkProvider>
   );
@@ -138,14 +121,14 @@ function PageTransfer() {
   );
 
   return (
-    <InputTokenAmountProvider
+    <InputNetworkTokenProvider
       address={current}
       defaultNetwork={assetNetwork}
       defaultIdentifier={assetId}
       supportedNetworks={supportedNetworkKeys}
     >
       <TransferUI initialRecipient={toParam} />
-    </InputTokenAmountProvider>
+    </InputNetworkTokenProvider>
   );
 }
 

@@ -5,7 +5,7 @@ import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 
 import { ApiManager } from '@mimir-wallet/polkadot-core';
 import { useQuery } from '@mimir-wallet/service';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useChainXcmAsset } from './useXcmAssets';
 
@@ -47,7 +47,9 @@ export function useCustomGasFeeSupport(network: string): boolean | undefined {
 export function useCustomGasFee(network: string) {
   const isSupported = useCustomGasFeeSupport(network);
   const [assets, isFetched, isFetching] = useChainXcmAsset(network);
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+
+  // User's preferred selection (null means no preference, use default)
+  const [preferredAssetId, setPreferredAssetId] = useState<string | null>(null);
 
   // Filter assets that can be used for fees
   // Include native token and local assets (exclude foreignAssets)
@@ -59,18 +61,29 @@ export function useCustomGasFee(network: string) {
     });
   }, [assets, isSupported]);
 
-  // Auto-select native token by default
-  useMemo(() => {
-    if (feeEligibleAssets.length > 0 && !selectedAssetId) {
-      const nativeAsset = feeEligibleAssets.find((asset) => asset.isNative);
+  // Derive effective selected asset id using derived state pattern
+  // If user has selected something, use that; otherwise default to native
+  const selectedAssetId = useMemo(() => {
+    if (preferredAssetId !== null) {
+      return preferredAssetId;
+    }
 
-      if (nativeAsset) {
-        queueMicrotask(() => {
-          setSelectedAssetId('native');
-        });
+    // Default to native if available
+    if (feeEligibleAssets.length > 0) {
+      const hasNative = feeEligibleAssets.some((asset) => asset.isNative);
+
+      if (hasNative) {
+        return 'native';
       }
     }
-  }, [feeEligibleAssets, selectedAssetId]);
+
+    return null;
+  }, [preferredAssetId, feeEligibleAssets]);
+
+  // Stable setter reference
+  const setSelectedAssetId = useCallback((assetId: string | null) => {
+    setPreferredAssetId(assetId);
+  }, []);
 
   return {
     isSupported,

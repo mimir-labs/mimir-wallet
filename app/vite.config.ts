@@ -1,9 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { existsSync, readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 
 import tanstackRouter from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
@@ -14,71 +12,172 @@ import svgr from 'vite-plugin-svgr';
 import wasm from 'vite-plugin-wasm';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-// Collect dependencies from all workspace package.json files
-function collectAllDependencies(): Set<string> {
-  const deps = new Set<string>();
-
-  const packagePaths = [
-    resolve(__dirname, 'package.json'), // app
-    resolve(__dirname, '../packages/polkadot-core/package.json'), // polkadot-core
-    resolve(__dirname, '../packages/service/package.json'), // service
-    resolve(__dirname, '../packages/ui/package.json'), // ui
-    resolve(__dirname, '../packages/ai-assistant/package.json'), // ai-assistant
-  ];
-
-  for (const pkgPath of packagePaths) {
-    if (existsSync(pkgPath)) {
-      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
-      const dependencies = pkg.dependencies || {};
-
-      for (const dep of Object.keys(dependencies)) {
-        // Skip workspace dependencies (local packages)
-        if (!dependencies[dep].startsWith('workspace:')) {
-          deps.add(dep);
-        }
-      }
-    }
-  }
-
-  return deps;
-}
-
-const allDependencies = collectAllDependencies();
-
-// Extract package name from module ID (supports both pnpm and standard node_modules)
-function getPackageName(id: string): string | null {
-  if (!id.includes('node_modules')) return null;
-
-  // Handle pnpm's nested structure: node_modules/.pnpm/pkg@version/node_modules/pkg
-  if (id.includes('node_modules/.pnpm/')) {
-    // Get the last node_modules segment (actual package location)
-    const parts = id.split('node_modules/');
-    const lastPart = parts[parts.length - 1];
-    const segments = lastPart.split('/');
-
-    // Handle scoped packages (@scope/name)
-    if (segments[0].startsWith('@')) {
-      return `${segments[0]}/${segments[1]}`;
-    }
-
-    return segments[0];
-  }
-
-  // Standard node_modules structure
-  const parts = id.split('node_modules/')[1].split('/');
-
-  if (parts[0].startsWith('@')) {
-    return `${parts[0]}/${parts[1]}`;
-  }
-
-  return parts[0];
-}
-
 const packageJson = JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url), 'utf-8'),
 );
+
+// Read UI package dependencies for chunking
+const uiPackageJson = JSON.parse(
+  readFileSync(
+    new URL('../packages/ui/package.json', import.meta.url),
+    'utf-8',
+  ),
+);
+const uiDependencies = Object.keys(uiPackageJson.dependencies || {}).filter(
+  (dep) => !dep.startsWith('@mimir-wallet/') && !dep.startsWith('workspace:'),
+);
+
+/**
+ * Manual Chunks Strategy for Optimal Caching
+ *
+ * Chunk priority (matched from top to bottom):
+ *   1. Shared primitives (shared-*) - Extracted first to prevent cascading cache invalidation
+ *   2. Framework layer - React core and state management
+ *   3. Utility layer - Common tools like lodash, rxjs
+ *   4. Domain libraries - Blockchain integrations (polkadot, walletconnect)
+ *   5. UI layer - Component libraries and animations
+ *   6. Feature libraries - Specific functionality (charts, flow, etc.)
+ *
+ * Naming convention:
+ *   - shared-*: Libraries used by multiple vendor chunks (crypto, polyfills)
+ *   - vendor-*: Independent vendor libraries
+ */
+function manualChunks(id: string): string | undefined {
+  if (!id.includes('node_modules')) {
+    return undefined;
+  }
+
+  // ============================================================================
+  // Layer 1: Shared Primitives (shared-*)
+  // These are extracted first to prevent cascading cache invalidation
+  // ============================================================================
+
+  // polyfills - required by many libraries
+  if (
+    id.includes('/vite-plugin-node-polyfills@') ||
+    id.includes('@babel/') ||
+    id.includes('/tslib@')
+  ) {
+    return 'shared-polyfills';
+  }
+
+  // Cryptographic primitives - used by @polkadot, @walletconnect, and others
+  if (
+    id.includes('@noble/') ||
+    id.includes('@scure/') ||
+    id.includes('/bn.js@') ||
+    id.includes('/tweetnacl@')
+  ) {
+    return 'shared-crypto';
+  }
+
+  // ============================================================================
+  // Layer 2: Framework Layer
+  // ============================================================================
+
+  // React core - must be loaded before any React components
+  if (
+    id.includes('/react@') ||
+    id.includes('/react-dom@') ||
+    id.includes('/scheduler@')
+  ) {
+    return 'vendor-react';
+  }
+
+  // TanStack ecosystem - routing, query, table, virtual
+  if (id.includes('@tanstack/')) {
+    return 'vendor-tanstack';
+  }
+
+  // ============================================================================
+  // Layer 3: Utility Layer
+  // ============================================================================
+
+  // Common utility libraries
+  if (
+    id.includes('/lodash-es@') ||
+    id.includes('/lodash@') ||
+    id.includes('/rxjs@')
+  ) {
+    return 'vendor-util';
+  }
+
+  // ============================================================================
+  // Layer 4: Domain Libraries (Blockchain)
+  // ============================================================================
+
+  // Polkadot ecosystem - core blockchain functionality
+  if (id.includes('@polkadot/') || id.includes('@polkadot-api/')) {
+    // Separate apps-config due to its large size and frequent updates
+    if (id.includes('@polkadot/apps-config')) {
+      return 'vendor-polkadot-config';
+    }
+
+    return 'vendor-polkadot';
+  }
+
+  // Paraspell - XCM cross-chain transfers (separate for independent updates)
+  if (id.includes('@paraspell/')) {
+    return 'vendor-paraspell';
+  }
+
+  // WalletConnect - wallet connection protocol
+  if (id.includes('@walletconnect/')) {
+    return 'vendor-walletconnect';
+  }
+
+  // ============================================================================
+  // Layer 5: UI Layer
+  // ============================================================================
+
+  // UI component dependencies (Radix, ShadCN primitives, etc.)
+  // Note: pnpm uses + instead of / for scoped packages in node_modules paths
+  // e.g., @radix-ui/react-dialog becomes @radix-ui+react-dialog
+  if (uiDependencies.some((dep) => id.includes(`/${dep.replace('/', '+')}`))) {
+    return 'vendor-ui';
+  }
+
+  // Icon library
+  if (id.includes('/lucide-react@')) {
+    return 'vendor-icons';
+  }
+
+  // Animation library
+  if (id.includes('/framer-motion@')) {
+    return 'vendor-framer';
+  }
+
+  // ============================================================================
+  // Layer 6: Feature Libraries
+  // ============================================================================
+
+  // Flow diagram library
+  if (id.includes('@xyflow/')) {
+    return 'vendor-xyflow';
+  }
+
+  // Chart libraries
+  if (id.includes('/chart.js@') || id.includes('/react-chartjs@')) {
+    return 'vendor-charts';
+  }
+
+  // Lottie animations
+  if (id.includes('/lottie-web@')) {
+    return 'vendor-lottie';
+  }
+
+  // Real-time communication
+  if (
+    id.includes('/socket.io') ||
+    id.includes('/engine.io') ||
+    id.includes('/@socket.io/')
+  ) {
+    return 'vendor-socket';
+  }
+
+  // Let Vite handle remaining small libraries automatically
+  return undefined;
+}
 
 export default defineConfig(({ mode }) => ({
   define: {
@@ -107,47 +206,16 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          const pkg = getPackageName(id);
-
-          if (!pkg) return undefined;
-
-          // React special handling - merge react & react-dom
-          if (pkg === 'react' || pkg === 'react-dom') {
-            return 'react';
-          }
-
-          // Skip packages with circular dependency issues - let Vite handle them
-          if (
-            pkg.startsWith('@acala-network') ||
-            pkg === 'react-syntax-highlighter'
-          ) {
-            return undefined;
-          }
-
-          // Separate @polkadot/apps-config from other @polkadot packages (large config data)
-          if (pkg === '@polkadot/apps-config') {
-            return 'vendor-polkadot-config';
-          }
-
-          // Only create vendor chunk for explicitly declared dependencies
-          if (allDependencies.has(pkg)) {
-            // Use scope for scoped packages (e.g., @polkadot/api -> vendor-@polkadot)
-            const scope = pkg.startsWith('@') ? pkg.split('/')[0] : pkg;
-
-            return `vendor-${scope}`;
-          }
-
-          return undefined;
-        },
+        manualChunks,
       },
     },
   },
   plugins: [
     tsconfigPaths(),
-    tanstackRouter(), // Must be before react()
+    tanstackRouter(),
     react({ babel: { plugins: ['babel-plugin-react-compiler'] } }),
     wasm(),
     svgr({ svgrOptions: { ref: true } }),
@@ -195,9 +263,6 @@ export default defineConfig(({ mode }) => ({
             },
           }),
         ]),
-    nodePolyfills({
-      // To add only specific polyfills, add them here. If no option is passed, adds all polyfills
-      include: ['crypto', 'path'],
-    }),
+    nodePolyfills(),
   ].filter(Boolean),
 }));

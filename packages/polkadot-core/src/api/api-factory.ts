@@ -61,7 +61,6 @@ export async function createApi(chain: Endpoint): Promise<ApiPromise> {
       Crust: { DispatchErrorModule: 'DispatchErrorModuleU8' },
     },
     metadata,
-    rpcCacheCapacity: 1,
     noInitWarn: true,
   });
 }

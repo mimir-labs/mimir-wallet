@@ -122,7 +122,7 @@ function Step2Members({
                 className="bg-secondary flex items-center gap-1 rounded-[5px] px-1 py-1"
               >
                 <AddressRow
-                  className="[&_.AddressRow-Address]:text-[#949494]"
+                  className="[&_.AddressRow-Address]:text-muted-foreground"
                   value={member}
                   withAddress
                   withName

@@ -25,6 +25,9 @@ export * from './call/index.js';
 // Note: simulate function should be dynamically imported to avoid loading @acala-network/chopsticks-core on page load
 export * from './dry-run/index.js';
 
+// paraspell exports
+export * from './paraspell/index.js';
+
 // Transaction exports
 export * from './tx/index.js';
 
@@ -37,7 +40,13 @@ export {
   allEndpoints,
   remoteProxyRelations,
   getChainIcon,
+  resolveChain,
+  getRelayChainKey,
+  getRelaySystemChains,
+  getAssetHub,
+  getBridgeHub,
 } from './chains/index.js';
+export type { ChainIdentifier, RelaySystemChains } from './chains/index.js';
 
 // API management exports
 export {
