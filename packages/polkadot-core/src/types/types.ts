@@ -1,6 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TSubstrateChain } from '@paraspell/sdk-common';
 import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 
@@ -61,9 +62,10 @@ type Widen<T> = T extends string
  * Except genesisHash which is overridden to HexString, and wsUrl to Record<string, string>
  */
 type RequiredFieldsFromJSON = {
-  [K in Exclude<SharedKeys<AllChains>, 'genesisHash' | 'wsUrl'>]: Widen<
-    AllChains[K]
-  >;
+  [K in Exclude<
+    SharedKeys<AllChains>,
+    'genesisHash' | 'wsUrl' | 'paraspellChain'
+  >]: Widen<AllChains[K]>;
 };
 
 /**
@@ -83,6 +85,7 @@ type OptionalFieldsFromJSON = {
 export type Endpoint = RequiredFieldsFromJSON &
   OptionalFieldsFromJSON & {
     genesisHash: HexString;
+    paraspellChain?: TSubstrateChain;
     wsUrl: Record<string, string>;
   };
 

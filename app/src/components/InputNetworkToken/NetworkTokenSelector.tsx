@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TokenAmountSelectorProps, TokenNetworkItem } from './types';
+import type { NetworkTokenSelectorProps, TokenNetworkItem } from './types';
 import type { Endpoint } from '@mimir-wallet/polkadot-core';
 
 import {
@@ -57,11 +57,11 @@ function NetworkListItem({
 }
 
 /**
- * Selector dialog content for InputTokenAmount
+ * Selector dialog content for InputNetworkToken
  * Contains search, network filter tabs, and token list
  * Can switch to full network list view when "More" is clicked
  */
-function TokenAmountSelector({
+function NetworkTokenSelector({
   items,
   selectedValue,
   onSelect,
@@ -72,7 +72,7 @@ function TokenAmountSelector({
   maxVisibleNetworks,
   isLoading,
   onClose,
-}: TokenAmountSelectorProps) {
+}: NetworkTokenSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllNetworks, setShowAllNetworks] = useState(false);
 
@@ -230,4 +230,4 @@ function TokenAmountSelector({
   );
 }
 
-export default React.memo(TokenAmountSelector);
+export default React.memo(NetworkTokenSelector);

@@ -1,9 +1,9 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TokenAmountTriggerProps, TokenNetworkItem } from './types';
+import type { NetworkTokenTriggerProps, TokenNetworkItem } from './types';
 
-import { Avatar, Button, Spinner } from '@mimir-wallet/ui';
+import { Avatar, cn, Spinner } from '@mimir-wallet/ui';
 import React from 'react';
 
 import FormatBalance from '../FormatBalance';
@@ -74,13 +74,13 @@ function TokenSelectorDisplay({
       </div>
       {/* Token info */}
       <div className="flex flex-col items-start gap-0.5">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <span className="text-foreground text-sm font-bold">
             {token.symbol}
           </span>
           <ArrowDown
             data-open={isOpen}
-            className="size-4 transition-transform data-[open=true]:rotate-180"
+            className="size-5 -translate-y-px transition-transform data-[open=true]:rotate-180"
           />
         </div>
         <span className="text-foreground/50 text-[10px]">
@@ -118,79 +118,78 @@ function renderTokenSelectorContent(
 }
 
 /**
- * Trigger component for InputTokenAmount
- * Shows selected token info + amount input in collapsed state
+ * Trigger component for InputNetworkToken
+ * Shows selected token info (token selector only, no amount input)
+ * Children are rendered inside the border container for default variant
  */
-function TokenAmountTrigger({
+function NetworkTokenTrigger({
   selectedItem,
   isTokenLoading = false,
-  amount,
-  isAmountValid,
-  onAmountChange,
   onOpen,
   isOpen,
   disabled,
-  amountPlaceholder = '0.0',
-  showMaxButton = true,
-  onMaxClick,
-  error,
   label,
-}: TokenAmountTriggerProps) {
-  // Check if we have a token selected (for disabling amount input)
-  const hasToken = !!selectedItem;
+  variant = 'default',
+  align = 'start',
+  children,
+}: NetworkTokenTriggerProps) {
+  const isInlineLabel = variant === 'inline-label';
+  const isEndAlign = align === 'end';
+
+  const mainContainer = (
+    <div
+      data-disabled={disabled}
+      onClick={!disabled ? onOpen : undefined}
+      className={cn(
+        'flex-1 border-border hover:border-primary rounded-[10px] border transition-all hover:bg-primary-50 cursor-pointer data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+        isInlineLabel
+          ? 'flex flex-col items-stretch justify-center gap-[5px] p-2.5'
+          : 'flex h-[54px] items-center gap-2.5 p-2',
+      )}
+    >
+      {/* Inline label for inline-label variant */}
+      {isInlineLabel && label && (
+        <span
+          className={cn(
+            'text-xs text-muted-foreground',
+            isEndAlign && 'text-right',
+          )}
+        >
+          {label}
+        </span>
+      )}
+
+      {/* Content row */}
+      <div
+        className={cn(
+          'flex flex-1 items-center gap-2.5',
+          isInlineLabel && isEndAlign && 'flex-row-reverse',
+        )}
+      >
+        {/* Token selector content */}
+        <div className="flex shrink-0 items-center gap-2.5">
+          {renderTokenSelectorContent(selectedItem, isTokenLoading, isOpen)}
+        </div>
+
+        {children}
+      </div>
+    </div>
+  );
+
+  if (isInlineLabel) {
+    return mainContainer;
+  }
 
   return (
-    <div className="space-y-[5px]">
-      {/* Label */}
-      {label && (
+    <>
+      {/* Label - only show outside for default variant */}
+      {!isInlineLabel && label && (
         <div className="text-foreground text-sm font-bold">{label}</div>
       )}
 
-      {/* Main input container */}
-      <div
-        data-disabled={disabled}
-        data-error={!!error || !isAmountValid}
-        className="border-divider hover:border-primary data-[error=true]:border-danger flex h-[54px] items-center gap-2.5 rounded-[10px] border p-2 transition-all hover:bg-secondary data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
-      >
-        {/* Token selector trigger */}
-        <button
-          type="button"
-          onClick={onOpen}
-          disabled={disabled}
-          className="flex shrink-0 cursor-pointer items-center gap-2.5 rounded-lg py-2 transition-colors"
-        >
-          {renderTokenSelectorContent(selectedItem, isTokenLoading, isOpen)}
-        </button>
-
-        {/* Amount input - flex grow to fill remaining space */}
-        <input
-          type="text"
-          inputMode="decimal"
-          value={amount}
-          onChange={onAmountChange}
-          disabled={disabled || !hasToken}
-          placeholder={amountPlaceholder}
-          className="text-foreground placeholder:text-foreground/50 min-w-0 flex-1 bg-transparent text-right text-sm font-bold outline-none disabled:cursor-not-allowed"
-        />
-
-        {/* Max button */}
-        {showMaxButton && onMaxClick && (
-          <Button
-            size="sm"
-            variant="bordered"
-            onClick={onMaxClick}
-            disabled={disabled || !hasToken}
-            className="border-primary text-primary h-[23px] shrink-0 rounded-[5px] px-2.5 py-1"
-          >
-            Max
-          </Button>
-        )}
-      </div>
-
-      {/* Error message */}
-      {error && <div className="text-danger text-xs">{error.message}</div>}
-    </div>
+      {mainContainer}
+    </>
   );
 }
 
-export default React.memo(TokenAmountTrigger);
+export default React.memo(NetworkTokenTrigger);

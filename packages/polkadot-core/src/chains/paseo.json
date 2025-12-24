@@ -22,7 +22,8 @@
     "nativeDecimals": 10,
     "nativeToken": "PAS",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "AssetHubPaseo"
   },
   {
     "key": "passethub",
@@ -43,7 +44,8 @@
     "nativeDecimals": 10,
     "nativeToken": "PAS",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "PAssetHub"
   },
   {
     "key": "xcavate-paseo",
@@ -84,6 +86,7 @@
     "nativeDecimals": 10,
     "nativeToken": "PAS",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Paseo"
   }
 ]

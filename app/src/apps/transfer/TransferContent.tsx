@@ -13,9 +13,10 @@ import { useAddressMeta } from '@/accounts/useAddressMeta';
 import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { AddressCell, InputAddress } from '@/components';
 import {
-  InputTokenAmount,
-  useInputTokenAmountContext,
-} from '@/components/InputTokenAmount';
+  AmountInput,
+  InputNetworkToken,
+  useInputNetworkTokenContext,
+} from '@/components/InputNetworkToken';
 import { MigrationTip } from '@/features/assethub-migration';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
@@ -27,6 +28,10 @@ interface TransferContentProps {
   filterSending?: string[];
   setSending?: (sending: string) => void;
   setRecipient?: (recipient: string) => void;
+  // Amount props (managed externally)
+  amount: string;
+  isAmountValid: boolean;
+  setAmount: (amount: string) => void;
 }
 
 function TransferContent({
@@ -37,14 +42,17 @@ function TransferContent({
   filterSending,
   setSending,
   setRecipient,
+  amount,
+  isAmountValid,
+  setAmount,
 }: TransferContentProps) {
   // Get data from context
   const {
     value: tokenValue,
-    isAmountValid,
+    token,
     keepAlive,
     setKeepAlive,
-  } = useInputTokenAmountContext();
+  } = useInputNetworkTokenContext();
 
   const chain = useChain(tokenValue?.network ?? '');
   const { chains } = useChains();
@@ -134,12 +142,16 @@ function TransferContent({
         />
       )}
 
-      {/* Combined Token + Network + Amount input (from context) */}
-      <InputTokenAmount
-        label="Transfer"
-        error={isAmountValid ? null : new Error('Invalid number')}
-        helper={remoteProxyHelper}
-      />
+      {/* Combined Token + Network selector with Amount input as children */}
+      <InputNetworkToken label="Transfer" helper={remoteProxyHelper}>
+        <AmountInput
+          amount={amount}
+          isAmountValid={isAmountValid}
+          setAmount={setAmount}
+          token={token?.token}
+          keepAlive={keepAlive}
+        />
+      </InputNetworkToken>
 
       <label className="flex items-center justify-end gap-2">
         <Switch

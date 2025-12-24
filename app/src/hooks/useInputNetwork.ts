@@ -2,8 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useChains, useNetwork } from '@mimir-wallet/polkadot-core';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
+/**
+ * Hook for managing network selection with validation against supported/enabled networks.
+ *
+ * Uses derived state pattern instead of effect-based state correction to avoid
+ * cascading renders and follow React best practices.
+ *
+ * @param defaultNetwork - Default network to use if no other is available
+ * @param supportedNetworks - Optional list of allowed networks to choose from
+ * @returns Tuple of [currentNetwork, setNetwork]
+ */
 export function useInputNetwork(
   defaultNetwork?: string,
   supportedNetworks?: string[],
@@ -17,46 +27,57 @@ export function useInputNetwork(
     [chains],
   );
 
-  const [network, setNetwork] = useState(
-    supportedNetworks?.at(0) ||
+  // Helper to compute the fallback network
+  const getFallbackNetwork = useCallback(() => {
+    return (
+      supportedNetworks?.at(0) ||
       defaultNetwork ||
       enabledNetworks.values().next().value ||
-      initialNetwork,
-  );
+      initialNetwork
+    );
+  }, [supportedNetworks, defaultNetwork, enabledNetworks, initialNetwork]);
 
-  const enabledNetworksRef = useRef(enabledNetworks);
+  // Store user's preferred selection (may become invalid if constraints change)
+  const [preferredNetwork, setPreferredNetwork] = useState(getFallbackNetwork);
 
-  useEffect(() => {
-    enabledNetworksRef.current = enabledNetworks;
-  }, [enabledNetworks]);
+  // Derive the effective network by validating preferredNetwork against constraints
+  // This avoids the need for effect-based state correction
+  const network = useMemo(() => {
+    if (mode !== 'omni') {
+      return preferredNetwork;
+    }
 
-  useEffect(() => {
-    queueMicrotask(() => {
-      if (mode === 'omni') {
-        if (!supportedNetworks || supportedNetworks.length === 0) {
-          if (!enabledNetworksRef.current.has(network)) {
-            setNetwork(initialNetwork);
-          }
-        } else {
-          if (!supportedNetworks.includes(network)) {
-            const newNetwork = supportedNetworks[0];
+    // Validate against supportedNetworks if provided
+    if (supportedNetworks) {
+      return supportedNetworks.includes(preferredNetwork)
+        ? preferredNetwork
+        : supportedNetworks[0] || preferredNetwork;
+    }
 
-            setNetwork(newNetwork);
-          }
-        }
-      }
-    });
-  }, [network, supportedNetworks, mode, initialNetwork]);
+    // Otherwise validate against enabledNetworks
+    return enabledNetworks.has(preferredNetwork)
+      ? preferredNetwork
+      : enabledNetworks.values().next().value || initialNetwork;
+  }, [
+    mode,
+    preferredNetwork,
+    supportedNetworks,
+    enabledNetworks,
+    initialNetwork,
+  ]);
 
-  return [
-    network,
+  // Setter with validation - only allows valid networks to be set
+  const setNetwork = useCallback(
     (newNetwork: string) => {
-      if (
-        mode === 'omni' &&
-        (!supportedNetworks || supportedNetworks.includes(newNetwork))
-      ) {
-        setNetwork(newNetwork);
+      if (mode !== 'omni') return;
+
+      // Only allow networks that are in supportedNetworks (if provided)
+      if (!supportedNetworks || supportedNetworks.includes(newNetwork)) {
+        setPreferredNetwork(newNetwork);
       }
     },
-  ] as const;
+    [mode, supportedNetworks],
+  );
+
+  return [network, setNetwork] as const;
 }

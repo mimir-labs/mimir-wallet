@@ -6,18 +6,18 @@ import type { TokenNetworkItem } from './types';
 import { Dialog, DialogContent, DialogTitle } from '@mimir-wallet/ui';
 import React, { useCallback, useState } from 'react';
 
-import TokenAmountSelector from './TokenAmountSelector';
-import TokenAmountTrigger from './TokenAmountTrigger';
-import { useInputTokenAmountContext } from './useInputTokenAmountContext';
+import NetworkTokenSelector from './NetworkTokenSelector';
+import NetworkTokenTrigger from './NetworkTokenTrigger';
+import { useInputNetworkTokenContext } from './useInputNetworkTokenContext';
 import { itemToValue } from './utils';
 
 /**
- * InputTokenAmount component props (UI-only)
+ * InputNetworkToken component props (UI-only)
  *
- * All data is fetched from InputTokenAmountContext.
+ * All data is fetched from InputNetworkTokenContext.
  * This component is purely for display and UI interaction.
  */
-export interface InputTokenAmountProps {
+export interface InputNetworkTokenProps {
   /** Label text above the component */
   label?: React.ReactNode;
   /** Helper text below the component */
@@ -28,56 +28,55 @@ export interface InputTokenAmountProps {
   className?: string;
   /** Placeholder for search input */
   searchPlaceholder?: string;
-  /** Placeholder for amount input */
-  amountPlaceholder?: string;
-  /** Whether to show Max button (default: true) */
-  showMaxButton?: boolean;
   /** Maximum networks to show before "More..." button (default: 5) */
   maxVisibleNetworks?: number;
-  /** Error state */
-  error?: Error | null;
+  /** Variant style - default shows label outside, inline-label shows label inside border */
+  variant?: 'default' | 'inline-label';
+  /** Content alignment for inline-label variant */
+  align?: 'start' | 'end';
+  /** Children slot - renders after token selector (typically for amount input) */
+  children?: React.ReactNode;
 }
 
 /**
- * Combined token selector and amount input component
+ * Network token selector component
  *
- * Must be used within InputTokenAmountProvider.
+ * Must be used within InputNetworkTokenProvider.
  * All state and data are managed by the provider.
+ * Children are rendered after the token selector (for custom amount input).
  *
  * @example
  * ```tsx
- * <InputTokenAmountProvider>
- *   <InputTokenAmount label="Transfer" />
- * </InputTokenAmountProvider>
+ * <InputNetworkTokenProvider address={current}>
+ *   <InputNetworkToken label="Token">
+ *     <AmountInput amount={amount} setAmount={setAmount} />
+ *   </InputNetworkToken>
+ * </InputNetworkTokenProvider>
  * ```
  */
-function InputTokenAmount({
+function InputNetworkToken({
   label,
   helper,
   disabled,
   className,
   searchPlaceholder,
-  amountPlaceholder,
-  showMaxButton = true,
   maxVisibleNetworks = 5,
-  error,
-}: InputTokenAmountProps) {
+  variant = 'default',
+  align = 'start',
+  children,
+}: InputNetworkTokenProps) {
   // Get all data and setters from context
   const {
     value,
-    amount,
-    isAmountValid,
     token,
     isTokenLoading,
     items,
     networks,
     isLoading,
-    setAmount,
     setValue,
-    setMax,
     activeNetworkFilter,
     setActiveNetworkFilter,
-  } = useInputTokenAmountContext();
+  } = useInputNetworkTokenContext();
 
   // Dialog state (local UI state)
   const [isOpen, setIsOpen] = useState(false);
@@ -89,19 +88,6 @@ function InputTokenAmount({
     },
     [setValue],
   );
-
-  // Handle amount input change
-  const handleAmountChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setAmount(e.target.value);
-    },
-    [setAmount],
-  );
-
-  // Handle max button click
-  const handleMaxClick = useCallback(() => {
-    setMax();
-  }, [setMax]);
 
   // Handle dialog open/close
   const handleOpen = useCallback(() => {
@@ -117,28 +103,26 @@ function InputTokenAmount({
   return (
     <div
       data-disabled={disabled}
-      className={`input-token-amount w-full data-[disabled=true]:pointer-events-none ${className || ''}`}
+      className={`input-network-token flex flex-col gap-y-2 w-full data-[disabled=true]:pointer-events-none ${className || ''}`}
     >
-      <TokenAmountTrigger
+      <NetworkTokenTrigger
         selectedItem={token}
         isTokenLoading={isTokenLoading}
-        amount={amount}
-        isAmountValid={isAmountValid}
-        onAmountChange={handleAmountChange}
         onOpen={handleOpen}
         isOpen={isOpen}
         disabled={disabled}
-        amountPlaceholder={amountPlaceholder}
-        showMaxButton={showMaxButton}
-        onMaxClick={handleMaxClick}
-        error={error}
         label={label}
-      />
+        variant={variant}
+        align={align}
+      >
+        {/* Children slot - passed to trigger for inline rendering (default variant) */}
+        {children}
+      </NetworkTokenTrigger>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent showCloseButton={false} className="sm:max-w-[480px] p-0">
           <DialogTitle className="sr-only">Select Token</DialogTitle>
-          <TokenAmountSelector
+          <NetworkTokenSelector
             items={items}
             selectedValue={value}
             onSelect={handleTokenSelect}
@@ -161,4 +145,4 @@ function InputTokenAmount({
   );
 }
 
-export default React.memo(InputTokenAmount);
+export default React.memo(InputNetworkToken);

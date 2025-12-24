@@ -114,7 +114,7 @@ function NativeToken({ amount }: { amount: bigint }) {
                 src={icon}
               />
               <Avatar
-                className="absolute right-0 bottom-0 border-1 border-black"
+                className="absolute right-0 bottom-0 border border-black"
                 style={{ width: 8, height: 8 }}
                 src={chain.icon}
               />
@@ -158,7 +158,7 @@ function AssetToken({ assetId, amount }: { assetId: string; amount: bigint }) {
                 src={assetInfo?.logoUri}
               />
               <Avatar
-                className="absolute right-0 bottom-0 border-1 border-black"
+                className="absolute right-0 bottom-0 border border-black"
                 style={{ width: 8, height: 8 }}
                 src={chain.icon}
               />
@@ -463,13 +463,15 @@ function DryRun({ call, account }: { call: IMethod; account?: string }) {
   }, [account, call, network]);
 
   useEffect(() => {
-    if (!simulation.isDone && !simulation.isLoading) {
-      // Use queueMicrotask to avoid setState during effect
-      queueMicrotask(() => {
+    const fn = async () => {
+      if (!simulation.isDone && !simulation.isLoading) {
+        // Use queueMicrotask to avoid setState during effect
         handleSimulate();
-      });
-    }
-  }, [handleSimulate, simulation]);
+      }
+    };
+
+    fn();
+  }, [handleSimulate, simulation.isDone, simulation.isLoading]);
 
   // Error State
   if (simulation.isDone && !simulation.success) {

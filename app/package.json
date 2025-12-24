@@ -22,14 +22,14 @@
     "lint": "mimir-lint"
   },
   "peerDependencies": {
-    "@polkadot/api": "catalog:",
-    "@polkadot/api-base": "catalog:",
-    "@polkadot/api-derive": "catalog:",
-    "@polkadot/types": "catalog:",
-    "@polkadot/types-known": "catalog:",
-    "@polkadot/ui-shared": "catalog:",
-    "@polkadot/util": "catalog:",
-    "@polkadot/util-crypto": "catalog:"
+    "@polkadot/api": "*",
+    "@polkadot/api-base": "*",
+    "@polkadot/api-derive": "*",
+    "@polkadot/types": "*",
+    "@polkadot/types-known": "*",
+    "@polkadot/ui-shared": "*",
+    "@polkadot/util": "*",
+    "@polkadot/util-crypto": "*"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.8",
@@ -55,10 +55,11 @@
     "copy-to-clipboard": "^3.3.3",
     "dayjs": "^1.11.19",
     "eventemitter3": "^5.0.1",
-    "framer-motion": "^12.23.25",
+    "framer-motion": "^12.23.26",
     "idb": "^8.0.3",
     "lodash-es": "^4.17.21",
     "lottie-web": "^5.12.2",
+    "lucide-react": "^0.552.0",
     "papaparse": "^5.4.1",
     "posthog-js": "^1.258.5",
     "qrcode-generator": "^1.4.4",
@@ -71,14 +72,13 @@
     "react-use": "^17.6.0",
     "rxjs": "^7.8.1",
     "sonner": "^2.0.7",
-    "tailwind-merge": "^3.4.0",
     "zod": "^4.1.12",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@mimir-wallet/dev": "workspace:^",
-    "@polkadot/extension-base": "catalog:",
-    "@polkadot/extension-inject": "catalog:",
+    "@polkadot/extension-base": "^0.62.6",
+    "@polkadot/extension-inject": "^0.62.6",
     "@tailwindcss/postcss": "^4.1.17",
     "@tanstack/react-query-devtools": "^5.90.2",
     "@tanstack/react-router-devtools": "^1.134.13",

@@ -304,7 +304,7 @@ function DappCell({
               size="lg"
               fullWidth
               className="w-[90%]"
-              onClick={() => handleOpenDapp()}
+              onClick={handleOpenDapp}
             >
               Open Dapp
             </Button>

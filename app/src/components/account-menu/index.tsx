@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AccountData, AddressMeta } from '@/hooks/types';
+import type { AddressMeta } from '@/hooks/types';
 
 import {
   addressEq,
@@ -10,7 +10,6 @@ import {
   isPolkadotAddress,
   useSs58Format,
 } from '@mimir-wallet/polkadot-core';
-import { service } from '@mimir-wallet/service';
 import {
   Button,
   Divider,
@@ -19,7 +18,7 @@ import {
   DrawerFooter,
   DrawerHeader,
 } from '@mimir-wallet/ui';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import AccountCell from './AccountCell';
 import CreateMultisig from './CreateMultisig';
@@ -27,6 +26,7 @@ import Search from './Search';
 import VirtualAccountCell from './VirtualAccountCell';
 
 import { useAccount } from '@/accounts/useAccount';
+import { useQueryAccountOmniChain } from '@/accounts/useQueryAccount';
 import { groupAccounts } from '@/accounts/utils';
 import ArrowDownIcon from '@/assets/svg/ArrowDown.svg?react';
 import IconAdd from '@/assets/svg/icon-add.svg?react';
@@ -77,10 +77,16 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
     hideAccountHex,
     metas,
   } = useAccount();
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchAccount, setSearchAccount] = useState<AccountData>();
   const [isMimirExpanded, setIsMimirExpanded] = useState(true);
   const { pinnedAccounts } = usePinAccounts();
+  const upSm = useMediaQuery('sm');
+
+  const keywordsIsPolkadotAddress = !!keywords && isPolkadotAddress(keywords);
+
+  const [searchAccount, , isSearching] = useQueryAccountOmniChain(
+    keywordsIsPolkadotAddress ? keywords : undefined,
+  );
+
   const visiblePinnedAccounts = useMemo(() => {
     const result = [];
 
@@ -96,9 +102,6 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
 
     return result;
   }, [pinnedAccounts, hideAccountHex, metas, keywords, chainSS58]);
-  const upSm = useMediaQuery('sm');
-
-  const keywordsIsPolkadotAddress = !!keywords && isPolkadotAddress(keywords);
 
   // Derive grouped accounts from keywords filter
   const grouped = useMemo(() => {
@@ -125,35 +128,6 @@ function AccountMenu({ anchor = 'left', onClose, open }: Props) {
       keywords,
     );
   }, [accounts, hideAccountHex, keywords, metas, pinnedAccounts]);
-
-  // Async search effect for polkadot addresses
-  useEffect(() => {
-    if (!keywords) {
-      queueMicrotask(() => {
-        setSearchAccount(undefined);
-      });
-
-      return;
-    }
-
-    if (isPolkadotAddress(keywords)) {
-      queueMicrotask(() => {
-        setIsSearching(true);
-      });
-      service.account
-        .getOmniChainDetails(keywords)
-        .then((data) => {
-          setSearchAccount(data);
-        })
-        .finally(() => {
-          setIsSearching(false);
-        });
-    } else {
-      queueMicrotask(() => {
-        setSearchAccount(undefined);
-      });
-    }
-  }, [keywords]);
 
   const onSelect = useCallback(
     (address: string) => {

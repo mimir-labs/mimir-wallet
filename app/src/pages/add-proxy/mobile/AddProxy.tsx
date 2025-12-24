@@ -19,7 +19,7 @@ import {
   Switch,
   Tooltip,
 } from '@mimir-wallet/ui';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
 
 import ProxyPermissionSelector from '../components/ProxyPermissionSelector';
@@ -104,9 +104,26 @@ function AddProxy({
   };
   const [reviewWindow, setReviewWindow] = useState<number>(0);
   const [proxyArgs, setProxyArgs] = useState<ProxyArgs[]>([]);
-  const [proxy, setProxy] = useState<string | undefined>(
+
+  // User's preferred proxy selection
+  const [preferredProxy, setPreferredProxy] = useState<string | undefined>(
     pure ? current : filteredProxy[0],
   );
+
+  // Derive effective proxy: clear if same as proxied (unless pure)
+  // This replaces the useEffect + queueMicrotask pattern
+  const proxy = useMemo(() => {
+    if (!pure && preferredProxy && addressEq(proxied, preferredProxy)) {
+      return undefined;
+    }
+
+    return preferredProxy;
+  }, [pure, preferredProxy, proxied]);
+
+  // Setter that updates the preferred value
+  const setProxy = useCallback((value: string | undefined) => {
+    setPreferredProxy(value);
+  }, []);
 
   const { data: proxies } = useQuery({
     queryKey: ['proxies', network, proxied || ''] as const,
@@ -117,7 +134,7 @@ function AddProxy({
   const swap = useCallback(() => {
     setProxied(proxy);
     setProxy(proxied);
-  }, [proxied, proxy, setProxied]);
+  }, [proxied, proxy, setProxied, setProxy]);
 
   const existsProxies = useMemo(
     () =>
@@ -129,14 +146,6 @@ function AddProxy({
       })) || [],
     [proxied, proxies],
   );
-
-  useEffect(() => {
-    if (!pure && addressEq(proxied, proxy)) {
-      queueMicrotask(() => {
-        setProxy(undefined);
-      });
-    }
-  }, [proxied, proxy, pure]);
 
   const estimateCustom =
     Number(custom) * blockInterval > ONE_DAY * 1000

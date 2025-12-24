@@ -5,6 +5,7 @@ import type { AccountEnhancedAssetBalance } from '@mimir-wallet/polkadot-core';
 
 import {
   Avatar,
+  cn,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -13,10 +14,8 @@ import {
   TooltipTrigger,
   TooltipWrapper,
 } from '@mimir-wallet/ui';
-import { clsx } from 'clsx';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useToggle } from 'react-use';
-import { twMerge } from 'tailwind-merge';
 
 import FormatBalance from './FormatBalance';
 
@@ -56,24 +55,34 @@ function InputToken({
   defaultIdentifier,
   onChange,
 }: Props) {
-  const isControl = useRef(identifier !== undefined);
   const [allBalances, isFetched, isFetching] = useChainBalances(
     network,
     address,
     { alwaysIncludeNative: true },
   );
   const [allAssets] = useChainXcmAsset(network);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
   const popoverWidth = useElementWidth(wrapperRef);
   const [isOpen, toggleOpen] = useToggle(false);
-  const [value, setValue] = useState<string>(
-    identifier || defaultIdentifier || '',
-  );
-  const onChangeRef = useRef(onChange);
 
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
+  // Controlled/uncontrolled pattern using derived state
+  const isControlled = identifier !== undefined;
+  const [internalValue, setInternalValue] = useState(defaultIdentifier || '');
+
+  // Derive effective value: use identifier if controlled, internal state otherwise
+  const value = isControlled ? identifier || '' : internalValue;
+
+  // Unified setter that handles both modes
+  const handleValueChange = useCallback(
+    (newValue: string) => {
+      if (!isControlled) {
+        setInternalValue(newValue);
+      }
+
+      onChange(newValue);
+    },
+    [isControlled, onChange],
+  );
 
   const options = useMemo((): AccountEnhancedAssetBalance[] => {
     return allBalances || [];
@@ -92,18 +101,6 @@ function InputToken({
       value === 'native' ? item.isNative : item.key === value,
     );
   }, [allAssets, value]);
-
-  useEffect(() => {
-    if (isControl.current) {
-      queueMicrotask(() => {
-        setValue(identifier || '');
-      });
-    }
-  }, [identifier]);
-
-  useEffect(() => {
-    onChangeRef.current?.(value);
-  }, [value]);
 
   const element =
     !isFetched && isFetching ? (
@@ -148,8 +145,8 @@ function InputToken({
         <PopoverTrigger asChild>
           <div
             ref={wrapperRef}
-            className={twMerge([
-              'group tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none',
+            className={cn([
+              'group border-divider hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative flex h-11 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 border px-2 py-2 shadow-none transition-all duration-150! data-[focus=true]:bg-transparent motion-reduce:transition-none',
               radius === 'full'
                 ? 'rounded-full'
                 : radius === 'lg'
@@ -186,9 +183,9 @@ function InputToken({
         >
           {options.length > 0 ? (
             <div
-              className={clsx('text-foreground max-h-[250px] overflow-y-auto')}
+              className={cn('text-foreground max-h-[250px] overflow-y-auto')}
             >
-              <ul className={clsx('flex list-none flex-col')}>
+              <ul className={cn('flex list-none flex-col')}>
                 {options.map((item) => {
                   const { logoUri, name, symbol, transferrable, decimals } =
                     item;
@@ -200,9 +197,9 @@ function InputToken({
                         <li
                           onClick={() => {
                             handleClose();
-                            setValue(identifier);
+                            handleValueChange(identifier);
                           }}
-                          className={clsx(
+                          className={cn(
                             'text-foreground transition-background hover:bg-secondary flex h-10 cursor-pointer items-center justify-between gap-2.5 rounded-[10px] px-2 py-1.5',
                           )}
                         >
