@@ -72,7 +72,6 @@ export {
 // Type exports
 export type {
   Endpoint,
-  ValidApiState,
   Network,
   ChainStatus,
   ApiConnection,

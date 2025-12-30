@@ -4,10 +4,11 @@
 import { store } from '@mimir-wallet/service';
 import { Button, Tabs } from '@mimir-wallet/ui';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import AppFrame from './AppFrame';
 
+import CrossChainSwap from '@/apps/cross-chain-swap';
 import CrossChainTransfer from '@/apps/cross-chain-transfer';
 import MultiTransfer from '@/apps/multi-transfer';
 import SubmitCalldata from '@/apps/submit-calldata';
@@ -120,6 +121,8 @@ function AppExplorer() {
     <div className="mx-auto w-full max-w-[500px] flex flex-col gap-4 p-3 sm:p-5">
       <SubmitCalldata />
     </div>
+  ) : url.startsWith('mimir://app/cross-chain-swap') ? (
+    <CrossChainSwap />
   ) : (
     <div className="h-full">{element}</div>
   );

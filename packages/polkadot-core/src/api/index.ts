@@ -2,7 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { ApiManager } from './ApiManager.js';
-export { createApi, getEndpoints } from './api-factory.js';
+export {
+  clearProvider,
+  createApi,
+  createPapiClient,
+  getEndpoints,
+  getProvider,
+} from './api-factory.js';
+export { PapiProviderAdapter } from './PapiProviderAdapter.js';
+export type {
+  JsonRpcConnection,
+  JsonRpcProvider,
+} from './PapiProviderAdapter.js';
 export { getIdentityNetwork, resolveChain } from './chain-resolver.js';
 export { useAllChainStatuses } from './useAllChainStatuses.js';
 export { useAllChainsConnected } from './useAllChainsConnected.js';

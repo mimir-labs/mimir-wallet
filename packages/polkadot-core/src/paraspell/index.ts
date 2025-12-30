@@ -4,6 +4,7 @@
 import type { Endpoint } from '../types/types.js';
 import type { AnyAssetInfo } from '@mimir-wallet/service';
 import type { ApiPromise } from '@polkadot/api';
+import type { PolkadotClient } from 'polkadot-api';
 
 import {
   findAssetInfo,
@@ -104,13 +105,13 @@ export function buildCurrencySpec(
 }
 
 export function buildCurrencyCore(token: AnyAssetInfo): TCurrencyCore {
-  // Priority: isNative > location > assetId
-  if (token.isNative) {
-    return { symbol: Native(token.symbol) };
-  }
-
+  // Priority: location > isNative > assetId
   if (token.location) {
     return { location: token.location as any };
+  }
+
+  if (token.isNative) {
+    return { symbol: Native(token.symbol) };
   }
 
   if (token.assetId) {
@@ -124,7 +125,7 @@ export function buildCurrencyCore(token: AnyAssetInfo): TCurrencyCore {
 /**
  * Helper function to build API overrides for ParaSpell
  */
-function buildApiOverrides(
+export function buildApiOverrides(
   sourceChain: Endpoint,
   destChain: Endpoint,
   asset: AnyAssetInfo,
@@ -176,6 +177,66 @@ function buildApiOverrides(
 }
 
 /**
+ * Helper function to build PAPI overrides for ParaSpell
+ */
+export function buildPapiOverrides(
+  sourceChain: Endpoint,
+  destChain: Endpoint,
+  asset: AnyAssetInfo,
+): Record<string, Promise<PolkadotClient>> {
+  const apiOverrides: Record<string, Promise<PolkadotClient>> = {};
+  const apiManager = ApiManager.getInstance();
+
+  if (sourceChain.paraspellChain) {
+    apiOverrides[sourceChain.paraspellChain] = apiManager.getPapiClient(
+      sourceChain.key,
+    );
+  }
+
+  if (destChain.paraspellChain) {
+    apiOverrides[destChain.paraspellChain] = apiManager.getPapiClient(
+      destChain.key,
+    );
+  }
+
+  // Add system chains (AssetHub, BridgeHub) for the relay chain
+  const { assetHub, bridgeHub } = getRelaySystemChains(sourceChain);
+
+  if (assetHub?.paraspellChain) {
+    apiOverrides[assetHub.paraspellChain] = apiManager.getPapiClient(
+      assetHub.key,
+    );
+  }
+
+  if (bridgeHub?.paraspellChain) {
+    apiOverrides[bridgeHub.paraspellChain] = apiManager.getPapiClient(
+      bridgeHub.key,
+    );
+  }
+
+  if (sourceChain.paraspellChain && asset.location) {
+    try {
+      const reserveChain = getAssetReserveChain(
+        sourceChain.paraspellChain,
+        asset.location as TLocation,
+      );
+
+      const chain = allEndpoints.find(
+        (item) => item.paraspellChain && item.paraspellChain === reserveChain,
+      );
+
+      if (chain) {
+        apiOverrides[reserveChain] = apiManager.getPapiClient(chain.key);
+      }
+    } catch {
+      /* empty */
+    }
+  }
+
+  return apiOverrides;
+}
+
+/**
  * Parameters for buildXcmCall
  */
 export interface BuildXcmCallParams {
@@ -202,23 +263,7 @@ export async function buildXcmCall(params: BuildXcmCallParams) {
     throw new Error('Chain does not support XCM transfers');
   }
 
-  // Get managed API connections for source and destination chains
-  const apiOverrides: Record<string, Promise<ApiPromise>> = {};
-  const apiManager = ApiManager.getInstance();
-
-  apiOverrides[sourceParaspell] = apiManager.getApi(sourceChain.key);
-  apiOverrides[destParaspell] = apiManager.getApi(destChain.key);
-
-  // Add system chains (AssetHub, BridgeHub) for the relay chain
-  const { assetHub, bridgeHub } = getRelaySystemChains(sourceChain);
-
-  if (assetHub?.paraspellChain) {
-    apiOverrides[assetHub.paraspellChain] = apiManager.getApi(assetHub.key);
-  }
-
-  if (bridgeHub?.paraspellChain) {
-    apiOverrides[bridgeHub.paraspellChain] = apiManager.getApi(bridgeHub.key);
-  }
+  const apiOverrides = buildApiOverrides(sourceChain, destChain, token);
 
   // Build currency spec
   const currencySpec = buildCurrencySpec(token, amount);
@@ -335,3 +380,5 @@ export {
   getAssetLocation,
   isAssetXcEqual,
 };
+
+export * from './router.js';

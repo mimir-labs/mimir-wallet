@@ -40,10 +40,12 @@
   },
   "dependencies": {
     "@acala-network/chopsticks-core": "^1.2.5",
-    "@paraspell/assets": "^12.0.3",
-    "@paraspell/sdk-common": "^12.0.3",
-    "@paraspell/sdk-core": "^12.0.3",
-    "@paraspell/sdk-pjs": "^12.0.3",
+    "@galacticcouncil/api-augment": "^0.9.0",
+    "@paraspell/assets": "^12.1.0",
+    "@paraspell/sdk-common": "^12.1.0",
+    "@paraspell/sdk-core": "^12.1.0",
+    "@paraspell/sdk-pjs": "^12.1.0",
+    "@paraspell/xcm-router": "^12.1.0",
     "@polkadot/api": "^16.5.4",
     "@polkadot/api-augment": "^16.5.4",
     "@polkadot/api-base": "^16.5.4",
@@ -61,7 +63,8 @@
     "eventemitter3": "^5.0.1",
     "idb": "^8.0.2",
     "jsondiffpatch": "^0.6.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "polkadot-api": "^1.23.1"
   },
   "devDependencies": {
     "@mimir-wallet/dev": "workspace:^",
