@@ -21,7 +21,8 @@
     "nativeDecimals": 12,
     "nativeToken": "WND",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "AssetHubWestend"
   },
   {
     "key": "westend",
@@ -44,6 +45,7 @@
     "nativeDecimals": 12,
     "nativeToken": "WND",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Westend"
   }
 ]

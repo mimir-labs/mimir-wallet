@@ -26,7 +26,8 @@
     "nativeDecimals": 12,
     "nativeToken": "KSM",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "AssetHubKusama"
   },
   {
     "key": "people-kusama",
@@ -52,7 +53,8 @@
     "nativeDecimals": 12,
     "nativeToken": "KSM",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "PeopleKusama"
   },
   {
     "key": "coretime-kusama",
@@ -78,7 +80,8 @@
     "nativeDecimals": 12,
     "nativeToken": "KSM",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "CoretimeKusama"
   },
   {
     "key": "bifrost-kusama",
@@ -97,7 +100,8 @@
     "nativeDecimals": 12,
     "nativeToken": "BNC",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "BifrostKusama"
   },
   {
     "key": "amplitude",
@@ -114,7 +118,8 @@
     "nativeDecimals": 12,
     "nativeToken": "AMPE",
     "supportsDryRun": false,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Amplitude"
   },
   {
     "key": "karura",
@@ -136,7 +141,8 @@
     "nativeDecimals": 12,
     "nativeToken": "KAR",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Karura"
   },
   {
     "key": "acurast",
@@ -183,6 +189,7 @@
     "nativeDecimals": 12,
     "nativeToken": "KSM",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Kusama"
   }
 ]

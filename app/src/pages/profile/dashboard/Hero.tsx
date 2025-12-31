@@ -4,8 +4,10 @@
 import { useNetwork } from '@mimir-wallet/polkadot-core';
 import { Button, Tooltip } from '@mimir-wallet/ui';
 import { Link } from '@tanstack/react-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useToggle } from 'react-use';
+
+import TransferSplitButton from './TransferSplitButton';
 
 import { useAccount } from '@/accounts/useAccount';
 import { useQueryAccount } from '@/accounts/useQueryAccount';
@@ -13,12 +15,12 @@ import SubId from '@/assets/images/subid.svg';
 import IconCancel from '@/assets/svg/icon-cancel.svg?react';
 import IconExtrinsic from '@/assets/svg/icon-extrinsic.svg?react';
 import IconProxy from '@/assets/svg/icon-proxy-fill.svg?react';
-import IconSend from '@/assets/svg/icon-send-fill.svg?react';
 import IconSet from '@/assets/svg/icon-set.svg?react';
 import IconWatch from '@/assets/svg/icon-watch.svg?react';
 import { Fund } from '@/components';
 import { SubsquareApp } from '@/config';
 import { ONE_DAY } from '@/constants';
+import { useNow } from '@/hooks/useNow';
 import { formatDisplay } from '@/utils';
 
 function SubsquareLink({
@@ -64,18 +66,14 @@ function Hero({
   const [open, toggleOpen] = useToggle(false);
   const { isLocalAccount, isLocalAddress, addAddressBook } = useAccount();
   const [account] = useQueryAccount(network, address);
-  const [days, setDays] = useState<string | number>('--');
+  const now = useNow();
 
-  // Calculate days in useEffect to avoid calling Date.now() during render
-  useEffect(() => {
-    queueMicrotask(() => {
-      if (account) {
-        setDays(Math.ceil((Date.now() - account.createdAt) / (ONE_DAY * 1000)));
-      } else {
-        setDays('--');
-      }
-    });
-  }, [account]);
+  // Derive days since account creation
+  const days = useMemo<string | number>(() => {
+    if (!account) return '--';
+
+    return Math.ceil((now - account.createdAt) / (ONE_DAY * 1000));
+  }, [account, now]);
 
   const formatUsd = formatDisplay(totalUsd.toString());
 
@@ -85,23 +83,7 @@ function Hero({
   );
   const buttons = (
     <div className="item-center grid w-full grid-cols-2 gap-2 pt-2.5 sm:w-auto md:flex">
-      <Button
-        asChild
-        variant="solid"
-        color="primary"
-        size="md"
-        className="h-[26px]"
-      >
-        <Link
-          to="/explorer/$url"
-          params={{
-            url: `mimir://app/transfer?callbackPath=${encodeURIComponent('/')}`,
-          }}
-        >
-          Transfer
-          <IconSend />
-        </Link>
-      </Button>
+      <TransferSplitButton />
       <Button
         onClick={toggleOpen}
         variant="ghost"

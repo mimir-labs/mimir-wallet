@@ -12,16 +12,17 @@ import {
   ModalFooter,
   ModalHeader,
 } from '@mimir-wallet/ui';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import NetworkErrorAlert from './NetworkErrorAlert';
 
 import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
 import {
-  InputTokenAmountProvider,
-  useInputTokenAmountContext,
-} from '@/components/InputTokenAmount';
+  InputNetworkTokenProvider,
+  useInputNetworkTokenContext,
+} from '@/components/InputNetworkToken';
+import { useInputNumber } from '@/hooks/useInputNumber';
 import { useWallet } from '@/wallet/useWallet';
 
 interface Props {
@@ -51,10 +52,11 @@ function FundModalContent({
   filterSending: string[];
 }) {
   const [error, setError] = useState<string | null>(null);
-  const prevOpenRef = useRef(open);
 
-  const { network, token, amount, isAmountValid, keepAlive, setAmount, reset } =
-    useInputTokenAmountContext();
+  // Amount state managed locally
+  const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
+
+  const { network, token, keepAlive, reset } = useInputNetworkTokenContext();
 
   // Set default amount when dialog opens with defaultValue
   useEffect(() => {
@@ -63,21 +65,17 @@ function FundModalContent({
     }
   }, [open, defaultValue, setAmount]);
 
-  useEffect(() => {
-    // Reset form when dialog closes (transition from true to false)
-    if (prevOpenRef.current && !open) {
-      queueMicrotask(() => {
-        setError(null);
-        reset();
-      });
-    }
-
-    prevOpenRef.current = open;
-  }, [open, reset]);
+  // Handle close with form reset - moves reset logic from effect to callback
+  const handleClose = useCallback(() => {
+    setError(null);
+    setAmount('');
+    reset();
+    onClose();
+  }, [onClose, reset, setAmount]);
 
   return (
     <NetworkProvider network={network}>
-      <Modal size="lg" onClose={onClose} isOpen={open}>
+      <Modal size="lg" onClose={handleClose} isOpen={open}>
         <ModalContent>
           <ModalHeader>Fund</ModalHeader>
 
@@ -89,6 +87,9 @@ function FundModalContent({
                 sending={sending}
                 recipient={receipt}
                 setSending={setSending}
+                amount={amount}
+                isAmountValid={isAmountValid}
+                setAmount={setAmount}
               />
             )}
 
@@ -103,7 +104,7 @@ function FundModalContent({
             <NetworkErrorAlert network={network} />
 
             <div className="flex items-center gap-2.5">
-              <Button fullWidth onClick={onClose} variant="ghost">
+              <Button fullWidth onClick={handleClose} variant="ghost">
                 Cancel
               </Button>
 
@@ -116,10 +117,7 @@ function FundModalContent({
                   keepAlive={keepAlive}
                   sending={sending}
                   recipient={receipt}
-                  onDone={() => {
-                    setError(null);
-                    onClose();
-                  }}
+                  onDone={handleClose}
                   onError={(error: unknown) => {
                     const message =
                       error instanceof Error
@@ -146,7 +144,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
   const [sending, setSending] = useState<string>(filterSending.at(0) || '');
 
   return (
-    <InputTokenAmountProvider
+    <InputNetworkTokenProvider
       address={sending}
       defaultNetwork={defaultNetwork}
       defaultIdentifier="native"
@@ -160,7 +158,7 @@ function Fund({ defaultValue, defaultNetwork, onClose, open, receipt }: Props) {
         receipt={receipt}
         filterSending={filterSending}
       />
-    </InputTokenAmountProvider>
+    </InputNetworkTokenProvider>
   );
 }
 

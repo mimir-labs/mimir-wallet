@@ -18,7 +18,13 @@ import {
   Tooltip,
 } from '@mimir-wallet/ui';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from 'react';
 
 import AllHistoryTransactions from './AllHistoryTransactions';
 import HistoryTransactions from './HistoryTransactions';
@@ -62,13 +68,15 @@ function Content({ address }: { address: string }) {
   const showAllHistoryTab = useMemo(() => {
     return !meta?.isMultisig && !meta?.isPure;
   }, [meta]);
-  const [selectedPendingNetworks, setSelectedPendingNetworks] = useState<
+  // User's preferred network selections
+  const [preferredPendingNetworks, setPreferredPendingNetworks] = useState<
     string[]
   >([]);
-  const [selectedHistoryNetworks, setSelectedHistoryNetworks] = useState<
+  const [preferredHistoryNetworks, setPreferredHistoryNetworks] = useState<
     string[]
   >([]);
-  const [selectedAllHistoryNetwork, setSelectedAllHistoryNetwork] = useState<
+  // User's preferred all-history network selection
+  const [preferredAllHistoryNetwork, setPreferredAllHistoryNetwork] = useState<
     string | undefined
   >(undefined);
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
@@ -84,6 +92,89 @@ function Content({ address }: { address: string }) {
         chain,
       }));
   }, [allApis]);
+
+  // Derive effective all-history network: use preference or fallback to first subscan chain
+  const selectedAllHistoryNetwork = useMemo(() => {
+    if (preferredAllHistoryNetwork !== undefined) {
+      return preferredAllHistoryNetwork;
+    }
+
+    return subscanChains[0]?.network;
+  }, [preferredAllHistoryNetwork, subscanChains]);
+
+  // Setter that updates the preferred value
+  const setSelectedAllHistoryNetwork = useCallback(
+    (network: string | undefined) => {
+      setPreferredAllHistoryNetwork(network);
+    },
+    [],
+  );
+
+  // Derive effective pending networks: use preference or fallback to all valid networks
+  const selectedPendingNetworks = useMemo(() => {
+    if (
+      preferredPendingNetworks.length === 0 &&
+      validPendingNetworks.length > 0
+    ) {
+      return validPendingNetworks.map(({ network }) => network);
+    } else if (validPendingNetworks.length > 0) {
+      // Filter out invalid networks and add new valid ones
+      return Array.from(
+        new Set(
+          preferredPendingNetworks.filter((network) =>
+            validPendingNetworks.some(({ network: n }) => n === network),
+          ),
+        ),
+      );
+    }
+
+    return preferredPendingNetworks;
+  }, [preferredPendingNetworks, validPendingNetworks]);
+
+  // Derive effective history networks: use preference or fallback to first valid network
+  const selectedHistoryNetworks = useMemo(() => {
+    if (
+      preferredHistoryNetworks.length === 0 &&
+      validHistoryNetworks.length > 0
+    ) {
+      return [validHistoryNetworks[0].network];
+    } else if (validHistoryNetworks.length > 0) {
+      const valid = preferredHistoryNetworks.filter((network) =>
+        validHistoryNetworks.some(({ network: n }) => n === network),
+      );
+
+      if (valid.length === 0) {
+        return [validHistoryNetworks[0].network];
+      }
+
+      return valid.slice(0, 1);
+    }
+
+    return preferredHistoryNetworks.slice(0, 1);
+  }, [preferredHistoryNetworks, validHistoryNetworks]);
+
+  // Setters that update the preferred values
+  const setSelectedPendingNetworks = useCallback(
+    (networks: string[] | ((prev: string[]) => string[])) => {
+      if (typeof networks === 'function') {
+        setPreferredPendingNetworks((prev) => networks(prev));
+      } else {
+        setPreferredPendingNetworks(networks);
+      }
+    },
+    [],
+  );
+
+  const setSelectedHistoryNetworks = useCallback(
+    (networks: string[] | ((prev: string[]) => string[])) => {
+      if (typeof networks === 'function') {
+        setPreferredHistoryNetworks((prev) => networks(prev));
+      } else {
+        setPreferredHistoryNetworks(networks);
+      }
+    },
+    [],
+  );
 
   const [, startTransition] = useTransition();
   const selectedPendingNetwork = useMemo(() => {
@@ -116,61 +207,6 @@ function Content({ address }: { address: string }) {
       });
     });
   };
-
-  useEffect(() => {
-    queueMicrotask(() => {
-      setSelectedPendingNetworks((selectedPendingNetworks) => {
-        if (
-          selectedPendingNetworks.length === 0 &&
-          validPendingNetworks.length > 0
-        ) {
-          return validPendingNetworks.map(({ network }) => network);
-        } else if (validPendingNetworks.length > 0) {
-          return Array.from(
-            new Set(
-              selectedPendingNetworks
-                .filter((network) =>
-                  validPendingNetworks.some(({ network: n }) => n === network),
-                )
-                .concat(validPendingNetworks.map(({ network }) => network)),
-            ),
-          );
-        } else {
-          return selectedPendingNetworks;
-        }
-      });
-
-      setSelectedHistoryNetworks((selectedHistoryNetworks) => {
-        if (
-          selectedHistoryNetworks.length === 0 &&
-          validHistoryNetworks.length > 0
-        ) {
-          return validHistoryNetworks.map(({ network }) => network).slice(0, 1);
-        } else if (validHistoryNetworks.length > 0) {
-          return Array.from(
-            new Set(
-              selectedHistoryNetworks
-                .filter((network) =>
-                  validHistoryNetworks.some(({ network: n }) => n === network),
-                )
-                .concat(validHistoryNetworks.map(({ network }) => network)),
-            ),
-          ).slice(0, 1);
-        } else {
-          return selectedHistoryNetworks;
-        }
-      });
-    });
-  }, [validPendingNetworks, validHistoryNetworks]);
-
-  // Initialize all-history network selection
-  useEffect(() => {
-    if (!selectedAllHistoryNetwork && subscanChains.length > 0) {
-      queueMicrotask(() => {
-        setSelectedAllHistoryNetwork(subscanChains[0].network);
-      });
-    }
-  }, [selectedAllHistoryNetwork, subscanChains]);
 
   return (
     <div className="space-y-5">

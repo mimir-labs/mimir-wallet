@@ -70,7 +70,7 @@ function makeNodes(
     nodeId: string,
     label = '',
     delay?: number,
-    color = '#d9d9d9',
+    color = 'var(--border)',
     isDash = false,
   ) {
     const id = `${parentId}->${nodeId}`;

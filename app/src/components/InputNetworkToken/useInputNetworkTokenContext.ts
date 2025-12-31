@@ -9,16 +9,14 @@ import { createContext, useCallback, useContext } from 'react';
 import { itemToValue } from './utils';
 
 /**
- * Context value provided by InputTokenAmountProvider
+ * Context value provided by InputNetworkTokenProvider
  */
-export interface InputTokenAmountContextValue {
+export interface InputNetworkTokenContextValue {
   // Address for data fetching
   address?: string;
 
   // Core state
   value: TokenNetworkValue | undefined;
-  amount: string;
-  isAmountValid: boolean;
   network: string;
   identifier: string;
 
@@ -36,14 +34,12 @@ export interface InputTokenAmountContextValue {
 
   // State setters
   setValue: (value: TokenNetworkValue) => void;
-  setAmount: (amount: string) => void;
   setNetwork: (network: string) => void;
   setIdentifier: (identifier: string) => void;
   setKeepAlive: (keepAlive: boolean) => void;
-  setMax: () => void;
   reset: () => void;
 
-  // Dialog state (for InputTokenAmount component)
+  // Dialog state (for InputNetworkToken component)
   activeNetworkFilter: string | null;
   setActiveNetworkFilter: (
     network: string | null,
@@ -51,22 +47,22 @@ export interface InputTokenAmountContextValue {
   ) => void;
 }
 
-export const InputTokenAmountContext =
-  createContext<InputTokenAmountContextValue | null>(null);
+export const InputNetworkTokenContext =
+  createContext<InputNetworkTokenContextValue | null>(null);
 
 /**
- * Hook to access InputTokenAmount context
+ * Hook to access InputNetworkToken context
  *
- * Must be used within InputTokenAmountProvider
+ * Must be used within InputNetworkTokenProvider
  *
  * @throws Error if used outside of provider
  */
-export function useInputTokenAmountContext(): InputTokenAmountContextValue {
-  const context = useContext(InputTokenAmountContext);
+export function useInputNetworkTokenContext(): InputNetworkTokenContextValue {
+  const context = useContext(InputNetworkTokenContext);
 
   if (!context) {
     throw new Error(
-      'useInputTokenAmountContext must be used within InputTokenAmountProvider',
+      'useInputNetworkTokenContext must be used within InputNetworkTokenProvider',
     );
   }
 
@@ -74,21 +70,21 @@ export function useInputTokenAmountContext(): InputTokenAmountContextValue {
 }
 
 /**
- * Optional hook to access InputTokenAmount context
+ * Optional hook to access InputNetworkToken context
  *
  * Returns null if used outside of provider (for backward compatibility)
  */
-export function useInputTokenAmountContextOptional(): InputTokenAmountContextValue | null {
-  return useContext(InputTokenAmountContext);
+export function useInputNetworkTokenContextOptional(): InputNetworkTokenContextValue | null {
+  return useContext(InputNetworkTokenContext);
 }
 
 /**
  * Hook to select token from context
  *
- * Handles token selection and amount reset
+ * Handles token selection
  */
 export function useTokenSelect(): (item: TokenNetworkItem) => void {
-  const { setValue } = useInputTokenAmountContext();
+  const { setValue } = useInputNetworkTokenContext();
 
   return useCallback(
     (item: TokenNetworkItem) => {

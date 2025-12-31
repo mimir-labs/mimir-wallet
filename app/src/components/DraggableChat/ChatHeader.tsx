@@ -85,7 +85,7 @@ export function AccountInfo() {
       </span>
       <AddressRow
         value={current}
-        className="text-xs [&_.AddressRow-Address]:text-[#949494] [&_.AddressRow-Name]:font-normal"
+        className="text-xs [&_.AddressRow-Address]:text-muted-foreground [&_.AddressRow-Name]:font-normal"
         iconSize={20}
         withAddress
         withName
@@ -108,10 +108,7 @@ export function ChatTitle({ onClose, onClearChat }: ChatTitleProps) {
   return (
     <>
       <div className="flex items-center gap-2.5 px-[15px] py-3">
-        <MimoLogo
-          className="border-primary/20 rounded-full border-1"
-          size={30}
-        />
+        <MimoLogo className="border-primary/20 rounded-full border" size={30} />
         <span className="text-foreground text-[16px] font-normal tracking-[0.16px]">
           Mimo
         </span>
@@ -137,7 +134,7 @@ export function ChatTitle({ onClose, onClearChat }: ChatTitleProps) {
           radius="md"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="data-[hovered=true]:bg-secondary py-[10px] text-[#949494] transition-all"
+          className="data-[hovered=true]:bg-secondary py-2.5 text-muted-foreground transition-all"
           aria-label="Minimize"
         >
           {isHovered && (

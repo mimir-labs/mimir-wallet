@@ -218,20 +218,22 @@ function NotificationButton() {
     [navigate, toggleOpen],
   );
 
+  // Handle popover open/close state changes
   // Mark viewed notifications as read when popover closes
-  useEffect(() => {
-    if (!isOpen && viewedNotifications.size > 0) {
-      // Mark all viewed notifications as read
-      viewedNotifications.forEach((id) => {
-        markAsRead(id);
-      });
-      // Clear viewed set after marking as read
-      // Use queueMicrotask to avoid setState during effect
-      queueMicrotask(() => {
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      // When closing, mark all viewed notifications as read
+      if (!open && viewedNotifications.size > 0) {
+        viewedNotifications.forEach((id) => {
+          markAsRead(id);
+        });
         setViewedNotifications(new Set());
-      });
-    }
-  }, [isOpen, viewedNotifications, markAsRead]);
+      }
+
+      toggleOpen(open);
+    },
+    [viewedNotifications, markAsRead, toggleOpen],
+  );
 
   const filteredNotifications = notifications.filter((notification) => {
     if (filter === 'all') return true;
@@ -245,7 +247,7 @@ function NotificationButton() {
 
   return (
     <>
-      <Popover open={isOpen} onOpenChange={toggleOpen}>
+      <Popover open={isOpen} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <div>
             <Tooltip content="Notification">

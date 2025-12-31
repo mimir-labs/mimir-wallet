@@ -23,7 +23,7 @@ interface Props {
 }
 
 function Empty({ height, label, variant = 'default', className = '' }: Props) {
-  const cn = `flex flex-col items-center justify-center ${variant === 'favorite-dapps' || variant === 'pending-transaction' ? 'gap-[15px]' : 'gap-2.5'} text-sm ${variant === 'account' || variant === 'select-account' ? 'text-[#949494]' : 'text-foreground'}`;
+  const cn = `flex flex-col items-center justify-center ${variant === 'favorite-dapps' || variant === 'pending-transaction' ? 'gap-[15px]' : 'gap-2.5'} text-sm ${variant === 'account' || variant === 'select-account' ? 'text-muted-foreground' : 'text-foreground'}`;
 
   const getContent = () => {
     switch (variant) {
