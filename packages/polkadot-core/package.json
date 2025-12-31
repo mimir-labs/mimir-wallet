@@ -43,7 +43,6 @@
     "@paraspell/assets": "^12.0.3",
     "@paraspell/sdk-common": "^12.0.3",
     "@paraspell/sdk-core": "^12.0.3",
-    "@paraspell/sdk-pjs": "^12.0.3",
     "@polkadot/api": "^16.5.4",
     "@polkadot/api-augment": "^16.5.4",
     "@polkadot/api-base": "^16.5.4",
