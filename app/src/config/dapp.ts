@@ -364,6 +364,19 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     tags: ['XCM', 'Transfer', 'CrossChain'],
   },
   {
+    id: 8,
+    name: 'Cross-chain Swap',
+    description:
+      'Swap tokens across different chains in the Polkadot ecosystem',
+    url: 'mimir://app/cross-chain-swap',
+    icon: '/dapp-icons/cross-chain-swap.svg',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['XCM', 'Swap', 'CrossChain', 'DeFi'],
+  },
+  {
     id: 500,
     icon: LogoCircle,
     name: 'Setup',

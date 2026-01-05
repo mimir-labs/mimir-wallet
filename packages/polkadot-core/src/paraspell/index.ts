@@ -98,6 +98,11 @@ export function buildCurrencySpec(
 }
 
 export function buildCurrencyCore(token: AnyAssetInfo): TCurrencyCore {
+  // Priority: location > isNative > assetId
+  if (token.location) {
+    return { location: token.location as any };
+  }
+
   // Priority: isNative > location > assetId
   if (token.isNative) {
     return { symbol: Native(token.symbol) };
@@ -273,3 +278,5 @@ export {
   getAssetLocation,
   isAssetXcEqual,
 };
+
+export * from './router.js';

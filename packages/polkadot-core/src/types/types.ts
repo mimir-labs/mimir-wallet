@@ -1,8 +1,8 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ApiPromise$ } from '../api/ApiPromise$.js';
 import type { TSubstrateChain } from '@paraspell/sdk-common';
-import type { ApiPromise } from '@polkadot/api';
 import type { HexString } from '@polkadot/util/types';
 
 import kusamaChains from '../chains/kusama.json' with { type: 'json' };
@@ -93,36 +93,6 @@ export type Network = Endpoint & {
   enabled: boolean;
 };
 
-export interface ApiState {
-  isApiReady: boolean;
-  tokenSymbol: string;
-  genesisHash: HexString;
-}
-
-export interface ApiProps extends ApiState {
-  api?: ApiPromise | null;
-  apiError: string | null;
-  isApiInitialized: boolean;
-  network: string;
-  chain: Endpoint;
-}
-
-export interface ApiContextProps extends ValidApiState, Omit<ApiProps, 'api'> {
-  chainSS58: number;
-  ss58Chain: string;
-  setSs58Chain: (chain: string) => void;
-  allApis: Record<string, ValidApiState>;
-  setNetwork: (network: string) => string | null;
-}
-
-export type ValidApiState = ApiState & {
-  api: ApiPromise;
-  chain: Endpoint;
-  apiError: string | null;
-  isApiInitialized: boolean;
-  network: string;
-};
-
 // New types for refactored API management
 
 /**
@@ -143,7 +113,7 @@ export interface ChainStatus {
  * API connection state managed by ApiManager
  */
 export interface ApiConnection {
-  api: ApiPromise | null;
+  api: ApiPromise$ | null;
   chain: Endpoint;
   network: string;
   status: ChainStatus;

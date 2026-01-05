@@ -4,10 +4,6 @@
 export type {
   Endpoint,
   Network,
-  ApiState,
-  ApiProps,
-  ApiContextProps,
-  ValidApiState,
   ChainStatus,
   ApiConnection,
   Ss58FormatControl,

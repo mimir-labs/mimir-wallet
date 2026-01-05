@@ -22,6 +22,7 @@ import type { HexString } from '@polkadot/util/types';
 import {
   allEndpoints,
   getAssetLocation,
+  getAssets,
   getChainIcon,
   useChain,
 } from '@mimir-wallet/polkadot-core';
@@ -99,6 +100,10 @@ function enhanceAsset(
       // Invalid location format - mark as non-XCM asset
       normalizedLocation = undefined;
     }
+  } else if (asset.isNative) {
+    normalizedLocation = getAssets(paraspellChain as any).find(
+      (item) => item.isNative,
+    )?.location;
   }
 
   return {

@@ -8,16 +8,20 @@ import type {
   Endpoint,
 } from '../types/types.js';
 import type { HexString } from '@polkadot/util/types';
+import type { PolkadotClient } from 'polkadot-api';
 
 import { ApiPromise } from '@polkadot/api';
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { isHex } from '@polkadot/util';
+import { createClient } from 'polkadot-api';
+import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat';
 
 import { DEFAULT_AUX } from '../utils/defaults.js';
 import { saveMetadata } from '../utils/metadata.js';
 
-import { createApi } from './api-factory.js';
+import { clearProvider, createApi, getProvider } from './api-factory.js';
 import { getIdentityNetwork, resolveChain } from './chain-resolver.js';
+import { PapiProviderAdapter } from './PapiProviderAdapter.js';
 
 /**
  * Singleton class for managing all blockchain API connections
@@ -34,6 +38,10 @@ export class ApiManager {
   // Map<network, Set<listener>> - Chain-specific listeners for efficient single-chain subscriptions
   private chainListeners: Map<string, Set<(status: ChainStatus) => void>> =
     new Map();
+
+  // papi support: stores PolkadotClient instances and adapters
+  private papiClients: Map<string, PolkadotClient> = new Map();
+  private papiAdapters: Map<string, PapiProviderAdapter> = new Map();
 
   private constructor() {}
 
@@ -314,6 +322,8 @@ export class ApiManager {
       return;
     }
 
+    this._cleanupPapiResources(network);
+
     const connection = this.apis.get(network);
 
     if (connection?.api) {
@@ -333,6 +343,8 @@ export class ApiManager {
     // Clear all references
     this.references.delete(network);
 
+    this._cleanupPapiResources(network);
+
     const connection = this.apis.get(network);
 
     if (connection?.api) {
@@ -342,6 +354,24 @@ export class ApiManager {
     this.apis.delete(network);
     this._notifyListeners();
     this.initPromises.delete(network);
+  }
+
+  /**
+   * Cleanup papi resources for a network
+   */
+  private _cleanupPapiResources(network: string): void {
+    // Destroy papi client
+    const papiClient = this.papiClients.get(network);
+
+    if (papiClient) {
+      papiClient.destroy();
+      this.papiClients.delete(network);
+    }
+
+    this.papiAdapters.delete(network);
+
+    // Clear provider reference
+    clearProvider(network);
   }
 
   /**
@@ -536,5 +566,81 @@ export class ApiManager {
     }
 
     return this.getApi(identityNetwork);
+  }
+
+  /**
+   * Get papi PolkadotClient by network key or genesis hash
+   * Lazily creates the client on first request, sharing the WebSocket with ApiPromise
+   *
+   * @param networkOrGenesisHash - Network key or genesis hash
+   * @returns Promise resolving to PolkadotClient
+   */
+  async getPapiClient(networkOrGenesisHash: string): Promise<PolkadotClient> {
+    // Resolve network identifier
+    const network = this._resolveNetwork(networkOrGenesisHash);
+
+    if (!network) {
+      throw new Error(`Network not found: ${networkOrGenesisHash}`);
+    }
+
+    // Check for existing client
+    const existing = this.papiClients.get(network);
+
+    if (existing) return existing;
+
+    // Ensure ApiPromise is initialized first (this creates the ApiProvider)
+    await this.getApi(network);
+
+    // Get ApiProvider and create adapter
+    const provider = getProvider(network);
+
+    if (!provider) {
+      throw new Error(`ApiProvider not found for: ${network}`);
+    }
+
+    const adapter = new PapiProviderAdapter(provider);
+
+    this.papiAdapters.set(network, adapter);
+
+    // Create papi client with SDK compatibility layer
+    const client = createClient(
+      withPolkadotSdkCompat(adapter.getJsonRpcProvider()),
+    );
+
+    this.papiClients.set(network, client);
+
+    return client;
+  }
+
+  /**
+   * Get both @polkadot/api and papi clients for a network
+   * Convenient method when you need to use both APIs
+   *
+   * @param networkOrGenesisHash - Network key or genesis hash
+   * @returns Promise resolving to both ApiPromise and PolkadotClient
+   */
+  async getDualApi(networkOrGenesisHash: string): Promise<{
+    api: ApiPromise;
+    papiClient: PolkadotClient;
+  }> {
+    const api = await this.getApi(networkOrGenesisHash);
+    const papiClient = await this.getPapiClient(networkOrGenesisHash);
+
+    return { api, papiClient };
+  }
+
+  /**
+   * Resolve network identifier to network key
+   */
+  private _resolveNetwork(networkOrGenesisHash: string): string | undefined {
+    // Direct match
+    if (this.apis.has(networkOrGenesisHash)) {
+      return networkOrGenesisHash;
+    }
+
+    // Lookup by genesis hash
+    const connection = this._resolveConnection(networkOrGenesisHash);
+
+    return connection?.network;
   }
 }

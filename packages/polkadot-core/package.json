@@ -60,7 +60,8 @@
     "eventemitter3": "^5.0.1",
     "idb": "^8.0.2",
     "jsondiffpatch": "^0.6.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "polkadot-api": "^1.23.1"
   },
   "devDependencies": {
     "@mimir-wallet/dev": "workspace:^",
