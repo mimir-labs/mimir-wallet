@@ -180,9 +180,9 @@ function makeNodes(
             : '',
         undefined,
         node.parent.type === TransactionType.Proxy
-          ? '#B700FF'
+          ? 'var(--purple)'
           : node.parent.type === TransactionType.Announce
-            ? '#B700FF'
+            ? 'var(--purple)'
             : '',
         node.parent.type === TransactionType.Proxy && node.parent.isRemoteProxy
           ? true

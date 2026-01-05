@@ -18,7 +18,7 @@ const badgeVariants = cva(
           'border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90',
         outline:
           'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
-        purple: 'border-transparent bg-[#B700FF]/5 text-[#B700FF]',
+        purple: 'border-transparent bg-purple/5 text-purple',
         teal: 'border-transparent bg-[#00A19C]/5 text-[#00A19C]',
       },
     },

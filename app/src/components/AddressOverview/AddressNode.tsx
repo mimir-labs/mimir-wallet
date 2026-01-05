@@ -174,7 +174,7 @@ const AddressNode = React.memo(
               borderRadius: '10px',
               background:
                 isPure || isProxied
-                  ? '#B700FF'
+                  ? 'var(--purple)'
                   : isMultisig
                     ? 'var(--primary)'
                     : 'var(--border)',
@@ -196,7 +196,7 @@ const AddressNode = React.memo(
               borderRadius: '10px',
               background:
                 data.type === 'proxy'
-                  ? '#B700FF'
+                  ? 'var(--purple)'
                   : data.type === 'multisig'
                     ? 'var(--primary)'
                     : 'var(--border)',

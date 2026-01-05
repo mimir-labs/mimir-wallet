@@ -147,7 +147,7 @@ function IdentityIcon({
               fontSize: size / 3,
               background: withBorder
                 ? isProxied
-                  ? '#B700FF'
+                  ? 'var(--purple)'
                   : 'var(--primary)'
                 : 'var(--primary)',
             }}
@@ -172,7 +172,7 @@ function IdentityIcon({
           <div
             style={{
               zIndex: 1,
-              borderColor: isProxied ? '#B700FF' : 'var(--primary)',
+              borderColor: isProxied ? 'var(--purple)' : 'var(--primary)',
               position: 'absolute',
               top: -3,
               right: -3,

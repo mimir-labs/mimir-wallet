@@ -134,6 +134,8 @@
   --color-info-foreground: var(--info-foreground);
   --color-danger: var(--danger);
   --color-danger-foreground: var(--danger-foreground);
+  --color-purple: var(--purple);
+  --color-purple-foreground: var(--purple-foreground);
 
   /* Shadows */
   --shadow-sm: 0 0 5px 0 rgba(21, 31, 52, 0.06);
@@ -276,6 +278,8 @@
   --info-foreground: oklch(0.15 0.04 185);
   --danger: #FF5310;
   --danger-foreground: #FFF;
+  --purple: #B700FF;
+  --purple-foreground: #FFF;
 
   /* Sidebar */
   --sidebar: white;

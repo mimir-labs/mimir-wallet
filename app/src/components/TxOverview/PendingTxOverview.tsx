@@ -379,7 +379,7 @@ function makeNodes(
         nodeId,
         node.from === 'delegate' ? node.value.proxyType : '',
         node.from === 'delegate' ? node.value.proxyDelay : undefined,
-        node.from === 'delegate' ? '#B700FF' : '#AEAEAE',
+        node.from === 'delegate' ? 'var(--purple)' : '#AEAEAE',
         node.from === 'delegate' && node.value.isRemoteProxy ? true : false,
       );
     }
