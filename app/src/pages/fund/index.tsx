@@ -10,9 +10,10 @@ import TransferAction from '@/apps/transfer/TransferAction';
 import TransferContent from '@/apps/transfer/TransferContent';
 import { NetworkErrorAlert } from '@/components';
 import {
-  InputTokenAmountProvider,
-  useInputTokenAmountContext,
-} from '@/components/InputTokenAmount';
+  InputNetworkTokenProvider,
+  useInputNetworkTokenContext,
+} from '@/components/InputNetworkToken';
+import { useInputNumber } from '@/hooks/useInputNumber';
 import { useWallet } from '@/wallet/useWallet';
 
 interface FundUIProps {
@@ -30,8 +31,10 @@ function FundUI({
 }: FundUIProps & { sending: string; setSending: (value: string) => void }) {
   const [error, setError] = useState<string | null>(null);
 
-  const { network, token, amount, isAmountValid, keepAlive } =
-    useInputTokenAmountContext();
+  // Amount state managed locally
+  const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
+
+  const { network, token, keepAlive } = useInputNetworkTokenContext();
 
   return (
     <NetworkProvider network={network}>
@@ -48,6 +51,9 @@ function FundUI({
               sending={sending}
               recipient={receipt}
               setSending={setSending}
+              amount={amount}
+              isAmountValid={isAmountValid}
+              setAmount={setAmount}
             />
 
             {error && (
@@ -95,14 +101,14 @@ function PageFund() {
   }
 
   return (
-    <InputTokenAmountProvider address={sending} defaultIdentifier="native">
+    <InputNetworkTokenProvider address={sending} defaultIdentifier="native">
       <FundUI
         filterSending={filterSending}
         sending={sending}
         setSending={setSending}
         receipt={receipt}
       />
-    </InputTokenAmountProvider>
+    </InputNetworkTokenProvider>
   );
 }
 

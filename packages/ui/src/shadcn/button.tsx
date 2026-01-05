@@ -25,7 +25,6 @@ const buttonVariants = cva(
     'font-normal',
     'subpixel-antialiased',
     'overflow-hidden',
-    'tap-highlight-transparent',
     'touch-manipulation',
     'transform-gpu active:scale-[0.97]',
     'transition-all motion-reduce:transition-none',
@@ -53,6 +52,7 @@ const buttonVariants = cva(
         success: '',
         warning: '',
         danger: '',
+        purple: '',
       },
       radius: {
         none: 'rounded-none',
@@ -96,6 +96,11 @@ const buttonVariants = cva(
         color: 'danger',
         class: colorVariants.solid.danger,
       },
+      {
+        variant: 'solid',
+        color: 'purple',
+        class: colorVariants.solid.purple,
+      },
       // shadow / color
       {
         variant: 'shadow',
@@ -121,6 +126,11 @@ const buttonVariants = cva(
         variant: 'shadow',
         color: 'danger',
         class: colorVariants.shadow.danger,
+      },
+      {
+        variant: 'shadow',
+        color: 'purple',
+        class: colorVariants.shadow.purple,
       },
       // bordered / color
       {
@@ -148,6 +158,11 @@ const buttonVariants = cva(
         color: 'danger',
         class: colorVariants.bordered.danger,
       },
+      {
+        variant: 'bordered',
+        color: 'purple',
+        class: colorVariants.bordered.purple,
+      },
       // flat / color
       {
         variant: 'flat',
@@ -174,6 +189,11 @@ const buttonVariants = cva(
         color: 'danger',
         class: colorVariants.flat.danger,
       },
+      {
+        variant: 'flat',
+        color: 'purple',
+        class: colorVariants.flat.purple,
+      },
       // faded / color
       {
         variant: 'faded',
@@ -199,6 +219,11 @@ const buttonVariants = cva(
         variant: 'faded',
         color: 'danger',
         class: colorVariants.faded.danger,
+      },
+      {
+        variant: 'faded',
+        color: 'purple',
+        class: colorVariants.faded.purple,
       },
       // light / color
       {
@@ -241,6 +266,14 @@ const buttonVariants = cva(
           'hover:bg-danger/20 disabled:bg-transparent! disabled:text-muted-foreground!',
         ],
       },
+      {
+        variant: 'light',
+        color: 'purple',
+        class: [
+          colorVariants.light.purple,
+          'hover:bg-purple/20 disabled:bg-transparent! disabled:text-muted-foreground!',
+        ],
+      },
       // ghost / color
       {
         variant: 'ghost',
@@ -280,6 +313,14 @@ const buttonVariants = cva(
         class: [
           colorVariants.ghost.danger,
           'hover:!bg-danger hover:!text-danger-foreground',
+        ],
+      },
+      {
+        variant: 'ghost',
+        color: 'purple',
+        class: [
+          colorVariants.ghost.purple,
+          'hover:!bg-purple hover:!text-purple-foreground',
         ],
       },
       {

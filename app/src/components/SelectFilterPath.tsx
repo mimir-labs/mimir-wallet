@@ -90,7 +90,7 @@ function SelectFilterPath({ label, filterPaths, value, onChange }: Props) {
         <PopoverTrigger asChild>
           <div
             ref={wrapperRef}
-            className="tap-highlight-transparent border-divider hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 rounded-[10px] border-1 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none"
+            className="border-divider hover:border-primary hover:bg-primary-50 data-[focus=true]:border-primary relative inline-flex h-14 min-h-10 w-full cursor-pointer flex-col items-start justify-center gap-0 rounded-[10px] border-1 px-2 py-2 shadow-none transition-all !duration-150 data-[focus=true]:bg-transparent motion-reduce:transition-none"
             onClick={handleOpen}
           >
             <FilterPathCell filterPath={value} />

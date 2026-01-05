@@ -9,14 +9,12 @@ import {
   toFunctionCallString,
 } from '@mimir-wallet/ai-assistant';
 import { isValidAddress, NetworkProvider } from '@mimir-wallet/polkadot-core';
-import { Button, Divider } from '@mimir-wallet/ui';
-import { Link } from '@tanstack/react-router';
+import { Divider } from '@mimir-wallet/ui';
 import { useCallback, useState } from 'react';
 
 import MultiTransferContent from './MultiTransferContent';
 
 import { useAccount } from '@/accounts/useAccount';
-import IconTransfer from '@/assets/svg/icon-transfer.svg?react';
 import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useRouteDependentHandler } from '@/hooks/useFunctionCallHandler';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
@@ -129,37 +127,19 @@ function MultiTransfer() {
 
   return (
     <NetworkProvider network={network}>
-      <div className="mx-auto w-full max-w-[500px] p-3 sm:p-5">
-        <Button onClick={() => window.history.back()} variant="ghost">
-          {'<'} Back
-        </Button>
-        <div className="card-root mt-4 p-3 sm:p-6 flex flex-col gap-5">
-          <div className="flex items-center justify-between">
-            <h3>Multi Transfer</h3>
+      <div className="card-root p-3 sm:p-6 flex flex-col gap-5">
+        <h4 className="font-extrabold">Multi Transfer</h4>
 
-            <Button asChild color="primary" variant="light">
-              <Link
-                to="/explorer/$url"
-                params={{
-                  url: 'mimir://app/transfer',
-                }}
-              >
-                <IconTransfer />
-                Solo-Transfer
-              </Link>
-            </Button>
-          </div>
-          <Divider />
+        <Divider />
 
-          <MultiTransferContent
-            data={data}
-            sending={current || ''}
-            network={network}
-            supportedNetworks={supportedNetworks?.map((n) => n.key)}
-            setNetwork={setNetwork}
-            setData={setData}
-          />
-        </div>
+        <MultiTransferContent
+          data={data}
+          sending={current || ''}
+          network={network}
+          supportedNetworks={supportedNetworks?.map((n) => n.key)}
+          setNetwork={setNetwork}
+          setData={setData}
+        />
       </div>
     </NetworkProvider>
   );

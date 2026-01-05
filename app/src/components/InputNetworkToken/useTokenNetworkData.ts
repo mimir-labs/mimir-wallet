@@ -22,10 +22,12 @@ import { useRecentNetworks } from '@/hooks/useRecentNetworks';
 interface UseTokenNetworkDataOptions {
   /** Only include these networks */
   supportedNetworks?: string[];
-  /** Include tokens with zero balance */
-  includeZeroBalance?: boolean;
   /** Active network filter from UI (when user selects a specific network) */
   activeNetworkFilter?: string | null;
+  /** Only show networks that support XCM (have paraspellChain defined) */
+  xcmOnly?: boolean;
+  /** Custom filter function for tokens */
+  tokenFilter?: (item: TokenNetworkItem) => boolean;
 }
 
 /**
@@ -45,8 +47,9 @@ export function useTokenNetworkData(
 ): TokenNetworkDataResult {
   const {
     supportedNetworks,
-    includeZeroBalance = false,
     activeNetworkFilter,
+    xcmOnly = false,
+    tokenFilter,
   } = options || {};
 
   // Use single chain query when user filters by a specific network
@@ -58,7 +61,7 @@ export function useTokenNetworkData(
 
   // Multi network: use useAllChainBalances (always enabled for "All" filter)
   const allChainBalances = useAllChainBalances(address, {
-    alwaysIncludeNative: false,
+    alwaysIncludeNative: true,
   });
 
   // Get network configurations
@@ -78,14 +81,32 @@ export function useTokenNetworkData(
     return map;
   }, [chains]);
 
-  // Filter networks based on supportedNetworks
+  // Filter networks based on supportedNetworks and xcmOnly
   const filteredNetworkKeys = useMemo(() => {
-    if (supportedNetworks && supportedNetworks.length > 0) {
+    // If xcmOnly, filter by paraspellChain existence
+    if (xcmOnly) {
+      const xcmNetworks = chains
+        .filter((chain) => chain.paraspellChain)
+        .map((chain) => chain.key);
+
+      // If supportedNetworks is also specified, intersect with xcmNetworks
+      if (supportedNetworks) {
+        const intersection = xcmNetworks.filter((key) =>
+          supportedNetworks.includes(key),
+        );
+
+        return new Set(intersection);
+      }
+
+      return new Set(xcmNetworks);
+    }
+
+    if (supportedNetworks) {
       return new Set(supportedNetworks);
     }
 
     return null; // null means all networks
-  }, [supportedNetworks]);
+  }, [supportedNetworks, xcmOnly, chains]);
 
   // Determine which networks to show in filter tabs
   // Priority: recent networks first, then enabled, then disabled
@@ -147,11 +168,6 @@ export function useTokenNetworkData(
 
       if (network && filteredChainData) {
         for (const tokenBalance of filteredChainData) {
-          // Skip zero balance tokens unless explicitly included
-          if (!includeZeroBalance && tokenBalance.transferrable <= 0n) {
-            continue;
-          }
-
           // Calculate USD value
           const usdValue = calculateUsdValue(
             tokenBalance.transferrable,
@@ -174,8 +190,20 @@ export function useTokenNetworkData(
         }
       }
 
+      // Filter by xcmOnly: exclude tokens without location and not native
+      let filteredItems = xcmOnly
+        ? tokenItems.filter(
+            (item) => item.token.isNative || item.token.location,
+          )
+        : tokenItems;
+
+      // Apply custom filter if provided
+      if (tokenFilter) {
+        filteredItems = filteredItems.filter(tokenFilter);
+      }
+
       return {
-        items: sortByUsdValue(tokenItems),
+        items: sortByUsdValue(filteredItems),
         allFetched: filteredChainFetched,
       };
     }
@@ -202,11 +230,6 @@ export function useTokenNetworkData(
         // Process balance data only when fetched
         if (data) {
           for (const tokenBalance of data) {
-            // Skip zero balance tokens unless explicitly included
-            if (!includeZeroBalance && tokenBalance.transferrable <= 0n) {
-              continue;
-            }
-
             // Calculate USD value
             const usdValue = calculateUsdValue(
               tokenBalance.transferrable,
@@ -234,8 +257,18 @@ export function useTokenNetworkData(
       }
     }
 
+    // Filter by xcmOnly: exclude tokens without location and not native
+    let filteredItems = xcmOnly
+      ? tokenItems.filter((item) => item.token.isNative || item.token.location)
+      : tokenItems;
+
+    // Apply custom filter if provided
+    if (tokenFilter) {
+      filteredItems = filteredItems.filter(tokenFilter);
+    }
+
     return {
-      items: sortByUsdValue(tokenItems),
+      items: sortByUsdValue(filteredItems),
       allFetched: allDone,
     };
   }, [
@@ -245,7 +278,8 @@ export function useTokenNetworkData(
     allChainBalances,
     networkMap,
     filteredNetworkKeys,
-    includeZeroBalance,
+    tokenFilter,
+    xcmOnly,
   ]);
 
   return {

@@ -351,6 +351,19 @@ export const dapps: DappOption<true | string[], (network: string) => URL>[] = [
     tags: ['Tool'],
   },
   {
+    id: 7,
+    name: 'Cross-chain Transfer',
+    description:
+      'Use XCM to perform cross-chain transfers within the Polkadot ecosystem',
+    url: 'mimir://app/cross-chain-transfer',
+    icon: '/dapp-icons/cross-chain-transfer.svg',
+    supportedChains: true,
+    website: 'https://mimir.global/',
+    github: 'https://github.com/mimir-labs/',
+    twitter: 'https://x.com/Mimir_global/',
+    tags: ['XCM', 'Transfer', 'CrossChain'],
+  },
+  {
     id: 500,
     icon: LogoCircle,
     name: 'Setup',

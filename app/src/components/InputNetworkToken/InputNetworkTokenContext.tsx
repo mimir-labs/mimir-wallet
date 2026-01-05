@@ -1,125 +1,141 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { InputTokenAmountContextValue } from './useInputTokenAmountContext';
+import type { TokenNetworkItem } from './types';
+import type { InputNetworkTokenContextValue } from './useInputNetworkTokenContext';
 
 import { useChain, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { InputTokenAmountContext } from './useInputTokenAmountContext';
+import { InputNetworkTokenContext } from './useInputNetworkTokenContext';
 import { useTokenNetworkData } from './useTokenNetworkData';
 import { findItemByValue } from './utils';
 
 import { useBalanceByIdentifier } from '@/hooks/useChainBalances';
-import { useInputNumber } from '@/hooks/useInputNumber';
 import { useRecentNetworks } from '@/hooks/useRecentNetworks';
-import { formatUnits } from '@/utils';
 
 /**
- * Props for InputTokenAmountProvider
+ * Props for InputNetworkTokenProvider
  */
-export interface InputTokenAmountProviderProps {
+export interface InputNetworkTokenProviderProps {
   children: React.ReactNode;
 
   /** Account address for fetching balance data */
   address?: string;
 
-  /** Default network */
+  /** Default network (used when network prop is not provided) */
   defaultNetwork?: string;
   /** Default identifier */
   defaultIdentifier?: string;
 
-  /** Minimum amount for validation */
-  minAmount?: number;
-  /** Include tokens with zero balance */
-  includeZeroBalance?: boolean;
   /** Default keep alive setting */
   defaultKeepAlive?: boolean;
 
   /** Supported networks filter - if provided, only show these networks */
   supportedNetworks?: string[];
+  /** Only show networks that support XCM (have paraspellChain defined) */
+  xcmOnly?: boolean;
+  /** Custom filter function for tokens */
+  tokenFilter?: (item: TokenNetworkItem) => boolean;
 }
 
 /**
- * Provider for InputTokenAmount context
+ * Provider for InputNetworkToken context
  *
- * Manages all state and data fetching for token amount input.
- * All networks are supported by default.
+ * Manages all state and data fetching for network token selection.
+ * Amount state is NOT managed here - it should be managed externally.
  *
  * @example
  * ```tsx
- * <InputTokenAmountProvider
+ * <InputNetworkTokenProvider
  *   address={current}
  *   defaultNetwork="polkadot"
  *   defaultIdentifier="native"
  * >
  *   <TransferUI />
- * </InputTokenAmountProvider>
+ * </InputNetworkTokenProvider>
  * ```
  */
-export function InputTokenAmountProvider({
+export function InputNetworkTokenProvider({
   children,
   address,
   defaultNetwork,
   defaultIdentifier = 'native',
-  minAmount = 0,
-  includeZeroBalance = false,
   defaultKeepAlive = true,
   supportedNetworks,
-}: InputTokenAmountProviderProps) {
+  xcmOnly = false,
+  tokenFilter,
+}: InputNetworkTokenProviderProps) {
   // Get initial network from context
   const { network: initialNetwork } = useNetwork();
   const { enableNetwork } = useChains();
 
-  // Network state (simple useState, supports all networks)
-  const [network, setNetworkInternal] = useState<string>(
+  // Store user's preferred selection (may become invalid if constraints change)
+  const [preferredNetwork, setPreferredNetwork] = useState<string>(
     defaultNetwork || initialNetwork,
   );
 
-  // Amount state with validation
-  const [[amount, isAmountValid], setAmountInternal] = useInputNumber(
-    '',
-    false,
-    minAmount,
-  );
-
-  // Identifier state
-  const [identifier, setIdentifierInternal] =
+  // Preferred identifier state
+  const [preferredIdentifier, setPreferredIdentifier] =
     useState<string>(defaultIdentifier);
 
   // Keep alive state
   const [keepAlive, setKeepAlive] = useState(defaultKeepAlive);
 
-  // Dialog filter state
-  const [activeNetworkFilter, setActiveNetworkFilterInternal] = useState<
-    string | null
-  >(null);
+  // Dialog filter state (internal, may be reset when network is forced to change)
+  const [activeNetworkFilterInternal, setActiveNetworkFilterInternal] =
+    useState<string | null>(null);
+
+  // Derive effective network by validating preferredNetwork against supportedNetworks
+  // This avoids the need for effect-based state correction
+  const network = useMemo(() => {
+    if (!supportedNetworks?.length) return preferredNetwork;
+
+    return supportedNetworks.includes(preferredNetwork)
+      ? preferredNetwork
+      : supportedNetworks[0];
+  }, [preferredNetwork, supportedNetworks]);
+
+  // Derive effective identifier (reset to native when network is forced to change)
+  const identifier = useMemo(() => {
+    if (
+      supportedNetworks?.length &&
+      !supportedNetworks.includes(preferredNetwork)
+    ) {
+      return 'native';
+    }
+
+    return preferredIdentifier;
+  }, [preferredNetwork, preferredIdentifier, supportedNetworks]);
+
+  // Reset activeNetworkFilter when network is forced to change
+  const activeNetworkFilter = useMemo(() => {
+    if (
+      supportedNetworks?.length &&
+      activeNetworkFilterInternal &&
+      !supportedNetworks.includes(activeNetworkFilterInternal)
+    ) {
+      return null;
+    }
+
+    return activeNetworkFilterInternal;
+  }, [supportedNetworks, activeNetworkFilterInternal]);
 
   // Data fetching with optional network filter
   const { items, networks, isLoading, isFetched } = useTokenNetworkData(
     address,
-    { includeZeroBalance, activeNetworkFilter, supportedNetworks },
+    {
+      activeNetworkFilter,
+      supportedNetworks: supportedNetworks,
+      xcmOnly,
+      tokenFilter,
+    },
   );
-
-  // Auto-switch to supported network when current network is not supported
-  useEffect(() => {
-    if (
-      supportedNetworks &&
-      supportedNetworks.length > 0 &&
-      !supportedNetworks.includes(network)
-    ) {
-      // Switch to first supported network with native token
-      setNetworkInternal(supportedNetworks[0]);
-      setIdentifierInternal('native');
-      setAmountInternal('');
-    }
-  }, [supportedNetworks, network, setAmountInternal]);
 
   // Recent networks for priority sorting
   const { addRecent } = useRecentNetworks();
 
   // Fallback: query balance directly when token not in items list
-  // (e.g., when token has zero balance and includeZeroBalance is false)
   const networkConfig = useChain(network);
   const [balanceData, isBalanceFetched, isBalanceFetching] =
     useBalanceByIdentifier(network, address, identifier);
@@ -159,17 +175,17 @@ export function InputTokenAmountProvider({
   // Setters
   const setNetwork = useCallback(
     (newNetwork: string) => {
-      setNetworkInternal(newNetwork);
+      setPreferredNetwork(newNetwork);
       addRecent(newNetwork);
     },
     [addRecent],
   );
 
   const setIdentifier = useCallback((newIdentifier: string) => {
-    setIdentifierInternal(newIdentifier);
+    setPreferredIdentifier(newIdentifier);
   }, []);
 
-  // Default maxVisibleNetworks is 5 (same as InputTokenAmount default)
+  // Default maxVisibleNetworks is 5 (same as InputNetworkToken default)
   const setActiveNetworkFilter = useCallback(
     (filter: string | null, maxVisibleNetworks = 5) => {
       setActiveNetworkFilterInternal(filter);
@@ -190,52 +206,19 @@ export function InputTokenAmountProvider({
       }
 
       setIdentifier(newValue.identifier);
-      // Reset amount when token changes
-      setAmountInternal('');
     },
-    [network, setNetwork, setIdentifier, setAmountInternal],
+    [network, setNetwork, setIdentifier],
   );
-
-  const setAmount = useCallback(
-    (newAmount: string) => {
-      setAmountInternal(newAmount);
-    },
-    [setAmountInternal],
-  );
-
-  // Set max amount based on selected token
-  const setMax = useCallback(() => {
-    if (!token) return;
-
-    const { token: tokenData } = token;
-    const existentialDeposit = tokenData.existentialDeposit
-      ? BigInt(tokenData.existentialDeposit)
-      : 0n;
-
-    let maxAmount = tokenData.transferrable;
-
-    // Subtract existential deposit if keepAlive is enabled for native token
-    if (keepAlive && tokenData.isNative && maxAmount > existentialDeposit) {
-      maxAmount = maxAmount - existentialDeposit;
-    }
-
-    const formatted = formatUnits(maxAmount, tokenData.decimals);
-
-    setAmountInternal(formatted);
-  }, [token, keepAlive, setAmountInternal]);
 
   // Reset to initial state
   const reset = useCallback(() => {
-    setIdentifier(defaultIdentifier);
-    setAmountInternal('');
+    setPreferredIdentifier(defaultIdentifier);
     setKeepAlive(defaultKeepAlive);
-  }, [defaultIdentifier, defaultKeepAlive, setIdentifier, setAmountInternal]);
+  }, [defaultIdentifier, defaultKeepAlive]);
 
-  const contextValue: InputTokenAmountContextValue = {
+  const contextValue: InputNetworkTokenContextValue = {
     address,
     value,
-    amount,
-    isAmountValid,
     network,
     identifier,
     token,
@@ -246,19 +229,17 @@ export function InputTokenAmountProvider({
     isFetched,
     keepAlive,
     setValue,
-    setAmount,
     setNetwork,
     setIdentifier,
     setKeepAlive,
-    setMax,
     reset,
     activeNetworkFilter,
     setActiveNetworkFilter,
   };
 
   return (
-    <InputTokenAmountContext.Provider value={contextValue}>
+    <InputNetworkTokenContext.Provider value={contextValue}>
       {children}
-    </InputTokenAmountContext.Provider>
+    </InputNetworkTokenContext.Provider>
   );
 }

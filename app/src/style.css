@@ -2,3 +2,17 @@
 @import '@mimir-wallet/ui/styles.css';
 @source '../index.html';
 @source '../src/**/*.{js,ts,jsx,tsx,mdx}';
+
+/* ============================================================================
+   View Transitions - iOS Style
+   ============================================================================ */
+
+::view-transition-old(root) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-new(root) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}

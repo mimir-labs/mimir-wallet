@@ -25,7 +25,8 @@
     "nativeDecimals": 10,
     "nativeToken": "DOT",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "AssetHubPolkadot"
   },
   {
     "key": "people-polkadot",
@@ -50,7 +51,8 @@
     "nativeDecimals": 10,
     "nativeToken": "DOT",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "PeoplePolkadot"
   },
   {
     "key": "coretime-polkadot",
@@ -76,7 +78,8 @@
     "nativeDecimals": 10,
     "nativeToken": "DOT",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "CoretimePolkadot"
   },
   {
     "key": "collectives-polkadot",
@@ -104,7 +107,8 @@
     "nativeDecimals": 10,
     "nativeToken": "DOT",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Collectives"
   },
   {
     "key": "bifrost-polkadot",
@@ -125,7 +129,8 @@
     "nativeDecimals": 12,
     "nativeToken": "BNC",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "BifrostPolkadot"
   },
   {
     "key": "hydration",
@@ -147,7 +152,8 @@
     "nativeDecimals": 12,
     "nativeToken": "HDX",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Hydration"
   },
   {
     "key": "crust-polkadot",
@@ -168,7 +174,8 @@
     "nativeDecimals": 12,
     "nativeToken": "CRU",
     "supportsDryRun": false,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Crust"
   },
   {
     "key": "pendulum",
@@ -186,7 +193,8 @@
     "nativeDecimals": 12,
     "nativeToken": "PEN",
     "supportsDryRun": false,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Pendulum"
   },
   {
     "key": "acala",
@@ -209,7 +217,8 @@
     "nativeDecimals": 12,
     "nativeToken": "ACA",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Acala"
   },
   {
     "key": "phala",
@@ -229,7 +238,8 @@
     "nativeDecimals": 12,
     "nativeToken": "PHA",
     "supportsDryRun": false,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Phala"
   },
   {
     "key": "nexus",
@@ -270,7 +280,8 @@
     "nativeDecimals": 18,
     "nativeToken": "ASTR",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Astar"
   },
   {
     "key": "xcavate-polkadot",
@@ -338,6 +349,7 @@
     "nativeDecimals": 10,
     "nativeToken": "DOT",
     "supportsDryRun": true,
-    "supportsProxy": true
+    "supportsProxy": true,
+    "paraspellChain": "Polkadot"
   }
 ]

@@ -5,6 +5,23 @@ import type { HexString } from '@polkadot/util/types';
 
 import { BaseService } from './BaseService.js';
 
+export type AssetJunctions = {
+  Here?: null;
+  X1?: object | object[];
+  X2?: object[];
+  X3?: object[];
+  X4?: object[];
+  X5?: object[];
+  X6?: object[];
+  X7?: object[];
+  X8?: object[];
+};
+
+export type AssetLocation = {
+  parents: string | number;
+  interior: AssetJunctions | 'Here';
+};
+
 /**
  * Base asset information shared across all asset types
  */
@@ -19,6 +36,7 @@ interface BaseAssetInfo {
   readonly existentialDeposit: string;
   /** Whether asset can pay for transaction fees */
   readonly isSufficient?: boolean;
+  readonly location?: AssetLocation | null;
 }
 
 /**
