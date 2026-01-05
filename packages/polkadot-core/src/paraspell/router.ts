@@ -6,16 +6,10 @@ import type { AnyAssetInfo } from '@mimir-wallet/service';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { PolkadotClient } from 'polkadot-api';
 
-import { RouterBuilder } from '@paraspell/xcm-router';
-
 import { ApiManager } from '../api/ApiManager.js';
 import { allEndpoints } from '../chains/config.js';
 
-import {
-  buildPapiOverrides,
-  buildCurrencyCore,
-  type XcmFeeAsset,
-} from './index.js';
+import { buildCurrencyCore, type XcmFeeAsset } from './index.js';
 
 /**
  * Swap transaction type
@@ -100,64 +94,50 @@ export async function buildSwapCall(
     throw new Error('Chain does not support XCM Router');
   }
 
-  const apiOverrides: Record<string, Promise<PolkadotClient>> = {
-    ...buildPapiOverrides(fromChain, toChain, fromToken),
-    Hydration: ApiManager.getInstance().getPapiClient('hydration'),
-  };
-
   // Build the router
-  let builder = RouterBuilder({
-    apiOverrides: apiOverrides,
-  })
-    .exchange('HydrationDex')
-    .from(fromParaspell)
-    .to(toParaspell)
-    .currencyFrom(buildCurrencyCore(fromToken))
-    .currencyTo(buildCurrencyCore(toToken))
-    .amount(amount)
-    .slippagePct(slippagePct)
-    .senderAddress(senderAddress)
-    .recipientAddress(recipient);
+  // let builder = RouterBuilder({
+  //   apiOverrides: apiOverrides,
+  // })
+  //   .exchange('HydrationDex')
+  //   .from(fromParaspell)
+  //   .to(toParaspell)
+  //   .currencyFrom(buildCurrencyCore(fromToken))
+  //   .currencyTo(buildCurrencyCore(toToken))
+  //   .amount(amount)
+  //   .slippagePct(slippagePct)
+  //   .senderAddress(senderAddress)
+  //   .recipientAddress(recipient);
 
-  // Set exchange if specified
-  if (exchange) {
-    builder = builder.exchange(exchange as any);
-  }
+  const [result, api] = await Promise.all([
+    fetch('https://api.lightspell.xyz/v5/router', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(
+        {
+          from: fromParaspell,
+          exchange: 'HydrationDex',
+          to: toParaspell,
+          currencyFrom: buildCurrencyCore(fromToken),
+          currencyTo: buildCurrencyCore(toToken),
+          amount: amount,
+          slippagePct: slippagePct,
+          recipientAddress: recipient,
+          senderAddress: senderAddress,
+        },
+        (_, value) => (typeof value === 'bigint' ? value.toString() : value),
+      ),
+    }).then((res) => res.json()),
+    ApiManager.getInstance().getApi(fromChain.key),
+  ]);
 
-  // Build transactions (PAPI format)
-  const transactions = await builder.buildTransactions();
-
-  // Convert PAPI transactions to Polkadot.js format
-  const apiManager = ApiManager.getInstance();
-
-  const result: SwapTransaction[] = await Promise.all(
-    transactions.map(async (tx) => {
-      // Get SCALE encoded call data from PAPI transaction
-      const encodedCallData = (await tx.tx.getEncodedData()).asHex();
-
-      // Find the chain endpoint
-      const chainEndpoint = allEndpoints.find(
-        (e) => e.paraspellChain === tx.chain,
-      );
-
-      if (!chainEndpoint) {
-        throw new Error(`Chain endpoint not found for ${tx.chain}`);
-      }
-
-      // Get Polkadot.js API and rebuild transaction
-      const api = await apiManager.getApi(chainEndpoint.key);
-      const pjsTx = api.tx(encodedCallData);
-
-      return {
-        tx: pjsTx,
-        chain: tx.chain,
-        type: tx.type as SwapTransactionType,
-        amountOut: 'amountOut' in tx ? (tx.amountOut as bigint) : undefined,
-      };
-    }),
-  );
-
-  return result;
+  return result.map((item: any) => ({
+    chain: item.chain,
+    type: item.type,
+    tx: api.tx(api.createType('Call', item.tx)),
+    amountOut: BigInt(item.amountOut),
+  }));
 }
 
 /**
@@ -171,19 +151,36 @@ export async function getBestAmountOut(params: {
   amount: string;
 }): Promise<{ amountOut: bigint; exchange: string }> {
   const { fromChain, toChain, fromToken, toToken, amount } = params;
-  const apiOverrides: Record<string, Promise<PolkadotClient>> = {
-    ...buildPapiOverrides(fromChain, toChain, fromToken),
-    Hydration: ApiManager.getInstance().getPapiClient('hydration'),
-  };
 
-  const result = await RouterBuilder({
-    apiOverrides: apiOverrides,
-  })
-    .exchange('HydrationDex')
-    .currencyFrom(buildCurrencyCore(fromToken))
-    .currencyTo(buildCurrencyCore(toToken))
-    .amount(amount)
-    .getBestAmountOut();
+  const result = await fetch(
+    'https://api.lightspell.xyz/v5/router/best-amount-out',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(
+        {
+          from: fromChain.paraspellChain,
+          exchange: 'HydrationDex',
+          to: toChain.paraspellChain,
+          currencyFrom: buildCurrencyCore(fromToken),
+          currencyTo: buildCurrencyCore(toToken),
+          amount: amount,
+        },
+        (_, value) => (typeof value === 'bigint' ? value.toString() : value),
+      ),
+    },
+  ).then((res) => res.json());
+
+  // const result = await RouterBuilder({
+  //   apiOverrides: apiOverrides,
+  // })
+  //   .exchange('HydrationDex')
+  //   .currencyFrom(buildCurrencyCore(fromToken))
+  //   .currencyTo(buildCurrencyCore(toToken))
+  //   .amount(amount)
+  //   .getBestAmountOut();
 
   return {
     amountOut: result.amountOut,
@@ -217,24 +214,40 @@ export async function getSwapXcmFees(params: GetSwapEstimateParams): Promise<{
     throw new Error('Chain does not support XCM Router');
   }
 
-  const apiOverrides: Record<string, Promise<PolkadotClient>> = {
-    ...buildPapiOverrides(fromChain, toChain, fromToken),
-    Hydration: ApiManager.getInstance().getPapiClient('hydration'),
-  };
+  // const fees = await RouterBuilder({
+  //   apiOverrides: apiOverrides,
+  // })
+  //   .exchange('HydrationDex')
+  //   .from(fromParaspell)
+  //   .to(toParaspell)
+  //   .currencyFrom(buildCurrencyCore(fromToken))
+  //   .currencyTo(buildCurrencyCore(toToken))
+  //   .amount(amount)
+  //   .slippagePct(slippagePct)
+  //   .senderAddress(senderAddress)
+  //   .recipientAddress(recipient)
+  //   .getXcmFees();
 
-  const fees = await RouterBuilder({
-    apiOverrides: apiOverrides,
-  })
-    .exchange('HydrationDex')
-    .from(fromParaspell)
-    .to(toParaspell)
-    .currencyFrom(buildCurrencyCore(fromToken))
-    .currencyTo(buildCurrencyCore(toToken))
-    .amount(amount)
-    .slippagePct(slippagePct)
-    .senderAddress(senderAddress)
-    .recipientAddress(recipient)
-    .getXcmFees();
+  const fees = await fetch('https://api.lightspell.xyz/v5/router/xcm-fees', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(
+      {
+        from: fromParaspell,
+        exchange: 'HydrationDex',
+        to: toParaspell,
+        currencyFrom: buildCurrencyCore(fromToken),
+        currencyTo: buildCurrencyCore(toToken),
+        amount: amount,
+        slippagePct: slippagePct,
+        recipientAddress: recipient,
+        senderAddress: senderAddress,
+      },
+      (_, value) => (typeof value === 'bigint' ? value.toString() : value),
+    ),
+  }).then((res) => res.json());
 
   const originFee: XcmFeeAsset = {
     fee: (fees.origin.fee ?? 0n).toString(),

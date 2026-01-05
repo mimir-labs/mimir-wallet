@@ -3,8 +3,6 @@
 
 import type { Endpoint } from '../types/types.js';
 import type { AnyAssetInfo } from '@mimir-wallet/service';
-import type { ApiPromise } from '@polkadot/api';
-import type { PolkadotClient } from 'polkadot-api';
 
 import {
   findAssetInfo,
@@ -18,20 +16,15 @@ import {
   type TCurrencyInputWithAmount,
 } from '@paraspell/assets';
 import {
-  Builder,
   Foreign,
   getSupportedDestinations as paraspellGetSupportedDestinations,
   Native,
-  getAssetReserveChain,
   type TLocation,
-} from '@paraspell/sdk-pjs';
+  type TGetXcmFeeResult,
+} from '@paraspell/sdk-core';
 
 import { ApiManager } from '../api/ApiManager.js';
-import {
-  allEndpoints,
-  getRelayChainKey,
-  getRelaySystemChains,
-} from '../chains/config.js';
+import { allEndpoints, getRelayChainKey } from '../chains/config.js';
 
 /**
  * Fee asset information from dry run
@@ -89,19 +82,19 @@ export function buildCurrencySpec(
 ): TCurrencyInputWithAmount {
   // Priority: isNative > location > assetId
   if (token.isNative) {
-    return { symbol: Native(token.symbol), amount: BigInt(amount) };
+    return { symbol: Native(token.symbol), amount: amount };
   }
 
   if (token.location) {
-    return { location: token.location as any, amount: BigInt(amount) };
+    return { location: token.location as any, amount: amount };
   }
 
   if (token.assetId) {
-    return { id: token.assetId, amount: BigInt(amount) };
+    return { id: token.assetId, amount: amount };
   }
 
   // Fallback: use Foreign() for tokens without location/assetId
-  return { symbol: Foreign(token.symbol), amount: BigInt(amount) };
+  return { symbol: Foreign(token.symbol), amount: amount };
 }
 
 export function buildCurrencyCore(token: AnyAssetInfo): TCurrencyCore {
@@ -120,120 +113,6 @@ export function buildCurrencyCore(token: AnyAssetInfo): TCurrencyCore {
 
   // Fallback: use Foreign() for tokens without location/assetId
   return { symbol: Foreign(token.symbol) };
-}
-
-/**
- * Helper function to build API overrides for ParaSpell
- */
-export function buildApiOverrides(
-  sourceChain: Endpoint,
-  destChain: Endpoint,
-  asset: AnyAssetInfo,
-): Record<string, Promise<ApiPromise>> {
-  const apiOverrides: Record<string, Promise<ApiPromise>> = {};
-  const apiManager = ApiManager.getInstance();
-
-  if (sourceChain.paraspellChain) {
-    apiOverrides[sourceChain.paraspellChain] = apiManager.getApi(
-      sourceChain.key,
-    );
-  }
-
-  if (destChain.paraspellChain) {
-    apiOverrides[destChain.paraspellChain] = apiManager.getApi(destChain.key);
-  }
-
-  // Add system chains (AssetHub, BridgeHub) for the relay chain
-  const { assetHub, bridgeHub } = getRelaySystemChains(sourceChain);
-
-  if (assetHub?.paraspellChain) {
-    apiOverrides[assetHub.paraspellChain] = apiManager.getApi(assetHub.key);
-  }
-
-  if (bridgeHub?.paraspellChain) {
-    apiOverrides[bridgeHub.paraspellChain] = apiManager.getApi(bridgeHub.key);
-  }
-
-  if (sourceChain.paraspellChain && asset.location) {
-    try {
-      const reserveChain = getAssetReserveChain(
-        sourceChain.paraspellChain,
-        asset.location as TLocation,
-      );
-
-      const chain = allEndpoints.find(
-        (item) => item.paraspellChain && item.paraspellChain === reserveChain,
-      );
-
-      if (chain) {
-        apiOverrides[reserveChain] = apiManager.getApi(chain.key);
-      }
-    } catch {
-      /* empty */
-    }
-  }
-
-  return apiOverrides;
-}
-
-/**
- * Helper function to build PAPI overrides for ParaSpell
- */
-export function buildPapiOverrides(
-  sourceChain: Endpoint,
-  destChain: Endpoint,
-  asset: AnyAssetInfo,
-): Record<string, Promise<PolkadotClient>> {
-  const apiOverrides: Record<string, Promise<PolkadotClient>> = {};
-  const apiManager = ApiManager.getInstance();
-
-  if (sourceChain.paraspellChain) {
-    apiOverrides[sourceChain.paraspellChain] = apiManager.getPapiClient(
-      sourceChain.key,
-    );
-  }
-
-  if (destChain.paraspellChain) {
-    apiOverrides[destChain.paraspellChain] = apiManager.getPapiClient(
-      destChain.key,
-    );
-  }
-
-  // Add system chains (AssetHub, BridgeHub) for the relay chain
-  const { assetHub, bridgeHub } = getRelaySystemChains(sourceChain);
-
-  if (assetHub?.paraspellChain) {
-    apiOverrides[assetHub.paraspellChain] = apiManager.getPapiClient(
-      assetHub.key,
-    );
-  }
-
-  if (bridgeHub?.paraspellChain) {
-    apiOverrides[bridgeHub.paraspellChain] = apiManager.getPapiClient(
-      bridgeHub.key,
-    );
-  }
-
-  if (sourceChain.paraspellChain && asset.location) {
-    try {
-      const reserveChain = getAssetReserveChain(
-        sourceChain.paraspellChain,
-        asset.location as TLocation,
-      );
-
-      const chain = allEndpoints.find(
-        (item) => item.paraspellChain && item.paraspellChain === reserveChain,
-      );
-
-      if (chain) {
-        apiOverrides[reserveChain] = apiManager.getPapiClient(chain.key);
-      }
-    } catch {
-      /* empty */
-    }
-  }
-
-  return apiOverrides;
 }
 
 /**
@@ -263,23 +142,29 @@ export async function buildXcmCall(params: BuildXcmCallParams) {
     throw new Error('Chain does not support XCM transfers');
   }
 
-  const apiOverrides = buildApiOverrides(sourceChain, destChain, token);
+  const api = await ApiManager.getInstance().getApi(sourceChain.key);
 
   // Build currency spec
   const currencySpec = buildCurrencySpec(token, amount);
 
-  // Build the transaction
-  const builder = Builder({ apiOverrides });
+  const result: string = await fetch(
+    'https://api.lightspell.xyz/v5/x-transfer',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: sourceParaspell,
+        to: destParaspell,
+        currency: currencySpec,
+        address: recipient,
+        senderAddress: senderAddress,
+      }),
+    },
+  ).then((res) => res.text());
 
-  const tx = await builder
-    .from(sourceParaspell)
-    .to(destParaspell)
-    .currency(currencySpec)
-    .address(recipient || senderAddress)
-    .senderAddress(senderAddress)
-    .build();
-
-  return tx;
+  return api.tx(api.createType('Call', result));
 }
 
 /**
@@ -307,17 +192,25 @@ export async function getXcmFee(params: GetXcmFeeParams) {
     throw new Error('Not Support chain');
   }
 
-  const apiOverrides = buildApiOverrides(sourceChain, destChain, token);
   // Use a minimal amount for fee estimation - XCM fees don't depend on transfer amount
-  const currencySpec = buildCurrencySpec(token, '0');
+  const currencySpec = buildCurrencySpec(token, '1');
 
-  const result = await Builder({ apiOverrides })
-    .from(sourceParaspell)
-    .to(destParaspell)
-    .currency(currencySpec)
-    .address(recipient)
-    .senderAddress(senderAddress)
-    .getXcmFee();
+  const result: TGetXcmFeeResult<false> = await fetch(
+    'https://api.lightspell.xyz/v5/xcm-fee',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: sourceParaspell,
+        to: destParaspell,
+        currency: currencySpec,
+        address: recipient,
+        senderAddress: senderAddress,
+      }),
+    },
+  ).then((res) => res.json());
 
   return result;
 }
