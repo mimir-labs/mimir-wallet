@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.2.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v3.1.0...mimir-wallet-app-v3.2.0) (2026-01-05)
+
+
+### Features
+
+* **xcm:** add cross-chain transfer feature ([#366](https://github.com/mimir-labs/mimir-wallet/issues/366)) ([6ef252f](https://github.com/mimir-labs/mimir-wallet/commit/6ef252f5ae3dbb145bf6eccafb1c9d1df0b03427))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 3.2.0
+    * @mimir-wallet/service bumped to 3.2.0
+    * @mimir-wallet/ui bumped to 3.2.0
+
 ## [3.1.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v3.0.0...mimir-wallet-app-v3.1.0) (2025-12-11)
 
 
