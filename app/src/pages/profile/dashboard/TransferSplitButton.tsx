@@ -9,7 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@mimir-wallet/ui';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import React, { useMemo, useState } from 'react';
 
 import ArrowDown from '@/assets/svg/ArrowDown.svg?react';
@@ -48,6 +48,7 @@ function TransferSplitButton() {
     HERO_TRANSFER_TYPE_KEY,
     'transfer',
   );
+  const navigate = useNavigate();
 
   const currentTransfer = useMemo(
     () => TRANSFER_TYPES.find((t) => t.key === selectedTransfer)!,
@@ -100,6 +101,12 @@ function TransferSplitButton() {
                   onClick={() => {
                     setSelectedTransfer(type.key);
                     setMenuOpen(false);
+                    navigate({
+                      to: '/explorer/$url',
+                      params: {
+                        url: `${type.url}?callbackPath=${encodeURIComponent('/')}`,
+                      },
+                    });
                   }}
                   className={cn(
                     'flex items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-secondary',

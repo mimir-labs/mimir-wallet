@@ -103,8 +103,13 @@ export function buildCurrencyCore(token: AnyAssetInfo): TCurrencyCore {
     return { location: token.location as any };
   }
 
+  // Priority: isNative > location > assetId
   if (token.isNative) {
     return { symbol: Native(token.symbol) };
+  }
+
+  if (token.location) {
+    return { location: token.location as any };
   }
 
   if (token.assetId) {

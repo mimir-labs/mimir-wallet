@@ -4,7 +4,7 @@
 import { store } from '@mimir-wallet/service';
 import { Button, Tabs } from '@mimir-wallet/ui';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import AppFrame from './AppFrame';
 

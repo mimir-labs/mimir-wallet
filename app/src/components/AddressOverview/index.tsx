@@ -162,7 +162,7 @@ function makeNodes(
             : '',
         node.from === 'delegate' ? node.value.proxyDelay : undefined,
         node.from === 'delegate'
-          ? '#B700FF'
+          ? 'var(--purple)'
           : node.from === 'member'
             ? 'var(--primary)'
             : 'var(--border)',

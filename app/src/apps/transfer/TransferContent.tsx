@@ -6,7 +6,8 @@ import {
   useChain,
   useChains,
 } from '@mimir-wallet/polkadot-core';
-import { Alert, AlertTitle, Avatar, Switch } from '@mimir-wallet/ui';
+import { Alert, AlertTitle, Avatar, Button, Switch } from '@mimir-wallet/ui';
+import { Link } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 
 import { useAddressMeta } from '@/accounts/useAddressMeta';
@@ -99,7 +100,7 @@ function TransferContent({
       {disabledSending ? (
         <div className="flex flex-col gap-2">
           <p className="text-sm font-bold">Sending From</p>
-          <div className="bg-secondary rounded-[10px] p-2">
+          <div className="flex items-center justify-between bg-secondary rounded-[10px] p-2">
             <AddressCell
               shorten={!upSm}
               showType
@@ -107,6 +108,9 @@ function TransferContent({
               withCopy
               withAddressBook
             />
+            <Button asChild size="sm" color="purple">
+              <Link to="/fund">Fund</Link>
+            </Button>
           </div>
         </div>
       ) : (

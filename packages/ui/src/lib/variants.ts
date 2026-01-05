@@ -8,6 +8,7 @@ const solid = {
   success: 'bg-success text-success-foreground',
   warning: 'bg-warning text-warning-foreground',
   danger: 'bg-danger text-danger-foreground',
+  purple: 'bg-purple text-purple-foreground',
   foreground: 'bg-foreground text-background',
 };
 
@@ -19,6 +20,7 @@ const shadow = {
   success: 'shadow-lg shadow-success/40 bg-success text-success-foreground',
   warning: 'shadow-lg shadow-warning/40 bg-warning text-warning-foreground',
   danger: 'shadow-lg shadow-danger/40 bg-danger text-danger-foreground',
+  purple: 'shadow-lg shadow-purple/40 bg-purple text-purple-foreground',
   foreground: 'shadow-lg shadow-foreground/40 bg-foreground text-background',
 };
 
@@ -29,6 +31,7 @@ const bordered = {
   success: 'bg-transparent border-success text-success',
   warning: 'bg-transparent border-warning text-warning',
   danger: 'bg-transparent border-danger text-danger',
+  purple: 'bg-transparent border-purple text-purple',
   foreground: 'bg-transparent border-foreground text-foreground',
 };
 
@@ -39,6 +42,7 @@ const flat = {
   success: 'bg-success/20 text-success-700 dark:text-success',
   warning: 'bg-warning/20 text-warning-700 dark:text-warning',
   danger: 'bg-danger/20 text-danger-600 dark:text-danger-500',
+  purple: 'bg-purple/20 text-purple',
   foreground: 'bg-foreground/10 text-foreground',
 };
 
@@ -49,6 +53,7 @@ const faded = {
   success: 'border-default bg-default-100 text-success',
   warning: 'border-default bg-default-100 text-warning',
   danger: 'border-default bg-default-100 text-danger',
+  purple: 'border-default bg-default-100 text-purple',
   foreground: 'border-default bg-default-100 text-foreground',
 };
 
@@ -59,6 +64,7 @@ const light = {
   success: 'bg-transparent text-success',
   warning: 'bg-transparent text-warning',
   danger: 'bg-transparent text-danger',
+  purple: 'bg-transparent text-purple',
   foreground: 'bg-transparent text-foreground',
 };
 
@@ -69,6 +75,7 @@ const ghost = {
   success: 'border-success text-success',
   warning: 'border-warning text-warning',
   danger: 'border-danger text-danger',
+  purple: 'border-purple text-purple',
   foreground: 'border-foreground text-foreground hover:!bg-foreground',
 };
 
