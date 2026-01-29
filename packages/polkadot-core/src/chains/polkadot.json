@@ -221,27 +221,6 @@
     "paraspellChain": "Acala"
   },
   {
-    "key": "phala",
-    "icon": "/chain-icons/phala.svg",
-    "tokenIcon": "/token-icons/PHA.svg",
-    "name": "Phala",
-    "relayChain": "polkadot",
-    "paraId": 2035,
-    "wsUrl": {
-      "Dwellir": "wss://phala-rpc.n.dwellir.com",
-      "OnFinality": "wss://phala.api.onfinality.io/public-ws",
-      "RadiumBlock": "wss://phala.public.curie.radiumblock.co/ws"
-    },
-    "genesisHash": "0x1bb969d85965e4bb5a651abbedf21a54b6b31a21f66b5401cc3f1e286268d736",
-    "ss58Format": 30,
-    "explorerUrl": "https://phala.subscan.io/",
-    "nativeDecimals": 12,
-    "nativeToken": "PHA",
-    "supportsDryRun": false,
-    "supportsProxy": true,
-    "paraspellChain": "Phala"
-  },
-  {
     "key": "nexus",
     "icon": "/chain-icons/nexus.webp",
     "tokenIcon": "/token-icons/BRIDGE.webp",

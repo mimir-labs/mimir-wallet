@@ -1,7 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TokenNetworkItem } from './types';
+import type { TokenNetworkItem, TokenNetworkValue } from './types';
 import type { InputNetworkTokenContextValue } from './useInputNetworkTokenContext';
 
 import { useChain, useChains, useNetwork } from '@mimir-wallet/polkadot-core';
@@ -23,10 +23,20 @@ export interface InputNetworkTokenProviderProps {
   /** Account address for fetching balance data */
   address?: string;
 
-  /** Default network (used when network prop is not provided) */
+  /** Default network (used in uncontrolled mode) */
   defaultNetwork?: string;
-  /** Default identifier */
+  /** Default identifier (used in uncontrolled mode) */
   defaultIdentifier?: string;
+
+  /**
+   * Controlled value - if provided, component becomes controlled
+   * When controlled, internal state syncs with this value
+   */
+  value?: TokenNetworkValue;
+  /**
+   * Callback when value changes (works in both controlled and uncontrolled modes)
+   */
+  onChange?: (value: TokenNetworkValue) => void;
 
   /** Default keep alive setting */
   defaultKeepAlive?: boolean;
@@ -37,6 +47,8 @@ export interface InputNetworkTokenProviderProps {
   xcmOnly?: boolean;
   /** Custom filter function for tokens */
   tokenFilter?: (item: TokenNetworkItem) => boolean;
+  /** Include all assets without balance query (for destination token selection) */
+  includeAllAssets?: boolean;
 }
 
 /**
@@ -60,24 +72,30 @@ export function InputNetworkTokenProvider({
   children,
   address,
   defaultNetwork,
-  defaultIdentifier = 'native',
+  defaultIdentifier,
+  value: controlledValue,
+  onChange,
   defaultKeepAlive = true,
   supportedNetworks,
   xcmOnly = false,
   tokenFilter,
+  includeAllAssets = false,
 }: InputNetworkTokenProviderProps) {
   // Get initial network from context
   const { network: initialNetwork } = useNetwork();
   const { enableNetwork } = useChains();
 
-  // Store user's preferred selection (may become invalid if constraints change)
-  const [preferredNetwork, setPreferredNetwork] = useState<string>(
+  // Internal state for uncontrolled mode
+  const [internalNetwork, setInternalNetwork] = useState<string>(
     defaultNetwork || initialNetwork,
   );
+  const [internalIdentifier, setInternalIdentifier] = useState<
+    string | undefined
+  >(defaultIdentifier);
 
-  // Preferred identifier state
-  const [preferredIdentifier, setPreferredIdentifier] =
-    useState<string>(defaultIdentifier);
+  // Derive effective preferred values: use controlled value if provided, otherwise internal state
+  const preferredNetwork = controlledValue?.network ?? internalNetwork;
+  const preferredIdentifier = controlledValue?.identifier ?? internalIdentifier;
 
   // Keep alive state
   const [keepAlive, setKeepAlive] = useState(defaultKeepAlive);
@@ -129,6 +147,7 @@ export function InputNetworkTokenProvider({
       supportedNetworks: supportedNetworks,
       xcmOnly,
       tokenFilter,
+      includeAllAssets,
     },
   );
 
@@ -142,6 +161,11 @@ export function InputNetworkTokenProvider({
 
   // Compute selected token from items, with fallback to direct balance query
   const token = useMemo(() => {
+    // If no identifier selected, no token
+    if (!identifier) {
+      return undefined;
+    }
+
     // First try to find in items list
     const fromItems = findItemByValue(items, { network, identifier });
 
@@ -172,17 +196,17 @@ export function InputNetworkTokenProvider({
     return { network, identifier };
   }, [network, identifier]);
 
-  // Setters
+  // Setters - update internal state only (onChange is called in setValue)
   const setNetwork = useCallback(
     (newNetwork: string) => {
-      setPreferredNetwork(newNetwork);
+      setInternalNetwork(newNetwork);
       addRecent(newNetwork);
     },
     [addRecent],
   );
 
   const setIdentifier = useCallback((newIdentifier: string) => {
-    setPreferredIdentifier(newIdentifier);
+    setInternalIdentifier(newIdentifier);
   }, []);
 
   // Default maxVisibleNetworks is 5 (same as InputNetworkToken default)
@@ -199,20 +223,27 @@ export function InputNetworkTokenProvider({
     [addRecent, enableNetwork],
   );
 
+  // Main setter - updates internal state and notifies onChange
   const setValue = useCallback(
     (newValue: { network: string; identifier: string }) => {
-      if (newValue.network !== network) {
+      // Update internal state
+      if (newValue.network !== internalNetwork) {
         setNetwork(newValue.network);
       }
 
-      setIdentifier(newValue.identifier);
+      if (newValue.identifier !== internalIdentifier) {
+        setIdentifier(newValue.identifier);
+      }
+
+      // Notify onChange (single call with complete value)
+      onChange?.(newValue);
     },
-    [network, setNetwork, setIdentifier],
+    [internalNetwork, internalIdentifier, setNetwork, setIdentifier, onChange],
   );
 
   // Reset to initial state
   const reset = useCallback(() => {
-    setPreferredIdentifier(defaultIdentifier);
+    setInternalIdentifier(defaultIdentifier);
     setKeepAlive(defaultKeepAlive);
   }, [defaultIdentifier, defaultKeepAlive]);
 

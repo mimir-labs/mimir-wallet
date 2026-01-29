@@ -238,7 +238,7 @@ function CrossChainTransferForm({
           getCall={getCall}
         >
           {isLoading ? (
-            <span className="animate-dots">Loading</span>
+            <span className="animate-dots">Calculating Fee</span>
           ) : (
             'Confirm'
           )}

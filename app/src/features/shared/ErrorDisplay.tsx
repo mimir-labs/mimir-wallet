@@ -51,30 +51,3 @@ export function ErrorDisplay({
     </Alert>
   );
 }
-
-/**
- * Legacy error display component for backwards compatibility
- * @deprecated Use ErrorDisplay component instead
- */
-export function LegacyErrorDisplay({
-  error,
-  className = 'bg-secondary rounded-[10px] p-2.5 break-all',
-}: {
-  error: Error | null;
-  className?: string;
-}) {
-  if (!error) return null;
-
-  return (
-    <div className={className}>
-      <div
-        style={{
-          fontFamily: 'Geist Mono',
-        }}
-        className="text-danger text-xs"
-      >
-        {error.message}
-      </div>
-    </div>
-  );
-}

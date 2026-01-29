@@ -1,6 +1,7 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { CompleteEnhancedAssetInfo } from '@mimir-wallet/service';
 import type { HexString } from '@polkadot/util/types';
 
 import {
@@ -17,8 +18,50 @@ import { useMemo } from 'react';
 
 import { useAllXcmAsset, useXcmAsset } from './useXcmAssets';
 
+/**
+ * Merge balance query results with all XCM assets
+ * Assets without balance will have zero balance fields
+ */
+function mergeBalancesWithAllAssets(
+  balanceData: AccountEnhancedAssetBalance[],
+  allAssets: CompleteEnhancedAssetInfo[],
+  addressHex: string,
+): AccountEnhancedAssetBalance[] {
+  // Build a map of assets with balance for quick lookup
+  const balanceMap = new Map<string, AccountEnhancedAssetBalance>();
+
+  for (const item of balanceData) {
+    const identifier = item.isNative ? 'native' : item.key;
+
+    balanceMap.set(identifier, item);
+  }
+
+  // Merge all assets with balance data
+  return allAssets.map((asset) => {
+    const identifier = asset.isNative ? 'native' : asset.key;
+    const withBalance = balanceMap.get(identifier);
+
+    if (withBalance) {
+      return withBalance;
+    }
+
+    // Return asset with zero balance
+    return {
+      ...asset,
+      address: addressHex as `0x${string}`,
+      total: 0n,
+      locked: 0n,
+      reserved: 0n,
+      free: 0n,
+      transferrable: 0n,
+    };
+  });
+}
+
 type ChainBalancesOptions = {
   alwaysIncludeNative?: boolean;
+  /** Include all assets with zero balance (for token selection where user doesn't have the token yet) */
+  includeAllAssets?: boolean;
 };
 
 /**
@@ -60,18 +103,37 @@ export function useChainBalances(
   }, [allXcmAssets, chain, options?.alwaysIncludeNative]);
 
   const { data, isFetched, isFetching } = useQuery({
+    // Include includeAllAssets in query key to differentiate cache
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['chain-balances', chain, addressHex, false] as const,
+    queryKey: [
+      'chain-balances',
+      chain,
+      addressHex,
+      !!options?.includeAllAssets,
+    ] as const,
     queryFn: async ({
-      queryKey: [, chain, addressHex],
+      queryKey: [, chain, addressHex, includeAllAssets],
     }): Promise<AccountEnhancedAssetBalance[]> => {
       if (!chain || !addressHex || !chainAssets.length) {
         throw new Error('Chain, address, and chain assets are required');
       }
 
-      const api = await ApiManager.getInstance().getApi(chain);
+      // Get all assets for the chain (for includeAllAssets merge)
+      const allChainAssets = allXcmAssets?.[chain || ''] || [];
 
-      return fetchAccountBalances(api, addressHex as HexString, chainAssets);
+      const api = await ApiManager.getInstance().getApi(chain);
+      const balances = await fetchAccountBalances(
+        api,
+        addressHex as HexString,
+        chainAssets,
+      );
+
+      // Merge with all assets if includeAllAssets is enabled
+      if (includeAllAssets && allChainAssets.length > 0) {
+        return mergeBalancesWithAllAssets(balances, allChainAssets, addressHex);
+      }
+
+      return balances;
     },
     enabled:
       !!address && !!chain && isXcmAssetsFetched && chainAssets.length > 0,
@@ -99,6 +161,8 @@ type UseAllChainBalances = {
 type AllChainBalancesOptions = {
   onlyWithPrice?: boolean;
   alwaysIncludeNative?: boolean;
+  /** Include all assets with zero balance (for token selection where user doesn't have the token yet) */
+  includeAllAssets?: boolean;
 };
 
 /**
@@ -131,9 +195,10 @@ export function useAllChainBalances(
     () =>
       enabledChains.map((chain) => {
         const chainName = chain.key;
-        let chainAssets = allXcmAssets?.[chainName];
+        const allChainAssets = allXcmAssets?.[chainName] || [];
+        let chainAssets = allChainAssets;
 
-        if (chainAssets) {
+        if (chainAssets.length > 0) {
           // Find native asset for potential inclusion
           const nativeAsset = chainAssets.find((asset) => asset.isNative);
 
@@ -161,13 +226,15 @@ export function useAllChainBalances(
         }
 
         const finalChainAssets = chainAssets;
+        const includeAllAssets = options?.includeAllAssets;
 
         return {
+          // Include includeAllAssets in query key to differentiate cache
           queryKey: [
             'chain-balances',
             chainName,
             addressHex,
-            !!options?.onlyWithPrice,
+            !!includeAllAssets,
           ] as const,
           staleTime: 12_000,
           refetchInterval: 12_000,
@@ -177,7 +244,6 @@ export function useAllChainBalances(
             !!address &&
             !!isXcmAssetsFetched &&
             !!allXcmAssets &&
-            !!finalChainAssets &&
             finalChainAssets.length > 0,
           queryFn: async (): Promise<AccountEnhancedAssetBalance[]> => {
             if (!addressHex || !finalChainAssets?.length) {
@@ -185,12 +251,22 @@ export function useAllChainBalances(
             }
 
             const api = await apiManager.getApi(chainName);
-
-            return fetchAccountBalances(
+            const balances = await fetchAccountBalances(
               api,
               addressHex as HexString,
               finalChainAssets,
             );
+
+            // Merge with all assets if includeAllAssets is enabled
+            if (includeAllAssets && allChainAssets.length > 0) {
+              return mergeBalancesWithAllAssets(
+                balances,
+                allChainAssets,
+                addressHex,
+              );
+            }
+
+            return balances;
           },
         };
       }),
@@ -202,6 +278,7 @@ export function useAllChainBalances(
       address,
       options?.onlyWithPrice,
       options?.alwaysIncludeNative,
+      options?.includeAllAssets,
       apiManager,
     ],
   );

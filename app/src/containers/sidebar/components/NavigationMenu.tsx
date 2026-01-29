@@ -11,6 +11,7 @@ import IconAssets from '@/assets/svg/icon-assets.svg?react';
 import IconDapp from '@/assets/svg/icon-dapp.svg?react';
 import IconHome from '@/assets/svg/icon-home.svg?react';
 import IconSetting from '@/assets/svg/icon-set.svg?react';
+import IconSwap from '@/assets/svg/icon-swap.svg?react';
 import IconTransaction from '@/assets/svg/icon-transaction.svg?react';
 import { useMultiChainTransactionCounts } from '@/hooks/useTransactions';
 
@@ -49,7 +50,7 @@ function NavLink({
       size="lg"
       radius="md"
       variant="light"
-      className="text-foreground/50 aria-[current=page]:bg-secondary aria-[current=page]:text-primary hover:bg-secondary hover:text-primary h-[50px] items-center justify-start gap-x-2.5 px-[15px] py-[20px] text-base font-semibold"
+      className="text-foreground/50 aria-[current=page]:bg-secondary aria-[current=page]:text-primary hover:bg-secondary hover:text-primary h-[50px] items-center justify-start gap-x-2.5 px-[15px] py-5 text-base font-semibold"
     >
       <Link
         to={to}
@@ -89,13 +90,18 @@ function NavigationMenuComponent({ address }: { address?: string }) {
     <>
       <NavLink Icon={IconHome} label="Home" to="/" exact />
       <NavLink Icon={IconDapp} label="Apps" to="/dapp" />
+      <NavLink
+        Icon={IconSwap}
+        label="Swap"
+        to={`/explorer/${encodeURIComponent('mimir://app/cross-chain-swap')}`}
+      />
       <NavLink Icon={IconAssets} label="Assets" to="/assets" />
       <NavLink
         Icon={IconTransaction}
         label="Transactions"
         endContent={
           totalCounts ? (
-            <div className="text-danger-foreground bg-danger flex aspect-1/1 w-5 items-center justify-center rounded-full text-sm leading-[1] font-semibold">
+            <div className="text-danger-foreground bg-danger flex aspect-square w-5 items-center justify-center rounded-full text-sm leading-none font-semibold">
               {totalCounts}
             </div>
           ) : null

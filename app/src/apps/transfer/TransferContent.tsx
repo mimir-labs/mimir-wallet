@@ -108,7 +108,12 @@ function TransferContent({
               withCopy
               withAddressBook
             />
-            <Button asChild size="sm" color="purple">
+            <Button
+              asChild
+              size="sm"
+              color="secondary"
+              className="bg-primary/5"
+            >
               <Link to="/fund">Fund</Link>
             </Button>
           </div>

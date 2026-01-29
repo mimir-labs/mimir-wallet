@@ -14,7 +14,7 @@ export {
 } from './error-handling';
 
 // Error display components
-export { ErrorDisplay, LegacyErrorDisplay } from './ErrorDisplay';
+export { ErrorDisplay } from './ErrorDisplay';
 
 // Call data utilities
 export type { CallSummary } from './calldata-utils';

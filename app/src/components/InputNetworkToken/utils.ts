@@ -104,22 +104,32 @@ export function filterByNetwork(
 }
 
 /**
- * Sort items by USD value (descending), then by symbol
+ * Sort items with balance priority
+ * Tokens with balance first, then by USD value, then by price availability, finally by symbol
  * @param items - Token network items to sort
  * @returns Sorted items (new array)
  */
-export function sortByUsdValue(items: TokenNetworkItem[]): TokenNetworkItem[] {
+export function sortWithBalancePriority(
+  items: TokenNetworkItem[],
+): TokenNetworkItem[] {
   return [...items].sort((a, b) => {
-    // First sort by USD value descending
-    if (b.usdValue !== a.usdValue) {
-      return b.usdValue - a.usdValue;
-    }
+    // Tokens with balance first
+    const aHasBalance = a.token.transferrable > 0n;
+    const bHasBalance = b.token.transferrable > 0n;
 
-    // Then sort by symbol alphabetically
-    const symbolA = a.token.symbol?.toLowerCase() || '';
-    const symbolB = b.token.symbol?.toLowerCase() || '';
+    if (aHasBalance !== bHasBalance) return bHasBalance ? 1 : -1;
 
-    return symbolA.localeCompare(symbolB);
+    // Then by USD value
+    if (a.usdValue !== b.usdValue) return b.usdValue - a.usdValue;
+
+    // Then by price availability
+    const aHasPrice = a.token.price && a.token.price > 0;
+    const bHasPrice = b.token.price && b.token.price > 0;
+
+    if (aHasPrice !== bHasPrice) return bHasPrice ? 1 : -1;
+
+    // Finally by symbol
+    return (a.token.symbol || '').localeCompare(b.token.symbol || '');
   });
 }
 
