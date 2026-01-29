@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v3.2.0...service-v3.3.0) (2026-01-29)
+
+
+### Features
+
+* Add cross chain swap app ([#367](https://github.com/mimir-labs/mimir-wallet/issues/367)) ([3a7c55b](https://github.com/mimir-labs/mimir-wallet/commit/3a7c55bc75b437592f849b994311a7502098e7aa))
+
 ## [3.2.0](https://github.com/mimir-labs/mimir-wallet/compare/service-v3.1.0...service-v3.2.0) (2026-01-05)
 
 

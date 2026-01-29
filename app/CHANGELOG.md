@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.3.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v3.2.0...mimir-wallet-app-v3.3.0) (2026-01-29)
+
+
+### Features
+
+* Add cross chain swap app ([#367](https://github.com/mimir-labs/mimir-wallet/issues/367)) ([3a7c55b](https://github.com/mimir-labs/mimir-wallet/commit/3a7c55bc75b437592f849b994311a7502098e7aa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @mimir-wallet/polkadot-core bumped to 3.3.0
+    * @mimir-wallet/service bumped to 3.3.0
+    * @mimir-wallet/ui bumped to 3.3.0
+
 ## [3.2.0](https://github.com/mimir-labs/mimir-wallet/compare/mimir-wallet-app-v3.1.0...mimir-wallet-app-v3.2.0) (2026-01-05)
 
 

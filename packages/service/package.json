@@ -15,7 +15,7 @@
   "sideEffects": true,
   "type": "module",
   "name": "@mimir-wallet/service",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "exports": {
     "./package.json": "./package.json",
     ".": "./src/index.ts"
