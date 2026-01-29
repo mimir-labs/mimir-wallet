@@ -23,22 +23,3 @@ export function decodeCallSection(
 
   return [call.section, call.method];
 }
-
-/**
- * Legacy function for backwards compatibility
- * @deprecated Use decodeCallSection with shared utilities
- */
-export function decodeCallSectionLegacy(
-  registry: Registry,
-  callData: string,
-): [string, string] | undefined {
-  if (!callData) return undefined;
-
-  try {
-    const call = registry.createType('Call', callData);
-
-    return [call.section, call.method];
-  } catch {
-    return undefined;
-  }
-}

@@ -1,76 +1,33 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Endpoint } from '../types/types.js';
+import type {
+  BuildSwapCallParams,
+  DryRunChainResult,
+  GetSwapEstimateParams,
+  LightSpellBestAmountResponse,
+  LightSpellDryRunResponse,
+  LightSpellRouterTransaction,
+  SwapEstimateResult,
+  SwapRouteHop,
+  SwapTransaction,
+  XcmFeeAsset,
+} from './types.js';
 import type { AnyAssetInfo } from '@mimir-wallet/service';
-import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import type { PolkadotClient } from 'polkadot-api';
 
 import { ApiManager } from '../api/ApiManager.js';
-import { allEndpoints } from '../chains/config.js';
 
-import { buildCurrencyCore, type XcmFeeAsset } from './index.js';
-
-/**
- * Swap transaction type
- */
-export type SwapTransactionType = 'TRANSFER' | 'SWAP' | 'SWAP_AND_TRANSFER';
+import { LIGHTSPELL_ENDPOINTS, lightSpellPost } from './api-client.js';
+import { buildCurrencyCore } from './currency.js';
+import { buildXcmFeeAsset, calculateExchangeRate } from './utils.js';
 
 /**
- * Swap transaction result with Polkadot.js format
+ * Default exchange for cross-chain swaps
  */
-export interface SwapTransaction {
-  tx: SubmittableExtrinsic<'promise'>;
-  chain: string;
-  type: SwapTransactionType;
-  amountOut?: bigint;
-}
-
-/**
- * Parameters for building swap call
- */
-export interface BuildSwapCallParams {
-  fromChain: Endpoint;
-  toChain: Endpoint;
-  fromToken: AnyAssetInfo;
-  toToken: AnyAssetInfo;
-  amount: string; // Amount in smallest unit
-  slippagePct: string; // e.g., "1" for 1%
-  senderAddress: string;
-  recipient: string;
-  exchange?: string | string[]; // Optional: specify DEX
-}
-
-/**
- * Parameters for getting swap estimate
- */
-export interface GetSwapEstimateParams {
-  fromChain: Endpoint;
-  toChain: Endpoint;
-  fromToken: AnyAssetInfo;
-  toToken: AnyAssetInfo;
-  amount: string;
-  slippagePct: string;
-  senderAddress: string;
-  recipient: string;
-}
-
-/**
- * Swap estimate result
- */
-export interface SwapEstimateResult {
-  outputAmount: string;
-  exchange: string;
-  originFee: XcmFeeAsset;
-  destFee?: XcmFeeAsset;
-  hopFees: XcmFeeAsset[];
-  priceImpact: number;
-  exchangeRate: string;
-}
+const HYDRATION_DEX = 'HydrationDex';
 
 /**
  * Build swap transactions using ParaSpell XCM Router
- * Returns Polkadot.js format transactions that can be submitted via TxButton
  */
 export async function buildSwapCall(
   params: BuildSwapCallParams,
@@ -94,45 +51,22 @@ export async function buildSwapCall(
     throw new Error('Chain does not support XCM Router');
   }
 
-  // Build the router
-  // let builder = RouterBuilder({
-  //   apiOverrides: apiOverrides,
-  // })
-  //   .exchange('HydrationDex')
-  //   .from(fromParaspell)
-  //   .to(toParaspell)
-  //   .currencyFrom(buildCurrencyCore(fromToken))
-  //   .currencyTo(buildCurrencyCore(toToken))
-  //   .amount(amount)
-  //   .slippagePct(slippagePct)
-  //   .senderAddress(senderAddress)
-  //   .recipientAddress(recipient);
-
   const [result, api] = await Promise.all([
-    fetch('https://api.lightspell.xyz/v5/router', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(
-        {
-          from: fromParaspell,
-          exchange: 'HydrationDex',
-          to: toParaspell,
-          currencyFrom: buildCurrencyCore(fromToken),
-          currencyTo: buildCurrencyCore(toToken),
-          amount: amount,
-          slippagePct: slippagePct,
-          recipientAddress: recipient,
-          senderAddress: senderAddress,
-        },
-        (_, value) => (typeof value === 'bigint' ? value.toString() : value),
-      ),
-    }).then((res) => res.json()),
+    lightSpellPost<LightSpellRouterTransaction[]>(LIGHTSPELL_ENDPOINTS.ROUTER, {
+      from: fromParaspell,
+      exchange,
+      to: toParaspell,
+      currencyFrom: buildCurrencyCore(fromToken),
+      currencyTo: buildCurrencyCore(toToken),
+      amount,
+      slippagePct,
+      recipientAddress: recipient,
+      senderAddress,
+    }),
     ApiManager.getInstance().getApi(fromChain.key),
   ]);
 
-  return result.map((item: any) => ({
+  return result.map((item) => ({
     chain: item.chain,
     type: item.type,
     tx: api.tx(api.createType('Call', item.tx)),
@@ -144,43 +78,25 @@ export async function buildSwapCall(
  * Get the best output amount and selected exchange
  */
 export async function getBestAmountOut(params: {
-  fromChain: Endpoint;
-  toChain: Endpoint;
+  fromChain: { paraspellChain?: string };
+  toChain: { paraspellChain?: string };
   fromToken: AnyAssetInfo;
   toToken: AnyAssetInfo;
   amount: string;
 }): Promise<{ amountOut: bigint; exchange: string }> {
   const { fromChain, toChain, fromToken, toToken, amount } = params;
 
-  const result = await fetch(
-    'https://api.lightspell.xyz/v5/router/best-amount-out',
+  const result = await lightSpellPost<LightSpellBestAmountResponse>(
+    LIGHTSPELL_ENDPOINTS.ROUTER_BEST_AMOUNT,
     {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(
-        {
-          from: fromChain.paraspellChain,
-          exchange: 'HydrationDex',
-          to: toChain.paraspellChain,
-          currencyFrom: buildCurrencyCore(fromToken),
-          currencyTo: buildCurrencyCore(toToken),
-          amount: amount,
-        },
-        (_, value) => (typeof value === 'bigint' ? value.toString() : value),
-      ),
+      from: fromChain.paraspellChain,
+      to: toChain.paraspellChain,
+      exchange: HYDRATION_DEX,
+      currencyFrom: buildCurrencyCore(fromToken),
+      currencyTo: buildCurrencyCore(toToken),
+      amount,
     },
-  ).then((res) => res.json());
-
-  // const result = await RouterBuilder({
-  //   apiOverrides: apiOverrides,
-  // })
-  //   .exchange('HydrationDex')
-  //   .currencyFrom(buildCurrencyCore(fromToken))
-  //   .currencyTo(buildCurrencyCore(toToken))
-  //   .amount(amount)
-  //   .getBestAmountOut();
+  );
 
   return {
     amountOut: result.amountOut,
@@ -189,13 +105,63 @@ export async function getBestAmountOut(params: {
 }
 
 /**
- * Get swap XCM fees
+ * Internal result type for getSwapDryRun
  */
-export async function getSwapXcmFees(params: GetSwapEstimateParams): Promise<{
-  originFee: XcmFeeAsset;
+interface DryRunResult {
+  success: boolean;
+  originFee?: XcmFeeAsset;
   destFee?: XcmFeeAsset;
-  hopFees: XcmFeeAsset[];
-}> {
+  hops: SwapRouteHop[];
+  error?: string;
+}
+
+/**
+ * Format chain error message for user display
+ */
+function formatChainError(
+  chainType: string,
+  result: DryRunChainResult,
+): string {
+  if (result.success) return '';
+
+  const parts = [`${chainType}: ${result.failureReason}`];
+
+  if (result.failureSubReason) {
+    parts.push(result.failureSubReason);
+  }
+
+  return parts.join(' - ');
+}
+
+/**
+ * Format top-level dry-run error for user display
+ */
+function formatDryRunError(response: LightSpellDryRunResponse): string {
+  const parts: string[] = [];
+
+  if (response.failureReason) {
+    parts.push(response.failureReason);
+  }
+
+  if (response.failureSubReason) {
+    parts.push(response.failureSubReason);
+  }
+
+  if (response.failureChain) {
+    parts.push(`on ${response.failureChain}`);
+  }
+
+  return parts.join(': ') || 'Unknown error';
+}
+
+/**
+ * Get swap dry-run result with fee estimation and validation
+ * Always parses the full response even if there are failures
+ */
+export async function getSwapDryRun(
+  params: GetSwapEstimateParams,
+  exchange: string,
+): Promise<DryRunResult> {
   const {
     fromChain,
     toChain,
@@ -211,63 +177,85 @@ export async function getSwapXcmFees(params: GetSwapEstimateParams): Promise<{
   const toParaspell = toChain.paraspellChain;
 
   if (!fromParaspell || !toParaspell) {
-    throw new Error('Chain does not support XCM Router');
+    return {
+      success: false,
+      hops: [],
+      error: 'Chain does not support XCM Router',
+    };
   }
 
-  // const fees = await RouterBuilder({
-  //   apiOverrides: apiOverrides,
-  // })
-  //   .exchange('HydrationDex')
-  //   .from(fromParaspell)
-  //   .to(toParaspell)
-  //   .currencyFrom(buildCurrencyCore(fromToken))
-  //   .currencyTo(buildCurrencyCore(toToken))
-  //   .amount(amount)
-  //   .slippagePct(slippagePct)
-  //   .senderAddress(senderAddress)
-  //   .recipientAddress(recipient)
-  //   .getXcmFees();
-
-  const fees = await fetch('https://api.lightspell.xyz/v5/router/xcm-fees', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const response = await lightSpellPost<LightSpellDryRunResponse>(
+    LIGHTSPELL_ENDPOINTS.ROUTER_DRY_RUN,
+    {
+      from: fromParaspell,
+      exchange,
+      to: toParaspell,
+      currencyFrom: buildCurrencyCore(fromToken),
+      currencyTo: buildCurrencyCore(toToken),
+      amount,
+      slippagePct,
+      recipientAddress: recipient,
+      senderAddress,
     },
-    body: JSON.stringify(
-      {
-        from: fromParaspell,
-        exchange: 'HydrationDex',
-        to: toParaspell,
-        currencyFrom: buildCurrencyCore(fromToken),
-        currencyTo: buildCurrencyCore(toToken),
-        amount: amount,
-        slippagePct: slippagePct,
-        recipientAddress: recipient,
-        senderAddress: senderAddress,
-      },
-      (_, value) => (typeof value === 'bigint' ? value.toString() : value),
-    ),
-  }).then((res) => res.json());
+  );
 
-  const originFee: XcmFeeAsset = {
-    fee: (fees.origin.fee ?? 0n).toString(),
-    symbol: fees.origin.asset.symbol,
-    decimals: fees.origin.asset.decimals,
-  };
+  // Collect errors but continue parsing
+  const errors: string[] = [];
 
-  const destFee: XcmFeeAsset | undefined =
-    fees.destination && fees.destination.fee !== undefined
-      ? {
-          fee: fees.destination.fee.toString(),
-          symbol: fees.destination.asset.symbol,
-          decimals: fees.destination.asset.decimals,
-        }
+  // Check for top-level failure
+  if (response.failureReason) {
+    errors.push(formatDryRunError(response));
+  }
+
+  // Check origin result
+  if (response.origin && !response.origin.success) {
+    errors.push(formatChainError('Origin', response.origin));
+  }
+
+  // Check destination result
+  if (response.destination && !response.destination.success) {
+    errors.push(formatChainError('Destination', response.destination));
+  }
+
+  // Check hops for failures
+  for (const hop of response.hops ?? []) {
+    if (!hop.result.success) {
+      errors.push(formatChainError(hop.chain, hop.result));
+    }
+  }
+
+  // Build hops from response (always parse)
+  const hops: SwapRouteHop[] = (response.hops ?? []).map(
+    (hop: { chain: string; result: DryRunChainResult }) => ({
+      chain: hop.chain,
+      isExchange: hop.chain === exchange,
+      fee: hop.result.success
+        ? buildXcmFeeAsset(hop.result.asset, hop.result.fee)
+        : undefined,
+    }),
+  );
+
+  // Parse origin fee if available (only when success)
+  const originFee =
+    response.origin?.success === true
+      ? buildXcmFeeAsset(response.origin.asset, response.origin.fee)
       : undefined;
 
-  // Extract hop fees if available - hops may not have fee info
-  const hopFees: XcmFeeAsset[] = [];
+  // Parse destination fee if available (only when success)
+  const destFee =
+    response.destination?.success === true
+      ? buildXcmFeeAsset(response.destination.asset, response.destination.fee)
+      : undefined;
 
-  return { originFee, destFee, hopFees };
+  const success = errors.length === 0;
+
+  return {
+    success,
+    originFee,
+    destFee,
+    hops,
+    error: success ? undefined : errors.join('; '),
+  };
 }
 
 /**
@@ -276,92 +264,40 @@ export async function getSwapXcmFees(params: GetSwapEstimateParams): Promise<{
 export async function getSwapEstimate(
   params: GetSwapEstimateParams,
 ): Promise<SwapEstimateResult> {
-  try {
-    // Get best amount out first
-    const { amountOut, exchange } = await getBestAmountOut({
+  // Parallel API calls with fixed exchange
+  const [{ amountOut }, dryRunResult] = await Promise.all([
+    getBestAmountOut({
       fromChain: params.fromChain,
       toChain: params.toChain,
       fromToken: params.fromToken,
       toToken: params.toToken,
       amount: params.amount,
-    });
+    }),
+    getSwapDryRun(params, HYDRATION_DEX),
+  ]);
 
-    // Get fees
-    const { originFee, destFee, hopFees } = await getSwapXcmFees(params);
+  const inputAmount = BigInt(params.amount);
+  const inputDecimals = params.fromToken.decimals || 10;
+  const outputDecimals = params.toToken.decimals || 10;
 
-    // Calculate price impact
-    const inputAmount = BigInt(params.amount);
-    const priceImpact = calculatePriceImpact(
+  // Default empty fee for failed dry-run
+  const emptyFee: XcmFeeAsset = { symbol: '', decimals: 0, fee: '0' };
+
+  return {
+    outputAmount: amountOut.toString(),
+    exchange: HYDRATION_DEX,
+    originFee: dryRunResult.originFee ?? emptyFee,
+    destFee: dryRunResult.destFee,
+    hops: dryRunResult.hops,
+    exchangeRate: calculateExchangeRate(
       inputAmount,
       amountOut,
-      params.fromToken.decimals || 10,
-      params.toToken.decimals || 10,
-    );
-
-    // Calculate exchange rate
-    const exchangeRate = calculateExchangeRate(
-      inputAmount,
-      amountOut,
-      params.fromToken,
-      params.toToken,
-    );
-
-    return {
-      outputAmount: amountOut.toString(),
-      exchange,
-      originFee,
-      destFee,
-      hopFees,
-      priceImpact,
-      exchangeRate,
-    };
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
-
-/**
- * Calculate price impact as a percentage (0-1)
- */
-function calculatePriceImpact(
-  inputAmount: bigint,
-  outputAmount: bigint,
-  inputDecimals: number,
-  outputDecimals: number,
-): number {
-  if (inputAmount === 0n) return 0;
-
-  // Normalize to same decimals for comparison
-  const normalizedInput = Number(inputAmount) / Math.pow(10, inputDecimals);
-  const normalizedOutput = Number(outputAmount) / Math.pow(10, outputDecimals);
-
-  // Assuming 1:1 is perfect, calculate deviation
-  // This is simplified - real price impact needs oracle data
-  const ratio = normalizedOutput / normalizedInput;
-  const impact = Math.abs(1 - ratio);
-
-  return Math.min(impact, 1); // Cap at 100%
-}
-
-/**
- * Calculate exchange rate string
- */
-function calculateExchangeRate(
-  inputAmount: bigint,
-  outputAmount: bigint,
-  fromToken: AnyAssetInfo,
-  toToken: AnyAssetInfo,
-): string {
-  if (inputAmount === 0n) return '';
-
-  const inputDecimals = fromToken.decimals || 10;
-  const outputDecimals = toToken.decimals || 10;
-
-  const normalizedInput = Number(inputAmount) / Math.pow(10, inputDecimals);
-  const normalizedOutput = Number(outputAmount) / Math.pow(10, outputDecimals);
-
-  const rate = normalizedOutput / normalizedInput;
-
-  return `1 ${fromToken.symbol} = ${rate.toFixed(6)} ${toToken.symbol}`;
+      params.fromToken.symbol,
+      params.toToken.symbol,
+      inputDecimals,
+      outputDecimals,
+    ),
+    dryRunSuccess: dryRunResult.success,
+    dryRunError: dryRunResult.error,
+  };
 }

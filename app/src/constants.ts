@@ -74,3 +74,5 @@ export const COOKIE_CONSENT_STORAGE_KEY = `${LS_NAMESPACE}cookie_consent`;
 export const SUGGESTIONS_DISMISSED_KEY = `${LS_NAMESPACE}suggestions_dismissed`;
 
 export const HERO_TRANSFER_TYPE_KEY = `${LS_NAMESPACE}hero_transfer_type`;
+
+export const CROSS_CHAIN_SWAP_SLIPPAGE_KEY = `${LS_NAMESPACE}cross_chain_swap_slippage`;

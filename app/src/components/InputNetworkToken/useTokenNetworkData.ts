@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import {
   calculateUsdValue,
   createTokenNetworkKey,
-  sortByUsdValue,
+  sortWithBalancePriority,
 } from './utils';
 
 import {
@@ -28,6 +28,8 @@ interface UseTokenNetworkDataOptions {
   xcmOnly?: boolean;
   /** Custom filter function for tokens */
   tokenFilter?: (item: TokenNetworkItem) => boolean;
+  /** Include all assets without balance query (for destination token selection) */
+  includeAllAssets?: boolean;
 }
 
 /**
@@ -50,18 +52,20 @@ export function useTokenNetworkData(
     activeNetworkFilter,
     xcmOnly = false,
     tokenFilter,
+    includeAllAssets = false,
   } = options || {};
 
   // Use single chain query when user filters by a specific network
   const [filteredChainData, filteredChainFetched] = useChainBalances(
     activeNetworkFilter ?? undefined,
     address,
-    { alwaysIncludeNative: true },
+    { alwaysIncludeNative: true, includeAllAssets },
   );
 
   // Multi network: use useAllChainBalances (always enabled for "All" filter)
   const allChainBalances = useAllChainBalances(address, {
     alwaysIncludeNative: true,
+    includeAllAssets,
   });
 
   // Get network configurations
@@ -203,7 +207,7 @@ export function useTokenNetworkData(
       }
 
       return {
-        items: sortByUsdValue(filteredItems),
+        items: sortWithBalancePriority(filteredItems),
         allFetched: filteredChainFetched,
       };
     }
@@ -268,7 +272,7 @@ export function useTokenNetworkData(
     }
 
     return {
-      items: sortByUsdValue(filteredItems),
+      items: sortWithBalancePriority(filteredItems),
       allFetched: allDone,
     };
   }, [

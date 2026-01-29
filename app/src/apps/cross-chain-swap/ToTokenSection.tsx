@@ -3,8 +3,7 @@
 
 import type { TokenNetworkValue } from '@/components/InputNetworkToken';
 
-import { cn } from '@mimir-wallet/ui';
-import { useEffect } from 'react';
+import { cn, Spinner } from '@mimir-wallet/ui';
 
 import FormatBalance from '@/components/FormatBalance';
 import {
@@ -35,7 +34,7 @@ function OutputAmountDisplay({
       )}
     >
       {outputLoading ? (
-        <span className="animate-dots text-foreground/50">...</span>
+        <Spinner />
       ) : outputAmount && token ? (
         <FormatBalance
           value={outputAmount}
@@ -48,66 +47,24 @@ function OutputAmountDisplay({
   );
 }
 
-/**
- * To Token Content Component
- * Uses InputNetworkToken with output amount display as children
- * Syncs context value with external state
- */
-function ToTokenContent({
-  externalValue,
-  onExternalChange,
-  outputAmount,
-  outputLoading,
-}: {
-  externalValue: TokenNetworkValue | undefined;
-  onExternalChange: (value: TokenNetworkValue) => void;
-  outputAmount?: string;
-  outputLoading?: boolean;
-}) {
-  const { value, setValue } = useInputNetworkTokenContext();
-
-  // Sync context value to external when it changes
-  useEffect(() => {
-    if (value) {
-      onExternalChange(value);
-    }
-  }, [value, onExternalChange]);
-
-  // Sync external value to context on mount (for swap functionality)
-  useEffect(() => {
-    if (externalValue && !value) {
-      setValue(externalValue);
-    }
-  }, [externalValue, value, setValue]);
-
-  return (
-    <InputNetworkToken variant="inline-label" label="To">
-      <OutputAmountDisplay
-        outputAmount={outputAmount}
-        outputLoading={outputLoading}
-      />
-    </InputNetworkToken>
-  );
-}
-
 export interface ToTokenSectionProps {
   address?: string;
   supportedNetworks?: string[];
-  externalValue: TokenNetworkValue | undefined;
-  onExternalChange: (value: TokenNetworkValue) => void;
+  value: TokenNetworkValue | undefined;
+  onChange: (value: TokenNetworkValue) => void;
   outputAmount?: string;
   outputLoading?: boolean;
 }
 
 /**
  * To Token Section Component
- * Wraps ToTokenContent in its own InputNetworkTokenProvider
+ * Uses controlled mode - value and onChange are passed to InputNetworkTokenProvider
  */
 function ToTokenSection({
   address,
   supportedNetworks,
-  externalValue,
-  onExternalChange,
+  value,
+  onChange,
   outputAmount,
   outputLoading,
 }: ToTokenSectionProps) {
@@ -115,14 +72,20 @@ function ToTokenSection({
     <InputNetworkTokenProvider
       address={address}
       supportedNetworks={supportedNetworks}
+      value={value}
+      onChange={onChange}
       xcmOnly
+      includeAllAssets
+      tokenFilter={(item) =>
+        (item.token.price && item.token.price > 0) || !!item.token.logoUri
+      }
     >
-      <ToTokenContent
-        externalValue={externalValue}
-        onExternalChange={onExternalChange}
-        outputAmount={outputAmount}
-        outputLoading={outputLoading}
-      />
+      <InputNetworkToken variant="inline-label" label="To">
+        <OutputAmountDisplay
+          outputAmount={outputAmount}
+          outputLoading={outputLoading}
+        />
+      </InputNetworkToken>
     </InputNetworkTokenProvider>
   );
 }

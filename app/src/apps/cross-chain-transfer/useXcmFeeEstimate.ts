@@ -128,8 +128,8 @@ export function useXcmFeeEstimate({
     retry: 1,
     queryFn: async () => {
       return getOriginXcmFee({
-        sourceChain: fromChain!,
-        destChain: toChain!,
+        fromChain: fromChain!,
+        toChain: toChain!,
         token: token!.token,
         recipient,
         senderAddress,
@@ -227,8 +227,8 @@ export function useXcmFeeEstimate({
     }
 
     return buildXcmCall({
-      sourceChain: fromChain,
-      destChain: toChain,
+      fromChain: fromChain,
+      toChain: toChain,
       token: tokenData,
       amount: amountInSmallestUnit,
       recipient,

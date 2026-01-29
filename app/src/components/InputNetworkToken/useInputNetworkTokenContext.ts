@@ -18,7 +18,7 @@ export interface InputNetworkTokenContextValue {
   // Core state
   value: TokenNetworkValue | undefined;
   network: string;
-  identifier: string;
+  identifier: string | undefined;
 
   // Fetched data (from useTokenNetworkData)
   token: TokenNetworkItem | undefined;

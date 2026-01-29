@@ -7,9 +7,12 @@ import type { Endpoint, XcmFeeAsset } from '@mimir-wallet/polkadot-core';
  * Swap route step representing a hop in the swap path
  */
 export interface SwapRouteStep {
+  /** Resolved Endpoint (for displaying icon and name) */
   network: Endpoint;
-  token: string;
-  icon?: string;
+  /** Token symbol displayed for this step */
+  token?: string;
+  /** Whether this step is an exchange (DEX) */
+  isExchange?: boolean;
 }
 
 /**
@@ -28,7 +31,6 @@ export interface SlippageState {
 export interface SwapEstimate {
   // Output amount
   outputAmount: string;
-  outputAmountUsd: number;
 
   // Fees
   originFee?: XcmFeeAsset;
@@ -38,26 +40,21 @@ export interface SwapEstimate {
   route: SwapRouteStep[];
   estimatedTime: string;
 
-  // Price impact (percentage, e.g. 0.01 = 1%)
-  priceImpact: number;
+  // Exchange used for swap
+  exchange: string;
 
   // Exchange rate display string
   exchangeRate: string;
+
+  // Dry-run validation result
+  dryRunSuccess: boolean;
+  dryRunError?: string;
 
   // States
   isLoading: boolean;
   isFetched: boolean;
   error?: string;
 }
-
-/**
- * Price impact threshold levels
- */
-export const PRICE_IMPACT_THRESHOLDS = {
-  LOW: 0.01, // 1%
-  MEDIUM: 0.03, // 3%
-  HIGH: 0.05, // 5%
-} as const;
 
 /**
  * Default slippage value

@@ -9,6 +9,7 @@ import {
   Modal,
   ModalBody,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   Tooltip,
 } from '@mimir-wallet/ui';
@@ -140,7 +141,7 @@ function SlippageSettingDialog({
       <ModalContent>
         <ModalHeader className="justify-center">Max Slippage</ModalHeader>
         <Divider />
-        <ModalBody className="gap-y-4 pb-5">
+        <ModalBody className="gap-y-4">
           {/* Slippage label with tooltip */}
           <div className="flex items-center gap-[5px]">
             <span className="text-sm font-bold">Slippage</span>
@@ -167,14 +168,13 @@ function SlippageSettingDialog({
               onCustomChange={handleCustomChange}
             />
           </div>
-
-          <Divider />
-
-          {/* Confirm button */}
+        </ModalBody>
+        <Divider />
+        <ModalFooter>
           <Button color="primary" fullWidth onClick={handleConfirm}>
             Confirm
           </Button>
-        </ModalBody>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

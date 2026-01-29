@@ -7,8 +7,6 @@ import type { XcmFeeAsset } from '@mimir-wallet/polkadot-core';
 import { Avatar, cn, Tooltip } from '@mimir-wallet/ui';
 import React from 'react';
 
-import { PRICE_IMPACT_THRESHOLDS } from './types';
-
 import IconQuestion from '@/assets/svg/icon-question-fill.svg?react';
 import FormatBalance from '@/components/FormatBalance';
 
@@ -17,7 +15,6 @@ interface SwapFeeInfoProps {
   originFee?: XcmFeeAsset;
   destFee?: XcmFeeAsset;
   route?: SwapRouteStep[];
-  priceImpact?: number;
   exchangeRate?: string;
 }
 
@@ -59,8 +56,8 @@ function RouteDisplay({ route }: { route: SwapRouteStep[] }) {
         <React.Fragment key={index}>
           <Avatar
             alt={step.network.name}
-            fallback={step.token?.slice(0, 1) || '?'}
-            src={step.icon || step.network.icon}
+            fallback={step.network.name?.slice(0, 1) || '?'}
+            src={step.network.icon}
             style={{ width: 16, height: 16 }}
           />
           {index < route.length - 1 && (
@@ -72,30 +69,13 @@ function RouteDisplay({ route }: { route: SwapRouteStep[] }) {
   );
 }
 
-function getPriceImpactClassName(priceImpact: number): string {
-  if (priceImpact >= PRICE_IMPACT_THRESHOLDS.MEDIUM) {
-    return 'text-danger font-bold';
-  }
-
-  if (priceImpact >= PRICE_IMPACT_THRESHOLDS.LOW) {
-    return 'text-warning font-bold';
-  }
-
-  return '';
-}
-
 function SwapFeeInfo({
   time,
   originFee,
   destFee,
   route,
-  priceImpact,
   exchangeRate,
 }: SwapFeeInfoProps) {
-  const priceImpactClassName = priceImpact
-    ? getPriceImpactClassName(priceImpact)
-    : '';
-
   return (
     <div className="bg-primary/5 rounded-[10px] p-2.5 flex flex-col gap-2.5">
       <FeeRow
@@ -137,17 +117,6 @@ function SwapFeeInfo({
         label="Route"
         value={<RouteDisplay route={route || []} />}
         tooltip="The path your tokens will take across chains"
-      />
-      <FeeRow
-        icon="📈"
-        label="Price Impact"
-        value={
-          priceImpact !== undefined
-            ? `~${(priceImpact * 100).toFixed(2)}%`
-            : undefined
-        }
-        valueClassName={priceImpactClassName}
-        tooltip="The difference between the market price and the price you will pay"
       />
       {exchangeRate && (
         <FeeRow

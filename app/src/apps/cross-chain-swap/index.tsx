@@ -1,23 +1,19 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useChains } from '@mimir-wallet/polkadot-core';
+
 import SwapForm from './SwapForm';
+import { SwapFormProvider } from './SwapFormContext';
 
 import { useAccount } from '@/accounts/useAccount';
-import {
-  InputNetworkTokenProvider,
-  useInputNetworkTokenContext,
-} from '@/components/InputNetworkToken';
-import { useAddressSupportedNetworks } from '@/hooks/useAddressSupportedNetwork';
 import { useInputNetwork } from '@/hooks/useInputNetwork';
 
 /**
- * Wrapper component that reads context for form props
+ * Check if a network is Polkadot or a Polkadot parachain
  */
-function CrossChainSwapContent({ sending }: { sending: string }) {
-  const { token, network } = useInputNetworkTokenContext();
-
-  return <SwapForm sending={sending} fromToken={token} fromNetwork={network} />;
+function isPolkadotNetwork(network: { key: string; relayChain?: string }) {
+  return network.relayChain === 'polkadot' || network.key === 'polkadot';
 }
 
 /**
@@ -25,20 +21,27 @@ function CrossChainSwapContent({ sending }: { sending: string }) {
  */
 function CrossChainSwap() {
   const { current } = useAccount();
-  const supportedNetworks = useAddressSupportedNetworks(current)?.map(
-    (item) => item.key,
-  );
+  const { chains } = useChains();
+
+  // Filter to only Polkadot networks (relay chain + parachains)
+  const supportedNetworks = chains
+    .filter(isPolkadotNetwork)
+    .map((item) => item.key);
+
   const [initialNetwork] = useInputNetwork(undefined, supportedNetworks);
 
+  if (!current) {
+    return null;
+  }
+
   return (
-    <InputNetworkTokenProvider
+    <SwapFormProvider
       address={current}
-      defaultNetwork={initialNetwork}
       supportedNetworks={supportedNetworks}
-      xcmOnly
+      defaultNetwork={initialNetwork}
     >
-      <CrossChainSwapContent sending={current || ''} />
-    </InputNetworkTokenProvider>
+      <SwapForm />
+    </SwapFormProvider>
   );
 }
 

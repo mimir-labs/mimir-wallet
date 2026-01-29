@@ -1,25 +1,18 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SlippageState } from './types';
-import type {
-  TokenNetworkItem,
-  TokenNetworkValue,
-} from '@/components/InputNetworkToken';
-
 import {
   buildSwapCall,
   NetworkProvider,
   useChain,
 } from '@mimir-wallet/polkadot-core';
 import { Alert, AlertTitle, Button, Divider } from '@mimir-wallet/ui';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import HighPriceImpactDialog from './HighPriceImpactDialog';
 import SlippageSettingDialog from './SlippageSettingDialog';
 import SwapFeeInfo from './SwapFeeInfo';
+import { useSwapFormContext } from './SwapFormContext';
 import ToTokenSection from './ToTokenSection';
-import { DEFAULT_SLIPPAGE, PRICE_IMPACT_THRESHOLDS } from './types';
 import { useSwapEstimate } from './useSwapEstimate';
 
 import IconSet from '@/assets/svg/icon-set.svg?react';
@@ -29,54 +22,39 @@ import AddressCell from '@/components/AddressCell';
 import InputAddress from '@/components/InputAddress';
 import {
   AmountInput,
-  findItemByValue,
   InputNetworkToken,
   itemToValue,
-  useInputNetworkTokenContext,
-  useTokenNetworkData,
 } from '@/components/InputNetworkToken';
-import { useInputNumber } from '@/hooks/useInputNumber';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { parseUnits } from '@/utils';
-
-export interface SwapFormProps {
-  sending: string;
-  fromToken: TokenNetworkItem | undefined;
-  fromNetwork: string;
-}
 
 /**
  * Swap form with From/To token selectors and swap logic
  */
-function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
+function SwapForm() {
   const upSm = useMediaQuery('sm');
 
-  // Form state
-  const [[amount, isAmountValid], setAmount] = useInputNumber('', false, 0);
-  const [recipient, setRecipient] = useState(sending);
-  const [slippage, setSlippage] = useState<SlippageState>(DEFAULT_SLIPPAGE);
+  // Get all form state from SwapFormContext
+  const {
+    sending,
+    supportedNetworks,
+    fromToken,
+    fromNetwork,
+    setFromValue,
+    toValue,
+    setToValue,
+    toToken,
+    amount,
+    isAmountValid,
+    setAmount,
+    slippage,
+    setSlippage,
+    recipient,
+    setRecipient,
+  } = useSwapFormContext();
 
   // Dialog states
   const [slippageDialogOpen, setSlippageDialogOpen] = useState(false);
-  const [priceImpactDialogOpen, setPriceImpactDialogOpen] = useState(false);
-
-  // To token state (managed independently)
-  const [toValue, setToValue] = useState<TokenNetworkValue | undefined>(
-    undefined,
-  );
-
-  // Get context for accessing From token data
-  const { setValue: setFromValue } = useInputNetworkTokenContext();
-
-  // Fetch To token data to resolve toValue
-  const { items: toItems } = useTokenNetworkData(sending, { xcmOnly: true });
-
-  // Resolve To token from toValue
-  const toToken = useMemo(() => {
-    if (!toValue) return undefined;
-
-    return findItemByValue(toItems, toValue);
-  }, [toItems, toValue]);
 
   // Get chain configurations
   const fromChain = useChain(fromNetwork);
@@ -109,11 +87,7 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
 
     setToValue(currentFromValue);
     setAmount('');
-  }, [fromToken, toToken, toValue, setFromValue, setAmount]);
-
-  // Check if price impact is high
-  const isHighPriceImpact =
-    estimate.priceImpact >= PRICE_IMPACT_THRESHOLDS.MEDIUM;
+  }, [fromToken, toToken, toValue, setFromValue, setToValue, setAmount]);
 
   // Form validation
   const isFormValid =
@@ -123,26 +97,13 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
     isAmountValid &&
     !!recipient &&
     !estimate.isLoading &&
-    !estimate.error;
-
-  // Handle confirm button click
-  const handleConfirmClick = useCallback(() => {
-    if (isHighPriceImpact) {
-      setPriceImpactDialogOpen(true);
-    }
-    // If not high price impact, the TxButton will handle the transaction
-  }, [isHighPriceImpact]);
+    !estimate.error &&
+    estimate.dryRunSuccess;
 
   // Reset amount when tokens change
   useEffect(() => {
     setAmount('');
-  }, [
-    fromNetwork,
-    fromToken?.token.key,
-    toValue?.network,
-    toValue?.identifier,
-    setAmount,
-  ]);
+  }, [fromNetwork, fromToken?.token.key, setAmount]);
 
   // Build swap transaction using ParaSpell XCM Router
   const getCall = useCallback(async () => {
@@ -166,6 +127,7 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
       slippagePct: slippage.value,
       senderAddress: sending,
       recipient,
+      exchange: estimate.exchange,
     });
 
     if (transactions.length === 0) {
@@ -173,7 +135,6 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
     }
 
     // Return the first transaction for now
-    // TODO: Handle multi-step transactions (two-click DEXes) in future iteration
     return transactions[0].tx;
   }, [
     fromChain,
@@ -184,6 +145,7 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
     slippage.value,
     sending,
     recipient,
+    estimate.exchange,
   ]);
 
   return (
@@ -254,8 +216,9 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
         {/* To row - InputNetworkToken with output amount display */}
         <ToTokenSection
           address={sending}
-          externalValue={toValue}
-          onExternalChange={setToValue}
+          supportedNetworks={supportedNetworks}
+          value={toValue}
+          onChange={setToValue}
           outputAmount={estimate.outputAmount}
           outputLoading={estimate.isLoading}
         />
@@ -263,19 +226,11 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
 
       {/* Recipient */}
       <InputAddress
-        label="To"
+        label="Recipient"
         value={recipient}
         onChange={setRecipient}
         placeholder="Enter recipient address"
       />
-
-      {/* Warning for unknown address */}
-      {recipient && recipient !== sending && (
-        <div className="text-xs text-warning">
-          Warning: This is an unknown address. You can add it to your address
-          book
-        </div>
-      )}
 
       {/* Fee Info */}
       {!estimate.isLoading && estimate.isFetched && (
@@ -284,15 +239,14 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
           originFee={estimate.originFee}
           destFee={estimate.destFee}
           route={estimate.route}
-          priceImpact={estimate.priceImpact}
           exchangeRate={estimate.exchangeRate}
         />
       )}
 
       {/* Error Alert */}
-      {estimate.error && (
+      {(estimate.error || estimate.dryRunError) && (
         <Alert variant="destructive">
-          <AlertTitle>{estimate.error}</AlertTitle>
+          <AlertTitle>{estimate.error || estimate.dryRunError}</AlertTitle>
         </Alert>
       )}
 
@@ -300,35 +254,20 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
 
       {/* Confirm Button */}
       <NetworkProvider network={fromNetwork}>
-        {isHighPriceImpact ? (
-          <Button
-            className="bg-warning text-warning-foreground hover:bg-warning/90"
-            fullWidth
-            disabled={!isFormValid}
-            onClick={handleConfirmClick}
-          >
-            {estimate.isLoading ? (
-              <span className="animate-dots">Loading</span>
-            ) : (
-              'High Price Impact'
-            )}
-          </Button>
-        ) : (
-          <TxButton
-            color="primary"
-            website="mimir://app/cross-chain-swap"
-            fullWidth
-            disabled={!isFormValid}
-            accountId={sending}
-            getCall={getCall}
-          >
-            {estimate.isLoading ? (
-              <span className="animate-dots">Loading</span>
-            ) : (
-              'Confirm'
-            )}
-          </TxButton>
-        )}
+        <TxButton
+          color="primary"
+          website="mimir://app/cross-chain-swap"
+          fullWidth
+          disabled={!isFormValid}
+          accountId={sending}
+          getCall={getCall}
+        >
+          {estimate.isLoading ? (
+            <span className="animate-dots">Calculating Fee</span>
+          ) : (
+            'Confirm'
+          )}
+        </TxButton>
       </NetworkProvider>
 
       {/* Slippage Setting Dialog */}
@@ -337,17 +276,6 @@ function SwapForm({ sending, fromToken, fromNetwork }: SwapFormProps) {
         value={slippage}
         onChange={setSlippage}
         onClose={() => setSlippageDialogOpen(false)}
-      />
-
-      {/* High Price Impact Dialog */}
-      <HighPriceImpactDialog
-        open={priceImpactDialogOpen}
-        priceImpact={estimate.priceImpact}
-        onClose={() => setPriceImpactDialogOpen(false)}
-        onContinue={() => {
-          setPriceImpactDialogOpen(false);
-          // TODO: Trigger actual swap transaction
-        }}
       />
     </div>
   );
