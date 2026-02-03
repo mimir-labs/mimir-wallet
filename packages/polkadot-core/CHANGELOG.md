@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.4.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v3.3.0...polkadot-core-v3.4.0) (2026-02-03)
+
+
+### Features
+
+* unsupport some chains ([#370](https://github.com/mimir-labs/mimir-wallet/issues/370)) ([8377837](https://github.com/mimir-labs/mimir-wallet/commit/8377837161d09db879fe74c99dd02dab011823b4))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @mimir-wallet/service bumped to 3.4.0
+
 ## [3.3.0](https://github.com/mimir-labs/mimir-wallet/compare/polkadot-core-v3.2.0...polkadot-core-v3.3.0) (2026-01-29)
 
 
