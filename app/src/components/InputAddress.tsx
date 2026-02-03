@@ -11,7 +11,6 @@ import {
   isPolkadotAddress,
   isPolkadotEvmAddress,
   isValidAddress as isValidAddressUtil,
-  useNetwork,
   useSs58Format,
   zeroAddress,
 } from '@mimir-wallet/polkadot-core';
@@ -160,8 +159,9 @@ function InputAddress({
 }: InputAddressProps) {
   const isControl = useRef(propsValue !== undefined);
   const { ss58: chainSS58 } = useSs58Format();
-  const { chain } = useNetwork();
-  const polkavm = chain.polkavm;
+  // const { chain } = useNetwork();
+  // const polkavm = chain.polkavm;
+  const polkavm = false;
   const {
     accounts,
     addresses,

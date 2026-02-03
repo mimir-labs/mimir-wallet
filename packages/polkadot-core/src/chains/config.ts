@@ -4,33 +4,34 @@
 import type { Endpoint } from '../types/types.js';
 import type { HexString } from '@polkadot/util/types';
 
-import kusamaChains from './kusama.json' with { type: 'json' };
-import paseoChains from './paseo.json' with { type: 'json' };
+// import kusamaChains from './kusama.json' with { type: 'json' };
+// import paseoChains from './paseo.json' with { type: 'json' };
 import polkadotChains from './polkadot.json' with { type: 'json' };
-import solochainChains from './solochain.json' with { type: 'json' };
-import westendChains from './westend.json' with { type: 'json' };
+// import solochainChains from './solochain.json' with { type: 'json' };
+// import westendChains from './westend.json' with { type: 'json' };
 
 export const allEndpoints: Endpoint[] = import.meta.env.VITE_ENDPOINTS
   ? JSON.parse(import.meta.env.VITE_ENDPOINTS)
   : [
       ...(polkadotChains as unknown as Endpoint[]),
-      ...(kusamaChains as unknown as Endpoint[]),
-      ...(paseoChains as unknown as Endpoint[]),
-      ...(westendChains as unknown as Endpoint[]),
-      ...(solochainChains as unknown as Endpoint[]),
+      // ...(kusamaChains as unknown as Endpoint[]),
+      // ...(paseoChains as unknown as Endpoint[]),
+      // ...(westendChains as unknown as Endpoint[]),
+      // ...(solochainChains as unknown as Endpoint[]),
     ];
 
-export const remoteProxyRelations: Record<HexString, HexString> =
-  allEndpoints.reduce(
-    (acc, item) => {
-      if (item.remoteProxyTo) {
-        acc[item.genesisHash] = item.remoteProxyTo as HexString;
-      }
+export const remoteProxyRelations: Record<HexString, HexString> = {};
+// export const remoteProxyRelations: Record<HexString, HexString> =
+//   allEndpoints.reduce(
+//     (acc, item) => {
+//       if (item.remoteProxyTo) {
+//         acc[item.genesisHash] = item.remoteProxyTo as HexString;
+//       }
 
-      return acc;
-    },
-    {} as Record<HexString, HexString>,
-  );
+//       return acc;
+//     },
+//     {} as Record<HexString, HexString>,
+//   );
 
 const chainMap: Map<string, Endpoint | undefined> = new Map();
 

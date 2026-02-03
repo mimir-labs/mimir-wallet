@@ -1,10 +1,10 @@
 // Copyright 2023-2025 dev.mimir authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useChain } from '@mimir-wallet/polkadot-core';
+// import { useChain } from '@mimir-wallet/polkadot-core';
 
 import { useBestBlock } from './useBestBlock';
-import { useRelayBestBlock } from './useRelayBestBlock';
+// import { useRelayBestBlock } from './useRelayBestBlock';
 
 /**
  * Hook to get the appropriate best block for proxy announcement time calculations
@@ -31,16 +31,16 @@ import { useRelayBestBlock } from './useRelayBestBlock';
  * - This ensures the UI remains functional even if relay chain API is slow to initialize
  */
 export function useProxyBestBlock(network: string) {
-  const chain = useChain(network);
+  // const chain = useChain(network);
   const parachainBlock = useBestBlock(network);
-  const relayBlock = useRelayBestBlock(network);
+  // const relayBlock = useRelayBestBlock(network);
 
   // Use relay chain block if:
   // 1. Chain configuration requires it (useRelayBlockForProxy=true)
   // 2. Relay block data is available
-  if (chain?.useRelayBlockForProxy && relayBlock[0]) {
-    return relayBlock;
-  }
+  // if (chain?.useRelayBlockForProxy && relayBlock[0]) {
+  //   return relayBlock;
+  // }
 
   // Fallback to parachain block:
   // - For chains that don't need relay block
