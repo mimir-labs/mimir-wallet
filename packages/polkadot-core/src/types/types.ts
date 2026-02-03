@@ -5,21 +5,20 @@ import type { ApiPromise$ } from '../api/ApiPromise$.js';
 import type { TSubstrateChain } from '@paraspell/sdk-common';
 import type { HexString } from '@polkadot/util/types';
 
-import kusamaChains from '../chains/kusama.json' with { type: 'json' };
-import paseoChains from '../chains/paseo.json' with { type: 'json' };
+// import kusamaChains from '../chains/kusama.json' with { type: 'json' };
+// import paseoChains from '../chains/paseo.json' with { type: 'json' };
 import polkadotChains from '../chains/polkadot.json' with { type: 'json' };
-import solochainChains from '../chains/solochain.json' with { type: 'json' };
-import westendChains from '../chains/westend.json' with { type: 'json' };
+// import solochainChains from '../chains/solochain.json' with { type: 'json' };
+// import westendChains from '../chains/westend.json' with { type: 'json' };
 
 /**
  * Union type of all chain configurations from JSON files
  */
-type AllChains =
-  | (typeof polkadotChains)[number]
-  | (typeof kusamaChains)[number]
-  | (typeof paseoChains)[number]
-  | (typeof westendChains)[number]
-  | (typeof solochainChains)[number];
+type AllChains = (typeof polkadotChains)[number];
+// | (typeof kusamaChains)[number]
+// | (typeof paseoChains)[number]
+// | (typeof westendChains)[number]
+// | (typeof solochainChains)[number];
 
 /**
  * Get all possible keys from a union (union of keys)

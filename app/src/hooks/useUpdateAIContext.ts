@@ -29,7 +29,8 @@ export function useUpdateAIContext() {
         genesisHash: item.genesisHash,
         ss58Format: item.ss58Format,
         paraId: item.paraId,
-        isTestnet: !!item.isTestnet,
+        // isTestnet: !!item.isTestnet,
+        isTestnet: false,
         isEnabled: item.enabled,
       })),
     });
